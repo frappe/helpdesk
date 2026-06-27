@@ -14,7 +14,7 @@
     </template>
 
     <template #body="{ close }">
-      <div class="absolute bg-surface-white top-2">
+      <div class="absolute bg-surface-base top-2">
         <!-- Built-in Duration Picker -->
         <div
           class="flex gap-2 border border-outline-gray-2 rounded w-fit min-w-max px-4 select-none shadow-sm"
@@ -41,13 +41,16 @@
                   @click="increment('hours')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-up" class="size-3.5" />
+                  <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
                 </button>
                 <button
                   @click="decrement('hours')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-down" class="size-3.5" />
+                  <span
+                    class="lucide-chevron-down size-3.5"
+                    aria-hidden="true"
+                  />
                 </button>
               </div>
             </div>
@@ -76,13 +79,16 @@
                   @click="increment('minutes')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-up" class="size-3.5" />
+                  <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
                 </button>
                 <button
                   @click="decrement('minutes')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-down" class="size-3.5" />
+                  <span
+                    class="lucide-chevron-down size-3.5"
+                    aria-hidden="true"
+                  />
                 </button>
               </div>
             </div>
@@ -110,13 +116,16 @@
                   @click="increment('seconds')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-up" class="size-3.5" />
+                  <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
                 </button>
                 <button
                   @click="decrement('seconds')"
                   class="hover:bg-surface-gray-2 rounded-sm select-none px-1 py-0.5 text-xs"
                 >
-                  <FeatherIcon name="chevron-down" class="size-3.5" />
+                  <span
+                    class="lucide-chevron-down size-3.5"
+                    aria-hidden="true"
+                  />
                 </button>
               </div>
             </div>

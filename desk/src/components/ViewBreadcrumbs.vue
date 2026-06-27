@@ -2,31 +2,32 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="ps-0 pe-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="ps-0 pe-0.5 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center text-lg-medium"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
     <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown :options="options">
       <template #default="{ open }">
-        <Button
-          variant="ghost"
-          class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
-          :label="currentView.label"
+        <button
+          type="button"
+          class="group flex items-center rounded px-0.5 py-1 text-lg-medium text-ink-gray-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 max-w-[200px] sm:max-w-none"
         >
-          <template #prefix>
-            <component
-              :is="currentView.icon"
-              class="h-4 flex items-center justify-center"
-            />
-          </template>
-          <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 text-ink-gray-8"
-            />
-          </template>
-        </Button>
+          <component
+            :is="currentView.icon"
+            class="me-1 h-4 flex items-center justify-center self-center"
+          />
+          <span class="truncate group-hover:underline">
+            {{ currentView.label }}
+          </span>
+          <span
+            :class="[
+              'ms-0.5 h-4 text-ink-gray-5',
+              open ? 'lucide-chevron-up' : 'lucide-chevron-down',
+            ]"
+            aria-hidden="true"
+          />
+        </button>
       </template>
 
       <template #item-prefix="{ item }">
@@ -54,10 +55,10 @@
           v-if="item.name"
           class="flex items-center justify-end gap-2 min-w-11"
         >
-          <FeatherIcon
+          <span
             v-if="isCurrentView(item)"
-            name="check"
-            class="size-4 text-ink-gray-7"
+            class="lucide-check size-4 text-ink-gray-7"
+            aria-hidden="true"
           />
           <Dropdown align="end" :options="dropdownActions(item)">
             <template #default="{ open }">
@@ -79,7 +80,7 @@
 <script setup>
 import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
-import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({
@@ -138,6 +139,6 @@ const isCurrentView = (item) => {
 
 /* keep the group label pinned while its items scroll */
 [data-slot="group"]:has(.kebab-btn) [data-slot="group-label"] {
-  @apply sticky -top-[6px] z-10 bg-surface-modal;
+  @apply sticky -top-[6px] z-10 bg-surface-elevation-2;
 }
 </style>

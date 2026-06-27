@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-e border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-e border-outline-elevation-2 bg-surface-sidebar text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -27,7 +27,7 @@
     <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute size-1.5 translate-x-6 rtl:-translate-x-6 translate-y-1 rounded-full bg-blue-400 start-1"
+        class="absolute size-1.5 translate-x-6 rtl:-translate-x-6 translate-y-1 rounded-full bg-surface-blue-5 start-1"
         theme="gray"
         variant="solid"
       />
@@ -70,7 +70,7 @@
           <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base-medium mx-2 text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ms-0 h-0 overflow-hidden opacity-0'
@@ -78,9 +78,8 @@
               "
               @click="toggleSection(view.label, view.opened)"
             >
-              <FeatherIcon
-                name="chevron-right"
-                class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+              <span
+                class="lucide-chevron-right h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
                 :class="{
                   'rotate-90': isSectionOpen(view.label, view.opened),
                   'rtl:rotate-180': !isSectionOpen(view.label, view.opened),
@@ -174,13 +173,14 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
-import Apps from "@/components/Apps.vue";
 import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import AppsIcon from "@/components/icons/AppsIcon.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
+import { useApps } from "@/composables/apps";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
@@ -224,12 +224,12 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
+import LucideMoon from "~icons/lucide/moon";
 import LucideSearch from "~icons/lucide/search";
+import LucideSun from "~icons/lucide/sun";
 import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
@@ -256,6 +256,7 @@ const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
+const { appsSubmenu } = useApps();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
@@ -351,7 +352,9 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
+    label: __("Apps"),
+    icon: markRaw(AppsIcon),
+    submenu: appsSubmenu.value,
   },
   {
     label: __("Customer portal"),
@@ -407,10 +410,12 @@ const profileSettings = computed(() => {
 });
 
 function isActiveTab(to: any) {
-  if (route.query.view) {
-    return route.query.view == to?.query?.view;
+  if (to?.query?.view) {
+    return route.query.view === to.query.view;
   }
-  return route.name === to;
+  if (route.query.view) return false;
+  const basePath = router.resolve({ name: to }).path;
+  return route.path === basePath || route.path.startsWith(`${basePath}/`);
 }
 
 function openCommandPalette() {

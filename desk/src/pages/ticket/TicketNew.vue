@@ -61,7 +61,7 @@
         <div class="flex flex-col gap-2">
           <span class="block text-sm text-ink-gray-6">
             {{ __("Subject") }}
-            <span class="place-self-center text-red-500"> * </span>
+            <span class="place-self-center text-ink-red-5"> * </span>
           </span>
           <FormControl
             v-model="subject"
@@ -97,7 +97,7 @@
                 theme="gray"
                 variant="solid"
                 :disabled="
-                  $refs.editor.editor.isEmpty || ticket.loading || !subject
+                  $refs.editor?.editor?.isEmpty || ticket.loading || !subject
                 "
                 @click="() => ticket.submit()"
               />
@@ -121,7 +121,7 @@
               theme="gray"
               variant="solid"
               :disabled="
-                $refs.editor.editor.isEmpty || ticket.loading || !subject
+                $refs.editor?.editor?.isEmpty || ticket.loading || !subject
               "
               @click="() => ticket.submit()"
             />

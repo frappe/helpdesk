@@ -15,7 +15,7 @@
       <div class="flex items-end w-full gap-2">
         <slot name="text">
           <div
-            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-2xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </div>
@@ -32,7 +32,7 @@
               <div class="rtl:flex rtl:gap-1">
                 <span>vs</span> <span>{{ currentDuration.toLowerCase() }}</span>
               </div>
-              <FeatherIcon name="chevron-down" class="size-4" />
+              <span class="lucide-chevron-down size-4" aria-hidden="true" />
             </div>
             <template #item-label="{ item }">
               <div
@@ -44,10 +44,10 @@
               </div>
             </template>
             <template #item-suffix="{ item }">
-              <FeatherIcon
+              <span
                 v-if="item.label == __(currentDuration)"
-                name="check"
-                class="size-4"
+                class="lucide-check size-4"
+                aria-hidden="true"
               />
             </template>
           </Dropdown>
@@ -63,7 +63,7 @@
       <div class="flex items-end w-full gap-2 justify-between flex-1">
         <slot name="text">
           <span
-            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-2xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </span>
@@ -84,7 +84,7 @@
             class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
           >
             vs {{ currentDuration.toLowerCase() }}
-            <FeatherIcon name="chevron-down" class="size-4" />
+            <span class="lucide-chevron-down size-4" aria-hidden="true" />
           </div>
           <template #item-label="{ item }">
             <div
@@ -96,10 +96,10 @@
             </div>
           </template>
           <template #item-suffix="{ item }">
-            <FeatherIcon
+            <span
               v-if="item.label == __(currentDuration)"
-              name="check"
-              class="size-4"
+              class="lucide-check size-4"
+              aria-hidden="true"
             />
           </template>
         </Dropdown>
@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { Dropdown, ECharts, FeatherIcon } from "frappe-ui";
+import { Dropdown, ECharts } from "frappe-ui";
 import { computed, type PropType } from "vue";
 
 const props = defineProps({

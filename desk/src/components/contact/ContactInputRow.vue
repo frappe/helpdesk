@@ -25,7 +25,7 @@
           @click="$emit('setPrimary')"
         >
           <template #icon>
-            <LucideStar class="size-4 fill-ink-amber-2 stroke-ink-amber-2" />
+            <LucideStar class="size-4 fill-ink-amber-6 stroke-ink-amber-6" />
           </template>
         </Button>
       </Tooltip>

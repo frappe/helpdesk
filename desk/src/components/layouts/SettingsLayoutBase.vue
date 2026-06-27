@@ -11,11 +11,11 @@
                 :label="backLabel"
                 size="md"
                 @click="onBack"
-                class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-lg hover:opacity-70 !pe-0 !max-w-96 !justify-start rtl:flex-row-reverse rtl:ps-4"
+                class="cursor-pointer -ms-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 text-ink-gray-7 text-md-semibold hover:opacity-70 !pe-0 !max-w-96 !justify-start rtl:flex-row-reverse rtl:ps-4"
               />
               <UnsavedBadge :show="Boolean(dirty)" />
             </div>
-            <h1 v-else class="text-lg font-semibold text-ink-gray-8">
+            <h1 v-else class="text-md-semibold text-ink-gray-8">
               {{ __(title) }}
             </h1>
           </slot>

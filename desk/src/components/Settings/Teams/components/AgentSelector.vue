@@ -16,7 +16,11 @@
         <UserAvatar :name="value" size="xs" />
       </template>
       <template #suffix>
-        <FeatherIcon class="h-3.5" name="x" @click.stop="removeValue(value)" />
+        <span
+          class="lucide-x h-3.5"
+          aria-hidden="true"
+          @click.stop="removeValue(value)"
+        />
       </template>
     </Button>
     <div class="flex-1">
@@ -45,7 +49,7 @@
         </ComboboxAnchor>
         <ComboboxPortal>
           <ComboboxContent
-            class="z-10 mt-1 min-w-48 w-auto max-w-96 bg-surface-modal overflow-hidden rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5"
+            class="z-10 mt-1 min-w-48 w-auto max-w-96 bg-surface-elevation-2 overflow-hidden rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5"
             position="popper"
             :align="'start'"
             @openAutoFocus.prevent
@@ -65,7 +69,7 @@
               >
                 <UserAvatar class="me-1" :name="agent.agent_name" size="lg" />
                 <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
-                  <div class="text-base font-medium">
+                  <div class="text-base-medium">
                     {{ agent.agent_name }}
                   </div>
                   <div class="text-sm text-ink-gray-5">

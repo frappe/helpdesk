@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">Call Logs</div>
+        <div class="text-lg-medium text-ink-gray-9">Call Logs</div>
       </template>
       <template #right-header>
         <Button
@@ -38,14 +38,14 @@
 </template>
 
 <script setup lang="ts">
+import { PhoneIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { Avatar, Badge, Button, FeatherIcon, usePageMeta } from "frappe-ui";
+import { Avatar, Badge, Button, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
 import { statusColorMap, statusLabelMap } from "./utils";
-import { PhoneIcon } from "@/components/icons";
 
 const showCallLogModal = ref(false);
 const showCallLogDetailModal = ref(false);
@@ -93,9 +93,9 @@ const options = computed(() => {
         prefix: ({ row }) => {
           let icon =
             row.type === "Incoming" ? "phone-incoming" : "phone-outgoing";
-          return h(FeatherIcon, {
-            name: icon,
-            class: ["size-3 shrink-0"],
+          return h("span", {
+            class: ["size-3 shrink-0", `lucide-${icon}`],
+            "aria-hidden": "true",
           });
         },
       },
@@ -110,9 +110,9 @@ const options = computed(() => {
       },
       duration: {
         prefix: () => {
-          return h(FeatherIcon, {
-            name: "clock",
-            class: ["size-3 shrink-0"],
+          return h("span", {
+            class: ["lucide-clock", "size-3 shrink-0"],
+            "aria-hidden": "true",
           });
         },
         custom: ({ row }) => {

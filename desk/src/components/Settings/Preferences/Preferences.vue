@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Manage your personal preferences.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg font-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("Preferences") }}
         </h1>
         <UnsavedBadge :show="isDirty" />
@@ -22,7 +22,7 @@
     <template #content>
       <div class="flex flex-col">
         <div>
-          <div class="text-base font-semibold text-ink-gray-9">
+          <div class="text-base-semibold text-ink-gray-9">
             {{ __("Appearance") }}
           </div>
           <ThemeSwitcher
@@ -32,7 +32,7 @@
         </div>
         <hr class="my-8" />
         <div>
-          <div class="text-base font-semibold text-ink-gray-9">
+          <div class="text-base-semibold text-ink-gray-9">
             {{ __("Language & Time") }}
           </div>
           <div class="mt-6">

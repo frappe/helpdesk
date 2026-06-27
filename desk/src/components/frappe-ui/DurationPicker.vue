@@ -28,7 +28,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
           </button>
           <button
             @mousedown="startAction(() => decrement('hours'))"
@@ -39,7 +39,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <span class="lucide-chevron-down size-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -72,7 +72,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
           </button>
           <button
             @mousedown="startAction(() => decrement('minutes'))"
@@ -83,7 +83,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <span class="lucide-chevron-down size-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -116,7 +116,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <span class="lucide-chevron-up size-3.5" aria-hidden="true" />
           </button>
           <button
             @mousedown="startAction(() => decrement('seconds'))"
@@ -127,7 +127,7 @@
             @touchcancel="clearActiveInterval"
             class="hover:bg-surface-gray-2 rounded-sm select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <span class="lucide-chevron-down size-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>

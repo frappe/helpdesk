@@ -1,7 +1,7 @@
 <template>
   <ActivityHeader :title="title" />
   <FadedScrollableDiv
-    class="flex flex-col flex-1 overflow-y-auto"
+    class="flex flex-col flex-1 overflow-y-auto overscroll-contain"
     :mask-length="20"
   >
     <div v-if="activities.length" class="activities flex-1 h-full mt-0.5">
@@ -17,7 +17,7 @@
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
+            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-elevation-2"
             :class="[
               i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -26,7 +26,7 @@
             ]"
           >
             <div
-              class="z-1 flex items-center justify-center rounded-full bg-surface-white"
+              class="z-1 flex items-center justify-center rounded-full bg-surface-base"
               :class="[
                 ['email', 'feedback'].includes(activity.type)
                   ? 'my-1 h-9 w-9'
@@ -39,22 +39,23 @@
               <Avatar
                 v-if="activity.type === 'email' || activity.type === 'feedback'"
                 size="lg"
-                :label="activity.sender?.full_name"
+                :label="activity.sender?.full_name || activity.sender?.name"
                 :image="getUser(activity.sender?.name).user_image"
-                class="bg-surface-white absolute start-[0.7px]"
+                class="bg-surface-base absolute start-[0.7px]"
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
                 class="text-ink-gray-5 absolute start-[7.5px]"
               />
-              <FeatherIcon
+              <span
                 v-else-if="activity.type === 'call'"
-                :name="
+                :class="[
+                  'text-ink-gray-5 start-[7.5px] size-4',
                   activity.call_type === 'Incoming'
-                    ? 'phone-incoming'
-                    : 'phone-outgoing'
-                "
-                class="text-ink-gray-5 start-[7.5px] size-4"
+                    ? 'lucide-phone-incoming'
+                    : 'lucide-phone-outgoing',
+                ]"
+                aria-hidden="true"
               />
               <DotIcon
                 v-else
@@ -100,18 +101,19 @@
     </div>
     <div
       v-else
-      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-xl-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{
-        __(emptyText)
-      }}</span>
+      <span class="text-md-medium text-ink-gray-8">{{ __(emptyText) }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
 
 <script setup lang="ts">
 import { FadedScrollableDiv } from "@/components";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -122,13 +124,10 @@ import {
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
-import { Avatar, FeatherIcon } from "frappe-ui";
+import { Avatar } from "frappe-ui";
 import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
-import CommentBox from "@/components/CommentBox.vue";
-import EmailArea from "@/components/EmailArea.vue";
-import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {
@@ -207,11 +206,11 @@ function scrollToHash() {
           (element as any).scrollIntoViewIfNeeded();
 
           // Add highlight effect using Tailwind class
-          element.classList.add("bg-yellow-100");
+          element.classList.add("bg-surface-yellow-2");
 
           // Remove highlight after 2 seconds
           setTimeout(() => {
-            element.classList.remove("bg-yellow-100");
+            element.classList.remove("bg-surface-yellow-2");
             router.replace({ hash: "" });
           }, 2000);
         }

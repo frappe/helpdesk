@@ -34,7 +34,7 @@
         </div>
         <!-- Title -->
         <textarea
-          class="w-full resize-none border-0 bg-transparent text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-gray-modals focus:ring-0 focus:border-outline-gray-modals"
+          class="w-full resize-none border-0 bg-transparent text-3xl-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-elevation-2 focus:ring-0 focus:border-outline-elevation-2"
           v-model="title"
           :placeholder="__('Title')"
           rows="1"
@@ -49,43 +49,54 @@
           "
         />
         <!-- Article Content -->
-        <TextEditor
-          :content="content"
-          @change="content = $event"
+        <Editor
+          v-model="content"
+          :extensions="extensions"
           :placeholder="__('Write your article here...')"
-          editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+          :upload-function="(file: File) => uploadFunction(file)"
         >
-          <template #bottom>
-            <TextEditorFixedMenu
+          <template #default="{ editor }">
+            <EditorContent
+              :editor="editor"
+              class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+            />
+            <EditorFixedMenu
               class="-ms-1 overflow-x-auto w-full"
-              :buttons="textEditorMenuButtons"
+              :editor="editor"
+              :items="textEditorMenuItems"
             />
           </template>
-        </TextEditor>
+        </Editor>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
 import {
-  Breadcrumbs,
-  TextEditor,
-  TextEditorFixedMenu,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  RichTextKit,
+} from "frappe-ui/editor";
 import { useOnboarding, Link } from "frappe-ui/frappe";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
 
 import { LayoutHeader, UserAvatar } from "@/components";
+import { textEditorMenuItems } from "@/editor-menu";
+import {
+  CleanStyles,
+  ComponentUtils,
+  HandleExcelPaste,
+} from "@/tiptap-extensions";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { Article } from "@/types";
-import { textEditorMenuButtons } from "@/utils";
+import { uploadFunction } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -98,6 +109,7 @@ const { isManager } = useAuthStore();
 
 const title = ref("");
 const content = ref("");
+const extensions = [RichTextKit, ComponentUtils, HandleExcelPaste, CleanStyles];
 
 const props = defineProps({
   id: {

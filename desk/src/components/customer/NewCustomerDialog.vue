@@ -60,7 +60,7 @@
         <hr class="my-5 border-outline-gray-2" />
 
         <div class="flex flex-col gap-3">
-          <h3 class="text-base font-medium text-ink-gray-8">
+          <h3 class="text-base-medium text-ink-gray-8">
             {{ __("Primary Contact") }}
           </h3>
           <div class="grid grid-cols-2 gap-4">

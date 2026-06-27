@@ -10,7 +10,7 @@
     class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-md"
     @click="props.conditions.push(['', '', ''])"
   >
-    <FeatherIcon name="plus" class="h-4" />
+    <span class="lucide-plus h-4" aria-hidden="true" />
     {{ __("Add a custom condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import { Button, Dropdown, ErrorMessage } from "frappe-ui";
 import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";

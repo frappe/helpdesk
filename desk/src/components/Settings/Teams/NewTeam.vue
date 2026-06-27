@@ -8,7 +8,7 @@
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 cursor-pointer">
           <Switch v-model="teamData.enabled" />
-          <span class="text-sm text-ink-gray-7 font-medium">
+          <span class="text-sm-medium text-ink-gray-7">
             {{ __("Enabled") }}
           </span>
         </div>
