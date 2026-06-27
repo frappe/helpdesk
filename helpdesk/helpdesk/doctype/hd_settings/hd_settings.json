@@ -58,6 +58,9 @@
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh",
+  "onboarding_section",
+  "ticket_count_limit",
+  "user_age_limit",
   "search_tab",
   "name_weight",
   "subject_weight",
@@ -504,12 +507,27 @@
    "fieldname": "enable_outside_hours_banner",
    "fieldtype": "Check",
    "label": "Apply outside working hours"
+  },
+  {
+   "fieldname": "onboarding_section",
+   "fieldtype": "Section Break",
+   "label": "Onboarding"
+  },
+  {
+   "fieldname": "ticket_count_limit",
+   "fieldtype": "Int",
+   "label": "Ticket Count"
+  },
+  {
+   "fieldname": "user_age_limit",
+   "fieldtype": "Int",
+   "label": "User Age"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-23 18:30:40.906948",
+ "modified": "2026-04-25 23:16:57.680550",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
