@@ -386,7 +386,6 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   return [...selfOption, ...rest];
 });
 
-
 function availabilitySubtitle(
   availability?: string,
   changedOn?: string
