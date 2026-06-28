@@ -397,15 +397,16 @@ function availabilitySubtitle(
 
   const label = __(availability);
   if (!changedOn) return label;
-  // prettyDate says "Just now" under a minute, which reads oddly after "since";
-  // keep the "… ago" phrasing consistent with the longer durations.
+  // Suffix with how long ago they were last active, e.g. "Away · Last seen 2
+  // minutes ago". prettyDate says "Just now" under a minute, which we lowercase
+  // so it reads cleanly after "Last seen".
   const secondsSinceChange = dayjsLocal().diff(
     dayjsLocal(changedOn),
     "seconds"
   );
-  const timeSinceChange =
-    secondsSinceChange < 60 ? __("a few seconds ago") : prettyDate(changedOn);
-  return timeSinceChange ? __("{0} since {1}", label, timeSinceChange) : label;
+  const lastSeen =
+    secondsSinceChange < 60 ? __("just now") : prettyDate(changedOn);
+  return lastSeen ? __("{0} · Last active {1}", label, lastSeen) : label;
 }
 
 function isSelected(agentName: string): boolean {
@@ -544,6 +545,8 @@ function warnUnavailableAgents(addedNames: string[]): boolean {
   let hasUnavailable = false;
   for (const agent of agents) {
     if (!addedNames.includes(agent.name)) continue;
+    // No point warning agents about their own status when assigning themselves.
+    if (agent.name === currentAgentName) continue;
     const category = agentStatusStore.getStatus(
       agent.availability || ""
     )?.category;

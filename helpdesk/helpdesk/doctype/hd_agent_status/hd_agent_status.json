@@ -9,11 +9,11 @@
  "field_order": [
   "agent_status",
   "enable",
-  "status_order",
-  "section_break_jqvx",
   "category",
+  "section_break_jqvx",
+  "color",
   "column_break_ekva",
-  "color"
+  "status_order"
  ],
  "fields": [
   {
@@ -32,6 +32,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "description": "Active: The agent is available and working.<br>\nAway: The agent is temporarily unreachable.<br>\nUnavailable: The agent is off and unavailable.",
    "fieldname": "category",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -43,14 +44,14 @@
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
+   "options": "Gray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
   },
   {
    "fieldname": "column_break_ekva",
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "enable",
    "fieldtype": "Check",
    "label": "Enable"
@@ -59,7 +60,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-06 00:00:00.000000",
+ "modified": "2026-06-08 13:19:57.646908",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent Status",
