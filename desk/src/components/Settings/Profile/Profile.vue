@@ -152,7 +152,6 @@ const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
 import { useAvailability } from "@/composables/useAvailability";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
