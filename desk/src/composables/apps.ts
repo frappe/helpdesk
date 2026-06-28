@@ -1,3 +1,4 @@
+import { isCustomerPortal } from "@/utils";
 import { createResource } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -13,6 +14,7 @@ interface App {
  * Dropdown submenu options (each with the app's logo as the row prefix).
  */
 export function useApps() {
+  if (isCustomerPortal.value) return { apps: null, appsSubmenu: null };
   const apps = createResource({
     url: "frappe.apps.get_apps",
     cache: "apps",

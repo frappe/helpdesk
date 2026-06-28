@@ -816,7 +816,10 @@ function handleScrollPosition() {
   }, 200);
 }
 
-function handleColumnResize() {
+function handleColumnResize({ key, width, save } = {}) {
+  const column = columns.value.find((c) => c.key === key);
+  if (column) column.width = width;
+  if (!save) return;
   isViewUpdated.value = true;
   defaultParams.columns = columns.value;
   if (!defaultParams.is_default) return;
