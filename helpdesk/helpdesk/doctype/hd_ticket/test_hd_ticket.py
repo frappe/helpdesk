@@ -649,6 +649,20 @@ class TestHDTicket(FrappeTestCase):
             target.name,
         )
 
+    def test_merge_cycle_does_not_resolve_target(self):
+        # A corrupt cycle (A merged into B, B merged back into A) must not redirect a reply
+        # onto another merged ticket, which would recurse until the request fails.
+        ticket_a = make_ticket(description="Cycle A")
+        ticket_b = make_ticket(description="Cycle B")
+
+        merge_ticket(source=ticket_a.name, target=ticket_b.name)
+        ticket_b.reload()
+        ticket_b.db_set("is_merged", 1)
+        ticket_b.db_set("merged_with", ticket_a.name)
+
+        ticket_a.reload()
+        self.assertIsNone(ticket_a.get_merge_target())
+
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
 
