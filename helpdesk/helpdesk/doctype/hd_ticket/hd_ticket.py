@@ -919,11 +919,44 @@ class HDTicket(Document):
             "category",
         )
 
+    def get_merge_target(self):
+        # Follow the chain of merged tickets to the final, existing, non-merged ticket.
+        # `target` only advances to a ticket we have confirmed exists, and `seen` keeps a
+        # corrupt merge cycle from looping forever.
+        target = None
+        candidate = self.merged_with
+        seen = {self.name}
+        while candidate and candidate not in seen:
+            row = frappe.db.get_value(
+                "HD Ticket", candidate, ["is_merged", "merged_with"], as_dict=True
+            )
+            if not row:
+                break
+            seen.add(candidate)
+            target = candidate
+            if not row.is_merged or not row.merged_with:
+                break
+            candidate = row.merged_with
+        return target
+
+    def redirect_communication_to_merge_target(self, c):
+        target_name = self.get_merge_target()
+        if not target_name:
+            return
+        c.db_set("reference_name", target_name)
+        frappe.get_doc("HD Ticket", target_name).on_communication_update(c)
+
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
     # is an external dependency. Refer `communication.py` of Frappe framework for more.
     # Since this is called from communication itself, `c` is the communication doc.
     def on_communication_update(self, c):
+        # A reply to a merged ticket belongs to the ticket it was merged into. Redirect
+        # the communication there instead of reopening this (merged) ticket.
+        if c.sent_or_received == "Received" and self.is_merged and self.merged_with:
+            self.redirect_communication_to_merge_target(c)
+            return
+
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
         # handle re opening tickets for email
