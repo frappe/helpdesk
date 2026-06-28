@@ -164,20 +164,10 @@ function getOptions(rowName: string) {
   });
 }
 
-<<<<<<< HEAD
 function handleSwitchToggle(row: any, value: boolean) {
   // Optimistically reflect the new state so the controlled Switch stays in
   // sync; without this the bound value never changes and toggling keeps
   // re-sending the same value (the disable never takes effect).
-=======
-function handleSwitchToggle(
-  row: { name: string; enabled: boolean },
-  value: boolean
-) {
-  // Optimistically update the local row so the controlled Switch reflects the
-  // new state immediately; revert if the backend update fails.
-  const previous = row.enabled;
->>>>>>> cb7490cc (fix: broken switches in field dependency and assignment rules)
   row.enabled = value;
   fieldDependenciesList.setValue.submit(
     {
@@ -189,11 +179,7 @@ function handleSwitchToggle(
         toast.success(__("Field dependency updated successfully."));
       },
       onError: () => {
-<<<<<<< HEAD
         row.enabled = !value;
-=======
-        row.enabled = previous;
->>>>>>> cb7490cc (fix: broken switches in field dependency and assignment rules)
         toast.error(__("Failed to update field dependency."));
       },
     }

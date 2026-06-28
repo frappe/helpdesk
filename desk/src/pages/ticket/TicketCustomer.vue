@@ -103,11 +103,8 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
-<<<<<<< HEAD
 import LucideWarning from "~icons/lucide/triangle-alert";
-=======
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
->>>>>>> 6c3d8e7b (fix: improve customer portal layouting)
 import {
   Alert,
   Breadcrumbs,
