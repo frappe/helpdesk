@@ -22,14 +22,16 @@
   >
     <template #default>
       <div class="space-y-4 text-base text-ink-gray-7">
-        <div class="space-y-2">
-          <span> {{ __("Select a rating") }} </span>
-          <span class="text-ink-red-6"> * </span>
-          <StarRating
-            :static="false"
-            :rating="rating"
+        <div class="flex flex-col gap-2">
+          <div>
+            <span> {{ __("Select a rating") }} </span>
+            <span class="text-ink-red-6"> * </span>
+          </div>
+          <Rating
             v-model="rating"
-            @update:model-value="rating = $event"
+            :max="5"
+            size="sm"
+            @update:model-value="onSelectRating"
           />
         </div>
         <div v-if="options.data?.length" class="space-y-2">
@@ -60,11 +62,10 @@
 </template>
 
 <script setup lang="ts">
-import { StarRating } from "@/components";
-import { createListResource, createResource } from "frappe-ui";
-import { inject, ref, watch } from "vue";
-import { ITicket } from "./symbols";
 import { __ } from "@/translation";
+import { createListResource, createResource, Rating } from "frappe-ui";
+import { inject, ref } from "vue";
+import { ITicket } from "./symbols";
 
 interface P {
   open: boolean;
@@ -101,15 +102,15 @@ const setValue = createResource({
     ticket.reload();
   },
 });
-watch(rating, (r) => {
+function onSelectRating(r: number) {
   preset.value = null;
   text.value = "";
   options.update({
     filters: {
-      rating: r,
+      rating: r / 5,
       disabled: 0,
     },
   });
   options.reload();
-});
+}
 </script>

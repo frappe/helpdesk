@@ -19,7 +19,12 @@
               {{ ticket.data.contact.name }}
             </div>
           </Tooltip>
-          <div class="flex gap-1.5" v-if="!ticket.data.feedback_rating">
+          <div
+            class="flex gap-1.5"
+            v-if="
+              !ticket.data.feedback_rating && ticket.data.status !== 'Closed'
+            "
+          >
             <Tooltip :text="ticket.data.contact.email_id">
               <Button class="h-7 w-7" @click="emit('open')">
                 <template #icon>
