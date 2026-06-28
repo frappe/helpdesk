@@ -921,30 +921,34 @@ class HDTicket(Document):
 
     def get_merge_target(self):
         # Follow the chain of merged tickets to the final, existing, non-merged ticket.
-        # `target` only advances to a ticket we have confirmed exists, and `seen` keeps a
-        # corrupt merge cycle from looping forever.
-        target = None
-        candidate = self.merged_with
-        seen = {self.name}
-        while candidate and candidate not in seen:
-            row = frappe.db.get_value(
-                "HD Ticket", candidate, ["is_merged", "merged_with"], as_dict=True
+        # `merge_target_name` only advances to a ticket we have confirmed exists, and
+        # `visited_ticket_names` keeps a corrupt merge cycle from looping forever.
+        merge_target_name = None
+        current_ticket_name = self.merged_with
+        visited_ticket_names = {self.name}
+        while current_ticket_name and current_ticket_name not in visited_ticket_names:
+            ticket = frappe.db.get_value(
+                "HD Ticket",
+                current_ticket_name,
+                ["is_merged", "merged_with"],
+                as_dict=True,
             )
-            if not row:
+            if not ticket:
                 break
-            seen.add(candidate)
-            target = candidate
-            if not row.is_merged or not row.merged_with:
+            visited_ticket_names.add(current_ticket_name)
+            merge_target_name = current_ticket_name
+            if not ticket.is_merged or not ticket.merged_with:
                 break
-            candidate = row.merged_with
-        return target
+            current_ticket_name = ticket.merged_with
+        return merge_target_name
 
-    def redirect_communication_to_merge_target(self, c):
-        target_name = self.get_merge_target()
-        if not target_name:
+    def redirect_communication_to_merge_target(self, communication):
+        merge_target_name = self.get_merge_target()
+        if not merge_target_name:
             return
-        c.db_set("reference_name", target_name)
-        frappe.get_doc("HD Ticket", target_name).on_communication_update(c)
+        communication.db_set("reference_name", merge_target_name)
+        merge_target = frappe.get_doc("HD Ticket", merge_target_name)
+        merge_target.on_communication_update(communication)
 
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
