@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">
+        <div class="text-lg-medium text-ink-gray-9">
           {{ __("Customers") }}
         </div>
       </template>
@@ -60,7 +60,7 @@ const options = computed(() => {
         },
       },
       mobile_no: {
-        prefix: PhoneIcon,
+        prefix: ({ row }) => (row.mobile_no ? h(PhoneIcon) : null),
       },
     },
     emptyState: {

@@ -7,9 +7,9 @@
     :class="icon"
     v-bind="$attrs"
   />
-  <FeatherIcon
+  <span
     v-else-if="typeof icon == 'string'"
-    :name="icon"
+    :class="`lucide-${icon}`"
     v-bind="$attrs"
   />
   <component v-else :is="icon" v-bind="$attrs" />

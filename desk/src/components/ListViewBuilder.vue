@@ -148,7 +148,6 @@ import { useStorage } from "@vueuse/core";
 import {
   createResource,
   Dropdown,
-  FeatherIcon,
   frappeRequest,
   ListFooter,
   ListHeader,
@@ -446,9 +445,9 @@ function getGroupedByRows(listRows, groupByField) {
       group: option || " ",
       collapsed: false,
       rows: filteredRows,
-      icon: h(FeatherIcon, {
-        name: "folder",
-        class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+      icon: h("span", {
+        class: ["lucide-folder", "h-4 w-4 flex-shrink-0 text-ink-gray-6"],
+        "aria-hidden": "true",
       }),
     };
     groupedRows.push(groupDetail);
@@ -817,7 +816,10 @@ function handleScrollPosition() {
   }, 200);
 }
 
-function handleColumnResize() {
+function handleColumnResize({ key, width, save } = {}) {
+  const column = columns.value.find((c) => c.key === key);
+  if (column) column.width = width;
+  if (!save) return;
   isViewUpdated.value = true;
   defaultParams.columns = columns.value;
   if (!defaultParams.is_default) return;

@@ -39,7 +39,7 @@
         >
           <ul class="flex flex-wrap gap-2 py-2">
             <li
-              class="flex items-center gap-x-2 rounded bg-surface-white p-1 shadow"
+              class="flex items-center gap-x-2 rounded bg-surface-base p-1 shadow"
               v-for="email in inviteQueue.slice().reverse()"
               :key="email"
               :title="email"
@@ -51,7 +51,7 @@
                 class="grid h-4 w-4 place-items-center rounded text-ink-gray-7 hover:bg-surface-gray-4"
                 @click="removeEmailFromQueue(email)"
               >
-                <FeatherIcon class="w-3" name="x" />
+                <span class="lucide-x w-3" aria-hidden="true" />
               </button>
             </li>
           </ul>
@@ -77,13 +77,7 @@
 
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import {
-  createResource,
-  Dialog,
-  FeatherIcon,
-  TextInput,
-  toast,
-} from "frappe-ui";
+import { createResource, Dialog, TextInput, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { ref } from "vue";
 

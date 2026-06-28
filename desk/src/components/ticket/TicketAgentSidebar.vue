@@ -1,10 +1,10 @@
 <template>
   <div class="flex !w-[382px] flex-col justify-between border-s">
     <div
-      class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
+      class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg-medium text-ink-gray-9 justify-between"
     >
       <span
-        class="cursor-copy text-lg font-semibold"
+        class="cursor-copy text-md-semibold"
         @click="
           copyToClipboard(ticket.name, `'${ticket.name}' copied to clipboard`)
         "
@@ -54,11 +54,11 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Ticket } from "@/types";
 import { copyToClipboard } from "@/utils";
 import { computed, ref } from "vue";
 import LucideMerge from "~icons/lucide/merge";
-import { __ } from "@/translation";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";

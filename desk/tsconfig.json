@@ -4,9 +4,6 @@
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
 		"target": "es2022",
-		"module": "esnext",
-		"moduleResolution":"node",
-		"jsx": "preserve",
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]

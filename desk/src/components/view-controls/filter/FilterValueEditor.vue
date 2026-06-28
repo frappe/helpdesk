@@ -90,16 +90,16 @@
       </div>
       <DateRangePicker
         v-else-if="isDate && operator === 'between'"
-        :value="dateRangeValue"
+        :model-value="dateRangeValue"
         icon-left=""
-        @change="handleDateRange"
+        @update:model-value="handleDateRange"
       />
       <component
         v-else-if="isDate"
         :is="field.fieldtype === 'Date' ? DatePicker : DateTimePicker"
-        :value="value"
+        :model-value="value"
         icon-left=""
-        @change="(date) => commitAndClose(date)"
+        @update:model-value="(date) => commitAndClose(date)"
       />
       <TextInput
         v-else

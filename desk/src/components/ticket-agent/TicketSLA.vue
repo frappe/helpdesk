@@ -66,10 +66,7 @@
             :label="resolutionBy.label"
             variant="ghost"
             class="mt-[2px]"
-            :theme="
-              resolutionBy.color !== 'purple' ? resolutionBy.color : undefined
-            "
-            :class="resolutionBy.color === 'purple' && '!text-[#6B46C1] '"
+            :theme="resolutionBy.color"
           />
         </Tooltip>
       </div>
@@ -103,7 +100,7 @@ const timeFormat = {
 // - if not first responded and response by is in past -> show overdue by
 // - if first responded after response by -> show failed by
 const firstResponse = computed(() => {
-  if (ticket.value?.get?.loading) return { label: "", color: "", date: "" };
+  if (ticket.value?.get?.loading) return { label: "", color: "gray", date: "" };
   if (
     !ticket.value.doc.first_responded_on &&
     dayjs().isBefore(dayjs(ticket.value.doc.response_by))
@@ -167,7 +164,7 @@ const firstResponse = computed(() => {
 });
 
 const resolutionBy = computed(() => {
-  if (ticket.value?.get?.loading) return { label: "", color: "", date: "" };
+  if (ticket.value?.get?.loading) return { label: "", color: "gray", date: "" };
 
   if (
     ticket.value.doc?.status_category === "Paused" &&
@@ -204,7 +201,7 @@ const resolutionBy = computed(() => {
     );
     return {
       label: `Due in ${resolutionBy}`,
-      color: "purple",
+      color: "violet",
       date: ticket.value.doc?.resolution_by,
     };
   } else if (

@@ -12,7 +12,7 @@
           v-if="key === 'feedback_received'"
           :title="__('Avg. Feedback Received')"
           :data="chartData"
-          bar-color="#E79913"
+          bar-color="#edba14"
           measure="average"
           :timelineFilter="false"
           :dt="props.dt"
@@ -23,8 +23,8 @@
           <template #text="{ text }">
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
-                <LucideStar class="size-4 fill-ink-amber-2 text-ink-amber-2" />
-                <span class="text-2xl font-medium text-ink-gray-8">
+                <Rating :max="1" size="sm" disabled :model-value="1" />
+                <span class="text-2xl-medium text-ink-gray-8">
                   {{ text }}
                 </span>
               </div>
@@ -85,11 +85,10 @@
 </template>
 
 <script setup lang="ts">
-import { createResource } from "frappe-ui";
+import { createResource, Rating } from "frappe-ui";
 import BarChartCard from "../BarChartCard.vue";
 import LineChartCard from "../LineChartCard.vue";
 import SkeletonLoader from "../SkeletonLoader.vue";
-
 const props = defineProps<{
   dt: "HD Customer" | "Contact";
   dn: string;

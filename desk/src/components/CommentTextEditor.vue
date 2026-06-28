@@ -1,23 +1,23 @@
 <template>
-  <TextEditor
+  <Editor
     v-if="agentsList.data"
     ref="editorRef"
-    :editor-class="[
-      'prose-sm max-w-none',
-      editable &&
-        'min-h-[7rem]  mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
-      getFontFamily(newComment),
-    ]"
-    :content="newComment"
-    :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
+    v-model="newComment"
+    :extensions="extensions"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="dropdown"
-    @change="editable ? (newComment = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
-    <template #bottom>
+    <template #default="{ editor }">
+      <EditorContent
+        :editor="editor"
+        :class="[
+          'prose-sm max-w-none',
+          editable &&
+            'min-h-[7rem]  mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
+          getFontFamily(newComment),
+        ]"
+      />
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 my-2 ms-5">
         <AttachmentItem
@@ -27,9 +27,9 @@
           :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
+            <span
+              class="lucide-x h-3.5"
+              aria-hidden="true"
               @click.stop="removeAttachment(a)"
             />
           </template>
@@ -63,9 +63,9 @@
                     </button>
                   </template>
                 </FileUploader>
-                <div class="h-4 w-[2px] border-s" />
+                <div class="ml-0.5 mr-1 h-5 w-px bg-surface-gray-3" />
               </div>
-              <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
+              <EditorFixedMenu :editor="editor" :items="textEditorMenuItems" />
             </div>
             <div class="flex items-center justify-end gap-x-2 w-[40%]">
               <Button
@@ -96,21 +96,23 @@
         </div>
       </div>
     </template>
-  </TextEditor>
+  </Editor>
 </template>
 <script setup lang="ts">
+import { FileUploader, createResource } from "frappe-ui";
 import {
-  FileUploader,
-  TextEditor,
-  TextEditorFixedMenu,
-  createResource,
-} from "frappe-ui";
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  RichTextKit,
+} from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
+import { textEditorMenuItems } from "@/editor-menu";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import {
@@ -122,7 +124,6 @@ import {
   getFontFamily,
   isContentEmpty,
   removeAttachmentFromServer,
-  textEditorMenuButtons,
   uploadFunction,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
@@ -222,6 +223,16 @@ async function submitComment() {
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
+
+const extensions = [
+  RichTextKit.configure({
+    heading: { levels: [2, 3, 4, 5, 6] },
+    mention: { items: dropdown },
+  }),
+  ComponentUtils,
+  HandleExcelPaste,
+  CleanStyles,
+];
 
 onMounted(() => {
   if (

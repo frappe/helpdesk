@@ -8,7 +8,10 @@
       v-bind="action"
     >
       <template v-if="action.icon" #prefix>
-        <FeatherIcon :name="action.icon" class="h-4 w-4" />
+        <span
+          :class="['h-4 w-4', lucideClass(action.icon)]"
+          aria-hidden="true"
+        />
       </template>
     </Button>
   </div>
@@ -17,9 +20,12 @@
       <Dropdown v-slot="{ open }" :options="g.action">
         <Button :label="g.label">
           <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4"
+            <span
+              :class="[
+                'h-4',
+                open ? 'lucide-chevron-up' : 'lucide-chevron-down',
+              ]"
+              aria-hidden="true"
             />
           </template>
         </Button>
@@ -34,6 +40,7 @@
 <script setup>
 import { Dropdown } from "frappe-ui";
 import { computed } from "vue";
+import { lucideClass } from "@/utils";
 
 const props = defineProps({
   actions: {
