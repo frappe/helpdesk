@@ -298,11 +298,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       image: currentUser.value.user_image || "",
       ...liveAvailability({ name: currentAgentName }),
     });
-<<<<<<< HEAD
-    options.add(a.name);
-=======
     seen.add(currentAgentName);
->>>>>>> 01ad2876 (fix: drop redundant per ticket fetch for current agent in AssignTo)
   }
 
   if (agentResource.data) {

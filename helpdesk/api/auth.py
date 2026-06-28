@@ -66,12 +66,9 @@ def get_user():
         "username": username,
         "time_zone": user.time_zone,
         "language": language,
-<<<<<<< HEAD
         "user_teams": user_team_names,
-=======
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
->>>>>>> d2ea0ecd (refactor: seed agent availability from session)
     }
 
 

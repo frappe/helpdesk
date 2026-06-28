@@ -151,11 +151,8 @@ import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
-<<<<<<< HEAD
 import { useAvailability } from "@/composables/useAvailability";
-=======
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
->>>>>>> 4b38d0c1 (refactor: update frontend to read availability from store)
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
