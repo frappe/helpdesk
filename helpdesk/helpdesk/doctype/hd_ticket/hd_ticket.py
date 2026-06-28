@@ -920,10 +920,9 @@ class HDTicket(Document):
         )
 
     def get_merge_target(self):
-        # Follow the chain of merged tickets to the final, existing, non-merged ticket.
-        # `merge_target_name` only advances to a ticket we have confirmed exists, and
-        # `visited_ticket_names` keeps a corrupt merge cycle from looping forever.
-        merge_target_name = None
+        # Follow the chain of merged tickets to the final, non-merged ticket. Return None
+        # if the chain dead-ends on a missing ticket or loops back on itself (a corrupt
+        # cycle), so a reply is never redirected onto another merged ticket.
         current_ticket_name = self.merged_with
         visited_ticket_names = {self.name}
         while current_ticket_name and current_ticket_name not in visited_ticket_names:
@@ -934,13 +933,14 @@ class HDTicket(Document):
                 as_dict=True,
             )
             if not ticket:
-                break
+                return None
             visited_ticket_names.add(current_ticket_name)
-            merge_target_name = current_ticket_name
-            if not ticket.is_merged or not ticket.merged_with:
-                break
+            if not ticket.is_merged:
+                return current_ticket_name
+            if not ticket.merged_with:
+                return None
             current_ticket_name = ticket.merged_with
-        return merge_target_name
+        return None
 
     def redirect_communication_to_merge_target(self, communication):
         merge_target_name = self.get_merge_target()
