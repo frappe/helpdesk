@@ -352,16 +352,12 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   if (!isSearching) {
     for (const a of localAssignees.value) {
       if (!seen.has(a.name)) {
-<<<<<<< HEAD
-        options.push({ value: a.name, label: a.label, image: a.image });
-=======
         const user = getUser(a.name);
         options.push({
           value: a.name,
           label: a.label || user.full_name || a.name,
           image: a.image || user.user_image,
         });
->>>>>>> a9268b86 (feat: handle manual assignment for away agents)
         seen.add(a.name);
       }
     }
@@ -384,29 +380,12 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   }
 
   // If there are pinned assignees, show them first then current user, otherwise current user first
-<<<<<<< HEAD
-<<<<<<< HEAD
   if (assigned.length > 0) {
     return [...assigned, ...selfOption, ...rest];
   }
   return [...selfOption, ...rest];
-=======
-  const ordered =
-    assigned.length > 0
-      ? [...assigned, ...selfOption, ...rest]
-      : [...selfOption, ...rest];
-
-  if (availabilityFilter.value === "All") return ordered;
-  return ordered.filter((opt) => opt.availability === availabilityFilter.value);
->>>>>>> 9d970c51 (feat: calculate and display time from agent status change)
-=======
-  if (assigned.length > 0) {
-    return [...assigned, ...selfOption, ...rest];
-  }
-
-  return [...selfOption, ...rest];
->>>>>>> 341591fa (feat: add availability menu to profile and bring prreferences section to frontend)
 });
+
 
 function availabilitySubtitle(
   availability?: string,

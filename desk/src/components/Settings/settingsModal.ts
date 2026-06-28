@@ -15,16 +15,13 @@ import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
-<<<<<<< HEAD
 import {
   ERPNextSettingsIcon,
   FieldDependencyIcon,
   PhoneIcon,
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
-=======
 import { FieldDependencyIcon, PhoneIcon, SlidersIcon } from "@/components/icons";
->>>>>>> 341591fa (feat: add availability menu to profile and bring prreferences section to frontend)
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";

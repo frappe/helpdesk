@@ -8,6 +8,7 @@
         @click="() => setActiveSettingsTab('Invite Agents')"
         label="New"
         variant="solid"
+        class="rtl:flex-row-reverse"
       >
         <template #prefix>
           <LucidePlus class="h-4 w-4 stroke-1.5" />
@@ -34,7 +35,7 @@
             icon="lucide-x"
             variant="ghost"
             @click="search = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
+            class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
         <Dropdown :options="dropdownOptions" placement="right">
@@ -107,14 +108,10 @@
           >
             <div class="col-span-6 text-p-sm">{{ __("Agent name") }}</div>
           </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
             <div class="flex items-center justify-between h-14 group rounded">
-              <div class="flex items-center space-x-3 grow">
+              <div class="flex items-center gap-x-3 grow">
                 <Avatar
                   :image="agent.user_image"
                   :label="agent.agent_name"
@@ -158,34 +155,14 @@
                 <Dropdown
                   :options="getOptions(agent)"
                   :key="agent"
-                  class="ml-2"
+                  class="ms-2"
                   placement="right"
                 >
-<<<<<<< HEAD
                   <Button icon="lucide-more-horizontal" variant="ghost" />
-=======
-                  <Button icon="more-horizontal" variant="ghost" />
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
                 </Dropdown>
               </div>
             </div>
             <hr v-if="index !== agents.data.length - 1" />
-<<<<<<< HEAD
-=======
-          <hr class="mt-2 mx-2" />
-          <div v-for="(agent, index) in agents.data" :key="agent.name">
-            <AgentRow
-              :agent="agent"
-              :stats="statsFor(agent.name)"
-              :is-manager="isManager"
-              :current-role="getUserRole(agent.name)"
-              :kebab-options="kebabOptionsFor(agent)"
-              @update:role="(role) => updateRole(agent.name, role)"
-            />
-            <hr v-if="index !== agents.data.length - 1" class="mx-2" />
->>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
-=======
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
           </div>
           <!-- Load More Button -->
           <div class="flex justify-center">
@@ -207,30 +184,15 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-<<<<<<< HEAD
-import { __ } from "@/translation";
-<<<<<<< HEAD
-import { renderOptionIcon } from "@/utils";
-=======
-import { Button, Dropdown, FeatherIcon, call, toast } from "frappe-ui";
-import { computed, onUnmounted } from "vue";
-import AgentIcon from "../icons/AgentIcon.vue";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import AgentRow from "./AgentRow.vue";
-=======
 import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
 import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { setActiveSettingsTab } from "./settingsModal";
-<<<<<<< HEAD
->>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
-=======
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
+import { renderOptionIcon } from "@/utils";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -239,10 +201,6 @@ const agentStore = useAgents();
 const search = agentStore.search;
 const agents = agentStore.agents;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
   const roles = [
@@ -253,11 +211,7 @@ function getRoles(agent: string) {
           role: "Agent",
           active: props.active,
           selected: agentRole === "Agent",
-<<<<<<< HEAD
           icon: "lucide-user",
-=======
-          icon: "user",
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
           onClick: () => {
             updateRole(agent, "Agent");
           },
@@ -272,11 +226,7 @@ function getRoles(agent: string) {
           role: "Manager",
           active: props.active,
           selected: agentRole === "Manager",
-<<<<<<< HEAD
           icon: "lucide-briefcase",
-=======
-          icon: "briefcase",
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
           onClick: () => {
             updateRole(agent, "Manager");
           },
@@ -300,17 +250,7 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
     },
     [
       h("div", { class: "flex gap-2" }, [
-<<<<<<< HEAD
         renderOptionIcon(icon),
-=======
-        icon
-          ? h(FeatherIcon, {
-              name: icon,
-              class: ["h-4 w-4 shrink-0"],
-              "aria-hidden": true,
-            })
-          : null,
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
         h("span", { class: "whitespace-nowrap" }, role),
       ]),
       selected
@@ -327,12 +267,6 @@ function updateRole(agent: string, newRole: string) {
   if (currentRole === newRole) {
     return;
   }
-<<<<<<< HEAD
-=======
-const { statsFor } = useAgentWorkload(computed(() => agents.data));
->>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
-=======
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
 
   call("helpdesk.helpdesk.doctype.hd_agent.hd_agent.update_agent_role", {
     user: agent,
@@ -348,7 +282,6 @@ function getOptions(agent) {
   return [
     {
       label: "Disable Agent",
-<<<<<<< HEAD
       icon: "lucide-x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
@@ -363,26 +296,6 @@ function getOptions(agent) {
         await agentStore.updateAgent(agent.name, 1);
         agents.reload({ ...filters, search: search.value });
       },
-=======
-      icon: "x-circle",
-      onClick: async () => {
-        await agentStore.updateAgent(agent.name, 0);
-        agents.reload({ ...filters, search: search.value });
-      },
-      condition: () => agent.is_active,
-    },
-    {
-      label: "Enable Agent",
-      icon: "check-circle",
-<<<<<<< HEAD
-      onClick: () => setAgentActive(agent.name, 1),
->>>>>>> 85edb100 (feat: add open tickets and avg first response in agents tab)
-=======
-      onClick: async () => {
-        await agentStore.updateAgent(agent.name, 1);
-        agents.reload({ ...filters, search: search.value });
-      },
->>>>>>> 065026b2 (Revert "feat: add open tickets and avg first response in agents tab")
       condition: () => !agent.is_active,
     },
   ];
