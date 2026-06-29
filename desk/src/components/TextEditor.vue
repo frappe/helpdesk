@@ -113,6 +113,6 @@ defineExpose({
 });
 
 if (props.autofocus) {
-  nextTick(() => e.value.editor.commands.focus());
+  nextTick(() => e.value?.editor.commands.focus());
 }
 </script>
