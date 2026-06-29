@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "creation": "2017-02-17 13:07:35.686409",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -39,6 +40,8 @@
   "enable_outside_hours_banner",
   "outside_working_hours_message",
   "column_break_fzef",
+  "ticket_routing_section",
+  "auto_set_customer_from_contact",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -504,12 +507,28 @@
    "fieldname": "enable_outside_hours_banner",
    "fieldtype": "Check",
    "label": "Apply outside working hours"
+  },
+  {
+   "fieldname": "ticket_routing_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Routing"
+  },
+  {
+   "default": "1",
+   "description": "Automatically set the customer on a ticket based on the contact's linked customer(s)",
+   "fieldname": "auto_set_customer_from_contact",
+   "fieldtype": "Check",
+   "label": "Auto-set customer from contact"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2025-12-18 10:37:02.103507",
+=======
+ "modified": "2026-06-29 18:07:35.389430",
+>>>>>>> 06b48822 (fix: auto set customer setting)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
