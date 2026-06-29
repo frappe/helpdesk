@@ -3,7 +3,9 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute inset-x-0',
+      list?.data?.data?.length > 0 || effectiveViewType === 'kanban'
+        ? 'relative'
+        : 'absolute inset-x-0',
     ]"
     v-if="showViewControls"
   >
@@ -35,9 +37,19 @@
     </div>
   </div>
 
+  <!-- Kanban View -->
+  <KanbanView
+    v-if="effectiveViewType === 'kanban'"
+    :doctype="options.doctype"
+    :rows="list.data?.data || []"
+    :loading="!!list.loading"
+    :group-by-field="list.data?.group_by_field"
+    :row-route="options.rowRoute"
+    @card-moved="handleReload"
+  />
   <!-- Loading State -->
   <div
-    v-if="list.loading && !list.data?.data?.length"
+    v-else-if="list.loading && !list.data?.data?.length"
     class="flex items-center justify-center h-full w-full absolute top-0 z-100"
   >
     <LoadingIndicator :scale="8" />
@@ -172,6 +184,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 
 import EmptyState from "./EmptyState.vue";
+import KanbanView from "./KanbanView.vue";
 import ListRows from "./ListRows.vue";
 
 interface P {
@@ -369,6 +382,73 @@ const emptyState = computed(() => {
 
 const isViewUpdated = ref(false);
 
+// Local override for view type (List / Group By / Kanban) — lets the user
+// toggle the layout without modifying the underlying HD View record.
+// Persisted per saved view (keyed by view name, or "__default__" when no
+// view is selected) so the layout choice survives navigation and reloads.
+type ViewType = "list" | "group_by" | "kanban";
+const viewTypeMap = useStorage<Record<string, ViewType>>(
+  `helpdesk:view-type:${props.options.doctype}`,
+  {}
+);
+const currentViewKey = computed(
+  () => (route.query.view as string) || "__default__"
+);
+const viewTypeOverride = computed<ViewType | null>({
+  get: () => viewTypeMap.value[currentViewKey.value] ?? null,
+  set: (val) => {
+    if (val === null) {
+      delete viewTypeMap.value[currentViewKey.value];
+    } else {
+      viewTypeMap.value[currentViewKey.value] = val;
+    }
+  },
+});
+const effectiveViewType = computed<"list" | "group_by" | "kanban">(() => {
+  if (viewTypeOverride.value) return viewTypeOverride.value;
+  const t = list.data?.view_type || defaultParams.view?.view_type;
+  return t === "group_by" || t === "kanban" ? t : "list";
+});
+// `owner` is the default group_by_field on every doctype but is useless
+// for kanban/group_by (one column per user). Treat it as "no preference".
+function pickGroupByField(currentField: string | null, viewType: ViewType) {
+  if (viewType === "list") return currentField || null;
+  if (currentField && currentField !== "owner") return currentField;
+  return "status";
+}
+// Label/icon shown in the breadcrumb when no saved view is active —
+// reflects the current effective view type so "Tickets / Kanban" reads
+// correctly after a layout toggle (previously stuck on "Liste").
+function viewTypeBadge(t: ViewType) {
+  if (t === "kanban") return { label: __("Kanban"), icon: LucideColumns3 };
+  return { label: __("List"), icon: LucideAlignJustify };
+}
+function handleViewTypeChange(val: ViewType) {
+  viewTypeOverride.value = val;
+  defaultParams.view = {
+    ...defaultParams.view,
+    view_type: val,
+    group_by_field: pickGroupByField(
+      defaultParams.view?.group_by_field,
+      val
+    ),
+  };
+  // Keep the breadcrumb in sync — only when no saved view is selected.
+  // For saved views, the view's label/icon remain authoritative until
+  // the user explicitly saves the new type back via "Save Changes".
+  if (!route.query.view) {
+    const badge = viewTypeBadge(val);
+    headerView.value.label = badge.label;
+    headerView.value.icon = badge.icon;
+  } else {
+    // On a saved view: flag the change so "Save Changes" appears,
+    // letting the user persist the new type into the HD View doc.
+    const storedType = findView(route.query.view as string).value?.type || "list";
+    if (val !== storedType) isViewUpdated.value = true;
+  }
+  list.submit({ ...defaultParams });
+}
+
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: defaultParams,
@@ -389,6 +469,10 @@ const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
+  // Lets the parent (e.g. Tickets.vue "Default Views" dropdown) switch
+  // between list / kanban / group_by without rendering an inline toggle.
+  setViewType: handleViewTypeChange,
+  effectiveViewType,
 };
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
@@ -420,7 +504,7 @@ function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
 
 const rows = computed(() => {
   if (!list.data?.data) return [];
-  if (list.data.view_type === "group_by") {
+  if (effectiveViewType.value === "group_by") {
     if (!list.data?.group_by_field?.name) return [];
     return getGroupedByRows(list.data.data, list.data.group_by_field);
   }
@@ -681,7 +765,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
-  const view = {
+  const view: Record<string, any> = {
     filters: JSON.stringify(defaultParams.filters),
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
@@ -690,6 +774,11 @@ function handleViewUpdate() {
     dt: options.value.doctype,
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
+    // Persist the current view type + group_by_field so a saved view
+    // remembers whether it should render as List or Kanban for everyone
+    // (matches what the local override has been showing the user).
+    type: effectiveViewType.value,
+    group_by_field: defaultParams.view?.group_by_field || null,
   };
   const currentView = findView(route.query.view as string).value;
   if (currentView && currentView.public) {
@@ -754,6 +843,22 @@ function handleViewChanges() {
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
+  // Carry the view type + group_by_field so the backend knows how to shape
+  // the response (e.g. kanban needs group_by_field expanded to {label,value}).
+  // If the user has toggled to a different view type via ViewTypeSwitch,
+  // keep that local override instead of resetting it from the saved view.
+  const storedType = (currentView as any).type || "list";
+  const effectiveType = viewTypeOverride.value || storedType;
+  const storedGroupBy = (currentView as any).group_by_field;
+  defaultParams.view = {
+    ...defaultParams.view,
+    view_type: effectiveType,
+    group_by_field: pickGroupByField(
+      storedGroupBy || defaultParams.view.group_by_field,
+      effectiveType
+    ),
+    name: currentView.name,
+  };
 
   if (route.query.filters) {
     try {
@@ -793,10 +898,16 @@ watch(
   () => route.query.view,
   (val: string) => {
     defaultParams.view.name = val;
+    // Switching to a different saved view: viewTypeOverride is keyed by
+    // view name and reactively re-reads from the persisted map, so the
+    // user's last layout choice for that view is restored automatically.
     handleViewChanges();
     if (!val) {
-      headerView.value.label = __("List");
-      headerView.value.icon = LucideAlignJustify;
+      // On the default (no saved view), the breadcrumb badge follows
+      // whatever layout the user picked — kanban override included.
+      const badge = viewTypeBadge(effectiveViewType.value);
+      headerView.value.label = badge.label;
+      headerView.value.icon = badge.icon;
     }
   }
 );
