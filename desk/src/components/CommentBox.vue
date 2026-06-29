@@ -39,19 +39,21 @@
       :id="`comment-${name}`"
       class="rounded-md bg-surface-gray-1 transition-colors px-3 py-1.5"
     >
-      <Editor v-model="_content" :extensions="extensions" :editable="editable">
-        <template #default="{ editor }">
-          <EditorBubbleMenu :editor="editor" :items="textEditorMenuItems" />
-          <EditorContent
-            :editor="editor"
-            :class="[
-              'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
-              getFontFamily(_content),
-            ]"
-            @keydown.ctrl.enter.capture.stop="handleSaveComment"
-            @keydown.meta.enter.capture.stop="handleSaveComment"
-          />
-          <div v-if="editable" class="flex flex-row-reverse gap-2">
+      <TextEditor
+        :editor-class="[
+          'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
+          getFontFamily(_content),
+        ]"
+        :content="_content"
+        :editable="editable"
+        :bubble-menu="textEditorMenuButtons"
+        :mentions="userMentions"
+        @change="(event:string) => {_content = event}"
+        @keydown.ctrl.enter.capture.stop="handleSaveComment"
+        @keydown.meta.enter.capture.stop="handleSaveComment"
+      >
+        <template #bottom v-if="editable">
+          <div class="flex flex-row-reverse gap-2">
             <div>
               <Button
                 :label="
@@ -68,7 +70,7 @@
             <Button label="Discard" @click="handleDiscard" />
           </div>
         </template>
-      </Editor>
+      </TextEditor>
       <div
         class="flex flex-wrap gap-2 mb-2"
         v-if="!editable && Boolean(attachments.length)"
@@ -95,13 +97,13 @@
           </template>
           <template #body>
             <div
-              class="bg-surface-base rounded-lg shadow-lg p-2 border border-outline-gray-2"
+              class="bg-surface-white rounded-lg shadow-lg p-2 border border-outline-gray-2"
             >
               <div class="grid grid-cols-6 gap-2">
                 <button
                   v-for="emoji in emojiList"
                   :key="emoji"
-                  class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-md transition-colors"
+                  class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-lg transition-colors"
                   @click="handleReaction(emoji)"
                 >
                   {{ emoji }}
@@ -115,7 +117,7 @@
           <Tooltip>
             <template #body>
               <div
-                class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded"
+                class="bg-surface-gray-7 px-2 py-1 text-center text-p-xs text-ink-white shadow-xl rounded"
               >
                 <span v-for="(user, idx) in reaction.users" :key="user.user"
                   >{{ user.full_name
@@ -127,7 +129,7 @@
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
               :class="
                 reaction.current_user_reacted
-                  ? 'bg-surface-blue-2 text-ink-blue-6 hover:bg-surface-blue-3'
+                  ? 'bg-surface-blue-2 text-ink-blue-3 hover:bg-surface-blue-3'
                   : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
               v-if="reaction.count !== 0"
@@ -155,34 +157,24 @@ import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { CommentActivity } from "@/types";
-import { textEditorMenuItems } from "@/editor-menu";
-import {
-  CleanStyles,
-  ComponentUtils,
-  HandleExcelPaste,
-} from "@/tiptap-extensions";
 import {
   ConfirmDelete,
   dateFormat,
   dateTooltipFormat,
   getFontFamily,
   isContentEmpty,
+  textEditorMenuButtons,
   timeAgo,
 } from "@/utils";
 import {
   Avatar,
   Dropdown,
   Popover,
+  TextEditor,
   Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
-import {
-  Editor,
-  EditorBubbleMenu,
-  EditorContent,
-  RichTextKit,
-} from "frappe-ui/editor";
 import { PropType, computed, onMounted, ref } from "vue";
 
 const authStore = useAuthStore();
@@ -206,12 +198,6 @@ const isTicketMergedComment = computed(() => {
 });
 const agentStore = useAgentStore();
 const userMentions = computed(() => agentStore.dropdown ?? []);
-const extensions = [
-  RichTextKit.configure({ mention: { items: userMentions } }),
-  ComponentUtils,
-  HandleExcelPaste,
-  CleanStyles,
-];
 
 const emit = defineEmits(["update"]);
 const isConfirmingDelete = ref(false);

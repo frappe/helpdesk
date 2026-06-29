@@ -29,7 +29,7 @@
       <div class="flex justify-center items-center mx-auto">
         <TicketIcon class="size-10 text-ink-gray-4" />
       </div>
-      <div class="text-md-medium text-ink-gray-8">
+      <div class="text-lg font-medium text-ink-gray-8">
         {{ __("Ticket not found") }}
       </div>
       <div class="text-center text-p-base text-ink-gray-6 mt-1">
@@ -39,7 +39,7 @@
       </div>
       <Button :route="{ name: 'TicketsAgent' }" variant="subtle">
         <template #prefix
-          ><span class="lucide-arrow-left size-4" aria-hidden="true"
+          ><FeatherIcon name="arrow-left" class="size-4"
         /></template>
         {{ __("Back to Tickets") }}
       </Button>

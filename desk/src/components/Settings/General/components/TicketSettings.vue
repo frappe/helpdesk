@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="text-base-semibold text-ink-gray-9">
+    <div class="text-base font-semibold text-ink-gray-9">
       {{ __("Ticket Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Make feedback mandatory")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -19,7 +19,7 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Enable comment reactions")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -31,7 +31,7 @@
       <div>
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
-            <span class="text-base-medium text-ink-gray-8">{{
+            <span class="text-base font-medium text-ink-gray-8">{{
               __("Restrict tickets by team")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">{{
@@ -63,7 +63,7 @@
         v-if="settingsData.restrictTicketsByAgentGroup"
       >
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Disable global saved replies")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -76,7 +76,7 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Auto update status")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -105,7 +105,7 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Allow anyone to create tickets")
           }}</span>
           <span class="text-p-sm text-ink-gray-6"
@@ -125,7 +125,7 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Default ticket type")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -141,7 +141,7 @@
       </div>
       <div>
         <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
+          <span class="text-base font-medium text-ink-gray-8">{{
             __("Automatically close stale tickets")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -195,7 +195,7 @@
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
+              <span class="text-base font-medium text-ink-gray-8">{{
                 __("Outside working hours notice")
               }}</span>
               <span class="text-p-sm text-ink-gray-6"

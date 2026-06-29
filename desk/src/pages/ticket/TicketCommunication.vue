@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border flex-1 px-3 pt-2.5 mb-4 border-transparent bg-surface-base rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="border flex-1 px-3 pt-2.5 mb-4 border-transparent bg-surface-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">

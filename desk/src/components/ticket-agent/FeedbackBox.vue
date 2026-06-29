@@ -5,15 +5,10 @@
       class="flex mb-1.5 items-center"
       :class="activity.feedback && 'gap-[9px]'"
     >
-      <p class="text-base-medium text-ink-gray-8">
+      <p class="text-base text-ink-gray-8 font-medium">
         {{ activity.feedback }}
       </p>
-      <Rating
-        :max="5"
-        size="sm"
-        disabled
-        :model-value="activity.feedback_rating * 5"
-      />
+      <StarRating :rating="activity.feedback_rating" />
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">
@@ -26,8 +21,8 @@
 
 <script setup lang="ts">
 import { FeedbackActivity } from "@/types";
-import { Rating } from "frappe-ui";
 import { computed, PropType } from "vue";
+import StarRating from "../StarRating.vue";
 
 const props = defineProps({
   activity: {

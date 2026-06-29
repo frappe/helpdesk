@@ -59,7 +59,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-md-semibold text-ink-gray-8">{{
+            <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Valid From")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -110,7 +110,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <div class="text-md-semibold text-ink-gray-8">
+            <div class="text-lg font-semibold text-ink-gray-8">
               {{ __("Recurring Holidays") }}
             </div>
             <div class="text-p-sm text-ink-gray-6">
@@ -128,7 +128,7 @@
         <div>
           <div class="flex justify-between items-center">
             <div class="flex justify-between flex-col gap-1">
-              <span class="text-md-semibold text-ink-gray-8">
+              <span class="text-lg font-semibold text-ink-gray-8">
                 {{ __("Holidays") }}
               </span>
               <div class="text-p-sm text-ink-gray-6">
@@ -167,7 +167,7 @@
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
               <div class="gap-1 flex items-center">
-                <span class="bg-surface-yellow-2 size-4 rounded-sm" />
+                <span class="bg-yellow-100 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Holidays")
                 }}</span>

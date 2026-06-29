@@ -26,7 +26,7 @@
       />
       <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
-        <p class="text-xl-medium text-ink-gray-5">Loading...</p>
+        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
       </div> -->
     </template>
   </Tabs>
@@ -64,7 +64,7 @@ import {
   TicketSymbol,
   TicketTab,
 } from "@/types";
-import { Tabs } from "frappe-ui";
+import { Button, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import { TicketAgentActivities } from "../ticket";
@@ -232,6 +232,7 @@ const _activities = computed(() => {
   // add feedback data at the last always
   // name is email
   // full_name is name
+
   if (ticket.value.doc.feedback_rating === 0) {
     return data;
   }

@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Configure your telephony settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-md-semibold text-ink-gray-8">
+        <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
         <UnsavedBadge
@@ -35,10 +35,10 @@
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
-            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-sidebar rounded px-2"
+            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-menu-bar rounded px-2"
           >
             <div class="flex flex-col">
-              <div class="text-p-base-medium text-ink-gray-7 truncate">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
                 {{ __("Default medium") }}
               </div>
               <div class="text-p-sm text-ink-gray-5">
@@ -61,14 +61,14 @@
               />
             </div>
           </div>
-          <div class="h-px border-t mx-2 border-outline-elevation-2" />
+          <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-sidebar px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
-              <div class="text-p-base-medium text-ink-gray-7 truncate">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
                 {{ __("Twilio") }}
               </div>
               <div class="text-p-sm text-ink-gray-5 truncate">
@@ -79,20 +79,20 @@
                 }}
               </div>
             </div>
-            <span
-              class="lucide-chevron-right size-4 text-ink-gray-5 rtl:rotate-180"
-              aria-hidden="true"
+            <FeatherIcon
+              name="chevron-right"
+              class="size-4 text-ink-gray-5 rtl:rotate-180"
             />
           </div>
 
-          <div class="h-px border-t mx-2 border-outline-elevation-2" />
+          <div class="h-px border-t mx-2 border-outline-gray-modals" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-sidebar px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-menu-bar px-2"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">
-              <div class="text-p-base-medium text-ink-gray-7 truncate">
+              <div class="text-p-base font-medium text-ink-gray-7 truncate">
                 {{ __("Exotel") }}
               </div>
               <div class="text-p-sm text-ink-gray-5 truncate">
@@ -103,9 +103,9 @@
                 }}
               </div>
             </div>
-            <span
-              class="lucide-chevron-right size-4 text-ink-gray-5 rtl:rotate-180"
-              aria-hidden="true"
+            <FeatherIcon
+              name="chevron-right"
+              class="size-4 text-ink-gray-5 rtl:rotate-180"
             />
           </div>
         </div>

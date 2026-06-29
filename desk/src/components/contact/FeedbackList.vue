@@ -22,9 +22,9 @@
       v-else-if="!feedbackListResource.data?.length"
       class="flex flex-col items-center justify-center gap-3 py-16 text-center h-full flex-1"
     >
-      <LucideStar class="size-7.5 text-ink-gray-4" />
+      <LucideMessageSquare class="h-10 w-10 text-ink-gray-4" />
       <div>
-        <p class="text-md-medium text-ink-gray-7">
+        <p class="text-lg font-medium text-ink-gray-7">
           {{ __("No reviews found") }}
         </p>
       </div>
@@ -34,7 +34,7 @@
     <div v-else class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
       <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
-          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-base p-2.5 hover:bg-surface-gray-1"
+          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-white p-2.5 hover:bg-surface-gray-1"
           @click="goToTicket(ticket.name)"
         >
           <!-- Rating badge + ticket name -->
@@ -61,7 +61,10 @@
 
           <!-- Feedback title + body -->
           <div class="flex flex-col gap-1.5">
-            <p v-if="ticket.feedback" class="text-sm-medium text-ink-gray-7">
+            <p
+              v-if="ticket.feedback"
+              class="text-sm font-medium text-ink-gray-7"
+            >
               {{ ticket.feedback }}
             </p>
             <p v-if="ticket.feedback_extra" class="text-p-base text-ink-gray-6">
@@ -93,6 +96,7 @@ import { __ } from "@/translation";
 import { dayjs, LoadingIndicator, TabButtons, Tooltip } from "frappe-ui";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideStar from "~icons/lucide/star";
 
 const props = defineProps<{
@@ -169,9 +173,9 @@ function formatRating(rating: number | undefined | null): number {
 
 function ratingBadgeClass(rating: number | undefined | null): string {
   const stars = formatRating(rating);
-  if (stars >= 4) return "bg-surface-green-2 text-ink-green-6";
-  if (stars >= 2.5) return "bg-surface-yellow-2 text-ink-yellow-7";
-  return "bg-surface-red-2 text-ink-red-6";
+  if (stars >= 4) return "bg-green-100 text-green-700";
+  if (stars >= 2.5) return "bg-yellow-100 text-yellow-700";
+  return "bg-red-100 text-red-700";
 }
 
 onMounted(() => {

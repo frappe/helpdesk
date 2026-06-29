@@ -8,7 +8,7 @@
           class="pb-4"
           :class="!group.hideBorder && 'border-b border-outline-gray-2'"
         >
-          <h2 class="text-md-semibold text-ink-gray-9 mb-4">
+          <h2 class="text-lg font-semibold text-ink-gray-9 mb-4">
             {{ group.title }}
           </h2>
           <ul class="space-y-2">
@@ -120,7 +120,7 @@ onMounted(() => {
 </script>
 <style>
 /* Hack to remove focus ring from buttons in shortcuts modal */
-.bg-surface-elevation-2:has(.shortcutsModal) button {
+.bg-surface-modal:has(.shortcutsModal) button {
   @apply focus-visible:ring-0;
 }
 </style>

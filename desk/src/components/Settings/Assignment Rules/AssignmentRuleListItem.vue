@@ -1,12 +1,12 @@
 <template>
   <div
-    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
       class="w-full ps-2 col-span-7 h-14 flex flex-col justify-center"
     >
-      <div class="text-base-medium text-ink-gray-7">{{ data.name }}</div>
+      <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
         class="text-sm w-full text-ink-gray-5 mt-1 truncate"

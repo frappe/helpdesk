@@ -12,7 +12,7 @@
           />
           <button
             type="button"
-            class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/40 text-ink-base opacity-0 outline-none transition focus:outline-none focus-visible:outline-none group-hover:opacity-100"
+            class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/40 text-white opacity-0 outline-none transition focus:outline-none focus-visible:outline-none group-hover:opacity-100"
             :class="roundedClass"
             :aria-label="__('Replace image')"
             @click.prevent="openFileSelector()"
@@ -21,7 +21,7 @@
           </button>
           <button
             type="button"
-            class="absolute -right-2.5 -top-2.5 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-surface-base text-ink-gray-4 opacity-0 outline outline-black-overlay-50 duration-300 ease-in-out focus:outline-none focus-visible:outline-none hover:bg-surface-gray-2 group-hover:opacity-100"
+            class="absolute -right-2.5 -top-2.5 flex size-4.5 cursor-pointer items-center justify-center rounded-full bg-surface-white text-ink-gray-4 opacity-0 outline outline-black-overlay-50 duration-300 ease-in-out focus:outline-none focus-visible:outline-none hover:bg-surface-gray-2 group-hover:opacity-100"
             :aria-label="__('Remove image')"
             @click.prevent="image = ''"
           >
@@ -45,7 +45,7 @@
     </FileUploader>
 
     <div v-if="label || description" class="flex flex-col gap-0.5">
-      <span v-if="label" class="text-p-sm-medium text-ink-gray-8">
+      <span v-if="label" class="text-p-sm font-medium text-ink-gray-8">
         {{ __(label) }}
       </span>
       <span v-if="description" class="text-p-sm text-ink-gray-5">

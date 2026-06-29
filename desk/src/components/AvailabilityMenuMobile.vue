@@ -30,7 +30,7 @@
     </template>
     <template #body="{ close }">
       <div
-        class="flex flex-col mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl min-w-[140px]"
+        class="flex flex-col mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl min-w-[140px]"
       >
         <button
           v-for="option in agentStatusStore.statusOptions"

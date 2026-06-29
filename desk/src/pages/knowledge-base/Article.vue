@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl bg-transparent font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -160,27 +160,24 @@
         </div>
 
         <!-- Article Content -->
-        <Editor
+        <TextEditor
           ref="editorRef"
-          :model-value="textEditorContentWithIDs"
-          :extensions="extensions"
+          :editor-class="editorClass"
+          :content="textEditorContentWithIDs"
+          :extensions="[ComponentUtils, CleanStyles]"
           :editable="editable"
-          :upload-function="(file: File) => uploadFunction(file)"
-          :placeholder="__('Write your article here...')"
           @change="(event:string) => {
 			      content = event;
 		      }"
+          :placeholder="__('Write your article here...')"
         >
-          <template #default="{ editor }">
-            <EditorContent :editor="editor" :class="editorClass" />
-            <EditorFixedMenu
-              v-if="editable"
+          <template #bottom v-if="editable">
+            <TextEditorFixedMenu
               class="-ms-1 overflow-x-auto w-full"
-              :editor="editor"
-              :items="textEditorMenuItems"
+              :buttons="textEditorMenuButtons"
             />
           </template>
-        </Editor>
+        </TextEditor>
         <div
           v-if="!editable && !isCustomerPortal"
           class="flex gap-1 items-center pt-1.5 mt-4"
@@ -193,7 +190,9 @@
               size="lg"
             />
             <div class="flex flex-col justify-start gap-1">
-              <p class="truncate capitalize text-p-base-medium text-ink-gray-9">
+              <p
+                class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
+              >
                 <span class="text-base text-ink-gray-5"
                   >{{ __("published by") }}
                 </span>
@@ -264,11 +263,10 @@ import {
 import { capture } from "@/telemetry";
 import { CleanStyles, ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
-import { textEditorMenuItems } from "@/editor-menu";
 import {
   copyToClipboard,
   isCustomerPortal,
-  uploadFunction,
+  textEditorMenuButtons,
   ConfirmDelete,
 } from "@/utils";
 import { newCategory } from "@/stores/knowledgeBase";
@@ -280,6 +278,8 @@ import {
   createListResource,
   debounce,
   Dropdown,
+  TextEditor,
+  TextEditorFixedMenu,
   toast,
   Badge,
   dayjs,
@@ -287,12 +287,6 @@ import {
   LoadingIndicator,
   usePageMeta,
 } from "frappe-ui";
-import {
-  Editor,
-  EditorContent,
-  EditorFixedMenu,
-  RichTextKit,
-} from "frappe-ui/editor";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
@@ -357,7 +351,6 @@ const route = useRoute();
 const authStore = useAuthStore();
 
 const editorRef = ref(null);
-const extensions = [RichTextKit, ComponentUtils, CleanStyles];
 const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);

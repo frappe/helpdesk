@@ -11,7 +11,7 @@
         leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-e bg-surface-sidebar transition-all duration-300 ease-in-out"
+          class="relative z-10 flex h-full w-[230px] flex-col border-e bg-surface-menu-bar transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
           <div class="p-1">
@@ -53,12 +53,13 @@
                 <template #header="{ opened, hide, toggle }">
                   <div
                     v-if="!hide"
-                    class="flex cursor-pointer gap-1.5 px-2 text-base-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
+                    class="flex cursor-pointer gap-1.5 px-2 text-base font-medium text-ink-gray-5 mx-2 transition-all duration-300 ease-in-out"
                     :class="'py-[7px] h-7.5 w-auto opacity-100 rtl:flex-row-reverse rtl:justify-end'"
                     @click="toggle()"
                   >
-                    <span
-                      class="lucide-chevron-right h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                    <FeatherIcon
+                      name="chevron-right"
+                      class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
                       :class="{
                         'rotate-90': opened,
                         'rtl:rotate-180': !opened,
@@ -125,8 +126,7 @@ import { useTheme } from "frappe-ui";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import AppsIcon from "@/components/icons/AppsIcon.vue";
-import { useApps } from "@/composables/apps";
+import Apps from "../Apps.vue";
 import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
 import {
   agentPortalSidebarOptions,
@@ -135,11 +135,10 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
-const { appsSubmenu } = useApps();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
-  label: __("Toggle theme"),
+  label: "Toggle theme",
   icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
   onClick: () => toggleTheme(),
 }));
@@ -208,7 +207,7 @@ function parseViews(views) {
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
   {
-    label: __("Log out"),
+    label: "Log out",
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },
@@ -216,9 +215,7 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    label: __("Apps"),
-    icon: markRaw(AppsIcon),
-    submenu: appsSubmenu.value,
+    component: markRaw(Apps),
   },
   ...(authStore.hasAgentRecord
     ? [
@@ -228,7 +225,7 @@ const agentPortalDropdown = computed(() => [
       ]
     : []),
   {
-    label: __("Customer portal"),
+    label: "Customer portal",
     icon: "lucide-users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
@@ -237,17 +234,17 @@ const agentPortalDropdown = computed(() => [
   },
   {
     icon: "lucide-life-buoy",
-    label: __("Support"),
+    label: "Support",
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
     icon: "lucide-book-open",
-    label: __("Docs"),
+    label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   themeMenuItem.value,
   {
-    label: __("Log out"),
+    label: "Log out",
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },

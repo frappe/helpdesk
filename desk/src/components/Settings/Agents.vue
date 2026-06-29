@@ -45,12 +45,9 @@
               class="flex items-center justify-between w-fit p-4"
             >
               <template #suffix>
-                <span
-                  :class="[
-                    'h-4',
-                    open ? 'lucide-chevron-up' : 'lucide-chevron-down',
-                  ]"
-                  aria-hidden="true"
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
                 />
               </template>
             </Button>
@@ -64,10 +61,10 @@
                 <span class="whitespace-nowrap">
                   {{ item.label }}
                 </span>
-                <span
+                <FeatherIcon
                   v-if="activeFilter === item.label"
-                  class="lucide-check size-4 text-ink-gray-7"
-                  aria-hidden="true"
+                  name="check"
+                  class="size-4 text-ink-gray-7"
                 />
               </div>
             </button>
@@ -145,12 +142,12 @@
                   :label="getUserRole(agent.name)"
                   :button="{
                     label: getUserRole(agent.name),
-                    iconRight: 'lucide-chevron-down',
+                    iconRight: 'chevron-down',
                     iconLeft:
                       getUserRole(agent.name) === 'Agent'
-                        ? 'lucide-user'
+                        ? 'user'
                         : getUserRole(agent.name) === 'Manager'
-                        ? 'lucide-briefcase'
+                        ? 'briefcase'
                         : null,
                   }"
                   placement="right"
@@ -187,7 +184,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { Avatar, Button, call, Dropdown, toast } from "frappe-ui";
+import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import { activeFilter, useAgents } from "./agents";

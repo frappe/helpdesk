@@ -20,21 +20,21 @@ interface AvailabilityEvent {
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
   black: "bg-ink-gray-9",
-  gray: "bg-surface-gray-6",
-  blue: "bg-surface-blue-6",
-  green: "bg-surface-green-6",
-  red: "bg-surface-red-6",
-  pink: "bg-surface-pink-6",
-  orange: "bg-surface-orange-6",
-  amber: "bg-surface-amber-6",
-  yellow: "bg-surface-yellow-6",
-  cyan: "bg-surface-cyan-6",
-  teal: "bg-surface-teal-6",
-  violet: "bg-surface-violet-6",
-  purple: "bg-surface-purple-6",
+  gray: "bg-gray-500",
+  blue: "bg-blue-500",
+  green: "bg-green-600",
+  red: "bg-red-500",
+  pink: "bg-pink-500",
+  orange: "bg-orange-500",
+  amber: "bg-amber-500",
+  yellow: "bg-yellow-500",
+  cyan: "bg-cyan-500",
+  teal: "bg-teal-500",
+  violet: "bg-violet-500",
+  purple: "bg-purple-500",
 };
 
-const defaultColor = "bg-surface-gray-8";
+const defaultColor = "bg-surface-gray-5";
 
 export const useAgentStatusStore = defineStore("agentStatus", () => {
   // Set only for sessions that have an HD Agent record; null otherwise.

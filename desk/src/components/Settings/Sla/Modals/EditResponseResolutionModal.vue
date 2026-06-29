@@ -27,7 +27,7 @@
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-surface-base top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
                   :options="{ seconds: false }"
@@ -51,7 +51,7 @@
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-surface-base top-2">
+              <div class="absolute bg-surface-white top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"
                   :options="{ seconds: false }"

@@ -40,10 +40,10 @@
         v-else-if="!Boolean(ticketsListResource.data?.length)"
         class="flex flex-col items-center justify-center gap-3 py-16 text-center h-full flex-1"
       >
-        <LucideTicket class="size-7.5 text-ink-gray-4" />
+        <LucideTicket class="h-10 w-10 text-ink-gray-4" />
         <div>
           <!-- make font larger -->
-          <p class="text-md-medium text-ink-gray-7">
+          <p class="text-lg font-medium text-ink-gray-7">
             {{ __("No tickets found") }}
           </p>
         </div>
@@ -52,7 +52,7 @@
       <template v-else>
         <!-- Headers -->
         <div
-          class="grid items-center px-1 py-2 text-xs-medium text-ink-gray-5"
+          class="grid items-center px-1 py-2 text-xs font-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
           <div

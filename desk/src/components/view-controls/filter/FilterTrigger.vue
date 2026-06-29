@@ -8,13 +8,13 @@
       <template #prefix><FilterIcon class="h-4" /></template>
       <template v-if="count" #suffix>
         <span
-          class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
+          class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
         >
           {{ count }}
         </span>
       </template>
     </Button>
-    <Tooltip v-if="count" :text="__('Clear all ')">
+    <Tooltip v-if="count" :text="__('Clear all Filter')">
       <div>
         <Button
           class="rounded-s-none border-s"

@@ -1,13 +1,21 @@
 <template>
-  <Editor
+  <TextEditor
     ref="editorRef"
-    v-model="newEmail"
-    :extensions="extensions"
+    :editor-class="[
+      'prose-sm max-w-full mx-6 md:mx-5 py-3',
+      getFontFamily(newEmail),
+      '[&_p.reply-to-content]:hidden',
+    ]"
+    :content="newEmail"
+    :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    @change="editable ? (newEmail = $event) : null"
+    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    @keydown.capture="handleKeydown"
   >
-    <template #default="{ editor }">
+    <template #top>
       <div
         v-if="hasMultipleSenders"
         class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 h-12.5"
@@ -93,22 +101,12 @@
           :custom-email-label="__('Add to recipients')"
         />
       </div>
+    </template>
 
-      <EditorBubbleMenu :editor="editor" :items="articleToolbar" />
-
-      <div
-        class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col"
-        @keydown.capture="handleKeydown"
-      >
+    <template #editor>
+      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
         <div class="flex-1">
-          <EditorContent
-            :editor="editor"
-            :class="[
-              'prose-sm max-w-full mx-6 md:mx-5 py-3',
-              getFontFamily(newEmail),
-              '[&_p.reply-to-content]:hidden',
-            ]"
-          />
+          <EditorContent :editor="editor" />
         </div>
         <div
           v-if="quotedContent"
@@ -129,7 +127,8 @@
           />
         </div>
       </div>
-
+    </template>
+    <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-5 my-2">
         <AttachmentItem
@@ -139,15 +138,15 @@
           :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
-            <span
-              class="lucide-x h-3.5"
-              aria-hidden="true"
+            <FeatherIcon
+              class="h-3.5"
+              name="x"
               @click.self.stop="removeAttachment(a)"
             />
           </template>
         </AttachmentItem>
       </div>
-      <!-- Editor Fixed Menu -->
+      <!-- TextEditor Fixed Menu -->
       <div
         class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
       >
@@ -185,9 +184,9 @@
             >
               <SavedReplyIcon class="h-4 w-4" />
             </button>
-            <div class="ml-0.5 mr-1 h-5 w-px bg-surface-gray-3" />
+            <div class="h-4 w-[2px] border-s" />
           </div>
-          <EditorFixedMenu :editor="editor" :items="textEditorMenuItems" />
+          <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
         </div>
         <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
           <Button label="Discard" @click="handleDiscard" />
@@ -205,7 +204,7 @@
         </div>
       </div>
     </template>
-  </Editor>
+  </TextEditor>
   <SavedRepliesSelectorModal
     v-model="showSavedRepliesSelectorModal"
     :doctype="doctype"
@@ -220,7 +219,6 @@ import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
-import { textEditorMenuItems } from "@/editor-menu";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
@@ -232,19 +230,19 @@ import {
   htmlToText,
   isContentEmpty,
   removeAttachmentFromServer,
+  textEditorMenuButtons,
   uploadFunction,
   validateEmailWithZod,
 } from "@/utils";
+import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
-import { FileUploader, createResource, toast } from "frappe-ui";
 import {
-  Editor,
-  EditorBubbleMenu,
-  EditorContent,
-  EditorFixedMenu,
-  RichTextKit,
-  articleToolbar,
-} from "frappe-ui/editor";
+  FileUploader,
+  TextEditor,
+  TextEditorFixedMenu,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import {
   computed,
@@ -300,13 +298,6 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
-
-const extensions = [
-  RichTextKit.configure({ heading: { levels: [2, 3, 4, 5, 6] } }),
-  ComponentUtils,
-  HandleExcelPaste,
-  CleanStyles,
-];
 
 function focusEditorAtStart() {
   setTimeout(() => {

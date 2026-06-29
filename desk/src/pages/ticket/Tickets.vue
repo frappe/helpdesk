@@ -75,7 +75,14 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal, shortDuration } from "@/utils";
-import { Badge, dayjs, toast, Tooltip, usePageMeta } from "frappe-ui";
+import {
+  Badge,
+  dayjs,
+  FeatherIcon,
+  toast,
+  Tooltip,
+  usePageMeta,
+} from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -442,7 +449,7 @@ const viewActions = (view) => {
       items: [
         {
           label: __("Duplicate"),
-          icon: h("span", { class: "lucide-copy", "aria-hidden": "true" }),
+          icon: h(FeatherIcon, { name: "copy" }),
           onClick: () => {
             viewDialog.view.label = _view.label + " (New)";
             viewDialog.view.icon = _view.icon;
@@ -472,9 +479,9 @@ const viewActions = (view) => {
     if (_view?.is_standard && isManager) {
       actions[0].items.push({
         label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
-        icon: h("span", {
-          class: ["h-4 w-4", _view?.public ? "lucide-eye-off" : "lucide-eye"],
-          "aria-hidden": "true",
+        icon: h(FeatherIcon, {
+          name: _view?.public ? "eye-off" : "eye",
+          class: "h-4 w-4",
         }),
         onClick: () => {
           toggleViewVisibility(
@@ -492,9 +499,9 @@ const viewActions = (view) => {
       if (isManager && !isCustomerPortal.value) {
         actions[0].items.push({
           label: _view?.public ? __("Make Private") : __("Make Public"),
-          icon: h("span", {
-            class: ["h-4 w-4", _view?.public ? "lucide-lock" : "lucide-unlock"],
-            "aria-hidden": "true",
+          icon: h(FeatherIcon, {
+            name: _view?.public ? "lock" : "unlock",
+            class: "h-4 w-4",
           }),
           onClick: () => {
             toggleViewVisibility(

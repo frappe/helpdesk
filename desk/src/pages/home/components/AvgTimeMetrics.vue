@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex items-center justify-between">
-      <div class="text-md-semibold text-ink-gray-8">
+      <div class="text-lg font-semibold text-ink-gray-8">
         {{ __("Average Time Metrics") }}
       </div>
       <div class="flex items-center gap-2">
@@ -23,10 +23,10 @@
           </template>
 
           <template #item-suffix="{ item }">
-            <span
+            <FeatherIcon
               v-if="item.label == durationLabels[currentDuration]"
-              class="lucide-check size-4"
-              aria-hidden="true"
+              name="check"
+              class="size-4"
             />
           </template>
         </Dropdown>
@@ -53,7 +53,7 @@
       <div class="flex items-center gap-12">
         <div>
           <div
-            class="text-md-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
           />
           <div
             class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
@@ -61,7 +61,7 @@
         </div>
         <div>
           <div
-            class="text-md-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
+            class="text-lg font-medium text-ink-gray-8 w-20 rounded-sm h-4 bg-surface-gray-1"
           />
           <div
             class="w-40 rounded-sm h-4 bg-surface-gray-1 text-base flex items-center gap-2 mt-1"
@@ -113,16 +113,16 @@
     <div v-else class="flex flex-col mt-5 grow w-full">
       <div class="flex items-center gap-12">
         <div>
-          <div class="text-md-medium text-ink-gray-8">
+          <div class="text-lg font-medium text-ink-gray-8">
             {{ timeAverages.first_response }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
-            <div class="size-2 bg-surface-gray-10 rounded-full" />
+            <div class="size-2 bg-surface-gray-7 rounded-full" />
             {{ __("Avg. first response time") }}
           </div>
         </div>
         <div>
-          <div class="text-md-medium text-ink-gray-8">
+          <div class="text-lg font-medium text-ink-gray-8">
             {{ timeAverages.resolution }}
           </div>
           <div class="text-base text-ink-gray-5 flex items-center gap-2 mt-1">
@@ -146,6 +146,7 @@ import {
   Dropdown,
   DateRangePicker,
   Button,
+  FeatherIcon,
   ECharts,
 } from "frappe-ui";
 import { dataTheme, formatTime } from "@/utils";
@@ -272,7 +273,7 @@ const chartConfig = computed<EChartsOption>(() => {
     legend: {},
     tooltip: {
       trigger: "item",
-      backgroundColor: cssVar("--surface-base"),
+      backgroundColor: cssVar("--surface-white"),
       borderColor: cssVar("--outline-gray-2"),
       borderWidth: 1,
       padding: 10,
@@ -337,7 +338,7 @@ const chartConfig = computed<EChartsOption>(() => {
     series: [
       {
         type: "bar",
-        color: cssVar("--surface-gray-10"),
+        color: cssVar("--surface-gray-7"),
         barWidth: "12%",
         itemStyle: { borderRadius: [4, 4, 0, 0] },
       },

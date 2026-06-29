@@ -17,7 +17,7 @@
         <div class="space-y-1.5">
           <label class="block text-xs text-ink-gray-5">
             {{ __("Role") }}
-            <span class="text-ink-red-6 select-none" aria-hidden="true">*</span>
+            <span class="text-ink-red-3 select-none" aria-hidden="true">*</span>
           </label>
           <Select :options="roleOptions" v-model="role" required class="w-full">
             <template #suffix>
@@ -38,7 +38,7 @@
         >
       </form>
       <template v-if="pendingInvitesResource.data?.length">
-        <h2 class="mt-8 text-base-semibold">
+        <h2 class="mt-8 text-base font-semibold">
           {{ __("Pending Invites") }}
         </h2>
         <ul class="flex flex-col gap-[0.375rem] mt-3">

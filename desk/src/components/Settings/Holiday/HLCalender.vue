@@ -1,6 +1,6 @@
 <template>
   <div class="w-max mx-auto">
-    <div class="text-base-medium mb-2 text-ink-gray-8 ms-2.5">
+    <div class="text-base font-medium mb-2 text-ink-gray-8 ms-2.5">
       {{ formattedMonth }}
     </div>
     <div class="rounded-md text-sm">
@@ -18,7 +18,7 @@
           <Popover v-if="isHoliday(date)">
             <template #target="{ open, close }">
               <div
-                class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded hover:bg-surface-yellow-2 select-none m-[1px]"
+                class="flex size-7 cursor-pointer text-orange-700 bg-yellow-100 items-center justify-center rounded hover:bg-yellow-100 select-none m-[1px]"
                 :class="{
                   '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
                 }"
@@ -46,10 +46,10 @@
                 "
               >
                 <div class="w-[5%]">
-                  <div class="size-3.5 bg-surface-orange-5 rounded-sm mt-1" />
+                  <div class="size-3.5 bg-orange-500 rounded-sm mt-1" />
                 </div>
                 <div class="grow">
-                  <div class="text-sm-semibold">
+                  <div class="text-sm font-semibold">
                     {{ getHolidayDescription(date) }}
                   </div>
                   <div class="text-xs mt-1">
@@ -137,7 +137,7 @@
               'text-ink-gray-3':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
-              'bg-surface-gray-10 text-ink-base hover:!bg-surface-gray-10/80 hover:text-ink-base':
+              'bg-surface-gray-7 text-ink-white hover:!bg-surface-gray-7/80 hover:text-ink-white':
                 getFormattedDate(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
             }"

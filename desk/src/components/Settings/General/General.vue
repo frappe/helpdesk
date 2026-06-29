@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Manage general settings of your app.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-md-semibold text-ink-gray-8">
+        <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
         <UnsavedBadge :show="isDirty" />
@@ -38,12 +38,12 @@
         <WorkflowKnowledgebaseSettings />
         <hr class="my-8" />
         <div>
-          <div class="text-base-semibold text-ink-gray-9">
+          <div class="text-base font-semibold text-ink-gray-9">
             {{ __("User Signup") }}
           </div>
           <div class="flex items-center justify-between mt-6">
             <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
+              <span class="text-base font-medium text-ink-gray-8">{{
                 __("Disable signup")
               }}</span>
               <span class="text-p-sm text-ink-gray-6">{{

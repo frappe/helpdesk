@@ -12,7 +12,7 @@
       </template>
       <template #body="{ togglePopover }">
         <div
-          class="mt-1 rounded-lg bg-surface-base py-1 text-base shadow-2xl w-60"
+          class="mt-1 rounded-lg bg-surface-white py-1 text-base shadow-2xl w-60"
         >
           <div class="relative px-1.5 pt-0.5">
             <ComboboxInput
@@ -32,7 +32,7 @@
               class="absolute end-1.5 inline-flex h-7 w-7 items-center justify-center"
               @click="query = ''"
             >
-              <span class="lucide-x w-4" />
+              <FeatherIcon name="x" class="w-4" />
             </button>
           </div>
           <ComboboxOptions class="my-2 max-h-64 overflow-y-auto px-1.5" static>

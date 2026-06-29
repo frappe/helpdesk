@@ -16,7 +16,7 @@
         <template #suffix>
           <kbd
             v-if="showShortcutHint && !query"
-            class="flex h-5 w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-base pt-px text-xs text-ink-gray-5"
+            class="flex h-5 w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-white pt-px text-xs text-ink-gray-5"
           >
             F
           </kbd>

@@ -2,7 +2,7 @@
   <div
     :id="`communication-${name}`"
     v-bind="$attrs"
-    class="grow cursor-pointer bg-surface-base rounded-md text-base leading-6 transition-all duration-300 ease-in-out border border-outline-gray-2"
+    class="grow cursor-pointer bg-surface-white rounded-md text-base leading-6 transition-all duration-300 ease-in-out border border-outline-gray-2"
   >
     <div
       class="flex items-center justify-between gap-2"
@@ -95,7 +95,7 @@
         </span>
       </template>
     </div>
-    <div class="border-0 border-t my-3 border-outline-elevation-2 !-mx-3" />
+    <div class="border-0 border-t my-3 border-outline-gray-modals !-mx-3" />
     <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem

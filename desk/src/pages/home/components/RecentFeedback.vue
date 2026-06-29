@@ -3,7 +3,7 @@
     <div class="flex flex-col rounded-md p-4 min-h-48 grow w-full h-full">
       <div class="flex flex-col sm:flex-row gap-4 h-full w-full">
         <div class="flex items-center justify-between sm:hidden">
-          <div class="text-ink-gray-8 text-md-semibold">
+          <div class="text-ink-gray-8 text-lg font-semibold">
             {{ __("Reviews") }}
           </div>
           <TabButtons
@@ -18,7 +18,7 @@
           :class="{ 'hidden sm:flex': currentTab === 'feedback' }"
         >
           <div class="items-center justify-between hidden sm:flex">
-            <div class="text-ink-gray-8 text-md-semibold">
+            <div class="text-ink-gray-8 text-lg font-semibold">
               {{ __("Reviews") }}
             </div>
             <TabButtons
@@ -35,7 +35,7 @@
             <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
-                <div class="text-2xl-medium text-ink-gray-8">
+                <div class="text-2xl font-medium text-ink-gray-8">
                   {{ chartConfig.averageRating }}
                 </div>
               </div>
@@ -44,10 +44,7 @@
                 @click="redirectToSeeAllReviews"
               >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
-                <span
-                  class="lucide-arrow-up-right size-3.5 ms-0.5"
-                  aria-hidden="true"
-                />
+                <FeatherIcon name="arrow-up-right" class="size-3.5 ms-0.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -109,10 +106,10 @@
                 </div>
               </template>
               <template #item-suffix="{ item }">
-                <span
+                <FeatherIcon
                   v-if="item.label == __(sortLabels[currentSort])"
-                  class="lucide-check size-4"
-                  aria-hidden="true"
+                  name="check"
+                  class="size-4"
                 />
               </template>
             </Dropdown>
@@ -140,10 +137,10 @@
                   </div>
                 </template>
                 <template #item-suffix="{ item }">
-                  <span
+                  <FeatherIcon
                     v-if="item.label == __(periodLabels[currentPeriod])"
-                    class="lucide-check size-4"
-                    aria-hidden="true"
+                    name="check"
+                    class="size-4"
                   />
                 </template>
               </Dropdown>
@@ -173,10 +170,7 @@
                   class="flex items-center gap-0.5 hover:text-ink-gray-7 cursor-pointer font-medium"
                   @click="goToTicket(currentFeedback)"
                 >
-                  <span
-                    class="lucide-arrow-up-right size-4"
-                    aria-hidden="true"
-                  />
+                  <FeatherIcon name="arrow-up-right" class="size-4" />
                   {{ currentFeedback.name }}
                 </div>
                 <span class="text-ink-gray-4">·</span>
@@ -196,12 +190,12 @@
                     :class="getRatingColor(currentFeedback.star_rating).text"
                   />
                   <span
-                    class="text-base-medium text-ink-gray-7"
+                    class="text-base font-medium text-ink-gray-7"
                     :class="getRatingColor(currentFeedback.star_rating).text"
                     >{{ currentFeedback.star_rating }}</span
                   >
                 </div>
-                <span class="text-base-medium text-ink-gray-7">{{
+                <span class="text-base text-ink-gray-7 font-medium">{{
                   currentFeedback.feedback || __("Feedback")
                 }}</span>
               </div>
@@ -238,9 +232,9 @@
                     @click="prevFeedback"
                     :disabled="currentIndex === 0"
                   >
-                    <span
-                      class="lucide-chevron-left size-4 rtl:rotate-180"
-                      aria-hidden="true"
+                    <FeatherIcon
+                      name="chevron-left"
+                      class="size-4 rtl:rotate-180"
                     />
                   </Button>
                   <Button
@@ -249,9 +243,9 @@
                     @click="nextFeedback"
                     :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
                   >
-                    <span
-                      class="lucide-chevron-right size-4 rtl:rotate-180"
-                      aria-hidden="true"
+                    <FeatherIcon
+                      name="chevron-right"
+                      class="size-4 rtl:rotate-180"
                     />
                   </Button>
                 </div>
@@ -304,6 +298,7 @@ import {
   createResource,
   DateRangePicker,
   Dropdown,
+  FeatherIcon,
   TabButtons,
   ECharts,
 } from "frappe-ui";
@@ -675,7 +670,7 @@ const redirectToSeeAllReviews = () => {
 const getRatingColor = (rating: number) => {
   if (rating >= 4)
     return {
-      text: "text-ink-green-6 fill-ink-green-6",
+      text: "text-ink-green-3 fill-ink-green-3",
       bg: "bg-surface-green-2",
     };
   if (rating >= 3)
@@ -684,7 +679,7 @@ const getRatingColor = (rating: number) => {
       bg: "bg-surface-yellow-2",
     };
   return {
-    text: "text-ink-red-6 fill-ink-red-6",
+    text: "text-ink-red-3 fill-ink-red-3",
     bg: "bg-surface-red-2",
   };
 };

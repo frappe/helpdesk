@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">
+        <div class="text-lg font-medium text-ink-gray-9">
           {{ __("Knowledge Base") }}
         </div>
       </template>
@@ -58,21 +58,22 @@ import {
   updateCategoryTitle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { __ } from "@/translation";
 import { Error } from "@/types";
 import { copyToClipboard } from "@/utils";
 import {
   Badge,
   Button,
   Dropdown,
+  FeatherIcon,
   createResource,
   toast,
   usePageMeta,
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
+import { __ } from "@/translation";
 import { useRouter } from "vue-router";
-import LucideBookOpen from "~icons/lucide/book-open";
 import LucideMerge from "~icons/lucide/merge";
+import LucideBookOpen from "~icons/lucide/book-open";
 
 const router = useRouter();
 const { $dialog } = globalStore();
@@ -401,12 +402,9 @@ const options = computed(() => {
     columnConfig: {
       title: {
         prefix: () => {
-          return h("span", {
-            class: [
-              "lucide-file-text",
-              "h-4 w-4 flex-shrink-0 text-ink-gray-6",
-            ],
-            "aria-hidden": "true",
+          return h(FeatherIcon, {
+            name: "file-text",
+            class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });
         },
       },

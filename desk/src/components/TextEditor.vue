@@ -1,15 +1,18 @@
 <template>
   <div class="rounded p-3 shadow w-full">
-    <Editor
-      ref="editorComponent"
-      :extensions="extensions"
-      :model-value="modelValue"
-      :placeholder="placeholder"
-      :autofocus="autofocus"
-      :upload-function="(file: File) => uploadFunction(file)"
-      @update:model-value="$emit('update:modelValue', $event)"
+    <FTextEditor
+      ref="e"
+      :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
+      v-bind="$attrs"
+      :editor-class="[
+        'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-[5rem]',
+        getFontFamily(modelValue),
+      ]"
+      bubble-menu
+      :content="modelValue"
+      @change="$emit('update:modelValue', $event)"
     >
-      <template #default="{ editor }">
+      <template #top>
         <span class="text-base">
           <span class="flex items-center justify-between">
             <UserAvatar
@@ -22,24 +25,18 @@
           </span>
           <slot name="top-bottom" />
         </span>
-        <EditorContent
-          :editor="editor"
-          :class="[
-            'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]',
-            getFontFamily(modelValue),
-          ]"
-        />
-        <EditorBubbleMenu :editor="editor" :items="articleToolbar" />
+      </template>
+      <template #bottom>
         <div class="flex flex-col gap-2">
           <slot name="bottom-top" />
           <div
-            class="flex flex-col space-y-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
+            class="flex flex-col space-y-1.5 overflow-auto sm:flex-row sm:justify-between"
           >
-            <div class="flex items-center min-w-0 overflow-x-auto max-w-[70%]">
+            <div class="flex items-center">
               <slot name="bottom-left" />
-              <EditorFixedMenu :editor="editor" :items="textEditorMenuItems" />
+              <TextEditorFixedMenu :buttons="fixedMenu" />
             </div>
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-2">
               <Button
                 :label="__('Discard')"
                 theme="gray"
@@ -57,58 +54,63 @@
           </div>
         </div>
       </template>
-    </Editor>
+    </FTextEditor>
   </div>
 </template>
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
-import { textEditorMenuItems } from "@/editor-menu";
 import { useAuthStore } from "@/stores/auth";
 import {
   CleanStyles,
   ComponentUtils,
   HandleExcelPaste,
 } from "@/tiptap-extensions";
-import { getFontFamily, isContentEmpty, uploadFunction } from "@/utils";
-import {
-  Editor,
-  EditorBubbleMenu,
-  EditorContent,
-  EditorFixedMenu,
-  RichTextKit,
-  articleToolbar,
-} from "frappe-ui/editor";
-import { computed, ref } from "vue";
+import { ClearFormattingUtility, getFontFamily, isContentEmpty } from "@/utils";
+import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
+import { computed, nextTick, ref } from "vue";
 
 interface P {
   modelValue: string;
-  placeholder?: string;
   autofocus?: boolean;
 }
 
 interface E {
   (event: "clear"): void;
-  (event: "update:modelValue", value: string): void;
+  (event: "update:modelValue", any): string;
 }
 
-withDefaults(defineProps<P>(), {
+const props = withDefaults(defineProps<P>(), {
   autofocus: false,
 });
 
 defineEmits<E>();
 
+const e = ref(null);
+const editor = computed(() => e.value.editor);
 const authStore = useAuthStore();
-const editorComponent = ref(null);
-const editor = computed(() => editorComponent.value?.editor);
-
-const extensions = [
-  RichTextKit.configure({ heading: { levels: [1, 2, 3, 4, 5, 6] } }),
-  ComponentUtils,
-  HandleExcelPaste,
-  CleanStyles,
+const fixedMenu = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4", "Heading 5"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Separator",
+  "Image",
+  "Video",
+  "Link",
+  "Blockquote",
+  "Code",
+  ClearFormattingUtility,
 ];
 
 defineExpose({
   editor,
 });
+
+if (props.autofocus) {
+  nextTick(() => e.value.editor.commands.focus());
+}
 </script>
