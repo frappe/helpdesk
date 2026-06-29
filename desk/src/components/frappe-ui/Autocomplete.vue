@@ -27,8 +27,9 @@
                   {{ placeholder || "" }}
                 </span>
               </div>
-              <span
-                class="lucide-chevron-down h-4 w-4 text-ink-gray-5"
+              <FeatherIcon
+                name="chevron-down"
+                class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
             </button>
@@ -38,7 +39,7 @@
       <template #body="{ isOpen }">
         <div v-show="isOpen" class="min-w-[--reka-popper-anchor-width]">
           <div
-            class="mt-1 rounded-lg bg-surface-elevation-2 py-1 text-base shadow-2xl"
+            class="mt-1 rounded-lg bg-surface-modal py-1 text-base shadow-2xl"
           >
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
@@ -58,7 +59,7 @@
                 class="absolute inset-y-0 end-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
-                <span class="lucide-x size-4" aria-hidden="true" />
+                <FeatherIcon name="x" class="size-4" />
               </button>
             </div>
             <ComboboxOptions
@@ -73,7 +74,7 @@
               >
                 <div
                   v-if="group.group && !group.hideLabel"
-                  class="px-2.5 py-1.5 text-sm-medium text-ink-gray-4"
+                  class="px-2.5 py-1.5 text-sm font-medium text-ink-gray-4"
                 >
                   {{ group.group }}
                 </div>
@@ -112,7 +113,7 @@
             </ComboboxOptions>
             <div
               v-if="slots.footer"
-              class="border-t border-outline-elevation-2 p-1.5 pb-0.5"
+              class="border-t border-outline-gray-modals p-1.5 pb-0.5"
             >
               <slot
                 name="footer"
@@ -133,7 +134,7 @@ import {
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/vue";
-import { Popover } from "frappe-ui";
+import { FeatherIcon, Popover } from "frappe-ui";
 import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({
@@ -254,7 +255,7 @@ const inputClasses = computed(() => {
   let sizeClasses = {
     sm: "text-base rounded h-7",
     md: "text-base rounded h-8",
-    lg: "text-md rounded-md h-10",
+    lg: "text-lg rounded-md h-10",
     xl: "text-xl rounded-md h-10",
   }[props.size];
 
@@ -268,11 +269,11 @@ const inputClasses = computed(() => {
   let variant = props.disabled ? "disabled" : props.variant;
   let variantClasses = {
     subtle:
-      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
+      "border border-outline-gray-1 bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     outline:
-      "border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
+      "border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3",
     disabled: [
-      "border bg-surface-sidebar placeholder-ink-gray-3",
+      "border bg-surface-menu-bar placeholder-ink-gray-3",
       props.variant === "outline"
         ? "border-outline-gray-2"
         : "border-transparent",

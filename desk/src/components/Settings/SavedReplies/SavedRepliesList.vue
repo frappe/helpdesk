@@ -25,7 +25,7 @@
             @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-surface-base hover:bg-surface-base focus:ring-0 border-outline-gray-2"
+            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
             :debounce="300"
           >
             <template #prefix>
@@ -47,12 +47,9 @@
               class="flex items-center justify-between w-fit p-4"
             >
               <template #suffix>
-                <span
-                  :class="[
-                    'h-4',
-                    open ? 'lucide-chevron-up' : 'lucide-chevron-down',
-                  ]"
-                  aria-hidden="true"
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
                 />
               </template>
             </Button>
@@ -66,10 +63,10 @@
                 <span class="whitespace-nowrap">
                   {{ item.label }}
                 </span>
-                <span
+                <FeatherIcon
                   v-if="activeFilter === item.value"
-                  class="lucide-check size-4 text-ink-gray-7"
-                  aria-hidden="true"
+                  name="check"
+                  class="size-4 text-ink-gray-7"
                 />
               </div>
             </button>
@@ -114,7 +111,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
           >
             <div
               @click="
@@ -125,7 +122,9 @@
               "
               class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7 min-w-0"
             >
-              <div class="text-base-medium text-ink-gray-7 w-full truncate">
+              <div
+                class="text-base text-ink-gray-7 font-medium w-full truncate"
+              >
                 {{ savedReply.title }}
               </div>
             </div>
@@ -207,6 +206,7 @@ import {
   Button,
   call,
   Dropdown,
+  FeatherIcon,
   LoadingIndicator,
   TextInput,
   toast,

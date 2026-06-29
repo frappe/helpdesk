@@ -11,17 +11,19 @@
           :class="labelClass"
           @click="collapsible && toggle()"
         >
-          <span
+          <FeatherIcon
             v-if="collapsible && collapseIconPosition === 'left'"
-            class="lucide-chevron-right h-4 transition-all duration-300 ease-in-out"
+            name="chevron-right"
+            class="h-4 transition-all duration-300 ease-in-out"
             :class="{ 'rotate-90': opened }"
           />
           <span>
             {{ label || "Untitled" }}
           </span>
-          <span
+          <FeatherIcon
             v-if="collapsible && collapseIconPosition === 'right'"
-            class="lucide-chevron-right h-4 transition-all duration-300 ease-in-out"
+            name="chevron-right"
+            class="h-4 transition-all duration-300 ease-in-out"
             :class="{ 'rotate-90': opened }"
           />
         </div>

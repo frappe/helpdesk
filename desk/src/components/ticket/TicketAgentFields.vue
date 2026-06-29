@@ -45,7 +45,7 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 :deep(.form-control textarea),
 :deep(.form-control button) {
   border-color: var(--outline-gray-2);
-  background: var(--surface-base);
+  background: var(--surface-white);
 }
 :deep(.form-control textarea) {
   field-sizing: content;
@@ -66,7 +66,7 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 }
 
 :deep(.form-control button svg) {
-  color: var(--ink-base);
+  color: var(--ink-white);
   width: 0;
 }
 </style>

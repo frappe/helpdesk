@@ -48,9 +48,10 @@
                 </span>
                 <slot name="suffix" />
               </div>
-              <span
+              <FeatherIcon
                 v-show="!loading"
-                class="lucide-chevron-down h-4 w-4 text-ink-gray-5"
+                name="chevron-down"
+                class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
               <LoadingIndicator
@@ -64,7 +65,7 @@
       <template #body="{ isOpen, togglePopover }">
         <div v-show="isOpen">
           <div
-            class="relative mt-1 overflow-hidden rounded-lg bg-surface-base text-base shadow-2xl"
+            class="relative mt-1 overflow-hidden rounded-lg bg-surface-white text-base shadow-2xl"
             :class="bodyClasses"
           >
             <ComboboxOptions
@@ -88,7 +89,7 @@
                   class="absolute end-0 inline-flex h-7 w-7 items-center justify-center"
                   @click="selectedValue = null"
                 >
-                  <span class="lucide-x w-4" aria-hidden="true" />
+                  <FeatherIcon name="x" class="w-4" />
                 </button>
               </div>
               <div class="w-full flex-1 overflow-y-auto">
@@ -99,7 +100,7 @@
                 >
                   <div
                     v-if="group.group && !group.hideLabel"
-                    class="sticky top-0 truncate bg-surface-base px-2.5 py-1.5 text-sm-medium text-ink-gray-5"
+                    class="sticky top-0 truncate bg-surface-white px-2.5 py-1.5 text-sm font-medium text-ink-gray-5"
                   >
                     {{ group.group }}
                   </div>

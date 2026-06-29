@@ -60,7 +60,7 @@
             <Popover>
               <template #target="{ togglePopover }">
                 <div
-                  class="flex items-center justify-between text-base rounded h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
+                  class="flex items-center justify-between text-base rounded h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
                   @click="togglePopover()"
                 >
                   <div>
@@ -70,26 +70,27 @@
                       )?.label
                     }}
                   </div>
-                  <span class="lucide-chevron-down size-4" />
+                  <FeatherIcon name="chevron-down" class="size-4" />
                 </div>
               </template>
               <template #body="{ togglePopover }">
                 <div
-                  class="p-1 text-ink-gray-6 top-1 absolute bg-surface-base shadow-2xl rounded w-[--reka-popper-anchor-width]"
+                  class="p-1 text-ink-gray-6 top-1 absolute bg-surface-white shadow-2xl rounded w-[--reka-popper-anchor-width]"
                 >
                   <div
                     v-for="option in priorityOptions"
                     :key="option.value"
-                    class="p-2 cursor-pointer hover:bg-surface-sidebar text-base flex items-center justify-between rounded"
+                    class="p-2 cursor-pointer hover:bg-surface-menu-bar text-base flex items-center justify-between rounded"
                     @click="
                       assignmentRuleData.priority = option.value;
                       togglePopover();
                     "
                   >
                     {{ option.label }}
-                    <span
+                    <FeatherIcon
                       v-if="assignmentRuleData.priority == option.value"
-                      class="lucide-check size-4"
+                      name="check"
+                      class="size-4"
                     />
                   </div>
                 </div>
@@ -117,7 +118,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-md-semibold text-ink-gray-8">{{
+            <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Assignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
@@ -143,12 +144,12 @@
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
                       <span>{{ __("Old Condition") }}</span>
-                      <span class="lucide-info size-4" />
+                      <FeatherIcon name="info" class="size-4" />
                     </div>
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.assignCondition }}</code>
                     </div>
@@ -194,7 +195,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-md-semibold text-ink-gray-8">{{
+            <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Unassignment Condition")
             }}</span>
             <div class="flex items-center justify-between gap-6">
@@ -224,12 +225,12 @@
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
                       <span> {{ __("Old Condition") }} </span>
-                      <span class="lucide-info size-4" />
+                      <FeatherIcon name="info" class="size-4" />
                     </div>
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ assignmentRuleData.unassignCondition }}</code>
                     </div>
@@ -271,7 +272,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-md-semibold text-ink-gray-8">{{
+            <span class="text-lg font-semibold text-ink-gray-8">{{
               __("Assignment Schedule")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">

@@ -5,7 +5,7 @@
         <Popover v-if="startYear !== endYear">
           <template #target="{ togglePopover }">
             <Button
-              class="flex items-center gap-2 text-xl-semibold cursor-pointer select-none"
+              class="flex items-center gap-2 font-semibold text-xl cursor-pointer select-none"
               variant="ghost"
               @click="togglePopover"
               :label="currentYear + ''"
@@ -23,10 +23,10 @@
                   @click="onYearChange(togglePopover, year)"
                 >
                   {{ year }}
-                  <span
-                    class="lucide-check size-4"
+                  <FeatherIcon
+                    name="check"
+                    class="size-4"
                     v-if="year === currentYear"
-                    aria-hidden="true"
                   />
                 </div>
               </div>
@@ -35,7 +35,7 @@
         </Popover>
         <div
           v-else
-          class="flex items-center gap-2 px-2 text-xl-semibold select-none"
+          class="flex items-center gap-2 px-2 font-semibold text-xl select-none"
         >
           {{ startYear }}
         </div>
@@ -85,7 +85,7 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-surface-gray-10': visibleMonths === 'first-half',
+            'bg-surface-gray-7': visibleMonths === 'first-half',
             'bg-surface-gray-4': visibleMonths === 'second-half',
           },
         ]"
@@ -95,7 +95,7 @@
         :class="[
           'size-1.5 rounded-full cursor-pointer',
           {
-            'bg-surface-gray-10': visibleMonths === 'second-half',
+            'bg-surface-gray-7': visibleMonths === 'second-half',
             'bg-surface-gray-4': visibleMonths === 'first-half',
           },
         ]"

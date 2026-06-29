@@ -33,7 +33,7 @@
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="yellow"
-            class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-outline-amber-2"
+            class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-amber-200"
             @dismiss="dismissBanner"
           >
           </Alert>
@@ -78,7 +78,7 @@
                 :label="__('Send')"
                 theme="gray"
                 variant="solid"
-                :disabled="$refs.editor?.editor?.isEmpty || send.loading"
+                :disabled="$refs.editor?.editor.isEmpty || send.loading"
                 :loading="send.loading"
                 @click="sendEmail"
               />

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-md bg-surface-base border border-outline-gray-1 px-3 py-2.5 flex flex-col gap-2.5 hover:border-outline-gray-3 hover:cursor-pointer"
+    class="rounded-md bg-surface-white border border-outline-gray-1 px-3 py-2.5 flex flex-col gap-2.5 hover:border-outline-gray-3 hover:cursor-pointer"
     @click="goToContact"
   >
     <div class="flex items-center justify-between">
@@ -32,10 +32,10 @@
           placement="top"
         >
           <span
-            class="flex h-6 w-6 items-center justify-center text-ink-amber-5"
+            class="flex h-6 w-6 items-center justify-center text-ink-amber-2"
             :aria-label="__('Primary')"
           >
-            <Rating :max="1" size="sm" disabled :model-value="1" class="mt-1" />
+            <LucideStar class="size-4 fill-ink-amber-2" />
           </span>
         </Tooltip>
         <Dropdown
@@ -53,7 +53,7 @@
         </Dropdown>
       </div>
     </div>
-    <div class="border-t border-outline-gray-2 w-full" />
+    <div class="border-t border-gray-200 w-full" />
     <div class="flex flex-col gap-3">
       <template v-for="item in contactDetails" :key="item.value">
         <div
@@ -88,7 +88,6 @@ import {
   Badge,
   Button,
   Dropdown,
-  Rating,
   Tooltip,
   dayjs,
   toast,
@@ -98,6 +97,7 @@ import { useRouter } from "vue-router";
 import LucideMail from "~icons/lucide/mail";
 import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucidePhone from "~icons/lucide/phone";
+import LucideStar from "~icons/lucide/star";
 import LucideTicket from "~icons/lucide/ticket";
 import ModifiedIcon from "../icons/ModifiedIcon.vue";
 
@@ -142,7 +142,7 @@ const contactDetails = computed(() => [
     value: ticketCountLabel.value,
     color: (value: string) =>
       value !== __("No active tickets")
-        ? "!text-ink-amber-8"
+        ? "!text-amber-700"
         : "!text-ink-gray-4",
     class: (value: string) =>
       value !== __("No active tickets") ? "hover:underline cursor-pointer" : "",

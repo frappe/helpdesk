@@ -22,21 +22,19 @@
   >
     <template #default>
       <div class="space-y-4 text-base text-ink-gray-7">
-        <div class="flex flex-col gap-2">
-          <div>
-            <span> {{ __("Select a rating") }} </span>
-            <span class="text-ink-red-6"> * </span>
-          </div>
-          <Rating
+        <div class="space-y-2">
+          <span> {{ __("Select a rating") }} </span>
+          <span class="text-ink-red-3"> * </span>
+          <StarRating
+            :static="false"
+            :rating="rating"
             v-model="rating"
-            :max="5"
-            size="sm"
-            @update:model-value="onSelectRating"
+            @update:model-value="rating = $event"
           />
         </div>
         <div v-if="options.data?.length" class="space-y-2">
           <span> {{ __("Pick an option") }} </span>
-          <span class="text-ink-red-6"> * </span>
+          <span class="text-ink-red-3"> * </span>
           <div class="flex flex-wrap gap-2">
             <Button
               v-for="o in options.data"
@@ -62,10 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { __ } from "@/translation";
-import { createListResource, createResource, Rating } from "frappe-ui";
-import { inject, ref } from "vue";
+import { StarRating } from "@/components";
+import { createListResource, createResource } from "frappe-ui";
+import { inject, ref, watch } from "vue";
 import { ITicket } from "./symbols";
+import { __ } from "@/translation";
 
 interface P {
   open: boolean;
@@ -102,15 +101,15 @@ const setValue = createResource({
     ticket.reload();
   },
 });
-function onSelectRating(r: number) {
+watch(rating, (r) => {
   preset.value = null;
   text.value = "";
   options.update({
     filters: {
-      rating: r / 5,
+      rating: r,
       disabled: 0,
     },
   });
   options.reload();
-}
+});
 </script>

@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">
+        <div class="text-lg font-medium text-ink-gray-9">
           {{ __(dashboardTitle) }}
         </div>
       </template>
@@ -188,26 +188,26 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
-import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
-import { __ } from "@/translation";
-import { useStorage } from "@vueuse/core";
 import {
   AxisChart,
   DateRangePicker,
   DonutChart,
   Dropdown,
-  NumberChart,
   TabButtons,
-  Tooltip,
+  NumberChart,
   createResource,
   dayjs,
   usePageMeta,
+  Tooltip,
 } from "frappe-ui";
+const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
-const { isMobileView } = useScreenSize();
+import { useScreenSize } from "@/composables/screen";
+import { useStorage } from "@vueuse/core";
 
 interface NumberCardData {
   title: string;
@@ -571,7 +571,7 @@ usePageMeta(() => {
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control button > div) {
   overflow: hidden;

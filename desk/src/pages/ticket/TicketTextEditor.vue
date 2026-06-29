@@ -110,7 +110,7 @@ withDefaults(defineProps<P>(), {
 });
 defineEmits<E>();
 const e = ref(null);
-const editor = computed(() => e.value?.editor);
+const editor = computed(() => e.value.editor);
 const authStore = useAuthStore();
 defineExpose({
   editor,

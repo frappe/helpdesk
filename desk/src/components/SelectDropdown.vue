@@ -16,7 +16,7 @@
     </template>
     <template #body="{ togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded"
+        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-white shadow-2xl rounded"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">
@@ -34,9 +34,10 @@
             <div class="w-full truncate">
               {{ option.label }}
             </div>
-            <span
+            <FeatherIcon
               v-if="model == option.value"
-              class="lucide-check size-4 ms-2"
+              name="check"
+              class="size-4 ms-2"
             />
           </div>
         </div>
@@ -54,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Popover } from "frappe-ui";
+import { Button, FeatherIcon, Popover } from "frappe-ui";
 
 const model = defineModel();
 

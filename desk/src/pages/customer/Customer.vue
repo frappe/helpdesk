@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-bind="$attrs"
-    class="flex flex-col overflow-y-hidden max-w-screen-xl mx-auto w-full"
-  >
+  <div class="flex flex-col overflow-y-hidden max-w-screen-xl mx-auto w-full">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
@@ -45,7 +42,7 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-white"
         >
           <template #tab-item="{ tab, selected }">
             <button
@@ -55,7 +52,7 @@
               <component :is="tab.icon" v-if="tab.icon" class="h-5" />
               {{ __(tab.label) }}
               <Badge
-                class="group-hover:bg-surface-gray-10 !bg-surface-gray-2 !text-ink-gray-7"
+                class="group-hover:bg-surface-gray-7 !bg-surface-gray-2 !text-ink-gray-7"
                 variant="solid"
                 theme="gray"
                 size="sm"
@@ -103,8 +100,6 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false });
-
 import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketStats from "@/components/customer/TicketStats.vue";

@@ -7,7 +7,7 @@
       <div class="flex items-center gap-4">
         <div class="flex items-center justify-between gap-2 cursor-pointer">
           <Switch v-model="teamEnabled" v-if="!team.loading" />
-          <span class="text-sm-medium text-ink-gray-7">
+          <span class="text-sm text-ink-gray-7 font-medium">
             {{ __("Enabled") }}
           </span>
         </div>
@@ -90,7 +90,7 @@
           <UserIcon class="size-6 text-ink-gray-6" />
         </div>
         <div class="flex flex-col items-center gap-1">
-          <div class="text-base-medium text-ink-gray-6">
+          <div class="text-base font-medium text-ink-gray-6">
             {{ __("No members found") }}
           </div>
           <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">

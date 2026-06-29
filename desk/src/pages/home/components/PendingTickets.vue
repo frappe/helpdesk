@@ -1,10 +1,12 @@
 <template>
   <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
-      <div class="flex items-center gap-2 text-md-semibold text-ink-gray-8">
+      <div
+        class="flex items-center gap-2 text-lg font-semibold text-ink-gray-8"
+      >
         {{ currentTitle }}
         <Tooltip :text="tooltipText" placement="top">
-          <span class="lucide-info size-3" aria-hidden="true" />
+          <FeatherIcon name="info" class="size-3" />
         </Tooltip>
       </div>
       <div class="w-max">
@@ -48,7 +50,7 @@
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
             @click="goToTicket(ticket)"
-            class="text-sm cursor-pointer hover:bg-surface-sidebar border-t border-outline-elevation-2"
+            class="text-sm cursor-pointer hover:bg-surface-menu-bar border-t border-outline-gray-modals"
           >
             <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
             <td class="p-2 py-3 w-full max-w-0 truncate">
@@ -98,7 +100,7 @@
           <tr
             v-for="i in 8"
             :key="i"
-            :class="i > 1 ? 'border-t border-outline-elevation-2' : ''"
+            :class="i > 1 ? 'border-t border-outline-gray-modals' : ''"
           >
             <td class="p-2 py-3 min-w-8">
               <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
@@ -144,10 +146,7 @@
             {{
               __("See all {0} tickets", chartConfig?.totalPendingTickets + "")
             }}
-            <span
-              class="lucide-arrow-right size-4 rtl:rotate-180"
-              aria-hidden="true"
-            />
+            <FeatherIcon name="arrow-right" class="size-4 rtl:rotate-180" />
           </div>
         </div>
         <div v-if="chartConfig?.tickets?.length > 0" class="mt-3 mb-0.5">
@@ -168,7 +167,7 @@
 <script setup lang="ts">
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
-import { Badge, createResource, TabButtons } from "frappe-ui";
+import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
@@ -317,7 +316,7 @@ function getReasonColorClass(reason: {
   seconds_until_due?: number;
 }) {
   if (reason.text.includes("overdue")) {
-    return "text-ink-red-6";
+    return "text-ink-red-3";
   }
 
   if (
@@ -327,10 +326,10 @@ function getReasonColorClass(reason: {
     const oneHour = 3600;
     const twoHours = 7200;
     if (reason.seconds_until_due <= oneHour) {
-      return "text-ink-red-6";
+      return "text-ink-red-3";
     }
     if (reason.seconds_until_due <= twoHours) {
-      return "text-ink-orange-5";
+      return "text-orange-500";
     }
   }
   return "";

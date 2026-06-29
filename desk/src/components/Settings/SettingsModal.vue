@@ -11,10 +11,10 @@
         :style="{ height: 'calc(100vh - 8rem)' }"
       >
         <div
-          class="flex-col rounded-l-lg w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
+          class="flex-col rounded-l-lg w-56 shrink-0 ps-1 py-1 bg-surface-menu-bar overflow-y-auto hide-scrollbar"
         >
           <h1
-            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar"
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs font-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-menu-bar"
           >
             {{ __("Account") }}
           </h1>
@@ -23,7 +23,7 @@
 
             <div
               v-if="!tab.hideLabel"
-              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar"
+              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs font-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-menu-bar"
             >
               <Tooltip :text="__(tab.label)" placement="right">
                 <span class="truncate">{{ __(tab.label) }}</span>
@@ -37,7 +37,7 @@
                 class="flex h-7 w-full items-center gap-2 rounded px-2 py-[7px]"
                 :class="[
                   activeTab?.label == item.label
-                    ? 'bg-surface-elevation-3 shadow-sm'
+                    ? 'bg-surface-selected shadow-sm'
                     : 'hover:bg-surface-gray-2',
                 ]"
                 @click="() => onTabChange(item)"
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div
-          class="flex flex-1 flex-col bg-surface-elevation-2 max-w-[816px] overflow-hidden relative"
+          class="flex flex-1 flex-col bg-surface-modal max-w-[816px] overflow-hidden relative"
         >
           <component
             :is="activeTab.component"

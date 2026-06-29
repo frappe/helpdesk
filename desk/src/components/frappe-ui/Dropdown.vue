@@ -16,14 +16,14 @@
 
       <template #body>
         <div
-          class="mt-2 min-w-40 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+          class="mt-2 min-w-40 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
           :class="{
             'mt-2': ['bottom', 'left', 'right'].includes(placement),
             'ms-2': placement == 'right-start',
           }"
         >
           <MenuItems
-            class="min-w-40 divide-y divide-outline-elevation-2"
+            class="min-w-40 divide-y divide-outline-gray-modals"
             :class="{
               'start-0 origin-top-left': placement == 'left',
               'end-0 origin-top-right': placement == 'right',
@@ -34,7 +34,7 @@
             <div v-for="group in groups" :key="group.key" class="p-1.5">
               <div
                 v-if="group.group && !group.hideLabel"
-                class="flex h-7 items-center px-2 text-sm-medium text-ink-gray-4"
+                class="flex h-7 items-center px-2 text-sm font-medium text-ink-gray-4"
               >
                 {{ group.group }}
               </div>
@@ -57,12 +57,10 @@
                     ]"
                     @click="item.onClick"
                   >
-                    <span
+                    <FeatherIcon
                       v-if="item.icon && typeof item.icon === 'string'"
-                      :class="[
-                        'me-2 h-4 w-4 flex-shrink-0 text-ink-gray-7',
-                        lucideClass(item.icon),
-                      ]"
+                      :name="item.icon"
+                      class="me-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
                       aria-hidden="true"
                     />
                     <component
@@ -89,10 +87,9 @@
 
 <script setup>
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
-import { Popover, Button } from "frappe-ui";
+import { Popover, Button, FeatherIcon } from "frappe-ui";
 import { computed, useSlots } from "vue";
 import { useRouter } from "vue-router";
-import { lucideClass } from "@/utils";
 
 const props = defineProps({
   button: {

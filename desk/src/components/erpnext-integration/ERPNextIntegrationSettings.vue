@@ -4,7 +4,7 @@
   >
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-md-semibold text-ink-gray-8">
+        <h1 class="text-lg font-semibold text-ink-gray-8">
           {{ __("ERPNext") }}
         </h1>
         <Badge
@@ -32,7 +32,7 @@
               :class="{ 'opacity-60': installed === false }"
             />
             <div class="flex min-w-0 flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">
+              <span class="text-base font-medium text-ink-gray-8">
                 {{ __("Enable ERPNext Integration") }}
               </span>
               <span class="text-p-sm text-ink-gray-6">
@@ -74,11 +74,11 @@
           v-else-if="erpnextIntegrationEnabled && inSync"
           class="flex items-center gap-3 rounded-lg bg-surface-green-1 p-3"
         >
-          <div class="grid size-7 shrink-0 place-items-center text-ink-green-6">
+          <div class="grid size-7 shrink-0 place-items-center text-ink-green-3">
             <LucideCheck class="h-4 w-4" />
           </div>
           <div class="flex min-w-0 flex-1 flex-col">
-            <span class="text-p-sm-medium text-ink-gray-8">
+            <span class="text-p-sm font-medium text-ink-gray-8">
               {{ __("Customers are in sync") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -96,11 +96,11 @@
           v-else-if="erpnextIntegrationEnabled"
           class="flex items-center gap-3 rounded-lg bg-surface-amber-1 p-3"
         >
-          <div class="grid size-7 shrink-0 place-items-center text-ink-amber-6">
+          <div class="grid size-7 shrink-0 place-items-center text-ink-amber-3">
             <LucideTriangleAlert class="h-4 w-4" />
           </div>
           <div class="flex min-w-0 flex-1 flex-col">
-            <span class="text-p-sm-medium text-ink-gray-8">
+            <span class="text-p-sm font-medium text-ink-gray-8">
               {{ __("Sync your existing customers") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -114,7 +114,7 @@
           <Button
             theme="gray"
             variant="subtle"
-            class="border border-outline-gray-2 bg-surface-base hover:bg-surface-base hover:border-outline-gray-3 active:bg-surface-gray-2 focus-visible:bg-surface-base focus-visible:ring-2 focus-visible:ring-outline-gray-3"
+            class="border border-outline-gray-2 bg-surface-white hover:bg-surface-white hover:border-outline-gray-3 active:bg-surface-gray-2 focus-visible:bg-surface-white focus-visible:ring-2 focus-visible:ring-outline-gray-3"
             :loading="isSyncing || syncAction.loading"
             :disabled="isSyncing || syncAction.loading"
             :label="isSyncing ? __('Syncing…') : __('Sync now')"

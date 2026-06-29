@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">{{ __("Home") }}</div>
+        <div class="text-lg font-medium text-ink-gray-9">{{ __("Home") }}</div>
       </template>
       <template #right-header>
         <div class="flex items-center gap-2">
@@ -74,7 +74,7 @@
         <div class="grow pb-12">
           <div
             v-if="!agentDashboard.loading && layout.length > 0"
-            class="text-xl-semibold text-ink-gray-8 ps-2"
+            class="text-xl font-semibold text-ink-gray-8 ps-2"
           >
             {{ __("Hey") }}, {{ userName }}
           </div>
@@ -83,11 +83,8 @@
             class="absolute top-1/2 start-1/2 transform -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
-              <span
-                class="lucide-layout size-12 text-ink-gray-4"
-                aria-hidden="true"
-              />
-              <div class="text-md-medium text-ink-gray-8">
+              <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
+              <div class="text-lg font-medium text-ink-gray-8">
                 {{ __("No charts added") }}
               </div>
               <div class="text-p-base text-ink-gray-6">
@@ -122,15 +119,15 @@
                   </div>
                   <div
                     v-if="editing"
-                    class="flex absolute end-0 top-0 bg-surface-gray-9 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                    class="flex absolute end-0 top-0 bg-surface-gray-6 rounded cursor-pointer opacity-0 group-hover:opacity-100"
                   >
                     <div
-                      class="rounded p-1 hover:bg-surface-gray-8"
+                      class="rounded p-1 hover:bg-surface-gray-5"
                       @click="layout.splice(index, 1)"
                     >
-                      <span
-                        class="lucide-trash-2 size-3 text-ink-base"
-                        aria-hidden="true"
+                      <FeatherIcon
+                        name="trash-2"
+                        class="size-3 text-ink-white"
                       />
                     </div>
                   </div>

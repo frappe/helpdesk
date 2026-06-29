@@ -101,21 +101,8 @@ export default defineConfig(async ({ mode }) => {
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
         ...localFrappeUIAliases,
       },
-      // When developing against the local frappe-ui submodule (localFrappeUIAliases),
-      // the submodule ships its own node_modules with older tiptap/ProseMirror.
-      // Force a single copy of each so the editor doesn't load two prosemirror-state
-      // instances — otherwise mounting throws "Adding different instances of a keyed
-      // plugin (plugin$)" and the editor (mentions included) breaks.
       dedupe: [
-        "@tiptap/core",
-        "@tiptap/pm",
-        "prosemirror-state",
-        "prosemirror-model",
-        "prosemirror-transform",
         "prosemirror-view",
-        "prosemirror-keymap",
-        "prosemirror-commands",
-        "prosemirror-history",
         "prosemirror-gapcursor",
         "prosemirror-tables",
       ],

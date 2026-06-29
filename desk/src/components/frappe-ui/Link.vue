@@ -54,7 +54,7 @@
             @click="attrs.onCreate(value, close)"
           >
             <template #prefix>
-              <span class="lucide-plus h-4" aria-hidden="true" />
+              <FeatherIcon name="plus" class="h-4" />
             </template>
           </Button>
         </div>
@@ -66,7 +66,7 @@
             @click="() => clearValue(close)"
           >
             <template #prefix>
-              <span class="lucide-x h-4" aria-hidden="true" />
+              <FeatherIcon name="x" class="h-4" />
             </template>
           </Button>
         </div>
@@ -228,7 +228,7 @@ const labelClasses = computed(() => {
     }[attrs.size || "sm"],
     "font-medium text-ink-gray-7",
     ...(attrs.required
-      ? ["after:content-['*']", "after:ms-0.5", "after:text-ink-red-6"]
+      ? ["after:content-['*']", "after:ms-0.5", "after:text-ink-red-3"]
       : []),
   ];
 });

@@ -17,15 +17,12 @@
               class="!inline-flex align-middle ms-1 -mt-1"
             >
               <template #target>
-                <span
-                  class="lucide-info size-4 cursor-pointer"
-                  aria-hidden="true"
-                />
+                <FeatherIcon name="info" class="size-4 cursor-pointer" />
               </template>
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-white rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -72,10 +69,10 @@
         />
         <!-- banner -->
         <div
-          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
+          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
         >
           <TriangleAlert
-            class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-yellow-5"
+            class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-yellow-500"
           />
 
           <div class="text-wrap text-sm text-ink-gray-7">

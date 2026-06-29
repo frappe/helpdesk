@@ -1,8 +1,8 @@
 <template>
   <div
-    class="md:mx-5 md:my-4 flex items-center justify-between text-md-medium mx-6 !mb-0 !my-3"
+    class="md:mx-5 md:my-4 flex items-center justify-between text-lg font-medium mx-6 !mb-0 !my-3"
   >
-    <div class="flex h-8 items-center text-xl-semibold text-ink-gray-8">
+    <div class="flex h-8 items-center text-xl font-semibold text-ink-gray-8">
       {{ title }}
     </div>
     <Dropdown
@@ -14,16 +14,13 @@
       <template v-slot="{ open }">
         <Button variant="subtle" class="flex items-center gap-1">
           <template #prefix>
-            <span class="lucide-plus h-4 w-4" aria-hidden="true" />
+            <FeatherIcon name="plus" class="h-4 w-4" />
           </template>
           <span>{{ __("New") }}</span>
           <template #suffix>
-            <span
-              :class="[
-                'h-4 w-4',
-                open ? 'lucide-chevron-up' : 'lucide-chevron-down',
-              ]"
-              aria-hidden="true"
+            <FeatherIcon
+              :name="open ? 'chevron-up' : 'chevron-down'"
+              class="h-4 w-4"
             />
           </template>
         </Button>

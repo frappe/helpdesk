@@ -13,7 +13,7 @@
       validateAssignmentRule(props.name);
     "
   >
-    <span class="lucide-plus h-4" />
+    <FeatherIcon name="plus" class="h-4" />
     {{ __("Add a condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">
@@ -41,7 +41,7 @@
 import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
-import { Button, Dropdown, ErrorMessage } from "frappe-ui";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
 import { validateAssignmentRule } from "@/stores/assignmentRules";
 import { __ } from "@/translation";
 

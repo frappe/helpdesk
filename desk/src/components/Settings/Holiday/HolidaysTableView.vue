@@ -30,7 +30,7 @@
             :type="'text'"
             placeholder="Description"
             v-model="holiday[column.key]"
-            class="!bg-surface-base w-full text-base px-0 focus:!ring-0 border-none hover:bg-surface-base outline-none no-underline focus:!outline-none"
+            class="!bg-surface-white w-full text-base px-0 focus:!ring-0 border-none hover:bg-surface-white outline-none no-underline focus:!outline-none"
           />
           <div v-else>
             {{ dayjs(holiday[column.key]).format("DD MMM YYYY") }}

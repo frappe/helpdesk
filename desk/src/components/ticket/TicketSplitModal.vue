@@ -14,10 +14,10 @@
           placeholder="Add a subject for the new ticket"
         />
         <div
-          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
+          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
         >
           <TriangleAlert
-            class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-yellow-5"
+            class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-yellow-500"
           />
 
           <div class="text-wrap text-sm text-ink-gray-7">
