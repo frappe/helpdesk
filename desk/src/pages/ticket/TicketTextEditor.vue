@@ -4,6 +4,7 @@
     ref="e"
     :model-value="content"
     :placeholder="placeholder"
+    :upload-function="uploadFunction"
     @update:model-value="$emit('update:content', $event)"
     @clear="() => $emit('update:attachments', [])"
   >
@@ -97,6 +98,7 @@ interface P {
   placeholder: string;
   attachments: File[];
   expand?: boolean;
+  uploadFunction?: (file: any) => Promise<any>;
 }
 
 interface E {
