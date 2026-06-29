@@ -3,6 +3,7 @@
     <FTextEditor
       ref="e"
       :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
+      :upload-function="uploadFunction"
       v-bind="$attrs"
       :editor-class="[
         'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-[5rem]',
@@ -72,6 +73,7 @@ import { computed, nextTick, ref } from "vue";
 interface P {
   modelValue: string;
   autofocus?: boolean;
+  uploadFunction?: (file: any) => Promise<any>;
 }
 
 interface E {
@@ -86,7 +88,7 @@ const props = withDefaults(defineProps<P>(), {
 defineEmits<E>();
 
 const e = ref(null);
-const editor = computed(() => e.value.editor);
+const editor = computed(() => e.value?.editor);
 const authStore = useAuthStore();
 const fixedMenu = [
   "Paragraph",
