@@ -23,8 +23,11 @@ def get_one(name: str):
     fields = get_fields_meta(name)
     customers = get_customers()
 
+    auto_set_customer_from_contact = frappe.db.get_single_value(
+        "HD Settings", "auto_set_customer_from_contact"
+    )
     has_customer_field = any(f.fieldname == "customer" for f in fields)
-    if len(customers) > 1 and not has_customer_field:
+    if auto_set_customer_from_contact and len(customers) > 1 and not has_customer_field:
         fields.append(
             frappe._dict(
                 fieldname="customer",
