@@ -60,7 +60,7 @@ const options = computed(() => {
         },
       },
       mobile_no: {
-        prefix: PhoneIcon,
+        prefix: ({ row }) => (row.mobile_no ? h(PhoneIcon) : null),
       },
     },
     emptyState: {
