@@ -2,6 +2,10 @@
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
+<<<<<<< HEAD
+=======
+		"target": "es2022",
+>>>>>>> c4b07a93 (fix: listview column resize, phone column & max capping)
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
