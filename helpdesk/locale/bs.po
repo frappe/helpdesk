@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-06-29 21:58\n"
+"PO-Revision-Date: 2026-06-30 22:28\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -1449,7 +1449,7 @@ msgstr "Nije moguće pronaći kolonu `name` u tabHD Zahtjevu."
 
 #: helpdesk/patches/move_contact_dynamic_link_to_hd_customer.py:74
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
-msgstr "Nije moguće migrirati kontakte za {0} korisnika: {1}. Ispravite osnovne podatke i ponovo pokrenite zakrpu."
+msgstr "Nije moguće migrirati kontakte za {0} klijente(a): {1}. Ispravite osnovne podatke i ponovo pokrenite zakrpu."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:848
 msgid "Could not send an acknowledgement email due to: {0}"
@@ -5118,7 +5118,7 @@ msgstr "Pošalji povratne informacije kada"
 
 #: desk/src/pages/contact/Contact.vue:294
 msgid "Send reset password email"
-msgstr "Pošalji e-pštu za poništenje lozinke"
+msgstr "Pošalji e-poštu za poništenje lozinke"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
