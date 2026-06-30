@@ -628,6 +628,54 @@ class TestHDTicket(IntegrationTestCase):
             len(comments), 3
         )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
 
+    def test_reply_to_merged_ticket_redirects_to_target(self):
+        source = make_ticket(description="Merged source")
+        target = make_ticket(description="Merge target")
+
+        merge_ticket(source=source.name, target=target.name)
+        source.reload()
+        self.assertTrue(source.is_merged)
+        self.assertEqual(source.status, "Closed")
+
+        # An incoming reply lands on the merged source ticket.
+        communication = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "subject": f"Re: {source.subject}",
+                "content": "Customer reply to merged ticket",
+                "reference_doctype": "HD Ticket",
+                "reference_name": source.name,
+            }
+        ).insert(ignore_permissions=True)
+
+        # The merged source must stay closed and merged.
+        source.reload()
+        self.assertEqual(source.status, "Closed")
+        self.assertTrue(source.is_merged)
+
+        # The communication is redirected to the target ticket.
+        self.assertEqual(
+            frappe.db.get_value("Communication", communication.name, "reference_name"),
+            target.name,
+        )
+
+    def test_merge_cycle_does_not_resolve_target(self):
+        # A corrupt cycle (A merged into B, B merged back into A) must not redirect a reply
+        # onto another merged ticket, which would recurse until the request fails.
+        ticket_a = make_ticket(description="Cycle A")
+        ticket_b = make_ticket(description="Cycle B")
+
+        merge_ticket(source=ticket_a.name, target=ticket_b.name)
+        ticket_b.reload()
+        ticket_b.db_set("is_merged", 1)
+        ticket_b.db_set("merged_with", ticket_a.name)
+
+        ticket_a.reload()
+        self.assertIsNone(ticket_a.get_merge_target())
+
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
 
