@@ -17,6 +17,10 @@ permissions:
 jobs:
   build-assets:
     name: Build assets and upload to release
+    # semantic-release pushes a "chore(release): Bumped to Version x" commit to
+    # main (no [skip ci]), which would otherwise trigger a redundant rebuild.
+    # Skip it — the assets are identical to the merge commit that preceded it.
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
     runs-on: ubuntu-latest
     env:
       # Vite/esbuild builds of large SPAs can exceed Node's default heap and
