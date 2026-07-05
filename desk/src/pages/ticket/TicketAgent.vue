@@ -19,9 +19,41 @@
   </div>
   <div
     v-else-if="!ticket.doc && !ticket.get?.error"
-    class="grid h-full place-items-center"
+    class="flex h-full flex-col"
   >
-    <LoadingIndicator class="w-6 text-ink-gray-4" />
+    <div class="flex items-center justify-between border-b px-5 py-2.5">
+      <Skeleton class="h-4 w-48" />
+      <div class="flex items-center gap-2">
+        <Skeleton variant="box" class="h-7 w-7" />
+        <Skeleton variant="box" class="h-7 w-28" />
+      </div>
+    </div>
+    <div class="flex flex-1 overflow-hidden">
+      <div class="flex-1 space-y-8 px-10 py-6">
+        <div v-for="message in 3" :key="message" class="flex gap-3">
+          <Skeleton variant="circle" class="h-8 w-8 shrink-0" />
+          <div class="flex-1 space-y-2">
+            <Skeleton class="h-3 w-40" />
+            <Skeleton class="h-3 w-24" />
+            <Skeleton
+              variant="box"
+              class="!mt-4 h-24"
+              :class="message % 2 ? 'w-4/5' : 'w-3/5'"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="w-80 space-y-6 border-l px-5 py-5">
+        <div
+          v-for="field in 8"
+          :key="field"
+          class="flex items-center justify-between"
+        >
+          <Skeleton class="h-3 w-24" />
+          <Skeleton class="h-3" :class="field % 2 ? 'w-32' : 'w-24'" />
+        </div>
+      </div>
+    </div>
   </div>
 
   <div v-else class="grid h-full place-items-center px-4 py-20 text-center">
@@ -72,12 +104,8 @@ import {
   TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
-import {
-  createResource,
-  LoadingIndicator,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
+import { Skeleton } from "@/components/Skeleton";
+import { createResource, toast, usePageMeta } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
