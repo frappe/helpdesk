@@ -5,10 +5,8 @@
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
       </template>
     </LayoutHeader>
-    <div
-      class="gap-5 flex flex-col h-full"
-      v-if="!contact.loading && contact.doc"
-    >
+    <DetailPageSkeleton v-if="contact.loading" avatar-shape="circle" />
+    <div class="gap-5 flex flex-col h-full" v-else-if="contact.doc">
       <!-- ContactInfo -->
       <PageInfo
         :avatar="{
@@ -118,6 +116,7 @@ import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
+import DetailPageSkeleton from "@/components/DetailPageSkeleton.vue";
 import ModifiedIcon from "@/components/icons/ModifiedIcon.vue";
 import TicketFeedbackIcon from "@/components/icons/TicketFeedbackIcon.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
