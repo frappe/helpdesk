@@ -7,8 +7,12 @@ msgstr ""
 "PO-Revision-Date: 2026-06-21 20:28\n"
 =======
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
+<<<<<<< HEAD
 "PO-Revision-Date: 2026-06-29 21:58\n"
 >>>>>>> 8636289f (chore: Persian translations)
+=======
+"PO-Revision-Date: 2026-07-06 08:52\n"
+>>>>>>> 43a2cab2 (chore: Persian translations)
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -4544,7 +4548,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr "منابع"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
