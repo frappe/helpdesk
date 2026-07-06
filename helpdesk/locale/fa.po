@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-06-29 21:58\n"
+"PO-Revision-Date: 2026-07-06 08:52\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -4529,7 +4529,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr "منابع"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
