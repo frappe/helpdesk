@@ -7,6 +7,23 @@ import frappe
 from frappe import _
 
 
+def _get_backend():
+    """Return the configured ticket search backend (SQLite default, or RediSearch).
+
+    Selected by ``HD Settings.search_backend``. Both backends expose the same
+    public surface (``search``, ``get_filter_options``, ``index_exists``) and
+    return the same shapes, so callers are backend-agnostic.
+    """
+    if frappe.db.get_single_value("HD Settings", "search_backend") == "RediSearch":
+        from helpdesk.search_redisearch import HelpdeskRediSearch
+
+        return HelpdeskRediSearch()
+
+    from helpdesk.search_sqlite import HelpdeskSearch
+
+    return HelpdeskSearch()
+
+
 @frappe.whitelist()
 def search(
     query: str, filters: str | None = None, limit: int = 20, title_only: bool = False
@@ -30,12 +47,14 @@ def search(
         except json.JSONDecodeError:
             _filters = {}
 
-    from helpdesk.search_sqlite import HelpdeskSearch, HelpdeskSearchIndexMissingError
+    from helpdesk.search_sqlite import HelpdeskSearchIndexMissingError
 
-    search = HelpdeskSearch()
+    search = _get_backend()
 
     try:
-        result = search.search(query, filters=_filters, title_only=title_only)
+        result = search.search(
+            query, filters=_filters, title_only=title_only, limit=limit
+        )
         return result
     except HelpdeskSearchIndexMissingError:
         frappe.throw(_("Search index not available. Please contact administrator."))
@@ -44,9 +63,7 @@ def search(
 @frappe.whitelist()
 def get_filter_options():
     """Get available filter options for search interface"""
-    from helpdesk.search_sqlite import HelpdeskSearch
-
-    search = HelpdeskSearch()
+    search = _get_backend()
 
     if not search.index_exists():
         return {

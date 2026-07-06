@@ -62,6 +62,7 @@
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh",
   "search_tab",
+  "search_backend",
   "name_weight",
   "subject_weight",
   "column_break_qoxt",
@@ -232,6 +233,14 @@
    "fieldname": "search_tab",
    "fieldtype": "Tab Break",
    "label": "Search"
+  },
+  {
+   "default": "SQLite",
+   "description": "Storage backend for ticket search. RediSearch requires the RediSearch module loaded in the cache Redis; use it for high-availability / NFS deployments where the SQLite FTS index cannot run.",
+   "fieldname": "search_backend",
+   "fieldtype": "Select",
+   "label": "Search Backend",
+   "options": "SQLite\nRediSearch"
   },
   {
    "default": "1",

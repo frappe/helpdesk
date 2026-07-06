@@ -25,6 +25,7 @@ after_install = "helpdesk.setup.install.after_install"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
+    "helpdesk.search_redisearch.build_index_in_background",
 ]
 
 
@@ -37,6 +38,7 @@ scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
+        "helpdesk.search_redisearch.build_index_if_enabled",
     ],
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
@@ -100,6 +102,19 @@ doc_events = {
     },
     "Notification Log": {
         "before_insert": "helpdesk.extends.notification_log.before_insert",
+    },
+    # RediSearch ticket index (inert unless HD Settings.search_backend = RediSearch)
+    "HD Ticket": {
+        "on_update": "helpdesk.search_redisearch.update_ticket_index",
+        "on_trash": "helpdesk.search_redisearch.delete_ticket_index",
+    },
+    "HD Ticket Comment": {
+        "on_update": "helpdesk.search_redisearch.update_ticket_index",
+        "on_trash": "helpdesk.search_redisearch.delete_ticket_index",
+    },
+    "Communication": {
+        "on_update": "helpdesk.search_redisearch.update_ticket_index",
+        "on_trash": "helpdesk.search_redisearch.delete_ticket_index",
     },
 }
 
