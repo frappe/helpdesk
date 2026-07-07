@@ -18,6 +18,13 @@
               "Contacts that existed before this update became regular members, so they may no longer see the other tickets of their customer."
             )
           }}
+          {{ __("Learn more in the") }}
+          <a
+            href="https://docs.frappe.io/helpdesk/customers-contacts#update-on-permissions"
+            target="_blank"
+            class="underline"
+            >{{ __("documentation") }}</a
+          >.
         </p>
         <FormControl
           v-model="restoreOldBehaviour"
