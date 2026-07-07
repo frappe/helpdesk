@@ -19,10 +19,12 @@ import {
   ERPNextSettingsIcon,
   FieldDependencyIcon,
   PhoneIcon,
-  SlidersIcon
+  SlidersIcon,
+  WhatsAppIcon,
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
+import WhatsAppSettings from "./WhatsAppSettings.vue";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
@@ -144,6 +146,12 @@ export const tabs = computed(() => {
           component: markRaw(TelephonyPage),
         },
         {
+          label: __("WhatsApp"),
+          icon: markRaw(WhatsAppIcon),
+          component: markRaw(WhatsAppSettings),
+          condition: () => auth.isAdmin || auth.isManager,
+        },
+        {
           label: __("ERPNext"),
           icon: markRaw(ERPNextSettingsIcon),
           component: markRaw(ERPNextIntegrationSettings),
@@ -185,6 +193,7 @@ type TabName =
   | "Assignment Rules"
   | "Field Dependencies"
   | "Telephony"
+  | "WhatsApp"
   | "ERPNext"
   | "Saved Replies";
 
