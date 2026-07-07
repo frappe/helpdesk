@@ -60,6 +60,7 @@
   "setup_section",
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
+  "show_customer_portal_permission_notice",
   "column_break_hjfh",
   "search_tab",
   "name_weight",
@@ -145,6 +146,13 @@
    "fieldname": "initial_helpdesk_name_setup_skipped",
    "fieldtype": "Check",
    "label": "Is name setup skipped"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_customer_portal_permission_notice",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Customer Portal Permission Notice"
   },
   {
    "fieldname": "column_break_hjfh",
@@ -524,7 +532,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-06-29 18:07:35.389430",
+ "modified": "2026-07-07 12:30:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
