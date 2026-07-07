@@ -114,6 +114,10 @@
           :isSidebarCollapsed="!isExpanded"
           appName="helpdesk"
         />
+        <CustomerPortalPermissionBanner
+          v-if="showPermissionNoticeBanner"
+          :isSidebarCollapsed="!isExpanded"
+        />
       </div>
 
       <SidebarLink
@@ -168,6 +172,7 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
+import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
@@ -184,6 +189,7 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
@@ -238,6 +244,7 @@ const isRtl = document.documentElement.dir === "rtl";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const configStore = useConfigStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
@@ -422,6 +429,14 @@ const showOnboardingBanner = computed(() => {
     !isCustomerPortal.value &&
     !isOnboardingStepsCompleted.value &&
     authStore.isManager
+  );
+});
+
+const showPermissionNoticeBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    authStore.isManager &&
+    configStore.showCustomerPortalPermissionNotice
   );
 });
 
