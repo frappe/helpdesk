@@ -746,8 +746,33 @@ def get_ticket_activities(ticket: str):
         "history": get_history(ticket),
         "views": get_views(ticket),
         "calls": get_call_logs(ticket),
+        "whatsapp": get_whatsapp_messages(ticket),
     }
     return activities
+
+
+def get_whatsapp_messages(ticket: str):
+    """WhatsApp thread of the ticket's contact, surfaced on the ticket timeline.
+
+    Anchored on the contact (omnichannel), so it spans the whole relationship,
+    not just this ticket. Empty when frappe_whatsapp is absent or no contact.
+    """
+    from helpdesk.integrations.whatsapp.utils import is_whatsapp_installed
+
+    # Degrade to empty like the sibling activity sources (get_comments, etc.)
+    # rather than raising: the WhatsApp API gates to agents, and a raise here
+    # would 403 the whole get_ticket_activities timeline for a non-agent reader.
+    if not is_agent() or not is_whatsapp_installed():
+        return []
+    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
+    if not contact:
+        return []
+
+    from helpdesk.integrations.whatsapp.api import (
+        get_whatsapp_messages as _get_whatsapp_messages,
+    )
+
+    return _get_whatsapp_messages(contact)
 
 
 @frappe.whitelist()
