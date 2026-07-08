@@ -461,7 +461,7 @@
    "read_only": 1
   },
   {
-   "default": "False",
+   "default": "0",
    "fieldname": "raised_outside_working_hours",
    "fieldtype": "Check",
    "label": "Ticket raised outside working hours",
