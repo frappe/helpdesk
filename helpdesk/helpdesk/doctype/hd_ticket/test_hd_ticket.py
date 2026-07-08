@@ -663,6 +663,37 @@ class TestHDTicket(FrappeTestCase):
         ticket_a.reload()
         self.assertIsNone(ticket_a.get_merge_target())
 
+    def test_reply_on_unresolvable_merge_is_not_dropped(self):
+        # No safe merge target (corrupt cycle): the reply must be handled here, not dropped.
+        ticket_a = make_ticket(description="Cycle A")
+        ticket_b = make_ticket(description="Cycle B")
+
+        merge_ticket(source=ticket_a.name, target=ticket_b.name)
+        ticket_b.reload()
+        ticket_b.db_set("is_merged", 1)
+        ticket_b.db_set("merged_with", ticket_a.name)
+
+        communication = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "subject": f"Re: {ticket_a.subject}",
+                "content": "Customer reply on cyclic merge",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket_a.name,
+            }
+        ).insert(ignore_permissions=True)
+
+        # The reply stays on this ticket (not redirected) and is handled here.
+        self.assertEqual(
+            frappe.db.get_value("Communication", communication.name, "reference_name"),
+            ticket_a.name,
+        )
+        ticket_a.reload()
+        self.assertIsNotNone(ticket_a.last_customer_response)
+
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
 
