@@ -945,21 +945,23 @@ class HDTicket(Document):
     def redirect_communication_to_merge_target(self, communication):
         merge_target_name = self.get_merge_target()
         if not merge_target_name:
-            return
+            return False
         communication.db_set("reference_name", merge_target_name)
         merge_target = frappe.get_doc("HD Ticket", merge_target_name)
         merge_target.on_communication_update(communication)
+        return True
 
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
     # is an external dependency. Refer `communication.py` of Frappe framework for more.
     # Since this is called from communication itself, `c` is the communication doc.
     def on_communication_update(self, c):
-        # A reply to a merged ticket belongs to the ticket it was merged into. Redirect
-        # the communication there instead of reopening this (merged) ticket.
+        # A reply to a merged ticket belongs to its merge target; redirect it there. If no
+        # safe target resolves (cycle/dead-end), fall through and handle it here so the
+        # reply isn't dropped.
         if c.sent_or_received == "Received" and self.is_merged and self.merged_with:
-            self.redirect_communication_to_merge_target(c)
-            return
+            if self.redirect_communication_to_merge_target(c):
+                return
 
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
