@@ -44,7 +44,11 @@ const gmailReplyToContent = doc.querySelectorAll("div.gmail_quote");
 const outlookReplyToContent = doc.querySelectorAll("div#appendonsend");
 const replyToContent = doc.querySelectorAll("p.reply-to-content");
 
-if (gmailReplyToContent.length) {
+if (doc.body.children.length === 0) {
+  // Plain-text emails (e.g. from Thunderbird) arrive as text with newlines and no spacing losing formatting
+  // Preserve line breaks with pre-wrap (content is already escaped by stripEmailColors).
+  _content.value = `<div style="white-space: pre-wrap">${_content.value}</div>`;
+} else if (gmailReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div.gmail_quote", true);
 } else if (outlookReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div#appendonsend");
