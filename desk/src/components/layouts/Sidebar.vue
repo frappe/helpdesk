@@ -107,7 +107,7 @@
     </div>
     <div class="grow" />
     <div class="flex flex-col gap-2 pb-2.5">
-      <div class="px-2">
+      <div class="px-2 flex flex-col gap-2">
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
           :isSidebarCollapsed="!isExpanded"
@@ -179,9 +179,9 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
-import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
@@ -230,12 +230,12 @@ import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
+import LucideMoon from "~icons/lucide/moon";
 import LucideSearch from "~icons/lucide/search";
+import LucideSun from "~icons/lucide/sun";
 import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
