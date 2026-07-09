@@ -47,7 +47,7 @@ const replyToContent = doc.querySelectorAll("p.reply-to-content");
 if (doc.body.children.length === 0) {
   // Plain-text emails (e.g. from Thunderbird) arrive as text with newlines and no spacing losing formatting
   // Preserve line breaks with pre-wrap (content is already escaped by stripEmailColors).
-  _content.value = `<div style="white-space: pre-wrap">${_content.value}</div>`;
+  _content.value = `<div class="plain-text-content">${_content.value}</div>`;
 } else if (gmailReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div.gmail_quote", true);
 } else if (outlookReplyToContent.length) {
@@ -182,6 +182,11 @@ const htmlContent = computed(
       }
       .email-content {
         word-break: break-word;
+      }
+      
+      .plain-text-content {
+        white-space: pre-wrap;
+        line-height: 1.5;
       }
           
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
