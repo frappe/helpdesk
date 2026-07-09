@@ -517,6 +517,13 @@ function addToReply(
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
 
+  // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their newlines/spacing
+  // thus lose formatting when added to replied content
+  const doc = new DOMParser().parseFromString(body, "text/html");
+  if (doc.body.children.length === 0) {
+    body = `<div style="white-space: pre-wrap; line-height: 1.5">${doc.body.innerHTML}</div>`;
+  }
+
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
     quotedContent.value = null;
