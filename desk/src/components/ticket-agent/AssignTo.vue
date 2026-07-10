@@ -302,7 +302,7 @@ const agentOptions = computed<AgentOption[]>(() => {
       image: currentUser.value.user_image || "",
       ...liveAvailability({ name: currentAgentName }),
     });
-    seen.add(currentAgentName);
+    options.add(currentAgentName);
   }
 
   if (agentResource.data) {
