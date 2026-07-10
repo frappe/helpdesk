@@ -1,6 +1,7 @@
 <template>
   <FrappeUIProvider>
-    <PortalRoot />
+    <router-view v-if="route.name === 'Persona'" />
+    <PortalRoot v-else />
   </FrappeUIProvider>
   <Dialogs />
 </template>
@@ -12,12 +13,14 @@ import { useFavicon } from "@vueuse/core";
 import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, defineAsyncComponent, h, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
 import { __ } from "./translation";
 import { isCustomerPortal } from "./utils";
 
+const route = useRoute();
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
 

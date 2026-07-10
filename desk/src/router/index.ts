@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { isPersonaCaptured, telemetryEnabled } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -6,6 +7,9 @@ import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
 export const LOGIN_PAGE = "/login";
+
+// The persona interrupt runs at most once per session.
+let personaChecked = false;
 
 // type the meta fields
 declare module "vue-router" {
@@ -191,6 +195,12 @@ const routes = [
     },
   },
 
+  {
+    path: "/onboarding",
+    name: "Persona",
+    component: () => import("@/pages/PersonaForm.vue"),
+  },
+
   // Additonal routes
   {
     path: "/:pathMatch(.*)*",
@@ -213,6 +223,28 @@ router.beforeEach(async (to, _, next) => {
   isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
     await authStore.init();
+  }
+
+  const isDeskAdmin =
+    authStore.isLoggedIn && authStore.hasDeskAccess && authStore.isAdmin;
+
+  // Guard the wizard page: only an uncaptured admin may view it, even via URL.
+  if (to.name === "Persona") {
+    const allow = isDeskAdmin && !(await isPersonaCaptured());
+    return next(allow ? undefined : { name: "Home" });
+  }
+
+  // Interrupt an eligible admin once per session — but only when telemetry is
+  // on, since the wizard's answers only feed telemetry.
+  if (isDeskAdmin && !personaChecked) {
+    personaChecked = true;
+    try {
+      if (!(await isPersonaCaptured()) && (await telemetryEnabled())) {
+        return next({ name: "Persona" });
+      }
+    } catch {
+      // fail open — never block navigation on the persona check
+    }
   }
 
   if (!authStore.isLoggedIn) {
