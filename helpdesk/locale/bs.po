@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-06-30 22:28\n"
+"PO-Revision-Date: 2026-07-10 09:49\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -3447,7 +3447,7 @@ msgstr "Upravljajte potpisom e-pošte."
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:2
 msgid "Manage your personal preferences."
-msgstr "Upravljaj svojim osobnim postavkama."
+msgstr "Upravljaj osobnim postavkama."
 
 #: desk/src/components/Settings/Profile/Profile.vue:4
 msgid "Manage your profile information."
