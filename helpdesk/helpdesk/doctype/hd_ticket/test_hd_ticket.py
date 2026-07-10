@@ -1081,6 +1081,21 @@ class TestHDTicket(IntegrationTestCase):
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
 
+    def test_parse_content_swaps_inline_media_src_for_embed(self):
+        """Inline media must carry `embed` and no `src`, so the framework
+        inlines it as a cid attachment instead of shipping a broken
+        /private/files/ link to the recipient (#3421)."""
+        ticket = frappe.new_doc("HD Ticket")
+        html = (
+            '<img src="/private/files/x.png">'
+            '<video src="/private/files/c.mp4"></video>'
+        )
+        parsed = ticket.parse_content(html)
+        # no leftover src would duplicate and win over the cid rewrite
+        self.assertNotIn('src="/private/files/', parsed)
+        self.assertIn('embed="/private/files/x.png"', parsed)
+        self.assertIn('embed="/private/files/c.mp4"', parsed)
+
     def test_reply_via_agent_with_cc_and_bcc_no_to(self):
         """
         reply_via_agent should succeed when both cc and bcc are provided but to is empty
