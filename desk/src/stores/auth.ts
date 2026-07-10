@@ -28,6 +28,9 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
+  const hasAgentRecord: ComputedRef<boolean> = computed(
+    () => user__.value.has_agent_record
+  );
   const isManager: ComputedRef<boolean> = computed(
     () => user__.value.is_manager
   );
@@ -41,6 +44,12 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
+  const availability: ComputedRef<string> = computed(
+    () => user__.value.availability || ""
+  );
+  const availabilityChangedOn: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_on || ""
+  );
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
   const language: ComputedRef<string> = computed(() => user__.value.language);
   const userTeams: ComputedRef<string[]> = computed(
@@ -81,6 +90,7 @@ export const useAuthStore = defineStore("auth", () => {
     init,
     isAdmin,
     isAgent,
+    hasAgentRecord,
     isManager,
     isLoggedIn,
     login,
@@ -90,6 +100,8 @@ export const useAuthStore = defineStore("auth", () => {
     userImage,
     userName,
     username,
+    availability,
+    availabilityChangedOn,
     timezone,
     language,
     userTeams,

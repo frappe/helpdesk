@@ -1,6 +1,7 @@
 import frappe
+from frappe import _
 
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, get_agent_name, publish_event
 
 
 @frappe.whitelist()
@@ -27,3 +28,30 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
             }
         ).insert()
     return
+
+
+@frappe.whitelist()
+@agent_only
+def set_my_availability(availability: str) -> dict:
+    if not frappe.db.exists("HD Agent Status", {"name": availability, "enable": 1}):
+        frappe.throw(_("Invalid availability"), frappe.ValidationError)
+
+    name = get_agent_name()
+    if not name:
+        frappe.throw(_("No HD Agent record for current user"), frappe.ValidationError)
+
+    changed_on = frappe.utils.now()
+    frappe.db.set_value(
+        "HD Agent",
+        name,
+        {"availability": availability, "availability_changed_on": changed_on},
+    )
+    publish_event(
+        "agent_availability_updated",
+        data={
+            "agent": name,
+            "availability": availability,
+            "availability_changed_on": changed_on,
+        },
+    )
+    return {"availability": availability}

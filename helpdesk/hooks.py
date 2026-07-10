@@ -108,6 +108,7 @@ permission_query_conditions = {
 # Override standard doctype classes
 override_doctype_class = {
     "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
+    "Assignment Rule": "helpdesk.overrides.assignment_rule.HelpdeskAssignmentRule",
 }
 
 ignore_links_on_delete = [
