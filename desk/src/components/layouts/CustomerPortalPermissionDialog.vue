@@ -8,14 +8,14 @@
         <p>
           {{
             __(
-              "Contacts on the portal now only see the tickets they raised themselves."
+              "Earlier, every contact could see all the tickets of their company. Now, contacts only see the tickets they raised themselves."
             )
           }}
         </p>
         <p>
           {{
             __(
-              "Customer managers can see every ticket of their company and manage its contacts. Your existing contacts aren't managers yet, so they may see fewer tickets than before."
+              "Only customer managers can see every ticket of their company and manage its contacts."
             )
           }}
           {{ __("Learn more in the") }}
@@ -29,11 +29,7 @@
         <FormControl
           v-model="restoreOldBehaviour"
           type="checkbox"
-          :label="
-            __(
-              'Make my existing contacts customer managers so they can still see all tickets of their company'
-            )
-          "
+          :label="__('Make all existing contacts customer managers')"
         />
         <p class="text-p-sm text-ink-gray-5">
           {{ __("You won't see this notice again.") }}
