@@ -1,16 +1,19 @@
 import frappe
 
+from helpdesk.utils import agent_manager_only
+
 NOTICE_FLAG = "show_customer_portal_permission_notice"
 
 
 @frappe.whitelist(methods=["POST"])
+@agent_manager_only
 def dismiss_notice() -> None:
     """Permanently dismiss the customer portal permission change notice."""
-    only_for_managers()
     disable_notice()
 
 
 @frappe.whitelist(methods=["POST"])
+@agent_manager_only
 def restore_ticket_access() -> None:
     """Restore pre-migration ticket visibility for customer contacts.
 
@@ -18,14 +21,12 @@ def restore_ticket_access() -> None:
     job, so each contact can again see all tickets of their customer.
     Dismisses the notice once the job is queued.
     """
-    only_for_managers()
     frappe.enqueue(
         promote_all_contacts_to_managers,
         queue="long",
         job_id="promote_all_contacts_to_managers",
         deduplicate=True,
     )
-    disable_notice()
 
 
 def disable_notice() -> None:
@@ -60,7 +61,3 @@ def promote_customer_contacts(customer_name: str) -> None:
     for contact in customer.contacts:
         contact.is_manager = True
     customer.save(ignore_permissions=True)
-
-
-def only_for_managers() -> None:
-    frappe.only_for(["Agent Manager", "System Manager"])
