@@ -193,6 +193,26 @@ def agent_only(fn):
     return wrapper
 
 
+def agent_manager_only(fn):
+    """Decorator to validate if user is an agent manager."""
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        # if not admin or system manager or agent manager, throw permission error, use python intersection to check if user has any of the roles
+        roles = set(frappe.get_roles())
+        access_roles = {"Administrator", "System Manager", "Agent Manager"}
+        if not roles.intersection(access_roles):
+            frappe.throw(
+                msg=_("You are not permitted to access this resource."),
+                title=_("Not Allowed"),
+                exc=frappe.PermissionError,
+            )
+
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
 def get_agents_team():
     Team = frappe.qb.DocType("HD Team")
     TeamMember = frappe.qb.DocType("HD Team Member")
