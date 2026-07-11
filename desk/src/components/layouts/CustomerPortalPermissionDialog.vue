@@ -8,14 +8,14 @@
         <p>
           {{
             __(
-              "Contacts are now members of a customer, and only customer managers can see all tickets of their customer. Other contacts only see the tickets they have raised themselves."
+              "Contacts on the portal now only see the tickets they raised themselves."
             )
           }}
         </p>
         <p>
           {{
             __(
-              "Contacts that existed before this update became regular members, so they may no longer see the other tickets of their customer."
+              "Customer managers can see every ticket of their company and manage its contacts. Your existing contacts aren't managers yet, so they may see fewer tickets than before."
             )
           }}
           {{ __("Learn more in the") }}
@@ -31,12 +31,12 @@
           type="checkbox"
           :label="
             __(
-              'Restore the previous behaviour by making every existing contact a customer manager'
+              'Make my existing contacts customer managers so they can still see all tickets of their company'
             )
           "
         />
         <p class="text-p-sm text-ink-gray-5">
-          {{ __("This notice will not be shown again after you confirm.") }}
+          {{ __("You won't see this notice again.") }}
         </p>
       </div>
     </template>
@@ -70,7 +70,7 @@ const dismissResource = createResource({
 const restoreResource = createResource({
   url: "helpdesk.api.customer_portal_notice.restore_ticket_access",
   onSuccess: () => {
-    show.value = false;
+    dismissResource.submit();
     toast.success(
       __("Existing contacts are being made customer managers in the background")
     );
