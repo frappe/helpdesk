@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-07-10 09:49\n"
+"PO-Revision-Date: 2026-07-11 10:18\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: Bosnian\n"
 "MIME-Version: 1.0\n"
@@ -437,7 +437,7 @@ msgstr "Ćilibar"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:113
 msgid "Anyone will be able to create tickets without any permission. e.g. from webform."
-msgstr "Bilo ko će moći kreirati zahtjeve bez ikakve dozvole, npr. putem web formulara."
+msgstr "Bilo ko će moći izraditi zahtjeve bez ikakve dozvole, npr. putem web obrasca."
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:26
 msgid "Appearance"
@@ -2686,7 +2686,7 @@ msgstr "Raspored Polja"
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "HD Form Script"
-msgstr "Formular Skripte"
+msgstr "Obrazac Skripte"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
@@ -5359,7 +5359,7 @@ msgstr "Razdjeli i Spoji"
 
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
-msgstr "Standardni Formulari Skripte se ne mogu mijenjati, umjesto toga dupliciraj skriptu."
+msgstr "Standardni Obrasci Skripte ne mogu se mijenjati, umjesto toga dupliciraj skriptu."
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:55
 msgid "Standard Views cannot be deleted."
