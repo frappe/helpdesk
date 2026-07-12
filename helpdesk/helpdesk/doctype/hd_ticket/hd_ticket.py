@@ -751,12 +751,10 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=(
-                    last_communication.name if last_communication.name else None
-                ),
+                in_reply_to=last_communication.name if last_communication else None,
             )
         except Exception as e:
-            frappe.throw(_(e))
+            frappe.throw(str(e))
 
     @frappe.whitelist()
     # flake8: noqa
