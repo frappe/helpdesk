@@ -732,6 +732,29 @@ class TestHDTicket(IntegrationTestCase):
             ticket2_doc.name,
         )
 
+    def test_parse_content_embeds_site_files_only(self):
+        """
+        Site file images must swap src for embed (so the framework inlines them
+        as cid attachments), while external and data URIs keep their src.
+        """
+        ticket = make_ticket()
+
+        parsed = ticket.parse_content('<img src="/private/files/shot.png">')
+        self.assertIn('embed="/private/files/shot.png"', parsed)
+        self.assertNotIn("src=", parsed)
+
+        parsed = ticket.parse_content('<img src="/files/public.png">')
+        self.assertIn('embed="/files/public.png"', parsed)
+        self.assertNotIn("src=", parsed)
+
+        external = '<img src="https://example.com/logo.png"/>'
+        self.assertEqual(ticket.parse_content(external), external)
+
+        data_uri = '<img src="data:image/png;base64,AAA"/>'
+        self.assertEqual(ticket.parse_content(data_uri), data_uri)
+
+        self.assertEqual(ticket.parse_content(""), "")
+
     def test_ticket_inside_working_hours(self):
         inside_working_hour = get_current_week_monday(hours=14)
         with self.freeze_time(inside_working_hour):
