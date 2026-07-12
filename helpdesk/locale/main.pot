@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-06-28 11:13+0000\n"
+"POT-Creation-Date: 2026-07-12 11:35+0000\n"
+"PO-Revision-Date: 2026-07-12 11:35+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -343,6 +343,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
+#: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
 msgstr ""
@@ -373,12 +374,10 @@ msgstr ""
 msgid "Agents will no longer be able to view and create saved replies with global scope."
 msgstr ""
 
-#. Name of a role
 #: desk/src/components/SavedRepliesSelectorModal.vue:165
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:323
 #: desk/src/components/contact/FeedbackList.vue:121
 #: desk/src/components/ticket/TicketSplitModal.vue:6
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "All"
 msgstr ""
 
@@ -741,6 +740,12 @@ msgstr ""
 msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
 msgstr ""
 
+#. Label of the auto_set_customer_from_contact (Check) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Auto-set customer from contact"
+msgstr ""
+
 #. Label of the auto_close_tickets (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Automatically Close Tickets when"
@@ -748,6 +753,12 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:145
 msgid "Automatically close stale tickets"
+msgstr ""
+
+#. Description of the 'Auto-set customer from contact' (Check) field in DocType
+#. 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Automatically set the customer on a ticket based on the contact's linked customer(s)"
 msgstr ""
 
 #. Label of a Card Break in the Helpdesk Workspace
@@ -1230,7 +1241,7 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:369
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:374
 msgid "Closed or rated tickets cannot be updated by non-agents"
 msgstr ""
 
@@ -1436,7 +1447,7 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:687
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:692
 msgid "Could not an email due to: {0}"
 msgstr ""
 
@@ -1448,7 +1459,7 @@ msgstr ""
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:848
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:853
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
@@ -1848,7 +1859,7 @@ msgstr ""
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
 msgstr ""
 
-#: desk/src/components/TextEditor.vue:41
+#: desk/src/components/TextEditor.vue:42
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:24
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
@@ -2604,11 +2615,6 @@ msgstr ""
 msgid "Group By Field"
 msgstr ""
 
-#. Name of a role
-#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
-msgid "Guest"
-msgstr ""
-
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
 msgstr ""
@@ -2651,17 +2657,24 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "HD Customer"
 msgstr ""
 
 #. Name of a role
+#: helpdesk/helpdesk/doctype/hd_article/hd_article.json
+#: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
+#: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
+#: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "HD Customer Manager"
 msgstr ""
 
@@ -3343,7 +3356,7 @@ msgstr ""
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
 #: desk/src/components/ListViewBuilder.vue:799
-#: desk/src/components/ListViewBuilder.vue:841
+#: desk/src/components/ListViewBuilder.vue:844
 #: desk/src/pages/ticket/Tickets.vue:623 desk/src/pages/ticket/Tickets.vue:637
 #: desk/src/pages/ticket/Tickets.vue:667
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
@@ -3718,7 +3731,7 @@ msgstr ""
 msgid "No Data Found"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:514
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:519
 msgid "No Email Account found for {0}"
 msgstr ""
 
@@ -5725,7 +5738,7 @@ msgstr ""
 msgid "The assignment condition json '{0}' is invalid: {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:297
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:302
 msgid "The contact {0} is linked to multiple customers. Please select the customer manually."
 msgstr ""
 
@@ -5741,7 +5754,7 @@ msgstr ""
 msgid "The number of days must be 1 or more"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:279
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:284
 msgid "The selected customer {0} is not linked to the contact {1}.Please select a valid customer or update the contact's linked customers."
 msgstr ""
 
@@ -5853,7 +5866,7 @@ msgstr ""
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:835
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:840
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -5906,7 +5919,10 @@ msgstr ""
 msgid "Ticket Reopen status"
 msgstr ""
 
+#. Label of the ticket_routing_section (Section Break) field in DocType 'HD
+#. Settings'
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket Routing"
 msgstr ""
 
@@ -5963,7 +5979,7 @@ msgstr ""
 msgid "Ticket merged successfully."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:359
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:364
 msgid "Ticket must be resolved with a feedback"
 msgstr ""
 
@@ -6205,7 +6221,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:668
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:673
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -6485,11 +6501,11 @@ msgstr ""
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:581
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:586
 msgid "You are not permitted to add a comment"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:607
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:612
 msgid "You are not permitted to reply as an agent"
 msgstr ""
 
