@@ -230,8 +230,12 @@ router.beforeEach(async (to, _, next) => {
 
   // Guard the wizard page: only an uncaptured admin may view it, even via URL.
   if (to.name === "Persona") {
-    const allow = isDeskAdmin && !(await isPersonaCaptured());
-    return next(allow ? undefined : { name: "Home" });
+    try {
+      const allow = isDeskAdmin && !(await isPersonaCaptured());
+      return next(allow ? undefined : { name: "Home" });
+    } catch {
+      return next({ name: "Home" }); // fail safe — never break navigation
+    }
   }
 
   // Interrupt an eligible admin once per session — but only when telemetry is
