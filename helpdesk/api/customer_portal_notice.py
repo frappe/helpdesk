@@ -1,4 +1,5 @@
 import frappe
+from frappe.realtime import get_website_room
 
 from helpdesk.utils import agent_manager_only
 
@@ -30,34 +31,76 @@ def restore_ticket_access() -> None:
 
 
 def disable_notice() -> None:
-    """Turn the flag off via the document, so HD Settings notifies
-    connected clients through its on_update realtime event."""
-    settings = frappe.get_doc("HD Settings")
-    settings.set(NOTICE_FLAG, 0)
-    settings.save(ignore_permissions=True)
+    """Turn the flag off and notify connected clients, publishing the same
+    realtime event HD Settings emits from its on_update."""
+    frappe.db.set_single_value("HD Settings", NOTICE_FLAG, 0)
+    frappe.publish_realtime(
+        "helpdesk:settings-updated", room=get_website_room(), after_commit=True
+    )
 
 
 def promote_all_contacts_to_managers() -> None:
-    """Mark every customer contact as manager, syncing roles via HD Customer."""
-    customers = frappe.get_all(
+    """Mark every customer contact as manager and grant the manager roles."""
+    users = get_users_of_non_manager_contacts()
+    mark_all_members_as_managers()
+    grant_manager_roles(users)
+    for user in users:
+        frappe.clear_cache(user=user)
+
+
+def get_users_of_non_manager_contacts() -> list[str]:
+    """Users linked to contacts that are not managers yet. Contacts without
+    a linked user are skipped, there is no user to grant the role to."""
+    contact_names = frappe.get_all(
         "HD Customer Member",
         filters={"is_manager": 0, "parenttype": "HD Customer"},
         parent_doctype="HD Customer",
-        pluck="parent",
+        pluck="contact_name",
         distinct=True,
     )
-    for customer_name in customers:
-        try:
-            promote_customer_contacts(customer_name)
-        except Exception:
-            frappe.log_error(
-                title="promote_all_contacts_to_managers",
-                message=f"Failed to promote contacts of customer {customer_name}",
-            )
+    if not contact_names:
+        return []
+
+    return frappe.get_all(
+        "Contact",
+        filters={"name": ("in", contact_names), "user": ("is", "set")},
+        pluck="user",
+        distinct=True,
+    )
 
 
-def promote_customer_contacts(customer_name: str) -> None:
-    customer = frappe.get_doc("HD Customer", customer_name)
-    for contact in customer.contacts:
-        contact.is_manager = True
-    customer.save(ignore_permissions=True)
+def mark_all_members_as_managers() -> None:
+    Member = frappe.qb.DocType("HD Customer Member")
+    (
+        frappe.qb.update(Member)
+        .set(Member.is_manager, 1)
+        .where((Member.is_manager == 0) & (Member.parenttype == "HD Customer"))
+    ).run()
+
+
+def grant_manager_roles(users: list[str]) -> None:
+    """Bulk-insert the customer roles for users that are missing them."""
+    roles = ("HD Customer Manager", "HD Customer")
+    if not users:
+        return
+
+    existing = frappe.get_all(
+        "Has Role",
+        filters={
+            "parenttype": "User",
+            "parent": ("in", users),
+            "role": ("in", roles),
+        },
+        fields=["parent", "role"],
+    )
+    existing_pairs = {(row.parent, row.role) for row in existing}
+    values = [
+        (frappe.generate_hash(length=10), user, role, "roles", "User")
+        for user in users
+        for role in roles
+        if (user, role) not in existing_pairs
+    ]
+    if values:
+        frappe.db.bulk_insert(
+            "Has Role", ["name", "parent", "role", "parentfield", "parenttype"], values
+        )
