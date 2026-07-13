@@ -16,7 +16,7 @@
     </div>
     <Button :label="__('Learn more')" theme="blue" @click="showDialog = true" />
   </div>
-  <Button v-else @click="showDialog = true">
+  <Button v-else variant="ghost" @click="showDialog = true">
     <LucideShieldAlert class="h-4 w-4 shrink-0" />
   </Button>
   <CustomerPortalPermissionDialog v-model="showDialog" />

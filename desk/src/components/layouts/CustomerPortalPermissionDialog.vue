@@ -13,10 +13,10 @@
           }}
         </p>
         <p>
-          {{ __("Only") }}
+          {{ __("Only users with the role of ") }}
           <span class="font-semibold text-ink-gray-8"
-            >'{{ __("customer managers") }}'</span
-          >
+            >'{{ __("Customer Manager") }}'
+          </span>
           {{
             __("can see every ticket of their company and manage its contacts.")
           }}
