@@ -18,6 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -72,6 +73,35 @@ class HDTicket(Document):
 
     def before_insert(self):
         self.generate_key()
+        self.apply_portal_insert_rules()
+
+    def apply_portal_insert_rules(self):
+        """
+        Non-agents cannot spoof server-owned fields on insert. The framework
+        resets permlevel-protected fields right after this hook
+        (`validate_higher_perm_levels`), so exempt the ones set server-side
+        here plus the template fields the customer legitimately fills.
+        """
+        if is_agent():
+            return
+        if frappe.session.user != "Guest":
+            self.raised_by = frappe.session.user
+        self.via_customer_portal = 1
+        self.flags.ignore_permlevel_for_fields = [
+            "key",
+            "raised_by",
+            "via_customer_portal",
+            *self.get_customer_template_fields(),
+        ]
+
+    def get_customer_template_fields(self):
+        """Fields the ticket's template exposes to the customer."""
+        template = self.template or DEFAULT_TICKET_TEMPLATE
+        return frappe.get_all(
+            "HD Ticket Template Field",
+            filters={"parent": template, "hide_from_customer": 0},
+            pluck="fieldname",
+        )
 
     def before_validate(self):
         self.check_update_perms()
