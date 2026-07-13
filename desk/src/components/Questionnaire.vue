@@ -1,85 +1,71 @@
 <template>
-  <div
-    class="relative mx-auto w-full max-w-2xl rounded-2xl bg-surface-white p-4"
-  >
-    <div class="flex flex-col">
-      <div class="flex items-center gap-2">
-        <HDLogo class="size-8" />
-        <span class="text-p-lg text-ink-gray-7 font-semibold"
-          >Frappe {{ brandName }}</span
+  <div class="relative mx-auto w-full max-w-md flex flex-col gap-5">
+    <HDLogo class="size-8" />
+
+    <!-- Fixed height keeps the panel from resizing as questions vary in length. -->
+    <div>
+      <Transition name="q-fade" mode="out-in" @after-enter="focusQuestion">
+        <fieldset
+          :key="question.key"
+          tabindex="-1"
+          class="mx-0 min-w-0 border-0 p-0 focus:outline-none"
         >
-      </div>
-      <Progress :value="progress" size="lg" class="mt-4" />
-      <!-- Fixed height keeps the panel from resizing as questions vary in length. -->
-      <div class="mt-6 h-[220px] overflow-y-auto">
-        <Transition name="q-fade" mode="out-in" @after-enter="focusQuestion">
-          <fieldset
-            :key="question.key"
-            tabindex="-1"
-            class="mx-0 min-w-0 border-0 p-0 focus:outline-none"
-          >
-            <legend class="p-0 text-xl font-semibold text-ink-gray-9">
-              {{ question.title }}
-            </legend>
-            <p class="mt-1 h-5 text-sm text-ink-gray-5">
-              {{ question.multiple ? __("Select all that apply") : "" }}
-            </p>
-            <div class="mt-5 flex flex-wrap gap-2.5">
-              <Button
-                v-for="option in question.options"
-                :key="option.value"
-                :label="option.label"
-                :variant="isSelected(option) ? 'solid' : 'subtle'"
-                size="md"
-                class="!rounded-full"
-                @click="select(option)"
-              />
-            </div>
-          </fieldset>
-        </Transition>
-      </div>
+          <legend class="p-0 text-p-2xl font-bold text-ink-gray-9">
+            {{ question.title }}
+          </legend>
+          <p class="text-p-base pt-1.5">
+            Answer a few quick questions so we can tailor Helpdesk to how you
+            work.
+          </p>
+          <div class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base">
+            <Button
+              v-for="option in question.options"
+              :key="option.value"
+              :label="option.label"
+              :variant="
+                isSelected(option)
+                  ? 'subtle'
+                  : 'outline active:bg-surface-gray-4 border-solid active:!border-outline-gray-3'
+              "
+              :icon-right="
+                question.multiple && isSelected(option) ? 'lucide-x' : undefined
+              "
+              size="md"
+              class="!rounded-md border border-solid [&_[aria-hidden]]:!size-3"
+              :class="
+                isSelected(option)
+                  ? '!bg-surface-gray-4 !border-outline-gray-3'
+                  : '!border-outline-gray-2'
+              "
+              @click="select(option)"
+            />
+          </div>
+        </fieldset>
+      </Transition>
     </div>
 
-    <div class="mt-6 flex items-center justify-between">
+    <div class="flex flex-col items-center gap-2">
       <Button
-        v-if="current > 0"
-        variant="ghost"
-        :label="__('Back')"
-        icon-left="lucide-chevron-left"
-        @click="back"
+        class="!h-7 w-full !rounded-lg"
+        variant="solid"
+        :label="isLast ? __('Finish') : __('Next')"
+        @click="proceed"
       />
-      <span v-else />
-
-      <div class="flex items-center gap-2">
-        <Button variant="ghost" :label="__('Skip')" @click="skip" />
-        <Button
-          v-if="current < total - 1"
-          variant="solid"
-          :disabled="!answered"
-          :label="__('Next')"
-          @click="next"
-        />
-        <Button
-          v-else
-          :disabled="!answered"
-          variant="solid"
-          :label="__('Finish')"
-          @click="finish"
-        />
-      </div>
     </div>
   </div>
+  <Button
+    class="mt-auto !bg-transparent !text-ink-gray-5 hover:!text-ink-gray-8"
+    variant="ghost"
+    :label="__('Skip for now')"
+    @click="finish"
+  />
 </template>
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
-import { Button, Progress } from "frappe-ui";
+import { Button } from "frappe-ui";
 import { computed, reactive, ref } from "vue";
-
-const configStore = useConfigStore();
-const brandName = computed(() => configStore.brandName || "Helpdesk");
 
 interface Option {
   label: string;
@@ -103,15 +89,7 @@ const answers = reactive<Answers>({});
 
 const total = computed(() => props.questions.length);
 const question = computed(() => props.questions[current.value] as Question);
-const progress = computed(() =>
-  Math.round(((current.value + 1) / total.value) * 100)
-);
-
-const answered = computed(() => {
-  const value = answers[question.value.key];
-  if (question.value.multiple) return Array.isArray(value) && value.length > 0;
-  return value !== undefined;
-});
+const isLast = computed(() => current.value === total.value - 1);
 
 function isSelected(option: Option) {
   const value = answers[question.value.key];
@@ -137,27 +115,18 @@ function select(option: Option) {
     answers[key] = value;
     return;
   }
-  // Single-select auto-advances; multi-select returned above and waits for Next.
+  // A click only sets the selection; advancing is always via the Next button.
   answers[key] = option.value;
-  if (current.value < total.value - 1) advance();
 }
 
 function advance() {
   if (current.value < total.value - 1) current.value += 1;
 }
 
-function next() {
-  if (answered.value) advance();
-}
-
-function back() {
-  if (current.value > 0) current.value -= 1;
-}
-
-// Skip advances without an answer; on the last step it submits what's answered.
-function skip() {
-  if (current.value < total.value - 1) advance();
-  else finish();
+// Next never blocks: an unanswered question is simply skipped past.
+function proceed() {
+  if (isLast.value) finish();
+  else advance();
 }
 
 function finish() {
@@ -172,10 +141,6 @@ function focusQuestion(el: Element) {
 </script>
 
 <style scoped>
-/* Progress fills its width instantly by default — animate it. */
-:deep([role="progressbar"] > div) {
-  transition: width 0.3s ease;
-}
 .q-fade-enter-active,
 .q-fade-leave-active {
   transition: opacity 0.15s ease, transform 0.15s ease;

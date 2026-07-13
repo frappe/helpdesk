@@ -3,8 +3,12 @@
     class="relative flex min-h-screen flex-col overflow-y-auto bg-surface-gray-1 transition-opacity duration-300 ease-out"
     :class="leaving ? 'opacity-0' : 'opacity-100'"
   >
-    <div class="flex flex-1 flex-col justify-start px-4 pt-24">
-      <Questionnaire :questions="questions" @submit="submitPersona" />
+    <div class="flex flex-1 flex-col justify-start pb-8 pt-24">
+      <Questionnaire
+        class="h-full"
+        :questions="questions"
+        @submit="submitPersona"
+      />
     </div>
   </div>
 </template>
@@ -41,11 +45,6 @@ const questions = [
     key: "current_solution",
     title: __("What do you currently use to manage customer support?"),
     options: [
-      { label: __("We don't use any helpdesk yet"), value: "none" },
-      {
-        label: __("Shared email inbox (Gmail, Outlook, etc.)"),
-        value: "shared_inbox",
-      },
       { label: __("Spreadsheets"), value: "spreadsheets" },
       { label: __("Notion"), value: "notion" },
       { label: __("Zendesk"), value: "zendesk" },
@@ -55,6 +54,11 @@ const questions = [
       { label: __("Zoho Desk"), value: "zoho_desk" },
       { label: __("Salesforce Service Cloud"), value: "salesforce" },
       { label: __("Other"), value: "other" },
+      { label: __("We don't use any helpdesk yet"), value: "none" },
+      {
+        label: __("Shared email inbox (Gmail, Outlook, etc.)"),
+        value: "shared_inbox",
+      },
     ],
   },
   {
@@ -93,15 +97,6 @@ const questions = [
     multiple: true,
     options: [
       {
-        label: __("Keeping track of customer requests"),
-        value: "tracking_requests",
-      },
-      { label: __("Missing or delayed responses"), value: "delayed_responses" },
-      {
-        label: __("Assigning tickets to the right agent"),
-        value: "assignment",
-      },
-      {
         label: __("Managing customer conversations across channels"),
         value: "omnichannel",
       },
@@ -114,6 +109,15 @@ const questions = [
         value: "measuring_performance",
       },
       { label: __("Scaling support as we grow"), value: "scaling" },
+      {
+        label: __("Keeping track of customer requests"),
+        value: "tracking_requests",
+      },
+      { label: __("Missing or delayed responses"), value: "delayed_responses" },
+      {
+        label: __("Assigning tickets to the right agent"),
+        value: "assignment",
+      },
       { label: __("Other"), value: "other" },
     ],
   },
