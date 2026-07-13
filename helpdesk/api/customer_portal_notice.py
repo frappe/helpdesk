@@ -94,13 +94,37 @@ def grant_manager_roles(users: list[str]) -> None:
         fields=["parent", "role"],
     )
     existing_pairs = {(row.parent, row.role) for row in existing}
+    now = frappe.utils.now()
+    session_user = frappe.session.user
     values = [
-        (frappe.generate_hash(length=10), user, role, "roles", "User")
+        (
+            frappe.generate_hash(length=10),
+            user,
+            role,
+            "roles",
+            "User",
+            now,
+            now,
+            session_user,
+            session_user,
+        )
         for user in users
         for role in roles
         if (user, role) not in existing_pairs
     ]
     if values:
         frappe.db.bulk_insert(
-            "Has Role", ["name", "parent", "role", "parentfield", "parenttype"], values
+            "Has Role",
+            [
+                "name",
+                "parent",
+                "role",
+                "parentfield",
+                "parenttype",
+                "creation",
+                "modified",
+                "owner",
+                "modified_by",
+            ],
+            values,
         )
