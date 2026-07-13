@@ -1540,3 +1540,150 @@ class TestHDTicket(IntegrationTestCase):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
+
+
+PERMS_CUSTOMER = "perms.customer@example.com"
+PERMS_OTHER_CUSTOMER = "perms.other@example.com"
+PERMS_AGENT = "perms.agent@example.com"
+
+
+class TestHDTicketFieldPermissions(IntegrationTestCase):
+    """Non-agents may only write customer-facing HD Ticket fields.
+
+    Agent-only fields sit at permlevel 1, so the framework silently
+    resets any change to them made by a user without level-1 write.
+    """
+
+    def setUp(self):
+        frappe.set_user("Administrator")
+        create_contact("Perms Customer", PERMS_CUSTOMER)
+        create_contact("Perms Other", PERMS_OTHER_CUSTOMER)
+        frappe.get_doc(
+            {"doctype": "User", "first_name": "Perms Agent", "email": PERMS_AGENT}
+        ).insert(ignore_if_duplicate=True)
+        frappe.get_doc(
+            {"doctype": "HD Agent", "user": PERMS_AGENT, "agent_name": "Perms Agent"}
+        ).insert(ignore_if_duplicate=True)
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
+
+    @staticmethod
+    def other_priority(current):
+        return "Urgent" if current != "Urgent" else "Low"
+
+    def get_customer_ticket(self):
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        return frappe.get_doc("HD Ticket", ticket.name)
+
+    def test_customer_cannot_write_agent_fields(self):
+        ticket = self.get_customer_ticket()
+        original_priority = ticket.priority
+        original_response_by = ticket.response_by
+        ticket.priority = self.other_priority(original_priority)
+        ticket.response_by = now_datetime()
+        ticket.save()
+        ticket.reload()
+        self.assertEqual(ticket.priority, original_priority)
+        self.assertEqual(ticket.response_by, original_response_by)
+
+    def test_customer_can_write_allowed_fields(self):
+        ticket = self.get_customer_ticket()
+        ticket.subject = "Updated by customer"
+        ticket.description = "Updated description"
+        ticket.save()
+        ticket.reload()
+        self.assertEqual(ticket.subject, "Updated by customer")
+        self.assertEqual(ticket.description, "Updated description")
+
+    def test_agent_can_write_agent_fields(self):
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_AGENT)
+        ticket = frappe.get_doc("HD Ticket", ticket.name)
+        new_priority = self.other_priority(ticket.priority)
+        ticket.priority = new_priority
+        ticket.save()
+        ticket.reload()
+        self.assertEqual(ticket.priority, new_priority)
+
+    def test_customer_cannot_spoof_fields_on_insert(self):
+        other_contact = frappe.db.get_value(
+            "Contact", {"email_id": PERMS_OTHER_CUSTOMER}
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        baseline = frappe.get_doc(get_ticket_obj()).insert()
+        self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
+        self.assertEqual(baseline.via_customer_portal, 1)
+        self.assertTrue(baseline.key)
+
+        spoofed = frappe.get_doc(
+            {
+                **get_ticket_obj(),
+                "raised_by": PERMS_OTHER_CUSTOMER,
+                "contact": other_contact,
+                "priority": self.other_priority(baseline.priority),
+            }
+        ).insert()
+        self.assertEqual(spoofed.raised_by, PERMS_CUSTOMER)
+        self.assertEqual(spoofed.priority, baseline.priority)
+        self.assertNotEqual(spoofed.contact, other_contact)
+
+    def test_hidden_template_field_not_writable_by_customer(self):
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_check"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": fieldname, "label": "Perms Check", "fieldtype": "Data"},
+        )
+        template = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Template",
+                "template_name": "Perms Test Template",
+                "fields": [{"fieldname": fieldname, "hide_from_customer": 0}],
+            }
+        ).insert()
+        try:
+            frappe.set_user(PERMS_CUSTOMER)
+            visible = frappe.get_doc(
+                {
+                    **get_ticket_obj(),
+                    "template": template.name,
+                    fieldname: "customer value",
+                }
+            ).insert()
+            self.assertEqual(visible.get(fieldname), "customer value")
+
+            frappe.set_user("Administrator")
+            template.fields[0].hide_from_customer = 1
+            template.save()
+            self.assertEqual(
+                frappe.db.get_value(
+                    "Custom Field",
+                    {"dt": "HD Ticket", "fieldname": fieldname},
+                    "permlevel",
+                ),
+                1,
+            )
+
+            frappe.set_user(PERMS_CUSTOMER)
+            hidden = frappe.get_doc(
+                {
+                    **get_ticket_obj(),
+                    "template": template.name,
+                    fieldname: "sneaky value",
+                }
+            ).insert()
+            self.assertFalse(hidden.get(fieldname))
+        finally:
+            frappe.set_user("Administrator")
+            frappe.db.delete("HD Ticket", {"template": template.name})
+            frappe.delete_doc("HD Ticket Template", template.name, force=True)
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
