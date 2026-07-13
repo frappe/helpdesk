@@ -25,7 +25,6 @@
             @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-surface-base hover:bg-surface-base focus:ring-0 border-outline-gray-2"
             :debounce="300"
           >
             <template #prefix>
@@ -199,6 +198,9 @@
 </template>
 
 <script setup lang="ts">
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
+import { ConfirmDelete } from "@/utils";
 import {
   Avatar,
   Button,
@@ -209,19 +211,16 @@ import {
   TextInput,
   toast,
 } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, inject, ref, Ref, watch } from "vue";
-import { __ } from "@/translation";
-import { ConfirmDelete } from "@/utils";
-import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
-import { activeFilter } from "./savedReplies";
-import { useUserStore } from "../../../stores/user";
+import GlobeIcon from "~icons/lucide/globe";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
-import GlobeIcon from "~icons/lucide/globe";
+import { useUserStore } from "../../../stores/user";
 import { SavedReply, SavedReplyListResourceSymbol } from "../../../types";
 import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
-import { storeToRefs } from "pinia";
-import { useConfigStore } from "@/stores/config";
+import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import { activeFilter } from "./savedReplies";
 
 const { getUser } = useUserStore();
 const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =

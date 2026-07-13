@@ -19,7 +19,7 @@
           }"
         >
           <div class="w-full space-y-1.5">
-            <label v-if="$props.label" class="block text-xs text-ink-gray-5">
+            <label v-if="$props.label" class="block text-base text-ink-gray-5">
               {{ $props.label }}
             </label>
             <button

@@ -152,7 +152,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-3">
           <div class="flex flex-col gap-1.5">
-            <FormLabel :label="__('Ticket status')" />
+            <FormLabel :label="__('Ticket status')" size="md" />
             <SelectDropdown
               :options="autoCloseTicketStatusList"
               :model-value="settingsData.autoCloseStatus"

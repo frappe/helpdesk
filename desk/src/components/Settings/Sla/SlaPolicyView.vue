@@ -137,7 +137,7 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('From date')" for="from_date" />
+              <FormLabel :label="__('From date')" for="from_date" size="md" />
               <DatePicker
                 v-model="slaData.start_date"
                 variant="subtle"
@@ -154,7 +154,7 @@
               <ErrorMessage :message="slaDataErrors.start_date" />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('To date')" for="to_date" />
+              <FormLabel :label="__('To date')" for="to_date" size="md" />
               <DatePicker
                 v-model="slaData.end_date"
                 variant="subtle"

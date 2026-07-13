@@ -35,7 +35,7 @@
           <ErrorMessage :message="errors.name" />
         </div>
         <div class="flex flex-col gap-1.5">
-          <FormLabel :label="__('Members')" required />
+          <FormLabel :label="__('Members')" required size="md" />
           <div class="flex">
             <AgentSelector
               v-model="teamData.agents"

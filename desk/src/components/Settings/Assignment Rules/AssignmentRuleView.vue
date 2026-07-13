@@ -56,7 +56,7 @@
             />
           </div>
           <div class="flex flex-col gap-1.5">
-            <FormLabel :label="__('Priority')" />
+            <FormLabel :label="__('Priority')" size="md" />
             <Popover>
               <template #target="{ togglePopover }">
                 <div

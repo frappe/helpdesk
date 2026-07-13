@@ -13,7 +13,7 @@
           required
         />
         <div>
-          <FormLabel label="Response time" required />
+          <FormLabel label="Response time" required size="md" />
           <Popover class="mt-2">
             <template #target="{ togglePopover }" class="w-max">
               <div
@@ -37,7 +37,7 @@
           </Popover>
         </div>
         <div>
-          <FormLabel label="Resolution time" required />
+          <FormLabel label="Resolution time" required size="md" />
           <Popover class="mt-2">
             <template #target="{ togglePopover }" class="w-max">
               <div

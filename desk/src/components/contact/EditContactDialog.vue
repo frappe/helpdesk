@@ -30,31 +30,23 @@
 
           <!-- First + Last name -->
           <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="block text-p-sm-medium text-ink-gray-7">
-                {{ __("First Name") }}
-                <span class="text-ink-red-6">*</span>
-              </label>
-              <FormControl
-                type="text"
-                :placeholder="__('John')"
-                v-model="state.firstName"
-              />
-            </div>
-            <div class="space-y-1.5">
-              <label class="block text-p-sm-medium text-ink-gray-7">
-                {{ __("Last Name") }}
-              </label>
-              <FormControl
-                type="text"
-                :placeholder="__('Doe')"
-                v-model="state.lastName"
-              />
-            </div>
+            <FormControl
+              :label="__('First Name')"
+              type="text"
+              :required="true"
+              :placeholder="__('John')"
+              v-model="state.firstName"
+            />
+            <FormControl
+              :label="__('Last Name')"
+              type="text"
+              :placeholder="__('Doe')"
+              v-model="state.lastName"
+            />
           </div>
           <!-- Email IDs -->
           <div class="space-y-1.5">
-            <label class="block text-p-sm-medium text-ink-gray-7">
+            <label class="block text-base text-ink-gray-5">
               {{ __("Email") }}
               <span class="text-ink-red-6">*</span>
             </label>
@@ -84,7 +76,7 @@
 
           <!-- Phone numbers -->
           <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
-            <label class="block text-p-sm-medium text-ink-gray-7">{{
+            <label class="block text-base text-ink-gray-5">{{
               __("Phone")
             }}</label>
             <ContactInputRow
@@ -113,7 +105,7 @@
 
           <!-- Timezone -->
           <div v-if="doc.doc?.user" class="space-y-1.5">
-            <label class="block text-p-sm-medium text-ink-gray-7">{{
+            <label class="block text-base text-ink-gray-5">{{
               __("Timezone")
             }}</label>
             <TimezoneControl v-model="state.timezone" />
@@ -122,7 +114,7 @@
           <!-- Customer -->
           <div class="space-y-1.5">
             <label
-              class="block text-p-sm-medium text-ink-gray-7"
+              class="block text-base text-ink-gray-5"
               v-if="!contactInfoResource.data?.invitation"
             >
               {{ __("Customer") }}

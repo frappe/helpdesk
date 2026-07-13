@@ -23,11 +23,15 @@
                 />
                 <div
                   v-if="agentStatusStore.myStatus"
-                  class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-base outline-4"
-                  :class="
-                    agentStatusStore.statusColor(agentStatusStore.myStatus)
-                  "
-                />
+                  class="absolute bottom-0.5 right-0.5 rounded-full bg-surface-elevation-2 p-1"
+                >
+                  <div
+                    class="size-3.5 rounded-full"
+                    :class="
+                      agentStatusStore.statusColor(agentStatusStore.myStatus)
+                    "
+                  />
+                </div>
                 <Tooltip
                   :hoverDelay="0"
                   placement="bottom"

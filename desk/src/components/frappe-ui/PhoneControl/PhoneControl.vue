@@ -1,10 +1,6 @@
 <template>
   <div :class="['space-y-1.5', $attrs.class as string]">
-    <label
-      v-if="label"
-      :for="id"
-      class="block w-fit text-p-sm-medium text-ink-gray-7"
-    >
+    <label v-if="label" :for="id" class="block w-fit text-base text-ink-gray-5">
       {{ label }}
       <span v-if="required" class="text-ink-red-6">*</span>
     </label>

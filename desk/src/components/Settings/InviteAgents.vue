@@ -15,7 +15,7 @@
           :description="__('Comma separated emails to invite.')"
         />
         <div class="space-y-1.5">
-          <label class="block text-xs text-ink-gray-5">
+          <label class="block text-base text-ink-gray-5">
             {{ __("Role") }}
             <span class="text-ink-red-6 select-none" aria-hidden="true">*</span>
           </label>
