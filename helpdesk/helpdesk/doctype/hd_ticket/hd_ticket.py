@@ -84,6 +84,7 @@ class HDTicket(Document):
         self.set_status_category()
         self.set_sla()
 
+        self.validate_portal_contact()
         self.set_contact()
         self.set_customer()
 
@@ -256,6 +257,28 @@ class HDTicket(Document):
         if self.raised_by:
             return
         self.raised_by = frappe.session.user
+
+    def validate_portal_contact(self) -> None:
+        """Block non-agent users from attributing a ticket to another contact.
+
+        Agents are unrestricted, and so are system channels like email intake,
+        which run as Administrator.
+        """
+        if is_agent():
+            return
+        if not self.contact:
+            return
+        if not self.is_new() and not self.has_value_changed("contact"):
+            return
+
+        session_contact = frappe.db.get_value(
+            "Contact", {"user": frappe.session.user}
+        ) or frappe.db.get_value("Contact", {"email_id": frappe.session.user})
+        if self.contact != session_contact:
+            frappe.throw(
+                _("You can only raise tickets for your own contact."),
+                frappe.PermissionError,
+            )
 
     def set_contact(self):
         email_id = parseaddr(self.raised_by)[1]
