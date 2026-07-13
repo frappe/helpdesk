@@ -1,7 +1,7 @@
 import frappe
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_config():
     fields = [
         "brand_name",
