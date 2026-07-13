@@ -158,6 +158,7 @@ class TestHelpdeskSearch(FrappeTestCase):
         self.assertEqual(query.count("?"), 1)
         self.assertEqual(len(params), 1)
         self.assertEqual(frappe.parse_json(params[0]), accessible_tickets)
+        self.assertEqual(sql.call_args.kwargs, {"read_only": True})
 
     def test_filter_options_returns_empty_without_index_or_access(self):
         missing_search = HelpdeskSearch(
