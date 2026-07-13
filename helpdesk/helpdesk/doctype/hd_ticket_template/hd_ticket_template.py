@@ -54,6 +54,27 @@ class HDTicketTemplate(Document):
 
     def on_update(self):
         capture_event("ticket_template_updated")
+        self.protect_hidden_custom_fields()
+
+    def protect_hidden_custom_fields(self):
+        """
+        Hidden template fields hold agent-only data: raise their custom
+        field to permlevel 1 so customers cannot write them. Standard
+        fields carry their permlevel in hd_ticket.json.
+        """
+        changed = False
+        for f in self.fields:
+            if not f.hide_from_customer:
+                continue
+            custom_field = frappe.db.get_value(
+                "Custom Field",
+                {"dt": "HD Ticket", "fieldname": f.fieldname, "permlevel": 0},
+            )
+            if custom_field:
+                frappe.db.set_value("Custom Field", custom_field, "permlevel", 1)
+                changed = True
+        if changed:
+            frappe.clear_cache(doctype="HD Ticket")
 
     def on_trash(self):
         self.prevent_default_delete()
