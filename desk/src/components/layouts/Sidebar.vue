@@ -443,7 +443,7 @@ const showOnboardingBanner = computed(() => {
 const showPermissionNoticeBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
-    authStore.isManager &&
+    (authStore.isManager || authStore.isAdmin) &&
     configStore.showCustomerPortalPermissionNotice
   );
 });
