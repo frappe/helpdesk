@@ -45,9 +45,9 @@ const outlookReplyToContent = doc.querySelectorAll("div#appendonsend");
 const replyToContent = doc.querySelectorAll("p.reply-to-content");
 
 if (doc.body.children.length === 0) {
-  // Plain-text emails (e.g. from Thunderbird) arrive as text with newlines and no spacing losing formatting
-  // Preserve line breaks with pre-wrap (content is already escaped by stripEmailColors).
-  _content.value = `<div class="plain-text-content">${doc.body.innerHTML}</div>`;
+  // Plain-text emails (e.g. from Thunderbird) arrive as text with newlines and no spacing losing formatting.
+  const plainText = doc.body.innerHTML.replace(/\n\n/g, "\n");
+  _content.value = `<div class="whitespace-pre-wrap">${plainText}</div>`;
 } else if (gmailReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div.gmail_quote", true);
 } else if (outlookReplyToContent.length) {
@@ -184,10 +184,6 @@ const htmlContent = computed(
         word-break: break-word;
       }
       
-      .plain-text-content {
-        white-space: pre-wrap;
-        line-height: 1.5;
-      }
           
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         border-width: 0;
