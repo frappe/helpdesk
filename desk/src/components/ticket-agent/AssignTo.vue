@@ -7,9 +7,12 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
-          __("Assignee")
-        }}</span>
+        <span
+          v-if="!hideLabel"
+          class="block text-p-sm font-medium text-ink-gray-7"
+        >
+          {{ __("Assignee") }}
+        </span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -147,6 +150,7 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -157,14 +161,21 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
+import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
   Checkbox,
   Popover,
+<<<<<<< HEAD
+=======
+  TextInput,
+  Tooltip,
+>>>>>>> c26cf84d (fix: recent tickets alignment)
   call,
   createListResource,
   createResource,
+  dayjsLocal,
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
@@ -172,10 +183,6 @@ import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
-import { useAgentStatusStore } from "@/stores/agentStatus.ts";
-import { prettyDate } from "@/utils.ts";
-import { dayjsLocal } from "frappe-ui";
-import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
 }
