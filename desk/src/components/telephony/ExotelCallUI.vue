@@ -27,7 +27,7 @@
         v-else-if="callStatus == 'Call ended' || callStatus == 'No answer'"
         class="blink"
         :class="{
-          'text-red-700':
+          'text-ink-red-6':
             callStatus == 'Call ended' || callStatus == 'No answer',
         }"
       >

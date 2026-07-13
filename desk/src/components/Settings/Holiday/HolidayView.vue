@@ -167,7 +167,7 @@
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
               <div class="gap-1 flex items-center">
-                <span class="bg-yellow-100 size-4 rounded-sm" />
+                <span class="bg-surface-yellow-2 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Holidays")
                 }}</span>

@@ -21,7 +21,6 @@
             >
               <template v-for="field in fieldOrRow" :key="field.key">
                 <FormControl
-                  class="[&_p]:text-p-xs"
                   :label="field.label"
                   :type="field.type"
                   :required="field.required"
@@ -48,7 +47,6 @@
             <!-- Email: single flat field -->
             <template v-else-if="fieldOrRow.type === 'email'">
               <FormControl
-                class="[&_p]:text-p-xs"
                 :label="fieldOrRow.label"
                 type="email"
                 :required="fieldOrRow.required"
@@ -80,7 +78,6 @@
             <!-- Default: text / number / etc -->
             <template v-else>
               <FormControl
-                class="[&_p]:text-p-xs"
                 :label="fieldOrRow.label"
                 :type="fieldOrRow.type"
                 :required="fieldOrRow.required"

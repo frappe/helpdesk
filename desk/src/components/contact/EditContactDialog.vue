@@ -30,21 +30,27 @@
 
           <!-- First + Last name -->
           <div class="grid grid-cols-2 gap-4">
-            <FormControl
-              class="[&_p]:text-p-xs"
-              :label="__('First Name')"
-              type="text"
-              :required="true"
-              :placeholder="__('John')"
-              v-model="state.firstName"
-            />
-            <FormControl
-              class="[&_p]:text-p-xs"
-              :label="__('Last Name')"
-              type="text"
-              :placeholder="__('Doe')"
-              v-model="state.lastName"
-            />
+            <div class="space-y-1.5">
+              <label class="block text-p-sm-medium text-ink-gray-7">
+                {{ __("First Name") }}
+                <span class="text-ink-red-6">*</span>
+              </label>
+              <FormControl
+                type="text"
+                :placeholder="__('John')"
+                v-model="state.firstName"
+              />
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-p-sm-medium text-ink-gray-7">
+                {{ __("Last Name") }}
+              </label>
+              <FormControl
+                type="text"
+                :placeholder="__('Doe')"
+                v-model="state.lastName"
+              />
+            </div>
           </div>
           <!-- Email IDs -->
           <div class="space-y-1.5">

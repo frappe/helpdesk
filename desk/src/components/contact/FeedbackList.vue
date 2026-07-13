@@ -170,9 +170,9 @@ function formatRating(rating: number | undefined | null): number {
 
 function ratingBadgeClass(rating: number | undefined | null): string {
   const stars = formatRating(rating);
-  if (stars >= 4) return "bg-green-100 text-green-700";
-  if (stars >= 2.5) return "bg-yellow-100 text-yellow-700";
-  return "bg-red-100 text-red-700";
+  if (stars >= 4) return "bg-surface-green-2 text-ink-green-6";
+  if (stars >= 2.5) return "bg-surface-yellow-2 text-ink-yellow-7";
+  return "bg-surface-red-2 text-ink-red-6";
 }
 
 onMounted(() => {

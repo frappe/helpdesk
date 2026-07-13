@@ -205,11 +205,11 @@ function scrollToHash() {
           (element as any).scrollIntoViewIfNeeded();
 
           // Add highlight effect using Tailwind class
-          element.classList.add("bg-yellow-100");
+          element.classList.add("bg-surface-yellow-2");
 
           // Remove highlight after 2 seconds
           setTimeout(() => {
-            element.classList.remove("bg-yellow-100");
+            element.classList.remove("bg-surface-yellow-2");
             router.replace({ hash: "" });
           }, 2000);
         }

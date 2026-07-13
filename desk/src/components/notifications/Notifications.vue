@@ -76,7 +76,10 @@
             <div class="text-sm text-ink-gray-5">
               {{ dayjs.tz(n.creation).fromNow() }}
             </div>
-            <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <div
+              v-if="!n.read"
+              class="h-1.5 w-1.5 rounded-full bg-surface-blue-5"
+            />
           </div>
         </span>
       </RouterLink>

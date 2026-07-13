@@ -18,7 +18,7 @@
           <Popover v-if="isHoliday(date)">
             <template #target="{ open, close }">
               <div
-                class="flex size-7 cursor-pointer text-orange-700 bg-yellow-100 items-center justify-center rounded hover:bg-yellow-100 select-none m-[1px]"
+                class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded hover:bg-surface-yellow-2 select-none m-[1px]"
                 :class="{
                   '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
                 }"
@@ -46,7 +46,7 @@
                 "
               >
                 <div class="w-[5%]">
-                  <div class="size-3.5 bg-orange-500 rounded-sm mt-1" />
+                  <div class="size-3.5 bg-surface-orange-5 rounded-sm mt-1" />
                 </div>
                 <div class="grow">
                   <div class="text-sm-semibold">

@@ -53,7 +53,7 @@
         </Dropdown>
       </div>
     </div>
-    <div class="border-t border-gray-200 w-full" />
+    <div class="border-t border-outline-gray-2 w-full" />
     <div class="flex flex-col gap-3">
       <template v-for="item in contactDetails" :key="item.value">
         <div
@@ -142,7 +142,7 @@ const contactDetails = computed(() => [
     value: ticketCountLabel.value,
     color: (value: string) =>
       value !== __("No active tickets")
-        ? "!text-amber-700"
+        ? "!text-ink-amber-8"
         : "!text-ink-gray-4",
     class: (value: string) =>
       value !== __("No active tickets") ? "hover:underline cursor-pointer" : "",

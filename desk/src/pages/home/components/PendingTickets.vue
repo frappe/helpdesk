@@ -327,7 +327,7 @@ function getReasonColorClass(reason: {
       return "text-ink-red-6";
     }
     if (reason.seconds_until_due <= twoHours) {
-      return "text-orange-500";
+      return "text-ink-orange-5";
     }
   }
   return "";
