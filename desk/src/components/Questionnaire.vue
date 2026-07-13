@@ -3,7 +3,14 @@
     <HDLogo class="size-8" />
 
     <!-- Fixed height keeps the panel from resizing as questions vary in length. -->
-    <div>
+    <div class="relative">
+      <Button
+        v-if="current > 0"
+        variant="ghost"
+        icon="lucide-chevron-left"
+        class="!size-7 shrink-0 !rounded-md absolute -left-11 mt-4"
+        @click="back"
+      />
       <Transition name="q-fade" mode="out-in" @after-enter="focusQuestion">
         <fieldset
           :key="question.key"
@@ -13,9 +20,9 @@
           <legend class="p-0 text-p-2xl font-bold text-ink-gray-9">
             {{ question.title }}
           </legend>
+
           <p class="text-p-base pt-1.5">
-            Answer a few quick questions so we can tailor Helpdesk to how you
-            work.
+            A few quick questions to tailor Helpdesk to how you work.
           </p>
           <div class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base">
             <Button
@@ -30,7 +37,7 @@
               :icon-right="
                 question.multiple && isSelected(option) ? 'lucide-x' : undefined
               "
-              size="md"
+              size="sm"
               class="!rounded-md border border-solid [&_[aria-hidden]]:!size-3"
               :class="
                 isSelected(option)
@@ -121,6 +128,10 @@ function select(option: Option) {
 
 function advance() {
   if (current.value < total.value - 1) current.value += 1;
+}
+
+function back() {
+  if (current.value > 0) current.value -= 1;
 }
 
 // Next never blocks: an unanswered question is simply skipped past.
