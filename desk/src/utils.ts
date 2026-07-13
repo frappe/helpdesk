@@ -445,7 +445,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
         "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
-        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+        variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
       ],
       onClick: onClick,
     },
@@ -881,7 +881,7 @@ export function buildPercentageChange(
   return {
     icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
     value: isPositive ? `+${capped}` : `-${capped}`,
-    color: isGood ? "text-ink-green-3" : "text-ink-red-3",
+    color: isGood ? "text-ink-green-6" : "text-ink-red-6",
   };
 }
 

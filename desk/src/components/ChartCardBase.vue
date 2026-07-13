@@ -15,7 +15,7 @@
       <div class="flex items-end w-full gap-2">
         <slot name="text">
           <div
-            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-3xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </div>
@@ -63,7 +63,7 @@
       <div class="flex items-end w-full gap-2 justify-between flex-1">
         <slot name="text">
           <span
-            class="text-2xl font-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-3xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </span>

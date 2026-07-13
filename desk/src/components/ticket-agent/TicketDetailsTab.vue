@@ -48,10 +48,10 @@
         <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
           <template #header="{ opened, toggle }">
             <div
-              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-4 py-4 cursor-pointer"
+              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
               @click="toggle"
             >
-              <span class="text-ink-gray-8 font-semibold text-base select-none">
+              <span class="text-ink-gray-8 text-base-semibold select-none">
                 {{ __("Ticket Info") }}
               </span>
               <LucideChevronRight
@@ -89,13 +89,11 @@
           >
             <template #header="{ opened, toggle }">
               <div
-                class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-white z-10 px-4 py-4 cursor-pointer"
+                class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
                 @click="toggle"
               >
                 <Tooltip :text="section.tooltipMessage">
-                  <span
-                    class="text-ink-gray-8 font-semibold text-base select-none"
-                  >
+                  <span class="text-ink-gray-8 text-base-semibold select-none">
                     {{ __(section.label) }}
                   </span>
                 </Tooltip>
@@ -371,7 +369,7 @@ useShortcut({ key: "t", shift: true }, () => {
 
 <style scoped>
 :deep(.form-control-core button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control-core button > div) {
   @apply truncate;

@@ -18,7 +18,7 @@
     <template #content>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">
+          <span class="text-base-medium text-ink-gray-8">
             {{ __("Signature") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">
@@ -26,7 +26,7 @@
           </span>
         </div>
         <TextEditor
-          editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5 rtl:text-end"
+          editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5 rtl:text-end"
           :content="user?.doc?.email_signature"
           :placeholder="__('Write your email signature here.')"
           :bubbleMenu="true"
@@ -36,7 +36,7 @@
       </div>
       <div class="flex flex-col gap-4 mt-6">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">
+          <span class="text-base-medium text-ink-gray-8">
             {{ __("Emails") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">
@@ -50,10 +50,10 @@
         <div>
           <div
             v-if="user.doc.user_emails?.length"
-            class="w-full border rounded-md mb-2 border-outline-gray-modals"
+            class="w-full border rounded-md mb-2 border-outline-elevation-2"
           >
             <div
-              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 px-4 py-3 text-sm font-medium text-ink-gray-5 border-b border-outline-gray-modals"
+              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 px-4 py-3 text-sm-medium text-ink-gray-5 border-b border-outline-elevation-2"
             >
               <span>{{ __("Email Account") }}</span>
               <span>{{ __("Email") }}</span>
@@ -62,7 +62,7 @@
             <div
               v-for="e in user.doc.user_emails"
               :key="e.name"
-              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 group items-center px-4 py-2.5 text-base border-b border-outline-gray-modals last:border-b-0"
+              class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 group items-center px-4 py-2.5 text-base border-b border-outline-elevation-2 last:border-b-0"
             >
               <span class="text-ink-gray-8 font-medium truncate">
                 {{ e.email_account }}
@@ -86,7 +86,7 @@
           >
             <template #target="{ togglePopover }">
               <Button
-                class="!bg-surface-modal"
+                class="!bg-surface-elevation-2"
                 variant="outline"
                 :label="__('Add Email')"
                 iconLeft="lucide-plus"

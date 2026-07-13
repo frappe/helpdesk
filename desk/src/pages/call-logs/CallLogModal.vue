@@ -1,10 +1,10 @@
 <template>
   <Dialog v-model:open="show" bare @after-leave="resetCallLog">
     <template #default>
-      <div class="px-4 pt-5 bg-surface-modal sm:px-6">
+      <div class="px-4 pt-5 bg-surface-elevation-2 sm:px-6">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-2">
-            <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
               {{ __(dialogOptions.title) || __("Untitled") }}
             </h3>
             <Badge v-if="isDirty" :label="__('Not Saved')" theme="orange" />

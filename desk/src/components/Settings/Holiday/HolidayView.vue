@@ -59,7 +59,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">{{
+            <span class="text-lg-semibold text-ink-gray-8">{{
               __("Valid From")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -110,7 +110,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <div class="text-lg font-semibold text-ink-gray-8">
+            <div class="text-lg-semibold text-ink-gray-8">
               {{ __("Recurring Holidays") }}
             </div>
             <div class="text-p-sm text-ink-gray-6">
@@ -128,7 +128,7 @@
         <div>
           <div class="flex justify-between items-center">
             <div class="flex justify-between flex-col gap-1">
-              <span class="text-lg font-semibold text-ink-gray-8">
+              <span class="text-lg-semibold text-ink-gray-8">
                 {{ __("Holidays") }}
               </span>
               <div class="text-p-sm text-ink-gray-6">

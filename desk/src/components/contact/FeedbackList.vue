@@ -24,7 +24,7 @@
     >
       <LucideMessageSquare class="h-10 w-10 text-ink-gray-4" />
       <div>
-        <p class="text-lg font-medium text-ink-gray-7">
+        <p class="text-lg-medium text-ink-gray-7">
           {{ __("No reviews found") }}
         </p>
       </div>
@@ -34,7 +34,7 @@
     <div v-else class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
       <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
-          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-white p-2.5 hover:bg-surface-gray-1"
+          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-base p-2.5 hover:bg-surface-gray-1"
           @click="goToTicket(ticket.name)"
         >
           <!-- Rating badge + ticket name -->
@@ -61,10 +61,7 @@
 
           <!-- Feedback title + body -->
           <div class="flex flex-col gap-1.5">
-            <p
-              v-if="ticket.feedback"
-              class="text-sm font-medium text-ink-gray-7"
-            >
+            <p v-if="ticket.feedback" class="text-sm-medium text-ink-gray-7">
               {{ ticket.feedback }}
             </p>
             <p v-if="ticket.feedback_extra" class="text-p-base text-ink-gray-6">

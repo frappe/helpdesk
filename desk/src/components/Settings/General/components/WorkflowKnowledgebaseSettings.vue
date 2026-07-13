@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="text-base font-semibold text-ink-gray-9">
+    <div class="text-base-semibold text-ink-gray-9">
       {{ __("Workflow & Knowledge Base Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">{{
+          <span class="text-base-medium text-ink-gray-8">{{
             __("Prefer knowledge base")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -22,7 +22,7 @@
       </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">{{
+          <span class="text-base-medium text-ink-gray-8">{{
             __("Skip email workflow")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{

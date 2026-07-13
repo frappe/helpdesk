@@ -97,7 +97,7 @@
           </template>
           <template #body>
             <div
-              class="bg-surface-white rounded-lg shadow-lg p-2 border border-outline-gray-2"
+              class="bg-surface-base rounded-lg shadow-lg p-2 border border-outline-gray-2"
             >
               <div class="grid grid-cols-6 gap-2">
                 <button
@@ -117,7 +117,7 @@
           <Tooltip>
             <template #body>
               <div
-                class="bg-surface-gray-7 px-2 py-1 text-center text-p-xs text-ink-white shadow-xl rounded"
+                class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded"
               >
                 <span v-for="(user, idx) in reaction.users" :key="user.user"
                   >{{ user.full_name
@@ -129,7 +129,7 @@
               class="flex items-center gap-1 px-2 py-1 rounded-full text-sm transition-colors"
               :class="
                 reaction.current_user_reacted
-                  ? 'bg-surface-blue-2 text-ink-blue-3 hover:bg-surface-blue-3'
+                  ? 'bg-surface-blue-2 text-ink-blue-6 hover:bg-surface-blue-3'
                   : 'bg-surface-gray-3 text-ink-gray-6 hover:bg-surface-gray-4'
               "
               v-if="reaction.count !== 0"

@@ -78,7 +78,7 @@
                 :label="__('Send')"
                 theme="gray"
                 variant="solid"
-                :disabled="$refs.editor?.editor.isEmpty || send.loading"
+                :disabled="$refs.editor?.editor?.isEmpty || send.loading"
                 :loading="send.loading"
                 @click="sendEmail"
               />

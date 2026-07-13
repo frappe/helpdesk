@@ -22,7 +22,7 @@
     </template>
     <template #body>
       <div
-        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
+        class="flex flex-col justify-between mx-3 p-1.5 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div v-for="app in apps.data" key="name">
           <a

@@ -1,10 +1,10 @@
 <template>
   <Dialog v-model:open="open" size="md" bare :dismissible="!isDirty">
     <template #default>
-      <div class="bg-surface-modal px-4 py-5 sm:px-6">
+      <div class="bg-surface-elevation-2 px-4 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
               {{ __("Edit Contact") }}
             </h3>
             <Badge
@@ -48,9 +48,9 @@
           </div>
           <!-- Email IDs -->
           <div class="space-y-1.5">
-            <label class="block text-p-sm font-medium text-ink-gray-7">
+            <label class="block text-p-sm-medium text-ink-gray-7">
               {{ __("Email") }}
-              <span class="text-ink-red-3">*</span>
+              <span class="text-ink-red-6">*</span>
             </label>
             <ContactInputRow
               v-for="(email, index) in state.emails"
@@ -78,7 +78,7 @@
 
           <!-- Phone numbers -->
           <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
-            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+            <label class="block text-p-sm-medium text-ink-gray-7">{{
               __("Phone")
             }}</label>
             <ContactInputRow
@@ -107,7 +107,7 @@
 
           <!-- Timezone -->
           <div v-if="doc.doc?.user" class="space-y-1.5">
-            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+            <label class="block text-p-sm-medium text-ink-gray-7">{{
               __("Timezone")
             }}</label>
             <TimezoneControl v-model="state.timezone" />
@@ -116,7 +116,7 @@
           <!-- Customer -->
           <div class="space-y-1.5">
             <label
-              class="block text-p-sm font-medium text-ink-gray-7"
+              class="block text-p-sm-medium text-ink-gray-7"
               v-if="!contactInfoResource.data?.invitation"
             >
               {{ __("Customer") }}

@@ -25,7 +25,7 @@
             @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
+            class="bg-surface-base hover:bg-surface-base focus:ring-0 border-outline-gray-2"
             :debounce="300"
           >
             <template #prefix>
@@ -111,7 +111,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
           >
             <div
               @click="
@@ -122,9 +122,7 @@
               "
               class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7 min-w-0"
             >
-              <div
-                class="text-base text-ink-gray-7 font-medium w-full truncate"
-              >
+              <div class="text-base-medium text-ink-gray-7 w-full truncate">
                 {{ savedReply.title }}
               </div>
             </div>

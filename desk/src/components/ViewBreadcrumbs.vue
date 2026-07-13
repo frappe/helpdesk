@@ -2,7 +2,7 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="ps-0 pe-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
@@ -11,7 +11,7 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
+          class="text-lg-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
           :label="currentView.label"
         >
           <template #prefix>
@@ -138,6 +138,6 @@ const isCurrentView = (item) => {
 
 /* keep the group label pinned while its items scroll */
 [data-slot="group"]:has(.kebab-btn) [data-slot="group-label"] {
-  @apply sticky -top-[6px] z-10 bg-surface-modal;
+  @apply sticky -top-[6px] z-10 bg-surface-elevation-2;
 }
 </style>

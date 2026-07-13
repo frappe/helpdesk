@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-3xl bg-transparent font-bold placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-4xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -190,9 +190,7 @@
               size="lg"
             />
             <div class="flex flex-col justify-start gap-1">
-              <p
-                class="truncate capitalize text-p-base text-ink-gray-9 font-medium"
-              >
+              <p class="truncate capitalize text-p-base-medium text-ink-gray-9">
                 <span class="text-base text-ink-gray-5"
                   >{{ __("published by") }}
                 </span>

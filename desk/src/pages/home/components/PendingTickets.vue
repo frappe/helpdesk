@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
-      <div
-        class="flex items-center gap-2 text-lg font-semibold text-ink-gray-8"
-      >
+      <div class="flex items-center gap-2 text-lg-semibold text-ink-gray-8">
         {{ currentTitle }}
         <Tooltip :text="tooltipText" placement="top">
           <FeatherIcon name="info" class="size-3" />
@@ -50,7 +48,7 @@
             v-for="ticket in chartConfig?.tickets"
             :key="ticket.name"
             @click="goToTicket(ticket)"
-            class="text-sm cursor-pointer hover:bg-surface-menu-bar border-t border-outline-gray-modals"
+            class="text-sm cursor-pointer hover:bg-surface-sidebar border-t border-outline-elevation-2"
           >
             <td class="p-2 py-3 whitespace-nowrap">{{ ticket.name }}</td>
             <td class="p-2 py-3 w-full max-w-0 truncate">
@@ -100,7 +98,7 @@
           <tr
             v-for="i in 8"
             :key="i"
-            :class="i > 1 ? 'border-t border-outline-gray-modals' : ''"
+            :class="i > 1 ? 'border-t border-outline-elevation-2' : ''"
           >
             <td class="p-2 py-3 min-w-8">
               <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
@@ -316,7 +314,7 @@ function getReasonColorClass(reason: {
   seconds_until_due?: number;
 }) {
   if (reason.text.includes("overdue")) {
-    return "text-ink-red-3";
+    return "text-ink-red-6";
   }
 
   if (
@@ -326,7 +324,7 @@ function getReasonColorClass(reason: {
     const oneHour = 3600;
     const twoHours = 7200;
     if (reason.seconds_until_due <= oneHour) {
-      return "text-ink-red-3";
+      return "text-ink-red-6";
     }
     if (reason.seconds_until_due <= twoHours) {
       return "text-orange-500";

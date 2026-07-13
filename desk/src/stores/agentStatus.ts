@@ -34,7 +34,7 @@ const dotColorMap: Record<string, string> = {
   purple: "bg-purple-500",
 };
 
-const defaultColor = "bg-surface-gray-5";
+const defaultColor = "bg-surface-gray-8";
 
 export const useAgentStatusStore = defineStore("agentStatus", () => {
   // Set only for sessions that have an HD Agent record; null otherwise.
