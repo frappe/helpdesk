@@ -182,7 +182,7 @@
               >
                 <SavedReplyIcon class="h-4 w-4" />
               </button>
-              <div class="h-4 w-[2px] border-s" />
+              <div class="h-4 w-[2px] border-s ml-1" />
             </div>
             <EditorFixedMenu :items="fullToolbar" />
           </div>
@@ -214,9 +214,9 @@
 
 <script setup lang="ts">
 import { AttachmentItem, SavedRepliesSelectorModal } from "@/components";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
-import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";

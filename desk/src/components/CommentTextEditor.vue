@@ -61,7 +61,7 @@
                     </button>
                   </template>
                 </FileUploader>
-                <div class="h-4 w-[2px] border-s" />
+                <div class="h-4 w-[2px] border-s ml-1" />
               </div>
               <EditorFixedMenu :items="fullToolbar" />
             </div>
