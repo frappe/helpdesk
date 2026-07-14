@@ -59,7 +59,7 @@
             name="check"
             class="size-4 text-ink-gray-7"
           />
-          <Dropdown align="end" :options="dropdownActions(item)">
+          <Dropdown side="right" align="start" :options="dropdownActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"

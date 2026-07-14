@@ -10,6 +10,14 @@
       </div>
     </template>
     <template #body>
+      <!-- Dedicated high-z layer the operator dropdown teleports into. Both this
+           and the frappe-ui Popover panel land in <body>; the popover panel is
+           z-[100], so a body-mounted menu (z-auto) renders behind it. This layer
+           establishes a z-[101] stacking context above the panel, and owning it
+           here keeps the fix scoped to the filter. -->
+      <Teleport to="body">
+        <div ref="operatorMenuLayer" class="relative z-[101]" />
+      </Teleport>
       <div
         class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
       >
@@ -123,6 +131,7 @@
                 :key="editSession"
                 :field="selectedField"
                 :filter="editingFilter"
+                :operator-menu-target="operatorMenuLayer"
                 @apply="applyFilter"
                 @clear="clearCurrentFilter"
                 @back="goBack"
@@ -175,6 +184,9 @@ const editSession = ref(0);
 // list (when adding a new filter) or the overview (when editing an existing one).
 const valueEditorOrigin = ref<"overview" | "fields">("overview");
 const overviewHeader = ref<HTMLElement | null>(null);
+// The high-z layer the operator dropdown teleports into (see #body), so its menu
+// sits above the filter popover panel instead of behind it.
+const operatorMenuLayer = ref<HTMLElement | null>(null);
 let openPopoverFn: (() => void) | null = null;
 
 // Row actions stay out of the way until the row is hovered or focused.
