@@ -52,6 +52,7 @@
         <Editor
           v-model="content"
           :extensions="extensions"
+          :upload-function="(file:any) => uploadFunction(file, 'HD Article', null, false)"
           :placeholder="__('Write your article here...')"
         >
           <template #default>
@@ -74,7 +75,8 @@ import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 const extensions = buildEditorExtensions();
-import { useOnboarding, Link } from "frappe-ui/frappe";
+import { useOnboarding } from "frappe-ui/frappe";
+import Link from "@/components/frappe-ui/Link.vue";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
 
@@ -84,7 +86,7 @@ import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { Article } from "@/types";
-import { textEditorMenuButtons } from "@/utils";
+import { uploadFunction } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();

@@ -165,6 +165,7 @@
           :model-value="textEditorContentWithIDs"
           :extensions="extensions"
           :editable="editable"
+          :upload-function="(file:any) => uploadFunction(file, 'HD Article', articleId, false)"
           @change="(event:string) => { content = event; }"
           :placeholder="__('Write your article here...')"
         >
@@ -245,54 +246,55 @@
 <script setup lang="ts">
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import {
+  ThumbsDownFilledIcon,
+  ThumbsDownIcon,
+  ThumbsUpFilledIcon,
+  ThumbsUpIcon,
+} from "@/components/icons";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
+import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
-import { globalStore } from "@/stores/globalStore";
 import {
   deleteRes as deleteArticle,
   incrementView,
   moveToCategory,
+  newCategory,
   updateRes as updateArticle,
-  likeArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
-import { copyToClipboard, isCustomerPortal, ConfirmDelete } from "@/utils";
-import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
-import { newCategory } from "@/stores/knowledgeBase";
+import {
+  ConfirmDelete,
+  copyToClipboard,
+  isCustomerPortal,
+  uploadFunction,
+} from "@/utils";
 import {
   Avatar,
+  Badge,
   Breadcrumbs,
   Button,
   createResource,
-  createListResource,
+  dayjsLocal,
   debounce,
   Dropdown,
-  toast,
-  Badge,
-  dayjs,
-  dayjsLocal,
   LoadingIndicator,
+  toast,
   usePageMeta,
 } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
-import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
-
-const extensions = buildEditorExtensions();
-import { useScreenSize } from "@/composables/screen";
-const { isMobileView } = useScreenSize();
+import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import { __ } from "@/translation";
-import {
-  ThumbsDownIcon,
-  ThumbsUpIcon,
-  ThumbsDownFilledIcon,
-  ThumbsUpFilledIcon,
-} from "@/components/icons";
+
+const extensions = buildEditorExtensions();
+const { isMobileView } = useScreenSize();
 
 const props = defineProps({
   articleId: {

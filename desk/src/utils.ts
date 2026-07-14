@@ -143,12 +143,14 @@ export function prettyDate(date, mini = false) {
       if (absDiff < 60) return __("Just now");
       if (diff >= 0) {
         if (absDiff < 120) return __("1 minute ago");
-        if (absDiff < 3600) return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
+        if (absDiff < 3600)
+          return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
         if (absDiff < 7200) return __("1 hour ago");
         return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
       }
       if (absDiff < 120) return __("In 1 minute");
-      if (absDiff < 3600) return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+      if (absDiff < 3600)
+        return __("In {0} minutes", [Math.floor(absDiff / 60)]);
       if (absDiff < 7200) return __("In 1 hour");
       return __("In {0} hours", [Math.floor(absDiff / 3600)]);
     } else if (diff < 0) {
@@ -486,12 +488,13 @@ export function getGridTemplateColumnsForTable(columns) {
 
 export function uploadFunction(
   file: File,
-  doctype: string = null,
-  docname: string = null
+  doctype: string | null = null,
+  docname: string | null = null,
+  isPrivate: boolean = true
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
-    private: true,
+    private: isPrivate,
     doctype: doctype,
     docname: docname,
   });
