@@ -8,8 +8,9 @@
       :placeholder="placeholder"
     >
       <template #default>
+        <EditorBubbleMenu :items="commentToolbar" />
         <div
-          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-2 py-1"
+          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-1 py-1"
         >
           <div
             v-if="showAttachments"
@@ -64,12 +65,21 @@
 
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
+import {
+  buildEditorExtensions,
+  commentToolbar,
+  fullToolbar,
+} from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons";
-import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { isContentEmpty } from "@/utils";
 import { FeatherIcon, FileUploader, type UploadedFile } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import {
+  Editor,
+  EditorBubbleMenu,
+  EditorContent,
+  EditorFixedMenu,
+} from "frappe-ui/editor";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 type UploadFunction = (file: File) => Promise<UploadedFile>;
@@ -107,7 +117,7 @@ const isUploading = ref(false);
 const extensions = buildEditorExtensions({ extra: props.extensions });
 
 const savedReplyClass = [
-  "!prose-sm max-w-full overflow-auto py-1.5 px-2",
+  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
   "rounded-b border border-[--surface-gray-2] bg-surface-gray-2",
   "placeholder-ink-gray-4",
   "hover:border-outline-elevation-2 hover:shadow-sm",
@@ -117,7 +127,7 @@ const savedReplyClass = [
 ];
 
 const emailClass = [
-  "!prose-sm max-w-full overflow-auto py-1.5 px-2",
+  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
   "rounded-b border border-[--surface-gray-2] bg-surface-base",
   "placeholder-ink-gray-4",
   "text-ink-gray-8 transition-colors -mt-0.5",
