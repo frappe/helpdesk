@@ -25,7 +25,6 @@
             @update:model-value="savedRepliesSearchQuery = $event"
             :placeholder="__('Search')"
             type="text"
-            class="bg-surface-white hover:bg-surface-white focus:ring-0 border-outline-gray-2"
             :debounce="300"
           >
             <template #prefix>
@@ -111,7 +110,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
           >
             <div
               @click="
@@ -122,9 +121,7 @@
               "
               class="w-full px-2 flex flex-col justify-center h-12.5 col-span-7 min-w-0"
             >
-              <div
-                class="text-base text-ink-gray-7 font-medium w-full truncate"
-              >
+              <div class="text-base-medium text-ink-gray-7 w-full truncate">
                 {{ savedReply.title }}
               </div>
             </div>
@@ -201,6 +198,9 @@
 </template>
 
 <script setup lang="ts">
+import { useConfigStore } from "@/stores/config";
+import { __ } from "@/translation";
+import { ConfirmDelete } from "@/utils";
 import {
   Avatar,
   Button,
@@ -211,19 +211,16 @@ import {
   TextInput,
   toast,
 } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, inject, ref, Ref, watch } from "vue";
-import { __ } from "@/translation";
-import { ConfirmDelete } from "@/utils";
-import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
-import { activeFilter } from "./savedReplies";
-import { useUserStore } from "../../../stores/user";
+import GlobeIcon from "~icons/lucide/globe";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
-import GlobeIcon from "~icons/lucide/globe";
+import { useUserStore } from "../../../stores/user";
 import { SavedReply, SavedReplyListResourceSymbol } from "../../../types";
 import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
-import { storeToRefs } from "pinia";
-import { useConfigStore } from "@/stores/config";
+import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
+import { activeFilter } from "./savedReplies";
 
 const { getUser } = useUserStore();
 const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =

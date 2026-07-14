@@ -13,7 +13,7 @@
           required
         />
         <div>
-          <FormLabel label="Response time" required />
+          <FormLabel label="Response time" required size="md" />
           <Popover class="mt-2">
             <template #target="{ togglePopover }" class="w-max">
               <div
@@ -27,7 +27,7 @@
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-surface-white top-2">
+              <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
                   :options="{ seconds: false }"
@@ -37,7 +37,7 @@
           </Popover>
         </div>
         <div>
-          <FormLabel label="Resolution time" required />
+          <FormLabel label="Resolution time" required size="md" />
           <Popover class="mt-2">
             <template #target="{ togglePopover }" class="w-max">
               <div
@@ -51,7 +51,7 @@
               </div>
             </template>
             <template #body>
-              <div class="absolute bg-surface-white top-2">
+              <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"
                   :options="{ seconds: false }"

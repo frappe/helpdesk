@@ -11,7 +11,7 @@
         :tooltip="copyOnClick ? __('Click to copy') : undefined"
         :class="[
           {
-            'rounded bg-surface-white hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+            'rounded bg-surface-base hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
               variant === 'subtle',
           },
           copyOnClick
@@ -42,7 +42,7 @@
             class="flex h-7 max-w-full w-auto items-center gap-2 rounded px-2 py-1 border border-transparent"
             :class="[
               variant == 'ghost'
-                ? 'bg-surface-white hover:bg-surface-white'
+                ? 'bg-surface-base hover:bg-surface-base'
                 : 'bg-surface-gray-2 hover:bg-surface-gray-3',
               inputClass,
             ]"
@@ -62,7 +62,7 @@
           </ComboboxAnchor>
           <ComboboxPortal>
             <ComboboxContent
-              class="z-10 mt-1 min-w-48 w-auto max-w-96 bg-surface-modal overflow-hidden rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5"
+              class="z-10 mt-1 min-w-48 w-auto max-w-96 bg-surface-elevation-2 overflow-hidden rounded-lg shadow-2xl ring-1 ring-black ring-opacity-5"
               position="popper"
               :align="'start'"
               @openAutoFocus.prevent
@@ -88,7 +88,7 @@
                     size="lg"
                   />
                   <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
-                    <div class="text-base font-medium">
+                    <div class="text-base-medium">
                       {{ getUsernameLabel(option.label) }}
                     </div>
                     <div class="text-sm text-ink-gray-5">
@@ -105,7 +105,7 @@
     <ErrorMessage class="mt-2 pl-2" v-if="error" :message="error" />
     <div
       v-if="info"
-      class="whitespace-pre-line text-sm text-ink-blue-3 mt-2 pl-2"
+      class="whitespace-pre-line text-sm text-ink-blue-6 mt-2 pl-2"
     >
       {{ info }}
     </div>

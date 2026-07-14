@@ -2,12 +2,12 @@
   <div v-if="customers?.length" class="flex items-center gap-1.5">
     <div class="flex items-center">
       <Tooltip
-        v-for="customer in customers"
+        v-for="customer in visibleCustomers"
         :key="customer.name"
         :text="customer.name"
       >
         <Avatar
-          class="-mr-1.5 cursor-pointer ring-2 ring-[var(--surface-white)] transition hover:z-10 hover:scale-110"
+          class="-mr-1.5 cursor-pointer ring-2 ring-[var(--surface-base)] transition hover:z-10 hover:scale-110"
           shape="circle"
           size="sm"
           :image="customer.image"
@@ -15,6 +15,12 @@
           @click="goToCustomer(customer.name)"
         />
       </Tooltip>
+      <div
+        v-if="remainingCustomers.length"
+        class="relative -mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-gray-2 text-2xs font-medium text-ink-gray-6 ring-2 ring-[var(--surface-white)]"
+      >
+        +{{ remainingCustomers.length }}
+      </div>
     </div>
     <span
       class="text-sm text-ink-gray-8 ml-2"
@@ -46,6 +52,16 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+
+const MAX_VISIBLE_AVATARS = 5;
+
+const visibleCustomers = computed(() =>
+  props.customers.slice(0, MAX_VISIBLE_AVATARS)
+);
+
+const remainingCustomers = computed(() =>
+  props.customers.slice(MAX_VISIBLE_AVATARS)
+);
 
 const label = computed(() =>
   props.customers.length === 1

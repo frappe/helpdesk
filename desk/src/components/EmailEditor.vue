@@ -1,210 +1,209 @@
 <template>
-  <TextEditor
+  <Editor
     ref="editorRef"
-    :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-5 py-3',
-      getFontFamily(newEmail),
-      '[&_p.reply-to-content]:hidden',
-    ]"
-    :content="newEmail"
-    :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
+    v-model="newEmail"
     :placeholder="placeholder"
     :editable="editable"
-    @change="editable ? (newEmail = $event) : null"
-    :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
-    @keydown.capture="handleKeydown"
+    :extensions="extensions"
+    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
-    <template #top>
-      <div
-        v-if="hasMultipleSenders"
-        class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 h-12.5"
-      >
-        <span class="text-p-xs text-ink-gray-4">{{ __("From") }}:</span>
-        <FormControl
-          v-model="fromEmail"
-          type="select"
-          variant="ghost"
-          class="w-full"
-          :placeholder="__('')"
-          :options="from"
-        />
-      </div>
-      <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
-        <span class="text-p-xs text-ink-gray-4">{{ __("To") }}:</span>
-        <EmailMultiSelect
-          v-model="toEmailsClone"
-          class="flex-1"
-          scope="contact"
-          variant="ghost"
-          allow-custom-email
-          copy-on-click
-          :validate="validateEmailWithZod"
-          :custom-email-label="__('Add to recipients')"
-        />
-        <div class="flex gap-1.5">
-          <Button
-            :label="__('Cc')"
+    <template #default>
+      <div @keydown.capture="handleKeydown">
+        <!-- Email headers -->
+        <div
+          v-if="hasMultipleSenders"
+          class="mx-6 md:mx-5 flex items-center gap-2 border-t py-2.5 h-12.5"
+        >
+          <span class="text-p-xs text-ink-gray-4">{{ __("From") }}:</span>
+          <FormControl
+            v-model="fromEmail"
+            type="select"
             variant="ghost"
-            :class="[
-              cc || showCC
-                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
-                : '!text-ink-gray-4',
-            ]"
-            @click="toggleCC()"
-          />
-          <Button
-            :label="__('Bcc')"
-            variant="ghost"
-            :class="[
-              bcc || showBCC
-                ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
-                : '!text-ink-gray-4',
-            ]"
-            @click="toggleBCC()"
+            class="w-full"
+            :placeholder="__('')"
+            :options="from"
           />
         </div>
-      </div>
-      <div
-        v-if="showCC || cc"
-        class="mx-5 flex items-center gap-2 py-2.5"
-        :class="cc || showCC ? 'border-b' : ''"
-      >
-        <span class="text-xs text-ink-gray-4">{{ __("Cc:") }}</span>
-        <EmailMultiSelect
-          ref="ccInput"
-          v-model="ccEmailsClone"
-          class="flex-1"
-          scope="contact"
-          variant="ghost"
-          allow-custom-email
-          copy-on-click
-          :validate="validateEmailWithZod"
-          :custom-email-label="__('Add to recipients')"
-        />
-      </div>
-      <div
-        v-if="showBCC || bcc"
-        class="mx-5 flex items-center gap-2 py-2.5"
-        :class="bcc || showBCC ? 'border-b' : ''"
-      >
-        <span class="text-xs text-ink-gray-4">{{ __("Bcc:") }}</span>
-        <EmailMultiSelect
-          ref="bccInput"
-          v-model="bccEmailsClone"
-          class="flex-1"
-          scope="contact"
-          variant="ghost"
-          allow-custom-email
-          copy-on-click
-          :validate="validateEmailWithZod"
-          :custom-email-label="__('Add to recipients')"
-        />
-      </div>
-    </template>
-
-    <template #editor>
-      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
-        <div class="flex-1">
-          <EditorContent :editor="editor" />
+        <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
+          <span class="text-p-xs text-ink-gray-4">{{ __("To") }}:</span>
+          <EmailMultiSelect
+            v-model="toEmailsClone"
+            class="flex-1"
+            scope="contact"
+            variant="ghost"
+            allow-custom-email
+            copy-on-click
+            :validate="validateEmailWithZod"
+            :custom-email-label="__('Add to recipients')"
+          />
+          <div class="flex gap-1.5">
+            <Button
+              :label="__('Cc')"
+              variant="ghost"
+              :class="[
+                cc || showCC
+                  ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                  : '!text-ink-gray-4',
+              ]"
+              @click="toggleCC()"
+            />
+            <Button
+              :label="__('Bcc')"
+              variant="ghost"
+              :class="[
+                bcc || showBCC
+                  ? '!bg-surface-gray-4 hover:bg-surface-gray-3'
+                  : '!text-ink-gray-4',
+              ]"
+              @click="toggleBCC()"
+            />
+          </div>
         </div>
         <div
-          v-if="quotedContent"
-          class="replied-content mx-6 md:mx-5 mb-2 mt-auto"
+          v-if="showCC || cc"
+          class="mx-5 flex items-center gap-2 py-2.5"
+          :class="cc || showCC ? 'border-b' : ''"
         >
-          <label class="collapse" for="quoted-toggle">...</label>
-          <input
-            id="quoted-toggle"
-            class="replyCollapser"
-            type="checkbox"
-            :checked="isQuoteExpanded"
-          />
-          <div
-            ref="quotedContentRef"
-            contenteditable="true"
-            class="prose !max-w-full mx-1 my-2 border-s-4 border-outline-gray-2 ps-4 text-sm focus:outline-none"
-            @input="onQuotedInput"
+          <span class="text-xs text-ink-gray-4">{{ __("Cc:") }}</span>
+          <EmailMultiSelect
+            ref="ccInput"
+            v-model="ccEmailsClone"
+            class="flex-1"
+            scope="contact"
+            variant="ghost"
+            allow-custom-email
+            copy-on-click
+            :validate="validateEmailWithZod"
+            :custom-email-label="__('Add to recipients')"
           />
         </div>
-      </div>
-    </template>
-    <template #bottom>
-      <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-5 my-2">
-        <AttachmentItem
-          v-for="a in attachments"
-          :key="a.file_url"
-          :label="a.file_name"
-          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+        <div
+          v-if="showBCC || bcc"
+          class="mx-5 flex items-center gap-2 py-2.5"
+          :class="bcc || showBCC ? 'border-b' : ''"
         >
-          <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.self.stop="removeAttachment(a)"
+          <span class="text-xs text-ink-gray-4">{{ __("Bcc:") }}</span>
+          <EmailMultiSelect
+            ref="bccInput"
+            v-model="bccEmailsClone"
+            class="flex-1"
+            scope="contact"
+            variant="ghost"
+            allow-custom-email
+            copy-on-click
+            :validate="validateEmailWithZod"
+            :custom-email-label="__('Add to recipients')"
+          />
+        </div>
+
+        <!-- Editor content + quoted reply -->
+        <div class="overflow-y-auto min-h-[7rem] max-h-[30vh] flex flex-col">
+          <div class="flex-1">
+            <EditorContent
+              :class="[
+                'prose-sm max-w-full mx-6 md:mx-5 py-3',
+                getFontFamily(newEmail),
+                '[&_p.reply-to-content]:hidden',
+              ]"
             />
-          </template>
-        </AttachmentItem>
-      </div>
-      <!-- TextEditor Fixed Menu -->
-      <div
-        class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
-      >
-        <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="inline-flex items-center gap-1.5 p-1">
-            <FileUploader
-              :upload-args="{
-                doctype: doctype,
-                docname: ticketId,
-                private: true,
-              }"
-              @success="
-                (f) => {
-                  attachments.push(f);
+          </div>
+          <div
+            v-if="quotedContent"
+            class="replied-content mx-6 md:mx-5 mb-2 mt-auto"
+          >
+            <label class="collapse" for="quoted-toggle">...</label>
+            <input
+              id="quoted-toggle"
+              class="replyCollapser"
+              type="checkbox"
+              :checked="isQuoteExpanded"
+            />
+            <div
+              ref="quotedContentRef"
+              contenteditable="true"
+              class="prose !max-w-full mx-1 my-2 border-s-4 border-outline-gray-2 ps-4 text-sm focus:outline-none"
+              @input="onQuotedInput"
+            />
+          </div>
+        </div>
+
+        <!-- Attachments -->
+        <div class="flex flex-wrap gap-2 px-5 my-2">
+          <AttachmentItem
+            v-for="a in attachments"
+            :key="a.file_url"
+            :label="a.file_name"
+            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+          >
+            <template #suffix>
+              <FeatherIcon
+                class="h-3.5"
+                name="x"
+                @click.self.stop="removeAttachment(a)"
+              />
+            </template>
+          </AttachmentItem>
+        </div>
+        <!-- Fixed Menu -->
+        <div
+          class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
+        >
+          <div class="flex items-center overflow-x-auto w-[60%]">
+            <div class="inline-flex items-center gap-1.5 p-1">
+              <FileUploader
+                :upload-args="{
+                  doctype: doctype,
+                  docname: ticketId,
+                  private: true,
+                }"
+                @success="
+                  (f) => {
+                    attachments.push(f);
+                  }
+                "
+              >
+                <template #default="{ openFileSelector, uploading }">
+                  {{ void (isUploading = uploading) }}
+                  <button
+                    class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                    @click="openFileSelector()"
+                    :disabled="uploading"
+                  >
+                    <AttachmentIcon
+                      class="h-4 w-4"
+                      style="stroke-width: 1.5 !important"
+                    />
+                  </button>
+                </template>
+              </FileUploader>
+              <button
+                class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                @click="showSavedRepliesSelectorModal = true"
+              >
+                <SavedReplyIcon class="h-4 w-4" />
+              </button>
+              <div class="h-4 w-[2px] border-s ml-1" />
+            </div>
+            <EditorFixedMenu :items="fullToolbar" />
+          </div>
+          <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
+            <Button label="Discard" @click="handleDiscard" />
+            <Button
+              variant="solid"
+              :disabled="isDisabled"
+              :loading="sendMail.loading"
+              :label="label"
+              @click="
+                () => {
+                  submitMail();
                 }
               "
-            >
-              <template #default="{ openFileSelector, uploading }">
-                {{ void (isUploading = uploading) }}
-                <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
-                  @click="openFileSelector()"
-                  :disabled="uploading"
-                >
-                  <AttachmentIcon
-                    class="h-4 w-4"
-                    style="stroke-width: 1.5 !important"
-                  />
-                </button>
-              </template>
-            </FileUploader>
-            <button
-              class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
-              @click="showSavedRepliesSelectorModal = true"
-            >
-              <SavedReplyIcon class="h-4 w-4" />
-            </button>
-            <div class="h-4 w-[2px] border-s" />
+            />
           </div>
-          <TextEditorFixedMenu :buttons="textEditorMenuButtons" />
-        </div>
-        <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
-          <Button label="Discard" @click="handleDiscard" />
-          <Button
-            variant="solid"
-            :disabled="isDisabled"
-            :loading="sendMail.loading"
-            :label="label"
-            @click="
-              () => {
-                submitMail();
-              }
-            "
-          />
         </div>
       </div>
     </template>
-  </TextEditor>
+  </Editor>
   <SavedRepliesSelectorModal
     v-model="showSavedRepliesSelectorModal"
     :doctype="doctype"
@@ -215,34 +214,23 @@
 
 <script setup lang="ts">
 import { AttachmentItem, SavedRepliesSelectorModal } from "@/components";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import {
-  CleanStyles,
-  ComponentUtils,
-  HandleExcelPaste,
-} from "@/tiptap-extensions";
-import {
   getFontFamily,
   htmlToText,
   isContentEmpty,
   removeAttachmentFromServer,
-  textEditorMenuButtons,
   uploadFunction,
   validateEmailWithZod,
 } from "@/utils";
-import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
-import {
-  FileUploader,
-  TextEditor,
-  TextEditorFixedMenu,
-  createResource,
-  toast,
-} from "frappe-ui";
+import { FileUploader, createResource, toast } from "frappe-ui";
+import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import {
   computed,
@@ -296,6 +284,8 @@ const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
+const extensions = buildEditorExtensions();
+
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
 
@@ -321,13 +311,6 @@ function isOnlySignature(content: string | null) {
 
 const userResource = getUserEmailInfo();
 
-watch(newEmail, (newValue, oldValue) => {
-  if (newValue !== oldValue && newValue) {
-    onUserType();
-  }
-  cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
-});
-
 const quotedContent = useStorage<null | string>(
   "quotedEmailBoxContent" + props.ticketId,
   null
@@ -340,42 +323,6 @@ function onQuotedInput() {
   if (!el) return;
   quotedContent.value = el.innerHTML || null;
 }
-
-watch(quotedContent, (newVal, oldVal) => {
-  if (!oldVal && newVal) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = newVal;
-      }
-    });
-  }
-});
-
-watch(
-  () => userResource.data,
-  (data: { email_signature?: string } | null) => {
-    if (!data?.email_signature) return;
-    emailSignature.value = `<br>${data.email_signature}`;
-    if (isOnlySignature(cachedEmail.value)) {
-      cachedEmail.value = null;
-    }
-    if (isContentEmpty(newEmail.value) && !quotedContent.value) {
-      newEmail.value = emailSignature.value;
-      focusEditorAtStart();
-    }
-  },
-  { immediate: true }
-);
-
-onMounted(() => {
-  if (quotedContent.value) {
-    nextTick(() => {
-      if (quotedContentRef.value) {
-        quotedContentRef.value.innerHTML = quotedContent.value;
-      }
-    });
-  }
-});
 
 const toEmailsClone = ref([...props.toEmails]);
 const ccEmailsClone = ref([...props.ccEmails]);
@@ -428,16 +375,6 @@ const from = computed(() => {
 });
 
 const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
-
-watch(
-  from,
-  (fromOptions) => {
-    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
-      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
-    }
-  },
-  { immediate: true }
-);
 
 const attachments = ref([]);
 const isUploading = ref(false);
@@ -525,6 +462,13 @@ function addToReply(
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
+
+  // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their newlines/spacing
+  // thus lose formatting when added to replied content
+  const doc = new DOMParser().parseFromString(body, "text/html");
+  if (doc.body.children.length === 0) {
+    body = `<div style="white-space: pre-wrap; line-height: 1.5">${doc.body.innerHTML}</div>`;
+  }
 
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
@@ -624,6 +568,59 @@ function handleKeydown(e: KeyboardEvent) {
     return;
   }
 }
+
+watch(newEmail, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+  cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
+});
+
+watch(quotedContent, (newVal, oldVal) => {
+  if (!oldVal && newVal) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = newVal;
+      }
+    });
+  }
+});
+
+watch(
+  () => userResource.data,
+  (data: { email_signature?: string } | null) => {
+    if (!data?.email_signature) return;
+    emailSignature.value = `<br>${data.email_signature}`;
+    if (isOnlySignature(cachedEmail.value)) {
+      cachedEmail.value = null;
+    }
+    if (isContentEmpty(newEmail.value) && !quotedContent.value) {
+      newEmail.value = emailSignature.value;
+      focusEditorAtStart();
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  from,
+  (fromOptions) => {
+    if (!fromOptions.find((f) => f.value === fromEmail.value)) {
+      fromEmail.value = fromOptions.length ? fromOptions[0].value : "";
+    }
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
+  if (quotedContent.value) {
+    nextTick(() => {
+      if (quotedContentRef.value) {
+        quotedContentRef.value.innerHTML = quotedContent.value;
+      }
+    });
+  }
+});
 
 onBeforeUnmount(() => {
   cleanup();
