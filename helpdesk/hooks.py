@@ -25,6 +25,8 @@ after_install = "helpdesk.setup.install.after_install"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
+    "helpdesk.integrations.whatsapp.install.add_custom_fields",
+    "helpdesk.integrations.whatsapp.install.add_roles",
 ]
 
 
@@ -100,6 +102,12 @@ doc_events = {
     },
     "Notification Log": {
         "before_insert": "helpdesk.extends.notification_log.before_insert",
+    },
+    # WhatsApp Message ships with the frappe_whatsapp app; these hooks are inert
+    # (the events never fire) when it is not installed.
+    "WhatsApp Message": {
+        "validate": "helpdesk.integrations.whatsapp.message.validate",
+        "after_insert": "helpdesk.integrations.whatsapp.message.after_insert",
     },
 }
 

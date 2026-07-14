@@ -337,7 +337,13 @@ export interface EmailAccount {
   default_incoming?: boolean;
 }
 
-export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
+export type TicketTab =
+  | "activity"
+  | "email"
+  | "comment"
+  | "details"
+  | "call"
+  | "whatsapp";
 
 export interface TabObject {
   name: TicketTab;
@@ -470,12 +476,49 @@ export interface FeedbackActivity {
   key: string;
 }
 
+// One WhatsApp message on the ticket timeline. The transport's own Incoming /
+// Outgoing lives in `direction` because `type` is the activity discriminator.
+// Every enriched field (template_*, reaction, reply_*) is resolved server-side
+// by helpdesk.integrations.whatsapp.api.get_whatsapp_messages.
+export interface WhatsAppActivity extends BaseActivity {
+  type: "whatsapp";
+  name: string;
+  direction: "Incoming" | "Outgoing";
+  content_type: string;
+  message_type: string;
+  message: string;
+  message_id: string;
+  attach?: string;
+  status?: string;
+  from_name?: string;
+  hd_ticket?: string;
+  template_name?: string;
+  header?: string;
+  footer?: string;
+  template?: string;
+  reaction?: string;
+  is_reply?: boolean;
+  reply_message?: string;
+  reply_to?: string;
+  reply_to_type?: "Incoming" | "Outgoing";
+  reply_to_from?: string;
+}
+
+// A row of the frappe_whatsapp `WhatsApp Templates` DocType, as listed in the
+// template picker.
+export interface WhatsAppTemplate {
+  name: string;
+  template: string;
+  footer?: string;
+}
+
 export type TicketActivity =
   | HistoryActivity
   | EmailActivity
   | CommentActivity
   | CallActivity
-  | FeedbackActivity;
+  | FeedbackActivity
+  | WhatsAppActivity;
 
 interface FileAttachment {
   name: string;

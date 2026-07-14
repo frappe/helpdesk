@@ -35,6 +35,7 @@ def after_install():
     add_property_setters()
     add_website_settings_permission()
     add_default_views()
+    setup_whatsapp()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 
@@ -195,6 +196,13 @@ def update_agent_role_permissions():
         add_permission("Contact", "Agent", 0)
         add_permission("Email Account", "Agent", 0)
         add_permission("Communication", "Agent", 0)
+
+
+def setup_whatsapp():
+    from helpdesk.integrations.whatsapp.install import add_custom_fields, add_roles
+
+    add_custom_fields()
+    add_roles()
 
 
 def add_agent_manager_permissions():

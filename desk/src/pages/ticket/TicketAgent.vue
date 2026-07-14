@@ -204,6 +204,19 @@ onMounted(() => {
       reloadTicket(props.ticketId);
     }
   });
+
+  // A WhatsApp message (sent, received via webhook, or a delivery/reaction
+  // update) lands on the contact's thread; refresh when it touches this ticket
+  // or its contact. The thread is part of the ticket's activities payload.
+  $socket.on(
+    "helpdesk:new-whatsapp-message",
+    (data: { ticket_id?: string; contact?: string }) => {
+      const contact = ticketComposable.value.contact.data?.name;
+      if (data.ticket_id === props.ticketId || data.contact === contact) {
+        ticketComposable.value.activities.reload();
+      }
+    }
+  );
 });
 
 onBeforeUnmount(() => {
@@ -214,6 +227,7 @@ onBeforeUnmount(() => {
   $socket.off("ticket_update");
   $socket.off("helpdesk:ticket-comment");
   $socket.off("helpdesk:ticket-update");
+  $socket.off("helpdesk:new-whatsapp-message");
 });
 usePageMeta(() => {
   if (!ticket.value?.doc?.name) {

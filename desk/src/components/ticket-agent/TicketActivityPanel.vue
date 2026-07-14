@@ -6,8 +6,16 @@
     class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
   >
     <template #tab-panel="{ tab }">
+      <!-- WhatsApp is its own medium: a self-contained chat (thread + composer),
+           not part of the email/comment timeline. -->
+      <WhatsAppConversation
+        v-if="tab.name === 'whatsapp'"
+        :messages="whatsappActivities"
+        :ticket-id="String(ticket.doc?.name)"
+        @update="() => activities.reload()"
+      />
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
+        v-else-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -24,14 +32,11 @@
           }
         "
       />
-      <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
-        <Button :loading="true" variant="ghost" size="2xl" />
-        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
-      </div> -->
     </template>
   </Tabs>
-  <!-- Comm Area -->
+  <!-- Email/comment composer — hidden on WhatsApp, which composes inline. -->
   <CommunicationArea
+    v-if="activeTabName !== 'whatsapp'"
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
     :to-emails="[ticket.doc?.raised_by]"
@@ -49,12 +54,15 @@
 
 <script setup lang="ts">
 import CommunicationArea from "@/components/CommunicationArea.vue";
+import WhatsAppConversation from "@/components/whatsapp/WhatsAppConversation.vue";
 import {
   ActivityIcon,
   CommentIcon,
   EmailIcon,
   PhoneIcon,
+  WhatsAppIcon,
 } from "@/components/icons";
+import { whatsAppEnabled } from "@/composables/whatsapp";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
@@ -107,10 +115,21 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: PhoneIcon,
     });
   }
+
+  // Only surface WhatsApp once the frappe_whatsapp transport app is configured.
+  if (whatsAppEnabled.value) {
+    _tabs.push({
+      name: "whatsapp",
+      label: "WhatsApp",
+      icon: WhatsAppIcon,
+    });
+  }
   return _tabs;
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+
+const activeTabName = computed(() => tabs.value[tabIndex.value]?.name);
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
@@ -254,7 +273,26 @@ const _activities = computed(() => {
   return data;
 });
 
+// The WhatsApp thread is the contact's whole conversation (omnichannel), kept
+// out of the general Activity feed so it does not drown emails and comments.
+// Each message keeps its Incoming/Outgoing under `direction`, freeing `type` to
+// be the activity discriminator the timeline switches on.
+const whatsappActivities = computed(() => {
+  const messages = activities.value?.data?.whatsapp;
+  if (!messages) return [];
+  return messages.map((m) => ({
+    ...m,
+    type: "whatsapp",
+    direction: m.type,
+    key: m.name,
+    content: m.message || "",
+    creation: m.creation,
+  }));
+});
+
 function filterActivities(eventType: TicketTab) {
+  // whatsapp is not handled here: its tab renders WhatsAppConversation directly
+  // (fed by whatsappActivities), never TicketAgentActivities.
   if (eventType === "activity") {
     return _activities.value;
   }
