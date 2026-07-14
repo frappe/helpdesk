@@ -49,32 +49,31 @@
           "
         />
         <!-- Article Content -->
-        <TextEditor
-          :content="content"
-          @change="content = $event"
+        <Editor
+          v-model="content"
+          :extensions="extensions"
           :placeholder="__('Write your article here...')"
-          editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
         >
-          <template #bottom>
-            <TextEditorFixedMenu
+          <template #default>
+            <EditorContent
+              class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+            />
+            <EditorFixedMenu
               class="-ms-1 overflow-x-auto w-full"
-              :buttons="textEditorMenuButtons"
+              :items="fullToolbar"
             />
           </template>
-        </TextEditor>
+        </Editor>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  Breadcrumbs,
-  TextEditor,
-  TextEditorFixedMenu,
-  toast,
-  usePageMeta,
-} from "frappe-ui";
+import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
+import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+const extensions = buildEditorExtensions();
 import { useOnboarding, Link } from "frappe-ui/frappe";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";

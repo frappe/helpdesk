@@ -83,13 +83,22 @@
               <div class="text-base-semibold truncate border-b pb-2">
                 {{ template.title }}
               </div>
-              <TextEditor
+              <div
                 v-if="template.message"
-                :content="template.message"
-                :editable="false"
-                editor-class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
                 class="flex-1 overflow-hidden pointer-events-none"
-              />
+              >
+                <Editor
+                  :model-value="template.message"
+                  :extensions="extensions"
+                  :editable="false"
+                >
+                  <template #default>
+                    <EditorContent
+                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                    />
+                  </template>
+                </Editor>
+              </div>
               <div
                 v-if="
                   selectedTemplate.name === template.name &&
@@ -133,9 +142,11 @@ import {
   Dialog,
   Dropdown,
   LoadingIndicator,
-  TextEditor,
   TextInput,
 } from "frappe-ui";
+import { Editor, EditorContent } from "frappe-ui/editor";
+import { buildEditorExtensions } from "@/components/editor/config";
+const extensions = buildEditorExtensions();
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
 import {

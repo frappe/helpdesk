@@ -1,4 +1,5 @@
 @import "frappe-ui/style.css";
+@import "frappe-ui/editor-style.css";
 
 @tailwind base;
 @tailwind components;

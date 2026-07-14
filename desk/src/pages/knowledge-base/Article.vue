@@ -160,24 +160,23 @@
         </div>
 
         <!-- Article Content -->
-        <TextEditor
+        <Editor
           ref="editorRef"
-          :editor-class="editorClass"
-          :content="textEditorContentWithIDs"
-          :extensions="[ComponentUtils, CleanStyles]"
+          :model-value="textEditorContentWithIDs"
+          :extensions="extensions"
           :editable="editable"
-          @change="(event:string) => {
-			      content = event;
-		      }"
+          @change="(event:string) => { content = event; }"
           :placeholder="__('Write your article here...')"
         >
-          <template #bottom v-if="editable">
-            <TextEditorFixedMenu
+          <template #default>
+            <EditorContent :class="editorClass" />
+            <EditorFixedMenu
+              v-if="editable"
               class="-ms-1 overflow-x-auto w-full"
-              :buttons="textEditorMenuButtons"
+              :items="fullToolbar"
             />
           </template>
-        </TextEditor>
+        </Editor>
         <div
           v-if="!editable && !isCustomerPortal"
           class="flex gap-1 items-center pt-1.5 mt-4"
@@ -259,14 +258,9 @@ import {
   likeArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { CleanStyles, ComponentUtils } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
-import {
-  copyToClipboard,
-  isCustomerPortal,
-  textEditorMenuButtons,
-  ConfirmDelete,
-} from "@/utils";
+import { copyToClipboard, isCustomerPortal, ConfirmDelete } from "@/utils";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { newCategory } from "@/stores/knowledgeBase";
 import {
   Avatar,
@@ -276,8 +270,6 @@ import {
   createListResource,
   debounce,
   Dropdown,
-  TextEditor,
-  TextEditorFixedMenu,
   toast,
   Badge,
   dayjs,
@@ -285,7 +277,10 @@ import {
   LoadingIndicator,
   usePageMeta,
 } from "frappe-ui";
+import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { computed, h, onMounted, ref, watch, nextTick, reactive } from "vue";
+
+const extensions = buildEditorExtensions();
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
 import { useRoute, useRouter } from "vue-router";

@@ -174,12 +174,12 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
-import Apps from "@/components/Apps.vue";
 import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import { useApps } from "@/composables/useApps";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
@@ -257,6 +257,7 @@ const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
 const { currentTheme, toggleTheme } = useTheme();
+const { appsMenuOption } = useApps();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
@@ -350,9 +351,7 @@ const customerPortalDropdown = computed(() => [
 ]);
 
 const agentPortalDropdown = computed(() => [
-  {
-    component: markRaw(Apps),
-  },
+  appsMenuOption.value,
   {
     label: __("Customer portal"),
     icon: "lucide-users",

@@ -125,9 +125,9 @@ import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
 import { useTheme } from "frappe-ui";
 
+import { useApps } from "@/composables/useApps";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import Apps from "../Apps.vue";
 import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
 import {
   agentPortalSidebarOptions,
@@ -137,6 +137,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
 const { currentTheme, toggleTheme } = useTheme();
+const { appsMenuOption } = useApps();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
@@ -215,9 +216,7 @@ const customerPortalDropdown = computed(() => [
 ]);
 
 const agentPortalDropdown = computed(() => [
-  {
-    component: markRaw(Apps),
-  },
+  appsMenuOption.value,
   ...(authStore.hasAgentRecord
     ? [
         {

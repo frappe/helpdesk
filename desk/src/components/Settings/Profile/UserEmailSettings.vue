@@ -25,14 +25,26 @@
             {{ __("Manage your email signature.") }}
           </span>
         </div>
-        <TextEditor
-          editor-class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5 rtl:text-end"
-          :content="user?.doc?.email_signature"
-          :placeholder="__('Write your email signature here.')"
-          :bubbleMenu="true"
-          :fixed-menu="true"
-          @change="(val) => (user.doc.email_signature = val)"
-        />
+        <div>
+          <Editor
+            :model-value="user?.doc?.email_signature"
+            :extensions="extensions"
+            :placeholder="__('Write your email signature here.')"
+            @change="(val) => (user.doc.email_signature = val)"
+          >
+            <template #default>
+              <EditorBubbleMenu :items="commentToolbar" />
+              <div
+                class="overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-2 py-1"
+              >
+                <EditorFixedMenu :items="fullToolbar" class="" />
+              </div>
+              <EditorContent
+                class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-4 rounded-b border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors -mt-0.5 rtl:text-end"
+              />
+            </template>
+          </Editor>
+        </div>
       </div>
       <div class="flex flex-col gap-4 mt-6">
         <div class="flex flex-col gap-1">
@@ -124,15 +136,28 @@
 </template>
 <script setup>
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import {
+  buildEditorExtensions,
+  commentToolbar,
+  fullToolbar,
+} from "@/components/editor/config";
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { normalize } from "@/utils";
-import { Button, createDocumentResource, TextEditor, toast } from "frappe-ui";
+import { Button, createDocumentResource, toast } from "frappe-ui";
+import {
+  Editor,
+  EditorBubbleMenu,
+  EditorContent,
+  EditorFixedMenu,
+} from "frappe-ui/editor";
 import { computed, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+
+const extensions = buildEditorExtensions();
 const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 const emit = defineEmits(["updateStep"]);

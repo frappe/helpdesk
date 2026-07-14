@@ -38,39 +38,34 @@
     <div
       :id="`comment-${name}`"
       class="rounded-md bg-surface-gray-1 transition-colors px-3 py-1.5"
+      @keydown.ctrl.enter.capture.stop="handleSaveComment"
+      @keydown.meta.enter.capture.stop="handleSaveComment"
     >
-      <TextEditor
-        :editor-class="[
-          'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
-          getFontFamily(_content),
-        ]"
-        :content="_content"
-        :editable="editable"
-        :bubble-menu="textEditorMenuButtons"
-        :mentions="userMentions"
-        @change="(event:string) => {_content = event}"
-        @keydown.ctrl.enter.capture.stop="handleSaveComment"
-        @keydown.meta.enter.capture.stop="handleSaveComment"
-      >
-        <template #bottom v-if="editable">
-          <div class="flex flex-row-reverse gap-2">
-            <div>
-              <Button
-                :label="
-                  isMobileView
-                    ? 'Save'
-                    : isMac
-                    ? 'Save (⌘ + ⏎)'
-                    : 'Save (Ctrl + ⏎)'
-                "
-                @click="handleSaveComment"
-                variant="solid"
-              />
-            </div>
-            <Button label="Discard" @click="handleDiscard" />
-          </div>
+      <Editor v-model="_content" :extensions="extensions" :editable="editable">
+        <template #default>
+          <EditorBubbleMenu v-if="editable" :items="fullToolbar" />
+          <EditorContent
+            :class="[
+              'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
+              getFontFamily(_content),
+            ]"
+          />
         </template>
-      </TextEditor>
+      </Editor>
+      <!-- Save/Discard live outside <Editor> so they react to `editable`
+           (the renderless Editor doesn't re-render its slot on prop change). -->
+      <div v-if="editable" class="flex flex-row-reverse gap-2">
+        <div>
+          <Button
+            :label="
+              isMobileView ? 'Save' : isMac ? 'Save (⌘ + ⏎)' : 'Save (Ctrl + ⏎)'
+            "
+            @click="handleSaveComment"
+            variant="solid"
+          />
+        </div>
+        <Button label="Discard" @click="handleDiscard" />
+      </div>
       <div
         class="flex flex-wrap gap-2 mb-2"
         v-if="!editable && Boolean(attachments.length)"
@@ -163,18 +158,18 @@ import {
   dateTooltipFormat,
   getFontFamily,
   isContentEmpty,
-  textEditorMenuButtons,
   timeAgo,
 } from "@/utils";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import {
   Avatar,
   Dropdown,
   Popover,
-  TextEditor,
   Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
+import { Editor, EditorBubbleMenu, EditorContent } from "frappe-ui/editor";
 import { PropType, computed, onMounted, ref } from "vue";
 
 const authStore = useAuthStore();
@@ -197,7 +192,13 @@ const isTicketMergedComment = computed(() => {
   return regex.test(content);
 });
 const agentStore = useAgentStore();
-const userMentions = computed(() => agentStore.dropdown ?? []);
+const extensions = buildEditorExtensions({
+  mentions: () =>
+    (agentStore.dropdown ?? []).map((a: { label: string; value: string }) => ({
+      id: a.value,
+      label: a.label,
+    })),
+});
 
 const emit = defineEmits(["update"]);
 const isConfirmingDelete = ref(false);

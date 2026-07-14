@@ -97,7 +97,7 @@
                 theme="gray"
                 variant="solid"
                 :disabled="
-                  $refs.editor.editor.isEmpty || ticket.loading || !subject
+                  $refs.editor?.editor?.isEmpty || ticket.loading || !subject
                 "
                 @click="() => ticket.submit()"
               />
@@ -114,6 +114,7 @@
           v-model:content="description"
           :placeholder="__('Detailed explanation')"
           expand
+          :uploadFunction="(file:any)=>uploadFunction(file)"
         >
           <template #bottom-right>
             <Button
@@ -121,7 +122,7 @@
               theme="gray"
               variant="solid"
               :disabled="
-                $refs.editor.editor.isEmpty || ticket.loading || !subject
+                $refs.editor?.editor?.isEmpty || ticket.loading || !subject
               "
               @click="() => ticket.submit()"
             />
