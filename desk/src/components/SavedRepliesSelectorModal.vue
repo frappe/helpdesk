@@ -9,7 +9,7 @@
     <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
-          <div class="text-2xl font-semibold">{{ __("Saved Replies") }}</div>
+          <div class="text-3xl-semibold">{{ __("Saved Replies") }}</div>
           <Button
             variant="solid"
             icon-left="lucide-plus"
@@ -50,7 +50,7 @@
               >
                 <template #suffix>
                   <p
-                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
+                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
                     v-if="savedReplyListResource?.data?.length"
                   >
                     {{ savedReplyListResource?.data?.length }}
@@ -80,22 +80,31 @@
               class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
               @click="onTemplateSelect(template)"
             >
-              <div class="text-base font-semibold truncate border-b pb-2">
+              <div class="text-base-semibold truncate border-b pb-2">
                 {{ template.title }}
               </div>
-              <TextEditor
+              <div
                 v-if="template.message"
-                :content="template.message"
-                :editable="false"
-                editor-class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
                 class="flex-1 overflow-hidden pointer-events-none"
-              />
+              >
+                <Editor
+                  :model-value="template.message"
+                  :extensions="extensions"
+                  :editable="false"
+                >
+                  <template #default>
+                    <EditorContent
+                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                    />
+                  </template>
+                </Editor>
+              </div>
               <div
                 v-if="
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-7/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -133,9 +142,11 @@ import {
   Dialog,
   Dropdown,
   LoadingIndicator,
-  TextEditor,
   TextInput,
 } from "frappe-ui";
+import { Editor, EditorContent } from "frappe-ui/editor";
+import { buildEditorExtensions } from "@/components/editor/config";
+const extensions = buildEditorExtensions();
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
 import {

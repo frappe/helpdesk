@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-e border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-e border-outline-elevation-2 bg-surface-sidebar text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -27,7 +27,7 @@
     <div v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute size-1.5 translate-x-6 rtl:-translate-x-6 translate-y-1 rounded-full bg-blue-400 start-1"
+        class="absolute size-1.5 translate-x-6 rtl:-translate-x-6 translate-y-1 rounded-full bg-surface-blue-5 start-1"
         theme="gray"
         variant="solid"
       />
@@ -70,7 +70,7 @@
           <template #header="{ opened, hide }">
             <div
               v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              class="flex cursor-pointer gap-1.5 px-2 text-base-medium mx-2 text-ink-gray-5 transition-all duration-300 ease-in-out"
               :class="
                 !isExpanded
                   ? 'ms-0 h-0 overflow-hidden opacity-0'
@@ -178,13 +178,13 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
-import Apps from "@/components/Apps.vue";
 import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import { useApps } from "@/composables/useApps";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
@@ -264,6 +264,7 @@ const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
 const { currentTheme, toggleTheme } = useTheme();
+const { appsMenuOption } = useApps();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
@@ -357,9 +358,7 @@ const customerPortalDropdown = computed(() => [
 ]);
 
 const agentPortalDropdown = computed(() => [
-  {
-    component: markRaw(Apps),
-  },
+  appsMenuOption.value,
   {
     label: __("Customer portal"),
     icon: "lucide-users",
