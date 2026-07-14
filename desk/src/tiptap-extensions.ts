@@ -13,6 +13,12 @@ import { createSuggestionExtension } from "frappe-ui";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
 import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import { getMeta } from "./stores/meta";
+import { VueRenderer } from "@tiptap/vue-3";
+import Mention from "@tiptap/extension-mention";
+import type { Range } from "@tiptap/core";
+import type { SuggestionProps, SuggestionKeyDownProps } from "@tiptap/suggestion";
+import tippy, { type Instance as TippyInstance } from "tippy.js";
+import MentionSuggestionList from "@/components/MentionSuggestionList.vue";
 
 export interface FieldItem {
   title: string;
@@ -187,6 +193,118 @@ export const ComponentUtils: Extension = Extension.create({
     ];
   },
 });
+
+// Structure for suggestion items in the mention dropdown
+export interface MentionItem {
+  label: string;
+  value: string;
+  group: string;
+}
+
+// Extension to support @mentions (Agents and Teams) in the comment text editor
+export function createMentionExtension(getItems: () => MentionItem[]) {
+  return Mention.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        id: {
+          default: null,
+          parseHTML: (el) => el.getAttribute("data-id"),
+          renderHTML: (attrs) => ({ "data-id": attrs.id }),
+        },
+        label: {
+          default: null,
+          parseHTML: (el) => el.getAttribute("data-label"),
+          renderHTML: (attrs) => ({ "data-label": attrs.label ?? attrs.id }),
+        },
+      };
+    },
+  }).configure({
+    HTMLAttributes: {
+      class: "mention",
+      "data-type": "mention",
+    },
+    suggestion: {
+      char: "@",
+      startOfLine: false,
+      allowSpaces: false,
+      items: ({ query }: { query: string }) => {
+        const normalized = query.trim().toLowerCase();
+        const all = getItems();
+        const filter = (item: MentionItem) =>
+          normalized.length === 0
+            ? true
+            : item.label.toLowerCase().includes(normalized);
+        return [
+          ...all.filter((i) => i.group === "Teams" && filter(i)).slice(0, 10),
+          ...all.filter((i) => i.group === "Agents" && filter(i)).slice(0, 10),
+        ];
+      },
+      command: ({
+        editor,
+        range,
+        props,
+      }: {
+        editor: any;
+        range: Range;
+        props: MentionItem;
+      }) => {
+        editor
+          .chain()
+          .focus()
+          .insertContentAt(range, [
+            { type: "mention", attrs: { id: props.value, label: props.label } },
+            { type: "text", text: " " },
+          ])
+          .run();
+      },
+      render: () => {
+        let component: VueRenderer | null = null;
+        let popup: TippyInstance[] | null = null;
+        return {
+          onStart(props: SuggestionProps<MentionItem>) {
+            component = new VueRenderer(MentionSuggestionList, {
+              editor: props.editor,
+              props,
+            });
+            if (!props.clientRect || !component.element) return;
+            popup = tippy("body", {
+              getReferenceClientRect: props.clientRect as () => DOMRect,
+              appendTo: () => document.body,
+              content: component.element,
+              showOnCreate: true,
+              interactive: true,
+              trigger: "manual",
+              placement: "bottom-start",
+            }) as TippyInstance[];
+          },
+          onUpdate(props: SuggestionProps<MentionItem>) {
+            component?.updateProps(props);
+            if (!props.clientRect || !popup) return;
+            popup[0].setProps({
+              getReferenceClientRect: props.clientRect as () => DOMRect,
+            });
+          },
+          onKeyDown(props: SuggestionKeyDownProps) {
+            if (props.event.key === "Escape") {
+              popup?.[0]?.hide();
+              return true;
+            }
+            return typeof (component?.ref as any)?.onKeyDown === "function"
+              ? (component!.ref as any).onKeyDown(props)
+              : false;
+          },
+          onExit() {
+            popup?.[0]?.destroy();
+            component?.destroy();
+            component = null;
+            popup = null;
+          },
+        };
+      },
+    },
+  });
+}
 
 // The extensions that match frappe-ui's TextEditor schema, used for generateJSON
 const excelPasteExtensions = [
