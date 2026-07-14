@@ -7,7 +7,7 @@
           !sidebarStore.isExpanded
             ? 'w-auto px-0'
             : open
-            ? 'w-full px-2 bg-surface-white shadow-sm'
+            ? 'w-full px-2 bg-surface-base shadow-sm'
             : 'w-full px-2 hover:bg-surface-gray-3'
         "
       >
@@ -20,9 +20,7 @@
               : 'ms-2 w-auto opacity-100'
           "
         >
-          <div
-            class="text-base font-medium leading-none text-ink-gray-9 truncate"
-          >
+          <div class="text-base-medium leading-none text-ink-gray-9 truncate">
             {{ config.brandName || "Helpdesk" }}
           </div>
           <div class="mt-1 text-sm text-ink-gray-7">

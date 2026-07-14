@@ -17,7 +17,7 @@
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
+            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-elevation-2"
             :class="[
               i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -26,7 +26,7 @@
             ]"
           >
             <div
-              class="z-1 flex items-center justify-center rounded-full bg-surface-white"
+              class="z-1 flex items-center justify-center rounded-full bg-surface-base"
               :class="[
                 ['email', 'feedback'].includes(activity.type)
                   ? 'my-1 h-9 w-9'
@@ -41,7 +41,7 @@
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
-                class="bg-surface-white absolute start-[0.7px]"
+                class="bg-surface-base absolute start-[0.7px]"
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
@@ -100,12 +100,10 @@
     </div>
     <div
       v-else
-      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-2xl-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{
-        __(emptyText)
-      }}</span>
+      <span class="text-lg-medium text-ink-gray-8">{{ __(emptyText) }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
@@ -207,11 +205,11 @@ function scrollToHash() {
           (element as any).scrollIntoViewIfNeeded();
 
           // Add highlight effect using Tailwind class
-          element.classList.add("bg-yellow-100");
+          element.classList.add("bg-surface-yellow-2");
 
           // Remove highlight after 2 seconds
           setTimeout(() => {
-            element.classList.remove("bg-yellow-100");
+            element.classList.remove("bg-surface-yellow-2");
             router.replace({ hash: "" });
           }, 2000);
         }

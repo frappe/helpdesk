@@ -2,7 +2,7 @@
   <span
     v-if="notificationStore.visible"
     ref="target"
-    class="fixed z-10 h-screen overflow-auto bg-surface-white notifications-panel"
+    class="fixed z-10 h-screen overflow-auto bg-surface-base notifications-panel"
     :style="{
       'box-shadow': '8px 0px 8px rgba(0, 0, 0, 0.1)',
       'max-width': '350px',
@@ -11,9 +11,9 @@
     }"
   >
     <div
-      class="sticky top-0 z-10 flex items-center justify-between border-b bg-surface-white px-5 py-2.5"
+      class="sticky top-0 z-10 flex items-center justify-between border-b bg-surface-base px-5 py-2.5"
     >
-      <span class="text-lg font-medium">{{ __("Notifications") }}</span>
+      <span class="text-lg-medium">{{ __("Notifications") }}</span>
       <div>
         <Button
           theme="blue"
@@ -76,7 +76,10 @@
             <div class="text-sm text-ink-gray-5">
               {{ dayjs.tz(n.creation).fromNow() }}
             </div>
-            <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <div
+              v-if="!n.read"
+              class="h-1.5 w-1.5 rounded-full bg-surface-blue-5"
+            />
           </div>
         </span>
       </RouterLink>

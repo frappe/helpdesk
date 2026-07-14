@@ -7,7 +7,7 @@
         <LucideFileX class="size-10 text-ink-gray-4" />
       </div>
       <div class="flex flex-col gap-1">
-        <div class="text-lg font-medium text-ink-gray-8">
+        <div class="text-lg-medium text-ink-gray-8">
           {{ __("Page not found") }}
         </div>
         <div class="text-center text-p-base text-ink-gray-6 mt-1">
