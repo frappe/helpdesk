@@ -28,6 +28,7 @@ const ticketMeta = getMeta("HD Ticket");
 export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   name: "fieldAutocomplete",
   trigger: "{{",
+  allowSpaces: true,
   items: (query: string) => {
     // Return empty list to force the dropdown to close.
     if (query.includes("}}")) {
@@ -768,7 +769,6 @@ export const HandleExcelPaste = Extension.create({
     ];
   },
 });
-
 
 // Handle formatting cleanup
 type StyleValidator = (value: string) => boolean;

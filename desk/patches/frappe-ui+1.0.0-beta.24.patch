@@ -1,3 +1,23 @@
+diff --git a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts b/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
+index 0b7069a..de2a3df 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
+@@ -16,6 +16,7 @@ export type SuggestionExtensionOptions<TItem = any> = {
+   items: TItem[] | ((query: string) => TItem[] | Promise<TItem[]>)
+   component?: Component
+   floatingOptions?: SuggestionFloatingOptions
++  allowSpaces?: boolean
+   command: (props: { editor: Editor; item: TItem; range: SuggestionRange }) => void
+ }
+ 
+@@ -26,6 +27,7 @@ function buildSuggestionExtension<TItem = any>(options: SuggestionExtensionOptio
+       return {
+         suggestion: {
+           char: options.trigger,
++          allowSpaces: options.allowSpaces,
+           pluginKey: new PluginKey(options.name),
+           items: ({ query }: { query: string }) =>
+             typeof options.items === 'function' ? options.items(query) : options.items,
 diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
 index 8363502..8203e91 100644
 --- a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
