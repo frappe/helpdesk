@@ -2,7 +2,7 @@
   <div class="flex w-[382px] flex-col border-l gap-4">
     <!-- Ticket ID -->
     <div class="flex items-center justify-between border-b px-5 py-3">
-      <span class="cursor-copy text-lg font-semibold">Ticket details</span>
+      <span class="cursor-copy text-lg-semibold">Ticket details</span>
     </div>
     <!-- user info and sla info -->
     <div class="flex flex-col gap-4 pt-0 px-5 py-3 border-b">
@@ -15,11 +15,16 @@
         />
         <div class="flex items-center justify-between">
           <Tooltip :text="ticket.data.contact.name">
-            <div class="w-[242px] truncate text-2xl font-medium">
+            <div class="w-[242px] truncate text-3xl-medium">
               {{ ticket.data.contact.name }}
             </div>
           </Tooltip>
-          <div class="flex gap-1.5" v-if="!ticket.data.feedback_rating">
+          <div
+            class="flex gap-1.5"
+            v-if="
+              !ticket.data.feedback_rating && ticket.data.status !== 'Closed'
+            "
+          >
             <Tooltip :text="ticket.data.contact.email_id">
               <Button class="h-7 w-7" @click="emit('open')">
                 <template #icon>
