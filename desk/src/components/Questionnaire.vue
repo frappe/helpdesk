@@ -24,7 +24,20 @@
           <p class="text-p-base pt-1.5">
             A few quick questions to tailor Helpdesk to how you work.
           </p>
-          <div class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base">
+          <TextInput
+            v-if="question.type === 'text'"
+            v-model="answers[question.key]"
+            class="mt-5"
+            size="sm"
+            type="text"
+            variant="outline"
+            :placeholder="question.placeholder"
+            @keyup.enter="proceed"
+          />
+          <div
+            v-else
+            class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base"
+          >
             <Button
               v-for="option in question.options"
               :key="option.value"
@@ -71,7 +84,7 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
-import { Button } from "frappe-ui";
+import { Button, TextInput } from "frappe-ui";
 import { computed, reactive, ref } from "vue";
 
 interface Option {
@@ -81,7 +94,9 @@ interface Option {
 interface Question {
   key: string;
   title: string;
-  options: Option[];
+  type?: "text";
+  placeholder?: string;
+  options?: Option[];
   multiple?: boolean;
 }
 

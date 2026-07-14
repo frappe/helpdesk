@@ -42,6 +42,12 @@ function submitPersona(answers: Record<string, string | string[]>) {
 
 const questions = [
   {
+    key: "company_name",
+    title: __("What's your company called?"),
+    type: "text",
+    placeholder: __("e.g. Acme Inc."),
+  },
+  {
     key: "current_solution",
     title: __("What do you currently use to manage customer support?"),
     options: [
