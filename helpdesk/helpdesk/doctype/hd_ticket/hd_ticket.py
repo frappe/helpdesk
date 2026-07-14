@@ -91,6 +91,9 @@ class HDTicket(Document):
             "key",
             "raised_by",
             "via_customer_portal",
+            # multi-org contacts pick the org at creation; set_customer
+            # rejects any customer the contact is not linked to
+            "customer",
             *self.get_customer_template_fields(),
         ]
 
