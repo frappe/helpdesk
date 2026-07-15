@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import Questionnaire from "@/components/Questionnaire.vue";
+import type { Question } from "@/components/Questionnaire.types";
 import { markPersonaCaptured } from "@/persona";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -43,13 +44,28 @@ function submitPersona(answers: Record<string, string | string[]>) {
 const questions = [
   {
     key: "company_name",
-    title: __("What's your company called?"),
+    title: __("Tell us about your organization"),
     type: "text",
+    label: __("What is your organization's name?"),
     placeholder: __("e.g. Acme Inc."),
+    dropdown: {
+      key: "company_size",
+      label: __("How big is your organization?"),
+      placeholder: __("Select company size"),
+      options: [
+        { label: __("1–10 employees"), value: "1-10" },
+        { label: __("11–50 employees"), value: "11-50" },
+        { label: __("51–200 employees"), value: "51-200" },
+        { label: __("201–500 employees"), value: "201-500" },
+        { label: __("501–1,000 employees"), value: "501-1000" },
+        { label: __("1,000+ employees"), value: "1000+" },
+      ],
+    },
   },
   {
     key: "current_solution",
     title: __("What do you currently use to manage customer support?"),
+    type: "choice",
     options: [
       { label: __("Spreadsheets"), value: "spreadsheets" },
       { label: __("Notion"), value: "notion" },
@@ -70,6 +86,7 @@ const questions = [
   {
     key: "contact_channels",
     title: __("How do your customers currently contact your support team?"),
+    type: "choice",
     multiple: true,
     options: [
       { label: __("Email"), value: "email" },
@@ -88,6 +105,7 @@ const questions = [
     title: __(
       "How would you like your customers to create support tickets in Frappe Helpdesk?"
     ),
+    type: "choice",
     multiple: true,
     options: [
       { label: __("Via email"), value: "email" },
@@ -100,6 +118,7 @@ const questions = [
   {
     key: "biggest_challenges",
     title: __("What's your biggest support challenge today?"),
+    type: "choice",
     multiple: true,
     options: [
       {
@@ -130,6 +149,7 @@ const questions = [
   {
     key: "first_goal",
     title: __("What would you like to do first in Frappe Helpdesk?"),
+    type: "choice",
     options: [
       { label: __("Connect my support email"), value: "connect_email" },
       { label: __("Set up a customer portal"), value: "setup_portal" },
@@ -138,7 +158,7 @@ const questions = [
       { label: __("Explore the product first"), value: "explore" },
     ],
   },
-];
+] satisfies Question[];
 
 usePageMeta(() => ({ title: __("Welcome to Frappe Helpdesk") }));
 </script>

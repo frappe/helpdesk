@@ -24,22 +24,46 @@
           <p class="text-p-base pt-1.5">
             A few quick questions to tailor Helpdesk to how you work.
           </p>
-          <TextInput
-            v-if="question.type === 'text'"
-            v-model="answers[question.key]"
-            class="mt-5"
-            size="sm"
-            type="text"
-            variant="outline"
-            :placeholder="question.placeholder"
-            @keyup.enter="proceed"
-          />
+          <template v-if="question.type === 'text'">
+            <div class="mt-5">
+              <span
+                v-if="question.label"
+                class="mb-1.5 block text-p-sm text-ink-gray-5"
+              >
+                {{ question.label }}
+              </span>
+              <TextInput
+                v-model="answers[question.key]"
+                size="sm"
+                type="text"
+                variant="outline"
+                :placeholder="question.placeholder"
+                @keyup.enter="proceed"
+              />
+            </div>
+            <div v-if="dropdown" class="mt-3">
+              <span class="mb-1.5 block text-p-sm text-ink-gray-5">
+                {{ dropdown.label }}
+              </span>
+              <Dropdown :options="dropdownOptions" match-trigger-width>
+                <Button
+                  class="w-full !justify-between !rounded-md"
+                  size="sm"
+                  variant="outline"
+                  icon-right="lucide-chevron-down"
+                  :label="dropdownLabel"
+                  :aria-label="dropdown.label"
+                  :class="dropdownSelected ? '' : '!text-ink-gray-5'"
+                />
+              </Dropdown>
+            </div>
+          </template>
           <div
             v-else
             class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base"
           >
             <Button
-              v-for="option in question.options"
+              v-for="option in choiceOptions"
               :key="option.value"
               :label="option.label"
               :variant="
@@ -48,7 +72,7 @@
                   : 'outline active:bg-surface-gray-4 border-solid active:!border-outline-gray-3'
               "
               :icon-right="
-                question.multiple && isSelected(option) ? 'lucide-x' : undefined
+                isMultiple && isSelected(option) ? 'lucide-x' : undefined
               "
               size="sm"
               class="!rounded-md border border-solid [&_[aria-hidden]]:!size-3"
@@ -84,21 +108,9 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
-import { Button, TextInput } from "frappe-ui";
+import { Button, Dropdown, TextInput } from "frappe-ui";
 import { computed, reactive, ref } from "vue";
-
-interface Option {
-  label: string;
-  value: string;
-}
-interface Question {
-  key: string;
-  title: string;
-  type?: "text";
-  placeholder?: string;
-  options?: Option[];
-  multiple?: boolean;
-}
+import type { Option, Question } from "./Questionnaire.types";
 
 type Answers = Record<string, string | string[]>;
 
@@ -113,9 +125,44 @@ const total = computed(() => props.questions.length);
 const question = computed(() => props.questions[current.value] as Question);
 const isLast = computed(() => current.value === total.value - 1);
 
+// Narrow the discriminated union so the template stays declarative: choice
+// questions render pills, text questions may carry a dropdown beneath them.
+const choiceOptions = computed(() =>
+  question.value.type === "choice" ? question.value.options : []
+);
+const isMultiple = computed(
+  () => question.value.type === "choice" && !!question.value.multiple
+);
+const dropdown = computed(() =>
+  question.value.type === "text" ? question.value.dropdown : undefined
+);
+// Dropdown menu items set the answer on click; the trigger reflects the choice.
+const dropdownOptions = computed(() =>
+  (dropdown.value?.options ?? []).map((option) => ({
+    label: option.label,
+    onClick: () => {
+      if (dropdown.value) answers[dropdown.value.key] = option.value;
+    },
+  }))
+);
+const dropdownSelected = computed(
+  () => !!dropdown.value && !!answers[dropdown.value.key]
+);
+const dropdownLabel = computed(() => {
+  const config = dropdown.value;
+  if (!config) return "";
+  const value = answers[config.key];
+  return (
+    config.options.find((option) => option.value === value)?.label ??
+    config.placeholder
+  );
+});
+
 function isSelected(option: Option) {
-  const value = answers[question.value.key];
-  if (question.value.multiple) {
+  const q = question.value;
+  if (q.type !== "choice") return false;
+  const value = answers[q.key];
+  if (q.multiple) {
     return Array.isArray(value) && value.includes(option.value);
   }
   return value === option.value;
@@ -123,8 +170,10 @@ function isSelected(option: Option) {
 
 function select(option: Option) {
   if (completed.value) return;
-  const key = question.value.key;
-  if (question.value.multiple) {
+  const q = question.value;
+  if (q.type !== "choice") return;
+  const key = q.key;
+  if (q.multiple) {
     const value = Array.isArray(answers[key])
       ? [...(answers[key] as string[])]
       : [];
