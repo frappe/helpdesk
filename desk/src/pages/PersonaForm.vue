@@ -37,7 +37,7 @@ async function finishOnboarding() {
 }
 
 function submitPersona(answers: Record<string, string | string[]>) {
-  capture("onboarding_persona", { data: answers });
+  capture("onboarding_persona_hd", { data: answers });
   finishOnboarding();
 }
 
