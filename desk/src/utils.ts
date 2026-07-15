@@ -9,12 +9,10 @@ import {
   toast,
   useFileUpload,
 } from "frappe-ui";
-import { gemoji } from "gemoji";
-import { h, markRaw, ref } from "vue";
+import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import { Icon } from "frappe-ui/icons";
-import TicketIcon from "./components/icons/TicketIcon.vue";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 
@@ -359,20 +357,20 @@ export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
 }
 
-export function isEmoji(str) {
-  const emojiList = gemoji.map((emoji) => emoji.emoji);
-  return emojiList.includes(str);
+// Lucide names are plain ASCII, so any emoji-presentation or pictographic
+// character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
+export function isEmoji(str: string): boolean {
+  return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
 
 /**
  * Resolves a stored icon value into a renderable component.
- * Supports Lucide icon names from the frappe-ui IconPicker (bare names like
- * `rocket`, or legacy `lucide-rocket`), emojis stored by older views, and
- * pre-resolved icon components, falling back to the ticket icon.
+ * Supports Lucide icon names from the frappe-ui IconPicker, emojis stored by
+ * older views, and pre-resolved icon components, falling back to the ticket icon.
  */
 export function getIcon(icon) {
   if (!icon) {
-    return markRaw(TicketIcon);
+    return h(Icon, { name: "ticket" });
   }
   if (isEmoji(icon)) {
     return h(
@@ -382,7 +380,7 @@ export function getIcon(icon) {
     );
   }
   if (typeof icon === "string") {
-    return h(Icon, { name: icon.replace(/^lucide-/, "") });
+    return h(Icon, { name: icon });
   }
   return icon;
 }

@@ -25,7 +25,6 @@
     "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
     "frappe-ui": "1.0.0-beta.24",
-    "gemoji": "^8.1.0",
     "mime": "^3.0.0",
     "pinia": "^2.0.33",
     "sanitize-html": "^2.10.0",

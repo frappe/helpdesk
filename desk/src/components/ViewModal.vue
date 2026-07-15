@@ -89,9 +89,13 @@ let viewDialogConfig = defineModel();
 
 const { isManager } = useAuthStore();
 
+// New views start with the ticket icon preselected - it is also what an
+// empty icon falls back to when rendering.
+const isCreate = !["edit", "duplicate"].includes(viewDialogConfig.value.mode);
+
 const view = ref({
   label: viewDialogConfig.value.view.label || "",
-  icon: viewDialogConfig.value.view.icon || "",
+  icon: viewDialogConfig.value.view.icon || (isCreate ? "ticket" : ""),
   name: viewDialogConfig.value.view.name || "",
   pinned: false,
   public: false,
@@ -107,7 +111,7 @@ const pickerIcon = computed({
   get: () => {
     const icon = view.value.icon;
     if (!icon || isEmoji(icon)) return "";
-    return icon.replace(/^lucide-/, "");
+    return icon;
   },
   set: (value) => {
     view.value.icon = value || "";
