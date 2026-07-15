@@ -22,10 +22,5 @@ export async function telemetryEnabled(): Promise<boolean> {
 
 export async function markPersonaCaptured(): Promise<void> {
   localStorage.setItem(PERSONA_DONE_KEY, "1");
-  await call("frappe.client.set_value", {
-    doctype: "HD Settings",
-    name: "HD Settings",
-    fieldname: "persona_captured",
-    value: 1,
-  });
+  await call("helpdesk.api.onboarding.mark_persona_captured");
 }
