@@ -36,7 +36,16 @@
                   >*</span
                 >
               </span>
+              <Textarea
+                v-if="question.multiline"
+                v-model="answers[question.key]"
+                size="sm"
+                variant="outline"
+                :rows="3"
+                :placeholder="question.placeholder"
+              />
               <TextInput
+                v-else
                 v-model="answers[question.key]"
                 size="sm"
                 type="text"

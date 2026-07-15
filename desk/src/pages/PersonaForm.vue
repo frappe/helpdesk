@@ -182,6 +182,13 @@ const questions = [
     ],
   },
   {
+    key: "referral_source",
+    title: __("How did you hear about Frappe Helpdesk?"),
+    type: "text",
+    multiline: true,
+    placeholder: __("e.g. a friend, a search, or the Frappe community"),
+  },
+  {
     key: "first_goal",
     title: __("What would you like to do first in Frappe Helpdesk?"),
     type: "choice",

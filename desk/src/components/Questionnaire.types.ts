@@ -17,6 +17,7 @@ export interface TextQuestion {
   type: "text";
   label?: string;
   placeholder?: string;
+  multiline?: boolean;
   required?: boolean;
   requiredMessage?: string;
   dropdown?: DropdownConfig;
