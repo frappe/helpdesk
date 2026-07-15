@@ -98,13 +98,21 @@ class HDTicket(Document):
         ]
 
     def get_customer_template_fields(self):
-        """Fields the ticket's template exposes to the customer."""
+        """Fields the ticket's template exposes to the customer.
+
+        Of the permlevel-1 fields, only genuine creation-form inputs may
+        pierce the guard; derived and system fields stay locked even if a
+        template lists them as visible.
+        """
         template = self.template or DEFAULT_TICKET_TEMPLATE
-        return frappe.get_all(
+        fields = frappe.get_all(
             "HD Ticket Template Field",
             filters={"parent": template, "hide_from_customer": 0},
             pluck="fieldname",
         )
+        exposable = {"priority", "ticket_type", "agent_group", "customer"}
+        protected = {df.fieldname for df in self.meta.get_high_permlevel_fields()}
+        return [f for f in fields if f not in protected or f in exposable]
 
     def before_validate(self):
         self.check_update_perms()

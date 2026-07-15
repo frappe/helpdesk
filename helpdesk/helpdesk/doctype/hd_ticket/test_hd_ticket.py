@@ -1702,3 +1702,29 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertTrue(
             frappe.db.get_value("HD Ticket", ticket.name, "last_customer_response")
         )
+
+    def test_template_cannot_expose_internal_fields(self):
+        template = frappe.get_doc(
+            {
+                "doctype": "HD Ticket Template",
+                "template_name": "Perms Exposure Template",
+                "fields": [
+                    {"fieldname": "priority", "hide_from_customer": 0},
+                    {"fieldname": "status_category", "hide_from_customer": 0},
+                ],
+            }
+        ).insert()
+
+        frappe.set_user(PERMS_CUSTOMER)
+        default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
+        ticket = frappe.get_doc(
+            {
+                **get_ticket_obj(),
+                "template": template.name,
+                "priority": self.other_priority(default_priority),
+                "status_category": "Resolved",
+            }
+        ).insert()
+        # exposable creation-form field is honored, internal field stays locked
+        self.assertEqual(ticket.priority, self.other_priority(default_priority))
+        self.assertEqual(ticket.status_category, "Open")
