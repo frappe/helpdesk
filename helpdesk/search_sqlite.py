@@ -66,8 +66,25 @@ class HelpdeskSearch(SQLiteSearch):
 
     def get_search_filters(self):
         """Return permission filters based on accessible tickets."""
-        accessible_tickets = self._get_accessible_tickets()
-        return {"reference_ticket": accessible_tickets}
+        if self._has_unrestricted_ticket_access():
+            # No ticket-level restriction applies (see permission_query): every
+            # ticket is visible, so skip building a reference_ticket IN (...)
+            # list. For such users that list is the entire ticket table, which
+            # can exceed SQLite's variable limit and make search() fail (it
+            # swallows the OperationalError and silently returns no results).
+            return {}
+        return {"reference_ticket": self._get_accessible_tickets()}
+
+    def _has_unrestricted_ticket_access(self):
+        """Whether the current user can see every ticket.
+
+        ``permission_query`` returns ``None`` (no WHERE fragment) for admins,
+        and for agents when ``restrict_tickets_by_agent_group`` is disabled --
+        i.e. when there is no ticket-level restriction to express.
+        """
+        from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import permission_query
+
+        return permission_query(frappe.session.user) is None
 
     def _get_accessible_tickets(self):
         """Get tickets accessible to current user based on helpdesk permissions."""
@@ -120,16 +137,29 @@ class HelpdeskSearch(SQLiteSearch):
                 "doctypes": {},
             }
 
-        # Get accessible tickets first
-        accessible_tickets = self._get_accessible_tickets()
-        if not accessible_tickets:
-            return {
-                "teams": {},
-                "statuses": {},
-                "priorities": {},
-                "customers": {},
-                "doctypes": {},
-            }
+        # Restrict facet counts to accessible tickets. Users with unrestricted
+        # access can see every ticket, so count the whole index instead of
+        # binding the entire ticket table into an IN (...) clause (which grows
+        # to 3N host parameters here and can exceed SQLite's variable limit).
+        if self._has_unrestricted_ticket_access():
+            where_clause = ""
+            params = []
+        else:
+            accessible_tickets = self._get_accessible_tickets()
+            if not accessible_tickets:
+                return {
+                    "teams": {},
+                    "statuses": {},
+                    "priorities": {},
+                    "customers": {},
+                    "doctypes": {},
+                }
+            placeholders = ",".join(["?" for _ in accessible_tickets])
+            where_clause = (
+                "WHERE (name IN ({p}) OR reference_name IN ({p}) "
+                "OR reference_ticket IN ({p}))".format(p=placeholders)
+            )
+            params = accessible_tickets * 3
 
         # Query the search index for available options
         sql = """
@@ -141,13 +171,12 @@ class HelpdeskSearch(SQLiteSearch):
 				doctype,
 				COUNT(*) as count
 			FROM search_fts
-			WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
+			{where_clause}
 			GROUP BY agent_group, status, priority, customer, doctype
 		""".format(
-            placeholders=",".join(["?" for _ in accessible_tickets])
+            where_clause=where_clause
         )
 
-        params = accessible_tickets * 3
         results = self.sql(sql, params, read_only=True)
 
         # Aggregate the results
