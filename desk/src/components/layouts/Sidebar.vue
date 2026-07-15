@@ -1,31 +1,10 @@
 <template>
-  <div
-    class="flex select-none flex-col border-e border-outline-elevation-2 bg-surface-sidebar text-base duration-300 ease-in-out"
-    :style="{
-      'min-width': width,
-      'max-width': width,
-    }"
-  >
-    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
-      <UserMenu :options="profileSettings" />
-    </div>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      :label="__('Search')"
-      :icon="LucideSearch"
-      :on-click="() => openCommandPalette()"
-      :is-expanded="isExpanded"
-      class="mt-1.5"
-    >
-      <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
-          <component :is="device.modifierIcon" class="h-3 w-3" />
-          <span>K</span>
-        </span>
-      </template>
-    </SidebarLink>
-    <div v-if="!isCustomerPortal">
+  <AppSidebar :profile-settings="profileSettings">
+    <template #footer="{ isCollapsed }">
+      <!-- The Sidebar container already has p-2; the extra px-2 only fits when
+      expanded. Collapsed, it would squeeze the banners' icon buttons to 0. -->
       <div
+<<<<<<< HEAD
         v-if="notificationStore.unread"
         class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-surface-blue-5 left-1"
         theme="gray"
@@ -105,34 +84,36 @@
     <div class="grow" />
     <div class="flex flex-col gap-2 pb-2.5">
       <div class="px-2 flex flex-col gap-2">
+=======
+        class="flex flex-col gap-2"
+        :class="isCollapsed ? 'items-center' : 'px-2'"
+      >
+>>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
-          :isSidebarCollapsed="!isExpanded"
+          :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
           v-if="showOnboardingBanner"
-          :isSidebarCollapsed="!isExpanded"
+          :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <CustomerPortalPermissionBanner
-          v-if="showPermissionNoticeBanner"
-          :isSidebarCollapsed="!isExpanded"
-        />
       </div>
-
-      <SidebarLink
+      <SidebarItem
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
-        :icon="HelpIcon"
         :label="__('Help')"
-        :is-expanded="isExpanded"
-        @click="
+        :icon="HelpIcon"
+        :on-click="
           () => {
             showHelpModal = minimize ? true : !showHelpModal;
             minimize = !showHelpModal;
           }
         "
       />
+    </template>
+  </AppSidebar>
 
+<<<<<<< HEAD
       <SidebarLink
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
@@ -166,22 +147,37 @@
     />
     <CP v-model="showCommandPalette" />
   </div>
+=======
+  <SettingsModal v-model="showSettingsModal" />
+  <ShortcutsModal v-model="showShortcutsModal" />
+  <HelpModal
+    v-if="showHelpModal"
+    v-model="showHelpModal"
+    v-model:articles="articles"
+    appName="helpdesk"
+    title="Frappe Helpdesk"
+    :logo="logo"
+    docsLink="https://docs.frappe.io/helpdesk"
+    :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
+    :afterSkipAll="() => capture('onboarding_steps_skipped')"
+    :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
+    :afterResetAll="() => capture('onboarding_steps_reset')"
+  />
+  <IntermediateStepModal
+    v-model="showIntermediateModal"
+    :currentStep="currentStep"
+  />
+>>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
 </template>
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { Section, SidebarLink } from "@/components";
-import CP from "@/components/command-palette/CP.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import UserMenu from "@/components/UserMenu.vue";
-import { useApps } from "@/composables/useApps";
-import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import { useApps } from "@/composables/useApps";
 import { useScreenSize } from "@/composables/screen";
-import { currentView, useView } from "@/composables/useView";
 import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
   showAssignmentModal,
@@ -189,12 +185,9 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
-import { useNotificationStore } from "@/stores/notification";
-import { useSidebarStore } from "@/stores/sidebar";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call, toast, useTheme } from "frappe-ui";
+import { call, SidebarItem, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -206,28 +199,20 @@ import {
 } from "frappe-ui/frappe";
 
 import { HelpIcon } from "frappe-ui/icons";
-import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-  agentPortalSidebarOptions,
-  customerPortalSidebarOptions,
-} from "./layoutSettings";
+import { useRouter } from "vue-router";
+import AppSidebar from "./AppSidebar.vue";
 
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
-import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
-import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSearch from "~icons/lucide/search";
-import LucideSun from "~icons/lucide/sun";
 import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
@@ -239,24 +224,13 @@ import {
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
-const isRtl = document.documentElement.dir === "rtl";
 
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const configStore = useConfigStore();
-const notificationStore = useNotificationStore();
-const { isExpanded, width } = storeToRefs(useSidebarStore());
-const device = useDevice();
-const telephonyStore = useTelephonyStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const showShortcutsModal = ref(false);
-const showCommandPalette = ref(false);
-
-const { pinnedViews, publicViews } = useView();
-const { currentTheme, toggleTheme } = useTheme();
 const { appsMenuOption } = useApps();
+const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
@@ -265,74 +239,6 @@ const themeMenuItem = computed(() => ({
 }));
 
 const isFCSite = ref(window.is_fc_site);
-
-const sectionOpenState = ref<Record<string, boolean>>({});
-
-function isSectionOpen(label: string, defaultOpen: boolean): boolean {
-  if (!isExpanded.value) return true;
-  if (label in sectionOpenState.value) return sectionOpenState.value[label];
-  return defaultOpen;
-}
-
-function toggleSection(label: string, defaultOpen: boolean) {
-  const current = isSectionOpen(label, defaultOpen);
-  sectionOpenState.value[label] = !current;
-}
-
-const allViews = computed(() => {
-  let items = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
-
-  if (!isCallingEnabled.value) {
-    items = items.filter((item) => item.label !== __("Call Logs"));
-  }
-
-  const options = [
-    {
-      label: __("All Views"),
-      hideLabel: true,
-      opened: true,
-      views: items,
-    },
-  ];
-  if (publicViews.value?.length && !isCustomerPortal.value) {
-    options.push({
-      label: __("Public Views"),
-      opened: true,
-      hideLabel: false,
-      views: parseViews(publicViews.value),
-    });
-  }
-  if (pinnedViews.value?.length) {
-    options.push({
-      label: __("Private Views"),
-      opened: true,
-      hideLabel: false,
-      views: parseViews(pinnedViews.value),
-    });
-  }
-  return options;
-});
-
-function parseViews(views) {
-  return views.map((view) => {
-    return {
-      label: view.label,
-      icon: view.icon,
-      to: {
-        name: view.route_name,
-        query: { view: view.name },
-      },
-      onClick: () => {
-        currentView.value = {
-          label: view.label,
-          icon: view.icon,
-        };
-      },
-    };
-  });
-}
 
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
@@ -404,17 +310,6 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-function isActiveTab(to: any) {
-  if (route.query.view) {
-    return route.query.view == to?.query?.view;
-  }
-  return route.name === to;
-}
-
-function openCommandPalette() {
-  showCommandPalette.value = true;
-}
-
 const logo = h(
   HDLogo,
   {
@@ -428,14 +323,6 @@ const showOnboardingBanner = computed(() => {
     !isCustomerPortal.value &&
     !isOnboardingStepsCompleted.value &&
     authStore.isManager
-  );
-});
-
-const showPermissionNoticeBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    (authStore.isManager || authStore.isAdmin) &&
-    configStore.showCustomerPortalPermissionNotice
   );
 });
 

@@ -10,6 +10,7 @@
         leave-from="translate-x-0"
         leave-to="-translate-x-full"
       >
+<<<<<<< HEAD
         <div
           class="relative z-10 flex h-full w-[230px] flex-col border-r bg-surface-sidebar transition-all duration-300 ease-in-out"
         >
@@ -81,6 +82,10 @@
               </Section>
             </div>
           </div>
+=======
+        <div class="relative z-10 h-full">
+          <AppSidebar mobile :profile-settings="profileSettings" />
+>>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
         </div>
       </TransitionChild>
       <TransitionChild
@@ -105,103 +110,32 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { computed, markRaw, onMounted } from "vue";
+import { computed, markRaw, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { Section } from "@/components";
-import SidebarLink from "@/components/SidebarLink.vue";
-import UserMenu from "@/components/UserMenu.vue";
-import { useNotificationStore } from "@/stores/notification";
-import { __ } from "@/translation";
-
-import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
-import { currentView, useView } from "@/composables/useView";
-
-import LucideBell from "~icons/lucide/bell";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
-import { useTheme } from "frappe-ui";
-
-import { useApps } from "@/composables/useApps";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
+import { useTheme } from "frappe-ui";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
+
+import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
+import { useApps } from "@/composables/useApps";
+import { __ } from "@/translation";
+import AppSidebar from "./AppSidebar.vue";
 import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
-import {
-  agentPortalSidebarOptions,
-  customerPortalSidebarOptions,
-} from "./layoutSettings";
-import { useTelephonyStore } from "@/stores/telephony";
-import { storeToRefs } from "pinia";
-const { pinnedViews, publicViews } = useView();
+
 const { currentTheme, toggleTheme } = useTheme();
 const { appsMenuOption } = useApps();
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
   icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
   onClick: () => toggleTheme(),
 }));
-
-const notificationStore = useNotificationStore();
-const route = useRoute();
-const router = useRouter();
-const authStore = useAuthStore();
-const telephonyStore = useTelephonyStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
-
-const allViews = computed(() => {
-  let items = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
-
-  if (!isCallingEnabled.value) {
-    items = items.filter((item) => item.label !== "Call Logs");
-  }
-
-  const options = [
-    {
-      label: "All Views",
-      hideLabel: true,
-      opened: true,
-      views: items,
-    },
-  ];
-  if (publicViews.value?.length && !isCustomerPortal.value) {
-    options.push({
-      label: "Public Views",
-      opened: true,
-      hideLabel: false,
-      views: parseViews(publicViews.value),
-    });
-  }
-  if (pinnedViews.value?.length) {
-    options.push({
-      label: "Private Views",
-      opened: true,
-      hideLabel: false,
-      views: parseViews(pinnedViews.value),
-    });
-  }
-  return options;
-});
-function parseViews(views) {
-  return views.map((view) => {
-    return {
-      label: view.label,
-      icon: view.icon,
-      to: {
-        name: view.route_name,
-        query: { view: view.name },
-      },
-      onClick: () => {
-        currentView.value = {
-          label: view.label,
-          icon: view.icon,
-        };
-      },
-    };
-  });
-}
 
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
@@ -253,12 +187,8 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-function isActiveTab(to: string) {
-  if (route.query.view) {
-    return route.query.view == to?.query?.view;
-  }
-  return route.name === to;
-}
+watch(
+  () => route.fullPath,
+  () => (sidebarOpened.value = false)
+);
 </script>
-
-<style scoped></style>
