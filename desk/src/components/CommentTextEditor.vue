@@ -79,6 +79,7 @@
               <Button
                 variant="solid"
                 :label="label"
+                :tooltip="commentTooltip"
                 :disabled="isDisabled"
                 :loading="loading"
                 @click="
@@ -105,7 +106,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { AttachmentItem } from "@/components/";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
+import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
+import { useScreenSize } from "@/composables/screen";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import {
@@ -120,6 +123,16 @@ import { storeToRefs } from "pinia";
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
+
+const commentTooltip = computed(() =>
+  isMobileView.value
+    ? "Comment"
+    : isMac
+    ? "Comment (⌘ + ⏎)"
+    : "Comment (Ctrl + ⏎)"
+);
 
 const props = defineProps({
   ticketId: {

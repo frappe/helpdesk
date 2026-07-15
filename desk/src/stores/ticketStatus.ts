@@ -6,6 +6,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
   const statuses = createListResource({
     doctype: "HD Ticket Status",
     cache: ["HD Ticket Status", "list"],
+    filters: { enabled: 1 },
     fields: [
       "label_agent",
       "label_customer",

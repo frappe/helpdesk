@@ -188,17 +188,29 @@
           </div>
           <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
             <Button label="Discard" @click="handleDiscard" />
-            <Button
-              variant="solid"
-              :disabled="isDisabled"
-              :loading="sendMail.loading"
-              :label="label"
-              @click="
-                () => {
-                  submitMail();
-                }
-              "
-            />
+            <div class="flex">
+              <Button
+                variant="solid"
+                class="rounded-r-none"
+                :disabled="isDisabled"
+                :loading="sendMail.loading"
+                :label="label"
+                :tooltip="sendTooltip"
+                @click="
+                  () => {
+                    submitMail();
+                  }
+                "
+              />
+              <Dropdown :options="statusOptions" side="top" placement="right">
+                <Button
+                  variant="solid"
+                  class="rounded-l-none"
+                  icon="chevron-down"
+                  :disabled="isDisabled"
+                />
+              </Dropdown>
+            </div>
           </div>
         </div>
       </div>
@@ -216,10 +228,15 @@
 import { AttachmentItem, SavedRepliesSelectorModal } from "@/components";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
-import { AttachmentIcon } from "@/components/icons";
+import { AttachmentIcon, IndicatorIcon } from "@/components/icons";
+import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
+import { useScreenSize } from "@/composables/screen";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation.ts";
+import { HDTicketStatus } from "@/types/doctypes";
 import {
   getFontFamily,
   htmlToText,
@@ -229,11 +246,12 @@ import {
   validateEmailWithZod,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { FileUploader, createResource, toast } from "frappe-ui";
+import { Dropdown, FileUploader, createResource, toast } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import {
   computed,
+  h,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -283,6 +301,12 @@ const emit = defineEmits(["submit", "discard"]);
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
+const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
+
+const sendTooltip = computed(() =>
+  isMobileView.value ? "Send" : isMac ? "Send (⌘ + ⏎)" : "Send (Ctrl + ⏎)"
+);
 
 const extensions = buildEditorExtensions();
 
@@ -384,6 +408,32 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
+const ticketStatusStore = useTicketStatusStore();
+const replyStatuses = computed<HDTicketStatus[]>(
+  () => ticketStatusStore.statuses.data ?? []
+);
+
+const preferredStatus = useStorage<string | null>("preferredReplyStatus", null);
+// Preferred status, falling back to the default open status when unset or
+// no longer available.
+const selectedStatus = computed<string | null>(() => {
+  const statuses = replyStatuses.value;
+  if (statuses.some((s) => s.label_agent === preferredStatus.value)) {
+    return preferredStatus.value;
+  }
+  return statuses.find((s) => s.category === "Open")?.label_agent ?? null;
+});
+
+const statusOptions = computed(() =>
+  replyStatuses.value.map((s) => ({
+    label: __("Submit as {0}", __(s.label_agent)),
+    icon: () => h(IndicatorIcon, { class: s.parsed_color }),
+    onClick: () => {
+      preferredStatus.value = s.label_agent;
+    },
+  }))
+);
+
 const showSavedRepliesSelectorModal = ref(false);
 
 function applySavedReplies(template: string) {
@@ -404,6 +454,7 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
+      status: selectedStatus.value,
       message:
         newEmail.value +
         (quotedContentRef.value
@@ -422,7 +473,11 @@ const sendMail = createResource({
   debounce: 300,
 });
 
-const label = computed(() => (sendMail.loading ? "Sending..." : props.label));
+const label = computed(() => {
+  if (sendMail.loading) return __("Sending...");
+  if (!selectedStatus.value) return props.label;
+  return __("Submit as {0}", __(selectedStatus.value));
+});
 
 const isDisabled = computed(
   () =>

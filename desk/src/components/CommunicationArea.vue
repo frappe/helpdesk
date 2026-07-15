@@ -43,9 +43,6 @@
         <div class="overflow-hidden">
           <EmailEditor
             ref="emailEditorRef"
-            :label="
-              isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
-            "
             placeholder="Hi John, we are looking into this issue."
             :ticketId="ticketId"
             :to-emails="toEmails"
@@ -77,13 +74,6 @@
         <div class="overflow-hidden">
           <CommentTextEditor
             ref="commentTextEditorRef"
-            :label="
-              isMobileView
-                ? 'Comment'
-                : isMac
-                ? 'Comment (⌘ + ⏎)'
-                : 'Comment (Ctrl + ⏎)'
-            "
             :ticketId="ticketId"
             :editable="showCommentBox"
             :doctype="doctype"
@@ -109,8 +99,6 @@
 <script setup lang="ts">
 import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
-import { useDevice } from "@/composables";
-import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { onClickOutside } from "@vueuse/core";
@@ -118,8 +106,6 @@ import { ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
-const { isMac } = useDevice();
-const { isMobileView } = useScreenSize();
 let doc = defineModel();
 // let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
@@ -235,9 +221,19 @@ const IGNORED_SELECTORS = [
   ".dialog-overlay",
 ];
 
+// While a dropdown menu is open, body has pointer-events: none, so clicks
+// land on <html> instead of the real element. Those clicks dismiss the menu,
+// not the editor.
+function isOverlayDismissClick(event: PointerEvent) {
+  return (
+    event.target === document.documentElement || event.target === document.body
+  );
+}
+
 onClickOutside(
   emailBoxRef,
-  () => {
+  (event) => {
+    if (isOverlayDismissClick(event)) return;
     if (showEmailBox.value) {
       showEmailBox.value = false;
     }
@@ -249,7 +245,8 @@ onClickOutside(
 
 onClickOutside(
   commentBoxRef,
-  () => {
+  (event) => {
+    if (isOverlayDismissClick(event)) return;
     if (showCommentBox.value) {
       showCommentBox.value = false;
     }
