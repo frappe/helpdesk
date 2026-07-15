@@ -1077,6 +1077,14 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
+        # The response stamps sit at permlevel 1; portal replies reach this
+        # save under the customer's session, which has no level-1 write, so
+        # exempt them from the framework's silent reset.
+        self.flags.ignore_permlevel_for_fields = [
+            "last_customer_response",
+            "last_agent_response",
+            "first_responded_on",
+        ]
         # Save the ticket, allowing for hooks to run.
         self.save()
 

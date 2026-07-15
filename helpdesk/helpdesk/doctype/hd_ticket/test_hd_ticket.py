@@ -1687,3 +1687,18 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 ),
                 force=True,
             )
+
+    def test_portal_activity_stamps_last_customer_response(self):
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        ticket.reload()
+        self.assertTrue(ticket.last_customer_response)
+
+        frappe.set_user("Administrator")
+        frappe.db.set_value("HD Ticket", ticket.name, "last_customer_response", None)
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc("HD Ticket", ticket.name)
+        ticket.create_communication_via_contact("customer follow-up")
+        self.assertTrue(
+            frappe.db.get_value("HD Ticket", ticket.name, "last_customer_response")
+        )
