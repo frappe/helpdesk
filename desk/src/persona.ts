@@ -1,16 +1,15 @@
+import { useAuthStore } from "@/stores/auth";
 import { call } from "frappe-ui";
 
-// localStorage mirrors the server flag so a failed persist can't re-loop the
+// localStorage mirrors the boot flag so a failed persist can't re-loop the
 // wizard next session. Distinct from the `useOnboarding` step tracker.
 export const PERSONA_DONE_KEY = "helpdesk_persona_captured";
 
-export async function isPersonaCaptured(): Promise<boolean> {
+// Both sources are already loaded (localStorage + the auth boot), so this stays
+// synchronous — the guard decides without a settings round-trip or a flash.
+export function isPersonaCaptured(): boolean {
   if (localStorage.getItem(PERSONA_DONE_KEY)) return true;
-  const captured = await call("frappe.client.get_single_value", {
-    doctype: "HD Settings",
-    field: "persona_captured",
-  });
-  return !!captured;
+  return !!useAuthStore().personaCaptured;
 }
 
 // The questionnaire's answers only feed telemetry, so there's no point showing

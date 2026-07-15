@@ -231,7 +231,7 @@ router.beforeEach(async (to, _, next) => {
   // Guard the wizard page: only an uncaptured admin may view it, even via URL.
   if (to.name === "Persona") {
     try {
-      const allow = isDeskAdmin && !(await isPersonaCaptured());
+      const allow = isDeskAdmin && !isPersonaCaptured();
       return next(allow ? undefined : { name: "Home" });
     } catch {
       return next({ name: "Home" }); // fail safe — never break navigation
@@ -243,7 +243,7 @@ router.beforeEach(async (to, _, next) => {
   if (isDeskAdmin && !personaChecked) {
     personaChecked = true;
     try {
-      if (!(await isPersonaCaptured()) && (await telemetryEnabled())) {
+      if (!isPersonaCaptured() && (await telemetryEnabled())) {
         return next({ name: "Persona" });
       }
     } catch {
