@@ -44,21 +44,22 @@ const settingsTabForGoal: Record<
 
 async function finishOnboarding(answers: Record<string, string | string[]>) {
   leaving.value = true;
-  // Persist and fade in parallel; localStorage in markPersonaCaptured is the
-  // durable guard, so a failed persist can be ignored here. The org name also
-  // becomes the HD Settings brand name.
+  // Persist and fade in parallel; localStorage is the durable guard.
   const brandName =
     typeof answers.company_name === "string" ? answers.company_name : undefined;
   const fade = new Promise((resolve) => setTimeout(resolve, FADE_MS));
   await Promise.allSettled([markPersonaCaptured(brandName), fade]);
-  routeToGoal(answers.first_goal);
+  try {
+    await routeToGoal(answers.first_goal);
+  } catch {
+    leaving.value = false; // navigation failed — un-fade so we're not stuck
+  }
 }
 
-// Drop the admin into their chosen first goal: a new ticket, the matching
-// settings tab over Home, or just Home.
+// Send the admin to their first goal: new ticket, a settings tab over Home, or Home.
 async function routeToGoal(goal?: string | string[]) {
   if (goal === "create_ticket") {
-    router.push({ name: "TicketAgentNew" });
+    await router.push({ name: "TicketAgentNew" });
     return;
   }
   await router.push({ name: "Home" });
@@ -69,9 +70,9 @@ async function routeToGoal(goal?: string | string[]) {
   }
 }
 
-function submitPersona(answers: Record<string, string | string[]>) {
+async function submitPersona(answers: Record<string, string | string[]>) {
   capture("onboarding_persona_hd", { data: answers });
-  finishOnboarding(answers);
+  await finishOnboarding(answers);
 }
 
 const questions = [
