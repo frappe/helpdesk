@@ -426,7 +426,7 @@ const selectedStatus = computed<string | null>(() => {
 
 const statusOptions = computed(() =>
   replyStatuses.value.map((s) => ({
-    label: __("Submit as {0}", __(s.label_agent)),
+    label: __("Send as {0}", __(s.label_agent)),
     icon: () => h(IndicatorIcon, { class: s.parsed_color }),
     onClick: () => {
       preferredStatus.value = s.label_agent;
@@ -476,7 +476,7 @@ const sendMail = createResource({
 const label = computed(() => {
   if (sendMail.loading) return __("Sending...");
   if (!selectedStatus.value) return props.label;
-  return __("Submit as {0}", __(selectedStatus.value));
+  return __("Send as {0}", __(selectedStatus.value));
 });
 
 const isDisabled = computed(
