@@ -11,7 +11,7 @@
         :tooltip="copyOnClick ? __('Click to copy') : undefined"
         :class="[
           {
-            'rounded bg-surface-base hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
+            'rounded !bg-surface-base hover:!bg-surface-gray-1 focus-visible:ring-outline-gray-4':
               variant === 'subtle',
           },
           copyOnClick
