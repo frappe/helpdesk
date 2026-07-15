@@ -4,11 +4,10 @@
     :class="{ 'animate-pulse': loading }"
   >
     <slot name="number-cards">
-      <div
-        v-if="showVariant('number-cards')"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-      >
+      <div v-if="showVariant('number-cards')" :class="numberCardsGridClass">
+        <!-- Vertical: title → value → subtitle stacked top→bottom -->
         <div
+          v-if="orientation === 'vertical'"
           v-for="i in numberCardsCount"
           :key="`card-${i}`"
           class="border rounded-md p-4 space-y-3 max-h-[140px] min-h-[114px]"
@@ -16,6 +15,30 @@
           <div class="h-3 w-1/2 bg-surface-gray-3 rounded" />
           <div class="h-7 w-2/3 bg-surface-gray-1 rounded" />
           <div class="h-3 w-1/2 bg-surface-gray-1 rounded" />
+        </div>
+        <!-- Horizontal: title on top, value + mini chart side-by-side, percentage row -->
+        <div
+          v-else
+          v-for="i in numberCardsCount"
+          :key="`card-h-${i}`"
+          class="border rounded-md flex flex-col p-4 pt-3 gap-2"
+          :style="{ minHeight: height }"
+        >
+          <div class="h-4 w-1/2 bg-surface-gray-3 rounded" />
+          <div class="flex items-end w-full gap-2 justify-between flex-1">
+            <div class="h-7 w-10 bg-surface-gray-2 rounded" />
+            <div
+              class="h-full max-w-[50%] w-[50%] flex items-end justify-end gap-1"
+            >
+              <div
+                v-for="(h, idx) in barHeights"
+                :key="idx"
+                :style="{ height: `${h}%` }"
+                class="w-2 bg-surface-gray-3 rounded-t-sm"
+              />
+            </div>
+          </div>
+          <div class="h-3 w-1/3 bg-surface-gray-2 rounded" />
         </div>
       </div>
     </slot>
@@ -80,12 +103,12 @@
               v-if="showVariant('empty-state')"
               :style="{
                 backgroundImage:
-                  'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
+                  'radial-gradient(ellipse at center, var(--surface-base) 10%, color-mix(in srgb, var(--surface-base) 90%, transparent) 25%, transparent 70%)',
               }"
               class="rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >
               <div
-                class="relative z-10 text-ink-gray-7 font-medium text-center text-p-base leading-[1.15]"
+                class="relative z-10 text-ink-gray-7 text-center text-p-base-medium leading-[1.15]"
               >
                 {{ __(getEmptyState(i).title) }}
               </div>
@@ -115,6 +138,22 @@ const props = defineProps({
     default: () => ["number-cards", "bar-chart"],
   },
   numberCardsCount: { type: Number, default: 5 },
+  // "vertical": title → value → subtitle stacked (default, KPI tiles).
+  // "horizontal": title on top, value + mini chart side-by-side, percentage row (compact chart cards).
+  orientation: {
+    type: String,
+    default: "vertical",
+    validator: (v) => ["vertical", "horizontal"].includes(v),
+  },
+  numberCardsGridClass: {
+    type: String,
+    default: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4",
+  },
+  // Min-height of each card in the horizontal number-cards layout (any CSS length).
+  height: {
+    type: String,
+    default: "160px",
+  },
   barChartCount: { type: Number, default: 4 },
   barHeights: { type: Array, default: () => [63, 95, 44, 37, 70] },
   hasAppliedFilter: { type: Boolean, default: false },

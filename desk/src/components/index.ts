@@ -1,3 +1,4 @@
+export { default as BackButton } from "./BackButton.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as Autocomplete } from "./Autocomplete.vue";
 export { default as CommandPalette } from "./command-palette/CP.vue";
@@ -14,7 +15,6 @@ export { default as Icon } from "./Icon.vue";
 export { default as LayoutHeader } from "./LayoutHeader.vue";
 export { default as ListViewBuilder } from "./ListViewBuilder.vue";
 export { default as MultipleAvatar } from "./MultipleAvatar.vue";
-export { default as MultiSelectInput } from "./MultiSelectInput.vue";
 export { default as NestedPopover } from "./NestedPopover.vue";
 export { default as Notifications } from "./notifications/Notifications.vue";
 export { default as PageTitle } from "./PageTitle.vue";

@@ -9,8 +9,16 @@
  "field_order": [
   "image",
   "customer_name",
+  "customer_type",
   "domain",
   "erpnext_customer",
+  "country",
+  "column_break_fead",
+  "primary_contact",
+  "email_id",
+  "mobile_no",
+  "section_break_fxor",
+  "contacts",
   "references_tab",
   "contact_html"
  ],
@@ -25,6 +33,13 @@
    "fieldtype": "Data",
    "label": "Customer Name",
    "unique": 1
+  },
+  {
+   "default": "Company",
+   "fieldname": "customer_type",
+   "fieldtype": "Select",
+   "label": "Customer Type",
+   "options": "Company\nIndividual\nPartnership"
   },
   {
    "fieldname": "domain",
@@ -49,12 +64,56 @@
    "hidden": 1,
    "label": "ERPNext Customer",
    "read_only": 1
+  },
+  {
+   "fieldname": "contacts",
+   "fieldtype": "Table",
+   "label": "Contacts",
+   "options": "HD Customer Member"
+  },
+  {
+   "fieldname": "column_break_fead",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_fxor",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Mobile no. of the primary contact",
+   "fetch_from": "primary_contact.mobile_no",
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No",
+   "options": "Phone",
+   "read_only": 1
+  },
+  {
+   "description": "Email address of the primary contact",
+   "fetch_from": "primary_contact.email_id",
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "label": "Email ID",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "primary_contact",
+   "fieldtype": "Link",
+   "label": "Primary Contact",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Link",
+   "label": "Country",
+   "options": "Country"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-16 19:18:37.792462",
+ "modified": "2026-06-20 15:34:00.998330",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
@@ -69,33 +128,67 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "Administrator",
    "share": 1,
    "write": 1
   },
   {
    "create": 1,
    "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Agent",
-   "share": 1,
-   "write": 1
+   "select": 1,
+   "share": 1
   },
   {
-   "create": 1,
    "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Administrator",
+   "role": "HD Customer Manager",
+   "select": 1,
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer",
+   "select": 1,
+   "share": 1
   }
  ],
  "row_format": "Dynamic",

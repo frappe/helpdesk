@@ -44,7 +44,11 @@ const gmailReplyToContent = doc.querySelectorAll("div.gmail_quote");
 const outlookReplyToContent = doc.querySelectorAll("div#appendonsend");
 const replyToContent = doc.querySelectorAll("p.reply-to-content");
 
-if (gmailReplyToContent.length) {
+if (doc.body.children.length === 0) {
+  // Plain-text emails (e.g. from Thunderbird) arrive as text with newlines and no spacing losing formatting.
+  const plainText = doc.body.innerHTML.replace(/\n\n/g, "\n");
+  _content.value = `<div class="whitespace-pre-wrap">${plainText}</div>`;
+} else if (gmailReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div.gmail_quote", true);
 } else if (outlookReplyToContent.length) {
   _content.value = parseReplyToContent(doc, "div#appendonsend");
@@ -151,6 +155,7 @@ const htmlContent = computed(
         font-weight: 700;
         height: 12px;
         line-height: 0.1;
+        color: #383838;
         background: #e8eaed;
         width: 23px;
         justify-content: center;
@@ -158,6 +163,13 @@ const htmlContent = computed(
       }
       .replied-content .collapse:hover {
         background: #dadce0;
+      }
+      [data-theme='dark'] .replied-content .collapse {
+        color: #e2e2e2;
+        background: #424242;
+      }
+      [data-theme='dark'] .replied-content .collapse:hover {
+        background: #525252;
       }
       .replied-content .collapse + input {
         display: none;
@@ -171,6 +183,7 @@ const htmlContent = computed(
       .email-content {
         word-break: break-word;
       }
+      
           
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         border-width: 0;

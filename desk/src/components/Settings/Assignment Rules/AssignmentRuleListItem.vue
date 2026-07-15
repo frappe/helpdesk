@@ -1,12 +1,12 @@
 <template>
   <div
-    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-menu-bar rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
       class="w-full ps-2 col-span-7 h-14 flex flex-col justify-center"
     >
-      <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
+      <div class="text-base-medium text-ink-gray-7">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
         class="text-sm w-full text-ink-gray-5 mt-1 truncate"
@@ -193,18 +193,25 @@ const onPriorityChange = () => {
   setAssignmentRuleValue("priority", props.data.priority);
 };
 
-const onToggle = () => {
+const onToggle = (enabled: boolean) => {
   if (!props.data.users_exists && props.data.disabled) {
     toast.error(__("Cannot enable rule without adding users in it"));
     return;
   }
-  setAssignmentRuleValue("disabled", !props.data.disabled, "status");
+  // Optimistically flip so the switch reflects the new state immediately;
+  // revert if the backend update fails.
+  const previous = props.data.disabled;
+  props.data.disabled = enabled ? 0 : 1;
+  setAssignmentRuleValue("disabled", props.data.disabled, "status", () => {
+    props.data.disabled = previous;
+  });
 };
 
 const setAssignmentRuleValue = (
   key: string,
   value: any,
-  fieldName?: string
+  fieldName?: string,
+  onError?: () => void
 ) => {
   createResource({
     url: "frappe.client.set_value",
@@ -215,9 +222,14 @@ const setAssignmentRuleValue = (
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesListData?.reload();
       toast.success(
         __("Assignment rule {0} updated successfully.", fieldName || key)
+      );
+    },
+    onError: () => {
+      onError?.();
+      toast.error(
+        __("Failed to update assignment rule {0}.", fieldName || key)
       );
     },
     auto: true,

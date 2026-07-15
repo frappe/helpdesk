@@ -8,13 +8,13 @@
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
-import { FrappeUIProvider, toast, setConfig, useTheme } from "frappe-ui";
+import { useFavicon } from "@vueuse/core";
+import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { computed, defineAsyncComponent, h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
 import { useAuthStore } from "./stores/auth";
-import { useFavicon } from "@vueuse/core";
-import { storeToRefs } from "pinia";
 import { __ } from "./translation";
 import { isCustomerPortal } from "./utils";
 
@@ -32,14 +32,14 @@ onMounted(() => {
   window.addEventListener("online", () => {
     toast.create({
       message: __("You are now online."),
-      icon: h(Wifi, { class: "text-ink-white" }),
+      icon: h(Wifi, { class: "text-ink-base" }),
     });
   });
 
   window.addEventListener("offline", () => {
     toast.create({
       message: __("You are now offline."),
-      icon: h(WifiOff, { class: "text-ink-white" }),
+      icon: h(WifiOff, { class: "text-ink-base" }),
     });
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
@@ -47,10 +47,10 @@ onMounted(() => {
 });
 
 const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/pages/desk/AgentRoot.vue")
+  () => import("@/roots/AgentRoot.vue")
 );
 const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/pages/CustomerPortalRoot.vue")
+  () => import("@/roots/CustomerPortalRoot.vue")
 );
 
 const PortalRoot = computed(() => {

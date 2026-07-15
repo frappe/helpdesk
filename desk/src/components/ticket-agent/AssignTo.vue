@@ -7,9 +7,9 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
-          __("Assignee")
-        }}</span>
+        <span v-if="!hideLabel" class="block text-base text-ink-gray-5">
+          {{ __("Assignee") }}
+        </span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -49,12 +49,12 @@
     <template #body="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <!-- Search Header -->
         <div class="p-1">
           <div
-            class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
+            class="flex h-7 items-center text-sm-medium text-ink-gray-6 justify-between"
           >
             <TextInput
               ref="inputRef"
@@ -122,12 +122,16 @@
                   >
                     <UserAvatar :name="agent.value" size="sm" />
                   </Tooltip>
-                  <div
-                    class="absolute bottom-0 -right-0.5 size-2 rounded-full outline outline-white outline-1.5"
-                    :class="
-                      agentStatusStore.statusColor(agent.availability || '')
-                    "
-                  />
+                  <span
+                    class="absolute block translate-x-1/2 translate-y-1/2 transform rounded-full bottom-0.5 right-0.5"
+                  >
+                    <span
+                      class="block h-2 w-2 rounded-full border border-slate-2"
+                      :class="
+                        agentStatusStore.statusColor(agent.availability || '')
+                      "
+                    />
+                  </span>
                 </div>
                 <span class="text-ink-gray-7 flex-1 text-start truncate">
                   {{ agent.label }}
@@ -148,6 +152,7 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -158,26 +163,24 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
-import type { HDAgent } from "@/types/doctypes";
+import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
   Checkbox,
   Popover,
   TextInput,
+  Tooltip,
   call,
   createListResource,
   createResource,
+  dayjsLocal,
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
-import { useAgentStatusStore } from "@/stores/agentStatus.ts";
-import { prettyDate } from "@/utils.ts";
-import { dayjsLocal } from "frappe-ui";
-import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
 }
@@ -195,7 +198,7 @@ const activities = inject(ActivitiesSymbol)!;
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const agentStatusStore = useAgentStatusStore();
-const currentAgentName = (window as any).agent as string | null;
+const currentAgentName = window.agent;
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -255,29 +258,10 @@ const agentResource = createListResource({
     "availability",
     "availability_changed_on",
   ],
-  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
+  filters: { is_active: true },
   pageLength: 20,
   auto: true,
 });
-
-// Fetch current agent separately to guarantee they appear in the list
-const currentAgentResource = currentAgentName
-  ? createResource({
-      url: "frappe.client.get",
-      params: {
-        doctype: "HD Agent",
-        name: currentAgentName,
-        fields: [
-          "name",
-          "agent_name",
-          "user_image",
-          "availability",
-          "availability_changed_on",
-        ],
-      },
-      auto: true,
-    })
-  : null;
 
 const debouncedSearch = useDebounceFn((text: string) => {
   const filters: Record<string, any> = { is_active: true };
@@ -311,16 +295,16 @@ const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const seen = new Set<string>();
 
-  // Include current agent only when not searching
-  if (!searchText.value && currentAgentResource?.data) {
-    const a = currentAgentResource.data;
+  // Include current agent only when not searching. Built from the session user
+  // and the store's live status (seeded from auth.get_user) — no extra fetch.
+  if (!searchText.value && currentAgentName) {
     agents.push({
-      value: a.name,
-      label: a.agent_name || getUser(a.name).full_name,
-      image: a.user_image || getUser(a.name).user_image,
-      ...liveAvailability(a),
+      value: currentAgentName,
+      label: currentUser.value.full_name || currentAgentName,
+      image: currentUser.value.user_image || "",
+      ...liveAvailability({ name: currentAgentName }),
     });
-    seen.add(a.name);
+    seen.add(currentAgentName);
   }
 
   if (agentResource.data) {
@@ -551,22 +535,22 @@ const removeAssigneesResource = createResource({
 // Toast a warning for each newly-added agent who isn't currently active.
 // Returns true if any warning was shown so the caller can defer the success toast.
 function warnUnavailableAgents(addedNames: string[]): boolean {
-  const agents = (agentResource.data as HDAgent[]) ?? [];
   let hasUnavailable = false;
-  for (const agent of agents) {
-    if (!addedNames.includes(agent.name)) continue;
+  // Iterate the rendered options (not just the fetched page) so agents picked
+  // via search — who aren't in the default list — are still checked.
+  for (const agent of sortedAgentOptions.value) {
+    if (!addedNames.includes(agent.value)) continue;
     // No point warning agents about their own status when assigning themselves.
-    if (agent.name === currentAgentName) continue;
+    if (agent.value === currentAgentName) continue;
     const category = agentStatusStore.getStatus(
       agent.availability || ""
     )?.category;
     if (category !== "Away" && category !== "Unavailable") continue;
 
-    const name = agent.agent_name || agent.name;
     toast.warning(
       category === "Unavailable"
-        ? __("{0} is currently unavailable.", name)
-        : __("{0} is currently away.", name)
+        ? __("{0} is currently unavailable.", agent.label)
+        : __("{0} is currently away.", agent.label)
     );
     hasUnavailable = true;
   }

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "creation": "2017-02-17 13:07:35.686409",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -39,6 +40,8 @@
   "enable_outside_hours_banner",
   "outside_working_hours_message",
   "column_break_fzef",
+  "ticket_routing_section",
+  "auto_set_customer_from_contact",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -57,6 +60,7 @@
   "setup_section",
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
+  "show_customer_portal_permission_notice",
   "column_break_hjfh",
   "search_tab",
   "name_weight",
@@ -142,6 +146,13 @@
    "fieldname": "initial_helpdesk_name_setup_skipped",
    "fieldtype": "Check",
    "label": "Is name setup skipped"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_customer_portal_permission_notice",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Customer Portal Permission Notice"
   },
   {
    "fieldname": "column_break_hjfh",
@@ -504,12 +515,24 @@
    "fieldname": "enable_outside_hours_banner",
    "fieldtype": "Check",
    "label": "Apply outside working hours"
+  },
+  {
+   "fieldname": "ticket_routing_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Routing"
+  },
+  {
+   "default": "1",
+   "description": "Automatically set the customer on a ticket based on the contact's linked customer(s)",
+   "fieldname": "auto_set_customer_from_contact",
+   "fieldtype": "Check",
+   "label": "Auto-set customer from contact"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-23 18:30:40.906948",
+ "modified": "2026-07-07 12:30:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

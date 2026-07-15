@@ -1,0 +1,363 @@
+<template>
+  <div :class="['space-y-1.5', $attrs.class as string]">
+    <label v-if="label" :for="id" class="block w-fit text-base text-ink-gray-5">
+      {{ label }}
+      <span v-if="required" class="text-ink-red-6">*</span>
+    </label>
+    <Popover v-model:open="isOpen" matchTargetWidth>
+      <template #target="{ togglePopover }">
+        <div :class="containerClasses">
+          <button
+            type="button"
+            class="flex h-full items-center gap-1 rounded-l px-2 min-w-[50px] focus:outline-none"
+            :class="[
+              { 'pointer-events-none': disabled },
+              flagCode ? '' : 'justify-center',
+            ]"
+            :aria-label="__('Select country')"
+            @click.stop="togglePopover()"
+          >
+            <img
+              v-if="flagCode"
+              :src="`https://flagcdn.com/${flagCode}.svg`"
+              :alt="selectedCountry ?? ''"
+              class="h-3 w-4 rounded-sm object-cover"
+            />
+            <FeatherIcon name="chevron-down" class="size-3.5 text-ink-gray-5" />
+          </button>
+          <div
+            class="self-stretch border-l border-outline-gray-2"
+            aria-hidden="true"
+          />
+          <span
+            v-if="isd"
+            class="select-none ps-2.5 text-base"
+            :class="textColorClass"
+          >
+            {{ isd }}
+          </span>
+          <TextInput
+            :id="id"
+            ref="numberInputRef"
+            v-model="localNumber"
+            type="tel"
+            variant="ghost"
+            :size="size"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            :autofocus="autofocus"
+            inputmode="tel"
+            autocomplete="off"
+            class="min-w-0 flex-1 [&_input]:!bg-transparent [&_input]:!ps-1"
+            @keydown.backspace="onBackspace"
+          />
+          <div
+            v-if="$slots.suffix"
+            class="flex items-center gap-2 ps-3.5 pe-2.5"
+          >
+            <slot name="suffix" />
+          </div>
+        </div>
+      </template>
+
+      <template #body="{ close }">
+        <div
+          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
+        >
+          <div class="border-b border-outline-gray-1 p-2">
+            <FormControl
+              v-model="searchQuery"
+              size="sm"
+              autocomplete="one-time-code"
+              :name="`country-search-${id}`"
+              :placeholder="__('Search country')"
+              :autofocus="true"
+              @keydown.down.prevent="moveHighlight(1)"
+              @keydown.up.prevent="moveHighlight(-1)"
+              @keydown.enter.prevent="commitHighlighted(close)"
+              @keydown.escape.prevent="close()"
+            />
+          </div>
+          <div class="flex-1 overflow-y-auto p-1">
+            <button
+              v-for="(country, idx) in filteredCountries"
+              :key="country.name"
+              :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
+              type="button"
+              class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
+              :class="
+                idx === highlightedIndex
+                  ? 'bg-surface-gray-3'
+                  : 'hover:bg-surface-gray-2'
+              "
+              @mouseenter="highlightedIndex = idx"
+              @click="onSelectCountry(country.name, close)"
+            >
+              <img
+                :src="`https://flagcdn.com/${country.code}.svg`"
+                :alt="country.name"
+                class="h-3 w-4 rounded-sm object-cover"
+              />
+              <span class="flex-1 truncate">
+                {{ country.name }}
+              </span>
+              <span class="text-ink-gray-5">{{ country.isd }}</span>
+            </button>
+            <div
+              v-if="filteredCountries.length === 0"
+              class="p-3 text-center text-base text-ink-gray-5"
+            >
+              {{ __("No country found") }}
+            </div>
+          </div>
+        </div>
+      </template>
+    </Popover>
+    <p v-if="description" :class="descriptionClasses">
+      {{ description }}
+    </p>
+  </div>
+</template>
+
+<script setup lang="ts">
+// TODO: replace with reka-ui in future
+import { __ } from "@/translation";
+import { FeatherIcon, FormControl, Popover, TextInput } from "frappe-ui";
+import { computed, ref, useId, watch } from "vue";
+import countries from "./countries.json";
+
+interface CountryInfo {
+  code: string;
+  isd: string;
+}
+
+const props = withDefaults(
+  defineProps<{
+    label?: string;
+    placeholder?: string;
+    description?: string;
+    disabled?: boolean;
+    required?: boolean;
+    autofocus?: boolean;
+    defaultCountry?: string;
+    size?: "sm" | "md";
+    variant?: "subtle" | "outline";
+  }>(),
+  {
+    placeholder: "",
+    disabled: false,
+    required: false,
+    autofocus: false,
+    size: "sm",
+    variant: "subtle",
+  }
+);
+
+defineOptions({ inheritAttrs: false });
+
+const model = defineModel<string>({ default: "" });
+
+const id = useId();
+
+const countryCodes: Record<string, CountryInfo> = countries;
+
+const selectedCountry = ref<string | null>(null);
+const isd = computed(
+  () => countryCodes[selectedCountry.value ?? ""]?.isd ?? ""
+);
+const flagCode = computed(
+  () => countryCodes[selectedCountry.value ?? ""]?.code ?? ""
+);
+
+const localNumber = ref<string>("");
+const isOpen = ref(false);
+const searchQuery = ref("");
+const numberInputRef = ref<{ el?: HTMLInputElement | null } | null>(null);
+const highlightedIndex = ref(0);
+const itemRefs: HTMLElement[] = [];
+
+function setItemRef(el: HTMLElement | null, idx: number) {
+  if (el) itemRefs[idx] = el;
+}
+
+function moveHighlight(delta: number) {
+  const total = filteredCountries.value.length;
+  if (total === 0) return;
+  highlightedIndex.value = (highlightedIndex.value + delta + total) % total;
+  itemRefs[highlightedIndex.value]?.scrollIntoView({ block: "nearest" });
+}
+
+function commitHighlighted(close: () => void) {
+  const country = filteredCountries.value[highlightedIndex.value];
+  if (country) onSelectCountry(country.name, close);
+}
+
+const allCountries = Object.entries(countryCodes)
+  .map(([name, info]) => ({ name, code: info.code, isd: info.isd }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const filteredCountries = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return allCountries;
+  return allCountries.filter(
+    (c) => c.name.toLowerCase().includes(query) || c.isd.includes(query)
+  );
+});
+
+const sizeClasses = computed(
+  () =>
+    ({
+      sm: "h-7 rounded",
+      md: "h-8 rounded",
+    }[props.size])
+);
+
+const variantClasses = computed(() => {
+  if (props.disabled) {
+    return [
+      "border bg-surface-gray-1",
+      props.variant === "outline"
+        ? "border-outline-gray-2"
+        : "border-transparent",
+    ];
+  }
+  return {
+    subtle:
+      "border border-[--surface-gray-2] bg-surface-gray-2 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus-within:bg-surface-base focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:bg-surface-base focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
+    outline:
+      "border border-outline-gray-2 bg-surface-base hover:border-outline-gray-3 hover:shadow-sm focus-within:bg-surface-base focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
+  }[props.variant];
+});
+
+const containerClasses = computed(() => [
+  "flex items-center w-full transition-colors",
+  sizeClasses.value,
+  variantClasses.value,
+]);
+
+const textColorClass = computed(() =>
+  props.disabled ? "text-ink-gray-5" : "text-ink-gray-8"
+);
+
+const descriptionClasses = computed(() => [
+  props.size === "md" ? "text-p-base" : "text-p-xs",
+  "text-ink-gray-5",
+]);
+
+function parseValue(value: unknown) {
+  const phoneNumber =
+    typeof value === "string"
+      ? value
+      : typeof value === "number"
+      ? String(value)
+      : "";
+  if (!phoneNumber) {
+    localNumber.value = "";
+    return;
+  }
+
+  // Form 1: "+ISD-NUMBER" (canonical, with dash separator)
+  const dashIdx = phoneNumber.indexOf("-");
+  if (dashIdx > 0) {
+    const isdPart = phoneNumber.substring(0, dashIdx);
+    const numberPart = phoneNumber.substring(dashIdx + 1);
+    const match = Object.entries(countryCodes).find(
+      ([, info]) => info.isd === isdPart
+    );
+    if (match) {
+      selectedCountry.value = match[0];
+      localNumber.value = numberPart;
+      return;
+    }
+  }
+
+  // Form 2: "+ISDNUMBER"
+  // Pick the longest matching ISD prefix so +1 → US doesn't shadow +1242 → Bahamas.
+  if (phoneNumber.startsWith("+")) {
+    let bestName: string | null = null;
+    let bestIsd = "";
+
+    for (const [countryName, info] of Object.entries(countryCodes)) {
+      if (
+        info.isd &&
+        phoneNumber.startsWith(info.isd) &&
+        info.isd.length > bestIsd.length
+      ) {
+        bestName = countryName;
+        bestIsd = info.isd;
+      }
+    }
+    if (bestName) {
+      selectedCountry.value = bestName;
+      localNumber.value = phoneNumber.substring(bestIsd.length);
+      return;
+    }
+  }
+
+  localNumber.value = phoneNumber;
+}
+
+function getDefaultCountry(): string | null {
+  const country = window.default_country;
+  return typeof country === "string" && country ? country : null;
+}
+
+function applyDefaultCountry() {
+  if (selectedCountry.value) return;
+  const candidates = [props.defaultCountry, getDefaultCountry(), "India"];
+  for (const name of candidates) {
+    if (name) {
+      selectedCountry.value = name;
+      return;
+    }
+  }
+}
+
+function onSelectCountry(name: string, close: () => void) {
+  selectedCountry.value = name;
+  searchQuery.value = "";
+  close();
+  numberInputRef.value?.el?.focus();
+}
+
+function onBackspace() {
+  if (!localNumber.value) selectedCountry.value = null;
+}
+
+function emitValue() {
+  const number = localNumber.value;
+  if (!number) {
+    model.value = "";
+    return;
+  }
+  model.value = isd.value ? `${isd.value}-${number}` : number;
+}
+
+parseValue(model.value);
+if (!model.value) applyDefaultCountry();
+
+watch([localNumber, isd], emitValue);
+
+watch(
+  () => model.value,
+  (next) => {
+    const current = isd.value
+      ? `${isd.value}-${localNumber.value}`
+      : localNumber.value;
+    if (next === current) return;
+    parseValue(next);
+  }
+);
+
+watch(isOpen, (open) => {
+  if (open) {
+    highlightedIndex.value = 0;
+  } else {
+    searchQuery.value = "";
+  }
+});
+
+watch(searchQuery, () => {
+  highlightedIndex.value = 0;
+});
+</script>

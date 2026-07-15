@@ -33,16 +33,29 @@
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="yellow"
-            class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-amber-200"
+            class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-outline-amber-2"
             @dismiss="dismissBanner"
           >
           </Alert>
         </div>
-        <!-- show for only mobile -->
-        <TicketCustomerTemplateFields v-if="isMobileView" />
+        <!-- Mobile: Activity / Details tabs -->
+        <Tabs
+          v-if="isMobileView"
+          v-model="activeTab"
+          :tabs="tabs"
+          class="[&_[role='tablist']]:px-5"
+        >
+          <template #tab-panel="{ tab }">
+            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <TicketConversation v-else :show-header="false" class="grow" />
+          </template>
+        </Tabs>
 
-        <TicketConversation class="grow" />
+        <!-- Desktop: conversation -->
+        <TicketConversation v-else class="grow" />
+
         <div
+          v-if="!isMobileView || activeTab === 0"
           class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
@@ -65,7 +78,7 @@
                 :label="__('Send')"
                 theme="gray"
                 variant="solid"
-                :disabled="$refs.editor?.editor.isEmpty || send.loading"
+                :disabled="$refs.editor?.editor?.isEmpty || send.loading"
                 :loading="send.loading"
                 @click="sendEmail"
               />
@@ -92,12 +105,14 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
   Alert,
   Breadcrumbs,
   Button,
   call,
   createResource,
+  Tabs,
   toast,
 } from "frappe-ui";
 import {
@@ -161,6 +176,12 @@ const isExpanded = ref(false);
 const { isMobileView } = useScreenSize();
 const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
+
+const activeTab = ref(0);
+const tabs = computed(() => [
+  { name: "activity", label: __("Activity"), icon: ActivityIcon },
+  { name: "details", label: __("Details"), icon: DetailsIcon },
+]);
 
 function getTodayKey() {
   return new Date().toISOString().split("T")[0];

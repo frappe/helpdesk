@@ -2,9 +2,7 @@
   <div class="flex flex-col gap-4 mt-6">
     <div class="flex flex-col gap-1">
       <slot name="title">
-        <span class="text-base font-medium text-ink-gray-8">{{
-          __("Theme")
-        }}</span>
+        <span class="text-base-medium text-ink-gray-8">{{ __("Theme") }}</span>
       </slot>
       <slot name="description">
         <span class="text-p-sm text-ink-gray-6">
@@ -21,8 +19,8 @@
             class="flex-1 rounded-lg border cursor-pointer min-h-[42px]"
             :class="
               theme === option.value
-                ? 'border-outline-gray-5'
-                : 'border-outline-gray-modals'
+                ? 'border-outline-gray-7'
+                : 'border-outline-elevation-2'
             "
             @click="theme = option.value"
           >
@@ -49,7 +47,7 @@
                     class="flex items-start justify-between gap-2 p-2.5 pr-0 pb-1 min-h-[41px]"
                   >
                     <div
-                      class="flex items-center flex-1 gap-1 text-xs text-ink-gray-5 font-semibold"
+                      class="flex items-center flex-1 gap-1 text-xs-semibold text-ink-gray-5"
                     >
                       <img
                         v-if="logoIsImage"
@@ -88,7 +86,7 @@
                 class="rounded-full size-3.5"
                 :class="
                   theme === option.value
-                    ? 'border-4 border-outline-gray-5'
+                    ? 'border-4 border-outline-gray-7'
                     : 'border border-outline-gray-4'
                 "
               />

@@ -34,7 +34,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 14:17:57.949674",
+ "modified": "2026-03-24 10:39:16.296257",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Feedback",
@@ -57,7 +57,7 @@
    "delete": 1,
    "if_owner": 1,
    "read": 1,
-   "role": "All",
+   "role": "HD Customer",
    "write": 1
   }
  ],

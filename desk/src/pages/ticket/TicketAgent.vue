@@ -29,7 +29,7 @@
       <div class="flex justify-center items-center mx-auto">
         <TicketIcon class="size-10 text-ink-gray-4" />
       </div>
-      <div class="text-lg font-medium text-ink-gray-8">
+      <div class="text-lg-medium text-ink-gray-8">
         {{ __("Ticket not found") }}
       </div>
       <div class="text-center text-p-base text-ink-gray-6 mt-1">
@@ -54,7 +54,11 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
-import { reloadTicket, useTicket } from "@/composables/useTicket";
+import {
+  reloadTicket,
+  revalidateTicket,
+  useTicket,
+} from "@/composables/useTicket";
 import { ticketsToNavigate } from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -153,6 +157,10 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
+
+    // Switching to an already-visited ticket: show its cached conversation and
+    // refresh it in the background in case it changed while we were elsewhere.
+    if (oldTicketId) revalidateTicket(newTicketId as string);
   },
   { immediate: true }
 );
@@ -165,6 +173,10 @@ type TicketUpdateData = {
 };
 
 onMounted(() => {
+  // Revisiting a ticket: show the cached conversation immediately and refresh it
+  // in place, since a reply may have arrived while the socket listener was off.
+  revalidateTicket(props.ticketId);
+
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,

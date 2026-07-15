@@ -23,7 +23,7 @@ from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_temp
 from helpdesk.utils import (
     agent_only,
     check_permissions,
-    get_customer,
+    get_customers,
     is_agent,
     parse_call_logs,
 )
@@ -158,7 +158,7 @@ def get_customer_criteria():
         QBTicket.raised_by == user,
         QBTicket.owner == user,
     ]
-    customer = get_customer(user)
+    customer = get_customers(user)
     for c in customer:
         conditions.append(QBTicket.customer == c)
     return Criterion.any(conditions)
@@ -602,51 +602,45 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-    filters = []
-    if current_view:
-        _filters = frappe.get_value("HD View", current_view, "filters")
-        if _filters:
-            try:
-                # Parse the filters string to list/dict
-                filters = (
-                    json.loads(_filters) if isinstance(_filters, str) else _filters
-                )
-            except json.JSONDecodeError, TypeError:
-                filters = []
+    conditions = _to_conditions(_get_view_filters(current_view))
+    # Custom filter "__assigned_on" is not available in any doctype
+    conditions = [c for c in conditions if c[0] != "__assigned_on"]
+    conditions.append(["name", "!=", ticket])
+    return handle_at_me_support(conditions)
 
-    if not filters:
-        default_view = frappe.db.get_value(
+
+def _get_view_filters(current_view: str | None) -> dict | list:
+    filters = _parse_view_filters(
+        frappe.get_value("HD View", current_view, "filters") if current_view else None
+    )
+    if filters:
+        return filters
+    return _parse_view_filters(
+        frappe.db.get_value(
             "HD View",
             {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
             "filters",
         )
+    )
 
-        if default_view:
-            try:
-                filters = (
-                    json.loads(default_view)
-                    if isinstance(default_view, str)
-                    else default_view
-                )
-            except json.JSONDecodeError, TypeError:
-                filters = []
 
-    # Base filters - exclude the current ticket
-    base_filters = {"name": ["!=", ticket]}
+def _parse_view_filters(raw) -> dict | list:
+    if not raw:
+        return []
+    try:
+        return (json.loads(raw) if isinstance(raw, str) else raw) or []
+    except (json.JSONDecodeError, TypeError):
+        return []
 
-    # Combine base filters with view filters
-    # is instance of {}
 
-    if filters and isinstance(filters, object):
-        final_filters = {**filters, **base_filters}
-    else:
-        final_filters = base_filters
-    final_filters = handle_at_me_support(final_filters)
-
-    # Remove custom filter "__assigned_on" as it is not available in any doctype
-    final_filters.pop("__assigned_on", None)
-
-    return final_filters
+def _to_conditions(filters: dict | list) -> list:
+    """Normalize dict filters (legacy saved views) to a list of conditions."""
+    if isinstance(filters, dict):
+        return [
+            [key, *value] if isinstance(value, list) else [key, "=", value]
+            for key, value in filters.items()
+        ]
+    return [c for c in filters if isinstance(c, list) and len(c) >= 3]
 
 
 def get_navigation_order_by(view):
@@ -724,11 +718,14 @@ def get_recent_tickets(ticket: str):
         )
 
     if raised_by:
+        # Exclude the current ticket and any already picked up as org tickets,
+        # otherwise a ticket matching both `customer` and `raised_by` shows twice.
+        excluded = [ticket] + [t.name for t in org_tickets]
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
                 filters={
-                    "name": ["!=", ticket],
+                    "name": ["not in", excluded],
                     "raised_by": raised_by,
                 },
                 fields=fields,

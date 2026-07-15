@@ -13,15 +13,21 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
     show_outside_hours_banner,
     split_ticket,
 )
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
 from helpdesk.test_utils import (
     add_comment,
+    add_contact_in_customer,
     add_holiday,
+    create_contact,
+    create_customer,
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_status,
     make_ticket,
     remove_holidays,
+    set_ticket_status_and_communication_date,
+    update_role_in_customer,
     upload_test_file,
 )
 
@@ -40,6 +46,15 @@ def get_ticket_obj():
 non_agent = "non_agent@test.com"
 agent = "agent@test.com"
 agent2 = "agent2@test.com"
+
+
+CONTACTS = [
+    "testc1@example.com",
+    "testc2@example.com",
+    "testc3@example.com",
+    "testc4@example.com",
+]
+CUSTOMERS = ["Test Org 1", "Test Org 2"]
 
 
 class TestHDTicket(IntegrationTestCase):
@@ -613,6 +628,85 @@ class TestHDTicket(IntegrationTestCase):
             len(comments), 3
         )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
 
+    def test_reply_to_merged_ticket_redirects_to_target(self):
+        source = make_ticket(description="Merged source")
+        target = make_ticket(description="Merge target")
+
+        merge_ticket(source=source.name, target=target.name)
+        source.reload()
+        self.assertTrue(source.is_merged)
+        self.assertEqual(source.status, "Closed")
+
+        # An incoming reply lands on the merged source ticket.
+        communication = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "subject": f"Re: {source.subject}",
+                "content": "Customer reply to merged ticket",
+                "reference_doctype": "HD Ticket",
+                "reference_name": source.name,
+            }
+        ).insert(ignore_permissions=True)
+
+        # The merged source must stay closed and merged.
+        source.reload()
+        self.assertEqual(source.status, "Closed")
+        self.assertTrue(source.is_merged)
+
+        # The communication is redirected to the target ticket.
+        self.assertEqual(
+            frappe.db.get_value("Communication", communication.name, "reference_name"),
+            target.name,
+        )
+
+    def test_merge_cycle_does_not_resolve_target(self):
+        # A corrupt cycle (A merged into B, B merged back into A) must not redirect a reply
+        # onto another merged ticket, which would recurse until the request fails.
+        ticket_a = make_ticket(description="Cycle A")
+        ticket_b = make_ticket(description="Cycle B")
+
+        merge_ticket(source=ticket_a.name, target=ticket_b.name)
+        ticket_b.reload()
+        ticket_b.db_set("is_merged", 1)
+        ticket_b.db_set("merged_with", ticket_a.name)
+
+        ticket_a.reload()
+        self.assertIsNone(ticket_a.get_merge_target())
+
+    def test_reply_on_unresolvable_merge_is_not_dropped(self):
+        # No safe merge target (corrupt cycle): the reply must be handled here, not dropped.
+        ticket_a = make_ticket(description="Cycle A")
+        ticket_b = make_ticket(description="Cycle B")
+
+        merge_ticket(source=ticket_a.name, target=ticket_b.name)
+        ticket_b.reload()
+        ticket_b.db_set("is_merged", 1)
+        ticket_b.db_set("merged_with", ticket_a.name)
+
+        communication = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "subject": f"Re: {ticket_a.subject}",
+                "content": "Customer reply on cyclic merge",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket_a.name,
+            }
+        ).insert(ignore_permissions=True)
+
+        # The reply stays on this ticket (not redirected) and is handled here.
+        self.assertEqual(
+            frappe.db.get_value("Communication", communication.name, "reference_name"),
+            ticket_a.name,
+        )
+        ticket_a.reload()
+        self.assertIsNotNone(ticket_a.last_customer_response)
+
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
 
@@ -709,6 +803,254 @@ class TestHDTicket(IntegrationTestCase):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
 
+    def test_contact_ticket_visibility(self):
+        """
+        Test case to validate that contact can only see the tickets raised by them only.
+        If part of any org still should only see the tickets raised by them and not the tickets raised by other contacts of the same org. It should also set the customer of the ticket as the org to which contact belongs to.
+        """
+        user_contact = create_contact("Test C1", CONTACTS[0])
+        user = user_contact.get("user", "")
+        frappe.set_user(user)
+        tickets = frappe.get_list("HD Ticket", filters={"owner": user}, pluck="name")
+        self.assertEqual(len(tickets), 0)
+
+        make_ticket()
+        tickets = frappe.get_list("HD Ticket", filters={"owner": user}, pluck="name")
+        self.assertEqual(len(tickets), 1)
+
+    def test_ticket_visibility_within_customer(self):
+        """
+        Test case to validate ticket visibility for contacts linked with same customer
+        Checks:
+            - Contact linked with same customer should be able to raise ticket for that customer
+            - Contact should only see the tickets raised by them if they are not HD Customer Manager
+            - If contact is made manager, they should see all the tickets of the customer
+        """
+        user_contact1 = create_contact("Test C1", CONTACTS[0])
+        user_contact2 = create_contact("Test C2", CONTACTS[1])
+        contacts = [
+            {"contact_name": user_contact1.get("contact")},
+            {"contact_name": user_contact2.get("contact")},
+        ]
+        customer = create_customer(CUSTOMERS[0], contacts)
+
+        frappe.set_user(user_contact1.get("user"))
+        ticket1 = make_ticket()
+
+        frappe.set_user(user_contact2.get("user"))
+        ticket2 = make_ticket()
+
+        frappe.set_user(user_contact1.get("user"))
+        ticket3 = make_ticket()
+        user1_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+
+        self.assertEqual(
+            set([ticket["name"] for ticket in user1_tickets]),
+            set([ticket1.name, ticket3.name]),
+        )
+        for ticket in user1_tickets:
+            self.assertEqual(
+                ticket["customer"],
+                customer.name,
+                "Customer should be set as {0}, but got {1}".format(
+                    customer.name, ticket["customer"]
+                ),
+            )
+
+        frappe.set_user(user_contact2.get("user", ""))
+        user2_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user2_tickets),
+            set([ticket2.name]),
+            "User should only see the tickets raised by them if they are not HD Customer Manager",
+        )
+
+        frappe.set_user("Administrator")
+        customer.reload()
+        update_role_in_customer(
+            customer, user_contact2.get("contact"), "HD Customer Manager", True
+        )
+
+        frappe.set_user(user_contact2.get("user", ""))
+        user2_manager_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user2_manager_tickets),
+            set([ticket1.name, ticket2.name, ticket3.name]),
+            "Manager should see all the tickets of the customer",
+        )
+
+    def test_contact_ticket_visibility_in_multiple_org(self):
+        """
+        Test case to validate ticket visibility for contacts linked with multiple customers
+        Checks:
+            - Contact linked with multiple customers should be able to raise ticket for both customers
+            - Contact should only see the tickets raised by them even if they are linked with multiple customers
+            - If contact is made manager in one org, they should only see the tickets of that org where they are manager and the tickets raised by them in other org, but not the tickets of other org where they are not manager
+            - Customer of the ticket should be set as the org for which ticket is raised, even if contact is linked with multiple orgs
+        """
+        user_contact1 = create_contact("Test C1", CONTACTS[0])
+        user_contact2 = create_contact("Test C2", CONTACTS[1])
+        user_contact3 = create_contact("Test C3", CONTACTS[2])
+        contacts_org1 = [
+            {"contact_name": user_contact1.get("contact")},
+            {"contact_name": user_contact2.get("contact")},
+        ]
+        contacts_org2 = [
+            {"contact_name": user_contact2.get("contact")},
+            {"contact_name": user_contact3.get("contact")},
+        ]
+        customer1 = create_customer(CUSTOMERS[0], contacts_org1)
+        customer2 = create_customer(CUSTOMERS[1], contacts_org2)
+
+        frappe.set_user(user_contact1.get("user"))
+        contact1_ticket1 = make_ticket()
+        self.assertEqual(contact1_ticket1.customer, customer1.name)
+
+        frappe.set_user(user_contact2.get("user"))
+        contact2_ticket1 = make_ticket(save=False, via_customer_portal=True)
+        self.assertRaises(frappe.ValidationError, contact2_ticket1.save)  # throws error
+        # adds customer explicitly and saves
+        contact2_ticket1.customer = customer1.name
+        contact2_ticket1.save()
+        self.assertEqual(contact2_ticket1.customer, customer1.name)
+
+        contact2_ticket2 = make_ticket(customer=customer2.name)
+        self.assertEqual(contact2_ticket2.customer, customer2.name)
+
+        user2_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+        self.assertEqual(
+            set([ticket["name"] for ticket in user2_tickets]),
+            set([contact2_ticket1.name, contact2_ticket2.name]),
+            "User should only see the tickets raised by them",
+        )
+
+        frappe.set_user(user_contact1.get("user", ""))
+        user1_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+        self.assertEqual(
+            set([ticket["name"] for ticket in user1_tickets]),
+            set([contact1_ticket1.name]),
+            "User should only see the tickets raised by them",
+        )
+        for ticket in user1_tickets:
+            self.assertEqual(
+                ticket["customer"],
+                customer1.name,
+                "Customer should be set as {0}, but got {1}".format(
+                    customer1.name, ticket["customer"]
+                ),
+            )
+
+        frappe.set_user(user_contact3.get("user", ""))
+        contact3_ticket1 = make_ticket()
+        self.assertEqual(contact3_ticket1.customer, customer2.name)
+        contact3_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+        self.assertEqual(
+            set([ticket["name"] for ticket in contact3_tickets]),
+            set([contact3_ticket1.name]),
+            "User should only see the tickets raised by them",
+        )
+
+        update_role_in_customer(
+            customer1, user_contact1.get("contact"), "HD Customer Manager", True
+        )
+        frappe.set_user(user_contact1.get("user", ""))
+        user1_manager_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user1_manager_tickets),
+            set([contact1_ticket1.name, contact2_ticket1.name]),
+            "Manager should see all the tickets of the customer",
+        )
+        frappe.set_user(user_contact2.get("user", ""))
+        user2_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user2_tickets),
+            set(
+                [
+                    contact2_ticket1.name,
+                    contact2_ticket2.name,
+                ]
+            ),
+            "User should only see the tickets raised by them",
+        )
+
+        update_role_in_customer(
+            customer2, user_contact2.get("contact"), "HD Customer Manager", True
+        )
+
+        frappe.set_user(user_contact2.get("user", ""))
+        user2_manager_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user2_manager_tickets),
+            set(
+                [
+                    contact2_ticket1.name,
+                    contact2_ticket2.name,
+                    contact3_ticket1.name,
+                ]
+            ),
+            "Manager should see all the tickets of the customer where they are manager and also the tickets raised by them",
+        )
+
+        frappe.set_user(user_contact1.get("user", ""))
+        user1_manager_tickets = frappe.get_list("HD Ticket", pluck="name")
+        self.assertEqual(
+            set(user1_manager_tickets),
+            set([contact1_ticket1.name, contact2_ticket1.name]),
+            "Manager should see all the tickets of the customer where they are manager and also the tickets raised by them",
+        )
+
+        frappe.set_user("Administrator")
+        user_contact4 = create_contact("Test C4", CONTACTS[3])
+        add_contact_in_customer(customer1, user_contact4.get("contact"), True, True)
+        update_role_in_customer(
+            customer1, user_contact1.get("contact"), "HD Customer", False
+        )
+
+        frappe.set_user(user_contact1.get("user", ""))
+        user1_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+        self.assertEqual(
+            set([ticket["name"] for ticket in user1_tickets]),
+            set([contact1_ticket1.name]),
+            "User should only see the tickets raised by them",
+        )
+        for ticket in user1_tickets:
+            self.assertEqual(
+                ticket["customer"],
+                customer1.name,
+                "Customer should be set as {0}, but got {1}".format(
+                    customer1.name, ticket["customer"]
+                ),
+            )
+
+        frappe.set_user(user_contact4.get("user", ""))
+        user4_tickets = frappe.get_list("HD Ticket", fields=["name", "customer"])
+        self.assertEqual(
+            set([ticket["name"] for ticket in user4_tickets]),
+            set([contact1_ticket1.name, contact2_ticket1.name]),
+            "User should see all the tickets of the customer where they are added as contact",
+        )
+        for ticket in user4_tickets:
+            self.assertEqual(
+                ticket["customer"],
+                customer1.name,
+                "Customer should be set as {0}, but got {1}".format(
+                    customer1.name, ticket["customer"]
+                ),
+            )
+
+    def test_contact_invalid_customer_ticket(self):
+        # a contact should not be able to raise ticket for a customer they are not part of
+        user_contact1 = create_contact("Test C1", CONTACTS[0])
+        customer1 = create_customer(
+            CUSTOMERS[0], [{"contact_name": user_contact1.get("contact")}]
+        )
+        customer2 = create_customer(CUSTOMERS[1], [])
+        frappe.set_user(user_contact1.get("user"))
+        contact1_ticket1 = make_ticket(customer=customer1.name)
+        self.assertEqual(contact1_ticket1.customer, customer1.name)
+        contact1_ticket2 = make_ticket(customer=customer2.name, save=False)
+        self.assertRaises(frappe.ValidationError, contact1_ticket2.save)
+
     def test_reply_via_agent_with_only_cc(self):
         """
         reply_via_agent should succeed when only cc is provided and to is empty/None
@@ -785,6 +1127,17 @@ class TestHDTicket(IntegrationTestCase):
             get_recent_similar_tickets(ticket.name)
 
         frappe.set_user("Administrator")
+        # clean up any HD Customers left by customer-visibility tests
+        for customer in CUSTOMERS:
+            frappe.delete_doc("HD Customer", customer, force=True)
+        # clean up contacts created by visibility tests
+        for email in CONTACTS:
+            for c in frappe.db.get_all(
+                "Contact", filters={"email_id": email}, pluck="name"
+            ):
+                frappe.delete_doc("Contact", c, force=True)
+            if frappe.db.exists("User", email):
+                frappe.delete_doc("User", email, force=True)
 
     def test_ticket_priority(self):
         # if priority is set, ticket will have the applied priority
@@ -1126,6 +1479,61 @@ class TestHDTicket(IntegrationTestCase):
         )
         for file in files:
             frappe.delete_doc("File", file)
+
+    def test_auto_close_respects_inactivity_cutoff_boundary(self):
+        """`close_tickets_after_n_days` closes a ticket whose last communication is
+        older than the inactivity cutoff and keeps one whose last communication
+        falls within it. The cutoff is computed in the system timezone, so the
+        boundary holds regardless of the database server's timezone."""
+        days_threshold = 5
+        eligible_status = "Replied"
+
+        settings_fields = [
+            "auto_close_tickets",
+            "auto_close_status",
+            "auto_close_after_days",
+        ]
+        previous_settings = {
+            field: frappe.db.get_single_value("HD Settings", field)
+            for field in settings_fields
+        }
+        frappe.db.set_single_value(
+            "HD Settings",
+            {
+                "auto_close_tickets": 1,
+                "auto_close_status": eligible_status,
+                "auto_close_after_days": days_threshold,
+            },
+        )
+
+        cutoff = add_to_date(now_datetime(), days=-days_threshold)
+        just_past_cutoff = cutoff - timedelta(minutes=5)  # inactive -> should close
+        within_cutoff = cutoff + timedelta(minutes=5)  # still active -> should stay
+
+        stale_ticket = make_ticket()
+        fresh_ticket = make_ticket()
+        set_ticket_status_and_communication_date(
+            stale_ticket.name, eligible_status, just_past_cutoff
+        )
+        set_ticket_status_and_communication_date(
+            fresh_ticket.name, eligible_status, within_cutoff
+        )
+
+        try:
+            close_tickets_after_n_days()
+
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", stale_ticket.name, "status"),
+                "Closed",
+                "Ticket inactive past the cutoff should be auto closed",
+            )
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", fresh_ticket.name, "status"),
+                eligible_status,
+                "Ticket active within the cutoff should not be closed",
+            )
+        finally:
+            frappe.db.set_single_value("HD Settings", previous_settings)
 
     def tearDown(self):
         frappe.set_user("Administrator")

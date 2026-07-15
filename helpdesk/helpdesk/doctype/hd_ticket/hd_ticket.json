@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_import": 1,
  "autoname": ".####",
  "creation": "2023-10-17 14:27:11.078679",
@@ -461,7 +462,7 @@
    "read_only": 1
   },
   {
-   "default": "False",
+   "default": "0",
    "fieldname": "raised_outside_working_hours",
    "fieldtype": "Check",
    "label": "Ticket raised outside working hours",
@@ -487,7 +488,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-05-11 18:25:54.352721",
+ "modified": "2026-06-28 13:51:31.692161",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -520,17 +521,6 @@
   },
   {
    "create": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
    "delete": 1,
    "email": 1,
    "export": 1,
@@ -538,6 +528,28 @@
    "read": 1,
    "report": 1,
    "role": "Agent Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer Manager",
    "share": 1,
    "write": 1
   }
