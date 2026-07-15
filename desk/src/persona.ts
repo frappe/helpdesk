@@ -20,7 +20,10 @@ export async function telemetryEnabled(): Promise<boolean> {
   return !!config?.enabled;
 }
 
-export async function markPersonaCaptured(): Promise<void> {
+// The org name entered in the questionnaire becomes the HD Settings brand name.
+export async function markPersonaCaptured(brandName?: string): Promise<void> {
   localStorage.setItem(PERSONA_DONE_KEY, "1");
-  await call("helpdesk.api.onboarding.mark_persona_captured");
+  await call("helpdesk.api.onboarding.mark_persona_captured", {
+    brand_name: brandName,
+  });
 }

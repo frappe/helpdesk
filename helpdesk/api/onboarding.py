@@ -5,14 +5,17 @@ from helpdesk.utils import agent_manager_only
 
 @frappe.whitelist(methods=["POST"])
 @agent_manager_only
-def mark_persona_captured() -> None:
-    """Flag the onboarding persona questionnaire as done so it never re-prompts.
+def mark_persona_captured(brand_name: str | None = None) -> None:
+    """Flag the onboarding persona questionnaire as done so it never re-prompts,
+    and adopt the org name entered in the questionnaire as the brand name.
 
-    A direct single-value write, mirroring the customer portal notice: it skips
+    Direct single-value writes, mirroring the customer portal notice: they skip
     HD Settings' document lifecycle (validate/on_update) so an unrelated invalid
-    setting can't block dismissing onboarding.
+    setting can't block finishing onboarding.
     """
     frappe.db.set_single_value("HD Settings", "persona_captured", 1)
+    if brand_name and brand_name.strip():
+        frappe.db.set_single_value("HD Settings", "brand_name", brand_name.strip())
 
 
 @frappe.whitelist()

@@ -42,13 +42,16 @@ const settingsTabForGoal: Record<
   setup_portal: "General",
 };
 
-async function finishOnboarding(goal?: string | string[]) {
+async function finishOnboarding(answers: Record<string, string | string[]>) {
   leaving.value = true;
   // Persist and fade in parallel; localStorage in markPersonaCaptured is the
-  // durable guard, so a failed persist can be ignored here.
+  // durable guard, so a failed persist can be ignored here. The org name also
+  // becomes the HD Settings brand name.
+  const brandName =
+    typeof answers.company_name === "string" ? answers.company_name : undefined;
   const fade = new Promise((resolve) => setTimeout(resolve, FADE_MS));
-  await Promise.allSettled([markPersonaCaptured(), fade]);
-  routeToGoal(goal);
+  await Promise.allSettled([markPersonaCaptured(brandName), fade]);
+  routeToGoal(answers.first_goal);
 }
 
 // Drop the admin into their chosen first goal: a new ticket, the matching
@@ -68,7 +71,7 @@ async function routeToGoal(goal?: string | string[]) {
 
 function submitPersona(answers: Record<string, string | string[]>) {
   capture("onboarding_persona_hd", { data: answers });
-  finishOnboarding(answers.first_goal);
+  finishOnboarding(answers);
 }
 
 const questions = [
