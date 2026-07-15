@@ -1,25 +1,59 @@
-import { useAuthStore } from "@/stores/auth";
 import { call } from "frappe-ui";
+import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
 
-// localStorage mirrors the boot flag so a failed persist can't re-loop the
-// wizard next session. Distinct from the `useOnboarding` step tracker.
 export const PERSONA_DONE_KEY = "helpdesk_persona_captured";
 
-// Both sources are already loaded (localStorage + the auth boot), so this stays
-// synchronous — the guard decides without a settings round-trip or a flash.
-export function isPersonaCaptured(): boolean {
-  if (localStorage.getItem(PERSONA_DONE_KEY)) return true;
-  return !!useAuthStore().personaCaptured;
+let personaChecked = false;
+
+// Minimal auth contract, so this module doesn't import the auth store (cycle).
+interface PersonaAuth {
+  isLoggedIn: boolean;
+  hasDeskAccess: boolean;
+  isAdmin: boolean;
+  personaCaptured: boolean;
 }
 
-// The questionnaire's answers only feed telemetry, so there's no point showing
-// it when telemetry is disabled.
+function isPersonaCaptured(auth: PersonaAuth): boolean {
+  if (localStorage.getItem(PERSONA_DONE_KEY)) return true;
+  return !!auth.personaCaptured;
+}
+
 export async function telemetryEnabled(): Promise<boolean> {
   const config = await call("frappe.utils.telemetry.pulse.client.boot_config");
   return !!config?.enabled;
 }
 
-// The org name entered in the questionnaire becomes the HD Settings brand name.
+// `done` means the guard should stop and next(to).
+export async function personaRedirect(
+  to: RouteLocationNormalized,
+  auth: PersonaAuth
+): Promise<{ done: boolean; to?: RouteLocationRaw }> {
+  const isDeskAdmin = auth.isLoggedIn && auth.hasDeskAccess && auth.isAdmin;
+
+  if (to.name === "Persona") {
+    try {
+      const allow = isDeskAdmin && !isPersonaCaptured(auth);
+      return { done: true, to: allow ? undefined : { name: "Home" } };
+    } catch {
+      return { done: true, to: { name: "Home" } };
+    }
+  }
+
+  // Interrupt an eligible admin once per session, only if telemetry is on.
+  if (isDeskAdmin && !personaChecked) {
+    personaChecked = true;
+    try {
+      if (!isPersonaCaptured(auth) && (await telemetryEnabled())) {
+        return { done: true, to: { name: "Persona" } };
+      }
+    } catch {
+      // fail open
+    }
+  }
+
+  return { done: false };
+}
+
 export async function markPersonaCaptured(brandName?: string): Promise<void> {
   localStorage.setItem(PERSONA_DONE_KEY, "1");
   await call("helpdesk.api.onboarding.mark_persona_captured", {

@@ -1,5 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
-import { isPersonaCaptured, telemetryEnabled } from "@/persona";
+import { personaRedirect } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -8,9 +8,6 @@ const { isMobileView } = useScreenSize();
 
 export const LOGIN_PAGE = "/login";
 
-// The persona interrupt runs at most once per session.
-let personaChecked = false;
-
 // type the meta fields
 declare module "vue-router" {
   interface RouteMeta {
@@ -18,6 +15,7 @@ declare module "vue-router" {
     agent?: boolean;
     admin?: boolean;
     public?: boolean;
+    fullScreen?: boolean;
     onSuccessRoute?: string;
     parent?: string;
   }
@@ -198,6 +196,7 @@ const routes = [
   {
     path: "/onboarding",
     name: "Persona",
+    meta: { fullScreen: true },
     component: () => import("@/pages/PersonaForm.vue"),
   },
 
@@ -225,31 +224,8 @@ router.beforeEach(async (to, _, next) => {
     await authStore.init();
   }
 
-  const isDeskAdmin =
-    authStore.isLoggedIn && authStore.hasDeskAccess && authStore.isAdmin;
-
-  // Guard the wizard page: only an uncaptured admin may view it, even via URL.
-  if (to.name === "Persona") {
-    try {
-      const allow = isDeskAdmin && !isPersonaCaptured();
-      return next(allow ? undefined : { name: "Home" });
-    } catch {
-      return next({ name: "Home" }); // fail safe — never break navigation
-    }
-  }
-
-  // Interrupt an eligible admin once per session — but only when telemetry is
-  // on, since the wizard's answers only feed telemetry.
-  if (isDeskAdmin && !personaChecked) {
-    personaChecked = true;
-    try {
-      if (!isPersonaCaptured() && (await telemetryEnabled())) {
-        return next({ name: "Persona" });
-      }
-    } catch {
-      // fail open — never block navigation on the persona check
-    }
-  }
+  const persona = await personaRedirect(to, authStore);
+  if (persona.done) return next(persona.to);
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";

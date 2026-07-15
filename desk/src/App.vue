@@ -1,6 +1,6 @@
 <template>
   <FrappeUIProvider>
-    <router-view v-if="route.name === 'Persona'" />
+    <router-view v-if="route.meta.fullScreen" />
     <PortalRoot v-else />
   </FrappeUIProvider>
   <Dialogs />

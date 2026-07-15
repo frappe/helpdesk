@@ -178,8 +178,9 @@ const dropdown = computed(() =>
   question.value.type === "text" ? question.value.dropdown : undefined
 );
 
-// "Other" free-text reveal (choice questions only, gated on that literal option).
-const otherKey = computed(() => `${question.value.key}_other`);
+// "Other" free-text is stored under a `<key>_other` sibling answer key.
+const OTHER_SUFFIX = "_other";
+const otherKey = computed(() => `${question.value.key}${OTHER_SUFFIX}`);
 const isOtherSelected = computed(() => {
   const otherOption = choiceOptions.value.find((o) => o.value === "other");
   return otherOption ? isSelected(otherOption) : false;
