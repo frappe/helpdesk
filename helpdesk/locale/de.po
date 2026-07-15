@@ -203,7 +203,7 @@ msgstr "Neuen Artikel hinzufügen"
 
 #: desk/src/components/contact/EditContactDialog.vue:99
 msgid "Add Phone"
-msgstr ""
+msgstr "Telefonnummer hinzufügen"
 
 #: desk/src/components/view-controls/SortBy.vue:148
 msgid "Add Sort"
@@ -279,7 +279,7 @@ msgstr "Zu arbeitsfreien Tagen hinzufügen"
 #: desk/src/components/EmailEditor.vue:83
 #: desk/src/components/EmailEditor.vue:101
 msgid "Add to recipients"
-msgstr ""
+msgstr "Zu Empfängern hinzufügen"
 
 #: desk/src/components/Settings/Agents.vue:4
 msgid "Add, manage agents and assign roles to them."
@@ -504,11 +504,11 @@ msgstr "Möchten Sie diese Artikel wirklich löschen?"
 
 #: desk/src/pages/contact/Contact.vue:102
 msgid "Are you sure you want to delete this contact? The contact will be permanently deleted and unlinked from any associated customers and tickets."
-msgstr ""
+msgstr "Möchten Sie diesen Kontakt wirklich löschen? Der Kontakt wird dauerhaft gelöscht und von allen zugehörigen Kunden und Tickets getrennt."
 
 #: desk/src/pages/customer/Customer.vue:94
 msgid "Are you sure you want to delete this customer? The reference to this customer will be removed from all the related tickets."
-msgstr ""
+msgstr "Möchten Sie diesen Kunden wirklich löschen? Der Verweis auf diesen Kunden wird aus allen zugehörigen Tickets entfernt."
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:204
 msgid "Are you sure you want to delete this ticket? This is an irreversible action and cannot be undone."
@@ -549,7 +549,7 @@ msgstr "Möchten Sie das Logo wirklich entfernen?"
 
 #: desk/src/components/customer/ContactCard.vue:295
 msgid "Are you sure you want to remove this contact from the customer?"
-msgstr ""
+msgstr "Möchten Sie diesen Kontakt wirklich vom Kunden entfernen?"
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:116
 msgid "Are you sure you want to reset the content? Current content will be overridden."
@@ -813,7 +813,7 @@ msgstr "Durchschn. Rückmeldungsbewertung"
 
 #: desk/src/components/customer/TicketStats.vue:13
 msgid "Avg. Feedback Received"
-msgstr ""
+msgstr "Durchschn. erhaltene Rückmeldungen"
 
 #: helpdesk/api/dashboard.py:197
 msgid "Avg. First Response"
@@ -821,7 +821,7 @@ msgstr "Durchschn. erste Antwort"
 
 #: desk/src/components/customer/TicketStats.vue:49
 msgid "Avg. First Response Time"
-msgstr ""
+msgstr "Durchschn. erste Antwortzeit"
 
 #: helpdesk/api/dashboard.py:216
 msgid "Avg. Resolution"
@@ -829,11 +829,11 @@ msgstr "Durchschn. Lösung"
 
 #: desk/src/components/customer/TicketStats.vue:62
 msgid "Avg. Resolution Time"
-msgstr ""
+msgstr "Durchschn. Lösungszeit"
 
 #: helpdesk/api/dashboard.py:243
 msgid "Avg. feedback rating for tickets resolved in this period"
-msgstr ""
+msgstr "Durchschnittliche Rückmeldungsbewertung für in diesem Zeitraum gelöste Tickets"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:121
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:290
@@ -982,15 +982,15 @@ msgstr "Kann alle Aspekte von Helpdesk verwalten."
 
 #: desk/src/components/customer/InviteContactDialog.vue:134
 msgid "Can raise tickets on behalf of the org and manage the tickets they raised."
-msgstr ""
+msgstr "Kann Tickets im Namen der Organisation erstellen und die von ihm erstellten Tickets verwalten."
 
 #: desk/src/components/customer/InviteContactDialog.vue:137
 msgid "Can view all tickets raised by the org and assign other members as managers."
-msgstr ""
+msgstr "Kann alle von der Organisation erstellten Tickets einsehen und andere Mitglieder als Manager zuweisen."
 
 #: desk/src/components/customer/ContactCard.vue:22
 msgid "Can view tickets raised by all contacts of the customer."
-msgstr ""
+msgstr "Kann Tickets aller Kontakte des Kunden einsehen."
 
 #: desk/src/components/Settings/InviteAgents.vue:156
 msgid "Can work on tickets, create custom views and manage private views."
@@ -1213,7 +1213,7 @@ msgstr "Klicken Sie auf „Zu arbeitsfreien Tagen hinzufügen“. Dadurch wird d
 
 #: desk/src/components/EmailMultiSelect.vue:11
 msgid "Click to copy"
-msgstr ""
+msgstr "Zum Kopieren klicken"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
@@ -1395,7 +1395,7 @@ msgstr "Kontakt-HTML"
 
 #: desk/src/components/customer/ContactCard.vue:313
 msgid "Contact removed successfully"
-msgstr ""
+msgstr "Kontakt erfolgreich entfernt"
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:84
 msgid "Contact updated successfully."
@@ -1403,7 +1403,7 @@ msgstr "Kontakt erfolgreich aktualisiert."
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:277
 msgid "Contact {0} has no email address"
-msgstr ""
+msgstr "Kontakt {0} hat keine E-Mail-Adresse"
 
 #. Label of the contacts (Table) field in DocType 'HD Customer'
 #: desk/src/components/customer/CustomerContactTab.vue:4
@@ -1416,7 +1416,7 @@ msgstr "Kontakte"
 
 #: desk/src/components/customer/InviteContactDialog.vue:168
 msgid "Contacts added successfully"
-msgstr ""
+msgstr "Kontakte erfolgreich hinzugefügt"
 
 #. Label of the content_section (Section Break) field in DocType 'HD Article'
 #. Label of the content (Text Editor) field in DocType 'HD Article'
@@ -1449,7 +1449,7 @@ msgstr "Die Spalte `name` konnte in tabHD Ticket nicht gefunden werden"
 
 #: helpdesk/patches/move_contact_dynamic_link_to_hd_customer.py:74
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
-msgstr ""
+msgstr "Kontakte für {0} Kunde(n) konnten nicht migriert werden: {1}. Beheben Sie die zugrunde liegenden Daten und führen Sie den Patch erneut aus."
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:848
 msgid "Could not send an acknowledgement email due to: {0}"
@@ -1485,7 +1485,7 @@ msgstr "Kontakt erstellen & einladen"
 
 #: desk/src/components/contact/NewContactDialog.vue:5
 msgid "Create Contact"
-msgstr ""
+msgstr "Kontakt erstellen"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:4
 msgid "Create Customer"
@@ -1561,7 +1561,7 @@ msgstr "Kunde"
 #: desk/src/components/customer/ContactCard.vue:177
 #: desk/src/components/customer/InviteContactDialog.vue:130
 msgid "Customer Manager"
-msgstr ""
+msgstr "Kunden-Manager"
 
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1580,11 +1580,11 @@ msgstr "Kundentyp"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:142
 msgid "Customer created"
-msgstr ""
+msgstr "Kunde erstellt"
 
 #: desk/src/components/customer/EditCustomerDialog.vue:119
 msgid "Customer name cannot be empty"
-msgstr ""
+msgstr "Kundenname darf nicht leer sein"
 
 #: desk/src/components/layouts/Sidebar.vue:357
 msgid "Customer portal"
@@ -1593,7 +1593,7 @@ msgstr "Kundenportal"
 #: desk/src/components/customer/EditCustomerDialog.vue:136
 #: desk/src/components/customer/EditCustomerDialog.vue:150
 msgid "Customer updated"
-msgstr ""
+msgstr "Kunde aktualisiert"
 
 #: desk/src/pages/customer/Customer.vue:198
 #: desk/src/pages/customer/Customers.vue:6
@@ -1746,7 +1746,7 @@ msgstr "Löschen"
 
 #: desk/src/pages/customer/Customer.vue:92
 msgid "Delete Contact"
-msgstr ""
+msgstr "Kontakt löschen"
 
 #: desk/src/pages/ticket/Tickets.vue:530
 msgid "Delete View"
@@ -1766,7 +1766,7 @@ msgstr "{0} löschen"
 
 #: desk/src/components/DeleteWithTicketsDialog.vue:10
 msgid "Delete {0} ticket(s)"
-msgstr ""
+msgstr "{0} Ticket(s) löschen"
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
 #. Label of the description (Text Editor) field in DocType 'HD Holiday'
@@ -1902,7 +1902,7 @@ msgstr "Dokumententyp"
 
 #: desk/src/components/contact/EditContactDialog.vue:45
 msgid "Doe"
-msgstr ""
+msgstr "Mustermann"
 
 #. Label of the domain (Data) field in DocType 'HD Customer'
 #: desk/src/components/customer/NewCustomerDialog.vue:50
@@ -1950,7 +1950,7 @@ msgstr "Gespeicherte Antwort duplizieren"
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:80
 msgid "Duplicate contacts are not allowed"
-msgstr ""
+msgstr "Doppelte Kontakte sind nicht zulässig"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
@@ -2013,11 +2013,11 @@ msgstr "Anrufprotokoll bearbeiten"
 
 #: desk/src/components/contact/EditContactDialog.vue:8
 msgid "Edit Contact"
-msgstr ""
+msgstr "Kontakt bearbeiten"
 
 #: desk/src/components/customer/EditCustomerDialog.vue:14
 msgid "Edit Customer"
-msgstr ""
+msgstr "Kunde bearbeiten"
 
 #: desk/src/components/Settings/EmailAdd.vue:70
 #: desk/src/components/Settings/EmailEdit.vue:63
@@ -2098,11 +2098,11 @@ msgstr "E-Mail-Konto erfolgreich aktualisiert"
 #. Description of the 'Email ID' (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Email address of the primary contact"
-msgstr ""
+msgstr "Geben Sie die E-Mail-Adresse des Hauptkontakts ein"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:196
 msgid "Email settings updated successfully."
-msgstr ""
+msgstr "E-Mail-Einstellungen erfolgreich aktualisiert"
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:40
 #: desk/src/pages/SearchAgent.vue:352
@@ -2200,7 +2200,7 @@ msgstr "Markennamen eingeben"
 
 #: desk/src/components/customer/InviteContactDialog.vue:12
 msgid "Enter email address"
-msgstr ""
+msgstr "E-Mail-Adresse eingeben"
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:64
 msgid "Enter the new name for the team"
@@ -2208,11 +2208,11 @@ msgstr "Geben Sie den neuen Namen für das Team ein"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:182
 msgid "Enter the primary contact's email"
-msgstr ""
+msgstr "Geben Sie die E-Mail-Adresse des Hauptkontakts ein"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:178
 msgid "Enter the primary contact's first name"
-msgstr ""
+msgstr "Geben Sie den Vornamen des Hauptkontakts ein"
 
 #: helpdesk/api/knowledge_base.py:86
 msgid "Error moving article to category"
@@ -2233,7 +2233,7 @@ msgstr "Excel"
 
 #: desk/src/components/customer/InviteContactDialog.vue:24
 msgid "Existing users join instantly. Others get an invite."
-msgstr ""
+msgstr "Bestehende Benutzer treten sofort bei. Andere erhalten eine Einladung."
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:4
 #: desk/src/components/Settings/Telephony/Telephony.vue:96
@@ -2271,7 +2271,7 @@ msgstr "Fehlgeschlagen"
 
 #: desk/src/components/customer/TicketStats.vue:39
 msgid "Failed SLAs"
-msgstr ""
+msgstr "Nicht erfüllte SLAs"
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:278
 msgid "Failed to create category"
@@ -2387,7 +2387,7 @@ msgstr "Rückmeldungs-E-Mail wurde an den Kunden gesendet"
 
 #: desk/src/components/contact/ContactFeedback.vue:20
 msgid "Feedback from this contact will appear here once available."
-msgstr ""
+msgstr "Rückmeldungen dieses Kontakts werden hier angezeigt, sobald verfügbar."
 
 #: desk/src/components/knowledge-base/ArticleFeedback.vue:79
 msgid "Feedback submitted successfully."
@@ -2460,7 +2460,7 @@ msgstr "Zuerst geantwortet auf"
 
 #: desk/src/components/customer/TicketsTab.vue:224
 msgid "First Response"
-msgstr ""
+msgstr "Erste Antwort"
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -2577,7 +2577,7 @@ msgstr "Zu Ticket #{0} wechseln"
 
 #: desk/src/components/customer/ContactCard.vue:220
 msgid "Grant Manager Access"
-msgstr ""
+"Manager-Zugriff gewähren"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
@@ -2666,17 +2666,17 @@ msgstr "HD Kunde"
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "HD Customer Manager"
-msgstr ""
+msgstr "HD Kunden-Manager"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_customer_member/hd_customer_member.json
 msgid "HD Customer Member"
-msgstr ""
+msgstr "HD Kundenmitglied"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 msgid "HD Email Feedback"
-msgstr ""
+msgstr "HD E-Mail-Rückmeldung"
 
 #. Name of a DocType
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
@@ -3045,7 +3045,7 @@ msgstr "Ungültige Verfügbarkeit"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:186
 msgid "Invalid email address"
-msgstr ""
+msgstr "Ungültige E-Mail-Adresse"
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:478
 #: desk/src/components/Settings/Holiday/HolidayView.vue:325
@@ -3063,7 +3063,7 @@ msgstr "Ungültige Telefonnummer"
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:264
 msgid "Invalid role {0}"
-msgstr ""
+msgstr "Ungültige Rolle {0}"
 
 #: desk/src/pages/contact/Contact.vue:251
 msgid "Invitation Expired"
@@ -3072,16 +3072,16 @@ msgstr "Einladung abgelaufen"
 #: desk/src/components/Settings/InviteAgents.vue:246
 #: desk/src/components/customer/RevokeInviteButton.vue:40
 msgid "Invitation cancelled successfully"
-msgstr ""
+msgstr "Einladung erfolgreich storniert"
 
 #: desk/src/pages/contact/Contact.vue:253
 msgid "Invitation expired. Resend to invite again."
-msgstr ""
+msgstr "Einladung abgelaufen. Erneut senden, um wieder einzuladen."
 
 #: desk/src/components/customer/CustomerContactTab.vue:7
 #: desk/src/components/customer/InviteContactDialog.vue:77
 msgid "Invite"
-msgstr ""
+msgstr "Einladen"
 
 #: desk/src/components/Settings/InviteAgents.vue:3
 msgid "Invite Agents"
@@ -3089,7 +3089,7 @@ msgstr "Agenten einladen"
 
 #: desk/src/components/customer/InviteContactDialog.vue:2
 msgid "Invite Contact"
-msgstr ""
+msgstr "Kontakt einladen"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:87
 msgid "Invite agent"
@@ -3110,11 +3110,11 @@ msgstr "Per E-Mail einladen"
 
 #: desk/src/pages/contact/Contact.vue:259
 msgid "Invite sent. Waiting for the user to accept."
-msgstr ""
+msgstr "Einladung gesendet. Warten auf Annahme durch den Benutzer."
 
 #: desk/src/components/EmailMultiSelect.vue:145
 msgid "Invite via email"
-msgstr ""
+msgstr "Per E-Mail einladen"
 
 #: desk/src/pages/contact/Contact.vue:257
 msgid "Invited"
@@ -3122,7 +3122,7 @@ msgstr "Eingeladen"
 
 #: desk/src/components/customer/InviteContactDialog.vue:57
 msgid "Invited by"
-msgstr ""
+msgstr "Eingeladen von"
 
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
@@ -3142,7 +3142,7 @@ msgstr "Ist Standard"
 #. Label of the is_manager (Check) field in DocType 'HD Customer Member'
 #: helpdesk/helpdesk/doctype/hd_customer_member/hd_customer_member.json
 msgid "Is Manager"
-msgstr ""
+msgstr "Ist Manager"
 
 #. Label of the is_standard (Check) field in DocType 'HD Form Script'
 #. Label of the is_standard (Check) field in DocType 'HD View'
@@ -3174,7 +3174,7 @@ msgstr "Einrichtung abgeschlossen"
 
 #: desk/src/components/contact/EditContactDialog.vue:38
 msgid "John"
-msgstr ""
+msgstr "Max"
 
 #: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
@@ -3311,7 +3311,7 @@ msgstr "Letzter Monat"
 
 #: desk/src/components/customer/ContactCard.vue:134
 msgid "Last seen"
-msgstr ""
+msgstr "Zuletzt gesehen"
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
 msgid "Last user assigned by this rule"
@@ -3521,7 +3521,7 @@ msgstr "Mobilfunknummer"
 #. Description of the 'Mobile No' (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Mobile no. of the primary contact"
-msgstr ""
+msgstr "Mobilnummer des Hauptansprechpartners"
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -3589,7 +3589,7 @@ msgstr "Gewichtung des Namens"
 
 #: desk/src/components/customer/NewCustomerDialog.vue:151
 msgid "Name is required"
-msgstr ""
+msgstr "Name is erforderlich"
 
 #. Description of the 'Label (customer view)' (Data) field in DocType 'HD
 #. Ticket Status'
@@ -3603,7 +3603,7 @@ msgstr "Navigation"
 
 #: desk/src/components/contact/FeedbackList.vue:124
 msgid "Negative"
-msgstr ""
+msgstr "Negativ"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:392
 #: desk/src/pages/home/components/RecentFeedback.vue:410
@@ -3745,7 +3745,7 @@ msgstr "Kein Team"
 #: desk/src/components/customer/ContactCard.vue:144
 #: desk/src/components/customer/ContactCard.vue:148
 msgid "No active tickets"
-msgstr ""
+msgstr "Keine aktiven Tickets"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:206
 msgid "No additional comments"
@@ -3785,7 +3785,7 @@ msgstr "Keine Diagramme hinzugefügt"
 
 #: desk/src/components/customer/CustomerContactTab.vue:29
 msgid "No contacts found"
-msgstr ""
+msgstr "Keine Kontakte gefunden"
 
 #: desk/src/pages/contact/Contacts.vue:66
 msgid "No contacts found for the applied filters. Try adjusting or clearing your filters."
@@ -3793,11 +3793,11 @@ msgstr "Keine Kontakte für die angewendeten Filter gefunden. Passen Sie Ihre Fi
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:247
 msgid "No contacts to add"
-msgstr ""
+msgstr "Keine Kontakte zum Hinzufügen"
 
 #: desk/src/components/frappe-ui/PhoneControl/PhoneControl.vue:114
 msgid "No country found"
-msgstr ""
+msgstr "Kein Land gefunden"
 
 #: desk/src/pages/customer/Customers.vue:69
 msgid "No customers found for the applied filters. Try adjusting or clearing your filters."
@@ -3813,7 +3813,7 @@ msgstr "Keine Rückmeldung"
 
 #: desk/src/components/contact/ContactFeedback.vue:16
 msgid "No feedback yet"
-msgstr ""
+msgstr "Noch kein Feedback"
 
 #: desk/src/components/view-controls/filter/FilterFieldList.vue:55
 msgid "No fields found"
@@ -3866,7 +3866,7 @@ msgstr "Keine Ergebnisse gefunden"
 
 #: desk/src/components/contact/FeedbackList.vue:28
 msgid "No reviews found"
-msgstr ""
+msgstr "Keine Bewertungen gefunden"
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:113
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:91
@@ -3896,7 +3896,7 @@ msgstr "Keine Tickets ausgewählt"
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:166
 msgid "No user linked to contact {0}"
-msgstr ""
+msgstr "Kein Benutzer mit Kontakt {0} verknüpft"
 
 #: helpdesk/api/ticket.py:76 helpdesk/utils.py:187
 msgid "Not Allowed"
@@ -3982,7 +3982,7 @@ msgstr "Kommentarfeld öffnen"
 
 #: desk/src/components/contact/EditContactDialog.vue:147
 msgid "Open customer"
-msgstr ""
+msgstr "Kunde öffnen"
 
 #: desk/src/components/modals/ShortcutsModal.vue:81
 msgid "Open help"
@@ -4167,7 +4167,7 @@ msgstr "Telefon"
 #: desk/src/components/contact/EditContactDialog.vue:24
 #: desk/src/components/contact/NewContactDialog.vue:42
 msgid "Photo"
-msgstr ""
+msgstr "Foto"
 
 #: desk/src/pages/ticket/TicketFeedback.vue:36
 msgid "Pick an option"
@@ -4268,7 +4268,7 @@ msgstr "Richtlinienname"
 
 #: desk/src/components/contact/FeedbackList.vue:123
 msgid "Positive"
-msgstr ""
+msgstr "Positiv"
 
 #: desk/src/pages/home/components/RecentFeedback.vue:388
 #: desk/src/pages/home/components/RecentFeedback.vue:411
@@ -4322,11 +4322,11 @@ msgstr "Hauptkontakt"
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:83
 msgid "Primary contact must be one of the listed contacts"
-msgstr ""
+msgstr "Der Hauptkontakt muss einer der aufgeführten Kontakte sein"
 
 #: desk/src/components/customer/ContactCard.vue:280
 msgid "Primary contact updated"
-msgstr ""
+msgstr "Hauptkontakt aktualisiert"
 
 #. Label of the priorities (Table) field in DocType 'HD Service Level
 #. Agreement'
@@ -4557,7 +4557,7 @@ msgstr "Entfernen"
 #: desk/src/components/customer/ContactCard.vue:190
 #: desk/src/components/customer/ContactCard.vue:294
 msgid "Remove Contact"
-msgstr ""
+msgstr "Kontakt entfernen"
 
 #: desk/src/components/Settings/General/components/Branding.vue:110
 msgid "Remove Logo"
@@ -4579,7 +4579,7 @@ msgstr "Bild entfernen"
 #: desk/src/components/contact/ContactInputRow.vue:20
 #: desk/src/components/contact/ContactInputRow.vue:24
 msgid "Remove primary"
-msgstr ""
+msgstr "Primär entfernen"
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:252
 #: desk/src/components/Settings/Teams/TeamsList.vue:161
@@ -4607,7 +4607,7 @@ msgstr "Filter ersetzen"
 
 #: desk/src/components/ImageAvatar.vue:17
 msgid "Replace image"
-msgstr ""
+msgstr "Bild ersetzen"
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
@@ -4653,7 +4653,7 @@ msgstr "Erforderlich"
 
 #: desk/src/pages/contact/Contact.vue:279
 msgid "Resend Invite"
-msgstr ""
+msgstr "Einladung erneut senden"
 
 #: desk/src/components/SelectDropdown.vue:47 desk/src/pages/home/Home.vue:19
 msgid "Reset"
@@ -4777,11 +4777,11 @@ msgstr "Bewertungen"
 
 #: desk/src/components/customer/RevokeInviteButton.vue:12
 msgid "Revoke Invite"
-msgstr ""
+msgstr "Einladung widerrufen"
 
 #: desk/src/components/customer/ContactCard.vue:221
 msgid "Revoke Manager Access"
-msgstr ""
+msgstr "Manager-Zugriff widerrufen"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
@@ -4978,11 +4978,11 @@ msgstr "Agenten suchen..."
 
 #: desk/src/components/customer/TicketsTab.vue:7
 msgid "Search by ID or Subject"
-msgstr ""
+msgstr "Nach ID oder Betreff suchen"
 
 #: desk/src/components/frappe-ui/PhoneControl/PhoneControl.vue:77
 msgid "Search country"
-msgstr ""
+msgstr "Land suchen"
 
 #: desk/src/components/view-controls/filter/Filter.vue:112
 msgid "Search fields..."
@@ -5047,7 +5047,7 @@ msgstr "Kategorie auswählen"
 
 #: desk/src/components/contact/EditContactDialog.vue:161
 msgid "Select Customer"
-msgstr ""
+msgstr "Kunde auswählen"
 
 #: desk/src/pages/dashboard/Dashboard.vue:25
 msgid "Select Range"
@@ -5071,7 +5071,7 @@ msgstr "Bewertung auswählen"
 
 #: desk/src/components/frappe-ui/PhoneControl/PhoneControl.vue:21
 msgid "Select country"
-msgstr ""
+msgstr "Land auswählen"
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:37
 #: desk/src/pages/home/components/RecentFeedback.vue:151
@@ -5088,7 +5088,7 @@ msgstr "Ticket für Vorschau auswählen"
 
 #: desk/src/components/TimezoneControl.vue:5
 msgid "Select timezone"
-msgstr ""
+msgstr "Zeitzone auswählen"
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:132
 msgid "Select what type all tickets get by default."
@@ -5118,7 +5118,7 @@ msgstr "Rückmeldung senden, wenn"
 
 #: desk/src/pages/contact/Contact.vue:294
 msgid "Send reset password email"
-msgstr ""
+msgstr "Kennwort-Zurücksetzen-E-Mail senden"
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
@@ -5169,7 +5169,7 @@ msgstr "Telefonnummer festlegen"
 
 #: desk/src/components/customer/ContactCard.vue:265
 msgid "Set Primary Contact"
-msgstr ""
+msgstr "Primärkontakt festlegen"
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
 msgid "Set Resolution Time for Priority {0} in row {1}."
@@ -5181,7 +5181,7 @@ msgstr "Legen Sie die Reaktionszeit für die Priorität {0} in der Zeile {1} fes
 
 #: desk/src/components/customer/ContactCard.vue:156
 msgid "Set as Primary"
-msgstr ""
+msgstr "Als primär festlegen"
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
 msgid "Set as default SLA"
@@ -5190,7 +5190,7 @@ msgstr "Als Standard-SLA festlegen"
 #: desk/src/components/contact/ContactInputRow.vue:32
 #: desk/src/components/contact/ContactInputRow.vue:36
 msgid "Set as primary"
-msgstr ""
+msgstr "Als primär festlegen"
 
 #: desk/src/components/AvailabilityMenu.vue:5
 #: desk/src/components/AvailabilityMenuMobile.vue:25
@@ -5730,7 +5730,7 @@ msgstr "Das Zuweisungsbedingung-JSON „{0}“ ist ungültig: {1}"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:297
 msgid "The contact {0} is linked to multiple customers. Please select the customer manually."
-msgstr ""
+msgstr "Der Kontakt {0} ist mit mehreren Kunden verknüpft. Bitte wählen Sie den Kunden manuell aus."
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:13
 msgid "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
@@ -5746,7 +5746,7 @@ msgstr "Die Anzahl der Tage muss 1 oder mehr betragen"
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:279
 msgid "The selected customer {0} is not linked to the contact {1}.Please select a valid customer or update the contact's linked customers."
-msgstr ""
+msgstr "Der ausgewählte Kunde {0} ist nicht mit dem Kontakt {1} verknüpft. Bitte wählen Sie einen gültigen Kunden aus oder aktualisieren Sie die verknüpften Kunden des Kontakts."
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:40
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
@@ -5770,11 +5770,11 @@ msgstr "Es sollte mindestens eine Zuweisungsregel für das Ticket geben"
 
 #: desk/src/components/customer/ContactCard.vue:223
 msgid "They'll get access to tickets raised by everyone in the organisation."
-msgstr ""
+msgstr "Sie erhalten Zugriff auf Tickets, die von allen in der Organisation erstellt wurden."
 
 #: desk/src/components/customer/ContactCard.vue:226
 msgid "They'll only see their own tickets going forward."
-msgstr ""
+msgstr "Sie sehen künftig nur noch ihre eigenen Tickets."
 
 #: helpdesk/extends/assignment_rule.py:51
 msgid "This Assignment Rule is linked to the Team {0}.</br> User {1} is added in the Assignment Rule but not in the linked Team. Please add the user in the {2} to ensure proper team structure."
@@ -5787,7 +5787,7 @@ msgstr "Diese Aktion ist unwiderruflich."
 
 #: desk/src/components/customer/ContactCard.vue:266
 msgid "This contact will become the primary point of contact and will be able to view tickets raised by all other contacts in the organisation."
-msgstr ""
+msgstr "Dieser Kontakt wird zum Hauptansprechpartner und kann Tickets aller anderen Kontakte der Organisation einsehen."
 
 #: desk/src/components/ticket/TicketCustomerSidebar.vue:68
 msgid "This date is calculated based on configured SLAs, working hours, and holidays."
@@ -5874,7 +5874,7 @@ msgstr "Ticket-Konfiguration"
 
 #: desk/src/components/customer/TicketsTab.vue:218
 msgid "Ticket ID"
-msgstr ""
+msgstr "Ticket-ID"
 
 #: desk/src/components/ticket-agent/TicketDetailsTab.vue:55
 msgid "Ticket Info"
@@ -6197,7 +6197,7 @@ msgstr "Nachricht eingeben"
 
 #: desk/src/components/customer/InviteContactDialog.vue:19
 msgid "Type an email address"
-msgstr ""
+msgstr "E-Mail-Adresse eingeben"
 
 #: desk/src/pages/call-logs/CallLogModal.vue:360
 msgid "Type is required"
@@ -6264,7 +6264,7 @@ msgstr "Nicht gespeicherte Änderungen"
 
 #: helpdesk/api/ticket_stats.py:26
 msgid "Unsupported doctype '{0}' for ticket stats."
-msgstr ""
+msgstr "Nicht unterstützter DocType „{0}“ für Ticket-Statistiken."
 
 #: desk/src/pages/call-logs/CallLogModal.vue:8
 msgid "Untitled"
@@ -6294,7 +6294,7 @@ msgstr "Foto hochladen"
 
 #: desk/src/components/ImageAvatar.vue:78
 msgid "Upload an image in PNG or JPG format"
-msgstr ""
+msgstr "Bild im PNG- oder JPG-Format hochladen"
 
 #: desk/src/components/ImageAvatar.vue:39
 msgid "Upload image"
@@ -6328,7 +6328,7 @@ msgstr "Lösungszeit des Benutzers"
 
 #: desk/src/components/contact/FeedbackList.vue:6
 msgid "User Reviews"
-msgstr ""
+msgstr "Benutzerbewertungen"
 
 #: desk/src/components/Settings/General/General.vue:42
 msgid "User Signup"
@@ -6478,7 +6478,7 @@ msgstr "Gelb"
 
 #: helpdesk/api/ticket_stats.py:35
 msgid "You are not allowed to view another agent's stats."
-msgstr ""
+msgstr "Sie dürfen die Statistiken eines anderen Agenten nicht einsehen."
 
 #: helpdesk/api/dashboard.py:36
 msgid "You are not allowed to view this dashboard data."
@@ -6526,7 +6526,7 @@ msgstr "Sie haben keine Berechtigung, auf diese Ressource zuzugreifen"
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:268
 msgid "You do not have permission to update contacts"
-msgstr ""
+msgstr "Sie sind nicht berechtigt, Kontakte zu aktualisieren"
 
 #: desk/src/pages/ticket/TicketAgent.vue:37
 msgid "You don't have access to this ticket, or it no longer exists."
@@ -6554,11 +6554,11 @@ msgstr "Ihre Leistung ist"
 
 #: desk/src/components/customer/ContactCard.vue:116
 msgid "active ticket"
-msgstr ""
+msgstr "aktives Ticket"
 
 #: desk/src/components/customer/ContactCard.vue:116
 msgid "active tickets"
-msgstr ""
+msgstr "aktive Tickets"
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
@@ -6711,15 +6711,15 @@ msgstr "ansichten"
 
 #: desk/src/components/contact/ContactCustomers.vue:53
 msgid "{0} Customers"
-msgstr ""
+msgstr "{0} Kunden"
 
 #: desk/src/components/EmailMultiSelect.vue:270
 msgid "{0} is already added"
-msgstr ""
+msgstr "{0} wurde bereits hinzugefügt"
 
 #: desk/src/components/EmailMultiSelect.vue:148
 msgid "{0} is an Invalid Email Address"
-msgstr ""
+msgstr "{0} ist keine gültige E-Mail-Adresse"
 
 #: desk/src/components/ticket-agent/AssignTo.vue:553
 msgid "{0} is currently away."
@@ -6731,11 +6731,11 @@ msgstr "{0} ist derzeit nicht verfügbar."
 
 #: desk/src/components/EmailMultiSelect.vue:265
 msgid "{0} is not an existing contact"
-msgstr ""
+msgstr "{0} ist kein bestehender Kontakt"
 
 #: desk/src/components/EmailMultiSelect.vue:264
 msgid "{0} is not an existing user"
-msgstr ""
+msgstr "{0} ist kein bestehender Benutzer"
 
 #: desk/src/components/ListViewBuilder.vue:307
 msgid "{0} item(s) deleted successfully"
