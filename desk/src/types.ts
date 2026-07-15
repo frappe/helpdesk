@@ -636,8 +636,6 @@ export interface HDSettings {
   assignWithinTeam: boolean;
   doNotRestrictTicketsWithoutAnAgentGroup: boolean;
   restrictTicketsByAgentGroup: boolean;
-  updateStatusTo: string;
-  autoUpdateStatus: boolean;
   isFeedbackMandatory: boolean;
   allowAnyoneToCreateTickets: boolean;
   defaultTicketType: string;

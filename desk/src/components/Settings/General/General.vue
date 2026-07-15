@@ -93,8 +93,6 @@ const settingsData = ref({
   assignWithinTeam: false,
   doNotRestrictTicketsWithoutAnAgentGroup: false,
   restrictTicketsByAgentGroup: false,
-  updateStatusTo: "",
-  autoUpdateStatus: false,
   isFeedbackMandatory: false,
   enableCommentReactions: false,
   allowAnyoneToCreateTickets: false,
@@ -145,8 +143,6 @@ const saveSettingsResource = createResource({
           settingsData.value.doNotRestrictTicketsWithoutAnAgentGroup,
         restrict_tickets_by_agent_group:
           settingsData.value.restrictTicketsByAgentGroup,
-        update_status_to: settingsData.value.updateStatusTo,
-        auto_update_status: settingsData.value.autoUpdateStatus,
         is_feedback_mandatory: settingsData.value.isFeedbackMandatory,
         enable_comment_reactions: settingsData.value.enableCommentReactions,
         allow_anyone_to_create_tickets:
@@ -184,8 +180,6 @@ const transformData = (data: any) => {
       data.do_not_restrict_tickets_without_an_agent_group
     ),
     restrictTicketsByAgentGroup: Boolean(data.restrict_tickets_by_agent_group),
-    updateStatusTo: data.update_status_to,
-    autoUpdateStatus: data.auto_update_status,
     isFeedbackMandatory: Boolean(data.is_feedback_mandatory),
     enableCommentReactions: Boolean(data.enable_comment_reactions),
     allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),

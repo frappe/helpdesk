@@ -77,35 +77,6 @@
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-base-medium text-ink-gray-8">{{
-            __("Auto update status")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __(
-              "The ticket status will automatically change whenever the agent respond to a ticket."
-            )
-          }}</span>
-        </div>
-        <SelectDropdown
-          :options="autoUpdateTicketStatusList"
-          :model-value="settingsData.updateStatusTo"
-          @update:model-value="
-            (value) => {
-              if (value) {
-                settingsData.updateStatusTo = value;
-                settingsData.autoUpdateStatus = true;
-              } else {
-                settingsData.updateStatusTo = null;
-                settingsData.autoUpdateStatus = 0;
-              }
-            }
-          "
-          target-class="max-w-40"
-          placement="bottom-start"
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
             __("Allow anyone to create tickets")
           }}</span>
           <span class="text-p-sm text-ink-gray-6"
@@ -317,17 +288,6 @@ const ticketTypeList = createListResource({
       };
     });
   },
-});
-
-const autoUpdateTicketStatusList = computed(() => {
-  return (
-    statuses.data?.map((s: HDTicketStatus) => {
-      return {
-        label: s.label_agent,
-        value: s.label_agent,
-      };
-    }) || []
-  );
 });
 
 const autoCloseTicketStatusList = computed(() => {

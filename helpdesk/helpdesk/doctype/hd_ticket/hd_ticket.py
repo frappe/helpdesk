@@ -645,11 +645,15 @@ class HDTicket(Document):
         cc: str | None = None,
         bcc: str | None = None,
         attachments: list[str] = [],
+        status: str | None = None,
     ):
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to reply as an agent"), frappe.PermissionError
             )
+        if status and status != self.status:
+            self.status = status
+            self.save()
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
@@ -1034,12 +1038,6 @@ class HDTicket(Document):
                 self.first_responded_on or frappe.utils.now_datetime()
             )
             self.last_agent_response = frappe.utils.now_datetime()
-
-            # TODO: remove this feature once we add automation feature
-            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
-                self.status = frappe.db.get_single_value(
-                    "HD Settings", "update_status_to"
-                )
 
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.

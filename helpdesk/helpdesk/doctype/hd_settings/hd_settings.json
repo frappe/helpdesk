@@ -30,8 +30,6 @@
   "enable_comment_reactions",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
-  "auto_update_status",
-  "update_status_to",
   "column_break_iarl",
   "auto_close_tickets",
   "auto_close_status",
@@ -286,13 +284,6 @@
    "label": "Allow anyone to create tickets"
   },
   {
-   "default": "0",
-   "description": "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n",
-   "fieldname": "auto_update_status",
-   "fieldtype": "Check",
-   "label": "Auto update status"
-  },
-  {
    "default": "1",
    "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n",
    "fieldname": "is_feedback_mandatory",
@@ -426,15 +417,6 @@
    "fieldname": "reply_from_agent_section",
    "fieldtype": "Section Break",
    "label": "Reply From Agent"
-  },
-  {
-   "depends_on": "eval:doc.auto_update_status",
-   "fieldname": "update_status_to",
-   "fieldtype": "Link",
-   "label": "Update status to",
-   "link_filters": "[]",
-   "mandatory_depends_on": "eval:doc.auto_update_status",
-   "options": "HD Ticket Status"
   },
   {
    "fieldname": "status_section",
