@@ -84,6 +84,7 @@ class HDTicket(Document):
         self.set_status_category()
         self.set_sla()
 
+        self.validate_portal_contact()
         self.set_contact()
         self.set_customer()
 
@@ -256,6 +257,44 @@ class HDTicket(Document):
         if self.raised_by:
             return
         self.raised_by = frappe.session.user
+
+    def validate_portal_contact(self) -> None:
+        """Block non-agent users from attributing a ticket to another contact.
+
+        Agents are unrestricted, and so are system channels like email intake,
+        which run as Administrator.
+        """
+        if is_agent():
+            return
+        if not self.contact:
+            return
+        if not self.is_new() and not self.has_value_changed("contact"):
+            return
+
+        if self.contact != self.get_session_contact():
+            frappe.throw(
+                _("You can only raise tickets for your own contact."),
+                frappe.PermissionError,
+            )
+
+    def get_session_contact(self) -> str | None:
+        """Resolve the Contact owned by the current session user.
+
+        Match strictly on the ``user`` link. Fall back to the email only when
+        it is the session user's own verified email and the Contact is not
+        already linked to a different user, so an unrelated record that merely
+        shares the email can never satisfy the ownership check.
+        """
+        contact = frappe.db.get_value("Contact", {"user": frappe.session.user})
+        if contact:
+            return contact
+
+        user_email = frappe.db.get_value("User", frappe.session.user, "email")
+        if not user_email:
+            return None
+        return frappe.db.get_value(
+            "Contact", {"email_id": user_email, "user": ("in", ("", None))}
+        )
 
     def set_contact(self):
         email_id = parseaddr(self.raised_by)[1]
@@ -716,12 +755,10 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=(
-                    last_communication.name if last_communication.name else None
-                ),
+                in_reply_to=last_communication.name if last_communication else None,
             )
         except Exception as e:
-            frappe.throw(_(e))
+            frappe.throw(str(e))
 
     @frappe.whitelist()
     # flake8: noqa
