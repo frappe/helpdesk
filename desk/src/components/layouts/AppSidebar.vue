@@ -2,116 +2,97 @@
   <Sidebar
     v-model:collapsed="collapsed"
     :disable-collapse="mobile"
-    :sections="sections"
-    class="app-sidebar"
+    class="border-e border-outline-gray-1"
   >
-    <template #header="{ isCollapsed }">
+    <div class="flex h-full flex-col p-2">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
-    </template>
 
-    <template
-      #section-header="{
-        label,
-        collapsible,
-        isSidebarCollapsed,
-        isOpen,
-        toggle,
-      }"
-    >
-      <template v-if="label">
-        <div
-          v-if="isSidebarCollapsed"
-          class="flex items-center justify-center px-2 py-1.5"
-        >
-          <hr class="w-full border-t border-ink-gray-3" />
-        </div>
-        <div
-          v-else
-          class="flex cursor-pointer items-center gap-1.5 px-2 pb-2.5 pt-[11px] text-sm font-medium text-ink-gray-5"
-          @click="collapsible && toggle()"
-        >
-          <span
-            class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out"
-            :class="{ 'rotate-90': isOpen }"
-          />
-          <span class="truncate">{{ label }}</span>
-        </div>
-      </template>
-    </template>
-
-    <template #sidebar-item="{ item, isCollapsed }">
-      <div class="group relative" :class="{ 'mt-4': item.spacedTop }">
-        <button
-          type="button"
-          :title="isCollapsed ? __(item.label) : undefined"
-          class="flex h-7.5 w-full items-center rounded px-2 text-ink-gray-8"
-          :class="
-            item.isActive
-              ? 'bg-surface-selected shadow-sm'
-              : 'hover:bg-surface-gray-2'
-          "
-          @click="item.onClick && item.onClick()"
-        >
-          <span
-            class="relative grid size-4 shrink-0 place-items-center text-ink-gray-7"
+      <div class="mt-2 flex-1 overflow-y-auto overflow-x-hidden">
+        <template v-for="(section, index) in sections" :key="index">
+          <SidebarLabel
+            v-if="section.label"
+            divider
+            class="my-1 select-none"
+            :class="section.collapsible && !isCollapsed && 'cursor-pointer'"
+            @click="section.collapsible && toggleSection(section.label)"
           >
-            <component :is="item.icon" class="size-4" />
-            <span
-              v-if="item.key === 'notifications' && item.badge"
-              class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-blue-400"
-            />
-          </span>
-          <span
-            class="ms-2 flex min-w-0 flex-1 items-center justify-between text-sm transition-all duration-300 ease-in-out"
-            :class="[
-              isCollapsed
-                ? 'w-0 overflow-hidden opacity-0'
-                : 'w-auto opacity-100',
-              // Reserve room on the right so a long label always truncates before
-              // the kebab instead of colliding with it on hover / when its menu opens.
-              item.view && !isCollapsed ? 'pe-6' : '',
-            ]"
-          >
-            <span class="truncate text-start">{{ __(item.label) }}</span>
-            <span
-              v-if="item.shortcut"
-              class="flex items-center gap-0.5 font-medium text-ink-gray-5"
-            >
-              <component :is="device.modifierIcon" class="h-3 w-3" />
-              <span>K</span>
+            <span class="flex items-center gap-1.5 text-sm font-medium">
+              <span
+                class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out"
+                :class="{ 'rotate-90': isSectionOpen(section.label) }"
+              />
+              <span class="truncate">{{ section.label }}</span>
             </span>
-            <Badge
-              v-else-if="item.badge"
-              :label="item.badge > 9 ? '9+' : item.badge"
-              theme="gray"
-              variant="subtle"
-            />
-          </span>
-        </button>
-        <Dropdown
-          v-if="item.view && !isCollapsed"
-          side="right"
-          align="start"
-          :options="viewActions(item.view, viewDialogConfig)"
-        >
-          <template #default="{ open }">
-            <Button
-              variant="ghost"
-              icon="lucide-more-horizontal"
-              class="absolute end-1 top-1/2 -translate-y-1/2 !size-6 rounded !text-ink-gray-7"
-              :class="
-                open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              "
-              @click.stop
-            />
-          </template>
-        </Dropdown>
+          </SidebarLabel>
+          <nav
+            v-if="!section.label || isSectionOpen(section.label)"
+            class="flex flex-col gap-0.5"
+          >
+            <SidebarItem
+              v-for="item in section.items"
+              :key="item.key"
+              :label="__(item.label)"
+              :active="item.isActive"
+              :class="item.spacedTop && 'mt-4'"
+              @click="item.onClick && item.onClick()"
+            >
+              <template #prefix>
+                <span
+                  class="relative grid size-4 shrink-0 place-items-center text-ink-gray-7"
+                >
+                  <component :is="item.icon" class="size-4" />
+                  <span
+                    v-if="item.key === 'notifications' && item.badge"
+                    class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-surface-blue-5"
+                  />
+                </span>
+              </template>
+              <template #suffix>
+                <span
+                  v-if="item.shortcut"
+                  class="me-2 flex items-center gap-0.5 font-medium text-ink-gray-5"
+                >
+                  <component :is="device.modifierIcon" class="h-3 w-3" />
+                  <span class="text-sm">K</span>
+                </span>
+                <Badge
+                  v-else-if="item.badge"
+                  class="me-2"
+                  :label="item.badge > 9 ? '9+' : item.badge"
+                  theme="gray"
+                  variant="subtle"
+                />
+                <Dropdown
+                  v-else-if="item.view"
+                  side="right"
+                  align="start"
+                  :options="viewActions(item.view, viewDialogConfig)"
+                >
+                  <template #default="{ open }">
+                    <Button
+                      variant="ghost"
+                      icon="lucide-more-horizontal"
+                      class="me-1 !size-6 rounded !text-ink-gray-7"
+                      :class="
+                        open
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover/sidebar-item:opacity-100'
+                      "
+                      @click.stop
+                    />
+                  </template>
+                </Dropdown>
+              </template>
+            </SidebarItem>
+          </nav>
+        </template>
       </div>
-    </template>
 
-    <template #footer-items="slotProps">
-      <slot name="footer" v-bind="slotProps" />
-    </template>
+      <div class="mt-auto flex flex-col gap-2">
+        <slot name="footer" :is-collapsed="isCollapsed" />
+        <SidebarCollapseToggle v-if="!mobile" />
+      </div>
+    </div>
   </Sidebar>
   <CP v-if="!mobile" v-model="showCommandPalette" />
   <ViewModal
@@ -132,7 +113,15 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { getIcon, isCustomerPortal } from "@/utils";
 import ViewModal from "@/components/ViewModal.vue";
-import { Badge, Button, Dropdown, Sidebar } from "frappe-ui";
+import {
+  Badge,
+  Button,
+  Dropdown,
+  Sidebar,
+  SidebarCollapseToggle,
+  SidebarItem,
+  SidebarLabel,
+} from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, reactive, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
@@ -171,6 +160,19 @@ const collapsed = computed({
   get: () => !sidebarStore.isExpanded,
   set: (value) => sidebarStore.toggleExpanded(!value),
 });
+
+// The mobile drawer pins the sidebar open (disable-collapse), so it is never
+// visually collapsed even when the store says so.
+const isCollapsed = computed(() => collapsed.value && !props.mobile);
+
+// Expanded/folded state of the collapsible view sections, keyed by label.
+const closedSections = ref(new Set<string>());
+const isSectionOpen = (label: string) => !closedSections.value.has(label);
+
+function toggleSection(label: string) {
+  if (isSectionOpen(label)) closedSections.value.add(label);
+  else closedSections.value.delete(label);
+}
 
 // Optimistic active item: set immediately on click so the highlight is
 // instant, then kept in sync with the route (browser back/forward, external
@@ -281,13 +283,3 @@ watch(
   () => (activeItem.value = currentRouteKey())
 );
 </script>
-
-<style>
-/* frappe-ui's SidebarSection keeps the hidden section label (h-4) in flow when
-the sidebar is collapsed, so each separator row stays 28px tall and the view
-icons float in dead space. Collapse the label so the separator hugs its
-section. `w-12` is the width frappe-ui applies in the collapsed state. */
-.app-sidebar.w-12 > .mt-2 > div.relative > h3 {
-  height: 0;
-}
-</style>
