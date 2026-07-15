@@ -16,6 +16,10 @@
 <script setup lang="ts">
 import Questionnaire from "@/components/Questionnaire.vue";
 import type { Question } from "@/components/Questionnaire.types";
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "@/components/Settings/settingsModal";
 import { markPersonaCaptured } from "@/persona";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -27,18 +31,44 @@ const router = useRouter();
 const leaving = ref(false);
 const FADE_MS = 300;
 
-async function finishOnboarding() {
+// The last question's "first goal" answer maps to a settings tab; other goals
+// route directly (create ticket) or fall through to Home.
+const settingsTabForGoal: Record<
+  string,
+  "Email Accounts" | "Invite Agents" | "General"
+> = {
+  connect_email: "Email Accounts",
+  invite_team: "Invite Agents",
+  setup_portal: "General",
+};
+
+async function finishOnboarding(goal?: string | string[]) {
   leaving.value = true;
   // Persist and fade in parallel; localStorage in markPersonaCaptured is the
   // durable guard, so a failed persist can be ignored here.
   const fade = new Promise((resolve) => setTimeout(resolve, FADE_MS));
   await Promise.allSettled([markPersonaCaptured(), fade]);
-  router.push({ name: "Home" });
+  routeToGoal(goal);
+}
+
+// Drop the admin into their chosen first goal: a new ticket, the matching
+// settings tab over Home, or just Home.
+async function routeToGoal(goal?: string | string[]) {
+  if (goal === "create_ticket") {
+    router.push({ name: "TicketAgentNew" });
+    return;
+  }
+  await router.push({ name: "Home" });
+  const tab = typeof goal === "string" ? settingsTabForGoal[goal] : undefined;
+  if (tab) {
+    setActiveSettingsTab(tab);
+    showSettingsModal.value = true;
+  }
 }
 
 function submitPersona(answers: Record<string, string | string[]>) {
   capture("onboarding_persona_hd", { data: answers });
-  finishOnboarding();
+  finishOnboarding(answers.first_goal);
 }
 
 const questions = [
@@ -48,17 +78,19 @@ const questions = [
     type: "text",
     label: __("What is your organization's name?"),
     placeholder: __("e.g. Acme Inc."),
+    required: true,
+    requiredMessage: __("Please enter your organization's name"),
     dropdown: {
       key: "company_size",
-      label: __("How big is your organization?"),
-      placeholder: __("Select company size"),
+      label: __("How big is your support team?"),
+      placeholder: __("Select team size"),
       options: [
-        { label: __("1–10 employees"), value: "1-10" },
-        { label: __("11–50 employees"), value: "11-50" },
-        { label: __("51–200 employees"), value: "51-200" },
-        { label: __("201–500 employees"), value: "201-500" },
-        { label: __("501–1,000 employees"), value: "501-1000" },
-        { label: __("1,000+ employees"), value: "1000+" },
+        { label: __("1–5"), value: "1-5" },
+        { label: __("6–10"), value: "6-10" },
+        { label: __("11–25"), value: "11-25" },
+        { label: __("26–50"), value: "26-50" },
+        { label: __("51–100"), value: "51-100" },
+        { label: __("100+"), value: "100+" },
       ],
     },
   },
@@ -75,12 +107,12 @@ const questions = [
       { label: __("Jira Service Management"), value: "jira" },
       { label: __("Zoho Desk"), value: "zoho_desk" },
       { label: __("Salesforce Service Cloud"), value: "salesforce" },
-      { label: __("Other"), value: "other" },
       { label: __("We don't use any helpdesk yet"), value: "none" },
       {
         label: __("Shared email inbox (Gmail, Outlook, etc.)"),
         value: "shared_inbox",
       },
+      { label: __("Other"), value: "other" },
     ],
   },
   {
@@ -134,13 +166,13 @@ const questions = [
         value: "measuring_performance",
       },
       { label: __("Scaling support as we grow"), value: "scaling" },
+      { label: __("Missing or delayed responses"), value: "delayed_responses" },
       {
         label: __("Keeping track of customer requests"),
         value: "tracking_requests",
       },
-      { label: __("Missing or delayed responses"), value: "delayed_responses" },
       {
-        label: __("Assigning tickets to the right agent"),
+        label: __("Assigning tickets"),
         value: "assignment",
       },
       { label: __("Other"), value: "other" },

@@ -11,26 +11,30 @@
         class="!size-7 shrink-0 !rounded-md absolute -left-11 mt-4"
         @click="back"
       />
-      <Transition name="q-fade" mode="out-in" @after-enter="focusQuestion">
-        <fieldset
-          :key="question.key"
-          tabindex="-1"
-          class="mx-0 min-w-0 border-0 p-0 focus:outline-none"
-        >
-          <legend class="p-0 text-p-2xl font-bold text-ink-gray-9">
+      <div
+        :key="question.key"
+        class="mx-0 min-w-0 border-0 p-0 flex gap-5 flex-col"
+      >
+        <div>
+          <p class="p-0 text-p-2xl font-bold text-ink-gray-9">
             {{ question.title }}
-          </legend>
+          </p>
 
-          <p class="text-p-base pt-1.5">
+          <p class="text-base pt-1.5">
             A few quick questions to tailor Helpdesk to how you work.
           </p>
-          <template v-if="question.type === 'text'">
-            <div class="mt-5">
+        </div>
+        <template v-if="question.type === 'text'">
+          <div class="flex flex-col gap-3">
+            <div>
               <span
                 v-if="question.label"
                 class="mb-1.5 block text-p-sm text-ink-gray-5"
               >
-                {{ question.label }}
+                {{ question.label
+                }}<span v-if="question.required" class="ms-0.5 text-ink-red-6"
+                  >*</span
+                >
               </span>
               <TextInput
                 v-model="answers[question.key]"
@@ -38,54 +42,73 @@
                 type="text"
                 variant="outline"
                 :placeholder="question.placeholder"
+                :error="
+                  showRequiredError
+                    ? question.requiredMessage ?? __('This field is required')
+                    : undefined
+                "
                 @keyup.enter="proceed"
               />
             </div>
-            <div v-if="dropdown" class="mt-3">
+            <div v-if="dropdown">
               <span class="mb-1.5 block text-p-sm text-ink-gray-5">
                 {{ dropdown.label }}
               </span>
-              <Dropdown :options="dropdownOptions" match-trigger-width>
-                <Button
-                  class="w-full !justify-between !rounded-md"
-                  size="sm"
-                  variant="outline"
-                  icon-right="lucide-chevron-down"
-                  :label="dropdownLabel"
-                  :aria-label="dropdown.label"
-                  :class="dropdownSelected ? '' : '!text-ink-gray-5'"
-                />
-              </Dropdown>
+              <Select
+                v-model="answers[dropdown.key]"
+                class="w-full"
+                size="sm"
+                variant="outline"
+                :placeholder="dropdown.placeholder"
+                :options="dropdown.options"
+              />
             </div>
-          </template>
-          <div
-            v-else
-            class="flex flex-wrap gap-3 mt-5 !text-ink-gray-7 text-p-base"
-          >
+          </div>
+        </template>
+        <template v-else>
+          <div class="flex flex-wrap gap-3 !text-ink-gray-7 text-p-base">
             <Button
               v-for="option in choiceOptions"
               :key="option.value"
               :label="option.label"
-              :variant="
-                isSelected(option)
-                  ? 'subtle'
-                  : 'outline active:bg-surface-gray-4 border-solid active:!border-outline-gray-3'
-              "
-              :icon-right="
-                isMultiple && isSelected(option) ? 'lucide-x' : undefined
-              "
+              :variant="isSelected(option) ? 'subtle' : 'outline'"
               size="sm"
-              class="!rounded-md border border-solid [&_[aria-hidden]]:!size-3"
+              class="!rounded-md border border-solid"
               :class="
                 isSelected(option)
-                  ? '!bg-surface-gray-4 !border-outline-gray-3'
-                  : '!border-outline-gray-2'
+                  ? '!bg-surface-gray-4 !border-outline-gray-3 hover:!bg-surface-gray-5'
+                  : ''
               "
               @click="select(option)"
             />
           </div>
-        </fieldset>
-      </Transition>
+          <div
+            class="-mt-5 grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            :class="
+              isOtherSelected
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0'
+            "
+          >
+            <div class="overflow-hidden">
+              <div
+                class="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                :class="isOtherSelected ? 'translate-y-0' : '-translate-y-full'"
+              >
+                <Textarea
+                  ref="otherInput"
+                  v-model="answers[otherKey]"
+                  class="mt-5"
+                  variant="outline"
+                  :rows="3"
+                  :placeholder="__('Please specify')"
+                  :tabindex="isOtherSelected ? 0 : -1"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
     </div>
 
     <div class="flex flex-col items-center gap-2">
@@ -108,8 +131,8 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
-import { Button, Dropdown, TextInput } from "frappe-ui";
-import { computed, reactive, ref } from "vue";
+import { Button, Select, Textarea, TextInput } from "frappe-ui";
+import { computed, nextTick, reactive, ref } from "vue";
 import type { Option, Question } from "./Questionnaire.types";
 
 type Answers = Record<string, string | string[]>;
@@ -120,42 +143,37 @@ const emit = defineEmits<{ submit: [answers: Answers] }>();
 const current = ref(0);
 const completed = ref(false);
 const answers = reactive<Answers>({});
+const requiredError = ref(false);
+const otherInput = ref<InstanceType<typeof Textarea>>();
 
 const total = computed(() => props.questions.length);
 const question = computed(() => props.questions[current.value] as Question);
 const isLast = computed(() => current.value === total.value - 1);
+
+const isRequiredTextEmpty = computed(() => {
+  const q = question.value;
+  if (q.type !== "text" || !q.required) return false;
+  const value = answers[q.key];
+  return typeof value !== "string" || !value.trim();
+});
+const showRequiredError = computed(
+  () => requiredError.value && isRequiredTextEmpty.value
+);
 
 // Narrow the discriminated union so the template stays declarative: choice
 // questions render pills, text questions may carry a dropdown beneath them.
 const choiceOptions = computed(() =>
   question.value.type === "choice" ? question.value.options : []
 );
-const isMultiple = computed(
-  () => question.value.type === "choice" && !!question.value.multiple
-);
 const dropdown = computed(() =>
   question.value.type === "text" ? question.value.dropdown : undefined
 );
-// Dropdown menu items set the answer on click; the trigger reflects the choice.
-const dropdownOptions = computed(() =>
-  (dropdown.value?.options ?? []).map((option) => ({
-    label: option.label,
-    onClick: () => {
-      if (dropdown.value) answers[dropdown.value.key] = option.value;
-    },
-  }))
-);
-const dropdownSelected = computed(
-  () => !!dropdown.value && !!answers[dropdown.value.key]
-);
-const dropdownLabel = computed(() => {
-  const config = dropdown.value;
-  if (!config) return "";
-  const value = answers[config.key];
-  return (
-    config.options.find((option) => option.value === value)?.label ??
-    config.placeholder
-  );
+
+// "Other" free-text reveal (choice questions only, gated on that literal option).
+const otherKey = computed(() => `${question.value.key}_other`);
+const isOtherSelected = computed(() => {
+  const otherOption = choiceOptions.value.find((o) => o.value === "other");
+  return otherOption ? isSelected(otherOption) : false;
 });
 
 function isSelected(option: Option) {
@@ -184,22 +202,34 @@ function select(option: Option) {
       value.splice(index, 1);
     }
     answers[key] = value;
-    return;
+  } else {
+    // A click only sets the selection; advancing is always via the Next button.
+    answers[key] = option.value;
   }
-  // A click only sets the selection; advancing is always via the Next button.
-  answers[key] = option.value;
+
+  if (!isOtherSelected.value) {
+    delete answers[otherKey.value];
+  } else if (option.value === "other") {
+    nextTick(() => otherInput.value?.el?.focus({ preventScroll: true }));
+  }
 }
 
 function advance() {
+  requiredError.value = false;
   if (current.value < total.value - 1) current.value += 1;
 }
 
 function back() {
+  requiredError.value = false;
   if (current.value > 0) current.value -= 1;
 }
 
-// Next never blocks: an unanswered question is simply skipped past.
+// Next never blocks except on a required, still-empty text question.
 function proceed() {
+  if (isRequiredTextEmpty.value) {
+    requiredError.value = true;
+    return;
+  }
   if (isLast.value) finish();
   else advance();
 }
@@ -209,23 +239,4 @@ function finish() {
   completed.value = true;
   setTimeout(() => emit("submit", { ...answers }), 700);
 }
-
-function focusQuestion(el: Element) {
-  (el as HTMLElement).focus();
-}
 </script>
-
-<style scoped>
-.q-fade-enter-active,
-.q-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-.q-fade-enter-from {
-  opacity: 0;
-  transform: translateY(6px);
-}
-.q-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-</style>
