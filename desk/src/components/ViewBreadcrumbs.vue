@@ -11,7 +11,8 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
+          class="text-lg-medium text-nowrap truncate max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
+          :class="open && '!bg-surface-gray-3'"
           :label="currentView.label"
         >
           <template #prefix>

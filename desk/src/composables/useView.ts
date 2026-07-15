@@ -357,7 +357,11 @@ export function useView(dt: string = null) {
   ) {
     let view: View;
     if (action === "update") {
-      updateView(viewInfo);
+      updateView({
+        name: viewInfo.name,
+        label: viewInfo.label,
+        icon: viewInfo.icon,
+      });
       handleViewSuccess(viewDialogConfig, __("updated"));
       currentView.value = {
         label: viewInfo.label,

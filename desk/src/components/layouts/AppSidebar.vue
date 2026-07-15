@@ -3,6 +3,7 @@
     v-model:collapsed="collapsed"
     :disable-collapse="mobile"
     :sections="sections"
+    class="app-sidebar"
   >
     <template #header="{ isCollapsed }">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
@@ -280,3 +281,13 @@ watch(
   () => (activeItem.value = currentRouteKey())
 );
 </script>
+
+<style>
+/* frappe-ui's SidebarSection keeps the hidden section label (h-4) in flow when
+the sidebar is collapsed, so each separator row stays 28px tall and the view
+icons float in dead space. Collapse the label so the separator hugs its
+section. `w-12` is the width frappe-ui applies in the collapsed state. */
+.app-sidebar.w-12 > .mt-2 > div.relative > h3 {
+  height: 0;
+}
+</style>
