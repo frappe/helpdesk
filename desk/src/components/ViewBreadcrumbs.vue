@@ -17,7 +17,7 @@
           <template #prefix>
             <component
               :is="currentView.icon"
-              class="h-4 flex items-center justify-center"
+              class="flex size-4 shrink-0 items-center justify-center"
             />
           </template>
           <template #suffix>
@@ -124,14 +124,10 @@ const isCurrentView = (item) => {
   @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
   -webkit-mask-image: linear-gradient(
     to bottom,
-    black calc(100% - var(--fade-bottom)),
+    black calc(100%),
     transparent 100%
   );
-  mask-image: linear-gradient(
-    to bottom,
-    black calc(100% - var(--fade-bottom)),
-    transparent 100%
-  );
+  mask-image: linear-gradient(to bottom, black calc(100%), transparent 100%);
   animation: scroll-fade linear both;
   animation-timeline: scroll(self);
 }

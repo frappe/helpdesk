@@ -21,7 +21,6 @@ export { default as PageTitle } from "./PageTitle.vue";
 export { default as SavedRepliesSelectorModal } from "./SavedRepliesSelectorModal.vue";
 export { default as SearchComplete } from "./SearchComplete.vue";
 export { default as Section } from "./Section.vue";
-export { default as SidebarLink } from "./SidebarLink.vue";
 export { default as StarRating } from "./StarRating.vue";
 export { default as TextEditor } from "./TextEditor.vue";
 export { default as TypingIndicator } from "./TypingIndicator.vue";

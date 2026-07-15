@@ -400,7 +400,7 @@ export interface View {
   pinned?: boolean;
   public?: boolean;
   group_by_field?: string;
-  name?: string;
+  name: string;
   is_customer_portal?: boolean;
 }
 
