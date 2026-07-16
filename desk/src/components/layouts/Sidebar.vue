@@ -98,6 +98,10 @@
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
+        <CustomerPortalPermissionBanner
+          v-if="showPermissionNoticeBanner"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
@@ -173,6 +177,7 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
@@ -185,6 +190,7 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useTheme } from "frappe-ui";
@@ -227,6 +233,7 @@ const { isMobileView } = useScreenSize();
 
 const router = useRouter();
 const authStore = useAuthStore();
+const configStore = useConfigStore();
 
 const showShortcutsModal = ref(false);
 const { appsMenuOption } = useApps();
@@ -317,6 +324,14 @@ const logo = h(
   },
   null
 );
+
+const showPermissionNoticeBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    (authStore.isManager || authStore.isAdmin) &&
+    configStore.showCustomerPortalPermissionNotice
+  );
+});
 
 const showOnboardingBanner = computed(() => {
   return (
