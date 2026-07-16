@@ -4,11 +4,13 @@
 from datetime import timedelta
 
 import frappe
+from frappe.client import get as client_get
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.api.ticket import bulk_reply
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
+    get_one,
     merge_ticket,
     show_outside_hours_banner,
     split_ticket,
@@ -1664,7 +1666,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                     {"dt": "HD Ticket", "fieldname": fieldname},
                     "permlevel",
                 ),
-                1,
+                2,
             )
 
             frappe.set_user(PERMS_CUSTOMER)
@@ -1728,3 +1730,23 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         # exposable creation-form field is honored, internal field stays locked
         self.assertEqual(ticket.priority, self.other_priority(default_priority))
         self.assertEqual(ticket.status_category, "Open")
+
+    def test_customer_cannot_read_internal_fields(self):
+        internal = ("sla", "agreement_status", "last_agent_response", "key")
+        display = ("priority", "raised_by", "response_by", "resolution_by")
+
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        data = get_one(ticket.name)
+        for field in internal:
+            self.assertNotIn(field, data)
+        for field in display:
+            self.assertIn(field, data)
+
+        # framework read paths strip permlevel-2 values for customers
+        stripped = client_get("HD Ticket", name=ticket.name)
+        self.assertFalse(stripped.get("sla"))
+        self.assertTrue(stripped.get("response_by"))
+
+        frappe.set_user(PERMS_AGENT)
+        self.assertIn("sla", get_one(ticket.name))
