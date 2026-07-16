@@ -8,7 +8,7 @@ default_views = [
         "dt": "HD Ticket",
         "filters": '{"sla":["is","set"],"agreement_status":["in","First Response Due,Resolution Due"],"status_category":"Open","_assign":["LIKE","%@me%"],"creation":["timespan","last 90 days"]}',
         "group_by_field": None,
-        "icon": "triangle-alert",
+        "icon": "clock-alert",
         "is_customer_portal": 0,
         "is_default": 0,
         "is_standard": 1,
