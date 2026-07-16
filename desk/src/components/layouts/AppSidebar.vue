@@ -31,6 +31,7 @@
             <SidebarItem
               v-for="item in section.items"
               :key="item.key"
+              :id="item.id"
               :label="__(item.label)"
               :active="item.isActive"
               :class="item.spacedTop && 'mt-4'"
@@ -214,6 +215,8 @@ const searchItem = computed(() => ({
   key: "search",
 }));
 
+// The Notifications panel's click-outside handler ignores #notifications-btn,
+// so this item's own click stays the single owner of open/close.
 const notificationItem = computed(() =>
   props.mobile
     ? {
@@ -223,6 +226,7 @@ const notificationItem = computed(() =>
         onClick: () => selectItem("Notifications", { name: "Notifications" }),
         badge: notificationStore.unread,
         key: "notifications",
+        id: "notifications-btn",
       }
     : {
         label: __("Notifications"),
@@ -230,6 +234,7 @@ const notificationItem = computed(() =>
         onClick: () => notificationStore.toggle(),
         badge: notificationStore.unread,
         key: "notifications",
+        id: "notifications-btn",
       }
 );
 
