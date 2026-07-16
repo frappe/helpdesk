@@ -1,9 +1,6 @@
 <template>
   <FrappeUIProvider>
-    <router-view v-if="route.meta.fullScreen" />
-    <!-- No route.name until the first navigation resolves: render neither, or
-         the portal shell flashes before a fullScreen route replaces it. -->
-    <PortalRoot v-else-if="route.name" />
+    <router-view />
   </FrappeUIProvider>
   <Dialogs />
 </template>
@@ -14,15 +11,12 @@ import { useConfigStore } from "@/stores/config";
 import { useFavicon } from "@vueuse/core";
 import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, defineAsyncComponent, h, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
-import { useAuthStore } from "./stores/auth";
 import { __ } from "./translation";
 import { isCustomerPortal } from "./utils";
 
-const route = useRoute();
 const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
 
@@ -49,21 +43,5 @@ onMounted(() => {
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
   setConfig("systemTimezone", window.timezone?.system || null);
-});
-
-const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/roots/AgentRoot.vue")
-);
-const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/roots/CustomerPortalRoot.vue")
-);
-
-const PortalRoot = computed(() => {
-  const authStore = useAuthStore();
-  if (authStore.hasDeskAccess && authStore.isAgent) {
-    return AgentPortalRoot;
-  } else {
-    return CustomerPortalRoot;
-  }
 });
 </script>

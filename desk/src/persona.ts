@@ -1,7 +1,7 @@
 import { call } from "frappe-ui";
-import type { RouteLocationNormalized, RouteLocationRaw } from "vue-router";
+import type { RouteLocationRaw } from "vue-router";
 
-export const PERSONA_DONE_KEY = "helpdesk_persona_captured";
+const PERSONA_DONE_KEY = "helpdesk_persona_captured";
 
 let personaChecked = false;
 
@@ -23,35 +23,36 @@ export async function telemetryEnabled(): Promise<boolean> {
   return !!config?.enabled;
 }
 
-// `done` means the guard should stop and next(to).
-export async function personaRedirect(
-  to: RouteLocationNormalized,
+// Gate for the route's beforeEnter: only an uncaptured desk admin may view
+// the wizard, even via URL. Fail safe — never break navigation.
+export function canViewPersona(auth: PersonaAuth): boolean {
+  try {
+    return (
+      auth.isLoggedIn &&
+      auth.hasDeskAccess &&
+      auth.isAdmin &&
+      !isPersonaCaptured(auth)
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Interrupt an eligible admin once per session, only if telemetry is on.
+// Returns where to redirect, or undefined to continue the navigation.
+export async function personaInterrupt(
   auth: PersonaAuth
-): Promise<{ done: boolean; to?: RouteLocationRaw }> {
+): Promise<RouteLocationRaw | undefined> {
   const isDeskAdmin = auth.isLoggedIn && auth.hasDeskAccess && auth.isAdmin;
-
-  if (to.name === "Persona") {
-    try {
-      const allow = isDeskAdmin && !isPersonaCaptured(auth);
-      return { done: true, to: allow ? undefined : { name: "Home" } };
-    } catch {
-      return { done: true, to: { name: "Home" } };
+  if (!isDeskAdmin || personaChecked) return;
+  personaChecked = true;
+  try {
+    if (!isPersonaCaptured(auth) && (await telemetryEnabled())) {
+      return { name: "Persona" };
     }
+  } catch {
+    // fail open
   }
-
-  // Interrupt an eligible admin once per session, only if telemetry is on.
-  if (isDeskAdmin && !personaChecked) {
-    personaChecked = true;
-    try {
-      if (!isPersonaCaptured(auth) && (await telemetryEnabled())) {
-        return { done: true, to: { name: "Persona" } };
-      }
-    } catch {
-      // fail open
-    }
-  }
-
-  return { done: false };
 }
 
 export async function markPersonaCaptured(brandName?: string): Promise<void> {
