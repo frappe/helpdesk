@@ -17,7 +17,8 @@
       >
         <div>
           <p class="p-0 text-p-2xl font-bold text-ink-gray-9">
-            {{ question.title }}
+            {{ question.title
+            }}<span v-if="titleRequired" class="ms-0.5 text-ink-red-6">*</span>
           </p>
 
           <p class="text-base pt-1.5">
@@ -105,8 +106,10 @@
                   class="mt-5"
                   variant="outline"
                   :rows="3"
-                  :placeholder="__('Please specify')"
+                  :placeholder="otherPlaceholder"
                   :tabindex="isOtherSelected ? 0 : -1"
+                  :error="otherError"
+                  @update:model-value="otherError = ''"
                 />
               </div>
             </div>
@@ -137,7 +140,7 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
 import { Button, Select, Textarea, TextInput } from "frappe-ui";
-import { computed, nextTick, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref, watch } from "vue";
 import type { Option, Question } from "./Questionnaire.types";
 
 type Answers = Record<string, string | string[]>;
@@ -180,6 +183,31 @@ const isOtherSelected = computed(() => {
   const otherOption = choiceOptions.value.find((o) => o.value === "other");
   return otherOption ? isSelected(otherOption) : false;
 });
+
+const otherPlaceholder = computed(
+  () =>
+    (question.value.type === "choice" && question.value.otherPlaceholder) ||
+    __("Tell us more")
+);
+
+// The asterisk normally rides on the field label; questions whose title is
+// itself the prompt have no label to hang it on.
+const titleRequired = computed(
+  () =>
+    question.value.type === "text" &&
+    !!question.value.required &&
+    !question.value.label
+);
+
+const isOtherFilled = computed(() => {
+  const other = answers[otherKey.value];
+  return typeof other === "string" && other.trim() !== "";
+});
+
+// Cleared on navigation and on toggling "Other" off, so re-opening the box
+// never shows a stale error the user hasn't earned yet.
+const otherError = ref("");
+watch([current, isOtherSelected], () => (otherError.value = ""));
 
 function isSelected(option: Option) {
   const q = question.value;
@@ -229,6 +257,12 @@ function back() {
 
 function proceed() {
   if (!canProceed.value) return;
+  // "Other" stays selectable with Next enabled; the ask happens on click.
+  if (isOtherSelected.value && !isOtherFilled.value) {
+    otherError.value = __("Add a few words so we can continue");
+    otherInput.value?.el?.focus({ preventScroll: true });
+    return;
+  }
   if (isLast.value) finish();
   else advance();
 }

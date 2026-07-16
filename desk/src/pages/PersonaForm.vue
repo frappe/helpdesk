@@ -117,6 +117,7 @@ const questions = [
       },
       { label: __("Other"), value: "other" },
     ],
+    otherPlaceholder: __("Which tool does your team use?"),
   },
   {
     key: "contact_channels",
@@ -134,6 +135,7 @@ const questions = [
       { label: __("In person"), value: "in_person" },
       { label: __("Other"), value: "other" },
     ],
+    otherPlaceholder: __("Which channel do they use?"),
   },
   {
     key: "preferred_channels",
@@ -180,6 +182,7 @@ const questions = [
       },
       { label: __("Other"), value: "other" },
     ],
+    otherPlaceholder: __("What makes support hard right now?"),
   },
   {
     key: "referral_source",
@@ -187,6 +190,7 @@ const questions = [
     type: "text",
     multiline: true,
     placeholder: __("e.g. a friend, a search, or the Frappe community"),
+    required: true,
   },
   {
     key: "first_goal",

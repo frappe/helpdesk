@@ -28,6 +28,8 @@ export interface ChoiceQuestion {
   type: "choice";
   options: Option[];
   multiple?: boolean;
+  // Placeholder for the free-text box the "Other" option reveals.
+  otherPlaceholder?: string;
 }
 
 export type Question = TextQuestion | ChoiceQuestion;
