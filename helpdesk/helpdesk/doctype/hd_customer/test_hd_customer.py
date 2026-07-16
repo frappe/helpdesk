@@ -262,6 +262,71 @@ class TestHDCustomer(FrappeTestCase):
         member_names = [row.contact_name for row in customer.contacts]
         self.assertEqual(member_names.count(contact), 1)
 
+    def test_primary_contact_with_linked_user_is_not_invited(self) -> None:
+        from helpdesk.api.customer import create_customer as create_customer_api
+
+        email = "primary-linked-user@example.com"
+        cleanup_customer_and_contact("Test Customer API Linked User", email)
+        contact = create_contact("LinkedPrimary", email)
+
+        name = create_customer_api(
+            {
+                "customer_name": "Test Customer API Linked User",
+                "customer_type": "Company",
+            },
+            {"first_name": "LinkedPrimary", "email": email},
+        )
+
+        customer = frappe.get_doc("HD Customer", name)
+        self.assertEqual(customer.primary_contact, contact["contact"])
+        contacts = frappe.db.get_all("Contact", {"email_id": email}, pluck="name")
+        self.assertEqual(contacts, [contact["contact"]], "Contact must be reused")
+        self.assertFalse(get_invitation(email), "No invite for an existing user")
+
+    def test_primary_contact_reuses_existing_contact_without_user(self) -> None:
+        from helpdesk.api.customer import create_customer as create_customer_api
+
+        email = "primary-existing-contact@example.com"
+        cleanup_customer_and_contact("Test Customer API Existing Contact", email)
+        contact = create_contact("ExistingPrimary", email, user=False)
+
+        name = create_customer_api(
+            {
+                "customer_name": "Test Customer API Existing Contact",
+                "customer_type": "Company",
+            },
+            {"first_name": "ExistingPrimary", "email": email},
+        )
+
+        customer = frappe.get_doc("HD Customer", name)
+        self.assertEqual(customer.primary_contact, contact["contact"])
+        contacts = frappe.db.get_all("Contact", {"email_id": email}, pluck="name")
+        self.assertEqual(contacts, [contact["contact"]], "Contact must be reused")
+        invitation = get_invitation(email)
+        self.assertEqual(invitation.customer, name)
+        self.assertEqual(invitation.contact, contact["contact"])
+
+    def test_primary_contact_links_existing_user_without_invite(self) -> None:
+        from helpdesk.api.customer import create_customer as create_customer_api
+
+        email = "primary-user-no-contact@example.com"
+        cleanup_customer_and_contact("Test Customer API User Only", email)
+        user = create_user(email)
+
+        name = create_customer_api(
+            {
+                "customer_name": "Test Customer API User Only",
+                "customer_type": "Company",
+            },
+            {"first_name": "UserOnly", "email": email},
+        )
+
+        customer = frappe.get_doc("HD Customer", name)
+        contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
+        self.assertEqual(customer.primary_contact, contact)
+        self.assertEqual(frappe.db.get_value("Contact", contact, "user"), user.name)
+        self.assertFalse(get_invitation(email), "No invite for an existing user")
+
     def test_delete_customer_unlinks_tickets_and_invitations(self) -> None:
         from helpdesk.api.customer import delete_customer
 
@@ -421,3 +486,5 @@ def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
         frappe.delete_doc("Contact", c, force=True)
     if frappe.db.exists("User", email):
         frappe.delete_doc("User", email, force=True)
+    for inv in frappe.db.get_all("User Invitation", {"email": email}, pluck="name"):
+        frappe.delete_doc("User Invitation", inv, force=True)

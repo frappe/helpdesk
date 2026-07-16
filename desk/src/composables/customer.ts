@@ -1,9 +1,10 @@
 import { __ } from "@/translation";
 import { DocumentResource, Error } from "@/types";
 import { HDCustomer } from "@/types/doctypes";
-import { getErrorMessage } from "@/utils";
+import { getErrorMessage, validateEmailWithZod } from "@/utils";
+import { useDebounceFn } from "@vueuse/core";
 import { call, createDocumentResource } from "frappe-ui";
-import { computed, h, markRaw, reactive, watch } from "vue";
+import { computed, h, markRaw, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import LucideGlobe from "~icons/lucide/globe";
 import LucideMapPin from "~icons/lucide/map-pin";
@@ -109,13 +110,46 @@ function usePrimaryContactState() {
   });
 }
 
+interface ExistingContact {
+  name: string;
+  first_name?: string;
+  last_name?: string;
+  mobile_no?: string;
+  phone?: string;
+  image?: string;
+}
+
 /** Bundles the customer + primary-contact state for the New Customer dialog. */
 export function useNewCustomerForm() {
   const state = useCustomerState();
   const primaryContact = usePrimaryContactState();
+  const existingContact = ref<ExistingContact | null>(null);
   applyDefaults();
 
+  const existingContactName = computed(() => {
+    const contact = existingContact.value;
+    if (!contact) return "";
+    const fullName = [contact.first_name, contact.last_name]
+      .filter(Boolean)
+      .join(" ");
+    return fullName || contact.name;
+  });
+
+  const lookupContact = useDebounceFn(async (email: string) => {
+    const contact = validateEmailWithZod(email)
+      ? await fetchContactByEmail(email)
+      : null;
+    if (email !== primaryContact.email) return;
+    existingContact.value = contact?.name ? contact : null;
+  }, 300);
+
+  function dismissExistingContact() {
+    existingContact.value = null;
+    primaryContact.email = "";
+  }
+
   function reset() {
+    existingContact.value = null;
     Object.assign(state, useCustomerState());
     Object.assign(primaryContact, usePrimaryContactState());
     applyDefaults();
@@ -125,7 +159,24 @@ export function useNewCustomerForm() {
     state.country = window.default_country || "";
   }
 
-  return { state, primaryContact, reset };
+  watch(() => primaryContact.email, lookupContact);
+
+  return {
+    state,
+    primaryContact,
+    existingContact,
+    existingContactName,
+    dismissExistingContact,
+    reset,
+  };
+}
+
+function fetchContactByEmail(email: string): Promise<ExistingContact | null> {
+  return call("frappe.client.get_value", {
+    doctype: "Contact",
+    filters: { email_id: email },
+    fieldname: ["name", "first_name", "last_name", "mobile_no", "phone", "image"],
+  });
 }
 
 type StateKey = "name" | "customerType" | "domain" | "image" | "country";
