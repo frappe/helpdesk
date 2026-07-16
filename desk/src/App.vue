@@ -1,7 +1,9 @@
 <template>
   <FrappeUIProvider>
     <router-view v-if="route.meta.fullScreen" />
-    <PortalRoot v-else />
+    <!-- No route.name until the first navigation resolves: render neither, or
+         the portal shell flashes before a fullScreen route replaces it. -->
+    <PortalRoot v-else-if="route.name" />
   </FrappeUIProvider>
   <Dialogs />
 </template>
