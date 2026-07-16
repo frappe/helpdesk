@@ -81,8 +81,8 @@
               class="!rounded-md border border-solid"
               :class="
                 isSelected(option)
-                  ? '!bg-surface-gray-4 !border-outline-gray-3 hover:!bg-surface-gray-5'
-                  : ''
+                  ? '!bg-surface-gray-3 hover:!bg-surface-gray-4 !border-outline-gray-3'
+                  : 'hover:!bg-surface-alpha-gray-2'
               "
               @click="select(option)"
             />
