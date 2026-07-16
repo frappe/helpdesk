@@ -2577,7 +2577,7 @@ msgstr "Zu Ticket #{0} wechseln"
 
 #: desk/src/components/customer/ContactCard.vue:220
 msgid "Grant Manager Access"
-"Manager-Zugriff gewähren"
+msgstr "Manager-Zugriff gewähren"
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
