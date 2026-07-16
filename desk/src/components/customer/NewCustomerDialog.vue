@@ -62,22 +62,35 @@
             {{ __("Primary Contact") }}
           </h3>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <div class="grid grid-cols-2 gap-4">
             <FormControl
+=======
+          <div class="grid grid-cols-2 gap-4">
+            <FormControl
+              class="[&_p]:text-p-xs"
+>>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
               type="text"
               :label="__('First Name')"
               placeholder="John"
               v-model="primaryContact.firstName"
             />
             <FormControl
+<<<<<<< HEAD
+=======
+              class="[&_p]:text-p-xs"
+>>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
               type="text"
               :label="__('Last Name')"
               placeholder="Doe"
               v-model="primaryContact.lastName"
             />
           </div>
+<<<<<<< HEAD
 =======
 >>>>>>> 755ac8de (fix: dont invite primary contact if already exists)
+=======
+>>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
           <FormControl
             type="email"
             :label="__('Email')"
@@ -88,83 +101,10 @@
               <LucideMail class="size-4" />
             </template>
           </FormControl>
-          <div
-            class="overflow-hidden transition-[height] duration-200 ease-in-out"
-            :style="{ height: contactSwapHeight }"
-          >
-            <div ref="contactSwapEl" class="flex flex-col gap-3">
-              <div
-                v-if="existingContact"
-                class="flex items-center gap-3 rounded-lg border border-outline-gray-2 p-3"
-              >
-                <Avatar
-                  size="xl"
-                  shape="circle"
-                  :label="existingContactName"
-                  :image="existingContact.image"
-                />
-                <div class="flex min-w-0 flex-col gap-0.5">
-                  <span class="truncate text-p-sm text-ink-gray-8">
-                    {{ existingContactName }}
-                  </span>
-                  <span class="truncate text-p-xs text-ink-gray-5">
-                    {{ existingContactDetail }}
-                  </span>
-                </div>
-                <div class="ml-auto flex shrink-0 items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    :aria-label="__('Open contact in new tab')"
-                    @click="openContact"
-                  >
-                    <template #icon>
-                      <LucideExternalLink class="size-4" />
-                    </template>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    :aria-label="__('Dismiss')"
-                    @click="dismissExistingContact"
-                  >
-                    <template #icon>
-                      <LucideX class="size-4" />
-                    </template>
-                  </Button>
-                </div>
-              </div>
-              <template v-else>
-                <div class="grid grid-cols-2 gap-4">
-                  <FormControl
-                    class="[&_p]:text-p-xs"
-                    type="text"
-                    :label="__('First Name')"
-                    placeholder="John"
-                    v-model="primaryContact.firstName"
-                  />
-                  <FormControl
-                    class="[&_p]:text-p-xs"
-                    type="text"
-                    :label="__('Last Name')"
-                    placeholder="Doe"
-                    v-model="primaryContact.lastName"
-                  />
-                </div>
-                <PhoneControl
-                  :label="__('Mobile Number')"
-                  v-model="primaryContact.mobileNo"
-                />
-                <div
-                  v-if="primaryContact.email"
-                  class="flex items-center gap-2 text-p-xs text-ink-gray-5"
-                >
-                  <LucideInfo class="size-3.5 shrink-0" />
-                  <span>{{
-                    __("An invitation will be sent to this email")
-                  }}</span>
-                </div>
-              </template>
-            </div>
-          </div>
+          <PhoneControl
+            :label="__('Mobile Number')"
+            v-model="primaryContact.mobileNo"
+          />
         </div>
       </div>
     </template>
@@ -192,63 +132,18 @@ import {
 import { __ } from "@/translation";
 import type { Resource } from "@/types";
 import { getErrorMessage, validateEmailWithZod } from "@/utils";
-import { useElementSize } from "@vueuse/core";
-import {
-  Avatar,
-  Button,
-  Dialog,
-  FormControl,
-  createResource,
-  toast,
-} from "frappe-ui";
-import { computed, ref } from "vue";
+import { Button, Dialog, FormControl, createResource, toast } from "frappe-ui";
 import { useRouter } from "vue-router";
-import LucideExternalLink from "~icons/lucide/external-link";
 import LucideGlobe from "~icons/lucide/globe";
-import LucideInfo from "~icons/lucide/info";
 import LucideMail from "~icons/lucide/mail";
 import LucideMapPin from "~icons/lucide/map-pin";
-import LucideX from "~icons/lucide/x";
 import Link from "../frappe-ui/Link.vue";
 import PhoneControl from "../frappe-ui/PhoneControl/PhoneControl.vue";
 
 const model = defineModel<boolean>({ default: false });
 const router = useRouter();
 
-const {
-  state,
-  primaryContact,
-  existingContact,
-  existingContactName,
-  dismissExistingContact,
-  reset,
-} = useNewCustomerForm();
-
-const contactSwapEl = ref<HTMLElement | null>(null);
-const { height: contactSwapContentHeight } = useElementSize(contactSwapEl);
-const contactSwapHeight = computed(() =>
-  contactSwapContentHeight.value
-    ? `${contactSwapContentHeight.value}px`
-    : "auto"
-);
-
-const existingContactDetail = computed(() => {
-  const contact = existingContact.value;
-  const mobile = contact?.mobile_no || contact?.phone;
-  const note = contact?.user
-    ? __("Will be added as the primary contact")
-    : __("Will be set as primary · an invitation will be sent");
-  return mobile ? `${mobile} · ${note}` : note;
-});
-
-function openContact() {
-  if (!existingContact.value) return;
-  const route = router.resolve({
-    name: "Contact",
-    params: { id: existingContact.value.name },
-  });
-  window.open(route.href, "_blank");
-}
+const { state, primaryContact, reset } = useNewCustomerForm();
 
 const customerResource: Resource = createResource({
   url: "helpdesk.api.customer.create_customer",
@@ -282,23 +177,18 @@ function addCustomer() {
       image: state.image,
       country: state.country,
     },
-    primary_contact: buildPrimaryContactPayload(),
+    primary_contact: hasPrimaryContactData()
+      ? {
+          first_name: primaryContact.firstName,
+          last_name: primaryContact.lastName,
+          email: primaryContact.email,
+          mobile_no: primaryContact.mobileNo,
+        }
+      : null,
   });
 }
 
-function buildPrimaryContactPayload(): Record<string, string> | null {
-  if (existingContact.value) return { email: primaryContact.email };
-  if (!hasPrimaryContactData()) return null;
-  return {
-    first_name: primaryContact.firstName,
-    last_name: primaryContact.lastName,
-    email: primaryContact.email,
-    mobile_no: primaryContact.mobileNo,
-  };
-}
-
 function validatePrimaryContact(): boolean {
-  if (existingContact.value) return true;
   if (!hasPrimaryContactData()) return true;
   if (!primaryContact.firstName) {
     toast.error(__("Enter the primary contact's first name"));
