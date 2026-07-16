@@ -44,7 +44,7 @@
             </div>
             <Dropdown :options="filters" placement="right">
               <Button
-                :label="activeFilter"
+                :label="activeFilterLabel"
                 icon-left="lucide-filter"
                 class="p-4"
               >
@@ -171,33 +171,33 @@ const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
   storeToRefs(useConfigStore());
 
 const filters = computed(() => {
-  const options = [
-    {
-      label: __("All"),
-      value: "All",
-      onClick: () => (activeFilter.value = "All"),
-    },
-    {
-      label: __("Personal"),
-      value: "Personal",
-      onClick: () => (activeFilter.value = "Personal"),
-    },
-    {
-      label: __("My Team"),
-      value: "Team",
-      onClick: () => (activeFilter.value = "My Team"),
-    },
-    {
-      label: __("Global"),
-      value: "Global",
-      onClick: () => (activeFilter.value = "Global"),
-    },
+  const scopes = [
+    { label: __("All"), value: "All" },
+    { label: __("Personal"), value: "Personal" },
+    { label: __("My Team(s)"), value: "Team" },
+    { label: __("Global"), value: "Global" },
   ];
   if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
-    options.pop();
+    scopes.pop();
   }
-  return options;
+  return scopes.map((scope) => ({
+    ...scope,
+    selected: activeFilter.value === scope.value,
+    onClick: () => (activeFilter.value = scope.value),
+  }));
 });
+
+const activeFilterLabel = computed(() => {
+  return (
+    filters.value.find((filter) => filter.value === activeFilter.value)
+      ?.label ?? activeFilter.value
+  );
+});
+
+// Older sessions stored the label instead of the value
+if (activeFilter.value == "My Team") {
+  activeFilter.value = "Team";
+}
 
 // Set default filter to Personal if Global is disabled
 if (

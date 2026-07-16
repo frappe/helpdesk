@@ -42,7 +42,7 @@
         <Dropdown :options="filterOptions" placement="right">
           <template #default="{ open }">
             <Button
-              :label="activeFilter"
+              :label="activeFilterLabel"
               class="flex items-center justify-between w-fit p-4"
             >
               <template #suffix>
@@ -52,23 +52,6 @@
                 />
               </template>
             </Button>
-          </template>
-          <template #item-label="{ item }">
-            <button
-              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
-              @click="item.onSelect"
-            >
-              <div class="flex items-center justify-between flex-1">
-                <span class="whitespace-nowrap">
-                  {{ item.label }}
-                </span>
-                <FeatherIcon
-                  v-if="activeFilter === item.value"
-                  name="check"
-                  class="size-4 text-ink-gray-7"
-                />
-              </div>
-            </button>
           </template>
         </Dropdown>
       </div>
@@ -315,40 +298,27 @@ const duplicate = async () => {
 };
 
 const filterOptions = computed(() => {
-  const options = [
-    {
-      label: __("All"),
-      value: "All",
-      onSelect: () => {
-        applyFilter("All");
-      },
-    },
-    {
-      label: __("Personal"),
-      value: "Personal",
-      onSelect: () => {
-        applyFilter("Personal");
-      },
-    },
-    {
-      label: __("My Team"),
-      value: "Team",
-      onSelect: () => {
-        applyFilter("Team");
-      },
-    },
-    {
-      label: __("Global"),
-      value: "Global",
-      onSelect: () => {
-        applyFilter("Global");
-      },
-    },
+  const scopes = [
+    { label: __("All"), value: "All" },
+    { label: __("Personal"), value: "Personal" },
+    { label: __("My Team(s)"), value: "Team" },
+    { label: __("Global"), value: "Global" },
   ];
   if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
-    options.pop();
+    scopes.pop();
   }
-  return options;
+  return scopes.map((scope) => ({
+    ...scope,
+    selected: activeFilter.value === scope.value,
+    onClick: () => applyFilter(scope.value),
+  }));
+});
+
+const activeFilterLabel = computed(() => {
+  return (
+    filterOptions.value.find((option) => option.value === activeFilter.value)
+      ?.label ?? activeFilter.value
+  );
 });
 
 const applyFilter = (scope: string) => {

@@ -11,13 +11,14 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
+          class="text-lg-medium text-nowrap truncate max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
+          :class="open && '!bg-surface-gray-3'"
           :label="currentView.label"
         >
           <template #prefix>
             <component
               :is="currentView.icon"
-              class="h-4 flex items-center justify-center"
+              class="flex size-4 shrink-0 items-center justify-center"
             />
           </template>
           <template #suffix>
@@ -124,14 +125,10 @@ const isCurrentView = (item) => {
   @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
   -webkit-mask-image: linear-gradient(
     to bottom,
-    black calc(100% - var(--fade-bottom)),
+    black calc(100%),
     transparent 100%
   );
-  mask-image: linear-gradient(
-    to bottom,
-    black calc(100% - var(--fade-bottom)),
-    transparent 100%
-  );
+  mask-image: linear-gradient(to bottom, black calc(100%), transparent 100%);
   animation: scroll-fade linear both;
   animation-timeline: scroll(self);
 }
