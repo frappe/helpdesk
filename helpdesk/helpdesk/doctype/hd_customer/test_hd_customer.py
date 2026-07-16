@@ -225,11 +225,13 @@ class TestHDCustomer(IntegrationTestCase):
         email = "primary-contact-api@example.com"
         cleanup_customer_and_contact("Test Customer API Primary", email)
 
-        name = create_customer_api(
+        result = create_customer_api(
             {"customer_name": "Test Customer API Primary", "customer_type": "Company"},
             {"first_name": "Primary", "last_name": "Contact", "email": email},
         )
 
+        name = result["name"]
+        self.assertEqual(result["invited_emails"], [email])
         customer = frappe.get_doc("HD Customer", name)
         contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
         self.assertEqual(customer.customer_type, "Company")
@@ -249,7 +251,7 @@ class TestHDCustomer(IntegrationTestCase):
         name = create_customer_api(
             {"customer_name": "Test Customer API Accept", "customer_type": "Company"},
             {"first_name": "Primary", "email": email},
-        )
+        )["name"]
         invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
         user = create_user(email)
 
@@ -269,7 +271,7 @@ class TestHDCustomer(IntegrationTestCase):
         cleanup_customer_and_contact("Test Customer API Linked User", email)
         contact = create_contact("LinkedPrimary", email)
 
-        name = create_customer_api(
+        result = create_customer_api(
             {
                 "customer_name": "Test Customer API Linked User",
                 "customer_type": "Company",
@@ -277,7 +279,8 @@ class TestHDCustomer(IntegrationTestCase):
             {"first_name": "LinkedPrimary", "email": email},
         )
 
-        customer = frappe.get_doc("HD Customer", name)
+        self.assertEqual(result["invited_emails"], [])
+        customer = frappe.get_doc("HD Customer", result["name"])
         self.assertEqual(customer.primary_contact, contact["contact"])
         contacts = frappe.db.get_all("Contact", {"email_id": email}, pluck="name")
         self.assertEqual(contacts, [contact["contact"]], "Contact must be reused")
@@ -290,7 +293,7 @@ class TestHDCustomer(IntegrationTestCase):
         cleanup_customer_and_contact("Test Customer API Existing Contact", email)
         contact = create_contact("ExistingPrimary", email, user=False)
 
-        name = create_customer_api(
+        result = create_customer_api(
             {
                 "customer_name": "Test Customer API Existing Contact",
                 "customer_type": "Company",
@@ -298,6 +301,8 @@ class TestHDCustomer(IntegrationTestCase):
             {"first_name": "ExistingPrimary", "email": email},
         )
 
+        name = result["name"]
+        self.assertEqual(result["invited_emails"], [email])
         customer = frappe.get_doc("HD Customer", name)
         self.assertEqual(customer.primary_contact, contact["contact"])
         contacts = frappe.db.get_all("Contact", {"email_id": email}, pluck="name")
@@ -313,7 +318,7 @@ class TestHDCustomer(IntegrationTestCase):
         cleanup_customer_and_contact("Test Customer API User Only", email)
         user = create_user(email)
 
-        name = create_customer_api(
+        result = create_customer_api(
             {
                 "customer_name": "Test Customer API User Only",
                 "customer_type": "Company",
@@ -321,7 +326,8 @@ class TestHDCustomer(IntegrationTestCase):
             {"first_name": "UserOnly", "email": email},
         )
 
-        customer = frappe.get_doc("HD Customer", name)
+        self.assertEqual(result["invited_emails"], [])
+        customer = frappe.get_doc("HD Customer", result["name"])
         contact = frappe.db.get_value("Contact", {"email_id": email}, "name")
         self.assertEqual(customer.primary_contact, contact)
         self.assertEqual(frappe.db.get_value("Contact", contact, "user"), user.name)
