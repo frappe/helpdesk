@@ -22,7 +22,7 @@
           </p>
 
           <p class="text-base pt-1.5">
-            A few quick questions to tailor Helpdesk to how you work.
+            {{ __("This helps us personalize your Helpdesk experience.") }}
           </p>
         </div>
         <template v-if="question.type === 'text'">
