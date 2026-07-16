@@ -19,6 +19,31 @@
           v-model="view.label"
         />
       </div>
+
+      <!-- Layout picker — applies to Create, Duplicate, and Edit so
+           every dialog touching the view doc surfaces the same control.
+           For Edit, the current view's type pre-fills it (see
+           viewDialog.view.type set by the parent on open). -->
+      <div class="mt-4 mb-1.5 block text-base text-ink-gray-5">
+        {{ __("Layout") }}
+      </div>
+      <div class="inline-flex rounded-md bg-surface-gray-2 p-0.5">
+        <button
+          v-for="opt in layoutOptions"
+          :key="opt.value"
+          type="button"
+          class="flex items-center gap-1.5 rounded px-3 py-1 text-sm transition"
+          :class="
+            view.type === opt.value
+              ? 'bg-surface-white text-ink-gray-9 shadow-sm'
+              : 'text-ink-gray-6 hover:text-ink-gray-8'
+          "
+          @click="view.type = opt.value"
+        >
+          <FeatherIcon :name="opt.icon" class="h-3.5 w-3.5" />
+          {{ opt.label }}
+        </button>
+      </div>
     </template>
     <template #actions>
       <Button
@@ -33,9 +58,10 @@
 
 <script setup>
 import { ref } from "vue";
-import { Dialog } from "frappe-ui";
+import { Dialog, FeatherIcon } from "frappe-ui";
 import IconPicker from "@/components/IconPicker.vue";
 import { computed } from "vue";
+import { __ } from "@/translation";
 
 let viewDialog = defineModel();
 
@@ -43,7 +69,13 @@ const view = ref({
   label: viewDialog.value.view.label || "",
   icon: viewDialog.value.view.icon || "",
   name: viewDialog.value.view.name || "",
+  type: viewDialog.value.view.type || "list",
 });
+
+const layoutOptions = [
+  { value: "list", label: __("List"), icon: "align-justify" },
+  { value: "kanban", label: __("Kanban"), icon: "columns" },
+];
 
 const modalInfo = computed(() => {
   return {
