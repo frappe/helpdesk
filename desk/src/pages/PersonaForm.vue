@@ -83,7 +83,6 @@ const questions = [
     label: __("What is your organization's name?"),
     placeholder: __("e.g. Acme Inc."),
     required: true,
-    requiredMessage: __("Please enter your organization's name"),
     dropdown: {
       key: "company_size",
       label: __("How big is your support team?"),

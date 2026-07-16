@@ -51,11 +51,6 @@
                 type="text"
                 variant="outline"
                 :placeholder="question.placeholder"
-                :error="
-                  showRequiredError
-                    ? question.requiredMessage ?? __('This field is required')
-                    : undefined
-                "
                 @keyup.enter="proceed"
               />
             </div>
@@ -125,6 +120,7 @@
         class="!h-7 w-full !rounded-lg"
         variant="solid"
         :label="isLast ? __('Finish') : __('Next')"
+        :disabled="!canProceed"
         @click="proceed"
       />
     </div>
@@ -152,22 +148,21 @@ const emit = defineEmits<{ submit: [answers: Answers] }>();
 const current = ref(0);
 const completed = ref(false);
 const answers = reactive<Answers>({});
-const requiredError = ref(false);
 const otherInput = ref<InstanceType<typeof Textarea>>();
 
 const total = computed(() => props.questions.length);
 const question = computed(() => props.questions[current.value] as Question);
 const isLast = computed(() => current.value === total.value - 1);
 
-const isRequiredTextEmpty = computed(() => {
+// Next stays disabled until the current question has an answer.
+const canProceed = computed(() => {
   const q = question.value;
-  if (q.type !== "text" || !q.required) return false;
   const value = answers[q.key];
-  return typeof value !== "string" || !value.trim();
+  if (q.type === "text")
+    return typeof value === "string" && value.trim() !== "";
+  if (q.multiple) return Array.isArray(value) && value.length > 0;
+  return typeof value === "string" && value !== "";
 });
-const showRequiredError = computed(
-  () => requiredError.value && isRequiredTextEmpty.value
-);
 
 // Narrow the discriminated union so the template stays declarative: choice
 // questions render pills, text questions may carry a dropdown beneath them.
@@ -225,21 +220,15 @@ function select(option: Option) {
 }
 
 function advance() {
-  requiredError.value = false;
   if (current.value < total.value - 1) current.value += 1;
 }
 
 function back() {
-  requiredError.value = false;
   if (current.value > 0) current.value -= 1;
 }
 
-// Next never blocks except on a required, still-empty text question.
 function proceed() {
-  if (isRequiredTextEmpty.value) {
-    requiredError.value = true;
-    return;
-  }
+  if (!canProceed.value) return;
   if (isLast.value) finish();
   else advance();
 }

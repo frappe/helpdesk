@@ -19,7 +19,6 @@ export interface TextQuestion {
   placeholder?: string;
   multiline?: boolean;
   required?: boolean;
-  requiredMessage?: string;
   dropdown?: DropdownConfig;
 }
 
