@@ -159,7 +159,7 @@ const canProceed = computed(() => {
   const q = question.value;
   const value = answers[q.key];
   if (q.type === "text")
-    return typeof value === "string" && value.trim() !== "";
+    return !q.required || (typeof value === "string" && value.trim() !== "");
   if (q.multiple) return Array.isArray(value) && value.length > 0;
   return typeof value === "string" && value !== "";
 });
