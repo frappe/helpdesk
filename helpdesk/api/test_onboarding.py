@@ -65,3 +65,14 @@ class TestInvitationTitleOverride(IntegrationTestCase):
             self._invitation()._get_email_title(),
             frappe.get_hooks("app_title", app_name="helpdesk")[0],
         )
+
+    def test_other_apps_keep_their_title(self):
+        # The override is site-wide; a brand name must not leak into other
+        # apps' invitation emails.
+        frappe.db.set_single_value("HD Settings", "brand_name", BRAND)
+        invitation = frappe.new_doc("User Invitation")
+        invitation.app_name = "frappe"
+        self.assertEqual(
+            invitation._get_email_title(),
+            frappe.get_hooks("app_title", app_name="frappe")[0],
+        )
