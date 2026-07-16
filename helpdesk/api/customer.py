@@ -32,16 +32,24 @@ def create_customer(customer: dict, primary_contact: dict | None = None) -> str:
 
 
 def add_primary_contact(customer_doc: Document, primary_contact: dict) -> None:
-    contact_name = create_contact(
-        {
-            "first_name": primary_contact.get("first_name"),
-            "last_name": primary_contact.get("last_name"),
-            "email": primary_contact.get("email"),
-            "phone": primary_contact.get("mobile_no"),
-            "customer": customer_doc.name,
-        },
-        invite=True,
-    )
+    """Set the primary contact, reusing an existing contact for the email.
+
+    The contact is created first when the email is unknown, so the form's
+    name and phone are kept; add_contacts then adds it directly if it has a
+    linked user and invites it by email otherwise.
+    """
+    email = primary_contact.get("email")
+    contact_name = frappe.db.get_value("Contact", {"email_id": email}, "name")
+    if not contact_name:
+        contact_name = create_contact(
+            {
+                "first_name": primary_contact.get("first_name"),
+                "last_name": primary_contact.get("last_name"),
+                "email": email,
+                "phone": primary_contact.get("mobile_no"),
+            }
+        )
+    customer_doc.add_contacts([contact_name], "HD Customer Manager")
     customer_doc.set_primary(contact_name)
     customer_doc.save()
 
