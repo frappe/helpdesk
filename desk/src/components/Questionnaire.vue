@@ -27,7 +27,10 @@
         </div>
         <template v-if="question.type === 'text'">
           <div class="flex flex-col gap-3">
-            <div>
+            <!-- Cap textarea resize: vertical only, between one row block and ~2x default. -->
+            <div
+              class="[&_textarea]:resize-y [&_textarea]:min-h-16 [&_textarea]:max-h-40"
+            >
               <span
                 v-if="question.label"
                 class="mb-1.5 block text-p-sm text-ink-gray-5"
@@ -97,7 +100,7 @@
           >
             <div class="overflow-hidden">
               <div
-                class="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                class="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] [&_textarea]:resize-y [&_textarea]:min-h-16 [&_textarea]:max-h-40"
                 :class="isOtherSelected ? 'translate-y-0' : '-translate-y-full'"
               >
                 <Textarea
