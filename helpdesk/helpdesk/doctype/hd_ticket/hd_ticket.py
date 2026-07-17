@@ -944,11 +944,50 @@ class HDTicket(Document):
             "category",
         )
 
+    def get_merge_target(self):
+        # Follow the chain of merged tickets to the final, non-merged ticket. Return None
+        # if the chain dead-ends on a missing ticket or loops back on itself (a corrupt
+        # cycle), so a reply is never redirected onto another merged ticket.
+        current_ticket_name = self.merged_with
+        visited_ticket_names = {self.name}
+        while current_ticket_name and current_ticket_name not in visited_ticket_names:
+            ticket = frappe.db.get_value(
+                "HD Ticket",
+                current_ticket_name,
+                ["is_merged", "merged_with"],
+                as_dict=True,
+            )
+            if not ticket:
+                return None
+            visited_ticket_names.add(current_ticket_name)
+            if not ticket.is_merged:
+                return current_ticket_name
+            if not ticket.merged_with:
+                return None
+            current_ticket_name = ticket.merged_with
+        return None
+
+    def redirect_communication_to_merge_target(self, communication):
+        merge_target_name = self.get_merge_target()
+        if not merge_target_name:
+            return False
+        communication.db_set("reference_name", merge_target_name)
+        merge_target = frappe.get_doc("HD Ticket", merge_target_name)
+        merge_target.on_communication_update(communication)
+        return True
+
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
     # is an external dependency. Refer `communication.py` of Frappe framework for more.
     # Since this is called from communication itself, `c` is the communication doc.
     def on_communication_update(self, c):
+        # A reply to a merged ticket belongs to its merge target; redirect it there. If no
+        # safe target resolves (cycle/dead-end), fall through and handle it here so the
+        # reply isn't dropped.
+        if c.sent_or_received == "Received" and self.is_merged and self.merged_with:
+            if self.redirect_communication_to_merge_target(c):
+                return
+
         # If communication is incoming, then it is a reply from customer, and ticket must
         # be reopened.
         # handle re opening tickets for email
