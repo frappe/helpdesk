@@ -17,7 +17,7 @@
         >
           <Button
             class="rtl:flex-row-reverse"
-            label="Create"
+            :label="__('Create')"
             theme="gray"
             variant="solid"
           >
