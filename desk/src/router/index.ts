@@ -233,11 +233,8 @@ router.beforeEach(async (to, _, next) => {
     await authStore.init();
   }
 
-  // Route-level access to /onboarding is handled by its beforeEnter.
-  if (to.name !== "Persona") {
-    const interrupt = await personaInterrupt(authStore);
-    if (interrupt) return next(interrupt);
-  }
+  const interrupt = personaInterrupt(to, authStore);
+  if (interrupt) return next(interrupt);
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";

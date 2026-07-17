@@ -53,10 +53,8 @@ def get_user():
         "System Settings", "language"
     )
     # Ride the boot so the onboarding guard decides without an extra round-trip.
-    persona_captured = (
-        bool(frappe.db.get_single_value("HD Settings", "persona_captured"))
-        if has_desk_access
-        else True
+    persona_captured = bool(
+        frappe.db.get_single_value("HD Settings", "persona_captured")
     )
 
     return {
