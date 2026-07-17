@@ -1,6 +1,6 @@
 <template>
   <FrappeUIProvider>
-    <PortalRoot />
+    <router-view />
   </FrappeUIProvider>
   <Dialogs />
 </template>
@@ -11,10 +11,9 @@ import { useConfigStore } from "@/stores/config";
 import { useFavicon } from "@vueuse/core";
 import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, defineAsyncComponent, h, onMounted } from "vue";
+import { h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
 import WifiOff from "~icons/lucide/wifi-off";
-import { useAuthStore } from "./stores/auth";
 import { __ } from "./translation";
 import { isCustomerPortal, getBrowserTimezone } from "./utils";
 
@@ -44,21 +43,5 @@ onMounted(() => {
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);
   setConfig("systemTimezone", window.timezone?.system || null);
-});
-
-const AgentPortalRoot = defineAsyncComponent(
-  () => import("@/roots/AgentRoot.vue")
-);
-const CustomerPortalRoot = defineAsyncComponent(
-  () => import("@/roots/CustomerPortalRoot.vue")
-);
-
-const PortalRoot = computed(() => {
-  const authStore = useAuthStore();
-  if (authStore.hasDeskAccess && authStore.isAgent) {
-    return AgentPortalRoot;
-  } else {
-    return CustomerPortalRoot;
-  }
 });
 </script>
