@@ -5,10 +5,8 @@
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
       </template>
     </LayoutHeader>
-    <div
-      class="gap-5 flex flex-col h-full"
-      v-if="customer.doc && customer.doc?.name"
-    >
+    <DetailPageSkeleton v-if="!customer.doc?.name" avatar-shape="square" />
+    <div class="gap-5 flex flex-col h-full" v-else>
       <!-- customer detail -->
       <PageInfo
         :avatar="{
@@ -104,6 +102,7 @@ import CustomerContactTab from "@/components/customer/CustomerContactTab.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import TicketStats from "@/components/customer/TicketStats.vue";
 import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
+import DetailPageSkeleton from "@/components/DetailPageSkeleton.vue";
 import TicketHashIcon from "@/components/icons/TicketHashIcon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import PageInfo from "@/components/PageInfo.vue";
@@ -136,7 +135,6 @@ const props = defineProps<{
 }>();
 const route = useRoute();
 const router = useRouter();
-
 const { isMobileView } = useScreenSize();
 const { ticketsListResource, ticketsCountResource } = getTicketListResource();
 

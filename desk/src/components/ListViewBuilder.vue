@@ -38,9 +38,29 @@
   <!-- Loading State -->
   <div
     v-if="list.loading && !list.data?.data?.length"
-    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+    class="flex-1 overflow-hidden sm:mx-5 mx-3"
   >
-    <LoadingIndicator :scale="8" />
+    <div class="flex items-center gap-6 border-b py-2.5">
+      <Skeleton
+        v-for="column in 5"
+        :key="column"
+        class="h-3"
+        :class="column === 1 ? 'w-2/5' : 'flex-1'"
+      />
+    </div>
+    <div
+      v-for="row in 12"
+      :key="row"
+      class="flex items-center gap-6 border-b py-3.5"
+    >
+      <div class="flex w-2/5 items-center gap-3">
+        <Skeleton variant="circle" class="h-5 w-5 shrink-0" />
+        <Skeleton class="h-3.5" :class="skeletonCellWidth(row, 0)" />
+      </div>
+      <div v-for="column in 4" :key="column" class="flex-1">
+        <Skeleton class="h-3.5" :class="skeletonCellWidth(row, column)" />
+      </div>
+    </div>
   </div>
   <!-- List View -->
   <ListView
@@ -156,7 +176,6 @@ import {
   ListRowItem,
   ListSelectBanner,
   ListView,
-  LoadingIndicator,
   dayjs,
   toast,
 } from "frappe-ui";
@@ -174,6 +193,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import EmptyState from "./EmptyState.vue";
 import ListRows from "./ListRows.vue";
+import { Skeleton } from "./Skeleton";
 
 interface P {
   options: {
@@ -550,6 +570,11 @@ function listCell(column: any, row: any, item: any, idx: number) {
     class: "truncate flex-1",
     textContent: item,
   });
+}
+
+const skeletonWidths = ["w-3/5", "w-2/5", "w-4/5", "w-1/2"];
+function skeletonCellWidth(row: number, column: number): string {
+  return skeletonWidths[(row + column) % skeletonWidths.length];
 }
 
 function handleFieldClick(e: MouseEvent, column, row, item) {
