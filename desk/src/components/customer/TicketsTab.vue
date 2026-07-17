@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col focus-visible:border-none" tabindex="0">
-    <!-- Filter bar: sticks below the tablist (46px) while the page scrolls -->
+    <!-- ponytail: top-[46px] hardcodes the frappe-ui tablist height; if the
+         tablist changes size, switch to measuring it (useElementSize) -->
+    <!-- Filter bar: sticks below the tablist while the page scrolls -->
     <div
       class="sticky top-[46px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
     >
@@ -153,17 +155,13 @@
   </div>
 </template>
 
-<script
-  setup
-  lang="ts"
-  generic="T extends Record<string, any> = Record<string, any>"
->
+<script setup lang="ts">
 import Link from "@/components/frappe-ui/Link.vue";
 import { IndicatorIcon } from "@/components/icons";
 import { useScreenSize } from "@/composables/screen";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
-import type { DocumentResource, ListResource, Resource } from "@/types";
+import type { ListResource, Resource } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
 import { watchDebounced } from "@vueuse/core";
 import { dayjsLocal, FormControl, LoadingIndicator } from "frappe-ui";
@@ -180,14 +178,13 @@ type TicketFilterField = {
 };
 
 const props = defineProps<{
-  doc: DocumentResource<T>;
   ticketsListResource: ListResource<HDTicket>;
   ticketsCountResource: Resource<number>;
   baseFilter: Record<string, string>;
   additionalFilter?: TicketFilterField;
 }>();
 
-const { doc, ticketsListResource, ticketsCountResource, baseFilter } = props;
+const { ticketsListResource, ticketsCountResource, baseFilter } = props;
 
 const router = useRouter();
 const { isMobileView } = useScreenSize();

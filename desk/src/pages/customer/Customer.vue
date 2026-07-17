@@ -66,7 +66,6 @@
               <div v-if="tab.label === __('Tickets')">
                 <!-- Tickets tab content -->
                 <TicketsTab
-                  :doc="customer"
                   :ticketsListResource="ticketsListResource"
                   :ticketsCountResource="ticketsCountResource"
                   :baseFilter="{ customer: props.id }"
