@@ -7,7 +7,7 @@
     <div class="flex h-full flex-col p-2">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
 
-      <div class="mt-2 flex-1 overflow-y-auto overflow-x-hidden">
+      <ScrollArea class="mt-2 min-h-0 flex-1 -mx-2" viewport-class="px-2">
         <template v-for="(section, index) in sections" :key="index">
           <SidebarLabel
             v-if="section.label"
@@ -87,7 +87,7 @@
             </SidebarItem>
           </nav>
         </template>
-      </div>
+      </ScrollArea>
 
       <div class="mt-auto flex flex-col gap-2">
         <slot name="footer" :is-collapsed="isCollapsed" />
@@ -118,6 +118,7 @@ import {
   Badge,
   Button,
   Dropdown,
+  ScrollArea,
   Sidebar,
   SidebarCollapseToggle,
   SidebarItem,
