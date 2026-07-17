@@ -47,3 +47,5 @@ helpdesk.patches.set_default_customer_type
 helpdesk.patches.add_user_invitation_perms
 helpdesk.patches.enable_auto_set_customer_from_contact
 helpdesk.patches.show_customer_portal_permission_notice
+helpdesk.patches.harden_hd_ticket_field_permissions
+

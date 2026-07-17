@@ -4,6 +4,7 @@ from datetime import timedelta
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils import (
     add_to_date,
@@ -40,6 +41,19 @@ def new(doc: dict, attachments: list[dict] = []):
     return d
 
 
+def get_customer_visible_columns():
+    """Columns a non-agent may read: standard fields plus everything up to
+    permlevel 1. Permlevel-2 fields are agent-only internals."""
+    meta = frappe.get_meta("HD Ticket")
+    columns = ["name", "creation", "modified", "owner"]
+    columns += [
+        df.fieldname
+        for df in meta.fields
+        if df.permlevel <= 1 and df.fieldtype not in no_value_fields
+    ]
+    return columns
+
+
 @frappe.whitelist()
 def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
@@ -48,15 +62,14 @@ def get_one(name: str, is_customer_portal: bool = False):
 
     _is_agent = is_agent()
 
-    query = (
-        frappe.qb.from_(QBTicket)
-        .select(QBTicket.star)
-        .where(QBTicket.name == name)
-        .limit(1)
-    )
+    query = frappe.qb.from_(QBTicket).where(QBTicket.name == name).limit(1)
 
-    if not _is_agent:
-        query = query.where(get_customer_criteria())
+    if _is_agent:
+        query = query.select(QBTicket.star)
+    else:
+        query = query.select(
+            *(QBTicket[column] for column in get_customer_visible_columns())
+        ).where(get_customer_criteria())
 
     ticket = query.run(as_dict=True)
     if not len(ticket):

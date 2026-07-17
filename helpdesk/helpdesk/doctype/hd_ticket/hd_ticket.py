@@ -18,6 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -72,6 +73,46 @@ class HDTicket(Document):
 
     def before_insert(self):
         self.generate_key()
+        self.apply_portal_insert_rules()
+
+    def apply_portal_insert_rules(self):
+        """
+        Non-agents cannot spoof server-owned fields on insert. The framework
+        resets permlevel-protected fields right after this hook
+        (`validate_higher_perm_levels`), so exempt the ones set server-side
+        here plus the template fields the customer legitimately fills.
+        """
+        if is_agent():
+            return
+        if frappe.session.user != "Guest":
+            self.raised_by = frappe.session.user
+        self.via_customer_portal = 1
+        self.flags.ignore_permlevel_for_fields = [
+            "key",
+            "raised_by",
+            "via_customer_portal",
+            # multi-org contacts pick the org at creation; set_customer
+            # rejects any customer the contact is not linked to
+            "customer",
+            *self.get_customer_template_fields(),
+        ]
+
+    def get_customer_template_fields(self):
+        """Fields the ticket's template exposes to the customer.
+
+        Of the permlevel-1 fields, only genuine creation-form inputs may
+        pierce the guard; derived and system fields stay locked even if a
+        template lists them as visible.
+        """
+        template = self.template or DEFAULT_TICKET_TEMPLATE
+        fields = frappe.get_all(
+            "HD Ticket Template Field",
+            filters={"parent": template, "hide_from_customer": 0},
+            pluck="fieldname",
+        )
+        exposable = {"priority", "ticket_type", "agent_group", "customer"}
+        protected = {df.fieldname for df in self.meta.get_high_permlevel_fields()}
+        return [f for f in fields if f not in protected or f in exposable]
 
     def before_validate(self):
         self.check_update_perms()
@@ -1042,6 +1083,14 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
+        # The response stamps sit at permlevel 1; portal replies reach this
+        # save under the customer's session, which has no level-1 write, so
+        # exempt them from the framework's silent reset.
+        self.flags.ignore_permlevel_for_fields = [
+            "last_customer_response",
+            "last_agent_response",
+            "first_responded_on",
+        ]
         # Save the ticket, allowing for hooks to run.
         self.save()
 
