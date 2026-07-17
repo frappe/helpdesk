@@ -132,9 +132,14 @@ const { state, primaryContact, reset } = useNewCustomerForm();
 const customerResource: Resource = createResource({
   url: "helpdesk.api.customer.create_customer",
   method: "POST",
-  onSuccess: (name: string) => {
-    router.push({ name: "Customer", params: { id: name } });
-    toast.success(__("Customer created"));
+  onSuccess: (data: { name: string; invited_emails: string[] }) => {
+    router.push({ name: "Customer", params: { id: data.name } });
+    const invited = data.invited_emails?.[0];
+    toast.success(
+      invited
+        ? __("Customer created · invitation sent to {0}", invited)
+        : __("Customer created")
+    );
   },
   onError: (error: unknown) => {
     getErrorMessage(error, true);

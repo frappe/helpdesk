@@ -66,11 +66,11 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 overflow-hidden flex flex-col flex-1 min-h-0">
+            <div class="p-5 flex flex-col flex-1 min-h-0">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
-                :doc="contact"
                 :ticketsListResource="ticketsListResource"
+                :ticketsCountResource="ticketsCountResource"
                 :baseFilter="{ contact: props.id }"
                 :additionalFilter="
                 (contactInfoResource.data?.customers?.length ?? 0) > 1
@@ -166,13 +166,13 @@ const {
 
 const { feedbackCount } = useContactFeedback(props.id);
 
-const { ticketsListResource } = getTicketListResource();
+const { ticketsListResource, ticketsCountResource } = getTicketListResource();
 
 const tabs = computed(() => [
   {
     label: __("Tickets"),
     hash: "tickets",
-    count: ticketsListResource.data?.length ?? 0,
+    count: ticketsCountResource.data ?? 0,
     icon: h(TicketHashIcon, { class: "size-4" }),
   },
   {
@@ -338,6 +338,7 @@ onMounted(() => {
     },
   });
   ticketsListResource.fetch();
+  ticketsCountResource.fetch();
 });
 
 usePageMeta(() => {
@@ -351,6 +352,11 @@ usePageMeta(() => {
 /* frappe-ui's TabsRoot clips with overflow-hidden, which traps the sticky
    tablist. Let it overflow so the tablist sticks to the page scroll container. */
 .tabs-sticky-header {
+  overflow: visible !important;
+}
+/* Same for the tab panels, so sticky children (e.g. the ticket filter bar)
+   can stick to the page scroll container instead of being clipped. */
+.tabs-sticky-header :deep([role="tabpanel"]) {
   overflow: visible !important;
 }
 .tabs-sticky-header :deep([role="tablist"]) {
