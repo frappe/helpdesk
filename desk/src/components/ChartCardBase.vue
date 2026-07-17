@@ -22,7 +22,11 @@
         </slot>
         <div v-if="timelineFilter" class="flex items-center text-sm gap-1">
           <div class="flex items-center gap-1" :class="percentageChange.color">
-            <span :class="percentageChange.icon" class="size-4" />
+            <span
+              v-if="percentageChange.icon"
+              :class="percentageChange.icon"
+              class="size-4"
+            />
             <div>{{ percentageChange.value }}%</div>
           </div>
           <Dropdown :options="durationOptions">
@@ -76,7 +80,11 @@
       </div>
       <div v-if="timelineFilter" class="flex items-center text-sm gap-1">
         <div class="flex items-center gap-1" :class="percentageChange.color">
-          <span :class="percentageChange.icon" class="size-4" />
+          <span
+            v-if="percentageChange.icon"
+            :class="percentageChange.icon"
+            class="size-4"
+          />
           <div>{{ percentageChange.value }}%</div>
         </div>
         <Dropdown :options="durationOptions">
