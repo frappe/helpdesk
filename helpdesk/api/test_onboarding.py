@@ -57,8 +57,12 @@ class TestInvitationTitleOverride(IntegrationTestCase):
         self.assertIsInstance(frappe.new_doc("User Invitation"), HelpdeskUserInvitation)
 
     def test_title_uses_brand_name(self):
+        # Subject becomes "You've been invited to join <brand> on <app title>".
         frappe.db.set_single_value("HD Settings", "brand_name", BRAND)
-        self.assertEqual(self._invitation()._get_email_title(), BRAND)
+        app_title = frappe.get_hooks("app_title", app_name="helpdesk")[0]
+        self.assertEqual(
+            self._invitation()._get_email_title(), f"{BRAND} on {app_title}"
+        )
 
     def test_title_falls_back_to_app_title(self):
         self.assertEqual(
