@@ -491,9 +491,9 @@ const toggleEnabled = () => {
   slaData.value.enabled = !slaData.value.enabled;
 };
 
-const toggleDefaultSla = () => {
-  slaData.value.default_sla = !slaData.value.default_sla;
-  if (slaData.value.default_sla) {
+const toggleDefaultSla = (value: boolean) => {
+  slaData.value.default_sla = value;
+  if (value) {
     slaData.value.enabled = true;
   }
 };
