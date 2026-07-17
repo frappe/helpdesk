@@ -69,7 +69,6 @@
             <div class="p-5 flex flex-col flex-1 min-h-0">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
-                :doc="contact"
                 :ticketsListResource="ticketsListResource"
                 :ticketsCountResource="ticketsCountResource"
                 :baseFilter="{ contact: props.id }"
