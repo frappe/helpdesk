@@ -19,27 +19,20 @@ index 0b7069a..de2a3df 100644
            items: ({ query }: { query: string }) =>
              typeof options.items === 'function' ? options.items(query) : options.items,
 diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
-index 8363502..8203e91 100644
+index 8363502..07f4551 100644
 --- a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
 +++ b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
-@@ -82,6 +82,32 @@ export function createSuggestionRenderer(
+@@ -82,6 +82,25 @@ export function createSuggestionRenderer(
      })
    }
  
-+  // The mount host `VueRenderer` creates for the popup component. We attach and
-+  // position THIS wrapper rather than `renderer.element` (its firstElementChild):
-+  // some popup components (e.g. the reka `FocusScope`-based `EditorPopover`) don't
-+  // expose a synchronous first element child at render time, so `renderer.element`
-+  // stays null and the popup never gets appended. The wrapper always exists right
-+  // after `new VueRenderer(...)`, and the popup renders inside it.
++  // Attach the VueRenderer's mount wrapper (`el`), not `renderer.element` —
++  // FocusScope-based popups have no synchronous first element child.
 +  function getWrapper(): HTMLElement | null {
 +    return (renderer as unknown as { el: HTMLElement | null } | null)?.el ?? null
 +  }
 +
-+  // Attach the popup wrapper to the body and position it. Safe to call again from
-+  // a later onUpdate if the initial attach couldn't complete.
 +  function attach(props: SuggestionProps, token: number): void {
-+    // Fix 2/3: bail if a newer query superseded us or we were torn down.
 +    if (!isActive || token !== renderToken || !renderer) return
 +    if (floatingEl) return
 +    const wrapper = getWrapper()
@@ -55,7 +48,7 @@ index 8363502..8203e91 100644
    return {
      onStart(props: SuggestionProps) {
        isActive = true
-@@ -92,15 +118,7 @@ export function createSuggestionRenderer(
+@@ -92,15 +111,7 @@ export function createSuggestionRenderer(
          props,
        })
  
@@ -72,13 +65,22 @@ index 8363502..8203e91 100644
      },
  
      onUpdate(props: SuggestionProps) {
-@@ -115,7 +133,10 @@ export function createSuggestionRenderer(
+@@ -108,14 +119,18 @@ export function createSuggestionRenderer(
+       if (!isActive || !renderer) return
+       const token = ++renderToken
+ 
+-      renderer.updateProps(props)
++      // Skip the plugin's transient `loading` dispatch (empty items) so the
++      // popover doesn't unmount/remount on every keystroke.
++      const loading = (props as SuggestionProps & { loading?: boolean }).loading
++      if (!loading) renderer.updateProps(props)
+ 
+       if (!props.clientRect) return
+       // Fix 2: a newer query bumped the token between updateProps and now.
        if (token !== renderToken) return
  
        getReferenceClientRect = props.clientRect as () => DOMRect | null
 -      updatePosition()
-+      // If the initial mount couldn't attach yet, do it now instead of only
-+      // repositioning.
 +      if (!floatingEl) attach(props, token)
 +      else updatePosition()
      },
