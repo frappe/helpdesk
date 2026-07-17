@@ -49,9 +49,25 @@ def get_boot():
             "lang": frappe.local.lang,
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
+            "telemetry": get_telemetry_boot(),
         }
     )
 
 
 def get_default_route():
     return "/helpdesk"
+
+
+def get_telemetry_boot():
+    """Direct-mode config for the browser telemetry client, as a boot value.
+
+    Telemetry must never break the page: older frappe versions have no pulse
+    module, and any boot_config error degrades to "disabled". The key it
+    ships is a public write-only ingest key (same as desk boot).
+    """
+    try:
+        from frappe.utils.telemetry.pulse.client import boot_config
+
+        return boot_config()
+    except Exception:
+        return {"enabled": False}
