@@ -183,11 +183,6 @@ const htmlContent = computed(
       .email-content {
         word-break: break-word;
       }
-<<<<<<< HEAD
-=======
-      
-          
->>>>>>> 0939bf8f (fix: preserve line-height for thunderbird mails)
       .email-content :is(:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *))) {
         border-width: 0;
       }
