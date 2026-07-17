@@ -367,7 +367,4 @@ usePageMeta(() => {
   z-index: 10;
   background-color: white;
 }
-html {
-  overscroll-behavior-y: contain;
-}
 </style>
