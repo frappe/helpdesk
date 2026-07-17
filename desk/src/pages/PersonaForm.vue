@@ -23,7 +23,7 @@ import {
 import { markPersonaCaptured } from "@/persona";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { usePageMeta } from "frappe-ui";
+import { call, usePageMeta } from "frappe-ui";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -32,7 +32,7 @@ const leaving = ref(false);
 const FADE_MS = 300;
 
 // The last question's "first goal" answer maps to a settings tab; other goals
-// route directly (create ticket) or fall through to Home.
+// route directly (create ticket, explore) or fall through to Home.
 const settingsTabForGoal: Record<
   string,
   "Email Accounts" | "Invite Agents" | "General"
@@ -56,10 +56,22 @@ async function finishOnboarding(answers: Record<string, string | string[]>) {
   }
 }
 
-// Send the admin to their first goal: new ticket, a settings tab over Home, or Home.
+// Send the admin to their first goal: new ticket, the seeded welcome ticket,
+// a settings tab over Home, or Home.
 async function routeToGoal(goal?: string | string[]) {
   if (goal === "create_ticket") {
     await router.push({ name: "TicketAgentNew" });
+    return;
+  }
+  if (goal === "explore") {
+    const ticket = await call(
+      "helpdesk.api.onboarding.get_welcome_ticket"
+    ).catch(() => null);
+    await router.push(
+      ticket
+        ? { name: "TicketAgent", params: { ticketId: ticket } }
+        : { name: "TicketsAgent" }
+    );
     return;
   }
   await router.push({ name: "Home" });
