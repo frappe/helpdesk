@@ -132,7 +132,7 @@
                 class="flex-1"
                 type="text"
                 :modelValue="customer.name"
-                :disabled="true"
+                readonly
               >
                 <template #prefix>
                   <Avatar

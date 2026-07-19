@@ -755,7 +755,7 @@ export function isElementInViewport(el: HTMLElement) {
 export function parseApiOptions(
   options: string[] | DropdownOption[]
 ): DropdownOption[] | [] {
-  if (!options.length) return [];
+  if (!options?.length) return [];
   return (
     options
       .filter((o) => Boolean(o))
