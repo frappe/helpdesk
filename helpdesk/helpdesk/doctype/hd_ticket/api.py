@@ -602,25 +602,11 @@ def get_navigation_tickets(ticket: str, current_view: str | None = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-<<<<<<< HEAD
-    filters = []
-    if current_view:
-        _filters = frappe.get_value("HD View", current_view, "filters")
-        if _filters:
-            try:
-                # Parse the filters string to list/dict
-                filters = (
-                    json.loads(_filters) if isinstance(_filters, str) else _filters
-                )
-            except (json.JSONDecodeError, TypeError):
-                filters = []
-=======
     conditions = _to_conditions(_get_view_filters(current_view))
     # Custom filter "__assigned_on" is not available in any doctype
     conditions = [c for c in conditions if c[0] != "__assigned_on"]
     conditions.append(["name", "!=", ticket])
     return handle_at_me_support(conditions)
->>>>>>> f079593b (refactor: filter component UX)
 
 
 def _get_view_filters(current_view: str | None) -> dict | list:
@@ -637,18 +623,6 @@ def _get_view_filters(current_view: str | None) -> dict | list:
         )
     )
 
-<<<<<<< HEAD
-        if default_view:
-            try:
-                filters = (
-                    json.loads(default_view)
-                    if isinstance(default_view, str)
-                    else default_view
-                )
-            except (json.JSONDecodeError, TypeError):
-                filters = []
-=======
->>>>>>> f079593b (refactor: filter component UX)
 
 def _parse_view_filters(raw) -> dict | list:
     if not raw:
