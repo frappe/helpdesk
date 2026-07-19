@@ -15,15 +15,9 @@
         <div
           class="flex flex-1 flex-col text-left duration-300 ease-in-out overflow-hidden"
           :class="
-<<<<<<< HEAD
-            !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 w-auto opacity-100'
-=======
             collapsed
               ? 'ms-0 w-0 overflow-hidden opacity-0'
               : 'ms-2 w-auto opacity-100'
->>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
           "
         >
           <div class="text-base-medium leading-none text-ink-gray-9 truncate">
@@ -36,15 +30,9 @@
         <div
           class="duration-300 ease-in-out"
           :class="
-<<<<<<< HEAD
-            !sidebarStore.isExpanded
-              ? 'ml-0 w-0 overflow-hidden opacity-0'
-              : 'ml-2 relative left-[-2.5px] w-auto opacity-100'
-=======
             collapsed
               ? 'ms-0 w-0 overflow-hidden opacity-0'
               : 'ms-2 relative start-[-2.5px] w-auto opacity-100'
->>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
           "
         >
           <FeatherIcon

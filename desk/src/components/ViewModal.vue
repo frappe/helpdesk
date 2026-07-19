@@ -1,16 +1,6 @@
 <template>
   <Dialog v-model:open="viewDialogConfig.show" :title="modalInfo.modalTitle">
     <template #default>
-<<<<<<< HEAD
-      <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
-      <div class="flex gap-2">
-        <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
-          <Button
-            size="md"
-            class="flex size-8 text-3xl leading-none"
-            :label="view.icon"
-            @click="togglePopover"
-=======
       <div class="flex flex-col gap-4">
         <div>
           <div class="mb-1.5 text-base text-ink-gray-5">
@@ -21,7 +11,6 @@
             type="text"
             placeholder="My Open Tickets"
             v-model="view.label"
->>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
           />
         </div>
         <div>

@@ -4,91 +4,9 @@
       <!-- The Sidebar container already has p-2; the extra px-2 only fits when
       expanded. Collapsed, it would squeeze the banners' icon buttons to 0. -->
       <div
-<<<<<<< HEAD
-        v-if="notificationStore.unread"
-        class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-surface-blue-5 left-1"
-        theme="gray"
-        variant="solid"
-      />
-      <SidebarLink
-        class="relative my-0.5"
-        :label="__('Notifications')"
-        :icon="LucideBell"
-        :on-click="() => notificationStore.toggle()"
-        :is-expanded="isExpanded"
-      >
-        <template #right>
-          <Badge
-            v-if="isExpanded && notificationStore.unread"
-            :label="
-              notificationStore.unread > 9 ? '9+' : notificationStore.unread
-            "
-            theme="gray"
-            variant="subtle"
-          />
-        </template>
-      </SidebarLink>
-    </div>
-    <div
-      :class="[
-        'overflow-y-auto overflow-x-hidden',
-        !isExpanded && 'hide-scrollbar',
-      ]"
-    >
-      <div v-for="view in allViews" :key="view.label">
-        <!-- <div
-          v-if="!view.hideLabel && !isExpanded && view.views?.length"
-          class="mx-2 my-2 h-1 border-b"
-        /> -->
-        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
-        <Section
-          :label="view.label"
-          :hideLabel="view.hideLabel"
-          :opened="isSectionOpen(view.label, view.opened)"
-        >
-          <template #header="{ opened, hide }">
-            <div
-              v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base-medium mx-2 text-ink-gray-5 transition-all duration-300 ease-in-out"
-              :class="
-                !isExpanded
-                  ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
-              "
-              @click="toggleSection(view.label, view.opened)"
-            >
-              <FeatherIcon
-                name="chevron-right"
-                class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                :class="{ 'rotate-90': isSectionOpen(view.label, view.opened) }"
-              />
-              <span>{{ __(view.label) }}</span>
-            </div>
-          </template>
-          <nav class="flex flex-col">
-            <SidebarLink
-              v-for="link in view.views"
-              :icon="link.icon"
-              :label="link.label"
-              :to="link.to"
-              :key="link.label"
-              :is-expanded="isExpanded"
-              :is-active="isActiveTab(link.to)"
-              class="my-0.5 emoji"
-              :onClick="link.onClick"
-            />
-          </nav>
-        </Section>
-      </div>
-    </div>
-    <div class="grow" />
-    <div class="flex flex-col gap-2 pb-2.5">
-      <div class="px-2 flex flex-col gap-2">
-=======
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
->>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
           :isSidebarCollapsed="isCollapsed"
@@ -117,41 +35,6 @@
     </template>
   </AppSidebar>
 
-<<<<<<< HEAD
-      <SidebarLink
-        :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
-        :is-active="false"
-        :is-expanded="isExpanded"
-        :label="isExpanded ? __('Collapse') : __('Expand')"
-        :on-click="() => (isExpanded = !isExpanded)"
-      />
-    </div>
-    <TrialBanner
-      v-if="isFCSite && !isCustomerPortal"
-      :isSidebarCollapsed="!isExpanded"
-    />
-    <SettingsModal v-model="showSettingsModal" />
-    <ShortcutsModal v-model="showShortcutsModal" />
-    <HelpModal
-      v-if="showHelpModal"
-      v-model="showHelpModal"
-      v-model:articles="articles"
-      appName="helpdesk"
-      title="Frappe Helpdesk"
-      :logo="logo"
-      docsLink="https://docs.frappe.io/helpdesk"
-      :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
-      :afterSkipAll="() => capture('onboarding_steps_skipped')"
-      :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
-      :afterResetAll="() => capture('onboarding_steps_reset')"
-    />
-    <IntermediateStepModal
-      v-model="showIntermediateModal"
-      :currentStep="currentStep"
-    />
-    <CP v-model="showCommandPalette" />
-  </div>
-=======
   <SettingsModal v-model="showSettingsModal" />
   <ShortcutsModal v-model="showShortcutsModal" />
   <HelpModal
@@ -171,7 +54,6 @@
     v-model="showIntermediateModal"
     :currentStep="currentStep"
   />
->>>>>>> 8fa03b64 (fix(views): use icons instead of emojis)
 </template>
 
 <script setup lang="ts">
