@@ -32,7 +32,7 @@
       </template>
     </LayoutHeader>
     <header
-      class="flex h-12 items-center justify-between py-[7px] px-5 border-b"
+      class="flex h-12 items-center justify-between py-[7px] px-3 border-b"
       v-if="ticket.doc?.name"
     >
       <!-- left side -->
