@@ -167,11 +167,8 @@ import {
   Button,
   Checkbox,
   Popover,
-<<<<<<< HEAD
-=======
   TextInput,
   Tooltip,
->>>>>>> c26cf84d (fix: recent tickets alignment)
   call,
   createListResource,
   createResource,
