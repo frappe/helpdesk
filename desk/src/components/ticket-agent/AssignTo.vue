@@ -13,10 +13,14 @@
         <Button
           ref="triggerRef"
           variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full [&>span]:min-w-0"
           @click="togglePopover()"
         >
+<<<<<<< HEAD
           <div class="flex items-center min-h-[20px] gap-2 w-full">
+=======
+          <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
+>>>>>>> af9aa8df (fix: truncate long single-assignee name in AssignTo trigger)
             <template v-if="localAssignees.length > 0">
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
