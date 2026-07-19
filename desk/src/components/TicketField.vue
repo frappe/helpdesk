@@ -1,8 +1,8 @@
 <template>
   <div class="flex gap-2 pb-1 leading-5 items-center">
-    <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
-      <Tooltip :text="field.label">
-        <span>{{ field.label }}</span>
+    <div class="w-[106px] shrink-0 truncate text-base text-ink-gray-5">
+      <Tooltip :text="__(field.label)">
+        <span>{{ __(field.label) }}</span>
       </Tooltip>
       <span v-if="field.required" class="text-ink-red-6"> * </span>
     </div>
