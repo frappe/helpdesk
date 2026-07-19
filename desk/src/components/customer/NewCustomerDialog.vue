@@ -61,36 +61,20 @@
           <h3 class="text-base-medium text-ink-gray-8">
             {{ __("Primary Contact") }}
           </h3>
-<<<<<<< HEAD
-<<<<<<< HEAD
           <div class="grid grid-cols-2 gap-4">
             <FormControl
-=======
-          <div class="grid grid-cols-2 gap-4">
-            <FormControl
-              class="[&_p]:text-p-xs"
->>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
               type="text"
               :label="__('First Name')"
               placeholder="John"
               v-model="primaryContact.firstName"
             />
             <FormControl
-<<<<<<< HEAD
-=======
-              class="[&_p]:text-p-xs"
->>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
               type="text"
               :label="__('Last Name')"
               placeholder="Doe"
               v-model="primaryContact.lastName"
             />
           </div>
-<<<<<<< HEAD
-=======
->>>>>>> 755ac8de (fix: dont invite primary contact if already exists)
-=======
->>>>>>> 534bc291 (fix: if new contact invited via customer show in toast)
           <FormControl
             type="email"
             :label="__('Email')"
