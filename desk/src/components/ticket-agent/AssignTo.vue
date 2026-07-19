@@ -154,6 +154,7 @@ import {
   ActivitiesSymbol,
   AgentOption,
   AssigneeSymbol,
+  LocalAssignee,
   TicketSymbol,
 } from "@/types";
 import { useDebounceFn } from "@vueuse/core";
@@ -203,12 +204,8 @@ const popoverIsOpen = ref(false);
 const hasBeenOpened = ref(false);
 
 // Local copy of assignees
-const localAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
-const snapshotAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
+const localAssignees = ref<LocalAssignee[]>([]);
+const snapshotAssignees = ref<LocalAssignee[]>([]);
 
 // Sync from injected assignees when popover is not open
 watch(
@@ -256,7 +253,7 @@ const agentResource = createListResource({
     "availability",
     "availability_changed_on",
   ],
-  filters: { is_active: true },
+  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
   pageLength: 20,
   auto: true,
 });
@@ -339,8 +336,9 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
         const user = getUser(a.name);
         options.push({
           value: a.name,
-          label: a.label || user.full_name || a.name,
-          image: a.image || user.user_image,
+          label: a.label || a.agent_name || user.full_name || a.name,
+          image: a.image || a.user_image || user.user_image,
+          ...liveAvailability(a),
         });
         seen.add(a.name);
       }
@@ -408,11 +406,17 @@ function toggleAgent(agent: AgentOption) {
       pinnedSelectedNames.value.delete(agent.value);
     }
   } else {
-    localAssignees.value.push({
+    const added: LocalAssignee = {
       name: agent.value,
       image: agent.image || "",
       label: agent.label,
-    });
+    };
+    // Carry the option's status so it survives the localAssignees fallback in
+    // sortedAgentOptions (e.g. a search-added agent outside the default page resource call).
+    if (agent.availability) added.availability = agent.availability;
+    if (agent.availability_changed_on)
+      added.availability_changed_on = agent.availability_changed_on;
+    localAssignees.value.push(added);
     // Pin only when selecting during search so they stay visible when search clears
     if (isSearching) {
       pinnedSelectedNames.value.add(agent.value);

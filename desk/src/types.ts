@@ -634,6 +634,23 @@ export interface TicketContact {
   image: string;
 }
 
+// A ticket assignee enriched with their agent status by get_ticket_assignees.
+// Non-agent assignees only carry `name`.
+export interface TicketAssignee {
+  name: string;
+  agent_name?: string;
+  user_image?: string;
+  availability?: string;
+  availability_changed_on?: string;
+}
+
+// A TicketAssignee plus the option fields AssignTo keeps when an agent is
+// picked from the dropdown (image/label come from AgentOption).
+export interface LocalAssignee extends TicketAssignee {
+  image?: string;
+  label?: string;
+}
+
 export type RecentTicket = Record<
   "subject" | "status" | "priority" | "name" | "creation",
   string
