@@ -1,18 +1,18 @@
 <template>
   <div class="space-y-2 px-6 py-3.5 border-b">
     <div class="flex items-center gap-4">
-      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">Status</span>
+      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Status</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-base-medium text-ink-gray-9"
+        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
         {{ ticket.data.status }}
       </span>
     </div>
 
     <div class="flex items-center gap-4">
-      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">Priority</span>
+      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Priority</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-base-medium text-ink-gray-9"
+        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
         {{ ticket.data.priority }}
       </span>
@@ -24,7 +24,7 @@
       class="flex items-center gap-4"
     >
       <Tooltip :text="dayjs(data.value).format('LLLL')">
-        <span class="w-[160px] shrink-0 text-sm text-ink-gray-5">{{
+        <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
           data.title
         }}</span>
       </Tooltip>
@@ -36,7 +36,7 @@
       />
       <span
         v-else
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-base-medium text-ink-gray-9"
+        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
         {{ dayjs.tz(data.value).fromNow() }}
       </span>
@@ -47,11 +47,11 @@
       :key="field.fieldname"
       class="flex items-center gap-4"
     >
-      <span class="w-[150px] shrink-0 text-sm text-ink-gray-5">{{
+      <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
         field.label
       }}</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-base-medium"
+        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm"
         :class="
           ticket.data[field.fieldname] ? 'text-ink-gray-9' : 'text-ink-gray-4'
         "
