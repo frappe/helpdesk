@@ -1,0 +1,77 @@
+name: ERPNext
+
+on:
+  pull_request:
+    branches:
+      - main
+      - main-hotfix
+      - develop
+
+    paths:
+      - 'helpdesk/integrations/erpnext/**'
+      - 'helpdesk/helpdesk/doctype/erpnext_hd_settings/**'
+      - '.github/helpers/install.sh'
+      - '.github/workflows/erpnext-tests.yml'
+
+concurrency:
+  group: erpnext-helpdesk-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: ERPNext Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+        mysql:
+          image: mariadb:10.6
+          env:
+            MARIADB_ROOT_PASSWORD: 'root'
+          ports:
+            - 3306:3306
+          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Add to Hosts
+        run: echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/*requirements.txt', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install
+        run: bash ${GITHUB_WORKSPACE}/.github/helpers/install.sh
+        env:
+          TYPE: server
+          WITH_ERPNEXT: 'yes'
+          FRAPPE_USER: ${{ github.event.inputs.user }}
+          FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
+
+      - name: Run ERPNext Integration Tests
+        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk --module helpdesk.integrations.erpnext.test_erpnext_integration'
+        env:
+          TYPE: server
+          CI_BUILD_ID: ${{ github.run_id }}
