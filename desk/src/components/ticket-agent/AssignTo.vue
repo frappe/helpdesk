@@ -13,10 +13,10 @@
         <Button
           ref="triggerRef"
           variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full [&>span]:min-w-0"
           @click="togglePopover()"
         >
-          <div class="flex items-center min-h-5 gap-2 w-full">
+          <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
             <template v-if="localAssignees.length > 0">
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
