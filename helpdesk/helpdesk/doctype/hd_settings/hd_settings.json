@@ -524,11 +524,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2025-12-18 10:37:02.103507",
-=======
  "modified": "2026-06-29 18:07:35.389430",
->>>>>>> 06b48822 (fix: auto set customer setting)
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
