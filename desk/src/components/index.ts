@@ -1,4 +1,3 @@
-export { default as BackButton } from "./BackButton.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as Autocomplete } from "./Autocomplete.vue";
 export { default as CommandPalette } from "./command-palette/CP.vue";

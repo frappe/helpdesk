@@ -21,7 +21,6 @@
 <script setup>
 import { FadedScrollableDiv } from "@/components";
 import { inject } from "vue";
-import { normalizeFilters } from "./filter";
 import QuickFilterField from "./QuickFilterField.vue";
 
 const listViewData = inject("listViewData");
@@ -31,17 +30,19 @@ const { list, quickFilters } = listViewData;
 const directValueFilterTypes = ["Check", "Select", "Link", "Date", "Datetime"];
 
 function applyQuickFilter(filter, value) {
-  const conditions = normalizeFilters(list.params?.filters).filter(
-    (condition) => condition[0] !== filter.name
-  );
+  let filters = { ...list.params?.filters };
+
+  let field = filter.name;
   if (value) {
     if (directValueFilterTypes.includes(filter.type)) {
-      conditions.push([filter.name, "=", value]);
+      filters[field] = value;
     } else {
-      conditions.push([filter.name, "LIKE", `%${value}%`]);
+      filters[field] = ["LIKE", `%${value}%`];
     }
+  } else {
+    delete filters[field];
   }
-  listViewActions.applyFilters(conditions);
+  listViewActions.applyFilters(filters);
 }
 
 function getDefaultValue(quickFilter) {
@@ -49,23 +50,32 @@ function getDefaultValue(quickFilter) {
 }
 
 function getValue(quickFilter, filters) {
-  if (!(quickFilter && quickFilter.name)) {
+  if (!filters || !(quickFilter && quickFilter.name)) {
     return getDefaultValue(quickFilter);
   }
-  const condition = normalizeFilters(filters).find(
-    (c) => c[0] === quickFilter.name
-  );
-  if (!condition) {
+  const filter = filters[quickFilter.name];
+  if (filter === undefined) {
+    // not a part of the customizable filters
     return getDefaultValue(quickFilter);
   }
-  const [, operator, value] = condition;
   if (directValueFilterTypes.includes(quickFilter.type)) {
-    return operator === "=" ? value : getDefaultValue(quickFilter);
+    return filter;
   }
-  if (String(operator).toLowerCase() !== "like" || typeof value !== "string") {
+  if (
+    !Array.isArray(filter) ||
+    filter.length !== 2 ||
+    filter[0].toLowerCase() !== "like"
+  ) {
     return getDefaultValue(quickFilter);
   }
-  return value.replaceAll("%", "");
+  let value = filter[1];
+  if (value.startsWith("%")) {
+    value = value.substring(1);
+  }
+  if (value.endsWith("%")) {
+    value = value.substring(0, value.length - 1);
+  }
+  return value;
 }
 </script>
 

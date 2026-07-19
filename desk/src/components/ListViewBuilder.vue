@@ -19,7 +19,7 @@
         @click="handleViewUpdate"
       />
       <Reload @click="handleReload" :loading="list.loading" />
-      <Filter />
+      <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
       <ColumnSettings
         :hide-label="isMobileView"
@@ -27,7 +27,7 @@
       />
     </div>
     <div v-else class="flex justify-between items-center w-full">
-      <Filter />
+      <Filter :default_filters="defaultParams.filters" />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
         <SortBy :hide-label="isMobileView" />
@@ -126,11 +126,11 @@
 import { MultipleAvatar, StarRating } from "@/components";
 import {
   ColumnSettings,
+  Filter,
   QuickFilters,
   Reload,
   SortBy,
 } from "@/components/view-controls";
-import { Filter, normalizeFilters } from "@/components/view-controls/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -578,18 +578,13 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyColumnFilter(column.key, "LIKE", `%${item}%`);
+    applyFilters({
+      ...defaultParams.filters,
+      [column.key]: ["LIKE", `%${item}%`],
+    });
     return;
   }
-  applyColumnFilter(column.key, "=", item);
-}
-
-function applyColumnFilter(key: string, operator: string, value: any) {
-  const conditions = normalizeFilters(defaultParams.filters).filter(
-    (condition) => condition[0] !== key
-  );
-  conditions.push([key, operator, value]);
-  applyFilters(conditions);
+  applyFilters({ ...defaultParams.filters, [column.key]: item });
 }
 
 const showViewControls = computed(() => {
@@ -619,7 +614,7 @@ provide("listViewActions", {
 
 function applyFilters(filters) {
   isViewUpdated.value = true;
-  defaultParams.filters = normalizeFilters(filters);
+  defaultParams.filters = { ...filters };
   list.submit({ ...defaultParams });
 
   // automatically update filters for default view
@@ -651,7 +646,7 @@ function updateColumns(obj) {
 
 function reload(reset: boolean = false) {
   if (reset) {
-    defaultParams.filters = normalizeFilters(options.value.defaultFilters);
+    defaultParams.filters = options.value.defaultFilters || {};
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
     pageLengthCount.value = options.value.default_page_length;
@@ -750,25 +745,19 @@ function handleViewChanges() {
     reload(true);
     return;
   }
-  // normalize so legacy dict-format saved views become list conditions
-  defaultParams.filters = normalizeFilters(currentView.filters);
+  defaultParams.filters = currentView.filters;
   defaultParams.order_by = currentView.order_by || "modified desc";
   defaultParams.columns = currentView.columns;
   defaultParams.rows = currentView.rows;
 
   if (route.query.filters) {
     try {
-      const parsedFilters = normalizeFilters(
-        JSON.parse(route.query.filters as string)
-      );
-      if (parsedFilters.length > 0) {
-        const overriddenFields = new Set(parsedFilters.map((c) => c[0]));
-        defaultParams.filters = [
-          ...normalizeFilters(defaultParams.filters).filter(
-            (c) => !overriddenFields.has(c[0])
-          ),
+      const parsedFilters = JSON.parse(route.query.filters as string);
+      if (Object.keys(parsedFilters).length > 0) {
+        defaultParams.filters = {
+          ...defaultParams.filters,
           ...parsedFilters,
-        ];
+        };
       }
     } catch (e) {
       console.error("Failed to parse filters from URL", e);
