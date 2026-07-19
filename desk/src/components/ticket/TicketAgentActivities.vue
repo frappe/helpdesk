@@ -177,8 +177,40 @@ onMounted(() => {
   });
 });
 
+// The URL hash serves two unrelated purposes on ticket pages, and this
+// component must tell them apart:
+//
+// 1. Active-tab state. useActiveTabManager persists the currently selected
+//    tab in the hash (#activity, #email, #comment, ...) so that a reload or a
+//    shared URL restores the same tab. On mobile every non-default tab is
+//    stored this way; on desktop the same happens for tabs after the first.
+//
+// 2. Activity deep-links. Notifications and agent search navigate to a ticket
+//    with a hash that names one specific activity to scroll to and highlight,
+//    e.g. #comment-<name> or #communication-<name> (see Notifications.vue,
+//    MobileNotifications.vue and SearchAgent.vue).
+//
+// Only case 2 is a scroll target for scrollToHash(). scrollToHash() finishes
+// by *removing* the hash from the URL (the deep-link is one-shot), so if a
+// case-1 hash ever fell through to it, the active-tab state would be wiped
+// and useActiveTabManager would snap back to the default tab — on mobile that
+// showed up as "I open Activity and seconds later I'm back on Details". It
+// even found an element to scroll to, because the lucide icon sprite defines
+// <symbol id="activity">. Hence: a hash matching one of these tab names is
+// never treated as a deep-link.
+const activeTabHashes = ["details", "activity", "email", "comment", "call"];
+
+// Returns the id of the activity element the current hash deep-links to
+// (case 2 above), or "" when there is no hash or it is only active-tab state
+// (case 1). Callers can therefore use it both as "should I scroll to a
+// specific activity?" and as the element id to scroll to.
+function linkedActivityId() {
+  const id = route.hash.substring(1);
+  return id && !activeTabHashes.includes(id) ? id : "";
+}
+
 function scrollToLatestActivity() {
-  if (route.hash) {
+  if (linkedActivityId()) {
     scrollToHash();
     return;
   }
@@ -192,11 +224,8 @@ function scrollToLatestActivity() {
   }, 200);
 }
 function scrollToHash() {
-  const hash = route.hash;
-  if (hash) {
-    // Remove the # symbol
-    const elementId = hash.substring(1);
-
+  const elementId = linkedActivityId();
+  if (elementId) {
     nextTick(() => {
       // Wait for activities to be rendered
       setTimeout(() => {
