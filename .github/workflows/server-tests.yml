@@ -110,7 +110,7 @@ jobs:
           FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
 
       - name: Run Tests
-        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk --coverage --total-builds 2 --build-number ${{ matrix.container }}'
+        run: 'cd ~/frappe-bench/ && bench --site test_site run-parallel-tests --app helpdesk --with-coverage --total-builds 2 --build-number ${{ matrix.container }}'
         env:
           TYPE: server
           CI_BUILD_ID: ${{ github.run_id }}
