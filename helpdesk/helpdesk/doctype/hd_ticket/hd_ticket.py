@@ -4,7 +4,7 @@ from datetime import timedelta
 from email.utils import parseaddr
 
 import frappe
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 from frappe import _
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
@@ -1233,6 +1233,11 @@ class HDTicket(Document):
             return ""
 
         soup = BeautifulSoup(content, "html.parser")
+
+        # comments (e.g. Outlook MSO conditionals in quoted replies) get mangled
+        # by the markdown conversion in sendmail and show up as visible text
+        for comment in soup.find_all(string=lambda s: isinstance(s, Comment)):
+            comment.extract()
 
         for tag in soup.find_all(["img", "video"]):
             if tag.name == "img":

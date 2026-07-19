@@ -85,6 +85,18 @@ class TestHDTicket(FrappeTestCase):
         ticket.insert()
         self.assertTrue(ticket.name)
 
+    def test_parse_content_strips_html_comments(self):
+        ticket = frappe.get_doc(get_ticket_obj())
+        ticket.insert()
+        content = (
+            "<blockquote><!--[if !mso]><!--><!--<![endif]-->"
+            "<!--[if gte mso 9]><xml><o:shapedefaults/></xml><![endif]-->"
+            "<p>Dear Admin,</p></blockquote>"
+        )
+        parsed = ticket.parse_content(content)
+        self.assertNotIn("<!--", parsed)
+        self.assertIn("<p>Dear Admin,</p>", parsed)
+
     def test_agent_flow(self):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
