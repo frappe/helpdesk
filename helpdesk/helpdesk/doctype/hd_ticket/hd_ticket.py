@@ -265,6 +265,11 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
+        if not frappe.db.get_single_value(
+            "HD Settings", "auto_set_customer_from_contact"
+        ):
+            return
+
         # For existing tickets, only validate if customer value has changed
         if not self.is_new() and not self.has_value_changed("customer"):
             return
