@@ -36,7 +36,15 @@
       v-if="ticket.doc?.name"
     >
       <!-- left side -->
-      <div class="flex items-center gap-2 max-w-[50%]">
+      <div class="flex items-center gap-2 max-w-[65%]">
+        <Link
+          class="min-w-0 flex-shrink"
+          doctype="HD Team"
+          :hide-clear-button="true"
+          :placeholder="__('Team')"
+          :model-value="ticket.doc.agent_group"
+          @update:model-value="(val) => updateField('agent_group', val)"
+        />
         <AssignTo :hide-label="true" />
       </div>
       <!-- right side -->
@@ -192,7 +200,7 @@ import {
   watchEffect,
 } from "vue";
 
-import { CommunicationArea, LayoutHeader } from "@/components";
+import { CommunicationArea, LayoutHeader, Link } from "@/components";
 import {
   ActivityIcon,
   CommentIcon,
