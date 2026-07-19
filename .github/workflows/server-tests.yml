@@ -36,7 +36,7 @@ jobs:
             MARIADB_ROOT_PASSWORD: 'root'
           ports:
             - 3306:3306
-          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3 --tmpfs=/var/lib/mysql:rw,noexec,nosuid,size=2g
 
     steps:
       - name: Clone
@@ -64,6 +64,14 @@ jobs:
 
       - name: Install Yarn
         run: npm install -g yarn
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/requirements*.txt
 
       - name: Add to Hosts
         run: echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
