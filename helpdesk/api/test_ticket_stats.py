@@ -1,11 +1,11 @@
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.ticket_stats import get_feedback_received, get_ticket_stats
 from helpdesk.test_utils import create_agent, create_contact, create_customer
 
 
-class TestTicketStatsPermissions(IntegrationTestCase):
+class TestTicketStatsPermissions(FrappeTestCase):
     agent_a = "stats-agent-a@example.com"
     agent_b = "stats-agent-b@example.com"
     manager = "stats-agent-manager@example.com"

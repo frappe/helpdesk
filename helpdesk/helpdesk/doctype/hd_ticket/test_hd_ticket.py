@@ -4,7 +4,7 @@
 from datetime import timedelta
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.api.ticket import bulk_reply
@@ -57,7 +57,7 @@ CONTACTS = [
 CUSTOMERS = ["Test Org 1", "Test Org 2"]
 
 
-class TestHDTicket(IntegrationTestCase):
+class TestHDTicket(FrappeTestCase):
     def setUp(self):
         frappe.db.delete("HD Ticket")
         frappe.get_doc(

@@ -2,13 +2,13 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.contact import delete_contact
 from helpdesk.test_utils import create_contact, create_customer, make_ticket
 
 
-class TestDeleteContact(IntegrationTestCase):
+class TestDeleteContact(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
 

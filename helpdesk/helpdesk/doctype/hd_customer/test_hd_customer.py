@@ -2,7 +2,7 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
     has_permission,
@@ -20,7 +20,7 @@ from helpdesk.test_utils import (
 )
 
 
-class TestHDCustomer(IntegrationTestCase):
+class TestHDCustomer(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
 
