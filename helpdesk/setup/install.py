@@ -24,6 +24,7 @@ def after_install():
     add_default_agent_groups()
     update_agent_role_permissions()
     add_agent_manager_permissions()
+    setup_customer_role()
     add_default_assignment_rule()
     create_default_template()
     create_fallback_ticket_type()
@@ -202,7 +203,7 @@ def add_agent_manager_permissions():
     doc_to_permissions = {
         "Email Account": ["create", "delete", "write"],
         "File": ["create", "delete", "write"],
-        "Contact": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
@@ -213,6 +214,25 @@ def add_agent_manager_permissions():
         add_permission(dt, "Agent Manager")
         for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
+
+
+def setup_customer_role(fresh_install=True):
+    customer_roles = ["HD Customer", "HD Customer Manager"]
+    for role_name in customer_roles:
+        if frappe.db.exists("Role", role_name):
+            role_doc = frappe.get_doc("Role", role_name)
+        else:
+            role_doc = frappe.new_doc("Role")
+            role_doc.role_name = role_name
+        role_doc.home_page = "/helpdesk"
+        role_doc.desk_access = 0
+        role_doc.save()
+
+    if fresh_install:
+        portal_settings = frappe.get_single("Portal Settings")
+        portal_settings.default_role = "HD Customer"
+        portal_settings.default_portal_home = "/helpdesk"
+        portal_settings.save()
 
 
 def add_website_settings_permission():
@@ -261,6 +281,24 @@ def get_custom_fields():
                 "label": "Unassign Condition JSON",
                 "insert_after": "unassign_condition",
                 "depends_on": "eval: doc.unassign_condition_json",
+            },
+        ],
+        "User Invitation": [
+            {
+                "fieldname": "contact",
+                "label": "Contact",
+                "fieldtype": "Link",
+                "options": "Contact",
+                "insert_after": "roles",
+                "set_only_once": 1,
+            },
+            {
+                "fieldname": "customer",
+                "label": "Customer",
+                "fieldtype": "Link",
+                "options": "HD Customer",
+                "insert_after": "contact",
+                "set_only_once": 1,
             },
         ],
     }

@@ -1,0 +1,175 @@
+<template>
+  <Dialog
+    v-model:open="model"
+    size="md"
+    bare
+    :dismissible="!isDirty"
+    @after-leave="revertChanges"
+  >
+    <template #default>
+      <div class="bg-surface-modal px-4 pb-6 py-5 sm:px-6">
+        <div class="mb-6 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
+              Edit Customer
+            </h3>
+            <Badge
+              v-if="isDirty"
+              :label="__('Unsaved')"
+              variant="subtle"
+              theme="orange"
+            />
+          </div>
+          <Button icon="x" @click="model = false" variant="ghost" />
+        </div>
+        <div class="space-y-4">
+          <!-- Image section -->
+          <ImageAvatar
+            v-model="state.image"
+            :label="__('Logo')"
+            :fallback-label="state.name || __('Customer')"
+            shape="square"
+          />
+
+          <!-- Fields -->
+          <template v-for="field in customerFields" :key="field.key">
+            <FormControl
+              class="!text-ink-gray-8"
+              :class="[
+                '[&_p]:text-p-xs',
+                field.type === 'select' &&
+                  '[&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8 ',
+              ]"
+              v-if="field.type !== 'Link'"
+              :type="field.type"
+              :label="field.label"
+              :required="field.required"
+              :placeholder="field.placeholder"
+              :description="field.description"
+              :options="field.options"
+              v-model="state[field.key]"
+            >
+              <template v-if="field.prefix" #prefix>
+                <component :is="field.prefix" />
+              </template>
+            </FormControl>
+            <Link
+              v-else
+              :label="field.label"
+              :placeholder="field.placeholder"
+              :description="field.description"
+              :doctype="field.doctype"
+              :required="field.required"
+              v-model="state[field.key]"
+            >
+              <template v-if="field.prefix" #prefix>
+                <component :is="field.prefix" />
+              </template>
+            </Link>
+          </template>
+
+          <div class="float-right flex space-x-2 pb-5">
+            <Button
+              :label="__('Save')"
+              theme="gray"
+              variant="solid"
+              :loading="loading || customer.setValue.loading"
+              @click.prevent="save"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import ImageAvatar from "@/components/ImageAvatar.vue";
+import { customerFields, useCustomer } from "@/composables/customer";
+import { __ } from "@/translation";
+import { getErrorMessage } from "@/utils.ts";
+import { Badge, Button, call, Dialog, FormControl, toast } from "frappe-ui";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import Link from "../frappe-ui/Link.vue";
+
+const model = defineModel<boolean>({ default: false });
+const emit = defineEmits(["update"]);
+
+const router = useRouter();
+const id = router.currentRoute.value.params.id as string;
+const {
+  doc: customer,
+  state,
+  isDirty,
+  hasNameChanged,
+  isCustomerInfoChanged,
+} = useCustomer(id);
+
+const loading = ref(false);
+
+async function save() {
+  if (!isDirty.value) {
+    return;
+  }
+  loading.value = true;
+  try {
+    if (hasNameChanged.value) {
+      if (!state.name.trim()) {
+        toast.error(__("Customer name cannot be empty"));
+        return;
+      }
+      const newName = await callRenameDoc();
+      if (isCustomerInfoChanged.value) {
+        // Use raw call after rename since the `createDocumentResource` still holds the old name
+        await call("frappe.client.set_value", {
+          doctype: "HD Customer",
+          name: newName,
+          fieldname: {
+            domain: state.domain,
+            country: state.country,
+            image: state.image,
+            customer_type: state.customerType,
+          },
+        });
+      }
+      toast.success(__("Customer updated"));
+      await router.replace({ name: "Customer", params: { id: newName } });
+      window.location.reload();
+      return;
+    }
+    if (isCustomerInfoChanged.value) {
+      await customer.setValue.submit({
+        name: state.name,
+        domain: state.domain,
+        country: state.country,
+        image: state.image,
+        customer_type: state.customerType,
+      });
+    }
+    toast.success(__("Customer updated"));
+    emit("update");
+  } catch (error: any) {
+    let msg = getErrorMessage(error);
+    toast.error(__(msg));
+  } finally {
+    loading.value = false;
+  }
+}
+async function callRenameDoc() {
+  return call("frappe.client.rename_doc", {
+    doctype: "HD Customer",
+    old_name: customer.doc.customer_name,
+    new_name: state.name,
+  });
+}
+
+function revertChanges() {
+  if (!isDirty.value) return;
+  state.name = customer.doc.customer_name || "";
+  state.domain = customer.doc.domain || "";
+  state.country = customer.doc.country || "";
+  state.image = customer.doc.image || "";
+  state.customerType = customer.doc.customer_type || "Company";
+}
+</script>

@@ -40,6 +40,7 @@ def get_boot():
             "agent": get_agent_name(),
             "date_format": frappe.get_system_settings("date_format"),
             "time_format": frappe.get_system_settings("time_format"),
+            "default_country": frappe.db.get_default("country"),
             "timezone": {
                 "system": get_system_timezone(),
                 "user": frappe.db.get_value("User", frappe.session.user, "time_zone")

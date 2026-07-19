@@ -32,11 +32,15 @@
       </div>
       <div class="mx-6 md:mx-5 flex items-center gap-2 border-y py-2.5">
         <span class="text-p-xs text-ink-gray-4">{{ __("To") }}:</span>
-        <MultiSelectInput
+        <EmailMultiSelect
           v-model="toEmailsClone"
           class="flex-1"
+          scope="contact"
+          variant="ghost"
+          allow-custom-email
+          copy-on-click
           :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :custom-email-label="__('Add to recipients')"
         />
         <div class="flex gap-1.5">
           <Button
@@ -67,12 +71,16 @@
         :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-ink-gray-4">{{ __("Cc:") }}</span>
-        <MultiSelectInput
+        <EmailMultiSelect
           ref="ccInput"
           v-model="ccEmailsClone"
           class="flex-1"
+          scope="contact"
+          variant="ghost"
+          allow-custom-email
+          copy-on-click
           :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :custom-email-label="__('Add to recipients')"
         />
       </div>
       <div
@@ -81,12 +89,16 @@
         :class="bcc || showBCC ? 'border-b' : ''"
       >
         <span class="text-xs text-ink-gray-4">{{ __("Bcc:") }}</span>
-        <MultiSelectInput
+        <EmailMultiSelect
           ref="bccInput"
           v-model="bccEmailsClone"
           class="flex-1"
+          scope="contact"
+          variant="ghost"
+          allow-custom-email
+          copy-on-click
           :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
+          :custom-email-label="__('Add to recipients')"
         />
       </div>
     </template>
@@ -202,11 +214,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  AttachmentItem,
-  MultiSelectInput,
-  SavedRepliesSelectorModal,
-} from "@/components";
+import { AttachmentItem, SavedRepliesSelectorModal } from "@/components";
+import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";

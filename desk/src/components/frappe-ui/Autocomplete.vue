@@ -87,7 +87,7 @@
                 >
                   <li
                     :class="[
-                      'flex items-center rounded px-2.5 py-1.5 text-base',
+                      'flex items-center rounded px-2.5 py-1.5 text-base cursor-pointer',
                       { 'bg-surface-gray-2': active },
                     ]"
                   >
