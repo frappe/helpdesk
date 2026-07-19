@@ -15,16 +15,12 @@
           class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
-<<<<<<< HEAD
-          <Button label="Create" theme="gray" variant="solid">
-=======
           <Button
             class="rtl:flex-row-reverse"
             :label="__('Create')"
             theme="gray"
             variant="solid"
           >
->>>>>>> 2b83c4bb (fix: translate create button label on tickets page)
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
