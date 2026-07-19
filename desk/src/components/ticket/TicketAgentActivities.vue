@@ -196,9 +196,11 @@ onMounted(() => {
 // and useActiveTabManager would snap back to the default tab — on mobile that
 // showed up as "I open Activity and seconds later I'm back on Details". It
 // even found an element to scroll to, because the lucide icon sprite defines
-// <symbol id="activity">. Hence: a hash matching one of these tab names is
-// never treated as a deep-link.
-const activeTabHashes = ["details", "activity", "email", "comment", "call"];
+// <symbol id="activity">. Deep-link ids are always prefixed (the element ids
+// come from CommentBox and EmailArea), while tab hashes are bare tab names —
+// so only hashes with a known deep-link prefix are treated as deep-links,
+// and a new or renamed tab cannot re-introduce the bug.
+const deepLinkPrefixes = ["comment-", "communication-"];
 
 // Returns the id of the activity element the current hash deep-links to
 // (case 2 above), or "" when there is no hash or it is only active-tab state
@@ -206,7 +208,7 @@ const activeTabHashes = ["details", "activity", "email", "comment", "call"];
 // specific activity?" and as the element id to scroll to.
 function linkedActivityId() {
   const id = route.hash.substring(1);
-  return id && !activeTabHashes.includes(id) ? id : "";
+  return id && deepLinkPrefixes.some((p) => id.startsWith(p)) ? id : "";
 }
 
 function scrollToLatestActivity() {

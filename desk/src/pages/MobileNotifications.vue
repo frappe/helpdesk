@@ -104,7 +104,9 @@ function getRoute(n: Notification) {
         params: {
           ticketId: n.reference_ticket,
         },
-        hash: "#" + n.reference_comment,
+        // Comment elements render as id="comment-<name>" (CommentBox), same
+        // prefix desktop Notifications.vue uses for this deep-link.
+        hash: "#comment-" + n.reference_comment,
       };
     case "Assignment":
     case "Reaction":
