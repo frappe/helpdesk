@@ -215,3 +215,187 @@ To setup the repository locally follow the steps mentioned below:
 		</picture>
 	</a>
 </div>
+
+
+---
+
+# 📝 Assessment Submission (Boopesh)
+
+## Overview
+This repository contains the complete assessment implementation by **Boopesh** for the **Frappe Helpdesk** project. The goals of the assessment are met with the following modifications and new features:
+1. **Modification**: Advanced combinable filters (Search, Priority, Status, Assignee, Date) in the ticket list page.
+2. **New Feature**: A real-time visual SLA Monitor in the agent's ticket details sidebar showing SLA targets, remaining time progress, overdue calculations, and visual alerts.
+3. **Infrastructure Improvements**: Crucial fixes to the Docker development setup and host asset compilation process to support seamless local development.
+
+---
+
+## 🚀 Project Setup Instructions
+
+The application can be run using either **Docker Compose** (recommended for quick evaluation) or a local **Frappe Bench** environment.
+
+### Option A: Running via Docker (Recommended)
+
+1. **Start the Docker Services**:
+   From the repository root directory, spin up all backend/frontend, database, and cache containers in detached mode:
+   ```bash
+   docker compose -f docker/docker-compose.yml up -d
+   ```
+2. **Monitor the Initialization Logs**:
+   The `frappe` container automatically runs `docker/init.sh` to link your local source code, run database migrations, build the assets, and start the bench. Monitor the setup using:
+   ```bash
+   docker compose -f docker/docker-compose.yml logs -f frappe
+   ```
+   Wait until you see output indicating the services are listening:
+   ```text
+   socketio.1 | Realtime service listening on: ws://0.0.0.0:9000
+   web.1      |  * Running on http://127.0.0.1:8000
+   ```
+3. **Access the App**:
+   Open [http://localhost:8000/helpdesk](http://localhost:8000/helpdesk) in your browser.
+4. **Login Credentials**:
+   * **Username**: `Administrator`
+   * **Password**: `admin`
+
+### Option B: Running via Local Bench
+
+1. Initialize your bench and fetch the telephony dependency:
+   ```bash
+   bench get-app https://github.com/frappe/telephony
+   ```
+2. Set up the helpdesk app:
+   ```bash
+   bench get-app https://github.com/frappe/helpdesk
+   bench --site helpdesk.test install-app helpdesk
+   bench build --app helpdesk
+   bench start
+   ```
+3. Start the Vite Frontend Development Server:
+   ```bash
+   cd desk
+   yarn install
+   yarn dev --host helpdesk.test
+   ```
+   Access the dev server on [http://helpdesk.test:8080](http://helpdesk.test:8080).
+
+---
+
+## 🗄️ Database Structure & Understanding
+
+Frappe Helpdesk leverages the **Frappe Framework's MariaDB ORM** to manage ticket lifecycle rules, SLAs, and support agent groups. The key DocTypes and relationships are outlined below:
+
+```mermaid
+erDiagram
+    HD-Ticket ||--|| HD-Ticket-Status : "status (Link)"
+    HD-Ticket ||--|| HD-Ticket-Priority : "priority (Link)"
+    HD-Ticket ||--|| HD-Team : "agent_group (Link)"
+    HD-Ticket ||--o| HD-Service-Level-Agreement : "sla (Link)"
+    HD-Team ||--|{ HD-Team-Member : "has members"
+    HD-Ticket ||--o| User : "raised_by / owner"
+```
+
+### 1. `HD Ticket` (The Core Entity)
+Represents a customer support request. Key database fields include:
+* `name`: Unique alphanumeric ID (primary key).
+* `subject` & `description`: Customer issue text.
+* `status` (Link to `HD Ticket Status`): Ticket lifecycle state.
+* `priority` (Link to `HD Ticket Priority`): Severity level.
+* `agent_group` (Link to `HD Team`): The assigned support group.
+* `sla` (Link to `HD Service Level Agreement`): Active SLA policy.
+* **SLA Targets & Progress**:
+  * `response_by`: Target datetime for the agent's first response.
+  * `resolution_by`: Target datetime for resolving the ticket.
+  * `first_responded_on`: Actual datetime of the first response.
+  * `resolution_date`: Actual datetime of resolution.
+
+### 2. `HD Service Level Agreement`
+Defines SLA compliance targets. It maps different `HD Ticket Priorities` to target **First Response Hours** and **Resolution Hours**.
+
+### 3. `HD Ticket Status` & `HD Ticket Priority`
+* **Status**: Configures states (e.g., *Open, Replied, Resolved, Closed, Hold*), agent-facing versus customer-facing labels, and status categories (e.g., *Open, Paused, Closed*).
+* **Priority**: Configurable priority levels (*Low, Medium, High, Urgent*).
+
+### 4. `HD Team` & `HD Team Member`
+Used to manage support agent groups. Tickets are assigned to a Team (`agent_group`), and individuals inside that team are linked through `HD Team Member`.
+
+---
+
+## 🛠️ Implemented Modifications & Features
+
+### Feature 1: Advanced Combinable Filters (Ticket List Page)
+
+#### Rationale & Design
+Standard Frappe filters operate on strict `AND` parameters. If an agent wants to perform a search query against a Ticket ID or Subject, Frappe cannot natively construct an `(ID LIKE %val% OR Subject LIKE %val%) AND status = 'Open'` query without intercepting database requests.
+
+#### Implementation Details
+* **Backend (`helpdesk/api/doc.py`)**:
+  * Added custom query interception in `get_list_data` for the `HD Ticket` doctype.
+  * Captures the client-side `_search` parameter and executes a custom SQL request using `frappe.db.sql_list` to find matching ticket names:
+    ```sql
+    SELECT name FROM `tabHD Ticket` WHERE name LIKE %s OR subject LIKE %s
+    ```
+  * Intercepts and merges matching IDs back into standard ORM query filters via the private `_merge_name_filter` helper. This maintains seamless integration with sorting, pagination, and saved views.
+* **Frontend (`desk/src/pages/ticket/Tickets.vue` & `ListViewBuilder.vue`)**:
+  * Created a unified filters bar containing:
+    1. **Search Input**: Live searching by ticket name/ID or subject, debounced to `400ms` using VueUse's `useDebounceFn` to reduce server load.
+    2. **Priority**: Fetches dynamically from `HD Ticket Priority` DocType options.
+    3. **Status**: Synced dynamically with the client-side `useTicketStatusStore`.
+    4. **Assignee**: Link component for selecting support agents.
+    5. **Date Created**: Presets (Today, Yesterday, This Week, This Month, Custom Datepicker).
+  * Added a `hideQuickFilters` configuration to [`ListViewBuilder.vue`](file:///c:/Users/bhoop/Desktop/helpdesk/desk/src/components/ListViewBuilder.vue) to hide the default quick filters and render our custom combinable filter bar instead.
+
+---
+
+### Feature 2: Real-Time SLA Monitor (Agent Sidebar Widget)
+
+#### Rationale & Design
+Agents need visual, immediate feedback on whether a ticket is approaching or violating target compliance times. The SLA Monitor provides details on remaining duration, target milestones, and escalation statuses in real-time.
+
+```
++----------------------------------------+
+| SLA Monitor               [On Track]   |
+|                                        |
+| Due Time: July 20, 2026 12:00 PM       |
+| Remaining Time: 2h 45m             82% |
+| [========================            ] |
++----------------------------------------+
+```
+
+#### Implementation Details
+* **Frontend Component ([SlaMonitor.vue](file:///c:/Users/bhoop/Desktop/helpdesk/desk/src/components/ticket-agent/SlaMonitor.vue))**:
+  * **Milestone Detection**: Dynamically determines if the current active target is the *First Response SLA* (if not yet responded) or *Resolution SLA* (if responded but unresolved). If completed, displays a summary indicating whether it was *Fulfilled* or *Failed*.
+  * **Progress Indicator**: Renders a dynamic status bar showing the percentage of remaining time.
+  * **Color Indicators & Banners**:
+    * **Green (On Track)**: Remaining time > 30% of total duration.
+    * **Yellow (Near Deadline)**: Remaining time <= 30%. Displays a pulsing **"Escalation Warning"** banner.
+    * **Red (Overdue)**: Time limit has passed. Displays a bouncing **"Overdue by X hours"** alert.
+  * **Real-time Live Timer**: Runs a 10-second `setInterval` loop to tick down the time dynamically in the browser, triggering recalculations of the computed properties.
+* **Sidebar Integration ([TicketDetailsTab.vue](file:///c:/Users/bhoop/Desktop/helpdesk/desk/src/components/ticket-agent/TicketDetailsTab.vue))**:
+  * Mounted the `<SlaMonitor>` component at the top of the details sidebar.
+  * Modified the component local storage logic to keep the SLA Monitor section open by default.
+
+---
+
+## ⚡ Challenges Faced & Resolution
+
+### 1. Host Asset compilation vs. Docker Config Dependencies
+* **Problem**: Running `npm run build` locally on the host machine failed because `socket.ts` statically imports `common_site_config.json` which is located outside the workspace and only exists inside the active Docker environment.
+* **Solution**: Created a local mock config at [`desk/common_site_config.json`](file:///c:/Users/bhoop/Desktop/helpdesk/desk/common_site_config.json) and mapped it in [`desk/vite.config.js`](file:///c:/Users/bhoop/Desktop/helpdesk/desk/vite.config.js) using resolve aliases:
+  ```js
+  alias: {
+    '@': path.resolve(__dirname, './src'),
+    '../../sites/common_site_config.json': path.resolve(__dirname, './common_site_config.json'),
+  }
+  ```
+  This allowed Vite compilation on both host machines and container images.
+
+### 2. Docker Live Reload and Permission Mappings
+* **Problem**: The original Docker Compose cloned the codebase directly from GitHub inside the container. Mounting the host directory locally caused root-permission errors inside the container, blocking asset builds.
+* **Solution**: Updated the volume mount mappings in `docker/docker-compose.yml` to clone the app inside a temporary directory and modified [`docker/init.sh`](file:///c:/Users/bhoop/Desktop/helpdesk/docker/init.sh) to fetch and link the repository locally using `bench get-app /workspace/helpdesk_src` instead. This links the active containers to host changes with correct permissions.
+
+---
+
+## 📸 Screenshots & Demonstrations
+
+An overview screenshot showing the combinable filter bar on the Tickets list and the active SLA Monitor sidebar widget is stored at:
+* **[screenshot.webp](file:///c:/Users/bhoop/Desktop/helpdesk/screenshot.webp)** (located in the repository root folder).
+

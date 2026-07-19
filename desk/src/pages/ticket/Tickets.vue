@@ -28,6 +28,87 @@
         </RouterLink>
       </template>
     </LayoutHeader>
+    <!-- Custom Filter Bar (Agent View only) -->
+    <div
+      v-if="!isCustomerPortal"
+      class="flex flex-wrap items-center gap-3 px-5 py-3 border-b bg-white select-none"
+    >
+      <!-- Search Input -->
+      <div class="flex-1 min-w-[200px]">
+        <TextInput
+          v-model="filtersState.search"
+          type="text"
+          :placeholder="__('Search by ID or Subject...')"
+          @input="debouncedFilterChange"
+        >
+          <template #prefix>
+            <LucideSearch class="h-4 w-4 text-ink-gray-4" />
+          </template>
+        </TextInput>
+      </div>
+
+      <!-- Priority Filter -->
+      <div class="w-[160px]">
+        <FormControl
+          type="select"
+          :model-value="filtersState.priority"
+          :options="priorityOptions"
+          :placeholder="__('Priority')"
+          @update:modelValue="(val) => { filtersState.priority = val; onFilterChange(); }"
+        />
+      </div>
+
+      <!-- Status Filter -->
+      <div class="w-[160px]">
+        <FormControl
+          type="select"
+          :model-value="filtersState.status"
+          :options="statusOptions"
+          :placeholder="__('Status')"
+          @update:modelValue="(val) => { filtersState.status = val; onFilterChange(); }"
+        />
+      </div>
+
+      <!-- Assignee Filter -->
+      <div class="w-[180px]">
+        <Link
+          doctype="User"
+          :value="filtersState.assignee"
+          :placeholder="__('Assignee')"
+          @change="(val) => { filtersState.assignee = val; onFilterChange(); }"
+        />
+      </div>
+
+      <!-- Date Preset Filter -->
+      <div class="w-[160px]">
+        <FormControl
+          type="select"
+          :model-value="filtersState.datePreset"
+          :options="datePresetOptions"
+          :placeholder="__('Date Created')"
+          @update:modelValue="onDatePresetChange"
+        />
+      </div>
+
+      <!-- Custom Date Picker -->
+      <div v-if="filtersState.datePreset === 'custom'" class="w-[160px]">
+        <DatePicker
+          :value="filtersState.customDate"
+          @change="(val) => { filtersState.customDate = val; onFilterChange(); }"
+          :placeholder="__('Pick Date')"
+        />
+      </div>
+
+      <!-- Clear Filters Button -->
+      <Button
+        v-if="hasCustomFilters"
+        variant="subtle"
+        theme="gray"
+        @click="clearCustomFilters"
+      >
+        {{ __('Clear') }}
+      </Button>
+    </div>
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
@@ -60,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { LayoutHeader, ListViewBuilder } from "@/components";
+import { LayoutHeader, ListViewBuilder, Link } from "@/components";
 import { TicketIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
@@ -75,9 +156,10 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { isCustomerPortal, shortDuration } from "@/utils";
-import { Badge, dayjs, Tooltip, usePageMeta } from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
+import { Badge, dayjs, Tooltip, usePageMeta, DatePicker, FormControl, TextInput, createListResource } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useDebounceFn } from "@vueuse/core";
 
 const router = useRouter();
 const route = useRoute();
@@ -102,6 +184,166 @@ const { $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
+
+const filtersState = reactive({
+  search: "",
+  priority: "",
+  status: "",
+  assignee: "",
+  datePreset: "",
+  customDate: "",
+});
+
+const isSyncing = ref(false);
+
+const priorities = createListResource({
+  doctype: "HD Ticket Priority",
+  fields: ["name"],
+  auto: true,
+});
+
+const priorityOptions = computed(() => {
+  if (!priorities.data) return [];
+  const opts = priorities.data.map((p: any) => ({
+    label: p.name,
+    value: p.name,
+  }));
+  return [{ label: __("All Priorities"), value: "" }, ...opts];
+});
+
+const statusStore = useTicketStatusStore();
+const statusOptions = computed(() => {
+  if (!statusStore.statuses.data) return [];
+  const opts = statusStore.statuses.data.map((s: any) => ({
+    label: s.label_agent,
+    value: s.name,
+  }));
+  return [{ label: __("All Statuses"), value: "" }, ...opts];
+});
+
+const datePresetOptions = [
+  { label: __("All Dates"), value: "" },
+  { label: __("Today"), value: "today" },
+  { label: __("Yesterday"), value: "yesterday" },
+  { label: __("This Week"), value: "this_week" },
+  { label: __("This Month"), value: "this_month" },
+  { label: __("Custom..."), value: "custom" },
+];
+
+const hasCustomFilters = computed(() => {
+  return (
+    filtersState.search ||
+    filtersState.priority ||
+    filtersState.status ||
+    filtersState.assignee ||
+    filtersState.datePreset
+  );
+});
+
+function onDatePresetChange(val: string) {
+  filtersState.datePreset = val;
+  if (val !== "custom") {
+    filtersState.customDate = "";
+  }
+  onFilterChange();
+}
+
+function clearCustomFilters() {
+  filtersState.search = "";
+  filtersState.priority = "";
+  filtersState.status = "";
+  filtersState.assignee = "";
+  filtersState.datePreset = "";
+  filtersState.customDate = "";
+  onFilterChange();
+}
+
+const debouncedFilterChange = useDebounceFn(() => {
+  onFilterChange();
+}, 400);
+
+function onFilterChange() {
+  if (isSyncing.value) return;
+
+  const currentFilters = listViewRef.value?.list?.params?.filters || [];
+  const controlledFields = ["_search", "priority", "status", "_assign", "creation"];
+
+  let mergedFilters = currentFilters.filter(
+    (c: any) => Array.isArray(c) && !controlledFields.includes(c[0])
+  );
+
+  if (filtersState.search) {
+    mergedFilters.push(["_search", "like", filtersState.search]);
+  }
+
+  if (filtersState.priority) {
+    mergedFilters.push(["priority", "=", filtersState.priority]);
+  }
+
+  if (filtersState.status) {
+    mergedFilters.push(["status", "=", filtersState.status]);
+  }
+
+  if (filtersState.assignee) {
+    mergedFilters.push(["_assign", "like", `%${filtersState.assignee}%`]);
+  }
+
+  if (filtersState.datePreset) {
+    if (filtersState.datePreset === "today") {
+      mergedFilters.push(["creation", ">=", dayjs().startOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+      mergedFilters.push(["creation", "<=", dayjs().endOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+    } else if (filtersState.datePreset === "yesterday") {
+      mergedFilters.push(["creation", ">=", dayjs().subtract(1, "day").startOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+      mergedFilters.push(["creation", "<=", dayjs().subtract(1, "day").endOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+    } else if (filtersState.datePreset === "this_week") {
+      mergedFilters.push(["creation", ">=", dayjs().startOf("week").format("YYYY-MM-DD HH:mm:ss")]);
+      mergedFilters.push(["creation", "<=", dayjs().endOf("week").format("YYYY-MM-DD HH:mm:ss")]);
+    } else if (filtersState.datePreset === "this_month") {
+      mergedFilters.push(["creation", ">=", dayjs().startOf("month").format("YYYY-MM-DD HH:mm:ss")]);
+      mergedFilters.push(["creation", "<=", dayjs().endOf("month").format("YYYY-MM-DD HH:mm:ss")]);
+    } else if (filtersState.datePreset === "custom" && filtersState.customDate) {
+      mergedFilters.push(["creation", ">=", dayjs(filtersState.customDate).startOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+      mergedFilters.push(["creation", "<=", dayjs(filtersState.customDate).endOf("day").format("YYYY-MM-DD HH:mm:ss")]);
+    }
+  }
+
+  listViewRef.value?.applyFilters(mergedFilters);
+}
+
+watch(
+  () => listViewRef.value?.list?.params?.filters,
+  (newFilters) => {
+    if (isSyncing.value) return;
+    isSyncing.value = true;
+
+    filtersState.search = "";
+    filtersState.priority = "";
+    filtersState.status = "";
+    filtersState.assignee = "";
+    filtersState.datePreset = "";
+    filtersState.customDate = "";
+
+    if (newFilters && Array.isArray(newFilters)) {
+      for (const condition of newFilters) {
+        if (!Array.isArray(condition)) continue;
+        const [field, op, val] = condition;
+        if (field === "_search") {
+          filtersState.search = val;
+        } else if (field === "priority") {
+          filtersState.priority = val;
+        } else if (field === "status") {
+          filtersState.status = val;
+        } else if (field === "_assign") {
+          if (typeof val === "string") {
+            filtersState.assignee = val.replaceAll("%", "");
+          }
+        }
+      }
+    }
+    isSyncing.value = false;
+  },
+  { deep: true }
+);
 const showExportModal = ref(false);
 
 const { getStatus } = useTicketStatusStore();
@@ -202,6 +444,7 @@ const options = computed(() => ({
     prop: "ticketId",
   },
   hideColumnSetting: false,
+  hideQuickFilters: !isCustomerPortal.value,
 }));
 
 function handleResponseByField(row: any, item: string) {
