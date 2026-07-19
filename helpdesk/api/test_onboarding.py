@@ -1,5 +1,5 @@
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.onboarding import mark_persona_captured
 from helpdesk.overrides.user_invitation import HelpdeskUserInvitation
@@ -7,7 +7,7 @@ from helpdesk.overrides.user_invitation import HelpdeskUserInvitation
 BRAND = "Acme Support"
 
 
-class TestMarkPersonaCaptured(IntegrationTestCase):
+class TestMarkPersonaCaptured(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         frappe.db.set_single_value("HD Settings", "brand_name", "")
@@ -40,7 +40,7 @@ class TestMarkPersonaCaptured(IntegrationTestCase):
         self.assertFalse(frappe.db.get_single_value("HD Settings", "brand_name"))
 
 
-class TestInvitationTitleOverride(IntegrationTestCase):
+class TestInvitationTitleOverride(FrappeTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         frappe.db.set_single_value("HD Settings", "brand_name", "")
