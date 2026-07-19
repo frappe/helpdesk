@@ -1,8 +1,6 @@
 # Copyright (c) 2022, Frappe Technologies and Contributors
 # See license.txt
 
-import unittest
-
 import frappe
 from frappe.model.rename_doc import rename_doc
 from frappe.tests.utils import FrappeTestCase
@@ -34,7 +32,6 @@ def fake_value(field: str, suffix: str) -> str:
     return f"/files/{field}-{suffix}.png"
 
 
-@unittest.skipUnless("erpnext" in frappe.get_installed_apps(), "requires ERPNext")
 class TestERPNextIntegration(FrappeTestCase):
     def setUp(self):
         disable_erpnext_sync()

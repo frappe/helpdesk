@@ -1,7 +1,6 @@
 # Copyright (c) 2026, Frappe Technologies and Contributors
 # See license.txt
 
-import unittest
 from unittest.mock import patch
 
 import frappe
@@ -14,7 +13,6 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-@unittest.skipUnless("erpnext" in frappe.get_installed_apps(), "requires ERPNext")
 class IntegrationTestERPNextHDSettings(FrappeTestCase):
     """
     Integration tests for ERPNextHDSettings.
