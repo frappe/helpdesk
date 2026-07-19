@@ -880,9 +880,11 @@ export function buildPercentageChange(
   }
   const isPositive = value > 0;
   const isGood = negativeIsBetter ? !isPositive : isPositive;
+  // Cap the magnitude at 100% so large swings (e.g. +3186%) stay readable.
+  const capped = Math.min(Math.abs(value), 100);
   return {
     icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
-    value: isPositive ? `+${value}` : value,
+    value: isPositive ? `+${capped}` : `-${capped}`,
     color: isGood ? "text-ink-green-3" : "text-ink-red-3",
   };
 }

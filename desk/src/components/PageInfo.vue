@@ -10,7 +10,9 @@
       />
       <div
         class="flex flex-col h-full gap-1.5"
-        :class="[isMobileView && 'flex-1 items-center justify-center']"
+        :class="[
+          (isMobileView || !hasDocInfo) && 'flex-1 items-center justify-center',
+        ]"
       >
         <div class="flex gap-2 items-center">
           <p class="font-medium text-ink-gray-8 text-xl">
@@ -56,6 +58,7 @@
 <script setup lang="ts">
 import { useScreenSize } from "@/composables/screen";
 import { Avatar, Badge, Tooltip, type AvatarProps } from "frappe-ui";
+import { computed } from "vue";
 
 interface DocInfoItem {
   icon?: any;
@@ -83,4 +86,8 @@ const props = withDefaults(
 );
 
 const { isMobileView } = useScreenSize();
+
+const hasDocInfo = computed(() => {
+  return props.docInfo?.some((item) => item.value) ?? false;
+});
 </script>
