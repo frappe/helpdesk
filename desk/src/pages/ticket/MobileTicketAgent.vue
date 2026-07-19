@@ -38,14 +38,38 @@
       <!-- left side -->
       <div class="flex items-center gap-2 max-w-[65%]">
         <Link
-          class="min-w-0 flex-shrink"
+          class="min-w-0 flex-1"
           doctype="HD Team"
           :hide-clear-button="true"
-          :placeholder="__('Team')"
           :model-value="ticket.doc.agent_group"
           @update:model-value="(val) => updateField('agent_group', val)"
-        />
-        <AssignTo :hide-label="true" />
+        >
+          <!-- Same trigger styling as AssignTo so the header controls match -->
+          <template #target="{ togglePopover }">
+            <Button
+              variant="outline"
+              class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+              @click="togglePopover()"
+            >
+              <div class="flex items-center min-h-5 gap-2 w-full">
+                <span
+                  class="truncate"
+                  :class="
+                    ticket.doc.agent_group
+                      ? 'text-ink-gray-7'
+                      : 'text-ink-gray-5'
+                  "
+                >
+                  {{ ticket.doc.agent_group || __("Team") }}
+                </span>
+              </div>
+              <template #suffix>
+                <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
+              </template>
+            </Button>
+          </template>
+        </Link>
+        <AssignTo class="min-w-0 flex-1" :hide-label="true" />
       </div>
       <!-- right side -->
       <div class="flex items-center gap-2">
