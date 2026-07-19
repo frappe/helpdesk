@@ -42,7 +42,7 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-white"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base"
         >
           <template #tab-item="{ tab, selected }">
             <button
@@ -52,7 +52,7 @@
               <component :is="tab.icon" v-if="tab.icon" class="h-5" />
               {{ __(tab.label) }}
               <Badge
-                class="group-hover:bg-surface-gray-7 !bg-surface-gray-2 !text-ink-gray-7"
+                class="group-hover:bg-surface-gray-10 !bg-surface-gray-2 !text-ink-gray-7"
                 variant="solid"
                 theme="gray"
                 size="sm"

@@ -27,17 +27,17 @@
             <!-- email service provider info -->
             <div>
               <div
-                class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
+                class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
               >
                 <CircleAlert
-                  class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
+                  class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-5"
                 />
                 <div class="text-wrap text-xs text-ink-gray-7">
                   {{ selectedService.info }}
                   <a
                     :href="selectedService.link"
                     target="_blank"
-                    class="text-ink-blue-2 underline"
+                    class="text-ink-blue-5 underline"
                     >here</a
                   >
                   .

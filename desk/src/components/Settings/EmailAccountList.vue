@@ -34,7 +34,13 @@
             :emailAccount="emailAccount"
             @click="emit('update:step', 'email-edit', emailAccount)"
           />
-          <hr class="mx-2" />
+          <hr
+            class="mx-2"
+            v-if="
+              emailAccount !==
+              emailAccounts?.data[emailAccounts?.data?.length - 1]
+            "
+          />
         </div>
       </div>
       <!-- fallback if no email accounts -->
@@ -50,11 +56,11 @@
 </template>
 
 <script setup lang="ts">
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
-import EmailAccountCard from "./EmailAccountCard.vue";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { EmailIcon } from "../icons";
+import EmailAccountCard from "./EmailAccountCard.vue";
 
 const emit = defineEmits(["update:step"]);
 

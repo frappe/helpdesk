@@ -2,11 +2,11 @@
   <div>
     <div
       v-show="showSmallCallPopup"
-      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-7 px-2 py-1 mt-1 text-base !text-ink-gray-2"
+      class="ml-2 flex cursor-pointer select-none items-center justify-between gap-1 rounded-full bg-surface-gray-10 px-2 py-1 mt-1 text-base !text-ink-gray-2"
       @click="toggleCallPopup"
     >
       <div
-        class="flex justify-center items-center size-5 rounded-full bg-surface-gray-6 shrink-0 mr-1"
+        class="flex justify-center items-center size-5 rounded-full bg-surface-gray-9 shrink-0 mr-1"
       >
         <Avatar
           v-if="contact?.image"
@@ -27,7 +27,7 @@
         v-else-if="callStatus == 'Call ended' || callStatus == 'No answer'"
         class="blink"
         :class="{
-          'text-red-700':
+          'text-ink-red-6':
             callStatus == 'Call ended' || callStatus == 'No answer',
         }"
       >
@@ -42,20 +42,20 @@
     <div v-show="showCallPopup" v-bind="$attrs">
       <div
         ref="callPopupHeader"
-        class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-7 p-2 !text-ink-gray-2 shadow-2xl"
+        class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-10 p-2 !text-ink-gray-2 shadow-2xl"
         :style="style"
       >
         <div class="flex flex-row-reverse items-center">
           <Button
             @click="closeCallPopup"
-            class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
+            class="bg-surface-gray-10 text-ink-base hover:bg-surface-gray-9 shrink-0"
             icon="lucide-x"
             size="md"
           />
           <Button
             @click="toggleCallPopup"
             variant="ghost"
-            class="bg-surface-gray-7 text-ink-white hover:bg-surface-gray-6 shrink-0"
+            class="bg-surface-gray-10 text-ink-base hover:bg-surface-gray-9 shrink-0"
           >
             <MinimizeIcon class="size-4 cursor-pointer" />
           </Button>
@@ -68,7 +68,7 @@
             :class="callStatus == 'In progress' ? '' : 'pulse'"
           />
           <div class="flex flex-col items-center justify-center gap-1">
-            <div class="text-xl font-medium">
+            <div class="text-2xl-medium">
               {{ contact?.full_name ?? "Unknown" }}
             </div>
             <div class="text-sm text-ink-gray-5">
@@ -307,7 +307,7 @@ defineExpose({ makeOutgoingCall, setup });
 }
 
 :deep(.ProseMirror) {
-  caret-color: var(--ink-white);
+  caret-color: var(--ink-base);
 }
 .pulse::before {
   content: "";

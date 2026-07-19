@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-1.5">
       <Tooltip :text="contact.data?.name || contact.data?.email_id">
         <div class="flex gap-2 items-center">
-          <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
+          <p class="text-ink-gray-8 text-2xl-medium max-w-[170px] truncate">
             {{ contact.data?.name || contact.data?.email_id }}
           </p>
           <ExternalLinkIcon

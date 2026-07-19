@@ -39,7 +39,7 @@
         >
           <ul class="flex flex-wrap gap-2 py-2">
             <li
-              class="flex items-center space-x-2 rounded bg-surface-white p-1 shadow"
+              class="flex items-center space-x-2 rounded bg-surface-base p-1 shadow"
               v-for="email in inviteQueue.slice().reverse()"
               :key="email"
               :title="email"

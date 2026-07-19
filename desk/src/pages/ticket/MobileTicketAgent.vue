@@ -70,12 +70,12 @@
                   :ticket="ticket.doc"
                 />
                 <!-- SLA Section -->
-                <h3 class="px-6 pt-3 font-semibold text-base">
+                <h3 class="px-6 pt-3 text-base-semibold">
                   {{ __("SLA") }}
                 </h3>
                 <TicketAgentDetails :ticket="ticket.doc" />
                 <!-- Ticket Fields -->
-                <h3 class="px-6 pt-3 font-semibold text-base">
+                <h3 class="px-6 pt-3 text-base-semibold">
                   {{ __("Details") }}
                 </h3>
                 <TicketAgentFields
@@ -105,7 +105,7 @@
             </template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-white"
+            class="sticky bottom-0 z-50 bg-surface-base"
             ref="communicationAreaRef"
             v-model="ticket.doc"
             :ticketId="ticket.doc?.name"

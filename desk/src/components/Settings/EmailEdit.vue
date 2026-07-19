@@ -14,10 +14,10 @@
           </div>
           <!-- banner for setting up email account -->
           <div
-            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-gray-modals"
+            class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
           >
             <CircleAlert
-              class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
+              class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-5"
             />
             <div class="text-wrap text-xs text-ink-gray-7 flex flex-col gap-1">
               <span>
@@ -25,7 +25,7 @@
                 <a
                   :href="info.link"
                   target="_blank"
-                  class="text-ink-blue-2 underline"
+                  class="text-ink-blue-5 underline"
                   >here</a
                 >.
               </span>
@@ -33,7 +33,7 @@
                 <a
                   :href="deskEditUrl"
                   target="_blank"
-                  class="text-ink-blue-2 underline"
+                  class="text-ink-blue-5 underline"
                 >
                   {{ __("Open in Desk") }}
                 </a>
@@ -343,7 +343,7 @@ async function updateAccount() {
   if (!nameChanged && !otherFieldsChanged) {
     toast.create({
       message: __("No changes made"),
-      icon: h(CircleAlert, { class: "text-ink-blue-2" }),
+      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
     });
     return;
   }
@@ -406,7 +406,7 @@ function pullEmails() {
 
   toast.create({
     message: __("Pulling emails, this may take a few minutes."),
-    icon: h(CircleAlert, { class: "text-ink-blue-2" }),
+    icon: h(CircleAlert, { class: "text-ink-blue-5" }),
   });
 
   call("frappe.email.doctype.email_account.email_account.pull_emails", {
