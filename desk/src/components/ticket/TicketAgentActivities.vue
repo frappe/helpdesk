@@ -177,38 +177,13 @@ onMounted(() => {
   });
 });
 
-// The URL hash serves two unrelated purposes on ticket pages, and this
-// component must tell them apart:
-//
-// 1. Active-tab state. useActiveTabManager persists the currently selected
-//    tab in the hash (#activity, #email, #comment, ...) so that a reload or a
-//    shared URL restores the same tab. On mobile every non-default tab is
-//    stored this way; on desktop the same happens for tabs after the first.
-//
-// 2. Activity deep-links. Notifications and agent search navigate to a ticket
-//    with a hash that names one specific activity to scroll to and highlight,
-//    e.g. #comment-<name> or #communication-<name> (see Notifications.vue,
-//    MobileNotifications.vue and SearchAgent.vue).
-//
-// Only case 2 is a scroll target for scrollToHash(). scrollToHash() finishes
-// by *removing* the hash from the URL (the deep-link is one-shot), so if a
-// case-1 hash ever fell through to it, the active-tab state would be wiped
-// and useActiveTabManager would snap back to the default tab — on mobile that
-// showed up as "I open Activity and seconds later I'm back on Details". It
-// even found an element to scroll to, because the lucide icon sprite defines
-// <symbol id="activity">. Deep-link ids are always prefixed (the element ids
-// come from CommentBox and EmailArea), while tab hashes are bare tab names —
-// so only hashes with a known deep-link prefix are treated as deep-links,
-// and a new or renamed tab cannot re-introduce the bug.
-const deepLinkPrefixes = ["comment-", "communication-"];
-
-// Returns the id of the activity element the current hash deep-links to
-// (case 2 above), or "" when there is no hash or it is only active-tab state
-// (case 1). Callers can therefore use it both as "should I scroll to a
-// specific activity?" and as the element id to scroll to.
+// The URL hash carries only active-tab state (useActiveTabManager). Activity
+// deep-links from notifications/search arrive as ?highlight=<element id>
+// (comment-<name> / communication-<name>, the ids CommentBox and EmailArea
+// render) so the one-shot scroll+cleanup below never touches tab state.
 function linkedActivityId() {
-  const id = route.hash.substring(1);
-  return id && deepLinkPrefixes.some((p) => id.startsWith(p)) ? id : "";
+  const id = route.query.highlight;
+  return typeof id === "string" ? id : "";
 }
 
 function scrollToLatestActivity() {
@@ -238,10 +213,14 @@ function scrollToHash() {
           // Add highlight effect using Tailwind class
           element.classList.add("bg-surface-yellow-2");
 
-          // Remove highlight after 2 seconds
+          // Remove highlight after 2 seconds; drop only the consumed
+          // ?highlight param, keeping other query keys (?view=) and
+          // whatever tab the user is on by now.
           setTimeout(() => {
             element.classList.remove("bg-surface-yellow-2");
-            router.replace({ hash: "" });
+            const query = { ...route.query };
+            delete query.highlight;
+            router.replace({ query, hash: route.hash });
           }, 2000);
         }
       }, 1000);
@@ -250,7 +229,7 @@ function scrollToHash() {
 }
 
 watch(
-  () => route.hash,
+  () => [route.hash, route.query.highlight],
   () => {
     scrollToLatestActivity();
   }

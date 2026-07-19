@@ -420,16 +420,20 @@ function getItemRoute(item: SearchResultItem) {
       params: { ticketId: item.name },
     };
   } else if (item.doctype === "HD Ticket Comment" && item.reference_ticket) {
+    // ?highlight is the activity deep-link target (element id, see
+    // TicketAgentActivities); the hash only selects the tab.
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_ticket },
-      hash: `#comment-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `comment-${item.name}` },
     };
   } else if (item.doctype === "Communication" && item.reference_name) {
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_name },
-      hash: `#communication-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `communication-${item.name}` },
     };
   }
   return { name: "SearchAgent" };
