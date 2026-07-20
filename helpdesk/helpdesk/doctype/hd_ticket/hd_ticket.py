@@ -87,13 +87,16 @@ class HDTicket(Document):
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
+
+        # stamped server-side above; the customer's value never survives.
+        # customer: multi-org contacts pick the org at creation, and
+        # set_customer rejects any customer the contact is not linked to.
+        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
+
+        # permlevel fields the customer legitimately fills on the creation
+        # form; exempted only here (before_insert) so they stay create-only.
         self.flags.ignore_permlevel_for_fields = [
-            "key",
-            "raised_by",
-            "via_customer_portal",
-            # multi-org contacts pick the org at creation; set_customer
-            # rejects any customer the contact is not linked to
-            "customer",
+            *server_owned_fields,
             *self.get_customer_template_fields(),
         ]
 
