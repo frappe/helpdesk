@@ -5,11 +5,12 @@ from helpdesk.api.contact import create_contact
 
 
 @frappe.whitelist()
-def create_customer(customer: dict, primary_contact: dict | None = None) -> str:
+def create_customer(customer: dict, primary_contact: dict | None = None) -> dict:
     """Create an HD Customer and optionally invite a primary contact.
 
     The primary contact is created, invited by email and set as the customer's
-    primary contact in a single operation.
+    primary contact in a single operation. Returns the customer name and the
+    emails an invitation was sent to.
     """
     frappe.has_permission("HD Customer", "create", throw=True)
 
@@ -25,25 +26,35 @@ def create_customer(customer: dict, primary_contact: dict | None = None) -> str:
     )
     customer_doc.insert()
 
+    invited_emails: list[str] = []
     if primary_contact and primary_contact.get("email"):
-        add_primary_contact(customer_doc, primary_contact)
+        invited_emails = add_primary_contact(customer_doc, primary_contact)
 
-    return customer_doc.name
+    return {"name": customer_doc.name, "invited_emails": invited_emails}
 
 
-def add_primary_contact(customer_doc: Document, primary_contact: dict) -> None:
-    contact_name = create_contact(
-        {
-            "first_name": primary_contact.get("first_name"),
-            "last_name": primary_contact.get("last_name"),
-            "email": primary_contact.get("email"),
-            "phone": primary_contact.get("mobile_no"),
-            "customer": customer_doc.name,
-        },
-        invite=True,
-    )
+def add_primary_contact(customer_doc: Document, primary_contact: dict) -> list[str]:
+    """Set the primary contact, reusing an existing contact for the email.
+
+    The contact is created first when the email is unknown, so the form's
+    name and phone are kept; add_contacts then adds it directly if it has a
+    linked user and invites it by email otherwise.
+    """
+    email = primary_contact.get("email")
+    contact_name = frappe.db.get_value("Contact", {"email_id": email}, "name")
+    if not contact_name:
+        contact_name = create_contact(
+            {
+                "first_name": primary_contact.get("first_name"),
+                "last_name": primary_contact.get("last_name"),
+                "email": email,
+                "phone": primary_contact.get("mobile_no"),
+            }
+        )
+    result = customer_doc.add_contacts([contact_name], "HD Customer Manager")
     customer_doc.set_primary(contact_name)
     customer_doc.save()
+    return result["invite_result"]["invited_emails"]
 
 
 @frappe.whitelist()

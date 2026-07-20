@@ -1,12 +1,12 @@
 <template>
   <div
-    class="flex justify-between items-center border-outline-gray-modals p-2 cursor-pointer hover:bg-surface-menu-bar rounded h-14"
+    class="flex justify-between items-center border-outline-elevation-2 p-2 cursor-pointer hover:bg-surface-sidebar rounded h-14"
   >
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
       <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
       <div class="rtl:text-right">
-        <p class="text-p-base text-ink-gray-7 font-medium">
+        <p class="text-p-base-medium text-ink-gray-7">
           {{ __(emailAccount.email_account_name) }}
         </p>
         <div class="text-p-sm w-full text-ink-gray-5 mt-1">

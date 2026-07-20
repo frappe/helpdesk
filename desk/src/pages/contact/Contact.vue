@@ -1,12 +1,14 @@
 <template>
-  <div class="flex flex-col max-w-screen-xl mx-auto w-full">
+  <div
+    class="flex h-full flex-col overflow-y-hidden max-w-screen-xl mx-auto w-full"
+  >
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
       </template>
     </LayoutHeader>
     <div
-      class="gap-5 flex flex-col h-full"
+      class="gap-5 flex flex-col flex-1 min-h-0"
       v-if="!contact.loading && contact.doc"
     >
       <!-- ContactInfo -->
@@ -41,12 +43,12 @@
           </div>
         </template>
       </PageInfo>
-      <div class="overflow-y-auto flex-1 flex flex-col">
+      <div class="overflow-y-auto overscroll-y-contain flex-1 flex flex-col">
         <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-white"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base"
         >
           <template #tab-item="{ tab, selected }: any">
             <button
@@ -56,7 +58,7 @@
               <component :is="tab.icon" v-if="tab.icon" class="h-5" />
               {{ __(tab.label) }}
               <Badge
-                class="group-hover:bg-surface-gray-7 !bg-surface-gray-2 !text-ink-gray-7"
+                class="group-hover:bg-surface-gray-10 !bg-surface-gray-2 !text-ink-gray-7"
                 variant="solid"
                 theme="gray"
                 size="sm"
@@ -66,11 +68,11 @@
             </button>
           </template>
           <template #tab-panel="{ tab }">
-            <div class="p-5 overflow-hidden flex flex-col flex-1 min-h-0">
+            <div class="p-5 flex flex-col flex-1 min-h-0">
               <TicketsTab
                 v-if="tab.label === __('Tickets')"
-                :doc="contact"
                 :ticketsListResource="ticketsListResource"
+                :ticketsCountResource="ticketsCountResource"
                 :baseFilter="{ contact: props.id }"
                 :additionalFilter="
                 (contactInfoResource.data?.customers?.length ?? 0) > 1
@@ -166,13 +168,13 @@ const {
 
 const { feedbackCount } = useContactFeedback(props.id);
 
-const { ticketsListResource } = getTicketListResource();
+const { ticketsListResource, ticketsCountResource } = getTicketListResource();
 
 const tabs = computed(() => [
   {
     label: __("Tickets"),
     hash: "tickets",
-    count: ticketsListResource.data?.length ?? 0,
+    count: ticketsCountResource.data ?? 0,
     icon: h(TicketHashIcon, { class: "size-4" }),
   },
   {
@@ -338,6 +340,7 @@ onMounted(() => {
     },
   });
   ticketsListResource.fetch();
+  ticketsCountResource.fetch();
 });
 
 usePageMeta(() => {
@@ -351,6 +354,11 @@ usePageMeta(() => {
 /* frappe-ui's TabsRoot clips with overflow-hidden, which traps the sticky
    tablist. Let it overflow so the tablist sticks to the page scroll container. */
 .tabs-sticky-header {
+  overflow: visible !important;
+}
+/* Same for the tab panels, so sticky children (e.g. the ticket filter bar)
+   can stick to the page scroll container instead of being clipped. */
+.tabs-sticky-header :deep([role="tabpanel"]) {
   overflow: visible !important;
 }
 .tabs-sticky-header :deep([role="tablist"]) {

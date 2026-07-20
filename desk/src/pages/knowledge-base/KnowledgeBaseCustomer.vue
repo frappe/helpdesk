@@ -2,7 +2,7 @@
   <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center relative">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">Knowledge Base</div>
+        <div class="text-lg-medium text-ink-gray-9">Knowledge Base</div>
       </template>
     </LayoutHeader>
     <div

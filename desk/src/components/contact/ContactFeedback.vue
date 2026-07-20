@@ -12,7 +12,7 @@
     >
       <LucideStar class="h-7.5 w-7.5 text-ink-gray-4" />
       <div class="flex flex-col gap-1 max-w-[282px] m-auto">
-        <p class="text-base font-medium text-ink-gray-7">
+        <p class="text-base-medium text-ink-gray-7">
           {{ __("No feedback yet") }}
         </p>
         <p class="text-ink-gray-6 text-base">

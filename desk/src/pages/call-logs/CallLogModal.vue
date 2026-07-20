@@ -1,10 +1,10 @@
 <template>
   <Dialog v-model:open="show" bare @after-leave="resetCallLog">
     <template #default>
-      <div class="px-4 pt-5 bg-surface-modal sm:px-6">
+      <div class="px-4 pt-5 bg-surface-elevation-2 sm:px-6">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-2">
-            <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
               {{ __(dialogOptions.title) || __("Untitled") }}
             </h3>
             <Badge v-if="isDirty" :label="__('Not Saved')" theme="orange" />
@@ -21,7 +21,7 @@
         <div class="flex flex-col gap-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Type')" required />
+              <FormLabel :label="__('Type')" required size="md" />
               <Select
                 v-model="callLog.type"
                 :options="callLogTypeOptions"
@@ -30,7 +30,7 @@
               <ErrorMessage :message="errors.type" />
             </div>
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('To')" required />
+              <FormLabel :label="__('To')" required size="md" />
               <FormControl
                 v-model="callLog.to"
                 type="text"
@@ -41,7 +41,7 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('From')" required />
+              <FormLabel :label="__('From')" required size="md" />
               <FormControl
                 v-model="callLog.from"
                 type="text"
@@ -50,7 +50,7 @@
               <ErrorMessage :message="errors.from" />
             </div>
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Status')" required />
+              <FormLabel :label="__('Status')" required size="md" />
               <Select
                 v-model="callLog.status"
                 :options="callLogStatusOptions"
@@ -61,7 +61,7 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Duration')" required />
+              <FormLabel :label="__('Duration')" required size="md" />
               <FormControl
                 v-model="callLog.duration"
                 type="number"
