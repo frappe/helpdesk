@@ -59,7 +59,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">{{
+            <span class="text-lg-semibold text-ink-gray-8">{{
               __("Valid From")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -68,7 +68,12 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('From date')" for="from_date" required />
+              <FormLabel
+                :label="__('From date')"
+                for="from_date"
+                required
+                size="md"
+              />
               <DatePicker
                 v-model="holidayData.from_date"
                 variant="subtle"
@@ -89,7 +94,12 @@
               />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('To date')" for="to_date" required />
+              <FormLabel
+                :label="__('To date')"
+                for="to_date"
+                required
+                size="md"
+              />
               <DatePicker
                 v-model="holidayData.to_date"
                 variant="subtle"
@@ -110,7 +120,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <div class="text-lg font-semibold text-ink-gray-8">
+            <div class="text-lg-semibold text-ink-gray-8">
               {{ __("Recurring Holidays") }}
             </div>
             <div class="text-p-sm text-ink-gray-6">
@@ -128,7 +138,7 @@
         <div>
           <div class="flex justify-between items-center">
             <div class="flex justify-between flex-col gap-1">
-              <span class="text-lg font-semibold text-ink-gray-8">
+              <span class="text-lg-semibold text-ink-gray-8">
                 {{ __("Holidays") }}
               </span>
               <div class="text-p-sm text-ink-gray-6">
@@ -167,7 +177,7 @@
             <!-- Indicators -->
             <div class="flex gap-4" v-if="holidayListView === 'calendar'">
               <div class="gap-1 flex items-center">
-                <span class="bg-yellow-100 size-4 rounded-sm" />
+                <span class="bg-surface-yellow-2 size-4 rounded-sm" />
                 <span class="text-sm text-ink-gray-6">{{
                   __("Holidays")
                 }}</span>

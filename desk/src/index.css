@@ -1,4 +1,5 @@
 @import "frappe-ui/style.css";
+@import "frappe-ui/editor-style.css";
 
 @tailwind base;
 @tailwind components;
@@ -15,6 +16,11 @@
     background-color: var(--surface-gray-2);
     color: var(--ink-gray-9);
   }
+  /* Editor content carries both prose systems: prose-f underlines links via
+     text-decoration, prose-v3 via border-bottom. Keep only the prose-v3 line. */
+  .prose-f.prose-v3 a {
+    text-decoration: none;
+  }
 }
 
 .tiptap input[placeholder="Add caption"] {
@@ -24,7 +30,7 @@
 html,
 body {
   color: var(--ink-gray-9);
-  background-color: var(--surface-white);
+  background-color: var(--surface-base);
 }
 
 :root {

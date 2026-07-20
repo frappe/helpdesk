@@ -7,10 +7,7 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span
-          v-if="!hideLabel"
-          class="block text-p-sm font-medium text-ink-gray-7"
-        >
+        <span v-if="!hideLabel" class="block text-base text-ink-gray-5">
           {{ __("Assignee") }}
         </span>
         <Button
@@ -52,12 +49,12 @@
     <template #body="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <!-- Search Header -->
         <div class="p-1">
           <div
-            class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
+            class="flex h-7 items-center text-sm-medium text-ink-gray-6 justify-between"
           >
             <TextInput
               ref="inputRef"

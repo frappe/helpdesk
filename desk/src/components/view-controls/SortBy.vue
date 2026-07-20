@@ -26,7 +26,7 @@
         <template v-else #prefix><SortIcon class="h-4" /></template>
         <template v-if="sortValues?.size" #suffix>
           <div
-            class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
+            class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
           >
             {{ sortValues.size }}
           </div>
@@ -68,7 +68,7 @@
     </template>
     <template #body="{ close }">
       <div
-        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-white shadow-xl"
+        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="min-w-60 p-2">
           <div
