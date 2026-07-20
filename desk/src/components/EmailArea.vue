@@ -103,6 +103,7 @@
         :key="a.file_url"
         :label="a.file_name"
         :url="a.file_url"
+        :attachments="attachments"
       />
     </div>
   </div>
