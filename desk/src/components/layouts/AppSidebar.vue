@@ -3,6 +3,7 @@
     v-model:collapsed="collapsed"
     :disable-collapse="mobile"
     class="border-e border-outline-gray-1"
+    :class="{ '!bg-surface-base': mobile }"
   >
     <div class="flex h-full flex-col p-2">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
