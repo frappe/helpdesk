@@ -5,7 +5,6 @@ import LogoSendgrid from "@/assets/images/sendgrid.png";
 import LogoSparkpost from "@/assets/images/sparkpost.webp";
 import LogoYahoo from "@/assets/images/yahoo.png";
 import LogoYandex from "@/assets/images/yandex.png";
-import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
 import { EmailAccount, EmailService, RenderField } from "@/types";
 import { validateEmailWithZod } from "@/utils";
 import { __ } from "@/translation";

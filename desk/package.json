@@ -20,7 +20,7 @@
     "@tiptap/starter-kit": "^3.26.0",
     "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^6.0.7",
     "@vueuse/core": "^13.8.0",
     "@vueuse/integrations": "^13.8.0",
     "dayjs": "^1.11.7",
@@ -36,7 +36,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue-jsx": "^3.0.1",
+    "@vitejs/plugin-vue-jsx": "^5.1.6",
     "autoprefixer": "^10.4.13",
     "patch-package": "^8.0.1",
     "postcss": "^8.4.5",
@@ -44,8 +44,8 @@
     "prettier": "2.8.4",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.0.2",
-    "vite": "^4.4.9",
-    "vite-plugin-pwa": "0.15.0"
+    "vite": "^8.1.4",
+    "vite-plugin-pwa": "1.3.0"
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12",
