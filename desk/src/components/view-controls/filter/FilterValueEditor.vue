@@ -313,9 +313,10 @@ function handleDateRange(emittedRange: any) {
 }
 
 function splitRange(rawRange: any): string[] {
-  if (typeof rawRange !== "string") return rawRange;
-  const [start, end] = rawRange.split(",");
-  return [start, end];
+  if (!Array.isArray(rawRange) && typeof rawRange !== "string") return [];
+  if (Array.isArray(rawRange)) return rawRange;
+  const delimiter = rawRange.includes(" to ") ? " to " : ",";
+  return rawRange.split(delimiter).map((s) => s.trim());
 }
 
 function moveActive(delta: number) {
