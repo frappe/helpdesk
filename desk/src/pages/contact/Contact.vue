@@ -1,12 +1,14 @@
 <template>
-  <div class="flex flex-col max-w-screen-xl mx-auto w-full">
+  <div
+    class="flex h-full flex-col overflow-y-hidden max-w-screen-xl mx-auto w-full"
+  >
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
       </template>
     </LayoutHeader>
     <div
-      class="gap-5 flex flex-col h-full"
+      class="gap-5 flex flex-col flex-1 min-h-0"
       v-if="!contact.loading && contact.doc"
     >
       <!-- ContactInfo -->
@@ -41,7 +43,7 @@
           </div>
         </template>
       </PageInfo>
-      <div class="overflow-y-auto flex-1 flex flex-col">
+      <div class="overflow-y-auto overscroll-y-contain flex-1 flex flex-col">
         <TicketStats :dt="'Contact'" :dn="id" v-if="!isMobileView" />
         <Tabs
           v-model="activeTab"

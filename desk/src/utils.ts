@@ -894,7 +894,7 @@ export function buildPercentageChange(
 ) {
   // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
   if (value === null || value === undefined || value === 0) {
-    return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
+    return { icon: "", value: "0", color: "text-ink-gray-5" };
   }
   const isPositive = value > 0;
   const isGood = negativeIsBetter ? !isPositive : isPositive;
