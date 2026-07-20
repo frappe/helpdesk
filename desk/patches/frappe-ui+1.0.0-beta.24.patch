@@ -18,6 +18,25 @@ index 0b7069a..de2a3df 100644
            pluginKey: new PluginKey(options.name),
            items: ({ query }: { query: string }) =>
              typeof options.items === 'function' ? options.items(query) : options.items,
+diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
+index 1447ba9..b6aad68 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
+@@ -45,6 +45,14 @@ export const LinkExtension = Link.extend({
+     }
+   },
+ 
++  // tiptap's Link mark is inclusive whenever `autolink` is on, so typing right
++  // after a link extends the mark onto the new text. Keep autolink (URL
++  // detection as you type) but make the mark non-inclusive so the link stops at
++  // its boundary.
++  inclusive() {
++    return false
++  },
++
+   addCommands() {
+     return {
+       ...this.parent?.(),
 diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
 index 8363502..07f4551 100644
 --- a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
