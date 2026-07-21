@@ -14,9 +14,9 @@
           />
         </div>
       </Tooltip>
-      <div class="flex items-center gap-1 text-base text-ink-gray-5">
-        <span
-          class="cursor-copy"
+      <div class="flex items-center gap-1 text-p-sm">
+        <p
+          class="cursor-copy text-ink-gray-6 transition-colors hover:text-ink-gray-8"
           @click="
             copyToClipboard(
               ticket.doc.name,
@@ -25,13 +25,18 @@
           "
         >
           #{{ ticket.doc.name }}
-        </span>
-        <span>via</span>
-        <GlobeIcon v-if="ticket.doc.via_customer_portal" class="size-4" />
-        <EmailIcon v-else class="size-4" />
-        <span>{{
-          ticket.doc.via_customer_portal ? __("Portal") : __("Email")
-        }}</span>
+        </p>
+        <div class="flex items-center text-ink-gray-5">
+          <span class="me-[4px]">{{ __("via") }}</span>
+          <GlobeIcon
+            v-if="ticket.doc.via_customer_portal"
+            class="me-1 inline-block size-4"
+          />
+          <EmailIcon v-else class="me-1 inline-block size-4" />
+          <span>{{
+            ticket.doc.via_customer_portal ? __("Portal") : __("Email")
+          }}</span>
+        </div>
       </div>
     </div>
     <Tooltip v-if="isCallingEnabled" :text="__('Call contact')">

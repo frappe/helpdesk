@@ -5,19 +5,18 @@
       :key="card.title"
       class="group flex min-h-7 items-center gap-2 leading-5"
     >
-      <div class="w-[106px] shrink-0 truncate text-base text-ink-gray-5">
+      <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
         {{ __(card.title) }}
       </div>
       <!-- 9px = field controls' 8px padding + 1px transparent border -->
       <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
         <Badge
           variant="ghost"
-          size="lg"
+          size="sm"
           :theme="badgeTheme[card.metric.color]"
-          class="min-w-0 !px-0 !text-base font-semibold"
-        >
-          <span class="truncate">{{ cardValue(card) }}</span>
-        </Badge>
+          class="min-w-0 !px-0 !text-base"
+          :label="cardValue(card)"
+        />
         <Popover
           placement="bottom"
           :show="openCard === card.title"
@@ -25,7 +24,7 @@
         >
           <template #target>
             <LucideInfo
-              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-4 opacity-0 transition-opacity hover:text-ink-gray-6 group-hover:opacity-100"
+              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-6 opacity-0 transition-opacity group-hover:opacity-100"
               @mouseenter="openCard = card.title"
               @mouseleave="openCard = null"
             />
@@ -44,12 +43,6 @@
                 >
                   {{ row.value }}
                 </span>
-              </div>
-              <div
-                v-if="card.metric.delayInWorkingHours"
-                class="mt-0.5 border-t pt-1.5 text-xs text-ink-gray-4"
-              >
-                {{ __("Delay in working hours") }}
               </div>
             </div>
           </template>
@@ -98,7 +91,7 @@ const cards = computed<SLACard[]>(() =>
       actualLabel: "Responded on",
     },
     {
-      title: "Resolution due",
+      title: "Resolution",
       metric: resolution.value,
       fulfilledLabel: "Fulfilled",
       actualLabel: "Resolved on",
@@ -133,7 +126,18 @@ function cardDetails(card: SLACard) {
     });
   }
   if (metric.delay) {
-    rows.push({ label: "Delay", value: metric.delay, danger: true });
+    rows.push({
+      label: metric.delayInWorkingHours ? "Delay (working hours)" : "Delay",
+      value: metric.delay,
+      danger: true,
+    });
+    if (metric.calendarDelay) {
+      rows.push({
+        label: "Delay (total)",
+        value: `+${metric.calendarDelay}`,
+        danger: true,
+      });
+    }
   }
   if (metric.fulfilledIn) {
     rows.push({

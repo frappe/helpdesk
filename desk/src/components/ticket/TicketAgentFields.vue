@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-1 flex-col overflow-hidden overflow-y-auto border-b px-6 py-3 sm:px-0 sm:py-3"
+    class="flex flex-1 flex-col gap-1 overflow-hidden overflow-y-auto border-b px-6 py-3 sm:px-0 sm:py-3"
   >
     <TicketField
       v-for="field in fields"

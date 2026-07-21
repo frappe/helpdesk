@@ -14,7 +14,11 @@
           ref="triggerRef"
           :variant="ghost ? 'ghost' : 'outline'"
           class="!flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
-          :class="ghost ? '!px-[9px] hover:!bg-transparent' : 'hover:shadow-sm'"
+          :class="
+            ghost
+              ? '!h-7 !rounded !border !border-transparent !bg-transparent !px-2 hover:!bg-transparent focus:!border-outline-gray-4 focus:!shadow-sm focus:!outline-none focus:!ring-0 focus-visible:!ring-2 focus-visible:!ring-outline-gray-3'
+              : 'hover:shadow-sm'
+          "
           @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full">
@@ -31,7 +35,12 @@
               </span>
             </template>
             <template v-else>
-              <span class="text-ink-gray-5">{{ __("No one") }}</span>
+              <span v-if="ghost" class="text-ink-gray-4">
+                {{ __("Set Assignee") }}...
+              </span>
+              <span v-else class="text-ink-gray-5 leading-5">{{
+                __("No one")
+              }}</span>
               <!-- <span
                 v-if="!popoverIsOpen"
                 class="text-xs text-ink-gray-6 hover:text-ink-gray-8 cursor-pointer underline ml-auto"
@@ -50,7 +59,7 @@
     <template #body="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none min-w-[325px]"
       >
         <!-- Search Header -->
         <div class="p-1">
@@ -70,16 +79,6 @@
                 <LucideSearch class="size-4 text-ink-gray-4" />
               </template>
             </TextInput>
-            <Button
-              v-if="searchText.length > 0"
-              variant="ghost"
-              size="sm"
-              @click="searchText = ''"
-            >
-              <template #icon>
-                <LucideX class="size-4" />
-              </template>
-            </Button>
           </div>
         </div>
 

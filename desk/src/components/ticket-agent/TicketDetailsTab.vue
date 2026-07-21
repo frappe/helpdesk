@@ -26,16 +26,7 @@
             />
           </div>
         </template>
-        <div class="mt-0.5 space-y-1.5 px-4 pb-4">
-          <!-- Assignee -->
-          <div class="flex items-center gap-2 leading-5">
-            <div class="w-[106px] shrink-0 truncate text-base text-ink-gray-5">
-              {{ __("Assigned To") }}
-            </div>
-            <div class="-m-0.5 min-w-0 flex-1 p-0.5">
-              <AssignTo hide-label ghost />
-            </div>
-          </div>
+        <div class="mt-0.5 space-y-2.5 px-4 pb-4">
           <!-- Core fields -->
           <template v-for="field in coreFields">
             <TicketField
@@ -50,10 +41,21 @@
               "
             />
           </template>
+          <!-- Assignee -->
+          <div class="flex items-center gap-2 leading-5">
+            <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
+              {{ __("Assignee") }}
+            </div>
+            <div
+              class="-m-0.5 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-0.5"
+            >
+              <AssignTo hide-label ghost />
+            </div>
+          </div>
           <!-- Tags: UI only, functionality comes later -->
           <div class="flex items-start gap-2 leading-5">
             <div
-              class="w-[106px] shrink-0 truncate pt-1 text-base text-ink-gray-5"
+              class="w-[106px] shrink-0 truncate pt-1 text-sm text-ink-gray-5"
             >
               {{ __("Tags") }}
             </div>
@@ -88,7 +90,7 @@
               />
             </div>
           </template>
-          <div class="mt-0.5 space-y-1.5 px-4 pb-4">
+          <div class="mt-0.5 space-y-2.5 px-4 pb-4">
             <template v-for="field in customFields">
               <TicketField
                 v-if="field.visible"
@@ -307,7 +309,7 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     options: fieldMeta?.options || "",
     placeholder:
       fieldTemplate.placeholder ||
-      `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
+      `Set ${fieldMeta?.label || fieldTemplate.fieldname}...`,
     readonly: Boolean(fieldMeta.read_only),
     disabled: Boolean(fieldMeta.read_only),
     url_method: fieldTemplate.url_method || "",
