@@ -24,7 +24,6 @@ export interface SLAMetric {
 
 interface TicketLike {
   doc?: Record<string, any>;
-  get?: { loading?: boolean };
 }
 
 export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
@@ -32,7 +31,6 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   resolution: ComputedRef<SLAMetric | null>;
 } {
   const doc = computed(() => ticket.value?.doc ?? {});
-  const loading = computed(() => Boolean(ticket.value?.get?.loading));
 
   // Cases:
   // - responded before due (or with no recorded due date) -> fulfilled
@@ -42,7 +40,6 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   // - no target and no response -> null (ticket has no SLA, card hidden)
   const firstResponse = computed<SLAMetric | null>(() => {
     const d = doc.value;
-    if (loading.value) return null;
 
     if (d.first_responded_on) {
       const inTime =
@@ -94,7 +91,6 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   //   empty target while paused still means hold, not "no SLA")
   const resolution = computed<SLAMetric | null>(() => {
     const d = doc.value;
-    if (loading.value) return null;
 
     const pausedBeforeBreach =
       !d.resolution_by || dayjs(d.resolution_by).isAfter(dayjs(d.on_hold_since));
