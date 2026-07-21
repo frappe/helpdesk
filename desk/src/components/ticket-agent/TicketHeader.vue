@@ -11,7 +11,6 @@
             />
           </template>
         </Breadcrumbs>
-        <TicketSLA />
       </div>
     </template>
     <template #right-header>
@@ -122,7 +121,6 @@ import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
-import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();

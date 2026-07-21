@@ -12,8 +12,9 @@
         </span>
         <Button
           ref="triggerRef"
-          variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+          :variant="ghost ? 'ghost' : 'outline'"
+          class="!flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
+          :class="ghost ? '!px-[9px] hover:!bg-transparent' : 'hover:shadow-sm'"
           @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full">
@@ -40,7 +41,7 @@
               </span> -->
             </template>
           </div>
-          <template #suffix>
+          <template v-if="!ghost" #suffix>
             <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
           </template>
         </Button>
@@ -183,13 +184,15 @@ import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 interface Props {
   hideLabel?: boolean;
+  ghost?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   hideLabel: false,
+  ghost: false,
 });
 
-const { hideLabel } = props;
+const { hideLabel, ghost } = props;
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;

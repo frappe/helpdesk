@@ -1,69 +1,94 @@
 <template>
   <div class="flex h-full flex-col">
-    <div class="shrink-0 px-4 pb-4 flex flex-col">
-      <!-- User avatar with buttons -->
+    <!-- Contact header -->
+    <div class="shrink-0 p-4 pb-3">
       <TicketContact />
-      <!-- Core Fields -->
-      <div class="mt-4">
-        <div
-          v-for="(section, index) in coreFields"
-          :key="index"
-          :class="
-            section.group ? 'flex gap-2 items-start max-w-full mb-3' : 'mb-3'
-          "
-        >
-          <template v-for="field in section.fields">
-            <Link
+    </div>
+
+    <!-- SLA card, pinned with the contact header -->
+    <TicketSLA class="shrink-0 px-4 pb-3.5" />
+
+    <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
+    <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
+      <!-- Key Info (core fields) -->
+      <Section label="Key Info" v-model:opened="openedSections.keyInfo">
+        <template #header="{ opened, toggle }">
+          <div
+            class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
+            @click="toggle"
+          >
+            <span class="text-base-semibold text-ink-gray-8">
+              {{ __("Key Info") }}
+            </span>
+            <LucideChevronRight
+              class="size-3.5 text-ink-gray-6 transition-transform"
+              :class="{ 'rotate-90': opened }"
+            />
+          </div>
+        </template>
+        <div class="mt-0.5 space-y-1.5 px-4 pb-4">
+          <!-- Assignee -->
+          <div class="flex items-center gap-2 leading-5">
+            <div class="w-[106px] shrink-0 truncate text-base text-ink-gray-5">
+              {{ __("Assigned To") }}
+            </div>
+            <div class="-m-0.5 min-w-0 flex-1 p-0.5">
+              <AssignTo hide-label ghost />
+            </div>
+          </div>
+          <!-- Core fields -->
+          <template v-for="field in coreFields">
+            <TicketField
               v-if="field.visible"
               :key="field.fieldname"
               :ref="(el) => setFieldRef(field.fieldname, el)"
-              class="form-control-core"
-              :id="field.fieldname"
-              :class="section.group ? 'flex-1 min-w-0' : 'w-full'"
-              :page-length="10"
-              :label="__(field.label)"
-              :placeholder="__(field.placeholder)"
-              :doctype="field.doctype"
-              :modelValue="__(field.value)"
-              :required="field.required"
-              @update:model-value="
-              (val:string) => handleFieldUpdate(field.fieldname, val,true)
-            "
+              :field="field"
+              :value="field.value"
+              @change="
+                ({ fieldname, value }) =>
+                  handleFieldUpdate(fieldname, value, true)
+              "
             />
           </template>
+          <!-- Tags: UI only, functionality comes later -->
+          <div class="flex items-start gap-2 leading-5">
+            <div
+              class="w-[106px] shrink-0 truncate pt-1 text-base text-ink-gray-5"
+            >
+              {{ __("Tags") }}
+            </div>
+            <!-- 9px = field controls' 8px padding + 1px transparent border -->
+            <div
+              class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 py-0.5 ps-[9px]"
+            >
+              <button
+                class="rounded border border-dashed border-outline-gray-2 px-2 py-0.5 text-sm text-ink-gray-5 transition-colors hover:border-outline-gray-3 hover:text-ink-gray-7"
+              >
+                + {{ __("Add") }}
+              </button>
+            </div>
+          </div>
         </div>
+      </Section>
 
-        <!-- Assignee component -->
-        <AssignTo />
-      </div>
-    </div>
-
-    <!-- Scrollable sections: Ticket Info + Recent / Similar Tickets -->
-    <div
-      class="border-t flex-1 min-h-0 overflow-y-auto divide-y-[1px]"
-      v-if="Boolean(customFields.length) || showRecentSimilarTickets"
-    >
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
         <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
           <template #header="{ opened, toggle }">
             <div
-              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
+              class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
               @click="toggle"
             >
-              <span class="text-ink-gray-8 text-base-semibold select-none">
+              <span class="text-base-semibold text-ink-gray-8">
                 {{ __("Ticket Info") }}
               </span>
               <LucideChevronRight
-                class="size-4 text-ink-gray-6"
+                class="size-3.5 text-ink-gray-6 transition-transform"
                 :class="{ 'rotate-90': opened }"
               />
             </div>
           </template>
-          <div
-            class="space-y-1.5 px-4 mb-2 mt-0.5"
-            v-if="Boolean(customFields.length)"
-          >
+          <div class="mt-0.5 space-y-1.5 px-4 pb-4">
             <template v-for="field in customFields">
               <TicketField
                 v-if="field.visible"
@@ -89,39 +114,39 @@
           >
             <template #header="{ opened, toggle }">
               <div
-                class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
+                class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
                 @click="toggle"
               >
                 <Tooltip :text="section.tooltipMessage">
-                  <span class="text-ink-gray-8 text-base-semibold select-none">
+                  <span class="text-base-semibold text-ink-gray-8">
                     {{ __(section.label) }}
                   </span>
                 </Tooltip>
                 <LucideChevronRight
-                  class="size-4 text-ink-gray-6"
+                  class="size-3.5 text-ink-gray-6 transition-transform"
                   :class="{ 'rotate-90': opened }"
                 />
               </div>
             </template>
-            <ul class="pt-0 px-4 divide-y divide-outline-gray-1 pb-4">
+            <ul class="divide-y divide-outline-gray-1 px-4 pb-4 pt-0">
               <li
                 v-for="t in section.tickets"
                 :key="t.name"
                 @click="openTicket(t.name)"
               >
                 <div
-                  class="-mx-2 px-2 py-3 cursor-pointer rounded hover:bg-surface-gray-2 transition-colors"
+                  class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
                 >
-                  <p class="text-sm font-base text-ink-gray-9 truncate mb-2">
+                  <p class="font-base mb-2 truncate text-sm text-ink-gray-9">
                     {{ t.subject }}
                   </p>
                   <div class="flex items-center justify-between gap-2">
-                    <p class="text-sm text-ink-gray-5 shrink-0">
+                    <p class="shrink-0 text-sm text-ink-gray-5">
                       {{ formatDate(t.creation as string) + " · " }}
                       <span class="">{{ "#" + t.name }}</span>
                     </p>
                     <span
-                      class="text-xs px-2 py-0.5 font-base shrink-0 rounded-sm"
+                      class="font-base shrink-0 rounded-sm px-2 py-0.5 text-xs"
                       :class="getStatusColor(t.status as string)"
                     >
                       {{ t.status }}
@@ -138,7 +163,6 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
@@ -160,6 +184,7 @@ import Section from "../Section.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
+import TicketSLA from "./TicketSLA.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -172,33 +197,23 @@ const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const dateFormat = window.date_format;
 const { getStatus, colorMap } = useTicketStatusStore();
 
-// ticket_type, priority, customer, agent_group
+const CORE_FIELDS = ["ticket_type", "priority", "customer", "agent_group"];
+
 const coreFields = computed(() => {
-  // TODO: to confirm whether customizations should apply to core fields as well
   const fieldsMeta = getFields();
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  const _coreFields = [
-    { group: true, fields: [getField("ticket_type"), getField("priority")] },
-    { group: false, fields: [getField("customer")] },
-    { group: true, fields: [getField("agent_group")] },
-  ];
-
-  _coreFields.forEach((section) => {
-    section.fields = section.fields.map((f) => {
-      f = parseField(f, ticket.value.doc);
-
-      // cant handle required depends on as we directly set the value in DB on change
-      f["required"] = f.reqd;
-      f["ref"] = f.fieldname;
-
-      f = getFieldInFormat(f, f);
-      f["visible"] = true;
-      return f;
-    });
-  });
-  return _coreFields;
+  return CORE_FIELDS.map((fieldname) => {
+    let field = getField(fieldname);
+    if (!field) return null;
+    field = parseField(field, ticket.value.doc);
+    // cant handle required depends on as we directly set the value in DB on change
+    field["required"] = field.reqd;
+    const formatted = getFieldInFormat(field, field);
+    formatted["visible"] = true;
+    return formatted;
+  }).filter(Boolean);
 });
 
 const customFields = computed(() => {
@@ -209,15 +224,10 @@ const customFields = computed(() => {
 
   if (!customizations.value.data || customizations.value.loading) return [];
   let customFields = customizations.value.data?.custom_fields || [];
-  const _coreFields = [
-    "ticket_type",
-    "priority",
-    "customer",
-    "agent_group",
-    "subject",
-    "status",
-  ];
-  customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
+  const excludedFields = [...CORE_FIELDS, "subject", "status"];
+  customFields = customFields.filter(
+    (f) => !excludedFields.includes(f.fieldname)
+  );
   let _customFields = customFields
     .map((f) => {
       let fieldMeta = getField(f.fieldname);
@@ -236,7 +246,8 @@ const customFields = computed(() => {
 const openedSections = useStorage(
   "openedSections",
   {
-    ticketInfo: false,
+    keyInfo: true,
+    ticketInfo: true,
     recentTickets: false,
     similarTickets: false,
   },
@@ -366,17 +377,3 @@ useShortcut({ key: "t", shift: true }, () => {
   fieldRefs.value?.agent_group?.$el?.querySelector("button")?.click();
 });
 </script>
-
-<style scoped>
-:deep(.form-control-core button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
-}
-:deep(.form-control-core button > div) {
-  @apply truncate;
-}
-
-:deep(.form-control-core div) {
-  width: 100%;
-  display: flex;
-}
-</style>
