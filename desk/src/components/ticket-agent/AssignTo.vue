@@ -18,8 +18,16 @@
 =======
           :variant="ghost ? 'ghost' : 'outline'"
           class="!flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
+<<<<<<< HEAD
           :class="ghost ? '!px-[9px] hover:!bg-transparent' : 'hover:shadow-sm'"
 >>>>>>> 865fdb4c (fix: reposition SLA layout)
+=======
+          :class="
+            ghost
+              ? '!h-7 !rounded !border !border-transparent !bg-transparent !px-2 hover:!bg-transparent focus:!border-outline-gray-4 focus:!shadow-sm focus:!outline-none focus:!ring-0 focus-visible:!ring-2 focus-visible:!ring-outline-gray-3'
+              : 'hover:shadow-sm'
+          "
+>>>>>>> 53284913 (fix: better SLA layout)
           @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
@@ -36,8 +44,18 @@
               </span>
             </template>
             <template v-else>
+<<<<<<< HEAD
               <span class="text-ink-gray-5">{{ __("No one") }}</span>
               <span
+=======
+              <span v-if="ghost" class="text-ink-gray-4">
+                {{ __("Set Assignee") }}...
+              </span>
+              <span v-else class="text-ink-gray-5 leading-5">{{
+                __("No one")
+              }}</span>
+              <!-- <span
+>>>>>>> 53284913 (fix: better SLA layout)
                 v-if="!popoverIsOpen"
                 class="text-xs text-ink-gray-6 hover:text-ink-gray-8 cursor-pointer underline ml-auto"
                 @click.stop="assignSelf"
@@ -55,7 +73,7 @@
     <template #body="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none min-w-[325px]"
       >
         <!-- Search Header -->
         <div class="p-1">
@@ -69,6 +87,7 @@
               class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-6 placeholder-ink-gray-4"
               @click.stop
               @keydown="handleInputKeydown"
+<<<<<<< HEAD
             />
             <Button
               v-if="searchText.length > 0"
@@ -80,6 +99,13 @@
                 <LucideX class="size-4" />
               </template>
             </Button>
+=======
+            >
+              <template #prefix>
+                <LucideSearch class="size-4 text-ink-gray-4" />
+              </template>
+            </TextInput>
+>>>>>>> 53284913 (fix: better SLA layout)
           </div>
         </div>
 

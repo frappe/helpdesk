@@ -16,6 +16,8 @@ export interface SLAMetric {
   delay: string;
   /** True when delay comes from the SLA engine and counts working hours only */
   delayInWorkingHours?: boolean;
+  /** Wall-clock delay, shown alongside the working-hours delay */
+  calendarDelay?: string;
   /** How long the metric took when fulfilled, e.g. "3h 20m" */
   fulfilledIn?: string;
 }
@@ -67,6 +69,9 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
           delay: `+${failed}`,
         }),
         delayInWorkingHours: Boolean(d.first_response_failed_by),
+        calendarDelay: d.first_response_failed_by
+          ? shortDuration(d.first_responded_on, d.response_by)
+          : undefined,
       };
     }
 
@@ -114,7 +119,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
       }
       const failed = d.resolution_failed_by
         ? twoUnitDuration(d.resolution_failed_by * 1000)
-        : shortDuration(d.resolution_by, d.resolution_date);
+        : shortDuration(d.resolution_date, d.resolution_by);
       return {
         ...metric("failed", `Failed by ${failed}`, "red", {
           dueBy: d.resolution_by,
@@ -122,6 +127,9 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
           delay: `+${failed}`,
         }),
         delayInWorkingHours: Boolean(d.resolution_failed_by),
+        calendarDelay: d.resolution_failed_by
+          ? shortDuration(d.resolution_date, d.resolution_by)
+          : undefined,
       };
     }
 
