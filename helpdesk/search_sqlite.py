@@ -131,8 +131,16 @@ class HelpdeskSearch(SQLiteSearch):
                 "doctypes": {},
             }
 
-        # Query the search index for available options
+        accessible_tickets_json = frappe.as_json(
+            accessible_tickets, indent=None, separators=(",", ":")
+        )
+
+        # Query the search index for available options. Binding the accessible
+        # tickets as one JSON value avoids SQLite's statement-wide variable limit.
         sql = """
+			WITH accessible_tickets(ticket) AS (
+				SELECT value FROM json_each(?)
+			)
 			SELECT
 				agent_group,
 				status,
@@ -141,14 +149,15 @@ class HelpdeskSearch(SQLiteSearch):
 				doctype,
 				COUNT(*) as count
 			FROM search_fts
-			WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
+			WHERE (
+				name IN (SELECT ticket FROM accessible_tickets)
+				OR reference_name IN (SELECT ticket FROM accessible_tickets)
+				OR reference_ticket IN (SELECT ticket FROM accessible_tickets)
+			)
 			GROUP BY agent_group, status, priority, customer, doctype
-		""".format(
-            placeholders=",".join(["?" for _ in accessible_tickets])
-        )
+		"""
 
-        params = accessible_tickets * 3
-        results = self.sql(sql, params, read_only=True)
+        results = self.sql(sql, (accessible_tickets_json,), read_only=True)
 
         # Aggregate the results
         teams = {}
