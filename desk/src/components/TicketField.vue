@@ -18,31 +18,17 @@
         :placeholder="field.placeholder || `Add ${field.label}`"
         :model-value="transValue"
         autocomplete="off"
-        v-on="
-          [...textFields, ...numberFields].includes(field.fieldtype)
-            ? {
-                blur: (event) => {
-                  emitUpdate(field.fieldname, event.target.value);
-                },
-              }
-            : {
-                'update:model-value': (event) => {
-                  emitUpdate(
-                    field.fieldname,
-                    event?.value || event?.target?.value || event
-                  );
-                },
-              }
-        "
+        v-on="listeners"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Autocomplete, Link } from "@/components";
+import { Autocomplete } from "@/components";
 import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
+import { Link } from "@framework/ui";
 import {
   createResource,
   DatePicker,
@@ -81,6 +67,13 @@ const apiOptions = createResource({
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 const numberFields = ["Int", "Float", "Currency", "Percent"];
 
+// Link doctypes whose records open on a helpdesk route. Presence here drives
+// both the redirect affordance and where handleRedirect navigates; add a
+// doctype -> route-segment entry to make another Link field redirectable.
+const REDIRECT_ROUTES: Record<string, string> = {
+  "HD Customer": "customers",
+};
+
 const component = computed(() => {
   if (props.field.url_method) {
     return h(Autocomplete, {
@@ -89,7 +82,9 @@ const component = computed(() => {
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
       doctype: props.field.options,
-      hideMe: true,
+      redirectable: props.field.options in REDIRECT_ROUTES,
+      class: "!w-full !bg-surface-base !border-transparent !text-base",
+      onRedirect: handleRedirect,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
@@ -133,6 +128,46 @@ const component = computed(() => {
   }
 });
 
+const listeners = computed(() => {
+  const fieldtype = props.field.fieldtype;
+  if ([...textFields, ...numberFields].includes(fieldtype)) {
+    return {
+      blur: (event: FocusEvent) =>
+        emitUpdate(
+          props.field.fieldname,
+          (event.target as HTMLInputElement).value
+        ),
+    };
+  }
+  // The @framework/ui Link (Combobox) streams the typed query through
+  // update:modelValue, so saving on it would persist half-typed text and
+  // trip LinkValidationError. Persist only on a committed selection.
+  if (fieldtype === "Link") {
+    return {
+      "update:selectedOption": (option: { value: string } | null) => {
+        emitUpdate(props.field.fieldname, option?.value ?? "");
+        // Keyboard commit leaves focus on the input; mouse commit already
+        // blurs it. Blur here so both paths deselect the field consistently.
+        (document.activeElement as HTMLElement | null)?.blur();
+      },
+      // Escape closes the listbox without committing and keeps focus on the
+      // input; blur so it deselects the field like a commit does.
+      keydown: (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          (event.target as HTMLElement | null)?.blur();
+        }
+      },
+    };
+  }
+  return {
+    "update:model-value": (event: any) =>
+      emitUpdate(
+        props.field.fieldname,
+        event?.value || event?.target?.value || event
+      ),
+  };
+});
+
 const transValue = computed(() => {
   const fieldtype = props.field.fieldtype;
   if (fieldtype === "Check") {
@@ -149,6 +184,12 @@ const transValue = computed(() => {
 
 function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
   emit("change", { fieldname, value });
+}
+
+function handleRedirect(value: string) {
+  const route = REDIRECT_ROUTES[props.field.options];
+  if (!route) return;
+  window.open(`${window.location.origin}/helpdesk/${route}/${value}`, "_blank");
 }
 </script>
 <style scoped>
@@ -172,10 +213,5 @@ function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-:deep(.form-control button svg) {
-  color: var(--ink-base);
-  width: 0;
 }
 </style>

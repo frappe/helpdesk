@@ -367,15 +367,22 @@ const showRecentSimilarTickets = computed(() => {
   );
 });
 
-useShortcut("t", () => {
-  fieldRefs.value?.ticket_type?.$el?.querySelector("button")?.click();
-});
+useShortcut("t", () => openFieldDropdown("ticket_type"));
 
-useShortcut("p", () => {
-  fieldRefs.value?.priority?.$el?.querySelector("button")?.click();
-});
+useShortcut("p", () => openFieldDropdown("priority"));
 
-useShortcut({ key: "t", shift: true }, () => {
-  fieldRefs.value?.agent_group?.$el?.querySelector("button")?.click();
-});
+useShortcut({ key: "t", shift: true }, () => openFieldDropdown("agent_group"));
+
+// The @framework/ui Link renders a [role=combobox] input, not a button, and
+// opens on ArrowDown from a focused input (a synthetic click won't open it).
+function openFieldDropdown(fieldname: string) {
+  const input = fieldRefs.value?.[fieldname]?.$el?.querySelector(
+    '[role="combobox"]'
+  ) as HTMLElement | null;
+  if (!input) return;
+  input.focus();
+  input.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
+  );
+}
 </script>

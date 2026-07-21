@@ -6,7 +6,9 @@
 		"target": "es2022",
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@framework/ui": ["../../frappe/ui/src/index.ts"],
+			"@framework/ui/*": ["../../frappe/ui/src/*"]
 		},
 		"types": [
 			"unplugin-icons/types/vue",
