@@ -58,10 +58,7 @@
               {{ ticket.status }}
             </td>
             <td class="p-2 py-3 min-w-20 truncate">
-              <Badge
-                :label="ticket.priority"
-                :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
-              />
+              <TicketPriority :priority="ticket.priority" />
             </td>
             <td class="p-2 py-3 min-w-36 truncate">
               {{ ticket.agent_group || __("Not Assigned") }}
@@ -165,7 +162,8 @@
 <script setup lang="ts">
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
-import { Badge, createResource, FeatherIcon, TabButtons } from "frappe-ui";
+import { createResource, FeatherIcon, TabButtons } from "frappe-ui";
+import TicketPriority from "@/components/TicketPriority.vue";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import TimerIcon from "~icons/lucide/timer";
@@ -185,7 +183,6 @@ interface PendingTicket {
   subject: string;
   status: string;
   priority: string;
-  priority_integer_value: number;
   agent_group?: string;
   agreement_status?: string;
   creation: string;
@@ -195,8 +192,6 @@ interface PendingTicket {
 }
 
 interface PendingTicketsData {
-  max_priority: number;
-  min_priority: number;
   tickets: PendingTicket[];
   total_pending_tickets: number;
 }
@@ -269,15 +264,11 @@ const chartConfig = computed(() => {
   const _data: PendingTicketsData = getPendingTicketsResource.fetched
     ? getPendingTicketsResource.data
     : props.data;
-  const maxPriority = _data.max_priority;
-  const minPriority = _data.min_priority;
   const tickets = _data.tickets;
   const totalPendingTickets = _data.total_pending_tickets;
 
   return {
     tickets,
-    maxPriority,
-    minPriority,
     totalPendingTickets,
   };
 });
@@ -296,18 +287,6 @@ const getPendingTicketsResource = createResource({
 const showSkeleton = computed(
   () => getPendingTicketsResource.loading && !hasLoadedOnce.value
 );
-
-function getPriorityBadgeColor(integerValue: number) {
-  const min = chartConfig.value.minPriority;
-  const max = chartConfig.value.maxPriority;
-  const range = max - min;
-  if (range === 0) return "gray";
-  const position = (integerValue - min) / range;
-  if (position < 0.25) return "red";
-  if (position < 0.5) return "orange";
-  if (position < 0.75) return "green";
-  return "gray";
-}
 
 function getReasonColorClass(reason: {
   text: string;

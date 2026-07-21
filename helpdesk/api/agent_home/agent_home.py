@@ -418,22 +418,6 @@ def get_avg_time_metrics(
     }
 
 
-def _get_priority_range():
-    priorities = frappe.get_all(
-        "HD Ticket Priority", fields="integer_value", filters={"disabled": 0}
-    )
-    if priorities:
-        min_priority = min(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-        max_priority = max(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-    else:
-        min_priority = max_priority = 0
-    return min_priority, max_priority
-
-
 def _get_upcoming_sla_tickets(limit=10):
     filters = [
         ["sla", "is", "set"],
@@ -450,7 +434,6 @@ def _get_upcoming_sla_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "response_by",
             "resolution_by",
@@ -533,7 +516,6 @@ def _get_new_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "creation",
         ],
@@ -568,7 +550,6 @@ def _get_pending_response_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "creation",
             "last_customer_response",
@@ -593,8 +574,6 @@ def _get_pending_response_tickets(limit=10):
 @frappe.whitelist()
 @agent_only
 def get_pending_tickets(ticket_type: str = "upcoming_sla"):
-    min_priority, max_priority = _get_priority_range()
-
     if ticket_type == "upcoming_sla":
         tickets, total_count = _get_upcoming_sla_tickets(limit=6)
     elif ticket_type == "new_tickets":
@@ -605,6 +584,4 @@ def get_pending_tickets(ticket_type: str = "upcoming_sla"):
     return {
         "tickets": tickets,
         "total_pending_tickets": total_count,
-        "min_priority": min_priority,
-        "max_priority": max_priority,
     }
