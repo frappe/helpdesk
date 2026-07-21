@@ -1,7 +1,7 @@
 <template>
   <Popover
     class="flex w-full"
-    placement="bottom-end"
+    placement="bottom-start"
     :matchTargetWidth="true"
     v-model:show="popoverIsOpen"
   >
@@ -13,10 +13,15 @@
         <Button
           ref="triggerRef"
           :variant="ghost ? 'ghost' : 'outline'"
-          class="!flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
+          class="group !flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
           :class="
             ghost
-              ? '!h-7 !rounded !border !border-transparent !bg-transparent !px-2 hover:!bg-transparent focus:!border-outline-gray-4 focus:!shadow-sm focus:!outline-none focus:!ring-0 focus-visible:!ring-2 focus-visible:!ring-outline-gray-3'
+              ? [
+                  '!h-7 !rounded !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
+                  // Hold the ring while the dropdown is open, mirroring the Link
+                  // field's data-[state=open]:focus-ring (focus lives in the popover).
+                  popoverIsOpen && 'focus-ring',
+                ]
               : 'hover:shadow-sm'
           "
           @click="togglePopover()"
@@ -50,16 +55,29 @@
               </span> -->
             </template>
           </div>
-          <template v-if="!ghost" #suffix>
-            <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
+          <template #suffix>
+            <LucideChevronDown
+              class="ms-auto size-4 shrink-0 transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
+              :class="[
+                ghost ? 'text-ink-gray-6' : 'text-ink-gray-5',
+                popoverIsOpen && 'rotate-180',
+                // Filled + closed: keep the chevron hidden until hover/focus,
+                // like a filled Link field's action icons. Empty always shows it.
+                ghost && localAssignees.length > 0 && !popoverIsOpen
+                  ? 'hidden group-hover:block group-focus-within:block'
+                  : '',
+              ]"
+            />
           </template>
         </Button>
       </div>
     </template>
-    <template #body="{ isOpen }">
+    <!-- body-main (not body) so the shared PopoverPanel supplies the shell
+         chrome and the combobox's scale-from-trigger open animation. -->
+    <template #body-main="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none min-w-[325px]"
+        class="divide-y divide-outline-elevation-2 focus:outline-none"
       >
         <!-- Search Header -->
         <div class="p-1">
