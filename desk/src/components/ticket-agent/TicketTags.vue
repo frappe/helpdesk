@@ -21,23 +21,11 @@
           v-for="tag in localTags"
           :key="tag"
           theme="gray"
-          variant="subtle"
+          variant="outline"
           size="lg"
-          class="max-w-40"
+          class="max-w-40 transition-colors duration-150 hover:bg-surface-gray-2"
         >
           <span :title="tag" class="min-w-0 truncate">{{ tag }}</span>
-          <template #suffix>
-            <span
-              role="button"
-              tabindex="-1"
-              :aria-label="__('Remove label')"
-              class="relative -mr-0.5 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-sm p-0.5 opacity-70 transition-opacity duration-150 before:absolute before:-inset-1 before:content-[''] hover:opacity-100"
-              @click.stop="removeTag(tag)"
-              @pointerdown.stop
-            >
-              <LucideX class="size-3" />
-            </span>
-          </template>
         </Badge>
         <Tooltip key="add-tags" :text="`${__('Add labels')} (L)`">
           <!-- h-6 matches Badge size=lg so the row height never changes
@@ -63,7 +51,7 @@
       <button
         v-if="query.trim()"
         :disabled="creating"
-        class="text-p-sm -mx-1 -my-0.5 flex h-7 w-[calc(100%+8px)] items-center gap-2 rounded px-2 text-ink-gray-6 hover:bg-surface-gray-3 disabled:opacity-50"
+        class="text-p-sm -mx-2 -my-1.5 flex h-8 w-[calc(100%+16px)] items-center gap-2 rounded px-2 text-ink-gray-6 hover:bg-surface-gray-3 disabled:opacity-50"
         @click="createTag(query)"
       >
         <LucidePlus class="size-3.5 shrink-0" />
@@ -112,7 +100,6 @@ import {
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, watch } from "vue";
 import LucidePlus from "~icons/lucide/plus";
-import LucideX from "~icons/lucide/x";
 
 const ticket = inject(TicketSymbol)!;
 
@@ -161,10 +148,6 @@ const tagOptions = computed(() => {
     )
     .map((name) => ({ label: name, value: name }));
 });
-
-function removeTag(tag: string) {
-  localTags.value = localTags.value.filter((t) => t !== tag);
-}
 
 function showCreate(query: string) {
   const text = query.trim().toLowerCase();
@@ -293,9 +276,10 @@ watch(pickerOpen, (open) => {
   [role="option"][data-highlighted] {
   background: var(--surface-alpha-gray-2);
 }
-/* Long tag names must not widen the popover past its trigger; rows truncate */
+/* Fixed width (13rem = w-52) so the popover doesn't track the chips row;
+   long tag names truncate in their rows instead of widening it */
 [data-slot="content"][data-selection]:has(.ticket-tags-marker) {
-  width: var(--reka-combobox-trigger-width);
+  width: 13rem;
 }
 [data-slot="content"][data-selection]:has(.ticket-tags-marker)
   [data-slot="item-label"] {
