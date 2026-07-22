@@ -69,6 +69,6 @@ const level = computed(() => getLevel(props.priority ?? ""));
 
 function barClass(barIndexFromTop: number): string {
   const faded = FADED_BARS[level.value] ?? 0;
-  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-8";
+  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-7";
 }
 </script>

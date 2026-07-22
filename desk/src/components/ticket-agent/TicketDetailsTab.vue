@@ -59,10 +59,11 @@
             >
               {{ __("Labels") }}
             </div>
-            <!-- 9px = field controls' 8px padding + 1px transparent border -->
-            <!-- <div class="min-w-0 flex-1 py-0.5 ps-[9px]"> -->
-            <TicketTags />
-            <!-- </div> -->
+            <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
+                 and the add button start on the same column as the values -->
+            <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
+              <TicketTags />
+            </div>
           </div>
         </div>
       </Section>
@@ -170,6 +171,7 @@ import {
   CustomizationSymbol,
   FieldValue,
   RecentSimilarTicketsSymbol,
+  TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
 import { useStorage } from "@vueuse/core";
@@ -185,6 +187,7 @@ import TicketTags from "./TicketTags.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
+const contact = inject(TicketContactSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
@@ -337,6 +340,10 @@ function handleFieldUpdate(
         // TODO: emit the event for notification to listeners
         if (fieldname === "agent_group") {
           assignees.value.reload();
+        }
+        // the contact payload carries customer_image for the Customer avatar
+        if (fieldname === "customer") {
+          contact.value.reload();
         }
         activities.value.reload();
       },

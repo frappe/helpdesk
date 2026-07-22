@@ -663,23 +663,28 @@ def get_ticket_contact(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
-    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
-    if not contact:
-        raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
-        return {
+    contact, customer, raised_by = frappe.db.get_value(
+        "HD Ticket", ticket, ["contact", "customer", "raised_by"]
+    )
+    if contact:
+        data = frappe.db.get_value(
+            "Contact",
+            contact,
+            ["name", "email_id", "phone", "mobile_no", "image"],
+            as_dict=1,
+        )
+    else:
+        data = {
             "email_id": raised_by,
             "name": raised_by.split("@")[0],
             "phone": "",
             "mobile_no": "",
             "image": "",
         }
-
-    return frappe.db.get_value(
-        "Contact",
-        contact,
-        ["name", "email_id", "phone", "mobile_no", "image"],
-        as_dict=1,
-    )
+    data["customer_image"] = (
+        frappe.db.get_value("HD Customer", customer, "image") if customer else ""
+    ) or ""
+    return data
 
 
 @frappe.whitelist()
