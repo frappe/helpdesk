@@ -3,7 +3,7 @@
     class="flex flex-col rounded-md px-2 py-4 grow w-full h-full overflow-hidden"
   >
     <div class="flex items-center gap-2 px-2 text-lg-semibold text-ink-gray-8">
-      {{ __("Recent Activity") }}
+      {{ __("My Recent Activity") }}
       <Tooltip
         :text="__('Tickets you\'ve recently worked on or viewed')"
         placement="top"
@@ -77,11 +77,12 @@ import ActivityIcon from "~icons/lucide/activity";
 import ReplyIcon from "~icons/lucide/corner-up-left";
 import EyeIcon from "~icons/lucide/eye";
 import MessageSquareIcon from "~icons/lucide/message-square";
+import UserPlusIcon from "~icons/lucide/user-plus";
 
 interface RecentActivity {
   name: string;
   subject: string;
-  activity_type: "replied" | "commented" | "status" | "viewed";
+  activity_type: "replied" | "commented" | "updated" | "viewed" | "assigned";
   text: string | null;
   timestamp: string;
   creation: string;
@@ -100,13 +101,15 @@ const typeLabels: Record<string, string> = {
   replied: __("Replied"),
   commented: __("Commented"),
   viewed: __("Viewed"),
+  assigned: __("Assigned"),
 };
 
 const icons = {
   replied: ReplyIcon,
   commented: MessageSquareIcon,
-  status: ActivityIcon,
+  updated: ActivityIcon,
   viewed: EyeIcon,
+  assigned: UserPlusIcon,
 };
 
 const hasLoadedOnce = ref(false);
@@ -131,9 +134,7 @@ function iconFor(type: string) {
 }
 
 function label(activity: RecentActivity) {
-  return activity.activity_type === "status"
-    ? activity.text
-    : typeLabels[activity.activity_type];
+  return activity.text || typeLabels[activity.activity_type];
 }
 
 const goToTicket = (activity: RecentActivity) => {

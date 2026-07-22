@@ -7,7 +7,6 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.agent_home.agent_home import (
-    _collapse_events,
     get_agent_tickets,
     get_avg_first_response_time,
     get_avg_resolution_time,
@@ -599,30 +598,9 @@ class TestAgentHome(FrappeTestCase):
             self.assertEqual(t["reason"]["type"], "pending")
             self.assertIn("Pending for", t["reason"]["text"])
 
-    def test_collapse_events_priority_and_recency(self):
-        """One row per ticket: highest-priority action wins, ties broken by
-        recency, and a viewed-only ticket still survives."""
-        # replied (older) beats a later view on the same ticket
-        events = [
-            {"ticket": "T1", "type": "viewed", "creation": 10},
-            {"ticket": "T1", "type": "replied", "creation": 5},
-        ]
-        self.assertEqual(_collapse_events(events)["T1"]["type"], "replied")
-
-        # same type -> most recent wins
-        events = [
-            {"ticket": "T2", "type": "viewed", "creation": 3},
-            {"ticket": "T2", "type": "viewed", "creation": 9},
-        ]
-        self.assertEqual(_collapse_events(events)["T2"]["creation"], 9)
-
-        # a ticket the agent only viewed still shows up
-        events = [{"ticket": "T3", "type": "viewed", "creation": 1}]
-        self.assertEqual(_collapse_events(events)["T3"]["type"], "viewed")
-
-    def test_get_recent_activity_collapses_and_labels(self):
-        """A ticket the agent both viewed and commented on appears once, as the
-        higher-priority action (commented > viewed)."""
+    def test_get_recent_activity_latest_per_ticket(self):
+        """One row per ticket showing its most recent action; SLA changes are
+        filtered out, and updated rows carry the capitalized action text."""
         ticket = self._create_ticket(subject="Recent Activity Ticket")
 
         frappe.get_doc(
@@ -643,11 +621,25 @@ class TestAgentHome(FrappeTestCase):
             }
         ).insert(ignore_permissions=True)
 
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Activity",
+                "ticket": ticket.name,
+                "action": "set status to Resolved",
+            }
+        ).insert(ignore_permissions=True)
+
+        # Inserted last (newest) but must be excluded, so it cannot win the row.
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Activity",
+                "ticket": ticket.name,
+                "action": "set SLA to Default",
+            }
+        ).insert(ignore_permissions=True)
+
         rows = [r for r in get_recent_activity() if r["name"] == ticket.name]
 
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]["activity_type"], "commented")
-        self.assertEqual(rows[0]["subject"], "Recent Activity Ticket")
-        # Only status rows carry server-side text (the raw action); the label for
-        # other types is applied on the frontend.
-        self.assertIsNone(rows[0]["text"])
+        self.assertEqual(rows[0]["activity_type"], "updated")
+        self.assertEqual(rows[0]["text"], "Set status to Resolved")

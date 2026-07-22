@@ -362,7 +362,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Recent Activity"),
+      label: __("My Recent Activity"),
       chart: "recent_activity",
       onClick: () =>
         addChart("recent_activity", {
