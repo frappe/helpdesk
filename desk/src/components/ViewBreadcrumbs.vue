@@ -6,7 +6,7 @@
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
-    <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+    <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button
