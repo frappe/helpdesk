@@ -138,6 +138,13 @@ const component = computed(() => {
   }
 });
 
+// The Link (Combobox) streams half-typed queries through update:modelValue
+// and nulls its model the moment the search text is emptied, so neither may
+// commit directly. Commits happen on a committed selection, or - for a
+// field left empty - once the picker closes still showing empty.
+let linkPickerOpen = false;
+let linkModel: FieldValue = null;
+
 const listeners = computed(() => {
   const fieldtype = props.field.fieldtype;
   if ([...textFields, ...numberFields].includes(fieldtype)) {
@@ -149,16 +156,24 @@ const listeners = computed(() => {
         ),
     };
   }
-  // The @framework/ui Link (Combobox) streams the typed query through
-  // update:modelValue, so saving on it would persist half-typed text and
-  // trip LinkValidationError. Persist only on a committed selection.
   if (fieldtype === "Link") {
     return {
+      "update:modelValue": (value: FieldValue) => {
+        if (linkPickerOpen) linkModel = value;
+        // only the clear (x) button nulls the model while the picker is closed
+        else if (!value) emitUpdate(props.field.fieldname, "");
+      },
       "update:selectedOption": (option: { value: string } | null) => {
-        emitUpdate(props.field.fieldname, option?.value ?? "");
+        if (!option) return;
+        emitUpdate(props.field.fieldname, option.value);
         // Keyboard commit leaves focus on the input; mouse commit already
         // blurs it. Blur here so both paths deselect the field consistently.
         (document.activeElement as HTMLElement | null)?.blur();
+      },
+      "update:open": (open: boolean) => {
+        linkPickerOpen = open;
+        if (open) linkModel = props.value ?? null;
+        else if (!linkModel) emitUpdate(props.field.fieldname, "");
       },
       // Escape closes the listbox without committing and keeps focus on the
       // input; blur so it deselects the field like a commit does.

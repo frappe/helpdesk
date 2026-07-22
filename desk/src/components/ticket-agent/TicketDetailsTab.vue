@@ -60,9 +60,9 @@
               {{ __("Labels") }}
             </div>
             <!-- 9px = field controls' 8px padding + 1px transparent border -->
-            <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
-              <TicketTags />
-            </div>
+            <!-- <div class="min-w-0 flex-1 py-0.5 ps-[9px]"> -->
+            <TicketTags />
+            <!-- </div> -->
           </div>
         </div>
       </Section>
