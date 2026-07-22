@@ -4,11 +4,11 @@
       <TransitionChild
         as="template"
         enter="transition ease-in-out duration-200 transform"
-        enter-from="-translate-x-full"
+        enter-from="-translate-x-full rtl:translate-x-full"
         enter-to="translate-x-0"
         leave="transition ease-in-out duration-200 transform"
         leave-from="translate-x-0"
-        leave-to="-translate-x-full"
+        leave-to="-translate-x-full rtl:translate-x-full"
       >
         <div class="relative z-10 h-full">
           <AppSidebar mobile :profile-settings="profileSettings" />
@@ -23,7 +23,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <DialogOverlay class="fixed inset-0 bg-black-overlay-500" />
+        <DialogOverlay class="fixed inset-0 bg-surface-gray-7/50" />
       </TransitionChild>
     </Dialog>
   </TransitionRoot>
@@ -64,7 +64,6 @@ const themeMenuItem = computed(() => ({
 }));
 
 const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
   {
     label: __("Log out"),
     icon: "lucide-log-out",
@@ -99,7 +98,6 @@ const agentPortalDropdown = computed(() => [
     label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
-  themeMenuItem.value,
   {
     label: __("Log out"),
     icon: "lucide-log-out",

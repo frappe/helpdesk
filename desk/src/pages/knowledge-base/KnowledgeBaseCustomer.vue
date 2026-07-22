@@ -21,7 +21,7 @@
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
         <!-- Heading -->
-        <p class="text-lg text-ink-gray-9">Categories</p>
+        <p class="text-lg text-ink-gray-9">{{ __("Categories") }}</p>
         <CategoryFolderContainer />
       </section>
     </div>

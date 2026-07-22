@@ -14,6 +14,7 @@
         variant="solid"
         @click="goToNew()"
         icon-left="lucide-plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template #header-bottom>
@@ -35,7 +36,7 @@
             icon="lucide-x"
             variant="ghost"
             @click="savedRepliesSearchQuery = ''"
-            class="absolute right-1 top-1/2 -translate-y-1/2"
+            class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
         <Dropdown :options="filterOptions" placement="right">
@@ -58,11 +59,11 @@
     <template #content>
       <div
         v-if="savedRepliesListResource?.list?.loading"
-        class="flex items-center justify-center h-[stretch] absolute w-[stretch] left-0 top-5.5"
+        class="flex items-center justify-center my-auto"
       >
         <LoadingIndicator class="w-4" />
       </div>
-      <EmptyState
+      <div
         v-if="
           !savedRepliesListResource?.list?.loading &&
           !savedRepliesListResource?.data?.length
@@ -77,10 +78,10 @@
           !savedRepliesListResource?.list?.loading &&
           savedRepliesListResource?.data?.length
         "
-        class="-ml-2"
+        class="-ms-2"
       >
         <div
-          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ml-2"
+          class="grid grid-cols-12 items-center gap-3 text-sm text-ink-gray-5 ms-2"
         >
           <div class="col-span-7">{{ __("Title") }}</div>
           <div class="col-span-2">{{ __("Owner") }}</div>
@@ -123,7 +124,7 @@
               }}</span>
             </div>
             <div
-              class="flex justify-between items-center w-full pr-2 col-span-3"
+              class="flex justify-between items-center w-full pe-2 col-span-3"
             >
               <div class="flex items-center gap-1 text-sm text-ink-gray-7">
                 <component
@@ -140,7 +141,7 @@
                   icon="lucide-more-horizontal"
                   variant="ghost"
                   @click="isConfirmingDelete = false"
-                  class="mr-2"
+                  class="me-2"
                 />
               </Dropdown>
             </div>

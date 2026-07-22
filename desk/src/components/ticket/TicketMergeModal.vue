@@ -29,18 +29,25 @@
                       __("Tickets must meet the following conditions:")
                     }}</span
                   >
-                  <ul class="list-disc pl-4 mt-1 space-y-1">
-                    <li
-                      v-for="(condition, index) in mergeConditions"
-                      :key="index"
-                    >
-                      {{ __(condition.text) }}
-                      <code
-                        v-if="condition.code"
-                        class="bg-surface-gray-2 rounded-md px-1 py-0.5"
+                  <ul class="list-disc ps-4 mt-1 space-y-1">
+                    <li>
+                      {{ __("Ticket must be Open or Paused.") }}
+                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
+                        {{ __("status_category in ['Open', 'Paused']") }}</code
                       >
-                        {{ __(condition.code) }}
-                      </code>
+                    </li>
+                    <li>
+                      {{ __("Ticket must not already be merged.") }}
+                      <code class="bg-surface-gray-2 rounded-md px-1 py-0.5">
+                        {{ __("is_merged === 0") }}</code
+                      >
+                    </li>
+                    <li>
+                      {{
+                        __(
+                          "Source and target tickets which are to be merged cannot be the same."
+                        )
+                      }}
                     </li>
                   </ul>
                 </div>
@@ -52,7 +59,7 @@
         <Link
           class="form-control"
           doctype="HD Ticket"
-          placeholder="Select Ticket"
+          :placeholder="__('Select Ticket')"
           :filters="getDefaultFilters()"
           :label="__('Ticket')"
           :page-length="10"
@@ -75,7 +82,7 @@
             class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-yellow-5"
           />
 
-          <div class="text-wrap text-sm text-ink-gray-7">
+          <div class="text-wrap text-sm text-ink-gray-6">
             {{ __("This action is irreversible.") }}
           </div>
         </div>

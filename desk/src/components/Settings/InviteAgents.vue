@@ -22,7 +22,7 @@
           <Select :options="roleOptions" v-model="role" required class="w-full">
             <template #suffix>
               <LucideChevronDown
-                class="size-4 shrink-0 text-ink-gray-4 ml-auto"
+                class="size-4 shrink-0 text-ink-gray-4 ms-auto"
               />
             </template>
           </Select>
