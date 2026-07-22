@@ -37,7 +37,7 @@
             </span>
           </div>
         </template>
-        <div v-else-if="showSkeleton" class="flex flex-col">
+        <div v-else class="flex flex-col">
           <div v-for="i in 6" :key="i" class="flex items-center gap-3 p-2 py-3">
             <div class="size-4 rounded-sm bg-surface-gray-1 flex-shrink-0" />
             <div class="flex flex-col gap-1 grow">
@@ -46,13 +46,15 @@
             </div>
           </div>
         </div>
-        <EmptyState
-          v-else
-          :title="__('No recent activity')"
-          :description="__('Tickets you act on will show up here')"
-          text="md"
-        />
       </div>
+      <EmptyState
+        v-if="!showSkeleton && activities.length === 0"
+        class="absolute inset-0 z-10"
+        :title="__('No recent activity')"
+        :description="__('Tickets you act on will show up here')"
+        variant="overlay"
+        text="md"
+      />
       <div
         v-if="!showSkeleton && activities.length > 0"
         class="pointer-events-none absolute inset-x-0 bottom-0 h-8"
