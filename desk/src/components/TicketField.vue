@@ -27,10 +27,11 @@
 <script setup lang="ts">
 import { Autocomplete } from "@/components";
 import TicketPriority from "@/components/TicketPriority.vue";
-import { APIOptions, Field, FieldValue } from "@/types";
+import { APIOptions, Field, FieldValue, TicketContactSymbol } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
 import {
+  Avatar,
   createResource,
   DatePicker,
   DateTimePicker,
@@ -38,7 +39,7 @@ import {
   FormControl,
   Tooltip,
 } from "frappe-ui";
-import { computed, h } from "vue";
+import { computed, h, inject } from "vue";
 
 interface P {
   field: Field;
@@ -56,6 +57,9 @@ interface E {
 
 const props = defineProps<P>();
 const emit = defineEmits<E>();
+
+// only provided on the agent ticket page; the new-ticket form has no contact
+const ticketContact = inject(TicketContactSymbol, null);
 
 const apiOptions = createResource({
   url: props.field.url_method,
@@ -93,6 +97,30 @@ const component = computed(() => {
       return h(Link, linkProps, {
         "item-prefix": ({ item }: { item: { value: string } }) =>
           h(TicketPriority, { priority: item.value, iconOnly: true }),
+        // while typing, the searched options may not contain the committed
+        // value, so the control loses its selectedOption and falls back to
+        // #prefix; keep showing the committed value's icon until it changes
+        prefix: () =>
+          props.value
+            ? h(TicketPriority, {
+                priority: String(props.value),
+                iconOnly: true,
+              })
+            : null,
+      });
+    }
+    // The control's #prefix shows the selected customer's avatar (image from
+    // the ticket contact payload); dropdown rows stay plain on purpose
+    if (props.field.options === "HD Customer") {
+      return h(Link, linkProps, {
+        prefix: () =>
+          props.value
+            ? h(Avatar, {
+                image: ticketContact?.value?.data?.customer_image,
+                label: String(props.value),
+                size: "sm",
+              })
+            : null,
       });
     }
     return h(Link, linkProps);
@@ -224,6 +252,7 @@ function handleRedirect(value: string) {
 :deep(.form-control button) {
   border-color: transparent;
   background: var(--surface-base);
+  color: var(--ink-gray-7);
 }
 
 :deep(.form-control button) {

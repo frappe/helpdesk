@@ -24,11 +24,19 @@ class TestTicketTags(FrappeTestCase):
     def test_agent_can_create_and_list_helpdesk_tags(self):
         frappe.set_user(AGENT_EMAIL)
         tag = frappe.get_doc(
-            {"doctype": "Tag", "name": "tag-perm-test", "app": "helpdesk"}
+            {
+                "doctype": "Tag",
+                "name": "tag-perm-test",
+                "app": "helpdesk",
+                "color": "Teal",
+            }
         )
         tag.insert()
-        names = frappe.get_list("Tag", filters={"app": "helpdesk"}, pluck="name")
-        self.assertIn("tag-perm-test", names)
+        tags = frappe.get_list(
+            "Tag", filters={"app": "helpdesk"}, fields=["name", "color"]
+        )
+        by_name = {t.name: t.color for t in tags}
+        self.assertEqual(by_name.get("tag-perm-test"), "Teal")
 
     def test_tag_round_trip_on_ticket(self):
         frappe.set_user(AGENT_EMAIL)
@@ -71,7 +79,8 @@ class TestTicketTags(FrappeTestCase):
             )
         )
 
-    def test_app_field_exists_on_tag(self):
-        self.assertTrue(
-            frappe.db.exists("Custom Field", {"dt": "Tag", "fieldname": "app"})
-        )
+    def test_custom_fields_exist_on_tag(self):
+        for fieldname in ("app", "color"):
+            self.assertTrue(
+                frappe.db.exists("Custom Field", {"dt": "Tag", "fieldname": fieldname})
+            )

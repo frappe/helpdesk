@@ -52,4 +52,5 @@ helpdesk.patches.set_default_portal_settings
 =======
 >>>>>>> fce24531 (feat: display ticket priority as icon and level)
 helpdesk.patches.backfill_priority_level
-helpdesk.patches.add_app_field_in_tag
+helpdesk.patches.add_tag_custom_fields
+helpdesk.patches.rename_purple_status_color
