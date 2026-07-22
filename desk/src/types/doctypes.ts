@@ -4,6 +4,8 @@ interface DocType {
     modified: string;
     owner: string;
     modified_by: string;
+    /** Comma-separated framework tags (Tag Link) */
+    _user_tags?: string;
   }
 
   interface ChildDocType extends DocType {

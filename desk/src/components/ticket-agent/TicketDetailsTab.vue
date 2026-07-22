@@ -52,22 +52,16 @@
               <AssignTo hide-label ghost />
             </div>
           </div>
-          <!-- Tags: UI only, functionality comes later -->
+          <!-- Tags -->
           <div class="flex items-start gap-2 leading-5">
             <div
               class="w-[106px] shrink-0 truncate pt-1 text-sm text-ink-gray-5"
             >
-              {{ __("Tags") }}
+              {{ __("Labels") }}
             </div>
             <!-- 9px = field controls' 8px padding + 1px transparent border -->
-            <div
-              class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 py-0.5 ps-[9px]"
-            >
-              <button
-                class="rounded border border-dashed border-outline-gray-2 px-2 py-0.5 text-sm text-ink-gray-5 transition-colors hover:border-outline-gray-3 hover:text-ink-gray-7"
-              >
-                + {{ __("Add") }}
-              </button>
+            <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
+              <TicketTags />
             </div>
           </div>
         </div>
@@ -187,6 +181,7 @@ import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketSLA from "./TicketSLA.vue";
+import TicketTags from "./TicketTags.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;

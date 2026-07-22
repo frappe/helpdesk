@@ -48,3 +48,4 @@ helpdesk.patches.enable_auto_set_customer_from_contact
 helpdesk.patches.show_customer_portal_permission_notice
 helpdesk.patches.set_persona_captured_for_existing_sites
 helpdesk.patches.backfill_priority_level
+helpdesk.patches.add_app_field_in_tag
