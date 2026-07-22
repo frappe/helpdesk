@@ -7,6 +7,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.agent_home.agent_home import (
+    RECENT_ACTIVITY_LIMIT,
     get_agent_tickets,
     get_avg_first_response_time,
     get_avg_resolution_time,
@@ -14,6 +15,7 @@ from helpdesk.api.agent_home.agent_home import (
     get_dashboard,
     get_default_agent_dashboard,
     get_pending_tickets,
+    get_recent_activity,
     get_recent_feedback,
 )
 from helpdesk.test_utils import make_agent, make_sla, make_ticket
@@ -596,3 +598,80 @@ class TestAgentHome(FrappeTestCase):
         for t in result["tickets"]:
             self.assertEqual(t["reason"]["type"], "pending")
             self.assertIn("Pending for", t["reason"]["text"])
+
+    def test_get_recent_activity_latest_per_ticket(self):
+        """One row per ticket showing its most recent action; SLA changes are
+        filtered out, and updated rows carry the capitalized action text."""
+        ticket = self._create_ticket(subject="Recent Activity Ticket")
+
+        frappe.get_doc(
+            {
+                "doctype": "View Log",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "viewed_by": agent_email,
+            }
+        ).insert(ignore_permissions=True)
+
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": ticket.name,
+                "commented_by": agent_email,
+                "content": "Looking into this",
+            }
+        ).insert(ignore_permissions=True)
+
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Activity",
+                "ticket": ticket.name,
+                "action": "set status to Resolved",
+            }
+        ).insert(ignore_permissions=True)
+
+        # Inserted last (newest) but must be excluded, so it cannot win the row.
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Activity",
+                "ticket": ticket.name,
+                "action": "set SLA to Default",
+            }
+        ).insert(ignore_permissions=True)
+
+        rows = [r for r in get_recent_activity() if r["name"] == ticket.name]
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["activity_type"], "updated")
+        self.assertEqual(rows[0]["text"], "Set status to Resolved")
+
+    def test_get_recent_activity_dedupes_before_limiting(self):
+        """A single busy ticket must not consume the row limit and starve other
+        eligible tickets: each ticket collapses to one row before the cap applies."""
+        other = self._create_ticket(subject="Quietly commented ticket")
+        frappe.get_doc(
+            {
+                "doctype": "HD Ticket Comment",
+                "reference_ticket": other.name,
+                "commented_by": agent_email,
+                "content": "single note",
+            }
+        ).insert(ignore_permissions=True)
+
+        busy = self._create_ticket(subject="Very busy ticket")
+        for i in range(RECENT_ACTIVITY_LIMIT + 5):
+            frappe.get_doc(
+                {
+                    "doctype": "HD Ticket Comment",
+                    "reference_ticket": busy.name,
+                    "commented_by": agent_email,
+                    "content": f"note {i}",
+                }
+            ).insert(ignore_permissions=True)
+
+        names = [r["name"] for r in get_recent_activity()]
+
+        # The busy ticket's many comments would fill a raw-row limit and drop the
+        # quieter ticket; deduping per ticket first keeps it in the feed.
+        self.assertIn(other.name, names)
+        self.assertEqual(names.count(busy.name), 1)

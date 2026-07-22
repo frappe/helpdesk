@@ -52,9 +52,10 @@
         <span
           v-if="descriptionText"
           :class="{
-            'text-center text-xs text-ink-gray-6 mt-1': text === 'sm',
-            'text-center text-sm text-ink-gray-6 mt-1': text === 'md' || !text,
-            'text-center text-base text-ink-gray-6 mt-1': text === 'lg',
+            'text-center text-p-xs text-ink-gray-6 mt-1': text === 'sm',
+            'text-center text-p-sm text-ink-gray-6 mt-1':
+              text === 'md' || !text,
+            'text-center text-p-base text-ink-gray-6 mt-1': text === 'lg',
           }"
         >
           {{ __(descriptionText) }}

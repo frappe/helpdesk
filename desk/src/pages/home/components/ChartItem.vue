@@ -24,6 +24,7 @@
     <RecentFeedback v-if="item.chart == 'recent_feedback'" :data="item.data" />
     <AvgTimeMetrics v-if="item.chart == 'avg_time_metrics'" :data="item.data" />
     <PendingTickets v-if="item.chart == 'pending_tickets'" :data="item.data" />
+    <RecentActivity v-if="item.chart == 'recent_activity'" :data="item.data" />
   </div>
 </template>
 
@@ -34,6 +35,7 @@ import LineChartCard from "../../../components/LineChartCard.vue";
 import AgentTicketsCard from "./AgentTicketsCard.vue";
 import AvgTimeMetrics from "./AvgTimeMetrics.vue";
 import PendingTickets from "./PendingTickets.vue";
+import RecentActivity from "./RecentActivity.vue";
 import RecentFeedback from "./RecentFeedback.vue";
 
 interface Item {

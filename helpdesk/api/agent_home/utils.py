@@ -4,7 +4,7 @@ from pypika.functions import Count
 
 
 def get_default_agent_dashboard():
-    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":32,"minW":25,"minH":32,"maxH":32}},{"chart":"recent_feedback","layout":{"x":0,"y":66,"w":50,"h":21,"minW":50,"minH":21,"maxH":21}},{"chart":"avg_time_metrics","layout":{"x":0,"y":42,"w":50,"h":24,"minW":18,"minH":24,"maxH":44}}]'
+    return '[{"chart":"avg_resolution_time","layout":{"x":33,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"avg_first_response_time","layout":{"x":16,"y":0,"w":17,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"agent_tickets","layout":{"x":0,"y":0,"w":16,"h":10,"minW":16,"minH":10,"maxH":11}},{"chart":"pending_tickets","layout":{"x":0,"y":10,"w":50,"h":32,"minW":25,"minH":32,"maxH":32}},{"chart":"recent_activity","layout":{"x":0,"y":42,"w":17,"h":29,"minW":12,"minH":20,"maxH":44}},{"chart":"avg_time_metrics","layout":{"x":17,"y":42,"w":33,"h":29,"minW":18,"minH":24,"maxH":44}},{"chart":"recent_feedback","layout":{"x":0,"y":71,"w":50,"h":21,"minW":50,"minH":21,"maxH":21}}]'
 
 
 def calculate_percentage_change(
