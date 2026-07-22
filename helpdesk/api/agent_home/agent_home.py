@@ -571,10 +571,8 @@ def _get_pending_response_tickets(limit=10):
     return tickets, total_count
 
 
-# Most significant action wins when collapsing a ticket's events to one row.
-ACTIVITY_PRIORITY = {"replied": 4, "commented": 3, "status": 2, "viewed": 1}
-RECENT_ACTIVITY_LIMIT = 10
-OVER_FETCH_PER_SOURCE = 30
+RECENT_ACTIVITY_LIMIT = 20
+RECENT_ACTIVITY_DAYS = 3
 
 # (doctype, user_field, ticket_field, activity_type, extra_filters)
 ACTIVITY_SOURCES = [
@@ -586,13 +584,27 @@ ACTIVITY_SOURCES = [
         {"reference_doctype": "HD Ticket", "sent_or_received": "Sent"},
     ),
     ("HD Ticket Comment", "commented_by", "reference_ticket", "commented", {}),
-    ("HD Ticket Activity", "owner", "ticket", "status", {}),
+    # SLA changes are automated noise, not something the agent chose to do.
+    (
+        "HD Ticket Activity",
+        "owner",
+        "ticket",
+        "updated",
+        {"action": ["not like", "%SLA%"]},
+    ),
     (
         "View Log",
         "viewed_by",
         "reference_name",
         "viewed",
         {"reference_doctype": "HD Ticket"},
+    ),
+    (
+        "ToDo",
+        "assigned_by",
+        "reference_name",
+        "assigned",
+        {"reference_type": "HD Ticket"},
     ),
 ]
 
@@ -601,49 +613,48 @@ def _activity_events(
     doctype: str, filters: dict, ticket_field: str, activity_type: str
 ) -> list[dict]:
     fields = [f"{ticket_field} as ticket", "creation"]
-    if activity_type == "status":
+    if activity_type == "updated":
         fields.append("action")
     rows = frappe.get_all(
         doctype,
         filters={
             **filters,
-            "creation": [">=", frappe.utils.add_days(frappe.utils.nowdate(), -7)],
+            "creation": [
+                ">=",
+                frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS),
+            ],
         },
         fields=fields,
         order_by="creation desc",
-        limit=OVER_FETCH_PER_SOURCE,
+        limit=RECENT_ACTIVITY_LIMIT,
     )
     events = []
     for row in rows:
         if not row.get("ticket"):
             continue
-        text = row.action if activity_type == "status" else None
         events.append(
             {
                 "ticket": row.ticket,
                 "type": activity_type,
-                "text": text,
+                "text": (
+                    _updated_label(row.action) if activity_type == "updated" else None
+                ),
                 "creation": row.creation,
             }
         )
     return events
 
 
-def _collapse_events(events: list[dict]) -> dict[str, dict]:
-    """One event per ticket: highest priority, ties broken by recency."""
-    best: dict[str, dict] = {}
-    for event in sorted(
-        events, key=lambda e: (ACTIVITY_PRIORITY[e["type"]], e["creation"])
-    ):
-        best[event["ticket"]] = event
-    return best
+def _updated_label(action: str) -> str | None:
+    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
+    return action[:1].upper() + action[1:] if action else None
 
 
 @frappe.whitelist()
 @agent_only
 def get_recent_activity() -> list[dict]:
-    """Tickets the current agent recently acted on, one row per ticket showing
-    the most significant action (replied > commented > status change > viewed)."""
+    """The current agent's latest action per ticket (replied, commented, updated,
+    viewed, assigned), one row per ticket, newest first, over the last few days."""
     user = frappe.session.user
 
     events = []
@@ -651,34 +662,36 @@ def get_recent_activity() -> list[dict]:
         events += _activity_events(
             doctype, {**extra, user_field: user}, ticket_field, activity_type
         )
-
-    best = _collapse_events(events)
-    if not best:
+    if not events:
         return []
 
+    events.sort(key=lambda e: e["creation"], reverse=True)
+
+    # One row per ticket: keep only its most recent event.
+    latest_event_per_ticket: dict[str, dict] = {}
+    for event in events:
+        latest_event_per_ticket.setdefault(event["ticket"], event)
+
     # get_list so tickets the agent can no longer access drop out.
-    accessible = frappe.get_list(
+    accessible_tickets = frappe.get_list(
         "HD Ticket",
-        filters=[["name", "in", list(best.keys())]],
+        filters=[["name", "in", list(latest_event_per_ticket.keys())]],
         fields=["name", "subject"],
     )
-    subjects = {t["name"]: t["subject"] for t in accessible}
+    subject_by_ticket = {t["name"]: t["subject"] for t in accessible_tickets}
 
-    activities = []
-    for ticket, event in best.items():
-        if ticket not in subjects:
-            continue
-        activities.append(
-            {
-                "name": ticket,
-                "subject": subjects[ticket],
-                "activity_type": event["type"],
-                "text": event["text"],
-                "timestamp": format_time_difference(event["creation"]),
-                "creation": event["creation"],
-            }
-        )
-
+    activities = [
+        {
+            "name": event["ticket"],
+            "subject": subject_by_ticket[event["ticket"]],
+            "activity_type": event["type"],
+            "text": event["text"],
+            "timestamp": format_time_difference(event["creation"]),
+            "creation": event["creation"],
+        }
+        for event in latest_event_per_ticket.values()
+        if event["ticket"] in subject_by_ticket
+    ]
     activities.sort(key=lambda a: a["creation"], reverse=True)
     return activities[:RECENT_ACTIVITY_LIMIT]
 
