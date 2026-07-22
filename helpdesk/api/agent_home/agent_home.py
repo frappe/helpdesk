@@ -4,7 +4,7 @@ from datetime import date, timedelta
 import frappe
 from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
-from frappe.query_builder.functions import Avg, Count, Function, Max
+from frappe.query_builder.functions import Avg, Count, Function
 from frappe.utils import add_months, today
 from pypika import Case
 
@@ -571,6 +571,22 @@ def _get_pending_response_tickets(limit=10):
     return tickets, total_count
 
 
+@frappe.whitelist()
+@agent_only
+def get_pending_tickets(ticket_type: str = "upcoming_sla"):
+    if ticket_type == "upcoming_sla":
+        tickets, total_count = _get_upcoming_sla_tickets(limit=6)
+    elif ticket_type == "new_tickets":
+        tickets, total_count = _get_new_tickets(limit=6)
+    elif ticket_type == "pending":
+        tickets, total_count = _get_pending_response_tickets(limit=6)
+
+    return {
+        "tickets": tickets,
+        "total_pending_tickets": total_count,
+    }
+
+
 RECENT_ACTIVITY_LIMIT = 20
 RECENT_ACTIVITY_DAYS = 3
 
@@ -609,140 +625,80 @@ ACTIVITY_SOURCES = [
 ]
 
 
-def _activity_events(
-    doctype: str, filters: dict, ticket_field: str, activity_type: str
-) -> list[dict]:
-    """The latest event per ticket for one source, newest first. Deduping in SQL
-    (one row per ticket via MAX(creation)) keeps a single busy ticket from
-    consuming the limit and starving other eligible tickets."""
-    table = frappe.qb.DocType(doctype)
-    last_activity = Max(table.creation).as_("last_activity")
-    query = (
-        frappe.qb.from_(table)
-        .select(table[ticket_field].as_("ticket"), last_activity)
-        .where(table.creation >= _recent_activity_cutoff())
-        .groupby(table[ticket_field])
-        .orderby(Max(table.creation), order=frappe.qb.desc)
-        .limit(RECENT_ACTIVITY_LIMIT)
-    )
-    for field, condition in filters.items():
-        column = table[field]
-        if isinstance(condition, (list, tuple)):
-            operator, value = condition
-            query = query.where(
-                column.not_like(value) if operator == "not like" else column.like(value)
-            )
-        else:
-            query = query.where(column == condition)
-
-    return [
-        {"ticket": row.ticket, "type": activity_type, "creation": row.last_activity}
-        for row in query.run(as_dict=True)
-        if row.ticket
-    ]
-
-
-def _recent_activity_cutoff() -> str:
-    return frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
-
-
-def _updated_label(action: str) -> str | None:
-    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
-    return action[:1].upper() + action[1:] if action else None
-
-
-def _updated_action_text(user: str, tickets: list[str]) -> dict[str, str]:
-    """Latest non-SLA action text per ticket, for tickets whose winning event is
-    an 'updated'. Only these rows carry server text; other types are labelled on
-    the frontend."""
-    if not tickets:
-        return {}
-    rows = frappe.get_all(
-        "HD Ticket Activity",
-        filters={
-            "ticket": ["in", tickets],
-            "owner": user,
-            "action": ["not like", "%SLA%"],
-        },
-        fields=["ticket", "action"],
-        order_by="creation asc",
-    )
-    # Ascending order means the last write per ticket is its most recent action.
-    return {row.ticket: _updated_label(row.action) for row in rows}
-
-
 @frappe.whitelist()
 @agent_only
 def get_recent_activity() -> list[dict]:
     """The current agent's latest action per ticket (replied, commented, updated,
     viewed, assigned), one row per ticket, newest first, over the last few days."""
     user = frappe.session.user
+    cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
 
     events = []
-    for doctype, user_field, ticket_field, activity_type, extra in ACTIVITY_SOURCES:
-        events += _activity_events(
-            doctype, {**extra, user_field: user}, ticket_field, activity_type
-        )
-    if not events:
-        return []
+    for (
+        doctype,
+        user_field,
+        ticket_field,
+        activity_type,
+        extra_filters,
+    ) in ACTIVITY_SOURCES:
+        filters = {**extra_filters, user_field: user, "creation": [">=", cutoff]}
+        events += _activity_events(doctype, filters, ticket_field, activity_type)
 
     # One row per ticket: keep only its most recent event across all sources.
-    latest_event_per_ticket: dict[str, dict] = {}
+    latest_per_ticket: dict[str, dict] = {}
     for event in sorted(events, key=lambda e: e["creation"]):
-        latest_event_per_ticket[event["ticket"]] = event
+        latest_per_ticket[event["ticket"]] = event
+    if not latest_per_ticket:
+        return []
 
-    # get_list so tickets the agent can no longer access drop out; filter before
-    # limiting so inaccessible tickets don't leave the card underfilled.
-    subject_by_ticket = _ticket_subjects(list(latest_event_per_ticket))
-    filtered_recent_events = [
-        event
-        for event in sorted(
-            latest_event_per_ticket.values(),
-            key=lambda e: e["creation"],
-            reverse=True,
-        )
-        if event["ticket"] in subject_by_ticket
-    ][:RECENT_ACTIVITY_LIMIT]
-
-    action_text = _updated_action_text(
-        user, [e["ticket"] for e in filtered_recent_events if e["type"] == "updated"]
+    # get_list respects permissions, so tickets the agent can't access drop out
+    # here — before the cap, so they can't leave the card underfilled.
+    accessible_tickets = frappe.get_list(
+        "HD Ticket",
+        filters=[["name", "in", list(latest_per_ticket)]],
+        fields=["name", "subject"],
     )
+    subject_by_ticket = {t.name: t.subject for t in accessible_tickets}
+
+    recent = sorted(
+        (e for e in latest_per_ticket.values() if e["ticket"] in subject_by_ticket),
+        key=lambda e: e["creation"],
+        reverse=True,
+    )[:RECENT_ACTIVITY_LIMIT]
 
     return [
         {
-            "name": event["ticket"],
-            "subject": subject_by_ticket[event["ticket"]],
-            "activity_type": event["type"],
-            "text": action_text.get(event["ticket"]),
-            "timestamp": format_time_difference(event["creation"]),
-            "creation": event["creation"],
+            "name": e["ticket"],
+            "subject": subject_by_ticket[e["ticket"]],
+            "activity_type": e["type"],
+            "text": e["text"],
+            "timestamp": format_time_difference(e["creation"]),
+            "creation": e["creation"],
         }
-        for event in filtered_recent_events
+        for e in recent
     ]
 
 
-def _ticket_subjects(tickets: list[str]) -> dict[str, str]:
-    if not tickets:
-        return {}
-    rows = frappe.get_list(
-        "HD Ticket",
-        filters=[["name", "in", tickets]],
-        fields=["name", "subject"],
-    )
-    return {row["name"]: row["subject"] for row in rows}
+def _activity_events(
+    doctype: str, filters: dict, ticket_field: str, activity_type: str
+) -> list[dict]:
+    """Every event of one type the agent performed in the window, tagged with its
+    ticket. Deduping to one row per ticket happens in get_recent_activity."""
+    fields = [f"{ticket_field} as ticket", "creation"]
+    if activity_type == "updated":
+        fields.append("action")
+    return [
+        {
+            "ticket": row.ticket,
+            "type": activity_type,
+            "text": _updated_label(row.action) if activity_type == "updated" else None,
+            "creation": row.creation,
+        }
+        for row in frappe.get_all(doctype, filters=filters, fields=fields)
+        if row.ticket
+    ]
 
 
-@frappe.whitelist()
-@agent_only
-def get_pending_tickets(ticket_type: str = "upcoming_sla"):
-    if ticket_type == "upcoming_sla":
-        tickets, total_count = _get_upcoming_sla_tickets(limit=6)
-    elif ticket_type == "new_tickets":
-        tickets, total_count = _get_new_tickets(limit=6)
-    elif ticket_type == "pending":
-        tickets, total_count = _get_pending_response_tickets(limit=6)
-
-    return {
-        "tickets": tickets,
-        "total_pending_tickets": total_count,
-    }
+def _updated_label(action: str) -> str | None:
+    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
+    return action[:1].upper() + action[1:] if action else None
