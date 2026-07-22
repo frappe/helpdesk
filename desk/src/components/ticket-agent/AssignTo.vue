@@ -31,6 +31,7 @@
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
                 size="sm"
+                :max="2"
               />
               <span
                 v-if="localAssignees.length > 1"
@@ -75,9 +76,13 @@
     <!-- body-main (not body) so the shared PopoverPanel supplies the shell
          chrome and the combobox's scale-from-trigger open animation. -->
     <template #body-main="{ isOpen }">
+      <!-- Pin to the trigger width. matchTargetWidth only sets min-width, so the
+           panel is otherwise shrink-to-fit and grows to the widest agent name
+           (then collapses as you filter) -> width jitter. Fixing the width lets
+           the rows' min-w-0 truncate instead. -->
       <div
         v-if="isOpen"
-        class="divide-y divide-outline-elevation-2 focus:outline-none"
+        class="w-[var(--reka-popover-trigger-width)] divide-y divide-outline-elevation-2 focus:outline-none"
       >
         <!-- Search Header -->
         <div class="p-1">
@@ -151,7 +156,9 @@
                     />
                   </span>
                 </div>
-                <span class="text-ink-gray-7 flex-1 text-start truncate">
+                <span
+                  class="text-ink-gray-7 min-w-0 flex-1 text-start truncate"
+                >
                   {{ agent.label }}
                 </span>
               </button>
@@ -618,7 +625,11 @@ useShortcut("a", () => {
 </script>
 
 <style scoped>
-.search-agents-input :deep(input) {
-  background-color: transparent;
+/* The class lands on TextInput's component root, which lacks this component's
+   scope id, so a parent-scoped `.search-agents-input :deep(input)` never
+   matches. Deep the whole selector so it applies by class and strips the
+   @tailwindcss/forms white reset that shows through in dark mode. */
+:deep(.search-agents-input input) {
+  @apply bg-surface-base;
 }
 </style>
