@@ -107,6 +107,7 @@
 <script setup lang="ts">
 import CP from "@/components/command-palette/CP.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
 import { currentView, useView } from "@/composables/useView";
 import { useNotificationStore } from "@/stores/notification";
@@ -114,7 +115,6 @@ import { useSidebarStore } from "@/stores/sidebar";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { getIcon, isCustomerPortal } from "@/utils";
-import ViewModal from "@/components/ViewModal.vue";
 import {
   Badge,
   Button,
@@ -153,7 +153,7 @@ const showCommandPalette = ref(false);
 
 // Local modal state for the per-view kebab menu (edit/duplicate). The action
 // logic itself is shared via useView so the sidebar and breadcrumb stay in sync.
-const viewDialogConfig = reactive({
+let viewDialogConfig = reactive({
   show: false,
   view: { label: "", icon: "", name: "" },
   mode: "create",
