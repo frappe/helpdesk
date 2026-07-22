@@ -14,16 +14,21 @@ def execute():
         # Fresh install already seeds `level`; there is nothing to migrate.
         return
 
-    # Lower integer_value = higher priority, so ascending walks most urgent first.
-    priorities = frappe.get_all(
-        "HD Ticket Priority", order_by="integer_value asc", pluck="name"
-    )
+    # Lower integer_value = higher priority, so ascending walks most urgent
+    # first. integer_value was never mandatory: null-valued customs sort last
+    # (else they'd lead the walk and wrongly inherit Urgent).
+    priorities = frappe.get_all("HD Ticket Priority", fields=["name", "integer_value"])
+    priorities.sort(key=lambda p: (p.integer_value is None, p.integer_value or 0))
 
-    has_anchor = any(name in BUILTIN_LEVELS for name in priorities)
+    has_anchor = any(p.name in BUILTIN_LEVELS for p in priorities)
     current_level = "Urgent" if has_anchor else "Medium"
-    for name in priorities:
-        if name in BUILTIN_LEVELS:
-            current_level = name
+    for priority in priorities:
+        if priority.name in BUILTIN_LEVELS:
+            current_level = priority.name
         frappe.db.set_value(
-            "HD Ticket Priority", name, "level", current_level, update_modified=False
+            "HD Ticket Priority",
+            priority.name,
+            "level",
+            current_level,
+            update_modified=False,
         )
