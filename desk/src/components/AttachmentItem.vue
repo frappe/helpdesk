@@ -24,6 +24,12 @@
           {{ content }}
         </div>
         <img v-if="isImage" :src="url" class="m-auto rounded border" />
+        <video
+          v-if="isVideo"
+          :src="url"
+          controls
+          class="m-auto max-h-[70vh] rounded border"
+        />
       </template>
     </Dialog>
   </span>
@@ -80,7 +86,8 @@ const mimeType = getMime(props.label) || "";
 const kind = getKind(mimeType);
 const isImage = kind === "image";
 const isText = kind === "text";
-const isShowable = props.url && (isText || isImage);
+const isVideo = kind === "video";
+const isShowable = props.url && (isText || isImage || isVideo);
 const icon = ICONS[kind];
 const content = ref("");
 
