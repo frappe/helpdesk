@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { Autocomplete } from "@/components";
+import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
@@ -80,12 +81,21 @@ const component = computed(() => {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    return h(Link, {
+    const linkProps = {
       doctype: props.field.options,
       redirectable: props.field.options in REDIRECT_ROUTES,
       class: "!w-full !bg-surface-base !border-transparent !text-base",
       onRedirect: handleRedirect,
-    });
+    };
+    // Priority shows its level icon before the selected value and each option.
+    // The combobox reuses item-prefix for the control, so one slot drives both.
+    if (props.field.options === "HD Ticket Priority") {
+      return h(Link, linkProps, {
+        "item-prefix": ({ item }: { item: { value: string } }) =>
+          h(TicketPriority, { priority: item.value, iconOnly: true }),
+      });
+    }
+    return h(Link, linkProps);
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
       options: props.field.options
