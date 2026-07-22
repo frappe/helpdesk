@@ -361,6 +361,18 @@ const chartsDropdown = computed(() => {
           maxH: 32,
         }),
     },
+    {
+      label: __("Recent Activity"),
+      chart: "recent_activity",
+      onClick: () =>
+        addChart("recent_activity", {
+          w: 16,
+          h: 32,
+          minW: 12,
+          minH: 20,
+          maxH: 44,
+        }),
+    },
   ].filter((chart) => {
     return !layout.value.some((item) => item.chart === chart.chart);
   });
