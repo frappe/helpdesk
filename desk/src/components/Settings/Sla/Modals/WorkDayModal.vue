@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineModel, reactive, watch } from "vue";
+import { ref, reactive, watch } from "vue";
 import { Dialog, FormControl, Button, toast } from "frappe-ui";
 import { __ } from "@/translation";
 
