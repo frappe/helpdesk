@@ -4,7 +4,7 @@ from datetime import date, timedelta
 import frappe
 from dateutil.relativedelta import relativedelta
 from frappe.query_builder import DocType
-from frappe.query_builder.functions import Avg, Count, Function
+from frappe.query_builder.functions import Avg, Count, Function, Max
 from frappe.utils import add_months, today
 from pypika import Case
 
@@ -612,42 +612,63 @@ ACTIVITY_SOURCES = [
 def _activity_events(
     doctype: str, filters: dict, ticket_field: str, activity_type: str
 ) -> list[dict]:
-    fields = [f"{ticket_field} as ticket", "creation"]
-    if activity_type == "updated":
-        fields.append("action")
-    rows = frappe.get_all(
-        doctype,
-        filters={
-            **filters,
-            "creation": [
-                ">=",
-                frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS),
-            ],
-        },
-        fields=fields,
-        order_by="creation desc",
-        limit=RECENT_ACTIVITY_LIMIT,
+    """The latest event per ticket for one source, newest first. Deduping in SQL
+    (one row per ticket via MAX(creation)) keeps a single busy ticket from
+    consuming the limit and starving other eligible tickets."""
+    table = frappe.qb.DocType(doctype)
+    last_activity = Max(table.creation).as_("last_activity")
+    query = (
+        frappe.qb.from_(table)
+        .select(table[ticket_field].as_("ticket"), last_activity)
+        .where(table.creation >= _recent_activity_cutoff())
+        .groupby(table[ticket_field])
+        .orderby(Max(table.creation), order=frappe.qb.desc)
+        .limit(RECENT_ACTIVITY_LIMIT)
     )
-    events = []
-    for row in rows:
-        if not row.get("ticket"):
-            continue
-        events.append(
-            {
-                "ticket": row.ticket,
-                "type": activity_type,
-                "text": (
-                    _updated_label(row.action) if activity_type == "updated" else None
-                ),
-                "creation": row.creation,
-            }
-        )
-    return events
+    for field, condition in filters.items():
+        column = table[field]
+        if isinstance(condition, (list, tuple)):
+            operator, value = condition
+            query = query.where(
+                column.not_like(value) if operator == "not like" else column.like(value)
+            )
+        else:
+            query = query.where(column == condition)
+
+    return [
+        {"ticket": row.ticket, "type": activity_type, "creation": row.last_activity}
+        for row in query.run(as_dict=True)
+        if row.ticket
+    ]
+
+
+def _recent_activity_cutoff() -> str:
+    return frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
 
 
 def _updated_label(action: str) -> str | None:
     """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
     return action[:1].upper() + action[1:] if action else None
+
+
+def _updated_action_text(user: str, tickets: list[str]) -> dict[str, str]:
+    """Latest non-SLA action text per ticket, for tickets whose winning event is
+    an 'updated'. Only these rows carry server text; other types are labelled on
+    the frontend."""
+    if not tickets:
+        return {}
+    rows = frappe.get_all(
+        "HD Ticket Activity",
+        filters={
+            "ticket": ["in", tickets],
+            "owner": user,
+            "action": ["not like", "%SLA%"],
+        },
+        fields=["ticket", "action"],
+        order_by="creation asc",
+    )
+    # Ascending order means the last write per ticket is its most recent action.
+    return {row.ticket: _updated_label(row.action) for row in rows}
 
 
 @frappe.whitelist()
@@ -665,35 +686,50 @@ def get_recent_activity() -> list[dict]:
     if not events:
         return []
 
-    events.sort(key=lambda e: e["creation"], reverse=True)
-
-    # One row per ticket: keep only its most recent event.
+    # One row per ticket: keep only its most recent event across all sources.
     latest_event_per_ticket: dict[str, dict] = {}
-    for event in events:
-        latest_event_per_ticket.setdefault(event["ticket"], event)
+    for event in sorted(events, key=lambda e: e["creation"]):
+        latest_event_per_ticket[event["ticket"]] = event
 
-    # get_list so tickets the agent can no longer access drop out.
-    accessible_tickets = frappe.get_list(
-        "HD Ticket",
-        filters=[["name", "in", list(latest_event_per_ticket.keys())]],
-        fields=["name", "subject"],
+    # get_list so tickets the agent can no longer access drop out; filter before
+    # limiting so inaccessible tickets don't leave the card underfilled.
+    subject_by_ticket = _ticket_subjects(list(latest_event_per_ticket))
+    filtered_recent_events = [
+        event
+        for event in sorted(
+            latest_event_per_ticket.values(),
+            key=lambda e: e["creation"],
+            reverse=True,
+        )
+        if event["ticket"] in subject_by_ticket
+    ][:RECENT_ACTIVITY_LIMIT]
+
+    action_text = _updated_action_text(
+        user, [e["ticket"] for e in filtered_recent_events if e["type"] == "updated"]
     )
-    subject_by_ticket = {t["name"]: t["subject"] for t in accessible_tickets}
 
-    activities = [
+    return [
         {
             "name": event["ticket"],
             "subject": subject_by_ticket[event["ticket"]],
             "activity_type": event["type"],
-            "text": event["text"],
+            "text": action_text.get(event["ticket"]),
             "timestamp": format_time_difference(event["creation"]),
             "creation": event["creation"],
         }
-        for event in latest_event_per_ticket.values()
-        if event["ticket"] in subject_by_ticket
+        for event in filtered_recent_events
     ]
-    activities.sort(key=lambda a: a["creation"], reverse=True)
-    return activities[:RECENT_ACTIVITY_LIMIT]
+
+
+def _ticket_subjects(tickets: list[str]) -> dict[str, str]:
+    if not tickets:
+        return {}
+    rows = frappe.get_list(
+        "HD Ticket",
+        filters=[["name", "in", tickets]],
+        fields=["name", "subject"],
+    )
+    return {row["name"]: row["subject"] for row in rows}
 
 
 @frappe.whitelist()
