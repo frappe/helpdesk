@@ -31,7 +31,7 @@
             </div>
           </template>
           <template #body>
-            <div class="absolute bg-surface-white top-2">
+            <div class="absolute bg-surface-base top-2">
               <DurationPicker v-model="props.row[column.key]" />
             </div>
           </template>

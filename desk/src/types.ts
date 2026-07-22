@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 import { Component, ComputedRef, InjectionKey, Ref } from "vue";
-import type { AssignmentRule, HDTicket } from "./types/doctypes";
+import type { AssignmentRule, HDCustomer, HDTicket } from "./types/doctypes";
 
 interface ResourceOptions<T = any> {
   method?: string;
@@ -118,6 +118,7 @@ export interface ListResource<T = any> {
   setValue: Resource<T>;
   delete: Resource<T>;
   runDocMethod: Resource<T>;
+  loading: boolean;
   update: (updatedOptions: Partial<ListResourceOptions>) => void;
   fetch: () => void;
   reload: () => Promise<T[]>;
@@ -444,9 +445,8 @@ export interface View {
   pinned?: boolean;
   public?: boolean;
   group_by_field?: string;
-  name?: string;
+  name: string;
   is_customer_portal?: boolean;
-  is_standard?: boolean;
 }
 
 export interface ViewType {
@@ -634,6 +634,23 @@ export interface TicketContact {
   image: string;
 }
 
+// A ticket assignee enriched with their agent status by get_ticket_assignees.
+// Non-agent assignees only carry `name`.
+export interface TicketAssignee {
+  name: string;
+  agent_name?: string;
+  user_image?: string;
+  availability?: string;
+  availability_changed_on?: string;
+}
+
+// A TicketAssignee plus the option fields AssignTo keeps when an agent is
+// picked from the dropdown (image/label come from AgentOption).
+export interface LocalAssignee extends TicketAssignee {
+  image?: string;
+  label?: string;
+}
+
 export type RecentTicket = Record<
   "subject" | "status" | "priority" | "name" | "creation",
   string
@@ -765,6 +782,10 @@ export const SavedReplyListResourceSymbol: InjectionKey<
   ListResource<SavedReply>
 > = Symbol("savedReplyListResource");
 
+export const CustomerResourceSymbol: InjectionKey<
+  DocumentResource<HDCustomer>
+> = Symbol("customerResource");
+
 declare global {
   interface Window {
     is_fc_site: boolean;
@@ -773,6 +794,59 @@ declare global {
     session_user: string;
     timezone: Record<"user" | "system", string>;
     agent: string | null;
+    default_country: string;
     apps: string[];
+    telemetry: { enabled: boolean };
   }
+}
+
+export interface CustomerContact {
+  contact_name: string;
+  is_primary: 0 | 1;
+  is_manager: 0 | 1;
+  email_id: string | null;
+  mobile_no: string | null;
+  image: string | null;
+  last_active: string;
+  modified?: string;
+  ticket_count: number;
+}
+export interface NewContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  email: string;
+  phone: string;
+  timezone: string;
+  customer: string;
+  invite: boolean;
+}
+
+export interface ContactEmailEntry {
+  email_id: string;
+  isPrimary: boolean;
+  key: number;
+}
+
+export interface ContactPhoneEntry {
+  phone: string;
+  isPrimary: boolean;
+  key: number;
+}
+
+export interface EditContactState {
+  firstName: string;
+  lastName: string;
+  image: string;
+  emails: ContactEmailEntry[];
+  phones: ContactPhoneEntry[];
+  customers: string[];
+  customer: string;
+  timezone: string;
+}
+
+export interface LineChart {
+  percentage_change: number;
+  total: number;
+  data: { date: string; count: number }[];
 }

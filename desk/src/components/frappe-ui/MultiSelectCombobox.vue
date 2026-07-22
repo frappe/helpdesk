@@ -19,7 +19,7 @@
           }"
         >
           <div class="w-full space-y-1.5">
-            <label v-if="$props.label" class="block text-xs text-ink-gray-5">
+            <label v-if="$props.label" class="block text-base text-ink-gray-5">
               {{ $props.label }}
             </label>
             <button
@@ -65,7 +65,7 @@
       <template #body="{ isOpen, togglePopover }">
         <div v-show="isOpen">
           <div
-            class="relative mt-1 overflow-hidden rounded-lg bg-surface-white text-base shadow-2xl"
+            class="relative mt-1 overflow-hidden rounded-lg bg-surface-base text-base shadow-2xl"
             :class="bodyClasses"
           >
             <ComboboxOptions
@@ -100,7 +100,7 @@
                 >
                   <div
                     v-if="group.group && !group.hideLabel"
-                    class="sticky top-0 truncate bg-surface-white px-2.5 py-1.5 text-sm font-medium text-ink-gray-5"
+                    class="sticky top-0 truncate bg-surface-base px-2.5 py-1.5 text-sm-medium text-ink-gray-5"
                   >
                     {{ group.group }}
                   </div>

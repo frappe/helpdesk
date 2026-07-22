@@ -7,9 +7,9 @@
   >
     <template #target="{ togglePopover }">
       <div class="flex flex-col gap-1.5 w-full">
-        <span v-if="!hideLabel" class="block text-xs text-ink-gray-5">{{
-          __("Assignee")
-        }}</span>
+        <span v-if="!hideLabel" class="block text-base text-ink-gray-5">
+          {{ __("Assignee") }}
+        </span>
         <Button
           ref="triggerRef"
           variant="outline"
@@ -49,12 +49,12 @@
     <template #body="{ isOpen }">
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-gray-modals rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <!-- Search Header -->
         <div class="p-1">
           <div
-            class="flex h-7 items-center text-sm font-medium text-ink-gray-6 justify-between"
+            class="flex h-7 items-center text-sm-medium text-ink-gray-6 justify-between"
           >
             <input
               ref="inputRef"
@@ -147,6 +147,7 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -154,16 +155,21 @@ import {
   ActivitiesSymbol,
   AgentOption,
   AssigneeSymbol,
+  LocalAssignee,
   TicketSymbol,
 } from "@/types";
+import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
   Checkbox,
   Popover,
+  TextInput,
+  Tooltip,
   call,
   createListResource,
   createResource,
+  dayjsLocal,
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
@@ -171,10 +177,6 @@ import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
-import { useAgentStatusStore } from "@/stores/agentStatus.ts";
-import { prettyDate } from "@/utils.ts";
-import { dayjsLocal } from "frappe-ui";
-import { Tooltip } from "frappe-ui";
 interface Props {
   hideLabel?: boolean;
 }
@@ -203,12 +205,8 @@ const popoverIsOpen = ref(false);
 const hasBeenOpened = ref(false);
 
 // Local copy of assignees
-const localAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
-const snapshotAssignees = ref<{ name: string; image: string; label: string }[]>(
-  []
-);
+const localAssignees = ref<LocalAssignee[]>([]);
+const snapshotAssignees = ref<LocalAssignee[]>([]);
 
 // Sync from injected assignees when popover is not open
 watch(
@@ -256,7 +254,7 @@ const agentResource = createListResource({
     "availability",
     "availability_changed_on",
   ],
-  filters: { is_active: true },
+  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
   pageLength: 20,
   auto: true,
 });
@@ -339,8 +337,9 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
         const user = getUser(a.name);
         options.push({
           value: a.name,
-          label: a.label || user.full_name || a.name,
-          image: a.image || user.user_image,
+          label: a.label || a.agent_name || user.full_name || a.name,
+          image: a.image || a.user_image || user.user_image,
+          ...liveAvailability(a),
         });
         seen.add(a.name);
       }
@@ -408,11 +407,17 @@ function toggleAgent(agent: AgentOption) {
       pinnedSelectedNames.value.delete(agent.value);
     }
   } else {
-    localAssignees.value.push({
+    const added: LocalAssignee = {
       name: agent.value,
       image: agent.image || "",
       label: agent.label,
-    });
+    };
+    // Carry the option's status so it survives the localAssignees fallback in
+    // sortedAgentOptions (e.g. a search-added agent outside the default page resource call).
+    if (agent.availability) added.availability = agent.availability;
+    if (agent.availability_changed_on)
+      added.availability_changed_on = agent.availability_changed_on;
+    localAssignees.value.push(added);
     // Pin only when selecting during search so they stay visible when search clears
     if (isSearching) {
       pinnedSelectedNames.value.add(agent.value);

@@ -6,7 +6,7 @@
           :label="__('Tickets')"
           :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
           :options="dropdownOptions"
-          :dropdown-actions="viewActions"
+          :dropdown-actions="(view) => viewActions(view, viewDialogConfig)"
           :current-view="currentView"
         />
       </template>
@@ -15,7 +15,12 @@
           class="inline-flex"
           :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
         >
-          <Button label="Create" theme="gray" variant="solid">
+          <Button
+            class="rtl:flex-row-reverse"
+            :label="__('Create')"
+            theme="gray"
+            variant="solid"
+          >
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -42,9 +47,9 @@
       "
     />
     <ViewModal
-      v-if="viewDialog.show"
-      v-model="viewDialog"
-      @update="(view, action) => handleView(view, action)"
+      v-if="viewDialogConfig.show"
+      v-model="viewDialogConfig"
+      @update="onViewModalUpdate"
     />
     <BulkReplyModal
       v-model="showBulkReplyModal"
@@ -56,11 +61,12 @@
 
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
-import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
+import { TicketIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
+import { normalizeFilters } from "@/components/view-controls/filter";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
@@ -68,15 +74,8 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { getIcon, isCustomerPortal, shortDuration } from "@/utils";
-import {
-  Badge,
-  dayjs,
-  FeatherIcon,
-  toast,
-  Tooltip,
-  usePageMeta,
-} from "frappe-ui";
+import { isCustomerPortal, shortDuration } from "@/utils";
+import { Badge, dayjs, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -85,13 +84,13 @@ const route = useRoute();
 
 const {
   getCurrentUserViews,
-  createView,
   publicViews,
   pinnedViews,
   findView,
-  updateView,
-  deleteView,
   standardViews,
+  viewActions,
+  handleView,
+  resetViewDialog,
 } = useView("HD Ticket");
 
 const activeView = computed(() => findView(route.query.view as string).value);
@@ -99,7 +98,7 @@ const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
 
-const { $dialog, $socket } = globalStore();
+const { $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
@@ -291,33 +290,25 @@ async function exportRows(
   const fields = JSON.stringify(list.data.columns.map((f) => f.key));
   const order_by = list.params.order_by;
 
-  let filters = { ...list.params.filters };
   // Resolve `@me` filters to the current session user before export
-  Object.keys(filters).forEach((key) => {
-    const value = filters[key];
-
-    // Handle direct filter format: { owner: "@me" }
-    if (value === "@me") {
-      filters[key] = userId;
-      return;
-    }
-    if (!Array.isArray(value)) return;
-
-    // Handle all operator-based filter format: { owner: ["=", "@me"], _assign: ["LIKE", "%@me%"] }
-    filters[key] = value.map((entry) =>
-      entry === "@me" ? userId : entry === "%@me%" ? `%${userId}%` : entry
-    );
-  });
+  const resolveAtMe = (entry: any) => {
+    if (Array.isArray(entry)) return entry.map(resolveAtMe);
+    if (entry === "@me") return userId;
+    if (entry === "%@me%") return `%${userId}%`;
+    return entry;
+  };
+  const conditions = normalizeFilters(list.params.filters).map(
+    ([field, operator, value]) => [field, operator, resolveAtMe(value)]
+  );
   let pageLength: number;
 
   if (export_all) {
-    filters = JSON.stringify(filters);
     pageLength = list.data.total_count;
   } else {
     pageLength = listSelections.value.size;
-    filters["name"] = ["in", Array.from(listSelections.value)];
-    filters = JSON.stringify(filters);
+    conditions.push(["name", "in", Array.from(listSelections.value)]);
   }
+  const filters = JSON.stringify(conditions);
 
   window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${encodeURIComponent(
     filters
@@ -340,7 +331,7 @@ const slaStatusColorMap = {
   Paused: "blue",
 };
 
-let viewDialog = reactive({
+let viewDialogConfig = reactive({
   show: false,
   view: {
     label: "",
@@ -403,8 +394,8 @@ const dropdownOptions = computed(() => {
         label: __("Create View"),
         icon: "lucide-plus",
         onClick: () => {
-          resetState();
-          viewDialog.show = true;
+          resetViewDialog(viewDialogConfig);
+          viewDialogConfig.show = true;
         },
       },
     ],
@@ -412,169 +403,6 @@ const dropdownOptions = computed(() => {
 
   return items;
 });
-
-let selectedView: View | null = null;
-
-const toggleViewVisibility = (_view: any, title: string, message: string) => {
-  const newView: any = {
-    name: _view.name,
-    public: !_view.public,
-  };
-
-  if (_view.public) {
-    $dialog({
-      title,
-      message,
-      actions: [
-        {
-          label: __("Confirm"),
-          variant: "solid",
-          onClick({ close }: any) {
-            close();
-            updateView(newView);
-          },
-        },
-      ],
-    });
-  } else {
-    updateView(newView);
-  }
-};
-
-const viewActions = (view) => {
-  const _view = findView(view.name).value;
-
-  let actions = [
-    {
-      group: __("Default Views"),
-      hideLabel: true,
-      items: [
-        {
-          label: __("Duplicate"),
-          icon: h(FeatherIcon, { name: "copy" }),
-          onClick: () => {
-            viewDialog.view.label = _view.label + " (New)";
-            viewDialog.view.icon = _view.icon;
-            viewDialog.view.name = _view.name;
-            viewDialog.mode = "duplicate";
-            selectedView = _view;
-            viewDialog.show = true;
-          },
-        },
-      ],
-    },
-  ];
-  if (!_view.public || isManager) {
-    if (!_view.public && !_view.is_standard) {
-      actions[0].items.push({
-        label: _view?.pinned ? __("Unpin View") : __("Pin View"),
-        icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
-        onClick: () => {
-          const newView = {
-            name: _view.name,
-          };
-          newView["pinned"] = !_view.pinned;
-          updateView(newView);
-        },
-      });
-    }
-    if (_view?.is_standard && isManager) {
-      actions[0].items.push({
-        label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
-        icon: h(FeatherIcon, {
-          name: _view?.public ? "eye-off" : "eye",
-          class: "h-4 w-4",
-        }),
-        onClick: () => {
-          toggleViewVisibility(
-            _view,
-            __("Hide view from sidebar"),
-            __(
-              "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar.",
-              [_view.label]
-            )
-          );
-        },
-      });
-    }
-    if (!_view.is_standard) {
-      if (_view?.is_standard && isManager) {
-        actions[0].items.push({
-          label: _view?.public
-            ? __("Hide from sidebar")
-            : __("Show in sidebar"),
-          icon: h(FeatherIcon, {
-            name: _view?.public ? "eye-off" : "eye",
-            class: "h-4 w-4",
-          }),
-          onClick: () => {
-            toggleViewVisibility(
-              _view,
-              __("Make view private"),
-              __(
-                "{0} view is currently public. Changing it to private will hide it for all the users.",
-                [_view.label]
-              )
-            );
-          },
-        });
-      }
-      actions[0].items.push({
-        label: __("Edit"),
-        icon: h(EditIcon, { class: "h-4 w-4" }),
-        onClick: () => {
-          viewDialog.view.label = _view.label;
-          viewDialog.view.icon = _view.icon;
-          viewDialog.view.name = _view.name;
-          viewDialog.mode = "edit";
-          viewDialog.show = true;
-        },
-      });
-      actions.push({
-        group: __("Delete View"),
-        hideLabel: true,
-        items: [
-          {
-            label: __("Delete"),
-            icon: "lucide-trash-2",
-            onClick: () => {
-              $dialog({
-                title: __("Delete {0}?", [_view.label]),
-                message:
-                  __("Are you sure you want to delete this view?") +
-                  (_view.public
-                    ? " " +
-                      __(
-                        "This view is public, and will be removed for all users."
-                      )
-                    : ""),
-                actions: [
-                  {
-                    label: __("Confirm"),
-                    variant: "solid",
-                    onClick({ close }) {
-                      if (route.query.view === _view.name) {
-                        router.push({
-                          name: isCustomerPortal.value
-                            ? "TicketsCustomer"
-                            : "TicketsAgent",
-                        });
-                      }
-                      deleteView(_view.name);
-                      handleSuccess(__("deleted"));
-                      close();
-                    },
-                  },
-                ],
-              });
-            },
-          },
-        ],
-      });
-    }
-  }
-  return actions;
-};
 
 function parseViews(views: View[]) {
   return views?.map((view) => {
@@ -596,70 +424,8 @@ function parseViews(views: View[]) {
   });
 }
 
-function handleView(viewInfo, action) {
-  let view: View;
-  if (action === "update") {
-    updateView(viewInfo);
-    handleSuccess("updated");
-    currentView.value = {
-      label: viewInfo.label,
-      icon: getIcon(viewInfo.icon),
-    };
-    return;
-  } else if (action === "duplicate") {
-    view = {
-      ...selectedView,
-      filters: JSON.stringify(selectedView.filters),
-      columns: JSON.stringify(selectedView.columns),
-      rows: JSON.stringify(selectedView.rows),
-      label: viewInfo.label,
-      icon: viewInfo.icon,
-      public: false,
-      pinned: false,
-    };
-  } else {
-    view = {
-      dt: "HD Ticket",
-      type: "list",
-      label: viewInfo.label ?? __("List"),
-      icon: viewInfo.icon ?? "",
-      route_name: router.currentRoute.value.name as string,
-      order_by: listViewRef.value?.list?.params.order_by,
-      filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-      columns: JSON.stringify(listViewRef.value?.list?.data.columns),
-      rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
-      is_customer_portal: isCustomerPortal.value,
-    };
-  }
-
-  // createView
-  createView(view, (d) => {
-    currentView.value = {
-      label: d.label || __("List"),
-      icon: getIcon(d.icon),
-    };
-    router.push({
-      name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-      query: {
-        view: d.name,
-      },
-    });
-
-    handleSuccess();
-  });
-}
-
-function handleSuccess(msg = __("created")) {
-  toast.success(__("View {0}", [msg]));
-  resetState();
-}
-function resetState() {
-  viewDialog.show = false;
-  viewDialog.view.label = "";
-  viewDialog.view.icon = "";
-  viewDialog.view.name = "";
-  viewDialog.mode = null;
-  selectedView = null;
+function onViewModalUpdate(viewInfo: any, action: string) {
+  handleView(viewInfo, action, viewDialogConfig, () => listViewRef.value?.list);
 }
 
 onMounted(() => {

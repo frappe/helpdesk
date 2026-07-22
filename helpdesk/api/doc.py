@@ -11,6 +11,7 @@ from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
     contact_default_columns,
+    contact_default_rows,
     parse_call_logs,
 )
 
@@ -19,7 +20,7 @@ from helpdesk.utils import (
 def get_list_data(
     doctype: str,
     # flake8: noqa
-    filters: dict = {},
+    filters: dict | list = {},
     default_filters: dict = {},
     order_by: str = "modified desc",
     page_length: int = 20,
@@ -76,6 +77,7 @@ def get_list_data(
         if not default_view:
             if doctype == "Contact":
                 columns = contact_default_columns
+                rows = contact_default_rows
             elif doctype == "TP Call Log":
                 columns = call_log_default_columns
             elif hasattr(_list, "default_list_data"):
@@ -90,7 +92,12 @@ def get_list_data(
                 doctype, _list, show_customer_portal_fields
             )
             if default_filters and not filters:
-                filters.append(default_filters)
+                default_filters = frappe.parse_json(default_filters)
+                for key, value in (default_filters or {}).items():
+                    if isinstance(value, list):
+                        filters.append([key, value[0], value[1]])
+                    else:
+                        filters.append([key, "=", value])
 
     if rows is None:
         rows = []
@@ -267,6 +274,7 @@ def get_filterable_fields(
         "response_by",
         "resolution_by",
         "creation",
+        "customer",
     ]
 
     from_doc_fields = (
@@ -496,7 +504,7 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     if not columns:
         if doctype == "Contact":
             columns = contact_default_columns
-            rows = ["name", "email_id", "creation"]
+            rows = ["name", "email_id", "mobile_no", "image", "creation"]
         elif doctype == "TP Call Log":
             columns = call_log_default_columns
             rows = ["name", "caller", "receiver", "creation"]
@@ -514,30 +522,39 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
 
 def handle_at_me_support(filters):
     # Converts @me in filters to current user
-    for key in filters:
-        value = filters[key]
-        if isinstance(value, list):
-            if "@me" in value:
-                value[value.index("@me")] = frappe.session.user
-            elif "%@me%" in value:
-                index = [i for i, v in enumerate(value) if v == "%@me%"]
-                for i in index:
-                    value[i] = "%" + frappe.session.user + "%"
-        elif value == "@me":
-            filters[key] = frappe.session.user
-
+    if isinstance(filters, dict):
+        for key in filters:
+            _replace_at_me(filters, key)
+        return filters
+    for condition in filters:
+        if isinstance(condition, list) and condition:
+            _replace_at_me(condition, len(condition) - 1)
     return filters
+
+
+def _replace_at_me(container, key):
+    value = container[key]
+    if isinstance(value, list):
+        if "@me" in value:
+            value[value.index("@me")] = frappe.session.user
+        elif "%@me%" in value:
+            index = [i for i, v in enumerate(value) if v == "%@me%"]
+            for i in index:
+                value[i] = "%" + frappe.session.user + "%"
+    elif value == "@me":
+        container[key] = frappe.session.user
+    elif value == "%@me%":
+        container[key] = "%" + frappe.session.user + "%"
 
 
 def handle_assigned_on_filter(filters, doctype):
     """
     Handle the custom __assigned_on filter by querying ToDo table
-    and returning ticket names that match the assignment date criteria.
+    and merging the matching ticket names into the filters in place.
     """
-    if "__assigned_on" not in filters:
-        return filters
-
-    assigned_on_filter = filters.pop("__assigned_on")
+    assigned_on_filter = _pop_assigned_on_filter(filters)
+    if assigned_on_filter is None:
+        return
 
     # Build ToDo query based on the operator and value
     ToDo = frappe.qb.DocType("ToDo")
@@ -554,20 +571,55 @@ def handle_assigned_on_filter(filters, doctype):
     query = apply_datetime_filter(query, ToDo.creation, assigned_on_filter)
 
     ticket_names = [row[0] for row in query.run()]
+    # No matching tickets results in an impossible filter
+    _merge_name_filter(filters, ticket_names)
 
-    if ticket_names:
-        # Merge with existing name filter if present
-        if "name" in filters:
+
+def _pop_assigned_on_filter(filters):
+    if isinstance(filters, dict):
+        if "__assigned_on" not in filters:
+            return None
+        return filters.pop("__assigned_on")
+    condition = next(
+        (
+            condition
+            for condition in filters
+            if isinstance(condition, list)
+            and condition
+            and condition[0] == "__assigned_on"
+        ),
+        None,
+    )
+    if condition is None:
+        return None
+    filters.remove(condition)
+    return [condition[1], condition[2]] if len(condition) >= 3 else None
+
+
+def _merge_name_filter(filters, ticket_names):
+    if isinstance(filters, dict):
+        if ticket_names and "name" in filters:
             existing_filter = filters["name"]
             if isinstance(existing_filter, list) and existing_filter[0] == "in":
                 # Intersection of both filters
                 ticket_names = list(set(ticket_names) & set(existing_filter[1]))
         filters["name"] = ["in", ticket_names]
+        return
+    existing = next(
+        (
+            condition
+            for condition in filters
+            if isinstance(condition, list)
+            and len(condition) >= 3
+            and condition[0] == "name"
+            and str(condition[1]).lower() == "in"
+        ),
+        None,
+    )
+    if existing:
+        existing[2] = list(set(ticket_names) & set(existing[2]))
     else:
-        # No matching tickets, add impossible filter
-        filters["name"] = ["in", []]
-
-    return filters
+        filters.append(["name", "in", ticket_names])
 
 
 def apply_datetime_filter(query, field, filter_value):

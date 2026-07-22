@@ -16,7 +16,7 @@
           <li class="flex items-center justify-between p-3 rounded relative">
             <div class="flex flex-col gap-1">
               <h2
-                class="text-base font-medium text-ink-gray-7 relative z-10 pointer-events-none"
+                class="text-base-medium text-ink-gray-7 relative z-10 pointer-events-none"
               >
                 {{ __(notification.label) }}
               </h2>
@@ -31,7 +31,7 @@
               class="text-ink-gray-7 size-4 relative z-10 pointer-events-none"
             />
             <div
-              class="w-full h-full absolute top-0 left-0 hover:bg-surface-menu-bar rounded-[inherit]"
+              class="w-full h-full absolute top-0 left-0 hover:bg-surface-sidebar rounded-[inherit]"
               @click="
                 () => {
                   props.onSelect(notification);

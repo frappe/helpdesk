@@ -16,7 +16,7 @@ from helpdesk.api.agent_home.agent_home import (
     get_pending_tickets,
     get_recent_feedback,
 )
-from helpdesk.test_utils import make_agent, make_sla, make_ticket
+from helpdesk.test_utils import SLA_PRIORITY_NAME, make_agent, make_sla, make_ticket
 
 agent_email = "test_agent@test.com"
 
@@ -496,6 +496,15 @@ class TestAgentHome(FrappeTestCase):
         self.assertIn(ticket.name, ticket_names)
         # Other agent's ticket should NOT be in the result
         self.assertNotIn(other_ticket.name, ticket_names)
+
+        # delete the SLA to clean up
+        frappe.set_user("Administrator")
+        tickets = [ticket, other_ticket]
+        for t in tickets:
+            frappe.delete_doc("HD Ticket", t.name, force=True)
+            # never delete the seeded SLAs shared by the whole suite
+            if t.sla not in (SLA_PRIORITY_NAME, "Default"):
+                frappe.delete_doc("HD Service Level Agreement", t.sla, force=True)
 
     def test_get_pending_tickets_new_tickets_type(self):
         """Test getting newly assigned tickets"""

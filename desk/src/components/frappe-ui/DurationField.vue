@@ -14,7 +14,7 @@
     </template>
 
     <template #body="{ close }">
-      <div class="absolute bg-surface-white top-2">
+      <div class="absolute bg-surface-base top-2">
         <!-- Built-in Duration Picker -->
         <div
           class="flex gap-2 border border-outline-gray-2 rounded w-fit min-w-max px-4 select-none shadow-sm"

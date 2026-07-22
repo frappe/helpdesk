@@ -52,13 +52,13 @@
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
           <div
-            class="flex items-center cursor-pointer hover:bg-surface-menu-bar rounded h-12.5"
+            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
           >
             <div
               class="w-full py-3 pl-2 flex gap-1 items-center"
               @click="() => emit('update:step', 'team-edit', team.name)"
             >
-              <p class="text-base text-ink-gray-7 font-medium">
+              <p class="text-base-medium text-ink-gray-7">
                 {{ team.name }}
               </p>
               <Badge :label="__('Disabled')" v-if="team.disabled" />

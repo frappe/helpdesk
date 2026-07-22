@@ -5,7 +5,7 @@
       class="flex mb-1.5 items-center"
       :class="activity.feedback && 'gap-[9px]'"
     >
-      <p class="text-base text-ink-gray-8 font-medium">
+      <p class="text-base-medium text-ink-gray-8">
         {{ activity.feedback }}
       </p>
       <StarRating :rating="activity.feedback_rating" />

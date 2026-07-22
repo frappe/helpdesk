@@ -1,18 +1,16 @@
 <template>
   <div class="flex flex-col">
-    <TextEditor
+    <Editor
       ref="editorRef"
-      :editor-class="editorClass"
-      :bubble-menu="false"
-      :content="internalContent"
+      v-model="internalContent"
       :extensions="extensions"
       v-bind="uploadFn ? { uploadFunction: uploadFn } : {}"
       :placeholder="placeholder"
-      @change="(val: string) => (internalContent = val)"
     >
-      <template #top>
+      <template #default>
+        <EditorBubbleMenu :items="commentToolbar" />
         <div
-          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-2 py-1"
+          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-1 py-1"
         >
           <div
             v-if="showAttachments"
@@ -36,12 +34,13 @@
                 </button>
               </template>
             </FileUploader>
-            <div class="h-4 w-[2px] border-l" />
+            <div class="h-4 w-[2px] border-l ml-1" />
           </div>
-          <TextEditorFixedMenu :buttons="(menuButtons as any)" />
+          <EditorFixedMenu :items="fullToolbar" />
         </div>
+        <EditorContent :class="editorClass" />
       </template>
-    </TextEditor>
+    </Editor>
     <div
       v-if="showAttachments && attachments?.length"
       class="flex flex-wrap gap-2 mt-2"
@@ -66,22 +65,21 @@
 
 <script setup lang="ts">
 import { AttachmentItem } from "@/components";
+import {
+  buildEditorExtensions,
+  commentToolbar,
+  fullToolbar,
+} from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons";
-import { menuButtons } from "@/components/Settings/SavedReplies/savedReplies";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
-import {
-  CleanStyles,
-  ComponentUtils,
-  HandleExcelPaste,
-} from "@/tiptap-extensions";
 import { isContentEmpty } from "@/utils";
+import { FeatherIcon, FileUploader, type UploadedFile } from "frappe-ui";
 import {
-  FeatherIcon,
-  FileUploader,
-  TextEditor,
-  TextEditorFixedMenu,
-  type UploadedFile,
-} from "frappe-ui";
+  Editor,
+  EditorBubbleMenu,
+  EditorContent,
+  EditorFixedMenu,
+} from "frappe-ui/editor";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 type UploadFunction = (file: File) => Promise<UploadedFile>;
@@ -101,7 +99,7 @@ const props = withDefaults(
     placeholder: "",
     minHeight: "min-h-[180px]",
     maxHeight: "max-h-80",
-    extensions: () => [ComponentUtils, HandleExcelPaste, CleanStyles],
+    extensions: () => [],
     showSignature: false,
     type: "Saved Reply",
     showAttachments: false,
@@ -116,19 +114,21 @@ const attachments = defineModel<UploadedFile[] | null>("attachments", {
 });
 const isUploading = ref(false);
 
+const extensions = buildEditorExtensions({ extra: props.extensions });
+
 const savedReplyClass = [
-  "!prose-sm max-w-full overflow-auto py-1.5 px-2",
+  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
   "rounded-b border border-[--surface-gray-2] bg-surface-gray-2",
   "placeholder-ink-gray-4",
-  "hover:border-outline-gray-modals hover:shadow-sm",
-  "focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0",
+  "hover:border-outline-elevation-2 hover:shadow-sm",
+  "focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0",
   "focus-visible:ring-2 focus-visible:ring-outline-gray-3",
   "text-ink-gray-8 transition-colors -mt-0.5",
 ];
 
 const emailClass = [
-  "!prose-sm max-w-full overflow-auto py-1.5 px-2",
-  "rounded-b border border-[--surface-gray-2] bg-surface-white",
+  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
+  "rounded-b border border-[--surface-gray-2] bg-surface-base",
   "placeholder-ink-gray-4",
   "text-ink-gray-8 transition-colors -mt-0.5",
 ];

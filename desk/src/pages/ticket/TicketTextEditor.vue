@@ -4,6 +4,7 @@
     ref="e"
     :model-value="content"
     :placeholder="placeholder"
+    :upload-function="uploadFunction"
     @update:model-value="$emit('update:content', $event)"
     @clear="() => $emit('update:attachments', [])"
   >
@@ -33,9 +34,10 @@
       </div>
     </template>
     <template #bottom-left>
-      <span class="flex">
+      <span class="flex items-center">
         <slot name="bottom-left" />
         <FileUploader
+          class="flex items-center"
           :upload-args="{
             folder: 'Home/Helpdesk',
             private: true,
@@ -46,11 +48,14 @@
           @failure="() => toast.error('Error uploading file')"
         >
           <template #default="{ openFileSelector }">
-            <Button theme="gray" variant="ghost" @click="openFileSelector()">
-              <template #icon>
-                <LucidePaperclip class="size-4" />
-              </template>
-            </Button>
+            <Button
+              theme="gray"
+              variant="ghost"
+              @click="openFileSelector()"
+              size="xs"
+              icon="lucide-paperclip"
+              class="mr-2"
+            />
           </template>
         </FileUploader>
       </span>
@@ -97,6 +102,7 @@ interface P {
   placeholder: string;
   attachments: File[];
   expand?: boolean;
+  uploadFunction?: (file: any) => Promise<any>;
 }
 
 interface E {
@@ -110,7 +116,7 @@ withDefaults(defineProps<P>(), {
 });
 defineEmits<E>();
 const e = ref(null);
-const editor = computed(() => e.value.editor);
+const editor = computed(() => e.value?.editor);
 const authStore = useAuthStore();
 defineExpose({
   editor,

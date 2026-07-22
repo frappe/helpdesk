@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-ink-gray-9">
+        <div class="text-lg-medium text-ink-gray-9">
           {{ __(dashboardTitle) }}
         </div>
       </template>
@@ -335,9 +335,11 @@ const parseFilters = (filters: Filters) => {
   };
 };
 
+// No `cache` key here: a static cache key makes frappe-ui return the same
+// resource instance across navigations, still bound to the previous mount's
+// `filters` closure, so reloads after navigating back send stale params.
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "NumberCards"],
   makeParams: () => ({
     dashboard_type: "number_card",
     filters: parseFilters(filters),
@@ -346,7 +348,6 @@ const numberCards = createResource({
 
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "MasterCharts"],
   makeParams: () => ({
     dashboard_type: "master",
     filters: parseFilters(filters),
@@ -355,7 +356,6 @@ const masterData = createResource({
 
 const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
-  cache: ["Analytics", "TrendCharts"],
   makeParams: () => ({
     dashboard_type: "trend",
     filters: parseFilters(filters),
@@ -571,7 +571,7 @@ usePageMeta(() => {
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control button > div) {
   overflow: hidden;

@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-6">
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-ink-gray-8">
+        <span class="text-base-medium text-ink-gray-8">
           {{ __("Language") }}
         </span>
         <span class="text-p-sm text-ink-gray-6">
@@ -18,7 +18,7 @@
     </div>
     <div class="flex items-center justify-between gap-4">
       <div class="flex flex-col gap-1">
-        <span class="text-base font-medium text-ink-gray-8">
+        <span class="text-base-medium text-ink-gray-8">
           {{ __("Timezone") }}
         </span>
         <span class="text-p-sm text-ink-gray-6">

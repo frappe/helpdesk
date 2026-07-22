@@ -2,7 +2,7 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 pl-0 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="px-0.5 pl-0 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
@@ -11,13 +11,16 @@
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="text-lg font-medium text-nowrap truncate max-w-[200px] sm:max-w-none"
-          :label="currentView.label"
+          class="max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
+          :class="open && '!bg-surface-gray-3'"
         >
+          <span class="text-lg-medium text-nowrap truncate">{{
+            currentView.label
+          }}</span>
           <template #prefix>
             <component
               :is="currentView.icon"
-              class="h-4 flex items-center justify-center"
+              class="flex size-4 shrink-0 items-center justify-center"
             />
           </template>
           <template #suffix>
@@ -59,7 +62,7 @@
             name="check"
             class="size-4 text-ink-gray-7"
           />
-          <Dropdown align="end" :options="dropdownActions(item)">
+          <Dropdown side="right" align="start" :options="dropdownActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
@@ -124,20 +127,16 @@ const isCurrentView = (item) => {
   @apply sm:max-h-80 max-h-40 overflow-y-auto overscroll-contain;
   -webkit-mask-image: linear-gradient(
     to bottom,
-    black calc(100% - var(--fade-bottom)),
+    black calc(100%),
     transparent 100%
   );
-  mask-image: linear-gradient(
-    to bottom,
-    black calc(100% - var(--fade-bottom)),
-    transparent 100%
-  );
+  mask-image: linear-gradient(to bottom, black calc(100%), transparent 100%);
   animation: scroll-fade linear both;
   animation-timeline: scroll(self);
 }
 
 /* keep the group label pinned while its items scroll */
 [data-slot="group"]:has(.kebab-btn) [data-slot="group-label"] {
-  @apply sticky -top-[6px] z-10 bg-surface-modal;
+  @apply sticky -top-[6px] z-10 bg-surface-elevation-2;
 }
 </style>
