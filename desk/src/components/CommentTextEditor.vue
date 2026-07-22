@@ -25,11 +25,7 @@
           :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.stop="removeAttachment(a)"
-            />
+            <FeatherIcon class="h-3.5" name="x" @click="removeAttachment(a)" />
           </template>
         </AttachmentItem>
       </div>

@@ -11,7 +11,9 @@
           <component :is="icon" class="h-4 w-4" />
         </template>
         <template #suffix>
-          <slot name="suffix" />
+          <span @click.stop.prevent>
+            <slot name="suffix" />
+          </span>
         </template>
       </Button>
     </a>

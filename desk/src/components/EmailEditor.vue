@@ -139,7 +139,7 @@
               <FeatherIcon
                 class="h-3.5"
                 name="x"
-                @click.self.stop="removeAttachment(a)"
+                @click="removeAttachment(a)"
               />
             </template>
           </AttachmentItem>

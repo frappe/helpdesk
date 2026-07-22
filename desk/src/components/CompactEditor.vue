@@ -55,7 +55,7 @@
           <FeatherIcon
             class="h-3.5 cursor-pointer"
             name="x"
-            @click.self.stop="removeAttachment(attachment)"
+            @click="removeAttachment(attachment)"
           />
         </template>
       </AttachmentItem>
