@@ -89,6 +89,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [shiftKey, "T"], description: __("Change team") },
       { keys: ["A"], description: __("Assign ticket") },
       { keys: ["S"], description: __("Change status") },
+      { keys: ["G"], description: __("Add tags") },
       { keys: [metaIcon, "."], description: __("Copy ticket id") },
       { keys: [metaIcon, shiftKey, "."], description: __("Copy ticket URL") },
     ],
