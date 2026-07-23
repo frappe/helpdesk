@@ -37,16 +37,16 @@
                     :color="tagColorToken(lastTag)"
                   />
                 </Transition>
-                <Tooltip :text="`${__('Add tags')} (G)`">
+                <Tooltip :text="`${__('Add tag(s)')} (G)`">
                   <!-- h-6 matches Badge size=lg so the row height never changes
                  when the first chip appears (no layout shift) -->
                   <button
                     v-if="!localTags.length"
                     class="inline-flex h-6 items-center text-sm text-ink-gray-5 transition-[color,transform] duration-150 hover:text-ink-gray-7 active:scale-[0.96]"
                   >
-                    + {{ __("Add Tag") }}
+                    + {{ __("Add") }}
                   </button>
-                  <!-- with tags present, collapse to a ghost + icon -->
+                  <!-- with tags present, collapse to="" a ghost + icon -->
                   <button
                     v-else-if="!atCap"
                     class="inline-flex h-6 w-6 items-center justify-center rounded-full text-ink-gray-5 transition-[color,background-color,transform] duration-150 hover:bg-surface-gray-2 hover:text-ink-gray-7 active:scale-[0.96]"
