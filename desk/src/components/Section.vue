@@ -7,7 +7,7 @@
         :class="headerClass"
         @click="collapsible && toggle()"
       >
-        <Tooltip v-if="tooltip" :text="tooltip">
+        <Tooltip v-if="tooltip" :text="__(tooltip)">
           <span class="text-base-semibold text-ink-gray-8" :class="labelClass">
             {{ __(label) || "Untitled" }}
           </span>
