@@ -143,9 +143,22 @@ export function normalizeFilters(raw: any): FilterCondition[] {
           : ([c[0], c[1], c[2]] as FilterCondition)
       );
   }
-  return Object.entries(raw).map(([fieldname, value]): FilterCondition => {
-    if (Array.isArray(value)) return [fieldname, value[0], value[1]];
-    return [fieldname, "=", value];
+  return Object.entries(raw).flatMap(([fieldname, value]): FilterCondition[] => {
+    if (Array.isArray(value)) {
+      if (Array.isArray(value[0])) {
+        return value
+          .filter(
+            (condition) => Array.isArray(condition) && condition.length >= 2
+          )
+          .map((condition) => [
+            fieldname,
+            condition[0],
+            condition[1],
+          ]);
+      }
+      return [[fieldname, value[0], value[1]]];
+    }
+    return [[fieldname, "=", value]];
   });
 }
 
