@@ -1,5 +1,5 @@
 <template>
-  <div v-if="cards.length">
+  <div v-if="cards.length" class="space-y-0.5">
     <div
 <<<<<<< HEAD
       class="flex items-center ms-5 me-5 md:me-0 text-p-sm gap-3 text-[14px] mb-[13px]"
@@ -9,6 +9,7 @@
       class="group flex min-h-7 items-center gap-2 leading-5"
 >>>>>>> 865fdb4c (fix: reposition SLA layout)
     >
+<<<<<<< HEAD
       <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
         {{ __(card.title) }}
       </div>
@@ -24,6 +25,9 @@
           :hover-delay="0.25"
           :placement="'top'"
 =======
+=======
+      <FieldLabel :label="card.title" />
+>>>>>>> 274271f8 (fix: polish side panel)
       <!-- 9px = field controls' 8px padding + 1px transparent border -->
       <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
         <Badge
@@ -42,19 +46,19 @@
         />
 >>>>>>> 53284913 (fix: better SLA layout)
         <Popover
-          placement="bottom"
+          placement="bottom-end"
           :show="openCard === card.title"
           @update:show="(open: boolean) => (openCard = open ? card.title : null)"
         >
           <template #target>
             <LucideInfo
-              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-6 opacity-0 transition-opacity group-hover:opacity-100"
+              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-6"
               @mouseenter="openCard = card.title"
               @mouseleave="openCard = null"
             />
           </template>
           <template #body-main>
-            <div class="flex min-w-[170px] flex-col gap-1.5 p-3 text-sm">
+            <div class="flex min-w-[170px] flex-col gap-2 p-3 text-sm">
               <div
                 v-for="row in cardDetails(card)"
                 :key="row.label"
@@ -77,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+import FieldLabel from "@/components/FieldLabel.vue";
 import { useSLA, type SLAMetric } from "@/composables/useSLA";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";

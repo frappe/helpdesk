@@ -64,6 +64,7 @@
               <span v-else class="text-ink-gray-5 leading-5">{{
                 __("No one")
               }}</span>
+<<<<<<< HEAD
               <!-- <span
 >>>>>>> 53284913 (fix: better SLA layout)
                 v-if="!popoverIsOpen"
@@ -72,6 +73,8 @@
               >
                 {{ __("Assign yourself") }}
               </span>
+=======
+>>>>>>> 274271f8 (fix: polish side panel)
             </template>
           </div>
           <template #suffix>
@@ -539,33 +542,6 @@ async function logActivity(action: string) {
       action,
     },
   });
-}
-
-async function assignSelf() {
-  if (!currentAgentName) return;
-
-  if (localAssignees.value.some((a) => a.name === currentAgentName)) return;
-
-  const self = currentUser.value;
-  localAssignees.value.push({
-    name: currentAgentName,
-    image: self.user_image || "",
-    label: self.full_name,
-  });
-
-  try {
-    await addAssigneesResource.submit([currentAgentName]);
-    await logActivity(`assigned ${currentAgentName}`);
-    capture("ticket_assigned", { doctype: "HD Ticket" });
-    toast.success(__("Assignee's updated successfully."));
-    assignees.value.reload();
-    activities.value.reload();
-  } catch {
-    toast.error(__("Failed to update Assignee's."));
-    localAssignees.value = localAssignees.value.filter(
-      (a) => a.name !== currentAgentName
-    );
-  }
 }
 
 // triggered when the popover is closed

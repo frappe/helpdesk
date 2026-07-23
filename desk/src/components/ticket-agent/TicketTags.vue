@@ -48,7 +48,7 @@
                   </button>
                   <!-- with tags present, collapse to a ghost + icon -->
                   <button
-                    v-else
+                    v-else-if="localTags.length < MAX_TAGS"
                     class="inline-flex h-6 w-6 items-center justify-center rounded-full text-ink-gray-5 transition-[color,background-color,transform] duration-150 hover:bg-surface-gray-2 hover:text-ink-gray-7 active:scale-[0.96]"
                   >
                     <LucidePlus class="size-3.5" />
@@ -133,6 +133,10 @@ import TagChip from "./TagChip.vue";
 // sentinel option value: picking it starts label creation instead of a toggle
 const CREATE_VALUE = "__create__";
 
+// at the cap, unchecked rows disable and the create row/+ button hide;
+// removal stays possible so the cap can always be resolved
+const MAX_TAGS = 5;
+
 // The HD Ticket Status palette (Gray first as the default pick); names are
 // stored on the Tag doc (Select field), dots use the matching frappe-ui
 // -500 tokens (theme-aware, so they flip correctly in dark mode)
@@ -205,7 +209,14 @@ const existingTagOptions = computed(() => {
         Number(applied.has(b.name)) - Number(applied.has(a.name)) ||
         a.name.localeCompare(b.name)
     )
-    .map((tag) => ({ label: tag.name, value: tag.name, color: tag.color }));
+    .map((tag) => ({
+      label: tag.name,
+      value: tag.name,
+      color: tag.color,
+      disabled:
+        localTags.value.length >= MAX_TAGS &&
+        !localTags.value.includes(tag.name),
+    }));
 });
 
 // The create row is a real option so keyboard navigation reaches it; its
@@ -256,6 +267,7 @@ function tagColorToken(tag: string) {
 
 // the create row only appears while the query names a tag that doesn't exist
 const showCreateOption = computed(() => {
+  if (localTags.value.length >= MAX_TAGS) return false;
   const text = queryText.value.trim().toLowerCase();
   if (!text) return false;
   return ![
