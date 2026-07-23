@@ -42,9 +42,9 @@
                  when the first chip appears (no layout shift) -->
                   <button
                     v-if="!localTags.length"
-                    class="inline-flex h-6 items-center rounded-full border border-dashed border-outline-gray-2 px-2 text-sm text-ink-gray-5 transition-[color,border-color,transform] duration-150 hover:border-outline-gray-3 hover:text-ink-gray-7 active:scale-[0.96]"
+                    class="inline-flex h-6 items-center text-sm text-ink-gray-5 transition-[color,transform] duration-150 hover:text-ink-gray-7 active:scale-[0.96]"
                   >
-                    + {{ __("Add") }}
+                    + {{ __("Add Tag") }}
                   </button>
                   <!-- with tags present, collapse to a ghost + icon -->
                   <button
@@ -67,7 +67,7 @@
             <span class="text-p-sm">
               {{
                 atCap
-                  ? __("Tag limit reached")
+                  ? __("No matching tags")
                   : __("No tags yet, type to create one")
               }}
             </span>
@@ -77,13 +77,12 @@
                can't reach it -->
           <template #footer>
             <span class="ticket-tags-marker hidden" aria-hidden="true" />
-            <!-- doubles as the at-cap marker for the style overrides -->
-            <p
+            <!-- at-cap marker for the style overrides (inert unchecked rows) -->
+            <span
               v-if="atCap"
-              class="ticket-tags-cap px-2 pb-1.5 pt-0.5 text-sm text-ink-gray-5"
-            >
-              {{ `${__("Tag limit reached")} (${MAX_TAGS})` }}
-            </p>
+              class="ticket-tags-cap hidden"
+              aria-hidden="true"
+            />
           </template>
         </MultiSelect>
       </div>
