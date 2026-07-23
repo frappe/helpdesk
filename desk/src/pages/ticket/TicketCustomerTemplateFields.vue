@@ -120,6 +120,9 @@ const customFields = computed(() => {
     .filter((field: Field) => !field.hide_from_customer)
     .filter(
       (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
+    )
+    .filter((field: Field) =>
+      evaluateDependsOnValue(field.depends_on, ticket.data)
     );
   return _custom_fields;
 });

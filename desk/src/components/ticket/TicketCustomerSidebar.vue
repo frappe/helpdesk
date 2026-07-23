@@ -245,7 +245,8 @@ const ticketAdditionalInfo = computed(() => {
     .filter(
       (field: Field) =>
         !field.hide_from_customer &&
-        ["subject", "team", "priority"].indexOf(field.fieldname) === -1
+        ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
+        evaluateDependsOnValue(field.depends_on, ticket.data)
     )
     .map((field: Field) => {
       const option = {
