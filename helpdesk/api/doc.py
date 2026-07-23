@@ -643,7 +643,15 @@ def apply_datetime_filter(query, field, filter_value):
         query = query.where(field <= value)
     elif operator == "between":
         if isinstance(value, list) and len(value) == 2:
-            query = query.where(field >= value[0]).where(field <= value[1])
+            from frappe.utils import get_datetime
+
+            # convert to datetime to include the full start and end day, matching
+            # the timespan branch below; otherwise a date-only upper bound like
+            # "2026-07-02" is treated as 2026-07-02 00:00:00 and drops everything
+            # on the end day (and returns nothing when start and end are equal).
+            start_dt = get_datetime(str(value[0])).replace(hour=0, minute=0, second=0)
+            end_dt = get_datetime(str(value[1])).replace(hour=23, minute=59, second=59)
+            query = query.where(field >= start_dt).where(field <= end_dt)
     elif operator == "timespan":
         from frappe.utils import get_datetime, get_timespan_date_range
 
