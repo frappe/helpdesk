@@ -44,7 +44,7 @@
                sit 2px higher and the gap to the Assignee row reads tighter
                than the field-to-field gap. Nudge the row down to even it. -->
           <div class="flex items-center gap-2 pt-1 leading-5">
-            <FieldLabel label="Labels" class="pt-0.5" />
+            <FieldLabel label="Tags" class="pt-0.5" />
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
             <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
