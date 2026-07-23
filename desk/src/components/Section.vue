@@ -10,15 +10,11 @@
         @click="collapsible && toggle()"
       >
         <Tooltip v-if="tooltip" :text="__(tooltip)">
-          <span class="text-base-semibold text-ink-gray-8" :class="labelClass">
+          <span class="text-base text-ink-gray-9" :class="labelClass">
             {{ __(label) || "Untitled" }}
           </span>
         </Tooltip>
-        <span
-          v-else
-          class="text-base-semibold text-ink-gray-8"
-          :class="labelClass"
-        >
+        <span v-else class="text-base text-ink-gray-9" :class="labelClass">
           {{ __(label) || "Untitled" }}
         </span>
         <LucideChevronRight

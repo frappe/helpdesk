@@ -3,7 +3,7 @@
     <!-- Contact header + SLA, pinned above the scrollable sections. Uniform
          padding on the wrapper; the gap between them comes from space-y, not
          per-element bottom padding. -->
-    <div class="shrink-0 space-y-3 p-4">
+    <div class="shrink-0 space-y-4 p-4">
       <TicketContact />
       <TicketSLA />
     </div>
@@ -12,10 +12,16 @@
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
       <!-- Key Info (core fields) -->
       <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
-        <!-- pt-0.5: the first field's value wrapper overhangs 2px upward (its
-             -m-0.5 gives the focus ring room). Without this, that overhang sits
-             behind the sticky z-10 header and the ring's top edge is clipped. -->
         <div class="space-y-2.5 pb-4 pt-0.5">
+          <!-- Assignee -->
+          <div class="flex items-center gap-2 leading-5">
+            <FieldLabel label="Assignee" />
+            <div
+              class="-m-0.5 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-0.5"
+            >
+              <AssignTo hide-label ghost />
+            </div>
+          </div>
           <!-- Core fields -->
           <template v-for="field in coreFields">
             <TicketField
@@ -30,20 +36,12 @@
               "
             />
           </template>
-          <!-- Assignee -->
-          <div class="flex items-center gap-2 leading-5">
-            <FieldLabel label="Assignee" />
-            <div
-              class="-m-0.5 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-0.5"
-            >
-              <AssignTo hide-label ghost />
-            </div>
-          </div>
+
           <!-- Tags -->
           <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
                sit 2px higher and the gap to the Assignee row reads tighter
                than the field-to-field gap. Nudge the row down to even it. -->
-          <div class="flex items-center gap-2 pt-1 leading-5">
+          <div class="flex items-start gap-2 pt-1 leading-5">
             <FieldLabel label="Tags" class="pt-0.5" />
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
@@ -60,9 +58,6 @@
           :label="__('More Details')"
           v-model:opened="openedSections.ticketInfo"
         >
-          <!-- pt-0.5: the first field's value wrapper overhangs 2px upward (its
-             -m-0.5 gives the focus ring room). Without this, that overhang sits
-             behind the sticky z-10 header and the ring's top edge is clipped. -->
           <div class="space-y-2.5 pb-4 pt-0.5">
             <template v-for="field in customFields">
               <TicketField

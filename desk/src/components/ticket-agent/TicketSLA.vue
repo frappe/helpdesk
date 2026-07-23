@@ -3,18 +3,18 @@
     <div
       v-for="card in cards"
       :key="card.title"
-      class="group flex min-h-7 items-center gap-2 leading-5"
+      class="flex min-h-7 items-center gap-2 leading-5"
     >
       <FieldLabel :label="card.title" />
-      <!-- 9px = field controls' 8px padding + 1px transparent border -->
+      <!-- 9px = field controls' 8px padding + 1px transparent border, so the
+           value lines up with the other sidebar field values -->
       <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
-        <Badge
-          variant="ghost"
-          size="sm"
-          :theme="badgeTheme[card.metric.color]"
-          class="min-w-0 !px-0 !text-base"
-          :label="cardValue(card)"
-        />
+        <span
+          class="min-w-0 truncate text-base"
+          :class="inkClass[card.metric.color]"
+        >
+          {{ cardValue(card) }}
+        </span>
         <Popover
           placement="bottom"
           :show="openCard === card.title"
@@ -22,13 +22,13 @@
         >
           <template #target>
             <LucideInfo
-              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-6"
+              class="size-3.5 shrink-0 cursor-pointer text-ink-gray-5"
               @mouseenter="openCard = card.title"
               @mouseleave="openCard = null"
             />
           </template>
           <template #body-main>
-            <div class="flex min-w-[170px] flex-col gap-3 p-4 text-sm">
+            <div class="flex min-w-[170px] flex-col gap-4 p-4 text-sm">
               <div
                 v-for="row in cardDetails(card)"
                 :key="row.label"
@@ -36,7 +36,7 @@
               >
                 <span class="text-ink-gray-5">{{ __(row.label) }}</span>
                 <span
-                  class="font-medium tabular-nums"
+                  class="tabular-nums"
                   :class="row.danger ? 'text-ink-red-6' : 'text-ink-gray-8'"
                 >
                   {{ row.value }}
@@ -56,7 +56,7 @@ import { useSLA, type SLAMetric } from "@/composables/useSLA";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { dateFormat } from "@/utils";
-import { Badge, Popover } from "frappe-ui";
+import { Popover } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import LucideInfo from "~icons/lucide/info";
 
@@ -72,13 +72,14 @@ const { firstResponse, resolution } = useSLA(ticket);
 
 const openCard = ref<string | null>(null);
 
-// Badge has no "purple" theme; its violet theme carries the purple ink tokens
-const badgeTheme: Record<SLAMetric["color"], string> = {
-  orange: "orange",
-  green: "green",
-  red: "red",
-  blue: "blue",
-  purple: "violet",
+// Value ink per SLA state colour; -8 is the readable dark step across hues
+// (violet-8 matches the Figma value token exactly). Purple maps to violet.
+const inkClass: Record<SLAMetric["color"], string> = {
+  orange: "text-ink-amber-8",
+  green: "text-ink-green-8",
+  red: "text-ink-red-8",
+  blue: "text-ink-blue-8",
+  purple: "text-ink-violet-8",
 };
 
 const cards = computed<SLACard[]>(() =>
