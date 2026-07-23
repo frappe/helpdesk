@@ -1,11 +1,6 @@
 <template>
   <div class="flex gap-2 leading-5 items-center">
-    <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
-      <Tooltip :text="__(field.label)">
-        <span>{{ __(field.label) }}</span>
-      </Tooltip>
-      <span v-if="field.required" class="text-ink-red-6"> * </span>
-    </div>
+    <FieldLabel :label="field.label" :required="field.required" />
     <div
       class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
     >
@@ -26,20 +21,19 @@
 
 <script setup lang="ts">
 import { Autocomplete } from "@/components";
+import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
-import { APIOptions, Field, FieldValue, TicketContactSymbol } from "@/types";
+import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
 import {
-  Avatar,
   createResource,
   DatePicker,
   DateTimePicker,
   dayjs,
   FormControl,
-  Tooltip,
 } from "frappe-ui";
-import { computed, h, inject } from "vue";
+import { computed, h } from "vue";
 
 interface P {
   field: Field;
@@ -57,9 +51,6 @@ interface E {
 
 const props = defineProps<P>();
 const emit = defineEmits<E>();
-
-// only provided on the agent ticket page; the new-ticket form has no contact
-const ticketContact = inject(TicketContactSymbol, null);
 
 const apiOptions = createResource({
   url: props.field.url_method,
@@ -105,20 +96,6 @@ const component = computed(() => {
             ? h(TicketPriority, {
                 priority: String(props.value),
                 iconOnly: true,
-              })
-            : null,
-      });
-    }
-    // The control's #prefix shows the selected customer's avatar (image from
-    // the ticket contact payload); dropdown rows stay plain on purpose
-    if (props.field.options === "HD Customer") {
-      return h(Link, linkProps, {
-        prefix: () =>
-          props.value
-            ? h(Avatar, {
-                image: ticketContact?.value?.data?.customer_image,
-                label: String(props.value),
-                size: "sm",
               })
             : null,
       });

@@ -587,8 +587,6 @@ export interface TicketContact {
   phone: string;
   mobile_no: string;
   image: string;
-  // image of the ticket's HD Customer, for the Customer field's avatar
-  customer_image: string;
 }
 
 // A ticket assignee enriched with their agent status by get_ticket_assignees.

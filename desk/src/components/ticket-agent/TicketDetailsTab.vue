@@ -12,20 +12,6 @@
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
       <!-- Key Info (core fields) -->
       <Section label="Key Info" v-model:opened="openedSections.keyInfo">
-        <template #header="{ opened, toggle }">
-          <div
-            class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
-            @click="toggle"
-          >
-            <span class="text-base-semibold text-ink-gray-8">
-              {{ __("Key Info") }}
-            </span>
-            <LucideChevronRight
-              class="size-3.5 text-ink-gray-6 transition-transform"
-              :class="{ 'rotate-90': opened }"
-            />
-          </div>
-        </template>
         <div class="mt-0.5 space-y-2.5 px-4 pb-4">
           <!-- Core fields -->
           <template v-for="field in coreFields">
@@ -43,9 +29,7 @@
           </template>
           <!-- Assignee -->
           <div class="flex items-center gap-2 leading-5">
-            <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
-              {{ __("Assignee") }}
-            </div>
+            <FieldLabel label="Assignee" />
             <div
               class="-m-0.5 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-0.5"
             >
@@ -53,12 +37,11 @@
             </div>
           </div>
           <!-- Tags -->
-          <div class="flex items-start gap-2 leading-5">
-            <div
-              class="w-[106px] shrink-0 truncate pt-1 text-sm text-ink-gray-5"
-            >
-              {{ __("Labels") }}
-            </div>
+          <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
+               sit 2px higher and the gap to the Assignee row reads tighter
+               than the field-to-field gap. Nudge the row down to even it. -->
+          <div class="flex items-center gap-2 pt-1 leading-5">
+            <FieldLabel label="Labels" class="pt-0.5" />
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
             <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
@@ -71,20 +54,6 @@
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
         <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
-          <template #header="{ opened, toggle }">
-            <div
-              class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
-              @click="toggle"
-            >
-              <span class="text-base-semibold text-ink-gray-8">
-                {{ __("Ticket Info") }}
-              </span>
-              <LucideChevronRight
-                class="size-3.5 text-ink-gray-6 transition-transform"
-                :class="{ 'rotate-90': opened }"
-              />
-            </div>
-          </template>
           <div class="mt-0.5 space-y-2.5 px-4 pb-4">
             <template v-for="field in customFields">
               <TicketField
@@ -106,25 +75,10 @@
         <div v-for="section in sections" :key="section.label">
           <Section
             :label="section.label"
+            :tooltip="section.tooltipMessage"
             :hideLabel="section.hideLabel"
             v-model:opened="openedSections[section.key]"
           >
-            <template #header="{ opened, toggle }">
-              <div
-                class="sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
-                @click="toggle"
-              >
-                <Tooltip :text="section.tooltipMessage">
-                  <span class="text-base-semibold text-ink-gray-8">
-                    {{ __(section.label) }}
-                  </span>
-                </Tooltip>
-                <LucideChevronRight
-                  class="size-3.5 text-ink-gray-6 transition-transform"
-                  :class="{ 'rotate-90': opened }"
-                />
-              </div>
-            </template>
             <ul class="divide-y divide-outline-gray-1 px-4 pb-4 pt-0">
               <li
                 v-for="t in section.tickets"
@@ -171,13 +125,12 @@ import {
   CustomizationSymbol,
   FieldValue,
   RecentSimilarTicketsSymbol,
-  TicketContactSymbol,
   TicketSymbol,
 } from "@/types";
 import { useStorage } from "@vueuse/core";
-import { dayjs, Tooltip } from "frappe-ui";
+import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
-import LucideChevronRight from "~icons/lucide/chevron-right";
+import FieldLabel from "../FieldLabel.vue";
 import Section from "../Section.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
@@ -187,7 +140,6 @@ import TicketTags from "./TicketTags.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
-const contact = inject(TicketContactSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
@@ -340,10 +292,6 @@ function handleFieldUpdate(
         // TODO: emit the event for notification to listeners
         if (fieldname === "agent_group") {
           assignees.value.reload();
-        }
-        // the contact payload carries customer_image for the Customer avatar
-        if (fieldname === "customer") {
-          contact.value.reload();
         }
         activities.value.reload();
       },
