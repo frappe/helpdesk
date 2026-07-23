@@ -67,6 +67,7 @@ import { dayjs } from "frappe-ui";
 import { Field } from "@/types";
 import { computed, inject } from "vue";
 import { ITicket } from "./symbols";
+import { evaluateDependsOnValue } from "@/composables/formCustomisation";
 
 const ticket = inject(ITicket);
 

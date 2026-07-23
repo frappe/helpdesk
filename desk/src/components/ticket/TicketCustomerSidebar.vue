@@ -118,6 +118,7 @@
 </template>
 
 <script setup lang="ts">
+import { evaluateDependsOnValue } from "@/composables/formCustomisation";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
