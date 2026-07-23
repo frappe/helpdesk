@@ -80,7 +80,7 @@
                     </div>
                   </div>
                   <div
-                    class="mt-1 flex items-center justify-between border-t border-outline-gray-1 px-1 py-1.5"
+                    class="flex items-center justify-between border-t border-outline-gray-1 px-1 py-1.5"
                   >
                     <Button
                       variant="ghost"
