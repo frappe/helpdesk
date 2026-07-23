@@ -16,7 +16,7 @@
           :label="cardValue(card)"
         />
         <Popover
-          placement="bottom-end"
+          placement="bottom"
           :show="openCard === card.title"
           @update:show="(open: boolean) => (openCard = open ? card.title : null)"
         >
