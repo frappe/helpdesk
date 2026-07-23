@@ -11,12 +11,12 @@
     <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
       <!-- Key Info (core fields) -->
-      <Section label="Key Info" v-model:opened="openedSections.keyInfo">
+      <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
         <div class="mt-0.5 space-y-2.5 px-4 pb-4">
           <!-- Core fields -->
           <template v-for="field in coreFields">
             <TicketField
-              v-if="field.visible"
+              v-if="field?.visible"
               :key="field.fieldname"
               :ref="(el) => setFieldRef(field.fieldname, el)"
               :field="field"
@@ -53,7 +53,10 @@
 
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
-        <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
+        <Section
+          :label="__('More Details')"
+          v-model:opened="openedSections.ticketInfo"
+        >
           <div class="mt-0.5 space-y-2.5 px-4 pb-4">
             <template v-for="field in customFields">
               <TicketField
