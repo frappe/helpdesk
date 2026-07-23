@@ -42,7 +42,7 @@
                  when the first chip appears (no layout shift) -->
                   <button
                     v-if="!localTags.length"
-                    class="inline-flex h-6 items-center text-sm text-ink-gray-5 transition-[color,transform] duration-150 hover:text-ink-gray-7 active:scale-[0.96]"
+                    class="inline-flex h-6 items-center text-base text-ink-gray-6 transition-[color,transform] duration-150 hover:text-ink-gray-8 active:scale-[0.96]"
                   >
                     + {{ __("Add") }}
                   </button>
@@ -83,6 +83,14 @@
               class="ticket-tags-cap hidden"
               aria-hidden="true"
             />
+            <p
+              v-if="atCap"
+              class="border-t border-outline-gray-1 px-3 py-2 text-p-sm text-ink-gray-5"
+            >
+              {{
+                __("Max {0} tags. Remove one to add more.", String(MAX_TAGS))
+              }}
+            </p>
           </template>
         </MultiSelect>
       </div>

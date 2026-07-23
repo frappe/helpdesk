@@ -1,5 +1,5 @@
 <template>
-  <div class="w-[106px] shrink-0 truncate text-sm text-ink-gray-5">
+  <div class="w-[106px] shrink-0 truncate text-base text-ink-gray-5">
     <Tooltip :text="__(label)">
       <span>{{ __(label) }}</span>
     </Tooltip>

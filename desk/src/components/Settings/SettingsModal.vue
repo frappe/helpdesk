@@ -30,7 +30,7 @@
               </Tooltip>
             </div>
 
-            <nav class="space-y-[3px] px-1">
+            <nav class="space-y-[3px] pr-1">
               <button
                 v-for="item in tab.items"
                 :key="item.label"
@@ -92,7 +92,7 @@
 </template>
 <script setup lang="ts">
 import { Dialog, Tooltip } from "frappe-ui";
-import { ModelRef, ref, watch } from "vue";
+import { ModelRef, ref } from "vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   activeTab,
