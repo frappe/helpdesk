@@ -97,7 +97,9 @@
                 <div
                   class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
                 >
-                  <p class="font-base mb-2 truncate text-sm text-ink-gray-9">
+                  <p
+                    class="font-base mb-2 truncate text-sm text-ink-gray-9 max-w-[70%]"
+                  >
                     {{ t.subject }}
                   </p>
                   <div class="flex items-center justify-between gap-2">
@@ -128,6 +130,7 @@ import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation.ts";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
@@ -227,8 +230,8 @@ const sections = computed(() => {
   if (recentTickets.length) {
     _sections.push({
       key: "recentTickets" as const,
-      label: "Recent Tickets",
-      tooltipMessage: "Tickets recently raised by this contact/customer",
+      label: __("Recent Tickets"),
+      tooltipMessage: __("Tickets recently raised by this contact/customer"),
       hideLabel: false,
       tickets: recentTickets,
     });
@@ -236,8 +239,8 @@ const sections = computed(() => {
   if (similarTickets.length) {
     _sections.push({
       key: "similarTickets" as const,
-      label: "Similar Tickets",
-      tooltipMessage: "Tickets with similar queries",
+      label: __("Similar Tickets"),
+      tooltipMessage: __("Tickets with similar queries"),
       hideLabel: false,
       tickets: similarTickets,
     });
