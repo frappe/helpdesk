@@ -48,8 +48,4 @@ helpdesk.patches.add_user_invitation_perms
 helpdesk.patches.enable_auto_set_customer_from_contact
 helpdesk.patches.show_customer_portal_permission_notice
 helpdesk.patches.set_persona_captured_for_existing_sites
-<<<<<<< HEAD
-=======
-helpdesk.patches.backfill_priority_level
 helpdesk.patches.set_default_portal_settings
->>>>>>> fbeeb0a5 (fix: set default portal settings for existing sites)
