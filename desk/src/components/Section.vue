@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <!-- px-4 lives once here so the header and content share a single horizontal
+       padding instead of each declaring their own. -->
+  <div class="px-4">
     <slot name="header" v-bind="{ opened, hide, open, close, toggle }">
       <div
         v-if="!hide"
-        class="section-header sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base px-4 py-3.5"
+        class="section-header sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base py-3.5"
         :class="headerClass"
         @click="collapsible && toggle()"
       >

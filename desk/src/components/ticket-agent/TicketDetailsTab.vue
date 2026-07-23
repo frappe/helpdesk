@@ -1,18 +1,18 @@
 <template>
   <div class="flex h-full flex-col">
-    <!-- Contact header -->
-    <div class="shrink-0 p-4 pb-3">
+    <!-- Contact header + SLA, pinned above the scrollable sections. Uniform
+         padding on the wrapper; the gap between them comes from space-y, not
+         per-element bottom padding. -->
+    <div class="shrink-0 space-y-3 p-4">
       <TicketContact />
+      <TicketSLA />
     </div>
-
-    <!-- SLA card, pinned with the contact header -->
-    <TicketSLA class="shrink-0 px-4 pb-3.5" />
 
     <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
       <!-- Key Info (core fields) -->
       <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
-        <div class="mt-0.5 space-y-2.5 px-4 pb-4">
+        <div class="space-y-2.5 pb-4">
           <!-- Core fields -->
           <template v-for="field in coreFields">
             <TicketField
@@ -57,7 +57,7 @@
           :label="__('More Details')"
           v-model:opened="openedSections.ticketInfo"
         >
-          <div class="mt-0.5 space-y-2.5 px-4 pb-4">
+          <div class="space-y-2.5 pb-4">
             <template v-for="field in customFields">
               <TicketField
                 v-if="field.visible"
@@ -82,7 +82,7 @@
             :hideLabel="section.hideLabel"
             v-model:opened="openedSections[section.key]"
           >
-            <ul class="divide-y divide-outline-gray-1 px-4 pb-4 pt-0">
+            <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
               <li
                 v-for="t in section.tickets"
                 :key="t.name"

@@ -46,7 +46,7 @@
         />
 >>>>>>> 53284913 (fix: better SLA layout)
         <Popover
-          placement="bottom-end"
+          placement="bottom"
           :show="openCard === card.title"
           @update:show="(open: boolean) => (openCard = open ? card.title : null)"
         >
