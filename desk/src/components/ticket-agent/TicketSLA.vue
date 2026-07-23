@@ -28,7 +28,7 @@
             />
           </template>
           <template #body-main>
-            <div class="flex min-w-[170px] flex-col gap-2 p-3 text-sm">
+            <div class="flex min-w-[170px] flex-col gap-3 p-4 text-sm">
               <div
                 v-for="row in cardDetails(card)"
                 :key="row.label"
@@ -118,10 +118,12 @@ function cardDetails(card: SLACard) {
     });
   }
   if (metric.actual) {
+    // The timestamp is neutral fact; only the Delay rows carry the failure
+    // signal, so the responded/resolved date stays in the default ink.
     rows.push({
       label: card.actualLabel,
       value: fmt(metric.actual),
-      danger: metric.state === "failed",
+      danger: false,
     });
   }
   if (metric.delay) {
@@ -149,6 +151,8 @@ function cardDetails(card: SLACard) {
 }
 
 function fmt(date: string): string {
-  return dateFormat(date, "MMM D, h:mm A");
+  // Year included: SLA breaches span months/years, so a bare "MMM D" makes the
+  // due/actual dates read as contradictory (e.g. resolved "before" the due date).
+  return dateFormat(date, "MMM D, YYYY, h:mm A");
 }
 </script>
