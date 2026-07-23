@@ -99,6 +99,7 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+        "../../../../sites/common_site_config.json": path.resolve(__dirname, "common_site_config.json"),
         // ...localFrappeUIAliases,
       },
       // frappe-ui is served from source (excluded from optimizeDeps) and the

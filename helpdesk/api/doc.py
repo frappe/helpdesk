@@ -46,6 +46,22 @@ def get_list_data(
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
 
+    if doctype == "HD Ticket":
+        search_query = None
+        for f in list(filters):
+            if isinstance(f, list) and len(f) >= 3 and f[0] == "_search":
+                search_query = f[2]
+                filters.remove(f)
+                break
+        if search_query:
+            matching_tickets = frappe.db.sql_list(
+                "SELECT name FROM `tabHD Ticket` WHERE name LIKE %s OR subject LIKE %s",
+                (f"%{search_query}%", f"%{search_query}%")
+            )
+            if not matching_tickets:
+                matching_tickets = [""]
+            _merge_name_filter(filters, matching_tickets)
+
     _list = get_controller(doctype)
     default_rows = []
     if hasattr(_list, "default_list_data"):

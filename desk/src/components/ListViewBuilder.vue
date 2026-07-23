@@ -7,8 +7,8 @@
     ]"
     v-if="showViewControls"
   >
-    <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
+    <QuickFilters v-if="!isMobileView && !options.hideQuickFilters" />
+    <div v-if="!isMobileView && !options.hideQuickFilters" class="-ms-2 h-5 border-s"></div>
     <div
       class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
       v-if="!isMobileView"
@@ -187,6 +187,7 @@ interface P {
       description?: string;
     };
     hideViewControls?: boolean;
+    hideQuickFilters?: boolean;
     hideColumnSetting?: boolean;
     selectable?: boolean;
     view?: ViewType;
@@ -214,6 +215,7 @@ const listSelections = ref(new Set());
 const defaultOptions = reactive({
   doctype: "",
   hideViewControls: false,
+  hideQuickFilters: false,
   selectable: false,
   view: {
     view_type: "list",
@@ -390,6 +392,7 @@ const exposeFunctions = {
   list,
   reload,
   unselectAll: () => {},
+  applyFilters,
 };
 
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {

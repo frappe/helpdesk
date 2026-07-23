@@ -1,12 +1,18 @@
-#!bin/bash
+#!/bin/bash
+set -e
+
+# Avoid git ownership issues in the container on Windows
+git config --global --add safe.directory '*'
 
 if [ -d "/home/frappe/frappe-bench/apps/frappe" ]; then
     echo "Bench already exists, skipping init"
-    cd frappe-bench
+    cd /home/frappe/frappe-bench
     bench start
-else
-    echo "Creating new bench..."
+    exit 0
 fi
+
+echo "Creating new bench..."
+yarn config set network-timeout 600000
 
 bench init --skip-redis-config-generation frappe-bench --version version-15
 
@@ -23,7 +29,7 @@ sed -i '/redis/d' ./Procfile
 sed -i '/watch/d' ./Procfile
 
 bench get-app telephony
-bench get-app helpdesk --branch main
+bench get-app /workspace/helpdesk_src
 
 bench new-site helpdesk.localhost \
 --force \

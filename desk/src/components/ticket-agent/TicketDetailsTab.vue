@@ -38,11 +38,34 @@
       </div>
     </div>
 
-    <!-- Scrollable sections: Ticket Info + Recent / Similar Tickets -->
+    <!-- Scrollable sections: Ticket Info + Recent / Similar Tickets + SLA Monitor -->
     <div
       class="border-t flex-1 min-h-0 overflow-y-auto divide-y-[1px]"
-      v-if="Boolean(customFields.length) || showRecentSimilarTickets"
+      v-if="Boolean(customFields.length) || showRecentSimilarTickets || hasSla"
     >
+      <!-- SLA Monitor -->
+      <div v-if="hasSla">
+        <Section label="SLA Monitor" v-model:opened="openedSections.slaMonitor">
+          <template #header="{ opened, toggle }">
+            <div
+              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
+              @click="toggle"
+            >
+              <span class="text-ink-gray-8 text-base-semibold select-none">
+                {{ __("SLA Monitor") }}
+              </span>
+              <LucideChevronRight
+                class="size-4 text-ink-gray-6"
+                :class="{ 'rotate-90': opened }"
+              />
+            </div>
+          </template>
+          <div class="px-4 pb-4">
+            <SlaMonitor :ticket="ticket.doc" />
+          </div>
+        </Section>
+      </div>
+
       <!-- Ticket Info (custom fields) -->
       <div v-if="Boolean(customFields.length)">
         <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
@@ -160,6 +183,7 @@ import Section from "../Section.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
+import SlaMonitor from "./SlaMonitor.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -239,10 +263,15 @@ const openedSections = useStorage(
     ticketInfo: false,
     recentTickets: false,
     similarTickets: false,
+    slaMonitor: true,
   },
   localStorage,
   { mergeDefaults: true }
 );
+
+const hasSla = computed(() => {
+  return ticket.value?.doc && (ticket.value.doc.response_by || ticket.value.doc.resolution_by);
+});
 
 const sections = computed(() => {
   if (recentSimilarTickets.value.loading || !recentSimilarTickets.value.data) {
