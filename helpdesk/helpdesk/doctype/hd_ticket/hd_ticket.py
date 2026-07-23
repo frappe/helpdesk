@@ -1244,10 +1244,12 @@ class HDTicket(Document):
             comment.extract()
 
         for tag in soup.find_all(["img", "video"]):
-            if tag.name == "img":
-                tag["embed"] = tag.get("src")
-            elif tag.name == "video":
-                tag["embed"] = tag.get("src")
+            src = tag.get("src")
+            # only site files can be embedded; external URLs must keep their src
+            if not src or not src.startswith(("/private/files/", "/files/")):
+                continue
+            tag["embed"] = src
+            del tag["src"]
 
         return str(soup)
 
