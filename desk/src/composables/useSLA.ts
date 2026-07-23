@@ -75,11 +75,16 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (!d.response_by) return null;
 
     if (dayjs().isBefore(dayjs(d.response_by))) {
-      return metric("due", `Due in ${shortDuration(d.response_by)}`, "orange", {
-        dueBy: d.response_by,
-      });
+      return metric(
+        "due",
+        `Due in ${coarseDuration(d.response_by)}`,
+        "orange",
+        {
+          dueBy: d.response_by,
+        }
+      );
     }
-    const overdue = shortDuration(String(new Date()), d.response_by);
+    const overdue = coarseDuration(d.response_by);
     return metric("overdue", `Overdue by ${overdue}`, "red", {
       dueBy: d.response_by,
       delay: `+${overdue}`,
@@ -93,8 +98,13 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     const d = doc.value;
 
     const pausedBeforeBreach =
-      !d.resolution_by || dayjs(d.resolution_by).isAfter(dayjs(d.on_hold_since));
-    if (d.status_category === "Paused" && d.on_hold_since && pausedBeforeBreach) {
+      !d.resolution_by ||
+      dayjs(d.resolution_by).isAfter(dayjs(d.on_hold_since));
+    if (
+      d.status_category === "Paused" &&
+      d.on_hold_since &&
+      pausedBeforeBreach
+    ) {
       return metric("hold", "On Hold", "blue", { dueBy: d.resolution_by });
     }
 
@@ -134,12 +144,12 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (dayjs().isBefore(dayjs(d.resolution_by))) {
       return metric(
         "due",
-        `Due in ${shortDuration(d.resolution_by)}`,
+        `Due in ${coarseDuration(d.resolution_by)}`,
         "purple",
         { dueBy: d.resolution_by }
       );
     }
-    const overdue = shortDuration(String(new Date()), d.resolution_by);
+    const overdue = coarseDuration(d.resolution_by);
     return metric("overdue", `Overdue by ${overdue}`, "red", {
       dueBy: d.resolution_by,
       delay: `+${overdue}`,
@@ -172,6 +182,13 @@ function shortDuration(date: string, end?: string): string {
   return twoUnitDuration(dayjs(date).diff(dayjs(end)));
 }
 
+/** Distance from now in whole minutes. Countdown values ("Due in",
+ * "Overdue by") don't tick, so seconds would read as a frozen timer. */
+function coarseDuration(date: string): string {
+  const diff = dayjs(date).startOf("minute").diff(dayjs().startOf("minute"));
+  return twoUnitDuration(Math.abs(diff));
+}
+
 /** Format a duration using its two most significant units, e.g. "1d 9h" */
 function twoUnitDuration(milliseconds: number): string {
   const duration = dayjs.duration(milliseconds);
@@ -181,6 +198,7 @@ function twoUnitDuration(milliseconds: number): string {
   const days = duration.days();
   const hours = duration.hours();
   const minutes = duration.minutes();
+  const seconds = duration.seconds();
 
   if (years > 0) {
     return `${years}y ${months}mo`;
@@ -190,6 +208,8 @@ function twoUnitDuration(milliseconds: number): string {
     return `${days}d ${hours}h`;
   } else if (hours > 0) {
     return `${hours}h ${minutes}m`;
+  } else if (minutes > 0) {
+    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
   }
-  return `${minutes}m`;
+  return `${seconds}s`;
 }

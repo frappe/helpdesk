@@ -12,7 +12,10 @@
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
       <!-- Key Info (core fields) -->
       <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
-        <div class="space-y-2.5 pb-4">
+        <!-- pt-0.5: the first field's value wrapper overhangs 2px upward (its
+             -m-0.5 gives the focus ring room). Without this, that overhang sits
+             behind the sticky z-10 header and the ring's top edge is clipped. -->
+        <div class="space-y-2.5 pb-4 pt-0.5">
           <!-- Core fields -->
           <template v-for="field in coreFields">
             <TicketField
@@ -57,7 +60,10 @@
           :label="__('More Details')"
           v-model:opened="openedSections.ticketInfo"
         >
-          <div class="space-y-2.5 pb-4">
+          <!-- pt-0.5: the first field's value wrapper overhangs 2px upward (its
+             -m-0.5 gives the focus ring room). Without this, that overhang sits
+             behind the sticky z-10 header and the ring's top edge is clipped. -->
+          <div class="space-y-2.5 pb-4 pt-0.5">
             <template v-for="field in customFields">
               <TicketField
                 v-if="field.visible"
