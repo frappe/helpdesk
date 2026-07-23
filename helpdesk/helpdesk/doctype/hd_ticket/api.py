@@ -38,7 +38,13 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    return d
+    if is_agent():
+        return d
+    # customers get only the ticket's readable columns, not the raw doc's
+    # permlevel-2 internals.
+    return frappe.db.get_value(
+        "HD Ticket", d.name, get_customer_visible_columns(), as_dict=True
+    )
 
 
 def get_customer_visible_columns():
