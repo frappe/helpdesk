@@ -41,7 +41,12 @@
       @keydown.ctrl.enter.capture.stop="handleSaveComment"
       @keydown.meta.enter.capture.stop="handleSaveComment"
     >
-      <Editor v-model="_content" :extensions="extensions" :editable="editable">
+      <Editor
+        v-model="_content"
+        :extensions="extensions"
+        :editable="editable"
+        :upload-function="(file:any) => uploadFunction(file, 'HD Ticket', ticketId)"
+      >
         <template #default>
           <EditorBubbleMenu :items="fullToolbar" />
           <EditorContent
@@ -157,6 +162,7 @@ import {
   getFontFamily,
   isContentEmpty,
   timeAgo,
+  uploadFunction,
 } from "@/utils";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import {
@@ -169,8 +175,10 @@ import {
 } from "frappe-ui";
 import { Editor, EditorBubbleMenu, EditorContent } from "frappe-ui/editor";
 import { PropType, computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 
 const authStore = useAuthStore();
+const ticketId = useRoute().params.ticketId as string;
 const props = defineProps({
   activity: {
     type: Object as PropType<CommentActivity>,
