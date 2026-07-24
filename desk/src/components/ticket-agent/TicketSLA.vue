@@ -54,10 +54,7 @@
       <!-- 9px = field controls' 8px padding + 1px transparent border, so the
            value lines up with the other sidebar field values -->
       <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
-        <span
-          class="min-w-0 truncate text-base"
-          :class="inkClass[card.metric.color]"
-        >
+        <span class="min-w-0 truncate text-base" :class="valueInk(card)">
           {{ cardValue(card) }}
         </span>
 >>>>>>> e1bb4efb (fix: polish SLA section)
@@ -296,12 +293,10 @@ const { firstResponse, resolution } = useSLA(ticket);
 
 const openCard = ref<string | null>(null);
 
-// Value ink per SLA state colour; -8 is the readable dark step across hues
-// (violet-8 matches the Figma value token exactly). Purple maps to violet.
 const inkClass: Record<SLAMetric["color"], string> = {
   orange: "text-ink-amber-8",
   green: "text-ink-green-8",
-  red: "text-ink-red-8",
+  red: "text-ink-red-7",
   blue: "text-ink-blue-8",
   purple: "text-ink-violet-8",
 };
@@ -327,6 +322,13 @@ function cardValue(card: SLACard): string {
   if (card.metric.state !== "fulfilled") return __(card.metric.value);
   if (!card.metric.fulfilledIn) return __(card.fulfilledLabel);
   return `${__(card.fulfilledLabel)} ${__("in")} ${card.metric.fulfilledIn}`;
+}
+
+// "Due" is the resting state of every open ticket, so it stays gray; colour
+// only appears when something changed (fulfilled, overdue, failed, hold).
+function valueInk(card: SLACard): string {
+  if (card.metric.state === "due") return "text-ink-gray-6";
+  return inkClass[card.metric.color];
 }
 
 function cardDetails(card: SLACard) {

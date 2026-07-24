@@ -14,7 +14,7 @@
           class="flex-col rounded-s-lg w-56 shrink-0 ps-1 py-1 bg-surface-sidebar overflow-y-auto hide-scrollbar"
         >
           <h1
-            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar"
+            class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar ml-1"
           >
             {{ __("Account") }}
           </h1>
@@ -23,14 +23,14 @@
 
             <div
               v-if="!tab.hideLabel"
-              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar"
+              class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar ml-1"
             >
               <Tooltip :text="__(tab.label)" placement="right">
                 <span class="truncate">{{ __(tab.label) }}</span>
               </Tooltip>
             </div>
 
-            <nav class="space-y-[3px] pr-1">
+            <nav class="space-y-[3px] pr-2 pl-1">
               <button
                 v-for="item in tab.items"
                 :key="item.label"
