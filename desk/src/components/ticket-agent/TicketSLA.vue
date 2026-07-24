@@ -28,7 +28,7 @@
             />
           </template>
           <template #body-main>
-            <div class="flex min-w-[170px] flex-col gap-4 p-4 text-sm">
+            <div class="flex min-w-[170px] flex-col gap-2.5 p-4 text-sm">
               <div
                 v-for="row in cardDetails(card)"
                 :key="row.label"

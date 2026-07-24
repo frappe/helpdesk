@@ -7,7 +7,7 @@
     />
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
       <Tooltip :text="contact.data?.name || contact.data?.email_id">
-        <div class="flex items-center gap-1.5 w-fit">
+        <div class="flex min-w-0 items-center gap-1.5 w-fit max-w-[65%]">
           <p
             class="min-h-[1lh] cursor-pointer truncate text-lg font-medium text-ink-gray-7 hover:text-ink-gray-9"
             @click="openContact(contact.data?.name)"

@@ -94,6 +94,9 @@
               <template #prefix>
                 <LucideSearch class="size-4 text-ink-gray-4" />
               </template>
+              <template #suffix>
+                <ShortcutKey v-if="!searchText" keys="A" />
+              </template>
             </TextInput>
           </div>
         </div>
@@ -181,6 +184,7 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {

@@ -5,10 +5,17 @@
     :class="{ 'me-1': iconOnly }"
   >
     <span class="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-      <LucideTriangleAlert
+      <svg
         v-if="level === 'Urgent'"
-        class="h-3.5 w-3.5 text-ink-red-5"
-      />
+        class="h-3.5 w-3.5"
+        viewBox="0 0 14 14"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="14" height="14" rx="4" class="fill-ink-gray-9" />
+        <rect x="6.25" y="3" width="1.5" height="4.75" rx="0.75" fill="white" />
+        <circle cx="7" cy="10" r="0.9" fill="white" />
+      </svg>
       <svg
         v-else
         class="h-3 w-3"
@@ -49,7 +56,6 @@
 <script setup lang="ts">
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { computed } from "vue";
-import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 
 const props = defineProps<{
   priority?: string;

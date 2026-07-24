@@ -41,7 +41,7 @@
           <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
                sit 2px higher and the gap to the Assignee row reads tighter
                than the field-to-field gap. Nudge the row down to even it. -->
-          <div class="flex items-start gap-2 pt-1 leading-5">
+          <div class="flex items-start gap-2 pt-1">
             <FieldLabel label="Tags" class="pt-0.5" />
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
