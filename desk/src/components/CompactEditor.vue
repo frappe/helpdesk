@@ -27,7 +27,9 @@
                   :disabled="uploading"
                   @click="openFileSelector()"
                 >
+                  <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                   <AttachmentIcon
+                    v-else
                     class="h-4 w-4"
                     style="stroke-width: 1.5 !important"
                   />
@@ -60,7 +62,7 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { isContentEmpty } from "@/utils";
-import { FileUploader, type UploadedFile } from "frappe-ui";
+import { FileUploader, LoadingIndicator, type UploadedFile } from "frappe-ui";
 import {
   Editor,
   EditorBubbleMenu,
