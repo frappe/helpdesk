@@ -1,5 +1,5 @@
 <template>
-  <div
+  <!-- <div
     v-if="ticketsToNavigate.data?.length > 1"
     class="flex gap-1 rtl:flex-row-reverse"
   >
@@ -33,7 +33,7 @@
         @click="goToNextTicket()"
       />
     </Tooltip>
-  </div>
+  </div> -->
 </template>
 
 <script setup lang="ts">
@@ -42,9 +42,7 @@ import {
   ticketsToNavigate,
   useTicketNavigation,
 } from "@/composables/useTicketNavigation";
-import { computed, onMounted, ref } from "vue";
-import LucideChevronLeft from "~icons/lucide/chevron-left";
-import LucideChevronRight from "~icons/lucide/chevron-right";
+import { computed, onMounted } from "vue";
 
 const {
   currentTicketIndex,
@@ -53,9 +51,6 @@ const {
   getNextTicket,
   getPreviousTicket,
 } = useTicketNavigation();
-
-const leftArrowRef = ref(null);
-const rightArrowRef = ref(null);
 
 const disableLeftCondition = computed(() => {
   if (ticketsToNavigate.loading || !ticketsToNavigate.data?.length) return true;
