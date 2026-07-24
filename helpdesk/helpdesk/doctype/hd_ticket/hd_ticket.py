@@ -77,27 +77,28 @@ class HDTicket(Document):
 
     def apply_portal_insert_rules(self):
         """
-        Exempt insert-time fields from the permlevel reset the framework runs
-        right after this hook (`validate_higher_perm_levels`): the fields owned
-        by the server or entry point plus the template fields the customer
-        legitimately fills. raised_by is force-stamped so it can't be spoofed.
+        Non-agents cannot spoof server-owned fields on insert. The framework
+        resets permlevel-protected fields right after this hook
+        (`validate_higher_perm_levels`), so exempt the ones set server-side
+        here plus the template fields the customer legitimately fills.
         """
         if is_agent():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
+        # non-agent inserts are customer-session tickets; stamp the channel
+        # flag so it stays a trusted server signal. Email tickets run as admin,
+        # skip this hook, and stay 0.
+        self.via_customer_portal = 1
 
-        # permlevel-protected fields whose insert value comes from the server
-        # or the entry point, not raw customer input. via_customer_portal is
-        # set by api.new (1 for the portal); email tickets run as admin, skip
-        # this hook, and stay 0. set_customer rejects any customer the contact
-        # is not linked to.
-        insert_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
+        # stamped/owned server-side; exempt so the permlevel reset keeps them.
+        # set_customer rejects any customer the contact is not linked to.
+        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
 
         # permlevel fields the customer legitimately fills on the creation
         # form; exempted only here (before_insert) so they stay create-only.
         self.flags.ignore_permlevel_for_fields = [
-            *insert_owned_fields,
+            *server_owned_fields,
             *self.get_customer_template_fields(),
         ]
 
@@ -449,8 +450,8 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        # applies to every non-agent update; not gated on via_customer_portal,
-        # which is now value-driven and customer-influenceable.
+        # keyed on the trust boundary; via_customer_portal is a channel flag,
+        # so the closed/rated lock holds for every ticket origin.
         if self.is_new() or is_agent():
             return
         old_doc = self.get_doc_before_save()
