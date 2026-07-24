@@ -158,7 +158,9 @@
                     @click="openFileSelector()"
                     :disabled="uploading"
                   >
+                    <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                     <AttachmentIcon
+                      v-else
                       class="h-4 w-4"
                       style="stroke-width: 1.5 !important"
                     />
@@ -218,7 +220,12 @@ import {
   validateEmailWithZod,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { FileUploader, createResource, toast } from "frappe-ui";
+import {
+  FileUploader,
+  LoadingIndicator,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import {
