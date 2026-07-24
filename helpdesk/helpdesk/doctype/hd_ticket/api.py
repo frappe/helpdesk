@@ -13,7 +13,7 @@ from frappe.utils import (
     now_datetime,
 )
 from frappe.utils.caching import redis_cache
-from pypika import Criterion, Order
+from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
@@ -21,13 +21,7 @@ from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_scr
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import (
-    agent_only,
-    check_permissions,
-    get_customers,
-    is_agent,
-    parse_call_logs,
-)
+from helpdesk.utils import agent_only, check_permissions, is_agent, parse_call_logs
 
 
 @frappe.whitelist()
@@ -50,21 +44,17 @@ def new(doc: dict, attachments: list[dict] = []):
 def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
-    QBTicket = frappe.qb.DocType("HD Ticket")
 
-    # perm-driven projection: agents' roles grant permlevel-2 read, customers'
-    # don't, so this yields the full doc or the customer-safe subset accordingly.
-    columns = get_permitted_fields("HD Ticket", permission_type="read")
-    query = (
-        frappe.qb.from_(QBTicket)
-        .select(*(QBTicket[column] for column in columns))
-        .where(QBTicket.name == name)
-        .limit(1)
-    )
-    if not is_agent():
-        query = query.where(get_customer_criteria())
-
-    ticket = query.run(as_dict=True)
+    # get_query with permissions applies field-level permlevel filtering ('*'
+    # expands to permitted columns only) and the HD Ticket permission_query row
+    # scoping, so agents get the full doc and customers the permitted subset.
+    ticket = frappe.qb.get_query(
+        "HD Ticket",
+        fields="*",
+        filters={"name": name},
+        limit=1,
+        ignore_permissions=False,
+    ).run(as_dict=True)
     if not len(ticket):
         frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
     ticket = ticket.pop()
@@ -154,20 +144,6 @@ def get_meta(template: str):
 
     fields.extend(meta_fields)
     return fields
-
-
-def get_customer_criteria():
-    QBTicket = frappe.qb.DocType("HD Ticket")
-    user = frappe.session.user
-    conditions = [
-        QBTicket.contact == user,
-        QBTicket.raised_by == user,
-        QBTicket.owner == user,
-    ]
-    customer = get_customers(user)
-    for c in customer:
-        conditions.append(QBTicket.customer == c)
-    return Criterion.any(conditions)
 
 
 def get_assignee(_assign: str):
