@@ -1616,6 +1616,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         baseline = frappe.get_doc(get_ticket_obj()).insert()
         self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
+        # server force-stamps the portal flag; the insert exemption lets it
+        # survive the permlevel reset even though the customer can't write it.
         self.assertEqual(baseline.via_customer_portal, 1)
         self.assertTrue(baseline.key)
 

@@ -75,31 +75,6 @@ class HDTicket(Document):
         self.generate_key()
         self.apply_portal_insert_rules()
 
-    def apply_portal_insert_rules(self):
-        """
-        Non-agents cannot spoof server-owned fields on insert. The framework
-        resets permlevel-protected fields right after this hook
-        (`validate_higher_perm_levels`), so exempt the ones set server-side
-        here plus the template fields the customer legitimately fills.
-        """
-        if is_agent():
-            return
-        if frappe.session.user != "Guest":
-            self.raised_by = frappe.session.user
-        self.via_customer_portal = 1
-
-        # stamped server-side above; the customer's value never survives.
-        # customer: multi-org contacts pick the org at creation, and
-        # set_customer rejects any customer the contact is not linked to.
-        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
-
-        # permlevel fields the customer legitimately fills on the creation
-        # form; exempted only here (before_insert) so they stay create-only.
-        self.flags.ignore_permlevel_for_fields = [
-            *server_owned_fields,
-            *self.get_customer_template_fields(),
-        ]
-
     def get_customer_template_fields(self):
         """Fields the ticket's template exposes to the customer.
 
@@ -116,6 +91,30 @@ class HDTicket(Document):
         exposable = {"priority", "ticket_type", "agent_group", "customer"}
         protected = {df.fieldname for df in self.meta.get_high_permlevel_fields()}
         return [f for f in fields if f not in protected or f in exposable]
+
+    def apply_portal_insert_rules(self):
+        """
+        Non-agents cannot spoof server-owned fields on insert. The framework
+        resets permlevel-protected fields right after this hook
+        (`validate_higher_perm_levels`), so exempt the ones set server-side
+        here plus the template fields the customer legitimately fills.
+        """
+        if is_agent():
+            return
+        if frappe.session.user != "Guest":
+            self.raised_by = frappe.session.user
+        self.via_customer_portal = 1
+
+        # stamped/owned server-side; exempt so the permlevel reset keeps them.
+        # set_customer rejects any customer the contact is not linked to.
+        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
+
+        # permlevel fields the customer legitimately fills on the creation
+        # form; exempted only here (before_insert) so they stay create-only.
+        self.flags.ignore_permlevel_for_fields = [
+            *server_owned_fields,
+            *self.get_customer_template_fields(),
+        ]
 
     def before_validate(self):
         self.check_update_perms()
