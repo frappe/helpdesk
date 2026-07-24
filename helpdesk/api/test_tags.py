@@ -79,6 +79,25 @@ class TestTicketTags(FrappeTestCase):
             )
         )
 
+    def test_add_tag_method_creates_colored_tag_and_links(self):
+        frappe.set_user(AGENT_EMAIL)
+        self.ticket.add_tag("vip-customer", "Red")
+
+        tag = frappe.get_doc("Tag", "vip-customer")
+        self.assertEqual(tag.app, "helpdesk")
+        self.assertEqual(tag.color, "Red")
+        self.assertIn(
+            "vip-customer",
+            frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags"),
+        )
+
+        # colour is applied only on creation; a second call keeps the original
+        self.ticket.add_tag("vip-customer", "Blue")
+        self.assertEqual(frappe.db.get_value("Tag", "vip-customer", "color"), "Red")
+
+        # a comma would corrupt the comma-separated _user_tags column
+        self.assertRaises(frappe.ValidationError, self.ticket.add_tag, "a,b")
+
     def test_custom_fields_exist_on_tag(self):
         for fieldname in ("app", "color"):
             self.assertTrue(

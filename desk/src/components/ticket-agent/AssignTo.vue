@@ -75,30 +75,24 @@
            the rows' min-w-0 truncate instead. -->
       <div
         v-if="isOpen"
-        class="w-[var(--reka-popover-trigger-width)] divide-y divide-outline-elevation-2 focus:outline-none"
+        class="w-[var(--reka-popover-trigger-width)] focus:outline-none"
       >
-        <!-- Search Header -->
-        <div class="p-1">
-          <div
-            class="flex h-7 items-center text-sm-medium text-ink-gray-6 justify-between"
+        <!-- Search Header: mirror the tag picker's flush search row - a
+             borderless input with a bottom divider and the key-cap suffix. -->
+        <div class="flex items-center border-b border-outline-gray-2 px-3">
+          <TextInput
+            ref="inputRef"
+            v-model="searchText"
+            :placeholder="__('Search agents...')"
+            variant="ghost"
+            class="flex-1 search-agents-input"
+            @click.stop
+            @keydown="handleInputKeydown"
           >
-            <TextInput
-              ref="inputRef"
-              v-model="searchText"
-              :placeholder="__('Search agents...')"
-              variant="ghost"
-              class="flex-1 search-agents-input"
-              @click.stop
-              @keydown="handleInputKeydown"
-            >
-              <template #prefix>
-                <LucideSearch class="size-4 text-ink-gray-4" />
-              </template>
-              <template #suffix>
-                <ShortcutKey v-if="!searchText" keys="A" />
-              </template>
-            </TextInput>
-          </div>
+            <template #suffix>
+              <ShortcutKey v-if="!searchText" keys="A" />
+            </template>
+          </TextInput>
         </div>
 
         <!-- Agent List -->
@@ -200,7 +194,6 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
-import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 interface Props {
@@ -600,6 +593,12 @@ useShortcut("a", () => {
    matches. Deep the whole selector so it applies by class and strips the
    @tailwindcss/forms white reset that shows through in dark mode. */
 :deep(.search-agents-input input) {
-  @apply bg-surface-base;
+  @apply bg-transparent px-0;
+}
+
+/* frappe-ui's suffix slot wrapper adds a pe-2; drop it so the shortcut cap
+   sits flush to the row padding, matching the tag picker's search. */
+:deep(.search-agents-input .end-0) {
+  @apply pe-0;
 }
 </style>

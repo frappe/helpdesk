@@ -9,9 +9,9 @@
       <div>
         <MultiSelect
           v-model="localTags"
-          v-model:open="pickerOpen"
+          v-model:open="tagPickerOpen"
           :options="tagOptions"
-          :loading="tagsResource.loading"
+          :loading="tagListResource.loading"
           :placeholder="__('Search or create tags')"
           side="left"
           @update:query="queryText = $event"
@@ -24,10 +24,11 @@
                 :tag="tag"
                 :color="tagColorToken(tag)"
               />
-              <!-- the last chip and the button form one flex item, so the +
-                   can never wrap onto a line of its own; new tags land at
-                   the end of localTags, so the enter transition still plays
-                   on every freshly added chip -->
+              <!-- the last chip and the trailing control (+ button or "+N
+                   more" chip) form one flex item, so neither can wrap onto
+                   a line of its own; new tags land at the end of localTags,
+                   so the enter transition still plays on every freshly
+                   added chip below the fold -->
               <div class="flex min-w-0 max-w-full items-center gap-1.5">
                 <Transition name="tag-chip">
                   <TagChip
@@ -37,7 +38,7 @@
                     :color="tagColorToken(lastTag)"
                   />
                 </Transition>
-                <Tooltip :text="__('Add')">
+                <Tooltip v-if="!hiddenTags.length" :text="__('Add')">
                   <!-- h-6 matches Badge size=lg so the row height never changes
                  when the first chip appears (no layout shift) -->
                   <button
@@ -46,15 +47,30 @@
                   >
                     + {{ __("Add") }}
                   </button>
-                  <!-- with tags present, collapse to="" a ghost + icon -->
+                  <!-- with tags present, collapse to a ghost + icon -->
                   <button
-                    v-else-if="!atCap"
+                    v-else
                     class="inline-flex h-6 w-6 items-center justify-center rounded-full text-ink-gray-5 transition-[color,background-color,transform] duration-150 hover:bg-surface-gray-2 hover:text-ink-gray-7 active:scale-[0.96]"
                   >
                     <LucidePlus class="size-3.5" />
                   </button>
                 </Tooltip>
               </div>
+              <!-- collapsed tags: a separate wrap item (grouping it with the
+                   last chip inflates the row's min-content width and blows
+                   past the panel edge); it may wrap to its own line like any
+                   chip. It's also the popover's click target, so the ghost +
+                   above yields to it; hover lists the hidden names -->
+              <Tooltip v-if="hiddenTags.length" :text="hiddenTags.join(', ')">
+                <Badge
+                  theme="gray"
+                  variant="outline"
+                  size="lg"
+                  class="shrink-0 text-ink-gray-7 transition-colors duration-150 hover:bg-surface-gray-2"
+                >
+                  {{ __("+{0} more", String(hiddenTags.length)) }}
+                </Badge>
+              </Tooltip>
             </div>
           </template>
           <template #suffix>
@@ -68,11 +84,7 @@
           </template>
           <template #empty>
             <span class="text-p-sm">
-              {{
-                atCap
-                  ? __("No matching tags")
-                  : __("No tags yet, type to create one")
-              }}
+              {{ __("No tags yet, type to create one") }}
             </span>
           </template>
           <!-- The hidden marker scopes this picker's style overrides
@@ -80,20 +92,6 @@
                can't reach it -->
           <template #footer>
             <span class="ticket-tags-marker hidden" aria-hidden="true" />
-            <!-- at-cap marker for the style overrides (inert unchecked rows) -->
-            <span
-              v-if="atCap"
-              class="ticket-tags-cap hidden"
-              aria-hidden="true"
-            />
-            <p
-              v-if="atCap"
-              class="border-t border-outline-gray-1 px-3 py-2 text-p-sm text-ink-gray-5"
-            >
-              {{
-                __("Max {0} tags. Remove one to add more.", String(MAX_TAGS))
-              }}
-            </p>
           </template>
         </MultiSelect>
       </div>
@@ -102,7 +100,7 @@
       <!-- live preview of the tag being created: the dot tracks the
            highlighted color -->
       <p
-        class="flex items-center gap-2 border-b border-outline-gray-1 px-3 py-2 text-base text-ink-gray-8"
+        class="flex items-center gap-2 border-b border-outline-gray-2 px-3 py-2 text-base text-ink-gray-8"
       >
         <span
           class="size-2.5 shrink-0 rounded-full"
@@ -135,19 +133,13 @@
 
 <script setup lang="ts">
 import { useShortcut } from "@/composables/shortcuts";
+import { useTags, type Tag } from "@/composables/useTags";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { useEventListener } from "@vueuse/core";
-import {
-  call,
-  createListResource,
-  createResource,
-  MultiSelect,
-  Popover,
-  toast,
-  Tooltip,
-} from "frappe-ui";
+import { Badge, MultiSelect, Popover, toast, Tooltip } from "frappe-ui";
 import { computed, h, inject, nextTick, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import LucidePlus from "~icons/lucide/plus";
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import TagChip from "./TagChip.vue";
@@ -155,9 +147,9 @@ import TagChip from "./TagChip.vue";
 // sentinel option value: picking it starts tag creation instead of a toggle
 const CREATE_VALUE = "__create__";
 
-// at the cap, unchecked rows go inert (style block below) and the create
-// row/+ button hide; removal stays possible so the cap can always resolve
-const MAX_TAGS = 5;
+// chips shown before collapsing into a "+N more" chip; collapse only past
+// VISIBLE_TAGS + 1 so "+1 more" never replaces the one chip it hides
+const VISIBLE_TAGS = 3;
 
 // The HD Ticket Status palette (Gray first as the default pick); keys are
 // stored on the Tag doc (Select field), values are frappe-ui's semantic
@@ -182,9 +174,13 @@ const TAG_COLORS: Record<string, string> = {
 const TAG_COLOR_NAMES = Object.keys(TAG_COLORS);
 
 const ticket = inject(TicketSymbol)!;
+const route = useRoute();
+const { tagListResource, add, remove } = useTags(
+  "HD Ticket",
+  () => route.params.ticketId as string
+);
 
-const pickerOpen = ref(false);
-const creating = ref(false);
+const tagPickerOpen = ref(false);
 const queryText = ref("");
 const localTags = ref<string[]>([]);
 // applied tags snapshot taken on open, so rows don't jump while toggling
@@ -198,26 +194,20 @@ let pendingSyncs = 0;
 const colorPickerOpen = ref(false);
 const pendingTag = ref("");
 const colorIndex = ref(0);
+// colour chosen for a not-yet-created tag, keyed by name; consumed by the
+// sync so add_tag mints the master with it (add_tag colours on create only)
+const pendingColors = ref<Record<string, string>>({});
 
-const tagsResource = createListResource({
-  doctype: "Tag",
-  fields: ["name", "color"],
-  cache: ["Tags", "Helpdesk"],
-  filters: { app: "helpdesk" },
-  orderBy: "name asc",
-  pageLength: 500,
-  auto: true,
-});
-
-const addTagResource = createResource({
-  url: "frappe.desk.doctype.tag.tag.add_tag",
-});
-const removeTagResource = createResource({
-  url: "frappe.desk.doctype.tag.tag.remove_tag",
-});
-
-const headTags = computed(() => localTags.value.slice(0, -1));
-const lastTag = computed(() => localTags.value.at(-1));
+const visibleTags = computed(() =>
+  localTags.value.length > VISIBLE_TAGS + 1
+    ? localTags.value.slice(0, VISIBLE_TAGS)
+    : localTags.value
+);
+const hiddenTags = computed(() =>
+  localTags.value.slice(visibleTags.value.length)
+);
+const headTags = computed(() => visibleTags.value.slice(0, -1));
+const lastTag = computed(() => visibleTags.value.at(-1));
 
 const appliedTags = computed<string[]>(() => [
   ...new Set(
@@ -228,11 +218,9 @@ const appliedTags = computed<string[]>(() => [
   ),
 ]);
 
-const atCap = computed(() => localTags.value.length >= MAX_TAGS);
-
 const existingTagOptions = computed(() => {
   const applied = new Set(appliedAtOpen.value);
-  const tags: { name: string; color?: string }[] = tagsResource.data || [];
+  const tags: { name: string; color?: string }[] = tagListResource.data || [];
   return [...tags]
     .sort(
       (a, b) =>
@@ -246,14 +234,16 @@ const existingTagOptions = computed(() => {
     }));
 });
 
-// The create row is a real option so keyboard navigation reaches it; its
-// label contains the query, which keeps it visible under reka's filter
+// The create row is a real option so keyboard navigation reaches it. Its
+// label ends with the *raw* query (not the trimmed display text): the list
+// matcher tests the query untrimmed, so a trailing space would otherwise
+// filter the row out. The visible label below stays trimmed.
 const tagOptions = computed(() => {
   const options: Record<string, unknown>[] = [...existingTagOptions.value];
   const text = queryText.value.trim();
   if (showCreateOption.value) {
     options.push({
-      label: `${__("Create")} "${text}"`,
+      label: `${__("Create")} ${queryText.value}`,
       value: CREATE_VALUE,
       slots: {
         // full-row takeover skips the default row's checkbox; the classes
@@ -286,7 +276,7 @@ function colorToken(name?: string) {
 
 function tagColorToken(tag: string) {
   return colorToken(
-    (tagsResource.data || []).find(
+    (tagListResource.data || []).find(
       (t: { name: string; color?: string }) => t.name === tag
     )?.color
   );
@@ -294,7 +284,6 @@ function tagColorToken(tag: string) {
 
 // the create row only appears while the query names a tag that doesn't exist
 const showCreateOption = computed(() => {
-  if (atCap.value) return false;
   const text = queryText.value.trim().toLowerCase();
   if (!text) return false;
   return ![
@@ -322,34 +311,24 @@ function startCreate() {
     return;
   }
   pendingTag.value = tag;
-  pickerOpen.value = false;
+  tagPickerOpen.value = false;
   colorPickerOpen.value = true;
 }
 
-async function pickColor(color: string) {
+function pickColor(color: string) {
   const tag = pendingTag.value;
-  if (creating.value || !tag) return;
-  creating.value = true;
-  try {
-    await call("frappe.client.insert", {
-      doc: { doctype: "Tag", name: tag, app: "helpdesk", color },
-    });
-  } catch (error: any) {
-    // duplicate = a tag outside helpdesk with this name; just apply it
-    if (!error?.exc_type?.includes("DuplicateEntryError")) {
-      toast.error(error.messages?.join(", ") || __("Failed to create tag"));
-      return;
-    }
-  } finally {
-    creating.value = false;
-  }
   colorPickerOpen.value = false;
-  if (!localTags.value.includes(tag)) {
-    localTags.value = [...localTags.value, tag];
+  if (!tag || localTags.value.includes(tag)) return;
+  pendingColors.value[tag] = color;
+  // seed the list so the new chip's dot is coloured before the reload lands
+  if (!(tagListResource.data || []).some((t: Tag) => t.name === tag)) {
+    tagListResource.data = [
+      ...(tagListResource.data || []),
+      { name: tag, color },
+    ];
   }
-  // seed the list so the new chip's dot is colored before the reload lands
-  tagsResource.data = [...(tagsResource.data || []), { name: tag, color }];
-  tagsResource.reload();
+  // the localTags watcher syncs this as an add, passing the pending colour
+  localTags.value = [...localTags.value, tag];
 }
 
 function handleColorKeydown(event: KeyboardEvent) {
@@ -365,15 +344,11 @@ function handleColorKeydown(event: KeyboardEvent) {
 }
 
 function syncTags(added: string[], removed: string[]) {
-  const params = (tag: string) => ({
-    tag,
-    dt: "HD Ticket",
-    dn: ticket.value.doc.name,
-  });
   const requests = [
-    ...added.map((tag) => addTagResource.submit(params(tag))),
-    ...removed.map((tag) => removeTagResource.submit(params(tag))),
+    ...added.map((tag) => add(tag, pendingColors.value[tag])),
+    ...removed.map((tag) => remove(tag)),
   ];
+  added.forEach((tag) => delete pendingColors.value[tag]);
   if (!requests.length) return;
   pendingSyncs += 1;
   Promise.all(requests)
@@ -392,7 +367,7 @@ function syncTags(added: string[], removed: string[]) {
 // keyboard position; stale in-flight reloads would also briefly
 // resurrect just-removed chips
 function adoptServerTags() {
-  if (pickerOpen.value || pendingSyncs) return;
+  if (tagPickerOpen.value || pendingSyncs) return;
   const tags = appliedTags.value;
   const local = localTags.value;
   if (tags.length === local.length && tags.every((t) => local.includes(t)))
@@ -402,35 +377,29 @@ function adoptServerTags() {
   nextTick(() => (muteSync = false));
 }
 
-// at the cap Enter must not toggle an unchecked (inert) row; blocked in
-// capture phase so reka's own Enter handler on the input never runs
-function capBlocksEnter() {
-  if (!atCap.value) return false;
-  const highlighted = document.querySelector(
-    '[data-slot="content"]:has(.ticket-tags-cap) [role="option"][data-highlighted]'
-  );
-  return highlighted?.getAttribute("data-state") === "unchecked";
-}
-
-useShortcut("g", () => (pickerOpen.value = true));
+useShortcut("g", () => (tagPickerOpen.value = true));
 
 // Document-level keys, capture phase (they must pre-empt reka's handlers
 // on the search input): the color popover has no input to focus (Escape
-// stays with reka's dismiss layer); at the cap Enter on an inert row is
-// swallowed; and Enter creates the tag when the create row is the only
-// thing to act on -- with matching rows visible, Enter keeps reka's
-// toggle-highlighted behavior
+// stays with reka's dismiss layer); Enter creates the tag when the create
+// row is the only thing to act on -- with matching rows visible, Enter
+// keeps reka's toggle-highlighted behavior
 useEventListener(
   document,
   "keydown",
   (event: KeyboardEvent) => {
-    if (colorPickerOpen.value) return handleColorKeydown(event);
-    if (!pickerOpen.value || event.key !== "Enter") return;
-    if (capBlocksEnter()) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (colorPickerOpen.value) {
+      handleColorKeydown(event);
+      // The colour popover has no input to absorb keys, so single-key global
+      // shortcuts (a, t, p, ...) would otherwise fire and close it. Swallow
+      // everything here (capture pre-empts useShortcut's document listener);
+      // Escape/Tab pass through for reka's dismiss and focus nav.
+      if (event.key !== "Escape" && event.key !== "Tab") {
+        event.stopPropagation();
+      }
       return;
     }
+    if (!tagPickerOpen.value || event.key !== "Enter") return;
     if (queryMatchesExistingTag.value || !showCreateOption.value) return;
     event.preventDefault();
     event.stopPropagation();
@@ -450,26 +419,17 @@ watch(localTags, (next, previous) => {
     return;
   }
   if (muteSync) return;
-  // invariant guard: mouse toggles are blocked by CSS and Enter by the
-  // capture listener, so anything past the cap that still lands here
-  // (e.g. a reka path we missed) reverts without touching the server
-  if (next.length > MAX_TAGS) {
-    muteSync = true;
-    localTags.value = previous;
-    nextTick(() => (muteSync = false));
-    return;
-  }
   syncTags(
     next.filter((tag) => !previous.includes(tag) && tag !== CREATE_VALUE),
     previous.filter((tag) => !next.includes(tag) && tag !== CREATE_VALUE)
   );
 });
 
-watch(pickerOpen, (open) => {
+watch(tagPickerOpen, (open) => {
   queryText.value = "";
   if (open) {
     appliedAtOpen.value = [...localTags.value];
-    tagsResource.reload();
+    tagListResource.reload();
   } else {
     // pick up any server-side changes that arrived while it was open
     adoptServerTags();
@@ -507,15 +467,11 @@ watch(colorPickerOpen, (open) => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* At the cap the unchecked rows stay listed (no reorder) but go inert.
-   Graying them via reka's disabled prop would also drop them from the
-   keyboard collection, making arrows leap across the gaps between
-   enabled rows; instead they keep their place in navigation and only
-   lose mouse interaction (Enter is swallowed by the capture listener). */
-[data-slot="content"][data-selection]:has(.ticket-tags-cap)
-  [role="option"][data-state="unchecked"] {
-  opacity: 0.5;
-  pointer-events: none;
+/* In dark mode outline-gray-1 collapses onto the elevation-2 surface, so the
+   search divider vanishes. Bump it to the next token to keep the separator. */
+[data-slot="content"][data-selection]:has(.ticket-tags-marker)
+  [data-slot="search"] {
+  @apply border-outline-gray-2;
 }
 </style>
 

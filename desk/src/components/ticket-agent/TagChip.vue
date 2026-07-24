@@ -3,7 +3,7 @@
     theme="gray"
     variant="outline"
     size="lg"
-    class="max-w-40 gap-1.5 transition-colors duration-150 hover:bg-surface-gray-2"
+    class="min-w-0 max-w-40 gap-1.5 transition-colors duration-150 hover:bg-surface-gray-2"
   >
     <span
       class="size-2 shrink-0 rounded-full"

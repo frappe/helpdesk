@@ -509,6 +509,38 @@ class HDTicket(Document):
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
 
+    @frappe.whitelist()
+    def add_tag(self, label: str, color: str = "Gray"):
+        """Add a tag to this ticket, creating the helpdesk Tag master if needed.
+
+        Handy from server scripts. ``color`` is one of the Tag colour options
+        (e.g. "Red", "Blue") and is applied only when the tag is first created;
+        an existing tag keeps its colour.
+        """
+        from frappe.desk.doctype.tag.tag import add_tag as link_tag
+
+        label = label.strip()
+        if not label:
+            frappe.throw(_("Tag label is required"))
+        if "," in label:
+            # _user_tags is a comma-separated column, so a comma would split it
+            frappe.throw(_("Tag cannot contain commas"))
+
+        self.check_permission("write")
+
+        if not frappe.db.exists("Tag", label):
+            frappe.get_doc(
+                {
+                    "doctype": "Tag",
+                    "name": label,
+                    "app": "helpdesk",
+                    "color": color,
+                }
+            ).insert(ignore_permissions=True, ignore_if_duplicate=True)
+
+        link_tag(label, self.doctype, self.name)
+        return label
+
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:

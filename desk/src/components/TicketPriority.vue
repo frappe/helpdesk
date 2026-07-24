@@ -12,9 +12,16 @@
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect width="14" height="14" rx="4" class="fill-ink-gray-9" />
-        <rect x="6.25" y="3" width="1.5" height="4.75" rx="0.75" fill="white" />
-        <circle cx="7" cy="10" r="0.9" fill="white" />
+        <rect width="14" height="14" rx="4" class="fill-ink-gray-5" />
+        <rect
+          x="6.25"
+          y="3"
+          width="1.5"
+          height="4.75"
+          rx="0.75"
+          class="fill-surface-gray-1"
+        />
+        <circle cx="7" cy="10" r="0.9" class="fill-surface-gray-1" />
       </svg>
       <svg
         v-else
@@ -26,7 +33,7 @@
         <rect
           x="0"
           y="8"
-          width="1.5"
+          width="2.5"
           height="4"
           rx="0.5"
           :class="barClass(2)"
@@ -34,7 +41,7 @@
         <rect
           x="4"
           y="4"
-          width="1.5"
+          width="2.5"
           height="8"
           rx="0.5"
           :class="barClass(1)"
@@ -42,7 +49,7 @@
         <rect
           x="8"
           y="0"
-          width="1.5"
+          width="2.5"
           height="12"
           rx="0.5"
           :class="barClass(0)"
@@ -75,6 +82,6 @@ const level = computed(() => getLevel(props.priority ?? ""));
 
 function barClass(barIndexFromTop: number): string {
   const faded = FADED_BARS[level.value] ?? 0;
-  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-7";
+  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-5";
 }
 </script>
