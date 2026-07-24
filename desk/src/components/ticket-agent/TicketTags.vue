@@ -37,12 +37,12 @@
                     :color="tagColorToken(lastTag)"
                   />
                 </Transition>
-                <Tooltip :text="`${__('Add tag(s)')} (G)`">
+                <Tooltip :text="__('Add')">
                   <!-- h-6 matches Badge size=lg so the row height never changes
                  when the first chip appears (no layout shift) -->
                   <button
                     v-if="!localTags.length"
-                    class="inline-flex h-6 items-center text-base text-ink-gray-6 transition-[color,transform] duration-150 hover:text-ink-gray-8 active:scale-[0.96]"
+                    class="inline-flex items-center text-base text-ink-gray-6 transition-[color,transform] duration-150 hover:text-ink-gray-8 active:scale-[0.96]"
                   >
                     + {{ __("Add") }}
                   </button>
@@ -56,6 +56,9 @@
                 </Tooltip>
               </div>
             </div>
+          </template>
+          <template #suffix>
+            <ShortcutKey v-if="!queryText" keys="G" />
           </template>
           <template #item-prefix="{ item }">
             <span
@@ -103,7 +106,7 @@
       >
         <span
           class="size-2.5 shrink-0 rounded-full"
-          :style="{ backgroundColor: TAG_COLORS[colorIndex].token }"
+          :style="{ backgroundColor: TAG_COLORS[TAG_COLOR_NAMES[colorIndex]] }"
         />
         <span class="min-w-0 truncate">{{ pendingTag }}</span>
       </p>
@@ -111,19 +114,19 @@
         <!-- tabindex -1 keeps the popover's autofocus off the first row;
              the highlight bar is the only selection indicator -->
         <button
-          v-for="(color, index) in TAG_COLORS"
-          :key="color.name"
+          v-for="(name, index) in TAG_COLOR_NAMES"
+          :key="name"
           tabindex="-1"
           class="flex h-8 shrink-0 items-center gap-2 rounded px-2 text-base text-ink-gray-7"
           :class="{ 'bg-surface-alpha-gray-2': index === colorIndex }"
           @mouseenter="colorIndex = index"
-          @click="pickColor(color)"
+          @click="pickColor(name)"
         >
           <span
             class="size-2.5 shrink-0 rounded-full"
-            :style="{ backgroundColor: color.token }"
+            :style="{ backgroundColor: TAG_COLORS[name] }"
           />
-          {{ __(color.name) }}
+          {{ __(name) }}
         </button>
       </div>
     </div>
@@ -146,6 +149,7 @@ import {
 } from "frappe-ui";
 import { computed, h, inject, nextTick, ref, watch } from "vue";
 import LucidePlus from "~icons/lucide/plus";
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import TagChip from "./TagChip.vue";
 
 // sentinel option value: picking it starts tag creation instead of a toggle
@@ -155,24 +159,27 @@ const CREATE_VALUE = "__create__";
 // row/+ button hide; removal stays possible so the cap can always resolve
 const MAX_TAGS = 5;
 
-// The HD Ticket Status palette (Gray first as the default pick); names are
-// stored on the Tag doc (Select field), dots use the matching frappe-ui
-// -500 tokens (theme-aware, so they flip correctly in dark mode)
-const TAG_COLORS = [
-  { name: "Gray", token: "var(--gray-400)" },
-  { name: "Black", token: "var(--gray-900)" },
-  { name: "Blue", token: "var(--blue-500)" },
-  { name: "Green", token: "var(--green-500)" },
-  { name: "Red", token: "var(--red-500)" },
-  { name: "Pink", token: "var(--pink-500)" },
-  { name: "Orange", token: "var(--orange-500)" },
-  { name: "Amber", token: "var(--amber-500)" },
-  { name: "Yellow", token: "var(--yellow-500)" },
-  { name: "Cyan", token: "var(--cyan-500)" },
-  { name: "Teal", token: "var(--teal-500)" },
-  { name: "Violet", token: "var(--violet-500)" },
-  { name: "Purple", token: "var(--purple-500)" },
-];
+// The HD Ticket Status palette (Gray first as the default pick); keys are
+// stored on the Tag doc (Select field), values are frappe-ui's semantic
+// surface tokens, which the theme overrides for dark mode (raw --red-500
+// style vars carry light values only; Black inverts to near-white in dark
+// so the dot keeps contrast)
+const TAG_COLORS: Record<string, string> = {
+  Gray: "var(--surface-gray-5)",
+  Black: "var(--surface-gray-10)",
+  Blue: "var(--surface-blue-6)",
+  Green: "var(--surface-green-6)",
+  Red: "var(--surface-red-6)",
+  Pink: "var(--surface-pink-6)",
+  Orange: "var(--surface-orange-6)",
+  Amber: "var(--surface-amber-6)",
+  Yellow: "var(--surface-yellow-6)",
+  Cyan: "var(--surface-cyan-6)",
+  Teal: "var(--surface-teal-6)",
+  Violet: "var(--surface-violet-6)",
+  Purple: "var(--surface-purple-6)",
+};
+const TAG_COLOR_NAMES = Object.keys(TAG_COLORS);
 
 const ticket = inject(TicketSymbol)!;
 
@@ -274,7 +281,7 @@ const tagOptions = computed(() => {
 });
 
 function colorToken(name?: string) {
-  return (TAG_COLORS.find((c) => c.name === name) ?? TAG_COLORS[0]).token;
+  return TAG_COLORS[name ?? ""] ?? TAG_COLORS.Gray;
 }
 
 function tagColorToken(tag: string) {
@@ -319,13 +326,13 @@ function startCreate() {
   colorPickerOpen.value = true;
 }
 
-async function pickColor(color: { name: string }) {
+async function pickColor(color: string) {
   const tag = pendingTag.value;
   if (creating.value || !tag) return;
   creating.value = true;
   try {
     await call("frappe.client.insert", {
-      doc: { doctype: "Tag", name: tag, app: "helpdesk", color: color.name },
+      doc: { doctype: "Tag", name: tag, app: "helpdesk", color },
     });
   } catch (error: any) {
     // duplicate = a tag outside helpdesk with this name; just apply it
@@ -341,22 +348,19 @@ async function pickColor(color: { name: string }) {
     localTags.value = [...localTags.value, tag];
   }
   // seed the list so the new chip's dot is colored before the reload lands
-  tagsResource.data = [
-    ...(tagsResource.data || []),
-    { name: tag, color: color.name },
-  ];
+  tagsResource.data = [...(tagsResource.data || []), { name: tag, color }];
   tagsResource.reload();
 }
 
 function handleColorKeydown(event: KeyboardEvent) {
-  const count = TAG_COLORS.length;
+  const count = TAG_COLOR_NAMES.length;
   if (event.key === "ArrowDown" || event.key === "ArrowUp") {
     event.preventDefault();
     const step = event.key === "ArrowDown" ? 1 : -1;
     colorIndex.value = (colorIndex.value + step + count) % count;
   } else if (event.key === "Enter") {
     event.preventDefault();
-    pickColor(TAG_COLORS[colorIndex.value]);
+    pickColor(TAG_COLOR_NAMES[colorIndex.value]);
   }
 }
 
