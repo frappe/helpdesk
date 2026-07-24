@@ -42,6 +42,7 @@
       @keydown.meta.enter.capture.stop="handleSaveComment"
     >
       <Editor
+        :key="editable ? 'edit' : 'view'"
         v-model="_content"
         :extensions="extensions"
         :editable="editable"
