@@ -77,26 +77,27 @@ class HDTicket(Document):
 
     def apply_portal_insert_rules(self):
         """
-        Non-agents cannot spoof server-owned fields on insert. The framework
-        resets permlevel-protected fields right after this hook
-        (`validate_higher_perm_levels`), so exempt the ones set server-side
-        here plus the template fields the customer legitimately fills.
+        Exempt insert-time fields from the permlevel reset the framework runs
+        right after this hook (`validate_higher_perm_levels`): the fields owned
+        by the server or entry point plus the template fields the customer
+        legitimately fills. raised_by is force-stamped so it can't be spoofed.
         """
         if is_agent():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
-        self.via_customer_portal = 1
 
-        # stamped server-side above; the customer's value never survives.
-        # customer: multi-org contacts pick the org at creation, and
-        # set_customer rejects any customer the contact is not linked to.
-        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
+        # permlevel-protected fields whose insert value comes from the server
+        # or the entry point, not raw customer input. via_customer_portal is
+        # set by api.new (1 for the portal); email tickets run as admin, skip
+        # this hook, and stay 0. set_customer rejects any customer the contact
+        # is not linked to.
+        insert_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
 
         # permlevel fields the customer legitimately fills on the creation
         # form; exempted only here (before_insert) so they stay create-only.
         self.flags.ignore_permlevel_for_fields = [
-            *server_owned_fields,
+            *insert_owned_fields,
             *self.get_customer_template_fields(),
         ]
 
@@ -448,7 +449,9 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent() or not self.via_customer_portal:
+        # applies to every non-agent update; not gated on via_customer_portal,
+        # which is now value-driven and customer-influenceable.
+        if self.is_new() or is_agent():
             return
         old_doc = self.get_doc_before_save()
         is_closed = old_doc.status == "Closed"

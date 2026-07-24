@@ -1616,7 +1616,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         baseline = frappe.get_doc(get_ticket_obj()).insert()
         self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
-        self.assertEqual(baseline.via_customer_portal, 1)
+        # via_customer_portal is no longer force-stamped; a plain insert keeps
+        # the field default.
+        self.assertEqual(baseline.via_customer_portal, 0)
         self.assertTrue(baseline.key)
 
         spoofed = frappe.get_doc(
@@ -1630,6 +1632,14 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(spoofed.raised_by, PERMS_CUSTOMER)
         self.assertEqual(spoofed.priority, baseline.priority)
         self.assertNotEqual(spoofed.contact, other_contact)
+
+    def test_portal_flag_survives_permlevel_on_insert(self):
+        # via_customer_portal is permlevel-2; the insert exemption lets the
+        # entry point's value (api.new stamps 1 for the portal) survive the
+        # framework's reset even though the customer can't write it directly.
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1}).insert()
+        self.assertEqual(ticket.via_customer_portal, 1)
 
     def test_hidden_template_field_not_writable_by_customer(self):
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
