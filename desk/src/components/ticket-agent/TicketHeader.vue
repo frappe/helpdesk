@@ -55,12 +55,6 @@
                   "
                 />
               </template>
-              <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
-                  class="h-4"
-                />
-              </template>
             </Button>
           </template>
         </Dropdown>
