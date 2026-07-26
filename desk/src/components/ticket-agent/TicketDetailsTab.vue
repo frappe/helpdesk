@@ -143,7 +143,7 @@ import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketSLA from "./TicketSLA.vue";
-import TicketTags from "./TicketTags.vue";
+import TicketTags from "./tag/TicketTags.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;

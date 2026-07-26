@@ -98,6 +98,64 @@ class TestTicketTags(FrappeTestCase):
         # a comma would corrupt the comma-separated _user_tags column
         self.assertRaises(frappe.ValidationError, self.ticket.add_tag, "a,b")
 
+    def test_claim_desk_tags(self):
+        # Desk's tag sidebar mints Tag masters with no app/color; the picker
+        # sends them as adds on session close, which claims them for helpdesk
+        frappe.set_user(AGENT_EMAIL)
+        add_tag("desk-minted", "HD Ticket", self.ticket.name)
+        self.assertNotEqual(
+            frappe.db.get_value("Tag", "desk-minted", "app"), "helpdesk"
+        )
+
+        self.ticket.update_tags(added=[{"name": "desk-minted", "color": "Gray"}])
+
+        tag = frappe.db.get_value("Tag", "desk-minted", ["app", "color"], as_dict=1)
+        self.assertEqual(tag.app, "helpdesk")
+        self.assertEqual(tag.color, "Gray")
+        self.assertEqual(
+            frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags").count(
+                "desk-minted"
+            ),
+            1,
+        )
+        # a claim is bookkeeping, not a change: no activity logged
+        self.assertFalse(
+            frappe.db.exists(
+                "HD Ticket Activity",
+                {"ticket": self.ticket.name, "action": ["like", "%desk-minted%"]},
+            )
+        )
+
+    def test_update_tags_applies_batch(self):
+        frappe.set_user(AGENT_EMAIL)
+        self.ticket.add_tag("batch-old")
+
+        self.ticket.update_tags(
+            added=[{"name": "batch-new", "color": "Blue"}, {"name": "batch-plain"}],
+            removed=["batch-old"],
+        )
+
+        user_tags = frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags")
+        self.assertIn("batch-new", user_tags)
+        self.assertIn("batch-plain", user_tags)
+        self.assertNotIn("batch-old", user_tags)
+        self.assertEqual(frappe.db.get_value("Tag", "batch-new", "color"), "Blue")
+        self.assertEqual(frappe.db.get_value("Tag", "batch-plain", "color"), "Gray")
+
+        # one activity for the whole batch
+        self.assertTrue(
+            frappe.db.exists(
+                "HD Ticket Activity",
+                {
+                    "ticket": self.ticket.name,
+                    "action": "added tags batch-new, batch-plain & removed tag batch-old",
+                },
+            )
+        )
+
+        # empty batches are a no-op, not an error
+        self.ticket.update_tags()
+
     def test_custom_fields_exist_on_tag(self):
         for fieldname in ("app", "color"):
             self.assertTrue(

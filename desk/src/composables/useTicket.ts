@@ -29,6 +29,7 @@ export const useTicket = (ticketId: string | number): MapValue => {
         name: ticketId,
         whitelistedMethods: {
           markSeen: "mark_seen",
+          updateTags: "update_tags",
         },
         setValue: {
           onSuccess: () => {
