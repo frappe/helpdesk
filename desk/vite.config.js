@@ -112,6 +112,9 @@ export default defineConfig(async ({ mode }) => {
         // each so its Combobox shares helpdesk's frappe-ui, not a second copy.
         "vue",
         "frappe-ui",
+        // @framework/ui is linked from source, so rollup resolves its imports from apps/frappe/ui and never reaches desk/node_modules. These two arrive as frappe-ui deps and are only findable from the root.
+        "dompurify",
+        "reka-ui",
         "@tiptap/core",
         "@tiptap/pm",
         "prosemirror-state",
