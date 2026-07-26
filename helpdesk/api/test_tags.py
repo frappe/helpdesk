@@ -1,16 +1,17 @@
 import frappe
-from frappe.desk.doctype.tag.tag import add_tag, remove_tag
+from frappe.desk.doctype.tag.tag import add_tag
 from frappe.tests.utils import FrappeTestCase
 
+from helpdesk.api.tags import apply_tag, update_tags
 from helpdesk.test_utils import create_agent, make_ticket
 
 AGENT_EMAIL = "helpdesk-tag-agent@example.com"
 
 
 class TestTicketTags(FrappeTestCase):
-    """The tag picker has no helpdesk endpoints: it relies on core Tag
-    permissions (role "All") for list/create and on core add_tag/remove_tag
-    for linking. These tests guard that contract."""
+    """The tag picker sends one batch per edit session to
+    `helpdesk.api.tags.update_tags`, which builds on core Tag permissions
+    and core add_tag/remove_tag for linking. These tests guard that contract."""
 
     @classmethod
     def setUpClass(cls):
@@ -21,51 +22,43 @@ class TestTicketTags(FrappeTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    def test_agent_can_create_and_list_helpdesk_tags(self):
+    def test_doc_add_and_remove_tag(self):
         frappe.set_user(AGENT_EMAIL)
-        tag = frappe.get_doc(
-            {
-                "doctype": "Tag",
-                "name": "tag-perm-test",
-                "app": "helpdesk",
-                "color": "Teal",
-            }
-        )
-        tag.insert()
-        tags = frappe.get_list(
-            "Tag", filters={"app": "helpdesk"}, fields=["name", "color"]
-        )
-        by_name = {t.name: t.color for t in tags}
-        self.assertEqual(by_name.get("tag-perm-test"), "Teal")
+        # the ticket overrides core's add_tag, which leaves app/color unset
+        self.ticket.add_tag("vip-customer", "Red")
 
-    def test_tag_round_trip_on_ticket(self):
-        frappe.set_user(AGENT_EMAIL)
-        add_tag("round-trip", "HD Ticket", self.ticket.name)
-
-        user_tags = frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags")
-        self.assertIn("round-trip", user_tags)
+        tag = frappe.get_doc("Tag", "vip-customer")
+        self.assertEqual(tag.app, "helpdesk")
+        self.assertEqual(tag.color, "Red")
+        # the picker lists tags as the agent, not as Administrator
+        listed = frappe.get_list("Tag", filters={"app": "helpdesk"}, fields=["name"])
+        self.assertIn("vip-customer", [t.name for t in listed])
         self.assertTrue(
             frappe.db.exists(
                 "Tag Link",
                 {
                     "document_type": "HD Ticket",
                     "document_name": self.ticket.name,
-                    "tag": "round-trip",
+                    "tag": "vip-customer",
                 },
             )
         )
 
-        add_tag("round-trip", "HD Ticket", self.ticket.name)
+        # colour is applied only on creation, and a repeat add is not a dupe
+        self.ticket.add_tag("vip-customer", "Blue")
+        self.assertEqual(frappe.db.get_value("Tag", "vip-customer", "color"), "Red")
         self.assertEqual(
             frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags").count(
-                "round-trip"
+                "vip-customer"
             ),
             1,
         )
 
-        remove_tag("round-trip", "HD Ticket", self.ticket.name)
+        # core's remove_tag is enough: it unlinks, and ignores a second call
+        self.ticket.remove_tag("vip-customer")
+        self.ticket.remove_tag("vip-customer")
         self.assertNotIn(
-            "round-trip",
+            "vip-customer",
             frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags") or "",
         )
         self.assertFalse(
@@ -74,26 +67,10 @@ class TestTicketTags(FrappeTestCase):
                 {
                     "document_type": "HD Ticket",
                     "document_name": self.ticket.name,
-                    "tag": "round-trip",
+                    "tag": "vip-customer",
                 },
             )
         )
-
-    def test_add_tag_method_creates_colored_tag_and_links(self):
-        frappe.set_user(AGENT_EMAIL)
-        self.ticket.add_tag("vip-customer", "Red")
-
-        tag = frappe.get_doc("Tag", "vip-customer")
-        self.assertEqual(tag.app, "helpdesk")
-        self.assertEqual(tag.color, "Red")
-        self.assertIn(
-            "vip-customer",
-            frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags"),
-        )
-
-        # colour is applied only on creation; a second call keeps the original
-        self.ticket.add_tag("vip-customer", "Blue")
-        self.assertEqual(frappe.db.get_value("Tag", "vip-customer", "color"), "Red")
 
         # a comma would corrupt the comma-separated _user_tags column
         self.assertRaises(frappe.ValidationError, self.ticket.add_tag, "a,b")
@@ -107,7 +84,11 @@ class TestTicketTags(FrappeTestCase):
             frappe.db.get_value("Tag", "desk-minted", "app"), "helpdesk"
         )
 
-        self.ticket.update_tags(added=[{"name": "desk-minted", "color": "Gray"}])
+        update_tags(
+            "HD Ticket",
+            self.ticket.name,
+            added=[{"name": "desk-minted", "color": "Gray"}],
+        )
 
         tag = frappe.db.get_value("Tag", "desk-minted", ["app", "color"], as_dict=1)
         self.assertEqual(tag.app, "helpdesk")
@@ -128,14 +109,16 @@ class TestTicketTags(FrappeTestCase):
 
     def test_update_tags_applies_batch(self):
         frappe.set_user(AGENT_EMAIL)
-        self.ticket.add_tag("batch-old")
+        apply_tag("HD Ticket", self.ticket.name, "batch-old")
 
-        self.ticket.update_tags(
+        # the response carries the new _user_tags, so the picker needs no reload
+        user_tags = update_tags(
+            "HD Ticket",
+            self.ticket.name,
             added=[{"name": "batch-new", "color": "Blue"}, {"name": "batch-plain"}],
             removed=["batch-old"],
         )
 
-        user_tags = frappe.db.get_value("HD Ticket", self.ticket.name, "_user_tags")
         self.assertIn("batch-new", user_tags)
         self.assertIn("batch-plain", user_tags)
         self.assertNotIn("batch-old", user_tags)
@@ -154,10 +137,29 @@ class TestTicketTags(FrappeTestCase):
         )
 
         # empty batches are a no-op, not an error
-        self.ticket.update_tags()
+        update_tags("HD Ticket", self.ticket.name)
 
-    def test_custom_fields_exist_on_tag(self):
-        for fieldname in ("app", "color"):
-            self.assertTrue(
-                frappe.db.exists("Custom Field", {"dt": "Tag", "fieldname": fieldname})
+    def test_tags_apply_to_any_doctype(self):
+        # the endpoint takes doctype/name, so tags are not a ticket feature;
+        # only the activity log is, and it stays quiet for other doctypes
+        frappe.set_user(AGENT_EMAIL)
+        article = frappe.get_doc(
+            {"doctype": "HD Article", "title": "Tagging an article"}
+        ).insert()
+
+        user_tags = update_tags(
+            "HD Article", article.name, added=[{"name": "kb-topic", "color": "Cyan"}]
+        )
+
+        self.assertIn("kb-topic", user_tags)
+        self.assertEqual(frappe.db.get_value("Tag", "kb-topic", "app"), "helpdesk")
+        self.assertTrue(
+            frappe.db.exists(
+                "Tag Link",
+                {
+                    "document_type": "HD Article",
+                    "document_name": article.name,
+                    "tag": "kb-topic",
+                },
             )
+        )

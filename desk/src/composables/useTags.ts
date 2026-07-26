@@ -32,7 +32,7 @@ export function colorToken(color?: string): string {
 }
 
 /** Shared master list of helpdesk tags. Per-document tag changes go through
- * the document resource's whitelisted `update_tags` method (see useTicket). */
+ * `helpdesk.api.tags.update_tags` (see Tags.vue). */
 export function useTags() {
   const tagListResource = createListResource({
     doctype: "Tag",
