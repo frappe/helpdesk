@@ -20,8 +20,6 @@
           size="md"
           :hide-name="true"
         />
-        <!-- Navigation -->
-        <TicketNavigation :key="ticket?.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
@@ -120,7 +118,6 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
-import TicketNavigation from "./TicketNavigation.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();

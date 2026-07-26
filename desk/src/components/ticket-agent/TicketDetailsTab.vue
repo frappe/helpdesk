@@ -150,12 +150,6 @@ const assignees = inject(AssigneeSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
-// Chips (24px) sit taller than the label, so nudge the label down a touch more
-// when tags are present to keep the baselines aligned.
-const hasTags = computed(() =>
-  Boolean((ticket.value.doc?._user_tags || "").split(",").some(Boolean))
-);
-
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 

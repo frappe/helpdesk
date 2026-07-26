@@ -126,7 +126,7 @@ import {
   SidebarLabel,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
@@ -153,7 +153,9 @@ const showCommandPalette = ref(false);
 
 // Local modal state for the per-view kebab menu (edit/duplicate). The action
 // logic itself is shared via useView so the sidebar and breadcrumb stay in sync.
-let viewDialogConfig = reactive({
+// ref, not reactive: v-model needs a writable binding, and a ref stays
+// reactive even if ViewModal ever replaces the whole object.
+const viewDialogConfig = ref({
   show: false,
   view: { label: "", icon: "", name: "" },
   mode: "create",
