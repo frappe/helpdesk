@@ -228,3 +228,10 @@ class TestHDAgent(FrappeTestCase):
 
     def tearDown(self):
         frappe.set_user("Administrator")
+        # Delete the teams created here so their auto-created assignment rules (and
+        # the cached Assignment Rule doctype-map) don't leak into other tests and
+        # break ticket creation with a phantom "... - Support Rotation not found".
+        for team in frappe.get_all(
+            "HD Team", filters={"name": ["like", "Test AR%"]}, pluck="name"
+        ):
+            frappe.delete_doc("HD Team", team, force=True, ignore_permissions=True)

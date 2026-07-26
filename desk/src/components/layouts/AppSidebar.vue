@@ -3,6 +3,7 @@
     v-model:collapsed="collapsed"
     :disable-collapse="mobile"
     class="border-e border-outline-gray-1"
+    :class="{ '!bg-surface-base': mobile }"
   >
     <div class="flex h-full flex-col p-2">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
@@ -12,13 +13,13 @@
           <SidebarLabel
             v-if="section.label"
             divider
-            class="my-1 select-none"
+            class="mt-4 my-1 select-none"
             :class="section.collapsible && !isCollapsed && 'cursor-pointer'"
             @click="section.collapsible && toggleSection(section.label)"
           >
             <span class="flex items-center gap-1.5 text-sm font-medium">
               <span
-                class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out"
+                class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out -ml-0.5"
                 :class="{ 'rotate-90': isSectionOpen(section.label) }"
               />
               <span class="truncate">{{ section.label }}</span>

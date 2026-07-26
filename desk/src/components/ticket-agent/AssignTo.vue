@@ -26,7 +26,7 @@
           "
           @click="togglePopover()"
         >
-          <div class="flex items-center min-h-5 gap-2 w-full">
+          <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
             <template v-if="localAssignees.length > 0">
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
@@ -166,6 +166,7 @@
 </template>
 
 <script setup lang="ts">
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
@@ -178,7 +179,6 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
-import ShortcutKey from "@/components/ShortcutKey.vue";
 import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {
