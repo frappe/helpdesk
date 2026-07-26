@@ -510,6 +510,7 @@ class HDTicket(Document):
             self.notify_agent(agent, "Assignment")
 
     @frappe.whitelist()
+    @agent_only
     def add_tag(self, label: str, color: str = "Gray"):
         """Add a tag to this ticket, creating the helpdesk Tag master if needed.
 
