@@ -279,7 +279,7 @@ function handleResolutionByField(row: any, item: string) {
     h(Badge, {
       label: shortDuration(item),
       variant: "subtle",
-      theme: "orange",
+      theme: "violet",
     })
   );
 }

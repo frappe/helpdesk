@@ -59,7 +59,10 @@ import {
   revalidateTicket,
   useTicket,
 } from "@/composables/useTicket";
-import { ticketsToNavigate } from "@/composables/useTicketNavigation";
+import {
+  ticketsToNavigate,
+  useTicketNavigation,
+} from "@/composables/useTicketNavigation";
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
@@ -93,6 +96,8 @@ const props = defineProps({
 });
 const route = useRoute();
 const showPhoneModal = ref(false);
+
+useTicketNavigation();
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);

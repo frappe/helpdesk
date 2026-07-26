@@ -58,7 +58,7 @@
               />
               <DotIcon
                 v-else
-                class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
+                class="text-ink-gray-3 absolute start-[7.5px] top-[6px]"
               />
             </div>
           </div>
@@ -110,6 +110,9 @@
 
 <script setup lang="ts">
 import { FadedScrollableDiv } from "@/components";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -124,9 +127,6 @@ import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
-import CommentBox from "@/components/CommentBox.vue";
-import EmailArea from "@/components/EmailArea.vue";
-import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {

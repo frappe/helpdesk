@@ -1,3 +1,4 @@
+import { useShortcut } from "@/composables/shortcuts";
 import { createResource } from "frappe-ui";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -66,7 +67,13 @@ export function useTicketNavigation() {
     router.push(routeToNavigate);
   }
 
-  // Remove the watcher that was causing conflicts
+  // Shift + < / > to move through the current view's tickets. Listeners are
+  // registered per caller, so call this once per page (the ticket page).
+  const ready = () =>
+    !ticketsToNavigate.loading && ticketsToNavigate.data?.length > 1;
+
+  useShortcut({ key: ">", shift: true }, () => ready() && goToNextTicket());
+  useShortcut({ key: "<", shift: true }, () => ready() && goToPreviousTicket());
 
   return {
     currentTicketIndex,
