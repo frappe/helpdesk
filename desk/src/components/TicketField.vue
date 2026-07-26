@@ -25,7 +25,7 @@ import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
-import { Link } from "@framework/ui";
+import { Link } from "@framework/ui/components/Link/index.ts";
 import {
   createResource,
   DatePicker,
