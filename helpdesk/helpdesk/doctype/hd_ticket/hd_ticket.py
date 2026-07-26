@@ -509,14 +509,15 @@ class HDTicket(Document):
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
 
-    @frappe.whitelist()
-    @agent_only
     def add_tag(self, label: str, color: str = "Gray"):
         """Add a tag to this ticket, creating the helpdesk Tag master if needed.
 
-        Handy from server scripts. ``color`` is one of the Tag colour options
-        (e.g. "Red", "Blue") and is applied only when the tag is first created;
-        an existing tag keeps its colour.
+        Internal unit behind ``update_tags`` (the remote entry point), also
+        handy from server scripts. ``color`` is one of the Tag colour options
+        (e.g. "Red", "Blue") and is applied only when the tag is first created
+        or claimed; an existing coloured tag keeps its colour. Tags minted
+        outside helpdesk (Desk's tag sidebar leaves app/color empty) are
+        claimed for helpdesk so they appear in the tag picker.
         """
         from frappe.desk.doctype.tag.tag import add_tag as link_tag
 
@@ -529,7 +530,8 @@ class HDTicket(Document):
 
         self.check_permission("write")
 
-        if not frappe.db.exists("Tag", label):
+        existing = frappe.db.get_value("Tag", label, ["app", "color"], as_dict=1)
+        if not existing:
             frappe.get_doc(
                 {
                     "doctype": "Tag",
@@ -538,9 +540,59 @@ class HDTicket(Document):
                     "color": color,
                 }
             ).insert(ignore_permissions=True, ignore_if_duplicate=True)
+        elif existing.app != "helpdesk":
+            frappe.db.set_value(
+                "Tag",
+                label,
+                {"app": "helpdesk", "color": existing.color or color},
+                update_modified=False,
+            )
 
         link_tag(label, self.doctype, self.name)
         return label
+
+    @frappe.whitelist()
+    @agent_only
+    def update_tags(
+        self, added: list[dict] | None = None, removed: list[str] | None = None
+    ):
+        """Apply a batch of tag changes in one call (one transaction).
+
+        ``added`` is a list of ``{"name": ..., "color": ...}``; ``removed`` is
+        a list of tag names. The tag picker sends one batch per edit session.
+        Logs one activity for the batch; claims of already-applied tags
+        (see ``add_tag``) don't count as changes and aren't logged.
+        """
+        from frappe.desk.doctype.tag.tag import remove_tag as unlink_tag
+
+        # from the db, not self: DocTags writes _user_tags via set_value, so
+        # the loaded doc's copy can be stale
+        applied = frappe.db.get_value(self.doctype, self.name, "_user_tags") or ""
+        before = {tag.strip() for tag in applied.split(",") if tag.strip()}
+        for tag in added or []:
+            self.add_tag(tag["name"], tag.get("color") or "Gray")
+        for name in removed or []:
+            unlink_tag(name, self.doctype, self.name)
+
+        added_names = [name for tag in added or [] if (name := tag["name"].strip())]
+        self._log_tag_activity(
+            [name for name in added_names if name not in before],
+            [name for name in removed or [] if name in before],
+        )
+        # DocTags wrote _user_tags behind this instance's back; refresh so the
+        # doc returned to the client (run_doc_method response) carries it
+        self.reload()
+
+    def _log_tag_activity(self, added: list[str], removed: list[str]):
+        parts = []
+        if added:
+            parts.append(f"added tag{'s' if len(added) > 1 else ''} {', '.join(added)}")
+        if removed:
+            parts.append(
+                f"removed tag{'s' if len(removed) > 1 else ''} {', '.join(removed)}"
+            )
+        if parts:
+            log_ticket_activity(self.name, " & ".join(parts))
 
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
