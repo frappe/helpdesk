@@ -46,7 +46,12 @@
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
             <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
-              <TicketTags />
+              <Tags
+                doctype="HD Ticket"
+                :name="ticket.doc?.name"
+                :tags="ticket.doc?._user_tags"
+                @change="onTagsChange"
+              />
             </div>
           </div>
         </div>
@@ -139,11 +144,11 @@ import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import FieldLabel from "../FieldLabel.vue";
 import Section from "../Section.vue";
+import Tags from "../tag/Tags.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketSLA from "./TicketSLA.vue";
-import TicketTags from "./tag/TicketTags.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -306,6 +311,10 @@ function handleFieldUpdate(
 
     //show error toast
   );
+}
+
+function onTagsChange() {
+  activities.value.reload();
 }
 
 const fieldRefs = ref<Record<string, any>>({});

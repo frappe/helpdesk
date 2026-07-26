@@ -93,17 +93,14 @@
 // picker and TagColorPicker are closed. `localTags` is the source of truth
 // while it runs, `appliedAtOpen` is the snapshot to diff against, and the close
 // sends one add/remove batch.
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
-import { useTicket } from "@/composables/useTicket";
 import { colorToken, useTags, type Tag } from "@/composables/useTags";
 import { __ } from "@/translation";
-import { TicketSymbol } from "@/types";
 import { useEventListener } from "@vueuse/core";
-import { Badge, MultiSelect, toast, Tooltip } from "frappe-ui";
-import { computed, h, inject, onBeforeUnmount, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { Badge, call, MultiSelect, toast, Tooltip } from "frappe-ui";
+import { computed, h, onBeforeUnmount, ref, watch } from "vue";
 import LucidePlus from "~icons/lucide/plus";
-import ShortcutKey from "@/components/ShortcutKey.vue";
 import TagChip from "./TagChip.vue";
 import TagColorPicker from "./TagColorPicker.vue";
 
@@ -114,8 +111,13 @@ const CREATE_VALUE = "__create__";
 // chip it hides
 const VISIBLE_TAGS = 3;
 
-const ticket = inject(TicketSymbol)!;
-const route = useRoute();
+const props = defineProps<{
+  doctype: string;
+  name: string;
+  tags?: string | undefined;
+}>();
+const emit = defineEmits<{ change: [] }>();
+
 const { tagListResource } = useTags();
 
 const tagPickerOpen = ref(false);
@@ -123,8 +125,6 @@ const colorPickerOpen = ref(false);
 const queryText = ref("");
 const localTags = ref<string[]>([]);
 const appliedAtOpen = ref<string[]>([]);
-// batches target the ticket the session opened on, not the current route
-let sessionTicketId = "";
 let syncing = false;
 
 const pendingTag = ref("");
@@ -133,9 +133,9 @@ const pendingColors = ref<Record<string, string>>({});
 
 const appliedTags = computed<string[]>(() => [
   ...new Set(
-    (ticket.value.doc?._user_tags || "")
+    (props.tags || "")
       .split(",")
-      .map((tag: string) => tag.trim())
+      .map((tag) => tag.trim())
       .filter(Boolean)
   ),
 ]);
@@ -279,19 +279,21 @@ async function syncTagChanges() {
   // rebase so a session reopened mid-request doesn't resend this batch
   appliedAtOpen.value = [...next];
   syncing = true;
-  const session = useTicket(sessionTicketId);
   try {
-    // success writes the returned doc into the resource: no manual reload
-    await session.ticket.updateTags.submit({ added, removed });
-    session.activities.reload();
+    await call("helpdesk.api.tags.update_tags", {
+      doctype: props.doctype,
+      name: props.name,
+      added,
+      removed,
+    });
+    emit("change");
   } catch (error: any) {
     toast.error(error?.messages?.join(", ") || __("Failed to update tags"));
-    await ticket.value.reload();
+    // the failed batch left the document unchanged, so no `tags` change will
+    // roll the optimistic chips back
+    localTags.value = [...appliedTags.value];
   } finally {
     syncing = false;
-    // a failed batch leaves _user_tags unchanged, so no watcher would fire
-    // to roll the optimistic chips back; adopt explicitly
-    adoptServerTags();
   }
 }
 
@@ -338,7 +340,6 @@ watch(tagPickerOpen, (open) => {
   queryText.value = "";
   if (open) {
     appliedAtOpen.value = [...localTags.value];
-    sessionTicketId = route.params.ticketId as string;
     tagListResource.reload();
   } else if (!colorPickerOpen.value) {
     // the create flow hands the session to the colour popover
