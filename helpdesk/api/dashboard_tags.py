@@ -42,6 +42,7 @@ class TagDashboard(HelpdeskDashboard):
         return get_bar_chart_config(
             # bars are drawn bottom-up, so ascending puts the biggest on top
             top_tag_data[::-1],
+            "top_tags",
             _("Top Tags"),
             _("Most used tags in this period"),
             {"key": "tag", "type": "category", "title": _("Tag")},
@@ -67,6 +68,7 @@ class TagDashboard(HelpdeskDashboard):
 
         return get_bar_chart_config(
             self.pivot_by_date(rows, tags),
+            "tag_trend",
             _("Tag Trend"),
             _("Daily volume of the top {0} tags").format(TREND_TAG_COUNT),
             {"key": "date", "type": "time", "title": _("Date"), "timeGrain": "day"},

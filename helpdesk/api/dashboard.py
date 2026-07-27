@@ -300,6 +300,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "ticket_trend",
             _("Ticket Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -381,6 +382,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "feedback_trend",
             _("Feedback Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -458,6 +460,7 @@ def get_team_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Percentage of total tickets by team"),
             "team",
@@ -466,6 +469,7 @@ def get_team_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Total tickets by team"),
             {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
@@ -491,6 +495,7 @@ def get_ticket_type_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Percentage of total tickets by type"),
             "type",
@@ -499,6 +504,7 @@ def get_ticket_type_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Total tickets by type"),
             {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
@@ -524,6 +530,7 @@ def get_ticket_priority_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Percentage of total tickets by priority"),
             "priority",
@@ -532,6 +539,7 @@ def get_ticket_priority_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Total tickets by priority"),
             {
@@ -564,6 +572,7 @@ def get_ticket_channel_chart_data(
 
     return get_pie_chart_config(
         result,
+        "tickets_by_channel",
         _("Tickets by Channel"),
         _("Percentage of total tickets by channel"),
         "channel",
@@ -573,6 +582,7 @@ def get_ticket_channel_chart_data(
 
 def get_pie_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     category_column: str,
@@ -581,6 +591,8 @@ def get_pie_chart_config(
     return {
         "type": "pie",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "categoryColumn": category_column,
@@ -590,6 +602,7 @@ def get_pie_chart_config(
 
 def get_bar_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     x_axis_config: dict[str, any],
@@ -600,6 +613,8 @@ def get_bar_chart_config(
     return {
         "type": "axis",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "xAxis": x_axis_config,

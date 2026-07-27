@@ -275,46 +275,63 @@ const colors = [
   "#15CCEF",
   "#A6B1B9",
 ];
-// Chart title (as returned by the dashboard APIs) → empty state copy.
-const emptyStateByChart: Record<string, { title: string; message: string }> = {
-  "Ticket Trend": {
+interface ChartEmptyState {
+  // header of the card, shown untranslated only when the chart itself is missing
+  chartTitle: string;
+  chartSubtitle?: string;
+  title: string;
+  message: string;
+}
+
+// Chart key (stable, untranslated identifier from the dashboard APIs) → empty state copy.
+const emptyStateByChart: Record<string, ChartEmptyState> = {
+  ticket_trend: {
+    chartTitle: "Ticket Trend",
     title: "No ticket activity",
     message: "Ticket trends will appear here once tickets are created.",
   },
-  "Feedback Trend": {
+  feedback_trend: {
+    chartTitle: "Feedback Trend",
     title: "No feedback data",
     message: "Feedback insights will appear once responses are collected.",
   },
-  "Tickets by Team": {
+  tickets_by_team: {
+    chartTitle: "Tickets by Team",
     title: "No team data",
     message: "Tickets will be grouped by team once available.",
   },
-  "Tickets by Type": {
+  tickets_by_type: {
+    chartTitle: "Tickets by Type",
     title: "No ticket type data",
     message: "Tickets will be categorized by type once created.",
   },
-  "Tickets by Priority": {
+  tickets_by_priority: {
+    chartTitle: "Tickets by Priority",
     title: "No priority data",
     message: "Ticket priorities will be reflected here once assigned.",
   },
-  "Tickets by Channel": {
+  tickets_by_channel: {
+    chartTitle: "Tickets by Channel",
     title: "No channel data",
     message: "Tickets will be grouped by channel once received.",
   },
-  "Top Tags": {
+  top_tags: {
+    chartTitle: "Top Tags",
     title: "No tags used yet",
     message: "The most used tags will be ranked here once tickets are tagged.",
   },
-  "Tag Trend": {
+  tag_trend: {
+    chartTitle: "Tag Trend",
     title: "No tag activity",
     message: "Daily tag volume will appear here once tickets are tagged.",
   },
 };
 
+// whole dashboard empty: no chart payload to read titles from, so fall back to ours
 const emptyStates = Object.values(emptyStateByChart);
 
 function chartEmptyState(chart: any) {
-  const state = emptyStateByChart[chart?.title] ?? {
+  const state = emptyStateByChart[chart?.key] ?? {
     title: `No ${String(chart?.title).toLowerCase()} available`,
   };
   return [
