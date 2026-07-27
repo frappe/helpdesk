@@ -150,6 +150,32 @@
             />
           </template>
         </div>
+
+        <!-- Tag Charts -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          v-if="!tagData.loading"
+        >
+          <template v-for="(chart, index) in tagData.data" :key="index">
+            <!-- has data -->
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="[
+                {
+                  title: `No ${(chart?.title).toLowerCase()} available.`,
+                },
+              ]"
+            />
+          </template>
+        </div>
       </div>
 
       <!-- Skeleton Loading State -->
@@ -176,7 +202,7 @@
         <div>
           <SkeletonLoader
             :variants="['bar-chart', 'empty-state']"
-            :bar-chart-count="6"
+            :bar-chart-count="8"
             :empty-states="emptyStates"
             :has-applied-filter="hasAppliedFilter"
           />
@@ -286,6 +312,14 @@ const emptyStates = [
     title: "No channel data",
     message: "Tickets will be grouped by channel once received.",
   },
+  {
+    title: "No tag data",
+    message: "Tags will be ranked here once tickets are tagged.",
+  },
+  {
+    title: "No tag trend",
+    message: "Daily tag volume will appear once tickets are tagged.",
+  },
 ];
 
 const tabButtons = computed(() => {
@@ -358,6 +392,14 @@ const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   makeParams: () => ({
     dashboard_type: "trend",
+    filters: parseFilters(filters),
+  }),
+});
+
+const tagData = createResource({
+  url: "helpdesk.api.dashboard.get_dashboard_data",
+  makeParams: () => ({
+    dashboard_type: "tags",
     filters: parseFilters(filters),
   }),
 });
@@ -547,6 +589,7 @@ watch(
     numberCards.reload();
     masterData.reload();
     trendData.reload();
+    tagData.reload();
   },
   { deep: true }
 );
@@ -560,6 +603,7 @@ onMounted(() => {
   numberCards.reload();
   masterData.reload();
   trendData.reload();
+  tagData.reload();
 });
 
 usePageMeta(() => {
