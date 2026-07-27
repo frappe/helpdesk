@@ -143,10 +143,10 @@
           </template>
         </div>
 
-        <!-- Tag Charts -->
+        <!-- Tag Charts: org level insight, an agent cannot act on their own tag mix -->
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
-          v-if="!tagData.loading"
+          v-if="isManager && !tagData.loading"
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
@@ -190,7 +190,7 @@
         <div>
           <SkeletonLoader
             :variants="['bar-chart', 'empty-state']"
-            :bar-chart-count="8"
+            :bar-chart-count="emptyStates.length"
             :empty-states="emptyStates"
             :has-applied-filter="hasAppliedFilter"
           />
@@ -327,8 +327,14 @@ const emptyStateByChart: Record<string, ChartEmptyState> = {
   },
 };
 
+const managerOnlyCharts = ["top_tags", "tag_trend"];
+
 // whole dashboard empty: no chart payload to read titles from, so fall back to ours
-const emptyStates = Object.values(emptyStateByChart);
+const emptyStates = computed(() =>
+  Object.entries(emptyStateByChart)
+    .filter(([key]) => isManager || !managerOnlyCharts.includes(key))
+    .map(([, state]) => state)
+);
 
 function chartEmptyState(chart: any) {
   const state = emptyStateByChart[chart?.key] ?? {
@@ -606,7 +612,7 @@ watch(
     numberCards.reload();
     masterData.reload();
     trendData.reload();
-    tagData.reload();
+    if (isManager) tagData.reload();
   },
   { deep: true }
 );
@@ -620,7 +626,7 @@ onMounted(() => {
   numberCards.reload();
   masterData.reload();
   trendData.reload();
-  tagData.reload();
+  if (isManager) tagData.reload();
 });
 
 usePageMeta(() => {
