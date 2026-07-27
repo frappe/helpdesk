@@ -64,6 +64,33 @@ class HelpdeskSearch(SQLiteSearch):
         },
     }
 
+    def is_search_enabled(self):
+        """Disable the SQLite index while the RediSearch backend is selected.
+
+        The core drives SQLiteSearch through global doc_events and schedulers
+        that all guard on ``is_search_enabled()``. Returning False here makes
+        that orchestration skip this class, so no SQLite index is built or
+        updated when the operator has switched ticket search to RediSearch.
+        """
+        return (
+            frappe.db.get_single_value("HD Settings", "search_backend") != "RediSearch"
+        )
+
+    def search(self, query, title_only=False, filters=None, limit=None):
+        """Search, honouring the API's ``limit`` (previously accepted but never
+        forwarded to either backend).
+
+        The core returns every match; when the caller passes a ``limit`` (the
+        frontend sends ``limit: 50``) the result page is capped to it so both the
+        SQLite and RediSearch backends obey the same contract.
+        """
+        result = super().search(query, title_only=title_only, filters=filters)
+        if limit:
+            capped = min(int(limit), 100)
+            result["results"] = result["results"][:capped]
+            result["summary"]["filtered_matches"] = len(result["results"])
+        return result
+
     def get_search_filters(self):
         """Return permission filters based on accessible tickets."""
         accessible_tickets = self._get_accessible_tickets()
