@@ -96,7 +96,7 @@
       </div>
     </div>
   </Sidebar>
-  <CP v-if="!mobile" v-model="showCommandPalette" />
+  <CP v-if="!mobile" />
   <ViewModal
     v-if="viewDialogConfig.show"
     v-model="viewDialogConfig"
@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import CP from "@/components/command-palette/CP.vue";
+import { openPalette } from "@/components/command-palette/useCommandPalette";
 import UserMenu from "@/components/UserMenu.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
@@ -148,8 +149,6 @@ const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
 const { isCallingEnabled } = storeToRefs(useTelephonyStore());
 const { pinnedViews, publicViews, viewActions, handleView } = useView();
-
-const showCommandPalette = ref(false);
 
 // Local modal state for the per-view kebab menu (edit/duplicate). The action
 // logic itself is shared via useView so the sidebar and breadcrumb stay in sync.
@@ -214,7 +213,7 @@ const navItems = computed(() => {
 const searchItem = computed(() => ({
   label: __("Search"),
   icon: LucideSearch,
-  onClick: () => (showCommandPalette.value = true),
+  onClick: () => openPalette(),
   shortcut: true,
   key: "search",
 }));

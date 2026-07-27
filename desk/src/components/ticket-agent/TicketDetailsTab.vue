@@ -45,7 +45,7 @@
             <FieldLabel label="Tags" class="pt-0.5" />
             <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
-            <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
+            <div class="min-w-0 flex-1 pb-0.5 ps-[9px]">
               <Tags
                 doctype="HD Ticket"
                 :name="ticket.doc?.name"

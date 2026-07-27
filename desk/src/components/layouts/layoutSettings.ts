@@ -1,5 +1,5 @@
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideContact2 from "~icons/lucide/contact-2";
+import LucideUsers from "~icons/lucide/users";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import { OrganizationsIcon } from "../icons";
@@ -35,7 +35,7 @@ export const agentPortalSidebarOptions = [
   },
   {
     label: __("Contacts"),
-    icon: LucideContact2,
+    icon: LucideUsers,
     to: "ContactList",
   },
   {

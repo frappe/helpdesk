@@ -80,6 +80,7 @@
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
+import { showMergeModal } from "@/pages/ticket/modalStates";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
@@ -234,7 +235,6 @@ const ticketCount = createResource({
   }),
   auto: true,
 });
-const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
     !ticket?.value?.doc?.is_merged &&
