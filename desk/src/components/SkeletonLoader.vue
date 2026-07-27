@@ -54,8 +54,18 @@
           :key="`chart-${i}`"
           class="border rounded-md min-h-[300px] p-4 space-y-3"
         >
-          <div class="h-4 w-1/3 bg-surface-gray-3 rounded" />
-          <div class="h-4 w-1/4 bg-surface-gray-1 rounded" />
+          <template v-if="getEmptyState(i).chartTitle">
+            <div class="text-ink-gray-8 text-p-base-medium">
+              {{ __(getEmptyState(i).chartTitle) }}
+            </div>
+            <div class="text-ink-gray-6 text-p-sm">
+              {{ __(getEmptyState(i).chartSubtitle ?? "") }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="h-4 w-1/3 bg-surface-gray-3 rounded" />
+            <div class="h-4 w-1/4 bg-surface-gray-1 rounded" />
+          </template>
 
           <div
             class="h-64 w-full rounded flex items-center justify-center relative overflow-hidden"

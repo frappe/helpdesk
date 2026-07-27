@@ -117,11 +117,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -142,11 +138,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -168,11 +160,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -287,40 +275,52 @@ const colors = [
   "#15CCEF",
   "#A6B1B9",
 ];
-const emptyStates = [
-  {
+// Chart title (as returned by the dashboard APIs) → empty state copy.
+const emptyStateByChart: Record<string, { title: string; message: string }> = {
+  "Ticket Trend": {
     title: "No ticket activity",
     message: "Ticket trends will appear here once tickets are created.",
   },
-  {
+  "Feedback Trend": {
     title: "No feedback data",
     message: "Feedback insights will appear once responses are collected.",
   },
-  {
+  "Tickets by Team": {
     title: "No team data",
     message: "Tickets will be grouped by team once available.",
   },
-  {
+  "Tickets by Type": {
     title: "No ticket type data",
     message: "Tickets will be categorized by type once created.",
   },
-  {
+  "Tickets by Priority": {
     title: "No priority data",
     message: "Ticket priorities will be reflected here once assigned.",
   },
-  {
+  "Tickets by Channel": {
     title: "No channel data",
     message: "Tickets will be grouped by channel once received.",
   },
-  {
-    title: "No tag data",
-    message: "Tags will be ranked here once tickets are tagged.",
+  "Top Tags": {
+    title: "No tags used yet",
+    message: "The most used tags will be ranked here once tickets are tagged.",
   },
-  {
-    title: "No tag trend",
-    message: "Daily tag volume will appear once tickets are tagged.",
+  "Tag Trend": {
+    title: "No tag activity",
+    message: "Daily tag volume will appear here once tickets are tagged.",
   },
-];
+};
+
+const emptyStates = Object.values(emptyStateByChart);
+
+function chartEmptyState(chart: any) {
+  const state = emptyStateByChart[chart?.title] ?? {
+    title: `No ${String(chart?.title).toLowerCase()} available`,
+  };
+  return [
+    { ...state, chartTitle: chart?.title, chartSubtitle: chart?.subtitle },
+  ];
+}
 
 const tabButtons = computed(() => {
   if (isMobileView.value) {
