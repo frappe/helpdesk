@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-07-03 12:07:21.572243",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "ticket_name",
+  "ticket_description",
+  "ticket_id",
+  "assigned_user"
+ ],
+ "fields": [
+  {
+   "fieldname": "ticket_name",
+   "fieldtype": "Data",
+   "label": "Ticket Name "
+  },
+  {
+   "fieldname": "ticket_description",
+   "fieldtype": "Text Editor",
+   "label": "Ticket Description"
+  },
+  {
+   "fieldname": "ticket_id",
+   "fieldtype": "Link",
+   "label": "Ticket ID",
+   "options": "HD Ticket"
+  },
+  {
+   "fieldname": "assigned_user",
+   "fieldtype": "Link",
+   "label": "Assigned User",
+   "options": "User"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-03 12:11:50.082029",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Child Ticket",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
