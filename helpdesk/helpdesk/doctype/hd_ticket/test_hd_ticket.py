@@ -622,10 +622,22 @@ class TestHDTicket(IntegrationTestCase):
         ticket = make_ticket()
         assign({"doctype": "HD Ticket", "name": ticket.name, "assign_to": [agent]})
 
+        # a ToDo that references the ticket without being an assignment
+        unallocated_todo = frappe.get_doc(
+            doctype="ToDo",
+            description="Chase the courier",
+            reference_type="HD Ticket",
+            reference_name=ticket.name,
+        ).insert(ignore_permissions=True)
+
         def todo_status():
             return frappe.db.get_value(
                 "ToDo",
-                {"reference_type": "HD Ticket", "reference_name": ticket.name},
+                {
+                    "reference_type": "HD Ticket",
+                    "reference_name": ticket.name,
+                    "allocated_to": agent,
+                },
                 "status",
             )
 
@@ -641,6 +653,9 @@ class TestHDTicket(IntegrationTestCase):
         self.assertIn(
             agent,
             frappe.db.get_value("HD Ticket", ticket.name, "_assign"),
+        )
+        self.assertEqual(
+            frappe.db.get_value("ToDo", unallocated_todo.name, "status"), "Open"
         )
 
         set_status("Replied")

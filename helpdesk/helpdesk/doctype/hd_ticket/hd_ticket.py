@@ -246,6 +246,10 @@ class HDTicket(Document):
     def sync_assignment_todos(self):
         """Close assignment ToDos once the ticket resolves, reopen them if it reopens.
 
+        Scoped to allocated ToDos, which is how `ToDo.update_in_reference` defines
+        an assignment, so ToDos merely referencing the ticket are left alone.
+        Cancelled ToDos stay cancelled, a removed assignment must not come back.
+
         Uses `db.set_value` because saving a ToDo drops the agent from `_assign`,
         which Helpdesk treats as the assignee for the ticket's whole lifetime.
         """
@@ -253,15 +257,19 @@ class HDTicket(Document):
             return
 
         resolved = self.status_category == "Resolved"
+        current_status, new_status = (
+            ("Open", "Closed") if resolved else ("Closed", "Open")
+        )
         frappe.db.set_value(
             "ToDo",
             {
                 "reference_type": "HD Ticket",
                 "reference_name": self.name,
-                "status": "Closed" if not resolved else "Open",
+                "allocated_to": ("is", "set"),
+                "status": current_status,
             },
             "status",
-            "Closed" if resolved else "Open",
+            new_status,
         )
 
     def notify_agent(self, agent, notification_type="Assignment"):
