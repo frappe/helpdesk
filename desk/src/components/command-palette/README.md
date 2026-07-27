@@ -44,17 +44,17 @@ entry point, no duplicated business logic.
 | `fuzzyScore.ts` | 35 | Dependency-free subsequence scorer |
 | `fuzzyScore.check.ts` | 38 | Runnable assertion check for the scorer |
 | `recentTickets.ts` | 33 | localStorage MRU for tickets and commands |
-| `CPRow.vue` | 55 | Row renderer |
+| `CommandPaletteRow.vue` | 55 | Row renderer |
 
-`CP.vue` (231 lines) was rewritten. `CPGroup.vue` and `CPGroupResult.vue` were
-deleted — `CPRow.vue` replaces both.
+`CommandPalette.vue` (231 lines) was rewritten. `CPGroup.vue` and `CPGroupResult.vue` were
+deleted — `CommandPaletteRow.vue` replaces both.
 
 ### Modified outside this folder
 
-- `layouts/AppSidebar.vue` — renders `<CP />` with no model; sidebar Search
+- `layouts/AppSidebar.vue` — renders `<CommandPalette />` with no model; sidebar Search
   button calls the shared `openPalette()`.
 - `layouts/DesktopLayout.vue` — removed the second, unbound `<CommandPalette />`.
-- `components/index.ts` — dropped the `CommandPalette` barrel export. `CP.vue` is
+- `components/index.ts` — dropped the `CommandPalette` barrel export. `CommandPalette.vue` is
   now a singleton that registers its own global shortcut; a second mount would
   give two `Cmd+K` handlers on one `isOpen`.
 - `pages/ticket/TicketAgent.vue` — records ticket visits for the Recent list.
@@ -66,7 +66,7 @@ deleted — `CPRow.vue` replaces both.
 ## Architecture
 
 ```
-CP.vue                 dialog, keyboard handling, rendering
+CommandPalette.vue     dialog, keyboard handling, rendering
   └── useCommandPalette.ts   state + scoring + search   (no Vue components)
         ├── commands.ts            root assembly
         │     ├── ticketCommands.ts
@@ -117,7 +117,7 @@ Hints render through the app's own `components/ShortcutKey.vue` (also used by
 frappe-ui's `bg` variant fills with `bg-surface-gray-2` — the same colour as the
 active row — so chips vanished on hover and read as heavy blobs elsewhere.
 `ShortcutKey` is outlined on `surface-base` and holds up in both states.
-`CPRow.vue` converts the combo string to the space-separated keys it expects,
+`CommandPaletteRow.vue` converts the combo string to the space-separated keys it expects,
 resolving `Mod` to `⌘`/`Ctrl` per platform.
 
 **Only set `hint` when the key reaches the same end result as the row** — not

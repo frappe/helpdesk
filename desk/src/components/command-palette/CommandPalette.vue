@@ -61,7 +61,10 @@
                 @mousemove="onRowHover(command)"
                 @click="run(command)"
               >
-                <CPRow :command="command" :active="activeCommand === command" />
+                <CommandPaletteRow
+                  :command="command"
+                  :active="activeCommand === command"
+                />
               </div>
             </div>
           </template>
@@ -135,7 +138,7 @@ import LucideDelete from "~icons/lucide/delete";
 import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
-import CPRow from "./CPRow.vue";
+import CommandPaletteRow from "./CommandPaletteRow.vue";
 import type { Command } from "./paletteTypes";
 import {
   back,
