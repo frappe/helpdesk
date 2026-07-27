@@ -4,6 +4,7 @@
 from datetime import timedelta
 
 import frappe
+from frappe.desk.form.assign_to import add as assign
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -614,6 +615,39 @@ class TestHDTicket(IntegrationTestCase):
             ticket.status = "Closed"
             ticket.save()
             self.assertEqual(ticket.resolution_time, 30 * 60)
+
+    def test_todo_status_follows_ticket_status_category(self):
+        """Resolving a ticket closes its assignment ToDos, reopening opens them
+        back up, and the assignee stays on `_assign` throughout."""
+        ticket = make_ticket()
+        assign({"doctype": "HD Ticket", "name": ticket.name, "assign_to": [agent]})
+
+        def todo_status():
+            return frappe.db.get_value(
+                "ToDo",
+                {"reference_type": "HD Ticket", "reference_name": ticket.name},
+                "status",
+            )
+
+        def set_status(status):
+            ticket.reload()
+            ticket.status = status
+            ticket.save()
+
+        self.assertEqual(todo_status(), "Open")
+
+        set_status("Resolved")
+        self.assertEqual(todo_status(), "Closed")
+        self.assertIn(
+            agent,
+            frappe.db.get_value("HD Ticket", ticket.name, "_assign"),
+        )
+
+        set_status("Replied")
+        self.assertEqual(todo_status(), "Open")
+
+        set_status("Open")
+        self.assertEqual(todo_status(), "Open")
 
     def test_ticket_merge(self):
         ticket1 = make_ticket(description="Test Desc 1")

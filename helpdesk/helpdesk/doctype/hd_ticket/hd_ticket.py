@@ -239,8 +239,30 @@ class HDTicket(Document):
                         self.notify_agent(agent.name, "Reaction")
 
         self.remove_assignment_if_not_in_team()
+        self.sync_assignment_todos()
         self.publish_update()
         self.capture_update_telemetry_events()
+
+    def sync_assignment_todos(self):
+        """Close assignment ToDos once the ticket resolves, reopen them if it reopens.
+
+        Uses `db.set_value` because saving a ToDo drops the agent from `_assign`,
+        which Helpdesk treats as the assignee for the ticket's whole lifetime.
+        """
+        if self.is_new() or not self.has_value_changed("status_category"):
+            return
+
+        resolved = self.status_category == "Resolved"
+        frappe.db.set_value(
+            "ToDo",
+            {
+                "reference_type": "HD Ticket",
+                "reference_name": self.name,
+                "status": "Closed" if not resolved else "Open",
+            },
+            "status",
+            "Closed" if resolved else "Open",
+        )
 
     def notify_agent(self, agent, notification_type="Assignment"):
         frappe.get_doc(
