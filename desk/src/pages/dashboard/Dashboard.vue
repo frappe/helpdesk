@@ -117,11 +117,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -142,19 +138,15 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
 
-        <!-- Tag Charts -->
+        <!-- Tag Charts: org level insight, an agent cannot act on their own tag mix -->
         <div
           class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
-          v-if="!tagData.loading"
+          v-if="isManager && !tagData.loading"
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
@@ -168,11 +160,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -202,7 +190,7 @@
         <div>
           <SkeletonLoader
             :variants="['bar-chart', 'empty-state']"
-            :bar-chart-count="8"
+            :bar-chart-count="emptyStates.length"
             :empty-states="emptyStates"
             :has-applied-filter="hasAppliedFilter"
           />
@@ -287,40 +275,75 @@ const colors = [
   "#15CCEF",
   "#A6B1B9",
 ];
-const emptyStates = [
-  {
+interface ChartEmptyState {
+  // header of the card, shown untranslated only when the chart itself is missing
+  chartTitle: string;
+  chartSubtitle?: string;
+  title: string;
+  message: string;
+}
+
+// Chart key (stable, untranslated identifier from the dashboard APIs) → empty state copy.
+const emptyStateByChart: Record<string, ChartEmptyState> = {
+  ticket_trend: {
+    chartTitle: "Ticket Trend",
     title: "No ticket activity",
     message: "Ticket trends will appear here once tickets are created.",
   },
-  {
+  feedback_trend: {
+    chartTitle: "Feedback Trend",
     title: "No feedback data",
     message: "Feedback insights will appear once responses are collected.",
   },
-  {
+  tickets_by_team: {
+    chartTitle: "Tickets by Team",
     title: "No team data",
     message: "Tickets will be grouped by team once available.",
   },
-  {
+  tickets_by_type: {
+    chartTitle: "Tickets by Type",
     title: "No ticket type data",
     message: "Tickets will be categorized by type once created.",
   },
-  {
+  tickets_by_priority: {
+    chartTitle: "Tickets by Priority",
     title: "No priority data",
     message: "Ticket priorities will be reflected here once assigned.",
   },
-  {
+  tickets_by_channel: {
+    chartTitle: "Tickets by Channel",
     title: "No channel data",
     message: "Tickets will be grouped by channel once received.",
   },
-  {
-    title: "No tag data",
-    message: "Tags will be ranked here once tickets are tagged.",
+  top_tags: {
+    chartTitle: "Top Tags",
+    title: "No tags used yet",
+    message: "The most used tags will be ranked here once tickets are tagged.",
   },
-  {
-    title: "No tag trend",
-    message: "Daily tag volume will appear once tickets are tagged.",
+  tag_trend: {
+    chartTitle: "Tag Trend",
+    title: "No tag activity",
+    message: "Daily tag volume will appear here once tickets are tagged.",
   },
-];
+};
+
+const managerOnlyCharts = ["top_tags", "tag_trend"];
+
+// whole dashboard empty: no chart payload to read titles from, so fall back to ours
+const emptyStates = computed(() =>
+  Object.entries(emptyStateByChart)
+    .filter(([key]) => isManager || !managerOnlyCharts.includes(key))
+    .map(([, state]) => state)
+);
+
+function chartEmptyState(chart: any) {
+  const state = emptyStateByChart[chart?.key] ?? {
+    title: `No ${String(chart?.title).toLowerCase()} available`,
+  };
+  return [
+    { ...state, chartTitle: chart?.title, chartSubtitle: chart?.subtitle },
+  ];
+}
 
 const tabButtons = computed(() => {
   if (isMobileView.value) {
@@ -589,7 +612,7 @@ watch(
     numberCards.reload();
     masterData.reload();
     trendData.reload();
-    tagData.reload();
+    if (isManager) tagData.reload();
   },
   { deep: true }
 );
@@ -603,7 +626,7 @@ onMounted(() => {
   numberCards.reload();
   masterData.reload();
   trendData.reload();
-  tagData.reload();
+  if (isManager) tagData.reload();
 });
 
 usePageMeta(() => {
