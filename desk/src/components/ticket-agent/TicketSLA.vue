@@ -95,6 +95,16 @@ function cardValue(card: SLACard): string {
   return `${__(card.fulfilledLabel)} ${__("in")} ${card.metric.fulfilledIn}`;
 }
 
+<<<<<<< HEAD
+=======
+// "Due" is the resting state of every open ticket, so it stays gray; colour
+// only appears when something changed (fulfilled, overdue, failed, hold).
+function valueInk(card: SLACard): string {
+  if (card.metric.state === "due") return "text-ink-gray-7";
+  return inkClass[card.metric.color];
+}
+
+>>>>>>> 1198b0e92 (fix(style): change sla due color)
 function cardDetails(card: SLACard) {
   const metric = card.metric;
   const rows = [];
