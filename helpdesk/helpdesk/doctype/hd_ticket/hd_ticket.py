@@ -208,14 +208,16 @@ class HDTicket(Document):
     def tag_first_ticket(self):
         """Tag the first ticket a requester ever raises.
 
-        A tag (not a field) so it filters, reports and slices like every other
-        tag. Runs after insert, so a count of one means this is the first.
+        This is a one-time tag, so it only applies to the first ticket a requester raises.
         """
         from helpdesk.api.tags import FIRST_TICKET_TAG, FIRST_TICKET_TAG_COLOR
 
         if not self.raised_by:
             return
-        if frappe.db.count("HD Ticket", {"raised_by": self.raised_by}) > 1:
+        earlier_ticket = frappe.db.exists(
+            "HD Ticket", {"raised_by": self.raised_by, "name": ["!=", self.name]}
+        )
+        if earlier_ticket:
             return
 
         self.add_tag(FIRST_TICKET_TAG, FIRST_TICKET_TAG_COLOR)
