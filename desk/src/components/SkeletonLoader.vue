@@ -58,8 +58,11 @@
             <div class="text-ink-gray-8 text-p-base-medium">
               {{ __(getEmptyState(i).chartTitle) }}
             </div>
-            <div class="text-ink-gray-6 text-p-sm">
-              {{ __(getEmptyState(i).chartSubtitle ?? "") }}
+            <div
+              v-if="getEmptyState(i).chartSubtitle"
+              class="text-ink-gray-6 text-p-sm"
+            >
+              {{ __(getEmptyState(i).chartSubtitle) }}
             </div>
           </template>
           <template v-else>
