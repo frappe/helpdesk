@@ -7,6 +7,9 @@ from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 )
 from helpdesk.utils import agent_only
 
+FIRST_TICKET_TAG = "First Ticket"
+FIRST_TICKET_TAG_COLOR = "Blue"
+
 
 @frappe.whitelist()
 @agent_only

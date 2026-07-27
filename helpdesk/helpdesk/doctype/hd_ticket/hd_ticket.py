@@ -174,6 +174,7 @@ class HDTicket(Document):
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
         publish_event("helpdesk:new-ticket")
+        self.tag_first_ticket()
 
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
@@ -205,6 +206,21 @@ class HDTicket(Document):
                 "split the ticket from #{0}".format(self.ticket_split_from),
             )
             capture_event("ticket_split")
+
+    def tag_first_ticket(self):
+        """Tag the first ticket a requester ever raises.
+
+        A tag (not a field) so it filters, reports and slices like every other
+        tag. Runs after insert, so a count of one means this is the first.
+        """
+        from helpdesk.api.tags import FIRST_TICKET_TAG, FIRST_TICKET_TAG_COLOR
+
+        if not self.raised_by:
+            return
+        if frappe.db.count("HD Ticket", {"raised_by": self.raised_by}) > 1:
+            return
+
+        self.add_tag(FIRST_TICKET_TAG, FIRST_TICKET_TAG_COLOR)
 
     def on_update(self):
         # flake8: noqa
