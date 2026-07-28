@@ -25,6 +25,7 @@ interface Command {
   rank?: number            // fixed score, bypasses the scorer
   marked?: string          // server's <mark> highlighting; rendered as text runs
   checked?: boolean        // trailing tick: this value is already set
+  keepOpen?: boolean       // perform without closing, then rebuild the level
   hideWhenEmpty?: boolean  // flat option rows, hidden until the user types
   children?: () => Command[] | Promise<Command[]>   // drill-down
   perform?: () => void
@@ -32,7 +33,9 @@ interface Command {
 ```
 
 A command either drills in (`children`) or acts (`perform`); `run()` picks based
-on which is present.
+on which is present. `keepOpen` is the third path, for toggle rows (tags):
+perform, then rebuild the current level in place so the ticks track the doc —
+one visit can flip several values, Linear-style.
 
 **Only set `hint` when the key reaches the same end result as the row** — not when
 it reaches it the same way. Hinted keys are *page* shortcuts and are inert while
@@ -84,11 +87,15 @@ results sliced to 6 client-side.
 
 `title_only: true` narrows the **SELECT clause**, not the MATCH — so it returns
 subjects rather than restricting where the term is looked for. A body phrase can
-still produce `No results` in the palette, which is why the "Search all of
-Helpdesk" fallback is pinned below the results whenever the query is long enough
+still produce `No results` in the palette, which is why the `Search for "…"`
+fallback is pinned below the results whenever the query is long enough
 to search, instead of appearing only when nothing matched. Subsequence matching
 means something almost always matched, so the escape hatch used to stay hidden
 exactly when it was needed.
+
+Next to it sits `Create ticket "…"`, which lands on the new-ticket page with the
+subject pre-filled from the query — suppressed for `#`-prefixed queries, since
+`#123` is someone reaching for a ticket, not naming one.
 
 ## Checks
 
