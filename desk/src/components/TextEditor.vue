@@ -1,18 +1,13 @@
 <template>
   <div class="rounded p-3 shadow w-full">
-    <FTextEditor
-      ref="e"
-      :extensions="[ComponentUtils, HandleExcelPaste, CleanStyles]"
-      v-bind="$attrs"
-      :editor-class="[
-        'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-[5rem]',
-        getFontFamily(modelValue),
-      ]"
-      bubble-menu
-      :content="modelValue"
-      @change="$emit('update:modelValue', $event)"
+    <Editor
+      ref="inner"
+      v-model="content"
+      :extensions="extensions"
+      :upload-function="uploadFunction"
+      :autofocus="autofocus"
     >
-      <template #top>
+      <template #default="{ editor, isEmpty }">
         <span class="text-base">
           <span class="flex items-center justify-between">
             <UserAvatar
@@ -25,8 +20,15 @@
           </span>
           <slot name="top-bottom" />
         </span>
-      </template>
-      <template #bottom>
+
+        <EditorBubbleMenu :items="commentToolbar" />
+        <EditorContent
+          :class="[
+            'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]',
+            getFontFamily(content),
+          ]"
+        />
+
         <div class="flex flex-col gap-2">
           <slot name="bottom-top" />
           <div
@@ -34,14 +36,14 @@
           >
             <div class="flex items-center">
               <slot name="bottom-left" />
-              <TextEditorFixedMenu :buttons="fixedMenu" />
+              <EditorFixedMenu :items="ticketToolbar" />
             </div>
             <div class="flex items-center gap-2">
               <Button
                 :label="__('Discard')"
                 theme="gray"
                 variant="subtle"
-                v-if="!isContentEmpty(modelValue)"
+                v-if="!isEmpty"
                 @click="
                   () => {
                     editor.commands.clearContent(true);
@@ -54,63 +56,58 @@
           </div>
         </div>
       </template>
-    </FTextEditor>
+    </Editor>
   </div>
 </template>
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { getFontFamily } from "@/utils";
+import { Button } from "frappe-ui";
 import {
-  CleanStyles,
-  ComponentUtils,
-  HandleExcelPaste,
-} from "@/tiptap-extensions";
-import { ClearFormattingUtility, getFontFamily, isContentEmpty } from "@/utils";
-import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
-import { computed, nextTick, ref } from "vue";
+  Editor,
+  EditorBubbleMenu,
+  EditorContent,
+  EditorFixedMenu,
+} from "frappe-ui/editor";
+import { computed, ref } from "vue";
+import {
+  buildEditorExtensions,
+  commentToolbar,
+  ticketToolbar,
+} from "./editor/config";
 
 interface P {
   modelValue: string;
   autofocus?: boolean;
+  uploadFunction?: (file: any) => Promise<any>;
 }
 
 interface E {
   (event: "clear"): void;
-  (event: "update:modelValue", any): string;
+  (event: "update:modelValue", value: string): void;
 }
 
 const props = withDefaults(defineProps<P>(), {
   autofocus: false,
 });
 
-defineEmits<E>();
+const emit = defineEmits<E>();
 
-const e = ref(null);
-const editor = computed(() => e.value.editor);
 const authStore = useAuthStore();
-const fixedMenu = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5"],
-  "Separator",
-  "Bold",
-  "Italic",
-  "Separator",
-  "Bullet List",
-  "Numbered List",
-  "Separator",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
-  ClearFormattingUtility,
-];
+const inner = ref(null);
+
+const content = computed({
+  get: () => props.modelValue,
+  set: (value) => emit("update:modelValue", value),
+});
+
+const extensions = buildEditorExtensions();
+
+const editor = computed(() => inner.value?.editor);
 
 defineExpose({
   editor,
 });
-
-if (props.autofocus) {
-  nextTick(() => e.value.editor.commands.focus());
-}
 </script>

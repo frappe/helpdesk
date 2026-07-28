@@ -61,7 +61,7 @@ def get_data(filters):
 def get_hours_count(start_time, end_time):
     data = (
         frappe.db.sql(
-            """ select count(*) from `tabIssue` where creation
+            """ select count(*) from `tabHD Ticket` where creation
 		between %(start_time)s and %(end_time)s""",
             {"start_time": start_time, "end_time": end_time},
             as_list=1,

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_guest_to_view": 1,
  "autoname": "hash",
  "creation": "2022-02-08 18:13:42.039744",
@@ -37,7 +38,7 @@
   }
  ],
  "links": [],
- "modified": "2026-02-02 17:13:11.729822",
+ "modified": "2026-06-28 13:55:47.056437",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
@@ -71,11 +72,11 @@
   },
   {
    "read": 1,
-   "role": "All"
+   "role": "HD Customer"
   },
   {
    "read": 1,
-   "role": "Guest"
+   "role": "HD Customer Manager"
   }
  ],
  "row_format": "Dynamic",

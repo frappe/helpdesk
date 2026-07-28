@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex w-full min-w-0 items-center rounded p-2 text-base font-medium text-ink-gray-8"
+    class="flex w-full min-w-0 items-center rounded p-2 text-base-medium text-ink-gray-8"
     :class="{ 'bg-surface-gray-3': active }"
   >
     <component

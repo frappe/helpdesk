@@ -81,7 +81,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-02 17:13:38.683167",
+ "modified": "2026-03-24 10:39:40.975326",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
@@ -115,7 +115,7 @@
   },
   {
    "read": 1,
-   "role": "All"
+   "role": "HD Customer"
   }
  ],
  "row_format": "Dynamic",

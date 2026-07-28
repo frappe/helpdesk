@@ -68,6 +68,10 @@ def get_dashboard_data(
         )
     elif dashboard_type == "trend":
         return dashboard.get_trend_data()
+    elif dashboard_type == "tags":
+        from helpdesk.api.dashboard_tags import TagDashboard
+
+        return TagDashboard(_filters).get_tag_chart_data()
 
 
 class HelpdeskDashboard:
@@ -114,8 +118,9 @@ class HelpdeskDashboard:
             )
         return conds
 
-    def _get_case(self, start, end, value, func, extra_cond=None):
-        cond = (self.ticket.creation >= start) & (self.ticket.creation < end)
+    def _get_case(self, start, end, value, func, extra_cond=None, date_field=None):
+        date_field = date_field or self.ticket.creation
+        cond = (date_field >= start) & (date_field < end)
         if extra_cond:
             cond = cond & extra_cond
         if self.combined_cond:
@@ -123,12 +128,12 @@ class HelpdeskDashboard:
 
         return func(Case().when(cond, value).else_(None))
 
-    def get_metric_data(self, value, func, extra_cond=None):
+    def get_metric_data(self, value, func, extra_cond=None, date_field=None):
         current_expr = self._get_case(
-            self.from_date, self.to_date_next, value, func, extra_cond
+            self.from_date, self.to_date_next, value, func, extra_cond, date_field
         )
         prev_expr = self._get_case(
-            self.prev_from_date, self.from_date, value, func, extra_cond
+            self.prev_from_date, self.from_date, value, func, extra_cond, date_field
         )
 
         query = frappe.qb.from_(self.ticket).select(
@@ -222,9 +227,15 @@ class HelpdeskDashboard:
         }
 
     def get_avg_feedback_score(self):
+        # Feedback belongs to the period a ticket was resolved in, not when it
+        # was raised, so include every ticket resolved within the date range
+        # regardless of its creation date.
         extra_cond = self.ticket.feedback_rating > 0
         current, prev = self.get_metric_data(
-            self.ticket.feedback_rating, Avg, extra_cond
+            self.ticket.feedback_rating,
+            Avg,
+            extra_cond,
+            date_field=self.ticket.resolution_date,
         )
 
         return {
@@ -233,7 +244,7 @@ class HelpdeskDashboard:
             "suffix": "/5",
             "delta": (current - prev) * 5,
             "deltaSuffix": " " + _("stars"),
-            "tooltip": _("Avg. feedback rating for the tickets resolved"),
+            "tooltip": _("Avg. feedback rating for tickets resolved in this period"),
         }
 
     def get_trend_data(self):
@@ -289,6 +300,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "ticket_trend",
             _("Ticket Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -311,16 +323,19 @@ class HelpdeskDashboard:
         rating = "Rating"
         rated_tickets = "Rated Tickets"
 
-        base_cond = (self.ticket.creation > self.from_date) & (
-            self.ticket.creation < self.to_date_next
-        )
+        # Plot feedback against the resolution date so this trend matches the
+        # number-card average (get_avg_feedback_score), which also keys feedback
+        # off resolution_date rather than creation.
+        date_field = self.ticket.resolution_date
+
+        base_cond = (date_field > self.from_date) & (date_field < self.to_date_next)
         if self.combined_cond:
             base_cond = base_cond & self.combined_cond
 
         query = (
             frappe.qb.from_(self.ticket)
             .select(
-                Function("DATE", self.ticket.creation).as_("date"),
+                Function("DATE", date_field).as_("date"),
                 (
                     Avg(
                         Case()
@@ -338,8 +353,8 @@ class HelpdeskDashboard:
                 ).as_(rated_tickets),
             )
             .where(base_cond)
-            .groupby(Function("DATE", self.ticket.creation))
-            .orderby(Function("DATE", self.ticket.creation))
+            .groupby(Function("DATE", date_field))
+            .orderby(Function("DATE", date_field))
         )
 
         result = query.run(as_dict=True)
@@ -349,7 +364,7 @@ class HelpdeskDashboard:
             frappe.qb.from_(self.ticket)
             .select((Avg(self.ticket.feedback_rating) * 5).as_("avg_rating"))
             .where(
-                (self.ticket.creation.between(self.from_date, self.to_date_next))
+                (date_field.between(self.from_date, self.to_date_next))
                 & (self.ticket.feedback_rating > 0)
             )
         )
@@ -367,6 +382,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "feedback_trend",
             _("Feedback Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -444,6 +460,7 @@ def get_team_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Percentage of total tickets by team"),
             "team",
@@ -452,6 +469,7 @@ def get_team_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Total tickets by team"),
             {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
@@ -477,6 +495,7 @@ def get_ticket_type_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Percentage of total tickets by type"),
             "type",
@@ -485,6 +504,7 @@ def get_ticket_type_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Total tickets by type"),
             {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
@@ -510,6 +530,7 @@ def get_ticket_priority_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Percentage of total tickets by priority"),
             "priority",
@@ -518,6 +539,7 @@ def get_ticket_priority_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Total tickets by priority"),
             {
@@ -550,6 +572,7 @@ def get_ticket_channel_chart_data(
 
     return get_pie_chart_config(
         result,
+        "tickets_by_channel",
         _("Tickets by Channel"),
         _("Percentage of total tickets by channel"),
         "channel",
@@ -559,6 +582,7 @@ def get_ticket_channel_chart_data(
 
 def get_pie_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     category_column: str,
@@ -567,6 +591,8 @@ def get_pie_chart_config(
     return {
         "type": "pie",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "categoryColumn": category_column,
@@ -576,6 +602,7 @@ def get_pie_chart_config(
 
 def get_bar_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     x_axis_config: dict[str, any],
@@ -586,10 +613,15 @@ def get_bar_chart_config(
     return {
         "type": "axis",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "xAxis": x_axis_config,
-        "yAxis": {"title": y_axis_title},
+        # every bar chart here counts tickets, so keep the value axis on whole
+        # steps; half a ticket is not a thing. y2 axes (% SLA, rating) are
+        # fractional and are left alone.
+        "yAxis": {"title": y_axis_title, "echartOptions": {"minInterval": 1}},
         "series": series,
         **kwargs,
     }

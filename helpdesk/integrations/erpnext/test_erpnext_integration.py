@@ -24,6 +24,14 @@ from .test_utils import (
 )
 
 
+def fake_value(field: str, suffix: str) -> str:
+    """A type-appropriate fake value for a synced field: a valid option for the
+    ``customer_type`` Select, an image path for the free-text fields."""
+    if field == "customer_type":
+        return "Individual"
+    return f"/files/{field}-{suffix}.png"
+
+
 class TestERPNextIntegration(FrappeTestCase):
     def setUp(self):
         disable_erpnext_sync()
@@ -81,7 +89,7 @@ class TestERPNextIntegration(FrappeTestCase):
         the ERP Customer twin created for it."""
         enable_erpnext_sync()
 
-        hd_values = {hd: f"/files/{hd}-create.png" for _customer, hd in FIELDS_TO_SYNC}
+        hd_values = {hd: fake_value(hd, "create") for _customer, hd in FIELDS_TO_SYNC}
         hd_doc = frappe.get_doc(
             {
                 "doctype": "HD Customer",
@@ -109,13 +117,13 @@ class TestERPNextIntegration(FrappeTestCase):
         hd_doc, erp_doc = link_customers(self, "Fields No Sync")
 
         for _customer_field, hd_field in FIELDS_TO_SYNC:
-            hd_doc.set(hd_field, f"/files/{hd_field}-test.png")
+            hd_doc.set(hd_field, fake_value(hd_field, "test"))
         hd_doc.save(ignore_permissions=True)
 
         for customer_field, hd_field in FIELDS_TO_SYNC:
             self.assertNotEqual(
                 frappe.db.get_value("Customer", erp_doc.name, customer_field),
-                f"/files/{hd_field}-test.png",
+                fake_value(hd_field, "test"),
             )
 
     def test_fields_sync_to_erp_customer(self):
@@ -124,14 +132,14 @@ class TestERPNextIntegration(FrappeTestCase):
         hd_doc, erp_doc = link_customers(self, "Fields Sync")
 
         for _customer_field, hd_field in FIELDS_TO_SYNC:
-            hd_doc.set(hd_field, f"/files/{hd_field}-test.png")
+            hd_doc.set(hd_field, fake_value(hd_field, "test"))
         hd_doc.flags.ignore_erpnext_sync = False
         hd_doc.save(ignore_permissions=True)
 
         for customer_field, hd_field in FIELDS_TO_SYNC:
             self.assertEqual(
                 frappe.db.get_value("Customer", erp_doc.name, customer_field),
-                f"/files/{hd_field}-test.png",
+                fake_value(hd_field, "test"),
             )
 
     def test_fields_sync_to_hd_customer(self):
@@ -142,14 +150,14 @@ class TestERPNextIntegration(FrappeTestCase):
 
         erp_doc.reload()
         for customer_field, _hd_field in FIELDS_TO_SYNC:
-            erp_doc.set(customer_field, f"/files/{customer_field}-test.png")
+            erp_doc.set(customer_field, fake_value(customer_field, "test"))
         erp_doc.flags.ignore_erpnext_sync = False
         erp_doc.save(ignore_permissions=True)
 
         for customer_field, hd_field in FIELDS_TO_SYNC:
             self.assertEqual(
                 frappe.db.get_value("HD Customer", hd_doc.name, hd_field),
-                f"/files/{customer_field}-test.png",
+                fake_value(customer_field, "test"),
             )
 
     def test_fields_not_synced_to_hd_when_sync_disabled(self):
@@ -159,14 +167,14 @@ class TestERPNextIntegration(FrappeTestCase):
 
         erp_doc.reload()
         for customer_field, _hd_field in FIELDS_TO_SYNC:
-            erp_doc.set(customer_field, f"/files/{customer_field}-test.png")
+            erp_doc.set(customer_field, fake_value(customer_field, "test"))
         erp_doc.flags.ignore_erpnext_sync = False
         erp_doc.save(ignore_permissions=True)
 
         for customer_field, hd_field in FIELDS_TO_SYNC:
             self.assertNotEqual(
                 frappe.db.get_value("HD Customer", hd_doc.name, hd_field),
-                f"/files/{customer_field}-test.png",
+                fake_value(customer_field, "test"),
             )
 
     # ------------------------------------------------------------------

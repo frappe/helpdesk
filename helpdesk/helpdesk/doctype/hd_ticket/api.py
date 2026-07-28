@@ -23,7 +23,7 @@ from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_temp
 from helpdesk.utils import (
     agent_only,
     check_permissions,
-    get_customer,
+    get_customers,
     is_agent,
     parse_call_logs,
 )
@@ -158,7 +158,7 @@ def get_customer_criteria():
         QBTicket.raised_by == user,
         QBTicket.owner == user,
     ]
-    customer = get_customer(user)
+    customer = get_customers(user)
     for c in customer:
         conditions.append(QBTicket.customer == c)
     return Criterion.any(conditions)
@@ -700,23 +700,25 @@ def get_ticket_contact(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
-    contact = frappe.db.get_value("HD Ticket", ticket, "contact")
-    if not contact:
-        raised_by = frappe.db.get_value("HD Ticket", ticket, "raised_by")
-        return {
+    contact, raised_by = frappe.db.get_value(
+        "HD Ticket", ticket, ["contact", "raised_by"]
+    )
+    if contact:
+        data = frappe.db.get_value(
+            "Contact",
+            contact,
+            ["name", "email_id", "phone", "mobile_no", "image"],
+            as_dict=1,
+        )
+    else:
+        data = {
             "email_id": raised_by,
             "name": raised_by.split("@")[0],
             "phone": "",
             "mobile_no": "",
             "image": "",
         }
-
-    return frappe.db.get_value(
-        "Contact",
-        contact,
-        ["name", "email_id", "phone", "mobile_no", "image"],
-        as_dict=1,
-    )
+    return data
 
 
 @frappe.whitelist()
@@ -755,11 +757,14 @@ def get_recent_tickets(ticket: str):
         )
 
     if raised_by:
+        # Exclude the current ticket and any already picked up as org tickets,
+        # otherwise a ticket matching both `customer` and `raised_by` shows twice.
+        excluded = [ticket] + [t.name for t in org_tickets]
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
                 filters={
-                    "name": ["!=", ticket],
+                    "name": ["not in", excluded],
                     "raised_by": raised_by,
                 },
                 fields=fields,

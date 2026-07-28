@@ -4,12 +4,11 @@
 		"allowSyntheticDefaultImports": true,
 		"allowUnreachableCode": false,
 		"target": "es2022",
-		"module": "esnext",
-		"moduleResolution":"node",
-		"jsx": "preserve",
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@framework/ui": ["../../frappe/ui/src/index.ts"],
+			"@framework/ui/*": ["../../frappe/ui/src/*"]
 		},
 		"types": [
 			"unplugin-icons/types/vue",

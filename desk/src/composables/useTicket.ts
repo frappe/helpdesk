@@ -105,4 +105,16 @@ export function reloadTicket(ticketId: string | number) {
   ticketData.ticket.reload();
   ticketData.assignees.reload();
   ticketData.activities.reload();
+
 }
+
+}
+
+// Refresh a ticket that may have gone stale
+export function revalidateTicket(ticketId: string | number) {
+  const ticketData = ticketMap[ticketId];
+  if (ticketData?.ticket.get.fetched && !ticketData.ticket.get.loading) {
+    reloadTicket(ticketId as string);
+  }
+}
+

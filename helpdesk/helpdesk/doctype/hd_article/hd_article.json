@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "autoname": "hash",
  "creation": "2022-02-08 18:13:42.994713",
  "doctype": "DocType",
@@ -89,7 +90,7 @@
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2026-03-24 20:11:47.835393",
+ "modified": "2026-06-28 13:55:21.075010",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",
@@ -126,7 +127,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "HD Customer",
    "share": 1
   },
   {
@@ -135,7 +136,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Guest",
+   "role": "HD Customer Manager",
    "share": 1
   }
  ],

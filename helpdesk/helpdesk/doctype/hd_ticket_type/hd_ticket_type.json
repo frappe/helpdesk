@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "Prompt",
@@ -42,7 +43,7 @@
   }
  ],
  "links": [],
- "modified": "2026-02-24 09:05:55.809201",
+ "modified": "2026-06-27 19:24:45.498088",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Type",
@@ -86,17 +87,19 @@
    "write": 1
   },
   {
+   "read": 1,
+   "role": "HD Customer",
+   "select": 1
+  },
+  {
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Helpdesk Contact",
+   "role": "HD Customer Manager",
+   "select": 1,
    "share": 1
-  },
-  {
-   "role": "All",
-   "select": 1
   }
  ],
  "quick_entry": 1,

@@ -22,10 +22,16 @@
                   :label="fullName"
                 />
                 <div
-                  v-if="currentStatus"
-                  class="absolute bottom-0.5 right-0.5 size-3.5 rounded-full outline outline-white outline-4"
-                  :class="agentStatusStore.statusColor(currentStatus)"
-                />
+                  v-if="agentStatusStore.myStatus"
+                  class="absolute bottom-0.5 right-0.5 rounded-full bg-surface-elevation-2 p-1"
+                >
+                  <div
+                    class="size-3.5 rounded-full"
+                    :class="
+                      agentStatusStore.statusColor(agentStatusStore.myStatus)
+                    "
+                  />
+                </div>
                 <Tooltip
                   :hoverDelay="0"
                   placement="bottom"
@@ -37,7 +43,7 @@
                   />
                   <div
                     v-if="user.doc?.user_image"
-                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
+                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
                     @click.stop="updateImage()"
                     @mouseenter="isHoveringRemove = true"
                     @mouseleave="isHoveringRemove = false"
@@ -50,7 +56,7 @@
                 </Tooltip>
                 <div
                   v-if="uploading"
-                  class="w-full h-full top-0 left-0 absolute bg-surface-gray-7 bg-opacity-20 rounded-full flex items-center justify-center"
+                  class="w-full h-full top-0 left-0 absolute bg-surface-gray-10 bg-opacity-20 rounded-full flex items-center justify-center"
                 >
                   <LoadingIndicator class="size-4" />
                 </div>
@@ -59,7 +65,7 @@
                 <div class="flex flex-col gap-1">
                   <div v-if="!editName" class="flex items-end gap-1">
                     <span
-                      class="text-lg sm:text-xl !font-semibold text-ink-gray-8"
+                      class="text-lg sm:text-2xl !font-semibold text-ink-gray-8"
                     >
                       {{ user?.doc?.full_name }}
                     </span>
@@ -98,7 +104,7 @@
       <div>
         <div class="flex items-center justify-between h-7">
           <div class="flex gap-2 items-center">
-            <span class="text-base font-semibold text-ink-gray-9">
+            <span class="text-base-semibold text-ink-gray-9">
               {{ __("Account Info & Security") }}
             </span>
           </div>
@@ -107,7 +113,7 @@
 
       <div v-if="hasAgentRecord" class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">
+          <span class="text-base-medium text-ink-gray-8">
             {{ __("Availability") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">
@@ -122,7 +128,7 @@
       </div>
       <div class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">
+          <span class="text-base-medium text-ink-gray-8">
             {{ __("Emails & Signature") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">
@@ -140,7 +146,7 @@
       </div>
       <div class="flex items-center justify-between mt-6">
         <div class="flex flex-col gap-1">
-          <span class="text-base font-medium text-ink-gray-8">
+          <span class="text-base-medium text-ink-gray-8">
             {{ __("Password") }}
           </span>
           <span class="text-p-sm text-ink-gray-6">{{
@@ -162,29 +168,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from "vue";
 import {
   Avatar,
   Button,
+  createDocumentResource,
   FileUploader,
   LoadingIndicator,
   toast,
-  createDocumentResource,
 } from "frappe-ui";
+import { computed, nextTick, ref, useTemplateRef } from "vue";
 
-import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
-import { useAvailability } from "@/composables/useAvailability";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 
-const { currentStatus } = useAvailability();
 const agentStatusStore = useAgentStatusStore();
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 const showChangePasswordModal = ref(false);
 
 const { userId, hasAgentRecord } = useAuthStore();

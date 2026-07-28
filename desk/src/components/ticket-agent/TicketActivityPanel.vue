@@ -28,7 +28,7 @@
     </template>
     <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
-        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
+        <p class="text-2xl-medium text-ink-gray-5">Loading...</p>
       </div> -->
   </Tabs>
   <!-- Comm Area -->

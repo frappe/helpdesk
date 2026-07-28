@@ -8,7 +8,7 @@
           class="pb-4"
           :class="!group.hideBorder && 'border-b border-outline-gray-2'"
         >
-          <h2 class="text-lg font-semibold text-ink-gray-9 mb-4">
+          <h2 class="text-lg-semibold text-ink-gray-9 mb-4">
             {{ group.title }}
           </h2>
           <ul class="space-y-2">
@@ -89,6 +89,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [shiftKey, "T"], description: __("Change team") },
       { keys: ["A"], description: __("Assign ticket") },
       { keys: ["S"], description: __("Change status") },
+      { keys: ["G"], description: __("Add tags") },
       { keys: [metaIcon, "."], description: __("Copy ticket id") },
       { keys: [metaIcon, shiftKey, "."], description: __("Copy ticket URL") },
     ],
@@ -120,7 +121,7 @@ onMounted(() => {
 </script>
 <style>
 /* Hack to remove focus ring from buttons in shortcuts modal */
-.bg-surface-modal:has(.shortcutsModal) button {
+.bg-surface-elevation-2:has(.shortcutsModal) button {
   @apply focus-visible:ring-0;
 }
 </style>

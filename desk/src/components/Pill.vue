@@ -1,5 +1,6 @@
 <template>
   <Button
+    ref="buttonRef"
     :key="label"
     theme="gray"
     variant="outline"
@@ -13,7 +14,9 @@
 </template>
 <script setup>
 import { Button } from "frappe-ui";
+import { computed, ref } from "vue";
 import IconX from "~icons/lucide/x";
+
 defineProps({
   label: {
     type: String,
@@ -28,7 +31,13 @@ defineProps({
 
 const emit = defineEmits(["click"]);
 
+const buttonRef = ref(null);
+
 const handleClick = (label) => {
   emit("click", label);
 };
+
+defineExpose({
+  rootRef: computed(() => buttonRef.value?.rootRef),
+});
 </script>

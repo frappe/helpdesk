@@ -171,10 +171,10 @@
                 <div class="flex items-center">
                   <div
                     v-if="item.title"
-                    class="text-base font-medium truncate max-w-[60%]"
+                    class="text-base-medium truncate max-w-[60%]"
                     v-html="item.title"
                   />
-                  <div class="text-base font-medium" v-else>
+                  <div class="text-base-medium" v-else>
                     {{ item.name }}
                   </div>
                   <span class="px-1 leading-none text-sm text-ink-gray-5">
@@ -420,16 +420,20 @@ function getItemRoute(item: SearchResultItem) {
       params: { ticketId: item.name },
     };
   } else if (item.doctype === "HD Ticket Comment" && item.reference_ticket) {
+    // ?highlight is the activity deep-link target (element id, see
+    // TicketAgentActivities); the hash only selects the tab.
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_ticket },
-      hash: `#comment-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `comment-${item.name}` },
     };
   } else if (item.doctype === "Communication" && item.reference_name) {
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_name },
-      hash: `#communication-${item.name}`,
+      hash: "#activity",
+      query: { highlight: `communication-${item.name}` },
     };
   }
   return { name: "SearchAgent" };

@@ -10,7 +10,10 @@ ALLOWED_DOCTYPES = ("HD Customer", "Customer")
 
 # Fields kept in sync between an ERPNext Customer and its linked HD Customer,
 # in both directions, on create and on update. Each entry is (customer_fieldname, hd_customer_fieldname).
-FIELDS_TO_SYNC: tuple[tuple[str, str], ...] = (("image", "image"),)
+FIELDS_TO_SYNC: tuple[tuple[str, str], ...] = (
+    ("image", "image"),
+    ("customer_type", "customer_type"),
+)
 
 
 def should_sync():

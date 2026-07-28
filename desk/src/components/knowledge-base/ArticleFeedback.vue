@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center justify-between mb-8 p-4 rounded-lg bg-surface-menu-bar"
+    class="flex items-center justify-between mb-8 p-4 rounded-lg bg-surface-sidebar"
   >
     <!-- Feedback Section -->
     <div>

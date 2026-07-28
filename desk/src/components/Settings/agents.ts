@@ -1,11 +1,14 @@
+import { ListResource } from "@/types";
+import { HDAgent } from "@/types/doctypes";
 import { createListResource, createResource } from "frappe-ui";
 import { reactive, ref, watch } from "vue";
 
 const PAGE_LENGTH = 20;
 
-export const agents = createListResource({
+export const agents: ListResource<HDAgent> = createListResource({
   doctype: "HD Agent",
-  fields: ["name", "user_image", "agent_name", "is_active"],
+  fields: ["name", "user_image", "agent_name", "is_active", "user"],
+  cache: ["HD Agent", "List"],
   start: 0,
   pageLength: PAGE_LENGTH,
   orderBy: "creation desc",

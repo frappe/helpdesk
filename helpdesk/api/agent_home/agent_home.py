@@ -13,6 +13,7 @@ from helpdesk.api.agent_home.utils import (
     get_default_agent_dashboard,
     get_ticket_count,
 )
+from helpdesk.api.analytics_utils import get_avg_time_metric
 from helpdesk.utils import agent_only, format_time_difference
 
 
@@ -51,6 +52,29 @@ def get_dashboard(reset_layout: bool = False):
         "default_layout": get_default_agent_dashboard(),
         "dashboard_id": dashboard_id,
     }
+
+
+def _resolve_window(period: str):
+    """Returns (current_from, current_to, prev_from, prev_to) using a rolling
+    window via date_diff (matches dashboard.py)."""
+    periods = {
+        "last 7 days": 7,
+        "last week": 7,
+        "last month": 30,
+        "last 3 months": 90,
+    }
+    days = periods.get((period or "").lower(), 30)
+
+    current_to = frappe.utils.nowdate()
+    current_from = frappe.utils.add_days(current_to, -(days - 1))
+
+    diff = frappe.utils.date_diff(current_to, current_from)
+    if diff == 0:
+        diff = 1
+    previous_from = frappe.utils.add_days(current_from, -diff)
+    previous_to = frappe.utils.add_days(current_from, -1)
+
+    return current_from, current_to, previous_from, previous_to
 
 
 @frappe.whitelist()
@@ -114,133 +138,16 @@ def get_agent_tickets(period: str = "last month"):
     }
 
 
-def get_avg_time(from_date, to_date, value_expr, extra_cond, group_by_date=False):
-    Ticket = DocType("HD Ticket")
-    to_date_plus_one = Function(
-        "DATE_ADD", to_date, frappe.qb.terms.PseudoColumn("INTERVAL 1 DAY")
-    )
-
-    query = frappe.qb.from_(Ticket)
-
-    if group_by_date:
-        creation_date = Function("DATE", Ticket.creation)
-        query = (
-            query.select(
-                creation_date.as_("date"),
-                Avg(value_expr).as_("avg_time"),
-            )
-            .groupby(creation_date)
-            .orderby(creation_date)
-        )
-    else:
-        query = query.select(Avg(value_expr).as_("avg_time"))
-
-    query = (
-        query.where(Ticket.creation >= from_date)
-        .where(Ticket.creation < to_date_plus_one)
-        .where(
-            Function(
-                "JSON_SEARCH", Ticket._assign, "one", frappe.session.user
-            ).isnotnull()
-        )
-    )
-    if extra_cond is not None:
-        query = query.where(extra_cond)
-
-    result = query.run(as_dict=True)
-
-    if group_by_date:
-        return result
-
-    return result[0]["avg_time"] if result and result[0]["avg_time"] is not None else 0
-
-
-def _resolve_window(period: str):
-    """Returns (current_from, current_to, prev_from, prev_to) using a rolling
-    window via date_diff (matches dashboard.py)."""
-    periods = {
-        "last 7 days": 7,
-        "last week": 7,
-        "last month": 30,
-        "last 3 months": 90,
-    }
-    days = periods.get((period or "").lower(), 30)
-
-    current_to = frappe.utils.nowdate()
-    current_from = frappe.utils.add_days(current_to, -(days - 1))
-
-    diff = frappe.utils.date_diff(current_to, current_from)
-    if diff == 0:
-        diff = 1
-    previous_from = frappe.utils.add_days(current_from, -diff)
-    previous_to = frappe.utils.add_days(current_from, -1)
-
-    return current_from, current_to, previous_from, previous_to
-
-
-def _get_avg_time_metric(period: str, value_expr, extra_cond) -> dict:
-    current_from, current_to, previous_from, previous_to = _resolve_window(period)
-
-    current_result = get_avg_time(
-        current_from, current_to, value_expr, extra_cond, group_by_date=True
-    )
-
-    current_avg = get_avg_time(current_from, current_to, value_expr, extra_cond)
-    previous_avg = get_avg_time(previous_from, previous_to, value_expr, extra_cond)
-
-    percentage_change = calculate_percentage_change(current_avg, previous_avg)
-
-    # Fill missing days with 0
-    from_date_obj = date.fromisoformat(current_from)
-    to_date_obj = date.fromisoformat(current_to)
-    date_dict = {}
-    current_date = from_date_obj
-    while current_date <= to_date_obj:
-        date_str = current_date.isoformat()
-        date_dict[date_str] = 0
-        current_date += timedelta(days=1)
-
-    for row in current_result:
-        date_dict[str(row["date"])] = round(row["avg_time"] or 0, 2)
-
-    data = [
-        {"date": date, "avg_time": avg_time}
-        for date, avg_time in sorted(date_dict.items())
-    ]
-
-    return {
-        "data": data,
-        "average": round(current_avg, 2),
-        "percentage_change": percentage_change,
-    }
-
-
 @frappe.whitelist()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
-    Ticket = DocType("HD Ticket")
-    return _get_avg_time_metric(
-        period,
-        value_expr=Ticket.first_response_time,
-        extra_cond=Ticket.first_responded_on.isnotnull(),
-    )
+    return get_avg_time_metric(period, "first_response_time", scope="agent")
 
 
 @frappe.whitelist()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
-    Ticket = DocType("HD Ticket")
-    resolved_statuses = frappe.get_all(
-        "HD Ticket Status",
-        filters={"category": "Resolved"},
-        pluck="name",
-    )
-    extra_cond = Ticket.status.isin(resolved_statuses) if resolved_statuses else None
-    return _get_avg_time_metric(
-        period,
-        value_expr=Ticket.resolution_time,
-        extra_cond=extra_cond,
-    )
+    return get_avg_time_metric(period, "resolution_time", scope="agent")
 
 
 @frappe.whitelist()
@@ -267,6 +174,8 @@ def get_recent_feedback(
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -30)
     elif period == "last_3_months":
         period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -90)
+    elif period == "last_6_months":
+        period_filter = frappe.utils.add_days(frappe.utils.nowdate(), -180)
 
     # Base query conditions
     base_conditions = [
@@ -509,22 +418,6 @@ def get_avg_time_metrics(
     }
 
 
-def _get_priority_range():
-    priorities = frappe.get_all(
-        "HD Ticket Priority", fields="integer_value", filters={"disabled": 0}
-    )
-    if priorities:
-        min_priority = min(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-        max_priority = max(priorities, key=lambda x: x["integer_value"])[
-            "integer_value"
-        ]
-    else:
-        min_priority = max_priority = 0
-    return min_priority, max_priority
-
-
 def _get_upcoming_sla_tickets(limit=10):
     filters = [
         ["sla", "is", "set"],
@@ -541,7 +434,6 @@ def _get_upcoming_sla_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "response_by",
             "resolution_by",
@@ -624,7 +516,6 @@ def _get_new_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "creation",
         ],
@@ -659,7 +550,6 @@ def _get_pending_response_tickets(limit=10):
             "subject",
             "status",
             "priority",
-            "priority.integer_value as priority_integer_value",
             "agent_group",
             "creation",
             "last_customer_response",
@@ -684,8 +574,6 @@ def _get_pending_response_tickets(limit=10):
 @frappe.whitelist()
 @agent_only
 def get_pending_tickets(ticket_type: str = "upcoming_sla"):
-    min_priority, max_priority = _get_priority_range()
-
     if ticket_type == "upcoming_sla":
         tickets, total_count = _get_upcoming_sla_tickets(limit=6)
     elif ticket_type == "new_tickets":
@@ -696,6 +584,121 @@ def get_pending_tickets(ticket_type: str = "upcoming_sla"):
     return {
         "tickets": tickets,
         "total_pending_tickets": total_count,
-        "min_priority": min_priority,
-        "max_priority": max_priority,
     }
+
+
+RECENT_ACTIVITY_LIMIT = 20
+RECENT_ACTIVITY_DAYS = 3
+
+# (doctype, user_field, ticket_field, activity_type, extra_filters)
+ACTIVITY_SOURCES = [
+    (
+        "Communication",
+        "owner",
+        "reference_name",
+        "replied",
+        {"reference_doctype": "HD Ticket", "sent_or_received": "Sent"},
+    ),
+    ("HD Ticket Comment", "commented_by", "reference_ticket", "commented", {}),
+    # SLA changes are automated noise, not something the agent chose to do.
+    (
+        "HD Ticket Activity",
+        "owner",
+        "ticket",
+        "updated",
+        {"action": ["not like", "%SLA%"]},
+    ),
+    (
+        "View Log",
+        "viewed_by",
+        "reference_name",
+        "viewed",
+        {"reference_doctype": "HD Ticket"},
+    ),
+    (
+        "ToDo",
+        "assigned_by",
+        "reference_name",
+        "assigned",
+        {"reference_type": "HD Ticket"},
+    ),
+]
+
+
+@frappe.whitelist()
+@agent_only
+def get_recent_activity() -> list[dict]:
+    """The current agent's latest action per ticket (replied, commented, updated,
+    viewed, assigned), one row per ticket, newest first, over the last few days."""
+    user = frappe.session.user
+    cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
+
+    events = []
+    for (
+        doctype,
+        user_field,
+        ticket_field,
+        activity_type,
+        extra_filters,
+    ) in ACTIVITY_SOURCES:
+        filters = {**extra_filters, user_field: user, "creation": [">=", cutoff]}
+        events += _activity_events(doctype, filters, ticket_field, activity_type)
+
+    # One row per ticket: keep only its most recent event across all sources.
+    latest_per_ticket: dict[str, dict] = {}
+    for event in sorted(events, key=lambda e: e["creation"]):
+        latest_per_ticket[event["ticket"]] = event
+    if not latest_per_ticket:
+        return []
+
+    # get_list respects permissions, so tickets the agent can't access drop out
+    # here — before the cap, so they can't leave the card underfilled.
+    accessible_tickets = frappe.get_list(
+        "HD Ticket",
+        filters=[["name", "in", list(latest_per_ticket)]],
+        fields=["name", "subject"],
+    )
+    subject_by_ticket = {t.name: t.subject for t in accessible_tickets}
+
+    recent = sorted(
+        (e for e in latest_per_ticket.values() if e["ticket"] in subject_by_ticket),
+        key=lambda e: e["creation"],
+        reverse=True,
+    )[:RECENT_ACTIVITY_LIMIT]
+
+    return [
+        {
+            "name": e["ticket"],
+            "subject": subject_by_ticket[e["ticket"]],
+            "activity_type": e["type"],
+            "text": e["text"],
+            "timestamp": format_time_difference(e["creation"]),
+            "creation": e["creation"],
+        }
+        for e in recent
+    ]
+
+
+def _activity_events(
+    doctype: str, filters: dict, ticket_field: str, activity_type: str
+) -> list[dict]:
+    """Every event of one type the agent performed in the window, tagged with its
+    ticket. Deduping to one row per ticket happens in get_recent_activity."""
+    fields = [f"{ticket_field} as ticket", "creation"]
+    if activity_type == "updated":
+        fields.append("action")
+    return [
+        {
+            "ticket": row.ticket,
+            "type": activity_type,
+            "text": _updated_label(row.action) if activity_type == "updated" else None,
+            "creation": row.creation,
+        }
+        for row in frappe.get_all(doctype, filters=filters, fields=fields)
+        if row.ticket
+    ]
+
+
+def _updated_label(action: str) -> str | None:
+    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
+    return action[:1].upper() + action[1:] if action else None

@@ -25,6 +25,9 @@ def get_sla(ticket: Document) -> Document:
         .select(QBSla.name, QBSla.condition)
         .where(QBSla.enabled == True)
         .where(QBSla.default_sla == False)
+        # A blank condition should not appear as a false positive
+        .where(QBSla.condition.notnull())
+        .where(QBSla.condition != "")
         .where(Criterion.any([QBSla.start_date.isnull(), QBSla.start_date <= now]))
         .where(Criterion.any([QBSla.end_date.isnull(), QBSla.end_date >= now]))
     )
@@ -37,8 +40,7 @@ def get_sla(ticket: Document) -> Document:
     sla_list = q.run(as_dict=True)
     res = None
     for sla in sla_list:
-        cond = sla.get("condition")
-        if not cond or frappe.safe_eval(cond, None, get_context(ticket)):
+        if frappe.safe_eval(sla.get("condition"), None, get_context(ticket)):
             res = sla
             break
     return res or get_default()
