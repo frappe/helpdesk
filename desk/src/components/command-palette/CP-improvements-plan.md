@@ -4,10 +4,10 @@ Outstanding work on the `⌘K` palette, ranked. Everything here came out of a
 design review, a PM review, and the two arguing with each other; items marked
 **shipped** are done and listed only so the plan reads as a whole.
 
-Verdict the plan is written against: the palette is **faster at triage,
-unproven at scale, and untouched on replies.** Setting a status or priority is
-now `⌘K → type → ⏎`. Composing a reply and working a 300-ticket queue are
-exactly as slow as before.
+Verdict the plan was written against: the palette is **faster at triage,
+unproven at scale, and untouched on replies.** Two of those three have moved —
+§5 shipped, so replies are now `⌘K → type → ⏎` like everything else. Scale is
+still untouched: §6 is the 300-ticket-queue item and it is deliberately later.
 
 > **Blocked on Custom Side Panel:** §7 (flat rows for team and type) and §15
 > (custom fields). Both hardcode a field set that feature is about to make
@@ -30,10 +30,26 @@ exactly as slow as before.
 | Flat option rows: typing `urgent` sets the priority, no drill-down | `ticketCommands.ts` (`flatOptionCommands`), `hideWhenEmpty` + `FLAT_OPTION_WEIGHT` |
 | Context chip scopes the palette to the open ticket, with fallthrough to global | `useCommandPalette.ts` (`context`) |
 | `esc` moved to the footer, labelled by what it actually does | `CommandPalette.vue` (`escapeLabel`) |
+| **§9** scope ranks instead of gating; fallback pinned whenever the query is searchable | `useCommandPalette.ts` (`groups`, `fallback`) |
+| **§2** `command_palette_opened` / `command_palette_command_run`; `source` on `ticket_assigned` and `saved_reply_applied` | `useCommandPalette.ts`, `ticketCommands.ts`, `AssignTo.vue`, `SavedRepliesSelectorModal.vue` |
+| **§3 + §4** combobox/listbox/option roles, live region; keys bound to the dialog, not the input | `CommandPalette.vue` |
+| **§15 "do now"** `FIELD_LABELS` replaced by `getMeta("HD Ticket")` | `ticketCommands.ts` (`fieldLabel`) |
+| **§10** recents keyed by session user, old keys dropped from disk | `userStorage.ts`, `recentTickets.ts` |
+| **§8** recent-commands MRU deleted; open ticket filtered out of recents | `recentTickets.ts`, `commands.ts` |
+| **§5** saved replies: drill-down, per-agent frequency, top-3 flat at root | `savedReplyCommands.ts`, `savedReplyRanking.ts`, `replyComposer.ts` |
+| **§11** `<mark>` runs, stale-not-blank results, loading bar, headers, per-level empty state, focus restore, Home/End + Ctrl+N/P, 640px, shortcuts row | `CommandPalette.vue`, `CommandPaletteRow.vue`, `paletteTypes.ts` |
+| **§12** README trimmed 380 → 95 lines, two false claims corrected | `README.md` |
+| `__()` accepts an array of replacements — `{1}` onwards had been silently dropped app-wide | `translation.ts` |
 
 Covered by runnable checks (`node_modules/.bin/tsx <file>`):
-`fuzzyScore.check.ts` (ranking, incl. flat-row vs parent in both directions),
-`listViewFilters.check.ts` (merge, same-field replace, clear, no-list fallback).
+`fuzzyScore.check.ts` (ranking, incl. flat-row vs parent in both directions, plus
+`<mark>` run splitting), `savedReplyRanking.check.ts` (promotion thresholds, sort
+stability, no mutation), `listViewFilters.check.ts` (merge, same-field replace,
+clear, no-list fallback).
+
+**Everything in "What can be done now" has shipped.** What remains below is the
+"later" list, unchanged: §1 undo, §6 selection, §7 and §15 behind Custom Side
+Panel, §13 SLA, §14 search cost.
 
 ---
 
@@ -497,32 +513,27 @@ that way. Small, and correct regardless of how the side panel lands.
 
 ---
 
-## What can be done now
+## What was done now — all shipped
 
-Nothing here touches a configurable field, so none of it waits on Custom Side
-Panel. Roughly in the order I would take them.
+Nothing here touched a configurable field, so none of it waited on Custom Side
+Panel. Built in this order, one commit each.
 
-| # | Item | Why now | Size |
-|---|---|---|---|
-| 1 | **§9** scope must not suppress search | A live bug, not just a prerequisite — `open` typed on a ticket already hides ticket search. It is also the gate for §7 later. | S |
-| 2 | **§2** two `capture()` calls | Converts several arguments in this plan from taste into data, including whether type deserves a flat row at all. | XS |
-| 3 | **§3 + §4** ARIA and the Tab trap | One file, one sitting. A regression against what headless-ui gave free, and a procurement gate. | S |
-| 4 | **§15 "do now"** kill `FIELD_LABELS` | Defuses the exact landmine Custom Side Panel creates: the palette would announce "Team" while the UI says "Squad". | XS |
-| 5 | **§10** user-scope recents keys | Ticket subjects currently leak between agents on a shared machine. | XS |
-| 6 | **§8** delete the recent-commands MRU | A deletion, not a fix. Broken four ways over a ~15-command corpus. | XS |
-| 7 | **§5** saved replies | The workflow bet, and the only item here that touches what an agent actually spends the day doing. Drill-down + frequency ordering; nothing in it depends on Custom Side Panel. | L |
-| 7b | **§5** top-N replies flat at root | Ships with §5. **Requires §9 first** — reply names are content-shaped, so at root they hit the same search-suppression trap as §7. | S |
-| 8 | **§11** polish batch, **§12** README trim | Motion, `<mark>` highlighting, stale-not-empty results, group headers, focus restore, missing keys. | M |
+| # | Item | Outcome |
+|---|---|---|
+| 1 | **§9** scope must not suppress search | Scope appends the global list below the scoped rows instead of returning early; fallback pinned once the query is searchable. |
+| 2 | **§2** two `capture()` calls | Plus `source` on `ticket_assigned` and `saved_reply_applied`. The popover's existing call was passing the wrong shape and had been reporting no properties at all. |
+| 3 | **§3 + §4** ARIA and the Tab trap | Rows carry their flat index, which supplies the option id and replaces identity comparison. Enter on a focused button is left alone so it does not double-fire. |
+| 4 | **§15 "do now"** kill `FIELD_LABELS` | Broadcast label from `getMeta`. Row titles stay literal — `getField` is null until meta lands, so deriving them would flash `Change agent_group`. |
+| 5 | **§10** user-scope recents keys | `userStorage.ts` reads the session cookie, since this runs before pinia. Old unscoped keys are also dropped from disk. |
+| 6 | **§8** delete the recent-commands MRU | Plus the open ticket no longer lists itself in recents. |
+| 7 | **§5** saved replies | Drill-down + per-agent frequency, with `replyComposer.ts` as the module-scope channel to the composer. |
+| 7b | **§5** top-N replies flat at root | 5 uses, top 3. Titles stored with the counts, so a root row costs no fetch and cannot block the root build. |
+| 8 | **§11** polish batch, **§12** README trim | Ten polish items; README 380 → 95 lines with two false claims corrected. |
+| — | `__()` array replacements | Not in the plan. Surfaced as the last type errors in the palette: ~50 call sites pass one array, so `{1}` onwards was silently dropped app-wide. Fixed at the source; repo `tsc` errors 952 → 709. |
 
-**Start with §9.** It is the only item on the list that makes something in the
-product unreachable, and it shipped as part of the flat option rows.
-
-**§9 now gates two things**, not one: §7 later, and §5's top-N root rows now.
-Both put content-shaped words at root level, and both are unsafe until scope
-ranks instead of gates.
-
-**§2 is still worth doing before §5** — it tells you whether the "5 uses"
-promotion threshold is right — but it no longer blocks anything.
+**§2 is now collecting.** It was supposed to tell you whether the "5 uses"
+promotion threshold is right, so that number is the first thing to revisit once
+there is data. §7's "type is rarely changed" argument is also waiting on it.
 
 ---
 
@@ -560,11 +571,8 @@ closed. Raise it there, not here.
 
 Only three, and they are the ones that break something if ignored.
 
-- **§9 → §5 top-N root rows.** Content-shaped names at root suppress search
-  until scope ranks instead of gates.
-- **§9 → §7.** Same reason, same mechanism.
+- ~~**§9 → §5 top-N root rows.**~~ Satisfied: §9 shipped first, so the root rows
+  rank above search hits instead of replacing them.
+- **§9 → §7.** Satisfied on the §9 side. §7 still waits on Custom Side Panel.
 - **Custom Side Panel → §7, §15.** Both hardcode a field set that feature makes
-  configurable.
-
-Everything else in "What can be done now" is independent and can be reordered
-freely.
+  configurable. Still open, and still the only hard dependency left.
