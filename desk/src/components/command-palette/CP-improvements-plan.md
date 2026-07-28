@@ -174,7 +174,7 @@ Zendesk macros are the volume tool for repetitive requests. Helpdesk's nearest
 equivalent is Saved Replies, whose only entry point today is a button inside
 the email composer (`EmailEditor.vue`).
 
-Add **"Reply with saved reply…"** on the ticket context: drill into the saved
+Add **"Insert saved reply"** on the ticket context: drill into the saved
 replies list, pick one, open the composer pre-filled. Not send-on-select — the
 agent must see it before it goes to a customer.
 

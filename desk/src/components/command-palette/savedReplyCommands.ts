@@ -30,7 +30,13 @@ interface SavedReplyRow {
 const FLAT_MIN_USES = 5;
 const FLAT_MAX_ROWS = 3;
 
-const GROUP_TITLE = "Reply with saved reply";
+/**
+ * "Insert", not "Reply with": it says what actually happens — the reply lands in
+ * the composer and the agent still has to send it. It also keeps the word "reply"
+ * out of the title, which matters for ranking (see fuzzyScore.check.ts): three
+ * rows in the reply family used to cluster at the top of a "reply" query.
+ */
+const GROUP_TITLE = "Insert saved reply";
 
 /**
  * Composing replies is the bulk of an agent's day, and the palette did not touch
@@ -89,8 +95,10 @@ function topSavedReplyCommands(ticketId: string): Command[] {
     (reply) => ({
       id: `saved-reply-flat-${reply.name}`,
       // Composed, like the other flat rows: a bare "Refund policy" reads as a
-      // ticket rather than as something that happens when you press Enter.
-      title: __("Reply: {0}", reply.title),
+      // ticket rather than as something that happens when you press Enter. The
+      // prefix must match the parent's verb — "Reply: X" under an "Insert saved
+      // reply" parent scored *above* it, inverting the intended hierarchy.
+      title: __("Insert: {0}", reply.title),
       group: GROUP.ticket,
       icon: LucideMessageSquareQuote,
       keywords: reply.title,

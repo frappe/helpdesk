@@ -112,6 +112,49 @@ assert.equal(
   "rank must win over the fuzzy path"
 );
 
+// --- composed flat titles must not outrank their parent -------------------
+// A naming choice can silently invert the hierarchy: a flat row whose title
+// *starts* with a word the parent only contains mid-title scores a prefix match
+// (1000) against the parent's word-boundary match (~950), and 1.15 vs 1.2 of
+// weight is not enough to make up the difference. So the flat prefix has to be
+// the parent's own leading verb.
+
+const insertParent: Command = {
+  id: "ticket-saved-reply",
+  title: "Insert saved reply",
+  group: "Ticket",
+  weight: CONTEXT_WEIGHT,
+  keywords: "template canned macro snippet",
+};
+const insertFlat: Command = {
+  id: "saved-reply-flat-x",
+  title: "Insert: Refund policy",
+  group: "Ticket",
+  weight: FLAT_OPTION_WEIGHT,
+  keywords: "Refund policy",
+};
+
+for (const term of ["insert", "saved", "saved reply", "reply"]) {
+  assert.ok(
+    scoreCommand(insertParent, term) > scoreCommand(insertFlat, term),
+    `"${term}" must lead with the drill-down parent, not one saved reply`
+  );
+}
+
+// ...while the reply's own name still reaches it directly.
+assert.ok(
+  scoreCommand(insertFlat, "refund") > scoreCommand(insertParent, "refund"),
+  "the reply's own words must reach its flat row"
+);
+
+// The rejected pairing, kept as the reason the titles are worded as they are:
+// "Saved reply: X" wins on a prefix match and buries the parent.
+assert.ok(
+  scoreCommand({ ...insertFlat, title: "Saved reply: Refund policy" }, "saved") >
+    scoreCommand(insertParent, "saved"),
+  "documents why the flat prefix mirrors the parent's verb"
+);
+
 // --- server highlighting -------------------------------------------------
 // Lives here rather than in its own file: same shape of pure, import-free helper.
 
