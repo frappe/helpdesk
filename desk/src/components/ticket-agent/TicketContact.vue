@@ -22,7 +22,7 @@
           @click="
             copyToClipboard(
               ticket.doc.name,
-              `Ticket #${ticket.doc.name} copied to clipboard`
+              `Ticket #${ticket.doc.name} copied`
             )
           "
         >
@@ -91,13 +91,13 @@ const callContact = () => {
 };
 
 useShortcut({ meta: true, shift: true, key: "." }, () => {
-  copyToClipboard(window.location.href, `Ticket URL copied to clipboard`);
+  copyToClipboard(window.location.href, `Ticket URL copied`);
 });
 
 useShortcut({ meta: true, key: "." }, () => {
   copyToClipboard(
     ticket.value.doc.name,
-    `Ticket #${ticket.value.doc.name} copied to clipboard`
+    `Ticket #${ticket.value.doc.name} copied`
   );
 });
 </script>
