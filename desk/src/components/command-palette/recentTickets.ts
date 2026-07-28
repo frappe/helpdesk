@@ -1,4 +1,4 @@
-import { useStorage } from "@vueuse/core";
+import { userStorage } from "./userStorage";
 
 export interface RecentTicket {
   name: string;
@@ -7,9 +7,21 @@ export interface RecentTicket {
 }
 
 const MAX_RECENTS = 5;
-const STORAGE_KEY = "hd_recent_tickets";
 
-export const recentTickets = useStorage<RecentTicket[]>(STORAGE_KEY, []);
+/**
+ * Per-agent: subjects routinely carry customer names, and the unscoped key
+ * handed the previous shift's tickets to whoever logged in next.
+ */
+export const recentTickets = userStorage<RecentTicket[]>(
+  "hd_recent_tickets",
+  []
+);
+
+// Scoping the key stops the next leak; these drop the one already on disk.
+// `hd_recent_commands` belonged to the deleted command MRU.
+["hd_recent_tickets", "hd_recent_commands"].forEach((key) =>
+  localStorage.removeItem(key)
+);
 
 /**
  * Records a ticket visit so the palette can show "what you'd probably do next"

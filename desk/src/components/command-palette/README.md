@@ -285,9 +285,13 @@ Cmd+K registration changes nothing user-visible.
 
 ## Recents
 
-`recentTickets.ts` — one `useStorage` list, `hd_recent_tickets`: the last 5
-visited tickets, recorded by a watcher in `TicketAgent.vue` once
-`ticket.doc.subject` resolves. The ticket currently open is filtered out.
+`recentTickets.ts` — one list, `hd_recent_tickets:<user_id>`: the last 5 visited
+tickets, recorded by a watcher in `TicketAgent.vue` once `ticket.doc.subject`
+resolves. The ticket currently open is filtered out.
+
+The key is per-user via `userStorage.ts`, which reads the session cookie rather
+than the auth store — it runs at module load, before pinia exists. Subjects
+carry customer names, and desks hot-desk.
 
 There is deliberately no recent-**commands** list. It covered ~15 commands that
 were all visible anyway, and burned rows a short list cannot spare.
