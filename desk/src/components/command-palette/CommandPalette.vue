@@ -24,7 +24,7 @@
           <Transition name="chip">
             <div
               v-if="context"
-              class="chip ms-3 shrink-0 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
+              class="chip ms-2 shrink-0 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
             >
               {{ context.label }}
             </div>
