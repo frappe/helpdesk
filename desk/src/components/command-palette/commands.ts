@@ -28,6 +28,11 @@ import LucideSettings from "~icons/lucide/settings";
 import LucideSun from "~icons/lucide/sun";
 import LucideTicket from "~icons/lucide/ticket";
 
+/** Extra root rows per route. Values stay lazy: they read page-published state. */
+const routeCommands: Record<string, () => Command[]> = {
+  TicketsAgent: ticketListCommands,
+};
+
 /**
  * The global list, in source order. The open ticket's own actions are not here:
  * they belong to the palette context, which renders them scoped behind a chip
@@ -37,7 +42,7 @@ export function buildRootCommands(query: string): Command[] {
   const route = router.currentRoute.value;
   return [
     ...ticketJumpCommand(query),
-    ...(route.name === "TicketsAgent" ? ticketListCommands() : []),
+    ...(routeCommands[String(route.name ?? "")]?.() ?? []),
     ...(query ? [] : recentTicketCommands()),
     ...navigateCommands(),
     ...createCommands(),
