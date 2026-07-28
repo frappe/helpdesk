@@ -191,7 +191,13 @@ class HelpdeskSearch(SQLiteSearch):
                 "doctypes": {},
             }
 
-        # Query the search index for available options
+        # The ticket list binds as ONE json variable per column instead of one
+        # placeholder per ticket. The old `IN (?,?,...)` repeated the whole list
+        # three times over — 3N placeholders — hitting SQLite's bound-variable
+        # ceiling at a third of the count the search query does.
+        # Three columns because each row type stores its ticket elsewhere:
+        # tickets in `name`, Communications in `reference_name`, comments in
+        # `reference_ticket`.
         sql = """
 			SELECT
 				agent_group,
@@ -201,14 +207,14 @@ class HelpdeskSearch(SQLiteSearch):
 				doctype,
 				COUNT(*) as count
 			FROM search_fts
-			WHERE (name IN ({placeholders}) OR reference_name IN ({placeholders}) OR reference_ticket IN ({placeholders}))
+			WHERE (name IN (SELECT value FROM json_each(?))
+				OR reference_name IN (SELECT value FROM json_each(?))
+				OR reference_ticket IN (SELECT value FROM json_each(?)))
 			GROUP BY agent_group, status, priority, customer, doctype
-		""".format(
-            placeholders=",".join(["?" for _ in accessible_tickets])
-        )
+		"""
 
-        params = accessible_tickets * 3
-        results = self.sql(sql, params, read_only=True)
+        tickets_json = frappe.as_json(accessible_tickets)
+        results = self.sql(sql, [tickets_json] * 3, read_only=True)
 
         # Aggregate the results
         teams = {}
