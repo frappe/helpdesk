@@ -1,3 +1,4 @@
+import { useTicket } from "@/composables/useTicket";
 import { router } from "@/router";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -60,7 +61,11 @@ export const context = computed<PaletteContext | null>(() => {
   const route = router.currentRoute.value;
   if (route.name !== "TicketAgent") return null;
   const id = String(route.params.ticketId);
-  return { id, label: `#${id}` };
+  return {
+    id,
+    label: `#${id}`,
+    title: useTicket(id).ticket.doc?.subject ?? "",
+  };
 });
 
 /** Drops the chip and widens the list back out to every global command. */

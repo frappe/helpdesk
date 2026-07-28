@@ -22,9 +22,15 @@
               <!-- Not a button: removal is backspace-only, advertised by esc's
                    footer label rather than a glyph on the chip. -->
               <div
-                class="chip mx-3.5 mt-3 w-fit rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
+                class="chip mx-3.5 mt-3 flex w-fit max-w-[30%] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
               >
-                {{ context.label }}
+                <span class="shrink-0 text-ink-gray-5">{{
+                  context.label
+                }}</span>
+                <span class="shrink-0 text-ink-gray-4">⋅</span>
+                <span class="truncate">{{
+                  context.title || __("Ticket")
+                }}</span>
               </div>
             </div>
           </div>
