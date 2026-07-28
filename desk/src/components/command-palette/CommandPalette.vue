@@ -85,59 +85,66 @@
           role="listbox"
           class="max-h-[380px] min-h-[7rem] overflow-y-auto py-2"
         >
-          <template v-if="flatItems.length">
-            <div
-              v-for="(group, groupIndex) in renderGroups"
-              :key="`${groupIndex}:${group.title}`"
-              role="group"
-              :aria-label="group.title || __('Ticket')"
-              class="mb-1 last:mb-0"
-            >
+          <!-- Keyed by level, so drilling in/out and removing the chip get the
+               same brief fade the chip already has. Typing never re-keys — a
+               per-keystroke animation would just flicker. -->
+          <Transition name="level" mode="out-in">
+            <div :key="levelKey">
+              <template v-if="flatItems.length">
+                <div
+                  v-for="(group, groupIndex) in renderGroups"
+                  :key="`${groupIndex}:${group.title}`"
+                  role="group"
+                  :aria-label="group.title || __('Ticket')"
+                  class="mb-1 last:mb-0"
+                >
+                  <div
+                    v-if="group.title"
+                    class="px-4 pb-1 pt-2 text-xs font-medium text-ink-gray-4"
+                  >
+                    {{ group.title }}
+                  </div>
+                  <div
+                    v-for="row in group.items"
+                    :id="optionId(row.index)"
+                    :key="`${group.title}:${row.command.id}`"
+                    role="option"
+                    :aria-selected="row.index === activeIndex"
+                    class="cursor-pointer px-2"
+                    :data-active="row.index === activeIndex"
+                    @mousemove="onRowHover(row.command)"
+                    @click="run(row.command)"
+                  >
+                    <CommandPaletteRow
+                      :command="row.command"
+                      :active="row.index === activeIndex"
+                    />
+                  </div>
+                </div>
+              </template>
+
+              <!-- presentation, or a listbox would be reported as holding a
+               non-option child; the live region announces this text instead. -->
               <div
-                v-if="group.title"
-                class="px-4 pb-1 pt-2 text-xs font-medium text-ink-gray-4"
+                v-else
+                role="presentation"
+                class="flex flex-col items-center py-12 text-ink-gray-4"
               >
-                {{ group.title }}
-              </div>
-              <div
-                v-for="row in group.items"
-                :id="optionId(row.index)"
-                :key="`${group.title}:${row.command.id}`"
-                role="option"
-                :aria-selected="row.index === activeIndex"
-                class="cursor-pointer px-2"
-                :data-active="row.index === activeIndex"
-                @mousemove="onRowHover(row.command)"
-                @click="run(row.command)"
-              >
-                <CommandPaletteRow
-                  :command="row.command"
-                  :active="row.index === activeIndex"
+                <component
+                  :is="
+                    isLoading
+                      ? LucideLoaderCircle
+                      : query
+                      ? LucideSearchX
+                      : LucideSearch
+                  "
+                  class="mb-2.5 size-8 opacity-40"
+                  :class="{ 'animate-spin': isLoading }"
                 />
+                <span class="text-base">{{ emptyMessage }}</span>
               </div>
             </div>
-          </template>
-
-          <!-- presentation, or a listbox would be reported as holding a
-               non-option child; the live region announces this text instead. -->
-          <div
-            v-else
-            role="presentation"
-            class="flex flex-col items-center py-12 text-ink-gray-4"
-          >
-            <component
-              :is="
-                isLoading
-                  ? LucideLoaderCircle
-                  : query
-                  ? LucideSearchX
-                  : LucideSearch
-              "
-              class="mb-2.5 size-8 opacity-40"
-              :class="{ 'animate-spin': isLoading }"
-            />
-            <span class="text-base">{{ emptyMessage }}</span>
-          </div>
+          </Transition>
         </div>
 
         <div
@@ -261,6 +268,10 @@ const resultAnnouncement = computed(() => {
 });
 
 const stepLabel = computed(() => (depth.value ? breadcrumb.value.at(-1) : ""));
+
+// Re-keys the list only on a level change — drill in/out or the chip — never
+// on typing.
+const levelKey = computed(() => `${depth.value}:${context.value ? "c" : ""}`);
 // Escape peels one layer at a time, so a fixed "Close" would be a lie on the
 // first two presses.
 const escapeLabel = computed(() => {
@@ -518,12 +529,31 @@ useShortcut({
   transform: translateY(-4px) scale(0.96);
 }
 
+.level-enter-active {
+  transition: opacity 100ms ease, transform 100ms ease;
+}
+
+.level-leave-active {
+  transition: opacity 75ms ease;
+}
+
+.level-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.level-leave-to {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .palette-content,
   .palette-overlay,
   .chip-row,
   .chip,
-  .loading-bar {
+  .loading-bar,
+  .level-enter-active,
+  .level-leave-active {
     animation: none !important;
     transition: none !important;
   }
