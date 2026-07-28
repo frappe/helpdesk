@@ -8,6 +8,7 @@
         class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[560px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
         @open-auto-focus.prevent
         @escape-key-down.prevent="onEscape"
+        @keydown="onKeydown"
       >
         <DialogTitle class="sr-only">{{ __("Command Palette") }}</DialogTitle>
 
@@ -55,16 +56,31 @@
             class="w-full border-none bg-transparent py-3.5 pe-4 ps-3 text-base text-ink-gray-8 placeholder-ink-gray-4 outline-none ring-0 focus:outline-none focus:ring-0"
             autocomplete="off"
             spellcheck="false"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="command-palette-list"
+            :aria-activedescendant="activeOptionId"
             @input="onQueryChange(($event.target as HTMLInputElement).value)"
-            @keydown="onKeydown"
           />
         </div>
 
-        <div ref="listRef" class="max-h-[380px] overflow-y-auto py-2">
+        <!-- Arrowing moves aria-activedescendant, which screen readers announce
+             on its own; this is for the things no row can say: how many there
+             are, and that the list changed under a debounced search. -->
+        <div class="sr-only" aria-live="polite">{{ resultAnnouncement }}</div>
+
+        <div
+          id="command-palette-list"
+          ref="listRef"
+          role="listbox"
+          class="max-h-[380px] overflow-y-auto py-2"
+        >
           <template v-if="flatItems.length">
             <div
-              v-for="group in groups"
+              v-for="group in renderGroups"
               :key="group.title"
+              role="group"
+              :aria-label="group.title || __('Ticket')"
               class="mb-1 last:mb-0"
             >
               <div
@@ -74,22 +90,31 @@
                 {{ group.title }}
               </div>
               <div
-                v-for="command in group.items"
-                :key="`${group.title}:${command.id}`"
+                v-for="row in group.items"
+                :id="optionId(row.index)"
+                :key="`${group.title}:${row.command.id}`"
+                role="option"
+                :aria-selected="row.index === activeIndex"
                 class="cursor-pointer px-2"
-                :data-active="activeCommand === command"
-                @mousemove="onRowHover(command)"
-                @click="run(command)"
+                :data-active="row.index === activeIndex"
+                @mousemove="onRowHover(row.command)"
+                @click="run(row.command)"
               >
                 <CommandPaletteRow
-                  :command="command"
-                  :active="activeCommand === command"
+                  :command="row.command"
+                  :active="row.index === activeIndex"
                 />
               </div>
             </div>
           </template>
 
-          <div v-else class="flex flex-col items-center py-12 text-ink-gray-4">
+          <!-- presentation, or a listbox would be reported as holding a
+               non-option child; the live region announces this text instead. -->
+          <div
+            v-else
+            role="presentation"
+            class="flex flex-col items-center py-12 text-ink-gray-4"
+          >
             <component
               :is="
                 isLoading
@@ -195,8 +220,30 @@ const listRef = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
 const keyboardNav = ref(false);
 
-// By identity, not id: a "Recent" row is a clone sharing its original's id.
-const activeCommand = computed(() => flatItems.value[activeIndex.value]);
+/**
+ * Rows paired with their flat index, so a row can carry the `id` that
+ * `aria-activedescendant` points at — and so highlighting compares indexes
+ * rather than object identity, which a "Recent" clone shares with its original.
+ */
+const renderGroups = computed(() => {
+  let index = 0;
+  return groups.value.map((group) => ({
+    title: group.title,
+    items: group.items.map((command) => ({ command, index: index++ })),
+  }));
+});
+
+const optionId = (index: number) => `command-palette-option-${index}`;
+const activeOptionId = computed(() =>
+  flatItems.value.length ? optionId(activeIndex.value) : undefined
+);
+
+const resultAnnouncement = computed(() => {
+  if (isLoading.value) return __("Searching…");
+  if (!flatItems.value.length) return __("No results");
+  return __("{0} results", String(flatItems.value.length));
+});
+
 const stepLabel = computed(() => (depth.value ? breadcrumb.value.at(-1) : ""));
 // Escape peels one layer at a time, so a fixed "Close" would be a lie on the
 // first two presses.
@@ -209,7 +256,15 @@ const placeholder = computed(() =>
   stepLabel.value ? __("Search…") : __("Search tickets or type a command…")
 );
 
+/**
+ * Bound to the dialog, not the input: Reka's focus trap lets Tab reach the chip
+ * and the back button, and from there arrows and Enter used to do nothing at all
+ * until the user found Shift+Tab. The one thing that must not double up is Enter
+ * on a focused button, which already fires its own click.
+ */
 function onKeydown(event: KeyboardEvent) {
+  const onButton = (event.target as HTMLElement | null)?.closest?.("button");
+  if (event.key === "Enter" && onButton) return;
   if (event.key === "ArrowDown") {
     event.preventDefault();
     moveActive(1);
