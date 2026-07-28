@@ -9,8 +9,20 @@ class HelpdeskSearchIndexMissingError(SQLiteSearchIndexMissingError):
     pass
 
 
+# Most tickets a bounded probe may bind as an exact `reference_ticket IN (...)`
+# prefilter. Past this, the prefilter is skipped and results are permission-checked
+# after the search instead: an unbounded IN list costs linearly per keystroke and
+# hard-fails at SQLite's bound-variable ceiling — which `search()`'s
+# `except sqlite3.Error` would turn into silently empty results forever.
+PREFILTER_LIMIT = 500
+
+
 class HelpdeskSearch(SQLiteSearch):
     INDEX_NAME = "helpdesk_search.db"
+
+    # Core search() bails early (disabled, empty query) without ever calling
+    # get_search_filters(), so the flag needs a resting value.
+    is_post_filter_required = False
 
     INDEX_SCHEMA = {
         "metadata_fields": [
@@ -64,10 +76,58 @@ class HelpdeskSearch(SQLiteSearch):
         },
     }
 
-    def get_search_filters(self):
+    def search(self, query, title_only: bool = False, filters: dict | None = None):
+        result = super().search(query, title_only=title_only, filters=filters)
+        if self.is_post_filter_required:
+            result["results"] = self._drop_unpermitted(result["results"])
+            result["summary"]["filtered_matches"] = len(result["results"])
+        return result
+
+    def get_search_filters(self) -> dict:
         """Return permission filters based on accessible tickets."""
-        accessible_tickets = self._get_accessible_tickets()
+        accessible_tickets = self.get_accessible_tickets()
+        # None means more than PREFILTER_LIMIT tickets are accessible, so we
+        # can't prefilter. Set before branching — the flag persists on the
+        # instance, so reading it unset would reuse a previous call's answer.
+        self.is_post_filter_required = accessible_tickets is None
+        if self.is_post_filter_required:
+            return {}
         return {"reference_ticket": accessible_tickets}
+
+    def get_accessible_tickets(self) -> list[str] | None:
+        """The accessible tickets when few enough to bind as an exact prefilter,
+        else None — meaning results get permission-checked after the search."""
+        tickets = frappe.get_list(
+            "HD Ticket", pluck="name", limit_page_length=PREFILTER_LIMIT + 1
+        )
+        if len(tickets) > PREFILTER_LIMIT:
+            return None
+        return tickets
+
+    def _drop_unpermitted(self, results: list[dict]) -> list[dict]:
+        """The authoritative permission gate for the unprefiltered branch.
+
+        `get_list` applies every permission layer (permission query, User
+        Permissions), and the IN list here is bounded by the result count,
+        not by table size. Rows without a resolvable ticket are dropped.
+        """
+        # ponytail: a heavily restricted agent on a huge site only sees matches
+        # surviving the global top-500 BM25 candidates; push the permission query
+        # into the index via json_each if anyone hits that recall ceiling.
+        candidates = {t for t in map(self._ticket_of, results) if t}
+        if not candidates:
+            return []
+        allowed = set(
+            frappe.get_list(
+                "HD Ticket", filters={"name": ["in", list(candidates)]}, pluck="name"
+            )
+        )
+        return [r for r in results if self._ticket_of(r) in allowed]
+
+    @staticmethod
+    def _ticket_of(result: dict) -> str | None:
+        """Communication rows carry their ticket in reference_name, not reference_ticket."""
+        return result.get("reference_ticket") or result.get("reference_name")
 
     def _get_accessible_tickets(self):
         """Get tickets accessible to current user based on helpdesk permissions."""
