@@ -28,15 +28,15 @@ import {
   type Command,
 } from "./paletteTypes";
 
+// Same icons as the composer buttons these rows press.
+import { CommentIcon, EmailIcon } from "@/components/icons/";
 import LucideArrowLeft from "~icons/lucide/arrow-left";
 import LucideArrowRight from "~icons/lucide/arrow-right";
 import LucideCircleDot from "~icons/lucide/circle-dot";
 import LucideCopy from "~icons/lucide/copy";
-import LucideCornerUpLeft from "~icons/lucide/corner-up-left";
 import LucideFlag from "~icons/lucide/flag";
 import LucideLink from "~icons/lucide/link";
 import LucideMerge from "~icons/lucide/merge";
-import LucideMessageCircle from "~icons/lucide/message-circle";
 import LucideShapes from "~icons/lucide/shapes";
 import LucideTags from "~icons/lucide/tags";
 import LucideUserPlus from "~icons/lucide/user-plus";
@@ -119,7 +119,7 @@ export function ticketCommands(ticketId: string): Command[] {
       title: __("Add comment"),
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
-      icon: LucideMessageCircle,
+      icon: CommentIcon,
       hint: "C",
       keywords: "note internal",
       perform: () => toggleCommentBox(),
@@ -129,7 +129,7 @@ export function ticketCommands(ticketId: string): Command[] {
       title: __("Reply to ticket"),
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
-      icon: LucideCornerUpLeft,
+      icon: EmailIcon,
       hint: "R",
       keywords: "email respond",
       perform: () => toggleEmailBox(),
