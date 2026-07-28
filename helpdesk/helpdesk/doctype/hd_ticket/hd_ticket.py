@@ -83,7 +83,6 @@ class HDTicket(Document):
         self.set_default_status()
         self.set_status_category()
         self.set_sla()
-
         self.set_contact()
         self.set_customer()
 
