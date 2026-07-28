@@ -25,6 +25,11 @@ export interface Command {
   /** Renders a trailing tick: this row's value is already set on the ticket. */
   checked?: boolean;
   /**
+   * Perform without closing, then rebuild the current level. For toggle rows
+   * (tags) where one visit changes several values and the tick must follow.
+   */
+  keepOpen?: boolean;
+  /**
    * Hidden until the user types. Weight can't express this — an empty term
    * scores 0 before weight applies, so every row would tie at the root.
    */

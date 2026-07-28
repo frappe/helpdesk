@@ -106,12 +106,12 @@ export function ticketCommands(ticketId: string): Command[] {
     },
     {
       id: "ticket-tags",
-      title: __("Add tag"),
+      title: __("Tags"),
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
       icon: LucideTags,
       hint: "G",
-      keywords: "label categorise",
+      keywords: "add remove label categorise",
       children: () => tagChildren(ticketId),
     },
     {

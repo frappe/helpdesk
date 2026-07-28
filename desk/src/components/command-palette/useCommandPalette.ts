@@ -23,6 +23,8 @@ export const query = ref("");
 interface Level {
   title: string;
   commands: Command[];
+  /** How this level was built, so keepOpen commands can rebuild it in place. */
+  load?: () => Command[] | Promise<Command[]>;
 }
 
 export interface PaletteGroup {
@@ -107,7 +109,10 @@ export async function run(command: Command): Promise<void> {
     loadingChildren.value = true;
     try {
       const commands = await command.children();
-      stack.value = [...stack.value, { title: command.title, commands }];
+      stack.value = [
+        ...stack.value,
+        { title: command.title, commands, load: command.children },
+      ];
       query.value = "";
       clearSearch();
     } catch {
@@ -126,8 +131,25 @@ export async function run(command: Command): Promise<void> {
       depth: depth.value,
     },
   });
+  if (command.keepOpen) {
+    await command.perform?.();
+    await reloadLevel();
+    return;
+  }
   closePalette();
   command.perform?.();
+}
+
+/** Rebuilds the current level in place so toggled rows show their new state. */
+async function reloadLevel(): Promise<void> {
+  const level = stack.value.at(-1);
+  if (!level?.load) return;
+  try {
+    const commands = await level.load();
+    stack.value = [...stack.value.slice(0, -1), { ...level, commands }];
+  } catch {
+    // Keep the stale list; the next drill-in rebuilds it.
+  }
 }
 
 /**
