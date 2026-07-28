@@ -8,6 +8,7 @@ import { fuzzyScore, scoreCommand } from "./fuzzyScore";
 import {
   CONTEXT_WEIGHT,
   FLAT_OPTION_WEIGHT,
+  titleRuns,
   type Command,
 } from "./paletteTypes";
 
@@ -109,6 +110,58 @@ assert.equal(
   scoreCommand({ ...setUrgent, rank: 42 }, "nomatchwhatsoever"),
   42,
   "rank must win over the fuzzy path"
+);
+
+// --- server highlighting -------------------------------------------------
+// Lives here rather than in its own file: same shape of pure, import-free helper.
+
+assert.deepEqual(
+  titleRuns("Cannot <mark>login</mark> to portal"),
+  [
+    { text: "Cannot ", match: false },
+    { text: "login", match: true },
+    { text: " to portal", match: false },
+  ],
+  "runs alternate around the marked text"
+);
+
+assert.deepEqual(
+  titleRuns("<mark>Refund</mark> for <mark>order</mark>"),
+  [
+    { text: "Refund", match: true },
+    { text: " for ", match: false },
+    { text: "order", match: true },
+  ],
+  "several marks in one title"
+);
+
+assert.deepEqual(
+  titleRuns("Nothing highlighted"),
+  [{ text: "Nothing highlighted", match: false }],
+  "an unhighlighted title is one plain run"
+);
+
+// Empty runs would render as stray nodes between adjacent marks.
+assert.deepEqual(
+  titleRuns("<mark>a</mark><mark>b</mark>"),
+  [
+    { text: "a", match: true },
+    { text: "b", match: true },
+  ],
+  "adjacent marks leave no empty run between them"
+);
+
+assert.deepEqual(titleRuns(""), [], "empty in, empty out");
+
+// The whole reason for rendering runs as text nodes: markup in ticket content
+// must come out inert, never as elements.
+assert.deepEqual(
+  titleRuns("<script>alert(1)</script> and <mark>hi</mark>"),
+  [
+    { text: "alert(1) and ", match: false },
+    { text: "hi", match: true },
+  ],
+  "other tags are stripped, not rendered"
 );
 
 console.log("fuzzyScore: all checks passed");

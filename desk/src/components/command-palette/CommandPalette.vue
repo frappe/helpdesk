@@ -5,7 +5,7 @@
         class="palette-overlay fixed inset-0 z-[100] bg-black/30 dark:bg-black/60"
       />
       <DialogContent
-        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[560px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
+        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
         @open-auto-focus.prevent
         @escape-key-down.prevent="onEscape"
         @keydown="onKeydown"
@@ -38,7 +38,9 @@
           </div>
         </Transition>
 
-        <div class="flex items-center border-b border-outline-gray-1 px-1">
+        <div
+          class="relative flex items-center border-b border-outline-gray-1 px-1"
+        >
           <LucideSearch class="ms-3 size-4 shrink-0 text-ink-gray-4" />
           <button
             v-if="stepLabel"
@@ -62,6 +64,16 @@
             :aria-activedescendant="activeOptionId"
             @input="onQueryChange(($event.target as HTMLInputElement).value)"
           />
+
+          <!-- Absolute, over the border: loading was only visible when the list
+               was empty, so a drill-down on a cold store showed 300ms of
+               nothing. Sitting in flow would shift the list by 2px. -->
+          <div
+            v-if="isLoading"
+            class="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden"
+          >
+            <div class="loading-bar h-full w-1/3 bg-surface-gray-5" />
+          </div>
         </div>
 
         <!-- Arrowing moves aria-activedescendant, which screen readers announce
@@ -73,7 +85,7 @@
           id="command-palette-list"
           ref="listRef"
           role="listbox"
-          class="max-h-[380px] overflow-y-auto py-2"
+          class="max-h-[380px] min-h-[7rem] overflow-y-auto py-2"
         >
           <template v-if="flatItems.length">
             <div
@@ -85,7 +97,7 @@
             >
               <div
                 v-if="group.title"
-                class="px-4 pb-1 pt-2 text-sm tracking-wider text-ink-gray-4"
+                class="px-4 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-ink-gray-4"
               >
                 {{ group.title }}
               </div>
@@ -126,13 +138,7 @@
               class="mb-2.5 size-8 opacity-40"
               :class="{ 'animate-spin': isLoading }"
             />
-            <span class="text-base">
-              <template v-if="isLoading">{{ __("Searching…") }}</template>
-              <template v-else-if="query">
-                {{ __('No results for "{0}"', [query]) }}
-              </template>
-              <template v-else>{{ __("No commands found") }}</template>
-            </span>
+            <span class="text-base">{{ emptyMessage }}</span>
           </div>
         </div>
 
@@ -219,6 +225,7 @@ const inputRef = ref<HTMLInputElement | null>(null);
 const listRef = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
 const keyboardNav = ref(false);
+let focusBeforeOpen: HTMLElement | null = null;
 
 /**
  * Rows paired with their flat index, so a row can carry the `id` that
@@ -238,9 +245,20 @@ const activeOptionId = computed(() =>
   flatItems.value.length ? optionId(activeIndex.value) : undefined
 );
 
+/**
+ * A drilled-in level with nothing left in it used to show the root's
+ * "No commands found", which is simply false — there are commands, just not here.
+ */
+const emptyMessage = computed(() => {
+  if (isLoading.value) return __("Searching…");
+  if (query.value) return __('No results for "{0}"', query.value);
+  if (stepLabel.value) return __("Nothing left in {0}", stepLabel.value);
+  return __("No commands found");
+});
+
 const resultAnnouncement = computed(() => {
   if (isLoading.value) return __("Searching…");
-  if (!flatItems.value.length) return __("No results");
+  if (!flatItems.value.length) return emptyMessage.value;
   return __("{0} results", String(flatItems.value.length));
 });
 
@@ -265,12 +283,22 @@ const placeholder = computed(() =>
 function onKeydown(event: KeyboardEvent) {
   const onButton = (event.target as HTMLElement | null)?.closest?.("button");
   if (event.key === "Enter" && onButton) return;
-  if (event.key === "ArrowDown") {
+  // Ctrl+N/P are what readline-shaped hands reach for, and Raycast honours them.
+  const down =
+    event.key === "ArrowDown" || (event.ctrlKey && event.key === "n");
+  const up = event.key === "ArrowUp" || (event.ctrlKey && event.key === "p");
+  if (down) {
     event.preventDefault();
     moveActive(1);
-  } else if (event.key === "ArrowUp") {
+  } else if (up) {
     event.preventDefault();
     moveActive(-1);
+  } else if (event.key === "Home") {
+    event.preventDefault();
+    setActive(0);
+  } else if (event.key === "End") {
+    event.preventDefault();
+    setActive(flatItems.value.length - 1);
   } else if (event.key === "Enter") {
     event.preventDefault();
     const command = flatItems.value[activeIndex.value];
@@ -288,9 +316,13 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 function moveActive(delta: number) {
+  setActive(activeIndex.value + delta);
+}
+
+function setActive(index: number) {
   keyboardNav.value = true;
   const last = flatItems.value.length - 1;
-  activeIndex.value = Math.min(Math.max(activeIndex.value + delta, 0), last);
+  activeIndex.value = Math.min(Math.max(index, 0), last);
   scrollActiveIntoView();
 }
 
@@ -317,6 +349,18 @@ function onEscape() {
 
 function onOpenChange(open: boolean) {
   isOpen.value = open;
+}
+
+/**
+ * Only steps in when the close left focus nowhere. A command may take focus
+ * itself — the saved-reply rows hand it to the composer — and that must win.
+ */
+function restoreFocus() {
+  const target = focusBeforeOpen;
+  focusBeforeOpen = null;
+  if (!target?.isConnected) return;
+  if (document.activeElement !== document.body) return;
+  target.focus();
 }
 
 function scrollActiveIntoView() {
@@ -350,8 +394,12 @@ watch(groups, (_next, previous) => {
 watch(isOpen, (open) => {
   if (!open) {
     resetPalette();
+    nextTick(restoreFocus);
     return;
   }
+  // There is no DialogTrigger, so nothing gives focus back on its own and a
+  // keyboard user lands on <body> having lost their place.
+  focusBeforeOpen = document.activeElement as HTMLElement | null;
   activeIndex.value = 0;
   nextTick(() => inputRef.value?.focus());
 });
@@ -435,6 +483,20 @@ useShortcut({
   }
 }
 
+/* Indeterminate: the search has no progress to report, only that it is running. */
+.loading-bar {
+  animation: loading-sweep 900ms ease-in-out infinite;
+}
+
+@keyframes loading-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
 /* grid-template-rows animates to intrinsic height, which max-height guesswork
    cannot: the chip owns its own size and the row still collapses smoothly. */
 .chip-row {
@@ -462,7 +524,8 @@ useShortcut({
   .palette-content,
   .palette-overlay,
   .chip-row,
-  .chip {
+  .chip,
+  .loading-bar {
     animation: none !important;
     transition: none !important;
   }

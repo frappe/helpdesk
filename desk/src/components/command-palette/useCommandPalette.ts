@@ -241,9 +241,16 @@ const debouncedSearch = useDebounceFn(async (term: string, token: number) => {
 /** Token advances on every change, so a response can't land under a newer query. */
 export function onQueryChange(term: string): void {
   query.value = term;
-  clearSearch();
+  latestSearchToken += 1;
   const trimmed = term.trim();
-  if (stack.value.length || trimmed.length < MIN_QUERY_LENGTH) return;
+  if (stack.value.length || trimmed.length < MIN_QUERY_LENGTH) {
+    searchResults.value = [];
+    searchLoading.value = false;
+    return;
+  }
+  // Deliberately keeping the old rows until the new ones land. Clearing here
+  // blanked the list on every keystroke and resized the panel under the cursor,
+  // 200ms of debounce at a time.
   searchLoading.value = true;
   debouncedSearch(trimmed, latestSearchToken);
 }

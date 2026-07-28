@@ -10,6 +10,9 @@ export function searchCommands(items: SearchItem[]): Command[] {
   return items.map((item, index) => ({
     id: `search-${item.doctype}-${item.name}`,
     title: stripTags(item.title || item.content || item.name),
+    // The index already computed which words matched; throwing that away was
+    // why search rows never showed why they came back.
+    marked: item.title || item.content || item.name,
     subtitle: searchSubtitle(item),
     // Priority up front, status in the subtitle: repeated subjects are common,
     // and the index returns both, so neither has to be guessed at.

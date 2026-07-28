@@ -19,7 +19,12 @@
     <span
       class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
     >
-      {{ command.title }}
+      <template v-for="(run, index) in runs" :key="index">
+        <span v-if="run.match" class="font-medium text-ink-gray-9">{{
+          run.text
+        }}</span>
+        <template v-else>{{ run.text }}</template>
+      </template>
     </span>
 
     <span v-if="command.subtitle" class="ms-3 shrink-0 text-xs text-ink-gray-4">
@@ -47,7 +52,7 @@ import { useDevice } from "@/composables";
 import { computed } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import LucideChevronRight from "~icons/lucide/chevron-right";
-import type { Command } from "./paletteTypes";
+import { titleRuns, type Command } from "./paletteTypes";
 
 const props = defineProps<{
   command: Command;
@@ -55,6 +60,13 @@ const props = defineProps<{
 }>();
 
 const { metaIcon } = useDevice();
+
+/** One unmatched run for every row without server highlighting. */
+const runs = computed(() =>
+  props.command.marked
+    ? titleRuns(props.command.marked)
+    : [{ text: props.command.title, match: false }]
+);
 
 /** "Mod+Shift+." -> "⌘ Shift ." — ShortcutKey caps each space-separated key. */
 const shortcutKeys = computed(() =>

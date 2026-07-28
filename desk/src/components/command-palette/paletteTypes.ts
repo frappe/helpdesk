@@ -17,6 +17,11 @@ export interface Command {
   dotClass?: string;
   /** Fixed score, bypassing the fuzzy scorer. Server hits arrive pre-ranked. */
   rank?: number;
+  /**
+   * The title as the server highlighted it, `<mark>` runs included. `title`
+   * stays plain, since that is what gets scored and read out.
+   */
+  marked?: string;
   /** Renders a trailing tick: this row's value is already set on the ticket. */
   checked?: boolean;
   /**
@@ -55,6 +60,27 @@ export interface SearchItem {
 /** Server highlights matches with <mark>; palette rows render plain text. */
 export function stripTags(value: string): string {
   return (value ?? "").replace(/<[^>]*>/g, "");
+}
+
+export interface TitleRun {
+  text: string;
+  /** Part of what the query matched, per the server's own highlighting. */
+  match: boolean;
+}
+
+/**
+ * Splits the server's `<mark>` highlighting into runs, so a search row can show
+ * *why* it matched. Rendered as text nodes — no `v-html`, so no sanitiser and no
+ * way for ticket content to inject markup. Any other tags are stripped.
+ */
+export function titleRuns(marked: string): TitleRun[] {
+  return (marked ?? "")
+    .split(/(<mark>[\s\S]*?<\/mark>)/g)
+    .map((part) => ({
+      text: stripTags(part),
+      match: part.startsWith("<mark>"),
+    }))
+    .filter((run) => run.text.length > 0);
 }
 
 /** Ticket-context rows outrank server search hits (fixed rank ~950). */

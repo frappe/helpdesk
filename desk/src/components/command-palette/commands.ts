@@ -1,4 +1,7 @@
-import { agentPortalSidebarOptions } from "@/components/layouts/layoutSettings";
+import {
+  agentPortalSidebarOptions,
+  showShortcutsModal,
+} from "@/components/layouts/layoutSettings";
 import {
   setActiveSettingsTab,
   showSettingsModal,
@@ -17,6 +20,7 @@ import { ticketListCommands } from "./ticketListCommands";
 import LucideActivity from "~icons/lucide/activity";
 import LucideClock from "~icons/lucide/clock";
 import LucideFileSearch from "~icons/lucide/file-search";
+import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideLogOut from "~icons/lucide/log-out";
 import LucideMoon from "~icons/lucide/moon";
 import LucidePlus from "~icons/lucide/plus";
@@ -148,6 +152,17 @@ function accountCommands(): Command[] {
       hint: "Mod+,",
       keywords: "preferences configure email agents teams sla telephony",
       children: () => settingsChildren(),
+    },
+    {
+      // The palette is the discovery surface for the shortcut system, so it
+      // should point at it rather than assume anyone found Mod+/ on their own.
+      id: "shortcuts",
+      title: __("Keyboard shortcuts"),
+      group: GROUP.account,
+      icon: LucideKeyboard,
+      hint: "Mod+/",
+      keywords: "keys hotkeys bindings help",
+      perform: () => (showShortcutsModal.value = true),
     },
     {
       id: "logout",
