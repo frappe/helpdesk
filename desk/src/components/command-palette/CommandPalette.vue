@@ -181,6 +181,7 @@ import {
   isOpen,
   isPaletteAvailable,
   onQueryChange,
+  openPalette,
   query,
   resetPalette,
   run,
@@ -317,7 +318,7 @@ useShortcut({
   condition: () =>
     isPaletteAvailable.value &&
     !document.activeElement?.closest?.(".ProseMirror"),
-  handler: () => (isOpen.value = !isOpen.value),
+  handler: () => (isOpen.value ? closePalette() : openPalette()),
 });
 </script>
 

@@ -393,7 +393,12 @@ async function assignTicket(ticketId: string, agent: string): Promise<void> {
       name: ticketId,
       assign_to: [agent],
     });
-    capture("ticket_assigned", { data: { doctype: "HD Ticket" } });
+    // `source` puts palette and popover assignments in one funnel: if popover
+    // usage stays flat while palette usage rises, the palette added a path
+    // rather than saving anyone time.
+    capture("ticket_assigned", {
+      data: { doctype: "HD Ticket", source: "command_palette" },
+    });
     await logAssignment(ticketId, agent);
     toast.success(__("Assignees updated successfully."));
     assignees.reload();

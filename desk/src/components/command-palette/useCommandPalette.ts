@@ -1,5 +1,6 @@
 import { useTicket } from "@/composables/useTicket";
 import { router } from "@/router";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
@@ -75,6 +76,11 @@ export function dismissContext(): void {
 export function openPalette(): void {
   if (!isPaletteAvailable.value) return;
   isOpen.value = true;
+  // Route every open through here, Cmd+K included, or the open rate undercounts
+  // the only path most agents use.
+  capture("command_palette_opened", {
+    data: { context: String(router.currentRoute.value.name ?? "") },
+  });
 }
 
 export function closePalette(): void {
@@ -114,6 +120,15 @@ export async function run(command: Command): Promise<void> {
     return;
   }
   trackRecentCommand(command.id);
+  // `runs ÷ opens` below 0.5 means agents open, miss and press Esc; a long
+  // query or a non-zero depth on a common action means the ranking is wrong.
+  capture("command_palette_command_run", {
+    data: {
+      command_id: command.id,
+      query_length: query.value.length,
+      depth: depth.value,
+    },
+  });
   closePalette();
   command.perform?.();
 }
