@@ -19,6 +19,7 @@ import { capture } from "@/telemetry";
 import { copyToClipboard } from "@/utils";
 import { call, createListResource, createResource, toast } from "frappe-ui";
 import { priorityOptions, statusOptions } from "./optionCommands";
+import { savedReplyCommands } from "./savedReplyCommands";
 import { tagChildren } from "./tagCommands";
 import {
   CONTEXT_WEIGHT,
@@ -123,6 +124,7 @@ export function ticketCommands(ticketId: string): Command[] {
       keywords: "email respond",
       perform: () => toggleEmailBox(),
     },
+    ...savedReplyCommands(ticketId),
     {
       id: "ticket-comment",
       title: __("Add comment"),

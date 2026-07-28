@@ -263,7 +263,7 @@ const onTemplateSelect = (template: SavedReply) => {
       if (!show.value) return;
       pendingTemplate.value = data;
       show.value = false;
-      capture("saved_reply_applied");
+      capture("saved_reply_applied", { data: { source: "composer" } });
     },
   });
   renderResponse.submit().catch(() => {

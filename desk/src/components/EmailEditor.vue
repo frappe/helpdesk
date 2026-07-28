@@ -208,6 +208,7 @@ import { AttachmentList, SavedRepliesSelectorModal } from "@/components";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
+import { replyComposer } from "@/components/replyComposer";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
@@ -609,6 +610,9 @@ watch(
 );
 
 onMounted(() => {
+  // Published for the command palette, which cannot reach `editorRef` from
+  // module scope. See replyComposer.ts.
+  replyComposer.value = applySavedReplies;
   if (quotedContent.value) {
     nextTick(() => {
       if (quotedContentRef.value) {
@@ -619,6 +623,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  replyComposer.value = null;
   cleanup();
 });
 
