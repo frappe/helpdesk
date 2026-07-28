@@ -13,6 +13,7 @@ import {
   toggleEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
+import { getMeta } from "@/stores/meta";
 import { __ } from "@/translation";
 import { capture } from "@/telemetry";
 import { copyToClipboard } from "@/utils";
@@ -340,13 +341,18 @@ async function ticketTypeChildren(ticketId: string): Promise<Command[]> {
   }));
 }
 
-/** Labels the realtime broadcast uses, matching TicketDetailsTab's field labels. */
-const FIELD_LABELS: Record<string, string> = {
-  status: "Status",
-  priority: "Priority",
-  agent_group: "Team",
-  ticket_type: "Ticket Type",
-};
+// Module scope is safe for getMeta — tiptap-extensions.ts already calls it that
+// way, and the resource is cached per doctype, so this shares that fetch.
+const ticketMeta = getMeta("HD Ticket");
+
+/**
+ * The field's own label from meta, never a copy of it. A site that relabels
+ * Team to "Squad" gets "Squad" in the broadcast; a hardcoded map would announce
+ * "Team" while the UI said otherwise.
+ */
+function fieldLabel(fieldname: string): string {
+  return ticketMeta.getField(fieldname)?.label ?? fieldname;
+}
 
 function updateTicket(ticketId: string, changes: Record<string, string>): void {
   const [field, value] = Object.entries(changes)[0] ?? [];
@@ -362,10 +368,7 @@ function updateTicket(ticketId: string, changes: Record<string, string>): void {
   // Same order as the header and details tab: tell co-viewers, then write.
   // Resolved lazily — globalStore() needs a mounted instance, which the ticket
   // page guarantees by the time a command can run.
-  useNotifyTicketUpdate(ticketId).notifyTicketUpdate(
-    FIELD_LABELS[field] ?? field,
-    value
-  );
+  useNotifyTicketUpdate(ticketId).notifyTicketUpdate(fieldLabel(field), value);
   ticket.setValue.submit(changes, {
     onSuccess: () => activities.reload(),
   });
