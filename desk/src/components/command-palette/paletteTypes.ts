@@ -25,8 +25,8 @@ export interface Command {
   /** Renders a trailing tick: this row's value is already set on the ticket. */
   checked?: boolean;
   /**
-   * Perform without closing, then rebuild the current level. For toggle rows
-   * (tags) where one visit changes several values and the tick must follow.
+   * Perform without closing; the tick flips optimistically and flips back if
+   * `perform` throws. For toggle rows (tags) where one visit flips several.
    */
   keepOpen?: boolean;
   /**

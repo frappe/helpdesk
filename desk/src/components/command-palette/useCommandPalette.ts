@@ -6,7 +6,11 @@ import { isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource, toast } from "frappe-ui";
 import { computed, ref, shallowRef } from "vue";
-import { buildFallbackCommands, buildRootCommands } from "./commands";
+import {
+  buildFallbackCommands,
+  buildRootCommands,
+  recentTicketCommands,
+} from "./commands";
 import { scoreCommand } from "./fuzzyScore";
 import {
   type Command,
@@ -23,8 +27,6 @@ export const query = ref("");
 interface Level {
   title: string;
   commands: Command[];
-  /** How this level was built, so keepOpen commands can rebuild it in place. */
-  load?: () => Command[] | Promise<Command[]>;
 }
 
 export interface PaletteGroup {
@@ -102,23 +104,26 @@ export function back(): void {
   clearSearch(); // else the pre-drill-down hits linger under an empty query
 }
 
+// Guards run() against a second Enter landing mid-await: without it a
+// double-Enter stacked a duplicate level, or double-toggled a tag.
+let running = false;
+
 /** Drills in when the command has children, otherwise performs it and closes. */
 export async function run(command: Command): Promise<void> {
-  if (!command) return;
+  if (!command || running) return;
   if (command.children) {
     loadingChildren.value = true;
+    running = true;
     try {
       const commands = await command.children();
-      stack.value = [
-        ...stack.value,
-        { title: command.title, commands, load: command.children },
-      ];
+      stack.value = [...stack.value, { title: command.title, commands }];
       query.value = "";
       clearSearch();
     } catch {
       toast.error(__("Could not load {0}", [command.title]));
     } finally {
       loadingChildren.value = false;
+      running = false;
     }
     return;
   }
@@ -132,24 +137,33 @@ export async function run(command: Command): Promise<void> {
     },
   });
   if (command.keepOpen) {
-    await command.perform?.();
-    await reloadLevel();
+    // Optimistic: the tick flips on Enter, and flips back if the write fails.
+    // Waiting for the round trip left the row looking like it ignored the key.
+    flipChecked(command);
+    running = true;
+    try {
+      await command.perform?.();
+    } catch {
+      flipChecked(command);
+    } finally {
+      running = false;
+    }
     return;
   }
   closePalette();
   command.perform?.();
 }
 
-/** Rebuilds the current level in place so toggled rows show their new state. */
-async function reloadLevel(): Promise<void> {
+/** Flips a row's tick in the current level without rebuilding it. */
+function flipChecked(target: Command): void {
   const level = stack.value.at(-1);
-  if (!level?.load) return;
-  try {
-    const commands = await level.load();
-    stack.value = [...stack.value.slice(0, -1), { ...level, commands }];
-  } catch {
-    // Keep the stale list; the next drill-in rebuilds it.
-  }
+  if (!level) return;
+  const commands = level.commands.map((command) =>
+    command.id === target.id
+      ? { ...command, checked: !command.checked }
+      : command
+  );
+  stack.value = [...stack.value.slice(0, -1), { ...level, commands }];
 }
 
 /**
@@ -173,10 +187,13 @@ export const groups = computed<PaletteGroup[]>(() => {
     : [];
 
   const term = query.value.trim();
-  // An empty query with the chip up means "just this ticket" — that is what the
-  // chip is for. Without the chip (removed, or a context-free page) the empty
-  // query must fall through to the global root, not an empty list.
-  if (!term && context.value) return scoped;
+  // An empty query with the chip up leads with the ticket's rows, then recents
+  // — jumping to another recent ticket is the highest-frequency zero-typing
+  // action, and the ticket page is exactly where it happens from. Without the
+  // chip (removed, or a context-free page) the empty query must fall through
+  // to the global root, not an empty list.
+  if (!term && context.value)
+    return [...scoped, ...groupCommands(recentTicketCommands(), "")];
   if (!term) return groupCommands(globalCommands(), "");
 
   // Scope *ranks*, it never *gates*. Returning early here is what made a ticket

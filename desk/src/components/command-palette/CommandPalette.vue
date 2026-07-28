@@ -529,21 +529,18 @@ useShortcut({
   transform: translateY(-4px) scale(0.96);
 }
 
+/*
+ * Enter-only: the outgoing list must vanish the instant the level changes.
+ * A leave fade kept the old rows on screen while Enter already targeted the
+ * new level, so a fast double-Enter fired a command the user couldn't see.
+ */
 .level-enter-active {
   transition: opacity 100ms ease, transform 100ms ease;
-}
-
-.level-leave-active {
-  transition: opacity 75ms ease;
 }
 
 .level-enter-from {
   opacity: 0;
   transform: translateY(4px);
-}
-
-.level-leave-to {
-  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -552,8 +549,7 @@ useShortcut({
   .chip-row,
   .chip,
   .loading-bar,
-  .level-enter-active,
-  .level-leave-active {
+  .level-enter-active {
     animation: none !important;
     transition: none !important;
   }

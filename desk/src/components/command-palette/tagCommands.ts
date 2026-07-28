@@ -30,7 +30,7 @@ export async function tagChildren(ticketId: string): Promise<Command[]> {
     icon: LucideTags,
     checked: applied.has(tag.name),
     keepOpen: true,
-    perform: () => toggleTag(ticketId, tag, applied.has(tag.name)),
+    perform: () => toggleTag(ticketId, tag),
   }));
 }
 
@@ -45,22 +45,22 @@ function appliedTags(ticketId: string): Set<string> {
   );
 }
 
-async function toggleTag(
-  ticketId: string,
-  tag: Tag,
-  applied: boolean
-): Promise<void> {
+/** Applied state is read at call time, so toggling the same row twice works. */
+async function toggleTag(ticketId: string, tag: Tag): Promise<void> {
+  const applied = appliedTags(ticketId).has(tag.name);
   try {
-    await call("helpdesk.api.tags.update_tags", {
+    const userTags = await call("helpdesk.api.tags.update_tags", {
       doctype: "HD Ticket",
       name: ticketId,
       added: applied ? [] : [{ name: tag.name, color: tag.color || "Gray" }],
       removed: applied ? [tag.name] : [],
     });
     const { ticket, activities } = useTicket(ticketId);
+    // The response carries the new _user_tags: one round trip, no doc reload.
+    if (ticket.doc) ticket.doc._user_tags = userTags;
     activities.reload();
-    await ticket.reload(); // the rebuilt level reads its ticks from the doc
   } catch (error: any) {
     toast.error(error?.messages?.join(", ") || __("Failed to update tags"));
+    throw error; // the palette flips the optimistic tick back
   }
 }

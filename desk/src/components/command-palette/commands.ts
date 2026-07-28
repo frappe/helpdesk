@@ -68,7 +68,7 @@ function ticketJumpCommand(query: string): Command[] {
  * zero-typing action in the product. The ticket being read is excluded — it was
  * listing itself as the thing to go to next.
  */
-function recentTicketCommands(): Command[] {
+export function recentTicketCommands(): Command[] {
   const openTicketId = String(
     router.currentRoute.value.params.ticketId ?? ""
   );
