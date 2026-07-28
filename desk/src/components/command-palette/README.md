@@ -285,15 +285,12 @@ Cmd+K registration changes nothing user-visible.
 
 ## Recents
 
-`recentTickets.ts` — two `useStorage` lists:
+`recentTickets.ts` — one `useStorage` list, `hd_recent_tickets`: the last 5
+visited tickets, recorded by a watcher in `TicketAgent.vue` once
+`ticket.doc.subject` resolves. The ticket currently open is filtered out.
 
-- `hd_recent_tickets` — last 5 visited tickets, recorded by a watcher in
-  `TicketAgent.vue` once `ticket.doc.subject` resolves
-- `hd_recent_commands` — last 3 executed command ids, tracked in `run()`
-
-Recent copies of a command get a `recent-` id prefix so a command appearing in
-both "Recent" and its home group stays two distinct rows and doesn't
-double-highlight.
+There is deliberately no recent-**commands** list. It covered ~15 commands that
+were all visible anyway, and burned rows a short list cannot spare.
 
 ---
 

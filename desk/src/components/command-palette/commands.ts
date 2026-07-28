@@ -11,7 +11,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { useTheme } from "frappe-ui";
 import { FALLBACK_GROUP, GROUP, type Command } from "./paletteTypes";
-import { recentCommandIds, recentTickets } from "./recentTickets";
+import { recentTickets } from "./recentTickets";
 import { ticketListCommands } from "./ticketListCommands";
 
 import LucideActivity from "~icons/lucide/activity";
@@ -31,16 +31,13 @@ import LucideTicket from "~icons/lucide/ticket";
  */
 export function buildRootCommands(query: string): Command[] {
   const route = router.currentRoute.value;
-  const always = [
-    ...navigateCommands(),
-    ...createCommands(),
-    ...accountCommands(),
-  ];
   return [
     ...ticketJumpCommand(query),
     ...(route.name === "TicketsAgent" ? ticketListCommands() : []),
-    ...(query ? [] : recentCommands(always)),
-    ...always,
+    ...(query ? [] : recentTicketCommands()),
+    ...navigateCommands(),
+    ...createCommands(),
+    ...accountCommands(),
   ];
 }
 
@@ -63,28 +60,26 @@ function ticketJumpCommand(query: string): Command[] {
 
 // --- recents -------------------------------------------------------------
 
-/** Clones of rows in `always`, so recents can't drift from the real commands. */
-function recentCommands(always: Command[]): Command[] {
-  return [...recentlyRunCommands(always), ...recentTicketCommands()];
-}
-
-function recentlyRunCommands(always: Command[]): Command[] {
-  return recentCommandIds.value
-    .map((id) => always.find((command) => command.id === id))
-    .filter((command): command is Command => Boolean(command))
-    .map((command) => ({ ...command, group: GROUP.recent, weight: 1 }));
-}
-
+/**
+ * An agent bounces between ~5 tickets a session, and this is the only
+ * zero-typing action in the product. The ticket being read is excluded — it was
+ * listing itself as the thing to go to next.
+ */
 function recentTicketCommands(): Command[] {
-  return recentTickets.value.map((ticket) => ({
-    id: `recent-ticket-${ticket.name}`,
-    title: ticket.subject,
-    subtitle: `#${ticket.name}`,
-    group: GROUP.recent,
-    icon: LucideClock,
-    perform: () =>
-      router.push({ name: "TicketAgent", params: { ticketId: ticket.name } }),
-  }));
+  const openTicketId = String(
+    router.currentRoute.value.params.ticketId ?? ""
+  );
+  return recentTickets.value
+    .filter((ticket) => ticket.name !== openTicketId)
+    .map((ticket) => ({
+      id: `recent-ticket-${ticket.name}`,
+      title: ticket.subject,
+      subtitle: `#${ticket.name}`,
+      group: GROUP.recent,
+      icon: LucideClock,
+      perform: () =>
+        router.push({ name: "TicketAgent", params: { ticketId: ticket.name } }),
+    }));
 }
 
 // --- navigation, create, account -----------------------------------------

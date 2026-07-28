@@ -15,7 +15,6 @@ import {
   type SearchItem,
 } from "./paletteTypes";
 import { searchCommands } from "./searchCommands";
-import { trackRecentCommand } from "./recentTickets";
 import { ticketCommands } from "./ticketCommands";
 
 // Module scope: the sidebar button, Cmd+K and the dialog drive one instance.
@@ -119,7 +118,6 @@ export async function run(command: Command): Promise<void> {
     }
     return;
   }
-  trackRecentCommand(command.id);
   // `runs ÷ opens` below 0.5 means agents open, miss and press Esc; a long
   // query or a non-zero depth on a common action means the ranking is wrong.
   capture("command_palette_command_run", {
