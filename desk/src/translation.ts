@@ -8,15 +8,29 @@ function getTranslatedMessage(message: string): string {
   return translatedMessages[message] || message;
 }
 
+type Replacement = string | number;
+
 function translate(message: string): string;
-function translate(message: string, ...args: string[]): string;
-function translate(message: string, ...args: string[]): string {
+function translate(message: string, ...args: Replacement[]): string;
+/**
+ * Most of the app passes replacements as one array. That reads as a single
+ * argument, so `{1}` onwards silently kept its placeholder and `{0}` rendered
+ * the whole comma-joined array. Accepted as an overload rather than rewritten at
+ * ~50 call sites.
+ */
+function translate(message: string, args: Replacement[]): string;
+function translate(
+  message: string,
+  ...args: (Replacement | Replacement[])[]
+): string {
   const translatedMessage = getTranslatedMessage(message);
-  if (args.length === 0) {
+  const values = args.flat();
+  if (values.length === 0) {
     return translatedMessage;
   }
   return translatedMessage.replace(/{(\d+)}/g, function (match, index) {
-    return typeof args[index] != "undefined" ? args[index] : match;
+    const value = values[Number(index)];
+    return value === undefined ? match : String(value);
   });
 }
 

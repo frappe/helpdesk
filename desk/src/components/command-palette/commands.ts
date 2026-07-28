@@ -47,9 +47,8 @@ export function buildRootCommands(query: string): Command[] {
 
 /** "#234" jumps straight to that ticket — the one prefix the palette already taught. */
 function ticketJumpCommand(query: string): Command[] {
-  const match = query.trim().match(/^#?(\d+)$/);
-  if (!match) return [];
-  const ticketId = match[1];
+  const ticketId = query.trim().match(/^#?(\d+)$/)?.[1];
+  if (!ticketId) return [];
   return [
     {
       id: `jump-${ticketId}`,

@@ -31,7 +31,7 @@ export function fuzzyScore(text: string, term: string): number {
   const direct = haystack.indexOf(needle);
   if (direct === 0) return 1000;
   if (direct > 0) {
-    const onWordBoundary = /[\s\-_#/]/.test(haystack[direct - 1]);
+    const onWordBoundary = /[\s\-_#/]/.test(haystack[direct - 1] ?? "");
     return 900 - Math.min(direct, 100) + (onWordBoundary ? 60 : 0);
   }
 

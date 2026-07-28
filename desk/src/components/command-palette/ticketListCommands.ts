@@ -106,7 +106,7 @@ function viewChildren(): Command[] {
     },
     ...ticketViews.map((view: View) => ({
       id: `list-view-${view.name}`,
-      title: view.label,
+      title: view.label ?? view.name,
       subtitle: viewScope(view),
       group: "Switch view",
       icon: LucideLayoutList,

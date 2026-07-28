@@ -191,7 +191,9 @@ function assignToMeCommand(ticketId: string): Command[] {
 function mergeCommand(ticketId: string): Command[] {
   const doc = useTicket(ticketId).ticket.doc;
   const mergeable =
-    doc && !doc.is_merged && ["Open", "Paused"].includes(doc.status_category);
+    doc &&
+    !doc.is_merged &&
+    ["Open", "Paused"].includes(doc.status_category ?? "");
   if (!mergeable) return [];
   return [
     {
