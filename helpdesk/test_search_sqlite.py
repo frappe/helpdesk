@@ -59,3 +59,12 @@ class TestSearchPermissionFilter(FrappeTestCase):
             [HelpdeskSearch._ticket_of(r) for r in kept],
             [self.own_ticket.name, self.own_ticket.name],
         )
+
+    def test_filter_options_bind_a_constant_number_of_variables(self):
+        """Runs the json_each facets query for real: the old 3N-placeholder
+        IN lists hit SQLite's bound-variable ceiling on large sites."""
+        options = HelpdeskSearch().get_filter_options()
+
+        self.assertEqual(
+            set(options), {"teams", "statuses", "priorities", "customers", "doctypes"}
+        )
