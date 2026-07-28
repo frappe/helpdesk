@@ -17,22 +17,11 @@
         ]"
       />
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 my-2 ms-5">
-        <AttachmentItem
-          v-for="a in attachments"
-          :key="a.file_url"
-          :label="a.file_name"
-          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-        >
-          <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.stop="removeAttachment(a)"
-            />
-          </template>
-        </AttachmentItem>
-      </div>
+      <AttachmentList
+        class="my-2 ms-5"
+        :attachments="attachments"
+        @remove="removeAttachment"
+      />
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
@@ -54,7 +43,9 @@
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
+                      <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                       <AttachmentIcon
+                        v-else
                         class="h-4 w-4"
                         style="stroke-width: 1.5 !important"
                       />
@@ -97,12 +88,12 @@
   </Editor>
 </template>
 <script setup lang="ts">
-import { FileUploader, createResource } from "frappe-ui";
+import { FileUploader, LoadingIndicator, createResource } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-import { AttachmentItem } from "@/components/";
+import { AttachmentList } from "@/components/";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";

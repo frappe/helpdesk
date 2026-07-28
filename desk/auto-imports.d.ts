@@ -8,4 +8,5 @@ export {}
 declare global {
   const LucideAlignJustify: typeof import('~icons/lucide/align-justify')['default']
   const LucideFileSearch: typeof import('~icons/lucide/file-search')['default']
+  const LucideTag: typeof import('~icons/lucide/tag')['default']
 }

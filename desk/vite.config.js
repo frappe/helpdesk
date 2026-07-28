@@ -92,7 +92,9 @@ export default defineConfig(async ({ mode }) => {
     server: {
       allowedHosts: true,
       fs: {
-        allow: [".."],
+        // ".." = apps/helpdesk; "../.." = apps/, so the linked @framework/ui
+        // (apps/frappe/ui) can be served from source in dev.
+        allow: ["..", "../.."],
       },
     },
     resolve: {
@@ -106,6 +108,10 @@ export default defineConfig(async ({ mode }) => {
       // Force a single copy of each so the editor doesn't load two
       // prosemirror-state instances (RangeError: different instances of a keyed plugin).
       dedupe: [
+        // @framework/ui imports from vue/frappe-ui; force a single instance of
+        // each so its Combobox shares helpdesk's frappe-ui, not a second copy.
+        "vue",
+        "frappe-ui",
         "@tiptap/core",
         "@tiptap/pm",
         "prosemirror-state",
@@ -130,7 +136,7 @@ export default defineConfig(async ({ mode }) => {
         "lowlight",
         "interactjs",
       ],
-      exclude: ["frappe-ui"],
+      exclude: ["frappe-ui", "@framework/ui"],
     },
   };
   return config;

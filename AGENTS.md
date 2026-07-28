@@ -157,8 +157,12 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 ### Icons
 
 - **Primary icon system**: Lucide icons via unplugin-icons for consistency and modern design
-- **Secondary**: FeatherIcon component from frappe-ui (legacy usage, prefer Lucide for new components)
-- Use Lucide icons for all new components:
+- **Secondary**: FeatherIcon component from frappe-ui (legacy usage only)
+- **Rule**: Never introduce `FeatherIcon` in new code. New components must use Lucide
+  icons (`<LucideInfo />`, `<LucidePlus />`, …) — no exceptions, including small
+  helper icons like tooltip/info glyphs.
+- Use Lucide icons for all new components. They are globally auto-registered
+  (see `desk/components.d.ts`), so no import is needed when used as a template tag:
   ```vue
   <template>
     <LucidePlus class="size-4" />

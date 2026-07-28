@@ -4,6 +4,8 @@ interface DocType {
     modified: string;
     owner: string;
     modified_by: string;
+    /** Comma-separated framework tags (Tag Link) */
+    _user_tags?: string;
   }
 
   interface ChildDocType extends DocType {
@@ -29,6 +31,15 @@ export interface HDTicketStatus extends DocType {
   order?: number;
   /** Enabled: Check */
   enabled: 0 | 1;
+}
+
+export interface HDTicketPriority extends DocType {
+  /** Level: Select */
+  level: 'Urgent' | 'High' | 'Medium' | 'Low';
+  /** Description: Small Text */
+  description?: string;
+  /** Disabled: Check */
+  disabled: 0 | 1;
 }
 
 // Last updated: 2026-06-28 13:51:31.692161

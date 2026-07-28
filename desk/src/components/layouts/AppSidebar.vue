@@ -3,6 +3,7 @@
     v-model:collapsed="collapsed"
     :disable-collapse="mobile"
     class="border-e border-outline-gray-1"
+    :class="{ '!bg-surface-base': mobile }"
   >
     <div class="flex h-full flex-col p-2">
       <UserMenu :options="profileSettings" :is-collapsed="isCollapsed" />
@@ -12,13 +13,13 @@
           <SidebarLabel
             v-if="section.label"
             divider
-            class="my-1 select-none"
+            class="mt-4 my-1 select-none"
             :class="section.collapsible && !isCollapsed && 'cursor-pointer'"
             @click="section.collapsible && toggleSection(section.label)"
           >
             <span class="flex items-center gap-1.5 text-sm font-medium">
               <span
-                class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out"
+                class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out -ml-0.5"
                 :class="{ 'rotate-90': isSectionOpen(section.label) }"
               />
               <span class="truncate">{{ section.label }}</span>
@@ -106,6 +107,7 @@
 <script setup lang="ts">
 import CP from "@/components/command-palette/CP.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
 import { currentView, useView } from "@/composables/useView";
 import { useNotificationStore } from "@/stores/notification";
@@ -113,7 +115,6 @@ import { useSidebarStore } from "@/stores/sidebar";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { getIcon, isCustomerPortal } from "@/utils";
-import ViewModal from "@/components/ViewModal.vue";
 import {
   Badge,
   Button,
@@ -125,7 +126,7 @@ import {
   SidebarLabel,
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
@@ -152,7 +153,9 @@ const showCommandPalette = ref(false);
 
 // Local modal state for the per-view kebab menu (edit/duplicate). The action
 // logic itself is shared via useView so the sidebar and breadcrumb stay in sync.
-const viewDialogConfig = reactive({
+// ref, not reactive: v-model needs a writable binding, and a ref stays
+// reactive even if ViewModal ever replaces the whole object.
+const viewDialogConfig = ref({
   show: false,
   view: { label: "", icon: "", name: "" },
   mode: "create",

@@ -44,7 +44,7 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base"
+          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3"
         >
           <template #tab-item="{ tab, selected }">
             <button

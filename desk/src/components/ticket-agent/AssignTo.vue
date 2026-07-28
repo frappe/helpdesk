@@ -1,7 +1,7 @@
 <template>
   <Popover
     class="flex w-full"
-    placement="bottom-end"
+    placement="bottom-start"
     :matchTargetWidth="true"
     v-model:show="popoverIsOpen"
   >
@@ -12,15 +12,26 @@
         </span>
         <Button
           ref="triggerRef"
-          variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+          :variant="ghost ? 'ghost' : 'outline'"
+          class="group !flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
+          :class="
+            ghost
+              ? [
+                  '!h-7 !rounded !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
+                  // Hold the ring while the dropdown is open, mirroring the Link
+                  // field's data-[state=open]:focus-ring (focus lives in the popover).
+                  popoverIsOpen && 'focus-ring',
+                ]
+              : 'hover:shadow-sm'
+          "
           @click="togglePopover()"
         >
-          <div class="flex items-center min-h-5 gap-2 w-full">
+          <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
             <template v-if="localAssignees.length > 0">
               <MultipleAvatar
                 :avatars="localAssignees.map((a) => a.name)"
                 size="sm"
+                :max="2"
               />
               <span
                 v-if="localAssignees.length > 1"
@@ -30,56 +41,58 @@
               </span>
             </template>
             <template v-else>
-              <span class="text-ink-gray-5">{{ __("No one") }}</span>
-              <!-- <span
-                v-if="!popoverIsOpen"
-                class="text-xs text-ink-gray-6 hover:text-ink-gray-8 cursor-pointer underline ml-auto"
-                @click.stop="assignSelf"
-              >
-                {{ __("Assign yourself") }}
-              </span> -->
+              <span v-if="ghost" class="text-ink-gray-4">
+                {{ __("Set Assignee") }}...
+              </span>
+              <span v-else class="text-ink-gray-5 leading-5">{{
+                __("No one")
+              }}</span>
             </template>
           </div>
           <template #suffix>
-            <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
+            <LucideChevronDown
+              class="ms-auto size-4 shrink-0 transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
+              :class="[
+                ghost ? 'text-ink-gray-6' : 'text-ink-gray-5',
+                popoverIsOpen && 'rotate-180',
+                // Filled + closed: keep the chevron hidden until hover/focus,
+                // like a filled Link field's action icons. Empty always shows it.
+                ghost && localAssignees.length > 0 && !popoverIsOpen
+                  ? 'hidden group-hover:block group-focus-within:block'
+                  : '',
+              ]"
+            />
           </template>
         </Button>
       </div>
     </template>
-    <template #body="{ isOpen }">
+    <!-- body-main (not body) so the shared PopoverPanel supplies the shell
+         chrome and the combobox's scale-from-trigger open animation. -->
+    <template #body-main="{ isOpen }">
+      <!-- Pin to the trigger width. matchTargetWidth only sets min-width, so the
+           panel is otherwise shrink-to-fit and grows to the widest agent name
+           (then collapses as you filter) -> width jitter. Fixing the width lets
+           the rows' min-w-0 truncate instead. -->
       <div
         v-if="isOpen"
-        class="my-2 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="w-[var(--reka-popover-trigger-width)] focus:outline-none"
       >
-        <!-- Search Header -->
-        <div class="p-1">
-          <div
-            class="flex h-7 items-center text-sm-medium text-ink-gray-6 justify-between"
+        <!-- Search Header: mirror the tag picker's flush search row - a
+             borderless input with a bottom divider and the key-cap suffix. -->
+        <div class="flex items-center border-b border-outline-gray-2 px-3">
+          <TextInput
+            ref="inputRef"
+            v-model="searchText"
+            :placeholder="__('Search agents...')"
+            variant="ghost"
+            class="flex-1 search-agents-input"
+            @click.stop
+            @keydown="handleInputKeydown"
           >
-            <TextInput
-              ref="inputRef"
-              v-model="searchText"
-              :placeholder="__('Search agents...')"
-              variant="ghost"
-              class="flex-1 search-agents-input"
-              @click.stop
-              @keydown="handleInputKeydown"
-            >
-              <template #prefix>
-                <LucideSearch class="size-4 text-ink-gray-4" />
-              </template>
-            </TextInput>
-            <Button
-              v-if="searchText.length > 0"
-              variant="ghost"
-              size="sm"
-              @click="searchText = ''"
-            >
-              <template #icon>
-                <LucideX class="size-4" />
-              </template>
-            </Button>
-          </div>
+            <template #suffix>
+              <ShortcutKey v-if="!searchText" keys="A" />
+            </template>
+          </TextInput>
         </div>
 
         <!-- Agent List -->
@@ -133,7 +146,9 @@
                     />
                   </span>
                 </div>
-                <span class="text-ink-gray-7 flex-1 text-start truncate">
+                <span
+                  class="text-ink-gray-7 min-w-0 flex-1 text-start truncate"
+                >
                   {{ agent.label }}
                 </span>
               </button>
@@ -151,6 +166,7 @@
 </template>
 
 <script setup lang="ts">
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
@@ -178,18 +194,19 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
-import LucideSearch from "~icons/lucide/search";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 interface Props {
   hideLabel?: boolean;
+  ghost?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   hideLabel: false,
+  ghost: false,
 });
 
-const { hideLabel } = props;
+const { hideLabel, ghost } = props;
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -483,33 +500,6 @@ async function logActivity(action: string) {
   });
 }
 
-async function assignSelf() {
-  if (!currentAgentName) return;
-
-  if (localAssignees.value.some((a) => a.name === currentAgentName)) return;
-
-  const self = currentUser.value;
-  localAssignees.value.push({
-    name: currentAgentName,
-    image: self.user_image || "",
-    label: self.full_name,
-  });
-
-  try {
-    await addAssigneesResource.submit([currentAgentName]);
-    await logActivity(`assigned ${currentAgentName}`);
-    capture("ticket_assigned", { doctype: "HD Ticket" });
-    toast.success(__("Assignee's updated successfully."));
-    assignees.value.reload();
-    activities.value.reload();
-  } catch {
-    toast.error(__("Failed to update Assignee's."));
-    localAssignees.value = localAssignees.value.filter(
-      (a) => a.name !== currentAgentName
-    );
-  }
-}
-
 // triggered when the popover is closed
 const addAssigneesResource = createResource({
   url: "frappe.desk.form.assign_to.add",
@@ -598,7 +588,17 @@ useShortcut("a", () => {
 </script>
 
 <style scoped>
-.search-agents-input :deep(input) {
-  background-color: transparent;
+/* The class lands on TextInput's component root, which lacks this component's
+   scope id, so a parent-scoped `.search-agents-input :deep(input)` never
+   matches. Deep the whole selector so it applies by class and strips the
+   @tailwindcss/forms white reset that shows through in dark mode. */
+:deep(.search-agents-input input) {
+  @apply bg-transparent px-0;
+}
+
+/* frappe-ui's suffix slot wrapper adds a pe-2; drop it so the shortcut cap
+   sits flush to the row padding, matching the tag picker's search. */
+:deep(.search-agents-input .end-0) {
+  @apply pe-0;
 }
 </style>

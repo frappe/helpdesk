@@ -137,15 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  watch,
-  defineEmits,
-  defineProps,
-  withDefaults,
-  onUnmounted,
-} from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 
 interface Options {
   hours?: boolean;
