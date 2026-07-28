@@ -130,27 +130,36 @@ export const groups = computed<PaletteGroup[]>(() => {
   const level = stack.value.at(-1);
   if (level) return groupCommands(level.commands, query.value);
 
-  if (context.value) {
-    // Untitled: the chip already says what these rows act on, so a "Ticket"
-    // header would only repeat it.
-    const scoped = groupCommands(
-      ticketCommands(context.value.id),
-      query.value
-    ).map((group) => ({ ...group, title: "" }));
-    // Scope narrows, it never traps: a query with no hit on this ticket falls
-    // through to everything, same as if the chip had been dismissed.
-    if (scoped.length || !query.value.trim()) return scoped;
-  }
+  // Untitled: the chip already says what these rows act on, so a "Ticket"
+  // header would only repeat it.
+  const scoped = context.value
+    ? groupCommands(ticketCommands(context.value.id), query.value).map(
+        (group) => ({ ...group, title: "" })
+      )
+    : [];
 
-  const built = groupCommands(globalCommands(), query.value);
+  const term = query.value.trim();
+  // An empty query with the chip up means "just this ticket" — that is what the
+  // chip is for. Appending the whole global list here would undo it.
+  if (!term) return scoped;
 
-  // Never a dead end: carry the typed text into something useful.
-  if (!built.length && query.value.trim()) {
-    const fallbacks = buildFallbackCommands(query.value.trim());
-    return [{ title: __(FALLBACK_GROUP), items: fallbacks }];
-  }
-  return built;
+  // Scope *ranks*, it never *gates*. Returning early here is what made a ticket
+  // whose subject contains "open" unreachable: `Set status: Open` matched, and
+  // global search never ran. Scoped rows already win on CONTEXT_WEIGHT, so
+  // appending costs nothing but keeps search reachable.
+  return [...scoped, ...groupCommands(globalCommands(), term), ...fallback(term)];
 });
+
+/**
+ * Pinned, not last-resort. `fuzzyScore` matches subsequences, so almost any real
+ * word matches *something* — an only-when-nothing-matched fallback stays hidden
+ * exactly when it is needed. Matters most because `title_only: true` searches
+ * subjects only, so a phrase from an email body finds nothing here.
+ */
+function fallback(term: string): PaletteGroup[] {
+  if (term.length < MIN_QUERY_LENGTH) return [];
+  return [{ title: __(FALLBACK_GROUP), items: buildFallbackCommands(term) }];
+}
 
 function globalCommands(): Command[] {
   return [

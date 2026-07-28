@@ -78,4 +78,5 @@ export const GROUP = {
   account: "Account",
 };
 
-export const FALLBACK_GROUP = "No results";
+/** Pinned below the results, so it can no longer be titled "No results". */
+export const FALLBACK_GROUP = "Search elsewhere";
