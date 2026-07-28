@@ -9,6 +9,41 @@ from frappe.email.doctype.email_queue.email_queue import EmailQueue
 from frappe.email.receive import InboundMail
 
 
+def auto_generated_reason(msg) -> str | None:
+    """Why this mail is machine-generated (bounce or autoresponder), else None.
+
+    One such mail can start three different loops: opening a ticket acks
+    raised_by straight back to the address that just bounced
+    (HD Ticket.after_insert), threading onto a portal ticket makes frappe CC the
+    parent doc's owner -- the same dead address -- on every inbound mail
+    (mail_cc), and an account with enable_auto_reply answers mailer-daemon.
+
+    X-Auto-Generated only catches helpdesk's own acks, which stamp it. Real
+    bounces announce themselves with RFC 3834 Auto-Submitted, the RFC 3464
+    report type, or the RFC 5321 null return-path.
+    """
+    if msg.get("X-Auto-Generated"):
+        return "X-Auto-Generated"
+
+    # RFC 3834: "no" is the only human-sent value, and it may carry parameters
+    auto_submitted = (msg.get("Auto-Submitted") or "no").split(";")[0].strip().lower()
+    if auto_submitted != "no":
+        return f"Auto-Submitted: {auto_submitted}"
+
+    # RFC 3464 delivery status notification -- survives a stripped Return-Path
+    if (
+        msg.get_content_type() == "multipart/report"
+        and msg.get_param("report-type") == "delivery-status"
+    ):
+        return "delivery status notification"
+
+    # bounces MUST carry a null envelope sender (RFC 5321 §6.1)
+    if (msg.get("Return-Path") or "").strip() == "<>":
+        return "null return-path"
+
+    return None
+
+
 class CustomInboundMail(InboundMail):
     """
     Extend InboundMail with robust thread stitching for forwarded emails.
@@ -68,15 +103,19 @@ class CustomEmailAccount(EmailAccount):
                         message.decode("utf-8", errors="replace")
                     )
 
-                    # Important: If the email is auto-generated, we do not create a ticket
-                    if _msg.get("X-Auto-Generated"):
-                        continue
-
                     uid = (
                         messages["uid_list"][index]
                         if messages.get("uid_list")
                         else None
                     )
+
+                    # Important: auto-generated mail must never reach a ticket, it
+                    # starts a mail loop. The fetch already marked it seen, so park
+                    # it in Unhandled Email instead of dropping it without a trace.
+                    if reason := auto_generated_reason(_msg):
+                        self.handle_bad_emails(uid, message, reason)
+                        continue
+
                     seen_status = messages.get("seen_status", {}).get(uid)
                     if self.email_sync_option != "UNSEEN" or seen_status != "SEEN":
                         _inbound_mail = CustomInboundMail(
