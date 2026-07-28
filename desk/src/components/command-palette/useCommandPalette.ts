@@ -153,8 +153,10 @@ export const groups = computed<PaletteGroup[]>(() => {
 
   const term = query.value.trim();
   // An empty query with the chip up means "just this ticket" — that is what the
-  // chip is for. Appending the whole global list here would undo it.
-  if (!term) return scoped;
+  // chip is for. Without the chip (removed, or a context-free page) the empty
+  // query must fall through to the global root, not an empty list.
+  if (!term && context.value) return scoped;
+  if (!term) return groupCommands(globalCommands(), "");
 
   // Scope *ranks*, it never *gates*. Returning early here is what made a ticket
   // whose subject contains "open" unreachable: `Set status: Open` matched, and
