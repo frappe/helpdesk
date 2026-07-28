@@ -10,6 +10,47 @@
 
     <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
     <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
+      <!-- Feedback, only once the contact has rated the ticket -->
+      <div v-if="ticket.doc?.feedback_rating">
+        <Section
+          :label="__('Feedback')"
+          v-model:opened="openedSections.feedback"
+        >
+          <!-- ps-[9px] on the values matches the field controls' 8px padding +
+               1px border, so they line up with the other sidebar values -->
+          <div class="space-y-2.5 pb-4 pt-0.5">
+            <div class="flex min-h-7 items-center gap-2 leading-5">
+              <FieldLabel label="Rating" />
+              <div class="min-w-0 flex-1 ps-[9px]">
+                <StarRating :rating="ticket.doc.feedback_rating" />
+              </div>
+            </div>
+            <div
+              v-if="ticket.doc.feedback"
+              class="flex min-h-7 items-center gap-2 leading-5"
+            >
+              <FieldLabel label="Feedback" />
+              <div
+                class="min-w-0 flex-1 truncate text-base text-ink-gray-8 ps-[9px]"
+              >
+                {{ ticket.doc.feedback }}
+              </div>
+            </div>
+            <div
+              v-if="ticket.doc.feedback_extra"
+              class="flex items-start gap-2 leading-5"
+            >
+              <FieldLabel label="Comment" class="pt-1" />
+              <div
+                class="min-w-0 flex-1 whitespace-pre-line py-1 text-base text-ink-gray-8 ps-[9px]"
+              >
+                {{ ticket.doc.feedback_extra }}
+              </div>
+            </div>
+          </div>
+        </Section>
+      </div>
+
       <!-- Key Info (core fields) -->
       <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
         <div class="space-y-2.5 pb-4 pt-0.5">
@@ -144,6 +185,7 @@ import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import FieldLabel from "../FieldLabel.vue";
 import Section from "../Section.vue";
+import StarRating from "../StarRating.vue";
 import Tags from "../tag/Tags.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
@@ -210,6 +252,7 @@ const customFields = computed(() => {
 const openedSections = useStorage(
   "openedSections",
   {
+    feedback: true,
     keyInfo: true,
     ticketInfo: true,
     recentTickets: false,
