@@ -429,16 +429,29 @@ breach filter, despite SLA Policies being a settings section the palette links
 to. "Show tickets breaching SLA" on the list route would likely be the
 most-used filter available. Jira Service Management sets the bar here.
 
-## 14. Search cost per keystroke (watch, don't fix yet)
+## 14. Search cost per keystroke — SHIPPED (on `perf/search-permission-scale`)
 
-`helpdesk/search_sqlite.py` runs `frappe.get_list("HD Ticket", pluck="name")`
-with no limit on every search call, feeding a SQLite `IN (...)`. That was fine
-when search was a page you visited deliberately; `⌘K` is now global with a
-200ms debounce, making it a per-typing-burst permission scan of the ticket
-table.
+Lives on its own branch so it can merge ahead of the palette; nothing here
+depends on it or vice versa.
 
-Not a blocker at 5k tickets. A real problem at 200k. Cap the list or push
-permission filtering into the index at build time.
+`helpdesk/search_sqlite.py` ran `frappe.get_list("HD Ticket", pluck="name")`
+with no limit on every search call, feeding a SQLite `IN (...)`: 108ms at 200k
+tickets, and a hard `OperationalError` past the bound-variable ceiling — which
+core's `except sqlite3.Error` turned into silently empty results forever.
+
+Fixed with a bounded probe: `get_search_filters` fetches at most
+`PREFILTER_LIMIT + 1` names. At or under the limit it binds the exact prefilter
+as before; over it, the prefilter is skipped and `_drop_unpermitted`
+permission-checks the ≤100 returned results through one `get_list` — which
+applies every layer, including User Permissions. Known ceiling: a heavily
+restricted agent on a huge site only sees matches surviving the global top-500
+BM25 candidates; the upgrade path is pushing the permission query into the
+index via `json_each` (see PR #3546's technique). Tests in
+`helpdesk/test_search_sqlite.py`.
+
+`get_filter_options` (the search page's facets) is fixed on the same branch:
+the ticket list now binds as one `json_each` variable per column instead of 3N
+placeholders, which is the correct form of what PR #3546 attempts.
 
 ## 15. Custom fields — blocked on Custom Side Panel
 
@@ -562,7 +575,6 @@ closed. Raise it there, not here.
 | **§1** | Undo on palette mutations | Nothing technical — a scheduling call. It was built once and backed out, and §1 keeps every finding from that build (shared toast id, mandatory refetch, one undo slot), so the rebuild is short whenever it comes back. |
 | **§6** | Act on the current selection | The v2 headline. Needs list selection published module-scope, the way `listViewFilters.ts` now does for filters. |
 | **§13** | SLA commands | A real gap. Needs product input on which SLA actions belong in a palette. |
-| **§14** | Search permission-scan cost | Watch only. Fine at 5k tickets, a problem at 200k. Revisit when a large site appears. |
 | — | Input step for freeform custom fields | `Command` is pick-from-a-list only. `Data`/`Date`/`Currency` need a new level type. Real feature, not a tweak. |
 
 ---
