@@ -1,3 +1,7 @@
+import {
+  applyListFilters,
+  type FilterCondition,
+} from "@/components/listViewFilters";
 import { views } from "@/composables/useView";
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
@@ -75,15 +79,17 @@ export function ticketListCommands(): Command[] {
 }
 
 function statusFilterChildren(): Command[] {
-  return statusOptions("Filter by status", (status) =>
-    applyFilter([["status", "=", status]])
-  );
+  return statusOptions({
+    group: "Filter by status",
+    onPick: (status) => applyFilter([["status", "=", status]]),
+  });
 }
 
 function priorityFilterChildren(): Command[] {
-  return priorityOptions("Filter by priority", (priority) =>
-    applyFilter([["priority", "=", priority]])
-  );
+  return priorityOptions({
+    group: "Filter by priority",
+    onPick: (priority) => applyFilter([["priority", "=", priority]]),
+  });
 }
 
 function viewChildren(): Command[] {
@@ -116,8 +122,13 @@ function viewScope(view: View): string {
   return __("Private");
 }
 
-/** Filters ride in the URL; an empty list clears them. */
-function applyFilter(conditions: unknown[]): void {
+/**
+ * Layers onto the list's existing filters; an empty list clears them. Falls
+ * back to the URL only when no list is mounted — the URL is a one-way write the
+ * popover never reads back, so repeating a filter there is a dead key.
+ */
+function applyFilter(conditions: FilterCondition[]): void {
+  if (applyListFilters(conditions)) return;
   router.push({
     name: "TicketsAgent",
     query: {

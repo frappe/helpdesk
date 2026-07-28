@@ -1,3 +1,4 @@
+import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useTicket } from "@/composables/useTicket";
 import {
   canNavigateTickets,
@@ -13,11 +14,17 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
 import { __ } from "@/translation";
+import { capture } from "@/telemetry";
 import { copyToClipboard } from "@/utils";
-import { createListResource, createResource, toast } from "frappe-ui";
+import { call, createListResource, createResource, toast } from "frappe-ui";
 import { priorityOptions, statusOptions } from "./optionCommands";
 import { tagChildren } from "./tagCommands";
-import { CONTEXT_WEIGHT, GROUP, type Command } from "./paletteTypes";
+import {
+  CONTEXT_WEIGHT,
+  FLAT_OPTION_WEIGHT,
+  GROUP,
+  type Command,
+} from "./paletteTypes";
 
 import LucideArrowLeft from "~icons/lucide/arrow-left";
 import LucideArrowRight from "~icons/lucide/arrow-right";
@@ -49,7 +56,9 @@ export function ticketCommands(ticketId: string): Command[] {
       weight: CONTEXT_WEIGHT,
       icon: LucideCircleDot,
       hint: "S",
-      keywords: "state open closed paused resolved",
+      // Option names deliberately absent: the flat "Set status: Open" rows own
+      // those terms, so typing a status name leads with the row that sets it.
+      keywords: "state",
       children: () => statusChildren(ticketId),
     },
     {
@@ -59,7 +68,7 @@ export function ticketCommands(ticketId: string): Command[] {
       weight: CONTEXT_WEIGHT,
       icon: LucideFlag,
       hint: "P",
-      keywords: "urgent high medium low",
+      keywords: "level",
       children: () => priorityChildren(ticketId),
     },
     {
@@ -72,6 +81,7 @@ export function ticketCommands(ticketId: string): Command[] {
       keywords: "agent owner assignee",
       children: () => agentChildren(ticketId),
     },
+    ...assignToMeCommand(ticketId),
     {
       id: "ticket-team",
       title: __("Change team"),
@@ -93,6 +103,16 @@ export function ticketCommands(ticketId: string): Command[] {
       children: () => ticketTypeChildren(ticketId),
     },
     {
+      id: "ticket-tags",
+      title: __("Add tag"),
+      group: GROUP.ticket,
+      weight: CONTEXT_WEIGHT,
+      icon: LucideTags,
+      hint: "G",
+      keywords: "label categorise",
+      children: () => tagChildren(ticketId),
+    },
+    {
       id: "ticket-reply",
       title: __("Reply to ticket"),
       group: GROUP.ticket,
@@ -112,16 +132,7 @@ export function ticketCommands(ticketId: string): Command[] {
       keywords: "note internal",
       perform: () => toggleCommentBox(),
     },
-    {
-      id: "ticket-tags",
-      title: __("Add tag"),
-      group: GROUP.ticket,
-      weight: CONTEXT_WEIGHT,
-      icon: LucideTags,
-      hint: "G",
-      keywords: "label categorise",
-      children: () => tagChildren(ticketId),
-    },
+    ...flatOptionCommands(ticketId),
     ...mergeCommand(ticketId),
     ...navigationCommands(),
     {
@@ -147,6 +158,27 @@ export function ticketCommands(ticketId: string): Command[] {
   ];
 
   return commands;
+}
+
+/**
+ * Claiming a ticket is the most frequent assignment in a queue, so it skips the
+ * agent drill-down. Hidden once you already hold it — the toggle inside
+ * "Assign to" is the way back out, where the current state is visible.
+ */
+function assignToMeCommand(ticketId: string): Command[] {
+  const me = window.agent;
+  if (!me || assignedNames(ticketId).includes(me)) return [];
+  return [
+    {
+      id: "ticket-assign-me",
+      title: __("Assign to me"),
+      group: GROUP.ticket,
+      weight: CONTEXT_WEIGHT,
+      icon: LucideUserPlus,
+      keywords: "claim mine myself take",
+      perform: () => assignTicket(ticketId, me),
+    },
+  ];
 }
 
 /**
@@ -204,21 +236,52 @@ function navigationCommands(): Command[] {
   return commands;
 }
 
+/**
+ * Every status and priority as a root-level row, so "urgent" sets the priority
+ * instead of opening a picker. Hidden until the user types — the drill-downs
+ * above stay the discoverable path for anyone who doesn't know the names.
+ */
+function flatOptionCommands(ticketId: string): Command[] {
+  const { doc } = useTicket(ticketId).ticket;
+  const flat = { hideWhenEmpty: true, weight: FLAT_OPTION_WEIGHT };
+  return [
+    ...statusOptions({
+      ...flat,
+      group: GROUP.ticket,
+      titlePrefix: "Set status",
+      current: doc?.status,
+      onPick: (status) => updateTicket(ticketId, { status }),
+    }),
+    ...priorityOptions({
+      ...flat,
+      group: GROUP.ticket,
+      titlePrefix: "Set priority",
+      current: doc?.priority,
+      onPick: (priority) => updateTicket(ticketId, { priority }),
+    }),
+  ];
+}
+
 function statusChildren(ticketId: string): Command[] {
-  return statusOptions("Set status", (status) =>
-    updateTicket(ticketId, { status })
-  );
+  return statusOptions({
+    group: "Set status",
+    current: useTicket(ticketId).ticket.doc?.status,
+    onPick: (status) => updateTicket(ticketId, { status }),
+  });
 }
 
 function priorityChildren(ticketId: string): Command[] {
-  return priorityOptions("Set priority", (priority) =>
-    updateTicket(ticketId, { priority })
-  );
+  return priorityOptions({
+    group: "Set priority",
+    current: useTicket(ticketId).ticket.doc?.priority,
+    onPick: (priority) => updateTicket(ticketId, { priority }),
+  });
 }
 
 async function agentChildren(ticketId: string): Promise<Command[]> {
   const store = useAgentStore();
   if (!store.agents.data) await store.agents.reload();
+  const assigned = assignedNames(ticketId);
   return (store.agents.data ?? []).map((agent) => ({
     id: `agent-${agent.name}`,
     title: agent.agent_name || agent.name,
@@ -226,8 +289,17 @@ async function agentChildren(ticketId: string): Promise<Command[]> {
     subtitle: agent.agent_name === agent.name ? "" : agent.name,
     group: "Assign to",
     icon: LucideUserPlus,
+    // A ticket can hold several assignees, so the row toggles rather than
+    // replaces. Without the tick there is no way to tell which it will do.
+    checked: assigned.includes(agent.name),
     perform: () => assignTicket(ticketId, agent.name),
   }));
+}
+
+function assignedNames(ticketId: string): string[] {
+  return (useTicket(ticketId).assignees.data ?? []).map(
+    (assignee) => assignee.name
+  );
 }
 
 const teams = createListResource({
@@ -238,11 +310,13 @@ const teams = createListResource({
 
 async function teamChildren(ticketId: string): Promise<Command[]> {
   if (!teams.data) await teams.reload();
+  const current = useTicket(ticketId).ticket.doc?.agent_group;
   return (teams.data ?? []).map((team) => ({
     id: `team-${team.name}`,
     title: team.name,
     group: "Set team",
     icon: LucideUsers,
+    checked: team.name === current,
     perform: () => updateTicket(ticketId, { agent_group: team.name }),
   }));
 }
@@ -255,42 +329,88 @@ const ticketTypes = createListResource({
 
 async function ticketTypeChildren(ticketId: string): Promise<Command[]> {
   if (!ticketTypes.data) await ticketTypes.reload();
+  const current = useTicket(ticketId).ticket.doc?.ticket_type;
   return (ticketTypes.data ?? []).map((type) => ({
     id: `type-${type.name}`,
     title: type.name,
     group: "Set type",
     icon: LucideTag,
+    checked: type.name === current,
     perform: () => updateTicket(ticketId, { ticket_type: type.name }),
   }));
 }
 
+/** Labels the realtime broadcast uses, matching TicketDetailsTab's field labels. */
+const FIELD_LABELS: Record<string, string> = {
+  status: "Status",
+  priority: "Priority",
+  agent_group: "Team",
+  ticket_type: "Ticket Type",
+};
+
 function updateTicket(ticketId: string, changes: Record<string, string>): void {
+  const [field, value] = Object.entries(changes)[0] ?? [];
+  if (!field || value === undefined) return;
   const { ticket, activities } = useTicket(ticketId);
-  const [field] = Object.keys(changes);
-  if (ticket.doc?.[field] === changes[field]) return;
+  const current = ticket.doc as unknown as Record<string, unknown> | undefined;
+  if (current?.[field] === value) {
+    // Otherwise the palette just closes and nothing happens, which reads as a
+    // failed command rather than "it was already that".
+    toast.success(__("Already set to {0}", value));
+    return;
+  }
+  // Same order as the header and details tab: tell co-viewers, then write.
+  // Resolved lazily — globalStore() needs a mounted instance, which the ticket
+  // page guarantees by the time a command can run.
+  useNotifyTicketUpdate(ticketId).notifyTicketUpdate(
+    FIELD_LABELS[field] ?? field,
+    value
+  );
   ticket.setValue.submit(changes, {
     onSuccess: () => activities.reload(),
   });
 }
 
-const assignResource = createResource({
-  url: "frappe.desk.form.assign_to.add",
-});
+const addAssignee = createResource({ url: "frappe.desk.form.assign_to.add" });
 
+/**
+ * Adds the agent, leaving anyone already assigned in place — a ticket holds
+ * several assignees, so the palette never silently drops one. Unassigning stays
+ * with the AssignTo widget, which can show the whole list.
+ *
+ * Mirrors the popover's activity log and telemetry so both surfaces leave the
+ * same trail.
+ */
 async function assignTicket(ticketId: string, agent: string): Promise<void> {
   const { assignees, activities } = useTicket(ticketId);
+  if (assignedNames(ticketId).includes(agent)) {
+    toast.success(__("Already assigned to {0}", agent));
+    return;
+  }
   try {
-    await assignResource.submit({
+    await addAssignee.submit({
       doctype: "HD Ticket",
       name: ticketId,
       assign_to: [agent],
     });
+    capture("ticket_assigned", { data: { doctype: "HD Ticket" } });
+    await logAssignment(ticketId, agent);
     toast.success(__("Assignees updated successfully."));
     assignees.reload();
     activities.reload();
   } catch {
     toast.error(__("Failed to update Assignees."));
   }
+}
+
+function logAssignment(ticketId: string, agent: string): Promise<unknown> {
+  return call("frappe.client.insert", {
+    doc: {
+      doctype: "HD Ticket Activity",
+      ticket: ticketId,
+      action: `assigned ${agent}`,
+    },
+  });
 }
 
 // ponytail: "Delete ticket" deliberately stays out of the palette. It needs a

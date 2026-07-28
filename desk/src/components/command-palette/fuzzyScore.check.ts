@@ -4,7 +4,12 @@
  * (tsx lives in the repo root node_modules; no test framework needed.)
  */
 import assert from "node:assert/strict";
-import { fuzzyScore } from "./fuzzyScore";
+import { fuzzyScore, scoreCommand } from "./fuzzyScore";
+import {
+  CONTEXT_WEIGHT,
+  FLAT_OPTION_WEIGHT,
+  type Command,
+} from "./paletteTypes";
 
 const NO_MATCH = -1;
 
@@ -34,5 +39,76 @@ assert.ok(
 
 // Guards against undefined titles reaching the scorer.
 assert.equal(fuzzyScore(undefined as unknown as string, "a"), NO_MATCH);
+
+// --- flat option rows vs their drill-down parent --------------------------
+// The whole point of the flat rows: "urgent" must SET the priority, while
+// "priority" must still lead with the picker. If these invert, Enter silently
+// does the wrong one of the two.
+
+const changePriority: Command = {
+  id: "ticket-priority",
+  title: "Change priority",
+  group: "Ticket",
+  weight: CONTEXT_WEIGHT,
+  keywords: "level",
+};
+const setUrgent: Command = {
+  id: "priority-Urgent",
+  title: "Set priority: Urgent",
+  group: "Ticket",
+  weight: FLAT_OPTION_WEIGHT,
+  keywords: "Urgent",
+};
+const changeStatus: Command = {
+  id: "ticket-status",
+  title: "Change status",
+  group: "Ticket",
+  weight: CONTEXT_WEIGHT,
+  keywords: "state",
+};
+const setOpen: Command = {
+  id: "status-Open",
+  title: "Set status: Open",
+  group: "Ticket",
+  weight: FLAT_OPTION_WEIGHT,
+  keywords: "Open",
+};
+
+assert.ok(
+  scoreCommand(setUrgent, "urgent") > scoreCommand(changePriority, "urgent"),
+  "typing an option name must lead with the row that sets it"
+);
+assert.ok(
+  scoreCommand(setOpen, "open") > scoreCommand(changeStatus, "open"),
+  "same for status names"
+);
+assert.ok(
+  scoreCommand(changePriority, "priority") > scoreCommand(setUrgent, "priority"),
+  "typing the field name must still lead with the picker"
+);
+assert.ok(
+  scoreCommand(changeStatus, "status") > scoreCommand(setOpen, "status"),
+  "same for status"
+);
+
+// Flat rows must clear the fixed rank server search hits carry (~950), or a
+// ticket whose subject contains "urgent" buries the row that sets it.
+const TOP_SEARCH_RANK = 950;
+assert.ok(
+  scoreCommand(setUrgent, "urgent") > TOP_SEARCH_RANK,
+  "flat option rows must outrank server search hits"
+);
+
+// An empty query scores 0 everywhere, which is exactly why hideWhenEmpty exists
+// rather than a low weight — weight cannot separate rows that all tie at 0.
+assert.equal(scoreCommand(setUrgent, ""), 0);
+assert.equal(scoreCommand(changePriority, ""), 0);
+
+// Fixed ranks bypass the scorer entirely.
+assert.equal(
+  scoreCommand({ ...setUrgent, rank: 42 }, "nomatchwhatsoever"),
+  42,
+  "rank must win over the fuzzy path"
+);
 
 console.log("fuzzyScore: all checks passed");

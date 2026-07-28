@@ -17,8 +17,28 @@ export interface Command {
   dotClass?: string;
   /** Fixed score, bypassing the fuzzy scorer. Server hits arrive pre-ranked. */
   rank?: number;
+  /** Renders a trailing tick: this row's value is already set on the ticket. */
+  checked?: boolean;
+  /**
+   * Hidden until the user types. Weight can't express this — an empty term
+   * scores 0 before weight applies, so every row would tie at the root.
+   */
+  hideWhenEmpty?: boolean;
   children?: () => Command[] | Promise<Command[]>;
   perform?: () => void;
+}
+
+/**
+ * The record the palette is acting on, shown as a removable chip above the
+ * input. Present means the list is scoped to that record's commands.
+ */
+export interface PaletteContext {
+  /** Ticket name, passed to the command builders. */
+  id: string;
+  /** Short identifier on the chip, e.g. "#13". */
+  label: string;
+  /** Human title on the chip; empty until the ticket resource resolves. */
+  title: string;
 }
 
 export interface SearchItem {
@@ -39,6 +59,13 @@ export function stripTags(value: string): string {
 
 /** Ticket-context rows outrank server search hits (fixed rank ~950). */
 export const CONTEXT_WEIGHT = 1.2;
+
+/**
+ * Flat option rows ("Set priority: Urgent") sit above search hits but below the
+ * drill-down parent, so typing "priority" still leads with "Change priority"
+ * while typing "urgent" leads with the row that sets it.
+ */
+export const FLAT_OPTION_WEIGHT = 1.15;
 
 /** Untranslated: the palette translates group labels once, at render. */
 export const GROUP = {

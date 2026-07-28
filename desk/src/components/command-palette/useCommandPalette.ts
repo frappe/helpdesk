@@ -1,12 +1,21 @@
+import { useTicket } from "@/composables/useTicket";
+import { router } from "@/router";
 import { __ } from "@/translation";
+import { isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource, toast } from "frappe-ui";
 import { computed, ref, shallowRef } from "vue";
 import { buildFallbackCommands, buildRootCommands } from "./commands";
-import { fuzzyScore } from "./fuzzyScore";
-import { FALLBACK_GROUP, type Command, type SearchItem } from "./paletteTypes";
+import { scoreCommand } from "./fuzzyScore";
+import {
+  FALLBACK_GROUP,
+  type Command,
+  type PaletteContext,
+  type SearchItem,
+} from "./paletteTypes";
 import { searchCommands } from "./searchCommands";
 import { trackRecentCommand } from "./recentTickets";
+import { ticketCommands } from "./ticketCommands";
 
 // Module scope: the sidebar button, Cmd+K and the dialog drive one instance.
 export const isOpen = ref(false);
@@ -28,7 +37,43 @@ const loadingChildren = ref(false);
 export const breadcrumb = computed(() => stack.value.map((level) => level.title));
 export const depth = computed(() => stack.value.length);
 
+/**
+ * Every command here is an agent command — nav, settings, availability, ticket
+ * search. AppSidebar is shared with the customer portal, so the gate lives with
+ * the state rather than on the mount site, which has two parents.
+ */
+export const isPaletteAvailable = computed(() => !isCustomerPortal.value);
+
+// --- context -------------------------------------------------------------
+
+const contextDismissed = ref(false);
+
+/**
+ * The ticket you have open, or null off a ticket page and once the chip is
+ * dismissed. Derived from the route so it can never go stale behind a
+ * navigation the palette didn't cause.
+ */
+export const context = computed<PaletteContext | null>(() => {
+  if (contextDismissed.value) return null;
+  const route = router.currentRoute.value;
+  if (route.name !== "TicketAgent") return null;
+  const id = String(route.params.ticketId);
+  return {
+    id,
+    label: `#${id}`,
+    title: useTicket(id).ticket.doc?.subject ?? "",
+  };
+});
+
+/** Drops the chip and widens the list back out to every global command. */
+export function dismissContext(): void {
+  contextDismissed.value = true;
+  query.value = "";
+  clearSearch();
+}
+
 export function openPalette(): void {
+  if (!isPaletteAvailable.value) return;
   isOpen.value = true;
 }
 
@@ -39,6 +84,7 @@ export function closePalette(): void {
 export function resetPalette(): void {
   stack.value = [];
   query.value = "";
+  contextDismissed.value = false;
   clearSearch();
 }
 
@@ -72,18 +118,6 @@ export async function run(command: Command): Promise<void> {
   command.perform?.();
 }
 
-function scoreCommand(command: Command, term: string): number {
-  if (command.rank !== undefined) return command.rank;
-  if (!term) return 0;
-  const base = Math.max(
-    fuzzyScore(command.title, term),
-    command.keywords ? fuzzyScore(command.keywords, term) - 50 : -1,
-    command.subtitle ? fuzzyScore(command.subtitle, term) - 100 : -1
-  );
-  if (base < 0) return -1;
-  return base * (command.weight ?? 1);
-}
-
 /**
  * Visible rows for the current level, grouped. Group order follows the best
  * score inside it, so once the user types, nav links sink below real matches.
@@ -94,17 +128,44 @@ export const groups = computed<PaletteGroup[]>(() => {
   if (!isOpen.value) return [];
 
   const level = stack.value.at(-1);
-  const source = level
-    ? level.commands
-    : [
-        ...buildRootCommands(query.value),
-        ...searchCommands(searchResults.value),
-      ];
+  if (level) return groupCommands(level.commands, query.value);
 
+  if (context.value) {
+    // Untitled: the chip already says what these rows act on, so a "Ticket"
+    // header would only repeat it.
+    const scoped = groupCommands(
+      ticketCommands(context.value.id),
+      query.value
+    ).map((group) => ({ ...group, title: "" }));
+    // Scope narrows, it never traps: a query with no hit on this ticket falls
+    // through to everything, same as if the chip had been dismissed.
+    if (scoped.length || !query.value.trim()) return scoped;
+  }
+
+  const built = groupCommands(globalCommands(), query.value);
+
+  // Never a dead end: carry the typed text into something useful.
+  if (!built.length && query.value.trim()) {
+    const fallbacks = buildFallbackCommands(query.value.trim());
+    return [{ title: __(FALLBACK_GROUP), items: fallbacks }];
+  }
+  return built;
+});
+
+function globalCommands(): Command[] {
+  return [
+    ...buildRootCommands(query.value),
+    ...searchCommands(searchResults.value),
+  ];
+}
+
+function groupCommands(source: Command[], term: string): PaletteGroup[] {
+  const typed = Boolean(term.trim());
   const matched = source
+    .filter((command) => typed || !command.hideWhenEmpty)
     .map((command, index) => ({
       command,
-      score: scoreCommand(command, query.value),
+      score: scoreCommand(command, term),
       index,
     }))
     .filter((entry) => entry.score >= 0)
@@ -115,18 +176,8 @@ export const groups = computed<PaletteGroup[]>(() => {
     if (!byGroup.has(command.group)) byGroup.set(command.group, []);
     byGroup.get(command.group)!.push(command);
   }
-  const built = [...byGroup].map(([title, items]) => ({
-    title: __(title),
-    items,
-  }));
-
-  // Never a dead end: carry the typed text into something useful.
-  if (!built.length && query.value.trim() && !level) {
-    const fallbacks = buildFallbackCommands(query.value.trim());
-    return [{ title: __(FALLBACK_GROUP), items: fallbacks }];
-  }
-  return built;
-});
+  return [...byGroup].map(([title, items]) => ({ title: __(title), items }));
+}
 
 export const flatItems = computed(() => groups.value.flatMap((g) => g.items));
 export const isLoading = computed(

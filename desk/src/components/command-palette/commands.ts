@@ -12,7 +12,6 @@ import { __ } from "@/translation";
 import { useTheme } from "frappe-ui";
 import { FALLBACK_GROUP, GROUP, type Command } from "./paletteTypes";
 import { recentCommandIds, recentTickets } from "./recentTickets";
-import { ticketCommands } from "./ticketCommands";
 import { ticketListCommands } from "./ticketListCommands";
 
 import LucideActivity from "~icons/lucide/activity";
@@ -26,14 +25,12 @@ import LucideSun from "~icons/lucide/sun";
 import LucideTicket from "~icons/lucide/ticket";
 
 /**
- * The whole palette in source order. Context first: on a ticket, that ticket's
- * actions outrank everything else, which is the behaviour that separates a
- * palette from a search box.
+ * The global list, in source order. The open ticket's own actions are not here:
+ * they belong to the palette context, which renders them scoped behind a chip
+ * and hands control back to this list once the chip is dismissed.
  */
 export function buildRootCommands(query: string): Command[] {
   const route = router.currentRoute.value;
-  const ticketId =
-    route.name === "TicketAgent" ? String(route.params.ticketId) : "";
   const always = [
     ...navigateCommands(),
     ...createCommands(),
@@ -41,7 +38,6 @@ export function buildRootCommands(query: string): Command[] {
   ];
   return [
     ...ticketJumpCommand(query),
-    ...(ticketId ? ticketCommands(ticketId) : []),
     ...(route.name === "TicketsAgent" ? ticketListCommands() : []),
     ...(query ? [] : recentCommands(always)),
     ...always,

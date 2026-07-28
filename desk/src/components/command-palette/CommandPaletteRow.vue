@@ -25,6 +25,10 @@
     <span v-if="command.subtitle" class="ms-3 shrink-0 text-xs text-ink-gray-4">
       {{ command.subtitle }}
     </span>
+    <LucideCheck
+      v-if="command.checked"
+      class="ms-3 size-3.5 shrink-0 text-ink-gray-7"
+    />
     <ShortcutKey
       v-if="command.hint"
       :keys="shortcutKeys"
@@ -41,6 +45,7 @@
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useDevice } from "@/composables";
 import { computed } from "vue";
+import LucideCheck from "~icons/lucide/check";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 import type { Command } from "./paletteTypes";
 

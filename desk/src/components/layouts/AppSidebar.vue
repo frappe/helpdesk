@@ -96,7 +96,7 @@
       </div>
     </div>
   </Sidebar>
-  <CommandPalette v-if="!mobile" />
+  <CommandPalette v-if="!mobile && isPaletteAvailable" />
   <ViewModal
     v-if="viewDialogConfig.show"
     v-model="viewDialogConfig"
@@ -106,7 +106,10 @@
 
 <script setup lang="ts">
 import CommandPalette from "@/components/command-palette/CommandPalette.vue";
-import { openPalette } from "@/components/command-palette/useCommandPalette";
+import {
+  isPaletteAvailable,
+  openPalette,
+} from "@/components/command-palette/useCommandPalette";
 import UserMenu from "@/components/UserMenu.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";

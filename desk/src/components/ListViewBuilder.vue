@@ -164,6 +164,7 @@ import {
   computed,
   h,
   onMounted,
+  onUnmounted,
   provide,
   reactive,
   ref,
@@ -173,6 +174,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 
 import EmptyState from "./EmptyState.vue";
+import { listFilters } from "./listViewFilters";
 import ListRows from "./ListRows.vue";
 
 interface P {
@@ -616,6 +618,14 @@ provide("listViewActions", {
   updateColumns,
   reload,
 });
+
+// Also published module-scope, for the command palette: it renders in the
+// sidebar, outside this provide chain.
+listFilters.value = {
+  current: () => normalizeFilters(list?.params?.filters),
+  apply: applyFilters,
+};
+onUnmounted(() => (listFilters.value = null));
 
 function applyFilters(filters) {
   isViewUpdated.value = true;
