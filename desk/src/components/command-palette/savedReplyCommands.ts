@@ -31,12 +31,18 @@ const FLAT_MIN_USES = 5;
 const FLAT_MAX_ROWS = 3;
 
 /**
- * "Insert", not "Reply with": it says what actually happens — the reply lands in
- * the composer and the agent still has to send it. It also keeps the word "reply"
- * out of the title, which matters for ranking (see fuzzyScore.check.ts): three
- * rows in the reply family used to cluster at the top of a "reply" query.
+ * A bare noun, not a verb phrase. This row opens a category, the same way the
+ * `Settings` row does, and it is what the product calls the feature everywhere
+ * else — so there is no invented verb to keep in sync with the settings tab.
+ *
+ * Leading with "Saved" also keeps this row above the individual replies on a
+ * "saved" query: both get a prefix match, so `CONTEXT_WEIGHT` decides. A
+ * mid-title verb would not — "Insert saved reply" only reaches a word-boundary
+ * match (~950) and loses to any root row starting with "Saved".
+ * `fuzzyScore.check.ts` pins both cases.
  */
-const GROUP_TITLE = "Insert saved reply";
+const GROUP_TITLE = "Saved Replies";
+const SUBTITLE = "Saved Reply";
 
 /**
  * Composing replies is the bulk of an agent's day, and the palette did not touch
@@ -52,7 +58,9 @@ export function savedReplyCommands(ticketId: string): Command[] {
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
       icon: LucideMessageSquareQuote,
-      keywords: "template canned macro snippet",
+      // "reply" singular is not a substring of "replies", so without it here the
+      // row is unreachable by the most obvious thing an agent would type.
+      keywords: "reply template canned macro snippet",
       children: () => savedReplyChildren(ticketId),
     },
     ...topSavedReplyCommands(ticketId),
@@ -94,14 +102,14 @@ function topSavedReplyCommands(ticketId: string): Command[] {
   return topSavedReplies(usage.value, FLAT_MIN_USES, FLAT_MAX_ROWS).map(
     (reply) => ({
       id: `saved-reply-flat-${reply.name}`,
-      // Composed, like the other flat rows: a bare "Refund policy" reads as a
-      // ticket rather than as something that happens when you press Enter. The
-      // prefix must match the parent's verb — "Reply: X" under an "Insert saved
-      // reply" parent scored *above* it, inverting the intended hierarchy.
-      title: __("Insert: {0}", reply.title),
+      title: reply.title,
+      // The qualifier belongs here rather than in the title: a bare "Refund
+      // policy" at root would read as a ticket, but as a title prefix it spends
+      // the first characters on chrome before the word the agent typed. Muted
+      // and right-aligned, the same way search rows carry "Open · #0484".
+      subtitle: __(SUBTITLE),
       group: GROUP.ticket,
       icon: LucideMessageSquareQuote,
-      keywords: reply.title,
       hideWhenEmpty: true,
       weight: FLAT_OPTION_WEIGHT,
       perform: () => applySavedReply(ticketId, reply.name, reply.title),

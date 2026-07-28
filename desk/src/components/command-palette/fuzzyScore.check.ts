@@ -112,47 +112,71 @@ assert.equal(
   "rank must win over the fuzzy path"
 );
 
-// --- composed flat titles must not outrank their parent -------------------
-// A naming choice can silently invert the hierarchy: a flat row whose title
-// *starts* with a word the parent only contains mid-title scores a prefix match
-// (1000) against the parent's word-boundary match (~950), and 1.15 vs 1.2 of
-// weight is not enough to make up the difference. So the flat prefix has to be
-// the parent's own leading verb.
+// --- a root row must not outrank the category it belongs to ----------------
+// "Saved Replies" leads with the word both rows share, which is what keeps the
+// category on top. The rule this pins: a category title must not bury its own
+// distinguishing word mid-title, because prefix (1000) vs word-boundary (~950)
+// is a wider gap than CONTEXT_WEIGHT 1.2 vs FLAT_OPTION_WEIGHT 1.15 can close.
 
-const insertParent: Command = {
+const savedReplies: Command = {
   id: "ticket-saved-reply",
-  title: "Insert saved reply",
+  title: "Saved Replies",
   group: "Ticket",
   weight: CONTEXT_WEIGHT,
-  keywords: "template canned macro snippet",
+  keywords: "reply template canned macro snippet",
 };
-const insertFlat: Command = {
+const oneSavedReply: Command = {
   id: "saved-reply-flat-x",
-  title: "Insert: Refund policy",
+  title: "Refund policy",
+  subtitle: "Saved Reply",
   group: "Ticket",
   weight: FLAT_OPTION_WEIGHT,
-  keywords: "Refund policy",
 };
 
-for (const term of ["insert", "saved", "saved reply", "reply"]) {
+for (const term of ["saved", "saved repl", "reply", "canned"]) {
   assert.ok(
-    scoreCommand(insertParent, term) > scoreCommand(insertFlat, term),
-    `"${term}" must lead with the drill-down parent, not one saved reply`
+    scoreCommand(savedReplies, term) > scoreCommand(oneSavedReply, term),
+    `"${term}" must lead with the category, not with one saved reply`
   );
 }
 
-// ...while the reply's own name still reaches it directly.
-assert.ok(
-  scoreCommand(insertFlat, "refund") > scoreCommand(insertParent, "refund"),
-  "the reply's own words must reach its flat row"
+// "reply" is not a substring of "replies", so a plural title cannot be found by
+// the singular the agent actually types — it has to be carried in keywords.
+assert.equal(
+  scoreCommand({ ...savedReplies, keywords: undefined }, "reply"),
+  -1,
+  "documents why 'reply' is in the keywords and not left to the title"
 );
 
-// The rejected pairing, kept as the reason the titles are worded as they are:
-// "Saved reply: X" wins on a prefix match and buries the parent.
+// ...while the reply's own words still reach it directly, which is its whole job.
+for (const term of ["refund", "polic"]) {
+  assert.ok(
+    scoreCommand(oneSavedReply, term) > scoreCommand(savedReplies, term),
+    `"${term}" must reach the reply itself`
+  );
+}
+
+// The hazard this arrangement avoids, worth pinning because it is not obvious:
+// a category row that carries its distinguishing word *mid-title* loses to a
+// root row that leads with it. Prefix (1000) vs word-boundary (~950) is a bigger
+// gap than CONTEXT_WEIGHT 1.2 vs FLAT_OPTION_WEIGHT 1.15 can close.
+const midTitleCategory: Command = { ...savedReplies, title: "Insert saved reply" };
+const titlePrefixedRow: Command = {
+  ...oneSavedReply,
+  title: "Saved Reply: Refund policy",
+};
 assert.ok(
-  scoreCommand({ ...insertFlat, title: "Saved reply: Refund policy" }, "saved") >
-    scoreCommand(insertParent, "saved"),
-  "documents why the flat prefix mirrors the parent's verb"
+  scoreCommand(titlePrefixedRow, "saved") > scoreCommand(midTitleCategory, "saved"),
+  "a mid-title category is buried by a root row that leads with the same word"
+);
+
+// Leading with that word is what makes the category safe — both score a prefix
+// match, so the weights decide and the category wins. Note this means the
+// subtitle is chosen for readability, not to escape the hazard above: a
+// "Saved reply: X" title would rank correctly under "Saved replies" too.
+assert.ok(
+  scoreCommand(savedReplies, "saved") > scoreCommand(titlePrefixedRow, "saved"),
+  "a category leading with the shared word outranks a root row on weight alone"
 );
 
 // --- server highlighting -------------------------------------------------
