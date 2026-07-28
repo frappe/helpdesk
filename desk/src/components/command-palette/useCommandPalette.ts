@@ -9,7 +9,6 @@ import { computed, ref, shallowRef } from "vue";
 import { buildFallbackCommands, buildRootCommands } from "./commands";
 import { scoreCommand } from "./fuzzyScore";
 import {
-  FALLBACK_GROUP,
   type Command,
   type PaletteContext,
   type SearchItem,
@@ -173,7 +172,9 @@ export const groups = computed<PaletteGroup[]>(() => {
  */
 function fallback(term: string): PaletteGroup[] {
   if (term.length < MIN_QUERY_LENGTH) return [];
-  return [{ title: __(FALLBACK_GROUP), items: buildFallbackCommands(term) }];
+  // Untitled: "Search all of Helpdesk for X" explains itself, a heading above
+  // it was one more thing to read.
+  return [{ title: "", items: buildFallbackCommands(term) }];
 }
 
 function globalCommands(): Command[] {

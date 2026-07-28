@@ -13,7 +13,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { useTheme } from "frappe-ui";
-import { FALLBACK_GROUP, GROUP, type Command } from "./paletteTypes";
+import { GROUP, type Command } from "./paletteTypes";
 import { recentTickets } from "./recentTickets";
 import { ticketListCommands } from "./ticketListCommands";
 
@@ -222,14 +222,14 @@ export function buildFallbackCommands(query: string): Command[] {
     {
       id: "fallback-search",
       title: __('Search all of Helpdesk for "{0}"', [query]),
-      group: FALLBACK_GROUP,
+      group: "",
       icon: LucideFileSearch,
       perform: () => router.push({ name: "SearchAgent", query: { q: query } }),
     },
     {
       id: "fallback-create",
       title: __('Create ticket "{0}"', [query]),
-      group: FALLBACK_GROUP,
+      group: "",
       icon: LucidePlus,
       perform: () =>
         router.push({ name: "TicketAgentNew", query: { subject: query } }),

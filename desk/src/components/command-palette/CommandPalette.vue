@@ -87,15 +87,15 @@
         >
           <template v-if="flatItems.length">
             <div
-              v-for="group in renderGroups"
-              :key="group.title"
+              v-for="(group, groupIndex) in renderGroups"
+              :key="`${groupIndex}:${group.title}`"
               role="group"
               :aria-label="group.title || __('Ticket')"
               class="mb-1 last:mb-0"
             >
               <div
                 v-if="group.title"
-                class="px-4 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-ink-gray-4"
+                class="px-4 pb-1 pt-2 text-xs font-medium text-ink-gray-4"
               >
                 {{ group.title }}
               </div>
