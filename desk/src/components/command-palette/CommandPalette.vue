@@ -19,7 +19,8 @@
             <div class="overflow-hidden">
               <!-- Sized off Linear's own chip: 12px text, 2px/6px padding,
                    10px radius, inset 14px to match the row below. -->
-              <!-- Not a button: removal is backspace-only, the ⌫ glyph is the hint. -->
+              <!-- Not a button: removal is backspace-only, advertised by esc's
+                   footer label rather than a glyph on the chip. -->
               <div
                 class="chip mx-3.5 mt-3 flex max-w-[calc(100%-1.75rem)] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
               >
@@ -30,7 +31,6 @@
                 <span class="truncate">{{
                   context.title || __("Ticket")
                 }}</span>
-                <LucideDelete class="size-3 shrink-0 text-ink-gray-5" />
               </div>
             </div>
           </div>
@@ -154,8 +154,8 @@
             <kbd :class="KEY_CHIP"><LucideCornerDownLeft class="size-3" /></kbd>
             {{ __("Select") }}
           </span>
-          <!-- No ⌫ hint for the context: the chip carries its own glyph, and
-               esc already advertises the same action. -->
+          <!-- No ⌫ hint for the context: esc's label already advertises
+               "Remove context" whenever the chip is up. -->
           <span
             v-if="stepLabel"
             class="flex items-center gap-1.5 text-xs text-ink-gray-4"
