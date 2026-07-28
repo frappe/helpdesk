@@ -9,19 +9,16 @@ class HelpdeskSearchIndexMissingError(SQLiteSearchIndexMissingError):
     pass
 
 
-# Most tickets a bounded probe may bind as an exact `reference_ticket IN (...)`
-# prefilter. Past this, the prefilter is skipped and results are permission-checked
-# after the search instead: an unbounded IN list costs linearly per keystroke and
-# hard-fails at SQLite's bound-variable ceiling — which `search()`'s
-# `except sqlite3.Error` would turn into silently empty results forever.
+# Most tickets to bind as an exact IN (...) prefilter; past this the prefilter is
+# skipped and results are permission-checked after the search instead, since an
+# unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
 
 
 class HelpdeskSearch(SQLiteSearch):
     INDEX_NAME = "helpdesk_search.db"
 
-    # Core search() bails early (disabled, empty query) without ever calling
-    # get_search_filters(), so the flag needs a resting value.
+    # Resting value: core search() can bail before get_search_filters() runs.
     is_post_filter_required = False
 
     INDEX_SCHEMA = {
@@ -86,17 +83,13 @@ class HelpdeskSearch(SQLiteSearch):
     def get_search_filters(self) -> dict:
         """Return permission filters based on accessible tickets."""
         accessible_tickets = self.get_accessible_tickets()
-        # None means more than PREFILTER_LIMIT tickets are accessible, so we
-        # can't prefilter. Set before branching — the flag persists on the
-        # instance, so reading it unset would reuse a previous call's answer.
         self.is_post_filter_required = accessible_tickets is None
         if self.is_post_filter_required:
             return {}
         return {"reference_ticket": accessible_tickets}
 
     def get_accessible_tickets(self) -> list[str] | None:
-        """The accessible tickets when few enough to bind as an exact prefilter,
-        else None — meaning results get permission-checked after the search."""
+        """Accessible tickets when few enough to prefilter, else None."""
         tickets = frappe.get_list(
             "HD Ticket", pluck="name", limit_page_length=PREFILTER_LIMIT + 1
         )
@@ -105,16 +98,10 @@ class HelpdeskSearch(SQLiteSearch):
         return tickets
 
     def _drop_unpermitted(self, results: list[dict]) -> list[dict]:
-        """The authoritative permission gate for the unprefiltered branch.
-
-        `get_list` applies every permission layer (permission query, User
-        Permissions), and the IN list here is bounded by the result count,
-        not by table size. Rows without a resolvable ticket are dropped.
-        """
-        # ponytail: a heavily restricted agent on a huge site only sees matches
-        # surviving the global top-500 BM25 candidates; push the permission query
-        # into the index via json_each if anyone hits that recall ceiling.
-        candidates = {t for t in map(self._ticket_of, results) if t}
+        """Permission gate for the unprefiltered branch: one get_list bounded by
+        the result count, not table size. Rows without a ticket are dropped."""
+        candidates = {self._ticket_of(row) for row in results}
+        candidates.discard(None)
         if not candidates:
             return []
         allowed = set(
@@ -191,13 +178,9 @@ class HelpdeskSearch(SQLiteSearch):
                 "doctypes": {},
             }
 
-        # The ticket list binds as ONE json variable per column instead of one
-        # placeholder per ticket. The old `IN (?,?,...)` repeated the whole list
-        # three times over — 3N placeholders — hitting SQLite's bound-variable
-        # ceiling at a third of the count the search query does.
-        # Three columns because each row type stores its ticket elsewhere:
-        # tickets in `name`, Communications in `reference_name`, comments in
-        # `reference_ticket`.
+        # The ticket list binds as one json variable per column instead of 3N
+        # placeholders, which hit SQLite's bound-variable ceiling. Three columns
+        # because each row type stores its ticket in a different one.
         sql = """
 			SELECT
 				agent_group,

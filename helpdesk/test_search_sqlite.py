@@ -10,10 +10,8 @@ RESTRICTED_USER = "helpdesk-search-user@example.com"
 
 
 class TestSearchPermissionFilter(FrappeTestCase):
-    """The prefilter must stay bounded: an unbounded IN list costs linearly per
-    keystroke and hard-fails at SQLite's variable ceiling, which core search()
-    turns into silently empty results. Past PREFILTER_LIMIT the filter is
-    skipped and _drop_unpermitted becomes the authoritative gate instead."""
+    """Under PREFILTER_LIMIT the permission filter binds exactly; over it,
+    _drop_unpermitted gates the results instead."""
 
     @classmethod
     def setUpClass(cls):
@@ -61,8 +59,7 @@ class TestSearchPermissionFilter(FrappeTestCase):
         )
 
     def test_filter_options_bind_a_constant_number_of_variables(self):
-        """Runs the json_each facets query for real: the old 3N-placeholder
-        IN lists hit SQLite's bound-variable ceiling on large sites."""
+        """Runs the json_each facets query for real."""
         options = HelpdeskSearch().get_filter_options()
 
         self.assertEqual(
