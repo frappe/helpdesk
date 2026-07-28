@@ -6,7 +6,7 @@ export interface RecentTicket {
   visitedAt: number;
 }
 
-const MAX_RECENTS = 5;
+const MAX_RECENTS = 3;
 
 /**
  * Per-agent: subjects routinely carry customer names, and the unscoped key

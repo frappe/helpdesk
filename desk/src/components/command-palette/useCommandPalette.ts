@@ -34,7 +34,7 @@ export interface PaletteGroup {
   items: Command[];
 }
 
-const stack = shallowRef<Level[]>([]);
+const stack = shallowRef<Level[]>([]); // drill-down levels, empty = root
 const loadingChildren = ref(false);
 
 export const breadcrumb = computed(() => stack.value.map((level) => level.title));
