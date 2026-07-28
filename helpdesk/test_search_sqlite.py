@@ -16,7 +16,9 @@ class TestSearchPermissionFilter(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        create_user(RESTRICTED_USER)
+        # HD Customer grants doctype-level read; row visibility still comes from
+        # the permission query. A role-less user cannot get_list at all.
+        create_user(RESTRICTED_USER).add_roles("HD Customer")
         cls.own_ticket = make_ticket(
             subject="Search perm own", raised_by=RESTRICTED_USER
         )
