@@ -47,8 +47,6 @@ export interface PaletteContext {
   id: string;
   /** Short identifier on the chip, e.g. "#13". */
   label: string;
-  /** Human title on the chip; empty until the ticket resource resolves. */
-  title: string;
 }
 
 export interface SearchItem {

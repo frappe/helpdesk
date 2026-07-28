@@ -24,11 +24,9 @@
           <Transition name="chip">
             <div
               v-if="context"
-              class="chip ms-3 flex min-w-0 max-w-[45%] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
+              class="chip ms-3 shrink-0 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
             >
-              <span class="shrink-0 text-ink-gray-5">{{ context.label }}</span>
-              <span class="shrink-0 text-ink-gray-4">⋅</span>
-              <span class="truncate">{{ context.title || __("Ticket") }}</span>
+              {{ context.label }}
             </div>
           </Transition>
           <button
