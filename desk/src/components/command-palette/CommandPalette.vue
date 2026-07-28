@@ -12,23 +12,28 @@
       >
         <DialogTitle class="sr-only">{{ __("Command Palette") }}</DialogTitle>
 
+        <!-- Collapses to a zero-height row on dismiss, so the input glides up
+             instead of jumping. -->
+        <Transition name="chip">
+          <div v-if="context" class="chip-row grid">
+            <div class="overflow-hidden">
+              <!-- Sized off Linear's own chip: 12px text, 2px/6px padding,
+                   10px radius, inset 14px to match the row below. -->
+              <!-- Not a button: removal is backspace-only, advertised by esc's
+                   footer label rather than a glyph on the chip. -->
+              <div
+                class="chip mx-3.5 mt-3 w-fit rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
+              >
+                {{ context.label }}
+              </div>
+            </div>
+          </div>
+        </Transition>
+
         <div
           class="relative flex items-center border-b border-outline-gray-1 px-1"
         >
           <LucideSearch class="ms-3 size-4 shrink-0 text-ink-gray-4" />
-          <!-- Inline token, left of the caret: a pill sitting where Backspace
-               points is its own affordance, and the chip no longer costs a
-               mostly-empty row of its own. Sized off Linear's chip. -->
-          <!-- Not a button: removal is backspace-only, advertised by esc's
-               footer label rather than a glyph on the chip. -->
-          <Transition name="chip">
-            <div
-              v-if="context"
-              class="chip ms-2 shrink-0 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
-            >
-              {{ context.label }}
-            </div>
-          </Transition>
           <button
             v-if="stepLabel"
             type="button"
@@ -500,17 +505,27 @@ useShortcut({
   }
 }
 
-/* Inline pill: pops in beside the caret. The input row never changes height,
-   so the old grid-row collapse is gone. */
-.chip-enter-active,
-.chip-leave-active {
-  transition: opacity 140ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+/* grid-template-rows animates to intrinsic height, which max-height guesswork
+   cannot: the chip owns its own size and the row still collapses smoothly. */
+.chip-row {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chip-enter-active .chip,
+.chip-leave-active .chip {
+  transition: opacity 140ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .chip-enter-from,
 .chip-leave-to {
+  grid-template-rows: 0fr;
+}
+
+.chip-enter-from .chip,
+.chip-leave-to .chip {
   opacity: 0;
-  transform: scale(0.92);
+  transform: translateY(-4px) scale(0.96);
 }
 
 /*
@@ -530,6 +545,7 @@ useShortcut({
 @media (prefers-reduced-motion: reduce) {
   .palette-content,
   .palette-overlay,
+  .chip-row,
   .chip,
   .loading-bar,
   .level-enter-active {
