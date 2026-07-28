@@ -4,8 +4,8 @@ import {
 } from "@/components/layouts/layoutSettings";
 import {
   setActiveSettingsTab,
-  showSettingsModal,
   tabs as settingsTabs,
+  showSettingsModal,
 } from "@/components/Settings/settingsModal";
 import { router } from "@/router";
 import { useAgentStatusStore } from "@/stores/agentStatus";
@@ -74,9 +74,7 @@ function ticketJumpCommand(query: string): Command[] {
  * listing itself as the thing to go to next.
  */
 export function recentTicketCommands(): Command[] {
-  const openTicketId = String(
-    router.currentRoute.value.params.ticketId ?? ""
-  );
+  const openTicketId = String(router.currentRoute.value.params.ticketId ?? "");
   return recentTickets.value
     .filter((ticket) => ticket.name !== openTicketId)
     .map((ticket) => ({
@@ -123,8 +121,7 @@ function createCommands(): Command[] {
       group: GROUP.create,
       icon: LucidePlus,
       keywords: "create knowledge base kb",
-      perform: () =>
-        router.push({ name: "NewArticle", params: { id: "new" } }),
+      perform: () => router.push({ name: "NewArticle", params: { id: "new" } }),
     },
   ];
 }
@@ -154,7 +151,8 @@ function accountCommands(): Command[] {
       group: GROUP.account,
       icon: LucideSettings,
       hint: "Mod+,",
-      keywords: "preferences configure email agents teams sla telephony",
+      keywords:
+        "preferences configure email agents teams sla telephony erpnext",
       children: () => settingsChildren(),
     },
     {
@@ -246,4 +244,3 @@ export function buildFallbackCommands(query: string): Command[] {
   }
   return commands;
 }
-
