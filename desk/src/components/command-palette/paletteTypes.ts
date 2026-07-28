@@ -105,7 +105,8 @@ export const GROUP = {
   recent: "Recent",
   results: "Tickets",
   navigate: "Navigate",
-  create: "Create",
+  // Untitled: "New ticket" already says create, a header would repeat it.
+  create: "",
   account: "Account",
 };
 

@@ -218,7 +218,7 @@ function availabilityChildren(): Command[] {
  * the typed text is carried into whatever the user picks.
  */
 export function buildFallbackCommands(query: string): Command[] {
-  return [
+  const commands: Command[] = [
     {
       id: "fallback-search",
       title: __('Search all of Helpdesk for "{0}"', [query]),
@@ -226,14 +226,18 @@ export function buildFallbackCommands(query: string): Command[] {
       icon: LucideFileSearch,
       perform: () => router.push({ name: "SearchAgent", query: { q: query } }),
     },
-    {
+  ];
+  // "#123" is someone reaching for a ticket, not naming a new one.
+  if (!query.startsWith("#")) {
+    commands.push({
       id: "fallback-create",
       title: __('Create ticket "{0}"', [query]),
       group: "",
       icon: LucidePlus,
       perform: () =>
         router.push({ name: "TicketAgentNew", query: { subject: query } }),
-    },
-  ];
+    });
+  }
+  return commands;
 }
 
