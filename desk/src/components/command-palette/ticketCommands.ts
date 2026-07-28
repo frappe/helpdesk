@@ -37,7 +37,7 @@ import LucideFlag from "~icons/lucide/flag";
 import LucideLink from "~icons/lucide/link";
 import LucideMerge from "~icons/lucide/merge";
 import LucideMessageCircle from "~icons/lucide/message-circle";
-import LucideTag from "~icons/lucide/tag";
+import LucideShapes from "~icons/lucide/shapes";
 import LucideTags from "~icons/lucide/tags";
 import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
@@ -99,7 +99,7 @@ export function ticketCommands(ticketId: string): Command[] {
       title: __("Change type"),
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
-      icon: LucideTag,
+      icon: LucideShapes,
       hint: "T",
       keywords: "question incident bug",
       children: () => ticketTypeChildren(ticketId),
@@ -339,7 +339,7 @@ async function ticketTypeChildren(ticketId: string): Promise<Command[]> {
     id: `type-${type.name}`,
     title: type.name,
     group: "Set type",
-    icon: LucideTag,
+    icon: LucideShapes,
     checked: type.name === current,
     perform: () => updateTicket(ticketId, { ticket_type: type.name }),
   }));
