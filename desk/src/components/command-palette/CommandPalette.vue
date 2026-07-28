@@ -19,11 +19,9 @@
             <div class="overflow-hidden">
               <!-- Sized off Linear's own chip: 12px text, 2px/6px padding,
                    10px radius, inset 14px to match the row below. -->
-              <button
-                type="button"
-                class="chip mx-3.5 mt-3 flex max-w-[calc(100%-1.75rem)] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7 transition-colors hover:bg-surface-gray-3"
-                :title="__('Remove context')"
-                @click="dismissContext"
+              <!-- Not a button: removal is backspace-only, the ⌫ glyph is the hint. -->
+              <div
+                class="chip mx-3.5 mt-3 flex max-w-[calc(100%-1.75rem)] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
               >
                 <span class="shrink-0 text-ink-gray-5">{{
                   context.label
@@ -33,7 +31,7 @@
                   context.title || __("Ticket")
                 }}</span>
                 <LucideDelete class="size-3 shrink-0 text-ink-gray-5" />
-              </button>
+              </div>
             </div>
           </div>
         </Transition>
@@ -275,8 +273,8 @@ const placeholder = computed(() =>
 );
 
 /**
- * Bound to the dialog, not the input: Reka's focus trap lets Tab reach the chip
- * and the back button, and from there arrows and Enter used to do nothing at all
+ * Bound to the dialog, not the input: Reka's focus trap lets Tab reach the back
+ * button, and from there arrows and Enter used to do nothing at all
  * until the user found Shift+Tab. The one thing that must not double up is Enter
  * on a focused button, which already fires its own click.
  */
