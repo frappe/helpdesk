@@ -209,6 +209,7 @@ function availabilityChildren(): Command[] {
     title: __(status),
     group: "Set availability",
     icon: LucideActivity,
+    checked: status === store.myStatus,
     perform: () => store.setMyStatus(status),
   }));
 }
