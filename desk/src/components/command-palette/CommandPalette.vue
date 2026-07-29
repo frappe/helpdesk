@@ -156,14 +156,11 @@
           class="flex items-center gap-4 border-t border-outline-gray-1 px-4 py-2.5"
         >
           <span class="flex items-center gap-1.5 text-xs text-ink-gray-4">
-            <span class="flex gap-1">
-              <kbd :class="KEY_CHIP"><LucideArrowUp class="size-3" /></kbd>
-              <kbd :class="KEY_CHIP"><LucideArrowDown class="size-3" /></kbd>
-            </span>
+            <ShortcutKey keys="↑ ↓" />
             {{ __("Navigate") }}
           </span>
           <span class="flex items-center gap-1.5 text-xs text-ink-gray-4">
-            <kbd :class="KEY_CHIP"><LucideCornerDownLeft class="size-3" /></kbd>
+            <ShortcutKey keys="↵" />
             {{ __("Select") }}
           </span>
           <!-- No ⌫ hint for the context: esc's label already advertises
@@ -172,13 +169,13 @@
             v-if="stepLabel"
             class="flex items-center gap-1.5 text-xs text-ink-gray-4"
           >
-            <kbd :class="KEY_CHIP"><LucideDelete class="size-3" /></kbd>
+            <ShortcutKey keys="⌫" />
             {{ __("Back") }}
           </span>
           <span
             class="ms-auto flex items-center gap-1.5 text-xs text-ink-gray-4"
           >
-            <kbd :class="KEY_CHIP">esc</kbd>
+            <ShortcutKey keys="esc" />
             {{ escapeLabel }}
           </span>
         </div>
@@ -199,11 +196,8 @@ import {
 } from "reka-ui";
 import { computed, nextTick, ref, watch } from "vue";
 
-import LucideArrowDown from "~icons/lucide/arrow-down";
-import LucideArrowUp from "~icons/lucide/arrow-up";
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import LucideChevronRight from "~icons/lucide/chevron-right";
-import LucideCornerDownLeft from "~icons/lucide/corner-down-left";
-import LucideDelete from "~icons/lucide/delete";
 import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
@@ -227,9 +221,6 @@ import {
   resetPalette,
   run,
 } from "./useCommandPalette";
-
-const KEY_CHIP =
-  "rounded border border-outline-gray-2 p-0.5 text-[11px] font-medium";
 
 const inputRef = ref<HTMLInputElement | null>(null);
 const listRef = ref<HTMLElement | null>(null);
