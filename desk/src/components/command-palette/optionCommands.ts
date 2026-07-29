@@ -47,6 +47,25 @@ export function priorityOptions(config: OptionListConfig): Command[] {
     }));
 }
 
+/**
+ * Live option names as parent keywords, so typing a value surfaces the
+ * drill-down — including site-defined values a hardcoded list would miss.
+ * Empty until the store resolves; the parent still matches on its title.
+ */
+export function statusKeywords(): string {
+  return (useTicketStatusStore().statuses.data ?? [])
+    .filter((status) => status.enabled)
+    .map((status) => status.label_agent)
+    .join(" ");
+}
+
+export function priorityKeywords(): string {
+  return (useTicketPriorityStore().priorities.data ?? [])
+    .filter((priority) => !priority.disabled)
+    .map((priority) => priority.name)
+    .join(" ");
+}
+
 function optionRow(config: OptionListConfig, value: string): Command {
   const label = __(value);
   return {

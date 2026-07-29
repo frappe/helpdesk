@@ -7,7 +7,12 @@ import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import type { View } from "@/types";
-import { priorityOptions, statusOptions } from "./optionCommands";
+import {
+  priorityKeywords,
+  priorityOptions,
+  statusKeywords,
+  statusOptions,
+} from "./optionCommands";
 import { CONTEXT_WEIGHT, GROUP, type Command } from "./paletteTypes";
 
 import LucideCircleDot from "~icons/lucide/circle-dot";
@@ -35,7 +40,7 @@ export function ticketListCommands(): Command[] {
       icon: LucideCircleDot,
       // No `hint` here: the app's "f" opens the whole filter popover, which is
       // not what this row does. A hint that doesn't map 1:1 teaches the wrong key.
-      keywords: "open replied resolved closed paused",
+      keywords: statusKeywords(),
       children: () => statusFilterChildren(),
     },
     {
@@ -44,7 +49,7 @@ export function ticketListCommands(): Command[] {
       group: GROUP.list,
       weight: CONTEXT_WEIGHT,
       icon: LucideFlag,
-      keywords: "urgent high medium low",
+      keywords: priorityKeywords(),
       children: () => priorityFilterChildren(),
     },
     {
