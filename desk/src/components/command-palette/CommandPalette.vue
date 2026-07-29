@@ -394,14 +394,15 @@ watch(groups, (_next, previous) => {
   activeIndex.value = Math.max(index, 0);
 });
 
-// Every close path, not just onOpenChange: running a command sets isOpen
-// directly, which is how a drill-down survived into the next open.
+// Reset on open, not close: resetting on close revived the dismissed context
+// chip while the close fade was still playing. Runs before the dialog mounts,
+// and covers every open path — including a close done by running a command.
 watch(isOpen, (open) => {
   if (!open) {
-    resetPalette();
     nextTick(restoreFocus);
     return;
   }
+  resetPalette();
   // There is no DialogTrigger, so nothing gives focus back on its own and a
   // keyboard user lands on <body> having lost their place.
   focusBeforeOpen = document.activeElement as HTMLElement | null;

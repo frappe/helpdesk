@@ -10,6 +10,7 @@ import {
 import { router } from "@/router";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
+import { parseColor } from "@/stores/ticketStatus";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
 import { useTheme } from "frappe-ui";
@@ -142,7 +143,11 @@ function accountCommands(): Command[] {
       title: __("Set availability"),
       group: GROUP.account,
       icon: LucideActivity,
-      keywords: "status away online offline",
+      // Live status names too (like the list filters), so site-defined values
+      // ("Lunch") surface the drill-down.
+      keywords:
+        "my status presence online offline away busy " +
+        useAgentStatusStore().statusOptions.join(" "),
       children: () => availabilityChildren(),
     },
     {
@@ -204,13 +209,16 @@ function openSettingsTab(label: string): void {
   showSettingsModal.value = true;
 }
 
-function availabilityChildren(): Command[] {
+async function availabilityChildren(): Promise<Command[]> {
   const store = useAgentStatusStore();
+  // Cold store on first open: the level snapshots whatever this returns, so an
+  // unresolved fetch would freeze the drill-down as empty.
+  await store.statuses.list.promise;
   return (store.statusOptions ?? []).map((status: string) => ({
     id: `availability-${status}`,
     title: __(status),
     group: "Set availability",
-    icon: LucideActivity,
+    dotClass: parseColor(store.getStatus(status)?.color ?? "Gray"),
     checked: status === store.myStatus,
     perform: () => store.setMyStatus(status),
   }));

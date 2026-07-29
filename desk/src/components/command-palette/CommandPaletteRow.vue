@@ -1,10 +1,17 @@
 <template>
   <div
-    class="flex w-full min-w-0 items-center rounded px-2 py-2 text-sm text-ink-gray-8"
+    class="flex h-9 w-full min-w-0 items-center rounded px-2 text-sm text-ink-gray-8"
     :class="{ 'bg-surface-gray-2': active }"
   >
+    <Avatar
+      v-if="command.avatar"
+      :image="command.avatar.image"
+      :label="command.avatar.label"
+      size="xs"
+      class="me-2.5 shrink-0"
+    />
     <span
-      v-if="command.dotClass"
+      v-else-if="command.dotClass"
       class="me-2.5 size-2 shrink-0 rounded-full bg-current"
       :class="command.dotClass"
     />
@@ -49,6 +56,7 @@
 <script setup lang="ts">
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useDevice } from "@/composables";
+import { Avatar } from "frappe-ui";
 import { computed } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import LucideChevronRight from "~icons/lucide/chevron-right";

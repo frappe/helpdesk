@@ -15,6 +15,8 @@ export interface Command {
   weight?: number;
   /** Tailwind class for the leading colour dot (status/priority rows). */
   dotClass?: string;
+  /** Leading avatar (agent rows); `label` initials are the no-photo fallback. */
+  avatar?: { image?: string; label: string };
   /** Fixed score, bypassing the fuzzy scorer. Server hits arrive pre-ranked. */
   rank?: number;
   /**
@@ -102,7 +104,7 @@ export const FLAT_OPTION_WEIGHT = 1.15;
 export const GROUP = {
   ticket: "Ticket",
   list: "Ticket list",
-  recent: "Recent",
+  recent: "Recent tickets",
   results: "Tickets",
   navigate: "Navigate",
   // Untitled: "New ticket" already says create, a header would repeat it.

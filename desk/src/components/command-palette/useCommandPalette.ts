@@ -176,7 +176,14 @@ export const groups = computed<PaletteGroup[]>(() => {
   if (!isOpen.value) return [];
 
   const level = stack.value.at(-1);
-  if (level) return groupCommands(level.commands, query.value);
+  if (level) {
+    // A single group's header only repeats the breadcrumb ("Change priority"
+    // over "Set priority"); multi-group levels like Settings keep theirs.
+    const grouped = groupCommands(level.commands, query.value);
+    return grouped.length === 1
+      ? grouped.map((group) => ({ ...group, title: "" }))
+      : grouped;
+  }
 
   // Untitled: the chip already says what these rows act on, so a "Ticket"
   // header would only repeat it.

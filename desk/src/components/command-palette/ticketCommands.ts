@@ -293,7 +293,10 @@ async function agentChildren(ticketId: string): Promise<Command[]> {
     // agent_name is often just the email; don't print it twice.
     subtitle: agent.agent_name === agent.name ? "" : agent.name,
     group: "Assign to",
-    icon: LucideUserPlus,
+    avatar: {
+      image: agent.user_image,
+      label: agent.agent_name || agent.name,
+    },
     // A ticket can hold several assignees, so the row toggles rather than
     // replaces. Without the tick there is no way to tell which it will do.
     checked: assigned.includes(agent.name),
@@ -320,7 +323,6 @@ async function teamChildren(ticketId: string): Promise<Command[]> {
     id: `team-${team.name}`,
     title: team.name,
     group: "Set team",
-    icon: LucideUsers,
     checked: team.name === current,
     perform: () => updateTicket(ticketId, { agent_group: team.name }),
   }));
@@ -339,7 +341,6 @@ async function ticketTypeChildren(ticketId: string): Promise<Command[]> {
     id: `type-${type.name}`,
     title: type.name,
     group: "Set type",
-    icon: LucideShapes,
     checked: type.name === current,
     perform: () => updateTicket(ticketId, { ticket_type: type.name }),
   }));
