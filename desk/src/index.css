@@ -27,6 +27,27 @@
   display: none !important;
 }
 
+/* Dialogs (e.g. saved replies) must sit above a detached FloatingWindow
+   (z-50); the frappe-ui overlay has no z-index of its own. */
+body.has-floating-window .dialog-overlay {
+  z-index: 100;
+}
+
+/* Drag-set height for the docked composer editing area (see
+   CommunicationArea's resize handle). */
+.ticket-composer-window[data-state="docked"] [data-slot="body"] {
+  /* min-height, not height: the body is a flex-1 item, so height loses to
+     flex-basis; min-height floors the flex sizing. */
+  min-height: var(--composer-body-height, auto);
+  max-height: max(50vh, var(--composer-body-height, 0px));
+}
+
+/* A floating window has a fixed height of its own; drop the library's inline
+   50vh cap so the editor fills it and the toolbar pins to the bottom. */
+.ticket-composer-window[data-state="floating"] [data-slot="body"] {
+  max-height: none;
+}
+
 html,
 body {
   color: var(--ink-gray-9);
