@@ -224,7 +224,7 @@ export function buildFallbackCommands(query: string): Command[] {
   const commands: Command[] = [
     {
       id: "fallback-search",
-      title: __('Search for "{0}"', [query]),
+      title: __('Search for "{0}" (advanced search)', [query]),
       group: "",
       icon: LucideFileSearch,
       perform: () => router.push({ name: "SearchAgent", query: { q: query } }),
