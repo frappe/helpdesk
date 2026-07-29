@@ -93,6 +93,8 @@ function priorityFilterChildren(): Command[] {
 }
 
 function viewChildren(): Command[] {
+  // The active view travels in the route query; absent means the default list.
+  const currentView = String(router.currentRoute.value.query.view ?? "");
   const ticketViews = (views.data ?? []).filter(
     (view: View) => view.dt === "HD Ticket"
   );
@@ -102,6 +104,7 @@ function viewChildren(): Command[] {
       title: __("List"),
       group: "Switch view",
       icon: LucideLayoutList,
+      checked: !currentView,
       perform: () => router.push({ name: "TicketsAgent" }),
     },
     ...ticketViews.map((view: View) => ({
@@ -110,6 +113,7 @@ function viewChildren(): Command[] {
       subtitle: viewScope(view),
       group: "Switch view",
       icon: LucideLayoutList,
+      checked: view.name === currentView,
       perform: () =>
         router.push({ name: "TicketsAgent", query: { view: view.name } }),
     })),
