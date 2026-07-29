@@ -101,7 +101,6 @@ export function ticketCommands(ticketId: string): Command[] {
       weight: CONTEXT_WEIGHT,
       icon: LucideShapes,
       hint: "T",
-      keywords: "question incident bug",
       children: () => ticketTypeChildren(ticketId),
     },
     {
