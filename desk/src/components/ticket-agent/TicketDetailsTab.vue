@@ -9,117 +9,140 @@
     </div>
 
     <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
-    <div class="min-h-0 flex-1 divide-y-[1px] overflow-y-auto border-t">
-      <!-- Key Info (core fields) -->
-      <Section :label="__('Overview')" v-model:opened="openedSections.keyInfo">
-        <div class="space-y-2.5 pb-4 pt-0.5">
-          <!-- Assignee -->
-          <div class="flex items-center gap-2 leading-5">
-            <FieldLabel label="Assignee" />
-            <div
-              class="-m-0.5 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-0.5"
-            >
-              <AssignTo hide-label ghost />
-            </div>
-          </div>
-          <!-- Core fields -->
-          <template v-for="field in coreFields">
-            <TicketField
-              v-if="field?.visible"
-              :key="field.fieldname"
-              :ref="(el) => setFieldRef(field.fieldname, el)"
-              :field="field"
-              :value="field.value"
-              @change="
-                ({ fieldname, value }) =>
-                  handleFieldUpdate(fieldname, value, true)
-              "
-            />
-          </template>
-
-          <!-- Tags -->
-          <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
-               sit 2px higher and the gap to the Assignee row reads tighter
-               than the field-to-field gap. Nudge the row down to even it. -->
-          <div class="flex items-start gap-2 pt-1">
-            <FieldLabel label="Tags" class="pt-0.5" />
-            <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
-                 and the add button start on the same column as the values -->
-            <div class="min-w-0 flex-1 pb-0.5 ps-[9px]">
-              <Tags
-                doctype="HD Ticket"
-                :name="ticket.doc?.name"
-                :tags="ticket.doc?._user_tags"
-                @change="onTagsChange"
-              />
-            </div>
-          </div>
+    <div
+      ref="scrollAreaRef"
+      class="min-h-0 flex-1 overflow-y-auto border-t"
+      @scroll.passive="trimScrollSpacer"
+    >
+      <div ref="scrollContentRef" class="divide-y-[1px]">
+        <!-- Feedback, only once the contact has rated the ticket -->
+        <div v-if="ticket.doc?.feedback_rating">
+          <TicketFeedback
+            :rating="ticket.doc.feedback_rating"
+            :feedback="ticket.doc.feedback"
+            :comment="ticket.doc.feedback_extra"
+            v-model:opened="openedSections.feedback"
+          />
         </div>
-      </Section>
 
-      <!-- Ticket Info (custom fields) -->
-      <div v-if="Boolean(customFields.length)">
+        <!-- Key Info (core fields) -->
         <Section
-          :label="__('More Details')"
-          v-model:opened="openedSections.ticketInfo"
+          :label="__('Overview')"
+          v-model:opened="openedSections.keyInfo"
         >
           <div class="space-y-2.5 pb-4 pt-0.5">
-            <template v-for="field in customFields">
+            <!-- Assignee -->
+            <div class="flex items-center gap-2 leading-5">
+              <FieldLabel label="Assignee" />
+              <div
+                class="-m-1 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-1"
+              >
+                <AssignTo hide-label ghost />
+              </div>
+            </div>
+            <!-- Core fields -->
+            <template v-for="field in coreFields">
               <TicketField
-                v-if="field.visible"
+                v-if="field?.visible"
                 :key="field.fieldname"
+                :ref="(el) => setFieldRef(field.fieldname, el)"
                 :field="field"
                 :value="field.value"
                 @change="
-                  ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+                  ({ fieldname, value }) =>
+                    handleFieldUpdate(fieldname, value, true)
                 "
               />
             </template>
+
+            <!-- Tags -->
+            <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
+               sit 2px higher and the gap to the Assignee row reads tighter
+               than the field-to-field gap. Nudge the row down to even it. -->
+            <div class="flex items-start gap-2 pt-1">
+              <FieldLabel label="Tags" class="pt-0.5" />
+              <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
+                 and the add button start on the same column as the values -->
+              <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
+                <Tags
+                  doctype="HD Ticket"
+                  :name="ticket.doc?.name"
+                  :tags="ticket.doc?._user_tags"
+                  @change="onTagsChange"
+                />
+              </div>
+            </div>
           </div>
         </Section>
-      </div>
 
-      <!-- Recent / Similar Tickets -->
-      <template v-if="showRecentSimilarTickets">
-        <div v-for="section in sections" :key="section.label">
+        <!-- Ticket Info (custom fields) -->
+        <div v-if="Boolean(customFields.length)">
           <Section
-            :label="section.label"
-            :tooltip="section.tooltipMessage"
-            :hideLabel="section.hideLabel"
-            v-model:opened="openedSections[section.key]"
+            :label="__('More Details')"
+            v-model:opened="openedSections.ticketInfo"
           >
-            <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
-              <li
-                v-for="t in section.tickets"
-                :key="t.name"
-                @click="openTicket(t.name)"
-              >
-                <div
-                  class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
-                >
-                  <p
-                    class="font-base mb-2 truncate text-sm text-ink-gray-9 max-w-[70%]"
-                  >
-                    {{ t.subject }}
-                  </p>
-                  <div class="flex items-center justify-between gap-2">
-                    <p class="shrink-0 text-sm text-ink-gray-5">
-                      {{ formatDate(t.creation as string) + " · " }}
-                      <span class="">{{ "#" + t.name }}</span>
-                    </p>
-                    <span
-                      class="font-base shrink-0 rounded-sm px-2 py-0.5 text-xs"
-                      :class="getStatusColor(t.status as string)"
-                    >
-                      {{ t.status }}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            <div class="space-y-2.5 pb-4 pt-0.5">
+              <template v-for="field in customFields">
+                <TicketField
+                  v-if="field.visible"
+                  :key="field.fieldname"
+                  :field="field"
+                  :value="field.value"
+                  @change="
+                    ({ fieldname, value }) =>
+                      handleFieldUpdate(fieldname, value)
+                  "
+                />
+              </template>
+            </div>
           </Section>
         </div>
-      </template>
+
+        <!-- Recent / Similar Tickets -->
+        <template v-if="showRecentSimilarTickets">
+          <div v-for="section in sections" :key="section.label">
+            <Section
+              :label="section.label"
+              :tooltip="section.tooltipMessage"
+              :hideLabel="section.hideLabel"
+              v-model:opened="openedSections[section.key]"
+            >
+              <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
+                <li
+                  v-for="t in section.tickets"
+                  :key="t.name"
+                  @click="openTicket(t.name)"
+                >
+                  <div
+                    class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
+                  >
+                    <p
+                      class="font-base mb-2 truncate text-sm text-ink-gray-9 max-w-[70%]"
+                    >
+                      {{ t.subject }}
+                    </p>
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="shrink-0 text-sm text-ink-gray-5">
+                        {{ formatDate(t.creation as string) + " · " }}
+                        <span class="">{{ "#" + t.name }}</span>
+                      </p>
+                      <span
+                        class="font-base shrink-0 rounded-sm px-2 py-0.5 text-xs"
+                        :class="getStatusColor(t.status as string)"
+                      >
+                        {{ t.status }}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </Section>
+          </div>
+        </template>
+      </div>
+      <!-- Absorbs the height a collapsing section removes, so scrollTop never
+           clamps and the clicked header stays put. Trimmed on scroll up. -->
+      <div :style="{ height: `${scrollSpacerHeight}px` }" />
     </div>
   </div>
 </template>
@@ -139,7 +162,7 @@ import {
   RecentSimilarTicketsSymbol,
   TicketSymbol,
 } from "@/types";
-import { useStorage } from "@vueuse/core";
+import { useResizeObserver, useStorage } from "@vueuse/core";
 import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import FieldLabel from "../FieldLabel.vue";
@@ -148,6 +171,7 @@ import Tags from "../tag/Tags.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
+import TicketFeedback from "./TicketFeedback.vue";
 import TicketSLA from "./TicketSLA.vue";
 
 const ticket = inject(TicketSymbol)!;
@@ -207,9 +231,36 @@ const customFields = computed(() => {
   return _customFields;
 });
 
+// When a section collapses, the scroller's content gets shorter and the
+// browser clamps scrollTop, yanking the viewport. The spacer absorbs the
+// lost height so nothing on screen moves; scrolling up trims it back, so
+// the blank space can never be scrolled into.
+const scrollAreaRef = ref<HTMLElement | null>(null);
+const scrollContentRef = ref<HTMLElement | null>(null);
+const scrollSpacerHeight = ref(0);
+
+useResizeObserver(scrollContentRef, () => {
+  scrollSpacerHeight.value = neededScrollSpacer();
+});
+
+function neededScrollSpacer(): number {
+  const area = scrollAreaRef.value;
+  const content = scrollContentRef.value;
+  if (!area || !content) return 0;
+  return Math.max(0, area.scrollTop + area.clientHeight - content.offsetHeight);
+}
+
+function trimScrollSpacer() {
+  scrollSpacerHeight.value = Math.min(
+    scrollSpacerHeight.value,
+    neededScrollSpacer()
+  );
+}
+
 const openedSections = useStorage(
   "openedSections",
   {
+    feedback: true,
     keyInfo: true,
     ticketInfo: true,
     recentTickets: false,

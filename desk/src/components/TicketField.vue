@@ -1,8 +1,10 @@
 <template>
   <div class="flex gap-2 leading-5 items-center">
     <FieldLabel :label="field.label" :required="field.required" />
+    <!-- p-1, not p-0.5: the Link pulls itself 2px left, so 2px of padding
+         leaves its rounded corner shaved by overflow-hidden -->
     <div
-      class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
+      class="-m-1 min-h-[28px] flex-1 items-center overflow-hidden p-1 text-base"
     >
       <component
         :is="component"
@@ -10,7 +12,7 @@
         :readonly="field.readonly"
         :disabled="field.disabled"
         class="form-control"
-        :placeholder="field.placeholder || `Add ${field.label}`"
+        :placeholder="placeholder"
         :model-value="transValue"
         autocomplete="off"
         v-on="listeners"
@@ -27,11 +29,13 @@ import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui/components/Link/index.ts";
 import {
+  Combobox,
   createResource,
   DatePicker,
   DateTimePicker,
   dayjs,
   FormControl,
+  Select,
 } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -63,12 +67,64 @@ const apiOptions = createResource({
 const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 const numberFields = ["Int", "Float", "Currency", "Percent"];
 
-// Link doctypes whose records open on a helpdesk route. Presence here drives
-// both the redirect affordance and where handleRedirect navigates; add a
-// doctype -> route-segment entry to make another Link field redirectable.
+// Link doctypes whose records open on a helpdesk route. Add an entry to make
+// another Link field redirectable.
 const REDIRECT_ROUTES: Record<string, string> = {
   "HD Customer": "customers",
 };
+
+// past this many options, the field gets a search box
+const SEARCHABLE_FROM = 10;
+
+// same overrides the Link fields carry: fill the row, stay flat on hover
+const ghostControl = {
+  variant: "ghost" as const,
+  class: "!w-full !bg-surface-base",
+};
+
+type Option = { label: string; value: string | number };
+
+const selectOptions = computed<Option[]>(() =>
+  (props.field.fieldtype === "Select"
+    ? props.field.options.split("\n")
+    : []
+  ).map((option) => ({ label: option, value: option }))
+);
+
+const isSearchableSelect = computed(
+  () => selectOptions.value.length > SEARCHABLE_FROM
+);
+
+// the Combobox feeds one placeholder to both trigger and search box, so it
+// gets none and its prefix slot carries the empty state instead
+const emptyLabel = computed(
+  () => props.field.placeholder || `Add ${props.field.label}`
+);
+
+const placeholder = computed(() =>
+  isSearchableSelect.value ? "" : emptyLabel.value
+);
+
+function select(options: Option[]) {
+  return h(Select, { ...ghostControl, options });
+}
+
+// trigger: "button" keeps the search inside the popover, so the row still
+// reads as a value and not a text input
+function combobox(options: Option[]) {
+  return h(
+    Combobox,
+    {
+      ...ghostControl,
+      trigger: "button",
+      options,
+    },
+    {
+      prefix: () =>
+        h("span", { class: "truncate text-ink-gray-4" }, emptyLabel.value),
+    }
+  );
+}
 
 const component = computed(() => {
   if (props.field.url_method) {
@@ -82,15 +138,14 @@ const component = computed(() => {
       class: "!w-full !bg-surface-base !border-transparent !text-base",
       onRedirect: handleRedirect,
     };
-    // Priority shows its level icon before the selected value and each option.
-    // The combobox reuses item-prefix for the control, so one slot drives both.
+    // item-prefix drives both the options and the control, so one slot puts
+    // the level icon everywhere
     if (props.field.options === "HD Ticket Priority") {
       return h(Link, linkProps, {
         "item-prefix": ({ item }: { item: { value: string } }) =>
           h(TicketPriority, { priority: item.value, iconOnly: true }),
-        // while typing, the searched options may not contain the committed
-        // value, so the control loses its selectedOption and falls back to
-        // #prefix; keep showing the committed value's icon until it changes
+        // typing can drop the committed value from the options, so the
+        // control falls back here; keep its icon until it changes
         prefix: () =>
           props.value
             ? h(TicketPriority, {
@@ -102,24 +157,14 @@ const component = computed(() => {
     }
     return h(Link, linkProps);
   } else if (props.field.fieldtype === "Select") {
-    return h(Autocomplete, {
-      options: props.field.options
-        .split("\n")
-        .map((o) => ({ label: o, value: o })),
-    });
+    return isSearchableSelect.value
+      ? combobox(selectOptions.value)
+      : select(selectOptions.value);
   } else if (props.field.fieldtype === "Check") {
-    return h(Autocomplete, {
-      options: [
-        {
-          label: "Yes",
-          value: 1,
-        },
-        {
-          label: "No",
-          value: 0,
-        },
-      ],
-    });
+    return select([
+      { label: "Yes", value: 1 },
+      { label: "No", value: 0 },
+    ]);
   } else if (textFields.includes(props.field.fieldtype)) {
     return h(FormControl, {
       type: "text",
@@ -143,10 +188,8 @@ const component = computed(() => {
   }
 });
 
-// The Link (Combobox) streams half-typed queries through update:modelValue
-// and nulls its model the moment the search text is emptied, so neither may
-// commit directly. Commits happen on a committed selection, or - for a
-// field left empty - once the picker closes still showing empty.
+// the Link streams half-typed queries through update:modelValue, so commits
+// wait for a real selection or for the picker to close still empty
 let linkPickerOpen = false;
 let linkModel: FieldValue = null;
 
@@ -171,8 +214,7 @@ const listeners = computed(() => {
       "update:selectedOption": (option: { value: string } | null) => {
         if (!option) return;
         emitUpdate(props.field.fieldname, option.value);
-        // Keyboard commit leaves focus on the input; mouse commit already
-        // blurs it. Blur here so both paths deselect the field consistently.
+        // a mouse commit blurs the input already, a keyboard one doesn't
         (document.activeElement as HTMLElement | null)?.blur();
       },
       "update:open": (open: boolean) => {
@@ -180,8 +222,7 @@ const listeners = computed(() => {
         if (open) linkModel = props.value ?? null;
         else if (!linkModel) emitUpdate(props.field.fieldname, "");
       },
-      // Escape closes the listbox without committing and keeps focus on the
-      // input; blur so it deselects the field like a commit does.
+      // Escape keeps focus on the input; blur so it deselects like a commit
       keydown: (event: KeyboardEvent) => {
         if (event.key === "Escape") {
           (event.target as HTMLElement | null)?.blur();
@@ -201,7 +242,8 @@ const listeners = computed(() => {
 const transValue = computed(() => {
   const fieldtype = props.field.fieldtype;
   if (fieldtype === "Check") {
-    return props.value ? "Yes" : "No";
+    // the Select matches on option value, so keep the stored 1 / 0
+    return props.value ? 1 : 0;
   } else if (fieldtype === "Date") {
     if (!props.value) return props.value;
     return dayjs(props.value).format(window.date_format.toUpperCase());
@@ -234,6 +276,19 @@ function handleRedirect(value: string) {
 
 :deep(.form-control button) {
   gap: 0;
+}
+
+/* Select and Combobox reveal their chevron on hover like the Link fields.
+   visibility, not display, so the row never reflows. */
+:deep(button.form-control[data-slot="trigger"] .lucide-chevron-down) {
+  visibility: hidden;
+}
+
+:deep(button.form-control[data-slot="trigger"]:hover .lucide-chevron-down),
+:deep(button.form-control[data-slot="trigger"]:focus .lucide-chevron-down),
+:deep(button.form-control[data-slot="trigger"][data-state="open"]
+    .lucide-chevron-down) {
+  visibility: visible;
 }
 :deep(.form-control [type="checkbox"]) {
   margin-left: 9px;
