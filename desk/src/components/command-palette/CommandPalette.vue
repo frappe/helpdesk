@@ -31,9 +31,7 @@
           </div>
         </Transition>
 
-        <div
-          class="relative flex items-center border-b border-outline-gray-1 px-1"
-        >
+        <div class="flex items-center border-b border-outline-gray-1 px-1">
           <LucideSearch class="ms-3 size-4 shrink-0 text-ink-gray-4" />
           <button
             v-if="stepLabel"
@@ -62,14 +60,6 @@
             :aria-activedescendant="activeOptionId"
             @input="onQueryChange(($event.target as HTMLInputElement).value)"
           />
-
-          <!-- Absolute over the border: in flow it would shift the list by 2px. -->
-          <div
-            v-if="isLoading"
-            class="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden"
-          >
-            <div class="loading-bar h-full w-1/3 bg-surface-gray-5" />
-          </div>
         </div>
 
         <!-- Announces what no row can: result count, and list changes under debounce. -->
@@ -479,20 +469,6 @@ useShortcut({
   }
 }
 
-/* Indeterminate: the search has no progress to report, only that it is running. */
-.loading-bar {
-  animation: loading-sweep 900ms ease-in-out infinite;
-}
-
-@keyframes loading-sweep {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(300%);
-  }
-}
-
 /* grid-template-rows animates to intrinsic height; max-height guesswork cannot. */
 .chip-row {
   grid-template-rows: 1fr;
@@ -531,7 +507,6 @@ useShortcut({
   .palette-overlay,
   .chip-row,
   .chip,
-  .loading-bar,
   .level-enter-active {
     animation: none !important;
     transition: none !important;
