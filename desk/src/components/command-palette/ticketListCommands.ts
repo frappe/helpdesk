@@ -21,15 +21,8 @@ import LucideFlag from "~icons/lucide/flag";
 import LucideLayoutList from "~icons/lucide/layout-list";
 import LucideUser from "~icons/lucide/user";
 
-/**
- * Actions for the ticket list. Every one navigates — filters travel as a URL
- * query that ListViewBuilder merges over the active view, so the palette stays
- * decoupled from the list component (it can't `inject` the list's actions
- * anyway; the palette lives in the sidebar, outside that provide chain).
- *
- * Surfaced only on the list route. The routing mechanism would work from any
- * page, but showing list actions while reading a ticket buries the ticket's own.
- */
+/** List-route actions. Filters travel as a URL query — the palette lives in the
+ * sidebar, outside the list's provide chain, so it cannot inject its actions. */
 export function ticketListCommands(): Command[] {
   return [
     {
@@ -38,8 +31,7 @@ export function ticketListCommands(): Command[] {
       group: GROUP.list,
       weight: CONTEXT_WEIGHT,
       icon: LucideCircleDot,
-      // No `hint` here: the app's "f" opens the whole filter popover, which is
-      // not what this row does. A hint that doesn't map 1:1 teaches the wrong key.
+      // No "f" hint: that key opens the whole filter popover, not this row.
       keywords: statusKeywords(),
       children: () => statusFilterChildren(),
     },
@@ -131,11 +123,8 @@ function viewScope(view: View): string {
   return __("Private");
 }
 
-/**
- * Layers onto the list's existing filters; an empty list clears them. Falls
- * back to the URL only when no list is mounted — the URL is a one-way write the
- * popover never reads back, so repeating a filter there is a dead key.
- */
+/** Layers onto the list's filters; empty clears. URL fallback only when no list
+ * is mounted — the popover never reads the URL back. */
 function applyFilter(conditions: FilterCondition[]): void {
   if (applyListFilters(conditions)) return;
   router.push({

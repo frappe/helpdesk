@@ -1,14 +1,10 @@
 import type { Command } from "./paletteTypes";
 
-/**
- * Score for one row: the best of its title, keywords and subtitle, scaled by
- * weight. Keywords and subtitle are penalised so a title match always wins a
- * tie. Kept beside the scorer, and free of Vue imports, so the ranking that
- * decides which row Enter runs can be checked in isolation.
- */
 /** Every substring hit scores at least this; scattered subsequences never do. */
 const SUBSTRING_SCORE = 800;
 
+/** Best of title, keywords (−50) and subtitle (−100), scaled by weight — the
+ * penalties keep a visible-title match winning any tie. */
 export function scoreCommand(command: Command, term: string): number {
   if (command.rank !== undefined) return command.rank;
   if (!term) return 0;
@@ -18,18 +14,12 @@ export function scoreCommand(command: Command, term: string): number {
     command.subtitle ? fuzzyScore(command.subtitle, term) - 100 : -1
   );
   if (base < 0) return -1;
-  // Hidden flat rows surface only on a deliberate match: near-identical titles
-  // ("Set status: …" × every status) mean a scattered hit like "sett" would
-  // un-hide the whole dozen at once, burying an exact match on a normal row.
+  // A scattered hit like "sett" would un-hide every "Set status: …" row at once.
   if (command.hideWhenEmpty && base < SUBSTRING_SCORE) return -1;
   return base * (command.weight ?? 1);
 }
 
-/**
- * Subsequence scorer for the command palette. Prefix beats substring beats
- * scattered match; -1 means no match at all. Small enough to not warrant a
- * dependency, and kept dependency-free so it can be checked in isolation.
- */
+/** Prefix beats substring beats scattered subsequence; -1 means no match. */
 export function fuzzyScore(text: string, term: string): number {
   if (!term) return 0;
   const haystack = (text ?? "").toLowerCase();

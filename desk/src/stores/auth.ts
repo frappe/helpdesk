@@ -68,8 +68,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
   const user: Ref<string> = ref(sessionUser());
   const isLoggedIn: ComputedRef<boolean> = computed(() => !!user.value);
-  // No in-SPA login on purpose: the router guard exits to the server-rendered
-  // login page, and returning is a full page load — which is what keeps the
+  // No in-SPA login on purpose: the full-page login round trip is what keeps
   // module-scope userStorage keys in sync with the session cookie.
 
   function logout() {

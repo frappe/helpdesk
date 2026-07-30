@@ -21,31 +21,19 @@ export interface Command {
   avatar?: { image?: string; label: string };
   /** Fixed score, bypassing the fuzzy scorer. Server hits arrive pre-ranked. */
   rank?: number;
-  /**
-   * The title as the server highlighted it, `<mark>` runs included. `title`
-   * stays plain, since that is what gets scored and read out.
-   */
+  /** Server-highlighted title with `<mark>` runs; `title` stays plain for scoring. */
   marked?: string;
   /** Renders a trailing tick: this row's value is already set on the ticket. */
   checked?: boolean;
-  /**
-   * Perform without closing; the tick flips optimistically and flips back if
-   * `perform` throws. For toggle rows (tags) where one visit flips several.
-   */
+  /** Perform without closing; the optimistic tick flips back if `perform` throws. */
   keepOpen?: boolean;
-  /**
-   * Hidden until the user types. Weight can't express this — an empty term
-   * scores 0 before weight applies, so every row would tie at the root.
-   */
+  /** Hidden until typed, and only a substring-or-better match reveals it. */
   hideWhenEmpty?: boolean;
   children?: () => Command[] | Promise<Command[]>;
   perform?: () => void;
 }
 
-/**
- * The record the palette is acting on, shown as a removable chip above the
- * input. Present means the list is scoped to that record's commands.
- */
+/** The record the palette acts on, shown as the removable chip above the input. */
 export interface PaletteContext {
   /** Ticket name, passed to the command builders. */
   id: string;
@@ -77,11 +65,8 @@ export interface TitleRun {
   match: boolean;
 }
 
-/**
- * Splits the server's `<mark>` highlighting into runs, so a search row can show
- * *why* it matched. Rendered as text nodes — no `v-html`, so no sanitiser and no
- * way for ticket content to inject markup. Any other tags are stripped.
- */
+/** Splits `<mark>` highlighting into runs, rendered as text nodes — no v-html,
+ * so ticket content cannot inject markup. */
 export function titleRuns(marked: string): TitleRun[] {
   return (marked ?? "")
     .split(/(<mark>[\s\S]*?<\/mark>)/g)
@@ -95,11 +80,8 @@ export function titleRuns(marked: string): TitleRun[] {
 /** Ticket-context rows outrank server search hits (fixed rank ~950). */
 export const CONTEXT_WEIGHT = 1.2;
 
-/**
- * Flat option rows ("Set priority: Urgent") sit above search hits but below the
- * drill-down parent, so typing "priority" still leads with "Change priority"
- * while typing "urgent" leads with the row that sets it.
- */
+/** Above search hits, below the drill-down parent: "priority" leads with the
+ * picker, "urgent" with the row that sets it. */
 export const FLAT_OPTION_WEIGHT = 1.15;
 
 /** Untranslated: the palette translates group labels once, at render. */

@@ -2,20 +2,14 @@ import TicketPriority from "@/components/TicketPriority.vue";
 import { router } from "@/router";
 import { GROUP, stripTags, type Command, type SearchItem } from "./paletteTypes";
 
-/**
- * Server-side full-text hits, mapped onto the same row shape. They keep the
- * server's relevance order via `rank` instead of being re-scored locally.
- */
+/** Server full-text hits; `rank` keeps the server's relevance order. */
 export function searchCommands(items: SearchItem[]): Command[] {
   return items.map((item, index) => ({
     id: `search-${item.doctype}-${item.name}`,
     title: stripTags(item.title || item.content || item.name),
-    // The index already computed which words matched; throwing that away was
-    // why search rows never showed why they came back.
+    // The index's own highlighting — it knows which words matched.
     marked: item.title || item.content || item.name,
     subtitle: searchSubtitle(item),
-    // Priority up front, status in the subtitle: repeated subjects are common,
-    // and the index returns both, so neither has to be guessed at.
     icon: TicketPriority,
     iconProps: { priority: item.priority, iconOnly: true },
     group: GROUP.results,

@@ -13,14 +13,10 @@ function tagList() {
   return tags;
 }
 
-/**
- * A toggle list, the way Linear's label picker works: every tag listed, applied
- * ones ticked, Enter flips one without closing — several tags in one visit.
- */
+/** Toggle list: applied tags ticked, Enter flips one without closing. */
 export async function tagChildren(ticketId: string): Promise<Command[]> {
   const { tagListResource } = tagList();
-  // Always refetch: the list is cached, and tags can be created mid-session
-  // from the sidebar picker. Tags.vue reloads on open for the same reason.
+  // Always refetch: tags can be created mid-session from the sidebar picker.
   await tagListResource.reload();
   const applied = appliedTags(ticketId);
   return (tagListResource.data ?? []).map((tag: Tag) => ({

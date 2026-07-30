@@ -44,11 +44,7 @@ import LucideUsers from "~icons/lucide/users";
 
 // --- ticket context ------------------------------------------------------
 
-/**
- * Actions on the ticket you're looking at. `weight` keeps them above server
- * search hits, which carry a fixed rank — context should win on purpose, not
- * by a few points of fuzzy-score luck.
- */
+/** Actions on the open ticket. `weight` keeps them above fixed-rank search hits. */
 export function ticketCommands(ticketId: string): Command[] {
   const commands: Command[] = [
     {
@@ -58,8 +54,7 @@ export function ticketCommands(ticketId: string): Command[] {
       weight: CONTEXT_WEIGHT,
       icon: LucideCircleDot,
       hint: "S",
-      // Option names deliberately absent: the flat "Set status: Open" rows own
-      // those terms, so typing a status name leads with the row that sets it.
+      // No option names: the flat "Set status: Open" rows own those terms.
       keywords: "state",
       children: () => statusChildren(ticketId),
     },
@@ -162,11 +157,7 @@ export function ticketCommands(ticketId: string): Command[] {
   return commands;
 }
 
-/**
- * Claiming a ticket is the most frequent assignment in a queue, so it skips the
- * agent drill-down. Hidden once you already hold it — the toggle inside
- * "Assign to" is the way back out, where the current state is visible.
- */
+/** Skips the agent drill-down; hidden once held — "Assign to" is the way back out. */
 function assignToMeCommand(ticketId: string): Command[] {
   const me = window.agent;
   if (!me || assignedNames(ticketId).includes(me)) return [];
@@ -183,10 +174,7 @@ function assignToMeCommand(ticketId: string): Command[] {
   ];
 }
 
-/**
- * Same guards as the ticket header's own Merge action: an already-merged or
- * resolved ticket has nothing to merge into.
- */
+/** Same guards as the ticket header's own Merge action. */
 function mergeCommand(ticketId: string): Command[] {
   const doc = useTicket(ticketId).ticket.doc;
   const mergeable =
@@ -240,11 +228,8 @@ function navigationCommands(): Command[] {
   return commands;
 }
 
-/**
- * Every status and priority as a root-level row, so "urgent" sets the priority
- * instead of opening a picker. Hidden until the user types — the drill-downs
- * above stay the discoverable path for anyone who doesn't know the names.
- */
+/** Every option as a root row, so "urgent" sets the priority without a picker;
+ * hidden until typed — the drill-downs stay the discoverable path. */
 function flatOptionCommands(ticketId: string): Command[] {
   const { doc } = useTicket(ticketId).ticket;
   const flat = { hideWhenEmpty: true, weight: FLAT_OPTION_WEIGHT };
@@ -296,8 +281,7 @@ async function agentChildren(ticketId: string): Promise<Command[]> {
       image: agent.user_image,
       label: agent.agent_name || agent.name,
     },
-    // A ticket can hold several assignees, so the row toggles rather than
-    // replaces. Without the tick there is no way to tell which it will do.
+    // Rows add, never replace — the tick is how you tell which it will do.
     checked: assigned.includes(agent.name),
     perform: () => assignTicket(ticketId, agent.name),
   }));
@@ -345,15 +329,10 @@ async function ticketTypeChildren(ticketId: string): Promise<Command[]> {
   }));
 }
 
-// Module scope is safe for getMeta — tiptap-extensions.ts already calls it that
-// way, and the resource is cached per doctype, so this shares that fetch.
+// Module scope is safe: getMeta is cached per doctype and shares the fetch.
 const ticketMeta = getMeta("HD Ticket");
 
-/**
- * The field's own label from meta, never a copy of it. A site that relabels
- * Team to "Squad" gets "Squad" in the broadcast; a hardcoded map would announce
- * "Team" while the UI said otherwise.
- */
+/** From meta, so a site that relabels Team gets its own word in the broadcast. */
 function fieldLabel(fieldname: string): string {
   return ticketMeta.getField(fieldname)?.label ?? fieldname;
 }
@@ -366,9 +345,7 @@ function updateTicket(ticketId: string, changes: Record<string, string>): void {
   // The drill-down already ticks the current value, so picking it again just
   // closes quietly.
   if (current?.[field] === value) return;
-  // Same order as the header and details tab: tell co-viewers, then write.
-  // Resolved lazily — globalStore() needs a mounted instance, which the ticket
-  // page guarantees by the time a command can run.
+  // Same order as the details tab: tell co-viewers, then write.
   useNotifyTicketUpdate(ticketId).notifyTicketUpdate(fieldLabel(field), value);
   ticket.setValue.submit(changes, {
     onSuccess: () => activities.reload(),
@@ -377,14 +354,8 @@ function updateTicket(ticketId: string, changes: Record<string, string>): void {
 
 const addAssignee = createResource({ url: "frappe.desk.form.assign_to.add" });
 
-/**
- * Adds the agent, leaving anyone already assigned in place — a ticket holds
- * several assignees, so the palette never silently drops one. Unassigning stays
- * with the AssignTo widget, which can show the whole list.
- *
- * Mirrors the popover's activity log and telemetry so both surfaces leave the
- * same trail.
- */
+/** Adds without dropping existing assignees; unassigning stays with the AssignTo
+ * widget. Mirrors the popover's activity log so both surfaces leave one trail. */
 async function assignTicket(ticketId: string, agent: string): Promise<void> {
   const { assignees, activities } = useTicket(ticketId);
   if (assignedNames(ticketId).includes(agent)) {
@@ -397,9 +368,6 @@ async function assignTicket(ticketId: string, agent: string): Promise<void> {
       name: ticketId,
       assign_to: [agent],
     });
-    // `source` puts palette and popover assignments in one funnel: if popover
-    // usage stays flat while palette usage rises, the palette added a path
-    // rather than saving anyone time.
     capture("ticket_assigned", {
       data: { doctype: "HD Ticket", source: "command_palette" },
     });
@@ -422,8 +390,6 @@ function logAssignment(ticketId: string, agent: string): Promise<unknown> {
   });
 }
 
-// ponytail: "Delete ticket" deliberately stays out of the palette. It needs a
-// confirm dialog, and $dialog is only reachable via globalStore(), which calls
-// getCurrentInstance() and is therefore unsafe from module scope. The ticket
-// header already offers it. Wire it here if a confirm helper lands in frappe-ui.
+// ponytail: "Delete ticket" stays out — $dialog is unreachable from module
+// scope and the ticket header offers it. Wire up if frappe-ui grows a confirm helper.
 

@@ -34,11 +34,7 @@ const routeCommands: Record<string, () => Command[]> = {
   TicketsAgent: ticketListCommands,
 };
 
-/**
- * The global list, in source order. The open ticket's own actions are not here:
- * they belong to the palette context, which renders them scoped behind a chip
- * and hands control back to this list once the chip is dismissed.
- */
+/** The global list. The open ticket's actions live in the context chip, not here. */
 export function buildRootCommands(query: string): Command[] {
   const route = router.currentRoute.value;
   return [
@@ -69,11 +65,7 @@ function ticketJumpCommand(query: string): Command[] {
 
 // --- recents -------------------------------------------------------------
 
-/**
- * An agent bounces between ~5 tickets a session, and this is the only
- * zero-typing action in the product. The ticket being read is excluded — it was
- * listing itself as the thing to go to next.
- */
+/** Excludes the open ticket — it was listing itself as the thing to go to next. */
 export function recentTicketCommands(): Command[] {
   const openTicketId = String(router.currentRoute.value.params.ticketId ?? "");
   return recentTickets.value
@@ -143,8 +135,7 @@ function accountCommands(): Command[] {
       title: __("Set availability"),
       group: GROUP.account,
       icon: LucideActivity,
-      // Live status names too (like the list filters), so site-defined values
-      // ("Lunch") surface the drill-down.
+      // Live status names too, so site-defined values ("Lunch") match.
       keywords:
         "my status presence online offline away busy " +
         useAgentStatusStore().statusOptions.join(" "),
@@ -160,8 +151,6 @@ function accountCommands(): Command[] {
       children: () => settingsChildren(),
     },
     {
-      // The palette is the discovery surface for the shortcut system, so it
-      // should point at it rather than assume anyone found Mod+/ on their own.
       id: "shortcuts",
       title: __("Keyboard shortcuts"),
       group: GROUP.account,
@@ -181,11 +170,7 @@ function accountCommands(): Command[] {
   ];
 }
 
-/**
- * Every settings tab as its own row, so "sla" jumps straight to SLA Policies.
- * Derived from the settings `tabs` computed, which is already permission
- * filtered — no second copy of who-can-see-what to keep in sync.
- */
+/** One row per settings tab, from the already permission-filtered `tabs` computed. */
 function settingsChildren(): Command[] {
   return settingsTabs.value.flatMap((section) =>
     section.items.map((item) => ({
@@ -211,8 +196,7 @@ function openSettingsTab(label: string): void {
 
 async function availabilityChildren(): Promise<Command[]> {
   const store = useAgentStatusStore();
-  // Cold store on first open: the level snapshots whatever this returns, so an
-  // unresolved fetch would freeze the drill-down as empty.
+  // The level snapshots this result; a cold store would freeze it empty.
   await store.statuses.list.promise;
   return (store.statusOptions ?? []).map((status: string) => ({
     id: `availability-${status}`,
@@ -224,10 +208,7 @@ async function availabilityChildren(): Promise<Command[]> {
   }));
 }
 
-/**
- * Shown only when nothing matched, so the palette is never a dead end —
- * the typed text is carried into whatever the user picks.
- */
+/** Never a dead end: the typed text carries into whatever the user picks. */
 export function buildFallbackCommands(query: string): Command[] {
   const commands: Command[] = [
     {

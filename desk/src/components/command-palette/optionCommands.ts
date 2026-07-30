@@ -10,19 +10,13 @@ interface OptionListConfig {
   onPick: (value: string) => void;
   /** Ticks the row already in effect. */
   current?: string | undefined;
-  /**
-   * Composes the title as "<prefix>: <value>" for rows that live at the root
-   * level, where a bare "Urgent" reads as a ticket, a filter or a status.
-   */
+  /** "<prefix>: <value>" for root rows, where a bare "Urgent" is ambiguous. */
   titlePrefix?: string | undefined;
   hideWhenEmpty?: boolean | undefined;
   weight?: number | undefined;
 }
 
-/**
- * Shared by the ticket context ("Set status") and the list context ("Filter by
- * status") — same options, different verb. Ids need only be unique per level.
- */
+/** Shared by "Set status" and "Filter by status" — same options, different verb. */
 export function statusOptions(config: OptionListConfig): Command[] {
   const statuses = useTicketStatusStore().statuses.data ?? [];
   return statuses
@@ -47,11 +41,8 @@ export function priorityOptions(config: OptionListConfig): Command[] {
     }));
 }
 
-/**
- * Live option names as parent keywords, so typing a value surfaces the
- * drill-down — including site-defined values a hardcoded list would miss.
- * Empty until the store resolves; the parent still matches on its title.
- */
+/** Live option names as parent keywords — site-defined values a hardcoded list
+ * would miss. Empty until the store resolves; the title still matches. */
 export function statusKeywords(): string {
   return (useTicketStatusStore().statuses.data ?? [])
     .filter((status) => status.enabled)

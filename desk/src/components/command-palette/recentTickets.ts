@@ -8,25 +8,18 @@ export interface RecentTicket {
 
 const MAX_RECENTS = 3;
 
-/**
- * Per-agent: subjects routinely carry customer names, and the unscoped key
- * handed the previous shift's tickets to whoever logged in next.
- */
+/** Per-agent: the unscoped key handed one shift's tickets to the next login. */
 export const recentTickets = userStorage<RecentTicket[]>(
   "hd_recent_tickets",
   []
 );
 
-// Scoping the key stops the next leak; these drop the one already on disk.
-// `hd_recent_commands` belonged to the deleted command MRU.
+// Drop the pre-scoping keys already on disk (`hd_recent_commands` is a dead MRU).
 ["hd_recent_tickets", "hd_recent_commands"].forEach((key) =>
   localStorage.removeItem(key)
 );
 
-/**
- * Records a ticket visit so the palette can show "what you'd probably do next"
- * on an empty query instead of a static nav list.
- */
+/** Feeds the empty-query "Recent tickets" rows. */
 export function recordTicketVisit(name: string, subject: string): void {
   if (!name || !subject) return;
   const others = recentTickets.value.filter((t) => t.name !== String(name));

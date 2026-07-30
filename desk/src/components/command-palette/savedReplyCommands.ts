@@ -30,26 +30,13 @@ interface SavedReplyRow {
 const FLAT_MIN_USES = 5;
 const FLAT_MAX_ROWS = 3;
 
-/**
- * A bare noun, not a verb phrase. This row opens a category, the same way the
- * `Settings` row does, and it is what the product calls the feature everywhere
- * else — so there is no invented verb to keep in sync with the settings tab.
- *
- * Leading with "Saved" also keeps this row above the individual replies on a
- * "saved" query: both get a prefix match, so `CONTEXT_WEIGHT` decides. A
- * mid-title verb would not — "Insert saved reply" only reaches a word-boundary
- * match (~950) and loses to any root row starting with "Saved".
- * `fuzzyScore.check.ts` pins both cases.
- */
+// A bare noun leading with "Saved": the prefix match keeps this row above the
+// individual replies on a "saved" query (pinned in fuzzyScore.check.ts).
 const GROUP_TITLE = "Saved Replies";
 const SUBTITLE = "Saved Reply";
 
-/**
- * Composing replies is the bulk of an agent's day, and the palette did not touch
- * it: `Reply to ticket` opened an empty box. This drills into the saved replies,
- * then opens the composer pre-filled — never send-on-select, because the agent
- * has to see what goes to a customer.
- */
+/** Drills into saved replies, then opens the composer pre-filled — never
+ * send-on-select; the agent must see what goes to a customer. */
 export function savedReplyCommands(ticketId: string): Command[] {
   return [
     {
@@ -58,8 +45,7 @@ export function savedReplyCommands(ticketId: string): Command[] {
       group: GROUP.ticket,
       weight: CONTEXT_WEIGHT,
       icon: LucideMessageSquareQuote,
-      // "reply" singular is not a substring of "replies", so without it here the
-      // row is unreachable by the most obvious thing an agent would type.
+      // "reply" singular is not a substring of "replies".
       keywords: "reply template canned macro snippet",
       children: () => savedReplyChildren(ticketId),
     },
@@ -70,17 +56,12 @@ export function savedReplyCommands(ticketId: string): Command[] {
 const savedReplies = createListResource({
   doctype: "HD Saved Reply",
   fields: ["name", "title"],
-  // Unfiltered by scope: the server already limits this to what the agent may
-  // use, and a palette that hides usable replies is worse than a long list.
+  // Unfiltered by scope: the server already limits this to what the agent may use.
   orderBy: "modified desc",
   pageLength: 999,
 });
 
-/**
- * A drill-down is a scoped search, not a consolation prize. Saved replies are
- * unbounded and content-named, so inside this level the query filters replies
- * only — zero collision with tickets or commands.
- */
+/** Inside this level the query filters replies only — no ticket/command collisions. */
 async function savedReplyChildren(ticketId: string): Promise<Command[]> {
   if (!savedReplies.data) await savedReplies.reload();
   const replies = (savedReplies.data ?? []) as SavedReplyRow[];
@@ -93,24 +74,15 @@ async function savedReplyChildren(ticketId: string): Promise<Command[]> {
   }));
 }
 
-/**
- * The most-used replies as root-level rows, so the common case skips the
- * drill-down entirely. Titles come from the usage record rather than the list
- * resource, so a root row costs no fetch and cannot block the root build.
- */
+/** Most-used replies as root rows, titled from the usage record — no fetch,
+ * nothing to block the root build. */
 function topSavedReplyCommands(ticketId: string): Command[] {
   return topSavedReplies(usage.value, FLAT_MIN_USES, FLAT_MAX_ROWS).map(
     (reply) => ({
       id: `saved-reply-flat-${reply.name}`,
       title: reply.title,
-      // The qualifier belongs here rather than in the title: a bare "Refund
-      // policy" at root would read as a ticket, but as a title prefix it spends
-      // the first characters on chrome before the word the agent typed. Muted
-      // and right-aligned, the same way search rows carry "Open · #0484".
+      // Subtitle, not title prefix: a bare reply title at root reads as a ticket.
       subtitle: __(SUBTITLE),
-      // Own titled section: these rows are promoted by usage, and without a
-      // header a lone reply title at root reads as a random ticket. "Replies"
-      // stays out of the header — the per-row subtitle already says it.
       group: "Most used",
       icon: LucideMessageSquareQuote,
       hideWhenEmpty: true,
@@ -158,20 +130,11 @@ async function applySavedReply(
 
 // --- per-agent usage -----------------------------------------------------
 
-/**
- * Frequency, per agent. Deliberately not frecency: frequency describes the
- * stable core set, and the case it misses — five password resets in a row —
- * needs recency decay, which is not worth building before anyone reports it.
- *
- * Per-device, being localStorage. If hot-desking makes that bite, this moves to
- * a per-agent usage record server-side. A counter on `HD Saved Reply` would not
- * do: that answers a team-wide question, not a personal one.
- */
+// ponytail: frequency, not frecency — add recency decay only if someone reports
+// needing it. Per-device localStorage; move server-side if hot-desking bites.
 const usage = userStorage<SavedReplyUsage>("hd_saved_reply_uses", {});
 
-/** Exported for the composer's selector modal: usage counts from both surfaces
- * feed the same record, so palette promotion reflects how an agent actually
- * works, not just their palette picks. */
+/** Also called by the composer's selector modal, so promotion counts both surfaces. */
 export function recordSavedReplyUse(replyId: string, title: string): void {
   usage.value = withUse(usage.value, replyId, title);
 }

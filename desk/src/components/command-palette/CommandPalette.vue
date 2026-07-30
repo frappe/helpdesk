@@ -13,15 +13,11 @@
       >
         <DialogTitle class="sr-only">{{ __("Command Palette") }}</DialogTitle>
 
-        <!-- Collapses to a zero-height row on dismiss, so the input glides up
-             instead of jumping. -->
+        <!-- Collapses to zero height on dismiss, so the input glides up. -->
         <Transition name="chip">
           <div v-if="context" class="chip-row grid">
             <div class="overflow-hidden">
-              <!-- Sized off Linear's own chip: 12px text, 2px/6px padding,
-                   10px radius, inset 14px to match the row below. -->
-              <!-- Not a button: removal is backspace-only, advertised by esc's
-                   footer label rather than a glyph on the chip. -->
+              <!-- Not a button: removal is backspace-only, advertised by esc's label. -->
               <div
                 class="chip mx-3.5 mt-3 flex w-fit max-w-[30%] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
               >
@@ -69,9 +65,7 @@
             @input="onQueryChange(($event.target as HTMLInputElement).value)"
           />
 
-          <!-- Absolute, over the border: loading was only visible when the list
-               was empty, so a drill-down on a cold store showed 300ms of
-               nothing. Sitting in flow would shift the list by 2px. -->
+          <!-- Absolute over the border: in flow it would shift the list by 2px. -->
           <div
             v-if="isLoading"
             class="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden"
@@ -80,9 +74,7 @@
           </div>
         </div>
 
-        <!-- Arrowing moves aria-activedescendant, which screen readers announce
-             on its own; this is for the things no row can say: how many there
-             are, and that the list changed under a debounced search. -->
+        <!-- Announces what no row can: result count, and list changes under debounce. -->
         <div class="sr-only" aria-live="polite">{{ resultAnnouncement }}</div>
 
         <div
@@ -91,9 +83,7 @@
           role="listbox"
           class="max-h-[380px] min-h-[7rem] overflow-y-auto py-2"
         >
-          <!-- Keyed by level, so drilling in/out and removing the chip get the
-               same brief fade the chip already has. Typing never re-keys — a
-               per-keystroke animation would just flicker. -->
+          <!-- Keyed by level: drill in/out fades, typing never re-keys. -->
           <Transition name="level" mode="out-in">
             <div :key="levelKey">
               <template v-if="flatItems.length">
@@ -128,8 +118,7 @@
                 </div>
               </template>
 
-              <!-- presentation, or a listbox would be reported as holding a
-               non-option child; the live region announces this text instead. -->
+              <!-- presentation: a listbox must not hold a non-option child. -->
               <div
                 v-else
                 role="presentation"
@@ -163,8 +152,7 @@
             <ShortcutKey keys="↵" />
             {{ __("Select") }}
           </span>
-          <!-- No ⌫ hint for the context: esc's label already advertises
-               "Remove context" whenever the chip is up. -->
+          <!-- No ⌫ hint for the chip: esc's label already says "Remove context". -->
           <span
             v-if="stepLabel"
             class="flex items-center gap-1.5 text-xs text-ink-gray-4"
@@ -228,11 +216,8 @@ const activeIndex = ref(0);
 const keyboardNav = ref(false);
 let focusBeforeOpen: HTMLElement | null = null;
 
-/**
- * Rows paired with their flat index, so a row can carry the `id` that
- * `aria-activedescendant` points at — and so highlighting compares indexes
- * rather than object identity, which a "Recent" clone shares with its original.
- */
+/** Rows paired with their flat index — highlighting compares indexes, not
+ * object identity, which a "Recent" clone shares with its original. */
 const renderGroups = computed(() => {
   let index = 0;
   return groups.value.map((group) => ({
@@ -246,10 +231,7 @@ const activeOptionId = computed(() =>
   flatItems.value.length ? optionId(activeIndex.value) : undefined
 );
 
-/**
- * A drilled-in level with nothing left in it used to show the root's
- * "No commands found", which is simply false — there are commands, just not here.
- */
+/** Per-level: an empty drill-down is not "No commands found". */
 const emptyMessage = computed(() => {
   if (isLoading.value) return __("Searching…");
   if (query.value) return __('No results for "{0}"', query.value);
@@ -265,11 +247,9 @@ const resultAnnouncement = computed(() => {
 
 const stepLabel = computed(() => (depth.value ? breadcrumb.value.at(-1) : ""));
 
-// Re-keys the list only on a level change — drill in/out or the chip — never
-// on typing.
+// Re-keys only on level/chip changes, never on typing.
 const levelKey = computed(() => `${depth.value}:${context.value ? "c" : ""}`);
-// Escape peels one layer at a time, so a fixed "Close" would be a lie on the
-// first two presses.
+// Esc peels one layer at a time, so the label tracks what it will actually do.
 const escapeLabel = computed(() => {
   if (query.value) return __("Clear");
   if (stepLabel.value) return __("Back");
@@ -279,12 +259,8 @@ const placeholder = computed(() =>
   stepLabel.value ? __("Search…") : __("Search tickets or type a command…")
 );
 
-/**
- * Bound to the dialog, not the input: Reka's focus trap lets Tab reach the back
- * button, and from there arrows and Enter used to do nothing at all
- * until the user found Shift+Tab. The one thing that must not double up is Enter
- * on a focused button, which already fires its own click.
- */
+/** Bound to the dialog, not the input, so keys still work with focus on the back
+ * button. Enter on a button must not double up with its own click. */
 function onKeydown(event: KeyboardEvent) {
   const onButton = (event.target as HTMLElement | null)?.closest?.("button");
   if (event.key === "Enter" && onButton) return;
@@ -313,9 +289,8 @@ function onKeydown(event: KeyboardEvent) {
     !(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) &&
     caretAtEnd()
   ) {
-    // The chevron's key: → drills into the highlighted row, mirroring ⌫ back.
-    // Only with the caret at the input's end, so editing a query stays native.
-    // Navigation only — rows without children keep → inert rather than running.
+    // → drills in, mirroring ⌫ back — only at the caret's end so editing stays
+    // native, and never on childless rows: running is Enter's job.
     const command = flatItems.value[activeIndex.value];
     if (command?.children) {
       event.preventDefault();
@@ -353,8 +328,7 @@ function setActive(index: number) {
   scrollActiveIntoView();
 }
 
-// Hover follows the pointer, not the list. Arrowing scrolls rows under a still
-// cursor, and the resulting hover would drag the highlight back to the mouse.
+// Arrowing scrolls rows under a still cursor; that hover must not steal the highlight.
 function onRowHover(command: Command) {
   if (keyboardNav.value) {
     keyboardNav.value = false;
@@ -378,10 +352,8 @@ function onOpenChange(open: boolean) {
   isOpen.value = open;
 }
 
-/**
- * Only steps in when the close left focus nowhere. A command may take focus
- * itself — the saved-reply rows hand it to the composer — and that must win.
- */
+/** Only when the close left focus nowhere — a command's own focus move (saved
+ * reply → composer) must win. */
 function restoreFocus() {
   const target = focusBeforeOpen;
   focusBeforeOpen = null;
@@ -398,11 +370,9 @@ function scrollActiveIntoView() {
   });
 }
 
-// Debounced search results land ~200ms after typing stops and rebuild `groups`.
-// Follow the highlighted row to its new index instead of resetting, or Enter
-// runs whatever ended up on top. Matched on group+id, not identity: the root
-// list re-creates every Command object on each recompute, and a "Recent" row is
-// a clone sharing its original's id.
+// Late search results rebuild `groups`; follow the highlighted row to its new
+// index or Enter runs whatever landed on top. Matched on group+id — recomputes
+// re-create every object, and a "Recent" clone shares its original's id.
 watch(groups, (_next, previous) => {
   const wasActive = previous?.flatMap((group) => group.items)[
     activeIndex.value
@@ -416,17 +386,13 @@ watch(groups, (_next, previous) => {
   activeIndex.value = Math.max(index, 0);
 });
 
-// Reset on open, not close: resetting on close revived the dismissed context
-// chip while the close fade was still playing. Runs before the dialog mounts,
-// and covers every open path — including a close done by running a command.
+// Reset on open, not close — resetting on close revived the dismissed chip
+// mid-fade. Close-side focus restore lives in @close-auto-focus, which fires
+// after the exit animation, when a command's own focus move is known.
 watch(isOpen, (open) => {
-  // Focus restoration on close lives in @close-auto-focus, which fires after
-  // the exit animation — the only moment the outcome of a command's own focus
-  // move (saved reply → composer) is known.
   if (!open) return;
   resetPalette();
-  // There is no DialogTrigger, so nothing gives focus back on its own and a
-  // keyboard user lands on <body> having lost their place.
+  // No DialogTrigger, so nothing restores focus on its own.
   focusBeforeOpen = document.activeElement as HTMLElement | null;
   activeIndex.value = 0;
   nextTick(() => inputRef.value?.focus());
@@ -435,10 +401,9 @@ watch(isOpen, (open) => {
 // Drilling into a sub-list swaps the whole list out; refocus for the next query.
 watch(depth, () => nextTick(() => inputRef.value?.focus()));
 
-// frappe-ui's useShortcut, not the local one: the local `disableShortcuts()`
-// suppresses every binding while focus is in an input or inside [role=dialog],
-// so Cmd+K couldn't open from a filter box nor close the palette once open.
-// ProseMirror keeps its own Mod-k (insert link), so bow out there.
+// frappe-ui's useShortcut: the local one suppresses bindings in inputs and
+// dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its own
+// Mod-k (insert link), so bow out there.
 useShortcut({
   key: "k",
   ctrl: true,
@@ -454,9 +419,7 @@ useShortcut({
 </script>
 
 <style scoped>
-/* Open is the moment worth animating, so it carries the scale and the lift.
-   Close is a plain fade: an exit that animates geometry reads as undo, and
-   makes a palette you dismiss on the way to something else feel slow. */
+/* Open carries the scale and lift; close is a plain fade so dismissal feels fast. */
 .palette-content[data-state="open"] {
   animation: palette-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -525,8 +488,7 @@ useShortcut({
   }
 }
 
-/* grid-template-rows animates to intrinsic height, which max-height guesswork
-   cannot: the chip owns its own size and the row still collapses smoothly. */
+/* grid-template-rows animates to intrinsic height; max-height guesswork cannot. */
 .chip-row {
   grid-template-rows: 1fr;
   transition: grid-template-rows 180ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -548,11 +510,8 @@ useShortcut({
   transform: translateY(-4px) scale(0.96);
 }
 
-/*
- * Enter-only: the outgoing list must vanish the instant the level changes.
- * A leave fade kept the old rows on screen while Enter already targeted the
- * new level, so a fast double-Enter fired a command the user couldn't see.
- */
+/* Enter-only: a leave fade kept old rows visible while Enter targeted the new
+   level, so a fast double-Enter fired a command the user couldn't see. */
 .level-enter-active {
   transition: opacity 100ms ease, transform 100ms ease;
 }

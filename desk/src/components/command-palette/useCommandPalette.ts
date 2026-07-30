@@ -41,22 +41,14 @@ const loadingChildren = ref(false);
 export const breadcrumb = computed(() => stack.value.map((level) => level.title));
 export const depth = computed(() => stack.value.length);
 
-/**
- * Every command here is an agent command — nav, settings, availability, ticket
- * search. AppSidebar is shared with the customer portal, so the gate lives with
- * the state rather than on the mount site, which has two parents.
- */
+/** Agent-only; AppSidebar is shared with the customer portal, so the gate lives here. */
 export const isPaletteAvailable = computed(() => !isCustomerPortal.value);
 
 // --- context -------------------------------------------------------------
 
 const contextDismissed = ref(false);
 
-/**
- * The ticket you have open, or null off a ticket page and once the chip is
- * dismissed. Derived from the route so it can never go stale behind a
- * navigation the palette didn't cause.
- */
+/** The open ticket, or null once dismissed. Route-derived so it can't go stale. */
 export const context = computed<PaletteContext | null>(() => {
   if (contextDismissed.value) return null;
   const route = router.currentRoute.value;
@@ -79,8 +71,7 @@ export function dismissContext(): void {
 export function openPalette(): void {
   if (!isPaletteAvailable.value) return;
   isOpen.value = true;
-  // Route every open through here, Cmd+K included, or the open rate undercounts
-  // the only path most agents use.
+  // Every open path routes through here, Cmd+K included, so the count is honest.
   capture("command_palette_opened", {
     data: { context: String(router.currentRoute.value.name ?? "") },
   });
@@ -105,8 +96,7 @@ export function back(): void {
   clearSearch(); // else the pre-drill-down hits linger under an empty query
 }
 
-// Guards run() against a second Enter landing mid-await: without it a
-// double-Enter stacked a duplicate level, or double-toggled a tag.
+// A second Enter mid-await stacked a duplicate level or double-toggled a tag.
 let running = false;
 
 /** Drills in when the command has children, otherwise performs it and closes. */
@@ -128,8 +118,6 @@ export async function run(command: Command): Promise<void> {
     }
     return;
   }
-  // `runs ÷ opens` below 0.5 means agents open, miss and press Esc; a long
-  // query or a non-zero depth on a common action means the ranking is wrong.
   capture("command_palette_command_run", {
     data: {
       command_id: command.id,
@@ -138,8 +126,7 @@ export async function run(command: Command): Promise<void> {
     },
   });
   if (command.keepOpen) {
-    // Optimistic: the tick flips on Enter, and flips back if the write fails.
-    // Waiting for the round trip left the row looking like it ignored the key.
+    // Optimistic: waiting for the round trip made the row look like it ignored Enter.
     flipChecked(command);
     running = true;
     try {
@@ -167,27 +154,21 @@ function flipChecked(target: Command): void {
   stack.value = [...stack.value.slice(0, -1), { ...level, commands }];
 }
 
-/**
- * Visible rows for the current level, grouped. Group order follows the best
- * score inside it, so once the user types, nav links sink below real matches.
- */
+/** Visible rows for the current level, grouped, ordered by best score inside. */
 export const groups = computed<PaletteGroup[]>(() => {
-  // Without this the root list rebuilds on every route change, forever, even
-  // for users who never press Cmd+K.
+  // Else the root list rebuilds on every route change for users who never open it.
   if (!isOpen.value) return [];
 
   const level = stack.value.at(-1);
   if (level) {
-    // A single group's header only repeats the breadcrumb ("Change priority"
-    // over "Set priority"); multi-group levels like Settings keep theirs.
+    // A single group's header only repeats the breadcrumb; Settings keeps its many.
     const grouped = groupCommands(level.commands, query.value);
     return grouped.length === 1
       ? grouped.map((group) => ({ ...group, title: "" }))
       : grouped;
   }
 
-  // The generic "Ticket" header goes untitled — the chip already says what
-  // those rows act on. Deliberate sections (promoted saved replies) keep theirs.
+  // The chip already says what "Ticket" rows act on; named sections keep headers.
   const scoped = context.value
     ? groupCommands(ticketCommands(context.value.id), query.value).map(
         (group) =>
@@ -196,32 +177,20 @@ export const groups = computed<PaletteGroup[]>(() => {
     : [];
 
   const term = query.value.trim();
-  // An empty query with the chip up leads with the ticket's rows, then recents
-  // — jumping to another recent ticket is the highest-frequency zero-typing
-  // action, and the ticket page is exactly where it happens from. Without the
-  // chip (removed, or a context-free page) the empty query must fall through
-  // to the global root, not an empty list.
+  // Chip + empty query: ticket rows then recents. No chip: the global root.
   if (!term && context.value)
     return [...scoped, ...groupCommands(recentTicketCommands(), "")];
   if (!term) return groupCommands(globalCommands(), "");
 
-  // Scope *ranks*, it never *gates*. Returning early here is what made a ticket
-  // whose subject contains "open" unreachable: `Set status: Open` matched, and
-  // global search never ran. Scoped rows already win on CONTEXT_WEIGHT, so
-  // appending costs nothing but keeps search reachable.
+  // Scope *ranks*, never *gates*: returning scoped-only made a ticket whose
+  // subject contains "open" unreachable behind "Set status: Open".
   return [...scoped, ...groupCommands(globalCommands(), term), ...fallback(term)];
 });
 
-/**
- * Pinned, not last-resort. `fuzzyScore` matches subsequences, so almost any real
- * word matches *something* — an only-when-nothing-matched fallback stays hidden
- * exactly when it is needed. Matters most because `title_only: true` searches
- * subjects only, so a phrase from an email body finds nothing here.
- */
+/** Pinned, not last-resort: almost any word fuzzy-matches *something*, so an
+ * only-when-empty fallback would hide exactly when needed. */
 function fallback(term: string): PaletteGroup[] {
   if (term.length < MIN_QUERY_LENGTH) return [];
-  // Untitled: "Search all of Helpdesk for X" explains itself, a heading above
-  // it was one more thing to read.
   return [{ title: "", items: buildFallbackCommands(term) }];
 }
 
@@ -280,9 +249,8 @@ const debouncedSearch = useDebounceFn(async (term: string, token: number) => {
       SEARCH_RESULT_LIMIT
     );
   } catch {
-    // ponytail: a missing FTS index or server error yields no rows; the
-    // "Search all of Helpdesk" fallback still routes the user somewhere.
-    // Add a `subject like` fallback if unindexed sites become common.
+    // ponytail: no rows on FTS/server errors — the fallback row still routes
+    // somewhere. Add a `subject like` fallback if unindexed sites become common.
     if (token === latestSearchToken) searchResults.value = [];
   } finally {
     if (token === latestSearchToken) searchLoading.value = false;
@@ -299,9 +267,7 @@ export function onQueryChange(term: string): void {
     searchLoading.value = false;
     return;
   }
-  // Deliberately keeping the old rows until the new ones land. Clearing here
-  // blanked the list on every keystroke and resized the panel under the cursor,
-  // 200ms of debounce at a time.
+  // Old rows stay until new ones land; clearing here blanked the list per keystroke.
   searchLoading.value = true;
   debouncedSearch(trimmed, latestSearchToken);
 }
