@@ -293,6 +293,19 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
+def set_agent_status_enabled(status: str, enable: bool | int):
+    """Toggle an HD Agent Status, bypassing its own at-least-one-Active validation."""
+    frappe.db.set_value("HD Agent Status", status, "enable", int(enable))
+
+
+def set_agent_availability(user: str, availability: str | None):
+    """Set an agent's availability through the document lifecycle."""
+    agent = frappe.get_doc("HD Agent", {"user": user})
+    agent.availability = availability
+    agent.save(ignore_permissions=True)
+    return agent
+
+
 def get_latest_ticket_communication(ticket_name: str):
     """
     Returns the latest Communication doc linked to the given HD Ticket.
