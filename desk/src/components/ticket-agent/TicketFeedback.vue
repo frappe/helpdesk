@@ -6,7 +6,7 @@
       <div v-if="comment">
         <p
           ref="commentRef"
-          class="whitespace-pre-line text-base leading-5 text-ink-gray-7"
+          class="whitespace-pre-line text-p-base text-ink-gray-7"
           :class="!showFullComment && 'line-clamp-3'"
         >
           <span class="text-ink-gray-4">&ldquo;</span>{{ comment
