@@ -509,7 +509,9 @@ const addAssigneesResource = createResource({
     assign_to: addedAssignees,
   }),
   onSuccess: () => {
-    capture("ticket_assigned", { doctype: "HD Ticket" });
+    capture("ticket_assigned", {
+      data: { doctype: "HD Ticket", source: "popover" },
+    });
   },
 });
 
