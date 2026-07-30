@@ -3,6 +3,8 @@ import type { Component } from "vue";
 export interface Command {
   id: string;
   title: string;
+  /** Rendered inline after the title in muted ink; not part of fuzzy scoring. */
+  titleSuffix?: string;
   group: string;
   icon?: Component;
   /** Props bound to `icon`, for icons that render from data (e.g. priority level). */

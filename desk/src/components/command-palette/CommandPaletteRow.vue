@@ -32,6 +32,9 @@
         }}</span>
         <template v-else>{{ run.text }}</template>
       </template>
+      <span v-if="command.titleSuffix" class="text-ink-gray-5">{{
+        " " + command.titleSuffix
+      }}</span>
     </span>
 
     <span v-if="command.subtitle" class="ms-3 shrink-0 text-xs text-ink-gray-4">

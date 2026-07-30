@@ -59,6 +59,7 @@ const setUrgent: Command = {
   group: "Ticket",
   weight: FLAT_OPTION_WEIGHT,
   keywords: "Urgent",
+  hideWhenEmpty: true,
 };
 const changeStatus: Command = {
   id: "ticket-status",
@@ -73,6 +74,7 @@ const setOpen: Command = {
   group: "Ticket",
   weight: FLAT_OPTION_WEIGHT,
   keywords: "Open",
+  hideWhenEmpty: true,
 };
 
 assert.ok(
@@ -98,6 +100,20 @@ const TOP_SEARCH_RANK = 950;
 assert.ok(
   scoreCommand(setUrgent, "urgent") > TOP_SEARCH_RANK,
   "flat option rows must outrank server search hits"
+);
+
+// Hidden flat rows need a deliberate (substring-or-better) match: "sett" is a
+// scattered subsequence of "Set status: …"/"Set priority: …", so it would
+// un-hide every option row at once and bury Settings' exact prefix match.
+assert.equal(scoreCommand(setUrgent, "sett"), NO_MATCH);
+assert.equal(scoreCommand(setOpen, "sett"), NO_MATCH);
+assert.ok(
+  scoreCommand(setOpen, "set status") > NO_MATCH,
+  "a deliberate prefix still surfaces the flat rows"
+);
+assert.ok(
+  scoreCommand(changeStatus, "chst") > NO_MATCH,
+  "normal rows keep scattered abbreviation matching"
 );
 
 // An empty query scores 0 everywhere, which is exactly why hideWhenEmpty exists
@@ -131,6 +147,7 @@ const oneSavedReply: Command = {
   subtitle: "Saved Reply",
   group: "Ticket",
   weight: FLAT_OPTION_WEIGHT,
+  hideWhenEmpty: true,
 };
 
 for (const term of ["saved", "saved repl", "reply", "canned"]) {

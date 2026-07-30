@@ -6,6 +6,9 @@ import type { Command } from "./paletteTypes";
  * tie. Kept beside the scorer, and free of Vue imports, so the ranking that
  * decides which row Enter runs can be checked in isolation.
  */
+/** Every substring hit scores at least this; scattered subsequences never do. */
+const SUBSTRING_SCORE = 800;
+
 export function scoreCommand(command: Command, term: string): number {
   if (command.rank !== undefined) return command.rank;
   if (!term) return 0;
@@ -15,6 +18,10 @@ export function scoreCommand(command: Command, term: string): number {
     command.subtitle ? fuzzyScore(command.subtitle, term) - 100 : -1
   );
   if (base < 0) return -1;
+  // Hidden flat rows surface only on a deliberate match: near-identical titles
+  // ("Set status: …" × every status) mean a scattered hit like "sett" would
+  // un-hide the whole dozen at once, burying an exact match on a normal row.
+  if (command.hideWhenEmpty && base < SUBSTRING_SCORE) return -1;
   return base * (command.weight ?? 1);
 }
 
