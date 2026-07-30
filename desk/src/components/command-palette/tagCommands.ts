@@ -13,7 +13,7 @@ function tagList() {
   return tags;
 }
 
-/** Toggle list: applied tags ticked, Enter flips one without closing. */
+/** Toggle list: applied tags ticked; Enter flips one and pops back a level. */
 export async function tagChildren(ticketId: string): Promise<Command[]> {
   const { tagListResource } = tagList();
   // Always refetch: tags can be created mid-session from the sidebar picker.

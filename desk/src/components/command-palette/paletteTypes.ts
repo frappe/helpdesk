@@ -25,7 +25,7 @@ export interface Command {
   marked?: string;
   /** Renders a trailing tick: this row's value is already set on the ticket. */
   checked?: boolean;
-  /** Perform without closing; the optimistic tick flips back if `perform` throws. */
+  /** Perform, then pop back a level; the optimistic tick flips back if `perform` throws. */
   keepOpen?: boolean;
   /** Hidden until typed, and only a substring-or-better match reveals it. */
   hideWhenEmpty?: boolean;

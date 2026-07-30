@@ -79,13 +79,13 @@ run(command);
 ```ts
 if (!command || running) return;      // double-Enter guard
 if (command.children) { ...push a level... return; }
-if (command.keepOpen)  { ...toggle, stay open... return; }
+if (command.keepOpen)  { ...toggle, back()... return; }
 closePalette();
 command.perform?.();                  // the plain case
 ```
 
 A command declares which path it takes by shape: `perform` only → act and
-close; `children` → drill in; `keepOpen + perform` → act and stay.
+close; `children` → drill in; `keepOpen + perform` → act, then pop back a level.
 
 ---
 
@@ -153,9 +153,10 @@ So nesting is nothing special: a parent whose `children()` returns more
 commands, and a stack the UI renders the top of. Leaf rows are ordinary
 non-nested commands.
 
-## Example 3 — nested + `keepOpen`: Tags (the Linear pattern)
+## Example 3 — nested + `keepOpen`: Tags
 
-One visit should flip *several* tags, so closing per Enter is wrong.
+Toggling a tag shouldn't close the palette — but once it lands you're done
+with the list, so the palette pops back to the ticket's commands.
 `tagCommands.ts:20`:
 
 ```ts
@@ -177,7 +178,8 @@ Trace of Enter on "billing":
    — no second fetch.
 3. If the write **fails**: `perform` re-throws, `run()`'s catch calls
    `flipChecked` again — the tick reverts, a toast explains.
-4. The palette stays open; press Enter on the next tag. Esc/close when done.
+4. On success `back()` pops the tag list — you land on the ticket's commands,
+   palette still open. On failure you stay in the list to retry.
 
 ## How context is given
 

@@ -10,8 +10,8 @@ import {
 import { router } from "@/router";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
-import { parseColor } from "@/stores/ticketStatus";
 import { useTelephonyStore } from "@/stores/telephony";
+import { parseColor } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { useTheme } from "frappe-ui";
 import { GROUP, type Command } from "./paletteTypes";
@@ -64,8 +64,6 @@ function ticketJumpCommand(query: string): Command[] {
 }
 
 // --- recents -------------------------------------------------------------
-
-/** Excludes the open ticket — it was listing itself as the thing to go to next. */
 export function recentTicketCommands(): Command[] {
   const openTicketId = String(router.currentRoute.value.params.ticketId ?? "");
   return recentTickets.value

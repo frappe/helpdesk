@@ -7,6 +7,7 @@ import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import type { View } from "@/types";
+import { getIcon } from "@/utils";
 import {
   priorityKeywords,
   priorityOptions,
@@ -109,7 +110,8 @@ function viewChildren(): Command[] {
       title: view.label ?? view.name,
       subtitle: viewScope(view),
       group: "Switch view",
-      icon: LucideLayoutList,
+      // Same resolver as the sidebar: emoji, lucide name, or the ticket default.
+      icon: () => getIcon(view.icon),
       checked: view.name === currentView,
       perform: () =>
         router.push({ name: "TicketsAgent", query: { view: view.name } }),

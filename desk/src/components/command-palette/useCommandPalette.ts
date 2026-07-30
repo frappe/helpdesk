@@ -131,6 +131,7 @@ export async function run(command: Command): Promise<void> {
     running = true;
     try {
       await command.perform?.();
+      back(); // done toggling — return to the parent level
     } catch {
       flipChecked(command);
     } finally {

@@ -25,7 +25,7 @@ interface Command {
   rank?: number            // fixed score, bypasses the scorer
   marked?: string          // server's <mark> highlighting; rendered as text runs
   checked?: boolean        // trailing tick: this value is already set
-  keepOpen?: boolean       // perform without closing; optimistic tick
+  keepOpen?: boolean       // perform, then pop back a level; optimistic tick
   hideWhenEmpty?: boolean  // flat option rows, hidden until the user types
   children?: () => Command[] | Promise<Command[]>   // drill-down
   perform?: () => void
@@ -34,8 +34,8 @@ interface Command {
 
 A command either drills in (`children`) or acts (`perform`); `run()` picks based
 on which is present. `keepOpen` is the third path, for toggle rows (tags): the
-tick flips before the write returns and flips back if it throws — one visit can
-flip several values, Linear-style, with no round trip between keystrokes.
+tick flips before the write returns and flips back if it throws; on success the
+palette pops back to the parent level instead of closing.
 
 **Only set `hint` when the key reaches the same end result as the row** — not when
 it reaches it the same way. Hinted keys are *page* shortcuts and are inert while

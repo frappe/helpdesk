@@ -18,17 +18,15 @@
           <div v-if="context" class="chip-row grid">
             <div class="overflow-hidden">
               <!-- Not a button: removal is backspace-only, advertised by esc's label. -->
-              <div
-                class="chip mx-3.5 mt-3 flex w-fit max-w-[30%] items-center gap-1 rounded-[10px] bg-surface-gray-2 px-1.5 py-0.5 text-xs text-ink-gray-7"
-              >
-                <span class="shrink-0 text-ink-gray-5">{{
+              <Badge class="chip mx-4.5 mt-3 max-w-[30%]">
+                <span class="shrink-0 text-ink-gray-7">{{
                   context.label
                 }}</span>
                 <span class="shrink-0 text-ink-gray-4">⋅</span>
-                <span class="truncate">{{
+                <span class="truncate text-ink-gray-5">{{
                   context.title || __("Ticket")
                 }}</span>
-              </div>
+              </Badge>
             </div>
           </div>
         </Transition>
@@ -174,7 +172,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { useShortcut } from "frappe-ui";
+import { Badge, useShortcut } from "frappe-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -215,6 +213,12 @@ const listRef = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
 const keyboardNav = ref(false);
 let focusBeforeOpen: HTMLElement | null = null;
+
+let activeRow: Command | null = null;
+
+function rememberActive() {
+  activeRow = flatItems.value[activeIndex.value] ?? null;
+}
 
 /** Rows paired with their flat index — highlighting compares indexes, not
  * object identity, which a "Recent" clone shares with its original. */
@@ -325,6 +329,7 @@ function setActive(index: number) {
   keyboardNav.value = true;
   const last = flatItems.value.length - 1;
   activeIndex.value = Math.min(Math.max(index, 0), last);
+  rememberActive();
   scrollActiveIntoView();
 }
 
@@ -335,6 +340,7 @@ function onRowHover(command: Command) {
     return;
   }
   activeIndex.value = flatItems.value.indexOf(command);
+  rememberActive();
 }
 
 /**
@@ -373,17 +379,15 @@ function scrollActiveIntoView() {
 // Late search results rebuild `groups`; follow the highlighted row to its new
 // index or Enter runs whatever landed on top. Matched on group+id — recomputes
 // re-create every object, and a "Recent" clone shares its original's id.
-watch(groups, (_next, previous) => {
-  const wasActive = previous?.flatMap((group) => group.items)[
-    activeIndex.value
-  ];
-  const index = wasActive
+watch(groups, () => {
+  const index = activeRow
     ? flatItems.value.findIndex(
         (command) =>
-          command.id === wasActive.id && command.group === wasActive.group
+          command.id === activeRow!.id && command.group === activeRow!.group
       )
     : -1;
   activeIndex.value = Math.max(index, 0);
+  rememberActive();
 });
 
 // Reset on open, not close — resetting on close revived the dismissed chip
@@ -395,6 +399,7 @@ watch(isOpen, (open) => {
   // No DialogTrigger, so nothing restores focus on its own.
   focusBeforeOpen = document.activeElement as HTMLElement | null;
   activeIndex.value = 0;
+  rememberActive();
   nextTick(() => inputRef.value?.focus());
 });
 
