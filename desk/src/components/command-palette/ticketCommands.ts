@@ -363,12 +363,9 @@ function updateTicket(ticketId: string, changes: Record<string, string>): void {
   if (!field || value === undefined) return;
   const { ticket, activities } = useTicket(ticketId);
   const current = ticket.doc as unknown as Record<string, unknown> | undefined;
-  if (current?.[field] === value) {
-    // Otherwise the palette just closes and nothing happens, which reads as a
-    // failed command rather than "it was already that".
-    toast.success(__("Already set to {0}", value));
-    return;
-  }
+  // The drill-down already ticks the current value, so picking it again just
+  // closes quietly.
+  if (current?.[field] === value) return;
   // Same order as the header and details tab: tell co-viewers, then write.
   // Resolved lazily — globalStore() needs a mounted instance, which the ticket
   // page guarantees by the time a command can run.
