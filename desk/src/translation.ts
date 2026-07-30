@@ -12,12 +12,6 @@ type Replacement = string | number;
 
 function translate(message: string): string;
 function translate(message: string, ...args: Replacement[]): string;
-/**
- * Most of the app passes replacements as one array. That reads as a single
- * argument, so `{1}` onwards silently kept its placeholder and `{0}` rendered
- * the whole comma-joined array. Accepted as an overload rather than rewritten at
- * ~50 call sites.
- */
 function translate(message: string, args: Replacement[]): string;
 function translate(
   message: string,
