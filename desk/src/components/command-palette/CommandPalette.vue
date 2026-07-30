@@ -7,6 +7,7 @@
       <DialogContent
         class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
         @open-auto-focus.prevent
+        @close-auto-focus.prevent="restoreFocus"
         @escape-key-down.prevent="onEscape"
         @keydown="onKeydown"
       >
@@ -398,10 +399,10 @@ watch(groups, (_next, previous) => {
 // chip while the close fade was still playing. Runs before the dialog mounts,
 // and covers every open path — including a close done by running a command.
 watch(isOpen, (open) => {
-  if (!open) {
-    nextTick(restoreFocus);
-    return;
-  }
+  // Focus restoration on close lives in @close-auto-focus, which fires after
+  // the exit animation — the only moment the outcome of a command's own focus
+  // move (saved reply → composer) is known.
+  if (!open) return;
   resetPalette();
   // There is no DialogTrigger, so nothing gives focus back on its own and a
   // keyboard user lands on <body> having lost their place.
