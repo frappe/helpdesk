@@ -3,7 +3,6 @@ import { call, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ComputedRef, Ref, ref } from "vue";
 
-const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 
@@ -69,17 +68,9 @@ export const useAuthStore = defineStore("auth", () => {
   }
   const user: Ref<string> = ref(sessionUser());
   const isLoggedIn: ComputedRef<boolean> = computed(() => !!user.value);
-  const login = createResource({
-    url: URI_LOGIN,
-    onError() {
-      throw new Error("Invalid email or password");
-    },
-    onSuccess() {
-      user.value = sessionUser();
-      login.reset();
-      router.replace({ path: "/" });
-    },
-  });
+  // No in-SPA login on purpose: the router guard exits to the server-rendered
+  // login page, and returning is a full page load — which is what keeps the
+  // module-scope userStorage keys in sync with the session cookie.
 
   function logout() {
     user.value = null;
@@ -96,7 +87,6 @@ export const useAuthStore = defineStore("auth", () => {
     hasAgentRecord,
     isManager,
     isLoggedIn,
-    login,
     reloadUser,
     userFirstName,
     userId,
