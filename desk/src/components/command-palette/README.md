@@ -97,6 +97,21 @@ Next to it sits `Create ticket "…"`, which lands on the new-ticket page with t
 subject pre-filled from the query — suppressed for `#`-prefixed queries, since
 `#123` is someone reaching for a ticket, not naming one.
 
+## Telemetry
+
+| Event | Payload | When |
+|---|---|---|
+| `command_palette_opened` | `context`: current route name | Every open — all paths route through `openPalette()`, so the count is honest |
+| `command_palette_command_run` | `command_id`, `query_length`, `depth` | A leaf command executes, tag toggles included; drilling into a sub-list is not captured |
+| `ticket_assigned` | `doctype`, `source: "command_palette"` | Assigning an agent via the Assign-to drill-down |
+| `saved_reply_applied` | `source: "command_palette"` or `"composer"` | Applying a saved reply; each surface tags its own source so the funnels are separable |
+
+`context` says *where* people reach for the palette, `query_length` separates
+browsed-to from searched-for, `depth` says whether drill-downs get used, and
+`source` compares the palette against the pre-existing UI for the same action.
+Closes, chip dismissals and abandoned opens are not captured — "opened but ran
+nothing" is only inferable by differencing the first two counts.
+
 ## Checks
 
 No test runner in `desk/`; each pure module leaves a runnable assertion file.
@@ -106,5 +121,3 @@ cd desk && ../node_modules/.bin/tsx src/components/command-palette/fuzzyScore.ch
 cd desk && ../node_modules/.bin/tsx src/components/command-palette/savedReplyRanking.check.ts
 cd desk && ../node_modules/.bin/tsx src/components/listViewFilters.check.ts
 ```
-
-Remaining work is tracked in `CP-improvements-plan.md`.
