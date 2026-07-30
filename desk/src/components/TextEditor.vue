@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded p-3 shadow w-full">
+  <div class="rounded p-3 shadow-sm w-full">
     <Editor
       ref="inner"
       v-model="content"
