@@ -102,7 +102,6 @@
                   :key="`${groupIndex}:${group.title}`"
                   role="group"
                   :aria-label="group.title || __('Ticket')"
-                  class="mb-1 last:mb-0"
                 >
                   <div
                     v-if="group.title"
@@ -309,6 +308,19 @@ function onKeydown(event: KeyboardEvent) {
     event.preventDefault();
     const command = flatItems.value[activeIndex.value];
     if (command) run(command);
+  } else if (
+    event.key === "ArrowRight" &&
+    !(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) &&
+    caretAtEnd()
+  ) {
+    // The chevron's key: → drills into the highlighted row, mirroring ⌫ back.
+    // Only with the caret at the input's end, so editing a query stays native.
+    // Navigation only — rows without children keep → inert rather than running.
+    const command = flatItems.value[activeIndex.value];
+    if (command?.children) {
+      event.preventDefault();
+      run(command);
+    }
   } else if (event.key === "Backspace" && !query.value) {
     // One layer per press, outermost last: step, then context.
     if (depth.value) {
@@ -323,6 +335,15 @@ function onKeydown(event: KeyboardEvent) {
 
 function moveActive(delta: number) {
   setActive(activeIndex.value + delta);
+}
+
+function caretAtEnd(): boolean {
+  const input = inputRef.value;
+  return (
+    !!input &&
+    input.selectionStart === input.selectionEnd &&
+    input.selectionEnd === input.value.length
+  );
 }
 
 function setActive(index: number) {

@@ -108,7 +108,10 @@ function topSavedReplyCommands(ticketId: string): Command[] {
       // the first characters on chrome before the word the agent typed. Muted
       // and right-aligned, the same way search rows carry "Open · #0484".
       subtitle: __(SUBTITLE),
-      group: GROUP.ticket,
+      // Own titled section: these rows are promoted by usage, and without a
+      // header a lone reply title at root reads as a random ticket. "Replies"
+      // stays out of the header — the per-row subtitle already says it.
+      group: "Most used",
       icon: LucideMessageSquareQuote,
       hideWhenEmpty: true,
       weight: FLAT_OPTION_WEIGHT,
@@ -166,7 +169,10 @@ async function applySavedReply(
  */
 const usage = userStorage<SavedReplyUsage>("hd_saved_reply_uses", {});
 
-function recordSavedReplyUse(replyId: string, title: string): void {
+/** Exported for the composer's selector modal: usage counts from both surfaces
+ * feed the same record, so palette promotion reflects how an agent actually
+ * works, not just their palette picks. */
+export function recordSavedReplyUse(replyId: string, title: string): void {
   usage.value = withUse(usage.value, replyId, title);
 }
 

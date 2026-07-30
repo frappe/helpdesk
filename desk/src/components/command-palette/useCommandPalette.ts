@@ -13,6 +13,7 @@ import {
 } from "./commands";
 import { scoreCommand } from "./fuzzyScore";
 import {
+  GROUP,
   type Command,
   type PaletteContext,
   type SearchItem,
@@ -185,11 +186,12 @@ export const groups = computed<PaletteGroup[]>(() => {
       : grouped;
   }
 
-  // Untitled: the chip already says what these rows act on, so a "Ticket"
-  // header would only repeat it.
+  // The generic "Ticket" header goes untitled — the chip already says what
+  // those rows act on. Deliberate sections (promoted saved replies) keep theirs.
   const scoped = context.value
     ? groupCommands(ticketCommands(context.value.id), query.value).map(
-        (group) => ({ ...group, title: "" })
+        (group) =>
+          group.title === __(GROUP.ticket) ? { ...group, title: "" } : group
       )
     : [];
 

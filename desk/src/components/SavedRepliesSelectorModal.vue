@@ -130,6 +130,7 @@
 </template>
 
 <script setup lang="ts">
+import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -263,6 +264,8 @@ const onTemplateSelect = (template: SavedReply) => {
       if (!show.value) return;
       pendingTemplate.value = data;
       show.value = false;
+      // Shared with the palette: modal picks count toward its most-used rows.
+      recordSavedReplyUse(template.name, template.title);
       capture("saved_reply_applied", { data: { source: "composer" } });
     },
   });
