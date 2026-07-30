@@ -31,6 +31,10 @@ const router = useRouter();
 const leaving = ref(false);
 const FADE_MS = 300;
 
+// Team size is the one optional answer; an untouched dropdown reports this
+// rather than dropping the key, so the answer set is always complete.
+const TEAM_SIZE_UNSPECIFIED = "prefer_not_to_say";
+
 // The last question's "first goal" answer maps to a settings tab; other goals
 // route directly (create ticket, explore) or fall through to Home.
 const settingsTabForGoal: Record<
@@ -83,8 +87,12 @@ async function routeToGoal(goal?: string | string[]) {
 }
 
 async function submitPersona(answers: Record<string, string | string[]>) {
-  capture("onboarding_persona_hd", { data: answers });
-  await finishOnboarding(answers);
+  const data = {
+    ...answers,
+    company_size: answers.company_size || TEAM_SIZE_UNSPECIFIED,
+  };
+  capture("onboarding_persona_hd", { data });
+  await finishOnboarding(data);
 }
 
 const questions = [
