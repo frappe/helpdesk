@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex min-h-screen flex-col overflow-y-auto bg-surface-gray-1 transition-opacity duration-300 ease-out"
+    class="relative flex min-h-screen flex-col overflow-y-auto bg-surface-base transition-opacity duration-300 ease-out"
     :class="leaving ? 'opacity-0' : 'opacity-100'"
   >
     <div class="flex flex-1 flex-col justify-start pb-8 pt-24">
