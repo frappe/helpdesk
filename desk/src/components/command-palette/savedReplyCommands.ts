@@ -83,7 +83,7 @@ function topSavedReplyCommands(ticketId: string): Command[] {
       title: reply.title,
       // Subtitle, not title prefix: a bare reply title at root reads as a ticket.
       subtitle: __(SUBTITLE),
-      group: "Most used",
+      group: "Frequent replies",
       icon: LucideMessageSquareQuote,
       hideWhenEmpty: true,
       weight: FLAT_OPTION_WEIGHT,
