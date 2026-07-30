@@ -155,11 +155,17 @@ function flipChecked(target: Command): void {
   stack.value = [...stack.value.slice(0, -1), { ...level, commands }];
 }
 
+// Frozen while closed: skips rebuilds for users who never open the palette, and
+// keeps the rows on screen through the close fade instead of "No commands found".
+let lastGroups: PaletteGroup[] = [];
+
 /** Visible rows for the current level, grouped, ordered by best score inside. */
 export const groups = computed<PaletteGroup[]>(() => {
-  // Else the root list rebuilds on every route change for users who never open it.
-  if (!isOpen.value) return [];
+  if (!isOpen.value) return lastGroups;
+  return (lastGroups = buildGroups());
+});
 
+function buildGroups(): PaletteGroup[] {
   const level = stack.value.at(-1);
   if (level) {
     // A single group's header only repeats the breadcrumb; Settings keeps its many.
@@ -186,7 +192,7 @@ export const groups = computed<PaletteGroup[]>(() => {
   // Scope *ranks*, never *gates*: returning scoped-only made a ticket whose
   // subject contains "open" unreachable behind "Set status: Open".
   return [...scoped, ...groupCommands(globalCommands(), term), ...fallback(term)];
-});
+}
 
 /** Pinned, not last-resort: almost any word fuzzy-matches *something*, so an
  * only-when-empty fallback would hide exactly when needed. */
