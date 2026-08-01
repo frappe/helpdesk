@@ -2,6 +2,7 @@
 # See license.txt
 
 from datetime import timedelta
+from unittest.mock import patch
 
 import frappe
 from frappe.tests import IntegrationTestCase
@@ -41,6 +42,20 @@ def get_ticket_obj():
         "subject": "Test Ticket",
         "description": "Test Ticket Description",
     }
+
+
+def get_ticket_communications(ticket_name: str):
+    """Communications on a ticket, oldest first.
+
+    `get_latest_ticket_communication` uses limit=1 with no order_by, so it cannot be
+    used to tell one reply from the next.
+    """
+    return frappe.get_all(
+        "Communication",
+        filters={"reference_doctype": "HD Ticket", "reference_name": ticket_name},
+        fields=["name", "message_id", "in_reply_to"],
+        order_by="creation asc",
+    )
 
 
 non_agent = "non_agent@test.com"
@@ -1132,6 +1147,109 @@ class TestHDTicket(IntegrationTestCase):
             self.assertEqual(communication_doc.cc, cc_recipient)
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
+
+    def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
+        """Every agent reply needs its own Message-Id and must point at the one before it.
+
+        Regression guard: helpdesk#2308 removed `communication.message_id`, while
+        frappe#32651 builds the `In-Reply-To` header from exactly that column. With the
+        column empty each reply is a dead end, so every reply arrives as a new thread.
+        """
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply")
+        first = get_ticket_communications(ticket.name)[-1]
+
+        ticket.reply_via_agent(message="Second reply")
+        second = get_ticket_communications(ticket.name)[-1]
+
+        self.assertTrue(first.message_id, "reply must store its own Message-Id")
+        self.assertTrue(second.message_id, "reply must store its own Message-Id")
+        self.assertNotEqual(
+            first.message_id,
+            second.message_id,
+            "each message needs a unique Message-Id, never a copy of the parent's",
+        )
+        self.assertEqual(
+            second.in_reply_to,
+            first.name,
+            "second reply must thread onto the first",
+        )
+
+    def test_agent_reply_sends_the_message_id_it_stored(self):
+        """The Message-Id on the wire must equal the one stored on the Communication.
+
+        Storing an id without passing it to sendmail looks correct but fails silently:
+        the recipient receives a queue-generated id while the next reply's `In-Reply-To`
+        names the stored one, which no mail client has ever seen.
+        """
+        email_account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Threading Test",
+                "email_id": "threading-test@example.com",
+                "enable_outgoing": 1,
+                "smtp_server": "smtp.example.com",
+            }
+        ).insert(ignore_if_duplicate=True)
+
+        reply_email_enabled = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 1)
+        try:
+            ticket = make_ticket()
+            with patch("frappe.sendmail") as sendmail:
+                ticket.reply_via_agent(
+                    message="Reply",
+                    to="customer@test.com",
+                    from_email={
+                        "email_account": email_account.name,
+                        "email_id": email_account.email_id,
+                    },
+                )
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", reply_email_enabled
+            )
+
+        communication = get_ticket_communications(ticket.name)[-1]
+        self.assertTrue(sendmail.called, "reply should have been emailed")
+        self.assertEqual(
+            sendmail.call_args.kwargs.get("message_id"),
+            communication.message_id,
+            "wire Message-Id must match the one stored on the Communication",
+        )
+
+    def test_portal_reply_does_not_break_agent_reply_threading(self):
+        """A customer's portal reply sent no email, so it cannot anchor a thread.
+
+        It must be skipped when picking a parent, otherwise a single portal message
+        breaks threading for every agent reply after it.
+        """
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply")
+        first = get_ticket_communications(ticket.name)[-1]
+
+        # each of these is its own request in production; replying updates the ticket row
+        ticket.reload()
+        ticket.create_communication_via_contact(message="Customer portal reply")
+        portal = get_ticket_communications(ticket.name)[-1]
+        self.assertFalse(
+            portal.message_id, "portal replies send no email, so they store no id"
+        )
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply")
+        second = get_ticket_communications(ticket.name)[-1]
+
+        self.assertEqual(
+            second.in_reply_to,
+            first.name,
+            "should thread onto the last emailed reply, not the portal message",
+        )
 
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()

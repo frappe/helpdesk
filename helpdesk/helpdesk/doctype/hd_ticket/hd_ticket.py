@@ -10,10 +10,11 @@ from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
+from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import add_to_date, cint, getdate, now_datetime
+from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -614,6 +615,27 @@ class HDTicket(Document):
         except Exception:
             return None
 
+    def get_last_threadable_communication(self):
+        """Newest communication on this ticket that can anchor an email thread.
+
+        Only communications with a stored `message_id` qualify. That column is what
+        frappe resolves `in_reply_to` against when setting the `In-Reply-To` header
+        (see `EmailQueue.prepare_email_content`), so a communication without one
+        cannot be replied to. Portal replies never sent an email and have no id;
+        skipping them keeps the chain intact across a portal message.
+        """
+        return frappe.db.get_value(
+            "Communication",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": str(self.name),
+                "message_id": ["is", "set"],
+            },
+            ["name", "message_id"],
+            order_by="creation desc",
+            as_dict=True,
+        )
+
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
             return
@@ -717,9 +739,17 @@ class HDTicket(Document):
             }
         )
 
-        last_communication = self.get_last_communication()
-        if last_communication and last_communication.message_id:
+        last_communication = self.get_last_threadable_communication()
+        if last_communication:
             communication.in_reply_to = last_communication.name
+
+        # Give this reply its own Message-Id so the *next* reply can point at it.
+        # frappe builds `In-Reply-To` by looking up `Communication.message_id` of the
+        # doc named in `in_reply_to`, so a reply without one is a dead end and the
+        # thread breaks after a single hop. Must be freshly generated per message —
+        # reusing the parent's id stamped every reply in a ticket with the same
+        # Message-Id, which is what helpdesk#2308 correctly removed.
+        communication.message_id = get_string_between("<", get_message_id(), ">")
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -786,6 +816,10 @@ class HDTicket(Document):
                 subject=subject,
                 with_container=False,
                 in_reply_to=last_communication.name if last_communication else None,
+                # Must match what we stored above: the recipient has to actually
+                # receive this Message-Id for the next reply's `In-Reply-To` to
+                # resolve on their side.
+                message_id=communication.message_id,
             )
         except Exception as e:
             frappe.throw(str(e))
