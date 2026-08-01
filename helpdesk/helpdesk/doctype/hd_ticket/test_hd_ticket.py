@@ -15,6 +15,7 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
 )
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
 from helpdesk.test_utils import (
+    SLA_PRIORITY_NAME,
     add_comment,
     add_contact_in_customer,
     add_holiday,
@@ -23,6 +24,8 @@ from helpdesk.test_utils import (
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_priority,
+    make_sla,
     make_status,
     make_ticket,
     remove_holidays,
@@ -33,6 +36,16 @@ from helpdesk.test_utils import (
 
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
 ERROR_MSG_RESOLUTION = "Resolution time differs by more than 1 second"
+
+SLA_DOCTYPE = "HD Service Level Agreement"
+UNINCLUDED_PRIORITY = "Critical"  # deliberately absent from every SLA's priorities
+
+
+def set_default_sla(name: str, value: int):
+    """Tick or untick a policy as the Default SLA, through the controller."""
+    sla = frappe.get_doc(SLA_DOCTYPE, name)
+    sla.default_sla = value
+    sla.save()
 
 
 def get_ticket_obj():
@@ -1569,6 +1582,311 @@ class TestHDTicket(IntegrationTestCase):
             )
         finally:
             frappe.db.set_single_value("HD Settings", previous_settings)
+
+    def make_test_sla(self, name, condition, rank=0, priorities=None):
+        """Create a conditional SLA and disable it once the test ends."""
+        sla = make_sla(name, condition, rank=rank, priorities=priorities)
+        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, sla.name, "enabled", 0)
+        return sla
+
+    def demote_default_sla(self):
+        """Leave the site with no Default SLA, restored once the test ends."""
+        self.addCleanup(set_default_sla, "Default", 1)
+        set_default_sla("Default", 0)
+
+    def test_ticket_without_sla(self):
+        """A priority that no SLA includes leaves every SLA field blank."""
+        make_priority(UNINCLUDED_PRIORITY)
+
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.agreement_status)
+        self.assertFalse(ticket.response_by)
+        self.assertFalse(ticket.resolution_by)
+        self.assertFalse(ticket.service_level_agreement_creation)
+
+    def test_ticket_without_default_sla(self):
+        """With no Default SLA on the site, an unmatched ticket gets no SLA."""
+        self.demote_default_sla()
+
+        # Medium is included everywhere but matched by no condition
+        ticket = make_ticket(priority="Medium")
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+
+    def test_sla_skipped_when_it_does_not_include_priority(self):
+        """A matching policy that lacks the priority is passed over, not the end of the walk."""
+        condition = "doc.priority == 'High'"
+        self.make_test_sla("Skipped SLA", condition, rank=10, priorities=["Low"])
+        applied = self.make_test_sla(
+            "Applied SLA", condition, rank=20, priorities=["High"]
+        )
+
+        ticket = make_ticket(priority="High")
+
+        self.assertEqual(ticket.sla, applied.name)
+
+    def test_sla_applied_when_condition_matches_later(self):
+        """A blank ticket picks up a policy on the save that makes it match."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.service_level_agreement_creation)
+
+        sla = self.make_test_sla(
+            "Late Match SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        ticket.reload()
+        ticket.save()
+
+        self.assertEqual(ticket.sla, sla.name)
+        self.assertTrue(ticket.response_by)
+        self.assertTrue(ticket.service_level_agreement_creation)
+        self.assertEqual(ticket.agreement_status, "First Response Due")
+
+    def test_sla_clock_starts_at_attach_not_creation(self):
+        """A late attach counts from the attach, not from when the ticket was raised."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        sla = self.make_test_sla(
+            "Attach Clock SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        attached_at = add_to_date(raised_at, hours=2)
+        with self.freeze_time(attached_at):
+            ticket.reload()
+            ticket.save()
+
+        self.assertEqual(ticket.sla, sla.name)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), attached_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            sla.name, UNINCLUDED_PRIORITY, add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(attached_at, seconds=response_time)
+        )
+
+    def test_sla_targets_stable_across_repeated_saves(self):
+        """Once attached, targets are anchored and must not slide on later saves."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.make_test_sla(
+            "Stable Clock SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.save()
+        response_by, resolution_by = ticket.response_by, ticket.resolution_by
+
+        with self.freeze_time(add_to_date(raised_at, hours=2)):
+            ticket.reload()
+            ticket.subject = "Saved again"
+            ticket.save()
+
+        self.assertEqual(ticket.response_by, response_by)
+        self.assertEqual(ticket.resolution_by, resolution_by)
+
+    def test_sla_removed_when_condition_stops_matching(self):
+        """A ticket that stops matching every policy loses its SLA and its targets."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        anchor = ticket.service_level_agreement_creation
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY  # matched by nothing
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+        self.assertFalse(ticket.resolution_by)
+        self.assertFalse(ticket.agreement_status)
+        # the clock keeps running, so flapping the condition buys no time
+        self.assertEqual(ticket.service_level_agreement_creation, anchor)
+
+    def test_no_detach_while_default_sla_enabled(self):
+        """With a Default SLA on the site a ticket falls back to it rather than detaching."""
+        ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        ticket.reload()
+        ticket.priority = (
+            "Medium"  # no condition matches, but the Default SLA includes it
+        )
+        ticket.save()
+
+        self.assertEqual(ticket.sla, "Default")
+        self.assertTrue(ticket.response_by)
+
+    def test_detach_keeps_breach_facts(self):
+        """Detaching drops the promises a policy made, not the record of missing them."""
+        # Urgent: response_by = T+30min, and the agent replies 9 minutes late
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=39)):
+            frappe.set_user(agent)
+            ticket.reply_via_agent(message="Late reply")
+            ticket.reload()
+            ticket.status = "Replied"
+            ticket.save()
+        self.assertEqual(ticket.agreement_status, "Failed")
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+        self.assertEqual(ticket.agreement_status, "Failed")
+        self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+        self.assertTrue(ticket.first_response_time)
+
+    def test_anchor_survives_detach_and_reattach(self):
+        """A policy picked up again recomputes from the original clock start."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertFalse(ticket.sla)
+
+        with self.freeze_time(add_to_date(raised_at, hours=2)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), raised_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            SLA_PRIORITY_NAME, "High", add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(raised_at, seconds=response_time)
+        )
+
+    def test_sla_swap_keeps_original_clock_start(self):
+        """Swapping policies recomputes targets from the original clock start."""
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        # Medium is matched by no other condition, so the swap target is unambiguous
+        swapped_to = self.make_test_sla(
+            "Swap Target SLA", "doc.priority == 'Medium'", priorities=["Medium"]
+        )
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.priority = "Medium"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, swapped_to.name)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), raised_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            swapped_to.name, "Medium", add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(raised_at, seconds=response_time)
+        )
+
+    def test_lower_rank_sla_wins(self):
+        """Between two matching policies, the lower rank is applied."""
+        condition = "doc.priority == 'Medium'"
+        # created first, so winning on creation order would hide the rank
+        self.make_test_sla("Rank Five SLA", condition, rank=5, priorities=["Medium"])
+        winner = self.make_test_sla(
+            "Rank One SLA", condition, rank=1, priorities=["Medium"]
+        )
+
+        ticket = make_ticket(priority="Medium")
+
+        self.assertEqual(ticket.sla, winner.name)
+
+    def test_unranked_sla_applied_after_ranked(self):
+        """Rank 0 means unranked, so it loses even to a high rank number."""
+        condition = "doc.priority == 'Medium'"
+        self.make_test_sla("Unranked SLA", condition, rank=0, priorities=["Medium"])
+        ranked = self.make_test_sla(
+            "Ranked Last SLA", condition, rank=5, priorities=["Medium"]
+        )
+
+        ticket = make_ticket(priority="Medium")
+
+        self.assertEqual(ticket.sla, ranked.name)
+
+    def test_default_sla_applied_only_when_no_condition_matches(self):
+        """The Default SLA is considered last, even when it carries the best rank."""
+        frappe.db.set_value(SLA_DOCTYPE, "Default", "rank", 1)
+        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, "Default", "rank", 0)
+        matched = self.make_test_sla(
+            "Worst Rank SLA", "doc.priority == 'Medium'", rank=99, priorities=["Medium"]
+        )
+
+        self.assertEqual(make_ticket(priority="Medium").sla, matched.name)
+
+        frappe.db.set_value(SLA_DOCTYPE, matched.name, "enabled", 0)
+        unmatched = make_ticket(subject="Nothing matches", priority="Medium")
+        self.assertEqual(unmatched.sla, "Default")
+
+    def test_ticket_without_sla_uses_settings_default_status(self):
+        """A blank ticket takes its status from HD Settings, not an arbitrary policy."""
+        make_priority(UNINCLUDED_PRIORITY)
+        sla_only_status = make_status(name="SLA Only Status")
+        status_field = "default_ticket_status"
+        frappe.db.set_value(
+            SLA_DOCTYPE, SLA_PRIORITY_NAME, status_field, sla_only_status.name
+        )
+        self.addCleanup(
+            frappe.db.set_value, SLA_DOCTYPE, SLA_PRIORITY_NAME, status_field, None
+        )
+
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.assertFalse(ticket.sla)
+        self.assertEqual(
+            ticket.status,
+            frappe.db.get_single_value("HD Settings", "default_ticket_status"),
+        )
+
+    def test_resolution_date_set_without_sla(self):
+        """Resolving a blank ticket stamps resolution_date; the durations stay blank."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+        self.assertFalse(ticket.sla)
+
+        ticket.reload()
+        ticket.status = "Resolved"
+        ticket.save()
+
+        self.assertTrue(ticket.resolution_date)
+        self.assertFalse(ticket.resolution_time)
 
     def tearDown(self):
         frappe.set_user("Administrator")
