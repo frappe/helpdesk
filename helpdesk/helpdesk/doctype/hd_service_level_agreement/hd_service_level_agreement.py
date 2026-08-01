@@ -28,12 +28,13 @@ class HDServiceLevelAgreement(Document):
         self.validate_priorities()
         self.validate_support_and_resolution()
         self.validate_condition()
+        self.warn_removed_priorities()
+        self.warn_default_sla_removed()
 
     def validate_priorities(self):
         self.validate_priority_defaults()
         self.validate_response_and_resolution_time()
         self.validate_unique_priorities()
-        self.validate_all_priorities()
 
     # check if we have more than one default priority
     def validate_priority_defaults(self):
@@ -74,19 +75,46 @@ class HDServiceLevelAgreement(Document):
             repeated_priority = get_repeated(priorities)
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
-    def validate_all_priorities(self):
-        all_priorities = frappe.get_all(
-            "HD Ticket Priority", pluck="name", filters={"disabled": 0}
-        )
-        sla_priorities = [p.priority for p in self.priorities]
+    def warn_removed_priorities(self):
+        """Warn when dropping a priority that open tickets on this SLA still use."""
+        before = self.get_doc_before_save()
+        if not before:
+            return
+        removed = {p.priority for p in before.priorities} - {
+            p.priority for p in self.priorities
+        }
+        for priority in removed:
+            count = self.count_open_tickets(priority=priority)
+            if not count:
+                continue
+            frappe.msgprint(
+                _(
+                    "{0} open tickets use priority {1}. They lose this SLA the next time they are updated."
+                ).format(count, priority),
+                title=_("Priority in use"),
+                indicator="orange",
+            )
 
-        for priority in all_priorities:
-            if priority not in sla_priorities:
-                frappe.msgprint(
-                    _("Priority <u>{0}</u> must be included in the SLA {1}.").format(
-                        priority, self.name
-                    )
-                )
+    def warn_default_sla_removed(self):
+        """Warn when turning off the Default SLA: tickets on it detach on their next save."""
+        if not self.has_value_changed("default_sla") or self.default_sla:
+            return
+        count = self.count_open_tickets()
+        if not count:
+            return
+        frappe.msgprint(
+            _(
+                "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
+            ).format(count),
+            title=_("Default SLA turned off"),
+            indicator="orange",
+        )
+
+    def count_open_tickets(self, **filters) -> int:
+        return frappe.db.count(
+            self.doctype_ticket,
+            {"sla": self.name, "status_category": "Open", **filters},
+        )
 
     def validate_support_and_resolution(self):
         week = get_weekdays()
@@ -127,16 +155,6 @@ class HDServiceLevelAgreement(Document):
                 ).format(self.name, default_sla_exists)
             )
 
-        if not self.default_sla and not default_sla_exists:
-            frappe.throw(
-                _(
-                    "You must set one SLA as Default. Please check the Default SLA option."
-                )
-            )
-
-        if self.has_value_changed("enabled") and not self.enabled and self.default_sla:
-            frappe.throw(_("You cannot disable the default SLA."))
-
     def validate_condition(self):
         if self.condition:
             try:
@@ -167,18 +185,20 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(_("Select a Default Priority."))
 
     def apply(self, doc: Document):
-        self.handle_new(doc)
+        self.set_default_priority(doc)
+        self.start_clock(doc)
         self.handle_doc_status(doc)
         self.handle_targets(doc)
         self.handle_agreement_status(doc)
-        self.validate_all_priorities()
 
-    def handle_new(self, doc: Document):
-        if not doc.is_new():
-            return
-        creation = doc.service_level_agreement_creation or now_datetime()
-        doc.service_level_agreement_creation = creation
+    def set_default_priority(self, doc: Document):
         doc.priority = doc.priority or self.default_priority
+
+    def start_clock(self, doc: Document):
+        """Stamp the moment targets are counted from. Written once, when the SLA
+        attaches, which may be long after the ticket was raised."""
+        if not doc.service_level_agreement_creation:
+            doc.service_level_agreement_creation = now_datetime()
 
     def handle_doc_status(self, doc: Document):
         if doc.is_new() or not doc.has_value_changed("status"):
@@ -191,7 +211,7 @@ class HDServiceLevelAgreement(Document):
         if was_resolved and is_closed:
             return
         self.set_first_response_time(doc)
-        self.set_resolution_date(doc)
+        self.set_resolution_time(doc)
         self.set_hold_time(doc)
 
     def set_first_response_time(self, doc: Document):
@@ -207,22 +227,12 @@ class HDServiceLevelAgreement(Document):
                 doc.response_by, end_at
             )
 
-    def set_resolution_date(self, doc: Document):
-        resolved_statuses = (
-            frappe.db.get_all(
-                "HD Ticket Status", {"category": "Resolved"}, pluck="name"
-            )
-            or []
-        )
-        next_state = doc.get("status")
-        is_fulfilled = next_state in resolved_statuses
-        if not is_fulfilled:
-            doc.resolution_date = None
+    def set_resolution_time(self, doc: Document):
+        """Business-hours duration to resolve. The date itself is stamped by the
+        ticket, which does not need an SLA to know when it was resolved."""
+        if not doc.resolution_date:
             doc.resolution_time = None
             return
-        if doc.resolution_date and not doc.has_value_changed("status_category"):
-            return
-        doc.resolution_date = now_datetime()
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
         time_took = self.calc_elapsed_time(start_at, end_at)
@@ -335,12 +345,7 @@ class HDServiceLevelAgreement(Document):
             - DateTime when the target is expected to be met
         """
         result = get_datetime(start_at)
-        priorities = self.get_priorities()
-        if priority not in priorities:
-            frappe.throw(
-                _("Please add {0} priority in {1} SLA").format(priority, self.name)
-            )
-        priority = priorities[priority]
+        priority = self.get_priorities()[priority]
         remaining_target_time = priority.get(
             target, 0
         )  # time for response or resolution in seconds
@@ -505,28 +510,6 @@ class HDServiceLevelAgreement(Document):
 
     def after_insert(self):
         capture_event("sla_created")
-
-    def on_trash(self):
-        self.handle_default_sla_deletion()
-
-    def handle_default_sla_deletion(self):
-        if not self.default_sla:
-            return
-        default_sla_exists = frappe.db.exists(
-            self.doctype,
-            {
-                "default_sla": True,
-                "name": ["!=", self.name],
-            },
-        )
-        if default_sla_exists:
-            return
-        else:
-            frappe.throw(
-                _(
-                    "Cannot delete the default SLA. At least one SLA must be marked as default."
-                )
-            )
 
 
 def get_repeated(values):

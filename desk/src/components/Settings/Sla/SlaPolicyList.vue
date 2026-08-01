@@ -34,23 +34,36 @@
         <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>
       <hr class="mt-2 mx-2" />
-      <div v-for="(sla, index) in slaPolicyList.list.data" :key="sla.name">
+      <div v-for="(sla, index) in orderedPolicies" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
-        <hr v-if="index !== slaPolicyList.list.data.length - 1" class="mx-2" />
+        <hr v-if="index !== orderedPolicies.length - 1" class="mx-2" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button, LoadingIndicator } from "frappe-ui";
+import { LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
-import { inject } from "vue";
+import { computed, inject } from "vue";
 import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import ShieldCheck from "~icons/lucide/shield-check";
 import { SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
+
+// rank 0 means unranked, which is applied last
+const rankOrder = (sla) => sla.rank || Infinity;
+
+// mirrors the ordering in get_sla (hd_service_level_agreement/utils.py) — keep in sync
+const orderedPolicies = computed(() =>
+  [...(slaPolicyList.list.data ?? [])].sort(
+    (a, b) =>
+      Number(a.default_sla) - Number(b.default_sla) ||
+      rankOrder(a) - rankOrder(b) ||
+      String(a.creation ?? "").localeCompare(String(b.creation ?? ""))
+  )
+);
 
 const goToNew = () => {
   resetSlaData();

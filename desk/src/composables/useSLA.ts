@@ -37,9 +37,10 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   // - responded after due -> failed
   // - not responded, due in future -> due
   // - not responded, due in past -> overdue
-  // - no target and no response -> null (ticket has no SLA, card hidden)
+  // - no policy -> null (card hidden), whether it never had one or was detached
   const firstResponse = computed<SLAMetric | null>(() => {
     const d = doc.value;
+    if (!d.sla) return null; // nothing promised, so nothing to report against
 
     if (d.first_responded_on) {
       const inTime =
@@ -96,6 +97,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   //   empty target while paused still means hold, not "no SLA")
   const resolution = computed<SLAMetric | null>(() => {
     const d = doc.value;
+    if (!d.sla) return null;
 
     const pausedBeforeBreach =
       !d.resolution_by ||

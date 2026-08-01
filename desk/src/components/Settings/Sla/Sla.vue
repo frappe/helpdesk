@@ -13,7 +13,7 @@ import { SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
-  fields: ["name", "default_sla", "enabled", "description"],
+  fields: ["name", "default_sla", "enabled", "description", "rank", "creation"],
   cache: ["SLAPolicyList"],
   orderBy: "modified desc",
   start: 0,

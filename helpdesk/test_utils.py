@@ -115,14 +115,43 @@ def make_holiday_list():
         ).insert()
 
 
-def make_sla(sla_name: str = "Test SLA", condition: str = ""):
+def make_sla(
+    sla_name: str = "Test SLA",
+    condition: str = "",
+    rank: int = 0,
+    priorities: list[str] | None = None,
+):
+    """Copy the seeded Default SLA. `priorities` replaces its priority rows, the
+    first becoming the default priority, each row slower than the one before."""
     def_sla = frappe.get_doc("HD Service Level Agreement", "Default")
     sla_doc = frappe.copy_doc(def_sla)
     sla_doc.service_level = sla_name
     sla_doc.condition = condition
     sla_doc.default_sla = 0
+    sla_doc.rank = rank
+    if priorities:
+        sla_doc.priorities = []
+        for index, priority in enumerate(priorities):
+            sla_doc.append(
+                "priorities",
+                {
+                    "priority": priority,
+                    "default_priority": index == 0,
+                    "response_time": 60 * 60 * (index + 1),
+                    "resolution_time": 60 * 60 * 4 * (index + 1),
+                },
+            )
     sla_doc.insert(ignore_if_duplicate=True, ignore_permissions=True)
     return sla_doc
+
+
+def make_priority(name: str):
+    """Create an HD Ticket Priority. It is not added to any SLA."""
+    if frappe.db.exists("HD Ticket Priority", name):
+        return frappe.get_doc("HD Ticket Priority", name)
+    return frappe.get_doc({"doctype": "HD Ticket Priority", "name": name}).insert(
+        ignore_permissions=True
+    )
 
 
 def make_ticket(
