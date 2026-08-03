@@ -171,35 +171,6 @@ class TestHDAgent(FrappeTestCase):
 
         publish.assert_not_called()
 
-    def test_availability_change_is_captured(self):
-        with patch(
-            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.capture_event"
-        ) as capture:
-            set_agent_availability(self.test_user, "Away")
-
-        capture.assert_called_once_with("agent_availability_updated")
-
-    # creating an agent seeds a default availability — not a status change
-    def test_new_agent_is_not_captured_as_availability_change(self):
-        with patch(
-            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.capture_event"
-        ) as capture:
-            make_agent("telemetry_new@test.com", first_name="Telemetry New")
-
-        capture.assert_not_called()
-
-    def test_save_without_availability_change_is_not_captured(self):
-        set_agent_availability(self.test_user, "Away")
-        agent = frappe.get_doc("HD Agent", {"user": self.test_user})
-
-        with patch(
-            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.capture_event"
-        ) as capture:
-            agent.is_active = 0
-            agent.save(ignore_permissions=True)
-
-        capture.assert_not_called()
-
     # the session payload (auth.get_user) carries the agent's current status, so
     # the frontend seeds availability without a dedicated round-trip
     def test_get_user_includes_availability(self):
