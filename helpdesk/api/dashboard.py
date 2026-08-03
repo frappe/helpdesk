@@ -68,6 +68,10 @@ def get_dashboard_data(
         )
     elif dashboard_type == "trend":
         return dashboard.get_trend_data()
+    elif dashboard_type == "tags":
+        from helpdesk.api.dashboard_tags import TagDashboard
+
+        return TagDashboard(_filters).get_tag_chart_data()
 
 
 class HelpdeskDashboard:
@@ -599,7 +603,10 @@ def get_bar_chart_config(
         "title": title,
         "subtitle": subtitle,
         "xAxis": x_axis_config,
-        "yAxis": {"title": y_axis_title},
+        # every bar chart here counts tickets, so keep the value axis on whole
+        # steps; half a ticket is not a thing. y2 axes (% SLA, rating) are
+        # fractional and are left alone.
+        "yAxis": {"title": y_axis_title, "echartOptions": {"minInterval": 1}},
         "series": series,
         **kwargs,
     }
