@@ -9,10 +9,7 @@
       <!-- 9px = field controls' 8px padding + 1px transparent border, so the
            value lines up with the other sidebar field values -->
       <div class="flex min-w-0 flex-1 items-center gap-1.5 ps-[9px]">
-        <span
-          class="min-w-0 truncate text-base"
-          :class="slaTextColor(card.metric)"
-        >
+        <span class="min-w-0 truncate text-base" :class="valueInk(card)">
           {{ cardValue(card) }}
         </span>
         <Popover
@@ -52,7 +49,7 @@
 
 <script setup lang="ts">
 import FieldLabel from "@/components/FieldLabel.vue";
-import { slaTextColor, useSLA, type SLAMetric } from "@/composables/useSLA";
+import { useSLA, type SLAMetric } from "@/composables/useSLA";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { dateFormat } from "@/utils";
@@ -71,6 +68,14 @@ const ticket = inject(TicketSymbol)!;
 const { firstResponse, resolution } = useSLA(ticket);
 
 const openCard = ref<string | null>(null);
+
+const inkClass: Record<SLAMetric["color"], string> = {
+  orange: "text-ink-amber-8",
+  green: "text-ink-green-8",
+  red: "text-ink-red-7",
+  blue: "text-ink-blue-8",
+  purple: "text-ink-violet-8",
+};
 
 const cards = computed<SLACard[]>(() =>
   [
@@ -95,8 +100,6 @@ function cardValue(card: SLACard): string {
   return `${__(card.fulfilledLabel)} ${__("in")} ${card.metric.fulfilledIn}`;
 }
 
-<<<<<<< HEAD
-=======
 // "Due" is the resting state of every open ticket, so it stays gray; colour
 // only appears when something changed (fulfilled, overdue, failed, hold).
 function valueInk(card: SLACard): string {
@@ -104,7 +107,6 @@ function valueInk(card: SLACard): string {
   return inkClass[card.metric.color];
 }
 
->>>>>>> 1198b0e92 (fix(style): change sla due color)
 function cardDetails(card: SLACard) {
   const metric = card.metric;
   const rows = [];
