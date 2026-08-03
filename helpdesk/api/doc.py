@@ -113,6 +113,8 @@ def get_list_data(
     rows.append("name") if "name" not in rows else rows
     if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
+        # the SLA columns render nothing without it, and no saved view lists it
+        rows.append("sla") if "sla" not in rows else rows
     data = (
         frappe.get_list(
             doctype,
