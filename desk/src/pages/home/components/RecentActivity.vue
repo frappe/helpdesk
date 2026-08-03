@@ -12,7 +12,8 @@
       </Tooltip>
     </div>
     <div class="relative mt-5 grow overflow-hidden">
-      <div class="flex flex-col h-full overflow-auto hide-scrollbar">
+      <!-- pb matches the fade height below, so the last row never sits under it -->
+      <div class="flex flex-col h-full overflow-auto hide-scrollbar pb-8">
         <template v-if="!showSkeleton && activities.length > 0">
           <router-link
             v-for="activity in activities"
