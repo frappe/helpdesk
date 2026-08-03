@@ -19,7 +19,7 @@ class HDAgent(Document):
 
     def before_save(self):
         old_doc = self.get_doc_before_save()
-        if not old_doc or old_doc.availability != self.availability:
+        if self.has_value_changed("availability"):
             self.availability_changed_on = frappe.utils.now()
         if old_doc and old_doc.agent_name != self.agent_name:
             if self.agent_name:
@@ -62,9 +62,21 @@ class HDAgent(Document):
         ):
             frappe.throw(_("Invalid availability"), frappe.ValidationError)
 
+    def availability_changed(self) -> bool:
+        """Whether this save changes the availability of an existing agent.
+
+        Inserts are excluded: has_value_changed is True when there is no doc
+        before save, but a new agent seeded with a default has not changed
+        anything. Note validate_availability deliberately does not use this —
+        a new agent must still be validated.
+        """
+        return bool(self.get_doc_before_save()) and self.has_value_changed(
+            "availability"
+        )
+
     def publish_availability_update(self):
         """Broadcast an availability change to every connected client."""
-        if not self.has_value_changed("availability"):
+        if not self.availability_changed():
             return
 
         publish_event(
@@ -77,14 +89,7 @@ class HDAgent(Document):
         )
 
     def capture_availability_telemetry(self):
-        # No doc before save means an insert, and has_value_changed is True for
-        # those. A new agent seeded with a default is not a status change, so it
-        # would otherwise count every agent created. The broadcast above does
-        # want inserts — clients learn the new agent's presence without a refetch.
-        if not self.get_doc_before_save():
-            return
-
-        if not self.has_value_changed("availability"):
+        if not self.availability_changed():
             return
 
         capture_event("agent_availability_updated")

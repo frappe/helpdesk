@@ -27,6 +27,20 @@ class TestHDAgent(FrappeTestCase):
         # known status or "did this change?" assertions depend on test order.
         set_agent_availability(self.test_user, "Active")
 
+    def _disable_status(self, status: str):
+        set_agent_status_enabled(status, 0)
+        self.addCleanup(set_agent_status_enabled, status, 1)
+
+    def _set_availability_as(self, user: str, agent: str, availability: str):
+        """Submit the payload agentStatus.ts sends, as `user`."""
+        frappe.set_user(user)
+        return client_set_value(
+            doctype="HD Agent",
+            name=agent,
+            fieldname="availability",
+            value=availability,
+        )
+
     # a new agent defaults to the Active-category status (looked up, not hardcoded)
     def test_new_agent_defaults_to_active_status(self):
         agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
@@ -66,14 +80,7 @@ class TestHDAgent(FrappeTestCase):
 
     # the exact payload desk/src/stores/agentStatus.ts now submits
     def test_client_set_value_updates_availability(self):
-        frappe.set_user(self.test_user)
-
-        client_set_value(
-            doctype="HD Agent",
-            name=self.test_user,
-            fieldname="availability",
-            value="Away",
-        )
+        self._set_availability_as(self.test_user, self.test_user, "Away")
 
         self.assertEqual(
             frappe.db.get_value("HD Agent", self.test_user, "availability"), "Away"
@@ -83,15 +90,9 @@ class TestHDAgent(FrappeTestCase):
     # hook any agent could flip a colleague's status through client.set_value
     def test_agent_cannot_set_another_agents_availability(self):
         other = make_agent("other_agent@test.com", first_name="Other Agent")
-        frappe.set_user(self.test_user)
 
         with self.assertRaises(frappe.PermissionError):
-            client_set_value(
-                doctype="HD Agent",
-                name=other,
-                fieldname="availability",
-                value="Away",
-            )
+            self._set_availability_as(self.test_user, other, "Away")
 
         self.assertEqual(
             frappe.db.get_value("HD Agent", other, "availability"), "Active"
@@ -102,14 +103,8 @@ class TestHDAgent(FrappeTestCase):
         other = make_agent("managed_agent@test.com", first_name="Managed Agent")
         manager = make_agent("agent_manager@test.com", first_name="Agent Manager")
         frappe.get_doc("User", manager).add_roles("Agent Manager")
-        frappe.set_user(manager)
 
-        client_set_value(
-            doctype="HD Agent",
-            name=other,
-            fieldname="availability",
-            value="Away",
-        )
+        self._set_availability_as(manager, other, "Away")
 
         self.assertEqual(frappe.db.get_value("HD Agent", other, "availability"), "Away")
 
@@ -125,10 +120,6 @@ class TestHDAgent(FrappeTestCase):
     def test_availability_rejects_unknown_status(self):
         with self.assertRaises(frappe.ValidationError):
             set_agent_availability(self.test_user, "Not A Status")
-
-    def _disable_status(self, status: str):
-        set_agent_status_enabled(status, 0)
-        self.addCleanup(set_agent_status_enabled, status, 1)
 
     # a status that exists but is disabled is rejected too — the Link field alone
     # does not filter on `enable`, so the controller has to
