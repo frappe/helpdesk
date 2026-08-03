@@ -202,7 +202,7 @@ class HDServiceLevelAgreement(Document):
             doc.service_level_agreement_creation = now_datetime()
 
     def handle_doc_status(self, doc: Document):
-        if not doc.is_valid_status_transitions():
+        if not doc.is_valid_status_transition():
             return
         self.set_first_response_time(doc)
         self.set_resolution_time(doc)
