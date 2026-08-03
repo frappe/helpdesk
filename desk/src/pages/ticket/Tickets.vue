@@ -167,6 +167,7 @@ const options = computed(() => ({
     },
     agreement_status: {
       custom: ({ item }) => {
+        if (!item) return null;
         return h(Badge, {
           label: __(item),
           theme: slaStatusColorMap[item],
@@ -209,6 +210,7 @@ const options = computed(() => ({
 }));
 
 function handleResponseByField(row: any, item: string) {
+  if (!row.sla) return null; // nothing promised, so nothing to report against
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
       label: __("Failed"),
@@ -244,6 +246,7 @@ function handleResponseByField(row: any, item: string) {
 }
 
 function handleResolutionByField(row: any, item: string) {
+  if (!row.sla) return null;
   const status = getStatus(row.status) || {};
   if (status.category === "Paused") {
     return h(Badge, {

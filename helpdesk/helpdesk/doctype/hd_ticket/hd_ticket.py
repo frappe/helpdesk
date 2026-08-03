@@ -92,6 +92,7 @@ class HDTicket(Document):
         self.validate_feedback()
 
     def before_save(self):
+        self.set_resolution_date()
         self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
@@ -928,27 +929,72 @@ class HDTicket(Document):
         self.add_seen()
         clear_notifications(ticket=self.name)
 
+    def is_valid_status_transition(self) -> bool:
+        """Closing an already-resolved ticket wraps up an outcome, it is not a new one."""
+        if self.is_new() or not self.has_value_changed("status"):
+            return False
+        if self.status != "Closed":
+            return True
+        previous = self.get_doc_before_save()
+        return not previous or previous.status_category != "Resolved"
+
+    def set_resolution_date(self):
+        """Stamp when the ticket was resolved. Runs for every ticket, with or
+        without an SLA, since it is what resolution analytics bucket by."""
+        if not self.is_valid_status_transition():
+            return
+
+        if self.status_category != "Resolved":
+            self.resolution_date = None
+            self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here
+            return
+        if self.resolution_date and not self.has_value_changed("status_category"):
+            return
+        self.resolution_date = now_datetime()
+
     def set_sla(self):
         """
         Find an SLA to apply to this ticket.
+
+        If no SLA is found, clear the SLA fields. If an SLA is found, set the SLA field
         """
         if sla := get_sla(self):
             self.sla = sla.name
+        else:
+            self.clear_sla_fields()
+
+    def clear_sla_fields(self):
+        """If no sla is found, clear the sla fields. The clock start is kept, so
+        flapping a condition off and on buys no time."""
+        self.sla = None
+        self.response_by = None
+        self.resolution_by = None
+        if self.status_category != "Paused":
+            self.on_hold_since = (
+                None  # else the detached window is added into the hold time.
+            )
+        if self.agreement_status != "Failed":
+            self.agreement_status = None
 
     def apply_sla(self):
         """
         Apply SLA if set.
         """
-        if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
+        if sla := self.get_sla():
             sla.apply(self)
 
     def get_sla(self):
-        return frappe.get_doc("HD Service Level Agreement", {"name": self.sla})
+        if not self.sla:
+            return None
+        return frappe.get_doc("HD Service Level Agreement", self.sla)
 
     def is_currently_outside_working_hours(self):
         """Return True if current time is outside this SLA's working hours."""
 
         sla = self.get_sla()
+        if not sla:
+            return False
+
         current_date = getdate()
         now = now_datetime()
 

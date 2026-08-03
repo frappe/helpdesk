@@ -173,7 +173,8 @@
    "fieldname": "sla",
    "fieldtype": "Link",
    "label": "SLA",
-   "options": "HD Service Level Agreement"
+   "options": "HD Service Level Agreement",
+   "search_index": 1
   },
   {
    "depends_on": "eval: doc.status_category != 'Paused' && doc.sla;",
