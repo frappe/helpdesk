@@ -26,4 +26,3 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
                 "user_image": user.user_image,
             }
         ).insert()
-    return

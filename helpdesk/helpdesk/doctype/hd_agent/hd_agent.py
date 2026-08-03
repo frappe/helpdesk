@@ -6,7 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 
 from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import get_active_status
-from helpdesk.utils import is_agent_manager, publish_event
+from helpdesk.utils import capture_event, is_agent_manager, publish_event
 
 
 class HDAgent(Document):
@@ -46,6 +46,7 @@ class HDAgent(Document):
 
     def on_update(self):
         self.publish_availability_update()
+        self.capture_availability_telemetry()
 
     def validate_availability(self):
         """Only an enabled HD Agent Status may be set as availability.
@@ -74,6 +75,19 @@ class HDAgent(Document):
                 "availability_changed_on": self.availability_changed_on,
             },
         )
+
+    def capture_availability_telemetry(self):
+        # No doc before save means an insert, and has_value_changed is True for
+        # those. A new agent seeded with a default is not a status change, so it
+        # would otherwise count every agent created. The broadcast above does
+        # want inserts — clients learn the new agent's presence without a refetch.
+        if not self.get_doc_before_save():
+            return
+
+        if not self.has_value_changed("availability"):
+            return
+
+        capture_event("agent_availability_updated")
 
     def set_user_roles(self):
         user = frappe.get_doc("User", self.user)
