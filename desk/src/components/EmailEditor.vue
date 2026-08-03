@@ -128,22 +128,11 @@
         </div>
 
         <!-- Attachments -->
-        <div class="flex flex-wrap gap-2 px-5 my-2">
-          <AttachmentItem
-            v-for="a in attachments"
-            :key="a.file_url"
-            :label="a.file_name"
-            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-          >
-            <template #suffix>
-              <FeatherIcon
-                class="h-3.5"
-                name="x"
-                @click.self.stop="removeAttachment(a)"
-              />
-            </template>
-          </AttachmentItem>
-        </div>
+        <AttachmentList
+          class="px-5 my-2"
+          :attachments="attachments"
+          @remove="removeAttachment"
+        />
         <!-- Fixed Menu -->
         <div
           class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
@@ -213,7 +202,7 @@
 </template>
 
 <script setup lang="ts">
-import { AttachmentItem, SavedRepliesSelectorModal } from "@/components";
+import { AttachmentList, SavedRepliesSelectorModal } from "@/components";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
