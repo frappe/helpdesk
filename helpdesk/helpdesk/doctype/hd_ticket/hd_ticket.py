@@ -929,18 +929,24 @@ class HDTicket(Document):
         self.add_seen()
         clear_notifications(ticket=self.name)
 
+    def is_valid_status_transition(self) -> bool:
+        """Closing an already-resolved ticket wraps up an outcome, it is not a new one."""
+        if self.is_new() or not self.has_value_changed("status"):
+            return False
+        if self.status != "Closed":
+            return True
+        previous = self.get_doc_before_save()
+        return not previous or previous.status_category != "Resolved"
+
     def set_resolution_date(self):
         """Stamp when the ticket was resolved. Runs for every ticket, with or
         without an SLA, since it is what resolution analytics bucket by."""
-        if self.is_new() or not self.has_value_changed("status"):
-            return
-
-        before = self.get_doc_before_save()
-        if before and before.status_category == "Resolved" and self.status == "Closed":
+        if not self.is_valid_status_transition():
             return
 
         if self.status_category != "Resolved":
             self.resolution_date = None
+            self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here
             return
         if self.resolution_date and not self.has_value_changed("status_category"):
             return

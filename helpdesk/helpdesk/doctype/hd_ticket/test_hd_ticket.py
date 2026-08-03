@@ -1888,6 +1888,28 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(ticket.resolution_date)
         self.assertFalse(ticket.resolution_time)
 
+    def test_reopening_a_detached_ticket_clears_resolution_time(self):
+        """Reopening must not leave a resolution duration behind with no resolution date."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.status = "Resolved"
+            ticket.save()
+        self.assertTrue(ticket.resolution_time)
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY  # detaches, so no SLA runs on the reopen
+        ticket.status = "Open"
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.resolution_date)
+        self.assertFalse(ticket.resolution_time)
+
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()

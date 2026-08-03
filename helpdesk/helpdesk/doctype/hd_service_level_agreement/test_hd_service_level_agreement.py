@@ -60,10 +60,10 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         ticket = make_ticket(priority="Medium")
         self.assertEqual(ticket.sla, "Default")
 
-    def test_demoted_default_sla_is_not_catch_all(self):
+    def test_demoted_default_sla_stops_matching_everything(self):
         # Promoting another SLA as default demotes the seeded "Default" SLA,
         # which stays enabled with a blank condition. It must not keep
-        # matching every ticket ahead of the new default.
+        # matching every ticket ahead of the new Default SLA.
         new_default = make_sla("New Default SLA").reload()
         new_default.default_sla = 1
         new_default.save()
