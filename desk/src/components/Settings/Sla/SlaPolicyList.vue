@@ -43,17 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import { LoadingIndicator } from "frappe-ui";
+import { dayjs, LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
 import { computed, inject } from "vue";
-import { resetSlaData, slaActiveScreen } from "@/stores/sla";
 import ShieldCheck from "~icons/lucide/shield-check";
-import { SlaPolicyListResourceSymbol } from "@/types";
+import { SlaPolicy, SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 
 // rank 0 means unranked, which is applied last
-const rankOrder = (sla) => sla.rank || Infinity;
+const rankOrder = (sla: SlaPolicy) => sla.rank || Infinity;
 
 // mirrors the ordering in get_sla (hd_service_level_agreement/utils.py) — keep in sync
 const orderedPolicies = computed(() =>
@@ -61,16 +60,7 @@ const orderedPolicies = computed(() =>
     (a, b) =>
       Number(a.default_sla) - Number(b.default_sla) ||
       rankOrder(a) - rankOrder(b) ||
-      String(a.creation ?? "").localeCompare(String(b.creation ?? ""))
+      dayjs(a.creation).diff(dayjs(b.creation))
   )
 );
-
-const goToNew = () => {
-  resetSlaData();
-  slaActiveScreen.value = {
-    screen: "view",
-    data: null,
-    fetchData: true,
-  };
-};
 </script>

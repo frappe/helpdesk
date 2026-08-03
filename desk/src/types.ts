@@ -704,6 +704,8 @@ export interface SlaPolicy {
   description: string;
   default_sla: boolean;
   enabled: boolean;
+  rank: number;
+  creation: string;
 }
 
 export interface Team {

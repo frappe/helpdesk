@@ -111,9 +111,10 @@ class HDServiceLevelAgreement(Document):
         )
 
     def count_open_tickets(self, **filters) -> int:
+        """Tickets still on the clock, so Paused counts too — they detach as well."""
         return frappe.db.count(
             self.doctype_ticket,
-            {"sla": self.name, "status_category": "Open", **filters},
+            {"sla": self.name, "status_category": ["!=", "Resolved"], **filters},
         )
 
     def validate_support_and_resolution(self):
@@ -201,14 +202,7 @@ class HDServiceLevelAgreement(Document):
             doc.service_level_agreement_creation = now_datetime()
 
     def handle_doc_status(self, doc: Document):
-        if doc.is_new() or not doc.has_value_changed("status"):
-            return
-
-        was_resolved = (
-            doc.get_doc_before_save().get("status_category", None) == "Resolved"
-        )
-        is_closed = doc.get("status", None) == "Closed"
-        if was_resolved and is_closed:
+        if not doc.is_valid_status_transitions():
             return
         self.set_first_response_time(doc)
         self.set_resolution_time(doc)
@@ -231,7 +225,6 @@ class HDServiceLevelAgreement(Document):
         """Business-hours duration to resolve. The date itself is stamped by the
         ticket, which does not need an SLA to know when it was resolved."""
         if not doc.resolution_date:
-            doc.resolution_time = None
             return
         start_at = doc.service_level_agreement_creation
         end_at = doc.resolution_date
@@ -282,18 +275,12 @@ class HDServiceLevelAgreement(Document):
         self.set_resolution_by(doc)
 
     def set_response_by(self, doc: Document):
-        start = doc.service_level_agreement_creation
         doc.response_by = self.calc_time(
             doc.service_level_agreement_creation, doc.priority, "response_time"
         )
 
     def set_resolution_by(self, doc: Document):
         total_hold_time = doc.total_hold_time or 0
-        start = add_to_date(
-            doc.service_level_agreement_creation,
-            seconds=total_hold_time,
-            as_datetime=True,
-        )
         doc.resolution_by = self.calc_time(
             doc.service_level_agreement_creation,
             doc.priority,
