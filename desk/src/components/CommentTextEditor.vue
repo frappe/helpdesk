@@ -43,7 +43,9 @@
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
+                      <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                       <AttachmentIcon
+                        v-else
                         class="h-4 w-4"
                         style="stroke-width: 1.5 !important"
                       />
@@ -86,7 +88,7 @@
   </Editor>
 </template>
 <script setup lang="ts">
-import { FileUploader, createResource } from "frappe-ui";
+import { FileUploader, LoadingIndicator, createResource } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
