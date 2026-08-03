@@ -960,7 +960,7 @@ class HDTicket(Document):
         """
         if sla := get_sla(self):
             self.sla = sla.name
-        elif self.sla:  # if sla is set
+        else:
             self.clear_sla_fields()
 
     def clear_sla_fields(self):
