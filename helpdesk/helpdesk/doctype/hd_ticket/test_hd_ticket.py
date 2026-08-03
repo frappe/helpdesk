@@ -2153,6 +2153,38 @@ class TestHDTicket(FrappeTestCase):
         self.assertFalse(ticket.resolution_date)
         self.assertFalse(ticket.resolution_time)
 
+    def test_detached_time_is_not_billed_as_hold_time(self):
+        """Detaching while paused must not credit the detached window as hold."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+        self.assertTrue(ticket.on_hold_since)
+
+        # un-pause and detach on the same save, so set_hold_time never runs
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.status = "Open"
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.on_hold_since)
+
+        # an hour later it matches again; the detached hour must not count as hold
+        with self.freeze_time(add_to_date(raised_at, minutes=80)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.status = "Replied"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertFalse(ticket.total_hold_time)
+
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()

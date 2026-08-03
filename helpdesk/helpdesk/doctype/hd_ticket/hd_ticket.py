@@ -987,7 +987,7 @@ class HDTicket(Document):
         """
         if sla := get_sla(self):
             self.sla = sla.name
-        elif self.sla:
+        elif self.sla:  # if sla is set
             self.clear_sla_fields()
 
     def clear_sla_fields(self):
@@ -996,6 +996,9 @@ class HDTicket(Document):
         self.sla = None
         self.response_by = None
         self.resolution_by = None
+        self.on_hold_since = (
+            None  # else the detached window is added into the hold time.
+        )
         if self.agreement_status != "Failed":
             self.agreement_status = None
 
