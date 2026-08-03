@@ -112,6 +112,7 @@ export default defineConfig(async ({ mode }) => {
         // each so its Combobox shares helpdesk's frappe-ui, not a second copy.
         "vue",
         "frappe-ui",
+        "reka-ui",
         "@tiptap/core",
         "@tiptap/pm",
         "prosemirror-state",
