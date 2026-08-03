@@ -90,6 +90,7 @@ import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
+import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
@@ -115,7 +116,6 @@ const router = useRouter();
 const authStore = useAuthStore();
 const configStore = useConfigStore();
 
-const showShortcutsModal = ref(false);
 const { appsMenuOption } = useApps();
 const { currentTheme, toggleTheme } = useTheme();
 

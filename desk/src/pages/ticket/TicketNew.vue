@@ -178,8 +178,8 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
-
-const subject = ref("");
+// Pre-filled by the command palette's "Create ticket …" fallback.
+const subject = ref(String(route.query.subject ?? ""));
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
