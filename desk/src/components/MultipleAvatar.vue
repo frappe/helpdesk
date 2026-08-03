@@ -1,8 +1,11 @@
 <template>
-  <div v-if="_avatars?.length" class="me-1.5 flex cursor-pointer items-center">
+  <div
+    v-if="_avatars?.length"
+    class="me-1.5 flex min-w-0 cursor-pointer items-center"
+  >
     <div
       v-if="_avatars?.length == 1"
-      class="flex items-center gap-2 text-base line-clamp-1"
+      class="flex min-w-0 items-center gap-2 text-base line-clamp-1"
     >
       <Tooltip :text="_avatars[0].name">
         <Avatar
@@ -11,7 +14,9 @@
           :label="_avatars[0].label"
           size="sm"
         />
-        <div class="truncate" v-if="!hideName">{{ _avatars[0].label }}</div>
+        <div class="min-w-0 truncate" v-if="!hideName">
+          {{ _avatars[0].label }}
+        </div>
       </Tooltip>
     </div>
     <Tooltip

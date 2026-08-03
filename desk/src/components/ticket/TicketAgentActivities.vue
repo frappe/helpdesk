@@ -177,8 +177,17 @@ onMounted(() => {
   });
 });
 
+// The URL hash carries only active-tab state (useActiveTabManager). Activity
+// deep-links from notifications/search arrive as ?highlight=<element id>
+// (comment-<name> / communication-<name>, the ids CommentBox and EmailArea
+// render) so the one-shot scroll+cleanup below never touches tab state.
+function linkedActivityId() {
+  const id = route.query.highlight;
+  return typeof id === "string" ? id : "";
+}
+
 function scrollToLatestActivity() {
-  if (route.hash) {
+  if (linkedActivityId()) {
     scrollToHash();
     return;
   }
@@ -193,11 +202,8 @@ function scrollToLatestActivity() {
   }, 500);
 }
 function scrollToHash() {
-  const hash = route.hash;
-  if (hash) {
-    // Remove the # symbol
-    const elementId = hash.substring(1);
-
+  const elementId = linkedActivityId();
+  if (elementId) {
     nextTick(() => {
       // Wait for activities to be rendered
       setTimeout(() => {
@@ -208,10 +214,14 @@ function scrollToHash() {
           // Add highlight effect using Tailwind class
           element.classList.add("bg-surface-yellow-2");
 
-          // Remove highlight after 2 seconds
+          // Remove highlight after 2 seconds; drop only the consumed
+          // ?highlight param, keeping other query keys (?view=) and
+          // whatever tab the user is on by now.
           setTimeout(() => {
             element.classList.remove("bg-surface-yellow-2");
-            router.replace({ hash: "" });
+            const query = { ...route.query };
+            delete query.highlight;
+            router.replace({ query, hash: route.hash });
           }, 2000);
         }
       }, 1000);
@@ -220,7 +230,7 @@ function scrollToHash() {
 }
 
 watch(
-  () => route.hash,
+  () => [route.hash, route.query.highlight],
   () => {
     scrollToLatestActivity();
   }
