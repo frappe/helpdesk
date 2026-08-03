@@ -165,15 +165,17 @@ class HelpdeskDashboard:
         }
 
     def get_sla_fulfilled_count(self):
-        extra_cond = self.ticket.agreement_status == "Fulfilled"
-        current_fulfilled, prev_fulfilled = self.get_metric_data(
-            self.ticket.name, Count, extra_cond
-        )
-
-        # only tickets that carried a policy can fulfil one
+        # the numerator must stay a subset of the denominator, else the
+        # percentage can exceed 100 (a response-only SLA marks an open ticket
+        # Fulfilled, which no resolved-status filter would count)
         status_cond = self.ticket.sla.isnotnull()
         if self.resolved_statuses:
             status_cond = status_cond & self.ticket.status.isin(self.resolved_statuses)
+        current_fulfilled, prev_fulfilled = self.get_metric_data(
+            self.ticket.name,
+            Count,
+            status_cond & (self.ticket.agreement_status == "Fulfilled"),
+        )
         current_total, prev_total = self.get_metric_data(
             self.ticket.name, Count, status_cond
         )
