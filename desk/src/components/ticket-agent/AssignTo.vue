@@ -12,20 +12,8 @@
         </span>
         <Button
           ref="triggerRef"
-<<<<<<< HEAD
-          variant="outline"
-          class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full [&>span]:min-w-0"
-=======
           :variant="ghost ? 'ghost' : 'outline'"
-<<<<<<< HEAD
-          class="!flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
-<<<<<<< HEAD
-          :class="ghost ? '!px-[9px] hover:!bg-transparent' : 'hover:shadow-sm'"
->>>>>>> 865fdb4c (fix: reposition SLA layout)
-=======
-=======
           class="group !flex !justify-start w-full active:!bg-inherit [&>span]:w-full"
->>>>>>> a16c83a5 (fix: assignTo focus state and animation)
           :class="
             ghost
               ? [
@@ -36,7 +24,6 @@
                 ]
               : 'hover:shadow-sm'
           "
->>>>>>> 53284913 (fix: better SLA layout)
           @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
@@ -54,27 +41,12 @@
               </span>
             </template>
             <template v-else>
-<<<<<<< HEAD
-              <span class="text-ink-gray-5">{{ __("No one") }}</span>
-              <span
-=======
               <span v-if="ghost" class="text-ink-gray-4">
                 {{ __("Set Assignee") }}...
               </span>
               <span v-else class="text-ink-gray-5 leading-5">{{
                 __("No one")
               }}</span>
-<<<<<<< HEAD
-              <!-- <span
->>>>>>> 53284913 (fix: better SLA layout)
-                v-if="!popoverIsOpen"
-                class="text-xs text-ink-gray-6 hover:text-ink-gray-8 cursor-pointer underline ml-auto"
-                @click.stop="assignSelf"
-              >
-                {{ __("Assign yourself") }}
-              </span>
-=======
->>>>>>> 274271f8 (fix: polish side panel)
             </template>
           </div>
           <template #suffix>
@@ -117,43 +89,10 @@
             @click.stop
             @keydown="handleInputKeydown"
           >
-<<<<<<< HEAD
-            <input
-              ref="inputRef"
-              v-model="searchText"
-              :placeholder="__('Search agents...')"
-              class="px-2 flex-1 bg-transparent border-none outline-none text-sm focus:border-none focus:ring-0 text-ink-gray-6 placeholder-ink-gray-4"
-              @click.stop
-              @keydown="handleInputKeydown"
-<<<<<<< HEAD
-            />
-            <Button
-              v-if="searchText.length > 0"
-              variant="ghost"
-              size="sm"
-              @click="searchText = ''"
-            >
-              <template #icon>
-                <LucideX class="size-4" />
-              </template>
-            </Button>
-=======
-            >
-              <template #prefix>
-                <LucideSearch class="size-4 text-ink-gray-4" />
-              </template>
-              <template #suffix>
-                <ShortcutKey v-if="!searchText" keys="A" />
-              </template>
-            </TextInput>
->>>>>>> 53284913 (fix: better SLA layout)
-          </div>
-=======
             <template #suffix>
               <ShortcutKey v-if="!searchText" keys="A" />
             </template>
           </TextInput>
->>>>>>> eb27fb81 (fix: polish sidebar and priority)
         </div>
 
         <!-- Agent List -->
@@ -227,6 +166,7 @@
 </template>
 
 <script setup lang="ts">
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useUserStore } from "@/stores/user";
@@ -239,7 +179,6 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
-import ShortcutKey from "@/components/ShortcutKey.vue";
 import { prettyDate } from "@/utils.ts";
 import { useDebounceFn } from "@vueuse/core";
 import {
@@ -255,11 +194,6 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
-<<<<<<< HEAD
-
-import LucideSearch from "~icons/lucide/search";
-=======
->>>>>>> eb27fb81 (fix: polish sidebar and priority)
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
 interface Props {
@@ -285,7 +219,7 @@ const currentAgentName = window.agent;
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
-const inputRef = useTemplateRef<HTMLInputElement>("inputRef");
+const inputRef = useTemplateRef<InstanceType<typeof TextInput>>("inputRef");
 const triggerRef = useTemplateRef("triggerRef");
 
 const popoverIsOpen = ref(false);
@@ -318,7 +252,7 @@ watch(popoverIsOpen, (isOpen) => {
     searchText.value = "";
     highlightedIndex.value = 0;
     nextTick(() => {
-      inputRef.value?.focus();
+      inputRef.value?.el?.focus();
     });
   } else if (hasBeenOpened.value) {
     // Closing after a real open: compute diff and save
@@ -341,7 +275,7 @@ const agentResource = createListResource({
     "availability",
     "availability_changed_on",
   ],
-  filters: { is_active: true, name: ["!=", "christopherwhitaker@example.net"] },
+  filters: { is_active: true },
   pageLength: 20,
   auto: true,
 });
@@ -376,7 +310,7 @@ function liveAvailability(agent: {
 
 const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
-  const options = new Set<string>();
+  const seen = new Set<string>();
 
   // Include current agent only when not searching. Built from the session user
   // and the store's live status (seeded from auth.get_user) — no extra fetch.
@@ -387,19 +321,19 @@ const agentOptions = computed<AgentOption[]>(() => {
       image: currentUser.value.user_image || "",
       ...liveAvailability({ name: currentAgentName }),
     });
-    options.add(currentAgentName);
+    seen.add(currentAgentName);
   }
 
   if (agentResource.data) {
     for (const agent of agentResource.data) {
-      if (!options.has(agent.name)) {
+      if (!seen.has(agent.name)) {
         agents.push({
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,
           image: agent.user_image || getUser(agent.name).user_image,
           ...liveAvailability(agent),
         });
-        options.add(agent.name);
+        seen.add(agent.name);
       }
     }
   }
@@ -453,6 +387,7 @@ const sortedAgentOptions = computed<AgentOption[]>(() => {
   if (assigned.length > 0) {
     return [...assigned, ...selfOption, ...rest];
   }
+
   return [...selfOption, ...rest];
 });
 
@@ -574,7 +509,9 @@ const addAssigneesResource = createResource({
     assign_to: addedAssignees,
   }),
   onSuccess: () => {
-    capture("ticket_assigned", { doctype: "HD Ticket" });
+    capture("ticket_assigned", {
+      data: { doctype: "HD Ticket", source: "popover" },
+    });
   },
 });
 
@@ -651,8 +588,6 @@ useShortcut("a", () => {
   (triggerRef.value?.$el as HTMLElement)?.click();
 });
 </script>
-<<<<<<< HEAD
-=======
 
 <style scoped>
 /* The class lands on TextInput's component root, which lacks this component's
@@ -669,4 +604,3 @@ useShortcut("a", () => {
   @apply pe-0;
 }
 </style>
->>>>>>> 700c4881 (fix: assignee component width)

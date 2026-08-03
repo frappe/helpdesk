@@ -19,23 +19,6 @@
         </div>
       </Tooltip>
     </div>
-<<<<<<< HEAD
-    <Tooltip
-      v-for="avatar in _avatars"
-      v-else
-      :key="avatar.name"
-      :text="avatar.name"
-    >
-      <Avatar
-        class="user-avatar -me-1.5 ring-2 ring-[var(--surface-base)] transition hover:z-10 hover:scale-110"
-        shape="circle"
-        :image="avatar.image"
-        :label="avatar.label"
-        :size="size"
-        :data-name="avatar.name"
-      />
-    </Tooltip>
-=======
     <template v-else>
       <Tooltip
         v-for="avatar in visibleAvatars"
@@ -59,7 +42,6 @@
         </div>
       </Tooltip>
     </template>
->>>>>>> 700c4881 (fix: assignee component width)
   </div>
 </template>
 <script setup lang="ts">
