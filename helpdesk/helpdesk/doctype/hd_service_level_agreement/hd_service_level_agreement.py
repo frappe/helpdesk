@@ -30,6 +30,7 @@ class HDServiceLevelAgreement(Document):
         self.validate_condition()
         self.warn_removed_priorities()
         self.warn_default_sla_removed()
+        self.warn_sla_disabled()
 
     def validate_priorities(self):
         self.validate_priority_defaults()
@@ -107,6 +108,21 @@ class HDServiceLevelAgreement(Document):
                 "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
             ).format(count),
             title=_("Default SLA turned off"),
+            indicator="orange",
+        )
+
+    def warn_sla_disabled(self):
+        """Warn when disabling a policy: tickets on it detach on their next save."""
+        if not self.has_value_changed("enabled") or self.enabled:
+            return
+        count = self.count_open_tickets()
+        if not count:
+            return
+        frappe.msgprint(
+            _(
+                "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
+            ).format(count),
+            title=_("SLA disabled"),
             indicator="orange",
         )
 

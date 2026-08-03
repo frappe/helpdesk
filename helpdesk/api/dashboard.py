@@ -170,11 +170,10 @@ class HelpdeskDashboard:
             self.ticket.name, Count, extra_cond
         )
 
-        status_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
-        )
+        # only tickets that carried a policy can fulfil one
+        status_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            status_cond = status_cond & self.ticket.status.isin(self.resolved_statuses)
         current_total, prev_total = self.get_metric_data(
             self.ticket.name, Count, status_cond
         )
@@ -192,7 +191,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_first_response_time(self):
-        extra_cond = self.ticket.first_responded_on.isnotnull()
+        extra_cond = (
+            self.ticket.sla.isnotnull() & self.ticket.first_responded_on.isnotnull()
+        )
         current, prev = self.get_metric_data(
             self.ticket.first_response_time / 3600, Avg, extra_cond
         )
@@ -208,11 +209,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_resolution_time(self):
-        extra_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
-        )
+        extra_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            extra_cond = extra_cond & self.ticket.status.isin(self.resolved_statuses)
         value_expr = Function("CEIL", self.ticket.resolution_time / 86400)
         current, prev = self.get_metric_data(value_expr, Avg, extra_cond)
 

@@ -175,6 +175,30 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         default.save()
         self.assertIn("lose", frappe.as_json(frappe.get_message_log()))
 
+    def test_warns_when_disabling_sla_with_open_tickets(self):
+        """Disabling a policy warns: every ticket on it detaches on its next save."""
+        sla = make_sla("Disablable SLA", "doc.priority == 'Medium'")
+        self.addCleanup(frappe.db.set_value, DOCTYPE, sla.name, "enabled", 0)
+
+        # an enabled policy with nothing on it says nothing
+        frappe.clear_messages()
+        sla.reload()
+        sla.enabled = 0
+        sla.save()
+        self.assertFalse(frappe.get_message_log())
+
+        sla.reload()
+        sla.enabled = 1
+        sla.save()
+        ticket = make_ticket(priority="Medium")
+        self.assertEqual(ticket.sla, sla.name)
+
+        frappe.clear_messages()
+        sla.reload()
+        sla.enabled = 0
+        sla.save()
+        self.assertIn("lose", frappe.as_json(frappe.get_message_log()))
+
     def test_warns_when_removing_priority_used_by_open_tickets(self):
         """Removing a priority warns only when open tickets actually use it."""
         unused = make_sla(
