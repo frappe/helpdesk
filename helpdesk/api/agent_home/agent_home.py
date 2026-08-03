@@ -585,3 +585,120 @@ def get_pending_tickets(ticket_type: str = "upcoming_sla"):
         "tickets": tickets,
         "total_pending_tickets": total_count,
     }
+
+
+RECENT_ACTIVITY_LIMIT = 20
+RECENT_ACTIVITY_DAYS = 3
+
+# (doctype, user_field, ticket_field, activity_type, extra_filters)
+ACTIVITY_SOURCES = [
+    (
+        "Communication",
+        "owner",
+        "reference_name",
+        "replied",
+        {"reference_doctype": "HD Ticket", "sent_or_received": "Sent"},
+    ),
+    ("HD Ticket Comment", "commented_by", "reference_ticket", "commented", {}),
+    # SLA changes are automated noise, not something the agent chose to do.
+    (
+        "HD Ticket Activity",
+        "owner",
+        "ticket",
+        "updated",
+        {"action": ["not like", "%SLA%"]},
+    ),
+    (
+        "View Log",
+        "viewed_by",
+        "reference_name",
+        "viewed",
+        {"reference_doctype": "HD Ticket"},
+    ),
+    (
+        "ToDo",
+        "assigned_by",
+        "reference_name",
+        "assigned",
+        {"reference_type": "HD Ticket"},
+    ),
+]
+
+
+@frappe.whitelist()
+@agent_only
+def get_recent_activity() -> list[dict]:
+    """The current agent's latest action per ticket (replied, commented, updated,
+    viewed, assigned), one row per ticket, newest first, over the last few days."""
+    user = frappe.session.user
+    cutoff = frappe.utils.add_days(frappe.utils.nowdate(), -RECENT_ACTIVITY_DAYS)
+
+    events = []
+    for (
+        doctype,
+        user_field,
+        ticket_field,
+        activity_type,
+        extra_filters,
+    ) in ACTIVITY_SOURCES:
+        filters = {**extra_filters, user_field: user, "creation": [">=", cutoff]}
+        events += _activity_events(doctype, filters, ticket_field, activity_type)
+
+    # One row per ticket: keep only its most recent event across all sources.
+    latest_per_ticket: dict[str, dict] = {}
+    for event in sorted(events, key=lambda e: e["creation"]):
+        latest_per_ticket[event["ticket"]] = event
+    if not latest_per_ticket:
+        return []
+
+    # get_list respects permissions, so tickets the agent can't access drop out
+    # here — before the cap, so they can't leave the card underfilled.
+    accessible_tickets = frappe.get_list(
+        "HD Ticket",
+        filters=[["name", "in", list(latest_per_ticket)]],
+        fields=["name", "subject"],
+    )
+    subject_by_ticket = {t.name: t.subject for t in accessible_tickets}
+
+    recent = sorted(
+        (e for e in latest_per_ticket.values() if e["ticket"] in subject_by_ticket),
+        key=lambda e: e["creation"],
+        reverse=True,
+    )[:RECENT_ACTIVITY_LIMIT]
+
+    return [
+        {
+            "name": e["ticket"],
+            "subject": subject_by_ticket[e["ticket"]],
+            "activity_type": e["type"],
+            "text": e["text"],
+            "timestamp": format_time_difference(e["creation"]),
+            "creation": e["creation"],
+        }
+        for e in recent
+    ]
+
+
+def _activity_events(
+    doctype: str, filters: dict, ticket_field: str, activity_type: str
+) -> list[dict]:
+    """Every event of one type the agent performed in the window, tagged with its
+    ticket. Deduping to one row per ticket happens in get_recent_activity."""
+    fields = [f"{ticket_field} as ticket", "creation"]
+    if activity_type == "updated":
+        fields.append("action")
+    return [
+        {
+            "ticket": row.ticket,
+            "type": activity_type,
+            "text": _updated_label(row.action) if activity_type == "updated" else None,
+            "creation": row.creation,
+        }
+        for row in frappe.get_all(doctype, filters=filters, fields=fields)
+        if row.ticket
+    ]
+
+
+def _updated_label(action: str) -> str | None:
+    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
+    return action[:1].upper() + action[1:] if action else None
