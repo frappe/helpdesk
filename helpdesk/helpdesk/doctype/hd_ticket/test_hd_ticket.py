@@ -2224,6 +2224,44 @@ class TestHDTicket(FrappeTestCase):
             add_to_date(get_datetime(resolution_by), minutes=30),
         )
 
+    def test_unpausing_while_detached_drops_the_pause_anchor(self):
+        """A detached ticket has no SLA to finalise its hold, so leaving Paused
+        must drop the anchor rather than bank the gap as hold time."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+
+        # detach while still paused, so the anchor is deliberately kept
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertTrue(ticket.on_hold_since)
+
+        # un-pause with no SLA attached: nothing can finalise the hold
+        with self.freeze_time(add_to_date(raised_at, minutes=30)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.on_hold_since)
+
+        # re-attaching must not treat the open, detached window as hold
+        with self.freeze_time(add_to_date(raised_at, minutes=90)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.status = "Replied"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertFalse(ticket.total_hold_time)
+
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()
