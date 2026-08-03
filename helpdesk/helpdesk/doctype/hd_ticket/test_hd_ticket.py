@@ -8,6 +8,7 @@ from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.api.ticket import bulk_reply
+from helpdesk.consts import DEFAULT_SLA
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
@@ -229,7 +230,7 @@ class TestHDTicket(IntegrationTestCase):
 
         # high priority has 1 hour response time and 4 hours resolution time
         first_response, resolution = get_priority_response_resolution_time(
-            "Default", "High", ticket_creation, add_to_time=False
+            DEFAULT_SLA, "High", ticket_creation, add_to_time=False
         )
         # start time = 10:00 AM
         # response time = 11:00 AM
@@ -1204,7 +1205,7 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(ticket3.priority, "Low")
 
         # if ticket type is set, and ticket type does not has a priority, the ticket's priority will be the same as applied sla's default priority
-        sla_doc = frappe.get_doc("HD Service Level Agreement", "Default")
+        sla_doc = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
         for p in sla_doc.priorities:
             if p.priority == "Low":
                 p.default_priority = 1
@@ -1591,8 +1592,8 @@ class TestHDTicket(IntegrationTestCase):
 
     def demote_default_sla(self):
         """Leave the site with no Default SLA, restored once the test ends."""
-        self.addCleanup(set_default_sla, "Default", 1)
-        set_default_sla("Default", 0)
+        self.addCleanup(set_default_sla, DEFAULT_SLA, 1)
+        set_default_sla(DEFAULT_SLA, 0)
 
     def test_ticket_without_sla(self):
         """A priority that no SLA includes leaves every SLA field blank."""
@@ -1730,7 +1731,7 @@ class TestHDTicket(IntegrationTestCase):
         )
         ticket.save()
 
-        self.assertEqual(ticket.sla, "Default")
+        self.assertEqual(ticket.sla, DEFAULT_SLA)
         self.assertTrue(ticket.response_by)
 
     def test_detach_keeps_breach_facts(self):
@@ -1843,8 +1844,8 @@ class TestHDTicket(IntegrationTestCase):
 
     def test_default_sla_applied_only_when_no_condition_matches(self):
         """The Default SLA is considered last, even when it carries the best rank."""
-        frappe.db.set_value(SLA_DOCTYPE, "Default", "rank", 1)
-        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, "Default", "rank", 0)
+        frappe.db.set_value(SLA_DOCTYPE, DEFAULT_SLA, "rank", 1)
+        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, DEFAULT_SLA, "rank", 0)
         matched = self.make_test_sla(
             "Worst Rank SLA", "doc.priority == 'Medium'", rank=99, priorities=["Medium"]
         )
@@ -1853,7 +1854,7 @@ class TestHDTicket(IntegrationTestCase):
 
         frappe.db.set_value(SLA_DOCTYPE, matched.name, "enabled", 0)
         unmatched = make_ticket(subject="Nothing matches", priority="Medium")
-        self.assertEqual(unmatched.sla, "Default")
+        self.assertEqual(unmatched.sla, DEFAULT_SLA)
 
     def test_ticket_without_sla_uses_settings_default_status(self):
         """A blank ticket takes its status from HD Settings, not an arbitrary policy."""

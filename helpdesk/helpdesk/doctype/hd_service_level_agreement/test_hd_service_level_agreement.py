@@ -5,6 +5,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime
 
+from helpdesk.consts import DEFAULT_SLA
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
     get_current_week_monday,
@@ -58,10 +59,10 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
 
         # Medium matches no conditional SLA, so the default SLA must win
         ticket = make_ticket(priority="Medium")
-        self.assertEqual(ticket.sla, "Default")
+        self.assertEqual(ticket.sla, DEFAULT_SLA)
 
     def test_demoted_default_sla_stops_matching_everything(self):
-        # Promoting another SLA as default demotes the seeded "Default" SLA,
+        # Promoting another SLA as default demotes the seeded SLA,
         # which stays enabled with a blank condition. It must not keep
         # matching every ticket ahead of the new Default SLA.
         new_default = make_sla("New Default SLA").reload()
@@ -69,7 +70,7 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         new_default.save()
 
         def restore():
-            default = frappe.get_doc("HD Service Level Agreement", "Default")
+            default = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
             default.default_sla = 1
             default.save()
             frappe.db.set_value(
@@ -78,9 +79,11 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
 
         self.addCleanup(restore)
 
-        # premise: saving the new default actually demoted "Default"
+        # premise: saving the new default actually demoted the seeded SLA
         self.assertEqual(
-            frappe.db.get_value("HD Service Level Agreement", "Default", "default_sla"),
+            frappe.db.get_value(
+                "HD Service Level Agreement", DEFAULT_SLA, "default_sla"
+            ),
             0,
         )
 
@@ -92,16 +95,16 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         """A site may run with no Default SLA: it can be unticked and deleted."""
 
         def restore():
-            default = frappe.get_doc(DOCTYPE, "Default")
+            default = frappe.get_doc(DOCTYPE, DEFAULT_SLA)
             default.default_sla = 1
             default.save()
 
         self.addCleanup(restore)
 
-        default = frappe.get_doc(DOCTYPE, "Default")
+        default = frappe.get_doc(DOCTYPE, DEFAULT_SLA)
         default.default_sla = 0
         default.save()
-        self.assertFalse(frappe.db.get_value(DOCTYPE, "Default", "default_sla"))
+        self.assertFalse(frappe.db.get_value(DOCTYPE, DEFAULT_SLA, "default_sla"))
 
         # a conditional policy still saves with no Default SLA on the site
         conditional = make_sla("No Default SLA", "doc.priority == 'Medium'")
@@ -147,7 +150,7 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         """Unticking the Default SLA warns: every ticket on it detaches on its next save."""
 
         def restore_default():
-            default = frappe.get_doc(DOCTYPE, "Default")
+            default = frappe.get_doc(DOCTYPE, DEFAULT_SLA)
             default.default_sla = 1
             default.save()
 
@@ -167,10 +170,10 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
 
         restore_default()
         ticket = make_ticket(priority="Medium")  # only the Default SLA matches Medium
-        self.assertEqual(ticket.sla, "Default")
+        self.assertEqual(ticket.sla, DEFAULT_SLA)
 
         frappe.clear_messages()
-        default = frappe.get_doc(DOCTYPE, "Default")
+        default = frappe.get_doc(DOCTYPE, DEFAULT_SLA)
         default.default_sla = 0
         default.save()
         self.assertIn("lose", frappe.as_json(frappe.get_message_log()))
