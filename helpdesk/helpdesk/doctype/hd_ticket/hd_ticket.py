@@ -506,6 +506,18 @@ class HDTicket(Document):
         if frappe.session.user != agent:
             self.notify_agent(agent, "Assignment")
 
+    def add_tag(self, tag: str, color: str = "Gray"):
+        """Tag this ticket, claiming the Tag master for helpdesk.
+
+        Overrides ``Document.add_tag``, which links the tag but leaves the
+        master without app/color, so it never lists in the tag picker.
+        ``remove_tag`` needs no override: core's already ignores a tag that
+        is not applied.
+        """
+        from helpdesk.api.tags import apply_tag
+
+        apply_tag(self.doctype, self.name, tag, color)
+
     def get_assigned_agents(self):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
