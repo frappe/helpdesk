@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: frappe\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
 "POT-Creation-Date: 2026-06-28 11:13+0000\n"
-"PO-Revision-Date: 2026-06-29 21:58\n"
+"PO-Revision-Date: 2026-06-29 21:57\n"
 "Last-Translator: hello@frappe.io\n"
-"Language-Team: Hindi\n"
+"Language-Team: Bulgarian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,14 +13,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: frappe\n"
 "X-Crowdin-Project-ID: 639578\n"
-"X-Crowdin-Language: hi\n"
+"X-Crowdin-Language: bg\n"
 "X-Crowdin-File: /[frappe.helpdesk] develop/helpdesk/locale/main.pot\n"
 "X-Crowdin-File-ID: 118\n"
-"Language: hi_IN\n"
+"Language: bg_BG\n"
 
 #: desk/src/components/CommentBox.vue:14
 msgid " commented"
-msgstr " टिप्पणी की"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:182
 msgid "% SLA Fulfilled"
@@ -41,7 +41,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:116
 msgid "- Ticket Reopen Status<br>"
-msgstr "- टिकट पुनः खोलने की स्थिति<br>"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:92
 msgid "- {0} as Default Status<br>"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:94
 msgid "- {0} as Reopen Status<br>"
-msgstr "- {0} पुनः खोलने की स्थिति<br> के रूप में"
+msgstr ""
 
 #. Description of the 'Feedback' (Select) field in DocType 'HD Article
 #. Feedback'
@@ -60,7 +60,7 @@ msgstr ""
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:178
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:196
 msgid "1 Year"
-msgstr "1 वर्ष"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:154
 msgid "1 person reacted to your comment"
@@ -69,13 +69,13 @@ msgstr ""
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:176
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:188
 msgid "3 Months"
-msgstr "3 महीने"
+msgstr ""
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:177
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:183
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:192
 msgid "6 Months"
-msgstr "6 महीने"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:117
 msgid "<br>Please update HD Settings to use a different status before disabling this status."
@@ -102,7 +102,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketNew.vue:69
 msgid "A short description"
-msgstr "एक संक्षिप्त विवरण"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:268
 msgid "A workday with this name already exists"
@@ -118,15 +118,15 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:262
 msgid "Access only this team's tickets"
-msgstr "केवल इसी टीम के टिकटों तक पहुंच प्राप्त करें"
+msgstr ""
 
 #: desk/src/components/Settings/SettingsModal.vue:19
 msgid "Account"
-msgstr "खाता"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:104
 msgid "Account Info & Security"
-msgstr "खाता जानकारी और सुरक्षा"
+msgstr ""
 
 #. Label of the acknowledgement_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -138,21 +138,21 @@ msgstr ""
 #. Label of the action (Small Text) field in DocType 'HD Ticket Activity'
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
-msgstr "कार्रवाई"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.py:24
 msgid "Action Required"
-msgstr "कार्रवाई आवश्यक है"
+msgstr ""
 
 #: desk/src/pages/contact/Contact.vue:303
 msgid "Actions"
-msgstr "कार्रवाई"
+msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:42
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Active"
-msgstr "सक्रिय"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:384
 msgid "Active now"
@@ -176,7 +176,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:643
 msgid "Add Category"
-msgstr "श्रेणी जोड़ना"
+msgstr ""
 
 #: desk/src/components/view-controls/ColumnSettings.vue:69
 msgid "Add Column"
@@ -286,14 +286,14 @@ msgstr ""
 #. Label of the about (Code) field in DocType 'HD Ticket Template'
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Additional Information"
-msgstr "अतिरिक्त जानकारी"
+msgstr ""
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Administrator"
-msgstr "प्रशासक"
+msgstr ""
 
 #. Name of a role
 #. Label of a Link in the Helpdesk Workspace
@@ -320,7 +320,7 @@ msgstr "प्रशासक"
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Agent"
-msgstr "प्रतिनिधि"
+msgstr ""
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -346,12 +346,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Agent Manager"
-msgstr "एजेंट प्रबंधक"
+msgstr ""
 
 #. Label of the agent_name (Data) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Agent Name"
-msgstr "एजेंट का नाम"
+msgstr ""
 
 #. Label of the agent_status (Data) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
@@ -360,7 +360,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:109
 msgid "Agent name"
-msgstr "एजेंट का नाम"
+msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:3
 msgid "Agents"
@@ -381,7 +381,7 @@ msgstr ""
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "All"
-msgstr "सभी"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:253
 msgid "All SLAs on track"
@@ -391,11 +391,11 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:398
 #: desk/src/pages/home/components/RecentFeedback.vue:406
 msgid "All Time"
-msgstr "पूरे समय"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:293
 msgid "All Views"
-msgstr "सभी दृश्य"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:322
 msgid "All articles from this category will move to General category."
@@ -414,7 +414,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/TicketSettings.vue:109
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Allow anyone to create tickets"
-msgstr "किसी को भी टिकट बनाने की अनुमति दें"
+msgstr ""
 
 #. Description of the 'Enable comment reactions' (Check) field in DocType 'HD
 #. Settings'
@@ -439,7 +439,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:26
 msgid "Appearance"
-msgstr "उपस्थिति"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:17
 msgid "Appears in the left sidebar. Recommended size is minimum 32x32 px in PNG or SVG."
@@ -458,29 +458,29 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Apply SLA for Resolution Time"
-msgstr "समाधान समय के लिए SLA लागू करें"
+msgstr ""
 
 #. Label of the apply_to (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply To"
-msgstr "पर लागू"
+msgstr ""
 
 #. Label of the apply_on_new_page (Check) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply on new page"
-msgstr "नए पेज पर आवेदन करें"
+msgstr ""
 
 #. Label of the enable_outside_hours_banner (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Apply outside working hours"
-msgstr "कार्य समय के बाहर आवेदन करें"
+msgstr ""
 
 #. Label of the apply_to_customer_portal (Check) field in DocType 'HD Form
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
-msgstr "ग्राहक पोर्टल पर आवेदन करें"
+msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:451
@@ -494,7 +494,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketCustomer.vue:314
 msgid "Are you sure you want to close this ticket?"
-msgstr "क्या आप वाकई इस टिकट को बंद करना चाहते हैं?"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:205
 msgid "Are you sure you want to delete these articles?"
@@ -514,15 +514,15 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:541
 msgid "Are you sure you want to delete this view?"
-msgstr "क्या आप वाकई इस दृश्य को हटाना चाहते हैं?"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:147
 msgid "Are you sure you want to discard changes?"
-msgstr "क्या आप वाकई बदलावों को रद्द करना चाहते हैं?"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:144
 msgid "Are you sure you want to discard this article?"
-msgstr "क्या आप वाकई इस लेख को हटाना चाहते हैं?"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:450
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:103
@@ -543,7 +543,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:111
 msgid "Are you sure you want to remove the logo?"
-msgstr "क्या आप वाकई लोगो हटाना चाहते हैं?"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:295
 msgid "Are you sure you want to remove this contact from the customer?"
@@ -557,7 +557,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:114
 #: helpdesk/helpdesk/doctype/hd_article_feedback/hd_article_feedback.json
 msgid "Article"
-msgstr "लेख"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:519
 msgid "Article body cannot be set as empty."
@@ -577,7 +577,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:514
 msgid "Article title cannot be set as empty"
-msgstr "लेख का शीर्षक खाली नहीं रखा जा सकता"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:545
 msgid "Article updated successfully."
@@ -601,17 +601,17 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:39
 msgid "Assign yourself"
-msgstr "स्वयं को नियुक्त करें"
+msgstr ""
 
 #: desk/src/components/customer/TicketsTab.vue:236
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
-msgstr "को सौंपना"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:11
 msgid "Assignee"
-msgstr "संपत्ति-भागी"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:5
 msgid "Assignee Rules"
@@ -632,7 +632,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Assignment"
-msgstr "कार्यभार"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:122
 msgid "Assignment Condition"
@@ -706,19 +706,19 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:418
 msgid "At least one team is required"
-msgstr "कम से कम एक टीम आवश्यक है"
+msgstr ""
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Attachment"
-msgstr "लगाव"
+msgstr ""
 
 #. Label of the author (Link) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Author"
-msgstr "लेखक"
+msgstr ""
 
 #. Label of the auto_update_status (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/TicketSettings.vue:80
@@ -749,7 +749,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:145
 msgid "Automatically close stale tickets"
-msgstr "पुराने टिकट अपने आप बंद हो जाते हैं"
+msgstr ""
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -769,24 +769,24 @@ msgstr ""
 
 #: desk/src/pages/home/components/ChartItem.vue:6
 msgid "Average First Response"
-msgstr "औसत प्रथम प्रतिक्रिया"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:317
 msgid "Average First Response Time"
-msgstr "औसत प्रथम प्रतिक्रिया समय"
+msgstr ""
 
 #: desk/src/pages/home/components/ChartItem.vue:16
 msgid "Average Resolution"
-msgstr "औसत संकल्प"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:329
 msgid "Average Resolution Time"
-msgstr "औसत समाधान समय"
+msgstr ""
 
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
-msgstr "औसत प्रतिक्रिया समय"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:305
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:5
@@ -803,11 +803,11 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:293
 msgid "Average tickets per day is around {0}"
-msgstr "प्रतिदिन टिकटों की औसत संख्या लगभग {0} है"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:238
 msgid "Avg. Feedback Rating"
-msgstr "औसत प्रतिक्रिया रेटिंग"
+msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:13
 msgid "Avg. Feedback Received"
@@ -815,7 +815,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:197
 msgid "Avg. First Response"
-msgstr "औसत प्रथम प्रतिक्रिया"
+msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:49
 msgid "Avg. First Response Time"
@@ -823,7 +823,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:216
 msgid "Avg. Resolution"
-msgstr "औसत संकल्प"
+msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:62
 msgid "Avg. Resolution Time"
@@ -836,20 +836,20 @@ msgstr ""
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:121
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:290
 msgid "Avg. first response time"
-msgstr "औसत प्रथम प्रतिक्रिया समय"
+msgstr ""
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:130
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:298
 msgid "Avg. resolution time"
-msgstr "औसत समाधान समय"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:203
 msgid "Avg. time taken to first respond to a ticket"
-msgstr "टिकट पर पहली प्रतिक्रिया देने में लगने वाला औसत समय"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:222
 msgid "Avg. time taken to resolve a ticket"
-msgstr "किसी टिकट को हल करने में लगने वाला औसत समय"
+msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
@@ -859,21 +859,21 @@ msgstr ""
 #: desk/src/components/Settings/EmailAdd.vue:145
 #: desk/src/components/Settings/EmailEdit.vue:134
 msgid "Back"
-msgstr "पीछे"
+msgstr ""
 
 #: desk/src/pages/InvalidPage.vue:25 desk/src/pages/ticket/TicketAgent.vue:44
 msgid "Back to Tickets"
-msgstr "टिकटों पर वापस जाएँ"
+msgstr ""
 
 #. Label of the base_support_rotation (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Base Support Rotation"
-msgstr "आधार समर्थन घूर्णन"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:9
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:9
 msgid "Based On"
-msgstr "पर आधारित"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:34
 msgid "Based on your HR Policy, select your leave allocation period's end date"
@@ -894,18 +894,18 @@ msgstr ""
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Black"
-msgstr "काला"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Blue"
-msgstr "नीला"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:10
 msgid "Brand name"
-msgstr "ब्रांड का नाम"
+msgstr ""
 
 #. Label of the branding_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/Branding.vue:4
@@ -936,11 +936,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/Holidays.vue:3
 msgid "Business Holidays"
-msgstr "व्यावसायिक अवकाश"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:210
 msgid "Busy"
-msgstr "व्यस्त"
+msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:15
 msgid "CSV"
@@ -996,7 +996,7 @@ msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:714 desk/src/pages/home/Home.vue:44
 msgid "Cancel"
-msgstr "रद्द करना"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:63
 msgid "Cancel Invitation"
@@ -1004,7 +1004,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:214
 msgid "Canceled"
-msgstr "रद्द कर दिया गया"
+msgstr ""
 
 #: helpdesk/integrations/erpnext/api.py:47
 msgid "Cannot Sync Customers"
@@ -1046,7 +1046,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Category"
-msgstr "वर्ग"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:175
 msgid "Category '{0}' link copied to clipboard"
@@ -1072,7 +1072,7 @@ msgstr ""
 #: helpdesk/api/knowledge_base.py:78
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:65
 msgid "Category must have atleast one article"
-msgstr "श्रेणी में कम से कम एक लेख होना चाहिए"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:305
 msgid "Category updated successfully."
@@ -1088,7 +1088,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:40
 msgid "Change"
-msgstr "परिवर्तन"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:154
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:2
@@ -1117,7 +1117,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:89
 msgid "Change team"
-msgstr "परिवर्तन टीम"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:87
 msgid "Change ticket type"
@@ -1134,11 +1134,11 @@ msgstr ""
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Channels"
-msgstr "चैनल"
+msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:18
 msgid "Child field"
-msgstr "बाल क्षेत्र"
+msgstr ""
 
 #: desk/src/components/view-controls/filter/Filter.vue:190
 msgid "Choose a field"
@@ -1186,7 +1186,7 @@ msgstr ""
 
 #: desk/src/components/view-controls/SortBy.vue:160
 msgid "Clear Sort"
-msgstr "क्रम साफ़ करें"
+msgstr ""
 
 #. Label of the clear_table (Button) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1220,16 +1220,16 @@ msgstr ""
 #: desk/src/pages/ticket/MobileTicketAgent.vue:159
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
-msgstr "बंद करना"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketCustomer.vue:313
 msgid "Close Ticket"
-msgstr "टिकट बंद करें"
+msgstr ""
 
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
-msgstr "बंद किया हुआ"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:369
 msgid "Closed or rated tickets cannot be updated by non-agents"
@@ -1237,7 +1237,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:143
 msgid "Collapse"
-msgstr "गिर जाना"
+msgstr ""
 
 #. Label of the color (Select) field in DocType 'HD Agent Status'
 #. Label of the color (Color) field in DocType 'HD Service Holiday List'
@@ -1246,13 +1246,13 @@ msgstr "गिर जाना"
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Color"
-msgstr "रंग"
+msgstr ""
 
 #. Label of the columns (Code) field in DocType 'HD View'
 #: desk/src/components/view-controls/ColumnSettings.vue:4
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Columns"
-msgstr "कॉलम"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:15
 msgid "Comma separated emails to invite."
@@ -1265,7 +1265,7 @@ msgstr ""
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
-msgstr "टिप्पणी"
+msgstr ""
 
 #: desk/src/components/CommentBox.vue:318
 msgid "Comment cannot be empty."
@@ -1278,7 +1278,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:67
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:112
 msgid "Comment not found"
-msgstr "टिप्पणी नहीं मिली"
+msgstr ""
 
 #: desk/src/components/CommentBox.vue:334
 msgid "Comment updated successfully."
@@ -1287,18 +1287,18 @@ msgstr ""
 #. Label of the commented_by (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Commented By"
-msgstr "द्वारा टिप्पणी की गई"
+msgstr ""
 
 #. Label of the comments_section (Section Break) field in DocType 'HD Settings'
 #: desk/src/pages/SearchAgent.vue:353
 #: desk/src/pages/ticket/MobileTicketAgent.vue:462
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
-msgstr "टिप्पणियाँ"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:97
 msgid "Communication"
-msgstr "संचार"
+msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:76
 msgid "Communication ID is required"
@@ -1307,7 +1307,7 @@ msgstr ""
 #. Option for the 'Customer Type' (Select) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Company"
-msgstr "कंपनी"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:209
 msgid "Completed"
@@ -1318,7 +1318,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Condition"
-msgstr "स्थिति"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:139
 msgid "Configure"
@@ -1355,11 +1355,11 @@ msgstr ""
 #: desk/src/pages/ticket/Tickets.vue:428 desk/src/pages/ticket/Tickets.vue:550
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:27
 msgid "Confirm"
-msgstr "पुष्टि करना"
+msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:698
 msgid "Confirm Changes"
-msgstr "परिवर्तनों की पुष्टि करें"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:19
 msgid "Confirm Password"
@@ -1384,7 +1384,7 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:43
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:72
 msgid "Contact"
-msgstr "संपर्क"
+msgstr ""
 
 #. Label of the contact_html (HTML) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -1410,7 +1410,7 @@ msgstr ""
 #: desk/src/pages/customer/Customer.vue:151
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Contacts"
-msgstr "संपर्क"
+msgstr ""
 
 #: desk/src/components/customer/InviteContactDialog.vue:168
 msgid "Contacts added successfully"
@@ -1422,12 +1422,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Content"
-msgstr "सामग्री"
+msgstr ""
 
 #. Label of the content_type (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Content Type"
-msgstr "सामग्री प्रकार"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:93
 msgid "Copy ticket URL"
@@ -1461,7 +1461,7 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:36
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Country"
-msgstr "देश"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:152
 #: desk/src/components/Settings/NewTeamModal.vue:7
@@ -1515,7 +1515,7 @@ msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:69
 msgid "Created by"
-msgstr "के द्वारा बनाई गई"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:583
 msgid "Creating a ticket"
@@ -1554,7 +1554,7 @@ msgstr ""
 #: desk/src/pages/contact/Contact.vue:79
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Customer"
-msgstr "ग्राहक"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:177
 #: desk/src/components/customer/InviteContactDialog.vue:130
@@ -1564,7 +1564,7 @@ msgstr ""
 #. Label of the customer_name (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Name"
-msgstr "ग्राहक का नाम"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:603
 msgid "Customer Portal"
@@ -1574,7 +1574,7 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:31
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Customer Type"
-msgstr "ग्राहक प्रकार"
+msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:142
 msgid "Customer created"
@@ -1586,7 +1586,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:357
 msgid "Customer portal"
-msgstr "ग्राहक पोर्टल"
+msgstr ""
 
 #: desk/src/components/customer/EditCustomerDialog.vue:136
 #: desk/src/components/customer/EditCustomerDialog.vue:150
@@ -1596,7 +1596,7 @@ msgstr ""
 #: desk/src/pages/customer/Customer.vue:198
 #: desk/src/pages/customer/Customers.vue:6
 msgid "Customers"
-msgstr "ग्राहकों"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:595
 msgid "Customers & Contacts"
@@ -1641,7 +1641,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
 msgid "Date"
-msgstr "तारीख"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
 msgid "Day count for auto closing tickets cannot be negative or zero"
@@ -1649,7 +1649,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentSchedule.vue:38
 msgid "Days"
-msgstr "दिन"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAccountCard.vue:53
 msgid "Default Inbox"
@@ -1760,7 +1760,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:539
 msgid "Delete {0}"
-msgstr "{0} को हटाएँ"
+msgstr ""
 
 #: desk/src/components/DeleteWithTicketsDialog.vue:10
 msgid "Delete {0} ticket(s)"
@@ -1790,7 +1790,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Description"
-msgstr "विवरण"
+msgstr ""
 
 #. Label of the description_template (Text Editor) field in DocType 'HD Ticket
 #. Template'
@@ -1801,12 +1801,12 @@ msgstr ""
 #. Label of the description_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Description Weight"
-msgstr "विवरण वजन"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketNew.vue:90
 #: desk/src/pages/ticket/TicketNew.vue:115
 msgid "Detailed explanation"
-msgstr "विस्तृत व्याख्या"
+msgstr ""
 
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
@@ -1817,7 +1817,7 @@ msgstr "विस्तृत व्याख्या"
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
-msgstr "विवरण"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:67
 msgid "Disable global saved replies"
@@ -1831,7 +1831,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:47
 msgid "Disable signup"
-msgstr "साइन अप अक्षम करें"
+msgstr ""
 
 #. Label of the disabled (Check) field in DocType 'HD Team'
 #. Label of the disabled (Check) field in DocType 'HD Ticket Feedback Option'
@@ -1843,7 +1843,7 @@ msgstr "साइन अप अक्षम करें"
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Disabled"
-msgstr "अक्षम"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:29
 msgid "Disables all email notifications for the ticket - including creation, updates, and alerts."
@@ -1853,15 +1853,15 @@ msgstr ""
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:24
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
-msgstr "खारिज करना"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:143
 msgid "Discard Article"
-msgstr "लेख को त्याग दें"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:146
 msgid "Discard changes?"
-msgstr "परिवर्तनों को निरस्त करें?"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:203
 msgid "Display a customizable banner message when customers raise tickets outside your working hours."
@@ -1887,7 +1887,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "DocType"
-msgstr "दस्तावेज़ प्रकार"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:371
 msgid "Docs"
@@ -1896,7 +1896,7 @@ msgstr ""
 #. Label of the document_type (Link) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Document Type"
-msgstr "दस्तावेज़ प्रकार"
+msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:45
 msgid "Doe"
@@ -1910,13 +1910,13 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:32
 msgid "Download"
-msgstr "डाउनलोड करना"
+msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:447
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Draft"
-msgstr "मसौदा"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:72
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:138
@@ -1953,11 +1953,11 @@ msgstr ""
 #: desk/src/pages/call-logs/CallLogModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:68
 msgid "Duration"
-msgstr "अवधि"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:388
 msgid "Duration is required"
-msgstr "अवधि आवश्यक है"
+msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:8
 msgid "ERPNext"
@@ -2003,7 +2003,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:626
 #: desk/src/pages/ticket/Tickets.vue:519
 msgid "Edit"
-msgstr "संपादन करना"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:221
 msgid "Edit Call Log"
@@ -2039,7 +2039,7 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:85
 #: desk/src/pages/SearchAgent.vue:184
 msgid "Email"
-msgstr "ईमेल"
+msgstr ""
 
 #. Label of the email_account (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
@@ -2047,7 +2047,7 @@ msgstr "ईमेल"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Email Account"
-msgstr "ईमेल खाता"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAccountList.vue:3
 msgid "Email Accounts"
@@ -2063,7 +2063,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:61
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Content"
-msgstr "ईमेल सामग्री"
+msgstr ""
 
 #. Label of the email_id (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -2075,7 +2075,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:3
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Email Notifications"
-msgstr "ईमेल सूचनाएं"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:3
 msgid "Email Settings"
@@ -2083,15 +2083,15 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:309
 msgid "Email account created"
-msgstr "ईमेल खाता बनाया गया"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAccountList.vue:27
 msgid "Email account name"
-msgstr "ईमेल खाते का नाम"
+msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:471
 msgid "Email account updated successfully"
-msgstr "ईमेल खाता सफलतापूर्वक अपडेट हो गया"
+msgstr ""
 
 #. Description of the 'Email ID' (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -2106,11 +2106,11 @@ msgstr ""
 #: desk/src/pages/SearchAgent.vue:352
 #: desk/src/pages/ticket/MobileTicketAgent.vue:457
 msgid "Emails"
-msgstr "ईमेल"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:128
 msgid "Emails & Signature"
-msgstr "ईमेल और हस्ताक्षर"
+msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:417
 msgid "Emails pulled successfully"
@@ -2128,7 +2128,7 @@ msgstr ""
 #. Label of the enable (Check) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 msgid "Enable"
-msgstr "सक्षम"
+msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:36
 msgid "Enable ERPNext Integration"
@@ -2138,7 +2138,7 @@ msgstr ""
 #: desk/src/components/Settings/General/components/TicketSettings.vue:23
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Enable comment reactions"
-msgstr "टिप्पणियों पर प्रतिक्रियाएँ सक्षम करें"
+msgstr ""
 
 #. Label of the is_feedback_mandatory (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2176,17 +2176,17 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Enabled"
-msgstr "सक्रिय"
+msgstr ""
 
 #. Label of the end_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "End Date"
-msgstr "अंतिम तिथि"
+msgstr ""
 
 #. Label of the end_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "End Time"
-msgstr "अंत समय"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:22
 msgid "Enter a name for this HD Service Holiday List."
@@ -2194,7 +2194,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:11
 msgid "Enter brand name"
-msgstr "ब्रांड का नाम दर्ज करें"
+msgstr ""
 
 #: desk/src/components/customer/InviteContactDialog.vue:12
 msgid "Enter email address"
@@ -2202,7 +2202,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:64
 msgid "Enter the new name for the team"
-msgstr "टीम के लिए नया नाम दर्ज करें"
+msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:182
 msgid "Enter the primary contact's email"
@@ -2240,7 +2240,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:143
 msgid "Expand"
-msgstr "बढ़ाना"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:557
 msgid "Explore customer portal"
@@ -2249,7 +2249,7 @@ msgstr ""
 #: desk/src/components/ticket/ExportModal.vue:2
 #: desk/src/pages/ticket/Tickets.vue:130
 msgid "Export"
-msgstr "निर्यात"
+msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:26
 msgid "Export All {0} Record(s)"
@@ -2257,7 +2257,7 @@ msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:7
 msgid "Export Type"
-msgstr "निर्यात प्रकार"
+msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
@@ -2265,7 +2265,7 @@ msgstr "निर्यात प्रकार"
 #: desk/src/pages/ticket/Tickets.vue:263 desk/src/pages/ticket/Tickets.vue:271
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
-msgstr "असफल"
+msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:39
 msgid "Failed SLAs"
@@ -2273,7 +2273,7 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:278
 msgid "Failed to create category"
-msgstr "श्रेणी बनाने में विफल"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:315
 msgid "Failed to create email account, Invalid credentials"
@@ -2291,7 +2291,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:422
 msgid "Failed to pull emails"
-msgstr "ईमेल प्राप्त करने में विफल"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:259
 #: desk/src/components/Settings/Telephony/Telephony.vue:238
@@ -2344,7 +2344,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback"
-msgstr "प्रतिक्रिया"
+msgstr ""
 
 #. Label of the feedback_extra (Small Text) field in DocType 'HD Email
 #. Feedback'
@@ -2352,32 +2352,32 @@ msgstr "प्रतिक्रिया"
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback "
-msgstr "प्रतिक्रिया "
+msgstr ""
 
 #. Label of the feedback_extra (Long Text) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Extra)"
-msgstr "प्रतिक्रिया (अतिरिक्त)"
+msgstr ""
 
 #. Label of the feedback (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Feedback (Option)"
-msgstr "प्रतिक्रिया (विकल्प)"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:30
 msgid "Feedback Already Exists"
-msgstr "प्रतिक्रिया पहले से मौजूद है"
+msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Email Feedback'
 #. Label of a field in the email-feedback Web Form
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Feedback Rating"
-msgstr "प्रतिक्रिया रेटिंग"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:380
 msgid "Feedback Trend"
-msgstr "प्रतिक्रिया प्रवृत्ति"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:167
 msgid "Feedback email has been sent to the customer"
@@ -2414,7 +2414,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:25
 msgid "Field `{0}` does not exist in Ticket"
-msgstr "टिकट में फ़ील्ड `{0}` मौजूद नहीं है"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.py:41
 msgid "Field `{0}` is not allowed in Ticket Template"
@@ -2432,7 +2432,7 @@ msgstr ""
 #: desk/src/components/view-controls/filter/FilterFieldList.vue:29
 #: helpdesk/helpdesk/doctype/hd_ticket_template/hd_ticket_template.json
 msgid "Fields"
-msgstr "क्षेत्र"
+msgstr ""
 
 #. Label of the filters_tab (Tab Break) field in DocType 'HD View'
 #. Label of the filters (Code) field in DocType 'HD View'
@@ -2449,12 +2449,12 @@ msgstr ""
 #: desk/src/components/contact/EditContactDialog.vue:35
 #: desk/src/components/customer/NewCustomerDialog.vue:70
 msgid "First Name"
-msgstr "पहला नाम"
+msgstr ""
 
 #. Label of the first_responded_on (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Responded On"
-msgstr "सबसे पहले जवाब दिया"
+msgstr ""
 
 #: desk/src/components/customer/TicketsTab.vue:224
 msgid "First Response"
@@ -2469,7 +2469,7 @@ msgstr ""
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Failed By"
-msgstr "पहली प्रतिक्रिया विफल रही"
+msgstr ""
 
 #. Label of the response_time (Duration) field in DocType 'HD Service Level
 #. Priority'
@@ -2477,17 +2477,17 @@ msgstr "पहली प्रतिक्रिया विफल रही"
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "First Response Time"
-msgstr "प्रथम प्रतिक्रिया समय"
+msgstr ""
 
 #. Name of a report
 #: helpdesk/helpdesk/report/first_response_time_for_tickets/first_response_time_for_tickets.json
 msgid "First Response Time for Tickets"
-msgstr "टिकटों के लिए प्रथम प्रतिक्रिया समय"
+msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Form"
-msgstr "रूप"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:637
 msgid "Frappe Helpdesk Mobile"
@@ -2499,14 +2499,14 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Friday"
-msgstr "शुक्रवार"
+msgstr ""
 
 #. Label of the user_from (Link) field in DocType 'HD Notification'
 #: desk/src/components/EmailEditor.vue:23
 #: desk/src/pages/call-logs/CallLogModal.vue:44
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "From"
-msgstr "से"
+msgstr ""
 
 #. Label of the from_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -2515,28 +2515,28 @@ msgstr "से"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:17
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:17
 msgid "From Date"
-msgstr "की तिथि से"
+msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:71
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:140
 msgid "From date"
-msgstr "की तिथि से"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:374
 msgid "From is required"
-msgstr "से आवश्यक है"
+msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/ticket/Tickets.vue:224 desk/src/pages/ticket/Tickets.vue:263
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
-msgstr "पूरा"
+msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:6
 #: desk/src/components/layouts/Sidebar.vue:528
 #: desk/src/components/modals/ShortcutsModal.vue:76
 msgid "General"
-msgstr "सामान्य"
+msgstr ""
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -2545,11 +2545,11 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:40
 msgid "General category can't be deleted"
-msgstr "सामान्य श्रेणी को हटाया नहीं जा सकता"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:36
 msgid "General category name can't be changed"
-msgstr "सामान्य श्रेणी का नाम बदला नहीं जा सकता"
+msgstr ""
 
 #: helpdesk/api/knowledge_base.py:56
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.py:23
@@ -2558,7 +2558,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:578
 msgid "Getting Started"
-msgstr "शुरू करना"
+msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:180
@@ -2571,7 +2571,7 @@ msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:89
 msgid "Go to Ticket #{0}"
-msgstr "टिकट पर जाएं #{0}"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:220
 msgid "Grant Manager Access"
@@ -2593,7 +2593,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Green"
-msgstr "हरा"
+msgstr ""
 
 #. Label of the group_by_tab (Tab Break) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -2608,7 +2608,7 @@ msgstr ""
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Guest"
-msgstr "अतिथि"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:13
 msgid "Guide users to articles before tickets."
@@ -2821,16 +2821,16 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:125
 msgid "Help"
-msgstr "मदद"
+msgstr ""
 
 #: helpdesk/config/desktop.py:11
 msgid "HelpDesk"
-msgstr "सहायता केंद्र"
+msgstr ""
 
 #. Name of a Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Helpdesk"
-msgstr "सहायता केंद्र"
+msgstr ""
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -2866,7 +2866,7 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Hold"
-msgstr "पकड़ना"
+msgstr ""
 
 #. Label of the holiday_list (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -2907,7 +2907,7 @@ msgstr ""
 
 #: desk/src/pages/home/Home.vue:5
 msgid "Home"
-msgstr "घर"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:115
 msgid "I understand, add conditions"
@@ -2915,7 +2915,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:26
 msgid "ID"
-msgstr "पहचान"
+msgstr ""
 
 #. Label of the icon (Data) field in DocType 'HD Article Category'
 #. Label of the icon (Data) field in DocType 'HD View'
@@ -2970,7 +2970,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Image"
-msgstr "छवि"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/Branding.vue:80
 msgid "Image removed successfully."
@@ -2987,11 +2987,11 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:217
 msgid "In Progress"
-msgstr "प्रगति पर है"
+msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:126
 msgid "Inactive"
-msgstr "निष्क्रिय"
+msgstr ""
 
 #: desk/src/components/CallArea.vue:36
 msgid "Inbound Call"
@@ -3003,16 +3003,16 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:203
 msgid "Incoming"
-msgstr "आने वाली"
+msgstr ""
 
 #. Option for the 'Customer Type' (Select) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Individual"
-msgstr "व्यक्ति"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:212
 msgid "Initiated"
-msgstr "शुरू किया"
+msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:59
 msgid "Install the"
@@ -3021,11 +3021,11 @@ msgstr ""
 #. Label of the instantly_send_email (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Instantly send e-mail"
-msgstr "तुरंत ईमेल भेजें"
+msgstr ""
 
 #: helpdesk/utils.py:31
 msgid "Insufficient Permission for {0}"
-msgstr "{0} के लिए अपर्याप्त अनुमति"
+msgstr ""
 
 #. Label of the integer_value (Int) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
@@ -3035,7 +3035,7 @@ msgstr ""
 #: desk/src/components/layouts/Sidebar.vue:570
 #: desk/src/components/layouts/Sidebar.vue:573
 msgid "Introduction"
-msgstr "परिचय"
+msgstr ""
 
 #: helpdesk/api/agent.py:37
 msgid "Invalid availability"
@@ -3043,7 +3043,7 @@ msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:186
 msgid "Invalid email address"
-msgstr "अमान्य ईमेल पता"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:478
 #: desk/src/components/Settings/Holiday/HolidayView.vue:325
@@ -3053,11 +3053,11 @@ msgstr ""
 
 #: helpdesk/api/settings/email_notifications.py:112
 msgid "Invalid notification"
-msgstr "अमान्य सूचना"
+msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:67
 msgid "Invalid phone number"
-msgstr "अमान्य फ़ोन नंबर"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:264
 msgid "Invalid role {0}"
@@ -3065,7 +3065,7 @@ msgstr ""
 
 #: desk/src/pages/contact/Contact.vue:251
 msgid "Invitation Expired"
-msgstr "निमंत्रण की समय सीमा समाप्त हो गई है"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:246
 #: desk/src/components/customer/RevokeInviteButton.vue:40
@@ -3125,12 +3125,12 @@ msgstr ""
 #. Label of the is_active (Check) field in DocType 'HD Agent'
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Is Active"
-msgstr "सक्रिय है"
+msgstr ""
 
 #. Label of the is_customer_portal (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Customer Portal"
-msgstr "क्या ग्राहक पोर्टल"
+msgstr ""
 
 #. Label of the is_default (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -3147,12 +3147,12 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Is Standard"
-msgstr "मानक है"
+msgstr ""
 
 #. Label of the apply_to_system (Check) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Is applied to system"
-msgstr "सिस्टम पर लागू होता है"
+msgstr ""
 
 #. Label of the initial_helpdesk_name_setup_skipped (Check) field in DocType
 #. 'HD Settings'
@@ -3176,7 +3176,7 @@ msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:114
 msgid "Jump to"
-msgstr "करने के लिए कूद"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:672
 msgid "KB"
@@ -3189,7 +3189,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Key"
-msgstr "चाबी"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:2
 msgid "Keyboard Shortcuts"
@@ -3215,72 +3215,72 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Label"
-msgstr "लेबल"
+msgstr ""
 
 #. Label of the label_customer (Data) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Label (customer view)"
-msgstr "लेबल (ग्राहक दृश्य)"
+msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
 msgid "Landing Page"
-msgstr "लैंडिंग पृष्ठ"
+msgstr ""
 
 #: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:6
 msgid "Language"
-msgstr "भाषा"
+msgstr ""
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:36
 msgid "Language & Time"
-msgstr "भाषा और समय"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
 msgid "Last"
-msgstr "अंतिम"
+msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:372
 #: desk/src/pages/home/components/RecentFeedback.vue:401
 msgid "Last 3 Months"
-msgstr "पिछले 3 महीने"
+msgstr ""
 
 #: desk/src/components/ChartCardBase.vue:169
 #: desk/src/components/ChartCardBase.vue:171
 #: desk/src/components/ChartCardBase.vue:172
 msgid "Last 3 months"
-msgstr "पिछले 3 महीने"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:453
 #: desk/src/pages/dashboard/Dashboard.vue:486
 #: desk/src/pages/dashboard/Dashboard.vue:488
 #: desk/src/pages/dashboard/Dashboard.vue:524
 msgid "Last 30 Days"
-msgstr "पिछले 30 दिन"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:493
 #: desk/src/pages/dashboard/Dashboard.vue:495
 msgid "Last 60 Days"
-msgstr "पिछले 60 दिन"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:479
 #: desk/src/pages/dashboard/Dashboard.vue:481
 msgid "Last 7 Days"
-msgstr "पिछले 7 दिन"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:500
 #: desk/src/pages/dashboard/Dashboard.vue:502
 msgid "Last 90 Days"
-msgstr "पिछले 90 दिन"
+msgstr ""
 
 #. Label of the last_agent_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Agent Response"
-msgstr "अंतिम एजेंट प्रतिक्रिया"
+msgstr ""
 
 #. Label of the last_customer_response (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Last Customer Response"
-msgstr "अंतिम ग्राहक प्रतिक्रिया"
+msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:368
 #: desk/src/pages/home/components/RecentFeedback.vue:400
@@ -3295,7 +3295,7 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:364
 #: desk/src/pages/home/components/RecentFeedback.vue:399
 msgid "Last Week"
-msgstr "पिछले सप्ताह"
+msgstr ""
 
 #: desk/src/components/BarChartCard.vue:79
 #: desk/src/components/ChartCardBase.vue:135
@@ -3319,11 +3319,11 @@ msgstr ""
 #: desk/src/components/ChartCardBase.vue:157
 #: desk/src/components/ChartCardBase.vue:158
 msgid "Last week"
-msgstr "पिछले सप्ताह"
+msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:122
 msgid "Latest"
-msgstr "नवीनतम"
+msgstr ""
 
 #. Label of the layout (Code) field in DocType 'HD Field Layout'
 #: helpdesk/helpdesk/doctype/hd_field_layout/hd_field_layout.json
@@ -3333,7 +3333,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:135
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:212
 msgid "Learn about conditions"
-msgstr "स्थितियों के बारे में जानें"
+msgstr ""
 
 #. Description of the 'Apply outside working hours' (Check) field in DocType
 #. 'HD Settings'
@@ -3350,15 +3350,15 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
-msgstr "सूची"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:357
 msgid "List View"
-msgstr "लिस्ट व्यू"
+msgstr ""
 
 #: desk/src/components/CallArea.vue:72
 msgid "Listen"
-msgstr "सुनना"
+msgstr ""
 
 #. Label of the load_default_columns (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -3370,11 +3370,11 @@ msgstr ""
 #: desk/src/components/contact/FeedbackList.vue:84
 #: desk/src/components/customer/TicketsTab.vue:142
 msgid "Load More"
-msgstr "और लोड करें"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:93
 msgid "Loading..."
-msgstr "लोड हो रहा है..."
+msgstr ""
 
 #: desk/src/components/ticket/ActivityHeader.vue:65
 msgid "Log a Call"
@@ -3383,7 +3383,7 @@ msgstr ""
 #: desk/src/components/layouts/Sidebar.vue:344
 #: desk/src/components/layouts/Sidebar.vue:395
 msgid "Log out"
-msgstr "लॉग आउट"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:375
 msgid "Login to Frappe Cloud"
@@ -3395,7 +3395,7 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:13
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Logo"
-msgstr "प्रतीक चिन्ह"
+msgstr ""
 
 #. Description of the 'Integer value' (Int) field in DocType 'HD Ticket
 #. Priority'
@@ -3409,11 +3409,11 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:501
 msgid "Make Public"
-msgstr "सार्वजनिक करें"
+msgstr ""
 
 #: desk/src/components/ticket/ActivityHeader.vue:60
 msgid "Make a Call"
-msgstr "फोन करें"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:10
 msgid "Make feedback mandatory"
@@ -3453,12 +3453,12 @@ msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:25
 msgid "Manager"
-msgstr "प्रबंधक"
+msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:11
 #: desk/src/pages/MobileNotifications.vue:14
 msgid "Mark all as read"
-msgstr "सभी को पढ़ा हुआ मार्क करें"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:608
 msgid "Masters"
@@ -3466,16 +3466,16 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:38
 msgid "Members"
-msgstr "सदस्यों"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:56
 msgid "Members ({0})"
-msgstr "सदस्य ({0})"
+msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Mention"
-msgstr "उल्लेख"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:158
 msgid "Merge"
@@ -3489,19 +3489,19 @@ msgstr ""
 #. Label of the merged_with (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Merged With"
-msgstr "के साथ विलय हो गया"
+msgstr ""
 
 #. Label of the message (Text) field in DocType 'HD Notification'
 #. Label of the message (Text Editor) field in DocType 'HD Saved Reply'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Message"
-msgstr "संदेश"
+msgstr ""
 
 #. Label of the misc_tab (Tab Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Misc"
-msgstr "विविध"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:640
 msgid "Mobile App Installation"
@@ -3514,7 +3514,7 @@ msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:94
 msgid "Mobile Number"
-msgstr "मोबाइल नंबर"
+msgstr ""
 
 #. Description of the 'Mobile No' (Data) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
@@ -3527,20 +3527,20 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Monday"
-msgstr "सोमवार"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:35
 msgid "Monthly"
-msgstr "महीने के"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:636
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:191
 msgid "Move To"
-msgstr "करने के लिए कदम"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:249
 msgid "My Dashboard"
-msgstr "मेरे यंत्र रखने की जगह"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:302
 msgid "My Organization"
@@ -3553,12 +3553,12 @@ msgstr ""
 #: desk/src/components/SavedRepliesSelectorModal.vue:175
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:337
 msgid "My Team"
-msgstr "मेरी टीम"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:293
 #: desk/src/pages/home/components/AgentTicketsCard.vue:4
 msgid "My Tickets"
-msgstr "मेरे टिकट"
+msgstr ""
 
 #. Label of the category_name (Data) field in DocType 'HD Article Category'
 #. Label of the contact_name (Link) field in DocType 'HD Customer Member'
@@ -3578,16 +3578,16 @@ msgstr "मेरे टिकट"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
 msgid "Name"
-msgstr "नाम"
+msgstr ""
 
 #. Label of the name_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Name Weight"
-msgstr "नाम वजन"
+msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:151
 msgid "Name is required"
-msgstr "नाम आवश्यक है"
+msgstr ""
 
 #. Description of the 'Label (customer view)' (Data) field in DocType 'HD
 #. Ticket Status'
@@ -3597,7 +3597,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:105
 msgid "Navigation"
-msgstr "मार्गदर्शन"
+msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:124
 msgid "Negative"
@@ -3606,11 +3606,11 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:392
 #: desk/src/pages/home/components/RecentFeedback.vue:410
 msgid "Negative first"
-msgstr "पहले नकारात्मक"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:137
 msgid "Never"
-msgstr "कभी नहीं"
+msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:16
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:19
@@ -3623,12 +3623,12 @@ msgstr "कभी नहीं"
 #: desk/src/components/ticket/ActivityHeader.vue:19
 #: desk/src/pages/home/Home.vue:55
 msgid "New"
-msgstr "नया"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:174
 #: desk/src/pages/knowledge-base/NewArticle.vue:181
 msgid "New Article"
-msgstr "नया लेख"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:4
 msgid "New Assignment Rule"
@@ -3640,7 +3640,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:3
 msgid "New Business Holiday"
-msgstr "नई व्यावसायिक छुट्टी"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:221
 msgid "New Call Log"
@@ -3656,7 +3656,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:8
 msgid "New Password"
-msgstr "नया पासवर्ड"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:3
 msgid "New SLA Policy"
@@ -3676,20 +3676,20 @@ msgstr ""
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:141
 msgid "New Subject"
-msgstr "नया विषय"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:3
 msgid "New Team"
-msgstr "नई टीम"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketNew.vue:302
 #: desk/src/pages/ticket/TicketNew.vue:312
 msgid "New Ticket"
-msgstr "नया टिकट"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:53
 msgid "New and old title cannot be same"
-msgstr "नया और पुराना शीर्षक एक समान नहीं हो सकता"
+msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:86
 msgid "New and updated customers sync automatically between Helpdesk and ERPNext."
@@ -3697,11 +3697,11 @@ msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:4
 msgid "New team"
-msgstr "नई टीम"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:51
 msgid "New title is required"
-msgstr "नए शीर्षक की आवश्यकता है"
+msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:50
 msgid "New users will have to be manually registered by system managers."
@@ -3709,19 +3709,19 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:107
 msgid "Next ticket"
-msgstr "अगला टिकट"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:216
 msgid "No Answer"
-msgstr "कोई जवाब नहीं"
+msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:345
 msgid "No Data Found"
-msgstr "डाटा प्राप्त नहीं हुआ"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:514
 msgid "No Email Account found for {0}"
-msgstr "{0} के लिए कोई ईमेल खाता नहीं मिला"
+msgstr ""
 
 #: helpdesk/api/agent.py:41
 msgid "No HD Agent record for current user"
@@ -3729,7 +3729,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
 msgid "No Holiday list found"
-msgstr "कोई अवकाश सूची नहीं मिली"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:20
 msgid "No SLA found"
@@ -3737,7 +3737,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:452
 msgid "No Team"
-msgstr "कोई टीम नहीं"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:115
 #: desk/src/components/customer/ContactCard.vue:144
@@ -3747,11 +3747,11 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:206
 msgid "No additional comments"
-msgstr "कोई अतिरिक्त टिप्पणी नहीं"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:144
 msgid "No agents found"
-msgstr "कोई एजेंट नहीं मिला"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:425
 msgid "No articles found for the applied filters. Try adjusting or clearing your filters."
@@ -3775,7 +3775,7 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:344
 msgid "No changes made"
-msgstr "कोई बदलाव नहीं किया गया"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:88
 msgid "No charts added"
@@ -3807,7 +3807,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:283
 msgid "No feedback"
-msgstr "कोई प्रतिक्रिया नहीं"
+msgstr ""
 
 #: desk/src/components/contact/ContactFeedback.vue:16
 msgid "No feedback yet"
@@ -3819,11 +3819,11 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:94
 msgid "No members found"
-msgstr "कोई सदस्य नहीं मिला"
+msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:68
 msgid "No new notifications"
-msgstr "कोई नए संदेश नहीं"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:258
 msgid "No new tickets assigned to you in the last 7 days"
@@ -3831,7 +3831,7 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:25
 msgid "No next ticket"
-msgstr "अगला टिकट उपलब्ध नहीं है"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:33
 msgid "No one"
@@ -3839,15 +3839,15 @@ msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:261
 msgid "No pending tickets"
-msgstr "कोई लंबित टिकट नहीं"
+msgstr ""
 
 #: desk/src/components/ticket-agent/TicketNavigation.vue:10
 msgid "No previous ticket"
-msgstr "कोई पूर्व टिकट नहीं"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:94
 msgid "No reason"
-msgstr "कोई कारण नहीं"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:257
 msgid "No recently assigned tickets"
@@ -3860,7 +3860,7 @@ msgstr ""
 #: desk/src/components/EmailMultiSelect.vue:137
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:79
 msgid "No results found"
-msgstr "कोई परिणाम नहीं मिला"
+msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:28
 msgid "No reviews found"
@@ -3874,7 +3874,7 @@ msgstr ""
 #: desk/src/components/customer/TicketsTab.vue:47
 #: desk/src/pages/ticket/Tickets.vue:192
 msgid "No tickets found"
-msgstr "कोई टिकट नहीं मिला"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:202
 msgid "No tickets found for the applied filters. Try adjusting or clearing your filters."
@@ -3898,11 +3898,11 @@ msgstr ""
 
 #: helpdesk/api/ticket.py:76 helpdesk/utils.py:187
 msgid "Not Allowed"
-msgstr "अनुमति नहीं"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:69
 msgid "Not Assigned"
-msgstr "सौंपा नहीं गया है"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:10
 msgid "Not Saved"
@@ -3910,7 +3910,7 @@ msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:220
 msgid "Not Set"
-msgstr "सेट नहीं"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:250
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:270
@@ -3931,25 +3931,25 @@ msgstr ""
 #: desk/src/components/notifications/Notifications.vue:16
 #: desk/src/pages/MobileNotifications.vue:6
 msgid "Notifications"
-msgstr "सूचनाएं"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:146
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:227
 msgid "Old Condition"
-msgstr "पुरानी स्थिति"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:88
 msgid "Old Conditions"
-msgstr "पुरानी स्थितियाँ"
+msgstr ""
 
 #. Label of the on_hold_since (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "On Hold Since"
-msgstr "तब से रुका हुआ है"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/ShareFeedback.vue:20
 msgid "On ticket status"
-msgstr "टिकट की स्थिति पर"
+msgstr ""
 
 #: helpdesk/api/ticket.py:75
 msgid "Only administrators can delete tickets."
@@ -3968,7 +3968,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Open"
-msgstr "खुला"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:78
 msgid "Open command palette"
@@ -3996,7 +3996,7 @@ msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:79
 msgid "Open settings"
-msgstr "खुली सेटिंग"
+msgstr ""
 
 #. Description of the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
@@ -4013,25 +4013,25 @@ msgstr ""
 #. Label of the opening_time (Time) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Opening Time"
-msgstr "खुलने का समय"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Orange"
-msgstr "नारंगी"
+msgstr ""
 
 #. Label of the order (Int) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Order"
-msgstr "आदेश"
+msgstr ""
 
 #. Label of the order_by_tab (Tab Break) field in DocType 'HD View'
 #. Label of the order_by (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Order By"
-msgstr "द्वारा आदेश"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:249
 msgid "Organization Dashboard"
@@ -4039,7 +4039,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:50
 msgid "Other"
-msgstr "अन्य"
+msgstr ""
 
 #: desk/src/components/CallArea.vue:37
 msgid "Outbound Call"
@@ -4051,19 +4051,19 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:199
 msgid "Outside working hours notice"
-msgstr "कार्य समय के बाहर की सूचना"
+msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:105
 msgid "Owner"
-msgstr "मालिक"
+msgstr ""
 
 #: desk/src/pages/InvalidPage.vue:11
 msgid "Page not found"
-msgstr "पृष्ठ नहीं मिला"
+msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyFieldsSelection.vue:5
 msgid "Parent field"
-msgstr "मूल फ़ील्ड"
+msgstr ""
 
 #: helpdesk/api/settings/field_dependency.py:47
 msgid "Parent field, child field, and parent-child mapping are required."
@@ -4072,15 +4072,15 @@ msgstr ""
 #. Option for the 'Customer Type' (Select) field in DocType 'HD Customer'
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Partnership"
-msgstr "साझेदारी"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:146
 msgid "Password"
-msgstr "पासवर्ड"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:104
 msgid "Password must be at least 8 characters"
-msgstr "पासवर्ड कम से कम 8 वर्णों का होना चाहिए"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:107
 msgid "Password must contain lowercase, uppercase, number, and symbol"
@@ -4092,12 +4092,12 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:117
 msgid "Passwords do not match"
-msgstr "सांकेतिक शब्द मेल नहीं खाते"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:36
 #: desk/src/components/Settings/Profile/components/ChangePasswordModal.vue:123
 msgid "Passwords match"
-msgstr "पासवर्ड का मेल"
+msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
@@ -4105,42 +4105,42 @@ msgstr "पासवर्ड का मेल"
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
-msgstr "रुका हुआ"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:222
 msgid "Pending"
-msgstr "लंबित"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:42
 #: desk/src/components/customer/InviteContactDialog.vue:38
 msgid "Pending Invites"
-msgstr "लंबित निमंत्रण"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:353
 #: desk/src/pages/home/components/PendingTickets.vue:234
 #: desk/src/pages/home/components/PendingTickets.vue:238
 msgid "Pending Tickets"
-msgstr "लंबित टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:564
 msgid "Percentage of total tickets by channel"
-msgstr "चैनल के अनुसार कुल टिकटों का प्रतिशत"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:524
 msgid "Percentage of total tickets by priority"
-msgstr "प्राथमिकता के आधार पर कुल टिकटों का प्रतिशत"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:458
 msgid "Percentage of total tickets by team"
-msgstr "टीम के अनुसार कुल टिकटों का प्रतिशत"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:491
 msgid "Percentage of total tickets by type"
-msgstr "टिकटों के प्रकार के अनुसार कुल टिकटों का प्रतिशत"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:46
 msgid "Period"
-msgstr "अवधि"
+msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:170
@@ -4149,16 +4149,16 @@ msgstr "अवधि"
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:190
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
-msgstr "निजी"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:54
 msgid "Personal mobile no"
-msgstr "व्यक्तिगत मोबाइल नंबर"
+msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:82
 #: desk/src/components/ticket/SetContactPhoneModal.vue:25
 msgid "Phone"
-msgstr "फ़ोन"
+msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:24
 #: desk/src/components/contact/NewContactDialog.vue:42
@@ -4167,7 +4167,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:36
 msgid "Pick an option"
-msgstr "एक विकल्प चुनें"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:468
 msgid "Pin View"
@@ -4178,7 +4178,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Pink"
-msgstr "गुलाबी"
+msgstr ""
 
 #. Label of the pinned (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -4248,7 +4248,7 @@ msgstr ""
 
 #: helpdesk/api/saved_replies.py:11
 msgid "Please provide saved_reply_id"
-msgstr "कृपया saved_reply_id प्रदान करें"
+msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:239
 msgid "Please select at least one restriction option for teams in the settings."
@@ -4256,11 +4256,11 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:41
 msgid "Please select weekly off day"
-msgstr "कृपया साप्ताहिक अवकाश का दिन चुनें"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:32
 msgid "Policy name"
-msgstr "पॉलिसी का नाम"
+msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:123
 msgid "Positive"
@@ -4270,13 +4270,13 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:411
 #: desk/src/pages/home/components/RecentFeedback.vue:415
 msgid "Positive first"
-msgstr "पहले सकारात्मक"
+msgstr ""
 
 #. Label of the prefer_knowledge_base (Check) field in DocType 'HD Settings'
 #: desk/src/components/Settings/General/components/WorkflowKnowledgebaseSettings.vue:10
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Prefer knowledge base"
-msgstr "ज्ञान आधार को प्राथमिकता दें"
+msgstr ""
 
 #: desk/src/components/Settings/Preferences/Preferences.vue:6
 msgid "Preferences"
@@ -4298,23 +4298,23 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:4
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:26
 msgid "Preview"
-msgstr "पूर्व दर्शन"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:108
 msgid "Previous ticket"
-msgstr "पिछला टिकट"
+msgstr ""
 
 #: desk/src/components/contact/ContactInputRow.vue:20
 #: desk/src/components/customer/ContactCard.vue:31
 #: desk/src/components/customer/ContactCard.vue:36
 msgid "Primary"
-msgstr "प्राथमिक"
+msgstr ""
 
 #. Label of the primary_contact (Link) field in DocType 'HD Customer'
 #: desk/src/components/customer/NewCustomerDialog.vue:64
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 msgid "Primary Contact"
-msgstr "प्राथमिक संपर्क"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:83
 msgid "Primary contact must be one of the listed contacts"
@@ -4347,7 +4347,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Priority"
-msgstr "प्राथमिकता"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:86
 msgid "Priority <u>{0}</u> must be included in the SLA {1}."
@@ -4360,16 +4360,16 @@ msgstr ""
 #: desk/src/components/layouts/Sidebar.vue:309
 #: desk/src/pages/ticket/Tickets.vue:377
 msgid "Private Views"
-msgstr "निजी दृश्य"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:30
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:11
 msgid "Product Experts"
-msgstr "उत्पाद विशेषज्ञ"
+msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:20
 msgid "Product experts"
-msgstr "उत्पाद विशेषज्ञ"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:3
 msgid "Profile"
@@ -4382,27 +4382,27 @@ msgstr ""
 #. Label of the public (Check) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Public"
-msgstr "जनता"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:301
 #: desk/src/pages/ticket/Tickets.vue:392
 msgid "Public Views"
-msgstr "सार्वजनिक विचार"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:21
 msgid "Publish"
-msgstr "प्रकाशित करना"
+msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:443
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published"
-msgstr "प्रकाशित"
+msgstr ""
 
 #. Label of the published_on (Datetime) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Published On"
-msgstr "प्रकाशित"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.py:24
 msgid "Published articles must have content."
@@ -4427,11 +4427,11 @@ msgstr ""
 #. Label of the raised_by (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Raised By (Email)"
-msgstr "(ईमेल) द्वारा जुटाया गया"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:31
 msgid "Range"
-msgstr "श्रेणी"
+msgstr ""
 
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
@@ -4453,7 +4453,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
-msgstr "रेटिंग"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:23
 msgid "Rating must be between 0.2 and 1.0"
@@ -4461,34 +4461,34 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.py:19
 msgid "Rating {0} is not allowed"
-msgstr "रेटिंग {0} की अनुमति नहीं है"
+msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Reaction"
-msgstr "प्रतिक्रिया"
+msgstr ""
 
 #. Label of the reactions (Table) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Reactions"
-msgstr "प्रतिक्रियाओं"
+msgstr ""
 
 #. Label of the read (Check) field in DocType 'HD Notification'
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Read"
-msgstr "पढ़ना"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:41
 msgid "Reason"
-msgstr "कारण"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:226
 msgid "Recent"
-msgstr "हाल ही का"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:233
 msgid "Recent Tickets"
-msgstr "हाल के टिकट"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:30
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:29
@@ -4511,17 +4511,17 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Red"
-msgstr "लाल"
+msgstr ""
 
 #. Label of the reference_tab (Tab Break) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Reference"
-msgstr "संदर्भ"
+msgstr ""
 
 #. Label of the reference_ticket (Link) field in DocType 'HD Ticket Comment'
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.json
 msgid "Reference Ticket"
-msgstr "संदर्भ टिकट"
+msgstr ""
 
 #. Label of the references_tab (Tab Break) field in DocType 'HD Customer'
 #. Label of the references_section (Section Break) field in DocType 'HD
@@ -4529,11 +4529,11 @@ msgstr "संदर्भ टिकट"
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.json
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "References"
-msgstr "संदर्भ"
+msgstr ""
 
 #: desk/src/pages/home/Home.vue:11
 msgid "Refresh"
-msgstr "ताज़ा करना"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:75
 msgid "Refresh Apps"
@@ -4548,7 +4548,7 @@ msgstr ""
 #: desk/src/components/contact/ContactInputRow.vue:45
 #: desk/src/components/contact/ContactInputRow.vue:50
 msgid "Remove"
-msgstr "निकालना"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:190
 #: desk/src/components/customer/ContactCard.vue:294
@@ -4561,7 +4561,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/Profile.vue:197
 msgid "Remove Photo"
-msgstr "फ़ोटो हटाएँ"
+msgstr ""
 
 #: desk/src/components/view-controls/filter/Filter.vue:66
 #: desk/src/components/view-controls/filter/Filter.vue:67
@@ -4608,44 +4608,44 @@ msgstr ""
 #. Option in a Select field in the tickets Web Form
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Replied"
-msgstr "उत्तर दिया"
+msgstr ""
 
 #: desk/src/components/EmailArea.vue:54
 msgid "Reply"
-msgstr "जवाब"
+msgstr ""
 
 #: desk/src/components/EmailArea.vue:59
 msgid "Reply All"
-msgstr "सभी को उत्तर दें"
+msgstr ""
 
 #. Label of the reply_from_agent_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Agent"
-msgstr "एजेंट की ओर से जवाब"
+msgstr ""
 
 #. Label of the reply_from_contact_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Reply From Contact"
-msgstr "संपर्क से उत्तर"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:84
 msgid "Reply from agent"
-msgstr "एजेंट की ओर से जवाब"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:77
 msgid "Reply from contact"
-msgstr "संपर्क से जवाब"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:494
 msgid "Reply on a ticket"
-msgstr "टिकट पर प्रतिक्रिया दें"
+msgstr ""
 
 #. Label of the required (Check) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "Required"
-msgstr "आवश्यक"
+msgstr ""
 
 #: desk/src/pages/contact/Contact.vue:279
 msgid "Resend Invite"
@@ -4672,22 +4672,22 @@ msgstr ""
 #: desk/src/components/customer/TicketsTab.vue:230
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution"
-msgstr "संकल्प"
+msgstr ""
 
 #. Label of the resolution_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution By"
-msgstr "संकल्प द्वारा"
+msgstr ""
 
 #. Label of the resolution_date (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Date"
-msgstr "संकल्प तिथि"
+msgstr ""
 
 #. Label of the resolution_details (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Details"
-msgstr "संकल्प विवरण"
+msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -4697,7 +4697,7 @@ msgstr ""
 #. Label of the resolution_failed_by (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Failed By"
-msgstr "संकल्प विफल रहा"
+msgstr ""
 
 #. Label of the resolution_time (Duration) field in DocType 'HD Service Level
 #. Priority'
@@ -4705,23 +4705,23 @@ msgstr "संकल्प विफल रहा"
 #: helpdesk/helpdesk/doctype/hd_service_level_priority/hd_service_level_priority.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution Time"
-msgstr "संकल्प समय"
+msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
-msgstr "हल किया"
+msgstr ""
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:89
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response"
-msgstr "प्रतिक्रिया"
+msgstr ""
 
 #. Label of the response_by (Datetime) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Response By"
-msgstr "द्वारा प्रतिक्रिया"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:65
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
@@ -4732,11 +4732,11 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:179
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
-msgstr "प्रतिक्रिया और समाधान"
+msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:407
 msgid "Response is required"
-msgstr "उत्तर देना आवश्यक है"
+msgstr ""
 
 #. Label of the assign_within_team (Check) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -4751,11 +4751,11 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Restrict tickets by Team"
-msgstr "टिकटों को टीम के आधार पर प्रतिबंधित करें"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:35
 msgid "Restrict tickets by team"
-msgstr "टिकटों को टीम के आधार पर प्रतिबंधित करें"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:38
 msgid "Restrict tickets to be viewed and managed by team members only."
@@ -4769,7 +4769,7 @@ msgstr ""
 #: desk/src/pages/home/components/RecentFeedback.vue:7
 #: desk/src/pages/home/components/RecentFeedback.vue:22
 msgid "Reviews"
-msgstr "समीक्षा"
+msgstr ""
 
 #: desk/src/components/customer/RevokeInviteButton.vue:12
 msgid "Revoke Invite"
@@ -4781,22 +4781,22 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:215
 msgid "Ringing"
-msgstr "बज"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:19
 #: desk/src/components/customer/ContactCard.vue:165
 #: desk/src/components/customer/InviteContactDialog.vue:32
 msgid "Role"
-msgstr "भूमिका"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:248
 msgid "Role updated successfully"
-msgstr "भूमिका सफलतापूर्वक अपडेट हो गई"
+msgstr ""
 
 #. Label of the route_name (Data) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Route Name"
-msgstr "मार्ग का नाम"
+msgstr ""
 
 #. Label of the rows (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -4874,7 +4874,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Saturday"
-msgstr "शनिवार"
+msgstr ""
 
 #. Button label of the email-feedback Web Form
 #: desk/src/components/ListViewBuilder.vue:704
@@ -4897,11 +4897,11 @@ msgstr "शनिवार"
 #: desk/src/pages/knowledge-base/Article.vue:152
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Save"
-msgstr "बचाना"
+msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:17
 msgid "Save Changes"
-msgstr "परिवर्तनों को सुरक्षित करें"
+msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:12
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
@@ -4938,12 +4938,12 @@ msgstr ""
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:57
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
-msgstr "दायरा"
+msgstr ""
 
 #. Label of the script (Code) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Script"
-msgstr "लिखी हुई कहानी"
+msgstr ""
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
 #: desk/src/components/SavedRepliesSelectorModal.vue:27
@@ -4958,7 +4958,7 @@ msgstr "लिखी हुई कहानी"
 #: desk/src/components/layouts/Sidebar.vue:14 desk/src/pages/SearchAgent.vue:7
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Search"
-msgstr "खोज"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.js:10
 msgid "Search Index Regenerated"
@@ -4966,11 +4966,11 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:40
 msgid "Search Score"
-msgstr "खोज स्कोर"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:62
 msgid "Search agents..."
-msgstr "खोज एजेंट..."
+msgstr ""
 
 #: desk/src/components/customer/TicketsTab.vue:7
 msgid "Search by ID or Subject"
@@ -4982,11 +4982,11 @@ msgstr ""
 
 #: desk/src/components/view-controls/filter/Filter.vue:112
 msgid "Search fields..."
-msgstr "खोज फ़ील्ड..."
+msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:126
 msgid "Search for \"{0}\""
-msgstr "\"{0} \" खोजें"
+msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:100
 msgid "Search index does not exist. Please build the index first."
@@ -5002,32 +5002,32 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:20
 msgid "Search ticket"
-msgstr "टिकट खोजें"
+msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:16
 msgid "Search tickets, comments, and communications..."
-msgstr "टिकट, टिप्पणियां और संदेश खोजें..."
+msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:12
 msgid "Search tickets, emails, comments, or #234 to navigate to ticket"
-msgstr "टिकट, ईमेल, टिप्पणियाँ या #234 खोजें और टिकट पर जाएँ"
+msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:33
 msgid "Search..."
-msgstr "खोज..."
+msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:137
 msgid "Searched for:"
-msgstr "खोज की गई:"
+msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:77
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
-msgstr "खोज जारी है..."
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:147
 msgid "See all {0} tickets"
-msgstr "सभी टिकट देखें {0}"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
@@ -5035,11 +5035,11 @@ msgstr "सभी टिकट देखें {0}"
 #: desk/src/pages/call-logs/CallLogModal.vue:92
 #: desk/src/pages/call-logs/CallLogModal.vue:101
 msgid "Select"
-msgstr "चुनना"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:19
 msgid "Select Category"
-msgstr "श्रेणी चुनना"
+msgstr ""
 
 #: desk/src/components/contact/EditContactDialog.vue:161
 msgid "Select Customer"
@@ -5063,7 +5063,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:26
 msgid "Select a rating"
-msgstr "रेटिंग चुनें"
+msgstr ""
 
 #: desk/src/components/frappe-ui/PhoneControl/PhoneControl.vue:21
 msgid "Select country"
@@ -5072,11 +5072,11 @@ msgstr ""
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:37
 #: desk/src/pages/home/components/RecentFeedback.vue:151
 msgid "Select range"
-msgstr "श्रेणी का चयन करें"
+msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:78
 msgid "Select teams"
-msgstr "टीमों का चयन करें"
+msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:17
 msgid "Select ticket to preview"
@@ -5092,15 +5092,15 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.js:41
 msgid "Select your weekly off day"
-msgstr "अपनी साप्ताहिक छुट्टी का दिन चुनें"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketCustomer.vue:78
 msgid "Send"
-msgstr "भेजना"
+msgstr ""
 
 #: desk/src/components/Settings/InviteAgents.vue:37
 msgid "Send Invites"
-msgstr "निमंत्रण भेजें"
+msgstr ""
 
 #: desk/src/components/ticket-agent/BulkReplyModal.vue:32
 msgid "Send Reply"
@@ -5110,7 +5110,7 @@ msgstr ""
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Send feedback when"
-msgstr "प्रतिक्रिया भेजें"
+msgstr ""
 
 #: desk/src/pages/contact/Contact.vue:294
 msgid "Send reset password email"
@@ -5138,7 +5138,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:618
 msgid "Service Level Agreement"
-msgstr "सेवा स्तर समझौता"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:5
 msgid "Service Level Agreements (SLAs)"
@@ -5148,7 +5148,7 @@ msgstr ""
 #. Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Service Level Name"
-msgstr "सेवा स्तर का नाम"
+msgstr ""
 
 #: helpdesk/api/settings/email.py:14
 msgid "Service not supported"
@@ -5156,12 +5156,12 @@ msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:219
 msgid "Set"
-msgstr "तय करना"
+msgstr ""
 
 #: desk/src/components/ticket/SetContactPhoneModal.vue:4
 #: desk/src/components/ticket/SetContactPhoneModal.vue:7
 msgid "Set Phone Number"
-msgstr "फ़ोन नंबर सेट करें"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:265
 msgid "Set Primary Contact"
@@ -5215,7 +5215,7 @@ msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:574
 msgid "Setting up"
-msgstr "की स्थापना"
+msgstr ""
 
 #. Label of the column_break_feto (Column Break) field in DocType 'HD Team'
 #: desk/src/components/layouts/Sidebar.vue:386
@@ -5240,7 +5240,7 @@ msgstr ""
 #. Label of the setup_section (Section Break) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Setup"
-msgstr "स्थापित करना"
+msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:3
 msgid "Setup Email"
@@ -5253,17 +5253,17 @@ msgstr ""
 #: desk/src/pages/knowledge-base/Article.vue:649
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:167
 msgid "Share"
-msgstr "शेयर करना"
+msgstr ""
 
 #. Label of the share_feedback_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Share Feedback"
-msgstr "प्रतिक्रिया साझा करें"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:65
 msgid "Share feedback"
-msgstr "प्रतिक्रिया साझा करें"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:381
 msgid "Shortcuts"
@@ -5288,11 +5288,11 @@ msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:154
 msgid "Showing {0} of {1} {2}"
-msgstr "{1} {2} में से {0} दिखा रहा है"
+msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:22
 msgid "Signature"
-msgstr "हस्ताक्षर"
+msgstr ""
 
 #. Description of the 'Condition' (Code) field in DocType 'HD Service Level
 #. Agreement'
@@ -5333,7 +5333,7 @@ msgstr ""
 #: desk/src/components/view-controls/SortBy.vue:22
 #: desk/src/components/view-controls/SortBy.vue:231
 msgid "Sort"
-msgstr "क्रम से लगाना"
+msgstr ""
 
 #: helpdesk/api/knowledge_base.py:125
 msgid "Source and target category cannot be same"
@@ -5345,13 +5345,13 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:335
 msgid "Source ticket does not exist"
-msgstr "स्रोत टिकट मौजूद नहीं है"
+msgstr ""
 
 #. Label of the split_and_merge_section (Section Break) field in DocType 'HD
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Split and Merge"
-msgstr "विभाजित करें और विलय करें"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.js:9
 msgid "Standard Form Scripts can't be modified, duplicate the script instead."
@@ -5364,12 +5364,12 @@ msgstr ""
 #. Label of the start_date (Date) field in DocType 'HD Service Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Start Date"
-msgstr "आरंभ करने की तिथि"
+msgstr ""
 
 #. Label of the start_time (Time) field in DocType 'HD Service Day'
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 msgid "Start Time"
-msgstr "समय शुरू"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:100
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
@@ -5391,24 +5391,24 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:31
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Status"
-msgstr "स्थिति"
+msgstr ""
 
 #. Label of the auto_close_status (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Status "
-msgstr "स्थिति "
+msgstr ""
 
 #. Label of the status_category (Data) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Status Category"
-msgstr "स्थिति श्रेणी"
+msgstr ""
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:227
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
-msgstr "स्थिति विवरण"
+msgstr ""
 
 #. Label of the status_order (Int) field in DocType 'HD Agent Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
@@ -5417,7 +5417,7 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:382
 msgid "Status is required"
-msgstr "स्थिति आवश्यक है"
+msgstr ""
 
 #. Description of the 'Ticket Reopen status' (Link) field in DocType 'HD
 #. Service Level Agreement'
@@ -5454,22 +5454,22 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:30
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Subject"
-msgstr "विषय"
+msgstr ""
 
 #. Label of the subject_weight (Int) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Subject Weight"
-msgstr "विषय का वजन"
+msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:74
 msgid "Subject is required"
-msgstr "विषय आवश्यक है"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:8
 #: desk/src/pages/ticket/TicketNew.vue:96
 #: desk/src/pages/ticket/TicketNew.vue:120
 msgid "Submit"
-msgstr "जमा करना"
+msgstr ""
 
 #. Label of the summary (Text Editor) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -5482,27 +5482,27 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Sunday"
-msgstr "रविवार"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:366
 msgid "Support"
-msgstr "सहायता"
+msgstr ""
 
 #. Name of a report
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.json
 msgid "Support Hour Distribution"
-msgstr "सहायता घंटा वितरण"
+msgstr ""
 
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Support Policy"
-msgstr "समर्थन नीति"
+msgstr ""
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "Support Team"
-msgstr "सहायता दल"
+msgstr ""
 
 #: desk/src/components/Settings/Preferences/components/ThemeSwitcher.vue:11
 msgid "Switch between light, dark, or system theme"
@@ -5555,7 +5555,7 @@ msgstr ""
 #. Label of the is_system (Check) field in DocType 'HD Ticket Type'
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 msgid "System"
-msgstr "प्रणाली"
+msgstr ""
 
 #. Name of a role
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
@@ -5586,7 +5586,7 @@ msgstr "प्रणाली"
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "System Manager"
-msgstr "सिस्टम प्रबंधक"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_type/hd_ticket_type.py:12
 msgid "System types can not be deleted"
@@ -5594,7 +5594,7 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:22
 msgid "Tampered Access"
-msgstr "छेड़छाड़ की गई पहुंच"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:337
 msgid "Target ticket does not exist"
@@ -5622,17 +5622,17 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Team"
-msgstr "टीम"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:29
 msgid "Team Name"
-msgstr "टीम का नाम"
+msgstr ""
 
 #. Label of the agent_groups_section (Section Break) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Team Restrictions"
-msgstr "टीम प्रतिबंध"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:269
 msgid "Team can now access all tickets."
@@ -5640,7 +5640,7 @@ msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:52
 msgid "Team created"
-msgstr "टीम ने बनाया"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/NewTeam.vue:140
 msgid "Team created successfully."
@@ -5661,7 +5661,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamsList.vue:51
 msgid "Team name"
-msgstr "टीम का नाम"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:56
 msgid "Team renamed successfully."
@@ -5676,7 +5676,7 @@ msgstr ""
 #: desk/src/components/Settings/Teams/TeamsList.vue:3
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Teams"
-msgstr "टीमें"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:6
 msgid "Telephony"
@@ -5690,7 +5690,7 @@ msgstr ""
 
 #: desk/src/pages/ticket/TicketFeedback.vue:54
 msgid "Tell us more"
-msgstr "हमें और अधिक बताएँ"
+msgstr ""
 
 #. Label of the template (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -5736,7 +5736,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:187
 msgid "The number of days must be 1 or more"
-msgstr "दिनों की संख्या 1 या अधिक होनी चाहिए"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:279
 msgid "The selected customer {0} is not linked to the contact {1}.Please select a valid customer or update the contact's linked customers."
@@ -5752,7 +5752,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Preferences/components/ThemeSwitcher.vue:6
 msgid "Theme"
-msgstr "विषय"
+msgstr ""
 
 #: desk/src/components/knowledge-base/CategoryFolderContainer.vue:18
 msgid "There are no categories published at the moment."
@@ -5834,7 +5834,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Thursday"
-msgstr "गुरुवार"
+msgstr ""
 
 #. Label of the ticket (Link) field in DocType 'HD Email Feedback'
 #. Label of the reference_ticket (Link) field in DocType 'HD Notification'
@@ -5848,18 +5848,18 @@ msgstr "गुरुवार"
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Ticket"
-msgstr "टिकट"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:835
 msgid "Ticket #{0}: We've received your request"
-msgstr "टिकट #{0}: हमें आपका अनुरोध प्राप्त हो गया है"
+msgstr ""
 
 #. Name of a report
 #. Label of a Link in the Helpdesk Workspace
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.json
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
 msgid "Ticket Analytics"
-msgstr "टिकट विश्लेषण"
+msgstr ""
 
 #. Label of a Card Break in the Helpdesk Workspace
 #: helpdesk/helpdesk/workspace/helpdesk/helpdesk.json
@@ -5872,20 +5872,20 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/TicketDetailsTab.vue:55
 msgid "Ticket Info"
-msgstr "टिकट की जानकारी"
+msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:85
 msgid "Ticket Management"
-msgstr "टिकट प्रबंधन"
+msgstr ""
 
 #. Label of the is_merged (Check) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Merged"
-msgstr "टिकट विलय हो गया"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket Not Found"
-msgstr "टिकट नहीं मिला"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:620
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:50
@@ -5893,7 +5893,7 @@ msgstr "टिकट नहीं मिला"
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:37
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:105
 msgid "Ticket Priority"
-msgstr "टिकट प्राथमिकता"
+msgstr ""
 
 #. Label of the ticket_reopen_status (Link) field in DocType 'HD Service Level
 #. Agreement'
@@ -5901,7 +5901,7 @@ msgstr "टिकट प्राथमिकता"
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Ticket Reopen status"
-msgstr "टिकट पुनः खोलने की स्थिति"
+msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:18
 msgid "Ticket Routing"
@@ -5914,7 +5914,7 @@ msgstr ""
 #. Label of the ticket_split_from (Link) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket Split From"
-msgstr "टिकट विभाजन से"
+msgstr ""
 
 #: desk/src/components/ticket/TicketMergeModal.vue:65
 msgid "Ticket Subject"
@@ -5929,7 +5929,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:299
 msgid "Ticket Trend"
-msgstr "टिकट ट्रेंड"
+msgstr ""
 
 #. Label of the ticket_type_section (Section Break) field in DocType 'HD
 #. Settings'
@@ -5967,7 +5967,7 @@ msgstr ""
 #: desk/src/pages/ticket/TicketAgent.vue:33
 #: helpdesk/helpdesk/doctype/hd_ticket/api.py:63
 msgid "Ticket not found"
-msgstr "टिकट नहीं मिला"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:40
 msgid "Ticket not found for the provided key."
@@ -5981,7 +5981,7 @@ msgstr ""
 #. Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Ticket raised outside working hours"
-msgstr "कार्य समय के बाहर टिकट जारी किया गया"
+msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:79
 msgid "Ticket split successfully."
@@ -5989,7 +5989,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/components/TicketSettings.vue:155
 msgid "Ticket status"
-msgstr "टिकट की स्थिति"
+msgstr ""
 
 #: desk/src/components/ticket/TicketMergeModal.vue:189
 msgid "Ticket to merged with is required"
@@ -6002,7 +6002,7 @@ msgstr ""
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
-msgstr "टिकट-खोज विश्लेषण"
+msgstr ""
 
 #: desk/src/components/command-palette/CP.vue:98
 #: desk/src/components/ticket-agent/TicketHeader.vue:173
@@ -6016,7 +6016,7 @@ msgstr "टिकट-खोज विश्लेषण"
 #: desk/src/pages/ticket/Tickets.vue:686 helpdesk/api/dashboard.py:155
 #: helpdesk/api/dashboard.py:302
 msgid "Tickets"
-msgstr "टिकट"
+msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:242
 msgid "Tickets approaching or breached SLA"
@@ -6028,7 +6028,7 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:563
 msgid "Tickets by Channel"
-msgstr "चैनल के अनुसार टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:523 helpdesk/api/dashboard.py:531
 msgid "Tickets by Priority"
@@ -6036,11 +6036,11 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:457 helpdesk/api/dashboard.py:465
 msgid "Tickets by Team"
-msgstr "टीम द्वारा टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:490 helpdesk/api/dashboard.py:498
 msgid "Tickets by Type"
-msgstr "टिकट प्रकार के अनुसार"
+msgstr ""
 
 #: helpdesk/api/ticket.py:65
 msgid "Tickets can only be assigned to agents"
@@ -6052,12 +6052,12 @@ msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:244
 msgid "Tickets that are awaiting your response"
-msgstr "जिन टिकटों पर आपकी प्रतिक्रिया का इंतजार है"
+msgstr ""
 
 #: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:22
 #: desk/src/components/contact/EditContactDialog.vue:111
 msgid "Timezone"
-msgstr "समय क्षेत्र"
+msgstr ""
 
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
@@ -6069,7 +6069,7 @@ msgstr "समय क्षेत्र"
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Title"
-msgstr "शीर्षक"
+msgstr ""
 
 #. Label of the title_slug (Data) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
@@ -6079,14 +6079,14 @@ msgstr ""
 #: desk/src/components/Settings/NewTeamModal.vue:48
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:397
 msgid "Title is required"
-msgstr "शीर्षक आवश्यक है"
+msgstr ""
 
 #. Label of the user_to (Link) field in DocType 'HD Notification'
 #: desk/src/components/EmailEditor.vue:34
 #: desk/src/pages/call-logs/CallLogModal.vue:33
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "To"
-msgstr "को"
+msgstr ""
 
 #. Label of the to_date (Date) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -6095,7 +6095,7 @@ msgstr "को"
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:24
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:24
 msgid "To Date"
-msgstr "तारीख तक"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.py:45
 msgid "To Date cannot be before From Date"
@@ -6104,20 +6104,20 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:92
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:157
 msgid "To date"
-msgstr "तारीख तक"
+msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:366
 msgid "To is required"
-msgstr "की आवश्यकता है"
+msgstr ""
 
 #: desk/src/components/Settings/EmailEdit.vue:268
 msgid "To know more about setting up email accounts, click"
-msgstr "ईमेल खाते सेट अप करने के बारे में अधिक जानने के लिए, क्लिक करें"
+msgstr ""
 
 #: desk/src/pages/dashboard/Dashboard.vue:472
 #: desk/src/pages/dashboard/Dashboard.vue:474
 msgid "Today"
-msgstr "आज"
+msgstr ""
 
 #: desk/src/components/layouts/Sidebar.vue:262
 msgid "Toggle theme"
@@ -6125,41 +6125,41 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.py:35
 msgid "Top Result"
-msgstr "शीर्ष परिणाम"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:98
 msgid "Total"
-msgstr "कुल"
+msgstr ""
 
 #. Label of the total_hold_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Total Hold Time"
-msgstr "कुल प्रतीक्षा समय"
+msgstr ""
 
 #. Label of the total_holidays (Int) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Total Holidays"
-msgstr "कुल छुट्टियाँ"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:126
 msgid "Total Ticket"
-msgstr "कुल टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:160
 msgid "Total number of tickets created"
-msgstr "कुल निर्मित टिकटों की संख्या"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:532
 msgid "Total tickets by priority"
-msgstr "प्राथमिकता के आधार पर कुल टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:466
 msgid "Total tickets by team"
-msgstr "टीम के अनुसार कुल टिकट"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:499
 msgid "Total tickets by type"
-msgstr "प्रकार के अनुसार कुल टिकट"
+msgstr ""
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -6167,7 +6167,7 @@ msgstr "प्रकार के अनुसार कुल टिकट"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Tuesday"
-msgstr "मंगलवार"
+msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:72
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:4
@@ -6183,11 +6183,11 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Type"
-msgstr "प्रकार"
+msgstr ""
 
 #: desk/src/pages/ticket/TicketCustomer.vue:69
 msgid "Type a message"
-msgstr "एक संदेश टाइप करें"
+msgstr ""
 
 #: desk/src/components/customer/InviteContactDialog.vue:19
 msgid "Type an email address"
@@ -6195,12 +6195,12 @@ msgstr ""
 
 #: desk/src/pages/call-logs/CallLogModal.vue:360
 msgid "Type is required"
-msgstr "टाइप आवश्यक है"
+msgstr ""
 
 #. Label of the url_method (Data) field in DocType 'HD Ticket Template Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
 msgid "URL/Method"
-msgstr "यूआरएल/विधि"
+msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:668
 msgid "Unable to send email. Please setup default outgoing email account."
@@ -6276,7 +6276,7 @@ msgstr ""
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Update status to"
-msgstr "स्थिति को अपडेट करें"
+msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:41
 msgid "Upload"
@@ -6313,12 +6313,12 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.py:55
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.py:83
 msgid "User"
-msgstr "उपयोगकर्ता"
+msgstr ""
 
 #. Label of the user_resolution_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "User Resolution Time"
-msgstr "उपयोगकर्ता समाधान समय"
+msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:6
 msgid "User Reviews"
@@ -6326,7 +6326,7 @@ msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:42
 msgid "User Signup"
-msgstr "उपयोगकर्ता पंजीकरण"
+msgstr ""
 
 #. Label of the users (Table MultiSelect) field in DocType 'HD Team'
 #: helpdesk/helpdesk/doctype/hd_team/hd_team.json
@@ -6339,18 +6339,18 @@ msgstr ""
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:132
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
-msgstr "मान्य तिथि से"
+msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:109
 msgid "Value"
-msgstr "कीमत"
+msgstr ""
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
 #. Label of a field in the tickets Web Form
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Via Customer Portal"
-msgstr "ग्राहक पोर्टल के माध्यम से"
+msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:241
 msgid "View Assignment rule"
@@ -6358,12 +6358,12 @@ msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:652
 msgid "View {0}"
-msgstr "दृश्य {0}"
+msgstr ""
 
 #. Label of the views (Int) field in DocType 'HD Article'
 #: helpdesk/helpdesk/doctype/hd_article/hd_article.json
 msgid "Views"
-msgstr "दृश्य"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
@@ -6374,7 +6374,7 @@ msgstr ""
 
 #: desk/src/components/knowledge-base/ArticleFeedback.vue:10
 msgid "Was this article Helpful?"
-msgstr "क्या यह लेख उपयोगी था?"
+msgstr ""
 
 #. Option for the 'Workday' (Select) field in DocType 'HD Service Day'
 #. Option for the 'Weekly Off' (Select) field in DocType 'HD Service Holiday
@@ -6382,18 +6382,18 @@ msgstr "क्या यह लेख उपयोगी था?"
 #: helpdesk/helpdesk/doctype/hd_service_day/hd_service_day.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Wednesday"
-msgstr "बुधवार"
+msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:34
 msgid "Weekly"
-msgstr "साप्ताहिक"
+msgstr ""
 
 #. Label of the weekly_off (Check) field in DocType 'HD Holiday'
 #. Label of the weekly_off (Select) field in DocType 'HD Service Holiday List'
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
 msgid "Weekly Off"
-msgstr "साप्ताहिक अवकाश"
+msgstr ""
 
 #. Description of the 'Auto update status' (Check) field in DocType 'HD
 #. Settings'
@@ -6406,7 +6406,7 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_stopword/hd_stopword.json
 #: helpdesk/helpdesk/doctype/hd_synonyms/hd_synonyms.json
 msgid "Word"
-msgstr "शब्द"
+msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:5
 msgid "Work Schedule and Holidays"
@@ -6444,12 +6444,12 @@ msgstr ""
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Working Hours"
-msgstr "कार्य के घंटे"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:172
 #: desk/src/pages/knowledge-base/NewArticle.vue:55
 msgid "Write your article here..."
-msgstr "अपना लेख यहाँ लिखें..."
+msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:31
 msgid "Write your email signature here."
@@ -6461,14 +6461,14 @@ msgstr ""
 
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:37
 msgid "Yearly"
-msgstr "सालाना"
+msgstr ""
 
 #. Option for the 'Color' (Select) field in DocType 'HD Agent Status'
 #. Option for the 'Color' (Select) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Yellow"
-msgstr "पीला"
+msgstr ""
 
 #: helpdesk/api/ticket_stats.py:35
 msgid "You are not allowed to view another agent's stats."
@@ -6544,7 +6544,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:51
 msgid "Your performance is"
-msgstr "आपका प्रदर्शन है"
+msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:116
 msgid "active ticket"
@@ -6556,7 +6556,7 @@ msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:46
 msgid "assigned you a ticket"
-msgstr "आपको एक टिकट सौंपा गया है"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:29
 msgid "assignees"
@@ -6564,7 +6564,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:477
 msgid "average"
-msgstr "औसत"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:13
 msgid "back to email event list"
@@ -6572,11 +6572,11 @@ msgstr ""
 
 #: desk/src/components/HistoryBox.vue:12
 msgid "changes from"
-msgstr "परिवर्तन से"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:651
 msgid "created"
-msgstr "बनाया था"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:42
 msgid "customize {0}"
@@ -6584,19 +6584,19 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:218 helpdesk/api/dashboard.py:220
 msgid "days"
-msgstr "दिन"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:563
 msgid "deleted"
-msgstr "हटाए गए"
+msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:7
 msgid "emails/ comments"
-msgstr "ईमेल/टिप्पणियाँ"
+msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:473
 msgid "excellent"
-msgstr "उत्कृष्ट"
+msgstr ""
 
 #: desk/src/components/ticket/TicketSplitModal.vue:8
 msgid "from this email onwards will be moved to new ticket."
@@ -6604,7 +6604,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:475
 msgid "good"
-msgstr "अच्छा"
+msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -6613,20 +6613,20 @@ msgstr ""
 
 #: desk/src/components/CallArea.vue:16
 msgid "has made a call"
-msgstr "फोन किया है"
+msgstr ""
 
 #: desk/src/components/CallArea.vue:15
 msgid "has reached out"
-msgstr "संपर्क किया है"
+msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:49
 msgid "has reopened the ticket"
-msgstr "टिकट दोबारा खोल दिया गया है"
+msgstr ""
 
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:78
 #: desk/src/components/Settings/General/components/TicketSettings.vue:237
 msgid "here"
-msgstr "यहाँ"
+msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:21
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:19
@@ -6635,15 +6635,15 @@ msgstr ""
 
 #: helpdesk/api/dashboard.py:199 helpdesk/api/dashboard.py:201
 msgid "hrs"
-msgstr "घंटे"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/NewArticle.vue:15
 msgid "in"
-msgstr "में"
+msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:396
 msgid "just now"
-msgstr "बस अब"
+msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
@@ -6653,11 +6653,11 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "list"
-msgstr "सूची"
+msgstr ""
 
 #: desk/src/pages/MobileNotifications.vue:43
 msgid "mentioned you in ticket"
-msgstr "टिकट में आपका जिक्र किया गया है"
+msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:479
 msgid "poor"
@@ -6676,11 +6676,11 @@ msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:32
 msgid "reviews"
-msgstr "समीक्षा"
+msgstr ""
 
 #: helpdesk/api/dashboard.py:242
 msgid "stars"
-msgstr "सितारे"
+msgstr ""
 
 #. Label of the synonym (Data) field in DocType 'HD Synonym'
 #: helpdesk/helpdesk/doctype/hd_synonym/hd_synonym.json
@@ -6689,7 +6689,7 @@ msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:158
 msgid "ticket"
-msgstr "टिकट"
+msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:68
 msgid "to enable this integration."
@@ -6697,11 +6697,11 @@ msgstr ""
 
 #: desk/src/pages/ticket/MobileTicketAgent.vue:531
 msgid "viewed this"
-msgstr "इसे देखा"
+msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:85
 msgid "views"
-msgstr "दृश्य"
+msgstr ""
 
 #: desk/src/components/contact/ContactCustomers.vue:53
 msgid "{0} Customers"
@@ -6741,11 +6741,11 @@ msgstr ""
 
 #: desk/src/pages/SearchAgent.vue:117
 msgid "{0} matches"
-msgstr "{0} मिलान"
+msgstr ""
 
 #: desk/src/pages/home/components/RecentFeedback.vue:46
 msgid "{0} reviews"
-msgstr "{0} समीक्षाएँ"
+msgstr ""
 
 #: desk/src/pages/ticket/Tickets.vue:510
 msgid "{0} view is currently public. Changing it to private will hide it for all the users."
