@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.consts import DEFAULT_SLA
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
 
@@ -121,9 +122,9 @@ def make_sla(
     rank: int = 0,
     priorities: list[str] | None = None,
 ):
-    """Copy the seeded Default SLA. `priorities` replaces its priority rows, the
+    """Copy the seeded SLA. `priorities` replaces its priority rows, the
     first becoming the default priority, each row slower than the one before."""
-    def_sla = frappe.get_doc("HD Service Level Agreement", "Default")
+    def_sla = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
     sla_doc = frappe.copy_doc(def_sla)
     sla_doc.service_level = sla_name
     sla_doc.condition = condition
