@@ -109,7 +109,7 @@
 
               <!-- Priority -->
               <div v-if="!isMobileView" class="flex items-center gap-1.5">
-                <span>{{ ticket.priority }}</span>
+                <TicketPriority :priority="ticket.priority" />
               </div>
 
               <!-- First Response -->
@@ -156,6 +156,7 @@
 
 <script setup lang="ts">
 import Link from "@/components/frappe-ui/Link.vue";
+import TicketPriority from "@/components/TicketPriority.vue";
 import { IndicatorIcon } from "@/components/icons";
 import { useScreenSize } from "@/composables/screen";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
