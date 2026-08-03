@@ -1942,6 +1942,45 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
         self.assertFalse(ticket.total_hold_time)
 
+    def test_detaching_while_paused_keeps_the_pause_anchor(self):
+        """A ticket that stays paused across a detach must keep its hold credit."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        resolution_by = ticket.resolution_by
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+
+        # detach without touching status, so the ticket is still paused
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertTrue(ticket.on_hold_since)
+
+        with self.freeze_time(add_to_date(raised_at, minutes=30)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.save()
+        self.assertEqual(ticket.agreement_status, "Paused")
+
+        # un-pausing bills the whole pause, so the deadline moves out by it
+        with self.freeze_time(add_to_date(raised_at, minutes=40)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+
+        self.assertEqual(ticket.total_hold_time, 30 * 60)
+        self.assertEqual(
+            get_datetime(ticket.resolution_by),
+            add_to_date(get_datetime(resolution_by), minutes=30),
+        )
+
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()

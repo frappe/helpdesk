@@ -969,9 +969,10 @@ class HDTicket(Document):
         self.sla = None
         self.response_by = None
         self.resolution_by = None
-        self.on_hold_since = (
-            None  # else the detached window is added into the hold time.
-        )
+        if self.status_category != "Paused":
+            self.on_hold_since = (
+                None  # else the detached window is added into the hold time.
+            )
         if self.agreement_status != "Failed":
             self.agreement_status = None
 
