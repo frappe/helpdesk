@@ -6,8 +6,9 @@
     class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
   >
     <template #tab-panel="{ tab }">
+      <TicketAnalyticsTab v-if="tab.name === 'analytics'" />
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
+        v-else-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -55,6 +56,8 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
+import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
+import LucideChartNoAxesColumn from "~icons/lucide/chart-no-axes-column";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import { ActivitiesSymbol, TabObject, TicketSymbol, TicketTab } from "@/types";
@@ -101,6 +104,11 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: PhoneIcon,
     });
   }
+  _tabs.push({
+    name: "analytics",
+    label: "Analytics",
+    icon: LucideChartNoAxesColumn,
+  });
   return _tabs;
 });
 

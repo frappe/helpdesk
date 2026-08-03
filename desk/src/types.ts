@@ -358,6 +358,7 @@ export interface EmailAccount {
   validate_ssl_certificate_for_outgoing: boolean;
 }
 
+<<<<<<< HEAD
 export type EmailAccountFormState = {
   email_account_name?: string;
   email_id?: string;
@@ -383,6 +384,15 @@ export type EmailAccountFormState = {
 };
 
 export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
+=======
+export type TicketTab =
+  | "activity"
+  | "email"
+  | "comment"
+  | "details"
+  | "call"
+  | "analytics";
+>>>>>>> 38a2289 (feat: analytics tab with metrics and conversation summary)
 
 export interface TabObject {
   name: TicketTab;
