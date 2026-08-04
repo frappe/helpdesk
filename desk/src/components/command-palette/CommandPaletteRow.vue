@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-9 w-full min-w-0 items-center rounded px-2 text-sm text-ink-gray-8"
+    class="flex h-9 w-full min-w-0 items-center rounded px-2 text-sm text-ink-gray-8 leading-snug"
     :class="{ 'bg-surface-gray-2': active }"
   >
     <Avatar
