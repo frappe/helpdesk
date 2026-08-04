@@ -737,15 +737,14 @@ class HDTicket(Document):
 
         communication.in_reply_to = self._last_threadable_communication()
 
-        # Each reply needs its own id so the next reply can point at it. It is saved
-        # further down, once the mail has actually gone out - see the send below.
+        # Each reply needs its own id so the next reply can point at it. Saved after
+        # the send below, not here.
         should_send_email = not skip_email_workflow and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
         )
         message_id = None
         if should_send_email:
-            # check before writing anything, so a reply we already know we cannot
-            # send is never saved at all
+            # fail before writing anything we would have to undo
             if not sender_email:
                 frappe.throw(
                     _(
@@ -794,7 +793,7 @@ class HDTicket(Document):
             send_now = True
 
         try:
-            queued = frappe.sendmail(
+            queued_email = frappe.sendmail(
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
@@ -817,13 +816,9 @@ class HDTicket(Document):
         except Exception as e:
             frappe.throw(str(e))
 
-        # Save the id only now that the mail is queued carrying it, so the next reply
-        # can point back at it. A reply we could not hand off keeps no id and so can
-        # never be answered. sendmail returns nothing when it queued nothing at all.
-        # A queued mail that later fails to deliver still keeps its id - undoing that
-        # would need to watch the Email Queue, and a bounce does not make the id
-        # unusable anyway.
-        if queued:
+        # Save the id now that a mail is queued carrying it. A reply we could not hand
+        # off keeps no id, so it can never become the next reply's parent.
+        if queued_email:
             communication.db_set("message_id", message_id)
 
     @frappe.whitelist()
