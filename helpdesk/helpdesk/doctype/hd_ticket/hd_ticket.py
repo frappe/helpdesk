@@ -612,14 +612,14 @@ class HDTicket(Document):
         except Exception:
             return None
 
-    def get_last_threadable_communication(self):
-        """Newest communication on this ticket that can anchor an email thread.
+    def _last_threadable_communication(self) -> str | None:
+        """Name of the newest communication that can anchor an email thread.
 
-        Only communications with a stored `message_id` qualify. That column is what
+        Only communications with a stored `message_id` qualify: that column is what
         frappe resolves `in_reply_to` against when setting the `In-Reply-To` header
-        (see `EmailQueue.prepare_email_content`), so a communication without one
-        cannot be replied to. Portal replies never sent an email and have no id;
-        skipping them keeps the chain intact across a portal message.
+        (see `EmailQueue.prepare_email_content`), so one without an id is a dead end.
+        A customer's portal reply sent no email and has no id, so stepping over it
+        keeps the chain intact across it.
         """
         return frappe.db.get_value(
             "Communication",
@@ -628,9 +628,8 @@ class HDTicket(Document):
                 "reference_name": str(self.name),
                 "message_id": ["is", "set"],
             },
-            ["name", "message_id"],
+            "name",
             order_by="creation desc",
-            as_dict=True,
         )
 
     def last_communication_email(self):
@@ -735,19 +734,12 @@ class HDTicket(Document):
             }
         )
 
-        last_communication = self.get_last_threadable_communication()
-        if last_communication:
-            communication.in_reply_to = last_communication.name
+        communication.in_reply_to = self._last_threadable_communication()
 
-        # Give this reply its own Message-Id so the *next* reply can point at it.
-        # frappe builds `In-Reply-To` by looking up `Communication.message_id` of the
-        # doc named in `in_reply_to`, so a reply without one is a dead end and the
-        # thread breaks after a single hop. Must be freshly generated per message —
-        # reusing the parent's id stamped every reply in a ticket with the same
-        # Message-Id, which is what helpdesk#2308 correctly removed.
-        # Only when this reply is actually emailed: an id stored for a reply nobody
-        # received would anchor the next one to a Message-Id that reached no mailbox,
-        # which fails exactly like storing no id at all.
+        # Minted per message so the *next* reply has something to point at, and only
+        # when we actually send: an id on a reply nobody received would anchor the
+        # next one to a Message-Id that reached no mailbox. Never reuse the parent's
+        # id - that stamped every reply in a ticket with the same one (helpdesk#2308).
         should_send_email = not skip_email_workflow and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
         )
@@ -816,10 +808,10 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=last_communication.name if last_communication else None,
-                # Must match what we stored above: the recipient has to actually
-                # receive this Message-Id for the next reply's `In-Reply-To` to
-                # resolve on their side.
+                # in_reply_to resolves through the name of the communication which holds
+                in_reply_to=communication.in_reply_to,
+                # Must match what we stored: the recipient has to receive this exact
+                # Message-Id for the next reply's `In-Reply-To` to resolve for them.
                 message_id=communication.message_id,
             )
         except Exception as e:
