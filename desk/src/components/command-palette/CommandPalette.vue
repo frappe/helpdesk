@@ -23,7 +23,7 @@
                   context.label
                 }}</span>
                 <span class="shrink-0 text-ink-gray-4">⋅</span>
-                <span class="truncate text-ink-gray-5">{{
+                <span class="truncate leading-snug text-ink-gray-5">{{
                   context.title || __("Ticket")
                 }}</span>
               </Badge>
