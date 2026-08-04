@@ -94,7 +94,7 @@
                 >
                   <template #default>
                     <EditorContent
-                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                      class="max-w-none text-p-sm text-ink-gray-5 focus:outline-none"
                     />
                   </template>
                 </Editor>
@@ -131,6 +131,7 @@
 
 <script setup lang="ts">
 import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
+import { buildEditorExtensions } from "@/components/editor/config";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -146,14 +147,13 @@ import {
   TextInput,
 } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { buildEditorExtensions } from "@/components/editor/config";
-const extensions = buildEditorExtensions();
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
+const extensions = buildEditorExtensions();
 
 const props = defineProps({
   doctype: {
