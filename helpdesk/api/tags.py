@@ -5,7 +5,7 @@ from frappe.desk.doctype.tag.tag import add_tag, remove_tag
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
     log_ticket_activity,
 )
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, capture_event
 
 FIRST_TICKET_TAG = "First Ticket"
 FIRST_TICKET_TAG_COLOR = "Blue"
@@ -32,10 +32,13 @@ def update_tags(
         remove_tag(label, doctype, name)
 
     added_labels = [label for tag in added or [] if (label := tag["name"].strip())]
+    new_labels = [label for label in added_labels if label not in before]
+    if new_labels and doctype == "HD Ticket":
+        capture_event("ticket_tag_applied")
     log_tag_activity(
         doctype,
         name,
-        [label for label in added_labels if label not in before],
+        new_labels,
         [label for label in removed or [] if label in before],
     )
     return frappe.db.get_value(doctype, name, "_user_tags") or ""
