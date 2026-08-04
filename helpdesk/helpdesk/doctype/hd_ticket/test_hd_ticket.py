@@ -2,6 +2,7 @@
 # See license.txt
 
 from datetime import timedelta
+from unittest.mock import patch
 
 import frappe
 from frappe.tests import IntegrationTestCase
@@ -55,6 +56,20 @@ def get_ticket_obj():
         "subject": "Test Ticket",
         "description": "Test Ticket Description",
     }
+
+
+def sent_replies(ticket_name: str):
+    """Agent replies saved on a ticket, oldest first."""
+    return frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_name,
+            "sent_or_received": "Sent",
+        },
+        fields=["name", "message_id", "in_reply_to"],
+        order_by="creation asc",
+    )
 
 
 non_agent = "non_agent@test.com"
@@ -1147,6 +1162,189 @@ class TestHDTicket(IntegrationTestCase):
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
 
+    def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
+        """Without this, every agent reply arrives as a new thread."""
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertTrue(first.message_id, "reply must store its own id")
+        self.assertTrue(second.message_id, "reply must store its own id")
+        self.assertNotEqual(
+            first.message_id, second.message_id, "ids must not be reused"
+        )
+        self.assertEqual(
+            second.in_reply_to, first.name, "second reply follows the first"
+        )
+
+    def test_agent_reply_sends_the_message_id_it_stored(self):
+        """If we store an id but send a different one, the customer never has the id
+        the next reply points at."""
+        email_account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Threading Test",
+                "email_id": "threading-test@example.com",
+                "enable_outgoing": 1,
+                "smtp_server": "smtp.example.com",
+            }
+        ).insert(ignore_if_duplicate=True)
+
+        reply_email_enabled = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 1)
+        try:
+            ticket = make_ticket()
+            with patch("frappe.sendmail") as sendmail:
+                ticket.reply_via_agent(
+                    message="Reply",
+                    to="customer@test.com",
+                    from_email={
+                        "email_account": email_account.name,
+                        "email_id": email_account.email_id,
+                    },
+                )
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", reply_email_enabled
+            )
+
+        communication = get_latest_ticket_communication(ticket.name)
+        self.assertTrue(sendmail.called, "reply should have been emailed")
+        self.assertEqual(
+            sendmail.call_args.kwargs.get("message_id"),
+            communication.message_id,
+            "wire Message-Id must match the one stored on the Communication",
+        )
+
+    def test_portal_reply_does_not_break_agent_reply_threading(self):
+        """A portal reply sent no email, so replies after it must skip past it."""
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        # each of these is its own request in production; replying updates the ticket row
+        ticket.reload()
+        ticket.create_communication_via_contact(message="Customer portal reply")
+        portal = get_latest_ticket_communication(ticket.name)
+        self.assertFalse(portal.message_id, "portal replies store no id")
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertEqual(
+            second.in_reply_to, first.name, "follows the last emailed reply"
+        )
+
+    def test_agent_replies_thread_on_a_ticket_created_by_email(self):
+        """A ticket raised by email: the first reply answers the customer's mail,
+        and later replies follow the reply before them."""
+        ticket = make_ticket()
+        customer_email = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "subject": f"Re: {ticket.subject}",
+                # frappe stores incoming ids without the angle brackets
+                "message_id": "customer-mail-1@example.com",
+                "content": "my printer is broken",
+            }
+        ).insert(ignore_permissions=True)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertEqual(
+            first.in_reply_to, customer_email.name, "first reply answers the customer"
+        )
+        self.assertEqual(
+            second.in_reply_to, first.name, "second reply follows the first"
+        )
+        self.assertNotEqual(
+            first.message_id, second.message_id, "ids must not be reused"
+        )
+
+    def test_reply_that_fails_to_send_stores_no_message_id(self):
+        """The reply stays visible, but with no id it can never be replied to."""
+        ticket = make_ticket()
+
+        with patch("frappe.sendmail", side_effect=Exception("smtp is down")):
+            with self.assertRaises(Exception):
+                ticket.reply_via_agent(message="Never sent", to="customer@test.com")
+
+        replies = sent_replies(ticket.name)
+        self.assertEqual(len(replies), 1, "the attempt stays on the ticket")
+        self.assertFalse(replies[0].message_id, "a reply nobody got has no id")
+
+    def test_reply_stores_no_message_id_when_nothing_was_queued(self):
+        """sendmail returns nothing when it queued nothing, which is not a send."""
+        ticket = make_ticket()
+
+        with patch("frappe.sendmail", return_value=None):
+            ticket.reply_via_agent(message="Queued nothing", to="customer@test.com")
+
+        self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
+
+    def test_next_reply_threads_onto_the_last_one_that_sent(self):
+        """The bug this guards: a reply that failed to send must not be answered,
+        or the customer gets a reply pointing at an email they never received."""
+        ticket = make_ticket()
+        real_sendmail = frappe.sendmail
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        with patch("frappe.sendmail", side_effect=Exception("smtp is down")):
+            with self.assertRaises(Exception):
+                ticket.reply_via_agent(
+                    message="Second reply, never sent", to="customer@test.com"
+                )
+
+        ticket.reload()
+        with patch("frappe.sendmail", side_effect=real_sendmail):
+            ticket.reply_via_agent(message="Third reply", to="customer@test.com")
+        third = get_latest_ticket_communication(ticket.name)
+
+        self.assertTrue(first.message_id, "the first reply did send")
+        self.assertEqual(
+            third.in_reply_to, first.name, "skips the reply that never went out"
+        )
+
+    def test_reply_stores_no_message_id_when_email_is_off(self):
+        """No email was sent, so there is no id the customer could ever reply to."""
+        previous = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 0)
+        try:
+            ticket = make_ticket()
+            ticket.reply_via_agent(message="Not emailed")
+            self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", previous
+            )
+
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
         frappe.set_user(non_agent)
@@ -1528,6 +1726,51 @@ class TestHDTicket(IntegrationTestCase):
         )
         for file in files:
             frappe.delete_doc("File", file)
+
+    def test_bulk_reply_writes_nothing_if_one_ticket_is_off_limits(self):
+        """Everything is checked before anything is written, so a ticket the agent
+        cannot reply to stops the batch instead of half completing it."""
+        frappe.set_user(agent)
+        allowed = make_ticket(raised_by="customer1@test.com")
+        forbidden = make_ticket(raised_by="customer2@test.com")
+
+        def deny_forbidden(*args, **kwargs):
+            if kwargs.get("doc") == forbidden.name:
+                raise frappe.PermissionError
+            return True
+
+        with patch("frappe.has_permission", side_effect=deny_forbidden):
+            with self.assertRaises(frappe.PermissionError):
+                bulk_reply(
+                    ticket_ids=[allowed.name, forbidden.name], message="Test Message"
+                )
+
+        self.assertFalse(
+            sent_replies(allowed.name), "no ticket may be replied to before all pass"
+        )
+
+    def test_bulk_reply_replies_once_per_duplicated_ticket(self):
+        """Ids are deduped before anything is written, so a ticket listed twice gets
+        one reply and one copy of each file."""
+        frappe.set_user(agent)
+        file1 = upload_test_file("outlook.png")
+        ticket = make_ticket(raised_by="customer1@test.com")
+
+        bulk_reply(
+            ticket_ids=[ticket.name, ticket.name],
+            message="Test Message",
+            attachments=[file1],
+        )
+
+        self.assertEqual(len(sent_replies(ticket.name)), 1, "one reply, not two")
+        self.assertEqual(
+            frappe.db.count(
+                "File",
+                {"attached_to_doctype": "HD Ticket", "attached_to_name": ticket.name},
+            ),
+            1,
+            "one copy of the file, not two",
+        )
 
     def test_auto_close_respects_inactivity_cutoff_boundary(self):
         """`close_tickets_after_n_days` closes a ticket whose last communication is

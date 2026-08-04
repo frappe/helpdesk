@@ -10,10 +10,11 @@ from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
+from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import add_to_date, cint, getdate, now_datetime
+from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -615,6 +616,23 @@ class HDTicket(Document):
         except Exception:
             return None
 
+    def _last_threadable_communication(self) -> str | None:
+        """Name of the newest communication that has a message_id.
+
+        Frappe builds In-Reply-To from that field, so a communication without one
+        cannot be replied to. Portal replies sent no email and have none.
+        """
+        return frappe.db.get_value(
+            "Communication",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": str(self.name),
+                "message_id": ["is", "set"],
+            },
+            "name",
+            order_by="creation desc",
+        )
+
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
             return
@@ -718,9 +736,23 @@ class HDTicket(Document):
             }
         )
 
-        last_communication = self.get_last_communication()
-        if last_communication and last_communication.message_id:
-            communication.in_reply_to = last_communication.name
+        communication.in_reply_to = self._last_threadable_communication()
+
+        # Each reply needs its own id so the next reply can point at it. Saved after
+        # the send below, not here.
+        should_send_email = not skip_email_workflow and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        message_id = None
+        if should_send_email:
+            # fail before writing anything we would have to undo
+            if not sender_email:
+                frappe.throw(
+                    _(
+                        "Unable to send email. Please setup default outgoing email account."
+                    )
+                )
+            message_id = get_string_between("<", get_message_id(), ">")
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -733,15 +765,8 @@ class HDTicket(Document):
             self.attach_file_with_doc("HD Ticket", self.name, file_url)
             _attachments.append({"file_url": file_url})
 
-        if skip_email_workflow or not frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_via_agent"
-        ):
+        if not should_send_email:
             return
-
-        if not sender_email:
-            frappe.throw(
-                _("Unable to send email. Please setup default outgoing email account.")
-            )
 
         message = self.parse_content(message)
 
@@ -769,7 +794,7 @@ class HDTicket(Document):
             send_now = True
 
         try:
-            frappe.sendmail(
+            queued_email = frappe.sendmail(
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
@@ -786,10 +811,16 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=last_communication.name if last_communication else None,
+                in_reply_to=communication.in_reply_to,
+                message_id=message_id,
             )
         except Exception as e:
             frappe.throw(str(e))
+
+        # Save the id now that a mail is queued carrying it. A reply we could not hand
+        # off keeps no id, so it can never become the next reply's parent.
+        if queued_email:
+            communication.db_set("message_id", message_id)
 
     @frappe.whitelist()
     # flake8: noqa

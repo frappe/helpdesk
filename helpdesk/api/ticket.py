@@ -8,23 +8,30 @@ from helpdesk.utils import agent_only, is_admin
 @agent_only
 def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
 
-    link_attachments_to_tickets(attachments, ticket_ids)
-
     if not ticket_ids:
         return
 
-    ticket_ids = list(set(ticket_ids))  # Remove duplicates
+    # dedupe but keep the order the agent picked. set() orders by hash, which varies
+    # per process, and duplicates would attach the same file to a ticket twice
+    ticket_ids = list(dict.fromkeys(ticket_ids))
 
+    # Check every ticket before writing anything, so one ticket the agent cannot
+    # reply to does not leave the rest of the batch half done
+    tickets = []
     for ticket_id in ticket_ids:
         frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
-        doc = frappe.get_doc("HD Ticket", ticket_id)
+        tickets.append(frappe.get_doc("HD Ticket", ticket_id))
+
+    link_attachments_to_tickets(attachments, ticket_ids)
+
+    for doc in tickets:
         try:
             doc.reply_via_agent(
                 message, to=doc.raised_by, attachments=attachments or []
             )
         except Exception as e:
             frappe.log_error(
-                title=f"Bulk reply failed for ticket {ticket_id}",
+                title=f"Bulk reply failed for ticket {doc.name}",
                 message=str(e),
             )
 
