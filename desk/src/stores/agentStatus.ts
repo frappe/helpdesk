@@ -15,6 +15,7 @@ interface AvailabilityEvent {
   agent: string;
   availability: string;
   availability_changed_on: string;
+  changed_by: string;
 }
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
@@ -68,15 +69,10 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
 
   const { $socket } = globalStore();
   $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
-    // Our own status moving to something we did not pick — an admin disabled the
-    // status we were on. Our own writes are applied optimistically before the
-    // request goes out, so they never differ here.
-    const mine = myAgentName && liveStatuses[myAgentName];
-    if (
-      data.agent === myAgentName &&
-      mine &&
-      mine.availability !== data.availability
-    ) {
+    // Our status, moved by someone else — an admin disabled the status we were
+    // on. Keyed on who did it rather than on the value changing, so a change we
+    // made in another tab stays silent.
+    if (data.agent === myAgentName && data.changed_by !== window.session_user) {
       // Status names go through __() in the picker, so translate it here too.
       toast.info(__("Your status was changed to {0}.", __(data.availability)));
     }

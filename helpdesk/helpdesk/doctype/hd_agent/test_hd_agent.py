@@ -155,6 +155,8 @@ class TestHDAgent(FrappeTestCase):
         self.assertEqual(event, "agent_availability_updated")
         self.assertEqual(kwargs["data"]["agent"], agent.name)
         self.assertEqual(kwargs["data"]["availability"], "Away")
+        # the client uses this to tell its own change from one made for it
+        self.assertEqual(kwargs["data"]["changed_by"], frappe.session.user)
 
     def test_save_without_availability_change_is_not_published(self):
         set_agent_availability(self.test_user, "Away")
