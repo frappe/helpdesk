@@ -44,20 +44,6 @@ def get_ticket_obj():
     }
 
 
-def get_ticket_communications(ticket_name: str):
-    """Communications on a ticket, oldest first.
-
-    `get_latest_ticket_communication` uses limit=1 with no order_by, so it cannot be
-    used to tell one reply from the next.
-    """
-    return frappe.get_all(
-        "Communication",
-        filters={"reference_doctype": "HD Ticket", "reference_name": ticket_name},
-        fields=["name", "message_id", "in_reply_to"],
-        order_by="creation asc",
-    )
-
-
 non_agent = "non_agent@test.com"
 agent = "agent@test.com"
 agent2 = "agent2@test.com"
@@ -1149,40 +1135,28 @@ class TestHDTicket(FrappeTestCase):
             self.assertEqual(communication_doc.bcc, bcc_recipient)
 
     def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
-        """Every agent reply needs its own Message-Id and must point at the one before it.
-
-        Regression guard: helpdesk#2308 removed `communication.message_id`, while
-        frappe#32651 builds the `In-Reply-To` header from exactly that column. With the
-        column empty each reply is a dead end, so every reply arrives as a new thread.
-        """
+        """Without this, every agent reply arrives as a new thread."""
         ticket = make_ticket()
 
         ticket.reply_via_agent(message="First reply")
-        first = get_ticket_communications(ticket.name)[-1]
+        first = get_latest_ticket_communication(ticket.name)
 
+        ticket.reload()
         ticket.reply_via_agent(message="Second reply")
-        second = get_ticket_communications(ticket.name)[-1]
+        second = get_latest_ticket_communication(ticket.name)
 
-        self.assertTrue(first.message_id, "reply must store its own Message-Id")
-        self.assertTrue(second.message_id, "reply must store its own Message-Id")
+        self.assertTrue(first.message_id, "reply must store its own id")
+        self.assertTrue(second.message_id, "reply must store its own id")
         self.assertNotEqual(
-            first.message_id,
-            second.message_id,
-            "each message needs a unique Message-Id, never a copy of the parent's",
+            first.message_id, second.message_id, "ids must not be reused"
         )
         self.assertEqual(
-            second.in_reply_to,
-            first.name,
-            "second reply must thread onto the first",
+            second.in_reply_to, first.name, "second reply follows the first"
         )
 
     def test_agent_reply_sends_the_message_id_it_stored(self):
-        """The Message-Id on the wire must equal the one stored on the Communication.
-
-        Storing an id without passing it to sendmail looks correct but fails silently:
-        the recipient receives a queue-generated id while the next reply's `In-Reply-To`
-        names the stored one, which no mail client has ever seen.
-        """
+        """If we store an id but send a different one, the customer never has the id
+        the next reply points at."""
         email_account = frappe.get_doc(
             {
                 "doctype": "Email Account",
@@ -1214,7 +1188,7 @@ class TestHDTicket(FrappeTestCase):
                 "HD Settings", "enable_reply_email_via_agent", reply_email_enabled
             )
 
-        communication = get_ticket_communications(ticket.name)[-1]
+        communication = get_latest_ticket_communication(ticket.name)
         self.assertTrue(sendmail.called, "reply should have been emailed")
         self.assertEqual(
             sendmail.call_args.kwargs.get("message_id"),
@@ -1223,33 +1197,78 @@ class TestHDTicket(FrappeTestCase):
         )
 
     def test_portal_reply_does_not_break_agent_reply_threading(self):
-        """A customer's portal reply sent no email, so it cannot anchor a thread.
-
-        It must be skipped when picking a parent, otherwise a single portal message
-        breaks threading for every agent reply after it.
-        """
+        """A portal reply sent no email, so replies after it must skip past it."""
         ticket = make_ticket()
 
         ticket.reply_via_agent(message="First reply")
-        first = get_ticket_communications(ticket.name)[-1]
+        first = get_latest_ticket_communication(ticket.name)
 
         # each of these is its own request in production; replying updates the ticket row
         ticket.reload()
         ticket.create_communication_via_contact(message="Customer portal reply")
-        portal = get_ticket_communications(ticket.name)[-1]
-        self.assertFalse(
-            portal.message_id, "portal replies send no email, so they store no id"
-        )
+        portal = get_latest_ticket_communication(ticket.name)
+        self.assertFalse(portal.message_id, "portal replies store no id")
 
         ticket.reload()
         ticket.reply_via_agent(message="Second reply")
-        second = get_ticket_communications(ticket.name)[-1]
+        second = get_latest_ticket_communication(ticket.name)
 
         self.assertEqual(
-            second.in_reply_to,
-            first.name,
-            "should thread onto the last emailed reply, not the portal message",
+            second.in_reply_to, first.name, "follows the last emailed reply"
         )
+
+    def test_agent_replies_thread_on_a_ticket_created_by_email(self):
+        """A ticket raised by email: the first reply answers the customer's mail,
+        and later replies follow the reply before them."""
+        ticket = make_ticket()
+        customer_email = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "subject": f"Re: {ticket.subject}",
+                # frappe stores incoming ids without the angle brackets
+                "message_id": "customer-mail-1@example.com",
+                "content": "my printer is broken",
+            }
+        ).insert(ignore_permissions=True)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="First reply")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertEqual(
+            first.in_reply_to, customer_email.name, "first reply answers the customer"
+        )
+        self.assertEqual(
+            second.in_reply_to, first.name, "second reply follows the first"
+        )
+        self.assertNotEqual(
+            first.message_id, second.message_id, "ids must not be reused"
+        )
+
+    def test_reply_stores_no_message_id_when_email_is_off(self):
+        """No email was sent, so there is no id the customer could ever reply to."""
+        previous = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 0)
+        try:
+            ticket = make_ticket()
+            ticket.reply_via_agent(message="Not emailed")
+            self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", previous
+            )
 
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
