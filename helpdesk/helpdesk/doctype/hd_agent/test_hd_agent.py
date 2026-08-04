@@ -22,10 +22,16 @@ class TestHDAgent(FrappeTestCase):
     test_user = "test_user@test.com"
 
     def setUp(self):
+        # Frappe only resets the session user per class, so tests that switch user
+        # leak into every later one. Reset both ends, as the rest of the suite does.
+        frappe.set_user("Administrator")
         make_agent(self.test_user, first_name="Test User")
         # Rollback is per-class, so availability leaks between tests. Reset to a
         # known status or "did this change?" assertions depend on test order.
         set_agent_availability(self.test_user, "Active")
+
+    def tearDown(self):
+        frappe.set_user("Administrator")
 
     def _disable_status(self, status: str):
         set_agent_status_enabled(status, 0)
