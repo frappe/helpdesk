@@ -31,23 +31,25 @@
           </div>
         </Transition>
 
-        <div class="flex items-center border-b border-outline-gray-1 px-1">
-          <LucideSearch class="ms-3 size-4 shrink-0 text-ink-gray-4" />
+        <!-- px-2 + size sm puts the glass on the row icons' axis, and the caret on
+             their titles' axis (8 + 8 = 16, 8 + 32 = 40). -->
+        <div class="flex items-center border-b border-outline-gray-1 px-2 py-2">
           <button
             v-if="stepLabel"
             type="button"
-            class="text-base-semibold ms-3 flex shrink-0 items-center gap-2 py-1 text-ink-gray-7"
+            class="text-base-semibold ms-2 flex shrink-0 items-center gap-2 py-1 text-ink-gray-7"
             @click="back"
           >
             {{ stepLabel }}
             <LucideChevronRight class="size-3 text-ink-gray-4" />
           </button>
-          <input
+          <TextInput
             ref="inputRef"
-            :value="query"
+            :model-value="query"
             :placeholder="placeholder"
-            class="w-full border-none bg-transparent py-3.5 pe-4 ps-3 text-base text-ink-gray-8 placeholder-ink-gray-4 outline-none ring-0 focus:outline-none focus:ring-0"
-            autocomplete="off"
+            variant="ghost"
+            size="sm"
+            class="w-full"
             spellcheck="false"
             :aria-label="
               context
@@ -58,8 +60,12 @@
             aria-expanded="true"
             aria-controls="command-palette-list"
             :aria-activedescendant="activeOptionId"
-            @input="onQueryChange(($event.target as HTMLInputElement).value)"
-          />
+            @update:model-value="onQueryChange"
+          >
+            <template #prefix>
+              <LucideSearch class="size-3.5 shrink-0 text-ink-gray-4" />
+            </template>
+          </TextInput>
         </div>
 
         <!-- Announces what no row can: result count, and list changes under debounce. -->
@@ -162,7 +168,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Badge, useShortcut } from "frappe-ui";
+import { Badge, TextInput, useShortcut } from "frappe-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -198,7 +204,8 @@ import {
   run,
 } from "./useCommandPalette";
 
-const inputRef = ref<HTMLInputElement | null>(null);
+// TextInput exposes the native element as `el`.
+const inputRef = ref<{ el: HTMLInputElement | null } | null>(null);
 const listRef = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
 const keyboardNav = ref(false);
@@ -307,7 +314,7 @@ function moveActive(delta: number) {
 }
 
 function caretAtEnd(): boolean {
-  const input = inputRef.value;
+  const input = inputRef.value?.el;
   return (
     !!input &&
     input.selectionStart === input.selectionEnd &&
@@ -390,11 +397,11 @@ watch(isOpen, (open) => {
   focusBeforeOpen = document.activeElement as HTMLElement | null;
   activeIndex.value = 0;
   rememberActive();
-  nextTick(() => inputRef.value?.focus());
+  nextTick(() => inputRef.value?.el?.focus());
 });
 
 // Drilling into a sub-list swaps the whole list out; refocus for the next query.
-watch(depth, () => nextTick(() => inputRef.value?.focus()));
+watch(depth, () => nextTick(() => inputRef.value?.el?.focus()));
 
 // frappe-ui's useShortcut: the local one suppresses bindings in inputs and
 // dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its own
