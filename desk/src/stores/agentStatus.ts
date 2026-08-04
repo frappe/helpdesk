@@ -43,7 +43,14 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   const statuses = createListResource({
     doctype: "HD Agent Status",
     cache: ["HD Agent Status", "list"],
-    fields: ["name", "agent_status", "category", "color", "enable", "status_order"],
+    fields: [
+      "name",
+      "agent_status",
+      "category",
+      "color",
+      "enabled",
+      "status_order",
+    ],
     orderBy: "`tabHD Agent Status`.status_order",
     pageLength: 1000,
     auto: true,
@@ -60,9 +67,20 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   }
 
   const { $socket } = globalStore();
-  $socket.on("agent_availability_updated", (data: AvailabilityEvent) =>
-    applyLive(data.agent, data.availability, data.availability_changed_on)
-  );
+  $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
+    // Our own status moving to something we did not pick — an admin disabled the
+    // status we were on. Our own writes are applied optimistically before the
+    // request goes out, so they never differ here.
+    const mine = myAgentName && liveStatuses[myAgentName];
+    if (
+      data.agent === myAgentName &&
+      mine &&
+      mine.availability !== data.availability
+    ) {
+      toast.info(__("Your status was changed to {0}.", data.availability));
+    }
+    applyLive(data.agent, data.availability, data.availability_changed_on);
+  });
 
   // Seed our own status from the session payload (auth.get_user already resolves
   // the agent), then let the socket and the optimistic write keep it current — no
@@ -92,7 +110,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // menu and the dots never disagree and we avoid a second server round-trip.
   const statusOptions = computed<string[]>(() =>
     (statuses.data ?? [])
-      .filter((s: HDAgentStatus) => s.enable)
+      .filter((s: HDAgentStatus) => s.enabled)
       .map((s: HDAgentStatus) => s.agent_status)
   );
 

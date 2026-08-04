@@ -58,7 +58,7 @@ class HDAgent(Document):
             return
 
         if not frappe.db.exists(
-            "HD Agent Status", {"name": self.availability, "enable": 1}
+            "HD Agent Status", {"name": self.availability, "enabled": 1}
         ):
             frappe.throw(_("Invalid availability"), frappe.ValidationError)
 

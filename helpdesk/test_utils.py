@@ -293,13 +293,13 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
-def make_agent_status(agent_status: str, category="Away", enable=1, status_order=None):
+def make_agent_status(agent_status: str, category="Away", enabled=1, status_order=None):
     return frappe.get_doc(
         {
             "doctype": "HD Agent Status",
             "agent_status": agent_status,
             "category": category,
-            "enable": enable,
+            "enabled": enabled,
             "status_order": status_order,
         }
     ).insert()
@@ -323,9 +323,13 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
-def set_agent_status_enabled(status: str, enable: bool | int):
-    """Toggle an HD Agent Status, bypassing its own at-least-one-Active validation."""
-    frappe.db.set_value("HD Agent Status", status, "enable", int(enable))
+def set_agent_status_enabled(status: str, enabled: bool | int):
+    """Toggle an HD Agent Status without running its controller.
+
+    Skips both the at-least-one-Active validation and the on_update reset, so a
+    test can leave an agent sitting on a disabled status.
+    """
+    frappe.db.set_value("HD Agent Status", status, "enabled", int(enabled))
 
 
 def set_agent_availability(user: str, availability: str | None):

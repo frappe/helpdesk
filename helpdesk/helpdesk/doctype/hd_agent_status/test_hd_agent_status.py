@@ -1,11 +1,13 @@
 # Copyright (c) 2026, Frappe Technologies and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.setup.install import add_default_agent_status
-from helpdesk.test_utils import make_agent, make_agent_status
+from helpdesk.test_utils import make_agent, make_agent_status, set_agent_availability
 
 
 class TestHDAgentStatus(FrappeTestCase):
@@ -81,16 +83,63 @@ class TestHDAgentStatus(FrappeTestCase):
     # the last enabled Active status cannot be disabled
     def test_last_active_status_cannot_be_disabled(self):
         active = frappe.get_doc("HD Agent Status", "Active")
-        active.enable = 0
+        active.enabled = 0
         with self.assertRaises(frappe.ValidationError):
             active.save()
 
     # an Active status can be disabled while another enabled Active status remains
     def test_active_status_can_be_disabled_with_another_active(self):
         online = make_agent_status("Online", category="Active")
-        online.enable = 0
+        online.enabled = 0
         online.save()
-        self.assertFalse(online.enable)
+        self.assertFalse(online.enabled)
+
+    # disabling a status moves the agents holding it back to the Active status —
+    # the picker hides disabled statuses, so they would be left with an empty menu
+    def test_disabling_status_resets_agents_to_active(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        agent = make_agent("disable_status@test.com", first_name="Disable Status")
+        set_agent_availability(agent, "Focusing")
+
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", agent, "availability"), "Active"
+        )
+
+    # the reset runs through HD Agent, so every connected client hears about it
+    def test_disabling_status_publishes_for_each_agent(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        first = make_agent("disable_publish_1@test.com", first_name="Disable Publish 1")
+        second = make_agent(
+            "disable_publish_2@test.com", first_name="Disable Publish 2"
+        )
+        set_agent_availability(first, "Focusing")
+        set_agent_availability(second, "Focusing")
+
+        with patch(
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+        ) as publish:
+            focusing.enabled = 0
+            focusing.save()
+
+        self.assertEqual(publish.call_count, 2)
+        self.assertEqual(
+            {call.kwargs["data"]["agent"] for call in publish.call_args_list},
+            {first, second},
+        )
+
+    # only agents on the disabled status are touched
+    def test_disabling_status_leaves_other_agents_alone(self):
+        online = make_agent_status("Online", category="Active")
+        agent = make_agent("unused_status@test.com", first_name="Unused Status")
+        set_agent_availability(agent, "Away")
+
+        online.enabled = 0
+        online.save()
+
+        self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
 
     # the last Active status cannot be moved out of the Active category
     def test_last_active_status_cannot_be_demoted(self):
