@@ -745,7 +745,14 @@ class HDTicket(Document):
         # thread breaks after a single hop. Must be freshly generated per message —
         # reusing the parent's id stamped every reply in a ticket with the same
         # Message-Id, which is what helpdesk#2308 correctly removed.
-        communication.message_id = get_string_between("<", get_message_id(), ">")
+        # Only when this reply is actually emailed: an id stored for a reply nobody
+        # received would anchor the next one to a Message-Id that reached no mailbox,
+        # which fails exactly like storing no id at all.
+        should_send_email = not skip_email_workflow and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        if should_send_email:
+            communication.message_id = get_string_between("<", get_message_id(), ">")
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -758,9 +765,7 @@ class HDTicket(Document):
             self.attach_file_with_doc("HD Ticket", self.name, file_url)
             _attachments.append({"file_url": file_url})
 
-        if skip_email_workflow or not frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_via_agent"
-        ):
+        if not should_send_email:
             return
 
         if not sender_email:
