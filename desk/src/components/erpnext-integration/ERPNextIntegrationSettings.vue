@@ -134,6 +134,7 @@
 import { ErpnextIcon } from "@/components/icons";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { globalStore } from "@/stores/globalStore";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Error } from "@/types";
 import {
@@ -175,6 +176,7 @@ const saveResource = createResource({
     };
   },
   onSuccess() {
+    if (erpnextIntegrationEnabled.value) capture("erpnext_integration_enabled");
     syncInfoResource.reload();
     toast.success(
       erpnextIntegrationEnabled.value
