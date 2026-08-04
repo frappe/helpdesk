@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "yarn install-framework-ui && vite",
+    "build": "yarn install-framework-ui && vite build",
     "serve": "vite preview",
+    "install-framework-ui": "[ -f ../../frappe/ui/node_modules/.yarn-integrity ] || (cd ../../frappe/ui && yarn install)",
     "postinstall": "patch-package"
   },
   "dependencies": {
