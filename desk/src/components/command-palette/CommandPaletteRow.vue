@@ -10,11 +10,13 @@
       size="xs"
       class="me-2.5 shrink-0"
     />
+    <!-- Boxed to the icon's 3.5 width, so a dot row's title lands on the same axis. -->
     <span
       v-else-if="command.dotClass"
-      class="me-2.5 size-2 shrink-0 rounded-full bg-current"
-      :class="command.dotClass"
-    />
+      class="me-2.5 flex size-3.5 shrink-0 items-center justify-center"
+    >
+      <span class="size-2 rounded-full bg-current" :class="command.dotClass" />
+    </span>
     <component
       :is="command.icon"
       v-else-if="command.icon"
