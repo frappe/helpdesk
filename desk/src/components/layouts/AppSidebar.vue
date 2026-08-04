@@ -22,7 +22,7 @@
                 class="lucide-chevron-right size-4 shrink-0 text-ink-gray-9 transition-transform duration-300 ease-in-out -ml-0.5"
                 :class="{ 'rotate-90': isSectionOpen(section.label) }"
               />
-              <span class="truncate">{{ section.label }}</span>
+              <span class="truncate leading-snug">{{ section.label }}</span>
             </span>
           </SidebarLabel>
           <nav
