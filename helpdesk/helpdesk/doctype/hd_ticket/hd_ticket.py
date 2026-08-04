@@ -737,13 +737,22 @@ class HDTicket(Document):
 
         communication.in_reply_to = self._last_threadable_communication()
 
-        # Each reply gets its own id so the next reply can point at it. Only set it
-        # when we really send, or the next reply points at an email nobody received.
+        # Each reply needs its own id so the next reply can point at it. It is saved
+        # further down, once the mail has actually gone out - see the send below.
         should_send_email = not skip_email_workflow and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
         )
+        message_id = None
         if should_send_email:
-            communication.message_id = get_string_between("<", get_message_id(), ">")
+            # check before writing anything, so a reply we already know we cannot
+            # send is never saved at all
+            if not sender_email:
+                frappe.throw(
+                    _(
+                        "Unable to send email. Please setup default outgoing email account."
+                    )
+                )
+            message_id = get_string_between("<", get_message_id(), ">")
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -758,11 +767,6 @@ class HDTicket(Document):
 
         if not should_send_email:
             return
-
-        if not sender_email:
-            frappe.throw(
-                _("Unable to send email. Please setup default outgoing email account.")
-            )
 
         message = self.parse_content(message)
 
@@ -790,7 +794,7 @@ class HDTicket(Document):
             send_now = True
 
         try:
-            frappe.sendmail(
+            queued = frappe.sendmail(
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
@@ -808,11 +812,19 @@ class HDTicket(Document):
                 subject=subject,
                 with_container=False,
                 in_reply_to=communication.in_reply_to,
-                # send the id we stored, so the next reply can point back at it
-                message_id=communication.message_id,
+                message_id=message_id,
             )
         except Exception as e:
             frappe.throw(str(e))
+
+        # Save the id only now that the mail is queued carrying it, so the next reply
+        # can point back at it. A reply we could not hand off keeps no id and so can
+        # never be answered. sendmail returns nothing when it queued nothing at all.
+        # A queued mail that later fails to deliver still keeps its id - undoing that
+        # would need to watch the Email Queue, and a bounce does not make the id
+        # unusable anyway.
+        if queued:
+            communication.db_set("message_id", message_id)
 
     @frappe.whitelist()
     # flake8: noqa
