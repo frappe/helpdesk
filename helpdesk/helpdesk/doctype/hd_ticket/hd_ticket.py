@@ -616,13 +616,10 @@ class HDTicket(Document):
             return None
 
     def _last_threadable_communication(self) -> str | None:
-        """Name of the newest communication that can anchor an email thread.
+        """Name of the newest communication that has a message_id.
 
-        Only communications with a stored `message_id` qualify: that column is what
-        frappe resolves `in_reply_to` against when setting the `In-Reply-To` header
-        (see `EmailQueue.prepare_email_content`), so one without an id is a dead end.
-        A customer's portal reply sent no email and has no id, so stepping over it
-        keeps the chain intact across it.
+        Frappe builds In-Reply-To from that field, so a communication without one
+        cannot be replied to. Portal replies sent no email and have none.
         """
         return frappe.db.get_value(
             "Communication",
@@ -740,10 +737,8 @@ class HDTicket(Document):
 
         communication.in_reply_to = self._last_threadable_communication()
 
-        # Minted per message so the *next* reply has something to point at, and only
-        # when we actually send: an id on a reply nobody received would anchor the
-        # next one to a Message-Id that reached no mailbox. Never reuse the parent's
-        # id - that stamped every reply in a ticket with the same one (helpdesk#2308).
+        # Each reply gets its own id so the next reply can point at it. Only set it
+        # when we really send, or the next reply points at an email nobody received.
         should_send_email = not skip_email_workflow and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_via_agent"
         )
@@ -812,10 +807,8 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                # in_reply_to resolves through the name of the communication which holds
                 in_reply_to=communication.in_reply_to,
-                # Must match what we stored: the recipient has to receive this exact
-                # Message-Id for the next reply's `In-Reply-To` to resolve for them.
+                # send the id we stored, so the next reply can point back at it
                 message_id=communication.message_id,
             )
         except Exception as e:
