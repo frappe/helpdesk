@@ -77,7 +77,8 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       mine &&
       mine.availability !== data.availability
     ) {
-      toast.info(__("Your status was changed to {0}.", data.availability));
+      // Status names go through __() in the picker, so translate it here too.
+      toast.info(__("Your status was changed to {0}.", __(data.availability)));
     }
     applyLive(data.agent, data.availability, data.availability_changed_on);
   });
