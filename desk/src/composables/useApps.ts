@@ -1,6 +1,7 @@
 import { createResource } from "frappe-ui";
 import { computed, h, markRaw, type Component, type ComputedRef } from "vue";
 import AppsIcon from "@/components/icons/AppsIcon.vue";
+import { isCustomerPortal } from "@/utils";
 
 export interface App {
   name: string;
@@ -33,7 +34,9 @@ export function useApps() {
   const resource = createResource({
     url: "frappe.apps.get_apps",
     cache: "apps",
-    auto: true,
+    // customers lack permission for get_apps (403); sidebar remounts on portal
+    // switch, so this re-evaluates for agents
+    auto: !isCustomerPortal.value,
     transform: (data: App[]) => {
       const apps = [deskApp];
       data.forEach((app) => {

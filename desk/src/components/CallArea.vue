@@ -7,7 +7,7 @@
           :label="activity?._caller?.label"
           size="md"
         />
-        <span class="font-medium text-ink-gray-8 ml-1">
+        <span class="font-medium text-ink-gray-8 ms-1">
           {{ activity?._caller?.label }}
         </span>
         <span>{{
@@ -16,7 +16,7 @@
             : __("has made a call")
         }}</span>
       </div>
-      <div class="ml-auto whitespace-nowrap">
+      <div class="ms-auto whitespace-nowrap">
         <Tooltip :text="dateFormat(activity.creation, 'MMM D, dddd')">
           <div class="text-sm text-ink-gray-5">
             {{ __(timeAgo(activity.creation)) }}

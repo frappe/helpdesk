@@ -44,7 +44,7 @@
                 @click="redirectToSeeAllReviews"
               >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
-                <FeatherIcon name="arrow-up-right" class="size-3.5 ml-0.5" />
+                <FeatherIcon name="arrow-up-right" class="size-3.5 ms-0.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -115,7 +115,7 @@
             </Dropdown>
 
             <!-- Period dropdown second -->
-            <div class="flex items-center gap-2 ml-auto">
+            <div class="flex items-center gap-2 ms-auto">
               <Dropdown
                 v-if="!showDatePicker && currentPeriod !== 'custom_range'"
                 :options="periodOptions"
@@ -182,7 +182,7 @@
               <!-- Rating & Title -->
               <div class="flex items-center gap-2 mb-2">
                 <div
-                  class="flex items-center gap-1 p-1 pl-0 rounded"
+                  class="flex items-center gap-1 p-1 ps-0 rounded"
                   :class="[getRatingColor(currentFeedback.star_rating).text]"
                 >
                   <LucideStar
@@ -232,7 +232,10 @@
                     @click="prevFeedback"
                     :disabled="currentIndex === 0"
                   >
-                    <FeatherIcon name="chevron-left" class="size-4" />
+                    <FeatherIcon
+                      name="chevron-left"
+                      class="size-4 rtl:rotate-180"
+                    />
                   </Button>
                   <Button
                     variant="ghost"
@@ -240,7 +243,10 @@
                     @click="nextFeedback"
                     :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
                   >
-                    <FeatherIcon name="chevron-right" class="size-4" />
+                    <FeatherIcon
+                      name="chevron-right"
+                      class="size-4 rtl:rotate-180"
+                    />
                   </Button>
                 </div>
               </div>
@@ -309,8 +315,8 @@ import EmptyState from "@/components/EmptyState.vue";
 
 const router = useRouter();
 const chartTabs = [
-  { label: "Rating", value: "rating" },
-  { label: "Feedback", value: "feedback" },
+  { label: __("Rating"), value: "rating" },
+  { label: __("Feedback"), value: "feedback" },
 ];
 const currentTab = ref("rating");
 const { views } = useView("HD Ticket");

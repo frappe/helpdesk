@@ -2,7 +2,7 @@
   <div v-if="ticket.data" class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
+        <Breadcrumbs :items="breadcrumbs" class="-ms-0.5" />
       </template>
       <template #right-header>
         <CustomActions
@@ -43,7 +43,7 @@
           v-if="isMobileView"
           v-model="activeTab"
           :tabs="tabs"
-          class="[&_[role='tablist']]:px-5"
+          class="[&_[role='tablist']]:px-3"
         >
           <template #tab-panel="{ tab }">
             <TicketCustomerTemplateFields v-if="tab.name === 'details'" />

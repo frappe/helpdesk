@@ -1,6 +1,6 @@
 <template>
   <div class="w-max mx-auto">
-    <div class="text-base-medium mb-2 text-ink-gray-8 ml-2.5">
+    <div class="text-base-medium mb-2 text-ink-gray-8 ms-2.5">
       {{ formattedMonth }}
     </div>
     <div class="rounded-md text-sm">

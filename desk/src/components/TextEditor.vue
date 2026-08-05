@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded p-3 shadow w-full">
+  <div class="rounded p-3 shadow-sm w-full">
     <Editor
       ref="inner"
       v-model="content"
@@ -40,7 +40,7 @@
             </div>
             <div class="flex items-center gap-2">
               <Button
-                label="Discard"
+                :label="__('Discard')"
                 theme="gray"
                 variant="subtle"
                 v-if="!isEmpty"

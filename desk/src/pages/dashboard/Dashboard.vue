@@ -30,7 +30,7 @@
               class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
-                <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+                <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
                 <span class="text-base whitespace-nowrap">{{ preset }}</span>
               </div>
               <LucideChevronDown class="size-4 text-ink-gray-5" />
@@ -47,7 +47,7 @@
           :format="'MMM D'"
         >
           <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+            <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
           </template>
         </DateRangePicker>
         <Link
@@ -60,7 +60,7 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUsers class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUsers class="size-4 text-ink-gray-5 me-2" />
           </template>
         </Link>
         <Link
@@ -74,7 +74,7 @@
           :hide-me="true"
         >
           <template #prefix>
-            <LucideUser class="size-4 text-ink-gray-5 mr-2" />
+            <LucideUser class="size-4 text-ink-gray-5 me-2" />
           </template>
         </Link>
       </div>
@@ -117,11 +117,7 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -142,11 +138,29 @@
               :variants="['bar-chart', 'empty-state']"
               :bar-chart-count="1"
               :has-applied-filter="hasAppliedFilter"
-              :empty-states="[
-                {
-                  title: `No ${(chart?.title).toLowerCase()} available.`,
-                },
-              ]"
+              :empty-states="chartEmptyState(chart)"
+            />
+          </template>
+        </div>
+
+        <!-- Tag Charts: org level insight, an agent cannot act on their own tag mix -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          v-if="isManager && !tagData.loading"
+        >
+          <template v-for="(chart, index) in tagData.data" :key="index">
+            <!-- has data -->
+            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+              <component :is="getChartType(chart)" />
+            </div>
+
+            <!-- chart with no data -->
+            <SkeletonLoader
+              v-else
+              :variants="['bar-chart', 'empty-state']"
+              :bar-chart-count="1"
+              :has-applied-filter="hasAppliedFilter"
+              :empty-states="chartEmptyState(chart)"
             />
           </template>
         </div>
@@ -176,7 +190,7 @@
         <div>
           <SkeletonLoader
             :variants="['bar-chart', 'empty-state']"
-            :bar-chart-count="6"
+            :bar-chart-count="emptyStates.length"
             :empty-states="emptyStates"
             :has-applied-filter="hasAppliedFilter"
           />
@@ -261,32 +275,75 @@ const colors = [
   "#15CCEF",
   "#A6B1B9",
 ];
-const emptyStates = [
-  {
+interface ChartEmptyState {
+  // header of the card, shown untranslated only when the chart itself is missing
+  chartTitle: string;
+  chartSubtitle?: string;
+  title: string;
+  message: string;
+}
+
+// Chart key (stable, untranslated identifier from the dashboard APIs) → empty state copy.
+const emptyStateByChart: Record<string, ChartEmptyState> = {
+  ticket_trend: {
+    chartTitle: "Ticket Trend",
     title: "No ticket activity",
     message: "Ticket trends will appear here once tickets are created.",
   },
-  {
+  feedback_trend: {
+    chartTitle: "Feedback Trend",
     title: "No feedback data",
     message: "Feedback insights will appear once responses are collected.",
   },
-  {
+  tickets_by_team: {
+    chartTitle: "Tickets by Team",
     title: "No team data",
     message: "Tickets will be grouped by team once available.",
   },
-  {
+  tickets_by_type: {
+    chartTitle: "Tickets by Type",
     title: "No ticket type data",
     message: "Tickets will be categorized by type once created.",
   },
-  {
+  tickets_by_priority: {
+    chartTitle: "Tickets by Priority",
     title: "No priority data",
     message: "Ticket priorities will be reflected here once assigned.",
   },
-  {
+  tickets_by_channel: {
+    chartTitle: "Tickets by Channel",
     title: "No channel data",
     message: "Tickets will be grouped by channel once received.",
   },
-];
+  top_tags: {
+    chartTitle: "Top Tags",
+    title: "No tags used yet",
+    message: "The most used tags will be ranked here once tickets are tagged.",
+  },
+  tag_trend: {
+    chartTitle: "Tag Trend",
+    title: "No tag activity",
+    message: "Daily tag volume will appear here once tickets are tagged.",
+  },
+};
+
+const managerOnlyCharts = ["top_tags", "tag_trend"];
+
+// whole dashboard empty: no chart payload to read titles from, so fall back to ours
+const emptyStates = computed(() =>
+  Object.entries(emptyStateByChart)
+    .filter(([key]) => isManager || !managerOnlyCharts.includes(key))
+    .map(([, state]) => state)
+);
+
+function chartEmptyState(chart: any) {
+  const state = emptyStateByChart[chart?.key] ?? {
+    title: `No ${String(chart?.title).toLowerCase()} available`,
+  };
+  return [
+    { ...state, chartTitle: chart?.title, chartSubtitle: chart?.subtitle },
+  ];
+}
 
 const tabButtons = computed(() => {
   if (isMobileView.value) {
@@ -299,12 +356,12 @@ const tabButtons = computed(() => {
     {
       value: "organization",
       iconLeft: h(LucideBuilding2, { class: "size-4" }),
-      label: "My Organization",
+      label: __("My Organization"),
     },
     {
       value: "my_stats",
       iconLeft: h(LucideUser, { class: "size-4" }),
-      label: "My Stats",
+      label: __("My Stats"),
     },
   ];
 });
@@ -358,6 +415,14 @@ const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   makeParams: () => ({
     dashboard_type: "trend",
+    filters: parseFilters(filters),
+  }),
+});
+
+const tagData = createResource({
+  url: "helpdesk.api.dashboard.get_dashboard_data",
+  makeParams: () => ({
+    dashboard_type: "tags",
     filters: parseFilters(filters),
   }),
 });
@@ -547,6 +612,7 @@ watch(
     numberCards.reload();
     masterData.reload();
     trendData.reload();
+    if (isManager) tagData.reload();
   },
   { deep: true }
 );
@@ -560,6 +626,7 @@ onMounted(() => {
   numberCards.reload();
   masterData.reload();
   trendData.reload();
+  if (isManager) tagData.reload();
 });
 
 usePageMeta(() => {

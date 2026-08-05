@@ -5,12 +5,12 @@
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
       <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
-      <div>
+      <div class="rtl:text-right">
         <p class="text-base-medium text-ink-gray-7">
           {{ emailAccount.email_account_name }}
         </p>
-        <div class="text-sm w-full text-ink-gray-5 mt-1">
-          {{ emailAccount.email_id }}
+        <div class="text-p-sm w-full text-ink-gray-5 mt-1">
+          {{ __(emailAccount.email_id) }}
         </div>
       </div>
     </div>

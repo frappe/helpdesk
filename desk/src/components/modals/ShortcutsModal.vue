@@ -20,7 +20,7 @@
               <div class="text-ink-gray-7 text-base flex-1">
                 {{ shortcut.description }}
               </div>
-              <div class="flex space-x-1 gap-1 justify-end">
+              <div class="flex gap-1 justify-end">
                 <span
                   v-for="(key, kIndex) in shortcut.keys"
                   :key="kIndex"
@@ -89,6 +89,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
       { keys: [shiftKey, "T"], description: __("Change team") },
       { keys: ["A"], description: __("Assign ticket") },
       { keys: ["S"], description: __("Change status") },
+      { keys: ["G"], description: __("Add tags") },
       { keys: [metaIcon, "."], description: __("Copy ticket id") },
       { keys: [metaIcon, shiftKey, "."], description: __("Copy ticket URL") },
     ],

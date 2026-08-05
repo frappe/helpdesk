@@ -5,7 +5,7 @@
   >
     <LoadingIndicator class="w-4" />
   </div>
-  <div v-else class="-ml-2 grow">
+  <div v-else class="-ms-2 grow">
     <div
       v-if="!holidayList.list.loading && !holidayList.list.data?.length"
       class="flex flex-col items-center justify-center gap-4 h-full"
@@ -26,7 +26,7 @@
     </div>
     <div v-else>
       <div class="flex text-sm text-ink-gray-5">
-        <div class="ml-2">{{ __("Schedule name") }}</div>
+        <div class="ms-2">{{ __("Schedule name") }}</div>
       </div>
       <hr class="mx-2 mt-2" />
       <div>

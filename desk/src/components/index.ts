@@ -1,7 +1,7 @@
 export { default as BackButton } from "./BackButton.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
+export { default as AttachmentList } from "./AttachmentList.vue";
 export { default as Autocomplete } from "./Autocomplete.vue";
-export { default as CommandPalette } from "./command-palette/CP.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as CommentTextEditor } from "./CommentTextEditor.vue";
 export { default as CommunicationArea } from "./CommunicationArea.vue";

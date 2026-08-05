@@ -24,7 +24,7 @@
           <component
             v-show="showEye"
             :is="show ? LucideEyeOff : LucideEye"
-            class="h-3 cursor-pointer mr-1"
+            class="h-3 cursor-pointer me-1"
             @click="show = !show"
           />
         </div>

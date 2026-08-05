@@ -13,7 +13,7 @@
         <Tooltip :text="s.tooltipValue">
           <Badge
             v-if="s.badgeText"
-            class="-ml-1"
+            class="-ms-1"
             :label="s.badgeText"
             variant="subtle"
             :theme="s.badgeColor"

@@ -231,6 +231,7 @@ const IGNORED_SELECTORS = [
   ".tippy-content",
   ".PopoverContent",
   '[role="dialog"]',
+  '[role="presentation"]',
   '[role="menu"]',
   ".dialog-overlay",
 ];

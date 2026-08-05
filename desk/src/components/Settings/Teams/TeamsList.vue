@@ -8,6 +8,7 @@
     <template #header-actions>
       <Button
         :label="__('New')"
+        class="rtl:flex-row-reverse"
         theme="gray"
         variant="solid"
         @click="emit('update:step', 'new-team', '')"
@@ -36,7 +37,7 @@
           icon="lucide-x"
           variant="ghost"
           @click="teamsSearchQuery = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
+          class="absolute end-1 top-1/2 -translate-y-1/2"
         />
       </div>
     </template>
@@ -44,10 +45,10 @@
       <!-- List -->
       <div
         v-if="!teams.loading && teams.data?.length > 0"
-        class="w-full h-full -ml-2"
+        class="w-full h-full -ms-2"
       >
         <div class="flex text-sm text-ink-gray-5">
-          <div class="ml-2">{{ __("Team name") }}</div>
+          <div class="ms-2">{{ __("Team name") }}</div>
         </div>
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
@@ -55,7 +56,7 @@
             class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
           >
             <div
-              class="w-full py-3 pl-2 flex gap-1 items-center"
+              class="w-full py-3 ps-2 flex gap-1 items-center"
               @click="() => emit('update:step', 'team-edit', team.name)"
             >
               <p class="text-base-medium text-ink-gray-7">
@@ -63,7 +64,7 @@
               </p>
               <Badge :label="__('Disabled')" v-if="team.disabled" />
             </div>
-            <div class="flex justify-between items-center pr-2">
+            <div class="flex justify-between items-center pe-2">
               <div>
                 <Dropdown placement="right" :options="dropdownOptions(team)">
                   <Button

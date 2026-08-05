@@ -58,7 +58,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
     getStatus,
   };
 });
-function parseColor(color: string): string {
+export function parseColor(color: string): string {
   color = color.toLowerCase();
   let textColor = `!text-${color}-500`;
   if (color == "black") {

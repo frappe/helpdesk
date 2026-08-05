@@ -2,16 +2,15 @@
   <LayoutHeader>
     <template #left-header>
       <div class="flex flex-col truncate">
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ml-0.5">
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs -ms-0.5">
           <template #prefix="{ item }">
             <Icon
               v-if="item.icon"
               :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
+              class="me-1 h-4 flex items-center justify-center self-center"
             />
           </template>
         </Breadcrumbs>
-        <TicketSLA />
       </div>
     </template>
     <template #right-header>
@@ -21,8 +20,6 @@
           size="md"
           :hide-name="true"
         />
-        <!-- Navigation -->
-        <TicketNavigation :key="ticket?.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
@@ -34,7 +31,7 @@
         <div v-if="groupedWithLabelActions.length">
           <div v-for="g in groupedWithLabelActions" :key="g.label">
             <Dropdown v-slot="{ open }" :options="g.action">
-              <Button :label="g.label">
+              <Button :label="__(g.label)">
                 <template #suffix>
                   <FeatherIcon
                     :name="open ? 'chevron-up' : 'chevron-down'"
@@ -48,7 +45,7 @@
         <!-- Status -->
         <Dropdown :options="statusDropdown" placement="right">
           <template #default="{ open }">
-            <Button :label="ticket.doc.status" ref="statusRef">
+            <Button :label="__(ticket.doc.status)" ref="statusRef">
               <template #prefix>
                 <IndicatorIcon
                   :class="
@@ -83,6 +80,7 @@
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
+import { showMergeModal } from "@/pages/ticket/modalStates";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
@@ -121,8 +119,6 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
-import TicketNavigation from "./TicketNavigation.vue";
-import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
@@ -149,7 +145,7 @@ const statusDropdown = computed(() => {
   const statuses =
     ticketStatusStore.statuses.data?.filter((s) => s.enabled) || [];
   return statuses.map((o: HDTicketStatus) => ({
-    label: o.label_agent,
+    label: __(o.label_agent),
     value: o.label_agent,
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
@@ -175,7 +171,7 @@ const breadcrumbs = computed(() => {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value?.label,
+        label: __(currView.value?.label),
         icon: getIcon(currView.value?.icon),
         route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });
@@ -239,7 +235,6 @@ const ticketCount = createResource({
   }),
   auto: true,
 });
-const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
     !ticket?.value?.doc?.is_merged &&
@@ -309,7 +304,7 @@ const groupedWithLabelActions = computed(() => {
         _actions[groupIndex].action.push(action);
       } else {
         _actions.push({
-          label: action.buttonLabel,
+          label: __(action.buttonLabel),
           action: [action],
         });
       }
@@ -321,7 +316,7 @@ const groupedActions = computed(() => {
   let _actions = [];
   _actions = _actions.concat(defaultActions.value);
   _actions = _actions.concat(
-    actions.value.filter((action) => action.group && !action.buttonLabel)
+    actions.value.filter((action) => action.group && !__(action.buttonLabel))
   );
   _actions = _actions.concat(deleteAction.value);
   return _actions;

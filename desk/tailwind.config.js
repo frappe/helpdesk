@@ -9,6 +9,7 @@ export default {
     "../node_modules/frappe-ui/src/**/*.{vue,js,ts,jsx,tsx}",
     "./node_modules/frappe-ui/frappe/**/*.{vue,js,ts,jsx,tsx}",
     "../node_modules/frappe-ui/frappe/**/*.{vue,js,ts,jsx,tsx}",
+    "../../frappe/ui/src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   safelist: [{ pattern: /!(text|bg)-/, variants: ["hover", "active"] }],
   theme: {
@@ -27,6 +28,7 @@ export default {
   },
   plugins: [
     require("@tailwindcss/typography"),
+    require("tailwindcss-rtl"),
     function ({ addUtilities }) {
       addUtilities({
         ".hide-scrollbar": {

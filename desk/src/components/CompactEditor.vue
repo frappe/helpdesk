@@ -14,7 +14,7 @@
         >
           <div
             v-if="showAttachments"
-            class="inline-flex items-center gap-1.5 pr-1"
+            class="inline-flex items-center gap-1.5 pe-1"
           >
             <FileUploader
               :upload-args="{ private: true }"
@@ -27,44 +27,33 @@
                   :disabled="uploading"
                   @click="openFileSelector()"
                 >
+                  <LoadingIndicator v-if="uploading" class="h-4 w-4" />
                   <AttachmentIcon
+                    v-else
                     class="h-4 w-4"
                     style="stroke-width: 1.5 !important"
                   />
                 </button>
               </template>
             </FileUploader>
-            <div class="h-4 w-[2px] border-l ml-1" />
+            <div class="h-4 w-[2px] border-s ms-1" />
           </div>
           <EditorFixedMenu :items="fullToolbar" />
         </div>
         <EditorContent :class="editorClass" />
       </template>
     </Editor>
-    <div
+    <AttachmentList
       v-if="showAttachments && attachments?.length"
-      class="flex flex-wrap gap-2 mt-2"
-    >
-      <AttachmentItem
-        v-for="attachment in attachments ?? []"
-        :key="attachment.file_url"
-        :label="attachment.file_name"
-        :url="attachment.file_url"
-      >
-        <template #suffix>
-          <FeatherIcon
-            class="h-3.5 cursor-pointer"
-            name="x"
-            @click.self.stop="removeAttachment(attachment)"
-          />
-        </template>
-      </AttachmentItem>
-    </div>
+      class="mt-2"
+      :attachments="attachments ?? []"
+      @remove="removeAttachment"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { AttachmentItem } from "@/components";
+import { AttachmentList } from "@/components";
 import {
   buildEditorExtensions,
   commentToolbar,
@@ -73,7 +62,7 @@ import {
 import { AttachmentIcon } from "@/components/icons";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { isContentEmpty } from "@/utils";
-import { FeatherIcon, FileUploader, type UploadedFile } from "frappe-ui";
+import { FileUploader, LoadingIndicator, type UploadedFile } from "frappe-ui";
 import {
   Editor,
   EditorBubbleMenu,

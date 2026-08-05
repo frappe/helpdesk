@@ -14,6 +14,7 @@
         variant="solid"
         @click="goToNew()"
         icon-left="lucide-plus"
+        class="rtl:flex-row-reverse"
       />
     </template>
     <template
@@ -38,7 +39,7 @@
           icon="lucide-x"
           variant="ghost"
           @click="holidaySearchRef = ''"
-          class="absolute right-1 top-1/2 -translate-y-1/2"
+          class="absolute end-1 top-1/2 -translate-y-1/2"
         />
       </div>
     </template>

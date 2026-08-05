@@ -1,3 +1,15 @@
+diff --git a/node_modules/frappe-ui/src/components/MultiSelect/MultiSelect.vue b/node_modules/frappe-ui/src/components/MultiSelect/MultiSelect.vue
+index b8d1d2b..56d6e3c 100644
+--- a/node_modules/frappe-ui/src/components/MultiSelect/MultiSelect.vue
++++ b/node_modules/frappe-ui/src/components/MultiSelect/MultiSelect.vue
+@@ -428,6 +428,7 @@ defineSlots<MultiSelectSlots>()
+                   v-if="loading"
+                   class="size-4 shrink-0 text-ink-gray-5"
+                 />
++                <slot name="suffix" v-bind="slotProps" />
+               </div>
+ 
+               <MultiSelectResults
 diff --git a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts b/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
 index 0b7069a..de2a3df 100644
 --- a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts

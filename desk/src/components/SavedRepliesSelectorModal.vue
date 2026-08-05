@@ -39,7 +39,7 @@
                 icon="lucide-x"
                 variant="ghost"
                 @click="search = ''"
-                class="absolute right-1 top-1/2 -translate-y-1/2"
+                class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
             <Dropdown :options="filters" placement="right">
@@ -94,7 +94,7 @@
                 >
                   <template #default>
                     <EditorContent
-                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                      class="max-w-none text-p-sm text-ink-gray-5 focus:outline-none"
                     />
                   </template>
                 </Editor>
@@ -104,7 +104,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -130,6 +130,8 @@
 </template>
 
 <script setup lang="ts">
+import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
+import { buildEditorExtensions } from "@/components/editor/config";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -145,14 +147,13 @@ import {
   TextInput,
 } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { buildEditorExtensions } from "@/components/editor/config";
-const extensions = buildEditorExtensions();
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
+const extensions = buildEditorExtensions();
 
 const props = defineProps({
   doctype: {
@@ -263,7 +264,9 @@ const onTemplateSelect = (template: SavedReply) => {
       if (!show.value) return;
       pendingTemplate.value = data;
       show.value = false;
-      capture("saved_reply_applied");
+      // Shared with the palette: modal picks count toward its most-used rows.
+      recordSavedReplyUse(template.name, template.title);
+      capture("saved_reply_applied", { data: { source: "composer" } });
     },
   });
   renderResponse.submit().catch(() => {

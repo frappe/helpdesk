@@ -123,8 +123,9 @@
 
     <div class="flex flex-col items-center gap-2">
       <Button
-        class="!h-7 w-full !rounded-lg"
+        class="w-full"
         variant="solid"
+        size="sm"
         :label="isLast ? __('Finish') : __('Next')"
         :disabled="!canProceed"
         @click="proceed"

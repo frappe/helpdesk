@@ -2,11 +2,11 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 pl-0 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
-    <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+    <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button
@@ -46,7 +46,7 @@
           <span class="truncate">{{ item.label }}</span>
           <Badge
             v-if="item.is_standard"
-            class="ml-1 flex-shrink-0"
+            class="ms-1 flex-shrink-0"
             size="sm"
             label="Standard"
           />
@@ -66,7 +66,7 @@
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="kebab-btn !size-4 ml-0 rounded-sm"
+                class="kebab-btn !size-4 ms-0 rounded-sm"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop

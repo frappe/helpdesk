@@ -43,19 +43,19 @@
                   :label="field.value.caller.label"
                   size="sm"
                 />
-                <div class="ml-1 flex flex-col gap-1">
+                <div class="ms-1 flex flex-col gap-1">
                   {{ field.value.caller.label }}
                 </div>
                 <FeatherIcon
                   name="arrow-right"
-                  class="mx-1 h-4 w-4 text-ink-gray-5"
+                  class="mx-1 h-4 w-4 text-ink-gray-5 rtl:rotate-180"
                 />
                 <Avatar
                   :image="field.value.receiver.image"
                   :label="field.value.receiver.label"
                   size="sm"
                 />
-                <div class="ml-1 flex flex-col gap-1">
+                <div class="ms-1 flex flex-col gap-1">
                   {{ field.value.receiver.label }}
                 </div>
               </div>

@@ -82,7 +82,7 @@
                 v-if="!editable && !isCustomerPortal && !isMobileView"
                 class="text-p-sm text-ink-gray-4 items-center"
               >
-                <span>{{ views }} views</span>
+                <span>{{ views }} {{ __("views") }}</span>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -173,7 +173,7 @@
             <EditorContent :class="editorClass" />
             <EditorFixedMenu
               v-if="editable"
-              class="-ml-1 overflow-x-auto w-full"
+              class="-ms-1 overflow-x-auto w-full"
               :items="fullToolbar"
             />
           </template>
@@ -195,7 +195,7 @@
                 {{ article.data.author.name }}
               </p>
               <div class="flex items-center gap-1">
-                <span class="text-p-xs text-ink-gray-7">
+                <span class="text-p-xs text-ink-gray-6">
                   {{
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
@@ -662,7 +662,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: isMobileView.value ? "" : __("Knowledge Base"),
+      label: isMobileView.value ? __("KB") : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"

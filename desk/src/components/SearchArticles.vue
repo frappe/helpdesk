@@ -3,7 +3,7 @@
     v-if="Boolean(articles.data?.length) && query.length > 2"
     class="rounded border p-4 text-base"
   >
-    <div class="mb-2 font-medium pl-2" v-if="!hideViewAll">
+    <div class="mb-2 font-medium ps-2" v-if="!hideViewAll">
       These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-ink-gray-9"
