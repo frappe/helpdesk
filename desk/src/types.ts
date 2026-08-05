@@ -400,7 +400,7 @@ export interface View {
   pinned?: boolean;
   public?: boolean;
   group_by_field?: string;
-  name?: string;
+  name: string;
   is_customer_portal?: boolean;
 }
 
@@ -658,6 +658,8 @@ export interface SlaPolicy {
   description: string;
   default_sla: boolean;
   enabled: boolean;
+  rank: number;
+  creation: string;
 }
 
 export interface Team {
@@ -750,6 +752,7 @@ declare global {
     agent: string | null;
     default_country: string;
     apps: string[];
+    telemetry: { enabled: boolean };
   }
 }
 

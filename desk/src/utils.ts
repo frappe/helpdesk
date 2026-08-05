@@ -9,11 +9,10 @@ import {
   toast,
   useFileUpload,
 } from "frappe-ui";
-import { gemoji } from "gemoji";
-import { h, markRaw, ref } from "vue";
+import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
-import TicketIcon from "./components/icons/TicketIcon.vue";
+import { Icon } from "frappe-ui/icons";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 
@@ -91,44 +90,41 @@ export function prettyDate(date, mini = false) {
 
   let nowDatetime = dayjsLocal();
   let diff = nowDatetime.diff(date, "seconds");
+  let absDiff = Math.abs(diff);
 
-  let dayDiff = diff / 86400;
+  // Day-level labels ("Yesterday", "N days ago"...) count calendar dates, not
+  // elapsed 24h windows — otherwise they track time-of-day and an event lands
+  // in the wrong day around midnight. Sub-day labels below still use elapsed
+  // seconds, so recent events keep precise "minutes/hours ago".
+  let dayDiff = nowDatetime.startOf("day").diff(date.startOf("day"), "day");
 
   if (isNaN(dayDiff)) return "";
 
   if (mini) {
     // Return short format of time difference
-    if (dayDiff < 0) {
-      if (Math.abs(dayDiff) < 1) {
-        if (Math.abs(diff) < 60) {
-          return __("Now");
-        } else if (Math.abs(diff) < 3600) {
-          return __("in {0} m", [Math.floor(Math.abs(diff) / 60)]);
-        } else if (Math.abs(diff) < 86400) {
-          return __("in {0} h", [Math.floor(Math.abs(diff) / 3600)]);
-        }
+    if (absDiff < 86400) {
+      // Within a day — show sub-day granularity (past or future).
+      if (absDiff < 60) return __("Now");
+      if (absDiff < 3600) {
+        const minutes = Math.floor(absDiff / 60);
+        return diff >= 0 ? __("{0} m", [minutes]) : __("in {0} m", [minutes]);
       }
-      if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
+      const hours = Math.floor(absDiff / 3600);
+      return diff >= 0 ? __("{0} h", [hours]) : __("in {0} h", [hours]);
+    } else if (diff < 0) {
+      const ahead = -dayDiff;
+      if (ahead === 1) {
         return __("Tomorrow");
-      } else if (Math.abs(dayDiff) < 7) {
-        return __("in {0} d", [Math.floor(Math.abs(dayDiff))]);
-      } else if (Math.abs(dayDiff) < 31) {
-        return __("in {0} w", [Math.floor(Math.abs(dayDiff) / 7)]);
-      } else if (Math.abs(dayDiff) < 365) {
-        return __("in {0} M", [Math.floor(Math.abs(dayDiff) / 30)]);
+      } else if (ahead < 7) {
+        return __("in {0} d", [ahead]);
+      } else if (ahead < 31) {
+        return __("in {0} w", [Math.floor(ahead / 7)]);
+      } else if (ahead < 365) {
+        return __("in {0} M", [Math.floor(ahead / 30)]);
       } else {
-        return __("in {0} y", [Math.floor(Math.abs(dayDiff) / 365)]);
-      }
-    } else if (dayDiff >= 0 && dayDiff < 1) {
-      if (diff < 60) {
-        return __("Now");
-      } else if (diff < 3600) {
-        return __("{0} m", [Math.floor(diff / 60)]);
-      } else if (diff < 86400) {
-        return __("{0} h", [Math.floor(diff / 3600)]);
+        return __("in {0} y", [Math.floor(ahead / 365)]);
       }
     } else {
-      dayDiff = Math.floor(dayDiff);
       if (dayDiff < 7) {
         return __("{0} d", [dayDiff]);
       } else if (dayDiff < 31) {
@@ -141,48 +137,38 @@ export function prettyDate(date, mini = false) {
     }
   } else {
     // Return long format of time difference
-    if (dayDiff < 0) {
-      if (Math.abs(dayDiff) < 1) {
-        if (Math.abs(diff) < 60) {
-          return __("Just now");
-        } else if (Math.abs(diff) < 120) {
-          return __("In 1 minute");
-        } else if (Math.abs(diff) < 3600) {
-          return __("In {0} minutes", [Math.floor(Math.abs(diff) / 60)]);
-        } else if (Math.abs(diff) < 7200) {
-          return __("In 1 hour");
-        } else if (Math.abs(diff) < 86400) {
-          return __("In {0} hours", [Math.floor(Math.abs(diff) / 3600)]);
-        }
+    if (absDiff < 86400) {
+      // Within a day — show sub-day granularity (past or future).
+      if (absDiff < 60) return __("Just now");
+      if (diff >= 0) {
+        if (absDiff < 120) return __("1 minute ago");
+        if (absDiff < 3600)
+          return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
+        if (absDiff < 7200) return __("1 hour ago");
+        return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
       }
-      if (Math.abs(dayDiff) >= 1 && Math.abs(dayDiff) < 1.5) {
+      if (absDiff < 120) return __("In 1 minute");
+      if (absDiff < 3600)
+        return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+      if (absDiff < 7200) return __("In 1 hour");
+      return __("In {0} hours", [Math.floor(absDiff / 3600)]);
+    } else if (diff < 0) {
+      const ahead = -dayDiff;
+      if (ahead === 1) {
         return __("Tomorrow");
-      } else if (Math.abs(dayDiff) < 7) {
-        return __("In {0} days", [Math.floor(Math.abs(dayDiff))]);
-      } else if (Math.abs(dayDiff) < 31) {
-        return __("In {0} weeks", [Math.floor(Math.abs(dayDiff) / 7)]);
-      } else if (Math.abs(dayDiff) < 365) {
-        return __("In {0} months", [Math.floor(Math.abs(dayDiff) / 30)]);
-      } else if (Math.abs(dayDiff) < 730) {
+      } else if (ahead < 7) {
+        return __("In {0} days", [ahead]);
+      } else if (ahead < 31) {
+        return __("In {0} weeks", [Math.floor(ahead / 7)]);
+      } else if (ahead < 365) {
+        return __("In {0} months", [Math.floor(ahead / 30)]);
+      } else if (ahead < 730) {
         return __("In 1 year");
       } else {
-        return __("In {0} years", [Math.floor(Math.abs(dayDiff) / 365)]);
-      }
-    } else if (dayDiff >= 0 && dayDiff < 1) {
-      if (diff < 60) {
-        return __("Just now");
-      } else if (diff < 120) {
-        return __("1 minute ago");
-      } else if (diff < 3600) {
-        return __("{0} minutes ago", [Math.floor(diff / 60)]);
-      } else if (diff < 7200) {
-        return __("1 hour ago");
-      } else if (diff < 86400) {
-        return __("{0} hours ago", [Math.floor(diff / 3600)]);
+        return __("In {0} years", [Math.floor(ahead / 365)]);
       }
     } else {
-      dayDiff = Math.floor(dayDiff);
-      if (dayDiff >= 1 && dayDiff < 2) {
+      if (dayDiff === 1) {
         return __("Yesterday");
       } else if (dayDiff < 7) {
         return __("{0} days ago", [dayDiff]);
@@ -367,16 +353,32 @@ export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
 }
 
-export function isEmoji(str) {
-  const emojiList = gemoji.map((emoji) => emoji.emoji);
-  return emojiList.includes(str);
+// Lucide names are plain ASCII, so any emoji-presentation or pictographic
+// character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
+export function isEmoji(str: string): boolean {
+  return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
 
+/**
+ * Resolves a stored icon value into a renderable component.
+ * Supports Lucide icon names from the frappe-ui IconPicker, emojis stored by
+ * older views, and pre-resolved icon components, falling back to the ticket icon.
+ */
 export function getIcon(icon) {
-  if (isEmoji(icon)) {
-    return h("div", icon);
+  if (!icon) {
+    return h(Icon, { name: "ticket" });
   }
-  return icon || markRaw(TicketIcon);
+  if (isEmoji(icon)) {
+    return h(
+      "div",
+      { class: "flex items-center justify-center leading-none" },
+      icon
+    );
+  }
+  if (typeof icon === "string") {
+    return h(Icon, { name: icon });
+  }
+  return icon;
 }
 export function formatTimeShort(date: string) {
   const now = dayjsLocal();
@@ -460,7 +462,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
         "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
-        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+        variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
       ],
       onClick: onClick,
     },
@@ -501,12 +503,13 @@ export function getGridTemplateColumnsForTable(columns) {
 
 export function uploadFunction(
   file: File,
-  doctype: string = null,
-  docname: string = null
+  doctype: string | null = null,
+  docname: string | null = null,
+  isPrivate: boolean = true
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
-    private: true,
+    private: isPrivate,
     doctype: doctype,
     docname: docname,
   });
@@ -766,7 +769,7 @@ export function isElementInViewport(el: HTMLElement) {
 export function parseApiOptions(
   options: string[] | DropdownOption[]
 ): DropdownOption[] | [] {
-  if (!options.length) return [];
+  if (!options?.length) return [];
   return (
     options
       .filter((o) => Boolean(o))
@@ -887,7 +890,7 @@ export function buildPercentageChange(
 ) {
   // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
   if (value === null || value === undefined || value === 0) {
-    return { icon: "lucide-arrow-right", value: "0", color: "text-ink-gray-5" };
+    return { icon: "", value: "0", color: "text-ink-gray-5" };
   }
   const isPositive = value > 0;
   const isGood = negativeIsBetter ? !isPositive : isPositive;
@@ -896,7 +899,7 @@ export function buildPercentageChange(
   return {
     icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
     value: isPositive ? `+${capped}` : `-${capped}`,
-    color: isGood ? "text-ink-green-3" : "text-ink-red-3",
+    color: isGood ? "text-ink-green-6" : "text-ink-red-6",
   };
 }
 

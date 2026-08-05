@@ -113,6 +113,8 @@ def get_list_data(
     rows.append("name") if "name" not in rows else rows
     if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
+        # the SLA columns render nothing without it, and no saved view lists it
+        rows.append("sla") if "sla" not in rows else rows
     data = (
         frappe.get_list(
             doctype,
@@ -339,6 +341,15 @@ def get_filterable_fields(
                 "label": "Assigned to",
                 "name": "_assign",
                 "options": "HD Agent",
+            }
+        )
+        res.append(
+            {
+                "fieldname": "_user_tags",
+                "fieldtype": "Link",
+                "label": "Tags",
+                "name": "_user_tags",
+                "options": "Tag",
             }
         )
 

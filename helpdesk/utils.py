@@ -193,6 +193,34 @@ def agent_only(fn):
     return wrapper
 
 
+def is_agent_manager(user: str | None = None) -> bool:
+    """
+    Check whether `user` may manage other agents
+
+    :param user: User to check against, defaults to current user
+    :return: Whether `user` is an agent manager, system manager or admin
+    """
+    roles = set(frappe.get_roles(user))
+    return bool(roles & {"Administrator", "System Manager", "Agent Manager"})
+
+
+def agent_manager_only(fn):
+    """Decorator to validate if user is an agent manager."""
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not is_agent_manager():
+            frappe.throw(
+                msg=_("You are not permitted to access this resource."),
+                title=_("Not Allowed"),
+                exc=frappe.PermissionError,
+            )
+
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
 def get_agents_team():
     Team = frappe.qb.DocType("HD Team")
     TeamMember = frappe.qb.DocType("HD Team Member")

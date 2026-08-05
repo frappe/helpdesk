@@ -54,8 +54,21 @@
           :key="`chart-${i}`"
           class="border rounded-md min-h-[300px] p-4 space-y-3"
         >
-          <div class="h-4 w-1/3 bg-surface-gray-3 rounded" />
-          <div class="h-4 w-1/4 bg-surface-gray-1 rounded" />
+          <template v-if="getEmptyState(i).chartTitle">
+            <div class="text-ink-gray-8 text-p-base-medium">
+              {{ __(getEmptyState(i).chartTitle) }}
+            </div>
+            <div
+              v-if="getEmptyState(i).chartSubtitle"
+              class="text-ink-gray-6 text-p-sm"
+            >
+              {{ __(getEmptyState(i).chartSubtitle) }}
+            </div>
+          </template>
+          <template v-else>
+            <div class="h-4 w-1/3 bg-surface-gray-3 rounded" />
+            <div class="h-4 w-1/4 bg-surface-gray-1 rounded" />
+          </template>
 
           <div
             class="h-64 w-full rounded flex items-center justify-center relative overflow-hidden"
@@ -103,12 +116,12 @@
               v-if="showVariant('empty-state')"
               :style="{
                 backgroundImage:
-                  'radial-gradient(ellipse at center, var(--surface-white) 10%, color-mix(in srgb, var(--surface-white) 90%, transparent) 25%, transparent 70%)',
+                  'radial-gradient(ellipse at center, var(--surface-base) 10%, color-mix(in srgb, var(--surface-base) 90%, transparent) 25%, transparent 70%)',
               }"
               class="rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >
               <div
-                class="relative z-10 text-ink-gray-7 font-medium text-center text-p-base leading-[1.15]"
+                class="relative z-10 text-ink-gray-7 text-center text-p-base-medium leading-[1.15]"
               >
                 {{ __(getEmptyState(i).title) }}
               </div>

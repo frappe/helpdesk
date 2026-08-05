@@ -68,6 +68,10 @@ def get_dashboard_data(
         )
     elif dashboard_type == "trend":
         return dashboard.get_trend_data()
+    elif dashboard_type == "tags":
+        from helpdesk.api.dashboard_tags import TagDashboard
+
+        return TagDashboard(_filters).get_tag_chart_data()
 
 
 class HelpdeskDashboard:
@@ -161,15 +165,16 @@ class HelpdeskDashboard:
         }
 
     def get_sla_fulfilled_count(self):
-        extra_cond = self.ticket.agreement_status == "Fulfilled"
+        # the numerator must stay a subset of the denominator, else the
+        # percentage can exceed 100 (a response-only SLA marks an open ticket
+        # Fulfilled, which no resolved-status filter would count)
+        status_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            status_cond = status_cond & self.ticket.status.isin(self.resolved_statuses)
         current_fulfilled, prev_fulfilled = self.get_metric_data(
-            self.ticket.name, Count, extra_cond
-        )
-
-        status_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
+            self.ticket.name,
+            Count,
+            status_cond & (self.ticket.agreement_status == "Fulfilled"),
         )
         current_total, prev_total = self.get_metric_data(
             self.ticket.name, Count, status_cond
@@ -188,7 +193,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_first_response_time(self):
-        extra_cond = self.ticket.first_responded_on.isnotnull()
+        extra_cond = (
+            self.ticket.sla.isnotnull() & self.ticket.first_responded_on.isnotnull()
+        )
         current, prev = self.get_metric_data(
             self.ticket.first_response_time / 3600, Avg, extra_cond
         )
@@ -204,11 +211,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_resolution_time(self):
-        extra_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
-        )
+        extra_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            extra_cond = extra_cond & self.ticket.status.isin(self.resolved_statuses)
         value_expr = Function("CEIL", self.ticket.resolution_time / 86400)
         current, prev = self.get_metric_data(value_expr, Avg, extra_cond)
 
@@ -296,6 +301,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "ticket_trend",
             _("Ticket Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -377,6 +383,7 @@ class HelpdeskDashboard:
 
         return get_bar_chart_config(
             result,
+            "feedback_trend",
             _("Feedback Trend"),
             subtitle,
             {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
@@ -454,6 +461,7 @@ def get_team_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Percentage of total tickets by team"),
             "team",
@@ -462,6 +470,7 @@ def get_team_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_team",
             _("Tickets by Team"),
             _("Total tickets by team"),
             {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
@@ -487,6 +496,7 @@ def get_ticket_type_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Percentage of total tickets by type"),
             "type",
@@ -495,6 +505,7 @@ def get_ticket_type_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_type",
             _("Tickets by Type"),
             _("Total tickets by type"),
             {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
@@ -520,6 +531,7 @@ def get_ticket_priority_chart_data(
     if len(result) < 7:
         return get_pie_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Percentage of total tickets by priority"),
             "priority",
@@ -528,6 +540,7 @@ def get_ticket_priority_chart_data(
     else:
         return get_bar_chart_config(
             result,
+            "tickets_by_priority",
             _("Tickets by Priority"),
             _("Total tickets by priority"),
             {
@@ -560,6 +573,7 @@ def get_ticket_channel_chart_data(
 
     return get_pie_chart_config(
         result,
+        "tickets_by_channel",
         _("Tickets by Channel"),
         _("Percentage of total tickets by channel"),
         "channel",
@@ -569,6 +583,7 @@ def get_ticket_channel_chart_data(
 
 def get_pie_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     category_column: str,
@@ -577,6 +592,8 @@ def get_pie_chart_config(
     return {
         "type": "pie",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "categoryColumn": category_column,
@@ -586,6 +603,7 @@ def get_pie_chart_config(
 
 def get_bar_chart_config(
     data: list[dict[str, any]],
+    key: str,
     title: str,
     subtitle: str,
     x_axis_config: dict[str, any],
@@ -596,10 +614,15 @@ def get_bar_chart_config(
     return {
         "type": "axis",
         "data": data,
+        # stable identifier for the client, `title` is translated and cannot be matched on
+        "key": key,
         "title": title,
         "subtitle": subtitle,
         "xAxis": x_axis_config,
-        "yAxis": {"title": y_axis_title},
+        # every bar chart here counts tickets, so keep the value axis on whole
+        # steps; half a ticket is not a thing. y2 axes (% SLA, rating) are
+        # fractional and are left alone.
+        "yAxis": {"title": y_axis_title, "echartOptions": {"minInterval": 1}},
         "series": series,
         **kwargs,
     }

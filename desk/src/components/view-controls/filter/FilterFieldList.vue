@@ -14,12 +14,7 @@
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
         <template #suffix>
-          <kbd
-            v-if="showShortcutHint && !query"
-            class="flex h-5 w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-white pt-px text-xs text-ink-gray-5"
-          >
-            F
-          </kbd>
+          <ShortcutKey v-if="showShortcutHint && !query" keys="F" />
         </template>
       </TextInput>
     </div>
@@ -59,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import ShortcutKey from "@/components/ShortcutKey.vue";
 import { __ } from "@/translation";
 import { TextInput } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, watch } from "vue";

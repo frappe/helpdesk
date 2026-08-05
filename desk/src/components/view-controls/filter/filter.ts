@@ -8,6 +8,7 @@ import LucideLink from "~icons/lucide/link";
 import LucideList from "~icons/lucide/list";
 import LucideSquareCheck from "~icons/lucide/square-check";
 import LucideStar from "~icons/lucide/star";
+import LucideTag from "~icons/lucide/tag";
 import LucideType from "~icons/lucide/type";
 import LucideUser from "~icons/lucide/user";
 
@@ -58,6 +59,9 @@ const typeSelect = ["Select"];
 const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 const typeRating = ["Rating"];
+// columns holding a comma-joined list, so "contains" is the only match that
+// works. It matches substrings too: "VIP" also finds tickets tagged "VIP Customer"
+export const multiValueFields = ["_assign", "_user_tags"];
 
 export function useFilter(): Filter {
   const listViewData = inject<any>("listViewData");
@@ -149,11 +153,11 @@ export function normalizeFilters(raw: any): FilterCondition[] {
   });
 }
 
-export function useLinkSearch(doctype: string) {
+export function useLinkSearch(doctype: string, filters?: Record<string, any>) {
   const results = createResource({
     url: "frappe.desk.search.search_link",
     method: "POST",
-    params: { txt: "", doctype, page_length: 10 },
+    params: { txt: "", doctype, filters, page_length: 10 },
     transform: (data: any[]) => {
       const options = data.map((option) => ({
         value: option.value,
@@ -169,7 +173,7 @@ export function useLinkSearch(doctype: string) {
 
   const search = useDebounceFn((txt: string) => {
     if (!doctype) return;
-    results.update({ params: { txt, doctype, page_length: 10 } });
+    results.update({ params: { txt, doctype, filters, page_length: 10 } });
     results.reload();
   }, 300);
 
@@ -229,7 +233,8 @@ function getOperators(fieldtype: string, fieldname?: string) {
     { label: "Greater Than or Equal To", value: ">=" },
   ];
 
-  if (fieldname === "_assign") return [...like, ...is];
+  if (fieldname && multiValueFields.includes(fieldname))
+    return [...like, ...is];
   if (typeString.includes(fieldtype) || typeLink.includes(fieldtype)) {
     return [...equality, ...like, ...inclusion, ...is];
   }
@@ -254,7 +259,7 @@ function getOperators(fieldtype: string, fieldname?: string) {
 }
 
 function getDefaultOperator(field: FilterField): string {
-  if (field.fieldname === "_assign") return "like";
+  if (multiValueFields.includes(field.fieldname)) return "like";
   if (typeDate.includes(field.fieldtype)) return "timespan";
   if (
     typeSelect.includes(field.fieldtype) ||
@@ -273,6 +278,7 @@ function getSelectOptions(options?: string): string[] {
 }
 
 export function fieldIcon(field: FilterField): Component {
+  if (field.fieldname === "_user_tags") return LucideTag;
   if (["_assign", "owner", "modified_by"].includes(field.fieldname)) {
     return LucideUser;
   }
@@ -323,7 +329,9 @@ function displayValue(filter: ActiveFilter): string {
       const n = Number(v);
       return Number.isFinite(n) ? String(Math.round(n * 5)) : String(v ?? "");
     };
-    return Array.isArray(value) ? value.map(toStars).join(", ") : toStars(value);
+    return Array.isArray(value)
+      ? value.map(toStars).join(", ")
+      : toStars(value);
   }
   if (Array.isArray(value)) return value.join(", ");
   if (typeof value === "string") return value.replaceAll("%", "");

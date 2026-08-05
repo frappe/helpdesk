@@ -23,8 +23,8 @@
           <template #text="{ text }">
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
-                <LucideStar class="size-4 fill-ink-amber-2 text-ink-amber-2" />
-                <span class="text-2xl font-medium text-ink-gray-8">
+                <LucideStar class="size-4 fill-ink-amber-5 text-ink-amber-5" />
+                <span class="text-3xl-medium text-ink-gray-8">
                   {{ text }}
                 </span>
               </div>

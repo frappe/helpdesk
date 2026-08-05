@@ -27,7 +27,7 @@
    "fieldname": "color",
    "fieldtype": "Select",
    "label": "Color",
-   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\npurple"
+   "options": "Black\nGray\nBlue\nGreen\nRed\nPink\nOrange\nAmber\nYellow\nCyan\nTeal\nViolet\nPurple"
   },
   {
    "fieldname": "label_agent",

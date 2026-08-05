@@ -6,9 +6,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "disabled",
+  "level",
   "description",
-  "integer_value"
+  "disabled"
  ],
  "fields": [
   {
@@ -17,12 +17,12 @@
    "label": "Description"
   },
   {
-   "description": "Lower the Integer value, higher is the priority of the issue",
-   "fieldname": "integer_value",
-   "fieldtype": "Int",
+   "default": "Medium",
+   "fieldname": "level",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Integer value",
-   "non_negative": 1,
+   "label": "Level",
+   "options": "Urgent\nHigh\nMedium\nLow",
    "reqd": 1
   },
   {

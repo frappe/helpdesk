@@ -16,7 +16,7 @@
         <ShieldCheck class="size-6 text-ink-gray-6" />
       </div>
       <div class="flex flex-col items-center gap-1">
-        <div class="text-base font-medium text-ink-gray-6">
+        <div class="text-base-medium text-ink-gray-6">
           {{ __("No SLA found") }}
         </div>
         <div class="text-p-sm text-ink-gray-5 max-w-60 text-center">
@@ -34,30 +34,33 @@
         <div class="col-span-1">{{ __("Enabled") }}</div>
       </div>
       <hr class="mt-2 mx-2" />
-      <div v-for="(sla, index) in slaPolicyList.list.data" :key="sla.name">
+      <div v-for="(sla, index) in orderedPolicies" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
-        <hr v-if="index !== slaPolicyList.list.data.length - 1" class="mx-2" />
+        <hr v-if="index !== orderedPolicies.length - 1" class="mx-2" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Button, LoadingIndicator } from "frappe-ui";
+import { dayjs, LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
-import { inject } from "vue";
-import { resetSlaData, slaActiveScreen } from "@/stores/sla";
+import { computed, inject } from "vue";
 import ShieldCheck from "~icons/lucide/shield-check";
-import { SlaPolicyListResourceSymbol } from "@/types";
+import { SlaPolicy, SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyList = inject(SlaPolicyListResourceSymbol);
 
-const goToNew = () => {
-  resetSlaData();
-  slaActiveScreen.value = {
-    screen: "view",
-    data: null,
-    fetchData: true,
-  };
-};
+// rank 0 means unranked, which is applied last
+const rankOrder = (sla: SlaPolicy) => sla.rank || Infinity;
+
+// mirrors the ordering in get_sla (hd_service_level_agreement/utils.py) — keep in sync
+const orderedPolicies = computed(() =>
+  [...(slaPolicyList.list.data ?? [])].sort(
+    (a, b) =>
+      Number(a.default_sla) - Number(b.default_sla) ||
+      rankOrder(a) - rankOrder(b) ||
+      dayjs(a.creation).diff(dayjs(b.creation))
+  )
+);
 </script>

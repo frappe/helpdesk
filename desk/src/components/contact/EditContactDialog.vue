@@ -1,10 +1,10 @@
 <template>
   <Dialog v-model:open="open" size="md" bare :dismissible="!isDirty">
     <template #default>
-      <div class="bg-surface-modal px-4 py-5 sm:px-6">
+      <div class="bg-surface-elevation-2 px-4 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h3 class="text-2xl font-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
               {{ __("Edit Contact") }}
             </h3>
             <Badge
@@ -31,7 +31,6 @@
           <!-- First + Last name -->
           <div class="grid grid-cols-2 gap-4">
             <FormControl
-              class="[&_p]:text-p-xs"
               :label="__('First Name')"
               type="text"
               :required="true"
@@ -39,7 +38,6 @@
               v-model="state.firstName"
             />
             <FormControl
-              class="[&_p]:text-p-xs"
               :label="__('Last Name')"
               type="text"
               :placeholder="__('Doe')"
@@ -48,9 +46,9 @@
           </div>
           <!-- Email IDs -->
           <div class="space-y-1.5">
-            <label class="block text-p-sm font-medium text-ink-gray-7">
+            <label class="block text-base text-ink-gray-5">
               {{ __("Email") }}
-              <span class="text-ink-red-3">*</span>
+              <span class="text-ink-red-6">*</span>
             </label>
             <ContactInputRow
               v-for="(email, index) in state.emails"
@@ -78,7 +76,7 @@
 
           <!-- Phone numbers -->
           <div class="space-y-1.5 flex flex-col items-start w-full flex-1">
-            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+            <label class="block text-base text-ink-gray-5">{{
               __("Phone")
             }}</label>
             <ContactInputRow
@@ -107,7 +105,7 @@
 
           <!-- Timezone -->
           <div v-if="doc.doc?.user" class="space-y-1.5">
-            <label class="block text-p-sm font-medium text-ink-gray-7">{{
+            <label class="block text-base text-ink-gray-5">{{
               __("Timezone")
             }}</label>
             <TimezoneControl v-model="state.timezone" />
@@ -116,7 +114,7 @@
           <!-- Customer -->
           <div class="space-y-1.5">
             <label
-              class="block text-p-sm font-medium text-ink-gray-7"
+              class="block text-base text-ink-gray-5"
               v-if="!contactInfoResource.data?.invitation"
             >
               {{ __("Customer") }}
@@ -132,7 +130,7 @@
                 class="flex-1"
                 type="text"
                 :modelValue="customer.name"
-                :disabled="true"
+                readonly
               >
                 <template #prefix>
                   <Avatar

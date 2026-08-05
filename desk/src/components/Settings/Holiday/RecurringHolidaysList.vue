@@ -71,7 +71,7 @@
       </div>
       <div v-else class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Day" required />
+          <FormLabel label="Day" required size="md" />
           <Select
             :options="availableWorkDays"
             v-model="recurringHolidayData.day"
@@ -79,7 +79,7 @@
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Repetition" required />
+          <FormLabel label="Repetition" required size="md" />
           <div class="grid grid-cols-2 gap-2 mt-2">
             <Checkbox
               v-model="recurringHolidayData.repetition.all"

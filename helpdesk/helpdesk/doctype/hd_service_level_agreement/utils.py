@@ -9,12 +9,15 @@ from helpdesk.utils import get_context
 DOCTYPE = "HD Service Level Agreement"
 
 
-def get_sla(ticket: Document) -> Document:
+def get_sla(ticket: Document) -> frappe._dict | None:
     """
-    Get Service Level Agreement for `ticket`
+    Get the Service Level Agreement that applies to `ticket`.
 
-    :param doc: Ticket to use
-    :return: Applicable SLA
+    A policy applies when its condition matches and it includes the ticket's
+    priority. The default policy needs no condition but is still considered last.
+
+    :param ticket: Ticket to use (document)
+    :return: Applicable SLA, or None when no policy applies
     """
     QBSla = frappe.qb.DocType(DOCTYPE)
     QBPriority = frappe.qb.DocType("HD Service Level Priority")
@@ -22,11 +25,14 @@ def get_sla(ticket: Document) -> Document:
     priority = ticket.priority
     q = (
         frappe.qb.from_(QBSla)
-        .select(QBSla.name, QBSla.condition)
+        .select(QBSla.name, QBSla.condition, QBSla.default_sla)
         .where(QBSla.enabled == True)
-        .where(QBSla.default_sla == False)
         .where(Criterion.any([QBSla.start_date.isnull(), QBSla.start_date <= now]))
         .where(Criterion.any([QBSla.end_date.isnull(), QBSla.end_date >= now]))
+        .orderby(QBSla.default_sla)  # the Default SLA is considered last
+        .orderby(QBSla.rank == 0)  # unranked sorts after ranked
+        .orderby(QBSla.rank)
+        .orderby(QBSla.creation)
     )
     if priority:
         q = (
@@ -34,29 +40,16 @@ def get_sla(ticket: Document) -> Document:
             .on(QBPriority.parent == QBSla.name)
             .where(QBPriority.priority == priority)
         )
-    sla_list = q.run(as_dict=True)
-    res = None
-    for sla in sla_list:
-        cond = sla.get("condition")
-        if not cond or frappe.safe_eval(cond, None, get_context(ticket)):
-            res = sla
-            break
-    return res or get_default()
-
-
-def get_default() -> Document:
-    """
-    Get default Service Level Agreement
-
-    :return: Default SLA
-    """
-    return frappe.get_last_doc(
-        DOCTYPE,
-        filters={
-            "enabled": True,
-            "default_sla": True,
-        },
-    )
+    context = None
+    for sla in q.run(as_dict=True):
+        if sla.default_sla:
+            return sla
+        if not sla.condition:
+            continue  # a blank condition is not a false positive
+        context = context or get_context(ticket)  # serialises the ticket, build once
+        if frappe.safe_eval(sla.condition, None, context):
+            return sla
+    return None
 
 
 def convert_to_seconds(time):

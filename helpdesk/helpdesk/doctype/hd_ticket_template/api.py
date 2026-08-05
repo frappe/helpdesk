@@ -1,10 +1,11 @@
+import json
 from typing import Literal
 
 import frappe
 from pypika import JoinType
 
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
-from helpdesk.utils import check_permissions, get_customers
+from helpdesk.utils import check_permissions, get_customers, is_agent
 
 DOCTYPE_TEMPLATE = "HD Ticket Template"
 DOCTYPE_TEMPLATE_FIELD = "HD Ticket Template Field"
@@ -21,23 +22,8 @@ def get_one(name: str):
         return {"about": None, "fields": []}
 
     fields = get_fields_meta(name)
-    customers = get_customers()
-
-    auto_set_customer_from_contact = frappe.db.get_single_value(
-        "HD Settings", "auto_set_customer_from_contact"
-    )
-    has_customer_field = any(f.fieldname == "customer" for f in fields)
-    if auto_set_customer_from_contact and len(customers) > 1 and not has_customer_field:
-        fields.append(
-            frappe._dict(
-                fieldname="customer",
-                fieldtype="Select",
-                label="Customer",
-                options="\n".join(customers),
-                required=1,
-                idx=len(fields) + 1,
-            )
-        )
+    if frappe.db.get_single_value("HD Settings", "auto_set_customer_from_contact"):
+        set_customer_field(fields)
 
     return {
         "about": about,
@@ -47,6 +33,41 @@ def get_one(name: str):
             "HD Ticket", apply_on_new_page=True, is_customer_portal=False
         ),
     }
+
+
+def set_customer_field(fields: list) -> None:
+    """Scope the customer field to the session contact's own customers on the
+    customer portal.
+
+    Agents get the template's customer field untouched. Portal contacts get it
+    filtered to their customers; when the template has no customer field and the
+    contact belongs to multiple customers, a required field is injected so they
+    can pick one. Selection is enforced server side in HDTicket.set_customer.
+    """
+    if is_agent():
+        return
+
+    customers = get_customers()
+    link_filters = json.dumps([["HD Customer", "name", "in", list(customers)]])
+    customer_field = next((f for f in fields if f.fieldname == "customer"), None)
+
+    if customer_field:
+        customer_field.link_filters = link_filters
+        if len(customers) > 1:
+            customer_field.required = 1
+            customer_field.hide_from_customer = 0
+    elif len(customers) > 1:
+        fields.append(
+            frappe._dict(
+                fieldname="customer",
+                fieldtype="Link",
+                label="Customer",
+                options="HD Customer",
+                link_filters=link_filters,
+                required=1,
+                idx=len(fields) + 1,
+            )
+        )
 
 
 def get_fields_meta(template: str):

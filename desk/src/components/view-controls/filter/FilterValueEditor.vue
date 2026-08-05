@@ -9,7 +9,11 @@
         class="min-w-0"
         @back="emit('back')"
       />
-      <Dropdown side="bottom" :options="operatorOptions">
+      <Dropdown
+        side="bottom"
+        :options="operatorOptions"
+        :portal-to="operatorMenuTarget || 'body'"
+      >
         <Button
           class="flex h-6 max-w-[150px] shrink-0 items-center gap-1 rounded bg-surface-gray-2 ps-2 pe-1 text-sm text-ink-gray-7 hover:bg-surface-gray-3"
           variant="ghost"
@@ -128,11 +132,20 @@ import {
   TextInput,
 } from "frappe-ui";
 import { computed, nextTick, ref, watch } from "vue";
-import { ActiveFilter, FilterField, useFilter, useLinkSearch } from "./filter";
+import {
+  ActiveFilter,
+  FilterField,
+  multiValueFields,
+  useFilter,
+  useLinkSearch,
+} from "./filter";
 
 interface P {
   field: FilterField;
   filter?: ActiveFilter | null;
+  // The high-z layer the operator dropdown teleports into, so its menu renders
+  // above the filter popover panel instead of behind it.
+  operatorMenuTarget?: HTMLElement | null;
 }
 
 interface E {
@@ -201,9 +214,9 @@ const isListMode = computed(() => {
   if (["Select", "Check"].includes(props.field.fieldtype)) {
     return true;
   }
-  // "like" matches free text, so it gets a plain input; only the assignee
-  // picker keeps its user list since "like" is its primary operator
-  if (props.field.fieldname === "_assign") return true;
+  // "like" matches free text, so it gets a plain input; the comma-joined
+  // columns keep their list since "like" is their primary operator
+  if (multiValueFields.includes(props.field.fieldname)) return true;
   return isLink.value && !operator.value.includes("like");
 });
 
@@ -236,7 +249,11 @@ const dateRangeValue = computed(() =>
   Array.isArray(value.value) ? value.value : []
 );
 
-const linkSearch = useLinkSearch(linkDoctype(props.field));
+// desk's sidebar mints Tag masters too; the picker only lists helpdesk's
+const linkSearch = useLinkSearch(
+  linkDoctype(props.field),
+  props.field.options === "Tag" ? { app: "helpdesk" } : undefined
+);
 
 // Link options are fetched from the server, so reflect the in-flight request
 // instead of briefly showing "No results" while the search is loading.

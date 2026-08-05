@@ -91,7 +91,7 @@
                 :model-value="toggleAllChildValues"
                 class="me-2"
               />
-              <span class="text-base text-ink-gray-8 font-medium">
+              <span class="text-base-medium text-ink-gray-8">
                 {{ toggleCheckboxLabel }}
               </span>
             </li>
