@@ -83,15 +83,22 @@
                   @mousedown.prevent="onSelect(option.value)"
                 >
                   <UserAvatar
-                    class="mr-0.5"
+                    class="mr-0.5 shrink-0"
                     :name="getUsernameLabel(option.label)"
                     size="lg"
                   />
+<<<<<<< HEAD
                   <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
                     <div class="text-base-medium">
+=======
+                  <!-- min-w-0 lets the column shrink past its text, so a long
+                       name or address truncates instead of scrolling the list -->
+                  <div class="flex min-w-0 flex-col gap-1 p-1 text-ink-gray-8">
+                    <div class="truncate text-base font-medium">
+>>>>>>> 0127ca4 (fix(email-select): truncate long recipient names in the popover)
                       {{ getUsernameLabel(option.label) }}
                     </div>
-                    <div class="text-sm text-ink-gray-5">
+                    <div class="truncate text-sm text-ink-gray-5">
                       {{ option.isCustom ? customEmailLabel : option.value }}
                     </div>
                   </div>
