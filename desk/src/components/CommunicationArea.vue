@@ -58,6 +58,19 @@
                 >
                   <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
                 </button>
+                <!-- The header's corners sit under the tab and window buttons,
+                     so grabbing one did nothing. These zones layer over them
+                     and start the same vertical resize. -->
+                <span
+                  v-if="mode === 'docked' && !isMobileView"
+                  class="absolute left-0 top-0 z-20 size-3 cursor-ns-resize touch-none"
+                  @pointerdown.stop.prevent="startDockedResize"
+                />
+                <span
+                  v-if="mode === 'docked' && !isMobileView"
+                  class="absolute right-0 top-0 z-20 size-3 cursor-ns-resize touch-none"
+                  @pointerdown.stop.prevent="startDockedResize"
+                />
                 <TabButtons v-model="channel" :options="channelOptions" />
                 <div class="min-w-0 flex-1">
                   <TypingIndicator :ticketId="ticketId" />
@@ -554,7 +567,7 @@ const minimizedLabel = computed(() => {
     draft = commentBody.value;
   }
   const preview = draft ? htmlToText(draft).trim() : "";
-  return preview || "Add a comment";
+  return preview || "Send a reply";
 });
 
 // ─── Email draft & signature ──────────────────────────────────
