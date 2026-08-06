@@ -89,7 +89,6 @@
                   />
                   <div class="flex min-w-0 flex-col gap-1 p-1 text-ink-gray-8">
                     <div class="truncate text-base-medium">
-
                       {{ getUsernameLabel(option.label) }}
                     </div>
                     <div class="truncate text-sm text-ink-gray-5">
