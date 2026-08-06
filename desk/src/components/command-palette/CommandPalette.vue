@@ -18,7 +18,7 @@
           <div v-if="context" class="chip-row grid">
             <div class="overflow-hidden">
               <!-- Not a button: removal is backspace-only, advertised by esc's label. -->
-              <Badge class="chip mx-4.5 mt-3 max-w-[30%]">
+              <Badge class="chip mx-4 mt-3 max-w-[30%]">
                 <span class="shrink-0 text-ink-gray-7">{{
                   context.label
                 }}</span>
@@ -33,7 +33,10 @@
 
         <!-- px-2 + size sm puts the glass on the row icons' axis, and the caret on
              their titles' axis (8 + 8 = 16, 8 + 32 = 40). -->
-        <div class="flex items-center border-b border-outline-gray-1 px-2 py-2">
+        <div
+          ref="inputWrapperRef"
+          class="flex items-center border-b border-outline-gray-1 bg-surface-base px-2 py-2"
+        >
           <button
             v-if="stepLabel"
             type="button"
@@ -43,13 +46,13 @@
             {{ stepLabel }}
             <LucideChevronRight class="size-3 text-ink-gray-4" />
           </button>
-          <TextInput
-            ref="inputRef"
+          <FormControl
+            type="text"
             :model-value="query"
             :placeholder="placeholder"
             variant="ghost"
             size="sm"
-            class="w-full"
+            class="w-full !bg-surface-base"
             spellcheck="false"
             :aria-label="
               context
@@ -65,7 +68,7 @@
             <template #prefix>
               <LucideSearch class="size-3.5 shrink-0 text-ink-gray-4" />
             </template>
-          </TextInput>
+          </FormControl>
         </div>
 
         <!-- Announces what no row can: result count, and list changes under debounce. -->
@@ -168,7 +171,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Badge, TextInput, useShortcut } from "frappe-ui";
+import { Badge, FormControl, useShortcut } from "frappe-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -204,8 +207,11 @@ import {
   run,
 } from "./useCommandPalette";
 
-// TextInput exposes the native element as `el`.
-const inputRef = ref<{ el: HTMLInputElement | null } | null>(null);
+// FormControl doesn't expose its native input, so we grab it from the DOM.
+const inputWrapperRef = ref<HTMLElement | null>(null);
+const inputRef = computed(
+  () => inputWrapperRef.value?.querySelector("input") ?? null
+);
 const listRef = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
 const keyboardNav = ref(false);
@@ -314,7 +320,7 @@ function moveActive(delta: number) {
 }
 
 function caretAtEnd(): boolean {
-  const input = inputRef.value?.el;
+  const input = inputRef.value;
   return (
     !!input &&
     input.selectionStart === input.selectionEnd &&
@@ -397,11 +403,11 @@ watch(isOpen, (open) => {
   focusBeforeOpen = document.activeElement as HTMLElement | null;
   activeIndex.value = 0;
   rememberActive();
-  nextTick(() => inputRef.value?.el?.focus());
+  nextTick(() => inputRef.value?.focus());
 });
 
 // Drilling into a sub-list swaps the whole list out; refocus for the next query.
-watch(depth, () => nextTick(() => inputRef.value?.el?.focus()));
+watch(depth, () => nextTick(() => inputRef.value?.focus()));
 
 // frappe-ui's useShortcut: the local one suppresses bindings in inputs and
 // dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its own
@@ -421,6 +427,11 @@ useShortcut({
 </script>
 
 <style scoped>
+/* Native inputs fall back to the OS "Field" color (white) unless cleared explicitly. */
+:deep(input[data-slot="control"]) {
+  background-color: transparent;
+}
+
 /* Open carries the scale and lift; close is a plain fade so dismissal feels fast. */
 .palette-content[data-state="open"] {
   animation: palette-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
