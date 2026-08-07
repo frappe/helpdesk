@@ -107,6 +107,7 @@
    "oldfieldname": "status",
    "oldfieldtype": "Select",
    "options": "HD Ticket Status",
+   "reqd": 1,
    "search_index": 1
   },
   {
