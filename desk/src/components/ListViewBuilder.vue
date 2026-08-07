@@ -86,9 +86,19 @@
     </ListRows>
     <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
-        <Dropdown :options="selectBannerOptions(selections, unselectAll)">
-          <Button icon="lucide-more-horizontal" variant="ghost" />
-        </Dropdown>
+        <div class="flex items-center gap-1">
+          <Button
+            v-for="action in selectBannerOptions(selections, unselectAll, true)"
+            :key="action.label"
+            :label="action.label"
+            :icon-left="action.icon"
+            variant="ghost"
+            @click="action.onClick"
+          />
+          <Dropdown :options="selectBannerOptions(selections, unselectAll)">
+            <Button icon="lucide-more-horizontal" variant="ghost" />
+          </Dropdown>
+        </div>
       </template>
     </ListSelectBanner>
   </ListView>
@@ -394,7 +404,12 @@ const exposeFunctions = {
   unselectAll: () => {},
 };
 
-function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
+/** Banner actions. `inline` picks the ones shown as buttons; the rest fill the "..." menu. */
+function selectBannerOptions(
+  selections: Set<string>,
+  unselectAll = () => {},
+  inline = false
+) {
   exposeFunctions["unselectAll"] = unselectAll;
 
   // Get the user-provided actions
@@ -417,8 +432,9 @@ function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
       onClick: () => action.onClick?.(selections),
     }));
 
-  // Return combined actions
-  return [...userActions, ...defaultActions];
+  return [...userActions, ...defaultActions].filter(
+    (action) => Boolean(action.inline) === inline
+  );
 }
 
 const rows = computed(() => {

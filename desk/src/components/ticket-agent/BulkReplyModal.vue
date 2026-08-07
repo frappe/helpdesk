@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:open="open" :title="__('Bulk Reply')" size="2xl">
+  <Dialog v-model:open="open" :title="__('Reply')" size="2xl">
     <template #default>
       <div class="flex flex-col gap-4">
         <p class="text-p-sm">
