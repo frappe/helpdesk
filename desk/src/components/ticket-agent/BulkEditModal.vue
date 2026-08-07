@@ -10,7 +10,7 @@
         />
         <component
           v-if="field"
-          :is="control"
+          :is="getFieldComponent(field.fieldtype)"
           :key="fieldname"
           :field="field"
           :model-value="value"
@@ -24,7 +24,6 @@
         <Button
           variant="solid"
           :loading="loading"
-          :disabled="!fieldname"
           :label="__('Update {0} tickets', selections.size)"
           @click="submit"
         />
@@ -39,12 +38,12 @@ import { getMeta } from "@/stores/meta";
 import { __ } from "@/translation";
 import { getFieldComponent } from "@framework/ui/fields";
 import { Button, call, Combobox, Dialog, toast } from "frappe-ui";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 const BULK_UPDATE_METHOD =
   "frappe.desk.doctype.bulk_update.bulk_update.submit_cancel_or_update_docs";
 
-// frappe runs the update inline below this count and enqueues it above.
+// frappe runs the update inline below this count, enqueues above.
 const BACKGROUND_THRESHOLD = 20;
 
 // Fieldtypes that hold no value, so there is nothing to bulk set.
@@ -78,6 +77,12 @@ const fieldname = ref<string | null>(null);
 const value = ref<any>(null);
 const loading = ref(false);
 
+let pending: {
+  taskId: string;
+  toastId: string | number;
+  total: number;
+} | null = null;
+
 const editableFields = computed(() =>
   getFields().filter(
     (field: any) =>
@@ -95,59 +100,88 @@ const fieldOptions = computed(() =>
     .sort((a, b) => a.label.localeCompare(b.label))
 );
 
-const field = computed(() =>
-  editableFields.value.find((f: any) => f.fieldname === fieldname.value)
+const selectedField = computed(
+  () =>
+    editableFields.value.find((f: any) => f.fieldname === fieldname.value) ??
+    null
 );
 
-// The fieldtype registry picks the control; the docfield doubles as its meta.
-const control = computed(() =>
-  field.value ? getFieldComponent(field.value.fieldtype) : null
+// Its own label would repeat the Combobox; the default placeholder is the raw doctype.
+const field = computed(
+  () =>
+    selectedField.value && {
+      ...selectedField.value,
+      label: __("Value"),
+      placeholder: __("Select {0}", selectedField.value.label),
+    }
 );
 
 async function submit() {
-  if (!fieldname.value) return;
+  if (!fieldname.value) {
+    toast.error(__("Select a field"));
+    return;
+  }
+  // Blanking a mandatory field fails `doc.save()` on every ticket.
+  if (selectedField.value.reqd && (value.value ?? "") === "") {
+    toast.error(__("{0} is required", selectedField.value.label));
+    return;
+  }
+
   const docnames = Array.from(props.selections);
+  const total = docnames.length;
+  const inBackground = total >= BACKGROUND_THRESHOLD;
+  const taskId = `bulk-edit-${Math.random().toString(36).slice(2, 10)}`;
   loading.value = true;
   try {
-    await call(BULK_UPDATE_METHOD, {
+    if (inBackground) $socket.emit("task_subscribe", taskId);
+    const failed = await call(BULK_UPDATE_METHOD, {
       doctype: "HD Ticket",
       docnames,
       action: "update",
       data: { [fieldname.value]: value.value ?? null },
+      task_id: taskId,
     });
     open.value = false;
-    if (docnames.length < BACKGROUND_THRESHOLD) {
-      toast.success(__("Updated {0} tickets", docnames.length));
-      emit("success");
-    } else {
-      toast.success(
-        __("Updating {0} tickets in the background", docnames.length)
-      );
-      reloadWhenDone();
+
+    if (inBackground) {
+      if (pending) toast.dismiss(pending.toastId);
+      const toastId = toast.loading(__("Updating {0} tickets…", total));
+      pending = { taskId, toastId, total };
+      return;
     }
+    // The inline path returns the docnames it could not update.
+    if (failed?.length) {
+      toast.warning(
+        __("Updated {0} of {1} tickets", total - failed.length, total)
+      );
+    } else {
+      toast.success(__("Updated {0} tickets", total));
+    }
+    emit("success");
   } finally {
     loading.value = false;
   }
 }
 
-/** The enqueued job reports through `frappe.publish_progress` on the user room. */
-function reloadWhenDone() {
-  const onProgress = ({ percent }: { percent: number }) => {
-    if (percent < 100) return;
-    $socket.off("progress", onProgress);
-    toast.success(__("Bulk edit completed"));
-    emit("success");
-  };
-  $socket.on("progress", onProgress);
+// Unrelated jobs publish `progress` on the user room too, so match the id.
+function onProgress(data: { percent: number; task_id?: string }) {
+  if (!pending || data.task_id !== pending.taskId || data.percent < 100) return;
+  // Same id replaces the pending toast.
+  toast.success(__("Updated {0} tickets", pending.total), {
+    id: pending.toastId,
+  });
+  pending = null;
+  emit("success");
 }
 
 watch(open, (isOpen) => {
-  if (!isOpen) return;
-  fieldname.value = null;
-  value.value = null;
+  if (isOpen) fieldname.value = null;
 });
 
 watch(fieldname, () => {
   value.value = null;
 });
+
+onMounted(() => $socket.on("progress", onProgress));
+onUnmounted(() => $socket.off("progress", onProgress));
 </script>
