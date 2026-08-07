@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <Dialog
     v-model="open"
     :options="{
@@ -7,6 +8,10 @@
     }"
   >
     <template #body-content>
+=======
+  <Dialog v-model:open="open" :title="__('Reply')" size="2xl">
+    <template #default>
+>>>>>>> f3c25b4 (feat(tickets): bulk edit and bulk assign from the selection banner)
       <div class="flex flex-col gap-4">
         <p class="text-p-sm">
           <CompactEditor
