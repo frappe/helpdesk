@@ -125,8 +125,6 @@ const showBulkReplyModal = ref(false);
 const showBulkEditModal = ref(false);
 const showBulkAssignModal = ref(false);
 
-// Lucide draws on two ink grids (2-22 and 3-21), so icons differ in optical size
-// inside the same 16px box. Scale the outliers to the 3-21 grid the rest sit on.
 const selectBannerActions = [
   {
 <<<<<<< HEAD
@@ -134,7 +132,7 @@ const selectBannerActions = [
     icon: "corner-up-left",
 =======
     label: __("Reply"),
-    icon: "lucide-corner-up-left scale-110",
+    icon: "lucide-corner-up-left",
     inline: true,
 >>>>>>> f3c25b4 (feat(tickets): bulk edit and bulk assign from the selection banner)
     onClick: (selections: Set<string>) => {
@@ -143,17 +141,9 @@ const selectBannerActions = [
     },
   },
   {
-    label: __("Edit"),
-    icon: "lucide-pencil scale-90",
-    inline: true,
-    onClick: (selections: Set<string>) => {
-      listSelections.value = new Set(selections);
-      showBulkEditModal.value = true;
-    },
-  },
-  {
     label: __("Assign"),
-    icon: "lucide-user-plus scale-90",
+    icon: "lucide-user-plus",
+    inline: true,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkAssignModal.value = true;
@@ -165,6 +155,14 @@ const selectBannerActions = [
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showExportModal.value = true;
+    },
+  },
+  {
+    label: __("Edit"),
+    icon: "lucide-pencil",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkEditModal.value = true;
     },
   },
 ];
