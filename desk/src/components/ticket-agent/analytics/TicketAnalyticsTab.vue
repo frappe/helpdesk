@@ -39,5 +39,10 @@ const analytics = createResource({
   auto: true,
 });
 
-watch(ticketId, () => analytics.reload());
+// status and priority changes rewrite the SLA picture (hold, due dates), so
+// the analytics must refetch, not just on ticket switch
+watch(
+  () => [ticketId.value, ticket.value.doc.status, ticket.value.doc.priority],
+  () => analytics.reload()
+);
 </script>
