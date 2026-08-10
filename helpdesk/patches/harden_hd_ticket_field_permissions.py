@@ -2,7 +2,8 @@ import frappe
 from frappe.permissions import add_permission, update_permission_property
 
 # level -> role -> has write access at that level. Level 1 holds the
-# customer-visible operational fields, level 2 the agent-only internals.
+# customer-visible operational fields, level 2 the agent-only internals,
+# level 3 the System Manager-only fields.
 LEVEL_GRANTS = {
     1: {
         "System Manager": 1,
@@ -15,6 +16,9 @@ LEVEL_GRANTS = {
         "System Manager": 1,
         "Agent": 1,
         "Agent Manager": 1,
+    },
+    3: {
+        "System Manager": 1,
     },
 }
 
