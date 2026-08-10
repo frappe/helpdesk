@@ -41,18 +41,10 @@ def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
 
-    # permission-aware: '*' expands to the caller's permitted columns and
-    # permission_query conditions scope the rows
-    ticket = frappe.qb.get_query(
-        "HD Ticket",
-        fields="*",
-        filters={"name": name},
-        limit=1,
-        ignore_permissions=False,
-    ).run(as_dict=True)
-    if not len(ticket):
-        frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
-    ticket = ticket.pop()
+    doc = frappe.get_doc("HD Ticket", name)
+    # strips permlevel fields the caller cannot read; no-op for agents
+    doc.apply_fieldlevel_read_permissions()
+    ticket = doc.as_dict()
 
     contact = (
         frappe.qb.from_(QBContact)

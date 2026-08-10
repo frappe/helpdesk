@@ -19,7 +19,6 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -76,22 +75,9 @@ class HDTicket(Document):
         self.generate_key()
         self.apply_portal_insert_rules()
 
-    def get_customer_template_fields(self):
-        """Template fields the customer may fill on creation; internal
-        fields stay locked even if a template lists them as visible."""
-        template = self.template or DEFAULT_TICKET_TEMPLATE
-        fields = frappe.get_all(
-            "HD Ticket Template Field",
-            filters={"parent": template, "hide_from_customer": 0},
-            pluck="fieldname",
-        )
-        exposable = {"priority", "ticket_type", "agent_group", "customer"}
-        protected = {df.fieldname for df in self.meta.get_high_permlevel_fields()}
-        return [f for f in fields if f not in protected or f in exposable]
-
     def apply_portal_insert_rules(self):
-        """Exempt server-set values and customer form fields from the
-        permlevel reset the framework runs right after this hook."""
+        """Exempt server-set values from the permlevel reset the framework
+        runs right after this hook."""
         if is_agent():
             return
         if frappe.session.user != "Guest":
@@ -99,11 +85,11 @@ class HDTicket(Document):
         self.via_customer_portal = 1
 
         # set server-side; set_customer validates the customer-contact link
-        server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
-        # template fields are exempt only on insert, keeping them create-only
         self.flags.ignore_permlevel_for_fields = [
-            *server_owned_fields,
-            *self.get_customer_template_fields(),
+            "key",
+            "raised_by",
+            "via_customer_portal",
+            "customer",
         ]
 
     def before_validate(self):

@@ -3,10 +3,14 @@
 
 import frappe
 from frappe import _
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 from frappe.model.document import Document
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.utils import capture_event
+
+# fields hidden from the customer are readable by agents and above only
+HIDDEN_FIELD_PERMLEVEL = 8
 
 
 class HDTicketTemplate(Document):
@@ -53,7 +57,34 @@ class HDTicketTemplate(Document):
         )
 
     def on_update(self):
+        self.sync_field_permlevels()
         capture_event("ticket_template_updated")
+
+    def sync_field_permlevels(self):
+        """Template visibility drives HD Ticket field permlevels: hidden
+        fields turn agent-only, visible fields turn customer-writable."""
+        meta = frappe.get_meta("HD Ticket")
+        changed = False
+        for f in self.fields:
+            target = HIDDEN_FIELD_PERMLEVEL if f.hide_from_customer else 0
+            field = meta.get_field(f.fieldname)
+            if not field or field.permlevel == target:
+                continue
+            self.set_field_permlevel(f.fieldname, target)
+            changed = True
+        if changed:
+            frappe.clear_cache(doctype="HD Ticket")
+
+    def set_field_permlevel(self, fieldname: str, level: int):
+        if self.custom_field_exists(fieldname):
+            frappe.db.set_value(
+                "Custom Field",
+                {"dt": "HD Ticket", "fieldname": fieldname},
+                "permlevel",
+                level,
+            )
+        else:
+            make_property_setter("HD Ticket", fieldname, "permlevel", level, "Int")
 
     def on_trash(self):
         self.prevent_default_delete()
