@@ -269,9 +269,9 @@ function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
     return getOverdueStartSegments(node);
 
   const duration = formatSeconds(node.took) || undefined;
-  const isSplit = Boolean(
-    node.state === "breach" && node.timestamp && node.took && node.target
-  );
+  const isLate = node.state === "breach" && Boolean(node.timestamp);
+  // an overshoot that swallows the whole duration leaves no window to split
+  const isSplit = isLate && Boolean(node.took && node.target);
   let leg: RailSegment[];
   if (node.state === "done")
     leg = [getLine(GREEN, { width: 120, isGrowing: true, duration })];
@@ -289,7 +289,7 @@ function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
       colorClass,
       tooltip: getMilestoneTooltip(node),
       label: getLabel(
-        isSplit ? __("Responded late") : __("First response"),
+        isLate ? __("Responded late") : __("First response"),
         getMilestoneSubtitle(node)
       ),
     },
@@ -298,8 +298,6 @@ function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
 
 function getMilestoneSubtitle(node: TimelineNode): string {
   if (node.timestamp) return formatDateTime(node.timestamp);
-  if (node.state === "breach" && node.eta)
-    return __("was due {0}", formatDateTime(node.eta) ?? "");
   return node.eta ? getDueLabel(node.eta) : __("pending");
 }
 
