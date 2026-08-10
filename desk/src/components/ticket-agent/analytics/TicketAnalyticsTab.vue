@@ -8,16 +8,15 @@
     </div>
     <div
       v-else-if="analytics.data"
-      class="mx-auto flex w-full max-w-4xl flex-col gap-4 px-5 py-4"
+      class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-4"
     >
-      <SlaTimeline
+      <TicketTimeline
         :timeline="analytics.data.timeline"
-        :has-sla="analytics.data.has_sla"
+        :events="analytics.data.events"
       />
-      <AnalyticsMetricCards :metrics="analytics.data.metrics" />
-      <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <ResponseGapChart :gaps="analytics.data.gaps" />
+      <div class="grid items-start gap-4 lg:grid-cols-2">
         <ConversationSummary :summary="analytics.data.summary" />
+        <AnalyticsMetricCards :metrics="analytics.data.metrics" />
       </div>
     </div>
   </div>
@@ -26,19 +25,19 @@
 <script setup lang="ts">
 import { TicketSymbol } from "@/types";
 import { createResource, LoadingIndicator } from "frappe-ui";
-import { inject } from "vue";
+import { computed, inject, watch } from "vue";
 import AnalyticsMetricCards from "./AnalyticsMetricCards.vue";
 import ConversationSummary from "./ConversationSummary.vue";
-import ResponseGapChart from "./ResponseGapChart.vue";
-import SlaTimeline from "./SlaTimeline.vue";
+import TicketTimeline from "./TicketTimeline.vue";
 
 const ticket = inject(TicketSymbol)!;
-const ticketId = String(ticket.value.doc.name);
+const ticketId = computed(() => String(ticket.value.doc.name));
 
 const analytics = createResource({
   url: "helpdesk.api.ticket_analytics.get_ticket_analytics",
-  params: { ticket: ticketId },
-  cache: ["ticket-analytics", ticketId],
+  makeParams: () => ({ ticket: ticketId.value }),
   auto: true,
 });
+
+watch(ticketId, () => analytics.reload());
 </script>
