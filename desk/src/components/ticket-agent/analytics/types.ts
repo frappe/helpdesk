@@ -73,5 +73,15 @@ export interface RailLine {
   isSlowest?: boolean;
 }
 
+// a node that belongs at its own timestamp rather than at a fixed rail position
+export interface RailMarker {
+  at: string;
+  build: () => RailNode;
+  isDeadline?: boolean;
+  // shown when a deadline lands immediately before this marker, which makes the
+  // leg between them pure overtime rather than an idle stretch
+  overtime?: string | undefined;
+}
+
 export type RailSegment = RailNode | RailLine;
 export type LineOptions = Omit<RailLine, "kind" | "colorClass">;

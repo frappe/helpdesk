@@ -127,6 +127,7 @@ import type {
   LineOptions,
   RailLabel,
   RailLine,
+  RailMarker,
   RailNode,
   RailSegment,
   TimelineEvent,
@@ -197,6 +198,27 @@ const eventsAfterMilestone = computed(() =>
   props.events.slice(eventsBeforeMilestone.value.length)
 );
 
+// the resolution sits at its own moment on the rail, not pinned to the end:
+// its deadline is drawn only when it was missed, exactly like the first response
+const resolutionMarkers = computed(() => {
+  const resolution = milestones.value.resolution;
+  if (milestones.value.hold?.active || !resolution) return [];
+  const markers: RailMarker[] = [];
+  if (resolution.state === "breach" && resolution.eta)
+    markers.push({
+      at: resolution.eta,
+      build: () => getResolutionDueNode(resolution),
+      isDeadline: true,
+    });
+  if (resolution.timestamp)
+    markers.push({
+      at: resolution.timestamp,
+      build: () => getResolvedNode(resolution),
+      overtime: getOvertimeLabel(resolution),
+    });
+  return markers;
+});
+
 const longestWait = computed(() => {
   const waits = props.events
     .map((event) => event.wait_seconds)
@@ -217,22 +239,26 @@ const segments = computed<RailSegment[]>(() => {
     ...getEventSegments(eventsBeforeMilestone.value, created?.timestamp, null),
   ];
   if (firstResponse) result.push(...getFirstResponseSegments(firstResponse));
+  const markers = [...resolutionMarkers.value];
   if (respondedAt.value)
     result.push(
       ...getEventSegments(
         eventsAfterMilestone.value,
         respondedAt.value,
-        eventsBeforeMilestone.value.at(-1) ?? null
+        eventsBeforeMilestone.value.at(-1) ?? null,
+        markers
       )
     );
   else if (overdueDeadline.value)
     result.push(
       ...getOverdueTailSegments(
         eventsAfterMilestone.value,
-        overdueDeadline.value
+        overdueDeadline.value,
+        markers
       )
     );
-  result.push(...getEndingSegments());
+  result.push(...drainMarkers(markers, null, IDLE));
+  if (!resolutionMarkers.value.length) result.push(...getEndingSegments());
   hideRepeatedDates(result);
   preventLabelOverlap(result);
   return result;
@@ -263,7 +289,7 @@ function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
       colorClass,
       tooltip: getMilestoneTooltip(node),
       label: getLabel(
-        isSplit ? __("Responded") : __("First response"),
+        isSplit ? __("Responded late") : __("First response"),
         getMilestoneSubtitle(node)
       ),
     },
@@ -291,7 +317,7 @@ function getBreachSplitSegments(node: TimelineNode): RailSegment[] {
       width: allowed,
       duration: formatSeconds(target) || undefined,
     }),
-    getDeadlineNode(node.eta),
+    getDeadlineNode(node.eta, __("First response due")),
     getLine(RED, {
       width: 150 - allowed,
       isGrowing: true,
@@ -300,25 +326,26 @@ function getBreachSplitSegments(node: TimelineNode): RailSegment[] {
   ];
 }
 
-function getDeadlineNode(eta?: string | null): RailNode {
+// the tick carries the commitment, never the verdict: the node that follows it
+// says what actually happened, or Today says nothing has
+function getDeadlineNode(
+  eta: string | null | undefined,
+  title: string
+): RailNode {
   const node: RailNode = {
     kind: "node",
     colorClass: RED,
     isDeadline: true,
     tooltip: [],
   };
-  if (eta)
-    node.label = getLabel(
-      __("First response"),
-      __("due at {0}", formatDateTime(eta) ?? "")
-    );
+  if (eta) node.label = getLabel(title, formatDateTime(eta) ?? "");
   return node;
 }
 
 // an overdue first response has no reply node: the deadline tick opens a red
 // dashed stretch that getOverdueTailSegments closes at a Today marker
 function getOverdueStartSegments(node: TimelineNode): RailSegment[] {
-  const deadline = getDeadlineNode(node.eta);
+  const deadline = getDeadlineNode(node.eta, __("First response overdue"));
   deadline.tooltip = getMilestoneTooltip(node);
   return [
     getLine(GREEN, {
@@ -333,7 +360,8 @@ function getOverdueStartSegments(node: TimelineNode): RailSegment[] {
 // ends when an agent replies, and no agent reply can exist in this state
 function getOverdueTailSegments(
   events: TimelineEvent[],
-  deadline: string
+  deadline: string,
+  markers: RailMarker[]
 ): RailSegment[] {
   const result: RailSegment[] = [];
   let previousDay = dayjsLocal(deadline).format("MMM D");
@@ -341,6 +369,7 @@ function getOverdueTailSegments(
   for (const event of events) {
     const at = dayjsLocal(event.at);
     const day = at.format("MMM D");
+    result.push(...drainMarkers(markers, event.at, OVERDUE));
     result.push(getLine(OVERDUE, { width: 72, isGrowing: true }));
     result.push(
       getEventNode(
@@ -351,6 +380,7 @@ function getOverdueTailSegments(
     previousDay = day;
     previousYear = at.year();
   }
+  result.push(...drainMarkers(markers, null, OVERDUE));
   result.push(getLine(OVERDUE, { width: 140, isGrowing: true }));
   result.push({
     kind: "node",
@@ -361,6 +391,64 @@ function getOverdueTailSegments(
   return result;
 }
 
+// pops every marker due on or before `until` (all of them when it is null),
+// so the caller stays a plain chronological walk over its own events
+function drainMarkers(
+  markers: RailMarker[],
+  until: string | null,
+  colorClass: string
+): RailSegment[] {
+  const result: RailSegment[] = [];
+  // two markers draining together means no event fell between them
+  let isAfterDeadline = false;
+  while (
+    markers.length &&
+    (!until || !dayjsLocal(markers[0].at).isAfter(dayjsLocal(until)))
+  ) {
+    const marker = markers.shift() as RailMarker;
+    result.push(
+      isAfterDeadline && marker.overtime
+        ? getLine(RED, {
+            width: 90,
+            isGrowing: true,
+            duration: marker.overtime,
+          })
+        : getLine(colorClass, { width: 64, isGrowing: true })
+    );
+    result.push(marker.build());
+    isAfterDeadline = Boolean(marker.isDeadline);
+  }
+  return result;
+}
+
+function getResolutionDueNode(resolution: TimelineNode): RailNode {
+  return {
+    kind: "node",
+    colorClass: RED,
+    isDeadline: true,
+    tooltip: getMilestoneTooltip(resolution),
+    label: getLabel(
+      resolution.timestamp ? __("Resolution due") : __("Resolution overdue"),
+      formatDateTime(resolution.eta as string)
+    ),
+  };
+}
+
+function getResolvedNode(resolution: TimelineNode): RailNode {
+  const tooltip = getMilestoneTooltip(resolution);
+  const hold = milestones.value.hold;
+  if (hold?.badge?.text) tooltip.push(hold.badge.text);
+  return {
+    kind: "node",
+    colorClass: resolution.state === "done" ? GREEN : RED,
+    tooltip,
+    label: getLabel(
+      getResolutionTitle(resolution),
+      formatDateTime(resolution.timestamp as string)
+    ),
+  };
+}
+
 function getOvertimeLabel(node: TimelineNode): string | undefined {
   const overtime = formatSeconds((node.took ?? 0) - (node.target ?? 0));
   return overtime ? `+${overtime}` : undefined;
@@ -369,7 +457,8 @@ function getOvertimeLabel(node: TimelineNode): string | undefined {
 function getEventSegments(
   events: TimelineEvent[],
   startAt: string | null | undefined,
-  carriedEvent: TimelineEvent | null
+  carriedEvent: TimelineEvent | null,
+  markers: RailMarker[] = []
 ): RailSegment[] {
   const result: RailSegment[] = [];
   let previousEvent = carriedEvent;
@@ -380,6 +469,12 @@ function getEventSegments(
     const at = dayjsLocal(event.at);
     const day = at.format("MMM D");
     const isNewDay = day !== previousDay;
+    const drained = drainMarkers(markers, event.at, IDLE);
+    if (drained.length) {
+      result.push(...drained);
+      previousEvent = null;
+      isGroupStart = true;
+    }
     result.push(getConnectorLine(previousEvent, event, isGroupStart));
     result.push(
       getEventNode(event, isNewDay ? getDayTitle(at, previousYear) : undefined)
@@ -493,12 +588,13 @@ function getEndingSegments(): RailSegment[] {
       },
     ];
 
-  const isBreached = resolution.state === "breach";
+  // a missed deadline is drawn as a marker on the rail, so only a live
+  // countdown reaches here
   return [
-    getLine(isBreached ? OVERDUE : IDLE, { width: 120, isGrowing: true }),
+    getLine(IDLE, { width: 120, isGrowing: true }),
     {
       kind: "node",
-      colorClass: isBreached ? RED : PENDING,
+      colorClass: PENDING,
       tooltip,
       label: getLabel(__("Resolution"), getMilestoneSubtitle(resolution)),
     },
@@ -542,28 +638,40 @@ function getHoldSegments(
   return result;
 }
 
-// a label repeating the date already shown by the previous label keeps only
-// the time, e.g. "Jul 17, 10:02 am" becomes "10:02 am" and "due at Jul 17,
-// 10:02 am" becomes "due at 10:02 am"
+// a label drops whatever the rail has already established: the date when the
+// previous label shared it, so "due at Jul 17, 10:02 am" becomes "due at 10:02
+// am", and the year until it changes, so only the first 2025 label carries it
 function hideRepeatedDates(segments: RailSegment[]): void {
   let previousDay = "";
+  let previousYear = String(dayjsLocal().year());
   for (const segment of segments) {
     if (segment.kind !== "node" || !segment.label) continue;
     if (!segment.label.isMilestone) {
-      previousDay = segment.label.title || previousDay;
+      const [, day, year] =
+        segment.label.title?.match(/^(\w{3} \d{1,2})(?:, (\d{4}))?$/) ?? [];
+      previousDay = day || segment.label.title || previousDay;
+      if (year) previousYear = year;
       continue;
     }
-    const [, prefix, day, time] =
+    const [, prefix, day, year, time] =
       segment.label.subtitle?.match(
-        /^(.*?)(\w{3} \d{1,2}(?:, \d{4})?), (.+)$/
+        /^(.*?)(\w{3} \d{1,2})(?:, (\d{4}))?, (.+)$/
       ) ?? [];
     if (!day || !time) {
       // a bare date like the Today marker still breaks the run
       previousDay = segment.label.subtitle || previousDay;
       continue;
     }
-    if (day === previousDay) segment.label.subtitle = prefix + time;
-    else previousDay = day;
+    const isNewYear = Boolean(year) && year !== previousYear;
+    if (year) previousYear = year;
+    if (day === previousDay && !isNewYear) {
+      segment.label.subtitle = prefix + time;
+      continue;
+    }
+    previousDay = day;
+    segment.label.subtitle = isNewYear
+      ? `${prefix}${day}, ${year}, ${time}`
+      : `${prefix}${day}, ${time}`;
   }
 }
 
