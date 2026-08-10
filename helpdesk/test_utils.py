@@ -171,6 +171,18 @@ def make_ticket(
     return ticket
 
 
+def other_priority(current: str) -> str:
+    """A priority different from `current`."""
+    return "Urgent" if current != "Urgent" else "Low"
+
+
+def get_customer_ticket(email: str):
+    """Make a ticket and return it as the customer `email` sees it."""
+    ticket = make_ticket(raised_by=email)
+    frappe.set_user(email)
+    return frappe.get_doc("HD Ticket", ticket.name)
+
+
 def create_agent(
     email: str, first_name: str | None = None, last_name: str | None = None
 ):

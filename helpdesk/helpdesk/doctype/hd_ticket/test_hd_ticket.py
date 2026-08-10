@@ -27,12 +27,14 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     get_current_week_monday,
+    get_customer_ticket,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_priority,
     make_sla,
     make_status,
     make_ticket,
+    other_priority,
     remove_holidays,
     set_ticket_status_and_communication_date,
     update_role_in_customer,
@@ -2299,20 +2301,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    @staticmethod
-    def other_priority(current):
-        return "Urgent" if current != "Urgent" else "Low"
-
-    def get_customer_ticket(self):
-        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
-        frappe.set_user(PERMS_CUSTOMER)
-        return frappe.get_doc("HD Ticket", ticket.name)
-
     def test_customer_cannot_write_agent_fields(self):
-        ticket = self.get_customer_ticket()
+        ticket = get_customer_ticket(PERMS_CUSTOMER)
         original_priority = ticket.priority
         original_response_by = ticket.response_by
-        ticket.priority = self.other_priority(original_priority)
+        ticket.priority = other_priority(original_priority)
         ticket.response_by = now_datetime()
         ticket.save()
         ticket.reload()
@@ -2320,7 +2313,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.response_by, original_response_by)
 
     def test_customer_can_write_allowed_fields(self):
-        ticket = self.get_customer_ticket()
+        ticket = get_customer_ticket(PERMS_CUSTOMER)
         ticket.subject = "Updated by customer"
         ticket.description = "Updated description"
         ticket.save()
@@ -2332,7 +2325,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         frappe.set_user(PERMS_AGENT)
         ticket = frappe.get_doc("HD Ticket", ticket.name)
-        new_priority = self.other_priority(ticket.priority)
+        new_priority = other_priority(ticket.priority)
         ticket.priority = new_priority
         ticket.save()
         ticket.reload()
@@ -2354,7 +2347,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 **get_ticket_obj(),
                 "raised_by": PERMS_OTHER_CUSTOMER,
                 "contact": other_contact,
-                "priority": self.other_priority(baseline.priority),
+                "priority": other_priority(baseline.priority),
             }
         ).insert()
         self.assertEqual(spoofed.raised_by, PERMS_CUSTOMER)
@@ -2477,12 +2470,12 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             {
                 **get_ticket_obj(),
                 "template": template.name,
-                "priority": self.other_priority(default_priority),
+                "priority": other_priority(default_priority),
                 "status_category": "Resolved",
             }
         ).insert()
         # exposable creation-form field is honored, internal field stays locked
-        self.assertEqual(ticket.priority, self.other_priority(default_priority))
+        self.assertEqual(ticket.priority, other_priority(default_priority))
         self.assertEqual(ticket.status_category, "Open")
 
     def test_customer_cannot_read_internal_fields(self):
