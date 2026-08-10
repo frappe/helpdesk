@@ -495,7 +495,7 @@ function getEndingSegments(): RailSegment[] {
 
   const isBreached = resolution.state === "breach";
   return [
-    getLine(IDLE, { width: 120, isGrowing: true }),
+    getLine(isBreached ? OVERDUE : IDLE, { width: 120, isGrowing: true }),
     {
       kind: "node",
       colorClass: isBreached ? RED : PENDING,
@@ -557,7 +557,11 @@ function hideRepeatedDates(segments: RailSegment[]): void {
       segment.label.subtitle?.match(
         /^(.*?)(\w{3} \d{1,2}(?:, \d{4})?), (.+)$/
       ) ?? [];
-    if (!day || !time) continue;
+    if (!day || !time) {
+      // a bare date like the Today marker still breaks the run
+      previousDay = segment.label.subtitle || previousDay;
+      continue;
+    }
     if (day === previousDay) segment.label.subtitle = prefix + time;
     else previousDay = day;
   }
