@@ -54,24 +54,49 @@ class HDTicketTemplate(Document):
 
     def on_update(self):
         capture_event("ticket_template_updated")
-        self.protect_hidden_custom_fields()
+        self.sync_custom_field_permlevels()
 
-    def protect_hidden_custom_fields(self):
-        """Raise custom fields hidden from customers to permlevel 2 so they
-        can neither read nor write them."""
+    def sync_custom_field_permlevels(self):
+        """Hidden fields rise to permlevel 2 (customers can neither read nor
+        write); fields no longer hidden in any template drop back to 0."""
+        if not self.fields:
+            return
+        custom_fields = frappe.get_all(
+            "Custom Field",
+            filters={
+                "dt": "HD Ticket",
+                "fieldname": ["in", [f.fieldname for f in self.fields]],
+            },
+            fields=["name", "fieldname", "permlevel"],
+        )
+        hidden = {f.fieldname for f in self.fields if f.hide_from_customer}
         changed = False
-        for f in self.fields:
-            if not f.hide_from_customer:
-                continue
-            custom_field = frappe.db.get_value(
-                "Custom Field",
-                {"dt": "HD Ticket", "fieldname": f.fieldname, "permlevel": ["<", 2]},
-            )
-            if custom_field:
-                frappe.db.set_value("Custom Field", custom_field, "permlevel", 2)
+        for custom_field in custom_fields:
+            if custom_field.fieldname in hidden:
+                if custom_field.permlevel < 2:
+                    frappe.db.set_value(
+                        "Custom Field", custom_field.name, "permlevel", 2
+                    )
+                    changed = True
+            elif custom_field.permlevel == 2 and not self.hidden_in_another_template(
+                custom_field.fieldname
+            ):
+                frappe.db.set_value("Custom Field", custom_field.name, "permlevel", 0)
                 changed = True
         if changed:
             frappe.clear_cache(doctype="HD Ticket")
+
+    def hidden_in_another_template(self, fieldname: str) -> bool:
+        return bool(
+            frappe.db.exists(
+                "HD Ticket Template Field",
+                {
+                    "fieldname": fieldname,
+                    "hide_from_customer": 1,
+                    "parent": ["!=", self.name],
+                },
+            )
+        )
 
     def on_trash(self):
         self.prevent_default_delete()

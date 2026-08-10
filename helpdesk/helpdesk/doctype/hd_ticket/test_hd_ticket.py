@@ -2408,6 +2408,30 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 }
             ).insert()
             self.assertFalse(hidden.get(fieldname))
+
+            # unhiding drops the field back to permlevel 0
+            frappe.set_user("Administrator")
+            template.reload()
+            template.fields[0].hide_from_customer = 0
+            template.save()
+            self.assertEqual(
+                frappe.db.get_value(
+                    "Custom Field",
+                    {"dt": "HD Ticket", "fieldname": fieldname},
+                    "permlevel",
+                ),
+                0,
+            )
+
+            frappe.set_user(PERMS_CUSTOMER)
+            visible_again = frappe.get_doc(
+                {
+                    **get_ticket_obj(),
+                    "template": template.name,
+                    fieldname: "customer value again",
+                }
+            ).insert()
+            self.assertEqual(visible_again.get(fieldname), "customer value again")
         finally:
             frappe.set_user("Administrator")
             frappe.db.delete("HD Ticket", {"template": template.name})
