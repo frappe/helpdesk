@@ -54,32 +54,6 @@ class HDTicketTemplate(Document):
 
     def on_update(self):
         capture_event("ticket_template_updated")
-        self.warn_about_unprotected_hidden_fields()
-
-    def warn_about_unprotected_hidden_fields(self):
-        """Hiding only removes a field from the customer form. Custom field
-        permlevels stay under the administrator's control, so point out the
-        hidden fields the API still exposes."""
-        hidden = [f.fieldname for f in self.fields if f.hide_from_customer]
-        if not hidden:
-            return
-        unprotected = frappe.get_all(
-            "Custom Field",
-            filters={"dt": "HD Ticket", "fieldname": ["in", hidden], "permlevel": 0},
-            pluck="label",
-        )
-        if not unprotected:
-            return
-        frappe.msgprint(
-            _(
-                "Hiding removes these fields from the customer form, but"
-                " customers can still read and write them through the API:"
-                " {0}. To protect them, set a permission level on the custom"
-                " field in Customize Form."
-            ).format(", ".join(unprotected)),
-            title=_("Hidden fields are not protected"),
-            indicator="orange",
-        )
 
     def on_trash(self):
         self.prevent_default_delete()
