@@ -2437,6 +2437,86 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 force=True,
             )
 
+    @staticmethod
+    def custom_field_permlevel(fieldname):
+        return frappe.db.get_value(
+            "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
+        )
+
+    def test_independent_permlevel_survives_template_save(self):
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_independent"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": fieldname, "label": "Perms Independent", "fieldtype": "Data"},
+        )
+        try:
+            frappe.db.set_value(
+                "Custom Field",
+                {"dt": "HD Ticket", "fieldname": fieldname},
+                "permlevel",
+                2,
+            )
+            template = frappe.get_doc(
+                {
+                    "doctype": "HD Ticket Template",
+                    "template_name": "Perms Independent Template",
+                    "fields": [{"fieldname": fieldname, "hide_from_customer": 0}],
+                }
+            ).insert()
+            template.save()
+            # visible in the template, but never hidden by it: stays protected
+            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
+        finally:
+            frappe.delete_doc(
+                "HD Ticket Template", "Perms Independent Template", force=True
+            )
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+
+    def test_template_delete_releases_hidden_fields(self):
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_released"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": fieldname, "label": "Perms Released", "fieldtype": "Data"},
+        )
+        try:
+            frappe.get_doc(
+                {
+                    "doctype": "HD Ticket Template",
+                    "template_name": "Perms Released Template",
+                    "fields": [{"fieldname": fieldname, "hide_from_customer": 1}],
+                }
+            ).insert()
+            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
+
+            frappe.delete_doc(
+                "HD Ticket Template", "Perms Released Template", force=True
+            )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 0)
+        finally:
+            frappe.delete_doc(
+                "HD Ticket Template",
+                "Perms Released Template",
+                force=True,
+                ignore_missing=True,
+            )
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+
     def test_portal_activity_stamps_last_customer_response(self):
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(get_ticket_obj()).insert()
