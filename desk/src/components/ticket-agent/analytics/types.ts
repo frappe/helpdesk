@@ -4,19 +4,15 @@ export interface TimelineBadge {
 }
 
 export interface TimelineNode {
-  key: "created" | "first_response" | "hold" | "exchanges" | "resolution";
+  key: "created" | "first_response" | "hold" | "resolution";
   state: "done" | "breach" | "pending" | "hold";
   timestamp: string | null;
   badge: TimelineBadge | null;
   eta?: string | null;
   took?: number | null;
   target?: number | null;
-  leg_label?: string;
-  progress?: number | null;
   active?: boolean;
   window?: { start: string; end: string | null } | null;
-  count?: number;
-  range?: string;
 }
 
 export interface TimelineEvent {
@@ -37,7 +33,7 @@ export interface AnalyticsSummary {
   customer_messages: number;
   agent_messages: number;
   internal_comments: number;
-  agents_involved: { user: string; full_name: string }[];
+  agents_involved: string[];
   churn: { sla_changes: number; team_changes: number };
 }
 
@@ -46,7 +42,6 @@ export interface TicketAnalytics {
   timeline: TimelineNode[];
   metrics: AnalyticsMetrics;
   events: TimelineEvent[];
-  first_response_target: number | null;
   summary: AnalyticsSummary;
 }
 

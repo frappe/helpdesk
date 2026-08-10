@@ -1,6 +1,7 @@
 import json
 
 import frappe
+from frappe.desk.form import assign_to
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date
 
@@ -70,15 +71,25 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(summary["customer_messages"], 2)
         self.assertEqual(summary["agent_messages"], 3)
         self.assertEqual(summary["internal_comments"], 1)
-        self.assertEqual(
-            [a["user"] for a in summary["agents_involved"]], [AGENT, AGENT_TWO]
+        self.assertEqual(summary["agents_involved"], [AGENT, AGENT_TWO])
+
+    def test_agents_involved_includes_assignees_who_never_replied(self):
+        ticket = self.make_high_ticket()
+        with self.freeze_time(add_to_date(self.monday, hours=1)):
+            add_message(ticket.name, "Sent", AGENT)
+        # AGENT replied and is assigned; AGENT_TWO only holds the assignment
+        assign_to.add(
+            {
+                "doctype": "HD Ticket",
+                "name": ticket.name,
+                "assign_to": [AGENT, AGENT_TWO],
+            }
         )
 
-        exchanges = timeline_node(result, "exchanges")
-        self.assertEqual(exchanges["count"], 5)
-        # same-day conversations collapse to a single date
-        self.assertTrue(exchanges["range"])
-        self.assertNotIn("–", exchanges["range"])
+        involved = get_ticket_analytics(ticket.name)["summary"]["agents_involved"]
+
+        # repliers keep their conversation order, assignees follow
+        self.assertEqual(involved, [AGENT, AGENT_TWO])
 
     def test_weekend_gap_counts_business_hours_only(self):
         friday = add_to_date(self.monday, days=4, hours=6)
@@ -117,7 +128,6 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertFalse(result["has_sla"])
         # 19:00 to 20:30 is outside business hours; wall-clock still counts it
         self.assertEqual(result["metrics"]["avg_agent_gap"], 5400)
-        self.assertIsNone(result["first_response_target"])
         first_response = timeline_node(result, "first_response")
         self.assertEqual(first_response["state"], "done")
         self.assertEqual(first_response["badge"]["text"], "Responded in 1h 30m")
@@ -127,7 +137,7 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertIsNone(resolution["eta"])
         self.assertIsNone(resolution["badge"])
 
-    def test_open_ticket_pending_progress(self):
+    def test_open_ticket_pending_milestones(self):
         ticket = self.make_high_ticket()
         with self.freeze_time(add_to_date(self.monday, minutes=30)):
             result = get_ticket_analytics(ticket.name)
@@ -135,15 +145,12 @@ class TestTicketAnalytics(FrappeTestCase):
         first_response = timeline_node(result, "first_response")
         self.assertEqual(first_response["state"], "pending")
         self.assertEqual(first_response["eta"], ticket.response_by)
-        self.assertAlmostEqual(first_response["progress"], 0.5)
         self.assertEqual(first_response["took"], 1800)
         self.assertEqual(first_response["target"], 3600)
 
         resolution = timeline_node(result, "resolution")
         self.assertEqual(resolution["state"], "pending")
-        self.assertAlmostEqual(resolution["progress"], 1800 / 14400)
         self.assertIsNone(timeline_node(result, "hold"))
-        self.assertIsNone(timeline_node(result, "exchanges"))
 
     def test_unresponded_past_due_is_overdue_breach(self):
         ticket = self.make_high_ticket()
@@ -153,7 +160,7 @@ class TestTicketAnalytics(FrappeTestCase):
         first_response = timeline_node(result, "first_response")
         self.assertEqual(first_response["state"], "breach")
         self.assertEqual(first_response["badge"]["text"], "Overdue by 1h")
-        self.assertAlmostEqual(first_response["progress"], 0.5)
+        self.assertEqual(first_response["took"], 7200)
 
     def test_first_response_within_sla(self):
         ticket = self.make_high_ticket()
@@ -172,7 +179,6 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(first_response["badge"]["tone"], "green")
         self.assertEqual(first_response["took"], 1800)
         self.assertEqual(first_response["target"], 3600)
-        self.assertEqual(first_response["leg_label"], "took 30m · 1h target")
 
     def test_fulfilled_duration_survives_sla_reapply(self):
         # an SLA change stamps a new service_level_agreement_creation that can
@@ -194,7 +200,7 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(first_response["took"], 1800)
         self.assertEqual(first_response["badge"]["text"], "Fulfilled in 30m")
 
-    def test_first_response_breach_progress(self):
+    def test_first_response_breach(self):
         ticket = self.make_high_ticket()
         ticket.reload()
         with self.freeze_time(add_to_date(self.monday, hours=2)):
@@ -207,7 +213,6 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(first_response["badge"]["text"], "Failed by 1h")
         self.assertEqual(first_response["took"], 7200)
         self.assertEqual(first_response["target"], 3600)
-        self.assertAlmostEqual(first_response["progress"], 0.5)
 
     def test_resolution_with_spare(self):
         ticket = self.make_high_ticket()
@@ -236,7 +241,6 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(resolution["state"], "breach")
         self.assertEqual(resolution["badge"]["text"], "Failed by 4h")
         self.assertEqual(resolution["took"], 28800)
-        self.assertAlmostEqual(resolution["progress"], 0.5)
 
     def test_hold_live_then_resumed_window(self):
         ticket = self.make_high_ticket()
@@ -271,6 +275,24 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(result["metrics"]["hold_time"], 3600)
         self.assertEqual(hold["window"]["start"], pause_at)
         self.assertEqual(hold["window"]["end"], resume_at)
+
+    def test_agent_gap_excludes_paused_time(self):
+        # description at 10:00, paused 10:30-11:00, agent reply at 11:30:
+        # the 1h30m raw gap loses the 30m the SLA clock was stopped
+        ticket = self.make_high_ticket()
+        ticket.reload()
+        with self.freeze_time(add_to_date(self.monday, minutes=30)):
+            ticket.status = "Replied"
+            ticket.save(ignore_version=False)
+        ticket.reload()
+        with self.freeze_time(add_to_date(self.monday, hours=1)):
+            ticket.status = "Open"
+            ticket.save(ignore_version=False)
+        with self.freeze_time(add_to_date(self.monday, hours=1, minutes=30)):
+            add_message(ticket.name, "Sent", AGENT)
+
+        result = get_ticket_analytics(ticket.name)
+        self.assertEqual(result["metrics"]["avg_agent_gap"], 3600)
 
     def test_closed_without_resolution(self):
         ticket = self.make_high_ticket()
