@@ -1,16 +1,18 @@
 <template>
-  <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+  <div class="flex flex-col gap-4">
     <div
       v-for="card in cards"
       :key="card.label"
-      class="flex flex-col gap-2 rounded-lg border border-outline-gray-1 bg-surface-white p-4"
+      class="flex flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-base p-4"
     >
-      <span class="text-base text-ink-gray-5">{{ card.label }}</span>
-      <span class="text-xl font-medium tabular-nums text-ink-gray-8">
+      <div class="flex items-center gap-1.5">
+        <span class="text-base text-ink-gray-5">{{ card.label }}</span>
+        <Tooltip :text="card.description">
+          <LucideInfo class="size-3.5 text-ink-gray-5" />
+        </Tooltip>
+      </div>
+      <span class="text-lg-medium text-ink-gray-8">
         {{ card.value ?? "–" }}
-      </span>
-      <span class="text-p-sm leading-snug text-ink-gray-5">
-        {{ card.description }}
       </span>
     </div>
   </div>
@@ -18,26 +20,28 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
+import { Tooltip } from "frappe-ui";
 import { computed } from "vue";
+import LucideInfo from "~icons/lucide/info";
 import { AnalyticsMetrics, formatSeconds } from "./types";
 
 const props = defineProps<{ metrics: AnalyticsMetrics }>();
 
 const cards = computed(() => [
   {
-    label: __("Avg agent response gap"),
+    label: __("Avg. agent response gap"),
     value: formatSeconds(props.metrics.avg_agent_gap),
     description: __("Average time to reply after a customer message"),
   },
   {
-    label: __("Time to resolution"),
-    value: formatSeconds(props.metrics.resolution_time),
-    description: __("Working time from ticket open to resolved"),
+    label: __("Avg. customer response gap"),
+    value: formatSeconds(props.metrics.avg_customer_gap),
+    description: __("Average time the customer took to reply to an agent"),
   },
   {
-    label: __("Longest agent silence"),
-    value: formatSeconds(props.metrics.longest_agent_silence),
-    description: __("Worst single gap where the customer was waiting"),
+    label: __("Total hold time"),
+    value: formatSeconds(props.metrics.hold_time),
+    description: __("Time on hold with the SLA clock paused"),
   },
 ]);
 </script>

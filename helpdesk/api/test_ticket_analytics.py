@@ -72,15 +72,21 @@ class TestTicketAnalytics(FrappeTestCase):
 
         result = get_ticket_analytics(ticket.name)
 
-        self.assertEqual([g["gap_seconds"] for g in result["gaps"]], [3600, 7200])
+        # the description and the first Sent (= first response) render as
+        # milestones, so events start at the follow-up; its gap still counts
+        events = result["events"]
+        self.assertEqual([e["side"] for e in events], ["agent", "customer", "agent"])
+        self.assertEqual([e["wait_seconds"] for e in events], [None, None, 7200])
+        self.assertEqual(events[0]["sender"], AGENT)
+        self.assertTrue(events[0]["sender_name"])
         self.assertEqual(result["metrics"]["avg_agent_gap"], 5400)
-        self.assertEqual(result["metrics"]["longest_agent_silence"], 7200)
-        self.assertIsNone(result["metrics"]["resolution_time"])
+        # only Sent->Received hand-off: the 1h30m follow-up to the 2h reply
+        self.assertEqual(result["metrics"]["avg_customer_gap"], 1800)
+        self.assertIsNone(result["metrics"]["hold_time"])
 
         summary = result["summary"]
         self.assertEqual(summary["customer_messages"], 2)
         self.assertEqual(summary["agent_messages"], 3)
-        self.assertEqual(summary["total_exchanges"], 5)
         self.assertEqual(summary["internal_comments"], 1)
         self.assertEqual(
             [a["user"] for a in summary["agents_involved"]], [AGENT, AGENT_TWO]
@@ -101,8 +107,10 @@ class TestTicketAnalytics(FrappeTestCase):
             add_message(ticket.name, "Sent", AGENT)
 
         result = get_ticket_analytics(ticket.name)
-        # Fri 17:00-18:00 + Mon 10:00-11:00
-        self.assertEqual(result["gaps"][0]["gap_seconds"], 7200)
+        # Fri 17:00-18:00 + Mon 10:00-11:00; the reply is the first response,
+        # so its gap surfaces through metrics rather than an event
+        self.assertEqual(result["metrics"]["avg_agent_gap"], 7200)
+        self.assertEqual([e["side"] for e in result["events"]], ["customer"])
 
     def test_no_sla_falls_back_to_wall_clock(self):
         # every ticket save re-selects an SLA, so clear the fields after the last write
@@ -126,7 +134,7 @@ class TestTicketAnalytics(FrappeTestCase):
 
         self.assertFalse(result["has_sla"])
         # 19:00 to 20:30 is outside business hours; wall-clock still counts it
-        self.assertEqual(result["gaps"][0]["gap_seconds"], 5400)
+        self.assertEqual(result["metrics"]["avg_agent_gap"], 5400)
         self.assertIsNone(result["first_response_target"])
         first_response = node(result, "first_response")
         self.assertEqual(first_response["state"], "done")
@@ -171,14 +179,38 @@ class TestTicketAnalytics(FrappeTestCase):
         with self.freeze_time(add_to_date(self.monday, minutes=30)):
             ticket.status = "Replied"
             ticket.save()
+        with self.freeze_time(add_to_date(self.monday, minutes=45)):
+            add_message(ticket.name, "Sent", AGENT)
         result = get_ticket_analytics(ticket.name)
 
+        # description and first response render as milestones, not events
+        self.assertEqual(result["events"], [])
         first_response = node(result, "first_response")
         self.assertEqual(first_response["state"], "done")
         self.assertEqual(first_response["badge"]["tone"], "green")
         self.assertEqual(first_response["took"], 1800)
         self.assertEqual(first_response["target"], 3600)
         self.assertEqual(first_response["leg_label"], "took 30m · 1h target")
+
+    def test_fulfilled_duration_survives_sla_reapply(self):
+        # an SLA change stamps a new service_level_agreement_creation that can
+        # postdate the response; the duration must not clamp to zero (it falls
+        # back to wall clock from creation, mirroring the sidebar)
+        ticket = self.make_high_ticket()
+        frappe.db.set_value(
+            "HD Ticket",
+            ticket.name,
+            {
+                "first_responded_on": add_to_date(self.monday, minutes=30),
+                "first_response_time": 0,
+                "service_level_agreement_creation": add_to_date(self.monday, days=2),
+            },
+        )
+        result = get_ticket_analytics(ticket.name)
+
+        first_response = node(result, "first_response")
+        self.assertEqual(first_response["took"], 1800)
+        self.assertEqual(first_response["badge"]["text"], "Fulfilled in 30m")
 
     def test_first_response_breach_progress(self):
         ticket = self.make_high_ticket()
@@ -208,7 +240,6 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(resolution["badge"]["text"], "3h 30m to spare")
         self.assertEqual(resolution["took"], 1800)
         self.assertEqual(resolution["target"], 14400)
-        self.assertEqual(result["metrics"]["resolution_time"], 1800)
 
     def test_resolution_breach(self):
         ticket = self.make_high_ticket()
@@ -238,6 +269,7 @@ class TestTicketAnalytics(FrappeTestCase):
             hold = node(result, "hold")
             self.assertTrue(hold["active"])
             self.assertEqual(hold["badge"]["text"], "30m paused")
+            self.assertEqual(result["metrics"]["hold_time"], 1800)
             self.assertEqual(hold["window"]["start"], pause_at)
             self.assertIsNone(hold["window"]["end"])
             resolution = node(result, "resolution")
@@ -254,6 +286,7 @@ class TestTicketAnalytics(FrappeTestCase):
         hold = node(result, "hold")
         self.assertFalse(hold["active"])
         self.assertEqual(hold["badge"]["text"], "1h paused")
+        self.assertEqual(result["metrics"]["hold_time"], 3600)
         self.assertEqual(hold["window"]["start"], pause_at)
         self.assertEqual(hold["window"]["end"], resume_at)
 
@@ -286,21 +319,10 @@ class TestTicketAnalytics(FrappeTestCase):
             ticket.agent_group = team.name
             # tests default to ignore_version, which would hide the diffs churn reads
             ticket.save(ignore_version=False)
-        for user in (AGENT, AGENT_TWO):
-            frappe.get_doc(
-                {
-                    "doctype": "ToDo",
-                    "allocated_to": user,
-                    "reference_type": "HD Ticket",
-                    "reference_name": ticket.name,
-                    "description": "Analytics test",
-                }
-            ).insert(ignore_permissions=True)
 
         churn = get_ticket_analytics(ticket.name)["summary"]["churn"]
         self.assertEqual(churn["sla_changes"], 1)
         self.assertEqual(churn["team_changes"], 1)
-        self.assertEqual(churn["reassignments"], 1)
 
     def test_non_agent_is_rejected(self):
         ticket = self.make_high_ticket()

@@ -42,13 +42,13 @@ def get_ticket_analytics(ticket: str) -> dict:
 
     working_seconds = working_seconds_fn(details.sla)
     messages = conversation(ticket)
-    agent_gaps = gap_series(messages, working_seconds)
+    events, gaps = event_series(messages, details, working_seconds)
     versions = version_changes(ticket)
     return {
         "has_sla": bool(details.sla),
         "timeline": build_timeline(details, working_seconds, messages, versions),
-        "metrics": compute_metrics(agent_gaps, details, working_seconds),
-        "gaps": agent_gaps,
+        "metrics": compute_metrics(gaps, details, working_seconds),
+        "events": events,
         "first_response_target": first_response_target(details, working_seconds),
         "summary": summary(ticket, messages, versions),
     }
@@ -89,49 +89,97 @@ def conversation(ticket: str) -> list[frappe._dict]:
     )
 
 
-def gap_series(
-    messages: list[frappe._dict], working_seconds: WorkingSeconds
-) -> list[dict]:
-    """Direction-flip walk: each Received->Sent flip is an agent response gap."""
-    agent_gaps = []
+def event_series(
+    messages: list[frappe._dict],
+    details: frappe._dict,
+    working_seconds: WorkingSeconds,
+) -> tuple[list[dict], dict[str, list[int]]]:
+    """Conversation as timeline rail events plus the hand-off gap series per
+    side. The description message and the first response are left out of events
+    (they render as the created / first response milestones) but still feed the
+    walk."""
+    events = []
+    gaps: dict[str, list[int]] = {"agent": [], "customer": []}
+    names: dict[str, str] = {}
     previous = None
-    for message in messages:
+    first_sent_seen = False
+    for index, message in enumerate(messages):
+        wait = None
         if (
             previous
             and previous.sent_or_received == "Received"
             and message.sent_or_received == "Sent"
         ):
-            agent_gaps.append(
+            wait = working_seconds(previous.creation, message.creation) or 0
+            gaps["agent"].append(wait)
+        elif (
+            previous
+            and previous.sent_or_received == "Sent"
+            and message.sent_or_received == "Received"
+        ):
+            gaps["customer"].append(
+                working_seconds(previous.creation, message.creation) or 0
+            )
+        is_first_response = (
+            message.sent_or_received == "Sent"
+            and not first_sent_seen
+            and bool(details.first_responded_on)
+        )
+        if message.sent_or_received == "Sent":
+            first_sent_seen = True
+        if not is_description(index, message, details) and not is_first_response:
+            if message.sender not in names:
+                names[message.sender] = frappe.utils.get_fullname(message.sender)
+            events.append(
                 {
-                    "replied_at": message.creation,
-                    "agent": message.sender,
-                    "gap_seconds": working_seconds(previous.creation, message.creation)
-                    or 0,
+                    "side": (
+                        "customer"
+                        if message.sent_or_received == "Received"
+                        else "agent"
+                    ),
+                    "at": message.creation,
+                    "sender": message.sender,
+                    "sender_name": names[message.sender],
+                    "wait_seconds": wait,
                 }
             )
         previous = message
-    return agent_gaps
+    return events, gaps
+
+
+def is_description(index: int, message: frappe._dict, details: frappe._dict) -> bool:
+    """The auto-created description Communication lands within seconds of the ticket."""
+    return (
+        index == 0
+        and message.sent_or_received == "Received"
+        and (elapsed(details.creation, message.creation) or 0) <= 60
+    )
 
 
 def compute_metrics(
-    agent_gaps: list[dict], details: frappe._dict, working_seconds: WorkingSeconds
+    gaps: dict[str, list[int]], details: frappe._dict, working_seconds: WorkingSeconds
 ) -> dict:
-    gaps = [row["gap_seconds"] for row in agent_gaps]
     return {
-        "avg_agent_gap": average(gaps),
-        "resolution_time": resolution_seconds(details, working_seconds),
-        "longest_agent_silence": max(gaps) if gaps else None,
+        "avg_agent_gap": average(gaps["agent"]),
+        "avg_customer_gap": average(gaps["customer"]),
+        "hold_time": hold_seconds(details, working_seconds) or None,
     }
 
 
-def resolution_seconds(
-    details: frappe._dict, working_seconds: WorkingSeconds
-) -> int | None:
+def hold_seconds(details: frappe._dict, working_seconds: WorkingSeconds) -> int:
+    """Accumulated pause time, including the running pause on an active hold."""
+    paused = cint(details.total_hold_time)
+    if details.status_category == "Paused" and details.on_hold_since:
+        paused += working_seconds(details.on_hold_since, now_datetime()) or 0
+    return paused
+
+
+def resolution_seconds(details: frappe._dict) -> int | None:
     if not details.resolution_date:
         return None
-    start = details.service_level_agreement_creation or details.creation
-    return cint(details.resolution_time) or working_seconds(
-        start, details.resolution_date
+    # same fallback rule as useSLA.ts, see first_response_node
+    return cint(details.resolution_time) or elapsed(
+        details.creation, details.resolution_date
     )
 
 
@@ -157,7 +205,6 @@ def summary(
     return {
         "customer_messages": customer,
         "agent_messages": len(messages) - customer,
-        "total_exchanges": len(messages),
         "internal_comments": frappe.db.count(
             "HD Ticket Comment", {"reference_ticket": ticket}
         ),
@@ -165,29 +212,16 @@ def summary(
             {"user": user, "full_name": frappe.utils.get_fullname(user)}
             for user in agents
         ],
-        "churn": churn(ticket, versions),
+        "churn": churn(versions),
     }
 
 
-def churn(ticket: str, versions: list[frappe._dict]) -> dict:
-    """Routing churn from Version diffs and assignment history. Reassignments follow the
-    assignee-stations model (distinct assignees - 1), so simultaneous multi-assignee
-    tickets inflate the count slightly; acceptable for v1."""
+def churn(versions: list[frappe._dict]) -> dict:
+    """Routing churn from Version field diffs recorded by track_changes."""
     changed = [field for version in versions for field, old, new in version.changed]
-    assignees = {
-        row.allocated_to
-        for row in frappe.get_list(
-            "ToDo",
-            filters={"reference_type": "HD Ticket", "reference_name": ticket},
-            fields=["allocated_to"],
-            ignore_permissions=True,
-        )
-        if row.allocated_to
-    }
     return {
         "sla_changes": changed.count("sla"),
         "team_changes": changed.count("agent_group"),
-        "reassignments": max(0, len(assignees) - 1),
     }
 
 
@@ -227,10 +261,12 @@ def build_timeline(
         },
         first_response_node(details, working_seconds),
     ]
-    if hold := hold_node(details, working_seconds, versions):
-        nodes.append(hold)
     if exchanges := exchanges_node(messages):
         nodes.append(exchanges)
+    # hold is a cumulative summary, not a point event; it sits before
+    # resolution so the dashed leg reads "the clock to resolution stopped"
+    if hold := hold_node(details, working_seconds, versions):
+        nodes.append(hold)
     nodes.append(resolution_node(details, working_seconds))
     return nodes
 
@@ -245,11 +281,15 @@ def first_response_node(details: frappe._dict, working_seconds: WorkingSeconds) 
     }
 
     if details.first_responded_on:
-        took = cint(details.first_response_time) or working_seconds(
-            start, details.first_responded_on
+        # mirrors useSLA.ts: the engine-recorded working-hours duration, else
+        # wall clock from creation; sla_creation can postdate the response when
+        # the SLA was re-applied, which would clamp the duration to 0
+        took = cint(details.first_response_time) or elapsed(
+            details.creation, details.first_responded_on
         )
         failed_by = cint(details.first_response_failed_by)
         if failed_by:
+            node["eta"] = details.response_by
             return milestone(node, "breach", took, max(took - failed_by, 0), failed_by)
         if target is None:
             return {
@@ -270,9 +310,10 @@ def resolution_node(details: frappe._dict, working_seconds: WorkingSeconds) -> d
     node = {"key": "resolution", "timestamp": details.resolution_date, "eta": None}
 
     if details.resolution_date:
-        took = resolution_seconds(details, working_seconds)
+        took = resolution_seconds(details)
         failed_by = cint(details.resolution_failed_by)
         if failed_by:
+            node["eta"] = details.resolution_by
             return milestone(node, "breach", took, max(took - failed_by, 0), failed_by)
         spare = working_seconds(details.resolution_date, details.resolution_by)
         if spare is None:
@@ -311,7 +352,7 @@ def milestone(
         text, tone = f"Failed by {fmt(failed_by)}", "red"
         progress = target / (target + failed_by) if target + failed_by else 0
     else:
-        text, tone = badge_text or f"Within SLA · {fmt(target)} target", "green"
+        text, tone = badge_text or f"Fulfilled in {fmt(took)}", "green"
         progress = None
     return {
         **node,
@@ -332,13 +373,21 @@ def pending_milestone(
     now = now_datetime()
     target = working_seconds(start, due_by) or 0
     spent = working_seconds(start, now) or 0
-    if spent > target:
-        overdue = spent - target
+    # countdowns are wall-clock on minute boundaries, exactly like the sidebar
+    # SLA panel (useSLA coarseDuration); measurements (elapsed/target legs)
+    # stay in working hours
+    remaining = int(
+        (
+            due_by.replace(second=0, microsecond=0)
+            - now.replace(second=0, microsecond=0)
+        ).total_seconds()
+    )
+    if remaining < 0:
         return {
             **node,
             "state": "breach",
             "eta": due_by,
-            "badge": badge(f"Overdue by {fmt(overdue)}", "red"),
+            "badge": badge(f"Overdue by {fmt(-remaining)}", "red"),
             "took": spent,
             "target": target,
             "leg_label": f"{fmt(spent)} elapsed · {fmt(target)} target",
@@ -348,7 +397,7 @@ def pending_milestone(
         **node,
         "state": "pending",
         "eta": due_by,
-        "badge": None,
+        "badge": badge(f"Due in {fmt(remaining)}", "gray"),
         "took": spent,
         "target": target,
         "leg_label": f"{fmt(spent)} elapsed · {fmt(target)} target",
@@ -360,9 +409,7 @@ def hold_node(
     details: frappe._dict, working_seconds: WorkingSeconds, versions: list[frappe._dict]
 ) -> dict | None:
     active = details.status_category == "Paused"
-    paused = cint(details.total_hold_time)
-    if active and details.on_hold_since:
-        paused += working_seconds(details.on_hold_since, now_datetime()) or 0
+    paused = hold_seconds(details, working_seconds)
     if not paused and not active:
         return None
     window = pause_window(versions, active, details.on_hold_since)
