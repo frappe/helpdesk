@@ -36,31 +36,36 @@ def protect_existing_hidden_template_fields():
         pluck="fieldname",
         distinct=True,
     )
-    for fieldname in hidden_fields:
-        custom_field = frappe.db.get_value(
-            "Custom Field",
-            {"dt": "HD Ticket", "fieldname": fieldname, "permlevel": ["<", 2]},
-        )
-        if custom_field:
-            frappe.db.set_value("Custom Field", custom_field, "permlevel", 2)
+    if not hidden_fields:
+        return
+    frappe.db.set_value(
+        "Custom Field",
+        {
+            "dt": "HD Ticket",
+            "fieldname": ["in", hidden_fields],
+            "permlevel": ["<", 2],
+        },
+        "permlevel",
+        2,
+    )
 
 
 def mirror_permlevel_grants_into_custom_docperms():
     """Any Custom DocPerm row makes Frappe ignore the JSON perms wholesale,
     so customised sites need the permlevel rows added explicitly or agents
     lose access to the protected fields."""
-    if not frappe.db.exists("Custom DocPerm", {"parent": "HD Ticket"}):
+    existing = frappe.get_all(
+        "Custom DocPerm",
+        filters={"parent": "HD Ticket"},
+        fields=["role", "permlevel"],
+    )
+    if not existing:
         return
+    roles_at_zero = {row.role for row in existing if row.permlevel == 0}
+    held = {(row.role, row.permlevel) for row in existing}
     for level, grants in LEVEL_GRANTS.items():
         for role, can_write in grants.items():
-            has_role = frappe.db.exists(
-                "Custom DocPerm", {"parent": "HD Ticket", "role": role, "permlevel": 0}
-            )
-            has_level = frappe.db.exists(
-                "Custom DocPerm",
-                {"parent": "HD Ticket", "role": role, "permlevel": level},
-            )
-            if not has_role or has_level:
+            if role not in roles_at_zero or (role, level) in held:
                 continue
             add_permission("HD Ticket", role, permlevel=level)  # grants read
             if can_write:
