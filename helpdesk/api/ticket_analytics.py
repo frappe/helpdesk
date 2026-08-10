@@ -7,7 +7,12 @@ from typing import Callable
 
 import frappe
 from frappe import _
-from frappe.utils import cint, now_datetime, time_diff_in_seconds
+from frappe.utils import (
+    cint,
+    get_user_info_for_avatar,
+    now_datetime,
+    time_diff_in_seconds,
+)
 
 from helpdesk.utils import agent_only
 
@@ -224,8 +229,10 @@ def summary(
         "internal_comments": frappe.db.count(
             "HD Ticket Comment", {"reference_ticket": ticket}
         ),
-        # user ids only; the desk resolves names and avatars from its user store
-        "agents_involved": involved_agents(messages, details.get("_assign")),
+        "agents_involved": [
+            get_user_info_for_avatar(user)
+            for user in involved_agents(messages, details.get("_assign"))
+        ],
         "churn": churn(versions),
     }
 

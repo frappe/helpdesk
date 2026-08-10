@@ -33,7 +33,7 @@ export interface AnalyticsSummary {
   customer_messages: number;
   agent_messages: number;
   internal_comments: number;
-  agents_involved: string[];
+  agents_involved: { email: string; image: string; name: string }[];
   churn: { sla_changes: number; team_changes: number };
 }
 

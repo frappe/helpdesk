@@ -71,7 +71,9 @@ class TestTicketAnalytics(FrappeTestCase):
         self.assertEqual(summary["customer_messages"], 2)
         self.assertEqual(summary["agent_messages"], 3)
         self.assertEqual(summary["internal_comments"], 1)
-        self.assertEqual(summary["agents_involved"], [AGENT, AGENT_TWO])
+        self.assertEqual(
+            [a["email"] for a in summary["agents_involved"]], [AGENT, AGENT_TWO]
+        )
 
     def test_agents_involved_includes_assignees_who_never_replied(self):
         ticket = self.make_high_ticket()
@@ -89,7 +91,9 @@ class TestTicketAnalytics(FrappeTestCase):
         involved = get_ticket_analytics(ticket.name)["summary"]["agents_involved"]
 
         # repliers keep their conversation order, assignees follow
-        self.assertEqual(involved, [AGENT, AGENT_TWO])
+        self.assertEqual([a["email"] for a in involved], [AGENT, AGENT_TWO])
+        # avatar payload is ready to render, no client-side user lookup
+        self.assertTrue(all(a["name"] for a in involved))
 
     def test_weekend_gap_counts_business_hours_only(self):
         friday = add_to_date(self.monday, days=4, hours=6)
