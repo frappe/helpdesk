@@ -45,16 +45,33 @@ export interface TicketAnalytics {
   summary: AnalyticsSummary;
 }
 
-/** Duration as at most two units, never decimal hours: "2h 30m", "45m"; sub-minute rounds up to "1m" */
-export function formatSeconds(
-  seconds: number | null | undefined
-): string | null {
-  if (seconds === null || seconds === undefined || seconds < 0) return null;
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  if (days) return hours ? `${days}d ${hours}h` : `${days}d`;
-  if (hours) return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
-  if (minutes) return `${minutes}m`;
-  return "1m";
+// a dot on the rail; isDeadline draws it as a short vertical tick instead
+export interface RailNode {
+  kind: "node";
+  colorClass: string;
+  tooltip: string[];
+  isDeadline?: boolean;
+  label?: RailLabel | undefined;
 }
+
+// isMilestone marks a label whose subtitle carries a full date, which is what
+// hideRepeatedDates rewrites
+export interface RailLabel {
+  title?: string;
+  subtitle?: string | undefined;
+  isMilestone?: boolean;
+}
+
+// the leg between two dots; duration is a measurement, caption is a state note
+export interface RailLine {
+  kind: "line";
+  colorClass: string;
+  width: number;
+  isGrowing?: boolean;
+  caption?: string;
+  duration?: string | undefined;
+  isSlowest?: boolean;
+}
+
+export type RailSegment = RailNode | RailLine;
+export type LineOptions = Omit<RailLine, "kind" | "colorClass">;

@@ -9,57 +9,63 @@
     </div>
     <div class="relative mx-4">
       <div
-        v-show="fadeLeft"
+        v-show="showLeftFade"
         class="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-base)] to-transparent"
       />
       <div
-        v-show="fadeRight"
+        v-show="showRightFade"
         class="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-base)] to-transparent"
       />
       <div
         ref="scroller"
         class="overflow-x-auto hide-scrollbar"
-        @scroll.passive="updateFades"
+        @scroll.passive="updateScrollFades"
       >
         <div
           ref="rail"
           class="flex w-max min-w-full items-start pl-12 pr-16 pb-16 pt-8"
         >
-          <template v-for="(seg, index) in segments" :key="index">
+          <template v-for="(segment, index) in segments" :key="index">
             <Tooltip
-              v-if="seg.kind === 'node'"
+              v-if="segment.kind === 'node'"
               :hover-delay="0.2"
               arrow-class="!hidden"
             >
               <span
                 class="group relative flex-none rounded-full before:absolute before:-inset-2 before:content-['']"
-                :class="[seg.cls, seg.tick ? '-mt-0.5 h-3 w-[3px]' : 'size-2']"
+                :class="[
+                  segment.colorClass,
+                  segment.isDeadline ? '-mt-0.5 h-3 w-[3px]' : 'size-2',
+                ]"
               >
                 <span
-                  v-if="seg.label"
+                  v-if="segment.label"
                   class="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-center"
                   :class="[
                     index === 0 ? 'rail-first-label' : '',
-                    seg.tick ? 'top-[18px]' : 'top-4',
+                    segment.isDeadline ? 'top-[18px]' : 'top-4',
                   ]"
                 >
                   <b
-                    v-if="seg.label.title"
+                    v-if="segment.label.title"
                     class="block text-sm text-ink-gray-8"
                   >
-                    {{ seg.label.title }}
+                    {{ segment.label.title }}
                   </b>
-                  <span v-if="seg.label.sub" class="text-xs text-ink-gray-5">
-                    {{ seg.label.sub }}
+                  <span
+                    v-if="segment.label.subtitle"
+                    class="text-xs text-ink-gray-5"
+                  >
+                    {{ segment.label.subtitle }}
                   </span>
                 </span>
               </span>
-              <template v-if="seg.tip.length" #body>
+              <template v-if="segment.tooltip.length" #body>
                 <div
                   class="space-y-1.5 rounded-md border border-outline-gray-1 bg-surface-elevation-2 px-3 py-2 shadow-sm"
                 >
                   <span
-                    v-for="line in seg.tip"
+                    v-for="line in segment.tooltip"
                     :key="line"
                     class="block whitespace-nowrap text-xs text-ink-gray-6 first:text-ink-gray-8"
                   >
@@ -71,24 +77,27 @@
             <span
               v-else
               class="relative mt-[3px] h-0.5 rounded-full"
-              :class="[seg.cls, seg.grow ? '' : 'flex-none']"
+              :class="[
+                segment.colorClass,
+                segment.isGrowing ? '' : 'flex-none',
+              ]"
               :style="
-                seg.grow
-                  ? { flex: `1 0 ${seg.width}px` }
-                  : { width: `${seg.width}px` }
+                segment.isGrowing
+                  ? { flex: `1 0 ${segment.width}px` }
+                  : { width: `${segment.width}px` }
               "
             >
               <span
-                v-if="seg.over"
+                v-if="segment.caption"
                 class="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs capitalize tracking-wide text-ink-gray-4"
               >
-                {{ seg.over }}
+                {{ segment.caption }}
               </span>
               <span
-                v-if="seg.wait"
+                v-if="segment.duration"
                 class="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs text-ink-gray-6"
               >
-                {{ seg.wait }}
+                {{ segment.duration }}
               </span>
             </span>
           </template>
@@ -99,11 +108,11 @@
       class="flex flex-wrap gap-x-4 gap-y-1 px-4 pb-4 text-xs text-ink-gray-5"
     >
       <span
-        v-for="item in legend"
+        v-for="item in LEGEND"
         :key="item.label"
         class="flex items-center gap-1.5"
       >
-        <span class="size-2 rounded-full" :class="item.cls" />
+        <span class="size-2 rounded-full" :class="item.colorClass" />
         {{ item.label }}
       </span>
     </div>
@@ -114,84 +123,17 @@
 import { __ } from "@/translation";
 import { dayjsLocal, Tooltip } from "frappe-ui";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { formatSeconds, TimelineEvent, TimelineNode } from "./types";
+import type {
+  LineOptions,
+  RailLabel,
+  RailLine,
+  RailNode,
+  RailSegment,
+  TimelineEvent,
+  TimelineNode,
+} from "./types";
+import { formatSeconds } from "./utils";
 
-const props = defineProps<{
-  timeline: TimelineNode[];
-  events: TimelineEvent[];
-}>();
-
-const scroller = ref<HTMLElement>();
-const rail = ref<HTMLElement>();
-const fadeLeft = ref(false);
-const fadeRight = ref(false);
-
-// the first label is centered under its dot but its left edge must sit on the
-// card's content axis, so the rail's left padding is half the label's width
-function alignFirstLabel(): void {
-  const el = rail.value;
-  const label = el?.querySelector<HTMLElement>(".rail-first-label");
-  if (!el) return;
-  el.style.paddingLeft = label
-    ? `${Math.max(0, Math.round(label.offsetWidth / 2 - 4))}px`
-    : "";
-}
-
-// reka-ui only dismisses tooltips on window scroll, and this app scrolls
-// inner containers, so popovers stay stranded when their anchor moves; once
-// a gesture passes trackpad jitter range, close them via reka's own
-// close-others signal, the "tooltip.open" window event
-const scrollPositions = new WeakMap<Element, number>();
-let gestureDelta = 0;
-let lastScrollAt = 0;
-
-function dismissPopoversOnScroll(event: Event): void {
-  const el =
-    event.target instanceof Element ? event.target : document.scrollingElement;
-  if (!el) return;
-  const position = el.scrollLeft + el.scrollTop;
-  const previous = scrollPositions.get(el);
-  scrollPositions.set(el, position);
-  const now = performance.now();
-  if (now - lastScrollAt > 200) gestureDelta = 0;
-  lastScrollAt = now;
-  if (previous == null) return;
-  gestureDelta += Math.abs(position - previous);
-  if (gestureDelta > 8) window.dispatchEvent(new CustomEvent("tooltip.open"));
-}
-
-function updateFades(): void {
-  const el = scroller.value;
-  if (!el) return;
-  const overflow = el.scrollWidth - el.clientWidth;
-  fadeLeft.value = overflow > 12 && el.scrollLeft > 4;
-  fadeRight.value = overflow > 12 && el.scrollLeft < overflow - 4;
-}
-
-interface RailNode {
-  kind: "node";
-  cls: string;
-  tip: string[];
-  tick?: boolean;
-  label?:
-    | { title?: string; sub?: string | undefined; strong?: boolean }
-    | undefined;
-}
-
-interface RailLine {
-  kind: "line";
-  cls: string;
-  width: number;
-  grow?: boolean;
-  over?: string;
-  wait?: string | undefined;
-  slow?: boolean;
-}
-
-type RailSegment = RailNode | RailLine;
-
-// arbitrary values: the espresso preset exposes ink-* for text and outline-*
-// for borders only, so bg-ink-* utilities do not exist
 const GREEN = "bg-[var(--ink-green-6)]";
 const RED = "bg-[var(--ink-red-6)]";
 const BLUE = "bg-[var(--ink-blue-6)]";
@@ -207,337 +149,434 @@ const OVERDUE =
 const TODAY =
   "bg-[var(--surface-base)] border-[1.5px] border-[var(--outline-gray-4)]";
 
-const legend = [
-  { cls: GREEN, label: __("SLA met") },
-  { cls: RED, label: __("SLA missed / longest wait") },
-  { cls: CUSTOMER, label: __("Customer message") },
-  { cls: BLUE, label: __("Agent reply") },
+const LEGEND = [
+  { colorClass: GREEN, label: __("SLA met") },
+  { colorClass: RED, label: __("SLA missed / longest wait") },
+  { colorClass: CUSTOMER, label: __("Customer message") },
+  { colorClass: BLUE, label: __("Agent reply") },
 ];
 
-const nodes = computed(() => {
+const props = defineProps<{
+  timeline: TimelineNode[];
+  events: TimelineEvent[];
+}>();
+
+const scroller = ref<HTMLElement>();
+const rail = ref<HTMLElement>();
+const showLeftFade = ref(false);
+const showRightFade = ref(false);
+
+const milestones = computed(() => {
   const byKey: Partial<Record<TimelineNode["key"], TimelineNode>> = {};
-  props.timeline.forEach((n) => (byKey[n.key] = n));
+  props.timeline.forEach((node) => (byKey[node.key] = node));
   return byKey;
 });
 
-const maxWait = computed(() => {
+const respondedAt = computed(
+  () => milestones.value.first_response?.timestamp ?? null
+);
+
+// with no reply at all, the missed deadline stands in for the reply time
+const overdueDeadline = computed(() => {
+  const firstResponse = milestones.value.first_response;
+  const isOverdue = !respondedAt.value && firstResponse?.state === "breach";
+  return isOverdue ? firstResponse?.eta ?? null : null;
+});
+
+// the milestone sits at its chronological spot: customer messages sent before
+// the first response (or its missed deadline) stay on its left
+const eventsBeforeMilestone = computed(() => {
+  const boundary = respondedAt.value ?? overdueDeadline.value;
+  if (!boundary) return props.events;
+  return props.events.filter(
+    (event) => !dayjsLocal(event.at).isAfter(dayjsLocal(boundary))
+  );
+});
+
+const eventsAfterMilestone = computed(() =>
+  props.events.slice(eventsBeforeMilestone.value.length)
+);
+
+const longestWait = computed(() => {
   const waits = props.events
-    .map((e) => e.wait_seconds)
-    .filter((w): w is number => w != null);
+    .map((event) => event.wait_seconds)
+    .filter((wait): wait is number => wait != null);
   return waits.length > 1 ? Math.max(...waits) : 0;
 });
 
 const segments = computed<RailSegment[]>(() => {
-  const segs: RailSegment[] = [];
-  const created = nodes.value.created;
-  const fr = nodes.value.first_response;
-  segs.push({
-    kind: "node",
-    cls: CUSTOMER,
-    tip: milestoneTip(created),
-    label: label(__("Created"), fmtAt(created?.timestamp)),
-  });
-  // the milestone sits at its chronological spot: customer messages sent
-  // before the first response (or its missed deadline) stay on its left
-  const responded = fr?.timestamp;
-  const overdueEta =
-    !responded && fr?.state === "breach" ? fr.eta ?? null : null;
-  const boundary = responded ?? overdueEta;
-  const before = boundary
-    ? props.events.filter(
-        (e) => !dayjsLocal(e.at).isAfter(dayjsLocal(boundary))
+  const created = milestones.value.created;
+  const firstResponse = milestones.value.first_response;
+  const result: RailSegment[] = [
+    {
+      kind: "node",
+      colorClass: CUSTOMER,
+      tooltip: getMilestoneTooltip(created),
+      label: getLabel(__("Created"), formatDateTime(created?.timestamp)),
+    },
+    ...getEventSegments(eventsBeforeMilestone.value, created?.timestamp, null),
+  ];
+  if (firstResponse) result.push(...getFirstResponseSegments(firstResponse));
+  if (respondedAt.value)
+    result.push(
+      ...getEventSegments(
+        eventsAfterMilestone.value,
+        respondedAt.value,
+        eventsBeforeMilestone.value.at(-1) ?? null
       )
-    : props.events;
-  pushEvents(segs, before, created?.timestamp, null);
-  if (fr) pushFirstResponse(segs, fr);
-  const after = props.events.slice(before.length);
-  if (responded) pushEvents(segs, after, responded, before.at(-1) ?? null);
-  else if (overdueEta) pushOverdueTail(segs, after, overdueEta);
-  pushEnding(segs);
-  dedupeDayPrefixes(segs);
-  widenCrowdedLegs(segs);
-  return segs;
+    );
+  else if (overdueDeadline.value)
+    result.push(
+      ...getOverdueTailSegments(
+        eventsAfterMilestone.value,
+        overdueDeadline.value
+      )
+    );
+  result.push(...getEndingSegments());
+  hideRepeatedDates(result);
+  preventLabelOverlap(result);
+  return result;
 });
 
-function pushFirstResponse(segs: RailSegment[], fr: TimelineNode): void {
-  const took = formatSeconds(fr.took) || undefined;
-  const split = Boolean(
-    fr.state === "breach" && fr.timestamp && fr.took && fr.target
+function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
+  if (node.state === "breach" && !node.timestamp && node.eta)
+    return getOverdueStartSegments(node);
+
+  const duration = formatSeconds(node.took) || undefined;
+  const isSplit = Boolean(
+    node.state === "breach" && node.timestamp && node.took && node.target
   );
-  if (fr.state === "done")
-    segs.push(line(GREEN, 120, { grow: true, wait: took }));
-  else if (split) pushBreachSplit(segs, fr);
-  else if (fr.state === "breach" && !fr.timestamp && fr.eta)
-    return pushOverdueStart(segs, fr);
-  else if (fr.state === "breach")
-    segs.push(line(RED, 130, { grow: true, wait: took }));
-  else segs.push(line(IDLE, 120, { grow: true }));
-  const cls =
-    fr.state === "done" ? GREEN : fr.state === "breach" ? RED : PENDING;
-  const sub = fr.timestamp
-    ? fmtAt(fr.timestamp)
-    : fr.state === "breach" && fr.eta
-    ? __("was due {0}", fmtAt(fr.eta) ?? "")
-    : fr.eta
-    ? dueLabel(fr.eta)
-    : __("pending");
-  segs.push({
-    kind: "node",
-    cls,
-    tip: milestoneTip(fr),
-    label: label(split ? __("Responded") : __("First response"), sub),
-  });
+  let leg: RailSegment[];
+  if (node.state === "done")
+    leg = [getLine(GREEN, { width: 120, isGrowing: true, duration })];
+  else if (isSplit) leg = getBreachSplitSegments(node);
+  else if (node.state === "breach")
+    leg = [getLine(RED, { width: 130, isGrowing: true, duration })];
+  else leg = [getLine(IDLE, { width: 120, isGrowing: true })];
+
+  const colorClass =
+    node.state === "done" ? GREEN : node.state === "breach" ? RED : PENDING;
+  return [
+    ...leg,
+    {
+      kind: "node",
+      colorClass,
+      tooltip: getMilestoneTooltip(node),
+      label: getLabel(
+        isSplit ? __("Responded") : __("First response"),
+        getMilestoneSubtitle(node)
+      ),
+    },
+  ];
+}
+
+function getMilestoneSubtitle(node: TimelineNode): string {
+  if (node.timestamp) return formatDateTime(node.timestamp);
+  if (node.state === "breach" && node.eta)
+    return __("was due {0}", formatDateTime(node.eta) ?? "");
+  return node.eta ? getDueLabel(node.eta) : __("pending");
 }
 
 // a breached milestone splits its leg at the deadline: green for the allowed
 // window, a tick where the SLA expired, red for the overtime
-function pushBreachSplit(segs: RailSegment[], node: TimelineNode): void {
+function getBreachSplitSegments(node: TimelineNode): RailSegment[] {
   const took = node.took as number;
   const target = node.target as number;
-  const green = Math.min(126, Math.max(24, Math.round((150 * target) / took)));
-  segs.push(line(GREEN, green, { wait: formatSeconds(target) || undefined }));
-  segs.push(deadlineTick(node.eta));
-  segs.push(line(RED, 150 - green, { grow: true, wait: overtime(node) }));
+  const allowed = Math.min(
+    126,
+    Math.max(24, Math.round((150 * target) / took))
+  );
+  return [
+    getLine(GREEN, {
+      width: allowed,
+      duration: formatSeconds(target) || undefined,
+    }),
+    getDeadlineNode(node.eta),
+    getLine(RED, {
+      width: 150 - allowed,
+      isGrowing: true,
+      duration: getOvertimeLabel(node),
+    }),
+  ];
 }
 
-function deadlineTick(eta?: string | null): RailNode {
-  const seg: RailNode = { kind: "node", cls: RED, tick: true, tip: [] };
+function getDeadlineNode(eta?: string | null): RailNode {
+  const node: RailNode = {
+    kind: "node",
+    colorClass: RED,
+    isDeadline: true,
+    tooltip: [],
+  };
   if (eta)
-    seg.label = label(__("First response"), __("due at {0}", fmtAt(eta) ?? ""));
-  return seg;
+    node.label = getLabel(
+      __("First response"),
+      __("due at {0}", formatDateTime(eta) ?? "")
+    );
+  return node;
 }
 
 // an overdue first response has no reply node: the deadline tick opens a red
-// dashed stretch that pushOverdueTail closes at a Today marker
-function pushOverdueStart(segs: RailSegment[], fr: TimelineNode): void {
-  segs.push(line(GREEN, 120, { wait: formatSeconds(fr.target) || undefined }));
-  const tick = deadlineTick(fr.eta);
-  tick.tip = milestoneTip(fr);
-  segs.push(tick);
+// dashed stretch that getOverdueTailSegments closes at a Today marker
+function getOverdueStartSegments(node: TimelineNode): RailSegment[] {
+  const deadline = getDeadlineNode(node.eta);
+  deadline.tooltip = getMilestoneTooltip(node);
+  return [
+    getLine(GREEN, {
+      width: 120,
+      duration: formatSeconds(node.target) || undefined,
+    }),
+    deadline,
+  ];
 }
 
 // customer nudges after the deadline sit on the red stretch: the wait only
 // ends when an agent replies, and no agent reply can exist in this state
-function pushOverdueTail(
-  segs: RailSegment[],
+function getOverdueTailSegments(
   events: TimelineEvent[],
-  eta: string
-): void {
-  let prevDay = dayjsLocal(eta).format("MMM D");
-  let prevYear = dayjsLocal(eta).year();
+  deadline: string
+): RailSegment[] {
+  const result: RailSegment[] = [];
+  let previousDay = dayjsLocal(deadline).format("MMM D");
+  let previousYear = dayjsLocal(deadline).year();
   for (const event of events) {
     const at = dayjsLocal(event.at);
     const day = at.format("MMM D");
-    segs.push(line(OVERDUE, 72, { grow: true }));
-    segs.push(
-      eventNode(event, day !== prevDay ? dayTitle(at, prevYear) : undefined)
+    result.push(getLine(OVERDUE, { width: 72, isGrowing: true }));
+    result.push(
+      getEventNode(
+        event,
+        day !== previousDay ? getDayTitle(at, previousYear) : undefined
+      )
     );
-    prevDay = day;
-    prevYear = at.year();
+    previousDay = day;
+    previousYear = at.year();
   }
-  segs.push(line(OVERDUE, 140, { grow: true }));
-  segs.push({
+  result.push(getLine(OVERDUE, { width: 140, isGrowing: true }));
+  result.push({
     kind: "node",
-    cls: TODAY,
-    tip: [],
-    label: label(__("Today"), dayjsLocal().format("MMM D")),
+    colorClass: TODAY,
+    tooltip: [],
+    label: getLabel(__("Today"), dayjsLocal().format("MMM D")),
   });
+  return result;
 }
 
-function overtime(node: TimelineNode): string | undefined {
-  const over = formatSeconds((node.took ?? 0) - (node.target ?? 0));
-  return over ? `+${over}` : undefined;
+function getOvertimeLabel(node: TimelineNode): string | undefined {
+  const overtime = formatSeconds((node.took ?? 0) - (node.target ?? 0));
+  return overtime ? `+${overtime}` : undefined;
 }
 
-function pushEvents(
-  segs: RailSegment[],
+function getEventSegments(
   events: TimelineEvent[],
   startAt: string | null | undefined,
-  carried: TimelineEvent | null
-): void {
-  let prev = carried;
-  let atGroupStart = true;
-  let prevDay = startAt ? dayjsLocal(startAt).format("MMM D") : "";
-  let prevYear = dayjsLocal(startAt ?? undefined).year();
+  carriedEvent: TimelineEvent | null
+): RailSegment[] {
+  const result: RailSegment[] = [];
+  let previousEvent = carriedEvent;
+  let isGroupStart = true;
+  let previousDay = startAt ? dayjsLocal(startAt).format("MMM D") : "";
+  let previousYear = dayjsLocal(startAt ?? undefined).year();
   for (const event of events) {
     const at = dayjsLocal(event.at);
     const day = at.format("MMM D");
-    const newDay = day !== prevDay;
-    segs.push(connectorBefore(prev, event, atGroupStart));
-    segs.push(eventNode(event, newDay ? dayTitle(at, prevYear) : undefined));
-    prevDay = day;
-    prevYear = at.year();
-    prev = event;
-    atGroupStart = false;
+    const isNewDay = day !== previousDay;
+    result.push(getConnectorLine(previousEvent, event, isGroupStart));
+    result.push(
+      getEventNode(event, isNewDay ? getDayTitle(at, previousYear) : undefined)
+    );
+    previousDay = day;
+    previousYear = at.year();
+    previousEvent = event;
+    isGroupStart = false;
   }
+  return result;
 }
 
 // a day label carries its year when it differs from the last one on the rail
-function dayTitle(at: ReturnType<typeof dayjsLocal>, prevYear: number): string {
-  return at.year() === prevYear ? at.format("MMM D") : at.format("MMM D, YYYY");
+function getDayTitle(
+  at: ReturnType<typeof dayjsLocal>,
+  previousYear: number
+): string {
+  return at.year() === previousYear
+    ? at.format("MMM D")
+    : at.format("MMM D, YYYY");
 }
 
-function connectorBefore(
-  prev: TimelineEvent | null,
+function getConnectorLine(
+  previousEvent: TimelineEvent | null,
   event: TimelineEvent,
-  groupStart: boolean
+  isGroupStart: boolean
 ): RailLine {
-  const answers =
+  const answersCustomer =
     event.side === "agent" &&
     event.wait_seconds != null &&
-    prev?.side === "customer";
-  if (answers) return waitLine(event.wait_seconds as number);
-  if (groupStart || !prev) return line(IDLE, 64, { grow: true });
-  if (prev.side === event.side) return line(CHAIN, 26, {});
+    previousEvent?.side === "customer";
+  if (answersCustomer) return getWaitLine(event.wait_seconds as number);
+  if (isGroupStart || !previousEvent)
+    return getLine(IDLE, { width: 64, isGrowing: true });
+  if (previousEvent.side === event.side) return getLine(CHAIN, { width: 26 });
   const days = dayjsLocal(event.at)
     .startOf("day")
-    .diff(dayjsLocal(prev.at).startOf("day"), "day");
-  if (!days) return line(IDLE, 32, {});
-  const over = days === 1 ? __("next day") : __("{0} days", String(days));
-  return line(IDLE, days === 1 ? 76 : 96, { over });
+    .diff(dayjsLocal(previousEvent.at).startOf("day"), "day");
+  if (!days) return getLine(IDLE, { width: 32 });
+  const caption = days === 1 ? __("next day") : __("{0} days", String(days));
+  return getLine(IDLE, { width: days === 1 ? 76 : 96, caption });
 }
 
-function waitLine(wait: number): RailLine {
+function getWaitLine(wait: number): RailLine {
   const width = Math.max(24, Math.min(130, Math.round((wait / 60) * 1.2)));
-  const slow = maxWait.value > 0 && wait === maxWait.value;
-  return {
-    kind: "line",
-    cls: slow ? RED : BLUE,
+  const isSlowest = longestWait.value > 0 && wait === longestWait.value;
+  return getLine(isSlowest ? RED : BLUE, {
     width,
-    wait: formatSeconds(wait) || undefined,
-    slow,
-  };
+    duration: formatSeconds(wait) || undefined,
+    isSlowest,
+  });
 }
 
-function eventNode(event: TimelineEvent, newDay?: string): RailNode {
-  const slow =
+function getEventNode(event: TimelineEvent, dayTitle?: string): RailNode {
+  const isSlowest =
     event.side === "agent" &&
-    maxWait.value > 0 &&
-    event.wait_seconds === maxWait.value;
+    longestWait.value > 0 &&
+    event.wait_seconds === longestWait.value;
+  const colorClass = event.side === "agent" ? BLUE : CUSTOMER;
   return {
     kind: "node",
-    cls: slow ? RED : event.side === "agent" ? BLUE : CUSTOMER,
-    tip: eventTip(event, slow),
-    label: newDay
-      ? { title: newDay, sub: dayjsLocal(event.at).format("h:mm a") }
+    colorClass: isSlowest ? RED : colorClass,
+    tooltip: getEventTooltip(event, isSlowest),
+    label: dayTitle
+      ? { title: dayTitle, subtitle: dayjsLocal(event.at).format("h:mm a") }
       : undefined,
   };
 }
 
-function eventTip(event: TimelineEvent, slow: boolean): string[] {
+function getEventTooltip(event: TimelineEvent, isSlowest: boolean): string[] {
   const who = event.sender_name || event.sender;
   if (event.side === "customer")
-    return [__("Customer message"), fmtAt(event.at)];
+    return [__("Customer message"), formatDateTime(event.at)];
   const lines = [__("{0} replied", who)];
   if (event.wait_seconds != null) {
     const took = formatSeconds(event.wait_seconds) || "0m";
-    lines.push(slow ? __("{0} · longest wait", took) : __("{0} wait", took));
+    lines.push(
+      isSlowest ? __("{0} · longest wait", took) : __("{0} wait", took)
+    );
   } else {
     lines.push(__("Follow-up"));
   }
-  lines.push(fmtAt(event.at));
+  lines.push(formatDateTime(event.at));
   return lines;
 }
 
-function pushEnding(segs: RailSegment[]): void {
-  const hold = nodes.value.hold;
-  const res = nodes.value.resolution;
-  if (hold?.active) return pushHold(segs, hold, res);
-  if (!res) return;
-  const tip = milestoneTip(res);
-  if (hold?.badge?.text) tip.push(hold.badge.text);
-  if (res.state === "done" || (res.state === "breach" && res.timestamp)) {
-    segs.push(line(IDLE, 48, { grow: true }));
-    const sub = res.timestamp ? fmtAt(res.timestamp) : undefined;
-    const cls = res.state === "done" ? GREEN : RED;
-    segs.push({
+function getEndingSegments(): RailSegment[] {
+  const hold = milestones.value.hold;
+  const resolution = milestones.value.resolution;
+  if (hold?.active) return getHoldSegments(hold, resolution);
+  if (!resolution) return [];
+
+  const tooltip = getMilestoneTooltip(resolution);
+  if (hold?.badge?.text) tooltip.push(hold.badge.text);
+  const isResolved =
+    resolution.state === "done" ||
+    (resolution.state === "breach" && resolution.timestamp);
+  if (isResolved)
+    return [
+      getLine(IDLE, { width: 48, isGrowing: true }),
+      {
+        kind: "node",
+        colorClass: resolution.state === "done" ? GREEN : RED,
+        tooltip,
+        label: getLabel(
+          getResolutionTitle(resolution),
+          resolution.timestamp
+            ? formatDateTime(resolution.timestamp)
+            : undefined
+        ),
+      },
+    ];
+
+  const isBreached = resolution.state === "breach";
+  return [
+    getLine(IDLE, { width: 120, isGrowing: true }),
+    {
       kind: "node",
-      cls,
-      tip,
-      label: label(resolutionName(res), sub),
-    });
-    return;
-  }
-  segs.push(line(IDLE, 120, { grow: true }));
-  const breach = res.state === "breach";
-  segs.push({
-    kind: "node",
-    cls: breach ? RED : PENDING,
-    tip,
-    label: label(
-      __("Resolution"),
-      breach && res.eta
-        ? __("was due {0}", fmtAt(res.eta) ?? "")
-        : res.eta
-        ? dueLabel(res.eta)
-        : __("pending")
-    ),
-  });
+      colorClass: isBreached ? RED : PENDING,
+      tooltip,
+      label: getLabel(__("Resolution"), getMilestoneSubtitle(resolution)),
+    },
+  ];
 }
 
-function pushHold(
-  segs: RailSegment[],
+function getHoldSegments(
   hold: TimelineNode,
-  res?: TimelineNode
-): void {
-  segs.push(line(PAUSE, 120, { grow: true, over: __("clock stopped") }));
-  const tip = hold.took
-    ? [__("Paused {0} so far", formatSeconds(hold.took) ?? "")]
-    : [];
-  segs.push({
+  resolution?: TimelineNode
+): RailSegment[] {
+  const result: RailSegment[] = [
+    getLine(PAUSE, {
+      width: 120,
+      isGrowing: true,
+      caption: __("clock stopped"),
+    }),
+    {
+      kind: "node",
+      colorClass: BLUE,
+      tooltip: hold.took
+        ? [__("Paused {0} so far", formatSeconds(hold.took) ?? "")]
+        : [],
+      label: getLabel(
+        __("SLA paused"),
+        hold.timestamp
+          ? __("since {0}", formatDateTime(hold.timestamp) ?? "")
+          : undefined
+      ),
+    },
+  ];
+  if (!resolution) return result;
+  const tooltip = getMilestoneTooltip(resolution);
+  tooltip.push(__("clock resumes when the ticket reopens"));
+  result.push(getLine(IDLE, { width: 110, isGrowing: true }));
+  result.push({
     kind: "node",
-    cls: BLUE,
-    tip,
-    label: label(
-      __("SLA paused"),
-      hold.timestamp ? __("since {0}", fmtAt(hold.timestamp) ?? "") : undefined
-    ),
+    colorClass: PENDING,
+    tooltip,
+    label: getLabel(__("Resolution"), __("pending")),
   });
-  if (!res) return;
-  segs.push(line(IDLE, 110, { grow: true }));
-  const tipRes = milestoneTip(res);
-  tipRes.push(__("clock resumes when the ticket reopens"));
-  segs.push({
-    kind: "node",
-    cls: PENDING,
-    tip: tipRes,
-    label: label(__("Resolution"), __("pending")),
-  });
+  return result;
 }
 
 // a label repeating the date already shown by the previous label keeps only
 // the time, e.g. "Jul 17, 10:02 am" becomes "10:02 am" and "due at Jul 17,
 // 10:02 am" becomes "due at 10:02 am"
-function dedupeDayPrefixes(segs: RailSegment[]): void {
-  let prevDay = "";
-  for (const seg of segs) {
-    if (seg.kind !== "node" || !seg.label) continue;
-    if (!seg.label.strong) {
-      prevDay = seg.label.title || prevDay;
+function hideRepeatedDates(segments: RailSegment[]): void {
+  let previousDay = "";
+  for (const segment of segments) {
+    if (segment.kind !== "node" || !segment.label) continue;
+    if (!segment.label.isMilestone) {
+      previousDay = segment.label.title || previousDay;
       continue;
     }
-    const [, prefix, day, rest] =
-      seg.label.sub?.match(/^(.*?)(\w{3} \d{1,2}(?:, \d{4})?), (.+)$/) ?? [];
-    if (!day || !rest) continue;
-    if (day === prevDay) seg.label.sub = prefix + rest;
-    else prevDay = day;
+    const [, prefix, day, time] =
+      segment.label.subtitle?.match(
+        /^(.*?)(\w{3} \d{1,2}(?:, \d{4})?), (.+)$/
+      ) ?? [];
+    if (!day || !time) continue;
+    if (day === previousDay) segment.label.subtitle = prefix + time;
+    else previousDay = day;
   }
 }
 
 // labels are centered under their dots, so the line span between two labeled
 // nodes must fit both label halves or the texts collide
-function widenCrowdedLegs(segs: RailSegment[]): void {
-  let prevHalf = 0;
+function preventLabelOverlap(segments: RailSegment[]): void {
+  let previousHalf = 0;
   let span = Infinity;
   let lastLine: RailLine | null = null;
-  for (const seg of segs) {
-    if (seg.kind === "line") {
-      span += seg.width;
-      lastLine = seg;
-    } else if (seg.label) {
-      const needed = prevHalf + labelHalfWidth(seg.label) + 12;
+  for (const segment of segments) {
+    if (segment.kind === "line") {
+      span += segment.width;
+      lastLine = segment;
+    } else if (segment.label) {
+      const needed = previousHalf + getLabelHalfWidth(segment.label) + 12;
       if (lastLine && span < needed) lastLine.width += needed - span;
-      prevHalf = labelHalfWidth(seg.label);
+      previousHalf = getLabelHalfWidth(segment.label);
       span = 0;
       lastLine = null;
     } else {
@@ -547,40 +586,41 @@ function widenCrowdedLegs(segs: RailSegment[]): void {
 }
 
 // rough text metrics: ~7px per text-sm char, ~6px per text-xs char
-function labelHalfWidth(label: NonNullable<RailNode["label"]>): number {
+function getLabelHalfWidth(label: RailLabel): number {
   const title = (label.title?.length ?? 0) * 7;
-  const sub = (label.sub?.length ?? 0) * 6;
-  return Math.max(title, sub) / 2;
+  const subtitle = (label.subtitle?.length ?? 0) * 6;
+  return Math.max(title, subtitle) / 2;
 }
 
 // milestone labels already show name and time below the dot, so the hover
 // only carries what the label does not: the SLA verdict
-function milestoneTip(node?: TimelineNode): string[] {
+function getMilestoneTooltip(node?: TimelineNode): string[] {
   return node?.badge?.text ? [node.badge.text] : [];
 }
 
-function resolutionName(res: TimelineNode): string {
-  if (res.state === "breach" && res.timestamp) return __("Resolved late");
-  if (res.state === "done")
-    return res.timestamp ? __("Resolved") : __("Closed");
+function getResolutionTitle(resolution: TimelineNode): string {
+  if (resolution.state === "breach" && resolution.timestamp)
+    return __("Resolved late");
+  if (resolution.state === "done")
+    return resolution.timestamp ? __("Resolved") : __("Closed");
   return __("Resolution");
 }
 
-function label(title: string, sub?: string): RailNode["label"] {
-  return { title, sub, strong: true };
+function getLabel(title: string, subtitle?: string): RailLabel {
+  return { title, subtitle, isMilestone: true };
 }
 
-function line(cls: string, width: number, extra: Partial<RailLine>): RailLine {
-  return { kind: "line", cls, width, ...extra };
+function getLine(colorClass: string, options: LineOptions): RailLine {
+  return { kind: "line", colorClass, ...options };
 }
 
-function dueLabel(eta: string): string {
-  return __("due {0}", fmtAt(eta));
+function getDueLabel(eta: string): string {
+  return __("due {0}", formatDateTime(eta));
 }
 
-function fmtAt(timestamp: string): string;
-function fmtAt(timestamp?: string | null): string | undefined;
-function fmtAt(timestamp?: string | null): string | undefined {
+function formatDateTime(timestamp: string): string;
+function formatDateTime(timestamp?: string | null): string | undefined;
+function formatDateTime(timestamp?: string | null): string | undefined {
   if (!timestamp) return undefined;
   const at = dayjsLocal(timestamp);
   return at.year() === dayjsLocal().year()
@@ -588,20 +628,62 @@ function fmtAt(timestamp?: string | null): string | undefined {
     : at.format("MMM D, YYYY, h:mm a");
 }
 
+// the first label is centered under its dot but its left edge must sit on the
+// card's content axis, so the rail's left padding is half the label's width
+function alignFirstLabel(): void {
+  const element = rail.value;
+  const label = element?.querySelector<HTMLElement>(".rail-first-label");
+  if (!element) return;
+  element.style.paddingLeft = label
+    ? `${Math.max(0, Math.round(label.offsetWidth / 2 - 4))}px`
+    : "";
+}
+
+function updateScrollFades(): void {
+  const element = scroller.value;
+  if (!element) return;
+  const overflow = element.scrollWidth - element.clientWidth;
+  showLeftFade.value = overflow > 12 && element.scrollLeft > 4;
+  showRightFade.value = overflow > 12 && element.scrollLeft < overflow - 4;
+}
+
+// reka-ui only dismisses tooltips on window scroll, and this app scrolls
+// inner containers, so popovers stay stranded when their anchor moves; once
+// a gesture passes trackpad jitter range, close them via reka's own
+// close-others signal, the "tooltip.open" window event
+const scrollPositions = new WeakMap<Element, number>();
+let gestureDelta = 0;
+let lastScrollAt = 0;
+
+function handleWindowScroll(event: Event): void {
+  const element =
+    event.target instanceof Element ? event.target : document.scrollingElement;
+  if (!element) return;
+  const position = element.scrollLeft + element.scrollTop;
+  const previous = scrollPositions.get(element);
+  scrollPositions.set(element, position);
+  const now = performance.now();
+  if (now - lastScrollAt > 200) gestureDelta = 0;
+  lastScrollAt = now;
+  if (previous == null) return;
+  gestureDelta += Math.abs(position - previous);
+  if (gestureDelta > 8) window.dispatchEvent(new CustomEvent("tooltip.open"));
+}
+
 watch(segments, () =>
   nextTick(() => {
     alignFirstLabel();
-    updateFades();
+    updateScrollFades();
   })
 );
 
 onMounted(() => {
   alignFirstLabel();
-  updateFades();
-  window.addEventListener("scroll", dismissPopoversOnScroll, true);
+  updateScrollFades();
+  window.addEventListener("scroll", handleWindowScroll, true);
 });
 
 onUnmounted(() =>
-  window.removeEventListener("scroll", dismissPopoversOnScroll, true)
+  window.removeEventListener("scroll", handleWindowScroll, true)
 );
 </script>

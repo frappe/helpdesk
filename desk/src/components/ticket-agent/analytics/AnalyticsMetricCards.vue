@@ -23,7 +23,8 @@ import { __ } from "@/translation";
 import { Tooltip } from "frappe-ui";
 import { computed } from "vue";
 import LucideInfo from "~icons/lucide/info";
-import { AnalyticsMetrics, formatSeconds } from "./types";
+import type { AnalyticsMetrics } from "./types";
+import { formatSeconds } from "./utils";
 
 const props = defineProps<{ metrics: AnalyticsMetrics }>();
 
