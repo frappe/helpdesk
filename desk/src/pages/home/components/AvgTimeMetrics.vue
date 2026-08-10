@@ -2,7 +2,7 @@
   <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
     <div class="flex items-center justify-between">
       <div class="text-lg-semibold text-ink-gray-8">
-        {{ __("Average Time Metrics") }}
+        {{ __("Avg. Time Metrics") }}
       </div>
       <div class="flex items-center gap-2">
         <Dropdown
