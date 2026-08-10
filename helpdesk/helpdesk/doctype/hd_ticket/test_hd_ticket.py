@@ -12,6 +12,7 @@ from helpdesk.api.ticket import bulk_reply
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
     merge_ticket,
+    new,
     show_outside_hours_banner,
     split_ticket,
 )
@@ -1616,8 +1617,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         baseline = frappe.get_doc(get_ticket_obj()).insert()
         self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
-        # server force-stamps the portal flag; the insert exemption lets it
-        # survive the permlevel reset even though the customer can't write it.
+        # server-stamped flag survives the reset via the insert exemption
         self.assertEqual(baseline.via_customer_portal, 1)
         self.assertTrue(baseline.key)
 
@@ -1750,5 +1750,30 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertFalse(stripped.get("sla"))
         self.assertTrue(stripped.get("response_by"))
 
+        # the creation response is stripped the same way
+        created = new(get_ticket_obj())
+        self.assertFalse(created.get("sla"))
+        self.assertFalse(created.get("key"))
+        self.assertTrue(created.get("priority"))
+        self.assertTrue(created.get("response_by"))
+
         frappe.set_user(PERMS_AGENT)
         self.assertIn("sla", get_one(ticket.name))
+        self.assertTrue(new(get_ticket_obj()).get("sla"))
+
+    def test_customer_spoof_rejected_without_auto_set_customer(self):
+        """The contact-customer link check must not depend on the auto-set toggle."""
+        create_customer("Perms Unlinked Corp")
+        setting = "auto_set_customer_from_contact"
+        original = frappe.db.get_single_value("HD Settings", setting)
+        frappe.db.set_single_value("HD Settings", setting, 0)
+        try:
+            frappe.set_user(PERMS_CUSTOMER)
+            with self.assertRaises(frappe.ValidationError):
+                frappe.get_doc(
+                    {**get_ticket_obj(), "customer": "Perms Unlinked Corp"}
+                ).insert()
+        finally:
+            frappe.set_user("Administrator")
+            frappe.db.set_single_value("HD Settings", setting, original)
+            frappe.delete_doc("HD Customer", "Perms Unlinked Corp", force=True)
