@@ -57,11 +57,8 @@ class HDTicketTemplate(Document):
         self.protect_hidden_custom_fields()
 
     def protect_hidden_custom_fields(self):
-        """
-        Hidden template fields hold agent-only data: raise their custom
-        field to permlevel 2 so customers can neither read nor write them.
-        Standard fields carry their permlevel in hd_ticket.json.
-        """
+        """Raise custom fields hidden from customers to permlevel 2 so they
+        can neither read nor write them."""
         changed = False
         for f in self.fields:
             if not f.hide_from_customer:

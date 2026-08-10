@@ -42,13 +42,9 @@ def protect_existing_hidden_template_fields():
 
 
 def mirror_permlevel_grants_into_custom_docperms():
-    """
-    When Custom DocPerm rows exist for a doctype, Frappe ignores the
-    standard perms from hd_ticket.json entirely. Sites with customised
-    HD Ticket permissions (e.g. guest ticket creation enabled) must
-    therefore receive the new permlevel rows explicitly, else agents
-    would lose write access to the protected fields.
-    """
+    """Any Custom DocPerm row makes Frappe ignore the JSON perms wholesale,
+    so customised sites need the permlevel rows added explicitly or agents
+    lose access to the protected fields."""
     if not frappe.db.exists("Custom DocPerm", {"parent": "HD Ticket"}):
         return
     for level, grants in LEVEL_GRANTS.items():

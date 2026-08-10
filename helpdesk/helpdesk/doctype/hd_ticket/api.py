@@ -20,7 +20,7 @@ from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_scr
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, check_permissions, is_agent, parse_call_logs
+from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
 
 @frappe.whitelist()
@@ -41,9 +41,8 @@ def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
 
-    # get_query with permissions applies field-level permlevel filtering ('*'
-    # expands to permitted columns only) and the HD Ticket permission_query row
-    # scoping, so agents get the full doc and customers the permitted subset.
+    # permission-aware: '*' expands to the caller's permitted columns and
+    # permission_query conditions scope the rows
     ticket = frappe.qb.get_query(
         "HD Ticket",
         fields="*",

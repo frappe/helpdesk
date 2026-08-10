@@ -76,12 +76,8 @@ class HDTicket(Document):
         self.apply_portal_insert_rules()
 
     def get_customer_template_fields(self):
-        """Fields the ticket's template exposes to the customer.
-
-        Of the permlevel-1 fields, only genuine creation-form inputs may
-        pierce the guard; derived and system fields stay locked even if a
-        template lists them as visible.
-        """
+        """Template fields the customer may fill on creation; internal
+        fields stay locked even if a template lists them as visible."""
         template = self.template or DEFAULT_TICKET_TEMPLATE
         fields = frappe.get_all(
             "HD Ticket Template Field",
@@ -93,24 +89,17 @@ class HDTicket(Document):
         return [f for f in fields if f not in protected or f in exposable]
 
     def apply_portal_insert_rules(self):
-        """
-        Non-agents cannot spoof server-owned fields on insert. The framework
-        resets permlevel-protected fields right after this hook
-        (`validate_higher_perm_levels`), so exempt the ones set server-side
-        here plus the template fields the customer legitimately fills.
-        """
+        """Exempt server-set values and customer form fields from the
+        permlevel reset the framework runs right after this hook."""
         if is_agent():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
 
-        # stamped/owned server-side; exempt so the permlevel reset keeps them.
-        # set_customer rejects any customer the contact is not linked to.
+        # set server-side; set_customer validates the customer-contact link
         server_owned_fields = ["key", "raised_by", "via_customer_portal", "customer"]
-
-        # permlevel fields the customer legitimately fills on the creation
-        # form; exempted only here (before_insert) so they stay create-only.
+        # template fields are exempt only on insert, keeping them create-only
         self.flags.ignore_permlevel_for_fields = [
             *server_owned_fields,
             *self.get_customer_template_fields(),
@@ -1087,9 +1076,8 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
-        # The response stamps sit at permlevel 1; portal replies reach this
-        # save under the customer's session, which has no level-1 write, so
-        # exempt them from the framework's silent reset.
+        # portal replies save under the customer session; exempt the response
+        # stamps so the permlevel reset keeps them
         self.flags.ignore_permlevel_for_fields = [
             "last_customer_response",
             "last_agent_response",
