@@ -69,7 +69,7 @@ const rows = computed<SummaryRow[]>(() => {
     rows.push({ label: __("Team changed"), value: times(churn.team_changes) });
   const agents: SummaryRow = { label: __("Agents involved"), value: "–" };
   if (summary.agents_involved.length)
-    agents.avatars = JSON.stringify(summary.agents_involved.map((a) => a.user));
+    agents.avatars = JSON.stringify(summary.agents_involved);
   rows.push(agents);
   return rows;
 });

@@ -7,7 +7,7 @@ from typing import Callable
 
 import frappe
 from frappe import _
-from frappe.utils import cint, formatdate, now_datetime, time_diff_in_seconds
+from frappe.utils import cint, now_datetime, time_diff_in_seconds
 
 from helpdesk.utils import agent_only
 
@@ -29,6 +29,7 @@ TICKET_FIELDS = [
     "resolution_failed_by",
     "on_hold_since",
     "total_hold_time",
+    "_assign",
 ]
 
 
@@ -42,15 +43,15 @@ def get_ticket_analytics(ticket: str) -> dict:
 
     working_seconds = working_seconds_fn(details.sla)
     messages = conversation(ticket)
-    events, gaps = event_series(messages, details, working_seconds)
     versions = version_changes(ticket)
+    spans = pause_spans(versions)
+    events, gaps = event_series(messages, details, working_seconds, spans)
     return {
         "has_sla": bool(details.sla),
-        "timeline": build_timeline(details, working_seconds, messages, versions),
+        "timeline": build_timeline(details, working_seconds, messages, spans),
         "metrics": compute_metrics(gaps, details, working_seconds),
         "events": events,
-        "first_response_target": first_response_target(details, working_seconds),
-        "summary": summary(ticket, messages, versions),
+        "summary": summary(ticket, messages, versions, details),
     }
 
 
@@ -93,6 +94,7 @@ def event_series(
     messages: list[frappe._dict],
     details: frappe._dict,
     working_seconds: WorkingSeconds,
+    spans: list[tuple],
 ) -> tuple[list[dict], dict[str, list[int]]]:
     """Conversation as timeline rail events plus the hand-off gap series per
     side. The description message and the first response are left out of events
@@ -110,13 +112,22 @@ def event_series(
             and previous.sent_or_received == "Received"
             and message.sent_or_received == "Sent"
         ):
-            wait = working_seconds(previous.creation, message.creation) or 0
+            # the SLA clock stops on hold, so paused time is not the agent's wait
+            wait = max(
+                0,
+                (working_seconds(previous.creation, message.creation) or 0)
+                - paused_overlap(
+                    previous.creation, message.creation, spans, working_seconds
+                ),
+            )
             gaps["agent"].append(wait)
         elif (
             previous
             and previous.sent_or_received == "Sent"
             and message.sent_or_received == "Received"
         ):
+            # customer gaps stay raw: replied tickets pause by design, so
+            # subtracting pause time would zero the metric
             gaps["customer"].append(
                 working_seconds(previous.creation, message.creation) or 0
             )
@@ -145,6 +156,19 @@ def event_series(
             )
         previous = message
     return events, gaps
+
+
+def paused_overlap(
+    start, end, spans: list[tuple], working_seconds: WorkingSeconds
+) -> int:
+    """Working seconds of (start, end) that fall inside pause spans."""
+    total = 0
+    for span_start, span_end in spans:
+        clipped_start = max(start, span_start)
+        clipped_end = min(end, span_end) if span_end else end
+        if clipped_start < clipped_end:
+            total += working_seconds(clipped_start, clipped_end) or 0
+    return total
 
 
 def is_description(index: int, message: frappe._dict, details: frappe._dict) -> bool:
@@ -187,33 +211,54 @@ def average(values: list) -> int | None:
     return round(sum(values) / len(values)) if values else None
 
 
-def first_response_target(
-    details: frappe._dict, working_seconds: WorkingSeconds
-) -> int | None:
-    start = details.service_level_agreement_creation or details.creation
-    return working_seconds(start, details.response_by)
-
-
 def summary(
-    ticket: str, messages: list[frappe._dict], versions: list[frappe._dict]
+    ticket: str,
+    messages: list[frappe._dict],
+    versions: list[frappe._dict],
+    details: frappe._dict,
 ) -> dict:
     customer = sum(1 for m in messages if m.sent_or_received == "Received")
-    agents = []
-    for m in messages:
-        if m.sent_or_received == "Sent" and m.sender not in agents:
-            agents.append(m.sender)
     return {
         "customer_messages": customer,
         "agent_messages": len(messages) - customer,
         "internal_comments": frappe.db.count(
             "HD Ticket Comment", {"reference_ticket": ticket}
         ),
-        "agents_involved": [
-            {"user": user, "full_name": frappe.utils.get_fullname(user)}
-            for user in agents
-        ],
+        # user ids only; the desk resolves names and avatars from its user store
+        "agents_involved": involved_agents(messages, details.get("_assign")),
         "churn": churn(versions),
     }
+
+
+def involved_agents(messages: list[frappe._dict], assigned: str | None) -> list[str]:
+    """Reply senders oldest first, then assignees who never replied."""
+    senders = [m.sender for m in messages if m.sent_or_received == "Sent"]
+    by_email = user_ids(senders)
+    users = []
+    for sender in senders:
+        user = by_email.get(sender, sender)
+        if user not in users:
+            users.append(user)
+    for user in frappe.parse_json(assigned or "[]"):
+        if user not in users:
+            users.append(user)
+    return users
+
+
+def user_ids(emails: list[str]) -> dict[str, str]:
+    """Sender email -> User id, so a sender and an assignee that are the same
+    person (admin@example.com / Administrator) collapse to one entry."""
+    if not emails:
+        return {}
+    return dict(
+        frappe.get_all(
+            "User",
+            filters={"email": ["in", list(set(emails))]},
+            fields=["email", "name"],
+            as_list=True,
+            ignore_permissions=True,
+        )
+    )
 
 
 def churn(versions: list[frappe._dict]) -> dict:
@@ -246,11 +291,38 @@ def version_changes(ticket: str) -> list[frappe._dict]:
     return versions
 
 
+def pause_spans(versions: list[frappe._dict]) -> list[tuple]:
+    """(start, end) status-paused windows from Version diffs, oldest first;
+    end is None while the pause is still running."""
+    paused_statuses = set(
+        frappe.get_list(
+            "HD Ticket Status",
+            filters={"category": "Paused"},
+            pluck="name",
+            ignore_permissions=True,
+        )
+    )
+    spans = []
+    start = None
+    for version in versions:
+        for field, old, new in version.changed:
+            if field != "status":
+                continue
+            if new in paused_statuses and old not in paused_statuses:
+                start = start or version.creation
+            elif old in paused_statuses and new not in paused_statuses and start:
+                spans.append((start, version.creation))
+                start = None
+    if start:
+        spans.append((start, None))
+    return spans
+
+
 def build_timeline(
     details: frappe._dict,
     working_seconds: WorkingSeconds,
     messages: list[frappe._dict],
-    versions: list[frappe._dict],
+    spans: list[tuple],
 ) -> list[dict]:
     nodes = [
         {
@@ -261,11 +333,9 @@ def build_timeline(
         },
         first_response_node(details, working_seconds),
     ]
-    if exchanges := exchanges_node(messages):
-        nodes.append(exchanges)
     # hold is a cumulative summary, not a point event; it sits before
     # resolution so the dashed leg reads "the clock to resolution stopped"
-    if hold := hold_node(details, working_seconds, versions):
+    if hold := hold_node(details, working_seconds, spans):
         nodes.append(hold)
     nodes.append(resolution_node(details, working_seconds))
     return nodes
@@ -298,7 +368,6 @@ def first_response_node(details: frappe._dict, working_seconds: WorkingSeconds) 
                 "badge": badge(f"Responded in {fmt(took)}", "green"),
                 "took": took,
                 "target": None,
-                "leg_label": f"took {fmt(took)}",
             }
         return milestone(node, "done", took, target)
 
@@ -323,7 +392,6 @@ def resolution_node(details: frappe._dict, working_seconds: WorkingSeconds) -> d
                 "badge": badge(f"Resolved in {fmt(took)}", "green"),
                 "took": took,
                 "target": None,
-                "leg_label": f"took {fmt(took)}",
             }
         return milestone(
             node, "done", took, took + spare, badge_text=f"{fmt(spare)} to spare"
@@ -350,18 +418,14 @@ def milestone(
 ) -> dict:
     if state == "breach":
         text, tone = f"Failed by {fmt(failed_by)}", "red"
-        progress = target / (target + failed_by) if target + failed_by else 0
     else:
         text, tone = badge_text or f"Fulfilled in {fmt(took)}", "green"
-        progress = None
     return {
         **node,
         "state": state,
         "badge": badge(text, tone),
         "took": took,
         "target": target,
-        "leg_label": f"took {fmt(took)} · {fmt(target)} target",
-        "progress": progress,
     }
 
 
@@ -390,8 +454,6 @@ def pending_milestone(
             "badge": badge(f"Overdue by {fmt(-remaining)}", "red"),
             "took": spent,
             "target": target,
-            "leg_label": f"{fmt(spent)} elapsed · {fmt(target)} target",
-            "progress": target / spent if spent else 0,
         }
     return {
         **node,
@@ -400,19 +462,17 @@ def pending_milestone(
         "badge": badge(f"Due in {fmt(remaining)}", "gray"),
         "took": spent,
         "target": target,
-        "leg_label": f"{fmt(spent)} elapsed · {fmt(target)} target",
-        "progress": min(spent / target, 1) if target else 0,
     }
 
 
 def hold_node(
-    details: frappe._dict, working_seconds: WorkingSeconds, versions: list[frappe._dict]
+    details: frappe._dict, working_seconds: WorkingSeconds, spans: list[tuple]
 ) -> dict | None:
     active = details.status_category == "Paused"
     paused = hold_seconds(details, working_seconds)
     if not paused and not active:
         return None
-    window = pause_window(versions, active, details.on_hold_since)
+    window = pause_window(spans, active, details.on_hold_since)
     return {
         "key": "hold",
         "state": "hold",
@@ -424,47 +484,16 @@ def hold_node(
     }
 
 
-def pause_window(
-    versions: list[frappe._dict], active: bool, on_hold_since
-) -> dict | None:
-    """One aggregated span (first pause start to last resume) from Version status diffs.
+def pause_window(spans: list[tuple], active: bool, on_hold_since) -> dict | None:
+    """One aggregated span (first pause start to last resume).
     None when Versions were pruned; duration alone still renders."""
-    paused_statuses = set(
-        frappe.get_list(
-            "HD Ticket Status",
-            filters={"category": "Paused"},
-            pluck="name",
-            ignore_permissions=True,
-        )
-    )
-    start = end = None
-    for version in versions:
-        for field, old, new in version.changed:
-            if field != "status":
-                continue
-            if new in paused_statuses and old not in paused_statuses:
-                start = start or version.creation
-            elif old in paused_statuses and new not in paused_statuses:
-                end = version.creation
+    start = spans[0][0] if spans else None
+    end = spans[-1][1] if spans else None
     if active:
         start, end = start or on_hold_since, None
     if not start:
         return None
     return {"start": start, "end": end}
-
-
-def exchanges_node(messages: list[frappe._dict]) -> dict | None:
-    if len(messages) < 2:
-        return None
-    first = formatdate(messages[0].creation, "MMM d")
-    last = formatdate(messages[-1].creation, "MMM d")
-    return {
-        "key": "exchanges",
-        "state": "done",
-        "count": len(messages),
-        "timestamp": None,
-        "range": first if first == last else f"{first} – {last}",
-    }
 
 
 def badge(text: str, tone: str) -> dict:
