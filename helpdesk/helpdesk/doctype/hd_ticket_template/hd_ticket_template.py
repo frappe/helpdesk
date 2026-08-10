@@ -54,70 +54,35 @@ class HDTicketTemplate(Document):
 
     def on_update(self):
         capture_event("ticket_template_updated")
-        self.sync_custom_field_permlevels()
+        self.warn_about_unprotected_hidden_fields()
 
-    def sync_custom_field_permlevels(self):
-        """Raise custom fields hidden from customers to permlevel 2 so they
-        can neither read nor write them.
-
-        Fail-closed: the permlevel is never lowered automatically, because
-        the raise is indistinguishable from an administrator protecting the
-        field independently. Unhiding only notifies, and exposing the field
-        again is an explicit Customize Form action."""
-        hidden = {f.fieldname for f in self.fields if f.hide_from_customer}
-        if hidden:
-            raised = frappe.get_all(
-                "Custom Field",
-                filters={
-                    "dt": "HD Ticket",
-                    "fieldname": ["in", list(hidden)],
-                    "permlevel": ["<", 2],
-                },
-                pluck="name",
-            )
-            if raised:
-                frappe.db.set_value(
-                    "Custom Field", {"name": ["in", raised]}, "permlevel", 2
-                )
-                frappe.clear_cache(doctype="HD Ticket")
-        self.warn_about_protected_fields(self.previously_hidden_fields() - hidden)
-
-    def previously_hidden_fields(self) -> set:
-        before = self.get_doc_before_save()
-        if not before:
-            return set()
-        return {f.fieldname for f in before.fields if f.hide_from_customer}
-
-    def warn_about_protected_fields(self, fieldnames: set):
-        """Tell the administrator which fields stay invisible to customers."""
-        if not fieldnames:
+    def warn_about_unprotected_hidden_fields(self):
+        """Hiding only removes a field from the customer form. Custom field
+        permlevels stay under the administrator's control, so point out the
+        hidden fields the API still exposes."""
+        hidden = [f.fieldname for f in self.fields if f.hide_from_customer]
+        if not hidden:
             return
-        still_protected = frappe.get_all(
+        unprotected = frappe.get_all(
             "Custom Field",
-            filters={
-                "dt": "HD Ticket",
-                "fieldname": ["in", list(fieldnames)],
-                "permlevel": [">", 0],
-            },
+            filters={"dt": "HD Ticket", "fieldname": ["in", hidden], "permlevel": 0},
             pluck="label",
         )
-        if not still_protected:
+        if not unprotected:
             return
         frappe.msgprint(
             _(
-                "These fields keep their protected permlevel and stay invisible"
-                " to customers: {0}. To expose them, lower the permlevel of the"
-                " custom field in Customize Form."
-            ).format(", ".join(still_protected)),
-            title=_("Fields still protected"),
+                "Hiding removes these fields from the customer form, but"
+                " customers can still read and write them through the API:"
+                " {0}. To protect them, set a permission level on the custom"
+                " field in Customize Form."
+            ).format(", ".join(unprotected)),
+            title=_("Hidden fields are not protected"),
             indicator="orange",
         )
 
     def on_trash(self):
         self.prevent_default_delete()
-        self.warn_about_protected_fields(
-            {f.fieldname for f in self.fields if f.hide_from_customer}
-        )
 
     def prevent_default_delete(self):
         if self.name == DEFAULT_TICKET_TEMPLATE:

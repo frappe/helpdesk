@@ -2355,61 +2355,69 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(spoofed.priority, baseline.priority)
         self.assertNotEqual(spoofed.contact, other_contact)
 
-    def test_hidden_template_field_not_writable_by_customer(self):
+    def test_custom_field_permlevels_are_user_controlled(self):
+        """The app never sets custom field permlevels. Hiding, unhiding, and
+        template deletion leave them alone; the framework enforces whatever
+        level the user set."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
-        fieldname = "custom_perms_check"
+        fieldname = "custom_perms_user_owned"
         create_custom_field(
             "HD Ticket",
-            {"fieldname": fieldname, "label": "Perms Check", "fieldtype": "Data"},
+            {"fieldname": fieldname, "label": "Perms User Owned", "fieldtype": "Data"},
         )
         template = make_template(
-            "Perms Test Template", [{"fieldname": fieldname, "hide_from_customer": 0}]
+            "Perms User Owned Template",
+            [{"fieldname": fieldname, "hide_from_customer": 1}],
         )
         try:
+            # hiding does not touch the permlevel; at level 0 the field
+            # stays customer-writable, hidden or not
+            self.assertEqual(self.custom_field_permlevel(fieldname), 0)
             frappe.set_user(PERMS_CUSTOMER)
-            visible = frappe.get_doc(
+            ticket = frappe.get_doc(
                 {
                     **get_ticket_obj(),
                     "template": template.name,
                     fieldname: "customer value",
                 }
             ).insert()
-            self.assertEqual(visible.get(fieldname), "customer value")
+            self.assertEqual(ticket.get(fieldname), "customer value")
 
+            # the level the user sets is enforced
             frappe.set_user("Administrator")
-            template.fields[0].hide_from_customer = 1
-            template.save()
-            self.assertEqual(
-                frappe.db.get_value(
-                    "Custom Field",
-                    {"dt": "HD Ticket", "fieldname": fieldname},
-                    "permlevel",
-                ),
+            frappe.db.set_value(
+                "Custom Field",
+                {"dt": "HD Ticket", "fieldname": fieldname},
+                "permlevel",
                 2,
             )
-
+            frappe.clear_cache(doctype="HD Ticket")
             frappe.set_user(PERMS_CUSTOMER)
-            hidden = frappe.get_doc(
+            protected = frappe.get_doc(
                 {
                     **get_ticket_obj(),
                     "template": template.name,
                     fieldname: "sneaky value",
                 }
             ).insert()
-            self.assertFalse(hidden.get(fieldname))
+            self.assertFalse(protected.get(fieldname))
 
-            # unhiding never lowers the permlevel; exposing the field again
-            # is an explicit Customize Form action
+            # unhiding and template deletion do not change the level
             frappe.set_user("Administrator")
             template.reload()
             template.fields[0].hide_from_customer = 0
             template.save()
             self.assertEqual(self.custom_field_permlevel(fieldname), 2)
+            frappe.db.delete("HD Ticket", {"template": template.name})
+            frappe.delete_doc("HD Ticket Template", template.name, force=True)
+            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
         finally:
             frappe.set_user("Administrator")
             frappe.db.delete("HD Ticket", {"template": template.name})
-            frappe.delete_doc("HD Ticket Template", template.name, force=True)
+            frappe.delete_doc(
+                "HD Ticket Template", template.name, force=True, ignore_missing=True
+            )
             frappe.delete_doc(
                 "Custom Field",
                 frappe.db.get_value(
@@ -2423,72 +2431,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         return frappe.db.get_value(
             "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
         )
-
-    def test_independent_permlevel_survives_template_save(self):
-        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
-
-        fieldname = "custom_perms_independent"
-        create_custom_field(
-            "HD Ticket",
-            {"fieldname": fieldname, "label": "Perms Independent", "fieldtype": "Data"},
-        )
-        try:
-            frappe.db.set_value(
-                "Custom Field",
-                {"dt": "HD Ticket", "fieldname": fieldname},
-                "permlevel",
-                2,
-            )
-            template = make_template(
-                "Perms Independent Template",
-                [{"fieldname": fieldname, "hide_from_customer": 0}],
-            )
-            template.save()
-            # visible in the template, but never hidden by it: stays protected
-            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
-        finally:
-            frappe.delete_doc(
-                "HD Ticket Template", "Perms Independent Template", force=True
-            )
-            frappe.delete_doc(
-                "Custom Field",
-                frappe.db.get_value(
-                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
-                ),
-                force=True,
-            )
-
-    def test_template_delete_keeps_fields_protected(self):
-        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
-
-        fieldname = "custom_perms_sticky"
-        create_custom_field(
-            "HD Ticket",
-            {"fieldname": fieldname, "label": "Perms Sticky", "fieldtype": "Data"},
-        )
-        try:
-            make_template(
-                "Perms Sticky Template",
-                [{"fieldname": fieldname, "hide_from_customer": 1}],
-            )
-            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
-
-            frappe.delete_doc("HD Ticket Template", "Perms Sticky Template", force=True)
-            self.assertEqual(self.custom_field_permlevel(fieldname), 2)
-        finally:
-            frappe.delete_doc(
-                "HD Ticket Template",
-                "Perms Sticky Template",
-                force=True,
-                ignore_missing=True,
-            )
-            frappe.delete_doc(
-                "Custom Field",
-                frappe.db.get_value(
-                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
-                ),
-                force=True,
-            )
 
     def test_portal_activity_stamps_last_customer_response(self):
         frappe.set_user(PERMS_CUSTOMER)

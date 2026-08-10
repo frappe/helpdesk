@@ -24,30 +24,7 @@ LEVEL_GRANTS = {
 
 
 def execute():
-    protect_existing_hidden_template_fields()
     mirror_permlevel_grants_into_custom_docperms()
-
-
-def protect_existing_hidden_template_fields():
-    """Raise custom fields hidden from customers to permlevel 2."""
-    hidden_fields = frappe.get_all(
-        "HD Ticket Template Field",
-        filters={"hide_from_customer": 1},
-        pluck="fieldname",
-        distinct=True,
-    )
-    if not hidden_fields:
-        return
-    frappe.db.set_value(
-        "Custom Field",
-        {
-            "dt": "HD Ticket",
-            "fieldname": ["in", hidden_fields],
-            "permlevel": ["<", 2],
-        },
-        "permlevel",
-        2,
-    )
 
 
 def mirror_permlevel_grants_into_custom_docperms():
