@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex items-center justify-between pb-4">
-      <p class="font-semibold text-lg">{{ __("Contacts") }}</p>
+      <p class="text-lg-semibold">{{ __("Contacts") }}</p>
       <Button
         v-if="hasPermission()"
         :label="__('Invite')"
@@ -25,7 +25,7 @@
       <LucideUserX class="h-10 w-10 text-ink-gray-4" />
       <div>
         <!-- make font larger -->
-        <p class="text-lg font-medium text-ink-gray-7">
+        <p class="text-lg-medium text-ink-gray-7">
           {{ __("No contacts found") }}
         </p>
       </div>

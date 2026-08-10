@@ -17,7 +17,7 @@
           class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-gray-modals"
+            class="relative flex justify-center after:absolute after:start-[50%] after:top-3 after:-z-10 after:border-s after:border-outline-elevation-2"
             :class="[
               i != activities.length - 1 && 'after:h-full',
               !['email', 'feedback', 'call', 'comment'].includes(
@@ -26,7 +26,7 @@
             ]"
           >
             <div
-              class="z-1 flex items-center justify-center rounded-full bg-surface-white"
+              class="z-1 flex items-center justify-center rounded-full bg-surface-base"
               :class="[
                 ['email', 'feedback'].includes(activity.type)
                   ? 'my-1 h-9 w-9'
@@ -41,7 +41,7 @@
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
-                class="bg-surface-white absolute start-[0.7px]"
+                class="bg-surface-base absolute start-[0.7px]"
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
@@ -58,7 +58,7 @@
               />
               <DotIcon
                 v-else
-                class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
+                class="text-ink-gray-3 absolute start-[7.5px] top-[6px]"
               />
             </div>
           </div>
@@ -100,18 +100,19 @@
     </div>
     <div
       v-else
-      class="h-screen flex flex-col items-center justify-center gap-3 text-xl font-medium text-ink-gray-4"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-2xl-medium text-ink-gray-4"
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
-      <span class="text-lg font-medium text-ink-gray-8">{{
-        __(emptyText)
-      }}</span>
+      <span class="text-lg-medium text-ink-gray-8">{{ __(emptyText) }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
 
 <script setup lang="ts">
 import { FadedScrollableDiv } from "@/components";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -126,9 +127,6 @@ import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
-import CommentBox from "@/components/CommentBox.vue";
-import EmailArea from "@/components/EmailArea.vue";
-import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {
@@ -179,8 +177,17 @@ onMounted(() => {
   });
 });
 
+// The URL hash carries only active-tab state (useActiveTabManager). Activity
+// deep-links from notifications/search arrive as ?highlight=<element id>
+// (comment-<name> / communication-<name>, the ids CommentBox and EmailArea
+// render) so the one-shot scroll+cleanup below never touches tab state.
+function linkedActivityId() {
+  const id = route.query.highlight;
+  return typeof id === "string" ? id : "";
+}
+
 function scrollToLatestActivity() {
-  if (route.hash) {
+  if (linkedActivityId()) {
     scrollToHash();
     return;
   }
@@ -194,11 +201,8 @@ function scrollToLatestActivity() {
   }, 200);
 }
 function scrollToHash() {
-  const hash = route.hash;
-  if (hash) {
-    // Remove the # symbol
-    const elementId = hash.substring(1);
-
+  const elementId = linkedActivityId();
+  if (elementId) {
     nextTick(() => {
       // Wait for activities to be rendered
       setTimeout(() => {
@@ -207,12 +211,16 @@ function scrollToHash() {
           (element as any).scrollIntoViewIfNeeded();
 
           // Add highlight effect using Tailwind class
-          element.classList.add("bg-yellow-100");
+          element.classList.add("bg-surface-yellow-2");
 
-          // Remove highlight after 2 seconds
+          // Remove highlight after 2 seconds; drop only the consumed
+          // ?highlight param, keeping other query keys (?view=) and
+          // whatever tab the user is on by now.
           setTimeout(() => {
-            element.classList.remove("bg-yellow-100");
-            router.replace({ hash: "" });
+            element.classList.remove("bg-surface-yellow-2");
+            const query = { ...route.query };
+            delete query.highlight;
+            router.replace({ query, hash: route.hash });
           }, 2000);
         }
       }, 1000);
@@ -221,7 +229,7 @@ function scrollToHash() {
 }
 
 watch(
-  () => route.hash,
+  () => [route.hash, route.query.highlight],
   () => {
     scrollToLatestActivity();
   }

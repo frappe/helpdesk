@@ -7,7 +7,7 @@
         :text="customer.name"
       >
         <Avatar
-          class="-mr-1.5 cursor-pointer ring-2 ring-[var(--surface-white)] transition hover:z-10 hover:scale-110"
+          class="-mr-1.5 cursor-pointer ring-2 ring-[var(--surface-base)] transition hover:z-10 hover:scale-110"
           shape="circle"
           size="sm"
           :image="customer.image"

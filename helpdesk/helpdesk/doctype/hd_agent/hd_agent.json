@@ -56,7 +56,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-02 01:18:56.023594",
+ "modified": "2026-07-27 16:57:56.129699",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
@@ -92,5 +92,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "agent_name"
+ "title_field": "agent_name",
+ "track_changes": 1
 }

@@ -34,7 +34,7 @@
           :description="roleDescription"
         />
         <div v-if="pendingInvites.length" class="flex flex-col gap-3 mt-2">
-          <p class="text-base font-medium text-ink-gray-5">
+          <p class="text-base-medium text-ink-gray-5">
             {{ __("Pending Invites") }}
           </p>
           <div class="flex flex-col gap-3 max-h-60 overflow-y-auto">
@@ -50,7 +50,7 @@
                   <LucideUser class="size-4 text-ink-gray-5" />
                 </div>
                 <div class="flex flex-col gap-0.5 min-w-0">
-                  <p class="text-base font-medium text-ink-gray-8 truncate">
+                  <p class="text-base-medium text-ink-gray-8 truncate">
                     {{ invite.email }}
                   </p>
                   <p class="text-sm text-ink-gray-5 truncate">
@@ -87,6 +87,7 @@
 <script setup lang="ts">
 import RevokeInviteButton from "@/components/customer/RevokeInviteButton.vue";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import {
@@ -165,10 +166,19 @@ function inviteContacts() {
           customer.addContacts.data;
         selectedContacts.value = [];
         if (data.added.length) {
+          capture("customer_contacts_added", {
+            data: { count: data.added.length, role: role.value },
+          });
           toast.success(__("Contacts added successfully"));
           customer.getContacts.reload();
         }
         if (data.invite_result.invited_emails.length) {
+          capture("customer_contacts_invited", {
+            data: {
+              count: data.invite_result.invited_emails.length,
+              role: role.value,
+            },
+          });
           customer.getPendingInvites.reload();
         }
         handleInviteUserSuccess(data.invite_result);

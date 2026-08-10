@@ -1,36 +1,47 @@
 <template>
-  <div class="mt-4 flex items-center justify-start gap-2.5">
-    <Avatar :label="contact.data?.name" :image="contactImage" size="2xl" />
-    <div class="flex flex-col gap-1.5">
+  <div class="flex items-center gap-3">
+    <Avatar
+      :label="contact.data?.name ?? ''"
+      :image="contactImage"
+      size="3xl"
+    />
+    <div class="flex min-w-0 flex-1 flex-col gap-1.5">
       <Tooltip :text="contact.data?.name || contact.data?.email_id">
-        <div class="flex gap-2 items-center">
-          <p class="text-ink-gray-8 font-medium text-xl max-w-[170px] truncate">
+        <div class="flex min-w-0 items-center gap-1.5 w-fit max-w-[65%]">
+          <p
+            class="min-h-[1lh] cursor-pointer truncate text-lg font-medium text-ink-gray-7 hover:text-ink-gray-9"
+            @click="openContact(contact.data?.name)"
+          >
             {{ contact.data?.name || contact.data?.email_id }}
           </p>
-          <ExternalLinkIcon
-            v-if="!contact.loading"
-            class="size-4 text-ink-gray-6 cursor-pointer"
-            @click="openContact(contact.data.name)"
-          />
         </div>
       </Tooltip>
-      <div class="flex gap-1.5" v-if="isCallingEnabled">
-        <Tooltip :text="contact.data?.email_id">
-          <!-- Email Button -->
-          <Button size="sm" @click="toggleEmailBox()">
-            <template #icon>
-              <EmailIcon class="size-4" />
-            </template>
-          </Button>
-          <!-- Call Button -->
-          <Button size="sm" v-if="isCallingEnabled" @click="callContact">
-            <template #icon>
-              <PhoneIcon class="size-4" />
-            </template>
-          </Button>
-        </Tooltip>
+      <div class="flex items-center gap-1 text-p-sm text-ink-gray-6">
+        <p
+          class="cursor-copy transition-colors hover:text-ink-gray-8"
+          @click="
+            copyToClipboard(
+              ticket.doc.name,
+              `Ticket #${ticket.doc.name} copied`
+            )
+          "
+        >
+          #{{ ticket.doc.name }}
+        </p>
+        <div class="flex items-center">
+          <span>{{
+            ticket.doc.via_customer_portal ? __("via Portal") : __("via Email")
+          }}</span>
+        </div>
       </div>
     </div>
+    <Tooltip v-if="isCallingEnabled" :text="__('Call contact')">
+      <Button variant="ghost" @click="callContact">
+        <template #icon>
+          <PhoneIcon class="size-4" />
+        </template>
+      </Button>
+    </Tooltip>
     <SetContactPhoneModal
       v-model="showPhoneModal"
       :name="contact.data?.name ?? ''"
@@ -40,18 +51,17 @@
 </template>
 
 <script setup lang="ts">
-import { toggleEmailBox } from "@/pages/ticket/modalStates";
+import { useShortcut } from "@/composables/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useUserStore } from "@/stores/user";
 import { TicketContactSymbol, TicketSymbol } from "@/types";
-import { openContact } from "@/utils";
+import { copyToClipboard, openContact } from "@/utils";
 import { Avatar, Button, Tooltip } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, inject, ref } from "vue";
-import { ExternalLinkIcon } from "../icons";
-import EmailIcon from "../icons/EmailIcon.vue";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import SetContactPhoneModal from "../ticket/SetContactPhoneModal.vue";
+
 const telephonyStore = useTelephonyStore();
 const { getUser } = useUserStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -79,6 +89,15 @@ const callContact = () => {
     docname: ticket.value.name,
   });
 };
-</script>
 
-<style scoped></style>
+useShortcut({ meta: true, shift: true, key: "." }, () => {
+  copyToClipboard(window.location.href, `Ticket URL copied`);
+});
+
+useShortcut({ meta: true, key: "." }, () => {
+  copyToClipboard(
+    ticket.value.doc.name,
+    `Ticket #${ticket.value.doc.name} copied`
+  );
+});
+</script>

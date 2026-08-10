@@ -19,7 +19,7 @@
         }"
       >
         {{ column.label }}
-        <span v-if="column.isRequired" class="text-ink-red-3">*</span>
+        <span v-if="column.isRequired" class="text-ink-red-6">*</span>
       </div>
     </div>
     <hr v-if="slaData.priorities?.length !== 0" />
@@ -67,6 +67,7 @@ import {
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
+import { PRIORITY_DISPLAY_ORDER } from "@/stores/ticketPriority";
 import { getGridTemplateColumnsForTable } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { Button, createResource, toast } from "frappe-ui";
@@ -77,16 +78,20 @@ createResource({
   url: "frappe.client.get_list",
   params: {
     doctype: "HD Ticket Priority",
-    fields: ["name"],
+    fields: ["name", "level"],
     filters: {
       disabled: 0,
     },
-    order_by: "integer_value desc",
   },
   auto: true,
   onSuccess(data) {
+    const ranked = [...data].sort(
+      (a, b) =>
+        (PRIORITY_DISPLAY_ORDER[a.level] ?? 99) -
+        (PRIORITY_DISPLAY_ORDER[b.level] ?? 99)
+    );
     priorityOptions.push(
-      ...data.map((p) => {
+      ...ranked.map((p) => {
         return {
           label: p.name,
           value: p.name,

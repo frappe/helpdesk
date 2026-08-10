@@ -1,7 +1,7 @@
 <template>
   <SettingsLayoutBase>
     <template #title>
-      <h1 class="text-lg font-semibold text-ink-gray-8">
+      <h1 class="text-lg-semibold text-ink-gray-8">
         {{ __("Service Level Agreements (SLAs)") }}
       </h1>
     </template>

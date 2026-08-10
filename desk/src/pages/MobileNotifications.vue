@@ -57,14 +57,17 @@
           <div class="text-sm text-ink-gray-5">
             {{ dayjs.tz(n.creation).fromNow() }}
           </div>
-          <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
+          <div
+            v-if="!n.read"
+            class="h-1.5 w-1.5 rounded-full bg-surface-blue-5"
+          />
         </div>
       </div>
     </RouterLink>
   </div>
   <div v-else class="flex flex-1 flex-col items-center gap-2">
     <LucideBell class="h-20 w-20 text-ink-gray-2" />
-    <div class="text-lg font-medium text-ink-gray-4">
+    <div class="text-lg-medium text-ink-gray-4">
       {{ __("No new notifications") }}
     </div>
   </div>
@@ -101,7 +104,10 @@ function getRoute(n: Notification) {
         params: {
           ticketId: n.reference_ticket,
         },
-        hash: "#" + n.reference_comment,
+        // ?highlight is the activity deep-link target (element id, see
+        // TicketAgentActivities); the hash only selects the tab.
+        hash: "#activity",
+        query: { highlight: "comment-" + n.reference_comment },
       };
     case "Assignment":
     case "Reaction":

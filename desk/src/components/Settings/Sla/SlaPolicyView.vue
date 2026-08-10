@@ -11,7 +11,7 @@
           @click="toggleEnabled"
         >
           <Switch size="sm" v-model="slaData.enabled" />
-          <span class="text-sm text-ink-gray-7 font-medium">
+          <span class="text-sm-medium text-ink-gray-7">
             {{ __("Enabled") }}
           </span>
         </div>
@@ -34,25 +34,46 @@
       </div>
       <div v-if="!slaData.loading">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <FormControl
-              :type="'text'"
-              size="sm"
-              variant="subtle"
-              :placeholder="__('Name')"
-              :label="__('Name')"
-              v-model="slaData.service_level"
-              required
-              @change="validateSlaData('service_level')"
-              :disabled="Boolean(slaActiveScreen.data)"
-              maxlength="50"
-            />
-            <ErrorMessage :message="slaDataErrors.service_level" class="mt-2" />
+          <div class="space-y-5">
+            <div>
+              <FormControl
+                :type="'text'"
+                size="sm"
+                variant="subtle"
+                :placeholder="__('Name')"
+                :label="__('Name')"
+                v-model="slaData.service_level"
+                required
+                @change="validateSlaData('service_level')"
+                :disabled="Boolean(slaActiveScreen.data)"
+                maxlength="50"
+              />
+              <ErrorMessage
+                :message="slaDataErrors.service_level"
+                class="mt-2"
+              />
+            </div>
+            <div class="space-y-1.5" v-if="!slaData.default_sla">
+              <FormLabel :label="__('Rank')" for="rank" size="md" />
+              <FormControl
+                id="rank"
+                type="number"
+                min="0"
+                variant="subtle"
+                v-model="slaData.rank"
+                :description="
+                  __(
+                    'When more than one policy matches, the lower rank is applied first. 0 means unranked, and is applied last.'
+                  )
+                "
+              />
+            </div>
           </div>
           <FormControl
             :type="'textarea'"
             size="sm"
             variant="subtle"
+            :rows="8"
             :placeholder="__('Description')"
             :label="__('Description')"
             v-model="slaData.description"
@@ -62,7 +83,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">{{
+            <span class="text-lg-semibold text-ink-gray-8">{{
               __("Assignment Conditions")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -75,7 +96,7 @@
                 :label="__('Set as default SLA')"
                 :model-value="slaData.default_sla"
                 @update:model-value="toggleDefaultSla"
-                class="text-ink-gray-6 text-base font-medium"
+                class="text-ink-gray-6 text-base-medium"
               />
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
@@ -91,7 +112,7 @@
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
@@ -128,7 +149,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">
+            <span class="text-lg-semibold text-ink-gray-8">
               {{ __("Valid From") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -137,7 +158,7 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('From date')" for="from_date" />
+              <FormLabel :label="__('From date')" for="from_date" size="md" />
               <DatePicker
                 v-model="slaData.start_date"
                 variant="subtle"
@@ -154,7 +175,7 @@
               <ErrorMessage :message="slaDataErrors.start_date" />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('To date')" for="to_date" />
+              <FormLabel :label="__('To date')" for="to_date" size="md" />
               <DatePicker
                 v-model="slaData.end_date"
                 variant="subtle"
@@ -175,7 +196,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">
+            <span class="text-lg-semibold text-ink-gray-8">
               {{ __("Response and Resolution") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -197,7 +218,7 @@
               :checked="!slaData.apply_sla_for_resolution"
               type="radio"
             />
-            <div class="select-none text-ink-gray-6 text-sm font-medium">
+            <div class="select-none text-ink-gray-6 text-sm-medium">
               Apply SLA for response time
             </div>
           </div>
@@ -210,7 +231,7 @@
               :checked="slaData.apply_sla_for_resolution"
               type="radio"
             />
-            <div class="select-none text-ink-gray-6 text-sm font-medium">
+            <div class="select-none text-ink-gray-6 text-sm-medium">
               Apply SLA for response time and resolution time
             </div>
           </div>
@@ -223,7 +244,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg font-semibold text-ink-gray-8">
+            <span class="text-lg-semibold text-ink-gray-8">
               {{ __("Status Details") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -474,16 +495,12 @@ const updateSla = () => {
 };
 
 const toggleEnabled = () => {
-  if (slaData.value.default_sla) {
-    toast.error(__("SLA set as default cannot be disabled"));
-    return;
-  }
   slaData.value.enabled = !slaData.value.enabled;
 };
 
-const toggleDefaultSla = () => {
-  slaData.value.default_sla = !slaData.value.default_sla;
-  if (slaData.value.default_sla) {
+const toggleDefaultSla = (value: boolean) => {
+  slaData.value.default_sla = value;
+  if (value) {
     slaData.value.enabled = true;
   }
 };

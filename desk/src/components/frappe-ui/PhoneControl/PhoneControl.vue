@@ -1,12 +1,8 @@
 <template>
   <div :class="['space-y-1.5', $attrs.class as string]">
-    <label
-      v-if="label"
-      :for="id"
-      class="block w-fit text-p-sm font-medium text-ink-gray-7"
-    >
+    <label v-if="label" :for="id" class="block w-fit text-base text-ink-gray-5">
       {{ label }}
-      <span v-if="required" class="text-ink-red-3">*</span>
+      <span v-if="required" class="text-ink-red-6">*</span>
     </label>
     <Popover v-model:open="isOpen" matchTargetWidth>
       <template #target="{ togglePopover }">
@@ -66,7 +62,7 @@
 
       <template #body="{ close }">
         <div
-          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-modal shadow-lg"
+          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
         >
           <div class="border-b border-outline-gray-1 p-2">
             <FormControl
@@ -227,9 +223,9 @@ const variantClasses = computed(() => {
   }
   return {
     subtle:
-      "border border-[--surface-gray-2] bg-surface-gray-2 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus-within:bg-surface-white focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:bg-surface-white focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
+      "border border-[--surface-gray-2] bg-surface-gray-2 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus-within:bg-surface-base focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:bg-surface-base focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
     outline:
-      "border border-outline-gray-2 bg-surface-white hover:border-outline-gray-3 hover:shadow-sm focus-within:bg-surface-white focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
+      "border border-outline-gray-2 bg-surface-base hover:border-outline-gray-3 hover:shadow-sm focus-within:bg-surface-base focus-within:border-outline-gray-4 focus-within:shadow-sm focus-within:hover:border-outline-gray-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-outline-gray-3",
   }[props.variant];
 });
 

@@ -7,5 +7,8 @@
 export {}
 declare global {
   const LucideAlignJustify: typeof import('~icons/lucide/align-justify')['default']
+  const LucideCornerUpLeft: typeof import('~icons/lucide/corner-up-left')['default']
   const LucideFileSearch: typeof import('~icons/lucide/file-search')['default']
+  const LucideMessageCircle: typeof import('~icons/lucide/message-circle')['default']
+  const LucideTag: typeof import('~icons/lucide/tag')['default']
 }

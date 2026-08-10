@@ -61,6 +61,7 @@
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
   "show_customer_portal_permission_notice",
+  "persona_captured",
   "column_break_hjfh",
   "search_tab",
   "name_weight",
@@ -153,6 +154,14 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Show Customer Portal Permission Notice"
+  },
+  {
+   "default": "0",
+   "description": "Set once an admin completes the onboarding persona questionnaire",
+   "fieldname": "persona_captured",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Persona Captured"
   },
   {
    "fieldname": "column_break_hjfh",
@@ -532,7 +541,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-07-07 12:30:00.000000",
+ "modified": "2026-07-10 14:58:15.922364",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

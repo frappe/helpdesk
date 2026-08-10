@@ -8,7 +8,7 @@
     <template #default>
       <div class="flex flex-col gap-4 mt-4">
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Date" required />
+          <FormLabel label="Date" required size="md" />
           <DatePicker
             :model-value="dayjs(dialog.holiday_date).format('YYYY-MM-DD')"
             @update:model-value="

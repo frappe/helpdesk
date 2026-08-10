@@ -9,7 +9,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
-import { createSuggestionExtension } from "frappe-ui";
+import { SuggestionExtension } from "frappe-ui/editor";
 import FieldAutocompleteList from "./components/Settings/SavedReplies/components/FieldAutocompleteList.vue";
 import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import { getMeta } from "./stores/meta";
@@ -25,12 +25,11 @@ export const FieldAutocompleteSuggestionKey = new PluginKey<any>(
 
 const ticketMeta = getMeta("HD Ticket");
 
-export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
+export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   name: "fieldAutocomplete",
-  char: "{{",
+  trigger: "{{",
   allowSpaces: true,
-  pluginKey: FieldAutocompleteSuggestionKey,
-  items: ({ editor, query, ...rest }) => {
+  items: (query: string) => {
     // Return empty list to force the dropdown to close.
     if (query.includes("}}")) {
       return [];
@@ -57,7 +56,7 @@ export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
         field.value.toLowerCase().includes(cleanedQuery.toLowerCase())
     );
   },
-  command: ({ editor, range, props: item }) => {
+  command: ({ editor, range, item }) => {
     const { state } = editor;
     const textAfterCursor = state.doc.textBetween(
       range.to,
@@ -770,7 +769,6 @@ export const HandleExcelPaste = Extension.create({
     ];
   },
 });
-
 
 // Handle formatting cleanup
 type StyleValidator = (value: string) => boolean;

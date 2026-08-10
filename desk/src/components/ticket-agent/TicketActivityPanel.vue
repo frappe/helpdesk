@@ -26,7 +26,7 @@
       />
       <!-- <div v-else class="flex items-center justify-center flex-col flex-1">
         <Button :loading="true" variant="ghost" size="2xl" />
-        <p class="text-xl font-medium text-ink-gray-5">Loading...</p>
+        <p class="text-2xl-medium text-ink-gray-5">Loading...</p>
       </div> -->
     </template>
   </Tabs>
@@ -57,13 +57,7 @@ import {
 } from "@/components/icons";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
-import {
-  ActivitiesSymbol,
-  FeedbackActivity,
-  TabObject,
-  TicketSymbol,
-  TicketTab,
-} from "@/types";
+import { ActivitiesSymbol, TabObject, TicketSymbol, TicketTab } from "@/types";
 import { Button, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
@@ -229,28 +223,8 @@ const _activities = computed(() => {
     }
     i++;
   }
-  // add feedback data at the last always
-  // name is email
-  // full_name is name
-
-  if (ticket.value.doc.feedback_rating === 0) {
-    return data;
-  }
-  let feedbackActivity: FeedbackActivity[] = [
-    {
-      type: "feedback",
-      key: "feedback-activity",
-      feedback_rating: ticket.value?.doc.feedback_rating,
-      feedback_extra: ticket.value?.doc.feedback_extra,
-      feedback: ticket.value?.doc.feedback,
-      sender: {
-        name: ticket.value?.doc.raised_by,
-        full_name: ticket.value?.doc.contact,
-      },
-    },
-  ];
-  data.push(...feedbackActivity);
-
+  // Feedback is not a timeline entry on desktop, it lives in the sidebar
+  // (TicketDetailsTab). Mobile still appends it to its own activity list.
   return data;
 });
 

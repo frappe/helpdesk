@@ -14,6 +14,7 @@
   "enabled",
   "filters_section",
   "default_sla",
+  "rank",
   "column_break_15",
   "condition",
   "condition_json",
@@ -102,6 +103,15 @@
    "fieldname": "default_sla",
    "fieldtype": "Check",
    "label": "Default SLA"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: !doc.default_sla",
+   "description": "Lower rank is applied first. 0 means unranked, and is applied last.",
+   "fieldname": "rank",
+   "fieldtype": "Int",
+   "label": "Rank",
+   "non_negative": 1
   },
   {
    "fieldname": "default_priority",

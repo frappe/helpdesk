@@ -15,6 +15,7 @@ import {
 } from "frappe-ui";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import { spritePlugin } from "frappe-ui/icons";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
@@ -48,7 +49,7 @@ setConfig("serverMessagesHandler", (msgs) => {
     }
     toast.create({
       message: msg.message,
-      icon: h(CircleAlert, { class: "text-ink-blue-2" }),
+      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
     });
   });
 });
@@ -63,6 +64,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(FrappeUI);
+app.use(spritePlugin);
 app.use(pinia);
 app.use(router);
 app.use(translationPlugin);

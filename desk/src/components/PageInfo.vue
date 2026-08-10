@@ -15,7 +15,7 @@
         ]"
       >
         <div class="flex gap-2 items-center">
-          <p class="font-medium text-ink-gray-8 text-xl">
+          <p class="text-ink-gray-8 text-2xl-medium">
             {{ avatar.label }}
           </p>
           <Tooltip v-if="badge" :text="badge.tooltip ?? ''">
