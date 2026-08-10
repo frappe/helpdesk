@@ -4,7 +4,6 @@ from datetime import timedelta
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
-from frappe.model import get_permitted_fields
 from frappe.model.document import get_controller
 from frappe.utils import (
     add_to_date,
@@ -32,12 +31,9 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    if is_agent():
-        return d
-    # customers get only their permlevel-readable columns, not the raw doc's
-    # permlevel-2 internals.
-    columns = get_permitted_fields("HD Ticket", permission_type="read")
-    return frappe.db.get_value("HD Ticket", d.name, columns, as_dict=True)
+    # strips permlevel fields the caller cannot read; no-op for agents
+    d.apply_fieldlevel_read_permissions()
+    return d
 
 
 @frappe.whitelist()
