@@ -324,11 +324,16 @@ function pushOverdueTail(
   eta: string
 ): void {
   let prevDay = dayjsLocal(eta).format("MMM D");
+  let prevYear = dayjsLocal(eta).year();
   for (const event of events) {
-    const day = dayjsLocal(event.at).format("MMM D");
+    const at = dayjsLocal(event.at);
+    const day = at.format("MMM D");
     segs.push(line(OVERDUE, 72, { grow: true }));
-    segs.push(eventNode(event, day !== prevDay ? day : undefined));
+    segs.push(
+      eventNode(event, day !== prevDay ? dayTitle(at, prevYear) : undefined)
+    );
     prevDay = day;
+    prevYear = at.year();
   }
   segs.push(line(OVERDUE, 140, { grow: true }));
   segs.push({
@@ -353,15 +358,23 @@ function pushEvents(
   let prev = carried;
   let atGroupStart = true;
   let prevDay = startAt ? dayjsLocal(startAt).format("MMM D") : "";
+  let prevYear = dayjsLocal(startAt ?? undefined).year();
   for (const event of events) {
-    const day = dayjsLocal(event.at).format("MMM D");
+    const at = dayjsLocal(event.at);
+    const day = at.format("MMM D");
     const newDay = day !== prevDay;
     segs.push(connectorBefore(prev, event, atGroupStart));
-    segs.push(eventNode(event, newDay ? day : undefined));
+    segs.push(eventNode(event, newDay ? dayTitle(at, prevYear) : undefined));
     prevDay = day;
+    prevYear = at.year();
     prev = event;
     atGroupStart = false;
   }
+}
+
+// a day label carries its year when it differs from the last one on the rail
+function dayTitle(at: ReturnType<typeof dayjsLocal>, prevYear: number): string {
+  return at.year() === prevYear ? at.format("MMM D") : at.format("MMM D, YYYY");
 }
 
 function connectorBefore(
@@ -504,7 +517,7 @@ function dedupeDayPrefixes(segs: RailSegment[]): void {
       continue;
     }
     const [, prefix, day, rest] =
-      seg.label.sub?.match(/^(.*?)(\w{3} \d{1,2}), (.+)$/) ?? [];
+      seg.label.sub?.match(/^(.*?)(\w{3} \d{1,2}(?:, \d{4})?), (.+)$/) ?? [];
     if (!day || !rest) continue;
     if (day === prevDay) seg.label.sub = prefix + rest;
     else prevDay = day;
@@ -562,14 +575,17 @@ function line(cls: string, width: number, extra: Partial<RailLine>): RailLine {
 }
 
 function dueLabel(eta: string): string {
-  return __("due {0}", dayjsLocal(eta).format("MMM D, h:mm a"));
+  return __("due {0}", fmtAt(eta));
 }
 
 function fmtAt(timestamp: string): string;
 function fmtAt(timestamp?: string | null): string | undefined;
 function fmtAt(timestamp?: string | null): string | undefined {
   if (!timestamp) return undefined;
-  return dayjsLocal(timestamp).format("MMM D, h:mm a");
+  const at = dayjsLocal(timestamp);
+  return at.year() === dayjsLocal().year()
+    ? at.format("MMM D, h:mm a")
+    : at.format("MMM D, YYYY, h:mm a");
 }
 
 watch(segments, () =>
