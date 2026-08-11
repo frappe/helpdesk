@@ -56,14 +56,14 @@ export const ACTION_TYPES: Record<SavedReplyActionType, ActionTypeConfig> = {
     chipLabel: __("Team"),
     fieldname: __("Team"),
     icon: LucideUsers,
-    control: "select",
+    control: "combobox",
   },
   "Set Ticket Type": {
     label: __("Set ticket type"),
     chipLabel: __("Type"),
     fieldname: __("Ticket Type"),
     icon: LucideTicket,
-    control: "select",
+    control: "combobox",
   },
   "Assign Agent": {
     label: __("Assign agent"),

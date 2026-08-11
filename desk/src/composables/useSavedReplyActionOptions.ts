@@ -6,16 +6,26 @@ import { useConfigStore } from "@/stores/config";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { SavedReplyActionType } from "@/types";
+import { useDebounceFn } from "@vueuse/core";
 import { createListResource } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
+const SEARCH_PAGE_LENGTH = 10;
+
+let shared: ReturnType<typeof buildActionOptions> | undefined;
+
 /**
  * The pickable values for each saved reply action type. Shared so the settings
  * editor and the reply composer offer the same list instead of each building
- * its own.
+ * its own. Built once: every action chip calls this, and a resource per caller
+ * means a list request per chip.
  */
 export function useSavedReplyActionOptions() {
+  return (shared ??= buildActionOptions());
+}
+
+function buildActionOptions() {
   const statusStore = useTicketStatusStore();
   const priorityStore = useTicketPriorityStore();
   const agentStore = useAgentStore();
@@ -25,21 +35,38 @@ export function useSavedReplyActionOptions() {
 
   const ticketTypesResource = createListResource({
     doctype: "HD Ticket Type",
-    cache: ["HD Ticket Type", "list"],
+    cache: ["HD Ticket Type", "search"],
     fields: ["name"],
     filters: { disabled: 0 },
-    pageLength: 100,
+    pageLength: SEARCH_PAGE_LENGTH,
     auto: true,
   });
 
   const teamsResource = createListResource({
     doctype: "HD Team",
-    cache: ["HD Team", "list"],
+    cache: ["HD Team", "search"],
     fields: ["name"],
     filters: { disabled: 0 },
-    pageLength: 999,
+    pageLength: SEARCH_PAGE_LENGTH,
     auto: true,
   });
+
+  /** Link fields: these lists are fetched by query instead of held whole. */
+  const searchResources: Partial<
+    Record<SavedReplyActionType, ReturnType<typeof createListResource>>
+  > = {
+    "Set Ticket Type": ticketTypesResource,
+    "Set Team": teamsResource,
+  };
+
+  const search = useDebounceFn((type: SavedReplyActionType, query: string) => {
+    const resource = searchResources[type];
+    if (!resource) return;
+    resource.update({
+      filters: { ...resource.filters, name: ["like", `%${query}%`] },
+    });
+    resource.reload();
+  }, 300);
 
   // A restricted agent can only route to their own teams
   const teamOptions = computed<ActionOption[]>(() => {
@@ -93,5 +120,5 @@ export function useSavedReplyActionOptions() {
 
   if (!agentStore.agents.data) agentStore.agents.fetch();
 
-  return { valueOptions, tagOptions };
+  return { valueOptions, tagOptions, search };
 }

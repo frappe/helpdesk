@@ -15,8 +15,9 @@
     :options="options"
     :placeholder="placeholder"
     @update:model-value="emit('update:modelValue', $event as string)"
+    @update:query="emit('search', $event)"
   >
-    <template #item-prefix="{ item }">
+    <template v-if="type === 'Assign Agent'" #item-prefix="{ item }">
       <Avatar size="xs" :image="item.image" :label="item.label" />
     </template>
   </Combobox>
@@ -97,6 +98,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | string[]];
+  search: [query: string];
 }>();
 
 const config = computed(() => ACTION_TYPES[props.type]);

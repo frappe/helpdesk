@@ -38,6 +38,7 @@
           :model-value="value"
           :options="valueOptions(row.action_type)"
           @update:model-value="update"
+          @search="search(row.action_type, $event)"
         />
         <span v-else class="flex items-center px-2 text-p-sm text-ink-gray-4">
           &mdash;
@@ -75,8 +76,11 @@ defineProps<{
 
 const actions = defineModel<SavedReplyAction[]>({ required: true });
 
-const { valueOptions: sharedValueOptions, tagOptions } =
-  useSavedReplyActionOptions();
+const {
+  valueOptions: sharedValueOptions,
+  tagOptions,
+  search,
+} = useSavedReplyActionOptions();
 
 const columns: GridColumn[] = [
   { fieldname: "action_type", label: __("Action"), width: 220 },
