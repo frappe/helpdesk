@@ -31,7 +31,7 @@
         />
       </div>
     </div>
-    <div v-if="expanded" class="border-t border-outline-gray-1">
+    <div v-if="expanded">
       <Editor
         :model-value="action.value"
         :extensions="extensions"
@@ -56,7 +56,7 @@
           class="ms-auto"
           variant="ghost"
           size="sm"
-          :label="__('Reset to saved reply')"
+          :label="__('Reset to default')"
           @click="emit('update:value', action.original_value ?? '')"
         />
       </div>

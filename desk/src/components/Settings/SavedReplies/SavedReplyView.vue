@@ -108,7 +108,6 @@
         </div>
         <ActionsEditor
           v-model="savedReplyData.actions"
-          :team-options="teamsList"
           :error="errors.actions"
         />
       </div>
