@@ -119,6 +119,15 @@ class TestHDTicket(IntegrationTestCase):
         ticket.insert()
         self.assertTrue(ticket.name)
 
+    def test_update_perms_skipped_without_a_previous_version(self):
+        # a before_insert hook that persists the ticket clears __islocal, so is_new()
+        # can be False on create while there is still no previous version to check
+        frappe.set_user(non_agent)
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.set("__islocal", False)
+        ticket.check_update_perms()
+        frappe.set_user("Administrator")
+
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()

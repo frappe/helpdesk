@@ -424,9 +424,9 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent() or not self.via_customer_portal:
-            return
         old_doc = self.get_doc_before_save()
+        if not old_doc or is_agent() or not self.via_customer_portal:
+            return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
         if is_closed or is_rated:
