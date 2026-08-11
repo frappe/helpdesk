@@ -202,9 +202,12 @@ const applyActions = createResource({
         )
       );
     }
+    // Cleared only once the actions have landed, so a failed apply leaves them
+    // staged for another try instead of losing them with the email already sent
+    pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
-  onError: (error) => {
+  onError: (error: { messages?: string[] }) => {
     toast.error(
       error?.messages?.[0] || __("Could not apply saved reply actions")
     );
@@ -215,11 +218,12 @@ const applyActions = createResource({
 /** Apply the staged actions to the ticket; call after the email is sent. */
 function submit() {
   if (!pendingActions.value.length || props.doctype !== "HD Ticket") return;
+  // Actions stay staged during the request, so guard the second call
+  if (applyActions.loading) return;
   applyActions.submit({
     ticket_id: props.ticketId,
     actions: [...pendingActions.value],
   });
-  pendingActions.value = [];
 }
 
 /** Drop the staged actions without applying them. */

@@ -86,7 +86,7 @@ export function ticketCommands(ticketId: string): Command[] {
       weight: CONTEXT_WEIGHT,
       icon: LucideUsers,
       hint: "Shift+T",
-      keywords: "group agent_group",
+      keywords: "group agent_group escalation escalate",
       children: () => teamChildren(ticketId),
     },
     {
@@ -392,4 +392,3 @@ function logAssignment(ticketId: string, agent: string): Promise<unknown> {
 
 // ponytail: "Delete ticket" stays out — $dialog is unreachable from module
 // scope and the ticket header offers it. Wire up if frappe-ui grows a confirm helper.
-
