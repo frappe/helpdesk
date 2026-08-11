@@ -17,6 +17,7 @@
           :options="pickerOptions"
           :placeholder="__('Select {0}', label.toLowerCase())"
           @update:model-value="pick($event as string)"
+          @update:query="search(action.action_type, $event)"
         >
           <template #trigger>
             <button
@@ -63,7 +64,7 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const { valueOptions } = useSavedReplyActionOptions();
+const { valueOptions, search } = useSavedReplyActionOptions();
 
 const config = computed(() => ACTION_TYPES[props.action.action_type]);
 const label = computed(() => config.value.chipLabel);
