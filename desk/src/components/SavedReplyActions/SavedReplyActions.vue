@@ -140,10 +140,7 @@ const countSentence = computed(() => {
 
 /** Stage the actions of an applied saved reply, replacing whatever was staged. */
 function add(reply: RenderedSavedReply) {
-  // A reply that brings no actions has nothing to conflict with, so it leaves
-  // an earlier reply's staged actions alone rather than wiping them
-  if (!reply.actions?.length) return;
-  pendingActions.value = reply.actions.map((action) => ({
+  pendingActions.value = (reply.actions ?? []).map((action) => ({
     ...action,
     source: reply.title,
     // Kept so the staged comment can report edits and restore
