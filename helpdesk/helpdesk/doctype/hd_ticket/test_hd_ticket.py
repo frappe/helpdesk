@@ -15,7 +15,11 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
     show_outside_hours_banner,
     split_ticket,
 )
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
+    close_tickets_after_n_days,
+    has_permission,
+    permission_query,
+)
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
     add_comment,
@@ -29,6 +33,7 @@ from helpdesk.test_utils import (
     make_priority,
     make_sla,
     make_status,
+    make_team,
     make_ticket,
     remove_holidays,
     set_ticket_status_and_communication_date,
@@ -2262,6 +2267,29 @@ class TestHDTicket(IntegrationTestCase):
 
         self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
         self.assertFalse(ticket.total_hold_time)
+
+    def test_permission_check_answers_for_passed_user_not_session(self):
+        """A check made on behalf of another user must use that user's teams.
+
+        Session is an agent on the ticket's team, the checked user is not, so a
+        session-bound lookup would wrongly grant access.
+        """
+        make_team("Team A", members=[agent])
+        make_team("Team B", members=[agent2])
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "restrict_tickets_by_agent_group",
+            0,
+        )
+
+        ticket = make_ticket(agent_group="Team B", raised_by=non_agent)
+
+        frappe.set_user(agent2)
+        self.assertTrue(has_permission(ticket, user=agent2))
+        self.assertFalse(has_permission(ticket, user=agent))
+        self.assertNotIn("Team B", permission_query(agent))
 
     def tearDown(self):
         frappe.set_user("Administrator")
