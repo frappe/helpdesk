@@ -1,17 +1,10 @@
 <template>
-  <Dialog
-    v-model:open="show"
-    size="4xl"
-    bare
-    @vue:unmounted="resetFilter"
-    @after-leave="onAfterLeave"
-  >
+  <Dialog v-model:open="show" size="4xl" bare @after-leave="onAfterLeave">
     <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
           <div class="text-3xl-semibold">{{ __("Saved Replies") }}</div>
           <Button
-            variant="solid"
             icon-left="lucide-plus"
             :label="__('New')"
             @click="onNewSavedReplyClick"
@@ -43,17 +36,13 @@
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button
-                :label="activeFilterLabel"
-                icon-left="lucide-filter"
-                class="p-4"
-              >
+              <Button :label="activeFilterLabel" icon-left="lucide-filter">
                 <template #suffix>
                   <p
-                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
-                    v-if="savedReplyListResource?.data?.length"
+                    class="flex h-5 min-w-[20px] items-center justify-center rounded-[5px] bg-surface-base px-1 pt-px text-xs-medium text-ink-gray-8 shadow-sm"
+                    v-if="savedReplyCount.data"
                   >
-                    {{ savedReplyListResource?.data?.length }}
+                    {{ savedReplyCount.data }}
                   </p>
                 </template>
               </Button>
@@ -72,16 +61,16 @@
               !savedReplyListResource?.list?.loading &&
               savedReplyListResource?.data?.length
             "
-            class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
+            class="grid grid-cols-1 md:grid-cols-3 gap-3 pb-36"
           >
             <div
               v-for="template in savedReplyListResource?.data"
               :key="template.name"
-              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border border-outline-gray-1 bg-surface-base p-3 hover:border-outline-gray-3 relative"
               @click="onTemplateSelect(template)"
             >
               <div class="flex items-center gap-2 border-b pb-2">
-                <div class="text-base-semibold truncate">
+                <div class="text-base-semibold truncate max-w-[75%]">
                   {{ template.title }}
                 </div>
                 <Tooltip
@@ -93,7 +82,7 @@
               </div>
               <div
                 v-if="template.message"
-                class="flex-1 overflow-hidden pointer-events-none"
+                class="flex-1 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
               >
                 <Editor
                   :model-value="template.message"
@@ -155,10 +144,10 @@ import {
   TextInput,
   Tooltip,
 } from "frappe-ui";
-import ZapIcon from "~icons/lucide/zap";
 import { Editor, EditorContent } from "frappe-ui/editor";
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
+import ZapIcon from "~icons/lucide/zap";
 import {
   setActiveSettingsTab,
   showSettingsModal,
@@ -250,7 +239,15 @@ const savedReplyListResource = createListResource({
   auto: true,
   orderBy: "modified desc",
   start: 0,
-  pageLength: 999,
+  pageLength: 20,
+});
+
+const savedReplyCount = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Saved Reply",
+    filters: savedReplyListResource.filters,
+  }),
 });
 
 const actionCounts = computed<Record<string, number>>(() => {
@@ -306,18 +303,12 @@ const onNewSavedReplyClick = () => {
   setActiveSettingsTab("Saved Replies");
 };
 
-const resetFilter = () => {
-  savedReplyListResource.filters = {
-    ...savedReplyListResource.filters,
-    title: undefined,
-  };
-};
-
-watch(search, (newValue) => {
-  savedReplyListResource.filters = {
-    ...savedReplyListResource.filters,
-    title: ["like", `%${newValue}%`],
-  };
+// A reply is as findable by its wording as by its name, now that only a page loads
+watch(search, (query) => {
+  savedReplyListResource.orFilters = query
+    ? { title: ["like", `%${query}%`], message: ["like", `%${query}%`] }
+    : undefined;
+  savedReplyListResource.start = 0;
   savedReplyListResource.list.reload();
 });
 
@@ -326,19 +317,25 @@ watch(activeFilter, () => {
     ...savedReplyListResource?.filters,
     scope: scope.value == "All" ? undefined : ["=", scope.value],
   };
+  savedReplyListResource.start = 0;
   savedReplyListResource.list.reload();
+  savedReplyCount.reload();
 });
 
 watch(
   show,
   (newValue) => {
-    if (newValue) {
+    if (!newValue) return;
+    if (search.value) {
+      search.value = "";
+    } else {
       savedReplyListResource.list.reload();
-      nextTick(() => {
-        const inputEl = searchInput.value?.$el?.querySelector("input");
-        inputEl?.focus();
-      });
     }
+    savedReplyCount.reload();
+    nextTick(() => {
+      const inputEl = searchInput.value?.$el?.querySelector("input");
+      inputEl?.focus();
+    });
   },
   { immediate: true }
 );
