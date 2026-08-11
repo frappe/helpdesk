@@ -58,7 +58,8 @@
   {
    "fieldname": "actions",
    "fieldtype": "JSON",
-   "label": "Actions"
+   "label": "Actions",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
