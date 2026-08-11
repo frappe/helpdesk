@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
+import click
 import frappe
 from frappe import _
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
@@ -64,16 +65,37 @@ class HDTicketTemplate(Document):
         """Template visibility drives HD Ticket field permlevels: hidden
         fields turn agent-only, visible fields turn customer-writable."""
         meta = frappe.get_meta("HD Ticket")
-        changed = False
+        changed = []
         for f in self.fields:
             target = HIDDEN_FIELD_PERMLEVEL if f.hide_from_customer else 0
             field = meta.get_field(f.fieldname)
             if not field or field.permlevel == target:
                 continue
             self.set_field_permlevel(f.fieldname, target)
-            changed = True
+            changed.append(f"{f.fieldname}: {field.permlevel} → {target}")
         if changed:
             frappe.clear_cache(doctype="HD Ticket")
+            self.warn_permlevel_changes(changed)
+
+    def warn_permlevel_changes(self, changed: list[str]):
+        if frappe.flags.in_patch or frappe.flags.in_migrate:
+            for line in changed:
+                click.secho(f"{self.name}: HD Ticket permlevel {line}", fg="yellow")
+            return
+        docs_link = (
+            "<a href='https://docs.frappe.io/framework/user/en/basics/"
+            "users-and-permissions' target='_blank'>Users and Permissions</a>"
+        )
+        frappe.msgprint(
+            _(
+                "This template changed HD Ticket permission levels: {0}.<br>"
+                "Hidden fields are agent-only (level {1}), visible fields are "
+                "customer-editable (level 0). This overrides levels set from "
+                "Customize Form. See {2}."
+            ).format(", ".join(changed), HIDDEN_FIELD_PERMLEVEL, docs_link),
+            title=_("Permission Levels Updated"),
+            indicator="yellow",
+        )
 
     def set_field_permlevel(self, fieldname: str, level: int):
         if self.custom_field_exists(fieldname):
