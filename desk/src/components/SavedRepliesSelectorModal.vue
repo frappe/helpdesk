@@ -36,15 +36,8 @@
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button :label="activeFilterLabel" icon-left="lucide-filter">
-                <template #suffix>
-                  <p
-                    class="flex h-5 min-w-[20px] items-center justify-center rounded-[5px] bg-surface-base px-1 pt-px text-xs-medium text-ink-gray-8 shadow-sm"
-                    v-if="savedReplyCount.data"
-                  >
-                    {{ savedReplyCount.data }}
-                  </p>
-                </template>
+              <Button :label="activeFilterLabel">
+                <template #prefix><FilterIcon class="h-4" /></template>
               </Button>
             </Dropdown>
           </div>
@@ -101,7 +94,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -129,6 +122,7 @@
 <script setup lang="ts">
 import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
 import { buildEditorExtensions } from "@/components/editor/config";
+import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -146,7 +140,7 @@ import {
 } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
 import { storeToRefs } from "pinia";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, h, nextTick, ref, watch } from "vue";
 import ZapIcon from "~icons/lucide/zap";
 import {
   setActiveSettingsTab,
@@ -184,6 +178,14 @@ const filters = computed(() => {
     ...scope,
     selected: activeFilter.value === scope.value,
     onClick: () => (activeFilter.value = scope.value),
+    slots: {
+      suffix: () =>
+        h(
+          "span",
+          { class: "text-sm text-ink-gray-5" },
+          String(scopeCounts.data?.[scope.value] ?? 0)
+        ),
+    },
   }));
 });
 
@@ -242,12 +244,25 @@ const savedReplyListResource = createListResource({
   pageLength: 20,
 });
 
-const savedReplyCount = createResource({
-  url: "frappe.client.get_count",
-  makeParams: () => ({
+// One grouped query answers every scope at once, so the menu can say where the
+// replies live before an agent switches to find out
+const scopeCounts = createResource({
+  url: "frappe.client.get_list",
+  params: {
     doctype: "HD Saved Reply",
-    filters: savedReplyListResource.filters,
-  }),
+    fields: ["scope", { COUNT: "name" }],
+    group_by: "scope",
+    limit_page_length: 0,
+  },
+  transform: (rows: { scope: string }[]) => {
+    const counts: Record<string, number> = { All: 0 };
+    for (const row of rows) {
+      const count = row["COUNT(`name`)"] ?? 0;
+      counts[row.scope] = count;
+      counts.All += count;
+    }
+    return counts;
+  },
 });
 
 const actionCounts = computed<Record<string, number>>(() => {
@@ -319,7 +334,6 @@ watch(activeFilter, () => {
   };
   savedReplyListResource.start = 0;
   savedReplyListResource.list.reload();
-  savedReplyCount.reload();
 });
 
 watch(
@@ -331,7 +345,8 @@ watch(
     } else {
       savedReplyListResource.list.reload();
     }
-    savedReplyCount.reload();
+    // Counts don't move with the selected scope, so this is the only refetch
+    scopeCounts.reload();
     nextTick(() => {
       const inputEl = searchInput.value?.$el?.querySelector("input");
       inputEl?.focus();
