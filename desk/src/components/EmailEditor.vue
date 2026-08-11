@@ -133,6 +133,13 @@
           :attachments="attachments"
           @remove="removeAttachment"
         />
+        <!-- Saved reply actions, applied once the reply is sent -->
+        <SavedReplyActions
+          ref="savedReplyActionsRef"
+          class="mx-5 my-2"
+          :ticket-id="ticketId"
+          :doctype="doctype"
+        />
         <!-- Fixed Menu -->
         <div
           class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
@@ -209,9 +216,11 @@ import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { AttachmentIcon } from "@/components/icons";
 import { replyComposer } from "@/components/replyComposer";
+import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
+import { RenderedSavedReply } from "@/types";
 import {
   getFontFamily,
   htmlToText,
@@ -382,11 +391,13 @@ async function removeAttachment(attachment) {
 }
 
 const showSavedRepliesSelectorModal = ref(false);
+const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 
-function applySavedReplies(template: string) {
+function applySavedReplies(reply: RenderedSavedReply) {
   const textEditor = editorRef.value?.editor;
   if (!textEditor) return;
-  textEditor.chain().focus("start").insertContent(template).run();
+  textEditor.chain().focus("start").insertContent(reply.message).run();
+  savedReplyActionsRef.value?.add(reply);
 }
 
 const sendMail = createResource({
@@ -409,6 +420,7 @@ const sendMail = createResource({
     },
   }),
   onSuccess: () => {
+    savedReplyActionsRef.value?.submit();
     resetState();
     emit("submit");
 
@@ -485,6 +497,7 @@ function addToReply(
 function resetState() {
   newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
+  savedReplyActionsRef.value?.clear();
   quotedContent.value = null;
   isQuoteExpanded.value = false;
   focusEditorAtStart();
@@ -492,6 +505,7 @@ function resetState() {
 
 function handleDiscard() {
   attachments.value = [];
+  savedReplyActionsRef.value?.clear();
   newEmail.value = getInitialContent();
   quotedContent.value = null;
   ccEmailsClone.value = [];

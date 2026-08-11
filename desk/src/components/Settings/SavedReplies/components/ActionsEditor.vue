@@ -9,6 +9,7 @@
     <Grid
       v-model="rows"
       :columns="columns"
+      :error="error"
       :empty-text="
         __(
           'No actions yet. Add one to update the ticket when this reply is sent'
@@ -42,9 +43,6 @@
           &mdash;
         </span>
       </template>
-      <template #footer>
-        <ErrorMessage v-if="error" class="ms-auto text-p-sm" :message="error" />
-      </template>
     </Grid>
   </div>
 </template>
@@ -61,7 +59,7 @@ import {
   SavedReplyActionType,
 } from "@/types";
 import { Grid, type GridColumn } from "@framework/ui";
-import { Combobox, createListResource, ErrorMessage } from "frappe-ui";
+import { Combobox, createListResource } from "frappe-ui";
 import { ref, watch } from "vue";
 import ActionValue from "./ActionValue.vue";
 import {

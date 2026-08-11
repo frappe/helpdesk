@@ -696,6 +696,8 @@ export interface SavedReplyAction {
   label?: string;
   /** Title of the saved reply that staged this action */
   source?: string;
+  /** Value the saved reply shipped, so an edited comment can be restored */
+  original_value?: string;
 }
 
 export interface RenderedSavedReply {
