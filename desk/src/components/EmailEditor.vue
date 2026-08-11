@@ -160,26 +160,30 @@
               >
                 <template #default="{ openFileSelector, uploading }">
                   {{ void (isUploading = uploading) }}
-                  <button
-                    class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
-                    @click="openFileSelector()"
-                    :disabled="uploading"
-                  >
-                    <LoadingIndicator v-if="uploading" class="h-4 w-4" />
-                    <AttachmentIcon
-                      v-else
-                      class="h-4 w-4"
-                      style="stroke-width: 1.5 !important"
-                    />
-                  </button>
+                  <Tooltip :text="__('Attach file')">
+                    <button
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                      @click="openFileSelector()"
+                      :disabled="uploading"
+                    >
+                      <LoadingIndicator v-if="uploading" class="h-4 w-4" />
+                      <AttachmentIcon
+                        v-else
+                        class="h-4 w-4"
+                        style="stroke-width: 1.5 !important"
+                      />
+                    </button>
+                  </Tooltip>
                 </template>
               </FileUploader>
-              <button
-                class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
-                @click="showSavedRepliesSelectorModal = true"
-              >
-                <SavedReplyIcon class="h-4 w-4" />
-              </button>
+              <Tooltip :text="__('Saved replies')">
+                <button
+                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                  @click="showSavedRepliesSelectorModal = true"
+                >
+                  <ZapIcon class="h-4 w-4" />
+                </button>
+              </Tooltip>
               <div class="h-4 w-[2px] border-s ml-1" />
             </div>
             <EditorFixedMenu :items="fullToolbar" />
@@ -235,6 +239,7 @@ import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
   LoadingIndicator,
+  Tooltip,
   createResource,
   toast,
 } from "frappe-ui";
@@ -248,7 +253,7 @@ import {
   ref,
   watch,
 } from "vue";
-import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
+import ZapIcon from "~icons/lucide/zap";
 
 // ─── Props & Emits ────────────────────────────────────────────
 const props = defineProps({

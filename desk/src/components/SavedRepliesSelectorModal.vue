@@ -70,7 +70,12 @@
                   v-if="actionCounts[template.name]"
                   :text="actionTooltip(actionCounts[template.name])"
                 >
-                  <ZapIcon class="ms-auto size-3.5 shrink-0 text-ink-gray-5" />
+                  <Badge
+                    class="ms-auto shrink-0"
+                    theme="gray"
+                    variant="subtle"
+                    :label="actionLabel(actionCounts[template.name])"
+                  />
                 </Tooltip>
               </div>
               <div
@@ -129,6 +134,7 @@ import { __ } from "@/translation";
 import { RenderedSavedReply, SavedReply } from "@/types";
 import { useStorage } from "@vueuse/core";
 import {
+  Badge,
   Button,
   createListResource,
   createResource,
@@ -141,7 +147,6 @@ import {
 import { Editor, EditorContent } from "frappe-ui/editor";
 import { storeToRefs } from "pinia";
 import { computed, h, nextTick, ref, watch } from "vue";
-import ZapIcon from "~icons/lucide/zap";
 import {
   setActiveSettingsTab,
   showSettingsModal,
@@ -272,6 +277,9 @@ const actionCounts = computed<Record<string, number>>(() => {
   }
   return counts;
 });
+
+const actionLabel = (count: number) =>
+  count === 1 ? __("1 action") : __("{0} actions", count);
 
 const actionTooltip = (count: number) =>
   count === 1
