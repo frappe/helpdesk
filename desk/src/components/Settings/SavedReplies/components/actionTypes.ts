@@ -100,9 +100,19 @@ export const ACTION_TYPES: Record<SavedReplyActionType, ActionTypeConfig> = {
   },
 };
 
-export const ACTION_TYPE_ORDER = Object.keys(
-  ACTION_TYPES
-) as SavedReplyActionType[];
+/** Action picker groups; icons alone can't separate the assignment pair. */
+export const ACTION_MENU_GROUPS: {
+  label: string;
+  types: SavedReplyActionType[];
+}[] = [
+  {
+    label: __("Fields"),
+    types: ["Set Status", "Set Priority", "Set Team", "Set Ticket Type"],
+  },
+  { label: __("Assignment"), types: ["Assign Agent", "Assign to Me"] },
+  { label: __("Tags"), types: ["Add Tag", "Remove Tag"] },
+  { label: __("Comment"), types: ["Add Comment"] },
+];
 
 /** Only one of these can be used per reply. */
 export const ASSIGNMENT_ACTIONS: SavedReplyActionType[] = [
