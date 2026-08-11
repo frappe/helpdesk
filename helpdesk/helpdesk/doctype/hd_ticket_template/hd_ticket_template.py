@@ -12,6 +12,14 @@ from helpdesk.utils import capture_event
 
 # fields hidden from the customer are readable by agents and above only
 HIDDEN_FIELD_PERMLEVEL = 8
+# the only standard fields a template may open for customer edits; custom
+# fields are template-owned and always eligible
+CUSTOMER_EDITABLE_STANDARD_FIELDS = {
+    "priority",
+    "ticket_type",
+    "agent_group",
+    "customer",
+}
 
 
 class HDTicketTemplate(Document):
@@ -63,7 +71,9 @@ class HDTicketTemplate(Document):
 
     def sync_field_permlevels(self):
         """Template visibility drives HD Ticket field permlevels: hidden
-        fields turn agent-only, visible fields turn customer-writable."""
+        fields turn agent-only; visible custom fields and the customer-editable
+        standard fields turn customer-writable. Other standard fields keep
+        their level, so a template can display them but never open them up."""
         meta = frappe.get_meta("HD Ticket")
         changed = []
         for f in self.fields:
@@ -71,11 +81,18 @@ class HDTicketTemplate(Document):
             field = meta.get_field(f.fieldname)
             if not field or field.permlevel == target:
                 continue
+            if target == 0 and not self.may_lower_for_customer(f.fieldname):
+                continue
             self.set_field_permlevel(f.fieldname, target)
             changed.append(f"{f.fieldname}: {field.permlevel} → {target}")
         if changed:
             frappe.clear_cache(doctype="HD Ticket")
             self.warn_permlevel_changes(changed)
+
+    def may_lower_for_customer(self, fieldname: str) -> bool:
+        return fieldname in CUSTOMER_EDITABLE_STANDARD_FIELDS or bool(
+            self.custom_field_exists(fieldname)
+        )
 
     def warn_permlevel_changes(self, changed: list[str]):
         if frappe.flags.in_patch or frappe.flags.in_migrate:
@@ -89,7 +106,8 @@ class HDTicketTemplate(Document):
         frappe.msgprint(
             _(
                 "This template changed HD Ticket permission levels: {0}.<br>"
-                "Hidden fields are agent-only (level {1}), visible fields are "
+                "Hidden fields are agent-only (level {1}); visible custom "
+                "fields and priority, type, team or customer are "
                 "customer-editable (level 0). This overrides levels set from "
                 "Customize Form. See {2}."
             ).format(", ".join(changed), HIDDEN_FIELD_PERMLEVEL, docs_link),

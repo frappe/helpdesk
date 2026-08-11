@@ -2459,6 +2459,25 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
         )
 
+    def test_internal_field_not_exposable_via_template(self):
+        """A template may display an internal field but never lower it to
+        customer-writable: `key` authenticates the guest feedback flow."""
+        template = make_template(
+            "Perms Internal Exposure",
+            [{"fieldname": "key", "hide_from_customer": 0}],
+        )
+        try:
+            key_level = frappe.get_meta("HD Ticket").get_field("key").permlevel
+            self.assertEqual(key_level, 8)
+            frappe.set_user(PERMS_CUSTOMER)
+            ticket = frappe.get_doc(get_ticket_obj()).insert()
+            self.assertFalse(get_one(ticket.name).get("key"))
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "HD Ticket Template", template.name, force=True, ignore_missing=True
+            )
+
     def test_portal_activity_stamps_last_customer_response(self):
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(get_ticket_obj()).insert()
