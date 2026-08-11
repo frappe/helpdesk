@@ -221,7 +221,9 @@ def agent_manager_only(fn):
     return wrapper
 
 
-def get_agents_team():
+def get_agents_team(user: str | None = None):
+    """Teams the user belongs to. Defaults to the session user."""
+    user = user or frappe.session.user
     Team = frappe.qb.DocType("HD Team")
     TeamMember = frappe.qb.DocType("HD Team Member")
 
@@ -229,7 +231,7 @@ def get_agents_team():
         frappe.qb.from_(TeamMember)
         .join(Team)
         .on(Team.name == TeamMember.parent)
-        .where(TeamMember.user == frappe.session.user)
+        .where(TeamMember.user == user)
         .where(Team.disabled == 0)
         .select(Team.team_name, Team.ignore_restrictions)
         .run(as_dict=True)
