@@ -1,8 +1,8 @@
 import { replyComposer } from "@/components/replyComposer";
 import { showEmailBox, toggleEmailBox } from "@/pages/ticket/modalStates";
-import { RenderedSavedReply } from "@/types";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
+import { RenderedSavedReply } from "@/types";
 import { createListResource, createResource, toast } from "frappe-ui";
 import { nextTick } from "vue";
 import {
@@ -131,8 +131,6 @@ async function applySavedReply(
 
 // --- per-agent usage -----------------------------------------------------
 
-// ponytail: frequency, not frecency — add recency decay only if someone reports
-// needing it. Per-device localStorage; move server-side if hot-desking bites.
 const usage = userStorage<SavedReplyUsage>("hd_saved_reply_uses", {});
 
 /** Also called by the composer's selector modal, so promotion counts both surfaces. */

@@ -14,19 +14,19 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
 import { getMeta } from "@/stores/meta";
-import { __ } from "@/translation";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { copyToClipboard } from "@/utils";
 import { call, createListResource, createResource, toast } from "frappe-ui";
 import { priorityOptions, statusOptions } from "./optionCommands";
-import { savedReplyCommands } from "./savedReplyCommands";
-import { tagChildren } from "./tagCommands";
 import {
   CONTEXT_WEIGHT,
   FLAT_OPTION_WEIGHT,
   GROUP,
   type Command,
 } from "./paletteTypes";
+import { savedReplyCommands } from "./savedReplyCommands";
+import { tagChildren } from "./tagCommands";
 
 // Same icons as the composer buttons these rows press.
 import { CommentIcon, EmailIcon } from "@/components/icons/";
@@ -389,6 +389,3 @@ function logAssignment(ticketId: string, agent: string): Promise<unknown> {
     },
   });
 }
-
-// ponytail: "Delete ticket" stays out — $dialog is unreachable from module
-// scope and the ticket header offers it. Wire up if frappe-ui grows a confirm helper.
