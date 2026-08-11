@@ -337,7 +337,13 @@ export interface EmailAccount {
   default_incoming?: boolean;
 }
 
-export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
+export type TicketTab =
+  | "activity"
+  | "email"
+  | "comment"
+  | "details"
+  | "call"
+  | "analytics";
 
 export interface TabObject {
   name: TicketTab;

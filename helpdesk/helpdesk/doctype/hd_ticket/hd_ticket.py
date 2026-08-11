@@ -1430,13 +1430,13 @@ def _agent_has_permission(doc, user: str) -> bool:
         except (ValueError, TypeError):
             return False
 
-    teams = get_agents_team()
+    teams = get_agents_team(user)
     if any(team.get("ignore_restrictions") for team in teams):
         return True
 
     team_names = [t.team_name for t in teams]
     is_team_member = frappe.db.exists(
-        "HD Team Member", {"parent": ["in", team_names], "user": frappe.session.user}
+        "HD Team Member", {"parent": ["in", team_names], "user": user}
     )
     return bool(is_team_member) and doc.get("agent_group") in team_names
 
@@ -1474,7 +1474,7 @@ def _agent_query(user: str) -> str | None:
         query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
     # An agent on a team with `ignore_restrictions` set can see every team's tickets.
-    teams = get_agents_team()
+    teams = get_agents_team(user)
     if any(team.get("ignore_restrictions") for team in teams):
         all_teams = frappe.get_all("HD Team", pluck="name")
         if not all_teams:

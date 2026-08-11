@@ -376,6 +376,30 @@ def get_latest_ticket_communication(ticket_name: str):
     return frappe.get_doc("Communication", name[0])
 
 
+def add_message(
+    ticket: str, direction: str, sender: str, subject: str = "Test message"
+) -> None:
+    """Insert a Communication on a ticket at the current (possibly frozen) time."""
+    frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": direction,
+            "sender": sender,
+            "subject": subject,
+            "content": subject,
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+        }
+    ).insert(ignore_permissions=True)
+
+
+def timeline_node(result: dict, key: str) -> dict | None:
+    """The milestone with the given key from a ticket analytics response."""
+    return next((n for n in result["timeline"] if n["key"] == key), None)
+
+
 def add_comment(
     ticket: str,
     content: str = "This is a test comment.",
