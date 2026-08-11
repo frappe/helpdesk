@@ -1,49 +1,61 @@
 <template>
-  <Tooltip :text="value ? `${label}: ${value}` : label">
-    <Badge class="bg-surface-base" theme="gray" variant="outline" size="lg">
-      <template #prefix>
-        <component :is="config.icon" class="size-3 shrink-0 text-ink-gray-6" />
-      </template>
-      <span class="flex min-w-0 items-center gap-1">
-        <span v-if="value" class="shrink-0 text-ink-gray-6">{{ label }}</span>
-        <!-- The value doubles as the picker's trigger, so a routing action can
-             be pointed somewhere else without re-picking the whole reply.
-             Combobox over Select: its `#trigger` replaces the control outright,
-             where Select's renders inside its own bordered button -->
-        <Combobox
-          v-if="isEditable"
-          trigger="button"
-          :model-value="action.value"
-          :options="pickerOptions"
-          :placeholder="__('Select {0}', label.toLowerCase())"
-          @update:model-value="pick($event as string)"
-          @update:query="search(action.action_type, $event)"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="max-w-40 cursor-pointer truncate text-start text-ink-gray-8 hover:text-ink-gray-5"
-            >
-              {{ value }}
-            </button>
-          </template>
-        </Combobox>
-        <span v-else class="max-w-40 truncate text-ink-gray-8">
-          {{ value || label }}
-        </span>
-      </span>
-      <template #suffix>
-        <button
-          type="button"
-          :aria-label="__('Remove {0}', label)"
-          class="flex items-center rounded-sm text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
-          @click.stop="emit('remove')"
-        >
-          <LucideX class="size-3" />
-        </button>
-      </template>
-    </Badge>
-  </Tooltip>
+  <Combobox
+    trigger="button"
+    :disabled="!isEditable"
+    :model-value="action.value"
+    :options="pickerOptions"
+    :placeholder="__('Select {0}', label.toLowerCase())"
+    @update:model-value="pick($event as string)"
+    @update:query="search(action.action_type, $event)"
+  >
+    <template #trigger="{ setOpen }">
+      <!-- The anchor forwards its click to this element, so it has to be a plain
+           one: Tooltip and Combobox both drop inherited attrs -->
+      <div
+        class="inline-flex"
+        :role="isEditable ? 'button' : undefined"
+        :tabindex="isEditable ? 0 : undefined"
+        @keydown.enter.self.prevent="setOpen(true)"
+      >
+        <Tooltip :text="value ? `${label}: ${value}` : label">
+          <Badge
+            class="bg-surface-base transition-colors"
+            :class="isEditable ? 'cursor-pointer hover:bg-surface-gray-2' : ''"
+            theme="gray"
+            variant="outline"
+            size="lg"
+          >
+            <template #prefix>
+              <component
+                :is="config.icon"
+                class="size-3 shrink-0 text-ink-gray-6"
+              />
+            </template>
+            <span class="flex min-w-0 items-center gap-1">
+              <span v-if="value" class="shrink-0 text-ink-gray-6">
+                {{ label }}
+              </span>
+              <span class="max-w-40 truncate text-ink-gray-8">
+                {{ value || label }}
+              </span>
+            </span>
+            <template #suffix>
+              <!-- Removing is not picking: the click stops here -->
+              <button
+                type="button"
+                :aria-label="__('Remove {0}', label)"
+                class="flex items-center rounded-sm text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
+                @click.stop="emit('remove')"
+                @pointerdown.stop
+              >
+                <LucideX class="size-3" />
+              </button>
+            </template>
+          </Badge>
+        </Tooltip>
+      </div>
+    </template>
+  </Combobox>
 </template>
 
 <script setup lang="ts">
