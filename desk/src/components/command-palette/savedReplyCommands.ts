@@ -1,5 +1,6 @@
 import { replyComposer } from "@/components/replyComposer";
 import { showEmailBox, toggleEmailBox } from "@/pages/ticket/modalStates";
+import { RenderedSavedReply } from "@/types";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { createListResource, createResource, toast } from "frappe-ui";
@@ -101,9 +102,9 @@ async function applySavedReply(
   replyId: string,
   title: string
 ): Promise<void> {
-  let html: string;
+  let reply: RenderedSavedReply;
   try {
-    html = await renderSavedReply.submit({
+    reply = await renderSavedReply.submit({
       saved_reply_id: replyId,
       ticket_id: ticketId,
     });
@@ -123,7 +124,7 @@ async function applySavedReply(
     toast.error(__("Could not open the reply box"));
     return;
   }
-  insert(html);
+  insert(reply);
   recordSavedReplyUse(replyId, title);
   capture("saved_reply_applied", { data: { source: "command_palette" } });
 }

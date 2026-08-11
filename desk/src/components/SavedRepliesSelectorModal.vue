@@ -80,8 +80,16 @@
               class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
               @click="onTemplateSelect(template)"
             >
-              <div class="text-base-semibold truncate border-b pb-2">
-                {{ template.title }}
+              <div class="flex items-center gap-2 border-b pb-2">
+                <div class="text-base-semibold truncate">
+                  {{ template.title }}
+                </div>
+                <Tooltip
+                  v-if="actionCounts[template.name]"
+                  :text="actionTooltip(actionCounts[template.name])"
+                >
+                  <ZapIcon class="ms-auto size-3.5 shrink-0 text-ink-gray-5" />
+                </Tooltip>
               </div>
               <div
                 v-if="template.message"
@@ -135,7 +143,7 @@ import { buildEditorExtensions } from "@/components/editor/config";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { SavedReply } from "@/types";
+import { RenderedSavedReply, SavedReply } from "@/types";
 import { useStorage } from "@vueuse/core";
 import {
   Button,
@@ -145,7 +153,9 @@ import {
   Dropdown,
   LoadingIndicator,
   TextInput,
+  Tooltip,
 } from "frappe-ui";
+import ZapIcon from "~icons/lucide/zap";
 import { Editor, EditorContent } from "frappe-ui/editor";
 import { storeToRefs } from "pinia";
 import { computed, nextTick, ref, watch } from "vue";
@@ -217,7 +227,7 @@ const selectedTemplate = ref({
   name: "",
   isLoading: false,
 });
-const pendingTemplate = ref<string | null>(null);
+const pendingTemplate = ref<RenderedSavedReply | null>(null);
 
 function onAfterLeave() {
   if (pendingTemplate.value !== null) {
@@ -232,7 +242,7 @@ const scope = computed(() => {
 
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
-  fields: ["name", "title", "owner", "scope", "message"],
+  fields: ["name", "title", "owner", "scope", "message", "actions"],
   filters: {
     scope: scope.value == "All" ? undefined : ["=", scope.value],
   },
@@ -242,6 +252,19 @@ const savedReplyListResource = createListResource({
   start: 0,
   pageLength: 999,
 });
+
+const actionCounts = computed<Record<string, number>>(() => {
+  const counts: Record<string, number> = {};
+  for (const row of savedReplyListResource.data || []) {
+    counts[row.name] = JSON.parse(row.actions || "[]").length;
+  }
+  return counts;
+});
+
+const actionTooltip = (count: number) =>
+  count === 1
+    ? __("Applies 1 action when sent")
+    : __("Applies {0} actions when sent", count);
 
 const onTemplateSelect = (template: SavedReply) => {
   if (selectedTemplate.value.isLoading) return;
@@ -255,7 +278,7 @@ const onTemplateSelect = (template: SavedReply) => {
       saved_reply_id: template.name,
       ticket_id: props.ticketId,
     },
-    onSuccess: (data: string) => {
+    onSuccess: (data: RenderedSavedReply) => {
       selectedTemplate.value = {
         name: "",
         isLoading: false,
@@ -310,6 +333,7 @@ watch(
   show,
   (newValue) => {
     if (newValue) {
+      savedReplyListResource.list.reload();
       nextTick(() => {
         const inputEl = searchInput.value?.$el?.querySelector("input");
         inputEl?.focus();
