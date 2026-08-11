@@ -702,7 +702,34 @@ export interface SavedReply {
   message: string;
   scope: string;
   teams: Team[];
+  /** JSON-encoded SavedReplyAction[] */
+  actions: string;
   owner: string;
+}
+
+export type SavedReplyActionType =
+  | "Set Status"
+  | "Set Priority"
+  | "Set Team"
+  | "Set Ticket Type"
+  | "Assign Agent"
+  | "Assign to Me"
+  | "Add Tag"
+  | "Remove Tag"
+  | "Add Comment";
+
+export interface SavedReplyAction {
+  action_type: SavedReplyActionType;
+  value: string;
+  label?: string;
+  /** Title of the saved reply that staged this action */
+  source?: string;
+}
+
+export interface RenderedSavedReply {
+  title: string;
+  message: string;
+  actions: SavedReplyAction[];
 }
 
 export type APIOptions = DropdownOption[] | string[] | [];
