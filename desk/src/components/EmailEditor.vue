@@ -398,7 +398,7 @@ const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 /** A reply is only replaced when another one is already applied. */
 function applySavedReplies(reply: RenderedSavedReply) {
   const staged = savedReplyActionsRef.value?.stagedSummary();
-  if (!staged || !reply.actions?.length) {
+  if (!staged) {
     insertSavedReply(reply);
     return;
   }
