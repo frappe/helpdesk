@@ -230,8 +230,11 @@ const listeners = computed(() => {
       },
     };
   }
+  // Camel, not hyphenated: Vue only recognises the camel form as a component's
+  // declared emit. The hyphenated one falls through as an attr and the Combobox
+  // re-binds it onto its search input, committing every keystroke
   return {
-    "update:model-value": (event: any) =>
+    "update:modelValue": (event: any) =>
       emitUpdate(
         props.field.fieldname,
         event?.value || event?.target?.value || event
