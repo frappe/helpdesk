@@ -7,25 +7,19 @@ from frappe import _
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 from frappe.model.document import Document
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.consts import (
+    DEFAULT_TICKET_TEMPLATE,
+    TICKET_INTERNAL_FIELD_PERMLEVEL,
+    TICKET_VISIBLE_FIELD_PERMLEVEL,
+)
 from helpdesk.utils import capture_event
-
-# fields hidden from the customer are readable by agents and above only
-HIDDEN_FIELD_PERMLEVEL = 8
-# the only standard fields a template may open for customer edits; custom
-# fields are template-owned and always eligible
-CUSTOMER_EDITABLE_STANDARD_FIELDS = {
-    "priority",
-    "ticket_type",
-    "agent_group",
-    "customer",
-}
 
 
 class HDTicketTemplate(Document):
     def validate(self):
         self.verify_field_exists()
         self.validate_unallowed_fields()
+        self.validate_internal_fields_stay_hidden()
 
     def verify_field_exists(self):
         for f in self.fields:
@@ -56,6 +50,20 @@ class HDTicketTemplate(Document):
                 )
                 frappe.throw(text)
 
+    def validate_internal_fields_stay_hidden(self):
+        """An internal standard field may be listed for the agent form,
+        never shown to customers."""
+        for f in self.fields:
+            if not f.fieldname or f.hide_from_customer:
+                continue
+            if self.custom_field_exists(f.fieldname):
+                continue
+            if self.shipped_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
+                text = _(
+                    "Field `{0}` is internal and cannot be shown to customers"
+                ).format(f.fieldname)
+                frappe.throw(text)
+
     def custom_field_exists(self, fieldname: str):
         return frappe.db.exists(
             {
@@ -72,6 +80,34 @@ class HDTicketTemplate(Document):
             self.sync_field_permlevels()
             self.release_removed_fields()
         capture_event("ticket_template_updated")
+
+    def sync_field_permlevels(self):
+        """Field visibility drives HD Ticket permlevels: hidden fields turn
+        internal, visible fields return to their shipped level (custom
+        fields to the customer-visible tier). The template never lowers a
+        field below its shipped level; customers may fill visible fields
+        only while creating a ticket."""
+        meta = frappe.get_meta("HD Ticket")
+        changed = []
+        for f in self.fields:
+            field = meta.get_field(f.fieldname)
+            if not field:
+                continue
+            target = self.target_permlevel(f)
+            if field.permlevel == target:
+                continue
+            self.set_field_permlevel(f.fieldname, target)
+            changed.append(f"{f.fieldname}: {field.permlevel} → {target}")
+        if changed:
+            frappe.clear_cache(doctype="HD Ticket")
+            self.warn_permlevel_changes(changed)
+
+    def target_permlevel(self, field_row) -> int:
+        if field_row.hide_from_customer:
+            return TICKET_INTERNAL_FIELD_PERMLEVEL
+        if self.custom_field_exists(field_row.fieldname):
+            return TICKET_VISIBLE_FIELD_PERMLEVEL
+        return self.shipped_permlevel(field_row.fieldname)
 
     def release_removed_fields(self):
         """A standard field dropped from the default template goes back to
@@ -124,32 +160,6 @@ class HDTicketTemplate(Document):
             or 0
         )
 
-    def sync_field_permlevels(self):
-        """Default template visibility drives HD Ticket field permlevels:
-        hidden fields turn agent-only; visible custom fields and the
-        customer-editable standard fields turn customer-writable. Other
-        standard fields keep their level, so the template can display them
-        but never open them up."""
-        meta = frappe.get_meta("HD Ticket")
-        changed = []
-        for f in self.fields:
-            target = HIDDEN_FIELD_PERMLEVEL if f.hide_from_customer else 0
-            field = meta.get_field(f.fieldname)
-            if not field or field.permlevel == target:
-                continue
-            if target == 0 and not self.may_lower_for_customer(f.fieldname):
-                continue
-            self.set_field_permlevel(f.fieldname, target)
-            changed.append(f"{f.fieldname}: {field.permlevel} → {target}")
-        if changed:
-            frappe.clear_cache(doctype="HD Ticket")
-            self.warn_permlevel_changes(changed)
-
-    def may_lower_for_customer(self, fieldname: str) -> bool:
-        return fieldname in CUSTOMER_EDITABLE_STANDARD_FIELDS or bool(
-            self.custom_field_exists(fieldname)
-        )
-
     def warn_permlevel_changes(self, changed: list[str]):
         if frappe.flags.in_patch or frappe.flags.in_migrate:
             for line in changed:
@@ -162,11 +172,11 @@ class HDTicketTemplate(Document):
         frappe.msgprint(
             _(
                 "This template changed HD Ticket permission levels: {0}.<br>"
-                "Hidden fields are agent-only (level {1}); visible custom "
-                "fields and priority, type, team or customer are "
-                "customer-editable (level 0). This overrides levels set from "
-                "Customize Form. See {2}."
-            ).format(", ".join(changed), HIDDEN_FIELD_PERMLEVEL, docs_link),
+                "Hidden fields are internal (level {1}); visible fields keep "
+                "their shipped level — customers can fill them while creating "
+                "a ticket and read them afterwards. This overrides levels set "
+                "from Customize Form. See {2}."
+            ).format(", ".join(changed), TICKET_INTERNAL_FIELD_PERMLEVEL, docs_link),
             title=_("Permission Levels Updated"),
             indicator="yellow",
         )
@@ -179,6 +189,9 @@ class HDTicketTemplate(Document):
                 "permlevel",
                 level,
             )
+        elif level == self.shipped_permlevel(fieldname):
+            # the shipped value needs no overlay
+            self.delete_permlevel_property_setter(fieldname)
         else:
             make_property_setter("HD Ticket", fieldname, "permlevel", level, "Int")
 

@@ -19,6 +19,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE, TICKET_VISIBLE_FIELD_PERMLEVEL
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -85,15 +86,40 @@ class HDTicket(Document):
         self.apply_portal_insert_rules()
 
     def apply_portal_insert_rules(self):
-        """Exempt server-set values from the permlevel reset the framework
-        runs right after this hook. Trusted staff (agents, System Managers)
-        keep the desk behaviour: raised_by stays as typed, no portal flag."""
+        """Exempt from the permlevel reset the framework runs right after
+        this hook: server-set values, plus the default template's visible
+        fields, which customers may fill only while creating the ticket.
+        Trusted staff (agents, System Managers) keep the desk behaviour:
+        raised_by stays as typed, no portal flag."""
         if is_agent() or "System Manager" in frappe.get_roles():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
-        self.flags.ignore_permlevel_for_fields = list(self.SERVER_OWNED_INSERT_FIELDS)
+        self.flags.ignore_permlevel_for_fields = (
+            list(self.SERVER_OWNED_INSERT_FIELDS)
+            + self.creation_fillable_template_fields()
+        )
+
+    def creation_fillable_template_fields(self) -> list[str]:
+        """Visible default-template fields up to the customer-visible tier;
+        internal fields stay protected even if a template lists them."""
+        visible = frappe.get_all(
+            "HD Ticket Template Field",
+            filters={
+                "parent": DEFAULT_TICKET_TEMPLATE,
+                "parenttype": "HD Ticket Template",
+                "hide_from_customer": 0,
+            },
+            pluck="fieldname",
+        )
+        meta = frappe.get_meta("HD Ticket")
+        fillable = []
+        for fieldname in visible:
+            field = meta.get_field(fieldname)
+            if field and field.permlevel <= TICKET_VISIBLE_FIELD_PERMLEVEL:
+                fillable.append(fieldname)
+        return fillable
 
     def before_validate(self):
         self.check_update_perms()
@@ -193,6 +219,8 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
+        # the creation-fill exemption must not outlive the insert
+        self.flags.pop("ignore_permlevel_for_fields", None)
 
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
