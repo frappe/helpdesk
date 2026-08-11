@@ -214,12 +214,14 @@
 import { AttachmentList, SavedRepliesSelectorModal } from "@/components";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
+import { createDialog } from "@/components/dialogs";
 import { AttachmentIcon } from "@/components/icons";
 import { replyComposer } from "@/components/replyComposer";
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";
 import {
   getFontFamily,
@@ -393,11 +395,46 @@ async function removeAttachment(attachment) {
 const showSavedRepliesSelectorModal = ref(false);
 const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 
+/** A reply is only replaced when another one is already applied. */
 function applySavedReplies(reply: RenderedSavedReply) {
+  const staged = savedReplyActionsRef.value?.stagedSummary();
+  if (!staged || !reply.actions?.length) {
+    insertSavedReply(reply);
+    return;
+  }
+  createDialog({
+    title: __("Replace saved reply"),
+    message: __(
+      'Applying "{0}" discards the reply you have now, along with its {1} action(s).',
+      [reply.title, staged.count]
+    ),
+    actions: [
+      { label: __("Cancel") },
+      {
+        label: __("Replace"),
+        variant: "solid",
+        onClick: ({ close }: { close: () => void }) => {
+          replaceSavedReply(reply);
+          close();
+        },
+      },
+    ],
+  });
+}
+
+/** First reply of a draft: added to whatever the agent has already written. */
+function insertSavedReply(reply: RenderedSavedReply) {
   const textEditor = editorRef.value?.editor;
   if (!textEditor) return;
   textEditor.chain().focus("start").insertContent(reply.message).run();
   savedReplyActionsRef.value?.add(reply);
+}
+
+/** Confirmed replace: the new reply's body and actions stand alone. */
+function replaceSavedReply(reply: RenderedSavedReply) {
+  newEmail.value = reply.message + (emailSignature.value ?? "");
+  savedReplyActionsRef.value?.add(reply);
+  focusEditorAtStart();
 }
 
 const sendMail = createResource({

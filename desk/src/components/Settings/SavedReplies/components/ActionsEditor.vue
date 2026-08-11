@@ -48,18 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import { useTags, type Tag } from "@/composables/useTags";
-import { useAgentStore } from "@/stores/agent";
-import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
 import { __ } from "@/translation";
-import {
-  DropdownOption,
-  SavedReplyAction,
-  SavedReplyActionType,
-} from "@/types";
+import { SavedReplyAction, SavedReplyActionType } from "@/types";
 import { Grid, type GridColumn } from "@framework/ui";
-import { Combobox, createListResource } from "frappe-ui";
+import { Combobox } from "frappe-ui";
 import { ref, watch } from "vue";
 import ActionValue from "./ActionValue.vue";
 import {
@@ -76,26 +69,14 @@ type ActionRow = {
   value: string | string[];
 };
 
-const props = defineProps<{
-  teamOptions: DropdownOption[];
+defineProps<{
   error?: string;
 }>();
 
 const actions = defineModel<SavedReplyAction[]>({ required: true });
 
-const statusStore = useTicketStatusStore();
-const priorityStore = useTicketPriorityStore();
-const agentStore = useAgentStore();
-const { tagListResource } = useTags();
-
-const ticketTypesResource = createListResource({
-  doctype: "HD Ticket Type",
-  cache: ["HD Ticket Type", "list"],
-  fields: ["name"],
-  filters: { disabled: 0 },
-  pageLength: 100,
-  auto: true,
-});
+const { valueOptions: sharedValueOptions, tagOptions } =
+  useSavedReplyActionOptions();
 
 const columns: GridColumn[] = [
   { fieldname: "action_type", label: __("Action"), width: 220 },
@@ -135,46 +116,17 @@ function setActionType(row: ActionRow, type: SavedReplyActionType) {
   row.value = isTagAction(type) ? [] : "";
 }
 
+/** Shared lists, minus the tags the opposite row already claimed. */
 function valueOptions(type: SavedReplyActionType): ActionOption[] {
-  switch (type) {
-    case "Set Status":
-      return (statusStore.statuses.data || [])
-        .filter((status) => status.enabled)
-        .map((status) => ({
-          label: status.label_agent,
-          value: status.label_agent,
-        }));
-    case "Set Priority":
-      return (priorityStore.priorities.data || [])
-        .filter((priority) => !priority.disabled)
-        .map((priority) => ({ label: priority.name, value: priority.name }));
-    case "Set Team":
-      return props.teamOptions;
-    case "Set Ticket Type":
-      return (ticketTypesResource.data || []).map(
-        (ticketType: { name: string }) => ({
-          label: ticketType.name,
-          value: ticketType.name,
-        })
-      );
-    case "Assign Agent":
-      return agentStore.dropdown || [];
-    case "Add Tag":
-    case "Remove Tag": {
-      // A tag can't be both added and removed by the same reply
-      const sibling = type === "Add Tag" ? "Remove Tag" : "Add Tag";
-      const taken = new Set(
-        rows.value
-          .filter((row) => row.action_type === sibling)
-          .flatMap((row) => row.value as string[])
-      );
-      return ((tagListResource.data || []) as Tag[])
-        .filter((tag) => !taken.has(tag.name))
-        .map((tag) => ({ label: tag.name, value: tag.name, color: tag.color }));
-    }
-    default:
-      return [];
-  }
+  if (!isTagAction(type)) return sharedValueOptions(type);
+  // A tag can't be both added and removed by the same reply
+  const sibling = type === "Add Tag" ? "Remove Tag" : "Add Tag";
+  const taken = new Set(
+    rows.value
+      .filter((row) => row.action_type === sibling)
+      .flatMap((row) => row.value as string[])
+  );
+  return tagOptions().filter((tag) => !taken.has(String(tag.value)));
 }
 
 function toRows(list: SavedReplyAction[]): ActionRow[] {
@@ -203,8 +155,6 @@ function toActions(list: ActionRow[]): SavedReplyAction[] {
     return [{ action_type: type, value: row.value }];
   });
 }
-
-if (!agentStore.agents.data) agentStore.agents.fetch();
 
 watch(rows, () => (actions.value = toActions(rows.value)), { deep: true });
 

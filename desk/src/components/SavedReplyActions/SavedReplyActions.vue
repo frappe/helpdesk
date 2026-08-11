@@ -44,6 +44,7 @@
           v-for="action in visibleChips"
           :key="actionKey(action)"
           :action="action"
+          @update="updateAction(action, $event)"
           @remove="removeAction(action)"
         />
         <button v-if="overflowCount" type="button" @click="showAllChips = true">
@@ -139,7 +140,10 @@ const countSentence = computed(() => {
 
 /** Stage the actions of an applied saved reply, replacing whatever was staged. */
 function add(reply: RenderedSavedReply) {
-  pendingActions.value = (reply.actions ?? []).map((action) => ({
+  // A reply that brings no actions has nothing to conflict with, so it leaves
+  // an earlier reply's staged actions alone rather than wiping them
+  if (!reply.actions?.length) return;
+  pendingActions.value = reply.actions.map((action) => ({
     ...action,
     source: reply.title,
     // Kept so the staged comment can report edits and restore
@@ -149,11 +153,23 @@ function add(reply: RenderedSavedReply) {
   }));
 }
 
+/** What is staged right now, for the replace confirmation. Null when nothing is. */
+function stagedSummary(): { count: number; source: string } | null {
+  if (!pendingActions.value.length) return null;
+  return { count: pendingActions.value.length, source: sourceLabel.value };
+}
+
 // Tags share an action type, so they key on their value too
 function actionKey(action: SavedReplyAction): string {
   return isTagAction(action.action_type)
     ? `${action.action_type}:${action.value}`
     : action.action_type;
+}
+
+/** Repoint an action, e.g. an escalation routed to a different team. */
+function updateAction(action: SavedReplyAction, updated: SavedReplyAction) {
+  const index = pendingActions.value.indexOf(action);
+  if (index !== -1) pendingActions.value[index] = updated;
 }
 
 function removeAction(action: SavedReplyAction) {
@@ -211,5 +227,5 @@ function clear() {
   pendingActions.value = [];
 }
 
-defineExpose({ add, submit, clear });
+defineExpose({ add, stagedSummary, submit, clear });
 </script>
