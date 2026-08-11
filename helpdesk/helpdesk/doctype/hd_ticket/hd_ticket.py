@@ -46,6 +46,15 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
+    # server-stamped fields, exempted from the permlevel reset only at the
+    # moment the server writes them
+    SERVER_OWNED_INSERT_FIELDS = ["key", "raised_by", "via_customer_portal", "customer"]
+    RESPONSE_STAMP_FIELDS = [
+        "last_customer_response",
+        "last_agent_response",
+        "first_responded_on",
+    ]
+
     @property
     def default_open_status(self):
         return frappe.db.get_value(
@@ -83,14 +92,7 @@ class HDTicket(Document):
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
-
-        # set server-side; set_customer validates the customer-contact link
-        self.flags.ignore_permlevel_for_fields = [
-            "key",
-            "raised_by",
-            "via_customer_portal",
-            "customer",
-        ]
+        self.flags.ignore_permlevel_for_fields = list(self.SERVER_OWNED_INSERT_FIELDS)
 
     def before_validate(self):
         self.check_update_perms()
@@ -1169,11 +1171,7 @@ class HDTicket(Document):
         self.description = self.description or c.content
         # portal replies save under the customer session; exempt the response
         # stamps so the permlevel reset keeps them
-        self.flags.ignore_permlevel_for_fields = [
-            "last_customer_response",
-            "last_agent_response",
-            "first_responded_on",
-        ]
+        self.flags.ignore_permlevel_for_fields = list(self.RESPONSE_STAMP_FIELDS)
         # Save the ticket, allowing for hooks to run.
         self.save()
 
