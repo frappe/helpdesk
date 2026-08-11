@@ -2307,6 +2307,7 @@ class TestHDTicket(IntegrationTestCase):
 PERMS_CUSTOMER = "perms.customer@example.com"
 PERMS_OTHER_CUSTOMER = "perms.other@example.com"
 PERMS_AGENT = "perms.agent@example.com"
+PERMS_SYSADMIN = "perms.sysadmin@example.com"
 
 
 class TestHDTicketFieldPermissions(IntegrationTestCase):
@@ -2458,6 +2459,25 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         return frappe.db.get_value(
             "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
         )
+
+    def test_system_manager_desk_insert_keeps_raised_by(self):
+        """Non-agent staff filing a ticket from the desk keep the typed
+        raised_by, and the ticket is not marked as a portal ticket."""
+        if not frappe.db.exists("User", PERMS_SYSADMIN):
+            frappe.get_doc(
+                {
+                    "doctype": "User",
+                    "first_name": "Perms Sysadmin",
+                    "email": PERMS_SYSADMIN,
+                    "roles": [{"role": "System Manager"}],
+                }
+            ).insert()
+        frappe.set_user(PERMS_SYSADMIN)
+        ticket = frappe.get_doc(
+            {**get_ticket_obj(), "raised_by": PERMS_CUSTOMER}
+        ).insert()
+        self.assertEqual(ticket.raised_by, PERMS_CUSTOMER)
+        self.assertEqual(ticket.via_customer_portal, 0)
 
     def test_internal_field_not_exposable_via_template(self):
         """A template may display an internal field but never lower it to

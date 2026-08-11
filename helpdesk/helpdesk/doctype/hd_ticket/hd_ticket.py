@@ -86,8 +86,9 @@ class HDTicket(Document):
 
     def apply_portal_insert_rules(self):
         """Exempt server-set values from the permlevel reset the framework
-        runs right after this hook."""
-        if is_agent():
+        runs right after this hook. Trusted staff (agents, System Managers)
+        keep the desk behaviour: raised_by stays as typed, no portal flag."""
+        if is_agent() or "System Manager" in frappe.get_roles():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
