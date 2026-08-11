@@ -9,7 +9,6 @@
     <Grid
       v-model="rows"
       :columns="columns"
-      :error="error"
       :empty-text="
         __(
           'No actions yet. Add one to update the ticket when this reply is sent'
@@ -21,9 +20,10 @@
       row-action="remove"
     >
       <template #cell="{ row, column, value, update }">
-        <Select
+        <Combobox
           v-if="column.fieldname === 'action_type'"
           class="w-full"
+          trigger="button"
           :model-value="(value as string)"
           :options="typeOptions(row as ActionRow)"
           :placeholder="__('Select action')"
@@ -42,6 +42,9 @@
           &mdash;
         </span>
       </template>
+      <template #footer>
+        <ErrorMessage v-if="error" class="ms-auto text-p-sm" :message="error" />
+      </template>
     </Grid>
   </div>
 </template>
@@ -58,11 +61,11 @@ import {
   SavedReplyActionType,
 } from "@/types";
 import { Grid, type GridColumn } from "@framework/ui";
-import { createListResource, Select } from "frappe-ui";
+import { Combobox, createListResource, ErrorMessage } from "frappe-ui";
 import { ref, watch } from "vue";
 import ActionValue from "./ActionValue.vue";
 import {
-  ACTION_TYPE_ORDER,
+  ACTION_MENU_GROUPS,
   ACTION_TYPES,
   ASSIGNMENT_ACTIONS,
   isTagAction,
@@ -105,21 +108,27 @@ const columns: GridColumn[] = [
 const rows = ref<ActionRow[]>(toRows(actions.value));
 
 /** Types still free for this row: no duplicates, and one assignment action. */
-function typeOptions(row: ActionRow): ActionOption[] {
+function typeOptions(row: ActionRow) {
   const used = new Set(
     rows.value
       .filter((other) => other !== row)
       .map((other) => other.action_type)
   );
   const hasAssignment = ASSIGNMENT_ACTIONS.some((type) => used.has(type));
-  return ACTION_TYPE_ORDER.filter(
-    (type) =>
-      !used.has(type) && !(hasAssignment && ASSIGNMENT_ACTIONS.includes(type))
-  ).map((type) => ({
-    label: ACTION_TYPES[type].label,
-    value: type,
-    icon: ACTION_TYPES[type].icon,
-  }));
+  return ACTION_MENU_GROUPS.map((group) => ({
+    group: group.label,
+    options: group.types
+      .filter(
+        (type) =>
+          !used.has(type) &&
+          !(hasAssignment && ASSIGNMENT_ACTIONS.includes(type))
+      )
+      .map((type) => ({
+        label: ACTION_TYPES[type].label,
+        value: type,
+        icon: ACTION_TYPES[type].icon,
+      })),
+  })).filter((group) => group.options.length);
 }
 
 /** A value picked for the old type means nothing to the new one. */
