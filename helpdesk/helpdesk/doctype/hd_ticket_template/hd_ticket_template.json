@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Saving this template sets HD Ticket permission levels from field visibility: hidden fields become agent-only (level 8); visible custom fields and priority, type, team or customer become customer-editable (level 0). Other standard fields keep their level. Removing a field, or deleting the template, returns a standard field to the level shipped with the app. This overrides levels set from Customize Form. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a>.",
+   "description": "Only the Default template controls HD Ticket permission levels. Saving it sets levels from field visibility: hidden fields become agent-only (level 8); visible custom fields and priority, type, team or customer become customer-editable (level 0). Other standard fields keep their level. Removing a field returns a standard field to the level shipped with the app. This overrides levels set from Customize Form. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a>.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",

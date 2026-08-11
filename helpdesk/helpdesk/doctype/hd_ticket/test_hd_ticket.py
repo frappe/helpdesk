@@ -10,7 +10,7 @@ from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.api.ticket import bulk_reply
-from helpdesk.consts import DEFAULT_SLA
+from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
     merge_ticket,
@@ -2315,8 +2315,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     Protected fields sit at permlevel 7 (customer-visible) and 8
     (agent-only), so the framework silently resets any change to them
-    made by a user without write access at that level. Template save
-    syncs permlevels from field visibility: hidden -> 8, visible -> 0.
+    made by a user without write access at that level. Saving the default
+    template syncs permlevels from field visibility: hidden -> 8,
+    visible -> 0. Other templates never move levels.
     """
 
     def setUp(self):
@@ -2329,9 +2330,36 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.get_doc(
             {"doctype": "HD Agent", "user": PERMS_AGENT, "agent_name": "Perms Agent"}
         ).insert(ignore_if_duplicate=True)
+        self.original_default_fields = self.default_template_rows()
 
     def tearDown(self):
         frappe.set_user("Administrator")
+        # putting the original rows back also restores permlevels: the
+        # save releases removed fields to their shipped levels
+        self.set_default_template_fields(self.original_default_fields)
+
+    @staticmethod
+    def default_template_rows():
+        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+        return [
+            {
+                "fieldname": f.fieldname,
+                "required": f.required,
+                "hide_from_customer": f.hide_from_customer,
+                "url_method": f.url_method,
+                "placeholder": f.placeholder,
+            }
+            for f in template.fields
+        ]
+
+    @staticmethod
+    def set_default_template_fields(rows):
+        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+        template.fields = []
+        for row in rows:
+            template.append("fields", row)
+        template.save()
+        return template
 
     def test_customer_cannot_write_agent_fields(self):
         ticket = get_customer_ticket(PERMS_CUSTOMER)
@@ -2387,9 +2415,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertNotEqual(spoofed.contact, other_contact)
 
     def test_template_visibility_drives_custom_field_permlevel(self):
-        """Template save syncs custom field permlevels: hidden -> 8
-        (agent-only), visible -> 0 (customer-writable). Deleting the
-        template leaves the level to the admin."""
+        """Default template save syncs custom field permlevels: hidden -> 8
+        (agent-only), visible -> 0 (customer-writable). Removing the field
+        leaves the level to the admin."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_template_driven"
@@ -2401,19 +2429,14 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "fieldtype": "Data",
             },
         )
-        template = make_template(
-            "Perms Template Driven",
-            [{"fieldname": fieldname, "hide_from_customer": 1}],
-        )
         try:
+            template = self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 1}]
+            )
             self.assertEqual(self.custom_field_permlevel(fieldname), 8)
             frappe.set_user(PERMS_CUSTOMER)
             hidden = frappe.get_doc(
-                {
-                    **get_ticket_obj(),
-                    "template": template.name,
-                    fieldname: "sneaky value",
-                }
+                {**get_ticket_obj(), fieldname: "sneaky value"}
             ).insert()
             self.assertFalse(hidden.get(fieldname))
 
@@ -2424,11 +2447,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             self.assertEqual(self.custom_field_permlevel(fieldname), 0)
             frappe.set_user(PERMS_CUSTOMER)
             visible = frappe.get_doc(
-                {
-                    **get_ticket_obj(),
-                    "template": template.name,
-                    fieldname: "customer value",
-                }
+                {**get_ticket_obj(), fieldname: "customer value"}
             ).insert()
             self.assertEqual(visible.get(fieldname), "customer value")
 
@@ -2437,15 +2456,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             template.fields[0].hide_from_customer = 1
             template.save()
             self.assertEqual(self.custom_field_permlevel(fieldname), 8)
-            frappe.db.delete("HD Ticket", {"template": template.name})
-            frappe.delete_doc("HD Ticket Template", template.name, force=True)
+            # custom fields have no shipped level: removal leaves it alone
+            self.set_default_template_fields([])
             self.assertEqual(self.custom_field_permlevel(fieldname), 8)
         finally:
             frappe.set_user("Administrator")
-            frappe.db.delete("HD Ticket", {"template": template.name})
-            frappe.delete_doc(
-                "HD Ticket Template", template.name, force=True, ignore_missing=True
-            )
             frappe.delete_doc(
                 "Custom Field",
                 frappe.db.get_value(
@@ -2480,61 +2495,50 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.via_customer_portal, 0)
 
     def test_internal_field_not_exposable_via_template(self):
-        """A template may display an internal field but never lower it to
-        customer-writable: `key` authenticates the guest feedback flow."""
-        template = make_template(
-            "Perms Internal Exposure",
-            [{"fieldname": "key", "hide_from_customer": 0}],
+        """The default template may display an internal field but never
+        lower it to customer-writable: `key` authenticates the guest
+        feedback flow."""
+        self.set_default_template_fields(
+            [{"fieldname": "key", "hide_from_customer": 0}]
         )
-        try:
-            key_level = frappe.get_meta("HD Ticket").get_field("key").permlevel
-            self.assertEqual(key_level, 8)
-            frappe.set_user(PERMS_CUSTOMER)
-            ticket = frappe.get_doc(get_ticket_obj()).insert()
-            self.assertFalse(get_one(ticket.name).get("key"))
-        finally:
-            frappe.set_user("Administrator")
-            frappe.delete_doc(
-                "HD Ticket Template", template.name, force=True, ignore_missing=True
-            )
+        key_level = frappe.get_meta("HD Ticket").get_field("key").permlevel
+        self.assertEqual(key_level, 8)
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        self.assertFalse(get_one(ticket.name).get("key"))
 
     def test_removed_template_field_restores_shipped_level(self):
-        """Dropping a field from the template — or deleting the template —
-        returns a standard field to the permlevel shipped in the doctype
-        JSON."""
+        """Dropping a standard field from the default template returns it
+        to the permlevel shipped in the doctype JSON."""
+        template = self.set_default_template_fields(
+            [{"fieldname": "priority", "hide_from_customer": 0}]
+        )
+        self.assertEqual(self.hd_ticket_permlevel("priority"), 0)
+        template.reload()
+        template.fields = []
+        template.save()
+        self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+
+        template.reload()
+        template.append("fields", {"fieldname": "priority", "hide_from_customer": 1})
+        template.save()
+        self.assertEqual(self.hd_ticket_permlevel("priority"), 8)
+        self.set_default_template_fields([])
+        self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+
+    def test_non_default_template_does_not_move_permlevels(self):
+        """Only the default template drives permlevels; any other template
+        is display-only."""
         template = make_template(
-            "Perms Restore Shipped",
-            [{"fieldname": "priority", "hide_from_customer": 0}],
+            "Perms Sidecar",
+            [{"fieldname": "priority", "hide_from_customer": 1}],
         )
         try:
-            self.assertEqual(self.hd_ticket_permlevel("priority"), 0)
-            template.reload()
-            template.fields = []
-            template.save()
-            self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
-
-            template.reload()
-            template.append(
-                "fields", {"fieldname": "priority", "hide_from_customer": 1}
-            )
-            template.save()
-            self.assertEqual(self.hd_ticket_permlevel("priority"), 8)
-            frappe.delete_doc("HD Ticket Template", template.name, force=True)
             self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
         finally:
-            frappe.set_user("Administrator")
             frappe.delete_doc(
                 "HD Ticket Template", template.name, force=True, ignore_missing=True
             )
-            frappe.db.delete(
-                "Property Setter",
-                {
-                    "doc_type": "HD Ticket",
-                    "field_name": "priority",
-                    "property": "permlevel",
-                },
-            )
-            frappe.clear_cache(doctype="HD Ticket")
 
     @staticmethod
     def hd_ticket_permlevel(fieldname):
@@ -2556,42 +2560,22 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
 
     def test_visible_standard_field_becomes_customer_writable(self):
-        """A standard field shown by a template drops to permlevel 0 and
-        stays customer-editable after creation too."""
-        template = make_template(
-            "Perms Visible Template",
-            [{"fieldname": "priority", "hide_from_customer": 0}],
+        """A standard field shown by the default template drops to
+        permlevel 0 and stays customer-editable after creation too."""
+        self.set_default_template_fields(
+            [{"fieldname": "priority", "hide_from_customer": 0}]
         )
-        try:
-            frappe.set_user(PERMS_CUSTOMER)
-            default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
-            chosen = other_priority(default_priority)
-            ticket = frappe.get_doc(
-                {**get_ticket_obj(), "template": template.name, "priority": chosen}
-            ).insert()
-            self.assertEqual(ticket.priority, chosen)
+        frappe.set_user(PERMS_CUSTOMER)
+        default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
+        chosen = other_priority(default_priority)
+        ticket = frappe.get_doc({**get_ticket_obj(), "priority": chosen}).insert()
+        self.assertEqual(ticket.priority, chosen)
 
-            ticket.reload()
-            ticket.priority = other_priority(chosen)
-            ticket.save()
-            ticket.reload()
-            self.assertEqual(ticket.priority, other_priority(chosen))
-        finally:
-            frappe.set_user("Administrator")
-            frappe.db.delete("HD Ticket", {"template": template.name})
-            frappe.delete_doc(
-                "HD Ticket Template", template.name, force=True, ignore_missing=True
-            )
-            # restore priority to its shipped level for sibling tests
-            frappe.db.delete(
-                "Property Setter",
-                {
-                    "doc_type": "HD Ticket",
-                    "field_name": "priority",
-                    "property": "permlevel",
-                },
-            )
-            frappe.clear_cache(doctype="HD Ticket")
+        ticket.reload()
+        ticket.priority = other_priority(chosen)
+        ticket.save()
+        ticket.reload()
+        self.assertEqual(ticket.priority, other_priority(chosen))
 
     def test_customer_cannot_read_internal_fields(self):
         internal = ("sla", "agreement_status", "last_agent_response", "key")

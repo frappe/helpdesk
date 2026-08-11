@@ -66,14 +66,17 @@ class HDTicketTemplate(Document):
         )
 
     def on_update(self):
-        self.sync_field_permlevels()
-        self.release_removed_fields()
+        # the default template is the single source of truth for permlevels;
+        # other templates are display-only
+        if self.name == DEFAULT_TICKET_TEMPLATE:
+            self.sync_field_permlevels()
+            self.release_removed_fields()
         capture_event("ticket_template_updated")
 
     def release_removed_fields(self):
-        """A standard field dropped from the template goes back to the
-        permlevel shipped in the doctype JSON; custom fields have no shipped
-        level, so they stay with the admin."""
+        """A standard field dropped from the default template goes back to
+        the permlevel shipped in the doctype JSON; custom fields have no
+        shipped level, so they stay with the admin."""
         previous = self.get_doc_before_save()
         if not previous:
             return
@@ -87,13 +90,11 @@ class HDTicketTemplate(Document):
 
     def restore_shipped_permlevels(self, fieldnames: list[str]):
         """Drop the permlevel overlay so the doctype JSON value applies
-        again — only for standard fields no other template still lists."""
+        again — standard fields only."""
         meta = frappe.get_meta("HD Ticket")
         restored = []
         for fieldname in fieldnames:
             if self.custom_field_exists(fieldname):
-                continue
-            if self.listed_in_other_template(fieldname):
                 continue
             if not self.delete_permlevel_property_setter(fieldname):
                 continue
@@ -103,18 +104,6 @@ class HDTicketTemplate(Document):
         if restored:
             frappe.clear_cache(doctype="HD Ticket")
             self.warn_permlevel_changes(restored)
-
-    def listed_in_other_template(self, fieldname: str) -> bool:
-        return bool(
-            frappe.db.exists(
-                "HD Ticket Template Field",
-                {
-                    "fieldname": fieldname,
-                    "parenttype": "HD Ticket Template",
-                    "parent": ["!=", self.name],
-                },
-            )
-        )
 
     def delete_permlevel_property_setter(self, fieldname: str) -> bool:
         filters = {
@@ -136,10 +125,11 @@ class HDTicketTemplate(Document):
         )
 
     def sync_field_permlevels(self):
-        """Template visibility drives HD Ticket field permlevels: hidden
-        fields turn agent-only; visible custom fields and the customer-editable
-        standard fields turn customer-writable. Other standard fields keep
-        their level, so a template can display them but never open them up."""
+        """Default template visibility drives HD Ticket field permlevels:
+        hidden fields turn agent-only; visible custom fields and the
+        customer-editable standard fields turn customer-writable. Other
+        standard fields keep their level, so the template can display them
+        but never open them up."""
         meta = frappe.get_meta("HD Ticket")
         changed = []
         for f in self.fields:
@@ -194,9 +184,6 @@ class HDTicketTemplate(Document):
 
     def on_trash(self):
         self.prevent_default_delete()
-        self.restore_shipped_permlevels(
-            [f.fieldname for f in self.fields if f.fieldname]
-        )
 
     def prevent_default_delete(self):
         if self.name == DEFAULT_TICKET_TEMPLATE:
