@@ -47,8 +47,8 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
-    # server-stamped fields, exempted from the permlevel reset only at the
-    # moment the server writes them
+    # fields the server fills in itself; the permission reset skips them
+    # only while the server is writing them
     SERVER_OWNED_INSERT_FIELDS = ["key", "raised_by", "via_customer_portal", "customer"]
     RESPONSE_STAMP_FIELDS = [
         "last_customer_response",
@@ -86,11 +86,12 @@ class HDTicket(Document):
         self.apply_portal_insert_rules()
 
     def apply_portal_insert_rules(self):
-        """Exempt from the permlevel reset the framework runs right after
-        this hook: server-set values, plus the default template's visible
-        fields, which customers may fill only while creating the ticket.
-        Trusted staff (agents, System Managers) keep the desk behaviour:
-        raised_by stays as typed, no portal flag."""
+        """Right after this hook, the framework wipes every field the user
+        cannot write. Protect two kinds of values from that: what the
+        server just set, and the fields the default template shows, which
+        a customer may fill only while creating the ticket. Agents and
+        System Managers skip these portal rules: their raised_by stays as
+        typed and the ticket is not marked as a portal ticket."""
         if is_agent() or "System Manager" in frappe.get_roles():
             return
         if frappe.session.user != "Guest":
@@ -102,8 +103,10 @@ class HDTicket(Document):
         )
 
     def creation_fillable_template_fields(self) -> list[str]:
-        """Visible default-template fields up to the customer-visible tier;
-        internal fields stay protected even if a template lists them."""
+        """Fields a customer may fill on the creation form: the fields the
+        default template shows, at level 0 or 7. Response timestamps the
+        server stamps, internal fields, and fields a site moved to its own
+        levels never qualify, even when a template lists them."""
         visible = frappe.get_all(
             "HD Ticket Template Field",
             filters={
@@ -116,8 +119,10 @@ class HDTicket(Document):
         meta = frappe.get_meta("HD Ticket")
         fillable = []
         for fieldname in visible:
+            if fieldname in self.RESPONSE_STAMP_FIELDS:
+                continue
             field = meta.get_field(fieldname)
-            if field and field.permlevel <= TICKET_VISIBLE_FIELD_PERMLEVEL:
+            if field and field.permlevel in (0, TICKET_VISIBLE_FIELD_PERMLEVEL):
                 fillable.append(fieldname)
         return fillable
 
@@ -219,7 +224,8 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
-        # the creation-fill exemption must not outlive the insert
+        # the creation-form exemption is for the insert only; drop it so a
+        # later save cannot reuse it
         self.flags.pop("ignore_permlevel_for_fields", None)
 
         # Telemetry Event
@@ -1456,7 +1462,7 @@ def _agent_has_permission(doc, user: str) -> bool:
         try:
             if user in json.loads(doc._assign):
                 return True
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return False
 
     teams = get_agents_team(user)

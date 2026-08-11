@@ -2338,8 +2338,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     def tearDown(self):
         frappe.set_user("Administrator")
-        # putting the original rows back also restores permlevels: the
-        # save releases removed fields to their shipped levels
+        # saving the original rows back also puts the permission levels
+        # back: fields we removed return to their shipped levels
         self.set_default_template_fields(self.original_default_fields)
 
     @staticmethod
@@ -2402,7 +2402,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         baseline = frappe.get_doc(get_ticket_obj()).insert()
         self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
-        # server-stamped flag survives the reset via the insert exemption
+        # the server-set portal flag survives the permission reset
         self.assertEqual(baseline.via_customer_portal, 1)
         self.assertTrue(baseline.key)
 
@@ -2456,7 +2456,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             ).insert()
             self.assertEqual(visible.get(fieldname), "customer value")
 
-            # fillable only while creating: edits after creation reset
+            # fillable only while creating: this later edit gets undone
             visible.reload()
             visible.set(fieldname, "changed later")
             visible.save()
@@ -2587,6 +2587,49 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket.save()
         ticket.reload()
         self.assertEqual(ticket.priority, chosen)
+
+    def test_response_stamp_not_fillable_at_creation(self):
+        """`first_responded_on` is server-stamped: even shown by the
+        template, a customer-supplied value at creation is dropped."""
+        self.set_default_template_fields(
+            [{"fieldname": "first_responded_on", "hide_from_customer": 0}]
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc(
+            {**get_ticket_obj(), "first_responded_on": now_datetime()}
+        ).insert()
+        self.assertFalse(ticket.first_responded_on)
+
+    def test_site_permlevel_not_fillable_at_creation(self):
+        """Only the app tiers 0 and 7 are creation-fillable; a field moved
+        to a site-owned level (1-6) after the template save is not."""
+        from frappe.custom.doctype.property_setter.property_setter import (
+            make_property_setter,
+        )
+
+        self.set_default_template_fields(
+            [{"fieldname": "priority", "hide_from_customer": 0}]
+        )
+        make_property_setter("HD Ticket", "priority", "permlevel", 3, "Int")
+        frappe.clear_cache(doctype="HD Ticket")
+        try:
+            frappe.set_user(PERMS_CUSTOMER)
+            baseline_priority = frappe.get_doc(get_ticket_obj()).insert().priority
+            ticket = frappe.get_doc(
+                {**get_ticket_obj(), "priority": other_priority(baseline_priority)}
+            ).insert()
+            self.assertEqual(ticket.priority, baseline_priority)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.db.delete(
+                "Property Setter",
+                {
+                    "doc_type": "HD Ticket",
+                    "field_name": "priority",
+                    "property": "permlevel",
+                },
+            )
+            frappe.clear_cache(doctype="HD Ticket")
 
     def test_customer_cannot_read_internal_fields(self):
         internal = ("sla", "agreement_status", "last_agent_response", "key")

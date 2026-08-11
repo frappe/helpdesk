@@ -82,11 +82,11 @@ class HDTicketTemplate(Document):
         capture_event("ticket_template_updated")
 
     def sync_field_permlevels(self):
-        """Field visibility drives HD Ticket permlevels: hidden fields turn
-        internal, visible fields return to their shipped level (custom
-        fields to the customer-visible tier). The template never lowers a
-        field below its shipped level; customers may fill visible fields
-        only while creating a ticket."""
+        """Hidden fields become internal: agents only. Visible fields go
+        back to the level the app ships them with (visible custom fields
+        to level 7). The template never lowers a field, so customers may
+        fill visible fields while creating a ticket but never edit them
+        afterwards."""
         meta = frappe.get_meta("HD Ticket")
         changed = []
         for f in self.fields:
@@ -110,9 +110,9 @@ class HDTicketTemplate(Document):
         return self.shipped_permlevel(field_row.fieldname)
 
     def release_removed_fields(self):
-        """A standard field dropped from the default template goes back to
-        the permlevel shipped in the doctype JSON; custom fields have no
-        shipped level, so they stay with the admin."""
+        """A standard field removed from the default template goes back to
+        the level the app ships it with. Custom fields have no shipped
+        level, so their level is left to the admin."""
         previous = self.get_doc_before_save()
         if not previous:
             return
@@ -125,8 +125,8 @@ class HDTicketTemplate(Document):
         self.restore_shipped_permlevels(removed)
 
     def restore_shipped_permlevels(self, fieldnames: list[str]):
-        """Drop the permlevel overlay so the doctype JSON value applies
-        again — standard fields only."""
+        """Delete the stored level override so the level from the app's
+        field definition applies again — standard fields only."""
         meta = frappe.get_meta("HD Ticket")
         restored = []
         for fieldname in fieldnames:
@@ -190,7 +190,7 @@ class HDTicketTemplate(Document):
                 level,
             )
         elif level == self.shipped_permlevel(fieldname):
-            # the shipped value needs no overlay
+            # same as the shipped level: no override needed, drop any old one
             self.delete_permlevel_property_setter(fieldname)
         else:
             make_property_setter("HD Ticket", fieldname, "permlevel", level, "Int")
