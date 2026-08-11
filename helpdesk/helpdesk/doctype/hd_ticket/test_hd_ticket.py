@@ -2498,6 +2498,48 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "HD Ticket Template", template.name, force=True, ignore_missing=True
             )
 
+    def test_removed_template_field_restores_shipped_level(self):
+        """Dropping a field from the template — or deleting the template —
+        returns a standard field to the permlevel shipped in the doctype
+        JSON."""
+        template = make_template(
+            "Perms Restore Shipped",
+            [{"fieldname": "priority", "hide_from_customer": 0}],
+        )
+        try:
+            self.assertEqual(self.hd_ticket_permlevel("priority"), 0)
+            template.reload()
+            template.fields = []
+            template.save()
+            self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+
+            template.reload()
+            template.append(
+                "fields", {"fieldname": "priority", "hide_from_customer": 1}
+            )
+            template.save()
+            self.assertEqual(self.hd_ticket_permlevel("priority"), 8)
+            frappe.delete_doc("HD Ticket Template", template.name, force=True)
+            self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "HD Ticket Template", template.name, force=True, ignore_missing=True
+            )
+            frappe.db.delete(
+                "Property Setter",
+                {
+                    "doc_type": "HD Ticket",
+                    "field_name": "priority",
+                    "property": "permlevel",
+                },
+            )
+            frappe.clear_cache(doctype="HD Ticket")
+
+    @staticmethod
+    def hd_ticket_permlevel(fieldname):
+        return frappe.get_meta("HD Ticket").get_field(fieldname).permlevel
+
     def test_portal_activity_stamps_last_customer_response(self):
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(get_ticket_obj()).insert()
