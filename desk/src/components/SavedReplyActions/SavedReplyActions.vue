@@ -108,15 +108,13 @@ const chipActions = computed(() =>
 );
 
 const visibleChips = computed(() =>
-  showAllChips.value
+  showAllChips.value || chipActions.value.length <= MAX_VISIBLE_CHIPS + 1
     ? chipActions.value
     : chipActions.value.slice(0, MAX_VISIBLE_CHIPS)
 );
 
-const overflowCount = computed(() =>
-  showAllChips.value
-    ? 0
-    : Math.max(chipActions.value.length - MAX_VISIBLE_CHIPS, 0)
+const overflowCount = computed(
+  () => chipActions.value.length - visibleChips.value.length
 );
 
 /** Collapsing puts the chip list back to its capped state. */
