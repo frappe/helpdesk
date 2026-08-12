@@ -100,8 +100,7 @@ const expanded = userStorage(
 );
 
 const showAllChips = ref(false);
-// Not reactive: nothing renders from it, it only decides if the next failure
-// still offers a retry
+// Not reactive: it only gates the next failure's retry
 let isRetry = false;
 const container = ref<HTMLElement>();
 const { width } = useElementSize(container);
@@ -209,12 +208,9 @@ const applyActions = createResource({
   },
   onError: (error: { status?: number }) => {
     const failed = [...pendingActions.value];
-    // A response means the whole apply rolled back, so retrying can't double
-    // anything. Without one it may have landed, and only the agent can tell.
-    // One retry only: a second failure is the agent's to sort out by hand.
+    // Only a response proves it rolled back, and one retry is enough
     const canRetry = Boolean(error?.status) && !isRetry;
-    // Unstaged either way: left pending, the batch would ride the agent's next,
-    // unrelated send on this ticket
+    // Unstaged always: a kept batch would ride the next, unrelated send
     pendingActions.value = [];
     toast.error(__("Could not apply actions from the saved reply."), {
       duration: FAILURE_TOAST_DURATION,
