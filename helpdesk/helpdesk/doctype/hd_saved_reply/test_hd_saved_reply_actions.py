@@ -4,6 +4,7 @@
 import json
 
 import frappe
+from frappe.cache_manager import clear_doctype_map
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.saved_replies import (
@@ -47,6 +48,12 @@ class TestHDSavedReplyActions(IntegrationTestCase):
         frappe.get_doc("User", AGENT).add_roles("Agent")
         make_team(TEAM, [AGENT])
         make_ticket_type(TICKET_TYPE)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        # The team's assignment rule is rolled back, its cached name is not
+        clear_doctype_map("Assignment Rule")
 
     def setUp(self):
         frappe.set_user("Administrator")
