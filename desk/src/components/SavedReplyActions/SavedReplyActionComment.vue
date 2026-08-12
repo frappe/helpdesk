@@ -8,7 +8,7 @@
       <button
         v-if="!expanded"
         type="button"
-        class="min-w-0 cursor-pointer truncate text-start text-ink-gray-7"
+        class="min-w-0 cursor-pointer truncate text-start text-ink-gray-7 max-w-[70%]"
         @click="expanded = true"
       >
         {{ preview }}
