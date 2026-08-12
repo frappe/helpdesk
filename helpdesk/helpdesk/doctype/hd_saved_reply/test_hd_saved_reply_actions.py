@@ -200,10 +200,12 @@ class TestHDSavedReplyActions(IntegrationTestCase):
                 {"action_type": "Set Status", "value": "Nope"},
                 {"action_type": "Set Priority", "value": ["!=", ""]},
                 {"action_type": "Set Team", "value": TEAM},
+                # Shadowed by the row above, so it is reported as skipped
+                {"action_type": "Set Team", "value": TEAM},
             ],
         )
 
-        self.assertEqual(len(result["skipped"]), 2)
+        self.assertEqual(len(result["skipped"]), 3)
         self.assertEqual(len(result["applied"]), 1)
         ticket.reload()
         self.assertEqual(ticket.status, original_status)

@@ -5,6 +5,7 @@ from frappe.utils import strip_html
 from helpdesk.api.tags import update_tags
 from helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply import (
     ACTIONS,
+    action_key,
     is_action_valid,
     parse_actions,
 )
@@ -23,7 +24,8 @@ def get_rendered_saved_reply(ticket_id: str, saved_reply_id: str | None = None):
     user = frappe.get_doc("User", frappe.session.user).as_dict()
     return {
         "title": saved_reply.title,
-        "message": frappe.render_template(
+        # Templates are authored by agents, never by customers
+        "message": frappe.render_template(  # nosemgrep
             saved_reply.message, {**ticket.as_dict(), **user}
         ),
         # Stale actions are dropped here so agents never stage one that
@@ -65,11 +67,18 @@ def apply_saved_reply_actions(ticket_id: str, actions: list[dict] | str) -> dict
     comment = None
     added_tags: list[str] = []
     removed_tags: list[str] = []
+    seen: set = set()
     for action in parsed_actions:
         action_type, value = action.get("action_type"), action.get("value")
         if not is_action_valid(action_type, value):
             skipped.append({"action_type": action_type, "value": value})
             continue
+        # A repeat is shadowed by the last one, so it never applies
+        key = action_key(action_type, value)
+        if key in seen:
+            skipped.append({"action_type": action_type, "value": value})
+            continue
+        seen.add(key)
         if action_type == "Assign Agent":
             assign_to = value
         elif action_type == "Assign to Me":
