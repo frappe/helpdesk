@@ -6,45 +6,90 @@
         {{ __("Applied to the ticket when this reply is sent") }}
       </span>
     </div>
-    <Grid
-      v-model="rows"
-      :columns="columns"
-      :error="error"
-      :empty-text="
-        __(
-          'No actions yet. Add one to update the ticket when this reply is sent'
-        )
-      "
-      :add-label="__('Add action')"
-      :selectable="false"
-      :reorderable="false"
-      row-action="remove"
-    >
-      <template #cell="{ row, column, value, update }">
-        <Combobox
-          v-if="column.fieldname === 'action_type'"
-          class="w-full"
-          trigger="button"
-          :model-value="(value as string)"
-          :options="typeOptions(row as ActionRow)"
-          :placeholder="__('Select action')"
-          @update:model-value="
-            setActionType(row as ActionRow, $event as SavedReplyActionType)
-          "
-        />
-        <ActionValue
-          v-else-if="row.action_type"
-          :type="row.action_type"
-          :model-value="value"
-          :options="valueOptions(row.action_type)"
-          @update:model-value="update"
-          @search="search(row.action_type, $event)"
-        />
-        <span v-else class="flex items-center px-2 text-p-sm text-ink-gray-4">
-          &mdash;
-        </span>
+    <div class="rounded-md border border-outline-gray-2 px-1 text-sm">
+      <template v-if="rows.length">
+        <div
+          class="grid items-center gap-6 p-2"
+          :style="{ gridTemplateColumns }"
+        >
+          <div
+            v-for="column in columns"
+            :key="column.key"
+            class="ms-2 overflow-hidden text-ellipsis whitespace-nowrap text-ink-gray-5"
+          >
+            {{ column.label }}
+          </div>
+        </div>
+        <hr />
+        <template v-for="(row, index) in rows" :key="index">
+          <div
+            class="grid items-center gap-6 p-2"
+            :style="{ gridTemplateColumns }"
+          >
+            <Combobox
+              class="w-full"
+              variant="ghost"
+              trigger="button"
+              :model-value="row.action_type"
+              :options="typeOptions(row)"
+              :placeholder="__('Select action')"
+              @update:model-value="
+                setActionType(row, $event as SavedReplyActionType)
+              "
+            />
+            <ActionValue
+              v-if="row.action_type"
+              :type="row.action_type"
+              :model-value="row.value"
+              :options="valueOptions(row.action_type)"
+              @update:model-value="row.value = $event"
+              @search="search(row.action_type, $event)"
+            />
+            <span
+              v-else
+              class="flex items-center px-2 text-p-sm text-ink-gray-4"
+            >
+              &mdash;
+            </span>
+            <div class="flex justify-end">
+              <Dropdown
+                placement="right"
+                :options="[
+                  {
+                    label: __('Delete'),
+                    icon: 'lucide-trash-2',
+                    onClick: () => rows.splice(index, 1),
+                  },
+                ]"
+              >
+                <Button
+                  variant="ghost"
+                  icon="lucide-more-horizontal"
+                  :label="__('Row actions')"
+                />
+              </Dropdown>
+            </div>
+          </div>
+          <hr v-if="index !== rows.length - 1" />
+        </template>
       </template>
-    </Grid>
+      <div v-else class="p-4 text-center text-ink-gray-5">
+        {{
+          __(
+            "No actions yet. Add one to update the ticket when this reply is sent"
+          )
+        }}
+      </div>
+    </div>
+    <div class="mt-2.5 flex items-center justify-between">
+      <Button
+        variant="subtle"
+        icon-left="lucide-plus"
+        :label="__('Add action')"
+        @click="rows.push({ value: '' })"
+      />
+      <ErrorMessage :message="error" />
+    </div>
   </div>
 </template>
 
@@ -52,9 +97,9 @@
 import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
 import { __ } from "@/translation";
 import { SavedReplyAction, SavedReplyActionType } from "@/types";
-import { Grid, type GridColumn } from "@framework/ui";
-import { Combobox } from "frappe-ui";
-import { ref, watch } from "vue";
+import { getGridTemplateColumnsForTable } from "@/utils";
+import { Button, Combobox, Dropdown } from "frappe-ui";
+import { computed, ref, watch } from "vue";
 import ActionValue from "./ActionValue.vue";
 import {
   ACTION_MENU_GROUPS,
@@ -82,12 +127,17 @@ const {
   search,
 } = useSavedReplyActionOptions();
 
-const columns: GridColumn[] = [
-  { fieldname: "action_type", label: __("Action"), width: 220 },
-  { fieldname: "value", label: __("Value") },
+const columns = [
+  { key: "action_type", label: __("Action"), width: "190px" },
+  { key: "value", label: __("Value") },
 ];
 
-// The grid edits rows in place, so it needs a real ref; the flat model is derived.
+// Trailing 22px column holds the remove button
+const gridTemplateColumns = computed(() =>
+  getGridTemplateColumnsForTable(columns)
+);
+
+// The table edits rows in place, so it needs a real ref; the flat model is derived.
 const rows = ref<ActionRow[]>(toRows(actions.value));
 
 /** Types still free for this row: no duplicates, and one assignment action. */
