@@ -78,6 +78,8 @@ import SavedReplyActionComment from "./SavedReplyActionComment.vue";
 
 /** Chips beyond this stay hidden until the agent asks for the rest. */
 const MAX_VISIBLE_CHIPS = 4;
+/** Failures hold long enough to read: one asks for a decision, the other for work. */
+const FAILURE_TOAST_DURATION = 15000;
 /** Below this the long sentence squeezes the reply name to nothing. */
 const NARROW_WIDTH = 470;
 
@@ -98,6 +100,9 @@ const expanded = userStorage(
 );
 
 const showAllChips = ref(false);
+// Not reactive: nothing renders from it, it only decides if the next failure
+// still offers a retry
+let isRetry = false;
 const container = ref<HTMLElement>();
 const { width } = useElementSize(container);
 
@@ -202,27 +207,37 @@ const applyActions = createResource({
     pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
-  onError: (error: { messages?: string[]; status?: number }) => {
-    // An error response means the request rolled back, so nothing was applied
-    // and the batch is safe to keep staged. Without a status we never heard
-    // back and it may have landed — drop it rather than risk applying twice.
-    const rolledBack = Boolean(error?.status);
-    if (!rolledBack) pendingActions.value = [];
-    toast.error(
-      error?.messages?.[0] ||
-        (rolledBack
-          ? __("Could not apply saved reply actions")
-          : __("Could not apply saved reply actions, apply them manually"))
-    );
+  onError: (error: { status?: number }) => {
+    const failed = [...pendingActions.value];
+    // A response means the whole apply rolled back, so retrying can't double
+    // anything. Without one it may have landed, and only the agent can tell.
+    // One retry only: a second failure is the agent's to sort out by hand.
+    const canRetry = Boolean(error?.status) && !isRetry;
+    // Unstaged either way: left pending, the batch would ride the agent's next,
+    // unrelated send on this ticket
+    pendingActions.value = [];
+    toast.error(__("Could not apply actions from the saved reply."), {
+      duration: FAILURE_TOAST_DURATION,
+      ...(canRetry
+        ? { action: { label: __("Retry"), onClick: () => retry(failed) } }
+        : { description: __("Please apply the actions manually") }),
+    });
     reloadTicket(props.ticketId);
   },
 });
+
+/** Re-send a batch the agent kept from the failure toast. */
+function retry(actions: SavedReplyAction[]) {
+  isRetry = true;
+  applyActions.submit({ ticket_id: props.ticketId, actions });
+}
 
 /** Apply the staged actions to the ticket; call after the email is sent. */
 function submit() {
   if (!pendingActions.value.length || props.doctype !== "HD Ticket") return;
   // Actions stay staged during the request, so guard the second call
   if (applyActions.loading) return;
+  isRetry = false;
   applyActions.submit({
     ticket_id: props.ticketId,
     actions: [...pendingActions.value],
