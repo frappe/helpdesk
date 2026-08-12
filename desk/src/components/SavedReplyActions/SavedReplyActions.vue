@@ -66,9 +66,10 @@
 <script setup lang="ts">
 import { isTagAction } from "@/components/Settings/SavedReplies/components/actionTypes";
 import { reloadTicket } from "@/composables/useTicket";
+import { userStorage } from "@/composables/userStorage";
 import { __ } from "@/translation";
 import { RenderedSavedReply, SavedReplyAction } from "@/types";
-import { useElementSize, useStorage } from "@vueuse/core";
+import { useElementSize } from "@vueuse/core";
 import { Badge, Button, Tooltip, createResource, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import LucideInfo from "~icons/lucide/info";
@@ -85,12 +86,13 @@ const props = defineProps<{
   doctype: string;
 }>();
 
-// Persisted like the draft body, so a refresh keeps text and actions in sync
-const pendingActions = useStorage<SavedReplyAction[]>(
+// Persisted like the draft body, so a refresh keeps text and actions in sync.
+// Scoped to the agent: a staged comment must not survive a shift handover.
+const pendingActions = userStorage<SavedReplyAction[]>(
   "pendingSavedReplyActions" + props.ticketId,
   []
 );
-const expanded = useStorage(
+const expanded = userStorage(
   "pendingSavedReplyActionsExpanded" + props.ticketId,
   false
 );
@@ -197,15 +199,17 @@ const applyActions = createResource({
         )
       );
     }
-    // Cleared only once the actions have landed, so a failed apply leaves them
-    // staged for another try instead of losing them with the email already sent
     pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
   onError: (error: { messages?: string[] }) => {
     toast.error(
-      error?.messages?.[0] || __("Could not apply saved reply actions")
+      error?.messages?.[0] ||
+        __("Could not apply saved reply actions, apply them manually")
     );
+    // Dropped even on failure: a failed apply may still have landed server-side,
+    // and staged actions would silently re-apply on the agent's next send
+    pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
 });
