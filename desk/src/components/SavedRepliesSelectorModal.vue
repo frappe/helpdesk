@@ -104,6 +104,17 @@
                 <LoadingIndicator class="size-4" />
               </div>
             </div>
+            <div class="col-span-full flex justify-center">
+              <Button
+                v-if="
+                  !savedReplyListResource.list.loading &&
+                  savedReplyListResource.hasNextPage
+                "
+                :label="__('Load More')"
+                icon-left="lucide-refresh-cw"
+                @click="savedReplyListResource.next()"
+              />
+            </div>
           </div>
           <div
             v-if="
