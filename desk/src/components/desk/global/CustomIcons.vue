@@ -93,21 +93,21 @@
         height="3"
         rx="1"
         transform="matrix(-1 0 0 1 2.5 6)"
-        fill="#A6B1B9"
+        fill="#2563EB"
       />
       <rect
         width="2"
         height="6"
         rx="1"
         transform="matrix(-1 0 0 1 5.5 3)"
-        fill="#A6B1B9"
+        fill="#2563EB"
       />
       <rect
         width="2"
         height="9"
         rx="1"
         transform="matrix(-1 0 0 1 8.5 0)"
-        fill="#EBEEF0"
+        fill="#DBEAFE"
       />
     </svg>
     <svg
@@ -124,21 +124,21 @@
         height="3"
         rx="1"
         transform="matrix(-1 0 0 1 2.5 6)"
-        fill="#A6B1B9"
+        fill="#16A34A"
       />
       <rect
         width="2"
         height="6"
         rx="1"
         transform="matrix(-1 0 0 1 5.5 3)"
-        fill="#EBEEF0"
+        fill="#DCFCE7"
       />
       <rect
         width="2"
         height="9"
         rx="1"
         transform="matrix(-1 0 0 1 8.5 0)"
-        fill="#EBEEF0"
+        fill="#DCFCE7"
       />
     </svg>
     <svg
@@ -155,21 +155,21 @@
         height="3"
         rx="1"
         transform="matrix(-1 0 0 1 2.5 6)"
-        fill="#A6B1B9"
+        fill="#F97316"
       />
       <rect
         width="2"
         height="6"
         rx="1"
         transform="matrix(-1 0 0 1 5.5 3)"
-        fill="#A6B1B9"
+        fill="#F97316"
       />
       <rect
         width="2"
         height="9"
         rx="1"
         transform="matrix(-1 0 0 1 8.5 0)"
-        fill="#A6B1B9"
+        fill="#F97316"
       />
     </svg>
     <svg

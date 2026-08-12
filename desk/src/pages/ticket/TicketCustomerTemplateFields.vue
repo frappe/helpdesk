@@ -9,7 +9,13 @@
     <div class="space-y-1.5">
       <span class="block text-sm text-gray-700"> Priority </span>
       <span class="block break-words text-base font-medium text-gray-900">
-        {{ ticket.data.priority }}
+        <Badge
+          v-if="ticket.data.priority"
+          :label="ticket.data.priority"
+          :theme="priorityStore.getBadgeTheme(ticket.data.priority)"
+          variant="outline"
+        />
+        <span v-else>-</span>
       </span>
     </div>
     <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
@@ -45,11 +51,14 @@
 
 <script setup lang="ts">
 import { inject, computed } from "vue";
+import { Badge } from "frappe-ui";
 import { ITicket } from "./symbols";
 import { dayjs } from "@/dayjs";
 import { Field } from "@/types";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
 
 const ticket = inject(ITicket);
+const priorityStore = useTicketPriorityStore();
 
 const slaData = computed(() => {
   const responseSla =

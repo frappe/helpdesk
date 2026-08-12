@@ -69,6 +69,7 @@ import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useAuthStore } from "@/stores/auth";
 import { dayjs } from "@/dayjs";
 import { createToast, getIcon, isCustomerPortal } from "@/utils";
@@ -98,6 +99,7 @@ const listViewRef = ref(null);
 const showExportModal = ref(false);
 
 const { textColorMap } = useTicketStatusStore();
+const priorityStore = useTicketPriorityStore();
 
 const listSelections = ref(new Set());
 const selectBannerActions = [
@@ -156,6 +158,16 @@ const options = {
       prefix: ({ row }) => {
         return h(IndicatorIcon, {
           class: textColorMap[row.status],
+        });
+      },
+    },
+    priority: {
+      custom: ({ item }) => {
+        if (!item) return null;
+        return h(Badge, {
+          label: item,
+          theme: priorityStore.getBadgeTheme(item),
+          variant: "outline",
         });
       },
     },

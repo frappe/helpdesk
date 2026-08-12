@@ -68,7 +68,13 @@
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
         <span class="text-base text-gray-800 flex-1">
-          {{ field.value }}
+          <Badge
+            v-if="field.isBadge"
+            :label="field.value"
+            :theme="field.theme"
+            variant="outline"
+          />
+          <span v-else>{{ field.value }}</span>
         </span>
       </div>
     </div>
@@ -78,10 +84,11 @@
 <script setup lang="ts">
 import { inject, computed } from "vue";
 import { ITicket } from "@/pages/ticket/symbols";
-import { Tooltip, Avatar } from "frappe-ui";
+import { Tooltip, Avatar, Badge } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { formatTime } from "@/utils";
 import { Field } from "@/types";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
 
 const emit = defineEmits(["open"]);
 
@@ -186,6 +193,8 @@ const ticketBasicInfo = computed(() => [
   },
 ]);
 
+const priorityStore = useTicketPriorityStore();
+
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
@@ -199,6 +208,8 @@ const ticketAdditionalInfo = computed(() => {
     {
       label: "Priority",
       value: ticket.data.priority,
+      isBadge: !!ticket.data.priority,
+      theme: priorityStore.getBadgeTheme(ticket.data.priority),
     },
   ];
   const custom_fields = ticket.data.template.fields
