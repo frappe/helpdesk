@@ -536,8 +536,7 @@ function addToReply(
   focusEditorAtStart();
 }
 
-// Staged actions are not cleared here: `submit()` owns them until the apply
-// call succeeds, so a failed apply leaves them staged to retry
+// Staged actions are left to `submit()`, which unstages them either way
 function resetState() {
   newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
