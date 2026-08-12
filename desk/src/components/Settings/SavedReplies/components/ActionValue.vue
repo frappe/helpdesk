@@ -67,13 +67,13 @@
   >
     <template #default>
       <EditorContent
-        class="prose prose-v3 [--prose-font-size:13px] min-h-8 max-h-40 max-w-full overflow-auto px-2 py-1.5 text-ink-gray-8 focus:ring-0"
+        class="prose prose-v3 [--prose-font-size:14px] min-h-8 max-h-40 max-w-full overflow-auto px-2 py-1.5 text-ink-gray-7 focus:ring-0"
       />
     </template>
   </Editor>
   <span
     v-else-if="config.hint"
-    class="flex items-center px-2 text-p-sm text-ink-gray-5 cursor-default"
+    class="flex items-center px-2 text-base text-ink-gray-7 cursor-default"
   >
     {{ config.hint }}
   </span>

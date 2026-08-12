@@ -21,7 +21,7 @@ import {
   withoutReply,
   type SavedReplyUsage,
 } from "./savedReplyRanking";
-import { userStorage } from "./userStorage";
+import { userStorage } from "@/composables/userStorage";
 
 import LucideMessageSquareQuote from "~icons/lucide/message-square-quote";
 
