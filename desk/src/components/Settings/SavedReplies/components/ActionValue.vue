@@ -2,6 +2,7 @@
   <Select
     v-if="config.control === 'select'"
     class="w-full"
+    variant="ghost"
     :model-value="(modelValue as string)"
     :options="options"
     :placeholder="placeholder"
@@ -10,6 +11,7 @@
   <Combobox
     v-else-if="config.control === 'combobox'"
     class="w-full"
+    variant="ghost"
     trigger="button"
     :model-value="(modelValue as string)"
     :options="options"
@@ -24,6 +26,7 @@
   <MultiSelect
     v-else-if="config.control === 'multiselect'"
     class="w-full"
+    variant="ghost"
     :model-value="(modelValue as string[])"
     :options="options"
     :placeholder="__('Select tags')"
