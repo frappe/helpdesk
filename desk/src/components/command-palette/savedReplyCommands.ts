@@ -1,5 +1,8 @@
-import { replyComposer } from "@/components/replyComposer";
-import { showEmailBox, toggleEmailBox } from "@/pages/ticket/modalStates";
+import {
+  replyComposer,
+  showEmailBox,
+  toggleEmailBox,
+} from "@/pages/ticket/modalStates";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";

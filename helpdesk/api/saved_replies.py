@@ -55,7 +55,7 @@ def apply_saved_reply_actions(ticket_id: str, actions: list[dict] | str) -> dict
     Actions that are no longer valid are skipped and reported instead of
     raised — the email is already out by the time this runs.
     """
-    parsed = parse_actions(actions)
+    parsed_actions = parse_actions(actions)
     ticket = frappe.get_doc("HD Ticket", ticket_id)
     ticket.check_permission("write")
 
@@ -65,7 +65,7 @@ def apply_saved_reply_actions(ticket_id: str, actions: list[dict] | str) -> dict
     comment = None
     added_tags: list[str] = []
     removed_tags: list[str] = []
-    for action in parsed:
+    for action in parsed_actions:
         action_type, value = action.get("action_type"), action.get("value")
         if not is_action_valid(action_type, value):
             skipped.append({"action_type": action_type, "value": value})
