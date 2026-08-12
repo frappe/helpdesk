@@ -4,8 +4,8 @@
     ref="container"
     class="overflow-hidden rounded-lg border border-outline-gray-1 bg-surface-gray-1"
   >
-    <div class="flex h-8 items-center gap-1.5 ps-2.5 pe-1.5">
-      <LucideInfo class="size-3.5 shrink-0 text-ink-gray-4" />
+    <div class="flex h-8 items-center gap-1.5 ps-3.5 pe-1.5">
+      <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />
       <template v-if="sourceLabel">
         <Tooltip :text="sourceLabel">
           <span class="min-w-0 truncate text-sm-medium text-ink-gray-7">
@@ -22,7 +22,7 @@
           variant="ghost"
           size="xs"
           :aria-expanded="expanded"
-          :icon="expanded ? 'lucide-chevron-up' : 'lucide-chevron-down'"
+          :icon="expanded ? 'lucide-chevron-down' : 'lucide-chevron-right'"
           :label="expanded ? __('Hide actions') : __('Show actions')"
           @click="toggleExpanded"
         />
@@ -32,18 +32,20 @@
           icon="lucide-x"
           :label="__('Clear all actions')"
           @click="clear"
+          :tooltip="__('Clear all actions')"
         />
       </div>
     </div>
     <div v-if="expanded">
       <div
         v-if="chipActions.length"
-        class="flex flex-wrap items-center gap-1.5 px-2.5 pb-2"
+        class="flex flex-wrap items-center gap-1.5 px-1.5 pb-2"
       >
         <SavedReplyActionChip
           v-for="action in visibleChips"
           :key="actionKey(action)"
           :action="action"
+          :taken="takenTags(action)"
           @update="updateAction(action, $event)"
           @remove="removeAction(action)"
         />
@@ -165,6 +167,14 @@ function actionKey(action: SavedReplyAction): string {
   return isTagAction(action.action_type)
     ? `${action.action_type}:${action.value}`
     : action.action_type;
+}
+
+// Dont re-use duplicate tags
+function takenTags(action: SavedReplyAction): string[] {
+  if (!isTagAction(action.action_type)) return [];
+  return pendingActions.value
+    .filter((other) => other !== action && isTagAction(other.action_type))
+    .map((other) => other.value);
 }
 
 /** Repoint an action, e.g. an escalation routed to a different team. */
