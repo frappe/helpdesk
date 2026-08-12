@@ -87,22 +87,43 @@ class HDTicketTemplate(Document):
         to level 7). The template never lowers a field, so customers may
         fill visible fields while creating a ticket but never edit them
         afterwards."""
+        was_hidden = self.field_visibility_before_save()
         meta = frappe.get_meta("HD Ticket")
-        changed = []
+        reported, moved_any = [], False
         for f in self.fields:
             field = meta.get_field(f.fieldname)
             if not field:
                 continue
             target = self.target_permlevel(f)
-            if field.permlevel == target:
-                continue
-            self.set_field_permlevel(f.fieldname, target)
-            hidden = target == TICKET_INTERNAL_FIELD_PERMLEVEL
-            state = "hidden from customers" if hidden else "visible to customers"
-            changed.append(f"{f.fieldname} ({state})")
-        if changed:
+            moved = field.permlevel != target
+            if moved:
+                self.set_field_permlevel(f.fieldname, target)
+                moved_any = True
+            if self.user_touched(f, was_hidden, moved):
+                hidden = target == TICKET_INTERNAL_FIELD_PERMLEVEL
+                state = "hidden from customers" if hidden else "visible to customers"
+                reported.append(f"{f.fieldname} ({state})")
+        if moved_any:
             frappe.clear_cache(doctype="HD Ticket")
-            self.warn_permlevel_changes(changed)
+        if reported:
+            self.warn_permlevel_changes(reported)
+
+    def field_visibility_before_save(self):
+        """Map of fieldname -> was-hidden from the last saved version, or
+        None during a migrate, which has no previous version to compare."""
+        previous = self.get_doc_before_save()
+        if not previous:
+            return None
+        return {f.fieldname: bool(f.hide_from_customer) for f in previous.fields}
+
+    def user_touched(self, field_row, was_hidden, moved: bool) -> bool:
+        """Whether to tell the admin about this field. On a normal save,
+        the fields they just added or switched between shown and hidden; on
+        a migrate (no previous version), only fields whose level moved."""
+        if was_hidden is None:
+            return moved
+        previous = was_hidden.get(field_row.fieldname)
+        return previous is None or previous != bool(field_row.hide_from_customer)
 
     def target_permlevel(self, field_row) -> int:
         if field_row.hide_from_customer:
@@ -170,9 +191,9 @@ class HDTicketTemplate(Document):
         )
         frappe.msgprint(
             _(
-                "Saving this template changed what customers can do with these "
-                "ticket fields: {0}. This overrides anything set in Customize "
-                "Form. See {1}."
+                "Saving this template set what customers can do with these "
+                "fields: {0}. This overrides anything set in Customize Form. "
+                "See {1}."
             ).format(", ".join(changed), docs_link),
             title=_("Customer access updated"),
             indicator="yellow",
