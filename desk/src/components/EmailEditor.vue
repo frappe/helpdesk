@@ -220,10 +220,10 @@ import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
 import { createDialog } from "@/components/dialogs";
 import { AttachmentIcon } from "@/components/icons";
-import { replyComposer } from "@/components/replyComposer";
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";
@@ -668,7 +668,7 @@ watch(
 
 onMounted(() => {
   // Published for the command palette, which cannot reach `editorRef` from
-  // module scope. See replyComposer.ts.
+  // module scope. See modalStates.ts.
   replyComposer.value = applySavedReplies;
   if (quotedContent.value) {
     nextTick(() => {

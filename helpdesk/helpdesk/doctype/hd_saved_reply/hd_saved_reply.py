@@ -121,7 +121,7 @@ def action_key(action_type: str, value: str):
     )
 
 
-def is_action_valid(action_type: str, value: str | None) -> bool:
+def is_action_valid(action_type: str | None, value: str | None) -> bool:
     """Whether an action can currently be applied to a ticket.
 
     Strict type checks: values can arrive from a whitelisted endpoint, where a
