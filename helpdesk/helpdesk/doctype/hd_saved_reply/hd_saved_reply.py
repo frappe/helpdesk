@@ -63,6 +63,9 @@ class HDSavedReply(Document):
         for action in actions:
             action_type = action.get("action_type")
             value = action.get("value") or ""
+            # A crafted list/dict here is unhashable and would crash the keys below
+            if not isinstance(action_type, str) or not isinstance(value, str):
+                frappe.throw(_("Invalid action: {0}").format(action_type))
             key = action_key(action_type, value)
             if key in seen:
                 frappe.throw(_("Duplicate action: {0}").format(_(action_type or "")))

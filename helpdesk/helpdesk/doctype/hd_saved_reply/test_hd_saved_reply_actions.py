@@ -80,6 +80,12 @@ class TestHDSavedReplyActions(IntegrationTestCase):
                 "Bad Value",
                 [{"action_type": "Set Status", "value": "Nonexistent Status"}],
             )
+        # A crafted filter would be unhashable, so it must not reach the keys
+        with self.assertRaises(frappe.ValidationError):
+            make_saved_reply_with_actions(
+                "Crafted Value",
+                [{"action_type": "Set Status", "value": ["!=", ""]}],
+            )
 
     def test_duplicate_action_type_rejected(self):
         with self.assertRaises(frappe.ValidationError):
