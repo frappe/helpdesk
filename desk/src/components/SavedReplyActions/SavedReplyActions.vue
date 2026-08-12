@@ -202,14 +202,18 @@ const applyActions = createResource({
     pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
-  onError: (error: { messages?: string[] }) => {
+  onError: (error: { messages?: string[]; status?: number }) => {
+    // An error response means the request rolled back, so nothing was applied
+    // and the batch is safe to keep staged. Without a status we never heard
+    // back and it may have landed — drop it rather than risk applying twice.
+    const rolledBack = Boolean(error?.status);
+    if (!rolledBack) pendingActions.value = [];
     toast.error(
       error?.messages?.[0] ||
-        __("Could not apply saved reply actions, apply them manually")
+        (rolledBack
+          ? __("Could not apply saved reply actions")
+          : __("Could not apply saved reply actions, apply them manually"))
     );
-    // Dropped even on failure: a failed apply may still have landed server-side,
-    // and staged actions would silently re-apply on the agent's next send
-    pendingActions.value = [];
     reloadTicket(props.ticketId);
   },
 });
