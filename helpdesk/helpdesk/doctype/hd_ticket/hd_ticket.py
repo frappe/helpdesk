@@ -55,6 +55,9 @@ class HDTicket(Document):
         "last_agent_response",
         "first_responded_on",
     ]
+    # levels a customer may write while creating a ticket: the open level and
+    # the one the default template puts its visible fields at
+    CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
 
     @property
     def default_open_status(self):
@@ -102,28 +105,29 @@ class HDTicket(Document):
             + self.creation_fillable_template_fields()
         )
 
+    def customer_may_fill_at_creation(self, fieldname: str) -> bool:
+        """Server-stamped response fields never qualify — first_responded_on
+        sits at a customer level, so the permlevel check alone would admit
+        it."""
+        if fieldname in self.RESPONSE_STAMP_FIELDS:
+            return False
+        field = frappe.get_meta("HD Ticket").get_field(fieldname)
+        return bool(field) and field.permlevel in self.CREATION_FILLABLE_PERMLEVELS
+
     def creation_fillable_template_fields(self) -> list[str]:
         """Fields a customer may fill on the creation form: the fields the
-        default template shows, at level 0 or 7. Response timestamps the
-        server stamps, internal fields, and fields a site moved to its own
-        levels never qualify, even when a template lists them."""
-        visible = frappe.get_all(
-            "HD Ticket Template Field",
-            filters={
-                "parent": DEFAULT_TICKET_TEMPLATE,
-                "parenttype": "HD Ticket Template",
-                "hide_from_customer": 0,
-            },
-            pluck="fieldname",
-        )
-        meta = frappe.get_meta("HD Ticket")
+        default template shows, at a level a customer may write."""
+        try:
+            template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+        except frappe.DoesNotExistError:
+            # a site set up without the default template exposes nothing extra
+            return []
         fillable = []
-        for fieldname in visible:
-            if fieldname in self.RESPONSE_STAMP_FIELDS:
+        for row in template.fields:
+            if row.hide_from_customer:
                 continue
-            field = meta.get_field(fieldname)
-            if field and field.permlevel in (0, TICKET_VISIBLE_FIELD_PERMLEVEL):
-                fillable.append(fieldname)
+            if self.customer_may_fill_at_creation(row.fieldname):
+                fillable.append(row.fieldname)
         return fillable
 
     def before_validate(self):
