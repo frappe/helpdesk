@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Only the Default template controls HD Ticket permission levels. Hidden fields become internal (level 8, agents and above). Visible fields keep the level shipped with the app: customers can fill them while creating a ticket and read them afterwards; custom fields sit at level 7. Internal fields cannot be marked visible. Removing a standard field returns it to its shipped level. This overrides levels set from Customize Form. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a>.",
+   "description": "Only the Default template controls what customers can do with ticket fields; other templates just change the form. Hide a field to keep it for agents only — customers cannot see it. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields meant to stay internal cannot be shown. Removing a field puts it back the way it started. These settings override anything set in Customize Form. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",

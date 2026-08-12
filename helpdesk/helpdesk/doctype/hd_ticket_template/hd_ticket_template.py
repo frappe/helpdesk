@@ -97,7 +97,9 @@ class HDTicketTemplate(Document):
             if field.permlevel == target:
                 continue
             self.set_field_permlevel(f.fieldname, target)
-            changed.append(f"{f.fieldname}: {field.permlevel} → {target}")
+            hidden = target == TICKET_INTERNAL_FIELD_PERMLEVEL
+            state = "hidden from customers" if hidden else "visible to customers"
+            changed.append(f"{f.fieldname} ({state})")
         if changed:
             frappe.clear_cache(doctype="HD Ticket")
             self.warn_permlevel_changes(changed)
@@ -127,16 +129,13 @@ class HDTicketTemplate(Document):
     def restore_shipped_permlevels(self, fieldnames: list[str]):
         """Delete the stored level override so the level from the app's
         field definition applies again — standard fields only."""
-        meta = frappe.get_meta("HD Ticket")
         restored = []
         for fieldname in fieldnames:
             if self.custom_field_exists(fieldname):
                 continue
             if not self.delete_permlevel_property_setter(fieldname):
                 continue
-            field = meta.get_field(fieldname)
-            shipped = self.shipped_permlevel(fieldname)
-            restored.append(f"{fieldname}: {field.permlevel} → {shipped} (shipped)")
+            restored.append(f"{fieldname} (back to default)")
         if restored:
             frappe.clear_cache(doctype="HD Ticket")
             self.warn_permlevel_changes(restored)
@@ -163,7 +162,7 @@ class HDTicketTemplate(Document):
     def warn_permlevel_changes(self, changed: list[str]):
         if frappe.flags.in_patch or frappe.flags.in_migrate:
             for line in changed:
-                click.secho(f"{self.name}: HD Ticket permlevel {line}", fg="yellow")
+                click.secho(f"{self.name} template: {line}", fg="yellow")
             return
         docs_link = (
             "<a href='https://docs.frappe.io/framework/user/en/basics/"
@@ -171,13 +170,11 @@ class HDTicketTemplate(Document):
         )
         frappe.msgprint(
             _(
-                "This template changed HD Ticket permission levels: {0}.<br>"
-                "Hidden fields are internal (level {1}); visible fields keep "
-                "their shipped level — customers can fill them while creating "
-                "a ticket and read them afterwards. This overrides levels set "
-                "from Customize Form. See {2}."
-            ).format(", ".join(changed), TICKET_INTERNAL_FIELD_PERMLEVEL, docs_link),
-            title=_("Permission Levels Updated"),
+                "Saving this template changed what customers can do with these "
+                "ticket fields: {0}. This overrides anything set in Customize "
+                "Form. See {1}."
+            ).format(", ".join(changed), docs_link),
+            title=_("Customer access updated"),
             indicator="yellow",
         )
 
