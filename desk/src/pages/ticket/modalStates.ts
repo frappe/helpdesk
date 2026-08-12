@@ -19,7 +19,8 @@ export function toggleCommentBox() {
   showCommentBox.value = !showCommentBox.value;
 }
 
-// The mounted composer's insert action, for the command palette which sits outside this provide chain. Null when no composer is mounted.
+// The mounted composer's insert action, for the command palette which sits
+// outside this provide chain. Null when no composer is mounted.
 export const replyComposer = shallowRef<
   ((reply: RenderedSavedReply) => void) | null
 >(null);
