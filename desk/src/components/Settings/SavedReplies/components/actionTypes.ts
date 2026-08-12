@@ -87,7 +87,7 @@ export const ACTION_TYPES: Record<SavedReplyActionType, ActionTypeConfig> = {
   },
   "Remove Tag": {
     label: __("Remove tags"),
-    chipLabel: __("Untag"),
+    chipLabel: __("Remove tag"),
     icon: LucideTag,
     control: "multiselect",
   },

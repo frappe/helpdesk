@@ -69,6 +69,8 @@ import LucideX from "~icons/lucide/x";
 
 const props = defineProps<{
   action: SavedReplyAction;
+  /** Values the other chips hold, so a repoint can't collide with them. */
+  taken?: string[];
 }>();
 
 const emit = defineEmits<{
@@ -83,18 +85,20 @@ const label = computed(() => config.value.chipLabel);
 // Empty for no-value actions like "Assign to Me"; the noun then stands alone
 const value = computed(() => props.action.label || props.action.value);
 
-// Tags are one chip per tag over a multi-select, which a single picker can't
-// express; no-value actions have nothing to pick
+// A tag chip holds one tag, so it picks like the rest; no-value actions have
+// nothing to pick
 const isEditable = computed(() =>
-  ["select", "combobox"].includes(config.value.control)
+  ["select", "combobox", "multiselect"].includes(config.value.control)
 );
 
 // Combobox takes string values; the shared options allow numbers too
 const pickerOptions = computed(() =>
-  valueOptions(props.action.action_type).map((option) => ({
-    label: option.label,
-    value: String(option.value),
-  }))
+  valueOptions(props.action.action_type)
+    .filter((option) => !props.taken?.includes(String(option.value)))
+    .map((option) => ({
+      label: option.label,
+      value: String(option.value),
+    }))
 );
 
 /** `label` carries the display name (an agent's, not their id), so both move. */

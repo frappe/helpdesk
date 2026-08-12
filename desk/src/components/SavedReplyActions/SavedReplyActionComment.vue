@@ -2,8 +2,8 @@
   <!-- Full-bleed white section, so the block reads as one box with a gray top
        and a white bottom rather than a card floating inside another card -->
   <div class="border-t border-outline-gray-1 bg-surface-base">
-    <div class="flex h-8 items-center gap-1.5 ps-2.5 pe-1.5 text-sm">
-      <LucideMessageSquare class="size-3.5 shrink-0 text-ink-gray-6" />
+    <div class="flex h-8 items-center gap-1.5 ps-3.5 pe-1.5 text-sm">
+      <LucideMessageSquare class="size-3 shrink-0 text-ink-gray-6" />
       <span class="shrink-0 text-ink-gray-6">{{ __("Comment") }}</span>
       <button
         v-if="!expanded"
@@ -18,7 +18,7 @@
           variant="ghost"
           size="xs"
           :aria-expanded="expanded"
-          :icon="expanded ? 'lucide-chevron-up' : 'lucide-chevron-down'"
+          :icon="expanded ? 'lucide-chevron-down' : 'lucide-chevron-right'"
           :label="expanded ? __('Hide comment') : __('Edit comment')"
           @click="expanded = !expanded"
         />
@@ -40,13 +40,13 @@
       >
         <template #default>
           <EditorContent
-            class="prose prose-v3 [--prose-font-size:13px] max-w-none max-h-[140px] min-h-16 overflow-y-auto px-2.5 py-2"
+            class="prose prose-v3 [--prose-font-size:13px] max-w-none max-h-[140px] min-h-16 overflow-y-auto px-3.5 py-2"
           />
         </template>
       </Editor>
       <!-- Fixed height so the reset button appearing doesn't grow the footer -->
       <div
-        class="flex h-9 items-center gap-2 px-2.5 pb-2 text-xs text-ink-gray-5"
+        class="flex h-9 items-center gap-2 ps-3.5 pe-1.5 pb-2 text-xs text-ink-gray-5"
       >
         <span class="cursor-default">
           {{ __("Visible to your team only, never sent to the customer.") }}
