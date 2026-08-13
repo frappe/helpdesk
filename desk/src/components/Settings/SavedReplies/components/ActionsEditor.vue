@@ -22,36 +22,35 @@
         </div>
         <hr />
         <template v-for="(row, index) in rows" :key="index">
+          <!-- Cells centre inside one line's height, so a row centres while it
+               fits on one line and pins to the first line once it grows -->
           <div
-            class="grid items-center gap-6 p-2"
+            class="grid items-start gap-6 p-2"
             :style="{ gridTemplateColumns }"
           >
-            <Combobox
-              class="w-full"
-              variant="ghost"
-              trigger="button"
-              :model-value="row.action_type"
-              :options="typeOptions(row)"
-              :placeholder="__('Select action')"
-              @update:model-value="
-                setActionType(row, $event as SavedReplyActionType)
-              "
-            />
-            <ActionValue
-              v-if="row.action_type"
-              :type="row.action_type"
-              :model-value="row.value"
-              :options="valueOptions(row.action_type)"
-              @update:model-value="row.value = $event"
-              @search="search(row.action_type, $event)"
-            />
-            <span
-              v-else
-              class="flex items-center px-2 text-p-sm text-ink-gray-4"
-            >
-              &mdash;
-            </span>
-            <div class="flex justify-end">
+            <div class="flex min-h-8 items-center">
+              <Combobox
+                class="w-full"
+                variant="ghost"
+                trigger="button"
+                :model-value="row.action_type"
+                :options="typeOptions(row)"
+                :placeholder="__('Select action')"
+                @update:model-value="
+                  setActionType(row, $event as SavedReplyActionType)
+                "
+              />
+            </div>
+            <div class="flex min-h-8 items-center">
+              <ActionValue
+                :type="row.action_type"
+                :model-value="row.value"
+                :options="valueOptions(row.action_type)"
+                @update:model-value="row.value = $event"
+                @search="search(row.action_type, $event)"
+              />
+            </div>
+            <div class="flex min-h-8 items-center justify-end">
               <Dropdown
                 placement="right"
                 :options="[
@@ -82,12 +81,14 @@
       </div>
     </div>
     <div class="mt-2.5 flex items-center justify-between">
-      <Button
-        variant="subtle"
-        icon-left="lucide-plus"
-        :label="__('Add action')"
-        @click="rows.push({ value: '' })"
-      />
+      <Dropdown align="start" :options="addOptions">
+        <Button
+          variant="subtle"
+          icon-left="lucide-plus"
+          :label="__('Add action')"
+          :disabled="!addOptions.length"
+        />
+      </Dropdown>
       <ErrorMessage :message="error" />
     </div>
   </div>
@@ -111,7 +112,7 @@ import {
 
 /** One grid row. Tag rows hold every selected tag; the model stores one per tag. */
 type ActionRow = {
-  action_type?: SavedReplyActionType;
+  action_type: SavedReplyActionType;
   value: string | string[];
 };
 
@@ -140,8 +141,8 @@ const gridTemplateColumns = computed(() =>
 // The table edits rows in place, so it needs a real ref; the flat model is derived.
 const rows = ref<ActionRow[]>(toRows(actions.value));
 
-/** Types still free for this row: no duplicates, and one assignment action. */
-function typeOptions(row: ActionRow) {
+/** Types still free, ignoring the row being changed: no duplicates, one assignment. */
+function typeOptions(row?: ActionRow) {
   const used = new Set(
     rows.value
       .filter((other) => other !== row)
@@ -164,10 +165,31 @@ function typeOptions(row: ActionRow) {
   })).filter((group) => group.options.length);
 }
 
+/** The add button picks the type up front, so a row is never typeless. */
+const addOptions = computed(() =>
+  typeOptions().map((group) => ({
+    group: group.group,
+    options: group.options.map((option) => ({
+      label: option.label,
+      icon: option.icon,
+      onClick: () => addAction(option.value),
+    })),
+  }))
+);
+
+function addAction(type: SavedReplyActionType) {
+  rows.value.push({ action_type: type, value: initialValue(type) });
+}
+
 /** A value picked for the old type means nothing to the new one. */
 function setActionType(row: ActionRow, type: SavedReplyActionType) {
   row.action_type = type;
-  row.value = isTagAction(type) ? [] : "";
+  row.value = initialValue(type);
+}
+
+/** Tag rows hold a list of tags, every other row a single value. */
+function initialValue(type: SavedReplyActionType): string | string[] {
+  return isTagAction(type) ? [] : "";
 }
 
 /** Shared lists, minus the tags the opposite row already claimed. */
@@ -199,11 +221,10 @@ function toRows(list: SavedReplyAction[]): ActionRow[] {
   return grouped;
 }
 
-/** Rows with no type yet (or no tags picked) simply don't persist. */
+/** A tag row with nothing picked simply doesn't persist. */
 function toActions(list: ActionRow[]): SavedReplyAction[] {
   return list.flatMap((row) => {
     const type = row.action_type;
-    if (!type) return [];
     if (Array.isArray(row.value))
       return row.value.map((value) => ({ action_type: type, value }));
     return [{ action_type: type, value: row.value }];

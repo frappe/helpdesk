@@ -70,7 +70,7 @@
   >
     <template #default>
       <EditorContent
-        class="prose prose-v3 [--prose-font-size:14px] min-h-8 max-h-40 max-w-full overflow-auto px-2 py-1.5 text-ink-gray-7 focus:ring-0"
+        class="prose prose-v3 [--prose-font-size:14px] min-h-8 max-h-30 w-full max-w-full overflow-auto rounded-4 bg-surface-gray-1 px-2 py-1.5 text-ink-gray-7 focus:ring-0"
       />
     </template>
   </Editor>
