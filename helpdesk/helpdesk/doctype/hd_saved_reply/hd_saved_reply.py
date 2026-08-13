@@ -90,6 +90,13 @@ class HDSavedReply(Document):
     def after_insert(self):
         capture_event("saved_reply_created")
 
+    def on_update(self) -> None:
+        # Counted once, when a reply first gets actions, so edits don't inflate it
+        previous = self.get_doc_before_save()
+        had_actions = bool(parse_actions(previous.actions)) if previous else False
+        if not had_actions and parse_actions(self.actions):
+            capture_event("saved_reply_actions_added")
+
 
 def parse_actions(raw: list | str | None) -> list[dict]:
     """Actions arrive as a JSON string (DB, HTTP) or a list (Python callers)."""
