@@ -41,10 +41,7 @@
         </div>
         <Dropdown :options="filterOptions" placement="right">
           <template #default="{ open }">
-            <Button
-              :label="activeFilter"
-              class="flex items-center justify-between w-fit p-4"
-            >
+            <Button :label="activeFilterLabel">
               <template #suffix>
                 <FeatherIcon
                   :name="open ? 'chevron-up' : 'chevron-down'"
@@ -52,23 +49,6 @@
                 />
               </template>
             </Button>
-          </template>
-          <template #item-label="{ item }">
-            <button
-              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
-              @click="item.onSelect"
-            >
-              <div class="flex items-center justify-between flex-1">
-                <span class="whitespace-nowrap">
-                  {{ item.label }}
-                </span>
-                <FeatherIcon
-                  v-if="activeFilter === item.value"
-                  name="check"
-                  class="size-4 text-ink-gray-7"
-                />
-              </div>
-            </button>
           </template>
         </Dropdown>
       </div>
@@ -86,7 +66,7 @@
           !savedRepliesListResource?.data?.length
         "
         variant="badge"
-        :icon="SavedReplyIcon"
+        :icon="ZapIcon"
         :title="__('No saved replies found')"
         :description="__('Add one to get started.')"
       />
@@ -218,7 +198,7 @@ import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import { useUserStore } from "../../../stores/user";
 import { SavedReply, SavedReplyListResourceSymbol } from "../../../types";
-import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
+import ZapIcon from "~icons/lucide/zap";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { activeFilter } from "./savedReplies";
 
@@ -315,40 +295,27 @@ const duplicate = async () => {
 };
 
 const filterOptions = computed(() => {
-  const options = [
-    {
-      label: __("All"),
-      value: "All",
-      onSelect: () => {
-        applyFilter("All");
-      },
-    },
-    {
-      label: __("Personal"),
-      value: "Personal",
-      onSelect: () => {
-        applyFilter("Personal");
-      },
-    },
-    {
-      label: __("My Team"),
-      value: "Team",
-      onSelect: () => {
-        applyFilter("Team");
-      },
-    },
-    {
-      label: __("Global"),
-      value: "Global",
-      onSelect: () => {
-        applyFilter("Global");
-      },
-    },
+  const scopes = [
+    { label: __("All"), value: "All" },
+    { label: __("Personal"), value: "Personal" },
+    { label: __("My Team(s)"), value: "Team" },
+    { label: __("Global"), value: "Global" },
   ];
   if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
-    options.pop();
+    scopes.pop();
   }
-  return options;
+  return scopes.map((scope) => ({
+    ...scope,
+    selected: activeFilter.value === scope.value,
+    onClick: () => applyFilter(scope.value),
+  }));
+});
+
+const activeFilterLabel = computed(() => {
+  return (
+    filterOptions.value.find((option) => option.value === activeFilter.value)
+      ?.label ?? activeFilter.value
+  );
 });
 
 const applyFilter = (scope: string) => {

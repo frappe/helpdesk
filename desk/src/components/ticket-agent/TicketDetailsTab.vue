@@ -1,149 +1,159 @@
 <template>
   <div class="flex h-full flex-col">
-    <div class="shrink-0 px-4 pb-4 flex flex-col">
-      <!-- User avatar with buttons -->
+    <!-- Contact header + SLA, pinned above the scrollable sections. Uniform
+         padding on the wrapper; the gap between them comes from space-y, not
+         per-element bottom padding. -->
+    <div class="shrink-0 space-y-4 p-4">
       <TicketContact />
-      <!-- Core Fields -->
-      <div class="mt-4">
-        <div
-          v-for="(section, index) in coreFields"
-          :key="index"
-          :class="
-            section.group ? 'flex gap-2 items-start max-w-full mb-3' : 'mb-3'
-          "
-        >
-          <template v-for="field in section.fields">
-            <Link
-              v-if="field.visible"
-              :key="field.fieldname"
-              :ref="(el) => setFieldRef(field.fieldname, el)"
-              class="form-control-core"
-              :id="field.fieldname"
-              :class="section.group ? 'flex-1 min-w-0' : 'w-full'"
-              :page-length="10"
-              :label="__(field.label)"
-              :placeholder="__(field.placeholder)"
-              :doctype="field.doctype"
-              :modelValue="__(field.value)"
-              :required="field.required"
-              @update:model-value="
-              (val:string) => handleFieldUpdate(field.fieldname, val,true)
-            "
-            />
-          </template>
-        </div>
-
-        <!-- Assignee component -->
-        <AssignTo />
-      </div>
+      <TicketSLA />
     </div>
 
-    <!-- Scrollable sections: Ticket Info + Recent / Similar Tickets -->
+    <!-- Scrollable sections: Key Info + Ticket Info + Recent / Similar Tickets -->
     <div
-      class="border-t flex-1 min-h-0 overflow-y-auto divide-y-[1px]"
-      v-if="Boolean(customFields.length) || showRecentSimilarTickets"
+      ref="scrollAreaRef"
+      class="min-h-0 flex-1 overflow-y-auto border-t"
+      @scroll.passive="trimScrollSpacer"
     >
-      <!-- Ticket Info (custom fields) -->
-      <div v-if="Boolean(customFields.length)">
-        <Section label="Ticket Info" v-model:opened="openedSections.ticketInfo">
-          <template #header="{ opened, toggle }">
-            <div
-              class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
-              @click="toggle"
-            >
-              <span class="text-ink-gray-8 text-base-semibold select-none">
-                {{ __("Ticket Info") }}
-              </span>
-              <LucideChevronRight
-                class="size-4 text-ink-gray-6"
-                :class="{ 'rotate-90': opened }"
-              />
+      <div ref="scrollContentRef" class="divide-y-[1px]">
+        <!-- Feedback, only once the contact has rated the ticket -->
+        <div v-if="ticket.doc?.feedback_rating">
+          <TicketFeedback
+            :rating="ticket.doc.feedback_rating"
+            :feedback="ticket.doc.feedback"
+            :comment="ticket.doc.feedback_extra"
+            v-model:opened="openedSections.feedback"
+          />
+        </div>
+
+        <!-- Key Info (core fields) -->
+        <Section
+          :label="__('Overview')"
+          v-model:opened="openedSections.keyInfo"
+        >
+          <div class="space-y-2.5 pb-3 pt-0.5">
+            <!-- Assignee -->
+            <div class="flex items-center gap-2 leading-5">
+              <FieldLabel label="Assignee" />
+              <div
+                class="-m-1 min-h-[28px] min-w-0 flex-1 items-center overflow-hidden p-1"
+              >
+                <AssignTo hide-label ghost />
+              </div>
             </div>
-          </template>
-          <div
-            class="space-y-1.5 px-4 mb-2 mt-0.5"
-            v-if="Boolean(customFields.length)"
-          >
-            <template v-for="field in customFields">
+            <!-- Core fields -->
+            <template v-for="field in coreFields">
               <TicketField
-                v-if="field.visible"
+                v-if="field?.visible"
                 :key="field.fieldname"
+                :ref="(el) => setFieldRef(field.fieldname, el)"
                 :field="field"
                 :value="field.value"
                 @change="
-                  ({ fieldname, value }) => handleFieldUpdate(fieldname, value)
+                  ({ fieldname, value }) =>
+                    handleFieldUpdate(fieldname, value, true)
                 "
               />
             </template>
-          </div>
-        </Section>
-      </div>
 
-      <!-- Recent / Similar Tickets -->
-      <template v-if="showRecentSimilarTickets">
-        <div v-for="section in sections" :key="section.label">
-          <Section
-            :label="section.label"
-            :hideLabel="section.hideLabel"
-            v-model:opened="openedSections[section.key]"
-          >
-            <template #header="{ opened, toggle }">
-              <div
-                class="flex gap-2.5 items-center justify-between sticky top-0 bg-surface-base z-10 px-4 py-4 cursor-pointer"
-                @click="toggle"
-              >
-                <Tooltip :text="section.tooltipMessage">
-                  <span class="text-ink-gray-8 text-base-semibold select-none">
-                    {{ __(section.label) }}
-                  </span>
-                </Tooltip>
-                <LucideChevronRight
-                  class="size-4 text-ink-gray-6"
-                  :class="{ 'rotate-90': opened }"
+            <!-- Tags -->
+            <!-- pt-0.5: chips are 24px vs the 20px avatars/text above, so they
+               sit 2px higher and the gap to the Assignee row reads tighter
+               than the field-to-field gap. Nudge the row down to even it. -->
+            <div class="flex items-start gap-2 pt-1">
+              <FieldLabel label="Tags" class="pt-0.5" />
+              <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
+                 and the add button start on the same column as the values -->
+              <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
+                <Tags
+                  doctype="HD Ticket"
+                  :name="ticket.doc?.name"
+                  :tags="ticket.doc?._user_tags"
+                  @change="onTagsChange"
                 />
               </div>
-            </template>
-            <ul class="pt-0 px-4 divide-y divide-outline-gray-1 pb-4">
-              <li
-                v-for="t in section.tickets"
-                :key="t.name"
-                @click="openTicket(t.name)"
-              >
-                <div
-                  class="-mx-2 px-2 py-3 cursor-pointer rounded hover:bg-surface-gray-2 transition-colors"
-                >
-                  <p class="text-sm font-base text-ink-gray-9 truncate mb-2">
-                    {{ t.subject }}
-                  </p>
-                  <div class="flex items-center justify-between gap-2">
-                    <p class="text-sm text-ink-gray-5 shrink-0">
-                      {{ formatDate(t.creation as string) + " · " }}
-                      <span class="">{{ "#" + t.name }}</span>
-                    </p>
-                    <span
-                      class="text-xs px-2 py-0.5 font-base shrink-0 rounded-sm"
-                      :class="getStatusColor(t.status as string)"
-                    >
-                      {{ t.status }}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            </div>
+          </div>
+        </Section>
+
+        <!-- Ticket Info (custom fields) -->
+        <div v-if="Boolean(customFields.length)">
+          <Section
+            :label="__('More Details')"
+            v-model:opened="openedSections.ticketInfo"
+          >
+            <div class="space-y-2.5 pb-2 pt-0.5">
+              <template v-for="field in customFields">
+                <TicketField
+                  v-if="field.visible"
+                  :key="field.fieldname"
+                  :field="field"
+                  :value="field.value"
+                  @change="
+                    ({ fieldname, value }) =>
+                      handleFieldUpdate(fieldname, value)
+                  "
+                />
+              </template>
+            </div>
           </Section>
         </div>
-      </template>
+
+        <!-- Recent / Similar Tickets -->
+        <template v-if="showRecentSimilarTickets">
+          <div v-for="section in sections" :key="section.label">
+            <Section
+              :label="section.label"
+              :tooltip="section.tooltipMessage"
+              :hideLabel="section.hideLabel"
+              v-model:opened="openedSections[section.key]"
+            >
+              <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
+                <li
+                  v-for="t in section.tickets"
+                  :key="t.name"
+                  @click="openTicket(t.name)"
+                >
+                  <div
+                    class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
+                  >
+                    <p
+                      class="font-base mb-2 truncate text-sm text-ink-gray-9 max-w-[70%]"
+                    >
+                      {{ t.subject }}
+                    </p>
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="shrink-0 text-sm text-ink-gray-5">
+                        {{ formatDate(t.creation as string) + " · " }}
+                        <span class="">{{ "#" + t.name }}</span>
+                      </p>
+                      <span
+                        class="font-base shrink-0 rounded-sm px-2 py-0.5 text-xs"
+                        :class="getStatusColor(t.status as string)"
+                      >
+                        {{ t.status }}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </Section>
+          </div>
+        </template>
+      </div>
+      <!-- Absorbs the height a collapsing section removes, so scrollTop never
+           clamps and the clicked header stays put. Trimmed on scroll up. -->
+      <div :style="{ height: `${scrollSpacerHeight}px` }" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { __ } from "@/translation.ts";
 import {
   ActivitiesSymbol,
   AssigneeSymbol,
@@ -152,14 +162,17 @@ import {
   RecentSimilarTicketsSymbol,
   TicketSymbol,
 } from "@/types";
-import { useStorage } from "@vueuse/core";
-import { dayjs, Tooltip } from "frappe-ui";
+import { useResizeObserver, useStorage } from "@vueuse/core";
+import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
-import LucideChevronRight from "~icons/lucide/chevron-right";
+import FieldLabel from "../FieldLabel.vue";
 import Section from "../Section.vue";
+import Tags from "../tag/Tags.vue";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
+import TicketFeedback from "./TicketFeedback.vue";
+import TicketSLA from "./TicketSLA.vue";
 
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
@@ -172,33 +185,23 @@ const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const dateFormat = window.date_format;
 const { getStatus, colorMap } = useTicketStatusStore();
 
-// ticket_type, priority, customer, agent_group
+const CORE_FIELDS = ["priority", "ticket_type", "customer", "agent_group"];
+
 const coreFields = computed(() => {
-  // TODO: to confirm whether customizations should apply to core fields as well
   const fieldsMeta = getFields();
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  const _coreFields = [
-    { group: true, fields: [getField("ticket_type"), getField("priority")] },
-    { group: false, fields: [getField("customer")] },
-    { group: true, fields: [getField("agent_group")] },
-  ];
-
-  _coreFields.forEach((section) => {
-    section.fields = section.fields.map((f) => {
-      f = parseField(f, ticket.value.doc);
-
-      // cant handle required depends on as we directly set the value in DB on change
-      f["required"] = f.reqd;
-      f["ref"] = f.fieldname;
-
-      f = getFieldInFormat(f, f);
-      f["visible"] = true;
-      return f;
-    });
-  });
-  return _coreFields;
+  return CORE_FIELDS.map((fieldname) => {
+    let field = getField(fieldname);
+    if (!field) return null;
+    field = parseField(field, ticket.value.doc);
+    // cant handle required depends on as we directly set the value in DB on change
+    field["required"] = field.reqd;
+    const formatted = getFieldInFormat(field, field);
+    formatted["visible"] = true;
+    return formatted;
+  }).filter(Boolean);
 });
 
 const customFields = computed(() => {
@@ -209,15 +212,10 @@ const customFields = computed(() => {
 
   if (!customizations.value.data || customizations.value.loading) return [];
   let customFields = customizations.value.data?.custom_fields || [];
-  const _coreFields = [
-    "ticket_type",
-    "priority",
-    "customer",
-    "agent_group",
-    "subject",
-    "status",
-  ];
-  customFields = customFields.filter((f) => !_coreFields.includes(f.fieldname));
+  const excludedFields = [...CORE_FIELDS, "subject", "status"];
+  customFields = customFields.filter(
+    (f) => !excludedFields.includes(f.fieldname)
+  );
   let _customFields = customFields
     .map((f) => {
       let fieldMeta = getField(f.fieldname);
@@ -233,10 +231,38 @@ const customFields = computed(() => {
   return _customFields;
 });
 
+// When a section collapses, the scroller's content gets shorter and the
+// browser clamps scrollTop, yanking the viewport. The spacer absorbs the
+// lost height so nothing on screen moves; scrolling up trims it back, so
+// the blank space can never be scrolled into.
+const scrollAreaRef = ref<HTMLElement | null>(null);
+const scrollContentRef = ref<HTMLElement | null>(null);
+const scrollSpacerHeight = ref(0);
+
+useResizeObserver(scrollContentRef, () => {
+  scrollSpacerHeight.value = neededScrollSpacer();
+});
+
+function neededScrollSpacer(): number {
+  const area = scrollAreaRef.value;
+  const content = scrollContentRef.value;
+  if (!area || !content) return 0;
+  return Math.max(0, area.scrollTop + area.clientHeight - content.offsetHeight);
+}
+
+function trimScrollSpacer() {
+  scrollSpacerHeight.value = Math.min(
+    scrollSpacerHeight.value,
+    neededScrollSpacer()
+  );
+}
+
 const openedSections = useStorage(
   "openedSections",
   {
-    ticketInfo: false,
+    feedback: true,
+    keyInfo: true,
+    ticketInfo: true,
     recentTickets: false,
     similarTickets: false,
   },
@@ -255,8 +281,8 @@ const sections = computed(() => {
   if (recentTickets.length) {
     _sections.push({
       key: "recentTickets" as const,
-      label: "Recent Tickets",
-      tooltipMessage: "Tickets recently raised by this contact/customer",
+      label: __("Recent Tickets"),
+      tooltipMessage: __("Tickets recently raised by this contact/customer"),
       hideLabel: false,
       tickets: recentTickets,
     });
@@ -264,8 +290,8 @@ const sections = computed(() => {
   if (similarTickets.length) {
     _sections.push({
       key: "similarTickets" as const,
-      label: "Similar Tickets",
-      tooltipMessage: "Tickets with similar queries",
+      label: __("Similar Tickets"),
+      tooltipMessage: __("Tickets with similar queries"),
       hideLabel: false,
       tickets: similarTickets,
     });
@@ -296,7 +322,7 @@ function getFieldInFormat(fieldTemplate, fieldMeta) {
     options: fieldMeta?.options || "",
     placeholder:
       fieldTemplate.placeholder ||
-      `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
+      `Set ${fieldMeta?.label || fieldTemplate.fieldname}...`,
     readonly: Boolean(fieldMeta.read_only),
     disabled: Boolean(fieldMeta.read_only),
     url_method: fieldTemplate.url_method || "",
@@ -338,6 +364,10 @@ function handleFieldUpdate(
   );
 }
 
+function onTagsChange() {
+  activities.value.reload();
+}
+
 const fieldRefs = ref<Record<string, any>>({});
 
 const setFieldRef = (fieldname: string, el: any) => {
@@ -354,29 +384,22 @@ const showRecentSimilarTickets = computed(() => {
   );
 });
 
-useShortcut("t", () => {
-  fieldRefs.value?.ticket_type?.$el?.querySelector("button")?.click();
-});
+useShortcut("t", () => openFieldDropdown("ticket_type"));
 
-useShortcut("p", () => {
-  fieldRefs.value?.priority?.$el?.querySelector("button")?.click();
-});
+useShortcut("p", () => openFieldDropdown("priority"));
 
-useShortcut({ key: "t", shift: true }, () => {
-  fieldRefs.value?.agent_group?.$el?.querySelector("button")?.click();
-});
+useShortcut({ key: "t", shift: true }, () => openFieldDropdown("agent_group"));
+
+// The @framework/ui Link renders a [role=combobox] input, not a button, and
+// opens on ArrowDown from a focused input (a synthetic click won't open it).
+function openFieldDropdown(fieldname: string) {
+  const input = fieldRefs.value?.[fieldname]?.$el?.querySelector(
+    '[role="combobox"]'
+  ) as HTMLElement | null;
+  if (!input) return;
+  input.focus();
+  input.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
+  );
+}
 </script>
-
-<style scoped>
-:deep(.form-control-core button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
-}
-:deep(.form-control-core button > div) {
-  @apply truncate;
-}
-
-:deep(.form-control-core div) {
-  width: 100%;
-  display: flex;
-}
-</style>

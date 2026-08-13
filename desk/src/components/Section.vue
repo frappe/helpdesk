@@ -1,38 +1,41 @@
 <template>
-  <div>
+  <!-- px-4 lives once here so the header and content share a single horizontal
+       padding instead of each declaring their own. -->
+  <div class="px-4">
     <slot name="header" v-bind="{ opened, hide, open, close, toggle }">
       <div
         v-if="!hide"
-        class="section-header flex items-center justify-between"
+        class="section-header sticky top-0 z-10 flex cursor-pointer select-none items-center gap-1 bg-surface-base py-3.5"
         :class="headerClass"
+        @click="collapsible && toggle()"
       >
-        <div
-          class="flex text-ink-gray-9 max-w-fit cursor-pointer items-center gap-2 text-base"
-          :class="labelClass"
-          @click="collapsible && toggle()"
-        >
-          <FeatherIcon
-            v-if="collapsible && collapseIconPosition === 'left'"
-            name="chevron-right"
-            class="h-4 transition-all duration-300 ease-in-out"
-            :class="{ 'rotate-90': opened }"
-          />
-          <span>
-            {{ label || "Untitled" }}
+        <!-- Figma: text/base/medium, ink-gray-8 -->
+        <Tooltip v-if="tooltip" :text="__(tooltip)">
+          <span
+            class="text-base font-medium text-ink-gray-8"
+            :class="labelClass"
+          >
+            {{ __(label) || "Untitled" }}
           </span>
-          <FeatherIcon
-            v-if="collapsible && collapseIconPosition === 'right'"
-            name="chevron-right"
-            class="h-4 transition-all duration-300 ease-in-out"
-            :class="{ 'rotate-90': opened }"
-          />
-        </div>
+        </Tooltip>
+        <span
+          v-else
+          class="text-base font-medium text-ink-gray-8"
+          :class="labelClass"
+        >
+          {{ __(label) || "Untitled" }}
+        </span>
+        <LucideChevronRight
+          v-if="collapsible"
+          class="size-3.5 text-ink-gray-5 transition-transform"
+          :class="{ 'rotate-90': opened }"
+        />
         <slot name="actions"></slot>
       </div>
     </slot>
     <transition
-      enter-active-class="duration-300 ease-in"
-      leave-active-class="duration-300 ease-[cubic-bezier(0, 1, 0.5, 1)]"
+      enter-active-class="transition-all duration-300 ease-in"
+      leave-active-class="transition-all duration-300 ease-[cubic-bezier(0,1,0.5,1)]"
       enter-to-class="max-h-[2000px] overflow-hidden"
       leave-from-class="max-h-[2000px] overflow-hidden"
       enter-from-class="max-h-0 opacity-0"
@@ -45,10 +48,17 @@
   </div>
 </template>
 <script setup>
+import { __ } from "@/translation";
+import { Tooltip } from "frappe-ui";
 import { ref, watch } from "vue";
+import LucideChevronRight from "~icons/lucide/chevron-right";
 
 const props = defineProps({
   label: {
+    type: String,
+    default: "",
+  },
+  tooltip: {
     type: String,
     default: "",
   },
@@ -63,10 +73,6 @@ const props = defineProps({
   collapsible: {
     type: Boolean,
     default: true,
-  },
-  collapseIconPosition: {
-    type: String,
-    default: "left",
   },
   labelClass: {
     type: [String, Object, Array],

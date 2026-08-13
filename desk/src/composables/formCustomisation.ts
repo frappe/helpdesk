@@ -92,7 +92,7 @@ export function parseField(field, doc) {
       field.required ||
       (field.mandatory_depends_on &&
         evaluateDependsOnValue(field.mandatory_depends_on, doc)),
-    filters: field.link_filters && JSON.parse(field.link_filters),
+    filters: field.link_filters && parseLinkFilters(field.link_filters),
     disabled: field.disabled,
     readonly:
       field.readonly ||
@@ -100,6 +100,26 @@ export function parseField(field, doc) {
         evaluateDependsOnValue(field.read_only_depends_on, doc)),
   };
 }
+
+/**
+ * Convert `link_filters` from the stored list format to the dict format that
+ * `frappe.desk.search.search_link` expects. Doctypes with a standard query
+ * @example
+ * // in:  '[["User", "name", "in", ["a@x.com", "b@x.com"]]]'
+ * // out: { name: ["in", ["a@x.com", "b@x.com"]] }
+ */
+export function parseLinkFilters(linkFilters: string) {
+  const conditions = JSON.parse(linkFilters);
+  if (!Array.isArray(conditions)) return conditions;
+  return Object.fromEntries(
+    conditions.map((condition) => {
+      const [fieldname, operator, value] =
+        condition.length === 4 ? condition.slice(1) : condition;
+      return [fieldname, operator === "=" ? value : [operator, value]];
+    })
+  );
+}
+
 export function evaluateDependsOnValue(expression, doc) {
   if (!expression) return true;
   let out = null;

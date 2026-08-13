@@ -16,7 +16,7 @@
           />
 
           <FormControl
-            class="[&_p]:text-p-xs"
+            size="sm"
             type="text"
             :label="__('Name')"
             :required="true"
@@ -26,7 +26,6 @@
 
           <div class="grid grid-cols-2 gap-4">
             <FormControl
-              class="[&_p]:text-p-xs [&_[data-slot=trigger]]:w-full [&_[data-slot=trigger]]:!text-ink-gray-8"
               type="select"
               :label="__('Customer Type')"
               :options="customerTypeOptions"
@@ -45,7 +44,6 @@
           </div>
 
           <FormControl
-            class="[&_p]:text-p-xs"
             type="text"
             :label="__('Domain')"
             placeholder="frappe.io"
@@ -65,14 +63,12 @@
           </h3>
           <div class="grid grid-cols-2 gap-4">
             <FormControl
-              class="[&_p]:text-p-xs"
               type="text"
               :label="__('First Name')"
               placeholder="John"
               v-model="primaryContact.firstName"
             />
             <FormControl
-              class="[&_p]:text-p-xs"
               type="text"
               :label="__('Last Name')"
               placeholder="Doe"
@@ -80,7 +76,6 @@
             />
           </div>
           <FormControl
-            class="[&_p]:text-p-xs"
             type="email"
             :label="__('Email')"
             placeholder="name@company.com"
@@ -137,9 +132,14 @@ const { state, primaryContact, reset } = useNewCustomerForm();
 const customerResource: Resource = createResource({
   url: "helpdesk.api.customer.create_customer",
   method: "POST",
-  onSuccess: (name: string) => {
-    router.push({ name: "Customer", params: { id: name } });
-    toast.success(__("Customer created"));
+  onSuccess: (data: { name: string; invited_emails: string[] }) => {
+    router.push({ name: "Customer", params: { id: data.name } });
+    const invited = data.invited_emails?.[0];
+    toast.success(
+      invited
+        ? __("Customer created · invitation sent to {0}", invited)
+        : __("Customer created")
+    );
   },
   onError: (error: unknown) => {
     getErrorMessage(error, true);

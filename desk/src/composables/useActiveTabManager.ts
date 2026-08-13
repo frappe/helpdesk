@@ -62,7 +62,8 @@ export function useActiveTabManager(tabs) {
     }
   );
 
-  // Handle when tabs array is updated
+  // Handle when tabs array is updated. `immediate` also applies the URL hash
+  // when the panel remounts on soft navigation between tickets.
   watch(
     [tabs, isTelephonyLoading],
     ([tabsValue, isLoading]) => {
@@ -71,7 +72,7 @@ export function useActiveTabManager(tabs) {
         setActiveTab();
       }
     },
-    { deep: true, flush: "post" }
+    { deep: true, flush: "post", immediate: true }
   );
 
   return { tabIndex, changeTabTo };

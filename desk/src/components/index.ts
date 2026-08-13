@@ -1,7 +1,7 @@
 export { default as BackButton } from "./BackButton.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
+export { default as AttachmentList } from "./AttachmentList.vue";
 export { default as Autocomplete } from "./Autocomplete.vue";
-export { default as CommandPalette } from "./command-palette/CP.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as CommentTextEditor } from "./CommentTextEditor.vue";
 export { default as CommunicationArea } from "./CommunicationArea.vue";
@@ -21,7 +21,6 @@ export { default as PageTitle } from "./PageTitle.vue";
 export { default as SavedRepliesSelectorModal } from "./SavedRepliesSelectorModal.vue";
 export { default as SearchComplete } from "./SearchComplete.vue";
 export { default as Section } from "./Section.vue";
-export { default as SidebarLink } from "./SidebarLink.vue";
 export { default as StarRating } from "./StarRating.vue";
 export { default as TextEditor } from "./TextEditor.vue";
 export { default as TypingIndicator } from "./TypingIndicator.vue";

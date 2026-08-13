@@ -58,7 +58,7 @@
               />
               <DotIcon
                 v-else
-                class="text-ink-gray-5 absolute start-[7.5px] top-[6px]"
+                class="text-ink-gray-3 absolute start-[7.5px] top-[6px]"
               />
             </div>
           </div>
@@ -110,6 +110,9 @@
 
 <script setup lang="ts">
 import { FadedScrollableDiv } from "@/components";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -124,9 +127,6 @@ import { Avatar, FeatherIcon } from "frappe-ui";
 import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
-import CommentBox from "@/components/CommentBox.vue";
-import EmailArea from "@/components/EmailArea.vue";
-import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {
@@ -177,8 +177,17 @@ onMounted(() => {
   });
 });
 
+// The URL hash carries only active-tab state (useActiveTabManager). Activity
+// deep-links from notifications/search arrive as ?highlight=<element id>
+// (comment-<name> / communication-<name>, the ids CommentBox and EmailArea
+// render) so the one-shot scroll+cleanup below never touches tab state.
+function linkedActivityId() {
+  const id = route.query.highlight;
+  return typeof id === "string" ? id : "";
+}
+
 function scrollToLatestActivity() {
-  if (route.hash) {
+  if (linkedActivityId()) {
     scrollToHash();
     return;
   }
@@ -192,11 +201,8 @@ function scrollToLatestActivity() {
   }, 200);
 }
 function scrollToHash() {
-  const hash = route.hash;
-  if (hash) {
-    // Remove the # symbol
-    const elementId = hash.substring(1);
-
+  const elementId = linkedActivityId();
+  if (elementId) {
     nextTick(() => {
       // Wait for activities to be rendered
       setTimeout(() => {
@@ -207,10 +213,14 @@ function scrollToHash() {
           // Add highlight effect using Tailwind class
           element.classList.add("bg-surface-yellow-2");
 
-          // Remove highlight after 2 seconds
+          // Remove highlight after 2 seconds; drop only the consumed
+          // ?highlight param, keeping other query keys (?view=) and
+          // whatever tab the user is on by now.
           setTimeout(() => {
             element.classList.remove("bg-surface-yellow-2");
-            router.replace({ hash: "" });
+            const query = { ...route.query };
+            delete query.highlight;
+            router.replace({ query, hash: route.hash });
           }, 2000);
         }
       }, 1000);
@@ -219,7 +229,7 @@ function scrollToHash() {
 }
 
 watch(
-  () => route.hash,
+  () => [route.hash, route.query.highlight],
   () => {
     scrollToLatestActivity();
   }

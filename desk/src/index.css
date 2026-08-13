@@ -16,6 +16,11 @@
     background-color: var(--surface-gray-2);
     color: var(--ink-gray-9);
   }
+  /* Editor content carries both prose systems: prose-f underlines links via
+     text-decoration, prose-v3 via border-bottom. Keep only the prose-v3 line. */
+  .prose-f.prose-v3 a {
+    text-decoration: none;
+  }
 }
 
 .tiptap input[placeholder="Add caption"] {
@@ -126,6 +131,13 @@ body {
 }
 .replied-content .collapse:hover {
   background: #dadce0;
+}
+[data-theme="dark"] .replied-content .collapse {
+  color: #e2e2e2;
+  background: #424242;
+}
+[data-theme="dark"] .replied-content .collapse:hover {
+  background: #525252;
 }
 .replied-content .collapse + input {
   display: none;

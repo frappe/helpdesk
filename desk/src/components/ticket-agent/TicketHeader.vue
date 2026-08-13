@@ -11,7 +11,6 @@
             />
           </template>
         </Breadcrumbs>
-        <TicketSLA />
       </div>
     </template>
     <template #right-header>
@@ -21,8 +20,6 @@
           size="md"
           :hide-name="true"
         />
-        <!-- Navigation -->
-        <TicketNavigation :key="ticket?.name" />
         <!-- Custom Actions -->
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
@@ -83,6 +80,7 @@
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
+import { showMergeModal } from "@/pages/ticket/modalStates";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
@@ -121,8 +119,6 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
-import TicketNavigation from "./TicketNavigation.vue";
-import TicketSLA from "./TicketSLA.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
@@ -239,7 +235,6 @@ const ticketCount = createResource({
   }),
   auto: true,
 });
-const showMergeModal = ref(false);
 const showMergeOption = computed(() => {
   return (
     !ticket?.value?.doc?.is_merged &&

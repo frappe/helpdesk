@@ -11,7 +11,9 @@
   "scope",
   "teams",
   "section_break_ybsb",
-  "message"
+  "message",
+  "actions_section",
+  "actions"
  ],
  "fields": [
   {
@@ -47,6 +49,17 @@
   {
    "fieldname": "section_break_ybsb",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "actions_section",
+   "fieldtype": "Section Break",
+   "label": "Actions"
+  },
+  {
+   "fieldname": "actions",
+   "fieldtype": "JSON",
+   "label": "Actions",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,

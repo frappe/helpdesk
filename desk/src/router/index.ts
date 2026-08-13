@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -19,10 +20,12 @@ declare module "vue-router" {
   }
 }
 
-const routes = [
+// Pages that render inside the portal chrome; PortalRoot picks the agent or
+// customer shell from the session.
+const portalRoutes = [
   // Agent Portal Routes
   {
-    path: "/",
+    path: "",
     redirect: "/home",
   },
   {
@@ -199,6 +202,21 @@ const routes = [
   },
 ];
 
+const routes = [
+  // Renders bare — no portal chrome.
+  {
+    path: "/onboarding",
+    name: "Persona",
+    component: () => import("@/pages/PersonaForm.vue"),
+    beforeEnter: () => canViewPersona(useAuthStore()) || { name: "Home" },
+  },
+  {
+    path: "/",
+    component: () => import("@/roots/PortalRoot.vue"),
+    children: portalRoutes,
+  },
+];
+
 const handleMobileView = (componentName: string) => {
   return isMobileView.value ? `Mobile${componentName}` : componentName;
 };
@@ -214,6 +232,9 @@ router.beforeEach(async (to, _, next) => {
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
+
+  const interrupt = personaInterrupt(to, authStore);
+  if (interrupt) return next(interrupt);
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";

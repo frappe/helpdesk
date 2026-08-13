@@ -41,9 +41,15 @@
       @keydown.ctrl.enter.capture.stop="handleSaveComment"
       @keydown.meta.enter.capture.stop="handleSaveComment"
     >
-      <Editor v-model="_content" :extensions="extensions" :editable="editable">
+      <Editor
+        :key="editable ? 'edit' : 'view'"
+        v-model="_content"
+        :extensions="extensions"
+        :editable="editable"
+        :upload-function="(file:any) => uploadFunction(file, 'HD Ticket', ticketId)"
+      >
         <template #default>
-          <EditorBubbleMenu v-if="editable" :items="fullToolbar" />
+          <EditorBubbleMenu :items="fullToolbar" />
           <EditorContent
             :class="[
               'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
@@ -52,8 +58,6 @@
           />
         </template>
       </Editor>
-      <!-- Save/Discard live outside <Editor> so they react to `editable`
-           (the renderless Editor doesn't re-render its slot on prop change). -->
       <div v-if="editable" class="flex flex-row-reverse gap-2">
         <div>
           <Button
@@ -159,6 +163,7 @@ import {
   getFontFamily,
   isContentEmpty,
   timeAgo,
+  uploadFunction,
 } from "@/utils";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import {
@@ -171,8 +176,10 @@ import {
 } from "frappe-ui";
 import { Editor, EditorBubbleMenu, EditorContent } from "frappe-ui/editor";
 import { PropType, computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 
 const authStore = useAuthStore();
+const ticketId = useRoute().params.ticketId as string;
 const props = defineProps({
   activity: {
     type: Object as PropType<CommentActivity>,

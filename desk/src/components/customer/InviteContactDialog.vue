@@ -87,6 +87,7 @@
 <script setup lang="ts">
 import RevokeInviteButton from "@/components/customer/RevokeInviteButton.vue";
 import EmailMultiSelect from "@/components/EmailMultiSelect.vue";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { CustomerResourceSymbol } from "@/types";
 import {
@@ -165,10 +166,19 @@ function inviteContacts() {
           customer.addContacts.data;
         selectedContacts.value = [];
         if (data.added.length) {
+          capture("customer_contacts_added", {
+            data: { count: data.added.length, role: role.value },
+          });
           toast.success(__("Contacts added successfully"));
           customer.getContacts.reload();
         }
         if (data.invite_result.invited_emails.length) {
+          capture("customer_contacts_invited", {
+            data: {
+              count: data.invite_result.invited_emails.length,
+              role: role.value,
+            },
+          });
           customer.getPendingInvites.reload();
         }
         handleInviteUserSuccess(data.invite_result);

@@ -6,7 +6,7 @@
           :label="__('Tickets')"
           :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
           :options="dropdownOptions"
-          :dropdown-actions="viewActions"
+          :dropdown-actions="(view) => viewActions(view, viewDialogConfig)"
           :current-view="currentView"
         />
       </template>
@@ -17,7 +17,7 @@
         >
           <Button
             class="rtl:flex-row-reverse"
-            label="Create"
+            :label="__('Create')"
             theme="gray"
             variant="solid"
           >
@@ -47,22 +47,35 @@
       "
     />
     <ViewModal
-      v-if="viewDialog.show"
-      v-model="viewDialog"
-      @update="(view, action) => handleView(view, action)"
+      v-if="viewDialogConfig.show"
+      v-model="viewDialogConfig"
+      @update="onViewModalUpdate"
     />
     <BulkReplyModal
       v-model="showBulkReplyModal"
       :selections="listSelections"
       @success="listViewRef?.unselectAll()"
     />
+    <BulkEditModal
+      v-model="showBulkEditModal"
+      :selections="listSelections"
+      @success="reset(true)"
+    />
+    <BulkAssignModal
+      v-model="showBulkAssignModal"
+      :selections="listSelections"
+      @success="reset(true)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
-import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
+import { TicketIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
+import TicketPriority from "@/components/TicketPriority.vue";
+import BulkAssignModal from "@/components/ticket-agent/BulkAssignModal.vue";
+import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
@@ -74,15 +87,8 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { getIcon, isCustomerPortal, shortDuration } from "@/utils";
-import {
-  Badge,
-  dayjs,
-  FeatherIcon,
-  toast,
-  Tooltip,
-  usePageMeta,
-} from "frappe-ui";
+import { isCustomerPortal, shortDuration } from "@/utils";
+import { Badge, dayjs, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -91,13 +97,13 @@ const route = useRoute();
 
 const {
   getCurrentUserViews,
-  createView,
   publicViews,
   pinnedViews,
   findView,
-  updateView,
-  deleteView,
   standardViews,
+  viewActions,
+  handleView,
+  resetViewDialog,
 } = useView("HD Ticket");
 
 const activeView = computed(() => findView(route.query.view as string).value);
@@ -105,7 +111,7 @@ const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
 
-const { $dialog, $socket } = globalStore();
+const { $socket } = globalStore();
 const { isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
@@ -116,14 +122,26 @@ const { getStatus } = useTicketStatusStore();
 const listSelections = ref(new Set());
 
 const showBulkReplyModal = ref(false);
+const showBulkEditModal = ref(false);
+const showBulkAssignModal = ref(false);
 
 const selectBannerActions = [
   {
-    label: __("Bulk Reply"),
+    label: __("Reply"),
     icon: "lucide-corner-up-left",
+    inline: true,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
+    },
+  },
+  {
+    label: __("Assign"),
+    icon: "lucide-user-plus",
+    inline: true,
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkAssignModal.value = true;
     },
   },
   {
@@ -132,6 +150,14 @@ const selectBannerActions = [
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showExportModal.value = true;
+    },
+  },
+  {
+    label: __("Edit"),
+    icon: "lucide-pencil",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkEditModal.value = true;
     },
   },
 ];
@@ -168,8 +194,12 @@ const options = computed(() => ({
         );
       },
     },
+    priority: {
+      custom: ({ item }) => h(TicketPriority, { priority: item }),
+    },
     agreement_status: {
       custom: ({ item }) => {
+        if (!item) return null;
         return h(Badge, {
           label: __(item),
           theme: slaStatusColorMap[item],
@@ -212,68 +242,14 @@ const options = computed(() => ({
 }));
 
 function handleResponseByField(row: any, item: string) {
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
+  if (!row.sla) return null; // nothing promised, so nothing to report against
+  if (row.first_responded_on) {
+    // no target means it was never breached, so responding at all fulfils it
+    const fulfilled = !item || dayjs(row.first_responded_on).isBefore(item);
+    return slaOutcomeBadge(fulfilled);
   }
-  if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
-    return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "gray",
-      variant: "subtle",
-    });
-  } else if (dayjs(row.first_responded_on).isAfter(item)) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  } else {
-    return h(
-      Tooltip,
-      {
-        text: dayjs(item).format("LLLL"),
-      },
-      h(Badge, {
-        label: shortDuration(item),
-        variant: "subtle",
-        theme: "orange",
-      })
-    );
-  }
-}
-
-function handleResolutionByField(row: any, item: string) {
-  const status = getStatus(row.status) || {};
-  if (status.category === "Paused") {
-    return h(Badge, {
-      label: __("Paused"),
-      theme: "blue",
-      variant: "subtle",
-    });
-  }
-  if (row.resolution_date) {
-    const fulfilled = dayjs(row.resolution_date).isBefore(
-      dayjs(row.resolution_by)
-    );
-    return h(Badge, {
-      label: fulfilled ? __("Fulfilled") : __("Failed"),
-      theme: fulfilled ? "gray" : "red",
-      variant: "subtle",
-    });
-  }
-  // In progress but the resolution deadline has already passed.
-  if (dayjs(item).isBefore(dayjs())) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  }
-  // In progress with a future deadline: show the live countdown.
+  if (!item) return null;
+  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
   return h(
     Tooltip,
     {
@@ -283,6 +259,45 @@ function handleResolutionByField(row: any, item: string) {
       label: shortDuration(item),
       variant: "subtle",
       theme: "orange",
+    })
+  );
+}
+
+function slaOutcomeBadge(fulfilled: boolean) {
+  return h(Badge, {
+    label: fulfilled ? __("Fulfilled") : __("Failed"),
+    theme: fulfilled ? "gray" : "red",
+    variant: "subtle",
+  });
+}
+
+function handleResolutionByField(row: any, item: string) {
+  if (!row.sla) return null;
+  const status = getStatus(row.status) || {};
+  if (status.category === "Paused") {
+    return h(Badge, {
+      label: __("Paused"),
+      theme: "blue",
+      variant: "subtle",
+    });
+  }
+  if (row.resolution_date) {
+    const fulfilled = !item || dayjs(row.resolution_date).isBefore(dayjs(item));
+    return slaOutcomeBadge(fulfilled);
+  }
+  if (!item) return null;
+  // In progress but the resolution deadline has already passed.
+  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
+  // In progress with a future deadline: show the live countdown.
+  return h(
+    Tooltip,
+    {
+      text: dayjs(item).format("LLLL"),
+    },
+    h(Badge, {
+      label: shortDuration(item),
+      variant: "subtle",
+      theme: "violet",
     })
   );
 }
@@ -338,7 +353,7 @@ const slaStatusColorMap = {
   Paused: "blue",
 };
 
-let viewDialog = reactive({
+let viewDialogConfig = reactive({
   show: false,
   view: {
     label: "",
@@ -401,8 +416,8 @@ const dropdownOptions = computed(() => {
         label: __("Create View"),
         icon: "lucide-plus",
         onClick: () => {
-          resetState();
-          viewDialog.show = true;
+          resetViewDialog(viewDialogConfig);
+          viewDialogConfig.show = true;
         },
       },
     ],
@@ -410,170 +425,6 @@ const dropdownOptions = computed(() => {
 
   return items;
 });
-
-let selectedView: View | null = null;
-
-const toggleViewVisibility = (_view: any, title: string, message: string) => {
-  const newView: any = {
-    name: _view.name,
-    public: !_view.public,
-  };
-
-  if (_view.public) {
-    $dialog({
-      title,
-      message,
-      actions: [
-        {
-          label: __("Confirm"),
-          variant: "solid",
-          onClick({ close }: any) {
-            close();
-            updateView(newView);
-          },
-        },
-      ],
-    });
-  } else {
-    updateView(newView);
-  }
-};
-
-const viewActions = (view) => {
-  const _view = findView(view.name).value;
-
-  let actions = [
-    {
-      group: __("Default Views"),
-      hideLabel: true,
-      items: [
-        {
-          label: __("Duplicate"),
-          icon: h(FeatherIcon, { name: "copy" }),
-          onClick: () => {
-            viewDialog.view.label = _view.label + " (New)";
-            viewDialog.view.icon = _view.icon;
-            viewDialog.view.name = _view.name;
-            viewDialog.mode = "duplicate";
-            selectedView = _view;
-            viewDialog.show = true;
-          },
-        },
-      ],
-    },
-  ];
-  if (!_view.public || isManager) {
-    if (!_view.public && !_view.is_standard) {
-      actions[0].items.push({
-        label: _view?.pinned ? __("Unpin View") : __("Pin View"),
-        icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
-        onClick: () => {
-          const newView = {
-            name: _view.name,
-          };
-          newView["pinned"] = !_view.pinned;
-          updateView(newView);
-        },
-      });
-    }
-    if (_view?.is_standard && isManager) {
-      actions[0].items.push({
-        label: _view?.public ? __("Hide from sidebar") : __("Show in sidebar"),
-        icon: h(FeatherIcon, {
-          name: _view?.public ? "eye-off" : "eye",
-          class: "h-4 w-4",
-        }),
-        onClick: () => {
-          toggleViewVisibility(
-            _view,
-            __("Hide view from sidebar"),
-            __(
-              "{0} view is currently visible in the sidebar. Hiding it will remove it from the sidebar.",
-              [_view.label]
-            )
-          );
-        },
-      });
-    }
-    if (!_view.is_standard) {
-      if (isManager && !isCustomerPortal.value) {
-        actions[0].items.push({
-          label: _view?.public ? __("Make Private") : __("Make Public"),
-          icon: h(FeatherIcon, {
-            name: _view?.public ? "lock" : "unlock",
-            class: "h-4 w-4",
-          }),
-          onClick: () => {
-            toggleViewVisibility(
-              _view,
-              __("Make view private"),
-              __(
-                "{0} view is currently public. Changing it to private will hide it for all the users.",
-                [_view.label]
-              )
-            );
-          },
-        });
-      }
-      actions[0].items.push({
-        label: __("Edit"),
-        icon: h(EditIcon, { class: "h-4 w-4" }),
-        onClick: () => {
-          viewDialog.view.label = _view.label;
-          viewDialog.view.icon = _view.icon;
-          viewDialog.view.name = _view.name;
-          viewDialog.mode = "edit";
-          viewDialog.show = true;
-        },
-      });
-      actions.push({
-        group: __("Delete View"),
-        hideLabel: true,
-        items: [
-          {
-            label: __("Delete"),
-            icon: "lucide-trash-2",
-            theme: "red",
-            onClick: () => {
-              $dialog({
-                title: __("Delete {0}", [_view.label]),
-                message:
-                  __("Are you sure you want to delete this view?") +
-                  (_view.public
-                    ? " " +
-                      __(
-                        "This view is public, and will be removed for all users."
-                      )
-                    : ""),
-                actions: [
-                  {
-                    label: __("Confirm"),
-                    variant: "solid",
-                    iconLeft: "trash-2",
-                    theme: "red",
-                    onClick({ close }) {
-                      if (route.query.view === _view.name) {
-                        router.push({
-                          name: isCustomerPortal.value
-                            ? "TicketsCustomer"
-                            : "TicketsAgent",
-                        });
-                      }
-                      deleteView(_view.name);
-                      handleSuccess(__("deleted"));
-                      close();
-                    },
-                  },
-                ],
-              });
-            },
-          },
-        ],
-      });
-    }
-  }
-  return actions;
-};
 
 function parseViews(views: View[]) {
   return views?.map((view) => {
@@ -595,70 +446,8 @@ function parseViews(views: View[]) {
   });
 }
 
-function handleView(viewInfo, action) {
-  let view: View;
-  if (action === "update") {
-    updateView(viewInfo);
-    handleSuccess("updated");
-    currentView.value = {
-      label: viewInfo.label,
-      icon: getIcon(viewInfo.icon),
-    };
-    return;
-  } else if (action === "duplicate") {
-    view = {
-      ...selectedView,
-      filters: JSON.stringify(selectedView.filters),
-      columns: JSON.stringify(selectedView.columns),
-      rows: JSON.stringify(selectedView.rows),
-      label: viewInfo.label,
-      icon: viewInfo.icon,
-      public: false,
-      pinned: false,
-    };
-  } else {
-    view = {
-      dt: "HD Ticket",
-      type: "list",
-      label: viewInfo.label ?? __("List"),
-      icon: viewInfo.icon ?? "",
-      route_name: router.currentRoute.value.name as string,
-      order_by: listViewRef.value?.list?.params.order_by,
-      filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-      columns: JSON.stringify(listViewRef.value?.list?.data.columns),
-      rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
-      is_customer_portal: isCustomerPortal.value,
-    };
-  }
-
-  // createView
-  createView(view, (d) => {
-    currentView.value = {
-      label: d.label || __("List"),
-      icon: getIcon(d.icon),
-    };
-    router.push({
-      name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-      query: {
-        view: d.name,
-      },
-    });
-
-    handleSuccess();
-  });
-}
-
-function handleSuccess(msg = __("created")) {
-  toast.success(__("View {0}", [msg]));
-  resetState();
-}
-function resetState() {
-  viewDialog.show = false;
-  viewDialog.view.label = "";
-  viewDialog.view.icon = "";
-  viewDialog.view.name = "";
-  viewDialog.mode = null;
-  selectedView = null;
+function onViewModalUpdate(viewInfo: any, action: string) {
+  handleView(viewInfo, action, viewDialogConfig, () => listViewRef.value?.list);
 }
 
 onMounted(() => {
