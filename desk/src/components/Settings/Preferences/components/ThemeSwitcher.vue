@@ -52,6 +52,7 @@
                       <img
                         v-if="logoIsImage"
                         :src="logo as string"
+                        alt=""
                         class="size-5 object-cover"
                       />
                       <component
