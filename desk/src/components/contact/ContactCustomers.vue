@@ -7,7 +7,7 @@
         :text="customer.name"
       >
         <Avatar
-          class="-mr-1.5 cursor-pointer ring-2 ring-[var(--surface-base)] transition hover:z-10 hover:scale-110"
+          class="-me-1.5 cursor-pointer ring-2 ring-[var(--surface-base)] transition hover:z-10 hover:scale-110"
           shape="circle"
           size="sm"
           :image="customer.image"
@@ -17,13 +17,13 @@
       </Tooltip>
       <div
         v-if="remainingCustomers.length"
-        class="relative -mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-gray-2 text-2xs font-medium text-ink-gray-6 ring-2 ring-[var(--surface-white)]"
+        class="relative -me-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-gray-2 text-2xs font-medium text-ink-gray-6 ring-2 ring-[var(--surface-white)]"
       >
         +{{ remainingCustomers.length }}
       </div>
     </div>
     <span
-      class="text-sm text-ink-gray-8 ml-2"
+      class="text-sm text-ink-gray-8 ms-2"
       :class="customers.length === 1 && 'cursor-pointer'"
       v-on="
         customers.length === 1

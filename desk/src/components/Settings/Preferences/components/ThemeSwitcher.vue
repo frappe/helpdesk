@@ -44,7 +44,7 @@
                     <div class="size-1.5 bg-[#28C840] rounded-full" />
                   </div>
                   <div
-                    class="flex items-start justify-between gap-2 p-2.5 pr-0 pb-1 min-h-[41px]"
+                    class="flex items-start justify-between gap-2 p-2.5 pe-0 pb-1 min-h-[41px]"
                   >
                     <div
                       class="flex items-center flex-1 gap-1 text-xs-semibold text-ink-gray-5"
@@ -138,7 +138,7 @@ const themeOptions: {
     panes: [
       {
         tone: "light",
-        containerClass: "pl-5 pt-3.5 bg-surface-gray-2 rounded-t-[10.5px]",
+        containerClass: "ps-5 pt-3.5 bg-surface-gray-2 rounded-t-[10.5px]",
         screenClass: "bg-white rounded-tl-sm",
       },
     ],
@@ -150,7 +150,7 @@ const themeOptions: {
     panes: [
       {
         tone: "dark",
-        containerClass: "pl-5 pt-3.5 bg-surface-gray-2 rounded-t-[10.5px]",
+        containerClass: "ps-5 pt-3.5 bg-surface-gray-2 rounded-t-[10.5px]",
         screenClass: "bg-gray-900 rounded-tl-sm",
       },
     ],
@@ -163,13 +163,13 @@ const themeOptions: {
       {
         tone: "light",
         containerClass:
-          "flex flex-1 pl-5 pt-3.5 bg-surface-gray-2 rounded-tl-[10.5px]",
+          "flex flex-1 ps-5 pt-3.5 bg-surface-gray-2 rounded-tl-[10.5px]",
         screenClass: "bg-white rounded-tl-sm w-full",
       },
       {
         tone: "dark",
         containerClass:
-          "flex flex-1 pl-5 pt-3.5 bg-surface-gray-3 rounded-tr-[10.5px]",
+          "flex flex-1 ps-5 pt-3.5 bg-surface-gray-3 rounded-tr-[10.5px]",
         screenClass: "bg-gray-900 rounded-tl-sm w-full",
       },
     ],

@@ -23,7 +23,7 @@
       >
         <div
           ref="rail"
-          class="flex w-max min-w-full items-start pl-12 pr-16 pb-16 pt-8"
+          class="flex w-max min-w-full items-start ps-12 pe-16 pb-16 pt-8"
         >
           <template v-for="(segment, index) in segments" :key="index">
             <Tooltip

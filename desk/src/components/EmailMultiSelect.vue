@@ -83,7 +83,7 @@
                   @mousedown.prevent="onSelect(option.value)"
                 >
                   <UserAvatar
-                    class="mr-0.5 shrink-0"
+                    class="me-0.5 shrink-0"
                     :name="getUsernameLabel(option.label)"
                     size="lg"
                   />
@@ -102,10 +102,10 @@
         </ComboboxRoot>
       </div>
     </div>
-    <ErrorMessage class="mt-2 pl-2" v-if="error" :message="error" />
+    <ErrorMessage class="mt-2 ps-2" v-if="error" :message="error" />
     <div
       v-if="info"
-      class="whitespace-pre-line text-sm text-ink-blue-6 mt-2 pl-2"
+      class="whitespace-pre-line text-sm text-ink-blue-6 mt-2 ps-2"
     >
       {{ info }}
     </div>
