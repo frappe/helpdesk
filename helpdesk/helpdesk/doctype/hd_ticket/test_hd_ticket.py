@@ -147,12 +147,14 @@ class TestHDTicket(IntegrationTestCase):
         ticket.assign_agent(agent)
         ticket.assign_agent(agent2)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -165,12 +167,14 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(ticket)
 
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Reaction",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Ticket Reopened",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -189,12 +193,14 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket.assign_agent(non_agent)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": non_agent,
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": non_agent,
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 1)
@@ -673,9 +679,11 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket2.reload()
         comments = frappe.get_all(
-            "HD Ticket Comment",
+            "Comment",
             filters={
-                "reference_ticket": ticket2.name,
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket2.name,
+                "comment_type": "Comment",
             },
             fields=["content", "name"],
         )
