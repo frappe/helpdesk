@@ -206,10 +206,9 @@ onMounted(() => {
     }
   });
 
-  $socket.on("helpdesk:ticket-comment", (data: { ticket_id: string }) => {
-    if (data.ticket_id == props.ticketId) {
-      ticketComposable.value.activities.reload();
-    }
+  // core Comment emits this into the ticket room on add, edit and delete
+  $socket.on("docinfo_update", () => {
+    ticketComposable.value.activities.reload();
   });
 
   $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
@@ -225,7 +224,7 @@ onBeforeUnmount(() => {
   showCommentBox.value = false;
 
   $socket.off("ticket_update");
-  $socket.off("helpdesk:ticket-comment");
+  $socket.off("docinfo_update");
   $socket.off("helpdesk:ticket-update");
 });
 usePageMeta(() => {

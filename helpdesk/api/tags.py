@@ -2,9 +2,6 @@ import frappe
 from frappe import _
 from frappe.desk.doctype.tag.tag import add_tag, remove_tag
 
-from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
-    log_ticket_activity,
-)
 from helpdesk.utils import agent_only, capture_event
 
 FIRST_TICKET_TAG = "First Ticket"
@@ -83,7 +80,7 @@ def apply_tag(doctype: str, name: str, label: str, color: str = "Gray") -> str:
 
 
 def log_tag_activity(doctype: str, name: str, added: list[str], removed: list[str]):
-    """Log one activity per batch; only tickets have an activity feed."""
+    """Log one Info comment per batch; only tickets have an activity feed."""
     if doctype != "HD Ticket":
         return
 
@@ -95,7 +92,7 @@ def log_tag_activity(doctype: str, name: str, added: list[str], removed: list[st
             f"removed tag{'s' if len(removed) > 1 else ''} {', '.join(removed)}"
         )
     if parts:
-        log_ticket_activity(name, " & ".join(parts))
+        frappe.get_doc(doctype, name).add_comment("Info", " & ".join(parts))
 
 
 def parse_tags(user_tags: str | None) -> list[str]:

@@ -157,7 +157,7 @@
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMessageSquare
-                    v-else-if="item.doctype === 'HD Ticket Comment'"
+                    v-else-if="item.doctype === 'Comment'"
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMail
@@ -350,7 +350,7 @@ const doctypesFilterOptions = computed(() => {
   return [
     { value: "HD Ticket", label: __("Tickets"), count: 0 },
     { value: "Communication", label: __("Emails"), count: 0 },
-    { value: "HD Ticket Comment", label: __("Comments"), count: 0 },
+    { value: "Comment", label: __("Comments"), count: 0 },
   ];
 });
 
@@ -419,7 +419,7 @@ function getItemRoute(item: SearchResultItem) {
       name: "TicketAgent",
       params: { ticketId: item.name },
     };
-  } else if (item.doctype === "HD Ticket Comment" && item.reference_ticket) {
+  } else if (item.doctype === "Comment" && item.reference_ticket) {
     // ?highlight is the activity deep-link target (element id, see
     // TicketAgentActivities); the hash only selects the tab.
     return {
@@ -446,7 +446,7 @@ function getTicketNumber(item: SearchResultItem) {
 
   if (item.doctype === "HD Ticket") {
     return item.name || "";
-  } else if (item.doctype === "HD Ticket Comment") {
+  } else if (item.doctype === "Comment") {
     return item.reference_ticket || "";
   } else if (item.doctype === "Communication") {
     return item.reference_name || "";

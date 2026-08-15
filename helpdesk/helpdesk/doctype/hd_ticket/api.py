@@ -204,29 +204,47 @@ def get_communications(ticket: str):
 
 
 def get_comments(ticket: str):
-    if not frappe.has_permission("HD Ticket Comment", "read"):
+    if not frappe.has_permission("Comment", "read"):
         return []
-    QBComment = frappe.qb.DocType("HD Ticket Comment")
+    QBComment = frappe.qb.DocType("Comment")
     comments = (
         frappe.qb.from_(QBComment)
         .select(
-            QBComment.commented_by,
+            QBComment.comment_email.as_("commented_by"),
             QBComment.content,
             QBComment.creation,
             QBComment.is_pinned,
             QBComment.name,
         )
-        .where(QBComment.reference_ticket == ticket)
+        .where(QBComment.reference_doctype == "HD Ticket")
+        .where(QBComment.reference_name == ticket)
+        .where(QBComment.comment_type == "Comment")
         .orderby(QBComment.creation, order=Order.asc)
         .run(as_dict=True)
     )
     for c in comments:
         c.user = get_user_info_for_avatar(c.commented_by)
-        c.attachments = get_attachments("HD Ticket Comment", c.name)
+        c.attachments = get_attachments("Comment", c.name)
     return comments
 
 
+FIELD_CHANGE_LABELS = {
+    "status": "status",
+    "priority": "priority",
+    "agent_group": "team",
+    "ticket_type": "type",
+    "contact": "contact",
+    "sla": "SLA",
+}
+
+
 def get_history(ticket: str):
+    """Legacy HD Ticket Activity rows plus Version-derived field changes.
+
+    Nothing writes HD Ticket Activity anymore; field changes come from
+    Version rows so the history feed stays live until the timeline swap
+    renders Versions directly.
+    """
     if not frappe.has_permission("HD Ticket Activity", "read"):
         return []
     QBActivity = frappe.qb.DocType("HD Ticket Activity")
@@ -239,9 +257,46 @@ def get_history(ticket: str):
         .orderby(QBActivity.creation, order=Order.desc)
     )
     history = history.run(as_dict=True)
+    # Versions duplicate the legacy field-change rows, so only serve them
+    # past the point the activity write path stopped (per ticket: its
+    # newest legacy row)
+    cutoff = max((h.creation for h in history), default=None)
+    history.extend(get_version_history(ticket, cutoff))
+    history.sort(key=lambda h: h.creation, reverse=True)
     for h in history:
         h.user = get_user_info_for_avatar(h.owner)
     return history
+
+
+def get_version_history(ticket: str, cutoff=None) -> list:
+    entries = []
+    filters = {"ref_doctype": "HD Ticket", "docname": ticket}
+    if cutoff:
+        filters["creation"] = [">", cutoff]
+    versions = frappe.get_all(
+        "Version",
+        filters=filters,
+        fields=["name", "owner", "creation", "data"],
+    )
+    for version in versions:
+        try:
+            changes = json.loads(version.data).get("changed") or []
+        except (ValueError, TypeError):
+            continue
+        for field, _old, new in changes:
+            label = FIELD_CHANGE_LABELS.get(field)
+            if not label:
+                continue
+            action = f"set {label} to {new}" if new else f"cleared {label}"
+            entries.append(
+                frappe._dict(
+                    name=version.name,
+                    action=action,
+                    owner=version.owner,
+                    creation=version.creation,
+                )
+            )
+    return entries
 
 
 def get_views(ticket: str):
@@ -341,11 +396,11 @@ def merge_ticket(source: str, target: str):
     controller = get_controller("HD Ticket")
 
     source_comments = frappe.db.get_list(
-        "HD Ticket Comment", filters={"reference_ticket": source}, pluck="name"
+        "Comment",
+        filters={"reference_doctype": "HD Ticket", "reference_name": source},
+        pluck="name",
     )
-    duplicate_list_retain_timestamp(
-        "HD Ticket Comment", source_comments, target, controller
-    )
+    duplicate_list_retain_timestamp("Comment", source_comments, target, controller)
 
     source_communications = frappe.db.get_list(
         "Communication",
@@ -379,9 +434,11 @@ def merge_ticket(source: str, target: str):
     )
 
     # comment in target ticket that
-    c = frappe.new_doc("HD Ticket Comment")
-    c.commented_by = frappe.session.user
-    c.reference_ticket = target
+    c = frappe.new_doc("Comment")
+    c.comment_type = "Comment"
+    c.comment_email = frappe.session.user
+    c.reference_doctype = "HD Ticket"
+    c.reference_name = target
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
     target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
     c.content = _(
@@ -393,7 +450,7 @@ def merge_ticket(source: str, target: str):
 def duplicate_list_retain_timestamp(doctype, activities: list, target: str, controller):
     for activity in activities:
         attachments = get_attachments(
-            "HD Ticket Comment",
+            "Comment",
             activity,
         )
 
@@ -408,8 +465,8 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
                 activity,
             )
 
-        elif doctype == "HD Ticket Comment":
-            duplicate_doc.reference_ticket = target
+        elif doctype == "Comment":
+            duplicate_doc.reference_name = target
             attachments = get_attachments(
                 "Communication",
                 activity,
@@ -471,12 +528,13 @@ def split_ticket(subject: str, communication_id: str):
 
     # update comments
     frappe.db.set_value(
-        "HD Ticket Comment",
+        "Comment",
         {
-            "reference_ticket": ticket_id,
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_id,
             "creation": [">=", communicaton_creation_time],
         },
-        "reference_ticket",
+        "reference_name",
         new_ticket,
         update_modified=False,
     )
@@ -629,7 +687,7 @@ def _parse_view_filters(raw) -> dict | list:
         return []
     try:
         return (json.loads(raw) if isinstance(raw, str) else raw) or []
-    except (json.JSONDecodeError, TypeError):
+    except json.JSONDecodeError, TypeError:
         return []
 
 

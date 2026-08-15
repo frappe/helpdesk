@@ -240,7 +240,7 @@ const reactions = ref<
 const reactionsList = computed(() => reactions.value || []);
 
 const fetchReactions = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment.get_reactions",
+  url: "helpdesk.api.comment.get_reactions",
   makeParams: () => ({ comment: name }),
   auto: true,
   onSuccess(data) {
@@ -249,7 +249,7 @@ const fetchReactions = createResource({
 });
 
 const toggleReaction = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket_comment.hd_ticket_comment.toggle_reaction",
+  url: "helpdesk.api.comment.toggle_reaction",
   makeParams: (emoji: string) => ({ comment: name, emoji }),
   onSuccess() {
     fetchReactions.reload();
@@ -308,7 +308,7 @@ function handleDiscard() {
 const deleteComment = createResource({
   url: "frappe.client.delete",
   makeParams: () => ({
-    doctype: "HD Ticket Comment",
+    doctype: "Comment",
     name: name,
   }),
   onSuccess() {
@@ -329,7 +329,7 @@ function handleSaveComment() {
 
   updateComment.submit(
     {
-      doctype: "HD Ticket Comment",
+      doctype: "Comment",
       name: name,
       fieldname: "content",
       value: _content.value,

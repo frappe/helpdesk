@@ -23,13 +23,12 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
 )
-from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
-    log_ticket_activity,
-)
 from helpdesk.helpdesk.utils.email import (
     default_outgoing_email_account,
     default_ticket_outgoing_email_account,
 )
+from helpdesk.notifications import clear as clear_notifications
+from helpdesk.notifications import notify_ticket_reopened
 from helpdesk.utils import (
     agent_only,
     capture_event,
@@ -41,7 +40,6 @@ from helpdesk.utils import (
     publish_event,
 )
 
-from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
 
 
@@ -95,9 +93,6 @@ class HDTicket(Document):
     def before_save(self):
         self.set_resolution_date()
         self.apply_sla()
-        if not self.is_new():
-            self.handle_ticket_activity_update()
-
         self.handle_email_feedback()
 
         if self.is_new():
@@ -203,9 +198,8 @@ class HDTicket(Document):
             capture_event("ticket_created_via_customer")
 
         if self.ticket_split_from:
-            log_ticket_activity(
-                self.name,
-                "split the ticket from #{0}".format(self.ticket_split_from),
+            self.add_comment(
+                "Info", "split the ticket from #{0}".format(self.ticket_split_from)
             )
             capture_event("ticket_split")
 
@@ -235,25 +229,11 @@ class HDTicket(Document):
             ):
                 agents = self.get_assigned_agents()
                 if agents:
-                    for agent in agents:
-                        if agent.name == frappe.session.user:
-                            continue
-                        self.notify_agent(agent.name, "Reaction")
+                    notify_ticket_reopened(self.name, [agent.name for agent in agents])
 
         self.remove_assignment_if_not_in_team()
         self.publish_update()
         self.capture_update_telemetry_events()
-
-    def notify_agent(self, agent, notification_type="Assignment"):
-        frappe.get_doc(
-            frappe._dict(
-                doctype="HD Notification",
-                user_from=frappe.session.user,
-                reference_ticket=self.name,
-                user_to=agent,
-                notification_type=notification_type,
-            )
-        ).insert(ignore_permissions=True)
 
     def capture_update_telemetry_events(self):
         capture_event("ticket_updated")
@@ -433,36 +413,6 @@ class HDTicket(Document):
             text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
-    def handle_ticket_activity_update(self):
-        """
-        Handles the ticket activity update.
-        Should be called inside on_update
-        """
-        field_maps = {
-            "status": "status",
-            "priority": "priority",
-            "agent_group": "team",
-            "ticket_type": "type",
-            "contact": "contact",
-            "sla": "SLA",
-        }
-        for field in [
-            "status",
-            "priority",
-            "agent_group",
-            "contact",
-            "ticket_type",
-            "sla",
-        ]:
-            if self.has_value_changed(field):
-                value = self.as_dict()[field]
-                if not value:
-                    msg = f"cleared {field_maps[field]}"
-                else:
-                    msg = f"set {field_maps[field]} to {value}"
-
-                log_ticket_activity(self.name, msg)
-
     def generate_key(self):
         self.key = uuid.uuid4()
 
@@ -524,10 +474,9 @@ class HDTicket(Document):
     @frappe.whitelist()
     @agent_only
     def assign_agent(self, agent: str):
+        # core assign_to notifies and emails the agent (self-assign suppressed);
+        # its Notification Log row derives app="helpdesk" from the ticket
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
-
-        if frappe.session.user != agent:
-            self.notify_agent(agent, "Assignment")
 
     def add_tag(self, tag: str, color: str = "Gray"):
         """Tag this ticket, claiming the Tag master for helpdesk.
@@ -673,15 +622,10 @@ class HDTicket(Document):
             frappe.throw(
                 _("You are not permitted to add a comment"), frappe.PermissionError
             )
-        c = frappe.new_doc("HD Ticket Comment")
-        c.commented_by = frappe.session.user
-        c.content = content
-        c.is_pinned = False
-        c.reference_ticket = self.name
-        c.save()
+        comment = self.add_comment("Comment", content)
         for attachment in attachments:
             self.attach_file_with_doc(
-                "HD Ticket Comment", c.name, attachment.get("file_url")
+                "Comment", comment.name, attachment.get("file_url")
             )
 
     @frappe.whitelist()
@@ -1556,9 +1500,9 @@ def close_tickets_after_n_days():
         doc.flags.ignore_validate = True
         try:
             doc.save(ignore_permissions=True)
-            # activity log for auto closing the ticket
-            log_ticket_activity(
-                doc.name,
+            # the status flip has a Version row; the reason is only recorded here
+            doc.add_comment(
+                "Info",
                 f"automatically closed the ticket after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
             )
         except Exception as e:

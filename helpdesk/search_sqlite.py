@@ -4,6 +4,8 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch, SQLiteSearchIndexMissingError
 
+from helpdesk.utils import is_agent
+
 
 class HelpdeskSearchIndexMissingError(SQLiteSearchIndexMissingError):
     pass
@@ -49,15 +51,17 @@ class HelpdeskSearch(SQLiteSearch):
                 "owner",
             ],
         },
-        "HD Ticket Comment": {
+        "Comment": {
             "fields": [
                 "name",
                 "content",
                 "modified",
-                "reference_ticket",
-                "commented_by",
+                "reference_doctype",
+                "reference_name",
+                "comment_email",
                 "owner",
             ],
+            "filters": {"reference_doctype": "HD Ticket", "comment_type": "Comment"},
         },
         "Communication": {
             "fields": [
@@ -75,6 +79,13 @@ class HelpdeskSearch(SQLiteSearch):
 
     def search(self, query, title_only: bool = False, filters: dict | None = None):
         result = super().search(query, title_only=title_only, filters=filters)
+        if not is_agent():
+            # agent-internal comments never surface to portal users, even on
+            # tickets they can read
+            result["results"] = [
+                r for r in result["results"] if r.get("doctype") != "Comment"
+            ]
+            result["summary"]["filtered_matches"] = len(result["results"])
         if self.is_post_filter_required:
             result["results"] = self._drop_unpermitted(result["results"])
             result["summary"]["filtered_matches"] = len(result["results"])
@@ -127,11 +138,11 @@ class HelpdeskSearch(SQLiteSearch):
             return None
 
         if (
-            doc.doctype == "HD Ticket Comment"
-            and doc.reference_ticket
-            and type(doc.reference_ticket) is str
+            doc.doctype == "Comment"
+            and doc.reference_name
+            and type(doc.reference_name) is str
         ):
-            document["reference_ticket"] = str(doc.reference_ticket)
+            document["reference_ticket"] = str(doc.reference_name)
 
         if doc.doctype == "Communication":
             # For communications, ensure reference fields are set for ticket doctype
@@ -146,9 +157,9 @@ class HelpdeskSearch(SQLiteSearch):
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = str(doc.name)
 
-        # Map commented_by to owner for HD Ticket Comment
-        if doc.doctype == "HD Ticket Comment":
-            document["owner"] = doc.commented_by
+        # Map comment author to owner for Comment
+        if doc.doctype == "Comment":
+            document["owner"] = doc.comment_email
 
         # Map sender to owner for Communication
         if doc.doctype == "Communication":
