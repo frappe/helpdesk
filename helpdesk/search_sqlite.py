@@ -2,14 +2,9 @@
 # MIT License. See license.txt
 
 import frappe
-from frappe.search.sqlite_search import SQLiteSearch, SQLiteSearchIndexMissingError
+from frappe.search.sqlite_search import SQLiteSearch
 
 from helpdesk.utils import is_agent
-
-
-class HelpdeskSearchIndexMissingError(SQLiteSearchIndexMissingError):
-    pass
-
 
 # Most tickets to bind as an exact IN (...) prefilter; past this the prefilter is
 # skipped and results are permission-checked after the search instead, since an

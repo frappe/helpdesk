@@ -10,6 +10,8 @@ PRESET_EMOJIS = ["👍", "👎", "❤️", "🎉", "👀", "✅"]
 @frappe.whitelist()
 def toggle_reaction(comment: str, emoji: str) -> dict | None:
     doc = frappe.get_doc("Comment", comment)
+    if doc.reference_doctype != "HD Ticket":
+        frappe.throw(_("Reactions are only supported on ticket comments"))
     frappe.has_permission("Comment", "read", doc, throw=True)
     frappe.has_permission("HD Ticket", "write", doc.reference_name, throw=True)
 

@@ -8,7 +8,7 @@ set-based data patches (idempotency, name preservation, collisions).
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.api.comment import toggle_reaction
+from helpdesk.api.comment import get_reactions, toggle_reaction
 from helpdesk.api.tags import update_tags
 from helpdesk.overrides import desk_form, realtime
 from helpdesk.patches import (
@@ -130,6 +130,48 @@ class TestNotificationFunnel(CoreCommentsTestCase):
         self.assertEqual(len(rows), 1, "reaction rolls up into one row")
         self.assertFalse(rows[0].read, "roll-up re-marks the row unread")
         self.assertIn("2 people", rows[0].subject)
+
+    def test_reaction_toggle_off_and_response_shape(self):
+        frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 1)
+        ticket = make_ticket()
+        comment = self.make_comment(ticket, "toggle me")
+
+        frappe.set_user(AGENT_TWO)
+        self.assertEqual(toggle_reaction(comment.name, "👍")["action"], "added")
+        shape = get_reactions(comment.name)
+        self.assertEqual(len(shape), 1)
+        self.assertEqual(shape[0]["emoji"], "👍")
+        self.assertEqual(shape[0]["count"], 1)
+        self.assertTrue(shape[0]["current_user_reacted"])
+        self.assertEqual(shape[0]["users"][0]["user"], AGENT_TWO)
+
+        self.assertEqual(toggle_reaction(comment.name, "👍")["action"], "removed")
+        self.assertEqual(get_reactions(comment.name), [])
+
+    def test_reaction_rejects_bad_input_and_self_notification(self):
+        frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 1)
+        ticket = make_ticket()
+        comment = self.make_comment(ticket, "my own comment")
+
+        frappe.set_user(AGENT_TWO)
+        self.assertRaises(frappe.ValidationError, toggle_reaction, comment.name, "🦄")
+
+        unrelated = frappe.get_doc(
+            {
+                "doctype": "Comment",
+                "comment_type": "Comment",
+                "reference_doctype": "User",
+                "reference_name": AGENT_ONE,
+                "content": "not a ticket comment",
+            }
+        ).insert(ignore_permissions=True)
+        self.assertRaises(frappe.ValidationError, toggle_reaction, unrelated.name, "👍")
+
+        frappe.set_user(AGENT_ONE)
+        self.assertEqual(toggle_reaction(comment.name, "👍")["action"], "added")
+        self.assertEqual(
+            notification_rows(for_user=AGENT_ONE, source_name=comment.name), []
+        )
 
     def test_manual_assignment_notifies_once_with_email(self):
         """Core assign_to's row is the only one: it derives app="helpdesk"
