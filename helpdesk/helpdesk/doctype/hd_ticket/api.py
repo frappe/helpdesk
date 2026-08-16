@@ -62,6 +62,8 @@ def get_one(name: str, is_customer_portal: bool = False):
     if not len(ticket):
         frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
     ticket = ticket.pop()
+    # core caches comment and email snippets here; nothing in the SPA reads it
+    ticket.pop("_comments", None)
 
     contact = (
         frappe.qb.from_(QBContact)
@@ -281,7 +283,7 @@ def get_version_history(ticket: str, cutoff=None) -> list:
     for version in versions:
         try:
             changes = json.loads(version.data).get("changed") or []
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             continue
         for field, _old, new in changes:
             label = FIELD_CHANGE_LABELS.get(field)

@@ -32,9 +32,13 @@ def get_docinfo(
 
 
 @frappe.whitelist()
-def get_activity_timeline(doctype: str, name: str | int) -> dict:
+def get_activity_timeline(
+    doctype: str,
+    name: str | int,
+    visible_types: list[str | dict[str, list[str]]] | str | None = None,
+) -> dict:
     deny_non_agents(doctype)
-    return activity.get_activity_timeline(doctype, name)
+    return activity.get_activity_timeline(doctype, name, visible_types)
 
 
 def deny_non_agents(doctype: str | None):

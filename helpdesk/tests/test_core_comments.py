@@ -10,6 +10,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.comment import get_reactions, toggle_reaction
 from helpdesk.api.tags import update_tags
+from helpdesk.helpdesk.doctype.hd_ticket.api import get_one
 from helpdesk.overrides import desk_form, realtime
 from helpdesk.patches import (
     migrate_hd_notifications_to_notification_log,
@@ -232,6 +233,13 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
             desk_form.get_docinfo(doctype="HD Ticket", name=ticket.name)
         with self.assertRaises(frappe.PermissionError):
             desk_form.get_activity_timeline("HD Ticket", ticket.name)
+
+    def test_ticket_payload_omits_the_comment_cache(self):
+        """Core caches comment and email snippets in `_comments`, which skips
+        field-level permission checks. Keep it off the ticket payload."""
+        ticket = make_ticket(raised_by=CUSTOMER)
+        self.make_comment(ticket, "escalate to legal")
+        self.assertNotIn("_comments", get_one(ticket.name))
 
     def test_agent_reads_comments(self):
         ticket = make_ticket()
