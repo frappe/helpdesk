@@ -30,7 +30,7 @@
           :label="__('Overview')"
           v-model:opened="openedSections.keyInfo"
         >
-          <div class="space-y-2.5 pb-4 pt-0.5">
+          <div class="space-y-2.5 pb-3 pt-0.5">
             <!-- Assignee -->
             <div class="flex items-center gap-2 leading-5">
               <FieldLabel label="Assignee" />
@@ -80,7 +80,7 @@
             :label="__('More Details')"
             v-model:opened="openedSections.ticketInfo"
           >
-            <div class="space-y-2.5 pb-4 pt-0.5">
+            <div class="space-y-2.5 pb-2 pt-0.5">
               <template v-for="field in customFields">
                 <TicketField
                   v-if="field.visible"

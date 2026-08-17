@@ -125,11 +125,15 @@ const showBulkReplyModal = ref(false);
 const showBulkEditModal = ref(false);
 const showBulkAssignModal = ref(false);
 
+// Replying, assigning and editing in bulk are agent-side actions only.
+const agentOnly = () => !isCustomerPortal.value;
+
 const selectBannerActions = [
   {
     label: __("Reply"),
     icon: "lucide-corner-up-left",
     inline: true,
+    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
@@ -139,6 +143,7 @@ const selectBannerActions = [
     label: __("Assign"),
     icon: "lucide-user-plus",
     inline: true,
+    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkAssignModal.value = true;
@@ -155,6 +160,7 @@ const selectBannerActions = [
   {
     label: __("Edit"),
     icon: "lucide-pencil",
+    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkEditModal.value = true;
