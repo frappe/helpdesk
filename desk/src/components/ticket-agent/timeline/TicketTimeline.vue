@@ -96,7 +96,6 @@ const VERSION_FIELDS = [
   "agent_group",
   "ticket_type",
   "sla",
-  "custom_members",
 ];
 
 // one key for every tab: the composable caches resources per visibleTypes, so
