@@ -17,6 +17,8 @@ interface MapValue {
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
   analytics: Resource<TicketAnalytics>;
+  // lent by the mounted timeline; see registerTicketFeed
+  reloadFeed?: () => void;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -74,6 +76,22 @@ export function reloadTicket(ticketId: string) {
   if (!ticketData) return;
   ticketData.ticket.reload();
   ticketData.assignees.reload();
+}
+
+// The timeline owns its feed through useActivityTimeline, so anything outside it
+// (a saved reply applying actions, say) reloads through the mounted component.
+export function registerTicketFeed(ticketId: string, reload: () => void) {
+  const ticketData = ticketMap[ticketId];
+  if (!ticketData) return () => {};
+  ticketData.reloadFeed = reload;
+  // identity check: on ticket switch the new instance mounts before the old unmounts
+  return () => {
+    if (ticketData.reloadFeed === reload) delete ticketData.reloadFeed;
+  };
+}
+
+export function reloadTicketFeed(ticketId: string) {
+  ticketMap[ticketId]?.reloadFeed?.();
 }
 
 // Refresh a ticket that may have gone stale

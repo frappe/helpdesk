@@ -67,9 +67,7 @@
 
 <script setup lang="ts">
 import { isTagAction } from "@/components/Settings/SavedReplies/components/actionTypes";
-import { SHARED_VISIBLE_TYPES } from "@/components/ticket-agent/timeline/TicketTimeline.vue";
-import { reloadTicket } from "@/composables/useTicket";
-import { prefetchActivityTimeline } from "@framework/ui";
+import { reloadTicket, reloadTicketFeed } from "@/composables/useTicket";
 import { userStorage } from "@/composables/userStorage";
 import { __ } from "@/translation";
 import { RenderedSavedReply, SavedReplyAction } from "@/types";
@@ -198,11 +196,7 @@ function setNoteValue(value: string) {
 
 function reloadFeed() {
   reloadTicket(props.ticketId);
-  prefetchActivityTimeline(
-    "HD Ticket",
-    props.ticketId,
-    SHARED_VISIBLE_TYPES
-  ).reload();
+  reloadTicketFeed(props.ticketId);
 }
 
 const applyActions = createResource({

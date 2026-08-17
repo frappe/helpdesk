@@ -52,7 +52,7 @@ import { recordTicketVisit } from "@/components/command-palette/recentTickets";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
 import { SHARED_VISIBLE_TYPES } from "@/components/ticket-agent/timeline/TicketTimeline.vue";
-import { prefetchActivityTimeline } from "@framework/ui";
+import { useActivityTimeline } from "@framework/ui/ActivityTimeline";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
@@ -99,13 +99,15 @@ const props = defineProps({
 const route = useRoute();
 const showPhoneModal = ref(false);
 
-// page spinner also waits for the feed; every tab shares this one resource
-const feed = prefetchActivityTimeline(
+// Started here, not in the timeline, so it runs alongside the doc fetch and both
+// sit behind one spinner. Every tab shares this one store.
+const { loading: feedLoading } = useActivityTimeline(
   "HD Ticket",
   props.ticketId,
   SHARED_VISIBLE_TYPES
 );
-const feedReady = computed(() => !!feed.fetched);
+// latched: a doc_update reloads the feed, and that must not blank the page
+const feedReady = ref(false);
 
 useTicketNavigation();
 
@@ -172,6 +174,15 @@ watch(
     // Switching to an already-visited ticket: show its cached conversation and
     // refresh it in the background in case it changed while we were elsewhere.
     if (oldTicketId) revalidateTicket(newTicketId as string);
+  },
+  { immediate: true }
+);
+
+// immediate so a store fetched earlier in the session opens the gate right away
+watch(
+  feedLoading,
+  (loading) => {
+    if (!loading) feedReady.value = true;
   },
   { immediate: true }
 );

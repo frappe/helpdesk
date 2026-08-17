@@ -20,7 +20,7 @@
     </template>
     <template #footer>
       <div v-if="extras.attachments.length" class="flex flex-wrap gap-2 mt-2">
-        <AttachmentItem
+        <AttachmentChip
           v-for="file in extras.attachments"
           :key="file.file_url"
           :label="file.file_name"
@@ -37,13 +37,16 @@
 </template>
 
 <script setup lang="ts">
-import { AttachmentItem } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { ConfirmDelete, copyActivityLink, isContentEmpty } from "@/utils";
-import { CommentItem, type CommentActivity } from "@framework/ui";
+import {
+  AttachmentChip,
+  CommentItem,
+  type CommentActivity,
+} from "@framework/ui/ActivityTimeline";
 import { Button, Dropdown, createResource, toast } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";

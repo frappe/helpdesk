@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import type { VisibleTypes } from "@framework/ui";
+import type { VisibleTypes } from "@framework/ui/ActivityTimeline";
 
 // the only field changes worth a feed row; everything else is noise the old
 // feed never showed
@@ -100,6 +100,10 @@ const VERSION_FIELDS = [
 
 // one key for every tab: the composable caches resources per visibleTypes, so
 // all tab instances share a single fetch; tabs filter client-side
+// live rows already patched with their files; module-level so force-mounted
+// tab instances don't refetch the same row
+const enrichedRows = new Set<string>();
+
 export const SHARED_VISIBLE_TYPES: VisibleTypes = [
   "email",
   "comment",
@@ -121,6 +125,7 @@ import {
 } from "@/components/icons";
 import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import TicketSplitModal from "@/components/ticket/TicketSplitModal.vue";
+import { registerTicketFeed } from "@/composables/useTicket";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
@@ -137,8 +142,8 @@ import {
   type CustomActivity,
   type EmailActivity,
   type LogActivity,
-} from "@framework/ui";
-import { Button, Dropdown, FeatherIcon, createResource } from "frappe-ui";
+} from "@framework/ui/ActivityTimeline";
+import { Button, Dropdown, FeatherIcon, call, createResource } from "frappe-ui";
 import {
   computed,
   inject,
@@ -380,17 +385,54 @@ watch(
   }
 );
 
+// the socket payload can't carry attachments (they live on File, joined
+// server-side), so a live comment renders bare; fetch its files and patch
+// extras, where our footer renders from. One keyed lookup, deduped across
+// tab instances.
+async function enrichLiveComment(payload: unknown) {
+  const { doc, key, action } = (payload ?? {}) as {
+    doc?: Record<string, unknown>;
+    key?: string;
+    action?: string;
+  };
+  if (key !== "comments" || action !== "add") return;
+  if (
+    doc?.reference_doctype !== "HD Ticket" ||
+    doc?.reference_name !== props.ticketId
+  )
+    return;
+  const name = doc.name as string;
+  if (enrichedRows.has(name)) return;
+  enrichedRows.add(name);
+  const files = await call("frappe.client.get_list", {
+    doctype: "File",
+    filters: { attached_to_doctype: "Comment", attached_to_name: name },
+    fields: ["file_name", "file_url", "is_private"],
+  });
+  if (!files?.length || !extras.data) return;
+  extras.data[name] = {
+    ...(extras.data[name] ?? { reactions: [] }),
+    attachments: files,
+  };
+}
+
+let unregisterFeed: () => void;
+
 onMounted(() => {
+  unregisterFeed = registerTicketFeed(props.ticketId, refreshAndScroll);
   $socket.on(
     "helpdesk:comment-reaction-update",
     (data: { ticket_id: string }) => {
       if (data.ticket_id === props.ticketId) extras.reload();
     }
   );
+  $socket.on("docinfo_update", enrichLiveComment);
 });
 
 onBeforeUnmount(() => {
+  unregisterFeed?.();
   $socket.off("helpdesk:comment-reaction-update");
+  $socket.off("docinfo_update", enrichLiveComment);
 });
 
 defineExpose({ reload: refreshAndScroll });
