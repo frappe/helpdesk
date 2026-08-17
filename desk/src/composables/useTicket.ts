@@ -4,7 +4,6 @@ import type {
   DocumentResource,
   RecentSimilarTicket,
   Resource,
-  TicketActivities,
   TicketAssignee,
   TicketContact,
 } from "@/types";
@@ -17,7 +16,6 @@ interface MapValue {
   assignees: Resource<TicketAssignee[]>;
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
-  activities: Resource<TicketActivities>;
   analytics: Resource<TicketAnalytics>;
 }
 
@@ -59,11 +57,6 @@ export const useTicket = (ticketId: string): MapValue => {
         params: { ticket: ticketId },
         auto: true,
       }),
-      activities: createResource({
-        url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_activities",
-        params: { ticket: ticketId },
-        auto: true,
-      }),
       // fetched by the analytics tab, not on ticket open
       analytics: createResource({
         url: "helpdesk.api.ticket_analytics.get_ticket_analytics",
@@ -81,7 +74,6 @@ export function reloadTicket(ticketId: string) {
   if (!ticketData) return;
   ticketData.ticket.reload();
   ticketData.assignees.reload();
-  ticketData.activities.reload();
 }
 
 // Refresh a ticket that may have gone stale

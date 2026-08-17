@@ -420,8 +420,6 @@ function getItemRoute(item: SearchResultItem) {
       params: { ticketId: item.name },
     };
   } else if (item.doctype === "Comment" && item.reference_ticket) {
-    // ?highlight is the activity deep-link target (element id, see
-    // TicketAgentActivities); the hash only selects the tab.
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_ticket },

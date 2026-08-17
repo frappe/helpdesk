@@ -92,7 +92,9 @@ def log_tag_activity(doctype: str, name: str, added: list[str], removed: list[st
             f"removed tag{'s' if len(removed) > 1 else ''} {', '.join(removed)}"
         )
     if parts:
-        frappe.get_doc(doctype, name).add_comment("Info", " & ".join(parts))
+        doc = frappe.get_doc(doctype, name)
+        doc.add_comment("Info", " & ".join(parts))
+        doc.notify_update()
 
 
 def parse_tags(user_tags: str | None) -> list[str]:

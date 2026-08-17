@@ -399,7 +399,7 @@ export interface ContactPhone extends ChildDocType {
   is_primary_mobile_no: 0 | 1;
 }
 
-// Last updated: 2024-03-23 16:01:30.937045
+// Last updated: 2026-07-31 16:01:30.937045
 export interface Contact extends DocType {
   /** First Name: Data */
   first_name?: string;
@@ -410,7 +410,7 @@ export interface Contact extends DocType {
   /** User Id: Link (User) */
   user?: string;
   /** Status: Select */
-  status?: "Passive" | "Open" | "Replied";
+  status?: 'Passive' | 'Open' | 'Replied';
   /** Salutation: Link (Salutation) */
   salutation?: string;
   /** Gender: Link (Gender) */
@@ -451,6 +451,4 @@ export interface Contact extends DocType {
   company_name?: string;
   /** Full Name: Data */
   full_name?: string;
-  /** Timezone: Data (from linked User) */
-  timezone?: string;
 }

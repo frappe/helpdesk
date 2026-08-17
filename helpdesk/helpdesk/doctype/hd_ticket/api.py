@@ -121,8 +121,6 @@ def get_one(name: str, is_customer_portal: bool = False):
         **ticket,
         "comments": get_comments(name),
         "communications": get_communications(name),
-        "history": get_history(name),
-        "views": get_views(name),
         "contact": contact,
         "tags": get_tags(name),
         "template": get_template(template),
@@ -228,98 +226,6 @@ def get_comments(ticket: str):
         c.user = get_user_info_for_avatar(c.commented_by)
         c.attachments = get_attachments("Comment", c.name)
     return comments
-
-
-FIELD_CHANGE_LABELS = {
-    "status": "status",
-    "priority": "priority",
-    "agent_group": "team",
-    "ticket_type": "type",
-    "contact": "contact",
-    "sla": "SLA",
-}
-
-
-def get_history(ticket: str):
-    """Legacy HD Ticket Activity rows plus Version-derived field changes.
-
-    Nothing writes HD Ticket Activity anymore; field changes come from
-    Version rows so the history feed stays live until the timeline swap
-    renders Versions directly.
-    """
-    if not frappe.has_permission("HD Ticket Activity", "read"):
-        return []
-    QBActivity = frappe.qb.DocType("HD Ticket Activity")
-    history = (
-        frappe.qb.from_(QBActivity)
-        .select(
-            QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
-        )
-        .where(QBActivity.ticket == str(ticket))
-        .orderby(QBActivity.creation, order=Order.desc)
-    )
-    history = history.run(as_dict=True)
-    # Versions duplicate the legacy field-change rows, so only serve them
-    # past the point the activity write path stopped (per ticket: its
-    # newest legacy row)
-    cutoff = max((h.creation for h in history), default=None)
-    history.extend(get_version_history(ticket, cutoff))
-    history.sort(key=lambda h: h.creation, reverse=True)
-    for h in history:
-        h.user = get_user_info_for_avatar(h.owner)
-    return history
-
-
-def get_version_history(ticket: str, cutoff=None) -> list:
-    entries = []
-    filters = {"ref_doctype": "HD Ticket", "docname": ticket}
-    if cutoff:
-        filters["creation"] = [">", cutoff]
-    versions = frappe.get_all(
-        "Version",
-        filters=filters,
-        fields=["name", "owner", "creation", "data"],
-    )
-    for version in versions:
-        try:
-            changes = json.loads(version.data).get("changed") or []
-        except ValueError, TypeError:
-            continue
-        for field, _old, new in changes:
-            label = FIELD_CHANGE_LABELS.get(field)
-            if not label:
-                continue
-            action = f"set {label} to {new}" if new else f"cleared {label}"
-            entries.append(
-                frappe._dict(
-                    name=version.name,
-                    action=action,
-                    owner=version.owner,
-                    creation=version.creation,
-                )
-            )
-    return entries
-
-
-def get_views(ticket: str):
-    if not frappe.has_permission("HD Ticket", "read", ticket):
-        return []
-    QBViewLog = frappe.qb.DocType("View Log")
-    views = (
-        frappe.qb.from_(QBViewLog)
-        .select(
-            QBViewLog.creation,
-            QBViewLog.name,
-            QBViewLog.viewed_by,
-        )
-        .where(QBViewLog.reference_doctype == "HD Ticket")
-        .where(QBViewLog.reference_name == ticket)
-        .orderby(QBViewLog.creation, order=Order.desc)
-        .run(as_dict=True)
-    )
-    for v in views:
-        v.user = get_user_info_for_avatar(v.viewed_by)
-    return views
 
 
 def get_tags(ticket: str):
@@ -797,19 +703,6 @@ def get_recent_tickets(ticket: str):
             or []
         )
     return org_tickets + user_tickets
-
-
-@frappe.whitelist()
-def get_ticket_activities(ticket: str):
-    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    activities = {
-        "comments": get_comments(ticket),
-        "communications": get_communications(ticket),
-        "history": get_history(ticket),
-        "views": get_views(ticket),
-        "calls": get_call_logs(ticket),
-    }
-    return activities
 
 
 @frappe.whitelist()

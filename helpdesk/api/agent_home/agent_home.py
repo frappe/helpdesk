@@ -697,27 +697,27 @@ def _activity_events(
     ]
 
 
-FEED_FIELDS = ("status", "priority", "agent_group", "ticket_type")
+# significance order decides which change to show, not the DocType field order
+FEED_FIELD_LABELS = {
+    "status": "status",
+    "priority": "priority",
+    "agent_group": "team",
+    "ticket_type": "type",
+}
 
 
 def _updated_label(data: str | None) -> str | None:
     """Most significant tracked field change in a Version row as display text
-    ('Set status to Resolved').
-
-    A single save often changes several fields at once, so FEED_FIELDS order
-    decides which one is worth showing rather than the DocType's field order.
-    """
-    from helpdesk.helpdesk.doctype.hd_ticket.api import FIELD_CHANGE_LABELS
-
+    ('Set status to Resolved')."""
     try:
         changes = json.loads(data).get("changed") or []
     except (ValueError, TypeError):
         return None
     changed = {field: new for field, _old, new in changes}
-    for field in FEED_FIELDS:
+    for field, label in FEED_FIELD_LABELS.items():
         if field not in changed:
             continue
-        label, new = FIELD_CHANGE_LABELS[field], changed[field]
+        new = changed[field]
         text = f"set {label} to {new}" if new else f"cleared {label}"
         return text[:1].upper() + text[1:]
     return None

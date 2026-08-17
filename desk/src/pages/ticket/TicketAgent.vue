@@ -1,5 +1,5 @@
 <template>
-  <div v-if="ticket.doc?.name" class="flex-1">
+  <div v-if="ticket.doc?.name && feedReady" class="flex-1">
     <TicketHeader :viewers="viewers" />
     <div class="h-full flex overflow-hidden">
       <div class="flex-1 flex flex-col overflow-hidden">
@@ -18,10 +18,10 @@
     />
   </div>
   <div
-    v-else-if="!ticket.doc && !ticket.get?.error"
+    v-else-if="ticket.doc?.name || (!ticket.doc && !ticket.get?.error)"
     class="grid h-full place-items-center"
   >
-    <LoadingIndicator class="w-6 text-ink-gray-4" />
+    <LoadingIndicator class="size-6 text-ink-gray-4" />
   </div>
 
   <div v-else class="grid h-full place-items-center px-4 py-20 text-center">
@@ -51,6 +51,8 @@
 import { recordTicketVisit } from "@/components/command-palette/recentTickets";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
+import { SHARED_VISIBLE_TYPES } from "@/components/ticket-agent/timeline/TicketTimeline.vue";
+import { prefetchActivityTimeline } from "@framework/ui";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
@@ -67,7 +69,6 @@ import {
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
-  ActivitiesSymbol,
   AssigneeSymbol,
   Customizations,
   CustomizationSymbol,
@@ -98,6 +99,14 @@ const props = defineProps({
 const route = useRoute();
 const showPhoneModal = ref(false);
 
+// page spinner also waits for the feed; every tab shares this one resource
+const feed = prefetchActivityTimeline(
+  "HD Ticket",
+  props.ticketId,
+  SHARED_VISIBLE_TYPES
+);
+const feedReady = computed(() => !!feed.fetched);
+
 useTicketNavigation();
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
@@ -125,10 +134,6 @@ provide(
 provide(
   RecentSimilarTicketsSymbol,
   computed(() => ticketComposable.value.recentSimilarTickets)
-);
-provide(
-  ActivitiesSymbol,
-  computed(() => ticketComposable.value.activities)
 );
 provide("makeCall", () => {
   if (
@@ -206,11 +211,6 @@ onMounted(() => {
     }
   });
 
-  // core Comment emits this into the ticket room on add, edit and delete
-  $socket.on("docinfo_update", () => {
-    ticketComposable.value.activities.reload();
-  });
-
   $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
     if (data.ticket_id == props.ticketId) {
       reloadTicket(props.ticketId);
@@ -224,7 +224,6 @@ onBeforeUnmount(() => {
   showCommentBox.value = false;
 
   $socket.off("ticket_update");
-  $socket.off("docinfo_update");
   $socket.off("helpdesk:ticket-update");
 });
 usePageMeta(() => {
