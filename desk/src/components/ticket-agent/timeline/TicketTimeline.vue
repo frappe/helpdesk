@@ -94,7 +94,6 @@ const VERSION_FIELDS = [
   "status",
   "priority",
   "agent_group",
-  "contact",
   "ticket_type",
   "sla",
   "custom_members",
