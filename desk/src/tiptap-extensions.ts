@@ -15,7 +15,7 @@ import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import { getMeta } from "./stores/meta";
 
 export interface FieldItem {
-  label: string; 
+  label: string;
   value: string;
 }
 
@@ -25,22 +25,18 @@ export const FieldAutocompleteSuggestionKey = new PluginKey<any>(
 
 const ticketMeta = getMeta("HD Ticket");
 
-
 // Updated to insert exactly "Ticket ID" and "Ticket Name"
 const ticketFields: FieldItem[] = [
   { label: "Ticket ID", value: "Ticket ID" },
   { label: "Ticket Name", value: "Ticket Name" },
 ];
 
-export const FieldAutocomplete = createSuggestionExtension<FieldItem>({
 export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   name: "fieldAutocomplete",
   trigger: "{{",
   allowSpaces: true,
 
   pluginKey: FieldAutocompleteSuggestionKey,
-  items: ({ editor, query, ...rest }) => {
-
   items: (query: string) => {
     // Return empty list to force the dropdown to close.
     if (query.includes("}}")) {
@@ -62,9 +58,6 @@ export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
       .map((f) => ({ label: f.label, value: f.fieldname }))
       .concat(ticketFields)
       .concat(userFields);
-
-    // Final fields log to verify the array before filtering
-    console.log("Combined fields:", fields);
 
     return fields.filter(
       (field) =>
@@ -759,8 +752,6 @@ export const HandleExcelPaste = Extension.create({
     ];
   },
 });
-
-
 
 // Handle formatting cleanup
 

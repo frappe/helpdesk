@@ -111,33 +111,8 @@
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   <!-- Ticket Fields -->
 
-                <!-- SLA Section, hidden when no policy is attached -->
-                <template v-if="ticket.doc?.sla">
-                  <h3 class="px-6 pt-3 text-base-semibold">
-                    {{ __("SLA") }}
-                  </h3>
-                  <div class="px-6 py-3">
-                    <TicketSLA />
-                  </div>
-                </template>
-                <div
-                  class="flex items-center border-b px-6 py-3 text-base leading-5"
-                >
-                  <div class="w-[126px] text-sm text-ink-gray-5">
-                    {{ __("Source") }}
-                  </div>
-                  <div>
-                    {{
-                      ticket.doc?.via_customer_portal
-                        ? __("Portal")
-                        : __("Mail")
-                    }}
-                  </div>
-                </div>
-
                 <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 text-base-semibold">
-
                   {{ __("Details") }}
                 </h3>
                 <TicketAgentFields
@@ -615,7 +590,7 @@ const _activities = computed(() => {
     };
   });
 
-  // FIXED: Built the safe task tracking loop mapping layer cleanly for mobile devices
+  // Built the safe task tracking loop mapping layer cleanly for mobile devices
   const taskProps = (sourceData.tasks || []).map((task: any) => {
     let cleanDueDate = "";
     if (task.due_date) {
@@ -701,7 +676,7 @@ const _activities = computed(() => {
   return data;
 });
 
-// FIXED: Cleaned up the filter activities routing check options mapping logic to split tasks
+// Cleaned up the filter activities routing check options mapping logic to split tasks
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value.filter((a: any) => a.type !== "task");
@@ -710,8 +685,6 @@ function filterActivities(eventType: TicketTab) {
 }
 
 onMounted(() => {
-
-  document.title = String(props.ticketId);
   document.title = props.ticketId;
   // Revisiting a ticket: show the cached conversation immediately and refresh it
   // in place (mobile has no live socket refresh to keep the cache current).

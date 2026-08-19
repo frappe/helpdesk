@@ -41,10 +41,10 @@ export const useTicket = (ticketId: string | number): MapValue => {
           onError: (error) => {
             let msg = error.message || "";
             const lowerMsg = msg.toLowerCase();
-            
+
             // Suppress both ToDo list and document sharing notice toasts
             if (
-              lowerMsg.includes("already in the following") || 
+              lowerMsg.includes("already in the following") ||
               lowerMsg.includes("todo list") ||
               lowerMsg.includes("shared with the following")
             ) {
@@ -62,15 +62,15 @@ export const useTicket = (ticketId: string | number): MapValue => {
         setValue: {
           onSuccess: () => {
             toast.success(__("Assignees updated successfully."));
-            ticketMap[mapKey].assignees.reload(); 
+            ticketMap[mapKey].assignees.reload();
           },
           onError: (error) => {
             let msg = error.message || "";
             const lowerMsg = msg.toLowerCase();
-            
+
             // Suppress both ToDo list and document sharing notice toasts
             if (
-              lowerMsg.includes("already in the following") || 
+              lowerMsg.includes("already in the following") ||
               lowerMsg.includes("todo list") ||
               lowerMsg.includes("shared with the following")
             ) {
@@ -113,9 +113,6 @@ export function reloadTicket(ticketId: string | number) {
   ticketData.ticket.reload();
   ticketData.assignees.reload();
   ticketData.activities.reload();
-
-}
-
 }
 
 // Refresh a ticket that may have gone stale
@@ -125,4 +122,3 @@ export function revalidateTicket(ticketId: string | number) {
     reloadTicket(ticketId as string);
   }
 }
-

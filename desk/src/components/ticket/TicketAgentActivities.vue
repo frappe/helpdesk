@@ -182,13 +182,9 @@ import { __ } from "@/translation";
 import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
 
-import CommentBox from "@/components/CommentBox.vue";
-import EmailArea from "@/components/EmailArea.vue";
-import HistoryBox from "@/components/HistoryBox.vue";
 import CallArea from "@/components/CallArea.vue";
 import Taskbox from "@/components/Taskbox.vue";
 import TaskboxEditor from "@/components/TaskboxEditor.vue";
-
 
 const props = defineProps({
   activities: {
@@ -289,22 +285,13 @@ function scrollToLatestActivity() {
 }
 
 function scrollToHash() {
-
-  const hash = route.hash;
-  if (hash) {
-    const elementId = hash.substring(1);
-
   const elementId = linkedActivityId();
   if (elementId) {
-
     nextTick(() => {
       setTimeout(() => {
         const element = document.getElementById(elementId);
         if (element) {
           (element as any).scrollIntoViewIfNeeded();
-
-          element.classList.add("bg-yellow-100");
-
 
           // Add highlight effect using Tailwind class
           element.classList.add("bg-surface-yellow-2");

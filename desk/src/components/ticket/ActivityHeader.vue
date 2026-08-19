@@ -1,10 +1,7 @@
 <template>
   <div
-
-    class="flex items-center justify-between text-lg font-medium px-6 py-3 bg-white"
- 
-    <div class="flex h-8 items-center text-lg font-bold text-ink-gray-9">
     class="md:mx-5 md:my-4 flex items-center justify-between text-lg-medium mx-6 !mb-0 !my-3"
+  >
     <div class="flex h-8 items-center text-2xl-semibold text-ink-gray-8">
       {{ title }}
     </div>
