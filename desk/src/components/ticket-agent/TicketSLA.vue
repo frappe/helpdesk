@@ -18,7 +18,9 @@
         <Popover
           placement="bottom"
           :show="openCard === card.title"
-          @update:show="(open: boolean) => (openCard = open ? card.title : null)"
+          @update:show="
+            (open: boolean) => (openCard = open ? card.title : null)
+          "
         >
           <template #target>
             <LucideInfo
@@ -101,10 +103,15 @@ function cardDetails(card: SLACard) {
   if (metric.dueBy) {
     rows.push({ label: "Due by", value: fmt(metric.dueBy), danger: false });
   }
-  if (metric.state === "hold") {
+  // A breached-then-paused metric reads as plain "Overdue", so the pause has to
+  // be visible here or the frozen number looks arbitrary.
+  if (
+    metric.state === "hold" ||
+    (metric.state === "overdue" && onHoldSince())
+  ) {
     rows.push({
       label: "On hold since",
-      value: fmt(ticket.value.doc.on_hold_since as string),
+      value: fmt(onHoldSince()),
       danger: false,
     });
   }
@@ -139,6 +146,10 @@ function cardDetails(card: SLACard) {
     });
   }
   return rows;
+}
+
+function onHoldSince(): string {
+  return (ticket.value?.doc?.on_hold_since as string) || "";
 }
 
 function fmt(date: string): string {
