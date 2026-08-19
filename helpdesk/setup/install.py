@@ -4,7 +4,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
-from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
+from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
 from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
@@ -64,11 +64,11 @@ def add_default_categories_and_articles():
 def add_default_sla():
     add_default_ticket_priorities()
     add_default_holiday_list()
-    if frappe.db.exists("HD Service Level Agreement", "Default"):
+    if frappe.db.exists("HD Service Level Agreement", DEFAULT_SLA):
         return
     sla_doc = frappe.new_doc("HD Service Level Agreement")
 
-    sla_doc.service_level = "Default"
+    sla_doc.service_level = DEFAULT_SLA
     sla_doc.document_type = "HD Ticket"
     sla_doc.default_sla = 1
     sla_doc.enabled = 1

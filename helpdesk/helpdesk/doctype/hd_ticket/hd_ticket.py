@@ -10,10 +10,11 @@ from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
+from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
-from frappe.utils import add_to_date, cint, getdate, now_datetime
+from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -92,6 +93,7 @@ class HDTicket(Document):
         self.validate_feedback()
 
     def before_save(self):
+        self.set_resolution_date()
         self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
@@ -422,9 +424,9 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent() or not self.via_customer_portal:
-            return
         old_doc = self.get_doc_before_save()
+        if not old_doc or is_agent() or not self.via_customer_portal:
+            return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
         if is_closed or is_rated:
@@ -614,6 +616,23 @@ class HDTicket(Document):
         except Exception:
             return None
 
+    def _last_threadable_communication(self) -> str | None:
+        """Name of the newest communication that has a message_id.
+
+        Frappe builds In-Reply-To from that field, so a communication without one
+        cannot be replied to. Portal replies sent no email and have none.
+        """
+        return frappe.db.get_value(
+            "Communication",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": str(self.name),
+                "message_id": ["is", "set"],
+            },
+            "name",
+            order_by="creation desc",
+        )
+
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
             return
@@ -717,9 +736,23 @@ class HDTicket(Document):
             }
         )
 
-        last_communication = self.get_last_communication()
-        if last_communication and last_communication.message_id:
-            communication.in_reply_to = last_communication.name
+        communication.in_reply_to = self._last_threadable_communication()
+
+        # Each reply needs its own id so the next reply can point at it. Saved after
+        # the send below, not here.
+        should_send_email = not skip_email_workflow and frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        message_id = None
+        if should_send_email:
+            # fail before writing anything we would have to undo
+            if not sender_email:
+                frappe.throw(
+                    _(
+                        "Unable to send email. Please setup default outgoing email account."
+                    )
+                )
+            message_id = get_string_between("<", get_message_id(), ">")
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -732,15 +765,8 @@ class HDTicket(Document):
             self.attach_file_with_doc("HD Ticket", self.name, file_url)
             _attachments.append({"file_url": file_url})
 
-        if skip_email_workflow or not frappe.db.get_single_value(
-            "HD Settings", "enable_reply_email_via_agent"
-        ):
+        if not should_send_email:
             return
-
-        if not sender_email:
-            frappe.throw(
-                _("Unable to send email. Please setup default outgoing email account.")
-            )
 
         message = self.parse_content(message)
 
@@ -768,7 +794,7 @@ class HDTicket(Document):
             send_now = True
 
         try:
-            frappe.sendmail(
+            queued_email = frappe.sendmail(
                 attachments=_attachments,
                 bcc=bcc,
                 cc=cc,
@@ -785,10 +811,16 @@ class HDTicket(Document):
                 sender=reply_to_email,
                 subject=subject,
                 with_container=False,
-                in_reply_to=last_communication.name if last_communication else None,
+                in_reply_to=communication.in_reply_to,
+                message_id=message_id,
             )
         except Exception as e:
             frappe.throw(str(e))
+
+        # Save the id now that a mail is queued carrying it. A reply we could not hand
+        # off keeps no id, so it can never become the next reply's parent.
+        if queued_email:
+            communication.db_set("message_id", message_id)
 
     @frappe.whitelist()
     # flake8: noqa
@@ -928,27 +960,72 @@ class HDTicket(Document):
         self.add_seen()
         clear_notifications(ticket=self.name)
 
+    def is_valid_status_transition(self) -> bool:
+        """Closing an already-resolved ticket wraps up an outcome, it is not a new one."""
+        if self.is_new() or not self.has_value_changed("status"):
+            return False
+        if self.status != "Closed":
+            return True
+        previous = self.get_doc_before_save()
+        return not previous or previous.status_category != "Resolved"
+
+    def set_resolution_date(self):
+        """Stamp when the ticket was resolved. Runs for every ticket, with or
+        without an SLA, since it is what resolution analytics bucket by."""
+        if not self.is_valid_status_transition():
+            return
+
+        if self.status_category != "Resolved":
+            self.resolution_date = None
+            self.resolution_time = None  # apply_sla() won't run to clear it if no SLA is attached, so clear it here
+            return
+        if self.resolution_date and not self.has_value_changed("status_category"):
+            return
+        self.resolution_date = now_datetime()
+
     def set_sla(self):
         """
         Find an SLA to apply to this ticket.
+
+        If no SLA is found, clear the SLA fields. If an SLA is found, set the SLA field
         """
         if sla := get_sla(self):
             self.sla = sla.name
+        else:
+            self.clear_sla_fields()
+
+    def clear_sla_fields(self):
+        """If no sla is found, clear the sla fields. The clock start is kept, so
+        flapping a condition off and on buys no time."""
+        self.sla = None
+        self.response_by = None
+        self.resolution_by = None
+        if self.status_category != "Paused":
+            self.on_hold_since = (
+                None  # else the detached window is added into the hold time.
+            )
+        if self.agreement_status != "Failed":
+            self.agreement_status = None
 
     def apply_sla(self):
         """
         Apply SLA if set.
         """
-        if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
+        if sla := self.get_sla():
             sla.apply(self)
 
     def get_sla(self):
-        return frappe.get_doc("HD Service Level Agreement", {"name": self.sla})
+        if not self.sla:
+            return None
+        return frappe.get_doc("HD Service Level Agreement", self.sla)
 
     def is_currently_outside_working_hours(self):
         """Return True if current time is outside this SLA's working hours."""
 
         sla = self.get_sla()
+        if not sla:
+            return False
+
         current_date = getdate()
         now = now_datetime()
 
@@ -1274,10 +1351,12 @@ class HDTicket(Document):
             comment.extract()
 
         for tag in soup.find_all(["img", "video"]):
-            if tag.name == "img":
-                tag["embed"] = tag.get("src")
-            elif tag.name == "video":
-                tag["embed"] = tag.get("src")
+            src = tag.get("src")
+            # only site files can be embedded; external URLs must keep their src
+            if not src or not src.startswith(("/private/files/", "/files/")):
+                continue
+            tag["embed"] = src
+            del tag["src"]
 
         return str(soup)
 
@@ -1328,13 +1407,13 @@ def _agent_has_permission(doc, user: str) -> bool:
         except (ValueError, TypeError):
             return False
 
-    teams = get_agents_team()
+    teams = get_agents_team(user)
     if any(team.get("ignore_restrictions") for team in teams):
         return True
 
     team_names = [t.team_name for t in teams]
     is_team_member = frappe.db.exists(
-        "HD Team Member", {"parent": ["in", team_names], "user": frappe.session.user}
+        "HD Team Member", {"parent": ["in", team_names], "user": user}
     )
     return bool(is_team_member) and doc.get("agent_group") in team_names
 
@@ -1372,7 +1451,7 @@ def _agent_query(user: str) -> str | None:
         query += " OR (`tabHD Ticket`.agent_group is null OR `tabHD Ticket`.agent_group = '')"
 
     # An agent on a team with `ignore_restrictions` set can see every team's tickets.
-    teams = get_agents_team()
+    teams = get_agents_team(user)
     if any(team.get("ignore_restrictions") for team in teams):
         all_teams = frappe.get_all("HD Team", pluck="name")
         if not all_teams:

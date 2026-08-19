@@ -7,7 +7,7 @@ export interface SLAMetric {
   state: SLAState;
   /** Short display value, e.g. "2d 4h", "Overdue by 59m", "On Hold" */
   value: string;
-  color: "orange" | "green" | "red" | "blue" | "purple";
+  color: "orange" | "green" | "red" | "blue" | "violet";
   /** Empty when the SLA target was never set or was cleared on pause */
   dueBy: string;
   /** When the SLA was actually met: first_responded_on / resolution_date */
@@ -26,6 +26,28 @@ interface TicketLike {
   doc?: Record<string, any>;
 }
 
+const inkClasses: Record<SLAMetric["color"], string> = {
+  orange: "text-ink-amber-8",
+  green: "text-ink-green-8",
+  red: "text-ink-red-7",
+  blue: "text-ink-blue-8",
+  violet: "text-ink-violet-8",
+};
+
+// "Due" is the resting state of every open ticket, so it stays gray; colour
+// only appears when something changed (fulfilled, overdue, failed, hold).
+export function slaTextColor(metric: SLAMetric): string {
+  return metric.state === "due" ? "text-ink-gray-7" : inkClasses[metric.color];
+}
+
+/** Display text, e.g. "Fulfilled in 3h 20m", "Due in 2d 4h", "On Hold" */
+export function slaLabel(metric: SLAMetric): string {
+  if (metric.state !== "fulfilled") return metric.value;
+  return metric.fulfilledIn
+    ? `Fulfilled in ${metric.fulfilledIn}`
+    : "Fulfilled";
+}
+
 export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   firstResponse: ComputedRef<SLAMetric | null>;
   resolution: ComputedRef<SLAMetric | null>;
@@ -37,9 +59,10 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   // - responded after due -> failed
   // - not responded, due in future -> due
   // - not responded, due in past -> overdue
-  // - no target and no response -> null (ticket has no SLA, card hidden)
+  // - no policy -> null (card hidden), whether it never had one or was detached
   const firstResponse = computed<SLAMetric | null>(() => {
     const d = doc.value;
+    if (!d.sla) return null; // nothing promised, so nothing to report against
 
     if (d.first_responded_on) {
       const inTime =
@@ -96,6 +119,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   //   empty target while paused still means hold, not "no SLA")
   const resolution = computed<SLAMetric | null>(() => {
     const d = doc.value;
+    if (!d.sla) return null;
 
     const pausedBeforeBreach =
       !d.resolution_by ||
@@ -145,7 +169,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
       return metric(
         "due",
         `Due in ${coarseDuration(d.resolution_by)}`,
-        "purple",
+        "violet",
         { dueBy: d.resolution_by }
       );
     }

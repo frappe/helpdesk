@@ -15,6 +15,8 @@ from helpdesk.utils import (
     parse_call_logs,
 )
 
+SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
+
 
 @frappe.whitelist()
 def get_list_data(
@@ -113,6 +115,9 @@ def get_list_data(
     rows.append("name") if "name" not in rows else rows
     if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
+        # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
+        for field in SLA_ROW_FIELDS:
+            rows.append(field) if field not in rows else rows
     data = (
         frappe.get_list(
             doctype,

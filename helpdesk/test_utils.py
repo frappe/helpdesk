@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.consts import DEFAULT_SLA
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
 
@@ -114,14 +115,43 @@ def make_holiday_list():
         ).insert()
 
 
-def make_sla(sla_name: str = "Test SLA", condition: str = ""):
-    def_sla = frappe.get_doc("HD Service Level Agreement", "Default")
+def make_sla(
+    sla_name: str = "Test SLA",
+    condition: str = "",
+    rank: int = 0,
+    priorities: list[str] | None = None,
+):
+    """Copy the seeded SLA. `priorities` replaces its priority rows, the
+    first becoming the default priority, each row slower than the one before."""
+    def_sla = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
     sla_doc = frappe.copy_doc(def_sla)
     sla_doc.service_level = sla_name
     sla_doc.condition = condition
     sla_doc.default_sla = 0
+    sla_doc.rank = rank
+    if priorities:
+        sla_doc.priorities = []
+        for index, priority in enumerate(priorities):
+            sla_doc.append(
+                "priorities",
+                {
+                    "priority": priority,
+                    "default_priority": index == 0,
+                    "response_time": 60 * 60 * (index + 1),
+                    "resolution_time": 60 * 60 * 4 * (index + 1),
+                },
+            )
     sla_doc.insert(ignore_if_duplicate=True, ignore_permissions=True)
     return sla_doc
+
+
+def make_priority(name: str):
+    """Create an HD Ticket Priority. It is not added to any SLA."""
+    if frappe.db.exists("HD Ticket Priority", name):
+        return frappe.get_doc("HD Ticket Priority", name)
+    return frappe.get_doc({"doctype": "HD Ticket Priority", "name": name}).insert(
+        ignore_permissions=True
+    )
 
 
 def make_ticket(
@@ -293,6 +323,19 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
+def set_agent_status_enabled(status: str, enable: bool | int):
+    """Toggle an HD Agent Status, bypassing its own at-least-one-Active validation."""
+    frappe.db.set_value("HD Agent Status", status, "enable", int(enable))
+
+
+def set_agent_availability(user: str, availability: str | None):
+    """Set an agent's availability through the document lifecycle."""
+    agent = frappe.get_doc("HD Agent", {"user": user})
+    agent.availability = availability
+    agent.save(ignore_permissions=True)
+    return agent
+
+
 def get_latest_ticket_communication(ticket_name: str):
     """
     Returns the latest Communication doc linked to the given HD Ticket.
@@ -309,6 +352,30 @@ def get_latest_ticket_communication(ticket_name: str):
     if not name:
         return None
     return frappe.get_doc("Communication", name[0])
+
+
+def add_message(
+    ticket: str, direction: str, sender: str, subject: str = "Test message"
+) -> None:
+    """Insert a Communication on a ticket at the current (possibly frozen) time."""
+    frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": direction,
+            "sender": sender,
+            "subject": subject,
+            "content": subject,
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+        }
+    ).insert(ignore_permissions=True)
+
+
+def timeline_node(result: dict, key: str) -> dict | None:
+    """The milestone with the given key from a ticket analytics response."""
+    return next((n for n in result["timeline"] if n["key"] == key), None)
 
 
 def add_comment(

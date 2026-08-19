@@ -6,11 +6,10 @@
       <slot />
     </div>
     <Notifications />
-    <CommandPalette />
   </div>
 </template>
 <script setup>
-import { Notifications, CommandPalette } from "@/components";
+import { Notifications } from "@/components";
 import AppHeader from "./AppHeader.vue";
 import Sidebar from "./Sidebar.vue";
 </script>

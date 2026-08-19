@@ -1,17 +1,10 @@
 <template>
-  <Dialog
-    v-model:open="show"
-    size="4xl"
-    bare
-    @vue:unmounted="resetFilter"
-    @after-leave="onAfterLeave"
-  >
+  <Dialog v-model:open="show" size="4xl" bare @after-leave="onAfterLeave">
     <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
           <div class="text-3xl-semibold">{{ __("Saved Replies") }}</div>
           <Button
-            variant="solid"
             icon-left="lucide-plus"
             :label="__('New')"
             @click="onNewSavedReplyClick"
@@ -43,19 +36,8 @@
               />
             </div>
             <Dropdown :options="filters" placement="right">
-              <Button
-                :label="activeFilterLabel"
-                icon-left="lucide-filter"
-                class="p-4"
-              >
-                <template #suffix>
-                  <p
-                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
-                    v-if="savedReplyListResource?.data?.length"
-                  >
-                    {{ savedReplyListResource?.data?.length }}
-                  </p>
-                </template>
+              <Button :label="activeFilterLabel">
+                <template #prefix><FilterIcon class="h-4" /></template>
               </Button>
             </Dropdown>
           </div>
@@ -72,20 +54,33 @@
               !savedReplyListResource?.list?.loading &&
               savedReplyListResource?.data?.length
             "
-            class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
+            class="grid grid-cols-1 md:grid-cols-3 gap-3 pb-36"
           >
             <div
               v-for="template in savedReplyListResource?.data"
               :key="template.name"
-              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border border-outline-gray-1 bg-surface-base p-3 hover:border-outline-gray-3 relative"
               @click="onTemplateSelect(template)"
             >
-              <div class="text-base-semibold truncate border-b pb-2">
-                {{ template.title }}
+              <div class="flex items-center gap-2 border-b pb-2">
+                <div class="text-base-semibold truncate max-w-[75%]">
+                  {{ template.title }}
+                </div>
+                <Tooltip
+                  v-if="actionCounts[template.name]"
+                  :text="actionTooltip(actionCounts[template.name])"
+                >
+                  <Badge
+                    class="ms-auto shrink-0"
+                    theme="gray"
+                    variant="subtle"
+                    :label="actionLabel(actionCounts[template.name])"
+                  />
+                </Tooltip>
               </div>
               <div
                 v-if="template.message"
-                class="flex-1 overflow-hidden pointer-events-none"
+                class="flex-1 overflow-hidden pointer-events-none [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
               >
                 <Editor
                   :model-value="template.message"
@@ -94,7 +89,7 @@
                 >
                   <template #default>
                     <EditorContent
-                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                      class="max-w-none text-p-sm text-ink-gray-5 focus:outline-none"
                     />
                   </template>
                 </Editor>
@@ -104,10 +99,21 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 start-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full rounded-lg"
               >
                 <LoadingIndicator class="size-4" />
               </div>
+            </div>
+            <div class="col-span-full flex justify-center">
+              <Button
+                v-if="
+                  !savedReplyListResource.list.loading &&
+                  savedReplyListResource.hasNextPage
+                "
+                :label="__('Load More')"
+                icon-left="lucide-refresh-cw"
+                @click="savedReplyListResource.next()"
+              />
             </div>
           </div>
           <div
@@ -130,12 +136,16 @@
 </template>
 
 <script setup lang="ts">
+import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
+import { buildEditorExtensions } from "@/components/editor/config";
+import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { SavedReply } from "@/types";
+import { RenderedSavedReply, SavedReply } from "@/types";
 import { useStorage } from "@vueuse/core";
 import {
+  Badge,
   Button,
   createListResource,
   createResource,
@@ -143,16 +153,16 @@ import {
   Dropdown,
   LoadingIndicator,
   TextInput,
+  Tooltip,
 } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { buildEditorExtensions } from "@/components/editor/config";
-const extensions = buildEditorExtensions();
 import { storeToRefs } from "pinia";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, h, nextTick, ref, watch } from "vue";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "./Settings/settingsModal";
+const extensions = buildEditorExtensions();
 
 const props = defineProps({
   doctype: {
@@ -184,6 +194,14 @@ const filters = computed(() => {
     ...scope,
     selected: activeFilter.value === scope.value,
     onClick: () => (activeFilter.value = scope.value),
+    slots: {
+      suffix: () =>
+        h(
+          "span",
+          { class: "text-sm text-ink-gray-5" },
+          String(scopeCounts.data?.[scope.value] ?? 0)
+        ),
+    },
   }));
 });
 
@@ -216,7 +234,7 @@ const selectedTemplate = ref({
   name: "",
   isLoading: false,
 });
-const pendingTemplate = ref<string | null>(null);
+const pendingTemplate = ref<RenderedSavedReply | null>(null);
 
 function onAfterLeave() {
   if (pendingTemplate.value !== null) {
@@ -231,7 +249,7 @@ const scope = computed(() => {
 
 const savedReplyListResource = createListResource({
   doctype: "HD Saved Reply",
-  fields: ["name", "title", "owner", "scope", "message"],
+  fields: ["name", "title", "owner", "scope", "message", "actions"],
   filters: {
     scope: scope.value == "All" ? undefined : ["=", scope.value],
   },
@@ -239,8 +257,45 @@ const savedReplyListResource = createListResource({
   auto: true,
   orderBy: "modified desc",
   start: 0,
-  pageLength: 999,
+  pageLength: 20,
 });
+
+// One grouped query answers every scope at once, so the menu can say where the
+// replies live before an agent switches to find out
+const scopeCounts = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Saved Reply",
+    fields: ["scope", { COUNT: "name" }],
+    group_by: "scope",
+    limit_page_length: 0,
+  },
+  transform: (rows: { scope: string }[]) => {
+    const counts: Record<string, number> = { All: 0 };
+    for (const row of rows) {
+      const count = row["COUNT(`name`)"] ?? 0;
+      counts[row.scope] = count;
+      counts.All += count;
+    }
+    return counts;
+  },
+});
+
+const actionCounts = computed<Record<string, number>>(() => {
+  const counts: Record<string, number> = {};
+  for (const row of savedReplyListResource.data || []) {
+    counts[row.name] = JSON.parse(row.actions || "[]").length;
+  }
+  return counts;
+});
+
+const actionLabel = (count: number) =>
+  count === 1 ? __("1 action") : __("{0} actions", count);
+
+const actionTooltip = (count: number) =>
+  count === 1
+    ? __("Applies 1 action when sent")
+    : __("Applies {0} actions when sent", count);
 
 const onTemplateSelect = (template: SavedReply) => {
   if (selectedTemplate.value.isLoading) return;
@@ -254,7 +309,7 @@ const onTemplateSelect = (template: SavedReply) => {
       saved_reply_id: template.name,
       ticket_id: props.ticketId,
     },
-    onSuccess: (data: string) => {
+    onSuccess: (data: RenderedSavedReply) => {
       selectedTemplate.value = {
         name: "",
         isLoading: false,
@@ -263,7 +318,9 @@ const onTemplateSelect = (template: SavedReply) => {
       if (!show.value) return;
       pendingTemplate.value = data;
       show.value = false;
-      capture("saved_reply_applied");
+      // Shared with the palette: modal picks count toward its most-used rows.
+      recordSavedReplyUse(template.name, template.title);
+      capture("saved_reply_applied", { data: { source: "composer" } });
     },
   });
   renderResponse.submit().catch(() => {
@@ -280,18 +337,12 @@ const onNewSavedReplyClick = () => {
   setActiveSettingsTab("Saved Replies");
 };
 
-const resetFilter = () => {
-  savedReplyListResource.filters = {
-    ...savedReplyListResource.filters,
-    title: undefined,
-  };
-};
-
-watch(search, (newValue) => {
-  savedReplyListResource.filters = {
-    ...savedReplyListResource.filters,
-    title: ["like", `%${newValue}%`],
-  };
+// A reply is as findable by its wording as by its name, now that only a page loads
+watch(search, (query) => {
+  savedReplyListResource.orFilters = query
+    ? { title: ["like", `%${query}%`], message: ["like", `%${query}%`] }
+    : undefined;
+  savedReplyListResource.start = 0;
   savedReplyListResource.list.reload();
 });
 
@@ -300,18 +351,25 @@ watch(activeFilter, () => {
     ...savedReplyListResource?.filters,
     scope: scope.value == "All" ? undefined : ["=", scope.value],
   };
+  savedReplyListResource.start = 0;
   savedReplyListResource.list.reload();
 });
 
 watch(
   show,
   (newValue) => {
-    if (newValue) {
-      nextTick(() => {
-        const inputEl = searchInput.value?.$el?.querySelector("input");
-        inputEl?.focus();
-      });
+    if (!newValue) return;
+    if (search.value) {
+      search.value = "";
+    } else {
+      savedReplyListResource.list.reload();
     }
+    // Counts don't move with the selected scope, so this is the only refetch
+    scopeCounts.reload();
+    nextTick(() => {
+      const inputEl = searchInput.value?.$el?.querySelector("input");
+      inputEl?.focus();
+    });
   },
   { immediate: true }
 );

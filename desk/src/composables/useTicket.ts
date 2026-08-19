@@ -1,3 +1,4 @@
+import type { TicketAnalytics } from "@/components/ticket-agent/analytics/types";
 import { __ } from "@/translation";
 import type {
   DocumentResource,
@@ -17,6 +18,7 @@ interface MapValue {
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
   activities: Resource<TicketActivities>;
+  analytics: Resource<TicketAnalytics>;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});
@@ -92,6 +94,12 @@ export const useTicket = (ticketId: string | number): MapValue => {
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_activities",
         params: { ticket: mapKey },
         auto: true,
+      }),
+      // fetched by the analytics tab, not on ticket open
+      analytics: createResource({
+        url: "helpdesk.api.ticket_analytics.get_ticket_analytics",
+        params: { ticket: ticketId },
+        cache: ["Ticket", ticketId, "analytics"],
       }),
     };
   }

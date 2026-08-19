@@ -111,6 +111,30 @@
                 <h3 class="px-6 pt-3 font-semibold text-base">
                   <!-- Ticket Fields -->
 
+                <!-- SLA Section, hidden when no policy is attached -->
+                <template v-if="ticket.doc?.sla">
+                  <h3 class="px-6 pt-3 text-base-semibold">
+                    {{ __("SLA") }}
+                  </h3>
+                  <div class="px-6 py-3">
+                    <TicketSLA />
+                  </div>
+                </template>
+                <div
+                  class="flex items-center border-b px-6 py-3 text-base leading-5"
+                >
+                  <div class="w-[126px] text-sm text-ink-gray-5">
+                    {{ __("Source") }}
+                  </div>
+                  <div>
+                    {{
+                      ticket.doc?.via_customer_portal
+                        ? __("Portal")
+                        : __("Mail")
+                    }}
+                  </div>
+                </div>
+
                 <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 text-base-semibold">
 
@@ -243,7 +267,7 @@ import { TicketAgentActivities } from "@/components/ticket";
 import CustomActions from "@/components/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
-import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
+import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import {
   parseField,
