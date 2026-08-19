@@ -79,17 +79,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
     {
       name: "activity",
-      label: "Activity",
+      label: __("Activity"),
       icon: ActivityIcon,
     },
     {
       name: "email",
-      label: "Emails",
+      label: __("Emails"),
       icon: EmailIcon,
     },
     {
       name: "comment",
-      label: "Comments",
+      label: __("Comments"),
       icon: CommentIcon,
     },
   ];
@@ -97,7 +97,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   if (isCallingEnabled.value) {
     _tabs.push({
       name: "call",
-      label: "Calls",
+      label: __("Calls"),
       icon: PhoneIcon,
     });
   }
@@ -167,7 +167,7 @@ const _activities = computed(() => {
     return {
       type: "history",
       key: h.creation,
-      content: h.action ? h.action : "viewed this",
+      content: h.action ? h.action : __("viewed this"),
       creation: h.creation,
       user: h.user.name + " ",
     };
