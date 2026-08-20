@@ -81,48 +81,54 @@
       <AssigneeSearch @addAssignee="validateAssignmentRule('users')" />
     </div>
     <div class="mt-4 flex flex-wrap gap-2">
-      <div
+      <Button
         v-for="user in users"
         :key="user.name"
-        class="flex items-center gap-2 text-sm bg-surface-gray-2 rounded-md p-1 w-max px-2 select-none"
+        variant="outline"
+        size="sm"
+        :label="user.full_name"
       >
-        <Avatar :image="user.user_image" :label="user.full_name" size="sm" />
-        <div class="text-ink-gray-7">
-          {{ user.full_name }}
-        </div>
-        <Tooltip
-          v-if="user.email == assignmentRuleData.lastUser"
-          :text="__('Last user assigned by this rule')"
-          :hover-delay="0.35"
-          :placement="'top'"
-        >
-          <div
-            class="text-xs rounded-full select-none bg-surface-blue-3 text-ink-base p-0.5 px-2"
+        <template #prefix>
+          <Avatar :image="user.user_image" :label="user.full_name" size="sm" />
+        </template>
+        <template #suffix>
+          <Tooltip
+            v-if="user.email == assignmentRuleData.lastUser"
+            :text="__('Last user assigned by this rule')"
+            :hover-delay="0.35"
+            placement="top"
           >
-            {{ __("Last") }}
-          </div>
-        </Tooltip>
-        <Button
-          variant="ghost"
-          icon="lucide-x"
-          @click="removeAssignedUser(user)"
-        />
-      </div>
+            <Badge theme="blue" variant="solid" :label="__('Last')" />
+          </Tooltip>
+          <LucideX
+            class="size-4 text-ink-gray-4 transition-colors hover:text-ink-gray-7"
+            @click.stop="removeAssignedUser(user)"
+          />
+        </template>
+      </Button>
     </div>
     <ErrorMessage :message="assignmentRulesErrors.users" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Avatar, Button, ErrorMessage, Popover, Tooltip } from "frappe-ui";
 import {
   assignmentRuleData,
   assignmentRulesErrors,
   validateAssignmentRule,
 } from "@/stores/assignmentRules";
-import AssigneeSearch from "./AssigneeSearch.vue";
-import { computed } from "vue";
 import { useUserStore } from "@/stores/user";
+import {
+  Avatar,
+  Badge,
+  Button,
+  ErrorMessage,
+  Popover,
+  Tooltip,
+} from "frappe-ui";
+import LucideX from "~icons/lucide/x";
+import { computed } from "vue";
+import AssigneeSearch from "./AssigneeSearch.vue";
 
 const { getUser } = useUserStore();
 

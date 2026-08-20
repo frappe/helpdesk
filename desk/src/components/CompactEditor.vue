@@ -10,7 +10,7 @@
       <template #default>
         <EditorBubbleMenu :items="commentToolbar" />
         <div
-          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-[--surface-gray-2] px-1 py-1"
+          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-outline-gray-1 bg-surface-gray-1 px-1 py-1"
         >
           <div
             v-if="showAttachments"
@@ -80,7 +80,6 @@ const props = withDefaults(
     maxHeight?: string;
     extensions?: any[];
     showSignature?: boolean;
-    type?: "Saved Reply" | "Email";
     showAttachments?: boolean;
     uploadFn?: UploadFunction;
   }>(),
@@ -90,7 +89,6 @@ const props = withDefaults(
     maxHeight: "max-h-80",
     extensions: () => [],
     showSignature: false,
-    type: "Saved Reply",
     showAttachments: false,
   }
 );
@@ -105,25 +103,14 @@ const isUploading = ref(false);
 
 const extensions = buildEditorExtensions({ extra: props.extensions });
 
-const savedReplyClass = [
+const contentClass = [
   "!prose-sm max-w-full overflow-auto py-1.5 px-3",
-  "rounded-b border border-[--surface-gray-2] bg-surface-gray-2",
-  "placeholder-ink-gray-4",
-  "hover:border-outline-elevation-2 hover:shadow-sm",
-  "focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0",
-  "focus-visible:ring-2 focus-visible:ring-outline-gray-3",
-  "text-ink-gray-8 transition-colors -mt-0.5",
-];
-
-const emailClass = [
-  "!prose-sm max-w-full overflow-auto py-1.5 px-3",
-  "rounded-b border border-[--surface-gray-2] bg-surface-base",
-  "placeholder-ink-gray-4",
-  "text-ink-gray-8 transition-colors -mt-0.5",
+  "rounded-b border border-outline-gray-1 bg-surface-base",
+  "placeholder-ink-gray-4 text-ink-gray-8 -mt-0.5",
 ];
 
 const editorClass = computed(() => [
-  ...(props.type === "Email" ? emailClass : savedReplyClass),
+  ...contentClass,
   props.minHeight,
   props.maxHeight,
 ]);
