@@ -1,6 +1,5 @@
 import json
 import uuid
-from datetime import timedelta
 from email.utils import parseaddr
 
 import frappe
@@ -12,8 +11,12 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
+<<<<<<< HEAD
 from frappe.query_builder import DocType, Order
 from frappe.utils import add_to_date, cint, getdate, now_datetime
+=======
+from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
+>>>>>>> 54e4587 (fix: consider holidays for outside working hours banner)
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -942,9 +945,9 @@ class HDTicket(Document):
         return frappe.get_doc("HD Service Level Agreement", {"name": self.sla})
 
     def is_currently_outside_working_hours(self):
-        """Return True if current time is outside this SLA's working hours."""
-
+        """Return True if today is a holiday or now is outside this SLA's working hours."""
         sla = self.get_sla()
+<<<<<<< HEAD
         current_date = getdate()
         now = now_datetime()
 
@@ -967,19 +970,13 @@ class HDTicket(Document):
         )
 
         if current_date in holidays:
+=======
+        if not sla:
+            return False
+        if getdate() in sla.get_holidays():
+>>>>>>> 54e4587 (fix: consider holidays for outside working hours banner)
             return True
-
-        working_hours = sla.get_working_hours()
-        # No working hours today
-        if day_name not in working_hours:
-            return True
-
-        start_time, end_time = working_hours[day_name]
-
-        # Outside working hours
-        if not (start_time <= current_td < end_time):
-            return True
-        return False
+        return not sla.is_working_time(now_datetime(), sla.get_working_hours())
 
     def set_default_status(self):
         if self.is_new():
