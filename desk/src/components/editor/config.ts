@@ -1,31 +1,35 @@
 import {
-  RichTextKit,
-  Paragraph,
-  HeadingGroup,
-  Separator,
+  CleanStyles,
+  ComponentUtils,
+  HandleExcelPaste,
+} from "@/tiptap-extensions";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Blockquote,
   Bold,
-  Italic,
-  Strike,
+  BulletList,
   FontColor,
   FontHighlight,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  BulletList,
-  OrderedList,
-  Blockquote,
-  InlineCode,
-  InsertLink,
-  InsertImage,
-  InsertVideo,
-  InsertTable,
+  HeadingGroup,
   HorizontalRule,
+  InlineCode,
+  InsertImage,
+  InsertLink,
+  InsertTable,
+  InsertVideo,
+  Italic,
+  OrderedList,
+  Paragraph,
+  RichTextKit,
+  Separator,
+  Strike,
   commentToolbar,
-  type MenuItem,
   type CommandMenuItem,
+  type MenuItem,
 } from "frappe-ui/editor";
 import type { MaybeRefOrGetter } from "vue";
-import { CleanStyles, ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
 
 /** A mentionable agent as the new editor expects it: `{ id, label }`. */
 export interface MentionItem {
@@ -39,10 +43,12 @@ export interface MentionItem {
  * Mentions are passed as a reactive getter so the `@` list stays in sync as
  * agents load (the v0 `:mentions` snapshot prop is what broke suggestions).
  */
-export function buildEditorExtensions(options: {
-  mentions?: MaybeRefOrGetter<MentionItem[]>;
-  extra?: unknown[];
-} = {}) {
+export function buildEditorExtensions(
+  options: {
+    mentions?: MaybeRefOrGetter<MentionItem[]>;
+    extra?: unknown[];
+  } = {}
+) {
   const kit = RichTextKit.configure({
     heading: { levels: [2, 3, 4, 5, 6] },
     ...(options.mentions ? { mention: { items: options.mentions } } : {}),
@@ -64,6 +70,14 @@ export const ClearFormatting: CommandMenuItem = {
     editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run(),
 };
 
+/** Code block button; frappe-ui ships the node but no toolbar item for it. */
+export const InsertCodeBlock: CommandMenuItem = {
+  label: "Code block",
+  icon: "lucide-square-code",
+  isActive: (editor) => editor.isActive("codeBlock"),
+  action: (editor) => editor.chain().focus().toggleCodeBlock().run(),
+};
+
 /** Full toolbar mirroring the v0 `textEditorMenuButtons`. */
 export const fullToolbar: MenuItem[] = [
   HeadingGroup,
@@ -82,6 +96,7 @@ export const fullToolbar: MenuItem[] = [
   OrderedList,
   Blockquote,
   InlineCode,
+  InsertCodeBlock,
   Separator,
   InsertLink,
   InsertImage,
