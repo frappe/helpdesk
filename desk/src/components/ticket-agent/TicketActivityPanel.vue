@@ -215,7 +215,7 @@ const _activities = computed(() => {
         if (
           nextActivity &&
           nextActivity.user === currentActivity.user &&
-          nextActivity.content !== "viewed this" &&
+          nextActivity.content !== __("viewed this") &&
           !nextActivity.content.includes("assigned") &&
           !nextActivity.content.includes("unassigned")
         ) {
