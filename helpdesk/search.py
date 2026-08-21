@@ -28,6 +28,7 @@ from redis.exceptions import ResponseError
 from helpdesk.search_i18n import (
     cjk_index_terms,
     expand_cjk_query,
+    indexed_field_names,
     normalize_search_text,
 )
 
@@ -202,14 +203,26 @@ class Search:
             num += self.get_count(doctype)
         return num
 
+    def index_fields(self) -> set[str]:
+        """Field names declared in this class's schema."""
+        return {f["name"] for f in self.schema if isinstance(f, dict) and f.get("name")}
+
     def index_exists(self):
         if hasattr(self, "_index_exists"):
             return self._index_exists
         self._index_exists = False
         with suppress(ResponseError):
             ftinfo = self.redis.ft(self.index_name).info()
-            if isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
-                self._index_exists = True
+            if not isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
+                return self._index_exists
+            # The document count alone cannot tell us whether the index was built
+            # from the current schema. An index created before a field was added
+            # has the right number of documents but cannot serve queries against
+            # the new field, so treat it as missing and let it be rebuilt.
+            existing = indexed_field_names(ftinfo.get("attributes"))
+            if existing and not self.index_fields() <= existing:
+                return self._index_exists
+            self._index_exists = True
         return self._index_exists
 
 

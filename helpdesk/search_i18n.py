@@ -61,3 +61,30 @@ def expand_cjk_query(text: str | None) -> str:
         return f" {' '.join(cjk_ngrams(run, sizes=(3,)))} "
 
     return WHITESPACE_RE.sub(" ", CJK_RUN_RE.sub(expand, normalized)).strip()
+
+
+def indexed_field_names(attributes) -> set[str]:
+    """Field names present in an existing RediSearch index.
+
+    FT.INFO reports attributes either as flat lists
+    (``["identifier", "title", "attribute", "title", "type", "TEXT", ...]``)
+    or as mappings, depending on the server and client version. Returning an
+    empty set means "could not tell", and callers should not treat that as
+    proof that a field is missing.
+    """
+    names = set()
+    for attr in attributes or []:
+        if isinstance(attr, dict):
+            name = attr.get("identifier") or attr.get("attribute")
+            if name:
+                names.add(name.decode() if isinstance(name, bytes) else str(name))
+            continue
+        if isinstance(attr, (list, tuple)):
+            values = [v.decode() if isinstance(v, bytes) else str(v) for v in attr]
+            if "identifier" in values:
+                idx = values.index("identifier") + 1
+                if idx < len(values):
+                    names.add(values[idx])
+            elif values:
+                names.add(values[0])
+    return names

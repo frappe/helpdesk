@@ -3,6 +3,7 @@ import unittest
 
 from helpdesk.search_i18n import (
     cjk_index_terms,
+    indexed_field_names,
     cjk_ngrams,
     contains_cjk,
     expand_cjk_query,
@@ -52,6 +53,48 @@ class TestJapaneseSearch(unittest.TestCase):
                 "SELECT COUNT(*) FROM documents WHERE documents MATCH ?", (fts_query,)
             ).fetchone()[0]
             self.assertEqual(count, 1, query)
+
+
+class TestIndexFieldDetection(unittest.TestCase):
+    """An index built before `cjk_terms` existed must be detected as stale.
+
+    FT.INFO only reports the document count, which stays correct across schema
+    changes; without looking at the attributes an upgraded site keeps serving
+    an index that cannot match CJK queries.
+    """
+
+    def test_flat_attributes_with_identifier(self):
+        attributes = [
+            ["identifier", "subject", "attribute", "subject", "type", "TEXT"],
+            ["identifier", "description", "attribute", "description", "type", "TEXT"],
+        ]
+        self.assertEqual(
+            indexed_field_names(attributes), {"subject", "description"}
+        )
+
+    def test_bytes_and_mapping_attributes(self):
+        attributes = [
+            [b"identifier", b"subject", b"type", b"TEXT"],
+            {"identifier": "cjk_terms", "type": "TEXT"},
+        ]
+        self.assertEqual(indexed_field_names(attributes), {"subject", "cjk_terms"})
+
+    def test_legacy_flat_attributes_without_identifier(self):
+        self.assertEqual(
+            indexed_field_names([["subject", "type", "TEXT"]]), {"subject"}
+        )
+
+    def test_missing_field_is_visible(self):
+        old_index = indexed_field_names(
+            [["identifier", "subject"], ["identifier", "description"]]
+        )
+        wanted = {"subject", "description", "cjk_terms"}
+        self.assertFalse(wanted <= old_index)
+
+    def test_unknown_shape_returns_empty(self):
+        # Empty means "cannot tell"; callers must not rebuild on that basis.
+        self.assertEqual(indexed_field_names(None), set())
+        self.assertEqual(indexed_field_names([42]), set())
 
 
 if __name__ == "__main__":
