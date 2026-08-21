@@ -1,11 +1,10 @@
-import re
-
 import frappe
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
+from helpdesk.search_i18n import contains_cjk, normalize_search_text
 
 
 def get_nouns(blob: TextBlob):
@@ -34,11 +33,7 @@ def search_with_enough_results(
 
 
 def sanitize_query(query: str) -> str:
-    q = query.strip().lower()
-    q = re.sub(r"[^a-z0-9\s]", " ", q)
-    # Collapse multiple spaces into one
-    q = re.sub(r"\s+", " ", q)
-    return q.strip()
+    return normalize_search_text(query)
 
 
 @frappe.whitelist()
@@ -71,8 +66,10 @@ def get_article_stats(article_name: str):
 @frappe.whitelist()
 def search(query: str) -> list:
     query = sanitize_query(query)
+    if not query:
+        return []
     ret, enough = search_with_enough_results([], query)
-    if enough:
+    if enough or contains_cjk(query):
         return ret
     blob = TextBlob(query)  # fallback
     if noun_phrases := get_noun_phrases(blob):

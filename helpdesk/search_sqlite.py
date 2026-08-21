@@ -4,6 +4,13 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch, SQLiteSearchIndexMissingError
 
+from helpdesk.search_i18n import (
+    cjk_index_terms,
+    contains_cjk,
+    expand_cjk_query,
+    normalize_search_text,
+)
+
 
 class HelpdeskSearchIndexMissingError(SQLiteSearchIndexMissingError):
     pass
@@ -16,12 +23,14 @@ PREFILTER_LIMIT = 500
 
 
 class HelpdeskSearch(SQLiteSearch):
-    INDEX_NAME = "helpdesk_search.db"
+    # Bumped so existing sites rebuild the index with the CJK terms column.
+    INDEX_NAME = "helpdesk_search_v2.db"
 
     # Resting value: core search() can bail before get_search_filters() runs.
     is_post_filter_required = False
 
     INDEX_SCHEMA = {
+        "text_fields": ["title", "content", "cjk_terms"],
         "metadata_fields": [
             "agent_group",
             "customer",
@@ -74,7 +83,26 @@ class HelpdeskSearch(SQLiteSearch):
     }
 
     def search(self, query, title_only: bool = False, filters: dict | None = None):
-        result = super().search(query, title_only=title_only, filters=filters)
+        japanese_title_search = title_only and contains_cjk(query)
+        result = super().search(
+            query,
+            # Japanese substring terms live in the hidden n-gram field.
+            title_only=False if japanese_title_search else title_only,
+            filters=filters,
+        )
+        if japanese_title_search:
+            query_parts = normalize_search_text(query).split()
+            result["results"] = [
+                row
+                for row in result["results"]
+                if all(
+                    part in normalize_search_text(row.get("title", ""))
+                    for part in query_parts
+                )
+            ]
+            result["summary"]["title_only"] = True
+            result["summary"]["filtered_matches"] = len(result["results"])
+            result["summary"]["returned_matches"] = len(result["results"])
         if self.is_post_filter_required:
             result["results"] = self._drop_unpermitted(result["results"])
             result["summary"]["filtered_matches"] = len(result["results"])
@@ -126,6 +154,10 @@ class HelpdeskSearch(SQLiteSearch):
         if not document:
             return None
 
+        document["cjk_terms"] = cjk_index_terms(
+            " ".join((document.get("title", ""), document.get("content", "")))
+        )
+
         if (
             doc.doctype == "HD Ticket Comment"
             and doc.reference_ticket
@@ -155,6 +187,17 @@ class HelpdeskSearch(SQLiteSearch):
             document["owner"] = doc.sender
 
         return document
+
+    def _expand_query_with_corrections(self, query):
+        # Expand Japanese before spelling correction; 2-3 character terms are
+        # intentionally left untouched by Frappe's English-oriented corrector.
+        return super()._expand_query_with_corrections(expand_cjk_query(query))
+
+    def _process_search_results(self, raw_results, query):
+        results = super()._process_search_results(raw_results, query)
+        for result in results:
+            result.pop("cjk_terms", None)
+        return results
 
     def get_filter_options(self):
         """Get available filter options for search interface."""
