@@ -1396,14 +1396,13 @@ def permission_query(user: str | None = None):
 def _customer_query(user: str) -> str:
     """Non-agents see their own tickets, plus all tickets of customers they manage."""
     query = _get_base_visibility(user)
-    managed_customers = _get_managed_customers(user)
-    if managed_customers:
-        query += " OR " + _build_in_clause("customer", managed_customers)
+    query = _add_managed_customer_visibility(query, user)
     return query
 
 
 def _agent_query(user: str) -> str | None:
     query = _get_base_visibility(user)
+    query = _add_managed_customer_visibility(query, user)
 
     if not frappe.db.get_single_value("HD Settings", "restrict_tickets_by_agent_group"):
         return  # Restrictions disabled, return all tickets
@@ -1448,6 +1447,13 @@ def _get_managed_customers(user: str) -> list[str]:
         for c in get_customers(user, get_roles=True)
         if c.get("is_manager")
     ]
+
+
+def _add_managed_customer_visibility(query: str, user: str) -> str:
+    managed_customers = _get_managed_customers(user)
+    if managed_customers:
+        query += " OR " + _build_in_clause("customer", managed_customers)
+    return query
 
 
 def _build_in_clause(field: str, values: list[str]) -> str:
