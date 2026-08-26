@@ -36,6 +36,7 @@ def new(doc: dict, attachments: list[dict] = []):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
@@ -552,6 +553,7 @@ def duplicate_ticket(ticket_doc, subject):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_ticket_customizations():
     # get form script
@@ -567,6 +569,7 @@ def get_ticket_customizations():
 
 
 @frappe.whitelist()
+@frappe.read_only()
 # TODO: make it bette, on mount fetch only once and cache it
 def get_navigation_tickets(ticket: str, current_view: str | None = None):
     """
@@ -654,6 +657,7 @@ def get_navigation_order_by(view):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_contact(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
@@ -680,6 +684,7 @@ def get_ticket_contact(ticket: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_recent_similar_tickets(ticket: str):
     frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
@@ -735,6 +740,7 @@ def get_recent_tickets(ticket: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_activities(ticket: str):
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
@@ -748,6 +754,7 @@ def get_ticket_activities(ticket: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_ticket_assignees(ticket: str) -> list[dict]:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     assignee_names = json.loads(
@@ -784,6 +791,7 @@ def show_banner_next_day(ticket):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def show_outside_hours_banner(ticket_name: str):
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"

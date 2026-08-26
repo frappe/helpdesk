@@ -22,6 +22,7 @@ def mark_persona_captured(brand_name: str | None = None) -> None:
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_manager_only
 def get_welcome_ticket() -> str | None:
     """Name of the seeded welcome ticket, if it still exists."""
@@ -29,6 +30,7 @@ def get_welcome_ticket() -> str | None:
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_first_ticket(ticket: str | None = None):
     """Get first ticket created except the default ticket"""
     # If a cached ticket ID was passed, verify it still exists
@@ -49,6 +51,7 @@ def get_first_ticket(ticket: str | None = None):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_general_category_id():
     """Get the id of the general category"""
     category = frappe.get_all(

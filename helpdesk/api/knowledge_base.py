@@ -8,6 +8,7 @@ from helpdesk.utils import is_agent
 
 
 @frappe.whitelist(allow_guest=True)
+@frappe.read_only()
 def get_article(name: str):
     article = frappe.get_doc("HD Article", name).as_dict()
 
@@ -87,6 +88,7 @@ def move_to_category(category: str, articles: list[str]):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_categories():
     categories = frappe.get_list(
         "HD Article Category",
@@ -103,6 +105,7 @@ def get_categories():
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_category_articles(category: str):
     articles = frappe.get_list(
         "HD Article",
@@ -140,6 +143,7 @@ def merge_category(source: str, target: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_general_category():
     return frappe.db.get_value(
         "HD Article Category", {"category_name": "General"}, "name"
@@ -147,6 +151,7 @@ def get_general_category():
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_category_title(category: str):
     return frappe.db.get_value("HD Article Category", category, "category_name")
 

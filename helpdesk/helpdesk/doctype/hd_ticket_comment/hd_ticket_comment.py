@@ -104,6 +104,7 @@ def toggle_reaction(comment: str, emoji: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_reactions(comment: str):
     if not frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
         return []
@@ -187,5 +188,6 @@ def notify_reaction(doc, emoji, user):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_preset_emojis():
     return PRESET_EMOJIS

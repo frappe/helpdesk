@@ -94,6 +94,7 @@ def get_reply_via_agent_data():
 
 
 @frappe.whitelist(methods=["GET"])
+@frappe.read_only()
 def get_data(notification: str):
     only_for_managers()
 

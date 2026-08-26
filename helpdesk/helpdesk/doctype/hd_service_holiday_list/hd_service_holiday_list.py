@@ -109,6 +109,7 @@ class HDServiceHolidayList(Document):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_events(start: str, end: str, filters: str | None = None):
     """Returns events for Gantt / Calendar view rendering.
 

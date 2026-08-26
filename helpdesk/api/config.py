@@ -2,6 +2,7 @@ import frappe
 
 
 @frappe.whitelist(allow_guest=True)
+@frappe.read_only()
 def get_config():
     fields = [
         "brand_name",

@@ -5,6 +5,7 @@ from frappe import _
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_field_dependency(name: str):
     """
     Returns the field dependency for the given name.

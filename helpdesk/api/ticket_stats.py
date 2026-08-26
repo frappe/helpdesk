@@ -51,6 +51,7 @@ def _fill_date_series(from_date_str, to_date_str, rows: list) -> list:
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_feedback_received(
     scope: Scope,
@@ -91,6 +92,7 @@ def get_feedback_received(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_sla_violations(
     dt: str,
@@ -206,6 +208,7 @@ def _get_sla_violations(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_first_response_time(
     dt: str,
@@ -216,6 +219,7 @@ def get_avg_first_response_time(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_resolution_time(
     dt: str,
@@ -226,6 +230,7 @@ def get_avg_resolution_time(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_ticket_stats(
     dt: str,

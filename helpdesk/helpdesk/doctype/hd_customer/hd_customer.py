@@ -168,6 +168,7 @@ class HDCustomer(Document):
             return None
 
     @frappe.whitelist()
+    @frappe.read_only()
     @agent_only
     def get_contacts(self):
         contact_names = [contact.contact_name for contact in self.contacts]
@@ -332,6 +333,7 @@ class HDCustomer(Document):
         return result
 
     @frappe.whitelist()
+    @frappe.read_only()
     def get_pending_invites(self):
         if "Agent Manager" not in frappe.get_roles():
             frappe.throw(

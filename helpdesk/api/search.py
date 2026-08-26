@@ -8,6 +8,7 @@ from frappe import _
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def search(
     query: str, filters: str | None = None, limit: int = 20, title_only: bool = False
 ):
@@ -42,6 +43,7 @@ def search(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_filter_options():
     """Get available filter options for search interface"""
     from helpdesk.search_sqlite import HelpdeskSearch
