@@ -1,8 +1,7 @@
 <template>
-  <div ref="rootRef" class="comm-area">
-    <!-- Minimized pill — the default state; opens the composer window. Stays
-         hidden while the window's close animation plays. -->
-    <div v-show="!windowOpen && !closing" ref="pillBlockRef" class="px-4 py-3">
+  <div ref="rootRef" class="max-sm:w-screen">
+    <!-- Minimized pill — the default state; opens the composer window. -->
+    <div v-show="!windowOpen" class="px-4 py-3">
       <div
         role="button"
         tabindex="0"
@@ -16,110 +15,107 @@
           {{ minimizedLabel }}
         </span>
         <TypingIndicator :ticketId="ticketId" />
-        <Button variant="ghost" label="Expand" tooltip="Expand">
+        <Button
+          variant="ghost"
+          label="Expand"
+          tooltip="Expand"
+          @click.stop="openFloatingComposer"
+        >
           <template #icon><LucideMaximize2 class="h-4 w-4" /></template>
         </Button>
       </div>
     </div>
+    <!-- Enter classes only: closing is instant, so the composers can hide in
+         the same patch without a keep-alive dance. -->
     <Transition
-      :css="false"
-      @enter="onWindowEnter"
-      @leave="onWindowLeave"
-      @enter-cancelled="cancelWindowAnimation"
-      @leave-cancelled="cancelWindowAnimation"
+      enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
+      enter-from-class="translate-y-1 opacity-0"
     >
-      <div v-show="windowOpen">
-        <div class="px-4 pb-3">
-          <FloatingWindow
-            v-model:mode="windowMode"
-            :storage-key="WINDOW_STORAGE_KEY"
-            class="ticket-composer-window"
-            :style="composerBodyStyle"
-          >
-            <!-- Custom chrome: channel switcher left, window controls right.
-                 The header is the resize handle while docked and the drag
-                 handle while floating (the library ignores buttons). -->
-            <template #header="{ mode, dock, float }">
-              <div
-                class="relative flex w-full items-center justify-between gap-2 p-2"
-                :class="
-                  mode === 'docked' && !isMobileView ? 'cursor-ns-resize' : ''
-                "
-                @pointerdown="onHeaderPointerDown($event, mode)"
+      <div v-show="windowOpen" class="px-4 pb-3">
+        <FloatingWindow
+          v-model:mode="windowMode"
+          class="ticket-composer-window"
+          :class="{ 'composer-resized': dockedHeight > 0 }"
+          @pointerdown="onPanelPointerDown"
+        >
+          <!-- Single chrome row: channel switcher left, window controls right.
+               Doubles as the library's drag handle while floating and our
+               resize surface while docked. -->
+          <template #header="{ mode, dock, float }">
+            <div
+              class="flex w-full items-center justify-between gap-2 px-2.5 py-2"
+            >
+              <!-- Visible grab pill at the window's top edge (the panel root is
+                   the positioned ancestor); also the keyboard resize handle. -->
+              <button
+                v-if="mode === 'docked'"
+                type="button"
+                class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 sm:flex"
+                aria-label="Resize composer"
+                @pointerdown.stop.prevent="startDockedResize($event)"
+                @keydown.up.prevent="resizeDockedBy(16)"
+                @keydown.down.prevent="resizeDockedBy(-16)"
               >
-                <button
-                  v-if="mode === 'docked' && !isMobileView"
-                  type="button"
-                  class="absolute left-1/2 top-0 z-10 flex h-4 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
-                  aria-label="Resize composer"
-                  @pointerdown.stop.prevent="startDockedResize"
-                  @keydown.up.prevent="resizeDockedBy(16)"
-                  @keydown.down.prevent="resizeDockedBy(-16)"
-                >
-                  <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
-                </button>
-                <!-- The header's corners sit under the tab and window buttons,
-                     so grabbing one did nothing. These zones layer over them
-                     and start the same vertical resize. -->
-                <span
-                  v-if="mode === 'docked' && !isMobileView"
-                  class="absolute left-0 top-0 z-20 size-3 cursor-ns-resize touch-none"
-                  @pointerdown.stop.prevent="startDockedResize"
-                />
-                <span
-                  v-if="mode === 'docked' && !isMobileView"
-                  class="absolute right-0 top-0 z-20 size-3 cursor-ns-resize touch-none"
-                  @pointerdown.stop.prevent="startDockedResize"
-                />
-                <TabButtons v-model="channel" :options="channelOptions" />
-                <div class="min-w-0 flex-1">
-                  <TypingIndicator :ticketId="ticketId" />
-                </div>
-                <div class="flex shrink-0 items-center gap-1">
-                  <Button
-                    v-if="!isMobileView"
-                    variant="ghost"
-                    :label="mode === 'floating' ? 'Dock' : 'Pop out'"
-                    :tooltip="mode === 'floating' ? 'Dock' : 'Pop out'"
-                    @click="mode === 'floating' ? dock() : float()"
-                  >
-                    <template #icon>
-                      <component
-                        :is="
-                          mode === 'floating'
-                            ? LucideMinimize2
-                            : LucideMaximize2
-                        "
-                        class="h-4 w-4"
-                      />
-                    </template>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    label="Close"
-                    tooltip="Close"
-                    @click="closeComposer"
-                  >
-                    <template #icon><LucideX class="h-4 w-4" /></template>
-                  </Button>
-                </div>
+                <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
+              </button>
+              <TabButtons v-model="channel" :options="channelOptions" />
+              <div class="min-w-0 flex-1">
+                <TypingIndicator :ticketId="ticketId" />
               </div>
-            </template>
-            <!-- Esc closes the window before the composer's internal Esc-reset,
-                 so drafts survive — same semantics as the old editors. h-full
-                 keeps the composer stretching to a floating window's height,
-                 pinning its toolbar to the bottom. -->
-            <div class="h-full" @keydown.esc.capture.stop="closeComposer">
+              <div class="flex shrink-0 items-center gap-1">
+                <Button
+                  v-if="!isMobileView"
+                  variant="ghost"
+                  :label="mode === 'floating' ? 'Dock' : 'Pop out'"
+                  :tooltip="mode === 'floating' ? 'Dock' : 'Pop out'"
+                  @click="mode === 'floating' ? dock() : float()"
+                >
+                  <template #icon>
+                    <component
+                      :is="
+                        mode === 'floating' ? LucideMinimize2 : LucideMaximize2
+                      "
+                      class="h-4 w-4"
+                    />
+                  </template>
+                </Button>
+                <Button
+                  variant="ghost"
+                  label="Close"
+                  tooltip="Close"
+                  @click="closeComposer"
+                >
+                  <template #icon><LucideX class="h-4 w-4" /></template>
+                </Button>
+              </div>
+            </div>
+          </template>
+          <!-- Esc closes the window before the composer's internal Esc-reset,
+               so drafts survive. Full-height column while floating pins the
+               composer toolbar to the window bottom; a dragged docked height
+               sizes the in-flow window through this column. -->
+          <div
+            ref="columnRef"
+            class="flex min-h-0 flex-col"
+            :class="windowMode === 'floating' ? 'h-full' : ''"
+            :style="dockedColumnStyle"
+            @keydown.esc.capture.stop="closeComposer"
+          >
+            <!-- v-show keeps both mounted so each draft survives a tab switch. -->
+            <div
+              v-show="showEmailBox"
+              class="flex min-h-0 flex-1 flex-col px-2.5 py-2"
+            >
               <EmailComposer
-                v-show="
-                  showEmailBox || (closing && lastOpenChannel === 'email')
-                "
                 ref="emailComposerRef"
                 v-model="emailBody"
-                v-model:recipients="recipients"
+                v-model:to="to"
+                v-model:cc="cc"
+                v-model:bcc="bcc"
                 v-model:quoted="quotedContent"
                 v-model:from="fromEmail"
-                :header-fields="headerFields"
+                class="min-h-0 flex-1"
+                :show-from="hasMultipleSenders"
                 :senders="senders"
                 :search-recipients="searchRecipients"
                 :upload-function="uploadFile"
@@ -131,20 +127,28 @@
                 "
               >
                 <template #actions>
-                  <button
-                    class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    label="Saved replies"
+                    tooltip="Saved replies"
                     @click="showSavedRepliesSelectorModal = true"
                   >
-                    <SavedReplyIcon class="h-4 w-4" />
-                  </button>
+                    <template #icon
+                      ><SavedReplyIcon class="h-4 w-4"
+                    /></template>
+                  </Button>
                 </template>
               </EmailComposer>
+            </div>
+            <div
+              v-show="showCommentBox"
+              class="flex min-h-0 flex-1 flex-col px-2.5 py-2"
+            >
               <CommentComposer
-                v-show="
-                  showCommentBox || (closing && lastOpenChannel === 'comment')
-                "
                 ref="commentComposerRef"
                 v-model="commentBody"
+                class="min-h-0 flex-1"
                 :mentions="mentionOptions"
                 :upload-function="uploadFile"
                 placeholder="@John could you please look into this?"
@@ -155,8 +159,8 @@
                 "
               />
             </div>
-          </FloatingWindow>
-        </div>
+          </div>
+        </FloatingWindow>
       </div>
     </Transition>
   </div>
@@ -175,7 +179,12 @@ import { useTyping } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
-import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
+import {
+  showCommentBox,
+  showEmailBox,
+  toggleCommentBox,
+  toggleEmailBox,
+} from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import {
@@ -190,16 +199,14 @@ import {
 import type {
   CommentPayload,
   EmailPayload,
-  HeaderField,
   MentionOption,
   Recipient,
-  Recipients,
 } from "@framework/ui/components/Composer/index.ts";
 import {
   CommentComposer,
   EmailComposer,
 } from "@framework/ui/components/Composer/index.ts";
-import { onClickOutside, useStorage } from "@vueuse/core";
+import { onClickOutside, useEventListener, useStorage } from "@vueuse/core";
 import {
   Avatar,
   TabButtons,
@@ -208,9 +215,6 @@ import {
   toast,
 } from "frappe-ui";
 import { FloatingWindow, type WindowMode } from "frappe-ui/experimental";
-import LucideMaximize2 from "~icons/lucide/maximize-2";
-import LucideMinimize2 from "~icons/lucide/minimize-2";
-import LucideX from "~icons/lucide/x";
 import { useOnboarding } from "frappe-ui/frappe";
 import { storeToRefs } from "pinia";
 import {
@@ -221,6 +225,9 @@ import {
   ref,
   watch,
 } from "vue";
+import LucideMaximize2 from "~icons/lucide/maximize-2";
+import LucideMinimize2 from "~icons/lucide/minimize-2";
+import LucideX from "~icons/lucide/x";
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const props = defineProps({
@@ -257,6 +264,7 @@ const { isManager, userImage, userName } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const rootRef = ref(null);
+const columnRef = ref<HTMLElement | null>(null);
 const emailComposerRef = ref<InstanceType<typeof EmailComposer> | null>(null);
 const commentComposerRef = ref<InstanceType<typeof CommentComposer> | null>(
   null
@@ -266,170 +274,29 @@ const commentComposerRef = ref<InstanceType<typeof CommentComposer> | null>(
 const windowOpen = computed(() => showEmailBox.value || showCommentBox.value);
 const windowMode = ref<WindowMode>("docked");
 
-// FloatingWindow persists {mode, rect}. Keep the rect, but never let it
-// restore a detached mode: the composer mounts closed, and a restored
-// "floating" would render an empty detached frame. Runs before the child
-// reads the key.
-const WINDOW_STORAGE_KEY = "helpdesk-reply-window";
-try {
-  const savedWindow = JSON.parse(
-    localStorage.getItem(WINDOW_STORAGE_KEY) || "null"
-  );
-  if (savedWindow?.mode && savedWindow.mode !== "docked") {
-    localStorage.setItem(
-      WINDOW_STORAGE_KEY,
-      JSON.stringify({ ...savedWindow, mode: "docked" })
-    );
-  }
-} catch {
-  localStorage.removeItem(WINDOW_STORAGE_KEY);
-}
-
-// ─── Open/close animation ─────────────────────────────────────
-// The window morphs between the pill's height and its own natural height.
-// WAAPI instead of a CSS transition: it always completes (the old
-// grid-template-rows transition wedged around Teleport/fixed heights).
-const pillBlockRef = ref<HTMLElement | null>(null);
-const closing = ref(false);
-let pillHeight = 56;
-let windowAnimation: Animation | null = null;
-
-// A hidden window must be docked: v-show can't hide a panel teleported to
-// <body>, and mobile never leaves the docked state. Pre-flush, so the pill is
-// still in the DOM to measure when opening — and `closing` is set before the
-// same patch hides the composers, or the window collapses to a header-only
-// bar before the leave animation can even measure it.
-watch(
-  windowOpen,
-  (open, wasOpen) => {
-    if (open) {
-      pillHeight = pillBlockRef.value?.offsetHeight || pillHeight;
-    } else {
-      if (wasOpen) closing.value = true;
-      windowMode.value = "docked";
-    }
-  },
-  { immediate: true }
-);
-
-// Which composer the close animation should keep on screen.
-const lastOpenChannel = ref<"email" | "comment">("email");
-watch([showEmailBox, showCommentBox], ([email, comment]) => {
-  if (email) lastOpenChannel.value = "email";
-  else if (comment) lastOpenChannel.value = "comment";
-});
-
-function runWindowAnimation(
-  el: HTMLElement,
-  keyframes: Keyframe[],
-  duration: number,
-  done: () => void
-) {
-  windowAnimation?.cancel();
-  el.style.overflow = "hidden";
-  // fill: "forwards" holds the last keyframe past the animation's end;
-  // without it the element snaps back to full height/opacity for the frame
-  // between the animation finishing and Vue applying v-show — a visible
-  // flash of the window chrome. The fill is released only after done().
-  const animation = el.animate(keyframes, {
-    duration,
-    easing: "cubic-bezier(0.32, 0.72, 0, 1)",
-    fill: "forwards",
-  });
-  windowAnimation = animation;
-  const settle = () => {
-    animation.onfinish = animation.oncancel = null;
-    if (windowAnimation === animation) windowAnimation = null;
-    closing.value = false;
-    done();
-    animation.cancel();
-    el.style.overflow = "";
-  };
-  animation.onfinish = animation.oncancel = settle;
-}
-
-// The window fades while it is pill-sized: bottom-clipped small heights show
-// only the header strip, which otherwise lingers as a stray chrome bar.
-function onWindowEnter(el: Element, done: () => void) {
-  const block = el as HTMLElement;
-  runWindowAnimation(
-    block,
-    [
-      { height: `${pillHeight}px`, opacity: 0 },
-      { opacity: 1, offset: 0.4 },
-      { height: `${block.offsetHeight}px`, opacity: 1 },
-    ],
-    250,
-    done
-  );
-}
-
-// Set by an overdrag-minimize; applied once the window is out of sight.
-let restoreBodyHeightAfterClose: number | null = null;
-
-function onWindowLeave(el: Element, done: () => void) {
-  const block = el as HTMLElement;
-  closing.value = true;
-  runWindowAnimation(
-    block,
-    [
-      { height: `${block.offsetHeight}px`, opacity: 1 },
-      { height: `${pillHeight}px`, opacity: 0 },
-    ],
-    200,
-    () => {
-      if (restoreBodyHeightAfterClose !== null) {
-        composerBodyHeight.value = restoreBodyHeightAfterClose;
-        restoreBodyHeightAfterClose = null;
-      }
-      done();
-    }
-  );
-}
-
-function cancelWindowAnimation() {
-  windowAnimation?.cancel();
-}
-// Covers the storage-restored "floating" mode arriving after mount while the
-// window is closed — it would otherwise render an empty detached frame.
-watch(windowMode, (mode) => {
-  if (mode !== "docked" && (!windowOpen.value || isMobileView.value)) {
+// A non-docked panel teleports to <body>, so the wrapper's v-show can't hide
+// it: force docked whenever the window is closed or the viewport is mobile.
+watch([windowOpen, isMobileView, windowMode], ([open, mobile, mode]) => {
+  if (mode !== "docked" && (!open || mobile)) {
     windowMode.value = "docked";
   }
 });
-
-function toggleEmailBox() {
-  if (showCommentBox.value) {
-    showCommentBox.value = false;
-  }
-  showEmailBox.value = !showEmailBox.value;
-}
-
-function toggleCommentBox() {
-  if (showEmailBox.value) {
-    showEmailBox.value = false;
-  }
-  showCommentBox.value = !showCommentBox.value;
-}
 
 function closeComposer() {
   showEmailBox.value = false;
   showCommentBox.value = false;
 }
 
-// The window-header switcher; the two show flags stay the source of truth so
-// external writers (Sidebar onboarding, mobile toggles, shortcuts) keep working.
+// ─── Channel & pill ───────────────────────────────────────────
+// The two show flags stay the source of truth so external writers (Sidebar
+// onboarding, mobile toggles, shortcuts) keep working.
 const channelOptions = [
   { label: "Email", value: "email" },
   { label: "Comment", value: "comment" },
 ];
 
 const channel = computed({
-  get: () =>
-    showCommentBox.value ||
-    (closing.value && lastOpenChannel.value === "comment")
-      ? "comment"
-      : "email",
+  get: () => (showCommentBox.value ? "comment" : "email"),
   set: (value) => {
     showEmailBox.value = value === "email";
     showCommentBox.value = value === "comment";
@@ -453,106 +320,11 @@ function openComposer() {
   showCommentBox.value = false;
 }
 
-// Drag-set height for the docked editing area (shared by both channels, via
-// the --composer-body-height CSS var in index.css); floating mode keeps the
-// window's own edge resize.
-const composerBodyHeight = useStorage<number | null>(
-  "helpdesk-composer-height",
-  null
-);
-
-// Guard every read. useStorage's null default means values rehydrate as
-// strings after a reload, and a NaN that sneaks in would poison all later
-// drags (NaN arithmetic no-ops silently, then persists itself).
-function storedBodyHeight(): number | null {
-  const value = Number(composerBodyHeight.value);
-  return Number.isFinite(value) && value > 0 ? value : null;
-}
-
-const composerBodyStyle = computed(() =>
-  storedBodyHeight()
-    ? { "--composer-body-height": `${storedBodyHeight()}px` }
-    : undefined
-);
-
-const MIN_BODY_HEIGHT = 120;
-// Dragging this far below the minimum collapses the window back to the pill.
-const MINIMIZE_OVERDRAG = 60;
-
-function clampBodyHeight(value: number) {
-  return Math.min(
-    Math.max(value, MIN_BODY_HEIGHT),
-    Math.round(window.innerHeight * 0.7)
-  );
-}
-
-function resizeDockedBy(delta: number) {
-  composerBodyHeight.value = clampBodyHeight(
-    (storedBodyHeight() ?? 160) + delta
-  );
-}
-
-// While a resize drag is live, a pointer released outside the (resized)
-// window must not count as an outside click.
-let suppressOutsideClose = false;
-
-// Teardown of the live drag. A drag must never stack on another or outlive
-// the component — leaked window listeners keep resizing on every mouse move.
-let stopActiveResize: (() => void) | null = null;
-
-// Anywhere on the docked header (except its buttons) starts a resize drag —
-// the pill handle alone is too small a target. Floating mode falls through to
-// the library's window drag.
-function onHeaderPointerDown(event: PointerEvent, mode: WindowMode) {
-  if (mode !== "docked" || isMobileView.value) return;
-  const target = event.target as HTMLElement;
-  if (target.closest("button, a, input, select, textarea, [role='button']"))
-    return;
-  event.preventDefault();
-  startDockedResize(event);
-}
-
-function startDockedResize(event: PointerEvent) {
-  stopActiveResize?.();
-  const handle = event.currentTarget as HTMLElement;
-  suppressOutsideClose = true;
-  const body = [
-    ...document.querySelectorAll<HTMLElement>(
-      ".ticket-composer-window [data-slot='body']"
-    ),
-  ].find((el) => el.offsetParent);
-  const startHeight = storedBodyHeight() ?? body?.offsetHeight ?? 160;
-  const startY = event.clientY;
-  try {
-    handle.setPointerCapture(event.pointerId);
-  } catch {}
-  // Listen on window, not the handle: capture is best-effort (synthetic
-  // pointers have no id) and bubbled events reach window either way.
-  const onMove = (e: PointerEvent) => {
-    const next = startHeight + (startY - e.clientY);
-    if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
-      // Dragged well past the floor: collapse to the pill. The pre-drag height
-      // is restored only after the close animation — restoring now would grow
-      // the window for one frame mid-collapse.
-      stop();
-      restoreBodyHeightAfterClose = clampBodyHeight(startHeight);
-      closeComposer();
-      return;
-    }
-    composerBodyHeight.value = clampBodyHeight(next);
-  };
-  const stop = () => {
-    stopActiveResize = null;
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup", stop);
-    window.removeEventListener("pointercancel", stop);
-    // The click event fires after pointerup; lift the guard a task later.
-    setTimeout(() => (suppressOutsideClose = false), 0);
-  };
-  stopActiveResize = stop;
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", stop);
-  window.addEventListener("pointercancel", stop);
+// The pill's expand button skips the docked stage and pops straight out
+// (the mode watcher forces docked back on mobile, where it just opens).
+function openFloatingComposer() {
+  openComposer();
+  windowMode.value = "floating";
 }
 
 const minimizedLabel = computed(() => {
@@ -569,6 +341,95 @@ const minimizedLabel = computed(() => {
   const preview = draft ? htmlToText(draft).trim() : "";
   return preview || "Send a reply";
 });
+
+// ─── Docked-height resize ─────────────────────────────────────
+// Dragging the title bar sizes the in-flow window by setting an explicit
+// height on our body column — no library hook needed. 0 means natural height.
+// The number default keeps useStorage on the number serializer, so reloads
+// can't rehydrate the value as a string.
+const dockedHeight = useStorage("helpdesk-composer-height", 0);
+
+const MIN_BODY_HEIGHT = 240;
+// Dragging this far below the minimum collapses the window back to the pill.
+const MINIMIZE_OVERDRAG = 60;
+
+const dockedColumnStyle = computed(() =>
+  windowMode.value === "docked" && dockedHeight.value > 0
+    ? { height: `${dockedHeight.value}px` }
+    : undefined
+);
+
+function clampBodyHeight(value: number) {
+  return Math.min(
+    Math.max(value, MIN_BODY_HEIGHT),
+    Math.round(window.innerHeight * 0.8)
+  );
+}
+
+// The live drag; move/up listeners are registered once below and no-op while
+// this is null, so nothing can stack or leak.
+let resizing: { startY: number; startHeight: number } | null = null;
+// A pointer released outside the window must not count as an outside click.
+let justResized = false;
+
+// Bound on <FloatingWindow>, so it lands on the panel root and catches
+// pointerdowns bubbling from the built-in title bar. The column containment
+// test limits the resize surface to the chrome without naming its internals;
+// the button filter matches the library's own drag bail-out.
+function onPanelPointerDown(event: PointerEvent) {
+  if (windowMode.value !== "docked" || isMobileView.value) return;
+  const target = event.target as HTMLElement;
+  if (target.closest("button, a, input, select, textarea, [role='button']"))
+    return;
+  if (columnRef.value?.contains(target)) return;
+  event.preventDefault();
+  startDockedResize(event);
+}
+
+function startDockedResize(event: PointerEvent) {
+  resizing = {
+    startY: event.clientY,
+    startHeight: currentBodyHeight(),
+  };
+  // Best-effort: a successful capture keeps the post-drag click inside the
+  // panel; synthetic pointers without an id fall back to the guard flag.
+  try {
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  } catch {}
+}
+
+function currentBodyHeight() {
+  return dockedHeight.value || columnRef.value?.offsetHeight || MIN_BODY_HEIGHT;
+}
+
+function resizeDockedBy(delta: number) {
+  dockedHeight.value = clampBodyHeight(currentBodyHeight() + delta);
+}
+
+useEventListener(window, "pointermove", (event: PointerEvent) => {
+  if (!resizing) return;
+  const next = resizing.startHeight + (resizing.startY - event.clientY);
+  if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
+    // Dragged well past the floor: collapse to the pill, keeping the pre-drag
+    // height so reopening restores it.
+    const previous = resizing.startHeight;
+    stopDockedResize();
+    dockedHeight.value = clampBodyHeight(previous);
+    closeComposer();
+    return;
+  }
+  dockedHeight.value = clampBodyHeight(next);
+});
+useEventListener(window, "pointerup", stopDockedResize);
+useEventListener(window, "pointercancel", stopDockedResize);
+
+function stopDockedResize() {
+  if (!resizing) return;
+  resizing = null;
+  justResized = true;
+  // The click event fires after pointerup; lift the guard a task later.
+  setTimeout(() => (justResized = false), 0);
+}
 
 // ─── Email draft & signature ──────────────────────────────────
 const cachedEmail = useStorage<string | null>(
@@ -633,10 +494,6 @@ const senders = computed<Recipient[]>(() => {
 
 const hasMultipleSenders = computed(() => senders.value.length > 1);
 
-const headerFields = computed<HeaderField[]>(() =>
-  hasMultipleSenders.value ? ["from", "to", "cc", "bcc"] : ["to", "cc", "bcc"]
-);
-
 watch(
   senders,
   (options) => {
@@ -654,15 +511,16 @@ function toRecipientList(emails: unknown[] | undefined): Recipient[] {
   }));
 }
 
-function seedRecipients(): Recipients {
-  return {
-    to: toRecipientList(props.toEmails),
-    cc: toRecipientList(props.ccEmails),
-    bcc: toRecipientList(props.bccEmails),
-  };
-}
+const to = ref<Recipient[]>([]);
+const cc = ref<Recipient[]>([]);
+const bcc = ref<Recipient[]>([]);
 
-const recipients = ref<Recipients>(seedRecipients());
+function resetRecipients() {
+  to.value = toRecipientList(props.toEmails);
+  cc.value = toRecipientList(props.ccEmails);
+  bcc.value = toRecipientList(props.bccEmails);
+}
+resetRecipients();
 
 // Plain request, not createResource: RecipientSelect evaluates this inside a
 // computedAsync, and touching a reactive resource there re-triggers evaluation
@@ -702,8 +560,9 @@ const sendMail = createResource({
   url: "run_doc_method",
   debounce: 300,
   onSuccess: () => {
+    // reset() clears the to/cc/bcc models itself, so re-seed after it.
     emailComposerRef.value?.reset();
-    recipients.value = seedRecipients();
+    resetRecipients();
     emailBody.value = emailSignature.value ?? "";
     showEmailBox.value = false;
     emit("update");
@@ -724,7 +583,7 @@ const emailSubmitLabel = computed(() => {
 
 function onEmailSubmit(payload: EmailPayload) {
   if (sendMail.loading) return;
-  const { to, cc, bcc } = payload.recipients;
+  const { to, cc, bcc } = payload;
   if (!to.length && !cc.length && !bcc.length) {
     toast.warning(
       "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
@@ -814,15 +673,10 @@ function replyToEmail(data: {
 }) {
   showCommentBox.value = false;
   showEmailBox.value = true;
-  if (windowMode.value === "minimized") {
-    windowMode.value = "docked";
-  }
 
-  recipients.value = {
-    to: toRecipientList(splitIfString(data.to)),
-    cc: toRecipientList(splitIfString(data.cc)),
-    bcc: toRecipientList(splitIfString(data.bcc)),
-  };
+  to.value = toRecipientList(splitIfString(data.to));
+  cc.value = toRecipientList(splitIfString(data.cc));
+  bcc.value = toRecipientList(splitIfString(data.bcc));
 
   // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their
   // newlines/spacing would be lost in the quoted block.
@@ -866,10 +720,10 @@ const IGNORED_SELECTORS = [
 onClickOutside(
   rootRef,
   () => {
-    // A floating or minimized window lives outside the page flow — only the
-    // docked composer closes on outside clicks.
+    // A floating window lives outside the page flow — only the docked
+    // composer closes on outside clicks.
     if (windowMode.value !== "docked") return;
-    if (suppressOutsideClose) return;
+    if (justResized) return;
     closeComposer();
   },
   {
@@ -890,7 +744,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanup();
-  stopActiveResize?.();
   if (isContentEmpty(commentBody.value)) {
     localStorage.removeItem("commentBoxContent" + props.ticketId);
   }
@@ -904,9 +757,21 @@ defineExpose({
 </script>
 
 <style>
-@media screen and (max-width: 640px) {
-  .comm-area {
-    width: 100vw;
+/* When the window's height is fixed (floating, or docked at a dragged height),
+   release the editor's internal 50vh cap so it fills and the toolbar pins to
+   the bottom. `.overflow-y-auto` matches exactly one element inside the
+   window: ComposerEditor's scroll region. */
+.ticket-composer-window[data-state="floating"] .overflow-y-auto,
+.ticket-composer-window.composer-resized[data-state="docked"] .overflow-y-auto {
+  max-height: none;
+}
+
+/* The built-in title bar doubles as the docked resize surface. Positional
+   selector into the library chrome; worst case on a library change is a wrong
+   cursor, nothing functional. */
+@media (min-width: 640px) {
+  .ticket-composer-window[data-state="docked"] > div:first-child {
+    cursor: ns-resize;
   }
 }
 </style>
