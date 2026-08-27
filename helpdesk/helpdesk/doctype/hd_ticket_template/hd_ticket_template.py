@@ -9,6 +9,7 @@ from frappe.model.document import Document
 
 from helpdesk.consts import (
     DEFAULT_TICKET_TEMPLATE,
+    SERVER_COMPUTED_FIELDS,
     TICKET_INTERNAL_FIELD_PERMLEVEL,
     TICKET_VISIBLE_FIELD_PERMLEVEL,
 )
@@ -19,7 +20,7 @@ class HDTicketTemplate(Document):
     def validate(self):
         self.verify_field_exists()
         self.validate_unallowed_fields()
-        self.validate_internal_fields_stay_hidden()
+        self.validate_unfillable_fields_stay_hidden()
 
     def verify_field_exists(self):
         for f in self.fields:
@@ -50,14 +51,20 @@ class HDTicketTemplate(Document):
                 )
                 frappe.throw(text)
 
-    def validate_internal_fields_stay_hidden(self):
-        """An internal standard field may be listed for the agent form,
-        never shown to customers."""
+    def validate_unfillable_fields_stay_hidden(self):
+        """A field a customer cannot fill may be listed for the agent form,
+        never shown to customers: showing it offers an input whose value the
+        server would throw away."""
         for f in self.fields:
             if not f.fieldname or f.hide_from_customer:
                 continue
             if self.custom_field_exists(f.fieldname):
                 continue
+            if f.fieldname in SERVER_COMPUTED_FIELDS:
+                text = _(
+                    "Field `{0}` is set by the system and cannot be shown to customers"
+                ).format(f.fieldname)
+                frappe.throw(text)
             if self.shipped_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
                 text = _(
                     "Field `{0}` is internal and cannot be shown to customers"
@@ -116,6 +123,13 @@ class HDTicketTemplate(Document):
             return None
         return {f.fieldname: bool(f.hide_from_customer) for f in previous.fields}
 
+    def target_permlevel(self, field_row) -> int:
+        if field_row.hide_from_customer:
+            return TICKET_INTERNAL_FIELD_PERMLEVEL
+        if self.custom_field_exists(field_row.fieldname):
+            return TICKET_VISIBLE_FIELD_PERMLEVEL
+        return self.shipped_permlevel(field_row.fieldname)
+
     def user_touched(self, field_row, was_hidden, moved: bool) -> bool:
         """Whether to tell the admin about this field. On a normal save,
         the fields they just added or switched between shown and hidden; on
@@ -124,13 +138,6 @@ class HDTicketTemplate(Document):
             return moved
         previous = was_hidden.get(field_row.fieldname)
         return previous is None or previous != bool(field_row.hide_from_customer)
-
-    def target_permlevel(self, field_row) -> int:
-        if field_row.hide_from_customer:
-            return TICKET_INTERNAL_FIELD_PERMLEVEL
-        if self.custom_field_exists(field_row.fieldname):
-            return TICKET_VISIBLE_FIELD_PERMLEVEL
-        return self.shipped_permlevel(field_row.fieldname)
 
     def release_removed_fields(self):
         """A standard field removed from the default template goes back to

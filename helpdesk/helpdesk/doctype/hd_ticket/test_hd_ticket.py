@@ -2520,6 +2520,18 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
         self.assertEqual(self.hd_ticket_permlevel("key"), 8)
 
+    def test_system_set_field_not_exposable_via_template(self):
+        """A customer may read `sla` for the SLA card, but showing it on the
+        form would offer a picker the server throws away, so the template
+        refuses it. Listing it hidden, for the agent form, stays allowed."""
+        with self.assertRaises(frappe.ValidationError):
+            self.set_default_template_fields(
+                [{"fieldname": "sla", "hide_from_customer": 0}]
+            )
+        self.set_default_template_fields(
+            [{"fieldname": "sla", "hide_from_customer": 1}]
+        )
+
     def test_removed_template_field_restores_shipped_level(self):
         """Hiding a standard field turns it internal; dropping it from the
         default template returns it to the permlevel shipped in the doctype
@@ -2589,11 +2601,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.priority, chosen)
 
     def test_response_stamp_not_fillable_at_creation(self):
-        """`first_responded_on` is server-stamped: even shown by the
-        template, a customer-supplied value at creation is dropped."""
-        self.set_default_template_fields(
-            [{"fieldname": "first_responded_on", "hide_from_customer": 0}]
-        )
+        """`first_responded_on` is server-stamped, so a customer-supplied
+        value at creation is dropped."""
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(
             {**get_ticket_obj(), "first_responded_on": now_datetime()}
@@ -2632,8 +2641,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.clear_cache(doctype="HD Ticket")
 
     def test_customer_cannot_read_internal_fields(self):
-        internal = ("sla", "agreement_status", "last_agent_response", "key")
-        display = ("priority", "raised_by", "response_by", "resolution_by")
+        internal = ("agreement_status", "last_agent_response", "key")
+        # the portal SLA card needs sla to render at all: it gates on it
+        display = ("priority", "raised_by", "response_by", "resolution_by", "sla")
 
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(get_ticket_obj()).insert()
@@ -2646,19 +2656,39 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
         # framework read paths strip permlevel-8 values for customers
         stripped = client_get("HD Ticket", name=ticket.name)
-        self.assertFalse(stripped.get("sla"))
+        self.assertFalse(stripped.get("agreement_status"))
+        self.assertTrue(stripped.get("sla"))
         self.assertTrue(stripped.get("response_by"))
 
         # the creation response is stripped the same way
         created = new(get_ticket_obj())
-        self.assertFalse(created.get("sla"))
+        self.assertFalse(created.get("agreement_status"))
         self.assertFalse(created.get("key"))
         self.assertTrue(created.get("priority"))
         self.assertTrue(created.get("response_by"))
+        self.assertTrue(created.get("sla"))
 
         frappe.set_user(PERMS_AGENT)
-        self.assertTrue(get_one(ticket.name).get("sla"))
-        self.assertTrue(new(get_ticket_obj()).get("sla"))
+        self.assertTrue(get_one(ticket.name).get("agreement_status"))
+        self.assertTrue(new(get_ticket_obj()).get("agreement_status"))
+
+    def test_sla_output_not_fillable_at_creation(self):
+        """SLA outputs are customer-readable so the portal can show them,
+        but the engine owns their values: a customer-supplied value at
+        creation is recomputed."""
+        supplied = "2000-01-01 00:00:00"
+        frappe.set_user(PERMS_CUSTOMER)
+        ticket = frappe.get_doc({**get_ticket_obj(), "response_by": supplied}).insert()
+        self.assertTrue(ticket.response_by)
+        self.assertNotEqual(str(ticket.response_by), supplied)
+
+    def test_server_computed_fields_never_creation_fillable(self):
+        """Second line of defence: the template guard only runs on save, so
+        a template stored before it existed can still list a system-set
+        field. The ticket refuses to fill it either way."""
+        ticket = frappe.new_doc("HD Ticket")
+        for fieldname in ("sla", "response_by", "first_responded_on"):
+            self.assertFalse(ticket.customer_may_fill_at_creation(fieldname))
 
     def test_customer_spoof_rejected_without_auto_set_customer(self):
         """The contact-customer link check must not depend on the auto-set toggle."""

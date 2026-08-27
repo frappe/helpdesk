@@ -19,7 +19,11 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE, TICKET_VISIBLE_FIELD_PERMLEVEL
+from helpdesk.consts import (
+    DEFAULT_TICKET_TEMPLATE,
+    SERVER_COMPUTED_FIELDS,
+    TICKET_VISIBLE_FIELD_PERMLEVEL,
+)
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -50,11 +54,6 @@ class HDTicket(Document):
     # fields the server fills in itself; the permission reset skips them
     # only while the server is writing them
     SERVER_OWNED_INSERT_FIELDS = ["key", "raised_by", "via_customer_portal", "customer"]
-    RESPONSE_STAMP_FIELDS = [
-        "last_customer_response",
-        "last_agent_response",
-        "first_responded_on",
-    ]
     # levels a customer may write while creating a ticket: the open level and
     # the one the default template puts its visible fields at
     CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
@@ -106,10 +105,10 @@ class HDTicket(Document):
         )
 
     def customer_may_fill_at_creation(self, fieldname: str) -> bool:
-        """Server-stamped response fields never qualify — first_responded_on
-        sits at a customer level, so the permlevel check alone would admit
-        it."""
-        if fieldname in self.RESPONSE_STAMP_FIELDS:
+        """Server-computed fields never qualify — they sit at a
+        customer-readable level, so the permlevel check alone would admit
+        them."""
+        if fieldname in SERVER_COMPUTED_FIELDS:
             return False
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return bool(field) and field.permlevel in self.CREATION_FILLABLE_PERMLEVELS
@@ -1208,9 +1207,9 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
-        # portal replies save under the customer session; exempt the response
-        # stamps so the permlevel reset keeps them
-        self.flags.ignore_permlevel_for_fields = list(self.RESPONSE_STAMP_FIELDS)
+        # portal replies save under the customer session; exempt the fields the
+        # server works out so the permlevel reset keeps them
+        self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
         # Save the ticket, allowing for hooks to run.
         self.save()
 

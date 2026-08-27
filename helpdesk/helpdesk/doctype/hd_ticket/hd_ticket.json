@@ -180,7 +180,7 @@
    "fieldtype": "Link",
    "label": "SLA",
    "options": "HD Service Level Agreement",
-   "permlevel": 8,
+   "permlevel": 7,
    "search_index": 1
   },
   {
@@ -227,7 +227,7 @@
    "fieldname": "on_hold_since",
    "fieldtype": "Datetime",
    "label": "On Hold Since",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   },
   {
@@ -247,7 +247,7 @@
    "fieldname": "first_response_time",
    "fieldtype": "Duration",
    "label": "First Response Time",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   },
   {
@@ -327,7 +327,7 @@
    "fieldname": "resolution_time",
    "fieldtype": "Duration",
    "label": "Resolution Time",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   },
   {
@@ -478,7 +478,7 @@
    "fieldname": "status_category",
    "fieldtype": "Data",
    "label": "Status Category",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   },
   {
@@ -509,7 +509,7 @@
    "fieldname": "first_response_failed_by",
    "fieldtype": "Duration",
    "label": "First Response Failed By",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   },
   {
@@ -517,7 +517,7 @@
    "fieldname": "resolution_failed_by",
    "fieldtype": "Duration",
    "label": "Resolution Failed By",
-   "permlevel": 8,
+   "permlevel": 7,
    "read_only": 1
   }
  ],
@@ -525,7 +525,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-06-28 13:51:31.692161",
+ "modified": "2026-08-25 11:56:01.708406",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
