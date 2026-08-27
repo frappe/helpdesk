@@ -2316,10 +2316,13 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     Protected fields sit at permlevel 7 (customer-visible) and 8
     (internal), so the framework silently resets any change to them
-    made by a user without write access at that level. The default
-    template drives the levels: hidden -> 8; visible fields keep their
-    shipped level and customers may fill them only while creating a
-    ticket. Other templates never move levels.
+    made by a user without write access at that level. Standard fields
+    keep the level the doctype ships; only custom fields take their
+    level from the default template's hide_from_customer flag.
+
+    Note the two shapes of refusal: a change to a permlevel-protected
+    field is reverted without a word, while a change to a permlevel-0
+    field a customer may fill at creation raises PermissionError.
     """
 
     def setUp(self):
@@ -2339,8 +2342,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     def tearDown(self):
         frappe.set_user("Administrator")
-        # saving the original rows back also puts the permission levels
-        # back: fields we removed return to their shipped levels
+        # restores the custom field levels the template drives; standard
+        # field levels never moved in the first place
         self.set_default_template_fields(self.original_default_fields)
 
     @staticmethod
@@ -2456,6 +2459,47 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(spoofed.raised_by, PERMS_CUSTOMER)
         self.assertEqual(spoofed.priority, baseline.priority)
         self.assertNotEqual(spoofed.contact, other_contact)
+
+    def test_hidden_custom_field_is_absent_from_the_api(self):
+        """Hiding a custom field has to mean the value stops being served, not
+        just that the form stops drawing it. The list path is the one that
+        matters: it never consults the controller, only the permission level.
+        """
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_api_hidden"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": fieldname, "label": "Perms API Hidden", "fieldtype": "Data"},
+        )
+        try:
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 1}]
+            )
+            ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+            frappe.db.set_value("HD Ticket", ticket.name, fieldname, "internal note")
+
+            frappe.set_user(PERMS_CUSTOMER)
+            rows = frappe.get_list(
+                "HD Ticket",
+                filters={"name": ticket.name},
+                fields=["name", fieldname],
+            )
+            self.assertNotIn(fieldname, rows[0])
+
+            frappe.set_user(PERMS_AGENT)
+            rows = frappe.get_list(
+                "HD Ticket",
+                filters={"name": ticket.name},
+                fields=["name", fieldname],
+            )
+            self.assertEqual(rows[0].get(fieldname), "internal note")
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "Custom Field", f"HD Ticket-{fieldname}", ignore_missing=True
+            )
+            frappe.clear_cache(doctype="HD Ticket")
 
     def test_template_visibility_drives_custom_field_permlevel(self):
         """Default template save syncs custom field permlevels: hidden -> 8
@@ -2673,22 +2717,29 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             [{"fieldname": "sla", "hide_from_customer": 1}]
         )
 
-    def test_removed_template_field_restores_shipped_level(self):
-        """Hiding a standard field turns it internal; dropping it from the
-        default template returns it to the permlevel shipped in the doctype
-        JSON. Visibility never lowers it below the shipped level."""
+    def test_template_never_moves_standard_field_permlevels(self):
+        """Standard fields keep the level the app ships, however the template
+        is filled in. Their levels are part of the doctype, not site config,
+        so nothing here writes a Property Setter over them."""
+        shipped = self.hd_ticket_permlevel("priority")
         template = self.set_default_template_fields(
             [{"fieldname": "priority", "hide_from_customer": 0}]
         )
-        self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
 
         template.reload()
         template.fields[0].hide_from_customer = 1
         template.save()
-        self.assertEqual(self.hd_ticket_permlevel("priority"), 8)
+        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
 
         self.set_default_template_fields([])
-        self.assertEqual(self.hd_ticket_permlevel("priority"), 7)
+        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
+        self.assertFalse(
+            frappe.get_all(
+                "Property Setter",
+                filters={"doc_type": "HD Ticket", "property": "permlevel"},
+            )
+        )
 
     def test_non_default_template_does_not_move_permlevels(self):
         """Only the default template drives permlevels; any other template

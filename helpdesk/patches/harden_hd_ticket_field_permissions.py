@@ -1,12 +1,10 @@
 import frappe
 from frappe.permissions import add_permission, update_permission_property
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
-
 # level -> role -> has write access at that level. Level 7 holds the
-# customer-visible operational fields, level 8 the agent-only internals,
-# level 9 the System Manager-only fields. High numbers avoid colliding
-# with permlevel schemes a site may have built itself.
+# customer-visible operational fields and level 8 the agent-only internals.
+# High numbers avoid colliding with permlevel schemes a site may have built
+# itself.
 LEVEL_GRANTS = {
     7: {
         "System Manager": 1,
@@ -20,25 +18,11 @@ LEVEL_GRANTS = {
         "Agent": 1,
         "Agent Manager": 1,
     },
-    9: {
-        "System Manager": 1,
-    },
 }
 
 
 def execute():
     mirror_permlevel_grants_into_custom_docperms()
-    sync_template_field_permlevels()
-
-
-def sync_template_field_permlevels():
-    """Apply the default template's field visibility to permlevels on
-    existing sites without waiting for it to be saved again. Only the
-    default template drives permlevels."""
-    if not frappe.db.exists("HD Ticket Template", DEFAULT_TICKET_TEMPLATE):
-        return
-    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
-    template.sync_field_permlevels()
 
 
 def mirror_permlevel_grants_into_custom_docperms():

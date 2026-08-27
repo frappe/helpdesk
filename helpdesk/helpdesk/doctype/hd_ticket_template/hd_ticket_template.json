@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Only the Default template controls what customers can do with ticket fields; other templates just change the form. Hide a field to keep it for agents only — customers cannot see it. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields meant to stay internal cannot be shown. Removing a field puts it back the way it started. These settings override anything set in Customize Form. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
+   "description": "Only the Default template affects permissions; other templates just change the form. Hide a custom field to keep it for agents only — customers stop seeing it on the form and it stops being returned by the API. Hiding a standard field only takes it off the customer's form: what customers may read of the app's own fields is set by the field's permission level, which you change in Customize Form. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields the system sets cannot be shown. Removing a field leaves its permission level alone. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",
