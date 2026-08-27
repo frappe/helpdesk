@@ -116,6 +116,10 @@
   {
    "read": 1,
    "role": "HD Customer"
+  },
+  {
+   "read": 1,
+   "role": "HD Customer Manager"
   }
  ],
  "row_format": "Dynamic",
