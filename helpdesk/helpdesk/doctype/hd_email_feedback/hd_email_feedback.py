@@ -42,6 +42,9 @@ class HDEmailFeedback(Document):
         ticket_doc.feedback_rating = self.feedback_rating
         ticket_doc.feedback_extra = self.feedback_extra
         ticket_doc.status = "Closed"
+        # the emailed feedback form runs as Guest, and the rating is derived
+        # here rather than sent by the customer, so the edit guard stands aside
+        ticket_doc.flags.ignore_customer_edit_guard = True
         ticket_doc.save(ignore_permissions=True)
 
         self.ticket = ticket_doc.name

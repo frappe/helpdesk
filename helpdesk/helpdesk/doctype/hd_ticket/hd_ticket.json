@@ -629,12 +629,6 @@
    "read": 1,
    "role": "Agent Manager",
    "write": 1
-  },
-  {
-   "permlevel": 9,
-   "read": 1,
-   "role": "System Manager",
-   "write": 1
   }
  ],
  "quick_entry": 1,

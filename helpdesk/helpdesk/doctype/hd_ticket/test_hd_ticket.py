@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import frappe
 from frappe.client import get as client_get
+from frappe.client import set_value as client_set_value
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -2376,14 +2377,52 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.priority, original_priority)
         self.assertEqual(ticket.response_by, original_response_by)
 
-    def test_customer_can_write_allowed_fields(self):
+    def test_customer_cannot_edit_ticket_after_creation(self):
+        """subject and description sit at permlevel 0, which a customer must
+        keep write access to in order to raise a ticket at all. Freezing them
+        afterwards is the guard's job, not the permission level's."""
         ticket = get_customer_ticket(PERMS_CUSTOMER)
+        original_subject = ticket.subject
         ticket.subject = "Updated by customer"
         ticket.description = "Updated description"
-        ticket.save()
+        with self.assertRaises(frappe.PermissionError):
+            ticket.save()
         ticket.reload()
-        self.assertEqual(ticket.subject, "Updated by customer")
-        self.assertEqual(ticket.description, "Updated description")
+        self.assertEqual(ticket.subject, original_subject)
+
+    def test_customer_can_close_own_ticket(self):
+        """The portal's Close button. Closing also flips status_category
+        through `fetch_from`, so a guard that froze everything but `status`
+        would break the one write customers are meant to make."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        client_set_value("HD Ticket", ticket.name, "status", "Closed")
+        self.assertEqual(
+            frappe.db.get_value("HD Ticket", ticket.name, "status"), "Closed"
+        )
+
+    def test_customer_cannot_tamper_via_run_doc_method(self):
+        """`run_doc_method` builds the document from the caller's own payload
+        when `dt` is absent, and `create_communication_via_contact` saves with
+        ignore_permissions, which skips the permlevel reset. Only a check that
+        runs inside validate stops the tampered value landing."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        # resolution_details is agent-authored internal text at permlevel 8.
+        # agreement_status makes a poor probe: the SLA engine recomputes it on
+        # every save, so it masks the write rather than preventing it.
+        before = frappe.db.get_value("HD Ticket", ticket.name, "resolution_details")
+
+        frappe.set_user(PERMS_CUSTOMER)
+        payload = frappe.get_doc("HD Ticket", ticket.name).as_dict()
+        payload["resolution_details"] = "injected by customer"
+        tampered = frappe.get_doc(payload)
+
+        with self.assertRaises(frappe.PermissionError):
+            tampered.create_communication_via_contact("Tampering")
+
+        self.assertEqual(
+            frappe.db.get_value("HD Ticket", ticket.name, "resolution_details"), before
+        )
 
     def test_agent_can_write_agent_fields(self):
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
@@ -2394,18 +2433,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket.save()
         ticket.reload()
         self.assertEqual(ticket.priority, new_priority)
-
-    def test_outside_hours_banner_needs_read_permission(self):
-        """The banner endpoint reads the ticket server-side and returns a
-        rendered message, so it needs the same read check every other endpoint
-        in that module makes. Without it any signed-in user could probe any
-        ticket id."""
-        from helpdesk.helpdesk.doctype.hd_ticket.api import show_outside_hours_banner
-
-        others = make_ticket(raised_by=PERMS_OTHER_CUSTOMER)
-        frappe.set_user(PERMS_CUSTOMER)
-        with self.assertRaises(frappe.PermissionError):
-            show_outside_hours_banner(others.name)
 
     def test_customer_cannot_spoof_fields_on_insert(self):
         other_contact = frappe.db.get_value(
@@ -2498,6 +2525,108 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         return frappe.db.get_value(
             "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
         )
+
+    def test_system_manager_can_edit_ticket_after_creation(self):
+        """A System Manager is not an agent, but HD Ticket grants them write at
+        every level. The guard must let them through or it contradicts the
+        permission rows it is supposed to be backing up."""
+        if not frappe.db.exists("User", PERMS_SYSADMIN):
+            frappe.get_doc(
+                {
+                    "doctype": "User",
+                    "first_name": "Perms Sysadmin",
+                    "email": PERMS_SYSADMIN,
+                    "roles": [{"role": "System Manager"}],
+                }
+            ).insert()
+        frappe.set_user(PERMS_SYSADMIN)
+        # raised from the desk, so has_permission lets them back in as owner:
+        # helpdesk denies non-agents any ticket they have no link to, which is
+        # a document-level rule and not what this guard is about
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        doc = frappe.get_doc("HD Ticket", ticket.name)
+        doc.subject = "Retitled by staff"
+        doc.save()
+        doc.reload()
+        self.assertEqual(doc.subject, "Retitled by staff")
+
+    def test_customer_cannot_set_agent_side_status(self):
+        """Closing is the only status move a customer makes for themselves.
+        `Replied` means an agent answered, so letting a customer set it lets
+        them misrepresent the queue."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "status", "Replied")
+
+    def test_customer_cannot_rewrite_feedback_once_rated(self):
+        """A rated ticket is settled. This held only for portal-raised tickets
+        before, so a ticket an agent opened on the customer's behalf let them
+        revise the rating afterwards."""
+        option, other = frappe.get_all(
+            "HD Ticket Feedback Option", fields=["name"], limit=2
+        )
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.db.set_value(
+            "HD Ticket",
+            ticket.name,
+            {
+                "status": "Closed",
+                "feedback": option.name,
+                "via_customer_portal": 0,
+            },
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "feedback", other.name)
+
+    def test_outside_hours_banner_needs_read_permission(self):
+        """The banner endpoint reads the ticket server-side and returns a
+        rendered message, so it needs the same read check every other endpoint
+        in that module makes. Without it any signed-in user could probe any
+        ticket id."""
+        from helpdesk.helpdesk.doctype.hd_ticket.api import show_outside_hours_banner
+
+        others = make_ticket(raised_by=PERMS_OTHER_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            show_outside_hours_banner(others.name)
+
+    def test_customer_can_submit_feedback(self):
+        """The portal sends status, feedback and feedback_extra in a single
+        set_value, and the rating is derived here rather than trusted."""
+        option = frappe.get_all(
+            "HD Ticket Feedback Option", fields=["name", "rating"], limit=1
+        )[0]
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        client_set_value(
+            "HD Ticket",
+            ticket.name,
+            {
+                "status": "Closed",
+                "feedback": option.name,
+                "feedback_extra": "Thanks for the help",
+            },
+        )
+        frappe.set_user("Administrator")
+        saved = frappe.db.get_value(
+            "HD Ticket",
+            ticket.name,
+            ["status", "feedback", "feedback_extra", "feedback_rating"],
+            as_dict=True,
+        )
+        self.assertEqual(saved.status, "Closed")
+        self.assertEqual(saved.feedback, option.name)
+        self.assertEqual(saved.feedback_extra, "Thanks for the help")
+        self.assertEqual(saved.feedback_rating, option.rating)
+
+    def test_customer_cannot_set_own_feedback_rating(self):
+        """feedback_rating is derived from feedback, never accepted raw."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "feedback_rating", 1)
 
     def test_system_manager_desk_insert_keeps_raised_by(self):
         """Non-agent staff filing a ticket from the desk keep the typed

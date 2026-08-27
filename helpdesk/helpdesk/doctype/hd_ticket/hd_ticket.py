@@ -11,6 +11,7 @@ from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
+from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import DocType, Order
@@ -43,6 +44,7 @@ from helpdesk.utils import (
     get_doc_room,
     is_admin,
     is_agent,
+    is_staff,
     publish_event,
 )
 
@@ -57,6 +59,15 @@ class HDTicket(Document):
     # levels a customer may write while creating a ticket: the open level and
     # the one the default template puts its visible fields at
     CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
+    # A customer fills the template's fields once, while raising the ticket.
+    # Afterwards only closing the ticket and rating it are still theirs.
+    # status_category is not really theirs: it is fetched from status, so the
+    # framework rewrites it on every save before any of our hooks look at it.
+    CUSTOMER_WRITABLE_AFTER_CREATION = (
+        "status_category",
+        "feedback",
+        "feedback_extra",
+    )
 
     @property
     def default_open_status(self):
@@ -94,7 +105,7 @@ class HDTicket(Document):
         a customer may fill only while creating the ticket. Agents and
         System Managers skip these portal rules: their raised_by stays as
         typed and the ticket is not marked as a portal ticket."""
-        if is_agent() or "System Manager" in frappe.get_roles():
+        if is_staff():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
@@ -131,6 +142,7 @@ class HDTicket(Document):
 
     def before_validate(self):
         self.check_update_perms()
+        self.prevent_customer_edits()
         self.set_ticket_type()
         self.set_raised_by()
         self.set_priority()
@@ -482,7 +494,10 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        if self.is_new() or is_agent() or not self.via_customer_portal:
+        # not gated on via_customer_portal: a ticket an agent raised on the
+        # customer's behalf is still their ticket, and rewriting a rating after
+        # the fact should be refused there too
+        if self.is_new() or is_staff():
             return
         old_doc = self.get_doc_before_save()
         is_closed = old_doc.status == "Closed"
@@ -490,6 +505,47 @@ class HDTicket(Document):
         if is_closed or is_rated:
             text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
+
+    def customer_writable_now(self) -> set[str]:
+        """Closing the ticket is the one status move a customer makes for
+        themselves. Reopening happens when they reply, which the server does on
+        their behalf, so allowing any status here would let them mark their own
+        ticket resolved or park it in a state meant for agents."""
+        writable = set(self.CUSTOMER_WRITABLE_AFTER_CREATION)
+        category = frappe.db.get_value("HD Ticket Status", self.status, "category")
+        if category == "Resolved":
+            writable.add("status")
+        return writable
+
+    def prevent_customer_edits(self):
+        """Freeze the ticket against its customer once it exists.
+
+        Permission levels cannot do this alone. A customer needs write access
+        at level 0 to raise a ticket at all, which leaves every level-0 field
+        editable forever after. The permlevel reset is also skipped entirely
+        when a save passes ignore_permissions, while this runs either way.
+        """
+        if self.is_new() or is_staff():
+            return
+        if self.flags.get("ignore_customer_edit_guard"):
+            return
+        writable = self.customer_writable_now()
+        changed = [
+            df
+            for df in self.meta.fields
+            if df.fieldtype not in no_value_fields
+            and df.fieldname not in writable
+            and self.has_value_changed(df.fieldname)
+        ]
+        if not changed:
+            return
+        labels = ", ".join(
+            self.meta.get_translated_label(df.fieldname) for df in changed
+        )
+        frappe.throw(
+            _("You cannot change {0} after the ticket is raised").format(labels),
+            frappe.PermissionError,
+        )
 
     def handle_ticket_activity_update(self):
         """
@@ -1210,6 +1266,11 @@ class HDTicket(Document):
         # portal replies save under the customer session; exempt the fields the
         # server works out so the permlevel reset keeps them
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
+        # the same save reopens the ticket and stamps the response times, so the
+        # customer edit guard has to stand aside too. The framework hands this
+        # method a freshly loaded ticket, never a caller's payload, so the
+        # exemption cannot be reached from outside.
+        self.flags.ignore_customer_edit_guard = True
         # Save the ticket, allowing for hooks to run.
         self.save()
 

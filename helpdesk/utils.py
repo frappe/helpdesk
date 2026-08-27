@@ -59,6 +59,21 @@ def is_agent(user: str | None = None) -> bool:
     )
 
 
+def is_staff(user: str | None = None) -> bool:
+    """
+    Check whether `user` works the helpdesk rather than raising tickets in it
+
+    System Managers are staff without being agents: HD Ticket grants them write
+    at every permission level, so ticket rules that gate on agents alone would
+    lock them out of their own doctype.
+
+    :param user: User to check against, defaults to current user
+    :return: Whether `user` is an agent or a System Manager
+    """
+    user = user or frappe.session.user
+    return is_agent(user) or "System Manager" in frappe.get_roles(user)
+
+
 def get_agent_name(user: str = None) -> str | None:
     """
     Get the HD Agent name for `user`
