@@ -773,6 +773,7 @@ def show_banner_next_day(ticket):
 
 @frappe.whitelist()
 def show_outside_hours_banner(ticket_name: str):
+    frappe.has_permission("HD Ticket", "read", ticket_name, throw=True)
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"
     )

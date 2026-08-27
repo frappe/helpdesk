@@ -2395,6 +2395,18 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket.reload()
         self.assertEqual(ticket.priority, new_priority)
 
+    def test_outside_hours_banner_needs_read_permission(self):
+        """The banner endpoint reads the ticket server-side and returns a
+        rendered message, so it needs the same read check every other endpoint
+        in that module makes. Without it any signed-in user could probe any
+        ticket id."""
+        from helpdesk.helpdesk.doctype.hd_ticket.api import show_outside_hours_banner
+
+        others = make_ticket(raised_by=PERMS_OTHER_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            show_outside_hours_banner(others.name)
+
     def test_customer_cannot_spoof_fields_on_insert(self):
         other_contact = frappe.db.get_value(
             "Contact", {"email_id": PERMS_OTHER_CUSTOMER}
