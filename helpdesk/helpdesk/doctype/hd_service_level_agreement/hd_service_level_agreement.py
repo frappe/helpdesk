@@ -402,7 +402,10 @@ class HDServiceLevelAgreement(Document):
 
     def is_working_time(self, date_time, working_hours):
         day_of_week = get_weekdays()[date_time.weekday()]
-        start_time, end_time = working_hours.get(day_of_week, (0, 0))
+        # empty window on non-working days
+        start_time, end_time = working_hours.get(
+            day_of_week, (timedelta(), timedelta())
+        )
         date_time = timedelta(
             hours=date_time.hour, minutes=date_time.minute, seconds=date_time.second
         )
@@ -468,6 +471,18 @@ class HDServiceLevelAgreement(Document):
             current_date = add_to_date(current_date, days=1)
 
         return total_seconds
+
+    def get_next_working_day_start(self, from_date):
+        """Start of the first working day after from_date, skipping holidays."""
+        working_hours = self.get_working_hours()
+        holidays = set(self.get_holidays())
+        # a year of lookahead is plenty; None means the calendar has no working day
+        for offset in range(1, 366):
+            next_date = getdate(add_to_date(from_date, days=offset, as_datetime=True))
+            day_name = next_date.strftime("%A")
+            if day_name in working_hours and next_date not in holidays:
+                return get_datetime(next_date) + working_hours[day_name][0]
+        return None
 
     def get_holidays(self):
         res = []

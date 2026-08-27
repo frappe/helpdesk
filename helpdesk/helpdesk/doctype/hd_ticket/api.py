@@ -5,12 +5,7 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import (
-    add_to_date,
-    get_datetime,
-    get_user_info_for_avatar,
-    now_datetime,
-)
+from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
 
@@ -752,23 +747,9 @@ def get_ticket_assignees(ticket: str) -> list[dict]:
 
 
 def show_banner_next_day(ticket):
-    sla = ticket.get_sla()
-    working_hours = sla.get_working_hours()
-    now = now_datetime()
-    creation_date = get_datetime(ticket.creation)
-    next_date = add_to_date(creation_date, days=1)
-    next_date_day_name = next_date.strftime("%A")
-    if next_date_day_name not in working_hours:
-        return True
-
-    start_time = working_hours[next_date_day_name][0]
-
-    next_day_start_datetime = (
-        next_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_time
-    )
-    if now > next_day_start_datetime:
-        return False
-    return True
+    """Show the banner until the first working day after the ticket was raised begins."""
+    next_start = ticket.get_sla().get_next_working_day_start(ticket.creation)
+    return next_start is None or now_datetime() <= next_start
 
 
 @frappe.whitelist()

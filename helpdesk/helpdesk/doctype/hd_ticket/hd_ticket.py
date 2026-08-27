@@ -1,6 +1,5 @@
 import json
 import uuid
-from datetime import timedelta
 from email.utils import parseaddr
 
 import frappe
@@ -14,7 +13,6 @@ from frappe.email.email_body import get_message_id
 from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
-from frappe.query_builder import DocType, Order
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
 from pypika.functions import Count
 from pypika.queries import Query
@@ -497,9 +495,9 @@ class HDTicket(Document):
         # not gated on via_customer_portal: a ticket an agent raised on the
         # customer's behalf is still their ticket, and rewriting a rating after
         # the fact should be refused there too
-        if self.is_new() or is_staff():
-            return
         old_doc = self.get_doc_before_save()
+        if not old_doc or is_staff():
+            return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
         if is_closed or is_rated:
@@ -1134,47 +1132,13 @@ class HDTicket(Document):
         return frappe.get_doc("HD Service Level Agreement", self.sla)
 
     def is_currently_outside_working_hours(self):
-        """Return True if current time is outside this SLA's working hours."""
-
+        """Return True if today is a holiday or now is outside this SLA's working hours."""
         sla = self.get_sla()
         if not sla:
             return False
-
-        current_date = getdate()
-        now = now_datetime()
-
-        current_td = timedelta(
-            hours=now.hour,
-            minutes=now.minute,
-            seconds=now.second,
-            microseconds=now.microsecond,
-        )
-
-        day_name = current_date.strftime("%A")
-        Holiday = DocType("HD Holiday")
-
-        # Check holidays for this SLA
-        holidays = (
-            frappe.qb.from_(Holiday)
-            .select(Holiday.holiday_date)
-            .where(Holiday.parent == sla.name)
-            .run(pluck=True)
-        )
-
-        if current_date in holidays:
+        if getdate() in sla.get_holidays():
             return True
-
-        working_hours = sla.get_working_hours()
-        # No working hours today
-        if day_name not in working_hours:
-            return True
-
-        start_time, end_time = working_hours[day_name]
-
-        # Outside working hours
-        if not (start_time <= current_td < end_time):
-            return True
-        return False
+        return not sla.is_working_time(now_datetime(), sla.get_working_hours())
 
     def set_default_status(self):
         if self.is_new():

@@ -14,6 +14,7 @@ export const useAgentStore = defineStore("agent", () => {
     agents.data?.map((o) => ({
       label: o.agent_name,
       value: o.name,
+      image: o.user_image,
     }))
   );
 

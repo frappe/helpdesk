@@ -433,7 +433,8 @@ function selectBannerOptions(
     }));
 
   return [...userActions, ...defaultActions].filter(
-    (action) => Boolean(action.inline) === inline
+    (action) =>
+      Boolean(action.inline) === inline && (action.condition?.() ?? true)
   );
 }
 

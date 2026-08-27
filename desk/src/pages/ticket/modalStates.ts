@@ -1,4 +1,5 @@
-import { ref } from "vue";
+import { RenderedSavedReply } from "@/types";
+import { ref, shallowRef } from "vue";
 
 export const showAssignmentModal = ref(false);
 export const showEmailBox = ref(false);
@@ -17,3 +18,9 @@ export function toggleCommentBox() {
   }
   showCommentBox.value = !showCommentBox.value;
 }
+
+// The mounted composer's insert action, for the command palette which sits
+// outside this provide chain. Null when no composer is mounted.
+export const replyComposer = shallowRef<
+  ((reply: RenderedSavedReply) => void) | null
+>(null);

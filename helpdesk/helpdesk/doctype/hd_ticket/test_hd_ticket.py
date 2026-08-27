@@ -126,6 +126,15 @@ class TestHDTicket(IntegrationTestCase):
         ticket.insert()
         self.assertTrue(ticket.name)
 
+    def test_update_perms_skipped_without_a_previous_version(self):
+        # a before_insert hook that persists the ticket clears __islocal, so is_new()
+        # can be False on create while there is still no previous version to check
+        frappe.set_user(non_agent)
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.set("__islocal", False)
+        ticket.check_update_perms()
+        frappe.set_user("Administrator")
+
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
@@ -878,6 +887,34 @@ class TestHDTicket(IntegrationTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
+
+    def test_ticket_outside_working_hours_next_day_holiday(self):
+        tuesday = add_to_date(get_current_week_monday(), days=1)
+        add_holiday(getdate(tuesday), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(get_current_week_monday(hours=20)):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=1)):
+            # Tuesday is a holiday, so the banner stays up
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=2)):
+            # Wednesday is the next working day
+            self.assertFalse(show_outside_hours_banner(ticket.name)["show"])
+
+    def test_ticket_raised_on_holiday(self):
+        tuesday_afternoon = add_to_date(get_current_week_monday(hours=14), days=1)
+        add_holiday(getdate(tuesday_afternoon), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(tuesday_afternoon):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
 
     def test_contact_ticket_visibility(self):
         """

@@ -31,10 +31,12 @@ export function colorToken(color?: string): string {
   return TAG_COLORS[color ?? ""] ?? DEFAULT_COLOR_CLASS;
 }
 
-/** Shared master list of helpdesk tags. Per-document tag changes go through
- * `helpdesk.api.tags.update_tags` (see Tags.vue). */
+let tagListResource: ReturnType<typeof createListResource<Tag>> | undefined;
+
+/** Shared master list of helpdesk tags, fetched once. Per-document tag changes
+ * go through `helpdesk.api.tags.update_tags` (see Tags.vue). */
 export function useTags() {
-  const tagListResource = createListResource({
+  tagListResource ??= createListResource({
     doctype: "Tag",
     fields: ["name", "color"],
     cache: ["Tags", "Helpdesk"],

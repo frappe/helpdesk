@@ -6,16 +6,9 @@ import type { Command } from "./paletteTypes";
 
 import LucideTags from "~icons/lucide/tags";
 
-// useTags() mints a resource per call; hold one so drilling in twice doesn't.
-let tags: ReturnType<typeof useTags> | null = null;
-function tagList() {
-  if (!tags) tags = useTags();
-  return tags;
-}
-
 /** Toggle list: applied tags ticked; Enter flips one and pops back a level. */
 export async function tagChildren(ticketId: string): Promise<Command[]> {
-  const { tagListResource } = tagList();
+  const { tagListResource } = useTags();
   // Always refetch: tags can be created mid-session from the sidebar picker.
   await tagListResource.reload();
   const applied = appliedTags(ticketId);

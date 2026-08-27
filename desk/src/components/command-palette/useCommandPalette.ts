@@ -38,7 +38,9 @@ export interface PaletteGroup {
 const stack = shallowRef<Level[]>([]); // drill-down levels, empty = root
 const loadingChildren = ref(false);
 
-export const breadcrumb = computed(() => stack.value.map((level) => level.title));
+export const breadcrumb = computed(() =>
+  stack.value.map((level) => level.title)
+);
 export const depth = computed(() => stack.value.length);
 
 /** Agent-only; AppSidebar is shared with the customer portal, so the gate lives here. */
@@ -191,7 +193,11 @@ function buildGroups(): PaletteGroup[] {
 
   // Scope *ranks*, never *gates*: returning scoped-only made a ticket whose
   // subject contains "open" unreachable behind "Set status: Open".
-  return [...scoped, ...groupCommands(globalCommands(), term), ...fallback(term)];
+  return [
+    ...scoped,
+    ...groupCommands(globalCommands(), term),
+    ...fallback(term),
+  ];
 }
 
 /** Pinned, not last-resort: almost any word fuzzy-matches *something*, so an
@@ -256,13 +262,11 @@ const debouncedSearch = useDebounceFn(async (term: string, token: number) => {
       SEARCH_RESULT_LIMIT
     );
   } catch {
-    // ponytail: no rows on FTS/server errors — the fallback row still routes
-    // somewhere. Add a `subject like` fallback if unindexed sites become common.
     if (token === latestSearchToken) searchResults.value = [];
   } finally {
     if (token === latestSearchToken) searchLoading.value = false;
   }
-}, 200);
+}, 300);
 
 /** Token advances on every change, so a response can't land under a newer query. */
 export function onQueryChange(term: string): void {
