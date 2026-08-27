@@ -5,7 +5,10 @@ from frappe.desk.doctype.tag.tag import add_tag, remove_tag
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
     log_ticket_activity,
 )
-from helpdesk.utils import agent_only
+from helpdesk.utils import agent_only, capture_event
+
+FIRST_TICKET_TAG = "First Ticket"
+FIRST_TICKET_TAG_COLOR = "Blue"
 
 
 @frappe.whitelist()
@@ -29,10 +32,13 @@ def update_tags(
         remove_tag(label, doctype, name)
 
     added_labels = [label for tag in added or [] if (label := tag["name"].strip())]
+    new_labels = [label for label in added_labels if label not in before]
+    if new_labels and doctype == "HD Ticket":
+        capture_event("ticket_tag_applied")
     log_tag_activity(
         doctype,
         name,
-        [label for label in added_labels if label not in before],
+        new_labels,
         [label for label in removed or [] if label in before],
     )
     return frappe.db.get_value(doctype, name, "_user_tags") or ""
@@ -41,7 +47,8 @@ def update_tags(
 def apply_tag(doctype: str, name: str, label: str, color: str = "Gray") -> str:
     """Link a tag to a document, creating the helpdesk Tag master if needed.
 
-    ``color`` applies only on create or claim; an existing tag keeps its colour.
+    ``color`` applies on create, on claim, and to a tag that has no colour
+    yet; a tag that already has one keeps it.
     """
     label = label.strip()
     if not label:
@@ -60,9 +67,10 @@ def apply_tag(doctype: str, name: str, label: str, color: str = "Gray") -> str:
                 "color": color,
             }
         ).insert(ignore_permissions=True, ignore_if_duplicate=True)
-    elif existing.app != "helpdesk":
+    elif existing.app != "helpdesk" or not existing.color:
         # Desk's tag sidebar mints tags with no app/color; claim them for
-        # helpdesk so they list in the picker
+        # helpdesk so they list in the picker, and fill a missing colour so
+        # they stop rendering gray
         frappe.db.set_value(
             "Tag",
             label,

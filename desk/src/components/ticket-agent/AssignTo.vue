@@ -44,9 +44,9 @@
               <span v-if="ghost" class="text-ink-gray-4">
                 {{ __("Set Assignee") }}...
               </span>
-              <span v-else class="text-ink-gray-5 leading-5">{{
-                __("No one")
-              }}</span>
+              <span v-else class="text-ink-gray-5 leading-5">
+                {{ emptyLabel }}
+              </span>
             </template>
           </div>
           <template #suffix>
@@ -208,9 +208,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { hideLabel, ghost } = props;
 
-const ticket = inject(TicketSymbol)!;
-const assignees = inject(AssigneeSymbol)!;
-const activities = inject(ActivitiesSymbol)!;
+// No ticket in context (bulk assign) means nothing to save to: the picker then
+// just reports its selection through v-model and the parent decides what to do.
+const ticket = inject(TicketSymbol, null);
+const assignees = inject(AssigneeSymbol, null);
+const activities = inject(ActivitiesSymbol, null);
+const selection = defineModel<string[]>({ default: () => [] });
+
+// On a ticket the trigger reports state ("No one" is assigned); standalone it is
+// an input still waiting on a choice, so it reads as a placeholder.
+const emptyLabel = computed(() =>
+  ticket ? __("No one") : __("Select agents")
+);
 
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
@@ -231,7 +240,7 @@ const snapshotAssignees = ref<LocalAssignee[]>([]);
 
 // Sync from injected assignees when popover is not open
 watch(
-  () => assignees.value?.data,
+  () => assignees?.value?.data,
   (data) => {
     if (!popoverIsOpen.value && data) {
       localAssignees.value = [...data];
@@ -239,6 +248,21 @@ watch(
   },
   { immediate: true, deep: true }
 );
+
+// Standalone mode: the selection itself is the output, so publish it live.
+watch(
+  localAssignees,
+  (list) => {
+    if (!ticket) selection.value = list.map((a) => a.name);
+  },
+  { deep: true }
+);
+
+// Standalone mode: let the parent clear the picker (e.g. on dialog open).
+watch(selection, (names) => {
+  if (ticket || names.length || !localAssignees.value.length) return;
+  localAssignees.value = [];
+});
 
 // Watch popover open/close — same pattern as old AssignToBody
 watch(popoverIsOpen, (isOpen) => {
@@ -258,6 +282,7 @@ watch(popoverIsOpen, (isOpen) => {
     // Closing after a real open: compute diff and save
     hasBeenOpened.value = false;
     searchText.value = "";
+    if (!ticket) return;
     const currentNames = localAssignees.value.map((a) => a.name);
     const oldNames = snapshotAssignees.value.map((a) => a.name);
     const added = currentNames.filter((n) => !oldNames.includes(n));
@@ -494,7 +519,7 @@ async function logActivity(action: string) {
   await call("frappe.client.insert", {
     doc: {
       doctype: "HD Ticket Activity",
-      ticket: ticket.value?.name,
+      ticket: ticket?.value?.name,
       action,
     },
   });
@@ -505,11 +530,13 @@ const addAssigneesResource = createResource({
   url: "frappe.desk.form.assign_to.add",
   makeParams: (addedAssignees: string[]) => ({
     doctype: "HD Ticket",
-    name: ticket.value?.name,
+    name: ticket?.value?.name,
     assign_to: addedAssignees,
   }),
   onSuccess: () => {
-    capture("ticket_assigned", { doctype: "HD Ticket" });
+    capture("ticket_assigned", {
+      data: { doctype: "HD Ticket", source: "popover" },
+    });
   },
 });
 
@@ -517,7 +544,7 @@ const removeAssigneesResource = createResource({
   url: "helpdesk.api.doc.remove_assignments",
   makeParams: (removedAssignees: string[]) => ({
     doctype: "HD Ticket",
-    name: ticket.value?.name,
+    name: ticket?.value?.name,
     assignees: removedAssignees,
   }),
 });
@@ -574,8 +601,8 @@ async function saveAssignees(added: string[], removed: string[]) {
       toast.success(__("Assignees updated successfully."));
     }, successDelay);
 
-    assignees.value.reload();
-    activities.value.reload();
+    assignees?.value.reload();
+    activities?.value.reload();
   } catch {
     toast.error(__("Failed to update Assignees."));
     localAssignees.value = [...snapshotAssignees.value];

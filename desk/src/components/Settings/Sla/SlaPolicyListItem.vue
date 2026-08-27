@@ -168,10 +168,6 @@ const deleteSla = () => {
 };
 
 const onToggle = () => {
-  if (props.data.default_sla) {
-    toast.error(__("SLA set as default cannot be disabled."));
-    return;
-  }
   slaPolicyList?.setValue.submit(
     {
       name: props.data.name,

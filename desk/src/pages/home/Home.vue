@@ -302,7 +302,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Average Time Metrics"),
+      label: __("Avg. Time Metrics"),
       chart: "avg_time_metrics",
       onClick: () =>
         addChart("avg_time_metrics", {
@@ -314,7 +314,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Average First Response Time"),
+      label: __("Avg. First Response Time"),
       chart: "avg_first_response_time",
       onClick: () =>
         addChart("avg_first_response_time", {
@@ -326,7 +326,7 @@ const chartsDropdown = computed(() => {
         }),
     },
     {
-      label: __("Average Resolution Time"),
+      label: __("Avg. Resolution Time"),
       chart: "avg_resolution_time",
       onClick: () =>
         addChart("avg_resolution_time", {

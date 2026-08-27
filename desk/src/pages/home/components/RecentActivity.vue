@@ -12,13 +12,17 @@
       </Tooltip>
     </div>
     <div class="relative mt-5 grow overflow-hidden">
-      <div class="flex flex-col h-full overflow-auto hide-scrollbar">
+      <!-- pb matches the fade height below, so the last row never sits under it -->
+      <div class="flex flex-col h-full overflow-auto hide-scrollbar pb-8">
         <template v-if="!showSkeleton && activities.length > 0">
-          <div
+          <router-link
             v-for="activity in activities"
             :key="activity.name"
-            @click="goToTicket(activity)"
-            class="flex items-center gap-3 px-2 py-3 text-sm cursor-pointer hover:bg-surface-sidebar rounded"
+            :to="{
+              name: 'TicketAgent',
+              params: { ticketId: String(activity.name) },
+            }"
+            class="flex items-center gap-3 px-2 py-3 text-sm hover:bg-surface-sidebar rounded"
           >
             <component
               :is="iconFor(activity.activity_type)"
@@ -35,7 +39,7 @@
             <span class="text-ink-gray-4 whitespace-nowrap tabular-nums">
               {{ activity.timestamp }}
             </span>
-          </div>
+          </router-link>
         </template>
         <div v-else class="flex flex-col">
           <div v-for="i in 6" :key="i" class="flex items-center gap-3 p-2 py-3">
@@ -72,7 +76,6 @@ import EmptyState from "@/components/EmptyState.vue";
 import { __ } from "@/translation";
 import { createResource, Tooltip } from "frappe-ui";
 import { computed, onMounted, ref, type PropType } from "vue";
-import { useRouter } from "vue-router";
 import ActivityIcon from "~icons/lucide/activity";
 import ReplyIcon from "~icons/lucide/corner-up-left";
 import EyeIcon from "~icons/lucide/eye";
@@ -94,8 +97,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const router = useRouter();
 
 const typeLabels: Record<string, string> = {
   replied: __("Replied"),
@@ -136,13 +137,6 @@ function iconFor(type: string) {
 function label(activity: RecentActivity) {
   return activity.text || typeLabels[activity.activity_type];
 }
-
-const goToTicket = (activity: RecentActivity) => {
-  router.push({
-    name: "TicketAgent",
-    params: { ticketId: String(activity.name) },
-  });
-};
 
 onMounted(() => {
   if (!Array.isArray(props.data)) {

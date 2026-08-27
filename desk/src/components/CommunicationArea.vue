@@ -134,12 +134,17 @@
                     tooltip="Saved replies"
                     @click="showSavedRepliesSelectorModal = true"
                   >
-                    <template #icon
-                      ><SavedReplyIcon class="h-4 w-4"
-                    /></template>
+                    <template #icon><ZapIcon class="h-4 w-4" /></template>
                   </Button>
                 </template>
               </EmailComposer>
+              <!-- Saved reply actions, applied once the reply is sent -->
+              <SavedReplyActions
+                ref="savedReplyActionsRef"
+                class="mt-2 shrink-0"
+                :ticket-id="ticketId"
+                :doctype="doctype"
+              />
             </div>
             <div
               v-show="showCommentBox"
@@ -168,18 +173,21 @@
     v-model="showSavedRepliesSelectorModal"
     :doctype="doctype"
     :ticketId="ticketId"
-    @apply="applySavedReply"
+    @apply="applySavedReplies"
   />
 </template>
 
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
+import { createDialog } from "@/components/dialogs";
+import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import {
+  replyComposer,
   showCommentBox,
   showEmailBox,
   toggleCommentBox,
@@ -187,6 +195,8 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { RenderedSavedReply } from "@/types";
 import {
   htmlToText,
   isContentEmpty,
@@ -228,7 +238,7 @@ import {
 import LucideMaximize2 from "~icons/lucide/maximize-2";
 import LucideMinimize2 from "~icons/lucide/minimize-2";
 import LucideX from "~icons/lucide/x";
-import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
+import ZapIcon from "~icons/lucide/zap";
 
 const props = defineProps({
   doctype: {
@@ -469,6 +479,12 @@ watch(emailBody, (value, oldValue) => {
   if (value !== oldValue && value) {
     onUserType();
   }
+  // Only the composer's internal Discard/Esc reset the model to exactly "";
+  // deleting text by hand leaves an empty paragraph. A discarded draft takes
+  // its staged saved-reply actions with it.
+  if (!value) {
+    savedReplyActionsRef.value?.clear();
+  }
   cachedEmail.value = isOnlySignature(value) ? null : value || null;
 });
 
@@ -548,11 +564,48 @@ function uploadFile(file: File) {
 
 // ─── Saved replies ────────────────────────────────────────────
 const showSavedRepliesSelectorModal = ref(false);
+const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 
-function applySavedReply(template: string) {
+/** A reply is only replaced when another one is already applied. */
+function applySavedReplies(reply: RenderedSavedReply) {
+  const staged = savedReplyActionsRef.value?.stagedSummary();
+  if (!staged) {
+    insertSavedReply(reply);
+    return;
+  }
+  createDialog({
+    title: __("Replace saved reply"),
+    message: __(
+      'Applying "{0}" discards the reply you have now, along with its {1} action(s).',
+      [reply.title, staged.count]
+    ),
+    actions: [
+      { label: __("Cancel") },
+      {
+        label: __("Replace"),
+        variant: "solid",
+        onClick: ({ close }: { close: () => void }) => {
+          replaceSavedReply(reply);
+          close();
+        },
+      },
+    ],
+  });
+}
+
+/** First reply of a draft: added to whatever the agent has already written. */
+function insertSavedReply(reply: RenderedSavedReply) {
   const editor = emailComposerRef.value?.editor;
   if (!editor) return;
-  editor.chain().focus("start").insertContent(template).run();
+  editor.chain().focus("start").insertContent(reply.message).run();
+  savedReplyActionsRef.value?.add(reply);
+}
+
+/** Confirmed replace: the new reply's body and actions stand alone. */
+function replaceSavedReply(reply: RenderedSavedReply) {
+  emailBody.value = reply.message + (emailSignature.value ?? "");
+  savedReplyActionsRef.value?.add(reply);
+  nextTick(() => emailComposerRef.value?.focus());
 }
 
 // ─── Send email ───────────────────────────────────────────────
@@ -560,6 +613,7 @@ const sendMail = createResource({
   url: "run_doc_method",
   debounce: 300,
   onSuccess: () => {
+    savedReplyActionsRef.value?.submit();
     // reset() clears the to/cc/bcc models itself, so re-seed after it.
     emailComposerRef.value?.reset();
     resetRecipients();
@@ -710,20 +764,30 @@ useShortcut("c", () => {
 });
 
 const IGNORED_SELECTORS = [
+  ".tippy-content",
   ".PopoverContent",
   '[role="dialog"]',
+  '[role="presentation"]',
   '[role="menu"]',
   ".dialog-overlay",
   "[data-reka-popper-content-wrapper]",
 ];
 
+// `ignore` is only consulted on pointerdown, which dialogs stop, so the click
+// through has to be checked too. Without this a dialog button closes the box.
+function isIgnored(event: Event): boolean {
+  const target = event.target as HTMLElement | null;
+  return Boolean(target?.closest?.(IGNORED_SELECTORS.join(", ")));
+}
+
 onClickOutside(
   rootRef,
-  () => {
+  (event) => {
     // A floating window lives outside the page flow — only the docked
     // composer closes on outside clicks.
     if (windowMode.value !== "docked") return;
     if (justResized) return;
+    if (isIgnored(event)) return;
     closeComposer();
   },
   {
@@ -732,6 +796,9 @@ onClickOutside(
 );
 
 onMounted(() => {
+  // Published for the command palette, which opens the email box itself
+  // before inserting. See modalStates.ts.
+  replyComposer.value = applySavedReplies;
   if (
     agentsList.value.loading ||
     agentsList.value.data?.length ||
@@ -743,6 +810,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  replyComposer.value = null;
   cleanup();
   if (isContentEmpty(commentBody.value)) {
     localStorage.removeItem("commentBoxContent" + props.ticketId);

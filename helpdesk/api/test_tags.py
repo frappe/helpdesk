@@ -2,7 +2,7 @@ import frappe
 from frappe.desk.doctype.tag.tag import add_tag
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.api.tags import apply_tag, update_tags
+from helpdesk.api.tags import FIRST_TICKET_TAG, apply_tag, update_tags
 from helpdesk.test_utils import create_agent, make_ticket
 
 AGENT_EMAIL = "helpdesk-tag-agent@example.com"
@@ -138,6 +138,20 @@ class TestTicketTags(FrappeTestCase):
 
         # empty batches are a no-op, not an error
         update_tags("HD Ticket", self.ticket.name)
+
+    def test_first_ticket_is_tagged(self):
+        requester = "helpdesk-first-timer@example.com"
+        first = make_ticket("First one", raised_by=requester)
+        second = make_ticket("Second one", raised_by=requester)
+
+        self.assertIn(
+            FIRST_TICKET_TAG,
+            frappe.db.get_value("HD Ticket", first.name, "_user_tags"),
+        )
+        self.assertNotIn(
+            FIRST_TICKET_TAG,
+            frappe.db.get_value("HD Ticket", second.name, "_user_tags") or "",
+        )
 
     def test_tags_apply_to_any_doctype(self):
         # the endpoint takes doctype/name, so tags are not a ticket feature;

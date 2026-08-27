@@ -86,9 +86,19 @@
     </ListRows>
     <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
-        <Dropdown :options="selectBannerOptions(selections, unselectAll)">
-          <Button icon="lucide-more-horizontal" variant="ghost" />
-        </Dropdown>
+        <div class="flex items-center gap-1">
+          <Button
+            v-for="action in selectBannerOptions(selections, unselectAll, true)"
+            :key="action.label"
+            :label="action.label"
+            :icon-left="action.icon"
+            variant="ghost"
+            @click="action.onClick"
+          />
+          <Dropdown :options="selectBannerOptions(selections, unselectAll)">
+            <Button icon="lucide-more-horizontal" variant="ghost" />
+          </Dropdown>
+        </div>
       </template>
     </ListSelectBanner>
   </ListView>
@@ -164,6 +174,7 @@ import {
   computed,
   h,
   onMounted,
+  onUnmounted,
   provide,
   reactive,
   ref,
@@ -173,6 +184,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 
 import EmptyState from "./EmptyState.vue";
+import { listFilters } from "./listViewFilters";
 import ListRows from "./ListRows.vue";
 
 interface P {
@@ -392,7 +404,12 @@ const exposeFunctions = {
   unselectAll: () => {},
 };
 
-function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
+/** Banner actions. `inline` picks the ones shown as buttons; the rest fill the "..." menu. */
+function selectBannerOptions(
+  selections: Set<string>,
+  unselectAll = () => {},
+  inline = false
+) {
   exposeFunctions["unselectAll"] = unselectAll;
 
   // Get the user-provided actions
@@ -415,8 +432,10 @@ function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
       onClick: () => action.onClick?.(selections),
     }));
 
-  // Return combined actions
-  return [...userActions, ...defaultActions];
+  return [...userActions, ...defaultActions].filter(
+    (action) =>
+      Boolean(action.inline) === inline && (action.condition?.() ?? true)
+  );
 }
 
 const rows = computed(() => {
@@ -617,6 +636,14 @@ provide("listViewActions", {
   reload,
 });
 
+// Also published module-scope, for the command palette: it renders in the
+// sidebar, outside this provide chain.
+listFilters.value = {
+  current: () => normalizeFilters(list?.params?.filters),
+  apply: applyFilters,
+};
+onUnmounted(() => (listFilters.value = null));
+
 function applyFilters(filters) {
   isViewUpdated.value = true;
   defaultParams.filters = normalizeFilters(filters);
@@ -744,38 +771,66 @@ function handleReload() {
 }
 
 function handleViewChanges() {
-  let currentView: View = findCurrentView();
-  if (!currentView) {
-    router.push({ name: route.name });
-    reload(true);
+  if (!switchToView(route.query.view as string)) return;
+  applyUrlFilters();
+  list.submit({ ...defaultParams });
+}
+
+/** Base for URL filters, so repeated pushes layer on the view, not each other. */
+let viewFilters = [];
+
+/** Owns sort, columns and rows. False means a redirect is in flight. */
+function switchToView(view: string): boolean {
+  defaultParams.view.name = view;
+  const currentView: View = findCurrentView();
+  if (currentView) {
+    // normalize so legacy dict-format saved views become list conditions
+    viewFilters = normalizeFilters(currentView.filters);
+    defaultParams.order_by = currentView.order_by || "modified desc";
+    defaultParams.columns = currentView.columns;
+    defaultParams.rows = currentView.rows;
+    return true;
+  }
+  if (view) {
+    // Stale ?view: drop it but keep the filters, unlike a push to the bare route.
+    router.replace({
+      name: route.name,
+      query: { ...route.query, view: undefined },
+    });
+    return false;
+  }
+  viewFilters = normalizeFilters(options.value.defaultFilters);
+  defaultParams.order_by = "modified desc";
+  defaultParams.columns = [];
+  defaultParams.rows = [];
+  defaultParams.is_default = true;
+  headerView.value.label = __("List");
+  headerView.value.icon = LucideAlignJustify;
+  return true;
+}
+
+/** Touches `filters` only, so filtering never resets the user's sort. */
+function applyUrlFilters() {
+  const urlFilters = parseUrlFilters();
+  if (!urlFilters) {
+    defaultParams.filters = viewFilters;
     return;
   }
-  // normalize so legacy dict-format saved views become list conditions
-  defaultParams.filters = normalizeFilters(currentView.filters);
-  defaultParams.order_by = currentView.order_by || "modified desc";
-  defaultParams.columns = currentView.columns;
-  defaultParams.rows = currentView.rows;
+  const overriddenFields = new Set(urlFilters.map((c) => c[0]));
+  defaultParams.filters = urlFilters.length
+    ? [...viewFilters.filter((c) => !overriddenFields.has(c[0])), ...urlFilters]
+    : [];
+}
 
-  if (route.query.filters) {
-    try {
-      const parsedFilters = normalizeFilters(
-        JSON.parse(route.query.filters as string)
-      );
-      if (parsedFilters.length > 0) {
-        const overriddenFields = new Set(parsedFilters.map((c) => c[0]));
-        defaultParams.filters = [
-          ...normalizeFilters(defaultParams.filters).filter(
-            (c) => !overriddenFields.has(c[0])
-          ),
-          ...parsedFilters,
-        ];
-      }
-    } catch (e) {
-      console.error("Failed to parse filters from URL", e);
-    }
+/** null when the URL carries no filters; [] means "clear them". */
+function parseUrlFilters() {
+  if (!route.query.filters) return null;
+  try {
+    return normalizeFilters(JSON.parse(route.query.filters as string));
+  } catch (e) {
+    console.error("Failed to parse filters from URL", e);
+    return null;
   }
-
-  list.submit({ ...defaultParams });
 }
 
 function findCurrentView() {
@@ -790,15 +845,14 @@ function findCurrentView() {
   return currentView;
 }
 
+// The view is re-read only when it changes; re-reading it on every filter
+// change is what let a filter silently reset the sort.
 watch(
-  () => route.query.view,
-  (val: string) => {
-    defaultParams.view.name = val;
-    handleViewChanges();
-    if (!val) {
-      headerView.value.label = __("List");
-      headerView.value.icon = LucideAlignJustify;
-    }
+  [() => route.query.view as string, () => route.query.filters as string],
+  ([view], [previousView]) => {
+    if (view !== previousView && !switchToView(view)) return;
+    applyUrlFilters();
+    list.submit({ ...defaultParams });
   }
 );
 

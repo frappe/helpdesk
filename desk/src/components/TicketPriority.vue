@@ -12,7 +12,7 @@
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect width="14" height="14" rx="4" class="fill-ink-gray-5" />
+        <rect width="14" height="14" rx="4" class="fill-ink-gray-6" />
         <rect
           x="6.25"
           y="3"
@@ -82,6 +82,6 @@ const level = computed(() => getLevel(props.priority ?? ""));
 
 function barClass(barIndexFromTop: number): string {
   const faded = FADED_BARS[level.value] ?? 0;
-  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-5";
+  return barIndexFromTop < faded ? "fill-ink-gray-3" : "fill-ink-gray-6";
 }
 </script>
