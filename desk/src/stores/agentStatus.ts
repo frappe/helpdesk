@@ -50,7 +50,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   });
 
   // Live availability keyed by HD Agent name. Seeded by fetches and kept current
-  // over the socket — set_my_availability broadcasts to every client, so this is
+  // over the socket — HD Agent's on_update broadcasts to every client, so this is
   // the single source of truth for "who is what right now", including ourselves.
   const liveStatuses = reactive<Record<string, LiveAvailability>>({});
 
@@ -75,8 +75,11 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     { immediate: true }
   );
 
+  // A plain document write: HD Agent's controller owns the validation, the
+  // availability_changed_on stamp and the socket broadcast, so every write path
+  // behaves the same and this needs no dedicated endpoint.
   const setMyAvailability = createResource({
-    url: "helpdesk.api.agent.set_my_availability",
+    url: "frappe.client.set_value",
     onSuccess: () => toast.success(__("Status updated successfully.")),
     onError: () => toast.error(__("Could not update status.")),
   });
@@ -101,7 +104,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     const previous = liveStatuses[myAgentName];
     applyLive(myAgentName, status);
     setMyAvailability.submit(
-      { availability: status },
+      {
+        doctype: "HD Agent",
+        name: myAgentName,
+        fieldname: "availability",
+        value: status,
+      },
       {
         // Roll back the optimistic write on failure.
         onError: () => {
