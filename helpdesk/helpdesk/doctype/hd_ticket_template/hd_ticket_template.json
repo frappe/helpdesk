@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Hide a custom field to keep it for agents only: its permission level is raised, so it also stops being returned by the API. To show it again, lower its permission level in Customize Form first. Hiding a standard field only takes it off the customer's form: what customers may read of the app's own fields is set by the field's permission level, which you change in Customize Form. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields the system sets cannot be shown. Only the Default template affects permission levels, and a template save never lowers one. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
+   "description": "Hide a custom field to keep it for agents only: its permission level moves to the internal tier, so the API stops returning it. Show it and the level moves to the customer-visible tier. Removing a field from the template returns it to the level it had before it was added. Hiding a standard field only takes it off the customer's form: what customers may read of the app's own fields is set by the field's permission level, which you change in Customize Form. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields the system sets cannot be shown. Only the Default template affects permission levels. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",
@@ -43,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-06-27 19:24:12.121049",
+ "modified": "2026-08-28 17:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",

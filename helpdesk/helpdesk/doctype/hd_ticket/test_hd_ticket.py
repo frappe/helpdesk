@@ -2354,8 +2354,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
     Protected fields sit at permlevel 7 (customer-visible) and 8
     (internal), so the framework silently resets any change to them
     made by a user without write access at that level. Standard fields
-    keep the level the doctype ships. Hiding a custom field in the
-    default template raises its level to 8; nothing ever lowers one.
+    keep the level the doctype ships. The default template owns custom
+    field levels: hidden -> 8, shown -> 7, and a removed row returns
+    the field to the level it arrived with.
 
     Note the two shapes of refusal: a change to a permlevel-protected
     field is reverted without a word, while a change to a permlevel-0
@@ -2393,6 +2394,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "hide_from_customer": f.hide_from_customer,
                 "url_method": f.url_method,
                 "placeholder": f.placeholder,
+                "base_permlevel": f.base_permlevel,
             }
             for f in template.fields
         ]
@@ -2542,10 +2544,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.clear_cache(doctype="HD Ticket")
 
     def test_custom_field_permlevel_governs_customer_access(self):
-        """A custom field's permission level is set in Customize Form, never by
-        the template. At 8 a customer's value is dropped. At 7 they may fill it
-        while creating the ticket, then it freezes like any other level-7 field.
-        """
+        """The permission level is what governs access: at 8 a customer's
+        value is dropped, at 7 they may fill it while creating the ticket,
+        then it freezes like any other level-7 field."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_admin_set"
@@ -2597,24 +2598,36 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             )
             frappe.clear_cache(doctype="HD Ticket")
 
-    def test_hiding_a_custom_field_is_form_only(self):
-        """Hiding a custom field in the Default template only takes it off the
-        form. The template never touches permission levels, so the field stays
-        readable through the API until an admin raises its level in Customize
-        Form."""
+    def test_template_visibility_drives_custom_field_permlevel(self):
+        """The Default template owns a custom field's level while it lists
+        it: hidden -> internal (8), shown -> customer-visible (7). Removing
+        the row returns the field to the level it arrived with, here 0."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
-        fieldname = "custom_perms_form_only"
+        fieldname = "custom_perms_template_driven"
         create_custom_field(
             "HD Ticket",
-            {"fieldname": fieldname, "label": "Perms Form Only", "fieldtype": "Data"},
+            {
+                "fieldname": fieldname,
+                "label": "Perms Template Driven",
+                "fieldtype": "Data",
+            },
         )
         try:
             self.assertEqual(self.custom_field_permlevel(fieldname), 0)
             self.set_default_template_fields(
                 [{"fieldname": fieldname, "hide_from_customer": 1}]
             )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 0}]
+            )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
+
+            self.set_default_template_fields([])
             self.assertEqual(self.custom_field_permlevel(fieldname), 0)
+
             self.assertFalse(
                 frappe.get_all(
                     "Property Setter",
@@ -2632,9 +2645,121 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             )
             frappe.clear_cache(doctype="HD Ticket")
 
+    def test_removed_custom_field_returns_to_admin_level(self):
+        """A field the admin kept internal before templating goes back to
+        internal when its row is removed: removal never exposes anything."""
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_round_trip"
+        create_custom_field(
+            "HD Ticket",
+            {
+                "fieldname": fieldname,
+                "label": "Perms Round Trip",
+                "fieldtype": "Data",
+                "permlevel": 8,
+            },
+        )
+        frappe.clear_cache(doctype="HD Ticket")
+        try:
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 0}]
+            )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
+
+            self.set_default_template_fields([])
+            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+            frappe.clear_cache(doctype="HD Ticket")
+
+    def test_migration_raises_hidden_custom_fields_and_records_bases(self):
+        """The patch records each row's base level and raises hidden rows to
+        internal. Raise only: it never lowers, so an upgrade cannot expose a
+        field. Safe to run twice."""
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        from helpdesk.patches.harden_hd_ticket_field_permissions import (
+            remember_bases_and_hide_hidden_custom_fields,
+        )
+
+        hidden_field = "custom_perms_patch_hidden"
+        shown_field = "custom_perms_patch_shown"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": hidden_field, "label": "Patch Hidden", "fieldtype": "Data"},
+        )
+        create_custom_field(
+            "HD Ticket",
+            {
+                "fieldname": shown_field,
+                "label": "Patch Shown",
+                "fieldtype": "Data",
+                "permlevel": 8,
+            },
+        )
+        frappe.clear_cache(doctype="HD Ticket")
+        try:
+            self.set_default_template_fields(
+                [
+                    {"fieldname": hidden_field, "hide_from_customer": 1},
+                    {"fieldname": shown_field, "hide_from_customer": 0},
+                ]
+            )
+            # rewind to the pre-upgrade shape: levels untouched, bases blank
+            self.set_custom_field_permlevel(hidden_field, 0)
+            self.set_custom_field_permlevel(shown_field, 8)
+            for row in self.default_template_row_names():
+                frappe.db.set_value(
+                    "HD Ticket Template Field", row, "base_permlevel", -1
+                )
+
+            for _ in range(2):  # idempotent
+                remember_bases_and_hide_hidden_custom_fields()
+                self.assertEqual(self.custom_field_permlevel(hidden_field), 8)
+                self.assertEqual(self.custom_field_permlevel(shown_field), 8)
+
+            bases = {
+                f.fieldname: f.base_permlevel
+                for f in frappe.get_doc(
+                    "HD Ticket Template", DEFAULT_TICKET_TEMPLATE
+                ).fields
+            }
+            self.assertEqual(bases[hidden_field], 0)
+            self.assertEqual(bases[shown_field], 8)
+        finally:
+            frappe.set_user("Administrator")
+            for fieldname in (hidden_field, shown_field):
+                frappe.delete_doc(
+                    "Custom Field",
+                    frappe.db.get_value(
+                        "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                    ),
+                    force=True,
+                )
+            frappe.clear_cache(doctype="HD Ticket")
+
+    @staticmethod
+    def default_template_row_names():
+        return frappe.get_all(
+            "HD Ticket Template Field",
+            filters={
+                "parenttype": "HD Ticket Template",
+                "parent": DEFAULT_TICKET_TEMPLATE,
+            },
+            pluck="name",
+        )
+
     def test_non_default_template_hide_is_display_only(self):
-        """No template touches permission levels; hiding only changes the
-        form. Left here to guard the non-default path too."""
+        """Only the Default template drives permission levels; a sidecar
+        template's hide only changes the form."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_sidecar"
@@ -2655,6 +2780,46 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 frappe.delete_doc(
                     "HD Ticket Template", template.name, force=True, ignore_missing=True
                 )
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+            frappe.clear_cache(doctype="HD Ticket")
+
+    def test_non_default_template_cannot_show_internal_custom_field(self):
+        """A sidecar template does not drive levels, so showing a custom
+        field the site keeps internal is refused instead of lowered."""
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_sidecar_internal"
+        create_custom_field(
+            "HD Ticket",
+            {
+                "fieldname": fieldname,
+                "label": "Perms Sidecar Internal",
+                "fieldtype": "Data",
+                "permlevel": 8,
+            },
+        )
+        frappe.clear_cache(doctype="HD Ticket")
+        try:
+            with self.assertRaises(frappe.ValidationError):
+                make_template(
+                    "Perms Sidecar Show",
+                    [{"fieldname": fieldname, "hide_from_customer": 0}],
+                )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "HD Ticket Template",
+                "Perms Sidecar Show",
+                force=True,
+                ignore_missing=True,
+            )
             frappe.delete_doc(
                 "Custom Field",
                 frappe.db.get_value(
