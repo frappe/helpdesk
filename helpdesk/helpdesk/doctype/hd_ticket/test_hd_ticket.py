@@ -5,6 +5,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import frappe
+from frappe.desk.form.utils import add_comment as desk_add_comment
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -2307,6 +2308,28 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(has_permission(ticket, user=agent2))
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
+
+    def test_only_agents_can_comment_on_a_ticket(self):
+        contact = create_contact("Commenter", "commenter@test.com")
+        customer = contact.get("user")
+        ticket = make_ticket(raised_by=customer, via_customer_portal=1)
+
+        frappe.set_user(customer)
+        self.assertTrue(frappe.has_permission("HD Ticket", "read", doc=ticket.name))
+        with self.assertRaises(frappe.PermissionError):
+            desk_add_comment("HD Ticket", ticket.name, "sneaky", customer, "Commenter")
+
+        frappe.set_user(agent)
+        comment = desk_add_comment("HD Ticket", ticket.name, "internal", agent, "agent")
+        self.assertTrue(frappe.db.exists("Comment", comment.name))
+
+        # system comments carry no author intent, so the session user is irrelevant
+        frappe.set_user(customer)
+        assigned = frappe.get_doc("HD Ticket", ticket.name).add_comment(
+            "Assigned", "assigned to agent"
+        )
+        self.assertTrue(frappe.db.exists("Comment", assigned.name))
+        frappe.set_user("Administrator")
 
     def tearDown(self):
         frappe.set_user("Administrator")

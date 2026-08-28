@@ -101,6 +101,9 @@ doc_events = {
     "Notification Log": {
         "before_insert": "helpdesk.extends.notification_log.before_insert",
     },
+    "Comment": {
+        "before_insert": "helpdesk.extends.comment.before_insert",
+    },
 }
 
 # For List View
@@ -110,20 +113,17 @@ permission_query_conditions = {
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
 
+
 has_permission = {
     "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
+    "Comment": "helpdesk.extends.comment.has_permission",
 }
 
-# Desk form endpoints read comments with permissions ignored, gated only on
-# the reference doc; deny non-agents for HD Ticket (see overrides/desk_form.py)
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
-    "frappe.desk.form.load.getdoc": "helpdesk.overrides.desk_form.getdoc",
-    "frappe.desk.form.load.get_docinfo": "helpdesk.overrides.desk_form.get_docinfo",
-    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.desk_form.get_activity_timeline",
 }
 
 

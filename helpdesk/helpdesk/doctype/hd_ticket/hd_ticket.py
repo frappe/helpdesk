@@ -42,6 +42,8 @@ from helpdesk.utils import (
 
 from ..hd_service_level_agreement.utils import get_sla
 
+customer_not_allowed_fields = ["customer"]
+
 
 class HDTicket(Document):
     @property
@@ -623,10 +625,48 @@ class HDTicket(Document):
                 _("You are not permitted to add a comment"), frappe.PermissionError
             )
         comment = self.add_comment("Comment", content)
-        for attachment in attachments:
-            self.attach_file_with_doc(
-                "Comment", comment.name, attachment.get("file_url")
+        urls = [a.get("file_url") for a in attachments if a.get("file_url")]
+        soup = BeautifulSoup(content or "", "html.parser")
+        urls += [
+            tag["src"] for tag in soup.find_all(["img", "video"]) if tag.has_attr("src")
+        ]
+        self.claim_comment_files(comment.name, urls)
+
+    def claim_comment_files(self, comment: str, urls: list[str]):
+        """Move a comment's files off the ticket and onto the comment.
+
+        The editor uploads against the ticket, which every customer on it can
+        read. Only the comment is agent-only, so the file has to hang off the
+        comment to inherit that, and no row may be left on the ticket: any one
+        readable row serves the url (see frappe's `find_file_by_url`).
+        """
+        if not urls:
+            return
+        # Someone else's file was embedded, not uploaded here; leave it be
+        claimed = frappe.get_all(
+            "File",
+            filters={
+                "file_url": ["in", urls],
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": self.name,
+                "owner": frappe.session.user,
+            },
+            pluck="name",
+        )
+        for name in claimed:
+            frappe.db.set_value(
+                "File",
+                name,
+                {"attached_to_doctype": "Comment", "attached_to_name": comment},
             )
+        # own uploads only: a row on the comment makes its url servable to readers
+        owned = frappe.get_all(
+            "File",
+            filters={"file_url": ["in", urls], "owner": frappe.session.user},
+            pluck="file_url",
+        )
+        for url in set(owned):
+            self.attach_file_with_doc("Comment", comment, url)
 
     @frappe.whitelist()
     @agent_only
@@ -1348,7 +1388,7 @@ def _agent_has_permission(doc, user: str) -> bool:
         try:
             if user in json.loads(doc._assign):
                 return True
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return False
 
     teams = get_agents_team(user)
@@ -1453,9 +1493,6 @@ def remove_guest_ticket_creation_permission():
     role = "Guest"
     permlevel = 0
     remove(doctype, role, permlevel, 1)
-
-
-customer_not_allowed_fields = ["customer"]
 
 
 def close_tickets_after_n_days():
