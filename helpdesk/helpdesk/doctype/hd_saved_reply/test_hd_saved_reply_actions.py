@@ -5,7 +5,7 @@ import json
 
 import frappe
 from frappe.cache_manager import clear_doctype_map
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.saved_replies import (
     apply_saved_reply_actions,
@@ -40,7 +40,7 @@ def make_saved_reply_with_actions(title, actions, scope="Global"):
     return doc
 
 
-class TestHDSavedReplyActions(IntegrationTestCase):
+class TestHDSavedReplyActions(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
