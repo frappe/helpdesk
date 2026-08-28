@@ -19,9 +19,11 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import (
+    CREATION_FILLABLE_PERMLEVELS,
+    CUSTOMER_WRITABLE_AFTER_CREATION,
     DEFAULT_TICKET_TEMPLATE,
+    PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
-    TICKET_VISIBLE_FIELD_PERMLEVEL,
 )
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
@@ -51,22 +53,6 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
-    # fields the server fills in itself; the permission reset skips them
-    # only while the server is writing them
-    SERVER_OWNED_INSERT_FIELDS = ["key", "raised_by", "via_customer_portal", "customer"]
-    # levels a customer may write while creating a ticket: the open level and
-    # the one the default template puts its visible fields at
-    CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
-    # A customer fills the template's fields once, while raising the ticket.
-    # Afterwards only closing the ticket and rating it are still theirs.
-    # status_category is not really theirs: it is fetched from status, so the
-    # framework rewrites it on every save before any of our hooks look at it.
-    CUSTOMER_WRITABLE_AFTER_CREATION = (
-        "status_category",
-        "feedback",
-        "feedback_extra",
-    )
-
     @property
     def default_open_status(self):
         return frappe.db.get_value(
@@ -109,8 +95,7 @@ class HDTicket(Document):
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
         self.flags.ignore_permlevel_for_fields = (
-            list(self.SERVER_OWNED_INSERT_FIELDS)
-            + self.creation_fillable_template_fields()
+            list(PORTAL_INSERT_EXEMPT_FIELDS) + self.creation_fillable_template_fields()
         )
 
     def customer_may_fill_at_creation(self, fieldname: str) -> bool:
@@ -120,7 +105,7 @@ class HDTicket(Document):
         if fieldname in SERVER_COMPUTED_FIELDS:
             return False
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
-        return bool(field) and field.permlevel in self.CREATION_FILLABLE_PERMLEVELS
+        return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
 
     def creation_fillable_template_fields(self) -> list[str]:
         """Fields a customer may fill on the creation form: the fields the
@@ -509,7 +494,7 @@ class HDTicket(Document):
         themselves. Reopening happens when they reply, which the server does on
         their behalf, so allowing any status here would let them mark their own
         ticket resolved or park it in a state meant for agents."""
-        writable = set(self.CUSTOMER_WRITABLE_AFTER_CREATION)
+        writable = set(CUSTOMER_WRITABLE_AFTER_CREATION)
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved":
             writable.add("status")
