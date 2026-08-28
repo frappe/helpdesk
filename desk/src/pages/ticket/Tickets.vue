@@ -56,6 +56,16 @@
       :selections="listSelections"
       @success="listViewRef?.unselectAll()"
     />
+    <BulkEditModal
+      v-model="showBulkEditModal"
+      :selections="listSelections"
+      @success="reset(true)"
+    />
+    <BulkAssignModal
+      v-model="showBulkAssignModal"
+      :selections="listSelections"
+      @success="reset(true)"
+    />
   </div>
 </template>
 
@@ -64,6 +74,8 @@ import { LayoutHeader, ListViewBuilder } from "@/components";
 import { TicketIcon } from "@/components/icons";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
+import BulkAssignModal from "@/components/ticket-agent/BulkAssignModal.vue";
+import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
@@ -110,14 +122,26 @@ const { getStatus } = useTicketStatusStore();
 const listSelections = ref(new Set());
 
 const showBulkReplyModal = ref(false);
+const showBulkEditModal = ref(false);
+const showBulkAssignModal = ref(false);
 
 const selectBannerActions = [
   {
-    label: __("Bulk Reply"),
-    icon: "corner-up-left",
+    label: __("Reply"),
+    icon: "lucide-corner-up-left",
+    inline: true,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
+    },
+  },
+  {
+    label: __("Assign"),
+    icon: "lucide-user-plus",
+    inline: true,
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkAssignModal.value = true;
     },
   },
   {
@@ -126,6 +150,14 @@ const selectBannerActions = [
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showExportModal.value = true;
+    },
+  },
+  {
+    label: __("Edit"),
+    icon: "lucide-pencil",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkEditModal.value = true;
     },
   },
 ];
@@ -211,38 +243,32 @@ const options = computed(() => ({
 
 function handleResponseByField(row: any, item: string) {
   if (!row.sla) return null; // nothing promised, so nothing to report against
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
+  if (row.first_responded_on) {
+    // no target means it was never breached, so responding at all fulfils it
+    const fulfilled = !item || dayjs(row.first_responded_on).isBefore(item);
+    return slaOutcomeBadge(fulfilled);
   }
-  if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
-    return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "gray",
+  if (!item) return null;
+  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
+  return h(
+    Tooltip,
+    {
+      text: dayjs(item).format("LLLL"),
+    },
+    h(Badge, {
+      label: shortDuration(item),
       variant: "subtle",
-    });
-  } else if (dayjs(row.first_responded_on).isAfter(item)) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  } else {
-    return h(
-      Tooltip,
-      {
-        text: dayjs(item).format("LLLL"),
-      },
-      h(Badge, {
-        label: shortDuration(item),
-        variant: "subtle",
-        theme: "orange",
-      })
-    );
-  }
+      theme: "orange",
+    })
+  );
+}
+
+function slaOutcomeBadge(fulfilled: boolean) {
+  return h(Badge, {
+    label: fulfilled ? __("Fulfilled") : __("Failed"),
+    theme: fulfilled ? "gray" : "red",
+    variant: "subtle",
+  });
 }
 
 function handleResolutionByField(row: any, item: string) {
@@ -256,23 +282,12 @@ function handleResolutionByField(row: any, item: string) {
     });
   }
   if (row.resolution_date) {
-    const fulfilled = dayjs(row.resolution_date).isBefore(
-      dayjs(row.resolution_by)
-    );
-    return h(Badge, {
-      label: fulfilled ? __("Fulfilled") : __("Failed"),
-      theme: fulfilled ? "gray" : "red",
-      variant: "subtle",
-    });
+    const fulfilled = !item || dayjs(row.resolution_date).isBefore(dayjs(item));
+    return slaOutcomeBadge(fulfilled);
   }
+  if (!item) return null;
   // In progress but the resolution deadline has already passed.
-  if (dayjs(item).isBefore(dayjs())) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "subtle",
-    });
-  }
+  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
   // In progress with a future deadline: show the live countdown.
   return h(
     Tooltip,
