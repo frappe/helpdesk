@@ -358,33 +358,6 @@ export interface EmailAccount {
   validate_ssl_certificate_for_outgoing: boolean;
 }
 
-<<<<<<< HEAD
-export type EmailAccountFormState = {
-  email_account_name?: string;
-  email_id?: string;
-  service?: string;
-  password?: string;
-  api_key?: string;
-  api_secret?: string;
-  frappe_mail_site?: string;
-  domain?: string;
-  email_server?: string;
-  incoming_port?: string | number;
-  smtp_server?: string;
-  smtp_port?: string | number;
-  use_ssl?: boolean | number;
-  use_starttls?: boolean | number;
-  use_tls?: boolean | number;
-  use_ssl_for_outgoing?: boolean | number;
-  validate_ssl_certificate?: boolean | number;
-  validate_ssl_certificate_for_outgoing?: boolean | number;
-  attachment_limit?: string | number;
-  append_emails_to_sent_folder?: boolean | number;
-  sent_folder_name?: string;
-};
-
-export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
-=======
 export type TicketTab =
   | "activity"
   | "email"
@@ -392,7 +365,6 @@ export type TicketTab =
   | "details"
   | "call"
   | "analytics";
->>>>>>> 38a2289 (feat: analytics tab with metrics and conversation summary)
 
 export interface TabObject {
   name: TicketTab;
