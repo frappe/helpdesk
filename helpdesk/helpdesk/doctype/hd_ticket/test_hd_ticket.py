@@ -2680,6 +2680,41 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             )
             frappe.clear_cache(doctype="HD Ticket")
 
+    def test_customize_form_restriction_survives_template_removal(self):
+        """Removing a row only undoes the sync's own write. A level-8
+        restriction the admin set in Customize Form after the field was
+        added is newer than the recorded base, so it stands."""
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_admin_override"
+        create_custom_field(
+            "HD Ticket",
+            {
+                "fieldname": fieldname,
+                "label": "Perms Admin Override",
+                "fieldtype": "Data",
+            },
+        )
+        try:
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 0}]
+            )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
+
+            self.set_custom_field_permlevel(fieldname, 8)
+            self.set_default_template_fields([])
+            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+            frappe.clear_cache(doctype="HD Ticket")
+
     def test_migration_raises_hidden_custom_fields_and_records_bases(self):
         """The patch records each row's base level and raises hidden rows to
         internal. Raise only: it never lowers, so an upgrade cannot expose a

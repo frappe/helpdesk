@@ -109,15 +109,18 @@ class HDTicketTemplate(Document):
                 continue
             current = self.current_permlevel(f.fieldname)
             self.remember_base_permlevel(f, current)
-            target = (
-                TICKET_INTERNAL_FIELD_PERMLEVEL
-                if f.hide_from_customer
-                else TICKET_VISIBLE_FIELD_PERMLEVEL
-            )
+            target = self.template_level(f)
             if current != target:
                 self.set_custom_field_permlevel(f.fieldname, target)
                 moved = True
         return moved
+
+    def template_level(self, row) -> int:
+        return (
+            TICKET_INTERNAL_FIELD_PERMLEVEL
+            if row.hide_from_customer
+            else TICKET_VISIBLE_FIELD_PERMLEVEL
+        )
 
     def remember_base_permlevel(self, row, current: int):
         """A save can replace rows wholesale, so a fresh row inherits the
@@ -131,17 +134,23 @@ class HDTicketTemplate(Document):
         row.db_set("base_permlevel", base, update_modified=False)
 
     def restore_removed_custom_fields(self) -> bool:
-        """A removed row hands the field back at the level it arrived with,
-        so a template round trip leaves no trace."""
+        """A removed row hands the field back at the level it arrived with.
+        Only the sync's own write is undone: a level someone set in
+        Customize Form after the last template save stands."""
+        before = self.get_doc_before_save()
+        if not before:
+            return False
         kept = {f.fieldname for f in self.fields}
         moved = False
-        for fieldname, base in self.bases_before_save().items():
-            if fieldname in kept or not has_recorded_base(base):
+        for f in before.fields:
+            if f.fieldname in kept or not has_recorded_base(f.base_permlevel):
                 continue
-            if not self.custom_field_exists(fieldname):
+            if not self.custom_field_exists(f.fieldname):
                 continue
-            if self.current_permlevel(fieldname) != base:
-                self.set_custom_field_permlevel(fieldname, base)
+            if self.current_permlevel(f.fieldname) != self.template_level(f):
+                continue
+            if f.base_permlevel != self.template_level(f):
+                self.set_custom_field_permlevel(f.fieldname, f.base_permlevel)
                 moved = True
         return moved
 
