@@ -2102,7 +2102,12 @@ class TestHDTicket(FrappeTestCase):
     def test_ticket_without_sla_uses_settings_default_status(self):
         """A blank ticket takes its status from HD Settings, not an arbitrary policy."""
         make_priority(UNINCLUDED_PRIORITY)
+        # rollback is per test class, so a leftover Open status would break
+        # the "last status in its category" guard in the status tests
         sla_only_status = make_status(name="SLA Only Status")
+        self.addCleanup(
+            frappe.delete_doc, "HD Ticket Status", sla_only_status.name, force=True
+        )
         status_field = "default_ticket_status"
         frappe.db.set_value(
             SLA_DOCTYPE, SLA_PRIORITY_NAME, status_field, sla_only_status.name
