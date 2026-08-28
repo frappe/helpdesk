@@ -50,10 +50,7 @@ class HDTicketTemplate(Document):
 
     def validate_unfillable_fields_stay_hidden(self):
         """An internal field must stay hidden, so only agents can fill it.
-
-        It may still sit in the template for the agent form. Showing it to
-        customers would only offer an input the server throws away.
-        """
+        Showing it offers the customer an input the server throws away."""
         for f in self.fields:
             if not f.fieldname or f.hide_from_customer:
                 continue
@@ -81,11 +78,8 @@ class HDTicketTemplate(Document):
         capture_event("ticket_template_updated")
 
     def current_permlevel(self, fieldname: str) -> int:
-        """The level HD Ticket gives this field right now.
-
-        Read from the live meta rather than the shipped DocField row, so a
-        field an administrator moved through Customize Form is recognised.
-        """
+        """Read from live meta, not the shipped DocField row, so a level an
+        administrator changed in Customize Form is recognised."""
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return field.permlevel if field else 0
 

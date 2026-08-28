@@ -20,7 +20,7 @@ from pypika.terms import Criterion
 
 from helpdesk.consts import (
     CREATION_FILLABLE_PERMLEVELS,
-    CUSTOMER_WRITABLE_AFTER_CREATION,
+    CUSTOMER_EDIT_EXEMPT_FIELDS,
     DEFAULT_TICKET_TEMPLATE,
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
@@ -44,7 +44,7 @@ from helpdesk.utils import (
     get_doc_room,
     is_admin,
     is_agent,
-    is_staff,
+    is_agent_staff,
     publish_event,
 )
 
@@ -83,13 +83,10 @@ class HDTicket(Document):
         self.apply_portal_insert_rules()
 
     def apply_portal_insert_rules(self):
-        """Right after this hook, the framework wipes every field the user
-        cannot write. Protect two kinds of values from that: what the
-        server just set, and the fields the default template shows, which
-        a customer may fill only while creating the ticket. Agents and
-        System Managers skip these portal rules: their raised_by stays as
-        typed and the ticket is not marked as a portal ticket."""
-        if is_staff():
+        """The framework wipes every field the user cannot write right after
+        this hook, so exempt what the server just set and what the default
+        template lets a customer fill. Staff skip these portal rules."""
+        if is_agent_staff():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
@@ -481,7 +478,7 @@ class HDTicket(Document):
         # customer's behalf is still their ticket, and rewriting a rating after
         # the fact should be refused there too
         old_doc = self.get_doc_before_save()
-        if not old_doc or is_staff():
+        if not old_doc or is_agent_staff():
             return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
@@ -490,11 +487,9 @@ class HDTicket(Document):
             frappe.throw(text, frappe.PermissionError)
 
     def customer_writable_now(self) -> set[str]:
-        """Closing the ticket is the one status move a customer makes for
-        themselves. Reopening happens when they reply, which the server does on
-        their behalf, so allowing any status here would let them mark their own
-        ticket resolved or park it in a state meant for agents."""
-        writable = set(CUSTOMER_WRITABLE_AFTER_CREATION)
+        """A customer may move the ticket into the Resolved category, nothing
+        else. Reopening happens on reply, which the server does for them."""
+        writable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved":
             writable.add("status")
@@ -503,12 +498,10 @@ class HDTicket(Document):
     def prevent_customer_edits(self):
         """Freeze the ticket against its customer once it exists.
 
-        Permission levels cannot do this alone. A customer needs write access
-        at level 0 to raise a ticket at all, which leaves every level-0 field
-        editable forever after. The permlevel reset is also skipped entirely
-        when a save passes ignore_permissions, while this runs either way.
+        Permission levels cannot do this alone: raising a ticket needs write
+        at level 0, and the reset is skipped on ignore_permissions saves.
         """
-        if self.is_new() or is_staff():
+        if self.is_new() or is_agent_staff():
             return
         if self.flags.get("ignore_customer_edit_guard"):
             return

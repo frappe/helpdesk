@@ -28,10 +28,8 @@ SERVER_COMPUTED_FIELDS = [
     "resolution_failed_by",
 ]
 
-# Fields kept out of the permlevel reset while a customer raises a ticket.
-# The server writes key, raised_by and via_customer_portal itself. customer
-# comes from the portal's own picker, and set_customer checks it belongs to
-# the contact. The exemption is insert only: later saves revert these fields.
+# Kept out of the permlevel reset while a customer raises a ticket. customer
+# is the odd one: the portal picker sends it and set_customer checks it.
 PORTAL_INSERT_EXEMPT_FIELDS = [
     "key",
     "raised_by",
@@ -43,11 +41,9 @@ PORTAL_INSERT_EXEMPT_FIELDS = [
 # one the default template puts its visible fields at.
 CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
 
-# A customer fills the template's fields once, while raising the ticket.
-# Afterwards only closing the ticket and rating it are still theirs.
-# status_category is not really theirs: it is fetched from status, so the
-# framework rewrites it on every save before any of our hooks look at it.
-CUSTOMER_WRITABLE_AFTER_CREATION = (
+# Changes the customer edit guard must not refuse. status_category is fetched
+# from status, so closing rewrites it before the guard ever looks.
+CUSTOMER_EDIT_EXEMPT_FIELDS = (
     "status_category",
     "feedback",
     "feedback_extra",

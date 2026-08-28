@@ -15,7 +15,7 @@ from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_scr
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, is_agent, is_staff, parse_call_logs
+from helpdesk.utils import agent_only, is_agent, is_agent_staff, parse_call_logs
 
 
 @frappe.whitelist()
@@ -103,7 +103,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         "tags": get_tags(name),
         "template": get_template(template),
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=is_customer_portal or not is_staff()
+            "HD Ticket", is_customer_portal=is_customer_portal or not is_agent_staff()
         ),
         "fields": get_meta(template),
         "calls": call_logs,
