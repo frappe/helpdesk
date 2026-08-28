@@ -2,12 +2,8 @@
 # Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 import frappe
-<<<<<<< HEAD
 from frappe.tests.utils import FrappeTestCase
-=======
-from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime
->>>>>>> b75761f (refactor: allow tickets to not have any SLA)
 
 from helpdesk.consts import DEFAULT_SLA
 from helpdesk.test_utils import (

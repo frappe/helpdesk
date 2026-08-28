@@ -504,13 +504,7 @@ class TestAgentHome(FrappeTestCase):
         frappe.set_user("Administrator")
         for t in [ticket, other_ticket]:
             frappe.delete_doc("HD Ticket", t.name, force=True)
-<<<<<<< HEAD
-            # never delete the seeded SLAs shared by the whole suite
-            if t.sla not in (SLA_PRIORITY_NAME, "Default"):
-                frappe.delete_doc("HD Service Level Agreement", t.sla, force=True)
-=======
         frappe.delete_doc("HD Service Level Agreement", "Test SLA High", force=True)
->>>>>>> b75761f (refactor: allow tickets to not have any SLA)
 
     def test_get_pending_tickets_new_tickets_type(self):
         """Test getting newly assigned tickets"""
