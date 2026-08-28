@@ -127,14 +127,9 @@ const showBulkAssignModal = ref(false);
 
 const selectBannerActions = [
   {
-<<<<<<< HEAD
-    label: __("Bulk Reply"),
-    icon: "corner-up-left",
-=======
     label: __("Reply"),
     icon: "lucide-corner-up-left",
     inline: true,
->>>>>>> f3c25b4 (feat(tickets): bulk edit and bulk assign from the selection banner)
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
