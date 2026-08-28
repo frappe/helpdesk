@@ -881,6 +881,34 @@ class TestHDTicket(FrappeTestCase):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
 
+    def test_ticket_outside_working_hours_next_day_holiday(self):
+        tuesday = add_to_date(get_current_week_monday(), days=1)
+        add_holiday(getdate(tuesday), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(get_current_week_monday(hours=20)):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=1)):
+            # Tuesday is a holiday, so the banner stays up
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=2)):
+            # Wednesday is the next working day
+            self.assertFalse(show_outside_hours_banner(ticket.name)["show"])
+
+    def test_ticket_raised_on_holiday(self):
+        tuesday_afternoon = add_to_date(get_current_week_monday(hours=14), days=1)
+        add_holiday(getdate(tuesday_afternoon), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(tuesday_afternoon):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+
     def test_contact_ticket_visibility(self):
         """
         Test case to validate that contact can only see the tickets raised by them only.
