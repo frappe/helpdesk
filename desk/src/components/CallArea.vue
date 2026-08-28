@@ -17,11 +17,7 @@
         }}</span>
       </div>
       <div class="ms-auto whitespace-nowrap">
-        <Tooltip :text="dateFormat(activity.creation, 'MMM D, dddd')">
-          <div class="text-sm text-ink-gray-5">
-            {{ __(timeAgo(activity.creation)) }}
-          </div>
-        </Tooltip>
+        <TimelineTimestamp :date="activity.creation" />
       </div>
     </div>
     <div
@@ -96,10 +92,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { dateFormat, timeAgo } from "@/utils";
-import { Avatar, Badge, Tooltip } from "frappe-ui";
+import { dateFormat } from "@/utils";
+import { Avatar, Badge } from "frappe-ui";
 import { inject, ref } from "vue";
 import MultipleAvatar from "./MultipleAvatar.vue";
+import TimelineTimestamp from "./TimelineTimestamp.vue";
 import CalendarIcon from "./icons/CalendarIcon.vue";
 import DurationIcon from "./icons/DurationIcon.vue";
 import PlayIcon from "./icons/PlayIcon.vue";

@@ -15,11 +15,10 @@
         </p>
       </div>
       <div class="flex items-center gap-1">
-        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="ps-0.5 text-sm text-ink-gray-5">
-            {{ timeAgo(creation) }}
-          </span>
-        </Tooltip>
+        <TimelineTimestamp
+          :date="creation"
+          class-name="ps-0.5 text-sm text-ink-gray-5"
+        />
         <div v-if="authStore.userId === commentedBy && !editable">
           <Dropdown
             :placement="'right'"
@@ -158,13 +157,11 @@ import { __ } from "@/translation";
 import { CommentActivity } from "@/types";
 import {
   ConfirmDelete,
-  dateFormat,
-  dateTooltipFormat,
   getFontFamily,
   isContentEmpty,
-  timeAgo,
   uploadFunction,
 } from "@/utils";
+import TimelineTimestamp from "./TimelineTimestamp.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import {
   Avatar,

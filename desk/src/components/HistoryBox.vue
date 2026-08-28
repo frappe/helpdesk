@@ -30,9 +30,7 @@
       </div>
 
       <div class="text-ink-gray-5 text-sm w-2/6 flex justify-end">
-        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span>{{ timeAgo(creation) }}</span>
-        </Tooltip>
+        <TimelineTimestamp :date="creation" />
       </div>
     </div>
     <div v-if="show_others" class="space-y-2.5 mt-3.5">
@@ -47,13 +45,7 @@
           </span>
           <span> {{ relatedActivity.content }}</span>
         </div>
-        <Tooltip
-          :text="dateFormat(relatedActivity.creation, dateTooltipFormat)"
-        >
-          <div class="text-ink-gray-5 text-sm flex justify-end">
-            {{ timeAgo(relatedActivity.creation) }}
-          </div>
-        </Tooltip>
+        <TimelineTimestamp :date="relatedActivity.creation" />
       </div>
     </div>
   </div>
@@ -61,8 +53,8 @@
 
 <script setup lang="ts">
 import { SelectIcon } from "@/components/icons";
-import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { computed, ref } from "vue";
+import TimelineTimestamp from "./TimelineTimestamp.vue";
 const props = defineProps({
   activity: {
     type: Object,

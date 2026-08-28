@@ -12,11 +12,10 @@
       <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
           <p>{{ sender.full_name || "Guest" }}</p>
-          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <p class="text-xs md:text-sm text-ink-gray-5">
-              {{ timeAgo(creation) }}
-            </p>
-          </Tooltip>
+          <TimelineTimestamp
+            :date="creation"
+            class-name="text-xs md:text-sm text-ink-gray-5"
+          />
           <p class="sm:flex hidden text-sm text-ink-gray-5" v-if="sender.name">
             {{ "<" + sender.name + ">" }}
           </p>
@@ -41,14 +40,11 @@
             :theme="status.color"
             class="me-1.5"
           />
-          <Tooltip
-            :text="dateFormat(creation, dateTooltipFormat)"
+          <TimelineTimestamp
             v-if="!isMobileView"
-          >
-            <p class="text-xs md:text-sm text-ink-gray-5">
-              {{ timeAgo(creation) }}
-            </p>
-          </Tooltip>
+            :date="creation"
+            class-name="text-xs md:text-sm text-ink-gray-5"
+          />
         </div>
         <div class="flex items-center gap-1">
           <Button :tooltip="__('Reply')" variant="ghost" @click="reply">
@@ -118,13 +114,13 @@ import { AttachmentItem } from "@/components";
 import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
 import { TicketSymbol } from "@/types";
-import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { Dropdown } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, inject, ref } from "vue";
 import LucideSplit from "~icons/lucide/split";
 import { ReplyAllIcon, ReplyIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
+import TimelineTimestamp from "./TimelineTimestamp.vue";
 
 const props = defineProps({
   activity: {
