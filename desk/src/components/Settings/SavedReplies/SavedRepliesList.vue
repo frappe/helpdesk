@@ -41,10 +41,7 @@
         </div>
         <Dropdown :options="filterOptions" placement="right">
           <template #default="{ open }">
-            <Button
-              :label="activeFilterLabel"
-              class="flex items-center justify-between w-fit p-4"
-            >
+            <Button :label="activeFilterLabel">
               <template #suffix>
                 <FeatherIcon
                   :name="open ? 'chevron-up' : 'chevron-down'"
@@ -69,7 +66,7 @@
           !savedRepliesListResource?.data?.length
         "
         variant="badge"
-        :icon="SavedReplyIcon"
+        :icon="ZapIcon"
         :title="__('No saved replies found')"
         :description="__('Add one to get started.')"
       />
@@ -202,7 +199,7 @@ import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
 import { useUserStore } from "../../../stores/user";
 import { SavedReply, SavedReplyListResourceSymbol } from "../../../types";
-import SavedReplyIcon from "../../icons/SavedReplyIcon.vue";
+import ZapIcon from "~icons/lucide/zap";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { activeFilter } from "./savedReplies";
 

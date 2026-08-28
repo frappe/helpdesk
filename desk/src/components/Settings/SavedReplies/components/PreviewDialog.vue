@@ -50,20 +50,21 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
+import { buildEditorExtensions } from "@/components/editor/config";
+import { __ } from "@/translation";
+import { RenderedSavedReply } from "@/types";
 import {
   createListResource,
   createResource,
   Dialog,
   FormLabel,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
-import { LoadingIndicator } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { buildEditorExtensions } from "@/components/editor/config";
-const extensions = buildEditorExtensions();
-import { Link } from "@/components";
 import { watch } from "vue";
-import { __ } from "@/translation";
+const extensions = buildEditorExtensions();
 
 const dialogModel = defineModel<{
   show: boolean;
@@ -74,8 +75,8 @@ const dialogModel = defineModel<{
 
 const getResponsePreviewResource = createResource({
   url: "helpdesk.api.saved_replies.get_rendered_saved_reply",
-  onSuccess: (data) => {
-    dialogModel.value.preview = data;
+  onSuccess: (data: RenderedSavedReply) => {
+    dialogModel.value.preview = data.message;
   },
 });
 
