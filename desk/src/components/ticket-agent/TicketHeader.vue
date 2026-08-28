@@ -58,7 +58,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions[0]?.items?.length >= 1"
+          v-if="groupedActions.length > 0"
           :options="groupedActions"
           placement="right"
         >
@@ -319,7 +319,9 @@ const groupedActions = computed(() => {
     actions.value.filter((action) => action.group && !__(action.buttonLabel))
   );
   _actions = _actions.concat(deleteAction.value);
-  return _actions;
+  // Drop groups without items (no merge option, no custom actions) so they
+  // neither decide whether the menu shows nor leave an empty section in it.
+  return _actions.filter((entry) => !entry.items || entry.items.length > 0);
 });
 
 const customizationCtx = computed(() => ({
