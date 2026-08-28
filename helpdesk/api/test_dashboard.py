@@ -1,7 +1,7 @@
 import json
 
 import frappe
-from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, now_datetime, nowdate
 
 from helpdesk.api.dashboard import HelpdeskDashboard
@@ -10,7 +10,7 @@ from helpdesk.test_utils import create_agent, make_sla, make_ticket
 AGENT = "dashboard-sla-agent@example.com"
 
 
-class TestSlaFulfilledCard(IntegrationTestCase):
+class TestSlaFulfilledCard(FrappeTestCase):
     def test_fulfilled_percentage_stays_within_100(self):
         """A response-only policy marks a still-open ticket Fulfilled. Counting it
         in the numerator while the denominator only holds resolved tickets pushes
