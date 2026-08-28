@@ -60,9 +60,15 @@ class HDTicketTemplate(Document):
                 ).format(f.fieldname)
                 frappe.throw(text)
             if self.current_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
-                text = _(
-                    "Field `{0}` is internal and cannot be shown to customers"
-                ).format(f.fieldname)
+                if self.custom_field_exists(f.fieldname):
+                    text = _(
+                        "Field `{0}` is internal and cannot be shown to customers."
+                        " Lower its permission level in Customize Form to show it."
+                    ).format(f.fieldname)
+                else:
+                    text = _(
+                        "Field `{0}` is internal and cannot be shown to customers"
+                    ).format(f.fieldname)
                 frappe.throw(text)
 
     def custom_field_exists(self, fieldname: str):
@@ -75,7 +81,29 @@ class HDTicketTemplate(Document):
         )
 
     def on_update(self):
+        if self.name == DEFAULT_TICKET_TEMPLATE:
+            self.make_hidden_custom_fields_internal()
         capture_event("ticket_template_updated")
+
+    def make_hidden_custom_fields_internal(self):
+        """Hiding a custom field must revoke API reads, not just the form
+        input. Raise only: showing a field again takes Customize Form, so a
+        template save can never hand customers a field they could not read."""
+        moved = False
+        for f in self.fields:
+            if not f.hide_from_customer or not self.custom_field_exists(f.fieldname):
+                continue
+            if self.current_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
+                continue
+            frappe.db.set_value(
+                "Custom Field",
+                {"dt": "HD Ticket", "fieldname": f.fieldname},
+                "permlevel",
+                TICKET_INTERNAL_FIELD_PERMLEVEL,
+            )
+            moved = True
+        if moved:
+            frappe.clear_cache(doctype="HD Ticket")
 
     def current_permlevel(self, fieldname: str) -> int:
         """Read from live meta, not the shipped DocField row, so a level an
