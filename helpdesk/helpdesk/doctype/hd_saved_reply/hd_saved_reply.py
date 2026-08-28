@@ -39,7 +39,7 @@ def has_permission(doc, user=None):
         if not is_team_restriction_applied:
             return True
         else:
-            user_team = get_agents_team()
+            user_team = get_agents_team(user)
             user_team_names = [team["team_name"] for team in user_team]
             if not user_team_names:
                 return False
@@ -82,7 +82,7 @@ def permission_query(user):
     team_cond = "`tabHD Saved Reply`.scope = 'Team'"
 
     if is_team_restriction_applied:
-        user_team = get_agents_team()
+        user_team = get_agents_team(user)
         user_team_names = [team["team_name"] for team in user_team]
         if user_team_names:
             team_names_escaped = ", ".join(
