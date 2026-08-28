@@ -2355,8 +2355,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
     (internal), so the framework silently resets any change to them
     made by a user without write access at that level. Standard fields
     keep the level the doctype ships. The default template owns custom
-    field levels: hidden -> 8, shown -> 7, and a removed row returns
-    the field to the level it arrived with.
+    field levels: hidden -> 8, shown -> 7. A removed row restores the
+    level the field arrived with only when that raises it; removal
+    never lowers a level, so it can never expose a field.
 
     Note the two shapes of refusal: a change to a permlevel-protected
     field is reverted without a word, while a change to a permlevel-0
@@ -2600,8 +2601,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     def test_template_visibility_drives_custom_field_permlevel(self):
         """The Default template owns a custom field's level while it lists
-        it: hidden -> internal (8), shown -> customer-visible (7). Removing
-        the row returns the field to the level it arrived with, here 0."""
+        it: hidden -> internal (8), shown -> customer-visible (7). Removal
+        never lowers a level, so a shown field stays at 7."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_template_driven"
@@ -2626,7 +2627,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             self.assertEqual(self.custom_field_permlevel(fieldname), 7)
 
             self.set_default_template_fields([])
-            self.assertEqual(self.custom_field_permlevel(fieldname), 0)
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
 
             self.assertFalse(
                 frappe.get_all(
@@ -2704,6 +2705,47 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             self.set_custom_field_permlevel(fieldname, 8)
             self.set_default_template_fields([])
             self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+        finally:
+            frappe.set_user("Administrator")
+            frappe.delete_doc(
+                "Custom Field",
+                frappe.db.get_value(
+                    "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+                ),
+                force=True,
+            )
+            frappe.clear_cache(doctype="HD Ticket")
+
+    def test_removal_never_lowers_a_permlevel(self):
+        """The two ways a stale base could expose a field, both refused: a
+        hidden row's removal keeps it internal, and a restriction the sync
+        overwrote on a later save is not dropped to the old base either."""
+        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
+
+        fieldname = "custom_perms_never_lower"
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": fieldname, "label": "Perms Never Lower", "fieldtype": "Data"},
+        )
+        try:
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 1}]
+            )
+            self.set_default_template_fields([])
+            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+
+            self.set_custom_field_permlevel(fieldname, 0)
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 0}]
+            )
+            self.set_custom_field_permlevel(fieldname, 8)
+            # an unrelated template save reasserts 7 over the admin's 8
+            self.set_default_template_fields(
+                [{"fieldname": fieldname, "hide_from_customer": 0}]
+            )
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
+            self.set_default_template_fields([])
+            self.assertEqual(self.custom_field_permlevel(fieldname), 7)
         finally:
             frappe.set_user("Administrator")
             frappe.delete_doc(

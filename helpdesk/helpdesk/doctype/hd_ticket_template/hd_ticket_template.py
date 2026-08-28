@@ -134,9 +134,10 @@ class HDTicketTemplate(Document):
         row.db_set("base_permlevel", base, update_modified=False)
 
     def restore_removed_custom_fields(self) -> bool:
-        """A removed row hands the field back at the level it arrived with.
-        Only the sync's own write is undone: a level someone set in
-        Customize Form after the last template save stands."""
+        """A removed row hands its field back, and never lowers a level: only
+        a base higher than the sync's own write is restored. Exposing a
+        removed field always takes a Customize Form step, and a level someone
+        set after the last template save stands."""
         before = self.get_doc_before_save()
         if not before:
             return False
@@ -149,7 +150,7 @@ class HDTicketTemplate(Document):
                 continue
             if self.current_permlevel(f.fieldname) != self.template_level(f):
                 continue
-            if f.base_permlevel != self.template_level(f):
+            if f.base_permlevel > self.template_level(f):
                 self.set_custom_field_permlevel(f.fieldname, f.base_permlevel)
                 moved = True
         return moved
