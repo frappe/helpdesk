@@ -486,14 +486,14 @@ class HDTicket(Document):
             text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
-    def customer_writable_now(self) -> set[str]:
+    def customer_editable_fields(self) -> set[str]:
         """A customer may move the ticket into the Resolved category, nothing
         else. Reopening happens on reply, which the server does for them."""
-        writable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
+        editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved":
-            writable.add("status")
-        return writable
+            editable.add("status")
+        return editable
 
     def prevent_customer_edits(self):
         """Freeze the ticket against its customer once it exists.
@@ -505,12 +505,12 @@ class HDTicket(Document):
             return
         if self.flags.get("ignore_customer_edit_guard"):
             return
-        writable = self.customer_writable_now()
+        editable = self.customer_editable_fields()
         changed = [
             df
             for df in self.meta.fields
             if df.fieldtype not in no_value_fields
-            and df.fieldname not in writable
+            and df.fieldname not in editable
             and self.has_value_changed(df.fieldname)
         ]
         if not changed:
