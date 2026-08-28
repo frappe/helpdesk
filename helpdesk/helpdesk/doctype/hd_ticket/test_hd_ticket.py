@@ -2,19 +2,26 @@
 # See license.txt
 
 from datetime import timedelta
+from unittest.mock import patch
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
 from helpdesk.api.ticket import bulk_reply
+from helpdesk.consts import DEFAULT_SLA
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
     show_outside_hours_banner,
     split_ticket,
 )
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
+    close_tickets_after_n_days,
+    has_permission,
+    permission_query,
+)
 from helpdesk.test_utils import (
+    SLA_PRIORITY_NAME,
     add_comment,
     add_contact_in_customer,
     add_holiday,
@@ -23,7 +30,10 @@ from helpdesk.test_utils import (
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_priority,
+    make_sla,
     make_status,
+    make_team,
     make_ticket,
     remove_holidays,
     set_ticket_status_and_communication_date,
@@ -34,6 +44,16 @@ from helpdesk.test_utils import (
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
 ERROR_MSG_RESOLUTION = "Resolution time differs by more than 1 second"
 
+SLA_DOCTYPE = "HD Service Level Agreement"
+UNINCLUDED_PRIORITY = "Critical"  # deliberately absent from every SLA's priorities
+
+
+def set_default_sla(name: str, value: int):
+    """Tick or untick a policy as the Default SLA, through the controller."""
+    sla = frappe.get_doc(SLA_DOCTYPE, name)
+    sla.default_sla = value
+    sla.save()
+
 
 def get_ticket_obj():
     return {
@@ -41,6 +61,20 @@ def get_ticket_obj():
         "subject": "Test Ticket",
         "description": "Test Ticket Description",
     }
+
+
+def sent_replies(ticket_name: str):
+    """Agent replies saved on a ticket, oldest first."""
+    return frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_name,
+            "sent_or_received": "Sent",
+        },
+        fields=["name", "message_id", "in_reply_to"],
+        order_by="creation asc",
+    )
 
 
 non_agent = "non_agent@test.com"
@@ -84,6 +118,15 @@ class TestHDTicket(FrappeTestCase):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
         self.assertTrue(ticket.name)
+
+    def test_update_perms_skipped_without_a_previous_version(self):
+        # a before_insert hook that persists the ticket clears __islocal, so is_new()
+        # can be False on create while there is still no previous version to check
+        frappe.set_user(non_agent)
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.set("__islocal", False)
+        ticket.check_update_perms()
+        frappe.set_user("Administrator")
 
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
@@ -216,7 +259,7 @@ class TestHDTicket(FrappeTestCase):
 
         # high priority has 1 hour response time and 4 hours resolution time
         first_response, resolution = get_priority_response_resolution_time(
-            "Default", "High", ticket_creation, add_to_time=False
+            DEFAULT_SLA, "High", ticket_creation, add_to_time=False
         )
         # start time = 10:00 AM
         # response time = 11:00 AM
@@ -1161,6 +1204,189 @@ class TestHDTicket(FrappeTestCase):
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
 
+    def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
+        """Without this, every agent reply arrives as a new thread."""
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertTrue(first.message_id, "reply must store its own id")
+        self.assertTrue(second.message_id, "reply must store its own id")
+        self.assertNotEqual(
+            first.message_id, second.message_id, "ids must not be reused"
+        )
+        self.assertEqual(
+            second.in_reply_to, first.name, "second reply follows the first"
+        )
+
+    def test_agent_reply_sends_the_message_id_it_stored(self):
+        """If we store an id but send a different one, the customer never has the id
+        the next reply points at."""
+        email_account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Threading Test",
+                "email_id": "threading-test@example.com",
+                "enable_outgoing": 1,
+                "smtp_server": "smtp.example.com",
+            }
+        ).insert(ignore_if_duplicate=True)
+
+        reply_email_enabled = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 1)
+        try:
+            ticket = make_ticket()
+            with patch("frappe.sendmail") as sendmail:
+                ticket.reply_via_agent(
+                    message="Reply",
+                    to="customer@test.com",
+                    from_email={
+                        "email_account": email_account.name,
+                        "email_id": email_account.email_id,
+                    },
+                )
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", reply_email_enabled
+            )
+
+        communication = get_latest_ticket_communication(ticket.name)
+        self.assertTrue(sendmail.called, "reply should have been emailed")
+        self.assertEqual(
+            sendmail.call_args.kwargs.get("message_id"),
+            communication.message_id,
+            "wire Message-Id must match the one stored on the Communication",
+        )
+
+    def test_portal_reply_does_not_break_agent_reply_threading(self):
+        """A portal reply sent no email, so replies after it must skip past it."""
+        ticket = make_ticket()
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        # each of these is its own request in production; replying updates the ticket row
+        ticket.reload()
+        ticket.create_communication_via_contact(message="Customer portal reply")
+        portal = get_latest_ticket_communication(ticket.name)
+        self.assertFalse(portal.message_id, "portal replies store no id")
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertEqual(
+            second.in_reply_to, first.name, "follows the last emailed reply"
+        )
+
+    def test_agent_replies_thread_on_a_ticket_created_by_email(self):
+        """A ticket raised by email: the first reply answers the customer's mail,
+        and later replies follow the reply before them."""
+        ticket = make_ticket()
+        customer_email = frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "subject": f"Re: {ticket.subject}",
+                # frappe stores incoming ids without the angle brackets
+                "message_id": "customer-mail-1@example.com",
+                "content": "my printer is broken",
+            }
+        ).insert(ignore_permissions=True)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        ticket.reply_via_agent(message="Second reply", to="customer@test.com")
+        second = get_latest_ticket_communication(ticket.name)
+
+        self.assertEqual(
+            first.in_reply_to, customer_email.name, "first reply answers the customer"
+        )
+        self.assertEqual(
+            second.in_reply_to, first.name, "second reply follows the first"
+        )
+        self.assertNotEqual(
+            first.message_id, second.message_id, "ids must not be reused"
+        )
+
+    def test_reply_that_fails_to_send_stores_no_message_id(self):
+        """The reply stays visible, but with no id it can never be replied to."""
+        ticket = make_ticket()
+
+        with patch("frappe.sendmail", side_effect=Exception("smtp is down")):
+            with self.assertRaises(Exception):
+                ticket.reply_via_agent(message="Never sent", to="customer@test.com")
+
+        replies = sent_replies(ticket.name)
+        self.assertEqual(len(replies), 1, "the attempt stays on the ticket")
+        self.assertFalse(replies[0].message_id, "a reply nobody got has no id")
+
+    def test_reply_stores_no_message_id_when_nothing_was_queued(self):
+        """sendmail returns nothing when it queued nothing, which is not a send."""
+        ticket = make_ticket()
+
+        with patch("frappe.sendmail", return_value=None):
+            ticket.reply_via_agent(message="Queued nothing", to="customer@test.com")
+
+        self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
+
+    def test_next_reply_threads_onto_the_last_one_that_sent(self):
+        """The bug this guards: a reply that failed to send must not be answered,
+        or the customer gets a reply pointing at an email they never received."""
+        ticket = make_ticket()
+        real_sendmail = frappe.sendmail
+
+        ticket.reply_via_agent(message="First reply", to="customer@test.com")
+        first = get_latest_ticket_communication(ticket.name)
+
+        ticket.reload()
+        with patch("frappe.sendmail", side_effect=Exception("smtp is down")):
+            with self.assertRaises(Exception):
+                ticket.reply_via_agent(
+                    message="Second reply, never sent", to="customer@test.com"
+                )
+
+        ticket.reload()
+        with patch("frappe.sendmail", side_effect=real_sendmail):
+            ticket.reply_via_agent(message="Third reply", to="customer@test.com")
+        third = get_latest_ticket_communication(ticket.name)
+
+        self.assertTrue(first.message_id, "the first reply did send")
+        self.assertEqual(
+            third.in_reply_to, first.name, "skips the reply that never went out"
+        )
+
+    def test_reply_stores_no_message_id_when_email_is_off(self):
+        """No email was sent, so there is no id the customer could ever reply to."""
+        previous = frappe.db.get_single_value(
+            "HD Settings", "enable_reply_email_via_agent"
+        )
+        frappe.db.set_single_value("HD Settings", "enable_reply_email_via_agent", 0)
+        try:
+            ticket = make_ticket()
+            ticket.reply_via_agent(message="Not emailed")
+            self.assertFalse(get_latest_ticket_communication(ticket.name).message_id)
+        finally:
+            # rollback is per test class, so restore or later tests inherit this
+            frappe.db.set_single_value(
+                "HD Settings", "enable_reply_email_via_agent", previous
+            )
+
     def test_security_unauthorized_reply_via_agent(self):
         ticket = make_ticket()
         frappe.set_user(non_agent)
@@ -1219,7 +1445,7 @@ class TestHDTicket(FrappeTestCase):
         self.assertEqual(ticket3.priority, "Low")
 
         # if ticket type is set, and ticket type does not has a priority, the ticket's priority will be the same as applied sla's default priority
-        sla_doc = frappe.get_doc("HD Service Level Agreement", "Default")
+        sla_doc = frappe.get_doc("HD Service Level Agreement", DEFAULT_SLA)
         for p in sla_doc.priorities:
             if p.priority == "Low":
                 p.default_priority = 1
@@ -1543,6 +1769,51 @@ class TestHDTicket(FrappeTestCase):
         for file in files:
             frappe.delete_doc("File", file)
 
+    def test_bulk_reply_writes_nothing_if_one_ticket_is_off_limits(self):
+        """Everything is checked before anything is written, so a ticket the agent
+        cannot reply to stops the batch instead of half completing it."""
+        frappe.set_user(agent)
+        allowed = make_ticket(raised_by="customer1@test.com")
+        forbidden = make_ticket(raised_by="customer2@test.com")
+
+        def deny_forbidden(*args, **kwargs):
+            if kwargs.get("doc") == forbidden.name:
+                raise frappe.PermissionError
+            return True
+
+        with patch("frappe.has_permission", side_effect=deny_forbidden):
+            with self.assertRaises(frappe.PermissionError):
+                bulk_reply(
+                    ticket_ids=[allowed.name, forbidden.name], message="Test Message"
+                )
+
+        self.assertFalse(
+            sent_replies(allowed.name), "no ticket may be replied to before all pass"
+        )
+
+    def test_bulk_reply_replies_once_per_duplicated_ticket(self):
+        """Ids are deduped before anything is written, so a ticket listed twice gets
+        one reply and one copy of each file."""
+        frappe.set_user(agent)
+        file1 = upload_test_file("outlook.png")
+        ticket = make_ticket(raised_by="customer1@test.com")
+
+        bulk_reply(
+            ticket_ids=[ticket.name, ticket.name],
+            message="Test Message",
+            attachments=[file1],
+        )
+
+        self.assertEqual(len(sent_replies(ticket.name)), 1, "one reply, not two")
+        self.assertEqual(
+            frappe.db.count(
+                "File",
+                {"attached_to_doctype": "HD Ticket", "attached_to_name": ticket.name},
+            ),
+            1,
+            "one copy of the file, not two",
+        )
+
     def test_auto_close_respects_inactivity_cutoff_boundary(self):
         """`close_tickets_after_n_days` closes a ticket whose last communication is
         older than the inactivity cutoff and keeps one whose last communication
@@ -1597,6 +1868,470 @@ class TestHDTicket(FrappeTestCase):
             )
         finally:
             frappe.db.set_single_value("HD Settings", previous_settings)
+
+    def make_test_sla(self, name, condition, rank=0, priorities=None):
+        """Create a conditional SLA and disable it once the test ends."""
+        sla = make_sla(name, condition, rank=rank, priorities=priorities)
+        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, sla.name, "enabled", 0)
+        return sla
+
+    def demote_default_sla(self):
+        """Leave the site with no Default SLA, restored once the test ends."""
+        self.addCleanup(set_default_sla, DEFAULT_SLA, 1)
+        set_default_sla(DEFAULT_SLA, 0)
+
+    def test_ticket_without_sla(self):
+        """A priority that no SLA includes leaves every SLA field blank."""
+        make_priority(UNINCLUDED_PRIORITY)
+
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.agreement_status)
+        self.assertFalse(ticket.response_by)
+        self.assertFalse(ticket.resolution_by)
+        self.assertFalse(ticket.service_level_agreement_creation)
+
+    def test_ticket_without_default_sla(self):
+        """With no Default SLA on the site, an unmatched ticket gets no SLA."""
+        self.demote_default_sla()
+
+        # Medium is included everywhere but matched by no condition
+        ticket = make_ticket(priority="Medium")
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+
+    def test_sla_skipped_when_it_does_not_include_priority(self):
+        """A matching policy that lacks the priority is passed over, not the end of the walk."""
+        condition = "doc.priority == 'High'"
+        self.make_test_sla("Skipped SLA", condition, rank=10, priorities=["Low"])
+        applied = self.make_test_sla(
+            "Applied SLA", condition, rank=20, priorities=["High"]
+        )
+
+        ticket = make_ticket(priority="High")
+
+        self.assertEqual(ticket.sla, applied.name)
+
+    def test_sla_applied_when_condition_matches_later(self):
+        """A blank ticket picks up a policy on the save that makes it match."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.service_level_agreement_creation)
+
+        sla = self.make_test_sla(
+            "Late Match SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        ticket.reload()
+        ticket.save()
+
+        self.assertEqual(ticket.sla, sla.name)
+        self.assertTrue(ticket.response_by)
+        self.assertTrue(ticket.service_level_agreement_creation)
+        self.assertEqual(ticket.agreement_status, "First Response Due")
+
+    def test_sla_clock_starts_at_attach_not_creation(self):
+        """A late attach counts from the attach, not from when the ticket was raised."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        sla = self.make_test_sla(
+            "Attach Clock SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        attached_at = add_to_date(raised_at, hours=2)
+        with self.freeze_time(attached_at):
+            ticket.reload()
+            ticket.save()
+
+        self.assertEqual(ticket.sla, sla.name)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), attached_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            sla.name, UNINCLUDED_PRIORITY, add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(attached_at, seconds=response_time)
+        )
+
+    def test_sla_targets_stable_across_repeated_saves(self):
+        """Once attached, targets are anchored and must not slide on later saves."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.make_test_sla(
+            "Stable Clock SLA",
+            f"doc.priority == '{UNINCLUDED_PRIORITY}'",
+            priorities=[UNINCLUDED_PRIORITY],
+        )
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.save()
+        response_by, resolution_by = ticket.response_by, ticket.resolution_by
+
+        with self.freeze_time(add_to_date(raised_at, hours=2)):
+            ticket.reload()
+            ticket.subject = "Saved again"
+            ticket.save()
+
+        self.assertEqual(ticket.response_by, response_by)
+        self.assertEqual(ticket.resolution_by, resolution_by)
+
+    def test_sla_removed_when_condition_stops_matching(self):
+        """A ticket that stops matching every policy loses its SLA and its targets."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        anchor = ticket.service_level_agreement_creation
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY  # matched by nothing
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+        self.assertFalse(ticket.resolution_by)
+        self.assertFalse(ticket.agreement_status)
+        # the clock keeps running, so flapping the condition buys no time
+        self.assertEqual(ticket.service_level_agreement_creation, anchor)
+
+    def test_no_detach_while_default_sla_enabled(self):
+        """With a Default SLA on the site a ticket falls back to it rather than detaching."""
+        ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        ticket.reload()
+        ticket.priority = (
+            "Medium"  # no condition matches, but the Default SLA includes it
+        )
+        ticket.save()
+
+        self.assertEqual(ticket.sla, DEFAULT_SLA)
+        self.assertTrue(ticket.response_by)
+
+    def test_detach_keeps_breach_facts(self):
+        """Detaching drops the promises a policy made, not the record of missing them."""
+        # Urgent: response_by = T+30min, and the agent replies 9 minutes late
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=39)):
+            frappe.set_user(agent)
+            ticket.reply_via_agent(message="Late reply")
+            ticket.reload()
+            ticket.status = "Replied"
+            ticket.save()
+        self.assertEqual(ticket.agreement_status, "Failed")
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.response_by)
+        self.assertEqual(ticket.agreement_status, "Failed")
+        self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+        self.assertTrue(ticket.first_response_time)
+
+    def test_anchor_survives_detach_and_reattach(self):
+        """A policy picked up again recomputes from the original clock start."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertFalse(ticket.sla)
+
+        with self.freeze_time(add_to_date(raised_at, hours=2)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), raised_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            SLA_PRIORITY_NAME, "High", add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(raised_at, seconds=response_time)
+        )
+
+    def test_sla_swap_keeps_original_clock_start(self):
+        """Swapping policies recomputes targets from the original clock start."""
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+
+        # Medium is matched by no other condition, so the swap target is unambiguous
+        swapped_to = self.make_test_sla(
+            "Swap Target SLA", "doc.priority == 'Medium'", priorities=["Medium"]
+        )
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.priority = "Medium"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, swapped_to.name)
+        self.assertEqual(
+            get_datetime(ticket.service_level_agreement_creation), raised_at
+        )
+        response_time, _ = get_priority_response_resolution_time(
+            swapped_to.name, "Medium", add_to_time=False
+        )
+        self.assertEqual(
+            ticket.response_by, add_to_date(raised_at, seconds=response_time)
+        )
+
+    def test_lower_rank_sla_wins(self):
+        """Between two matching policies, the lower rank is applied."""
+        condition = "doc.priority == 'Medium'"
+        # created first, so winning on creation order would hide the rank
+        self.make_test_sla("Rank Five SLA", condition, rank=5, priorities=["Medium"])
+        winner = self.make_test_sla(
+            "Rank One SLA", condition, rank=1, priorities=["Medium"]
+        )
+
+        ticket = make_ticket(priority="Medium")
+
+        self.assertEqual(ticket.sla, winner.name)
+
+    def test_unranked_sla_applied_after_ranked(self):
+        """Rank 0 means unranked, so it loses even to a high rank number."""
+        condition = "doc.priority == 'Medium'"
+        self.make_test_sla("Unranked SLA", condition, rank=0, priorities=["Medium"])
+        ranked = self.make_test_sla(
+            "Ranked Last SLA", condition, rank=5, priorities=["Medium"]
+        )
+
+        ticket = make_ticket(priority="Medium")
+
+        self.assertEqual(ticket.sla, ranked.name)
+
+    def test_default_sla_applied_only_when_no_condition_matches(self):
+        """The Default SLA is considered last, even when it carries the best rank."""
+        frappe.db.set_value(SLA_DOCTYPE, DEFAULT_SLA, "rank", 1)
+        self.addCleanup(frappe.db.set_value, SLA_DOCTYPE, DEFAULT_SLA, "rank", 0)
+        matched = self.make_test_sla(
+            "Worst Rank SLA", "doc.priority == 'Medium'", rank=99, priorities=["Medium"]
+        )
+
+        self.assertEqual(make_ticket(priority="Medium").sla, matched.name)
+
+        frappe.db.set_value(SLA_DOCTYPE, matched.name, "enabled", 0)
+        unmatched = make_ticket(subject="Nothing matches", priority="Medium")
+        self.assertEqual(unmatched.sla, DEFAULT_SLA)
+
+    def test_ticket_without_sla_uses_settings_default_status(self):
+        """A blank ticket takes its status from HD Settings, not an arbitrary policy."""
+        make_priority(UNINCLUDED_PRIORITY)
+        # rollback is per test class, so a leftover Open status would break
+        # the "last status in its category" guard in the status tests
+        sla_only_status = make_status(name="SLA Only Status")
+        self.addCleanup(
+            frappe.delete_doc, "HD Ticket Status", sla_only_status.name, force=True
+        )
+        status_field = "default_ticket_status"
+        frappe.db.set_value(
+            SLA_DOCTYPE, SLA_PRIORITY_NAME, status_field, sla_only_status.name
+        )
+        self.addCleanup(
+            frappe.db.set_value, SLA_DOCTYPE, SLA_PRIORITY_NAME, status_field, None
+        )
+
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+
+        self.assertFalse(ticket.sla)
+        self.assertEqual(
+            ticket.status,
+            frappe.db.get_single_value("HD Settings", "default_ticket_status"),
+        )
+
+    def test_resolution_date_set_without_sla(self):
+        """Resolving a blank ticket stamps resolution_date; the durations stay blank."""
+        make_priority(UNINCLUDED_PRIORITY)
+        ticket = make_ticket(priority=UNINCLUDED_PRIORITY)
+        self.assertFalse(ticket.sla)
+
+        ticket.reload()
+        ticket.status = "Resolved"
+        ticket.save()
+
+        self.assertTrue(ticket.resolution_date)
+        self.assertFalse(ticket.resolution_time)
+
+    def test_reopening_a_detached_ticket_clears_resolution_time(self):
+        """Reopening must not leave a resolution duration behind with no resolution date."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=12)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, hours=1)):
+            ticket.reload()
+            ticket.status = "Resolved"
+            ticket.save()
+        self.assertTrue(ticket.resolution_time)
+
+        ticket.reload()
+        ticket.priority = UNINCLUDED_PRIORITY  # detaches, so no SLA runs on the reopen
+        ticket.status = "Open"
+        ticket.save()
+
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.resolution_date)
+        self.assertFalse(ticket.resolution_time)
+
+    def test_detached_time_is_not_billed_as_hold_time(self):
+        """Detaching while paused must not credit the detached window as hold."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+        self.assertTrue(ticket.on_hold_since)
+
+        # un-pause and detach on the same save, so set_hold_time never runs
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.status = "Open"
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.on_hold_since)
+
+        # an hour later it matches again; the detached hour must not count as hold
+        with self.freeze_time(add_to_date(raised_at, minutes=80)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.status = "Replied"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertFalse(ticket.total_hold_time)
+
+    def test_detaching_while_paused_keeps_the_pause_anchor(self):
+        """A ticket that stays paused across a detach must keep its hold credit."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+        resolution_by = ticket.resolution_by
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+
+        # detach without touching status, so the ticket is still paused
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertTrue(ticket.on_hold_since)
+
+        with self.freeze_time(add_to_date(raised_at, minutes=30)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.save()
+        self.assertEqual(ticket.agreement_status, "Paused")
+
+        # un-pausing bills the whole pause, so the deadline moves out by it
+        with self.freeze_time(add_to_date(raised_at, minutes=40)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+
+        self.assertEqual(ticket.total_hold_time, 30 * 60)
+        self.assertEqual(
+            get_datetime(ticket.resolution_by),
+            add_to_date(get_datetime(resolution_by), minutes=30),
+        )
+
+    def test_unpausing_while_detached_drops_the_pause_anchor(self):
+        """A detached ticket has no SLA to finalise its hold, so leaving Paused
+        must drop the anchor rather than bank the gap as hold time."""
+        make_priority(UNINCLUDED_PRIORITY)
+        raised_at = get_current_week_monday(hours=10)
+        with self.freeze_time(raised_at):
+            ticket = make_ticket(priority="High")
+
+        with self.freeze_time(add_to_date(raised_at, minutes=10)):
+            ticket.reload()
+            ticket.status = "Replied"  # pauses the clock
+            ticket.save()
+
+        # detach while still paused, so the anchor is deliberately kept
+        with self.freeze_time(add_to_date(raised_at, minutes=20)):
+            ticket.reload()
+            ticket.priority = UNINCLUDED_PRIORITY
+            ticket.save()
+        self.assertTrue(ticket.on_hold_since)
+
+        # un-pause with no SLA attached: nothing can finalise the hold
+        with self.freeze_time(add_to_date(raised_at, minutes=30)):
+            ticket.reload()
+            ticket.status = "Open"
+            ticket.save()
+        self.assertFalse(ticket.sla)
+        self.assertFalse(ticket.on_hold_since)
+
+        # re-attaching must not treat the open, detached window as hold
+        with self.freeze_time(add_to_date(raised_at, minutes=90)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.status = "Replied"
+            ticket.save()
+
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
+        self.assertFalse(ticket.total_hold_time)
+
+    def test_permission_check_answers_for_passed_user_not_session(self):
+        """A check made on behalf of another user must use that user's teams.
+
+        Session is an agent on the ticket's team, the checked user is not, so a
+        session-bound lookup would wrongly grant access.
+        """
+        make_team("Team A", members=[agent])
+        make_team("Team B", members=[agent2])
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "restrict_tickets_by_agent_group",
+            0,
+        )
+
+        ticket = make_ticket(agent_group="Team B", raised_by=non_agent)
+
+        frappe.set_user(agent2)
+        self.assertTrue(has_permission(ticket, user=agent2))
+        self.assertFalse(has_permission(ticket, user=agent))
+        self.assertNotIn("Team B", permission_query(agent))
 
     def tearDown(self):
         frappe.set_user("Administrator")

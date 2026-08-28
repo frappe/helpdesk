@@ -80,6 +80,7 @@ def get_avg_time(
         query.where(Ticket.creation >= from_date)
         .where(Ticket.creation < to_date_plus_one)
         .where(Ticket[time_field].isnotnull())
+        .where(Ticket.sla.isnotnull())  # durations are only meaningful under a policy
     )
     if time_field == "resolution_time":
         query = _restrict_to_resolved(query, Ticket)

@@ -439,7 +439,8 @@ class TestAgentHome(FrappeTestCase):
         """Helper to create a ticket with SLA"""
         # Create SLA with condition for the priority
         condition = f"doc.priority == '{priority}'"
-        sla = make_sla(f"Test SLA {priority}", condition)
+        # ranked, so this policy wins over the broader seeded ones
+        sla = make_sla(f"Test SLA {priority}", condition, rank=1)
 
         # Configure SLA with priority settings
         sla.reload()
@@ -501,12 +502,9 @@ class TestAgentHome(FrappeTestCase):
 
         # delete the SLA to clean up
         frappe.set_user("Administrator")
-        tickets = [ticket, other_ticket]
-        for t in tickets:
+        for t in [ticket, other_ticket]:
             frappe.delete_doc("HD Ticket", t.name, force=True)
-            # never delete the seeded SLAs shared by the whole suite
-            if t.sla not in (SLA_PRIORITY_NAME, "Default"):
-                frappe.delete_doc("HD Service Level Agreement", t.sla, force=True)
+        frappe.delete_doc("HD Service Level Agreement", "Test SLA High", force=True)
 
     def test_get_pending_tickets_new_tickets_type(self):
         """Test getting newly assigned tickets"""

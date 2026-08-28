@@ -73,7 +73,7 @@ The local one bails whenever focus is in an input or inside `[role="dialog"]`, s
 
 **List and composer state is published module-scope, not routed through the URL.**
 The palette sits outside `ListViewBuilder`'s and `EmailEditor`'s provide chains,
-so it cannot inject. `listViewFilters.ts` and `replyComposer.ts` each hold a
+so it cannot inject. `listViewFilters.ts` and `modalStates.ts` each hold a
 `shallowRef` the mounted component fills in and clears on unmount, and the
 palette handles their absence. Filters merge through the list's own
 `applyFilters`, which preserves sort, columns and the active view — an earlier
