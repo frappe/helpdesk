@@ -307,25 +307,24 @@ def get_avg_time_metrics(
     )
 
     # Monthly aggregation query using query builder. Per-series gating mirrors
-    # dashboard.py: first-response avg requires first_responded_on; resolution
-    # avg requires status IN resolved_statuses.
+    # dashboard.py: both averages require an SLA; first-response also requires
+    # first_responded_on, resolution also requires status IN resolved_statuses.
     month_abbr = Function("DATE_FORMAT", Ticket.creation, "%b")
     year_val = Function("YEAR", Ticket.creation)
     month_val = Function("MONTH", Ticket.creation)
 
+    has_sla = Ticket.sla.isnotnull()
     first_response_value = (
         Case()
-        .when(Ticket.first_responded_on.isnotnull(), Ticket.first_response_time)
+        .when(
+            has_sla & Ticket.first_responded_on.isnotnull(), Ticket.first_response_time
+        )
         .else_(None)
     )
-    resolution_gate = (
-        Ticket.status.isin(resolved_statuses) if resolved_statuses else None
-    )
-    resolution_value = (
-        Case().when(resolution_gate, Ticket.resolution_time).else_(None)
-        if resolution_gate is not None
-        else Ticket.resolution_time
-    )
+    resolution_gate = has_sla
+    if resolved_statuses:
+        resolution_gate = resolution_gate & Ticket.status.isin(resolved_statuses)
+    resolution_value = Case().when(resolution_gate, Ticket.resolution_time).else_(None)
 
     result = (
         frappe.qb.from_(Ticket)

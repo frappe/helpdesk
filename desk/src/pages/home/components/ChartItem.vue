@@ -3,7 +3,7 @@
     <AgentTicketsCard v-if="item.chart == 'agent_tickets'" :data="item.data" />
     <LineChartCard
       v-if="item.chart == 'avg_first_response_time'"
-      :title="__('Average First Response')"
+      :title="__('Avg. First Response')"
       api-url="helpdesk.api.agent_home.agent_home.get_avg_first_response_time"
       :data="item.data"
       :chart-color="{
@@ -13,7 +13,7 @@
     />
     <LineChartCard
       v-if="item.chart == 'avg_resolution_time'"
-      :title="__('Average Resolution')"
+      :title="__('Avg. Resolution')"
       api-url="helpdesk.api.agent_home.agent_home.get_avg_resolution_time"
       :data="item.data"
       :chart-color="{

@@ -40,10 +40,7 @@
         </div>
         <Dropdown :options="dropdownOptions" placement="right">
           <template #default="{ open }">
-            <Button
-              :label="activeFilter"
-              class="flex items-center justify-between w-fit p-4"
-            >
+            <Button :label="activeFilter">
               <template #suffix>
                 <FeatherIcon
                   :name="open ? 'chevron-up' : 'chevron-down'"
@@ -182,17 +179,17 @@
 </template>
 
 <script setup lang="ts">
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
+import { renderOptionIcon } from "@/utils";
 import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
-import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
+import { activeFilter, useAgents } from "./agents";
 import { setActiveSettingsTab } from "./settingsModal";
-import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { __ } from "@/translation";
-import { renderOptionIcon } from "@/utils";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();

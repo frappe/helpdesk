@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="_avatars?.length"
-    class="me-1.5 flex min-w-0 cursor-pointer items-center"
+    class="isolate me-1.5 flex min-w-0 cursor-pointer items-center"
   >
     <div
       v-if="_avatars?.length == 1"

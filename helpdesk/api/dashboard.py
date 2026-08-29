@@ -165,15 +165,16 @@ class HelpdeskDashboard:
         }
 
     def get_sla_fulfilled_count(self):
-        extra_cond = self.ticket.agreement_status == "Fulfilled"
+        # the numerator must stay a subset of the denominator, else the
+        # percentage can exceed 100 (a response-only SLA marks an open ticket
+        # Fulfilled, which no resolved-status filter would count)
+        status_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            status_cond = status_cond & self.ticket.status.isin(self.resolved_statuses)
         current_fulfilled, prev_fulfilled = self.get_metric_data(
-            self.ticket.name, Count, extra_cond
-        )
-
-        status_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
+            self.ticket.name,
+            Count,
+            status_cond & (self.ticket.agreement_status == "Fulfilled"),
         )
         current_total, prev_total = self.get_metric_data(
             self.ticket.name, Count, status_cond
@@ -192,7 +193,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_first_response_time(self):
-        extra_cond = self.ticket.first_responded_on.isnotnull()
+        extra_cond = (
+            self.ticket.sla.isnotnull() & self.ticket.first_responded_on.isnotnull()
+        )
         current, prev = self.get_metric_data(
             self.ticket.first_response_time / 3600, Avg, extra_cond
         )
@@ -208,11 +211,9 @@ class HelpdeskDashboard:
         }
 
     def get_avg_resolution_time(self):
-        extra_cond = (
-            self.ticket.status.isin(self.resolved_statuses)
-            if self.resolved_statuses
-            else None
-        )
+        extra_cond = self.ticket.sla.isnotnull()
+        if self.resolved_statuses:
+            extra_cond = extra_cond & self.ticket.status.isin(self.resolved_statuses)
         value_expr = Function("CEIL", self.ticket.resolution_time / 86400)
         current, prev = self.get_metric_data(value_expr, Avg, extra_cond)
 
