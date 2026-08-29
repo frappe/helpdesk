@@ -28,6 +28,10 @@ SERVER_COMPUTED_FIELDS = [
     "resolution_failed_by",
 ]
 
+# The ticket's key authenticates guest feedback links. A secret is never
+# display data, so no permission level makes it customer-visible.
+NEVER_CUSTOMER_VISIBLE_FIELDS = ("key",)
+
 # Kept out of the permlevel reset while a customer raises a ticket. customer
 # is the odd one: the portal picker sends it and set_customer checks it.
 PORTAL_INSERT_EXEMPT_FIELDS = [

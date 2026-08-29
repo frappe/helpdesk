@@ -7,6 +7,7 @@ from frappe.model.document import Document
 
 from helpdesk.consts import (
     DEFAULT_TICKET_TEMPLATE,
+    NEVER_CUSTOMER_VISIBLE_FIELDS,
     SERVER_COMPUTED_FIELDS,
     TICKET_INTERNAL_FIELD_PERMLEVEL,
     TICKET_VISIBLE_FIELD_PERMLEVEL,
@@ -60,6 +61,11 @@ class HDTicketTemplate(Document):
         for f in self.fields:
             if not f.fieldname or f.hide_from_customer:
                 continue
+            if f.fieldname in NEVER_CUSTOMER_VISIBLE_FIELDS:
+                text = _(
+                    "Field `{0}` is a secret and can never be shown to customers"
+                ).format(f.fieldname)
+                frappe.throw(text)
             if f.fieldname in SERVER_COMPUTED_FIELDS:
                 text = _(
                     "Field `{0}` is set by the system and cannot be shown to customers"

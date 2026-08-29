@@ -2757,18 +2757,19 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             )
             frappe.clear_cache(doctype="HD Ticket")
 
-    def test_migration_raises_hidden_custom_fields_and_records_bases(self):
-        """The patch records each row's base level and raises hidden rows to
-        internal. Raise only: it never lowers, so an upgrade cannot expose a
-        field. Safe to run twice."""
+    def test_migration_raises_levels_and_records_bases(self):
+        """The patch records each row's base level, raises hidden rows to
+        internal and low shown rows to visible. Raise only: it never lowers,
+        so an upgrade cannot expose a field. Safe to run twice."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         from helpdesk.patches.harden_hd_ticket_field_permissions import (
-            remember_bases_and_hide_hidden_custom_fields,
+            remember_bases_and_raise_custom_field_levels,
         )
 
         hidden_field = "custom_perms_patch_hidden"
         shown_field = "custom_perms_patch_shown"
+        low_field = "custom_perms_patch_low"
         create_custom_field(
             "HD Ticket",
             {"fieldname": hidden_field, "label": "Patch Hidden", "fieldtype": "Data"},
@@ -2782,26 +2783,33 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "permlevel": 8,
             },
         )
+        create_custom_field(
+            "HD Ticket",
+            {"fieldname": low_field, "label": "Patch Low", "fieldtype": "Data"},
+        )
         frappe.clear_cache(doctype="HD Ticket")
         try:
             self.set_default_template_fields(
                 [
                     {"fieldname": hidden_field, "hide_from_customer": 1},
                     {"fieldname": shown_field, "hide_from_customer": 0},
+                    {"fieldname": low_field, "hide_from_customer": 0},
                 ]
             )
             # rewind to the pre-upgrade shape: levels untouched, bases blank
             self.set_custom_field_permlevel(hidden_field, 0)
             self.set_custom_field_permlevel(shown_field, 8)
+            self.set_custom_field_permlevel(low_field, 0)
             for row in self.default_template_row_names():
                 frappe.db.set_value(
                     "HD Ticket Template Field", row, "base_permlevel", -1
                 )
 
             for _ in range(2):  # idempotent
-                remember_bases_and_hide_hidden_custom_fields()
+                remember_bases_and_raise_custom_field_levels()
                 self.assertEqual(self.custom_field_permlevel(hidden_field), 8)
                 self.assertEqual(self.custom_field_permlevel(shown_field), 8)
+                self.assertEqual(self.custom_field_permlevel(low_field), 7)
 
             bases = {
                 f.fieldname: f.base_permlevel
@@ -2811,9 +2819,10 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             }
             self.assertEqual(bases[hidden_field], 0)
             self.assertEqual(bases[shown_field], 8)
+            self.assertEqual(bases[low_field], 0)
         finally:
             frappe.set_user("Administrator")
-            for fieldname in (hidden_field, shown_field):
+            for fieldname in (hidden_field, shown_field, low_field):
                 frappe.delete_doc(
                     "Custom Field",
                     frappe.db.get_value(
@@ -3093,6 +3102,36 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             [{"fieldname": "key", "hide_from_customer": 1}]
         )
         self.assertEqual(self.hd_ticket_permlevel("key"), 8)
+
+    def test_secret_field_never_exposable_via_template(self):
+        """`key` authenticates guest feedback links. Even an admin lowering
+        its level in Customize Form must not make it showable."""
+        frappe.make_property_setter(
+            {
+                "doctype": "HD Ticket",
+                "fieldname": "key",
+                "property": "permlevel",
+                "value": "7",
+                "property_type": "Int",
+            }
+        )
+        frappe.clear_cache(doctype="HD Ticket")
+        try:
+            self.assertEqual(self.hd_ticket_permlevel("key"), 7)
+            with self.assertRaises(frappe.ValidationError):
+                self.set_default_template_fields(
+                    [{"fieldname": "key", "hide_from_customer": 0}]
+                )
+        finally:
+            frappe.db.delete(
+                "Property Setter",
+                {
+                    "doc_type": "HD Ticket",
+                    "field_name": "key",
+                    "property": "permlevel",
+                },
+            )
+            frappe.clear_cache(doctype="HD Ticket")
 
     def test_system_set_field_not_exposable_via_template(self):
         """A customer may read `sla` for the SLA card, but showing it on the

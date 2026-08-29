@@ -1,7 +1,11 @@
 import frappe
 from frappe.permissions import add_permission, update_permission_property
 
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE, TICKET_INTERNAL_FIELD_PERMLEVEL
+from helpdesk.consts import (
+    DEFAULT_TICKET_TEMPLATE,
+    TICKET_INTERNAL_FIELD_PERMLEVEL,
+    TICKET_VISIBLE_FIELD_PERMLEVEL,
+)
 
 # level -> role -> has write access at that level. Level 7 holds the
 # customer-visible operational fields and level 8 the agent-only internals.
@@ -24,14 +28,15 @@ LEVEL_GRANTS = {
 
 
 def execute():
-    remember_bases_and_hide_hidden_custom_fields()
+    remember_bases_and_raise_custom_field_levels()
     mirror_permlevel_grants_into_custom_docperms()
 
 
-def remember_bases_and_hide_hidden_custom_fields():
+def remember_bases_and_raise_custom_field_levels():
     """Default template rows record the level their custom field held before
-    the sync existed, and rows already hidden get raised to the internal
-    level once. Raise only: a migration must never expose a field."""
+    the sync existed, then move to the sync's level: hidden rows to internal,
+    shown rows below the visible level to visible. Raise only: a migration
+    must never lower a level and expose a field."""
     rows = frappe.get_all(
         "HD Ticket Template Field",
         filters={
@@ -62,6 +67,14 @@ def remember_bases_and_hide_hidden_custom_fields():
                 custom_field,
                 "permlevel",
                 TICKET_INTERNAL_FIELD_PERMLEVEL,
+            )
+            moved = True
+        elif not row.hide_from_customer and level < TICKET_VISIBLE_FIELD_PERMLEVEL:
+            frappe.db.set_value(
+                "Custom Field",
+                custom_field,
+                "permlevel",
+                TICKET_VISIBLE_FIELD_PERMLEVEL,
             )
             moved = True
     if moved:
