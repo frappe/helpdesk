@@ -53,7 +53,7 @@ class TestHDSavedReplyActions(FrappeTestCase):
     def tearDownClass(cls):
         super().tearDownClass()
         # The team's assignment rule is rolled back, its cached name is not
-        clear_doctype_map("Assignment Rule")
+        clear_doctype_map("Assignment Rule", "*")
 
     def setUp(self):
         frappe.set_user("Administrator")
