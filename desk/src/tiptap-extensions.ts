@@ -15,7 +15,7 @@ import { userFields } from "./components/Settings/SavedReplies/savedReplies";
 import { getMeta } from "./stores/meta";
 
 export interface FieldItem {
-  title: string;
+  label: string;
   value: string;
 }
 
@@ -25,10 +25,18 @@ export const FieldAutocompleteSuggestionKey = new PluginKey<any>(
 
 const ticketMeta = getMeta("HD Ticket");
 
+// Updated to insert exactly "Ticket ID" and "Ticket Name"
+const ticketFields: FieldItem[] = [
+  { label: "Ticket ID", value: "Ticket ID" },
+  { label: "Ticket Name", value: "Ticket Name" },
+];
+
 export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   name: "fieldAutocomplete",
   trigger: "{{",
   allowSpaces: true,
+
+  pluginKey: FieldAutocompleteSuggestionKey,
   items: (query: string) => {
     // Return empty list to force the dropdown to close.
     if (query.includes("}}")) {
@@ -48,6 +56,7 @@ export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
           Boolean(f.label)
       )
       .map((f) => ({ label: f.label, value: f.fieldname }))
+      .concat(ticketFields)
       .concat(userFields);
 
     return fields.filter(
@@ -374,10 +383,6 @@ function addMarkIfMissing(
   return marks;
 }
 
-// Use the browser's CSSOM to fully resolve all computed styles on Excel HTML elements.
-// Excel uses stylesheet classes (.xl65 etc.), not inline styles, so DOMParser alone
-// cannot resolve them — we need a live document with the <style> block applied.
-// Styles are keyed by "r{rowIdx}:c{colIdx}" for table cells so they survive DOM mutations.
 async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
   return new Promise((resolve) => {
     const iframe = document.createElement("iframe");
@@ -392,11 +397,9 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
 
     requestAnimationFrame(() => {
       const body = iframeDoc.body;
-      // Key: "r{rowIdx}:c{colIdx}", value: computed styles for that cell
       const stylesByCell = new Map<string, ElementStyles>();
       const cellMetaByCell = new Map<string, TableCellMeta>();
 
-      // Capture styles keyed by stable table coordinates
       iframeDoc.querySelectorAll("tr").forEach((tr, rowIdx) => {
         (tr as HTMLElement)
           .querySelectorAll("td, th")
@@ -428,7 +431,6 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
           });
       });
 
-      // Wrap cell contents with semantic tags based on cell-level computed styles
       iframeDoc.querySelectorAll("tr").forEach((tr, rowIdx) => {
         (tr as HTMLElement)
           .querySelectorAll("td, th")
@@ -449,7 +451,6 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
           });
       });
 
-      // Remove CSS classes and <style> block so generateJSON sees clean HTML
       body.querySelectorAll("*").forEach((el) => el.removeAttribute("class"));
       iframeDoc.querySelectorAll("style").forEach((s) => s.remove());
 
@@ -474,9 +475,6 @@ function wrapChildren(doc: Document, el: HTMLElement, tag: string) {
   el.appendChild(wrapper);
 }
 
-// Post-process Tiptap JSON to inject textStyle marks (color, fontSize, backgroundColor)
-// and paragraph attrs (textAlign) that generateJSON cannot infer from semantic HTML alone.
-// stylesByCell is keyed "r{rowIdx}:c{colIdx}" matching table structure.
 function injectStylesIntoJSON(
   json: any,
   stylesByCell: Map<string, ElementStyles>,
@@ -489,7 +487,6 @@ function injectStylesIntoJSON(
       const marks = [...(node.marks || [])];
       const textStyleAttrs: Record<string, string> = {};
 
-      // Only apply non-default colors
       if (
         elStyle.color &&
         !isDefaultTextColor(sanitizeCssColor(elStyle.color))
@@ -549,7 +546,6 @@ function injectStylesIntoJSON(
     return node;
   }
 
-  // Walk table cells and inject styles per cell using row/col coordinates
   function walkNode(node: any): any {
     if (node.type === "table") {
       return {
@@ -595,7 +591,6 @@ function injectStylesIntoJSON(
   return { ...json, content: (json.content || []).map(walkNode) };
 }
 
-// Handle pasting from excel properly
 export const HandleExcelPaste = Extension.create({
   name: "handleExcelPaste",
 
@@ -624,11 +619,8 @@ export const HandleExcelPaste = Extension.create({
                 return true;
               }
 
-              // Async: use iframe + getComputedStyle to fully resolve Excel CSS classes,
-              // then insert the enriched content into the editor
               resolveExcelStyles(html).then(
                 ({ html: normalizedHTML, stylesByCell, cellMetaByCell }) => {
-                  // Extract column widths from <col> elements (pt → px)
                   const tempDoc = new DOMParser().parseFromString(
                     html,
                     "text/html"
@@ -650,14 +642,12 @@ export const HandleExcelPaste = Extension.create({
 
                   let json = generateJSON(normalizedHTML, excelPasteExtensions);
 
-                  // Inject colors, fontSize, textAlign from computed styles
                   json = injectStylesIntoJSON(
                     json,
                     stylesByCell,
                     cellMetaByCell
                   );
 
-                  // Inject colwidth into each tableCell based on its column index
                   if (colWidths.length) {
                     (json.content || []).forEach((node: any) => {
                       if (node.type !== "table") return;
@@ -713,15 +703,10 @@ export const HandleExcelPaste = Extension.create({
                   );
                   dispatch(insertTr);
 
-                  // After the table is inserted, ensure there is a paragraph after it
-                  // and move the cursor there. We do this in a separate transaction so
-                  // we can walk the already-updated document and find the exact node
-                  // position after the last inserted top-level node.
                   requestAnimationFrame(() => {
                     const currentState = view.state;
                     const followUpTr = currentState.tr;
 
-                    // Walk top-level nodes to find the end of the inserted block.
                     let tableEnd: number | null = null;
                     let offset = 0;
                     currentState.doc.forEach((node, nodeOffset) => {
@@ -736,7 +721,6 @@ export const HandleExcelPaste = Extension.create({
 
                     if (tableEnd === null) return;
 
-                    // If nothing exists after the table, insert an empty paragraph.
                     const needsParagraph =
                       tableEnd >= currentState.doc.content.size;
                     if (needsParagraph) {
@@ -746,7 +730,6 @@ export const HandleExcelPaste = Extension.create({
                       );
                     }
 
-                    // Resolve the position just inside the paragraph after the table.
                     const targetPos = Math.min(
                       tableEnd + 1,
                       followUpTr.doc.content.size - 1
@@ -771,6 +754,7 @@ export const HandleExcelPaste = Extension.create({
 });
 
 // Handle formatting cleanup
+
 type StyleValidator = (value: string) => boolean;
 type StyleNormalizer = (value: string) => string | null;
 

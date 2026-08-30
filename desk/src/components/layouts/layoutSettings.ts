@@ -7,6 +7,7 @@ import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
+import TaskIcon from "@/components/icons/TaskIcon.vue";
 
 /**
  * Shared rather than local to Sidebar.vue: the command palette opens it too, and
@@ -39,6 +40,11 @@ export const agentPortalSidebarOptions = [
     label: "Customers",
     icon: OrganizationsIcon,
     to: "CustomerList",
+  },
+   {
+    label: __('Tasks'),
+    icon: TaskIcon,
+    to: { name: 'TaskList' } 
   },
   {
     label: __("Contacts"),
