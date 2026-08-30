@@ -207,7 +207,7 @@ const template = createResource({
 
 function setupTemplateFields(fields) {
   fields.forEach((field: Field) => {
-    templateFields[field.fieldname] = "";
+    templateFields[field.fieldname] = field.default || "";
   });
 }
 
