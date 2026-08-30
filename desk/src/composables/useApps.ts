@@ -59,7 +59,7 @@ export function useApps() {
     icon: markRaw(AppsIcon),
     submenu: apps.value.map((app) => ({
       label: app.title,
-      icon: h("img", { src: app.logo }),
+      icon: h("img", { src: app.logo, alt: "" }),
       onClick: () => window.open(app.route, "_self"),
     })),
   }));
