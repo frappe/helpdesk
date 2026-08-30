@@ -29,7 +29,7 @@
                       __("Tickets must meet the following conditions:")
                     }}</span
                   >
-                  <ul class="list-disc pl-4 mt-1 space-y-1">
+                  <ul class="list-disc ps-4 mt-1 space-y-1">
                     <li
                       v-for="(condition, index) in mergeConditions"
                       :key="index"

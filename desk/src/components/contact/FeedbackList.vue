@@ -48,7 +48,7 @@
             </span>
             <p class="min-w-0 flex-1 truncate text-sm">
               <span class="text-ink-gray-5"># {{ ticket.name }}</span>
-              <span class="ml-1 font-medium text-ink-gray-7">{{
+              <span class="ms-1 font-medium text-ink-gray-7">{{
                 ticket.subject
               }}</span>
             </p>

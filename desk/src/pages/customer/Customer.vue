@@ -4,7 +4,7 @@
   >
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="-ml-[2px]" />
+        <Breadcrumbs :items="breadcrumbs" class="-ms-[2px]" />
       </template>
     </LayoutHeader>
     <div
