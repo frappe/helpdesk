@@ -104,7 +104,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
         "orange",
         {
           dueBy: d.response_by,
-        }
+        },
       );
     }
     const overdue = coarseDuration(d.response_by);
@@ -170,10 +170,16 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
         "due",
         `Due in ${coarseDuration(d.resolution_by)}`,
         "violet",
-        { dueBy: d.resolution_by }
+        { dueBy: d.resolution_by },
       );
     }
-    const overdue = coarseDuration(d.resolution_by);
+    // Paused after the deadline: freeze at the breach, hold time is not lateness.
+    // The pause itself stays in the popover; the card has room for one fact, and
+    // a failed SLA outranks a pause that ends the moment the customer replies.
+    const paused = d.status_category === "Paused" && Boolean(d.on_hold_since);
+    const overdue = paused
+      ? shortDuration(d.on_hold_since, d.resolution_by)
+      : coarseDuration(d.resolution_by);
     return metric("overdue", `Overdue by ${overdue}`, "red", {
       dueBy: d.resolution_by,
       delay: `+${overdue}`,
@@ -187,7 +193,7 @@ function metric(
   state: SLAState,
   value: string,
   color: SLAMetric["color"],
-  extra: Partial<Pick<SLAMetric, "dueBy" | "actual" | "delay">>
+  extra: Partial<Pick<SLAMetric, "dueBy" | "actual" | "delay">>,
 ): SLAMetric {
   return {
     state,
