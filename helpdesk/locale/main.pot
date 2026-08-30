@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-08-27 07:59+0000\n"
-"PO-Revision-Date: 2026-08-27 07:59+0000\n"
+"POT-Creation-Date: 2026-08-30 14:54+0000\n"
+"PO-Revision-Date: 2026-08-30 14:54+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -20,11 +20,11 @@ msgstr ""
 msgid " commented"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:186
+#: helpdesk/api/dashboard.py:187
 msgid "% SLA Fulfilled"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:191
+#: helpdesk/api/dashboard.py:192
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr ""
@@ -37,6 +37,7 @@ msgstr ""
 msgid "({0}s)"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:54
 #: desk/src/components/tag/Tags.vue:62
 msgid "+{0} more"
 msgstr ""
@@ -72,8 +73,20 @@ msgstr ""
 msgid "1 Year"
 msgstr ""
 
+#: desk/src/components/SavedRepliesSelectorModal.vue:293
+msgid "1 action"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:143
+msgid "1 action will be applied after sending the email"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:154
 msgid "1 person reacted to your comment"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:84
+msgid "1 time"
 msgstr ""
 
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:176
@@ -154,6 +167,7 @@ msgid "Acknowledgement"
 msgstr ""
 
 #. Label of the action (Small Text) field in DocType 'HD Ticket Activity'
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:132
 #: helpdesk/helpdesk/doctype/hd_ticket_activity/hd_ticket_activity.json
 msgid "Action"
 msgstr ""
@@ -162,7 +176,12 @@ msgstr ""
 msgid "Action Required"
 msgstr ""
 
+#. Label of the actions_section (Section Break) field in DocType 'HD Saved
+#. Reply'
+#. Label of the actions (JSON) field in DocType 'HD Saved Reply'
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:4
 #: desk/src/pages/contact/Contact.vue:305
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Actions"
 msgstr ""
 
@@ -172,7 +191,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:401
+#: desk/src/components/ticket-agent/AssignTo.vue:426
 msgid "Active now"
 msgstr ""
 
@@ -184,7 +203,7 @@ msgid ""
 "Unavailable: The agent is off and unavailable."
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:482
+#: desk/src/pages/ticket/MobileTicketAgent.vue:500
 #: desk/src/pages/ticket/TicketCustomer.vue:182
 msgid "Activity"
 msgstr ""
@@ -256,6 +275,10 @@ msgstr ""
 msgid "Add a few words so we can continue"
 msgstr ""
 
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:88
+msgid "Add action"
+msgstr ""
+
 #: desk/src/pages/home/Home.vue:91
 msgid "Add charts to get started"
 msgstr ""
@@ -285,7 +308,7 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesListView.vue:23
 #: desk/src/components/Settings/EmailAccountList.vue:53
 #: desk/src/components/Settings/Holiday/HolidayList.vue:23
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:74
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:71
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:23
 msgid "Add one to get started."
 msgstr ""
@@ -298,7 +321,7 @@ msgstr ""
 msgid "Add tags"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:183
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:204
 msgid "Add time targets around support milestones like first reply and resolution times."
 msgstr ""
 
@@ -394,8 +417,16 @@ msgstr ""
 msgid "Agent Status"
 msgstr ""
 
-#: desk/src/components/Settings/Agents.vue:109
+#: desk/src/components/Settings/Agents.vue:106
 msgid "Agent name"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:58
+msgid "Agent replies"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:157
+msgid "Agent reply"
 msgstr ""
 
 #: desk/src/components/Settings/Agents.vue:3
@@ -406,12 +437,16 @@ msgstr ""
 msgid "Agents & Teams"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:70
+msgid "Agents involved"
+msgstr ""
+
 #: desk/src/components/Settings/General/components/TicketSettings.vue:70
 msgid "Agents will no longer be able to view and create saved replies with global scope."
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:176
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:303
+#: desk/src/components/SavedRepliesSelectorModal.vue:185
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:300
 #: desk/src/components/contact/FeedbackList.vue:118
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 msgid "All"
@@ -492,6 +527,22 @@ msgstr ""
 msgid "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO."
 msgstr ""
 
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:6
+msgid "Applied to the ticket when this reply is sent"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:205
+msgid "Applied {0} saved reply action(s)"
+msgstr ""
+
+#: desk/src/components/SavedRepliesSelectorModal.vue:297
+msgid "Applies 1 action when sent"
+msgstr ""
+
+#: desk/src/components/SavedRepliesSelectorModal.vue:298
+msgid "Applies {0} actions when sent"
+msgstr ""
+
 #. Label of the apply_sla_for_resolution (Check) field in DocType 'HD Service
 #. Level Agreement'
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
@@ -518,6 +569,10 @@ msgstr ""
 #. Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Apply to customer portal"
+msgstr ""
+
+#: desk/src/components/EmailEditor.vue:412
+msgid "Applying \"{0}\" discards the reply you have now, along with its {1} action(s)."
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'HD Article'
@@ -563,8 +618,8 @@ msgstr ""
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:68
 #: desk/src/components/Settings/Holiday/HolidayView.vue:202
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:218
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:279
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:355
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:288
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:376
 #: desk/src/components/Settings/Teams/NewTeam.vue:109
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:215
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:184
@@ -625,12 +680,21 @@ msgstr ""
 msgid "Articles moved successfully."
 msgstr ""
 
+#: desk/src/components/ticket-agent/BulkAssignModal.vue:2
+#: desk/src/pages/ticket/Tickets.vue:143
+msgid "Assign"
+msgstr ""
+
 #: desk/src/components/layouts/Sidebar.vue:269
 msgid "Assign a ticket to an agent"
 msgstr ""
 
 #: desk/src/components/modals/ShortcutsModal.vue:90
 msgid "Assign ticket"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkAssignModal.vue:13
+msgid "Assign {0} tickets"
 msgstr ""
 
 #: desk/src/pages/home/components/RecentActivity.vue:105
@@ -641,6 +705,10 @@ msgstr ""
 #: helpdesk/helpdesk/report/ticket_analytics/ticket_analytics.js:62
 #: helpdesk/helpdesk/report/ticket_summary/ticket_summary.js:49
 msgid "Assigned To"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkAssignModal.vue:53
+msgid "Assigned {0} tickets"
 msgstr ""
 
 #: desk/src/components/ticket-agent/AssignTo.vue:11
@@ -655,7 +723,7 @@ msgstr ""
 msgid "Assignees"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:576
+#: desk/src/components/ticket-agent/AssignTo.vue:601
 msgid "Assignees updated successfully."
 msgstr ""
 
@@ -674,7 +742,7 @@ msgstr ""
 
 #. Label of the filters_section (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:66
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:87
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Assignment Conditions"
 msgstr ""
@@ -738,8 +806,12 @@ msgstr ""
 msgid "At least one feedback option must be enabled for rating {0}"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:417
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:426
 msgid "At least one team is required"
+msgstr ""
+
+#: desk/src/components/EmailEditor.vue:163
+msgid "Attach file"
 msgstr ""
 
 #. Label of the attachment (Attach) field in DocType 'HD Ticket'
@@ -813,33 +885,12 @@ msgstr ""
 msgid "Availability Changed On"
 msgstr ""
 
-#: desk/src/pages/home/components/ChartItem.vue:6
-msgid "Average First Response"
-msgstr ""
-
-#: desk/src/pages/home/Home.vue:317
-msgid "Average First Response Time"
-msgstr ""
-
-#: desk/src/pages/home/components/ChartItem.vue:16
-msgid "Average Resolution"
-msgstr ""
-
-#: desk/src/pages/home/Home.vue:329
-msgid "Average Resolution Time"
-msgstr ""
-
 #. Label of the avg_response_time (Duration) field in DocType 'HD Ticket'
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Average Response Time"
 msgstr ""
 
-#: desk/src/pages/home/Home.vue:305
-#: desk/src/pages/home/components/AvgTimeMetrics.vue:5
-msgid "Average Time Metrics"
-msgstr ""
-
-#: helpdesk/api/dashboard.py:379
+#: helpdesk/api/dashboard.py:380
 msgid "Average feedback rating per day is around {0} stars"
 msgstr ""
 
@@ -847,11 +898,19 @@ msgstr ""
 msgid "Average response and resolution metrics not available"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:297
+#: helpdesk/api/dashboard.py:298
 msgid "Average tickets per day is around {0}"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:242
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:40
+msgid "Average time the customer took to reply to an agent"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:35
+msgid "Average time to reply after a customer message"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:243
 msgid "Avg. Feedback Rating"
 msgstr ""
 
@@ -859,23 +918,39 @@ msgstr ""
 msgid "Avg. Feedback Received"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:201
+#: desk/src/pages/home/components/ChartItem.vue:6 helpdesk/api/dashboard.py:204
 msgid "Avg. First Response"
 msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:49
+#: desk/src/pages/home/Home.vue:317
 msgid "Avg. First Response Time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:220
+#: desk/src/pages/home/components/ChartItem.vue:16
+#: helpdesk/api/dashboard.py:221
 msgid "Avg. Resolution"
 msgstr ""
 
 #: desk/src/components/customer/TicketStats.vue:62
+#: desk/src/pages/home/Home.vue:329
 msgid "Avg. Resolution Time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:247
+#: desk/src/pages/home/Home.vue:305
+#: desk/src/pages/home/components/AvgTimeMetrics.vue:5
+msgid "Avg. Time Metrics"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:33
+msgid "Avg. agent response gap"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:38
+msgid "Avg. customer response gap"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:248
 msgid "Avg. feedback rating for tickets resolved in this period"
 msgstr ""
 
@@ -889,11 +964,11 @@ msgstr ""
 msgid "Avg. resolution time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:207
+#: helpdesk/api/dashboard.py:210
 msgid "Avg. time taken to first respond to a ticket"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:226
+#: helpdesk/api/dashboard.py:227
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
@@ -904,8 +979,8 @@ msgstr ""
 
 #: desk/src/components/Settings/EmailAdd.vue:146
 #: desk/src/components/Settings/EmailEdit.vue:136
-#: desk/src/components/command-palette/CommandPalette.vue:155
-#: desk/src/components/command-palette/CommandPalette.vue:256
+#: desk/src/components/command-palette/CommandPalette.vue:158
+#: desk/src/components/command-palette/CommandPalette.vue:262
 msgid "Back"
 msgstr ""
 
@@ -961,24 +1036,19 @@ msgstr ""
 msgid "Branding"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:272
+#: desk/src/components/ListViewBuilder.vue:282
 msgid "Bulk Operation Failed"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:275
+#: desk/src/components/ListViewBuilder.vue:285
 msgid "Bulk Operation Successful"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:5
-#: desk/src/pages/ticket/Tickets.vue:116
-msgid "Bulk Reply"
-msgstr ""
-
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:111
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:105
 msgid "Bulk reply sent successfully to 1 ticket."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:112
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:106
 msgid "Bulk reply sent successfully to {0} tickets."
 msgstr ""
 
@@ -1018,7 +1088,7 @@ msgstr ""
 msgid "Caller"
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:500
+#: desk/src/pages/ticket/MobileTicketAgent.vue:518
 msgid "Calls"
 msgstr ""
 
@@ -1046,7 +1116,11 @@ msgstr ""
 msgid "Can work on tickets, create custom views and manage private views."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:724 desk/src/pages/home/Home.vue:44
+#: desk/src/components/EmailEditor.vue:417
+#: desk/src/components/ListViewBuilder.vue:741
+#: desk/src/components/ticket-agent/BulkAssignModal.vue:8
+#: desk/src/components/ticket-agent/BulkEditModal.vue:23
+#: desk/src/pages/home/Home.vue:44
 msgid "Cancel"
 msgstr ""
 
@@ -1060,10 +1134,6 @@ msgstr ""
 
 #: helpdesk/integrations/erpnext/api.py:47
 msgid "Cannot Sync Customers"
-msgstr ""
-
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:526
-msgid "Cannot delete the default SLA. At least one SLA must be marked as default."
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:110
@@ -1196,7 +1266,7 @@ msgstr ""
 msgid "Choose a field"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:135
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:156
 msgid "Choose how long this SLA policy will be active."
 msgstr ""
 
@@ -1220,7 +1290,7 @@ msgstr ""
 msgid "Choose which tickets are affected by this assignment rule."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:69
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:90
 msgid "Choose which tickets are affected by this policy."
 msgstr ""
 
@@ -1236,7 +1306,7 @@ msgstr ""
 msgid "Choose who receives the tickets."
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:255
+#: desk/src/components/command-palette/CommandPalette.vue:261
 msgid "Clear"
 msgstr ""
 
@@ -1257,6 +1327,11 @@ msgstr ""
 msgid "Clear all Filter"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:33
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:35
+msgid "Clear all actions"
+msgstr ""
+
 #: desk/src/pages/SearchAgent.vue:86
 msgid "Clear all filters"
 msgstr ""
@@ -1271,10 +1346,10 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:69
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:47
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:174
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:171
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:56
-#: desk/src/components/command-palette/CommandPalette.vue:257
-#: desk/src/pages/ticket/MobileTicketAgent.vue:189
+#: desk/src/components/command-palette/CommandPalette.vue:263
+#: desk/src/pages/ticket/MobileTicketAgent.vue:207
 #: desk/src/pages/ticket/TicketCustomer.vue:14
 msgid "Close"
 msgstr ""
@@ -1284,6 +1359,7 @@ msgid "Close Ticket"
 msgstr ""
 
 #. Option in a Select field in the tickets Web Form
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:715
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
 msgstr ""
@@ -1319,6 +1395,8 @@ msgid "Command Palette"
 msgstr ""
 
 #. Label of the reference_comment (Link) field in DocType 'HD Notification'
+#: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:7
+#: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:20
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 msgid "Comment"
 msgstr ""
@@ -1351,7 +1429,7 @@ msgstr ""
 
 #. Label of the comments_section (Section Break) field in DocType 'HD Settings'
 #: desk/src/pages/SearchAgent.vue:353
-#: desk/src/pages/ticket/MobileTicketAgent.vue:492
+#: desk/src/pages/ticket/MobileTicketAgent.vue:510
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
 msgstr ""
@@ -1411,13 +1489,13 @@ msgstr ""
 #: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:45
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:327
 #: desk/src/pages/knowledge-base/NewArticle.vue:148
-#: desk/src/pages/ticket/MobileTicketAgent.vue:186
+#: desk/src/pages/ticket/MobileTicketAgent.vue:204
 #: desk/src/pages/ticket/TicketCustomer.vue:317
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:27
 msgid "Confirm"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:708
+#: desk/src/components/ListViewBuilder.vue:725
 msgid "Confirm Changes"
 msgstr ""
 
@@ -1425,7 +1503,7 @@ msgstr ""
 msgid "Confirm Password"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:393
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:414
 msgid "Confirm overwrite"
 msgstr ""
 
@@ -1493,6 +1571,10 @@ msgstr ""
 msgid "Content Type"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:5
+msgid "Conversation Summary"
+msgstr ""
+
 #: desk/src/components/modals/ShortcutsModal.vue:94
 msgid "Copy ticket URL"
 msgstr ""
@@ -1501,8 +1583,12 @@ msgstr ""
 msgid "Copy ticket id"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:757
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:781
 msgid "Could not an email due to: {0}"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:225
+msgid "Could not apply actions from the saved reply."
 msgstr ""
 
 #: helpdesk/patches/set_hd_ticket_naming_series.py:37
@@ -1513,7 +1599,7 @@ msgstr ""
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:916
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:946
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
 
@@ -1555,7 +1641,7 @@ msgstr ""
 msgid "Create Customer"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:394 desk/src/pages/ticket/Tickets.vue:398
+#: desk/src/pages/ticket/Tickets.vue:418 desk/src/pages/ticket/Tickets.vue:422
 msgid "Create View"
 msgstr ""
 
@@ -1581,6 +1667,10 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaHolidays.vue:57
 msgid "Create new business holiday"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:237
+msgid "Created"
 msgstr ""
 
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:69
@@ -1657,6 +1747,15 @@ msgstr ""
 
 #: desk/src/components/customer/NewCustomerDialog.vue:140
 msgid "Customer created · invitation sent to {0}"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:156
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:548
+msgid "Customer message"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:55
+msgid "Customer messages"
 msgstr ""
 
 #: desk/src/components/customer/EditCustomerDialog.vue:119
@@ -1763,6 +1862,10 @@ msgstr ""
 msgid "Default SLA"
 msgstr ""
 
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:32
+msgid "Default SLA turned off"
+msgstr ""
+
 #: desk/src/components/Settings/EmailAccountCard.vue:56
 msgid "Default Sending"
 msgstr ""
@@ -1777,7 +1880,7 @@ msgstr ""
 msgid "Default Ticket Status"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:351
+#: desk/src/pages/ticket/Tickets.vue:375
 msgid "Default Views"
 msgstr ""
 
@@ -1820,9 +1923,10 @@ msgstr ""
 
 #: desk/src/components/DeleteWithTicketsDialog.vue:20
 #: desk/src/components/DeleteWithTicketsDialog.vue:63
-#: desk/src/components/ListViewBuilder.vue:235
-#: desk/src/components/ListViewBuilder.vue:239
 #: desk/src/components/ListViewBuilder.vue:245
+#: desk/src/components/ListViewBuilder.vue:249
+#: desk/src/components/ListViewBuilder.vue:255
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:58
 #: desk/src/components/ticket-agent/TicketHeader.vue:205
 #: desk/src/components/ticket-agent/TicketHeader.vue:274
 #: desk/src/components/ticket-agent/TicketHeader.vue:276
@@ -1863,8 +1967,8 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:106
 #: desk/src/components/Settings/Holiday/HolidayView.vue:53
 #: desk/src/components/Settings/Holiday/HolidayView.vue:54
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:56
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:57
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:77
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:78
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/doctype/hd_service_holiday_list/hd_service_holiday_list.json
@@ -1895,8 +1999,8 @@ msgstr ""
 #. Label of the details_section (Section Break) field in DocType 'HD
 #. Notification'
 #. Label of the sb_details (Section Break) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/MobileTicketAgent.vue:111
-#: desk/src/pages/ticket/MobileTicketAgent.vue:476
+#: desk/src/pages/ticket/MobileTicketAgent.vue:129
+#: desk/src/pages/ticket/MobileTicketAgent.vue:494
 #: desk/src/pages/ticket/TicketCustomer.vue:183
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
@@ -1934,7 +2038,7 @@ msgid "Disables all email notifications for the ticket - including creation, upd
 msgstr ""
 
 #: desk/src/components/TextEditor.vue:43
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:30
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:24
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
 msgstr ""
@@ -2007,8 +2111,8 @@ msgstr ""
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleListItem.vue:138
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:50
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:90
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:177
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:242
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:174
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:239
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:59
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
@@ -2026,8 +2130,12 @@ msgstr ""
 msgid "Duplicate SLA Policy"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:158
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:155
 msgid "Duplicate Saved reply"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:71
+msgid "Duplicate action: {0}"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:80
@@ -2086,9 +2194,11 @@ msgstr ""
 msgid "Easily invite new agents, managers, or admins."
 msgstr ""
 
+#: desk/src/components/ticket-agent/BulkEditModal.vue:2
 #: desk/src/pages/contact/Contact.vue:33
 #: desk/src/pages/customer/Customer.vue:28 desk/src/pages/home/Home.vue:36
 #: desk/src/pages/knowledge-base/Article.vue:619
+#: desk/src/pages/ticket/Tickets.vue:161
 msgid "Edit"
 msgstr ""
 
@@ -2191,7 +2301,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:38
 #: desk/src/pages/SearchAgent.vue:352
-#: desk/src/pages/ticket/MobileTicketAgent.vue:487
+#: desk/src/pages/ticket/MobileTicketAgent.vue:505
 msgid "Emails"
 msgstr ""
 
@@ -2342,7 +2452,7 @@ msgid "Explore the product first"
 msgstr ""
 
 #: desk/src/components/ticket/ExportModal.vue:2
-#: desk/src/pages/ticket/Tickets.vue:124
+#: desk/src/pages/ticket/Tickets.vue:153
 msgid "Export"
 msgstr ""
 
@@ -2356,8 +2466,7 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #: desk/src/pages/call-logs/CallLogModal.vue:211
-#: desk/src/pages/ticket/Tickets.vue:214 desk/src/pages/ticket/Tickets.vue:227
-#: desk/src/pages/ticket/Tickets.vue:260 desk/src/pages/ticket/Tickets.vue:268
+#: desk/src/pages/ticket/Tickets.vue:274
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Failed"
 msgstr ""
@@ -2376,6 +2485,10 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:218
 msgid "Failed to delete ticket."
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketAnalyticsTab.vue:21
+msgid "Failed to load analytics"
 msgstr ""
 
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:194
@@ -2399,7 +2512,7 @@ msgstr ""
 msgid "Failed to save Twilio settings"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:582
+#: desk/src/components/ticket-agent/AssignTo.vue:607
 msgid "Failed to update Assignees."
 msgstr ""
 
@@ -2471,7 +2584,7 @@ msgstr ""
 msgid "Feedback Rating"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:386
+#: helpdesk/api/dashboard.py:387
 msgid "Feedback Trend"
 msgstr ""
 
@@ -2485,6 +2598,10 @@ msgstr ""
 
 #: desk/src/components/knowledge-base/ArticleFeedback.vue:79
 msgid "Feedback submitted successfully."
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkEditModal.vue:7
+msgid "Field"
 msgstr ""
 
 #. Label of the fieldname (Data) field in DocType 'HD Ticket Template Field'
@@ -2592,6 +2709,22 @@ msgstr ""
 msgid "First Response Time for Tickets"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:292
+msgid "First response"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:318
+msgid "First response due"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:346
+msgid "First response overdue"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:556
+msgid "Follow-up"
+msgstr ""
+
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 msgid "Form"
@@ -2634,7 +2767,7 @@ msgid "From Date"
 msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:72
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:140
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:161
 msgid "From date"
 msgstr ""
 
@@ -2643,13 +2776,13 @@ msgid "From is required"
 msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
-#: desk/src/pages/ticket/Tickets.vue:221 desk/src/pages/ticket/Tickets.vue:260
+#: desk/src/pages/ticket/Tickets.vue:274
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Fulfilled"
 msgstr ""
 
 #: desk/src/components/Settings/General/General.vue:6
-#: desk/src/components/command-palette/CommandPalette.vue:413
+#: desk/src/components/command-palette/CommandPalette.vue:419
 #: desk/src/components/layouts/Sidebar.vue:315
 #: desk/src/components/modals/ShortcutsModal.vue:76
 msgid "General"
@@ -2682,10 +2815,10 @@ msgid "GitHub"
 msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:179
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:306
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:346
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:201
+#: desk/src/components/SavedRepliesSelectorModal.vue:188
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:303
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:343
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:209
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
 msgstr ""
@@ -2972,6 +3105,10 @@ msgstr ""
 msgid "Hide "
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:26
+msgid "Hide actions"
+msgstr ""
+
 #. Label of the hide_from_customer (Check) field in DocType 'HD Ticket Template
 #. Field'
 #: helpdesk/helpdesk/doctype/hd_ticket_template_field/hd_ticket_template_field.json
@@ -3045,7 +3182,7 @@ msgstr ""
 msgid "How would you like your customers to create support tickets in Frappe Helpdesk?"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:115
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:136
 msgid "I understand, add conditions"
 msgstr ""
 
@@ -3134,7 +3271,7 @@ msgstr ""
 msgid "In person"
 msgstr ""
 
-#: desk/src/components/Settings/Agents.vue:126
+#: desk/src/components/Settings/Agents.vue:123
 msgid "Inactive"
 msgstr ""
 
@@ -3176,12 +3313,28 @@ msgstr ""
 msgid "Intercom"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:60
+msgid "Internal comments"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/components/ActionValue.vue:68
+msgid "Internal note. Type / for commands"
+msgstr ""
+
 #: desk/src/components/layouts/Sidebar.vue:357
 #: desk/src/components/layouts/Sidebar.vue:360
 msgid "Introduction"
 msgstr ""
 
-#: helpdesk/api/agent.py:37
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:161
+msgid "Invalid action {0}: {1} does not exist or is disabled"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:68
+msgid "Invalid action: {0}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.py:63
 msgid "Invalid availability"
 msgstr ""
 
@@ -3191,7 +3344,7 @@ msgstr ""
 
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:478
 #: desk/src/components/Settings/Holiday/HolidayView.vue:335
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:384
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:405
 msgid "Invalid fields, check if all are filled in and values are correct."
 msgstr ""
 
@@ -3520,15 +3673,15 @@ msgstr ""
 
 #. Option for the 'Apply To' (Select) field in DocType 'HD Form Script'
 #. Label of the list_tab (Tab Break) field in DocType 'HD View'
-#: desk/src/components/ListViewBuilder.vue:790
-#: desk/src/components/ListViewBuilder.vue:881
-#: desk/src/pages/ticket/Tickets.vue:438
+#: desk/src/components/ListViewBuilder.vue:807
+#: desk/src/components/ListViewBuilder.vue:898
+#: desk/src/pages/ticket/Tickets.vue:462
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "List"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:354
+#: desk/src/pages/ticket/Tickets.vue:378
 msgid "List View"
 msgstr ""
 
@@ -3545,7 +3698,8 @@ msgstr ""
 msgid "Load Default Columns"
 msgstr ""
 
-#: desk/src/components/Settings/Agents.vue:174
+#: desk/src/components/SavedRepliesSelectorModal.vue:113
+#: desk/src/components/Settings/Agents.vue:171
 #: desk/src/components/Settings/Teams/TeamsList.vue:88
 #: desk/src/components/contact/FeedbackList.vue:81
 #: desk/src/components/customer/TicketsTab.vue:142
@@ -3582,6 +3736,16 @@ msgstr ""
 #. Option for the 'Level' (Select) field in DocType 'HD Ticket Priority'
 #: helpdesk/helpdesk/doctype/hd_ticket_priority/hd_ticket_priority.json
 msgid "Low"
+msgstr ""
+
+#. Description of the 'Rank' (Int) field in DocType 'HD Service Level
+#. Agreement'
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Lower rank is applied first. 0 means unranked, and is applied last."
+msgstr ""
+
+#: desk/src/pages/ticket/MobileTicketAgent.vue:123
+msgid "Mail"
 msgstr ""
 
 #: desk/src/components/ticket/ActivityHeader.vue:60
@@ -3672,7 +3836,6 @@ msgid "Merge"
 msgstr ""
 
 #: desk/src/components/ticket-agent/TicketHeader.vue:250
-#: desk/src/components/ticket/TicketAgentSidebar.vue:18
 msgid "Merge Ticket"
 msgstr ""
 
@@ -3757,8 +3920,8 @@ msgstr ""
 msgid "My Stats"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:178
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:305
+#: desk/src/components/SavedRepliesSelectorModal.vue:187
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:302
 msgid "My Team(s)"
 msgstr ""
 
@@ -3777,8 +3940,8 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayView.vue:37
 #: desk/src/components/Settings/Holiday/HolidayView.vue:38
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:47
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:42
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:43
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:44
 #: desk/src/components/ViewModal.vue:7
 #: desk/src/components/customer/NewCustomerDialog.vue:21
 #: helpdesk/helpdesk/doctype/hd_article_category/hd_article_category.json
@@ -3803,7 +3966,7 @@ msgstr ""
 msgid "Name shown on the customer portal<br> (e.g., Replied → Awaiting Response)."
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:143
+#: desk/src/components/command-palette/CommandPalette.vue:146
 msgid "Navigate"
 msgstr ""
 
@@ -3824,7 +3987,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:16
+#: desk/src/components/SavedRepliesSelectorModal.vue:9
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:19
 #: desk/src/components/Settings/EmailAccountList.vue:12
 #: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:27
@@ -3882,11 +4045,11 @@ msgstr ""
 msgid "New Saved Reply"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:164
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:161
 msgid "New Saved reply Name"
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:171
+#: desk/src/pages/ticket/MobileTicketAgent.vue:189
 msgid "New Subject"
 msgstr ""
 
@@ -3931,16 +4094,12 @@ msgstr ""
 msgid "No Answer"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:347
+#: desk/src/components/ListViewBuilder.vue:357
 msgid "No Data Found"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:585
 msgid "No Email Account found for {0}"
-msgstr ""
-
-#: helpdesk/api/agent.py:41
-msgid "No HD Agent record for current user"
 msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayList.vue:20
@@ -3951,8 +4110,12 @@ msgstr ""
 msgid "No SLA found"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:458
+#: helpdesk/api/dashboard.py:459
 msgid "No Team"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:77
+msgid "No actions yet. Add one to update the ticket when this reply is sent"
 msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:115
@@ -3997,7 +4160,7 @@ msgstr ""
 msgid "No charts added"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:240
+#: desk/src/components/command-palette/CommandPalette.vue:246
 msgid "No commands found"
 msgstr ""
 
@@ -4053,7 +4216,7 @@ msgstr ""
 msgid "No next ticket"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:48
+#: desk/src/components/ticket-agent/AssignTo.vue:221
 msgid "No one"
 msgstr ""
 
@@ -4081,7 +4244,7 @@ msgstr ""
 msgid "No results"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:238
+#: desk/src/components/command-palette/CommandPalette.vue:244
 msgid "No results for \"{0}\""
 msgstr ""
 
@@ -4094,8 +4257,8 @@ msgstr ""
 msgid "No reviews found"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:122
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:73
+#: desk/src/components/SavedRepliesSelectorModal.vue:128
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:70
 msgid "No saved replies found"
 msgstr ""
 
@@ -4104,23 +4267,23 @@ msgid "No tags yet, type to create one"
 msgstr ""
 
 #: desk/src/components/customer/TicketsTab.vue:51
-#: desk/src/pages/ticket/Tickets.vue:189
+#: desk/src/pages/ticket/Tickets.vue:228
 msgid "No tickets found"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:199
+#: desk/src/pages/ticket/Tickets.vue:238
 msgid "No tickets found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:195
+#: desk/src/pages/ticket/Tickets.vue:234
 msgid "No tickets found for this view. Try adjusting your filters or creating a new view."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:104
+#: desk/src/components/Settings/SavedReplies/components/PreviewDialog.vue:105
 msgid "No tickets found to preview."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:90
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:84
 msgid "No tickets selected"
 msgstr ""
 
@@ -4128,7 +4291,7 @@ msgstr ""
 msgid "No user linked to contact {0}"
 msgstr ""
 
-#: helpdesk/api/ticket.py:76 helpdesk/utils.py:187 helpdesk/utils.py:207
+#: helpdesk/api/ticket.py:83 helpdesk/utils.py:187 helpdesk/utils.py:215
 msgid "Not Allowed"
 msgstr ""
 
@@ -4154,7 +4317,7 @@ msgstr ""
 msgid "Not installed"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:239
+#: desk/src/components/command-palette/CommandPalette.vue:245
 msgid "Nothing left in {0}"
 msgstr ""
 
@@ -4178,7 +4341,7 @@ msgstr ""
 msgid "Old Condition"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:88
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:109
 msgid "Old Conditions"
 msgstr ""
 
@@ -4191,12 +4354,16 @@ msgstr ""
 msgid "On ticket status"
 msgstr ""
 
-#: helpdesk/api/ticket.py:75
+#: helpdesk/api/ticket.py:82
 msgid "Only administrators can delete tickets."
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.py:29
 msgid "Only one default view is allowed per user for {0}"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:80
+msgid "Only one of Assign Agent or Assign to Me is allowed"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:29
@@ -4214,7 +4381,7 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:412
+#: desk/src/components/command-palette/CommandPalette.vue:418
 #: desk/src/components/modals/ShortcutsModal.vue:78
 msgid "Open command palette"
 msgstr ""
@@ -4305,7 +4472,7 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:87
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:84
 msgid "Owner"
 msgstr ""
 
@@ -4353,10 +4520,14 @@ msgstr ""
 
 #. Option for the 'SLA Status' (Select) field in DocType 'HD Ticket'
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/pages/ticket/Tickets.vue:250
+#: desk/src/pages/ticket/Tickets.vue:285
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Paused"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:616
+msgid "Paused {0} so far"
 msgstr ""
 
 #: desk/src/pages/home/components/PendingTickets.vue:215
@@ -4374,19 +4545,19 @@ msgstr ""
 msgid "Pending Tickets"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:577
+#: helpdesk/api/dashboard.py:578
 msgid "Percentage of total tickets by channel"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:535
+#: helpdesk/api/dashboard.py:536
 msgid "Percentage of total tickets by priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:465
+#: helpdesk/api/dashboard.py:466
 msgid "Percentage of total tickets by team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:500
+#: helpdesk/api/dashboard.py:501
 msgid "Percentage of total tickets by type"
 msgstr ""
 
@@ -4400,10 +4571,10 @@ msgid "Persona Captured"
 msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/SavedRepliesSelectorModal.vue:177
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:304
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:338
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:191
+#: desk/src/components/SavedRepliesSelectorModal.vue:186
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:301
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:335
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:199
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
 msgstr ""
@@ -4455,8 +4626,8 @@ msgstr ""
 msgid "Please add this priority in the <a href='/app/hd-service-level-agreement'>required SLA documents</a>"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:341
-msgid "Please add {0} priority in {1} SLA"
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:229
+msgid "Please apply the actions manually"
 msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:219
@@ -4499,15 +4670,11 @@ msgstr ""
 msgid "Please fill all required fields for Twilio"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:302
-msgid "Please fill all the required fields"
-msgstr ""
-
 #: desk/src/components/Settings/Sla/Modals/WorkDayModal.vue:244
 msgid "Please fix the errors in the form"
 msgstr ""
 
-#: helpdesk/api/saved_replies.py:11
+#: helpdesk/api/saved_replies.py:19
 msgid "Please provide saved_reply_id"
 msgstr ""
 
@@ -4521,6 +4688,10 @@ msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicyList.vue:32
 msgid "Policy name"
+msgstr ""
+
+#: desk/src/pages/ticket/MobileTicketAgent.vue:122
+msgid "Portal"
 msgstr ""
 
 #: desk/src/components/contact/FeedbackList.vue:120
@@ -4610,16 +4781,16 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:86
-msgid "Priority <u>{0}</u> must be included in the SLA {1}."
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:95
+msgid "Priority in use"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:75
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:77
 msgid "Priority {0} has been repeated."
 msgstr ""
 
 #: desk/src/components/layouts/AppSidebar.vue:266
-#: desk/src/pages/ticket/Tickets.vue:374
+#: desk/src/pages/ticket/Tickets.vue:398
 msgid "Private Views"
 msgstr ""
 
@@ -4646,7 +4817,7 @@ msgid "Public"
 msgstr ""
 
 #: desk/src/components/layouts/AppSidebar.vue:259
-#: desk/src/pages/ticket/Tickets.vue:389
+#: desk/src/pages/ticket/Tickets.vue:413
 msgid "Public Views"
 msgstr ""
 
@@ -4699,6 +4870,12 @@ msgstr ""
 msgid "Range"
 msgstr ""
 
+#. Label of the rank (Int) field in DocType 'HD Service Level Agreement'
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:57
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
+msgid "Rank"
+msgstr ""
+
 #. Title of the email-feedback Web Form
 #: helpdesk/helpdesk/web_form/email_feedback/email_feedback.json
 msgid "Rate Your Support Experience"
@@ -4708,14 +4885,14 @@ msgstr ""
 msgid "Rate this ticket"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:389
+#: helpdesk/api/dashboard.py:390
 msgid "Rated Tickets"
 msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
 #: desk/src/pages/home/components/RecentFeedback.vue:318
-#: helpdesk/api/dashboard.py:400
+#: helpdesk/api/dashboard.py:401
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -4834,7 +5011,11 @@ msgstr ""
 msgid "Remove Photo"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:257
+#: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:13
+msgid "Remove comment"
+msgstr ""
+
+#: desk/src/components/command-palette/CommandPalette.vue:263
 msgid "Remove context"
 msgstr ""
 
@@ -4852,10 +5033,14 @@ msgstr ""
 msgid "Remove primary"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActionChip.vue:46
+msgid "Remove {0}"
+msgstr ""
+
 #: desk/src/components/Settings/Teams/TeamEdit.vue:252
 #: desk/src/components/Settings/Teams/TeamsList.vue:161
 #: desk/src/components/ticket-agent/TicketSubjectModal.vue:21
-#: desk/src/pages/ticket/MobileTicketAgent.vue:162
+#: desk/src/pages/ticket/MobileTicketAgent.vue:180
 msgid "Rename"
 msgstr ""
 
@@ -4871,6 +5056,10 @@ msgstr ""
 msgid "Rename team"
 msgstr ""
 
+#: desk/src/components/EmailEditor.vue:419
+msgid "Replace"
+msgstr ""
+
 #: desk/src/components/view-controls/filter/Filter.vue:66
 #: desk/src/components/view-controls/filter/Filter.vue:67
 msgid "Replace filter"
@@ -4878,6 +5067,10 @@ msgstr ""
 
 #: desk/src/components/ImageAvatar.vue:17
 msgid "Replace image"
+msgstr ""
+
+#: desk/src/components/EmailEditor.vue:411
+msgid "Replace saved reply"
 msgstr ""
 
 #: desk/src/components/ViewModal.vue:32
@@ -4891,6 +5084,8 @@ msgid "Replied"
 msgstr ""
 
 #: desk/src/components/EmailArea.vue:54
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:2
+#: desk/src/pages/ticket/Tickets.vue:133
 msgid "Reply"
 msgstr ""
 
@@ -4948,8 +5143,15 @@ msgstr ""
 msgid "Reset to Default"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:41
+msgid "Reset to default"
+msgstr ""
+
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/components/customer/TicketsTab.vue:226
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:597
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:634
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:716
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution"
 msgstr ""
@@ -4987,9 +5189,26 @@ msgstr ""
 msgid "Resolution Time"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:429
+msgid "Resolution due"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:429
+msgid "Resolution overdue"
+msgstr ""
+
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:715
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:713
+msgid "Resolved late"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:292
+msgid "Responded late"
 msgstr ""
 
 #. Label of the response_tab (Tab Break) field in DocType 'HD Ticket'
@@ -5003,18 +5222,18 @@ msgstr ""
 msgid "Response By"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:65
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:67
 msgid "Response Time for {0} priority in row {1} can't be greater than Resolution Time."
 msgstr ""
 
 #. Label of the response_and_resolution_time_section (Section Break) field in
 #. DocType 'HD Service Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:179
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:200
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Response and Resolution"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:406
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:415
 msgid "Response is required"
 msgstr ""
 
@@ -5043,6 +5262,11 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:84
 msgid "Restrict visibility to these teams"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:228
+#: desk/src/components/ticket-agent/analytics/TicketAnalyticsTab.vue:23
+msgid "Retry"
 msgstr ""
 
 #: desk/src/pages/home/Home.vue:341
@@ -5078,6 +5302,10 @@ msgstr ""
 msgid "Route Name"
 msgstr ""
 
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:67
+msgid "Row actions"
+msgstr ""
+
 #. Label of the rows (Code) field in DocType 'HD View'
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Rows"
@@ -5090,7 +5318,7 @@ msgstr ""
 #. Label of the sla (Link) field in DocType 'HD Ticket'
 #. Label of the sla_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/pages/home/components/PendingTickets.vue:211
-#: desk/src/pages/ticket/MobileTicketAgent.vue:106
+#: desk/src/pages/ticket/MobileTicketAgent.vue:107
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "SLA"
 msgstr ""
@@ -5116,7 +5344,27 @@ msgstr ""
 msgid "SLA Status"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:430
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:67
+msgid "SLA changed"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:33
+msgid "SLA disabled"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:154
+msgid "SLA met"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:155
+msgid "SLA missed / longest wait"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:619
+msgid "SLA paused"
+msgstr ""
+
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:451
 msgid "SLA policy created successfully."
 msgstr ""
 
@@ -5128,20 +5376,12 @@ msgstr ""
 msgid "SLA policy duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:182
+#: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:178
 msgid "SLA policy status updated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:469
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:490
 msgid "SLA policy updated successfully."
-msgstr ""
-
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:478
-msgid "SLA set as default cannot be disabled"
-msgstr ""
-
-#: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:172
-msgid "SLA set as default cannot be disabled."
 msgstr ""
 
 #: desk/src/components/Settings/Sla/SlaPolicies.vue:11
@@ -5161,7 +5401,7 @@ msgid "Saturday"
 msgstr ""
 
 #. Button label of the email-feedback Web Form
-#: desk/src/components/ListViewBuilder.vue:714
+#: desk/src/components/ListViewBuilder.vue:731
 #: desk/src/components/Settings/Assignment Rules/AssignmentRuleView.vue:20
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:39
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:19
@@ -5187,29 +5427,33 @@ msgstr ""
 msgid "Save Changes"
 msgstr ""
 
-#: desk/src/components/SavedRepliesSelectorModal.vue:12
+#: desk/src/components/SavedRepliesSelectorModal.vue:6
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:3
 #: desk/src/components/layouts/Sidebar.vue:404
 msgid "Saved Replies"
 msgstr ""
 
-#: desk/src/pages/ticket/Tickets.vue:368
+#: desk/src/pages/ticket/Tickets.vue:392
 msgid "Saved Views"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:267
+#: desk/src/components/EmailEditor.vue:179
+msgid "Saved replies"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:264
 msgid "Saved reply deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:284
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:281
 msgid "Saved reply duplicated successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:325
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:333
 msgid "Saved reply saved successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:388
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:397
 msgid "Saved reply updated successfully."
 msgstr ""
 
@@ -5222,7 +5466,7 @@ msgid "Schedule name"
 msgstr ""
 
 #. Label of the scope (Select) field in DocType 'HD Saved Reply'
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:88
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:85
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Scope"
 msgstr ""
@@ -5233,7 +5477,7 @@ msgid "Script"
 msgstr ""
 
 #. Label of the search_tab (Tab Break) field in DocType 'HD Settings'
-#: desk/src/components/SavedRepliesSelectorModal.vue:27
+#: desk/src/components/SavedRepliesSelectorModal.vue:20
 #: desk/src/components/Settings/Agents.vue:24
 #: desk/src/components/Settings/Assignment Rules/AssigneeSearch.vue:29
 #: desk/src/components/Settings/Assignment Rules/AssignmentRulesList.vue:38
@@ -5263,11 +5507,11 @@ msgstr ""
 msgid "Search by ID or Subject"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:57
+#: desk/src/components/command-palette/CommandPalette.vue:60
 msgid "Search commands"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:56
+#: desk/src/components/command-palette/CommandPalette.vue:59
 msgid "Search commands for {0}"
 msgstr ""
 
@@ -5299,7 +5543,7 @@ msgstr ""
 msgid "Search ticket"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:260
+#: desk/src/components/command-palette/CommandPalette.vue:266
 msgid "Search tickets or type a command…"
 msgstr ""
 
@@ -5320,12 +5564,12 @@ msgstr ""
 msgid "Searching..."
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:237
-#: desk/src/components/command-palette/CommandPalette.vue:244
+#: desk/src/components/command-palette/CommandPalette.vue:243
+#: desk/src/components/command-palette/CommandPalette.vue:250
 msgid "Searching…"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:260
+#: desk/src/components/command-palette/CommandPalette.vue:266
 msgid "Search…"
 msgstr ""
 
@@ -5333,7 +5577,7 @@ msgstr ""
 msgid "See all {0} tickets"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:147
+#: desk/src/components/command-palette/CommandPalette.vue:150
 #: desk/src/pages/call-logs/CallLogModal.vue:28
 #: desk/src/pages/call-logs/CallLogModal.vue:57
 #: desk/src/pages/call-logs/CallLogModal.vue:80
@@ -5362,7 +5606,7 @@ msgstr ""
 msgid "Select Timezone"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:187
 msgid "Select a Default Priority."
 msgstr ""
 
@@ -5370,8 +5614,21 @@ msgstr ""
 msgid "Select a Value"
 msgstr ""
 
+#: desk/src/components/ticket-agent/BulkEditModal.vue:9
+#: desk/src/components/ticket-agent/BulkEditModal.vue:121
+msgid "Select a field"
+msgstr ""
+
 #: desk/src/pages/ticket/TicketFeedback.vue:27
 msgid "Select a rating"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:38
+msgid "Select action"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:221
+msgid "Select agents"
 msgstr ""
 
 #: desk/src/components/view-controls/Filter.vue:424
@@ -5389,6 +5646,11 @@ msgstr ""
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:37
 #: desk/src/pages/home/components/RecentFeedback.vue:151
 msgid "Select range"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/components/ActionValue.vue:32
+#: desk/src/components/Settings/SavedReplies/components/ActionValue.vue:56
+msgid "Select tags"
 msgstr ""
 
 #: desk/src/pages/PersonaForm.vue:109
@@ -5415,6 +5677,12 @@ msgstr ""
 msgid "Select your weekly off day"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActionChip.vue:7
+#: desk/src/components/Settings/SavedReplies/components/ActionValue.vue:109
+#: desk/src/components/ticket-agent/BulkEditModal.vue:115
+msgid "Select {0}"
+msgstr ""
+
 #: desk/src/pages/ticket/TicketCustomer.vue:78
 msgid "Send"
 msgstr ""
@@ -5423,7 +5691,7 @@ msgstr ""
 msgid "Send Invites"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:38
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:32
 msgid "Send Reply"
 msgstr ""
 
@@ -5437,7 +5705,7 @@ msgstr ""
 msgid "Send reset password email"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:39
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:33
 msgid "Send to {0} tickets"
 msgstr ""
 
@@ -5493,11 +5761,11 @@ msgstr ""
 msgid "Set Primary Contact"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:56
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:58
 msgid "Set Resolution Time for Priority {0} in row {1}."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:48
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:50
 msgid "Set Response Time for Priority {0} in row {1}."
 msgstr ""
 
@@ -5505,7 +5773,7 @@ msgstr ""
 msgid "Set as Primary"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:75
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:96
 msgid "Set as default SLA"
 msgstr ""
 
@@ -5524,7 +5792,7 @@ msgstr ""
 msgid "Set status"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:231
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:252
 msgid "Set the default status assigned when a ticket is created, and the status to apply when a ticket is reopened. If not specified, the default status from HD Settings will be used."
 msgstr ""
 
@@ -5544,7 +5812,7 @@ msgstr ""
 msgid "Set your team’s working days, hours, and holidays using a template or custom schedule."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:125
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:155
 msgid "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
 msgstr ""
 
@@ -5618,6 +5886,10 @@ msgstr ""
 msgid "Show Customer Portal Permission Notice"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:26
+msgid "Show actions"
+msgstr ""
+
 #. Label of the different_view (Check) field in DocType 'HD Ticket Status'
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Show end users a different view"
@@ -5666,6 +5938,10 @@ msgstr ""
 msgid "Skip for now"
 msgstr ""
 
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:210
+msgid "Skipped {0} saved reply action(s) that are no longer valid"
+msgstr ""
+
 #: desk/src/pages/PersonaForm.vue:154
 msgid "Social media"
 msgstr ""
@@ -5678,7 +5954,7 @@ msgstr ""
 msgid "Some error occurred while renaming holiday list"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:367
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:376
 msgid "Some error occurred while renaming saved reply"
 msgstr ""
 
@@ -5694,11 +5970,15 @@ msgstr ""
 msgid "Sort"
 msgstr ""
 
+#: desk/src/pages/ticket/MobileTicketAgent.vue:117
+msgid "Source"
+msgstr ""
+
 #: helpdesk/api/knowledge_base.py:125
 msgid "Source and target category cannot be same"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:339
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:334
 msgid "Source and target ticket cannot be same"
 msgstr ""
 
@@ -5706,7 +5986,7 @@ msgstr ""
 msgid "Source and target tickets which are to be merged cannot be the same."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:335
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:330
 msgid "Source ticket does not exist"
 msgstr ""
 
@@ -5738,7 +6018,7 @@ msgstr ""
 msgid "Start Time"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:100
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:130
 msgid "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
 msgstr ""
 
@@ -5772,7 +6052,7 @@ msgstr ""
 
 #. Label of the status_details (Section Break) field in DocType 'HD Service
 #. Level Agreement'
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:227
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:248
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Status Details"
 msgstr ""
@@ -5991,11 +6271,15 @@ msgstr ""
 msgid "Tag label is required"
 msgstr ""
 
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:121
+msgid "Tag {0} cannot be both added and removed"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_email_feedback/hd_email_feedback.py:22
 msgid "Tampered Access"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:337
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:332
 msgid "Target ticket does not exist"
 msgstr ""
 
@@ -6010,8 +6294,8 @@ msgstr ""
 #. Label of the team (Link) field in DocType 'HD Saved Reply Team'
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:196
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:204
 #: desk/src/components/layouts/Sidebar.vue:400
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
 #: desk/src/pages/dashboard/Dashboard.vue:57
@@ -6036,6 +6320,10 @@ msgstr ""
 
 #: desk/src/components/Settings/Teams/TeamEdit.vue:269
 msgid "Team can now access all tickets."
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:69
+msgid "Team changed"
 msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:52
@@ -6119,11 +6407,11 @@ msgstr ""
 msgid "The Unassign Condition JSON '{0}' is invalid: </br> {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:147
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:167
 msgid "The assignment condition '{0}' is invalid: {1}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:154
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:174
 msgid "The assignment condition json '{0}' is invalid: {1}"
 msgstr ""
 
@@ -6188,7 +6476,7 @@ msgstr ""
 msgid "This contact will become the primary point of contact and will be able to view tickets raised by all other contacts in the organisation."
 msgstr ""
 
-#: desk/src/components/ticket/TicketCustomerSidebar.vue:73
+#: desk/src/components/ticket/TicketCustomerSidebar.vue:75
 msgid "This date is calculated based on configured SLAs, working hours, and holidays."
 msgstr ""
 
@@ -6217,15 +6505,15 @@ msgstr ""
 msgid "This method is only meant for developer mode"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:373
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:368
 msgid "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:514
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:509
 msgid "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:709
+#: desk/src/components/ListViewBuilder.vue:726
 msgid "This view is public. Changes made will be visible to everyone."
 msgstr ""
 
@@ -6250,7 +6538,7 @@ msgstr ""
 #. Label of the ticket_tab (Tab Break) field in DocType 'HD Settings'
 #. Title of the tickets Web Form
 #: desk/src/components/command-palette/CommandPalette.vue:27
-#: desk/src/components/command-palette/CommandPalette.vue:88
+#: desk/src/components/command-palette/CommandPalette.vue:91
 #: desk/src/components/layouts/Sidebar.vue:398
 #: desk/src/components/ticket/TicketMergeModal.vue:64
 #: desk/src/pages/call-logs/CallLogModal.vue:102
@@ -6261,7 +6549,7 @@ msgstr ""
 msgid "Ticket"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:903
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:933
 msgid "Ticket #{0}: We've received your request"
 msgstr ""
 
@@ -6337,7 +6625,11 @@ msgstr ""
 msgid "Ticket Summary"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:304
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:7
+msgid "Ticket Timeline"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:305
 msgid "Ticket Trend"
 msgstr ""
 
@@ -6383,7 +6675,7 @@ msgid "Ticket must not already be merged."
 msgstr ""
 
 #: desk/src/pages/ticket/TicketAgent.vue:33
-#: helpdesk/helpdesk/doctype/hd_ticket/api.py:63
+#: helpdesk/helpdesk/doctype/hd_ticket/api.py:58
 msgid "Ticket not found"
 msgstr ""
 
@@ -6417,6 +6709,10 @@ msgstr ""
 msgid "Ticket updated succesfully."
 msgstr ""
 
+#: helpdesk/api/ticket_analytics.py:47
+msgid "Ticket {0} not found."
+msgstr ""
+
 #. Name of a report
 #: helpdesk/helpdesk/report/ticket_search_analysis/ticket_search_analysis.json
 msgid "Ticket-Search Analysis"
@@ -6427,11 +6723,11 @@ msgstr ""
 #: desk/src/pages/contact/Contact.vue:175
 #: desk/src/pages/customer/Customer.vue:68
 #: desk/src/pages/customer/Customer.vue:147
-#: desk/src/pages/ticket/MobileTicketAgent.vue:452
+#: desk/src/pages/ticket/MobileTicketAgent.vue:470
 #: desk/src/pages/ticket/TicketCustomer.vue:354
 #: desk/src/pages/ticket/TicketNew.vue:297 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:457 helpdesk/api/dashboard.py:159
-#: helpdesk/api/dashboard.py:307 helpdesk/api/dashboard_tags.py:49
+#: desk/src/pages/ticket/Tickets.vue:481 helpdesk/api/dashboard.py:159
+#: helpdesk/api/dashboard.py:308 helpdesk/api/dashboard_tags.py:49
 #: helpdesk/api/dashboard_tags.py:75
 msgid "Tickets"
 msgstr ""
@@ -6444,23 +6740,23 @@ msgstr ""
 msgid "Tickets assigned to you in the last 7 days"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:576
+#: helpdesk/api/dashboard.py:577
 msgid "Tickets by Channel"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:534 helpdesk/api/dashboard.py:543
+#: helpdesk/api/dashboard.py:535 helpdesk/api/dashboard.py:544
 msgid "Tickets by Priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:464 helpdesk/api/dashboard.py:473
+#: helpdesk/api/dashboard.py:465 helpdesk/api/dashboard.py:474
 msgid "Tickets by Team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:499 helpdesk/api/dashboard.py:508
+#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:509
 msgid "Tickets by Type"
 msgstr ""
 
-#: helpdesk/api/ticket.py:65
+#: helpdesk/api/ticket.py:72
 msgid "Tickets can only be assigned to agents"
 msgstr ""
 
@@ -6484,6 +6780,10 @@ msgstr ""
 msgid "Tickets you act on will show up here"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:45
+msgid "Time on hold with the SLA clock paused"
+msgstr ""
+
 #: desk/src/components/Settings/Preferences/components/LanguageTimezoneSetting.vue:22
 #: desk/src/components/contact/EditContactDialog.vue:109
 msgid "Timezone"
@@ -6492,7 +6792,7 @@ msgstr ""
 #. Label of the title (Data) field in DocType 'HD Article'
 #. Label of the title (Data) field in DocType 'HD Saved Reply'
 #: desk/src/components/Settings/NewTeamModal.vue:19
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:86
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:83
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:10
 #: desk/src/pages/knowledge-base/Article.vue:48
 #: desk/src/pages/knowledge-base/NewArticle.vue:39
@@ -6507,7 +6807,7 @@ msgid "Title Slug"
 msgstr ""
 
 #: desk/src/components/Settings/NewTeamModal.vue:48
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:396
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:405
 msgid "Title is required"
 msgstr ""
 
@@ -6532,7 +6832,7 @@ msgid "To Date cannot be before From Date"
 msgstr ""
 
 #: desk/src/components/Settings/Holiday/HolidayView.vue:98
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:157
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:178
 msgid "To date"
 msgstr ""
 
@@ -6544,6 +6844,7 @@ msgstr ""
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:387
 #: desk/src/pages/dashboard/Dashboard.vue:537
 #: desk/src/pages/dashboard/Dashboard.vue:539
 msgid "Today"
@@ -6580,19 +6881,23 @@ msgstr ""
 msgid "Total Ticket"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/AnalyticsMetricCards.vue:43
+msgid "Total hold time"
+msgstr ""
+
 #: helpdesk/api/dashboard.py:164
 msgid "Total number of tickets created"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:544
+#: helpdesk/api/dashboard.py:545
 msgid "Total tickets by priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:474
+#: helpdesk/api/dashboard.py:475
 msgid "Total tickets by team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:509
+#: helpdesk/api/dashboard.py:510
 msgid "Total tickets by type"
 msgstr ""
 
@@ -6637,7 +6942,7 @@ msgstr ""
 msgid "URL/Method"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:738
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:745
 msgid "Unable to send email. Please setup default outgoing email account."
 msgstr ""
 
@@ -6678,9 +6983,9 @@ msgstr ""
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:66
 #: desk/src/components/Settings/Holiday/HolidayView.vue:200
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:217
-#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:278
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:287
 #: desk/src/components/Settings/SettingsModal.vue:72
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:354
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:375
 #: desk/src/components/Settings/Teams/NewTeam.vue:108
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:214
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:183
@@ -6708,6 +7013,23 @@ msgstr ""
 #. Label of the update_status_to (Link) field in DocType 'HD Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Update status to"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkEditModal.vue:27
+msgid "Update {0} tickets"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkEditModal.vue:155
+msgid "Updated {0} of {1} tickets"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkEditModal.vue:158
+#: desk/src/components/ticket-agent/BulkEditModal.vue:170
+msgid "Updated {0} tickets"
+msgstr ""
+
+#: desk/src/components/ticket-agent/BulkEditModal.vue:148
+msgid "Updating {0} tickets…"
 msgstr ""
 
 #: desk/src/components/Settings/General/components/LogoUpload.vue:41
@@ -6773,13 +7095,19 @@ msgstr ""
 #. Label of the agreement_details_section (Section Break) field in DocType 'HD
 #. Service Level Agreement'
 #: desk/src/components/Settings/Holiday/HolidayView.vue:63
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:132
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:153
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 msgid "Valid From"
 msgstr ""
 
+#: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:133
+#: desk/src/components/ticket-agent/BulkEditModal.vue:114
 #: desk/src/components/view-controls/filter/FilterValueEditor.vue:113
 msgid "Value"
+msgstr ""
+
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:438
+msgid "Values can't be empty"
 msgstr ""
 
 #. Label of the via_customer_portal (Check) field in DocType 'HD Ticket'
@@ -6815,6 +7143,10 @@ msgstr ""
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Violet"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:34
+msgid "Visible to your team only, never sent to the customer."
 msgstr ""
 
 #: desk/src/components/knowledge-base/ArticleFeedback.vue:10
@@ -6886,6 +7218,10 @@ msgstr ""
 msgid "When enabled, the ticket status will automatically change to the status selected below whenever the agent responds to a ticket.\n"
 msgstr ""
 
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:65
+msgid "When more than one policy matches, the lower rank is applied first. 0 means unranked, and is applied last."
+msgstr ""
+
 #: desk/src/pages/PersonaForm.vue:228
 msgid "Where did you hear about us?"
 msgstr ""
@@ -6922,7 +7258,7 @@ msgstr ""
 msgid "Workday updated successfully."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:111
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:141
 msgid "Workday {0} has been repeated."
 msgstr ""
 
@@ -6952,7 +7288,7 @@ msgstr ""
 msgid "Write your email signature here."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:19
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:13
 msgid "Write your reply..."
 msgstr ""
 
@@ -6983,15 +7319,15 @@ msgstr ""
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
-#: helpdesk/utils.py:186 helpdesk/utils.py:206
+#: helpdesk/utils.py:186 helpdesk/utils.py:214
 msgid "You are not permitted to access this resource."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:652
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:669
 msgid "You are not permitted to add a comment"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:677
+#: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:694
 msgid "You are not permitted to reply as an agent"
 msgstr ""
 
@@ -7011,11 +7347,7 @@ msgstr ""
 msgid "You can only raise tickets for your own contact."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:138
-msgid "You cannot disable the default SLA."
-msgstr ""
-
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:41
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:43
 msgid "You cannot set more than one Default Priority."
 msgstr ""
 
@@ -7043,10 +7375,6 @@ msgstr ""
 msgid "You have already provided feedback for this ticket."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:132
-msgid "You must set one SLA as Default. Please check the Default SLA option."
-msgstr ""
-
 #: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:37
 msgid "You won't see this notice again."
 msgstr ""
@@ -7055,7 +7383,7 @@ msgstr ""
 msgid "YouTube"
 msgstr ""
 
-#: desk/src/components/Settings/Sla/SlaPolicyView.vue:394
+#: desk/src/components/Settings/Sla/SlaPolicyView.vue:415
 msgid "Your old conditions will be overwritten. Are you sure you want to save?"
 msgstr ""
 
@@ -7069,6 +7397,10 @@ msgstr ""
 
 #: desk/src/pages/PersonaForm.vue:131
 msgid "Zoho Desk"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.py:110
+msgid "actions must be a list of objects"
 msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:116
@@ -7103,16 +7435,28 @@ msgstr ""
 msgid "changes from"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:628
+msgid "clock resumes when the ticket reopens"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:610
+msgid "clock stopped"
+msgstr ""
+
 #: desk/src/components/Settings/EmailNotifications/NotificationList.vue:42
 msgid "customize {0}"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:222 helpdesk/api/dashboard.py:224
+#: helpdesk/api/dashboard.py:223 helpdesk/api/dashboard.py:225
 msgid "days"
 msgstr ""
 
 #: desk/src/components/layouts/CustomerPortalPermissionDialog.vue:28
 msgid "documentation"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:728
+msgid "due {0}"
 msgstr ""
 
 #: desk/src/pages/PersonaForm.vue:104
@@ -7162,11 +7506,11 @@ msgstr ""
 msgid "here."
 msgstr ""
 
-#: helpdesk/api/dashboard.py:203 helpdesk/api/dashboard.py:205
+#: helpdesk/api/dashboard.py:206 helpdesk/api/dashboard.py:208
 msgid "hrs"
 msgstr ""
 
-#: desk/src/components/ticket-agent/TicketSLA.vue:100
+#: desk/src/components/ticket-agent/TicketSLA.vue:95
 #: desk/src/pages/knowledge-base/NewArticle.vue:15
 msgid "in"
 msgstr ""
@@ -7175,7 +7519,7 @@ msgstr ""
 msgid "is_merged === 0"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:413
+#: desk/src/components/ticket-agent/AssignTo.vue:438
 msgid "just now"
 msgstr ""
 
@@ -7193,6 +7537,15 @@ msgstr ""
 msgid "mentioned you in ticket"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:515
+msgid "next day"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:301
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:634
+msgid "pending"
+msgstr ""
+
 #: desk/src/pages/home/components/RecentFeedback.vue:479
 msgid "poor"
 msgstr ""
@@ -7206,7 +7559,11 @@ msgstr ""
 msgid "reviews"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:246
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:621
+msgid "since {0}"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:247
 msgid "stars"
 msgstr ""
 
@@ -7235,7 +7592,7 @@ msgstr ""
 msgid "via Portal"
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:561
+#: desk/src/pages/ticket/MobileTicketAgent.vue:579
 msgid "viewed this"
 msgstr ""
 
@@ -7247,6 +7604,22 @@ msgstr ""
 msgid "{0} Customers"
 msgstr ""
 
+#: desk/src/components/SavedRepliesSelectorModal.vue:293
+msgid "{0} actions"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:140
+msgid "{0} actions after sending"
+msgstr ""
+
+#: desk/src/components/SavedReplyActions/SavedReplyActions.vue:144
+msgid "{0} actions will be applied after sending the email"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:515
+msgid "{0} days"
+msgstr ""
+
 #: desk/src/components/EmailMultiSelect.vue:270
 msgid "{0} is already added"
 msgstr ""
@@ -7255,11 +7628,11 @@ msgstr ""
 msgid "{0} is an Invalid Email Address"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:545
+#: desk/src/components/ticket-agent/AssignTo.vue:570
 msgid "{0} is currently away."
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:544
+#: desk/src/components/ticket-agent/AssignTo.vue:569
 msgid "{0} is currently unavailable."
 msgstr ""
 
@@ -7271,11 +7644,15 @@ msgstr ""
 msgid "{0} is not an existing user"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:309
+#: desk/src/components/ticket-agent/BulkEditModal.vue:126
+msgid "{0} is required"
+msgstr ""
+
+#: desk/src/components/ListViewBuilder.vue:319
 msgid "{0} item(s) deleted successfully"
 msgstr ""
 
-#: desk/src/components/ListViewBuilder.vue:323
+#: desk/src/components/ListViewBuilder.vue:333
 msgid "{0} item(s) queued for deletion"
 msgstr ""
 
@@ -7287,7 +7664,19 @@ msgstr ""
 msgid "{0} on {1}"
 msgstr ""
 
-#: desk/src/components/command-palette/CommandPalette.vue:246
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:92
+msgid "{0} open tickets use priority {1}. They lose this SLA the next time they are updated."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:107
+msgid "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:549
+msgid "{0} replied"
+msgstr ""
+
+#: desk/src/components/command-palette/CommandPalette.vue:252
 msgid "{0} results"
 msgstr ""
 
@@ -7295,8 +7684,20 @@ msgstr ""
 msgid "{0} reviews"
 msgstr ""
 
-#: desk/src/components/ticket-agent/AssignTo.vue:414
+#: desk/src/components/ticket-agent/analytics/ConversationSummary.vue:84
+msgid "{0} times"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:553
+msgid "{0} wait"
+msgstr ""
+
+#: desk/src/components/ticket-agent/AssignTo.vue:439
 msgid "{0} · Last active {1}"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:553
+msgid "{0} · longest wait"
 msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_ticket_comment/hd_ticket_comment.py:156
