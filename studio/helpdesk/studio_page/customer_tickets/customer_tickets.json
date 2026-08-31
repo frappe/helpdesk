@@ -1,0 +1,631 @@
+{
+ "blocks": [
+  {
+   "baseStyles": {
+    "backgroundColor": "var(--surface-base)",
+    "display": "flex",
+    "flexDirection": "column",
+    "height": "100%",
+    "overflowX": "hidden",
+    "width": "inherit"
+   },
+   "blockName": "body",
+   "children": [
+    {
+     "baseStyles": {
+      "alignItems": "center",
+      "backgroundColor": "var(--surface-base)",
+      "borderBottom": "1px solid var(--outline-gray-2)",
+      "display": "flex",
+      "flexShrink": "0",
+      "height": "52px",
+      "justifyContent": "space-between",
+      "padding": "0 20px",
+      "width": "100%"
+     },
+     "blockName": "navbar",
+     "children": [
+      {
+       "blockName": "Header",
+       "children": [],
+       "classes": [],
+       "componentId": "header-topbar",
+       "componentName": "header",
+       "componentProps": {
+        "currentView": "{{ currentView }}",
+        "viewActions": "{{ viewActions }}",
+        "viewLabel": "Tickets",
+        "viewOptions": "{{ viewOptions }}"
+       },
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [],
+     "componentId": "container-suug88a18",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "baseStyles": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexShrink": "0",
+      "gap": "8px",
+      "justifyContent": "space-between",
+      "padding": "16px 20px",
+      "width": "100%"
+     },
+     "blockName": "toolbar",
+     "children": [
+      {
+       "baseStyles": {
+        "alignItems": "center",
+        "display": "flex",
+        "flex": "1",
+        "gap": "8px",
+        "minWidth": "0"
+       },
+       "blockName": "toolbar-left",
+       "children": [
+        {
+         "baseStyles": {
+          "flexShrink": "0"
+         },
+         "blockName": "tickets-org-switcher",
+         "children": [],
+         "classes": [],
+         "componentId": "KbOrgSwitcher-tickets",
+         "componentName": "KbOrgSwitcher",
+         "componentProps": {
+          "onSelect": "(customers) => selectOrganization(customers)",
+          "organizations": "{{ organizations }}",
+          "selectedOrganizations": "{{ selectedOrganizations }}"
+         },
+         "isCustomVueComponent": true
+        },
+        {
+         "baseStyles": {
+          "display": "block",
+          "flex": "1",
+          "minWidth": "0"
+         },
+         "children": [
+          {
+           "blockName": "tickets-quickfilter",
+           "children": [],
+           "classes": [],
+           "componentId": "QuickFilter-tickets-quickfilter",
+           "componentName": "QuickFilter",
+           "componentProps": {
+            "customizing": {
+             "$type": "variable",
+             "name": "quickFilterCustomizing"
+            },
+            "doctype": "HD Ticket",
+            "fields": {
+             "$type": "variable",
+             "name": "quickFilterFields"
+            },
+            "filters": {
+             "$type": "variable",
+             "name": "filters"
+            }
+           }
+          }
+         ],
+         "classes": [],
+         "componentId": "container-toolbar-quickfilter",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [],
+       "componentId": "container-toolbar-left",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "baseStyles": {
+        "borderLeft": "1px solid var(--outline-gray-2)",
+        "flexShrink": "0",
+        "height": "20px",
+        "marginLeft": "-8px"
+       },
+       "blockName": "toolbar-divider",
+       "children": [],
+       "classes": [],
+       "componentId": "container-toolbar-divider",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "baseStyles": {
+        "alignItems": "center",
+        "display": "flex",
+        "flexShrink": "0",
+        "gap": "8px"
+       },
+       "blockName": "toolbar-right",
+       "children": [
+        {
+         "blockName": "tickets-reload",
+         "children": [],
+         "classes": [],
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "reload()"
+          }
+         },
+         "componentId": "Button-tickets-reload",
+         "componentName": "Button",
+         "componentProps": {
+          "iconLeft": "refresh-cw",
+          "label": "Refresh",
+          "variant": "subtle"
+         }
+        },
+        {
+         "children": [],
+         "classes": [],
+         "componentEvents": {
+          "update:conditions": {
+           "action": "Run Script",
+           "script": "setFilterConditions(eventArgs[0])"
+          }
+         },
+         "componentId": "KbFilter-tickets-filter",
+         "componentName": "KbFilter",
+         "componentProps": {
+          "conditions": "{{ filterConditions }}",
+          "fields": "{{ filterFields }}"
+         },
+         "isCustomVueComponent": true
+        },
+        {
+         "blockName": "tickets-sort",
+         "children": [],
+         "classes": [],
+         "componentId": "SortBy-tickets-sort",
+         "componentName": "SortBy",
+         "componentProps": {
+          "doctype": "HD Ticket",
+          "modelValue": {
+           "$type": "variable",
+           "name": "sort"
+          }
+         }
+        },
+        {
+         "blockName": "tickets-columns",
+         "children": [],
+         "classes": [],
+         "componentId": "ColumnSettings-tickets-columns",
+         "componentName": "ColumnSettings",
+         "componentProps": {
+          "canReset": false,
+          "doctype": "HD Ticket",
+          "modelValue": {
+           "$type": "variable",
+           "name": "columns"
+          },
+          "synthetic": "{{ syntheticColumns }}"
+         }
+        }
+       ],
+       "classes": [],
+       "componentId": "container-toolbar-right",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [],
+     "componentId": "container-xrv76su96",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "baseStyles": {
+      "display": "flex",
+      "flex": "1",
+      "flexDirection": "column",
+      "minHeight": "0",
+      "width": "100%"
+     },
+     "blockName": "table-wrap",
+     "children": [
+      {
+       "baseStyles": {
+        "display": "flex",
+        "flex": "1",
+        "minHeight": "0",
+        "width": "100%"
+       },
+       "blockName": "tickets-listview",
+       "children": [],
+       "classes": [],
+       "componentId": "KbTicketList-tickets",
+       "componentName": "KbTicketList",
+       "componentProps": {
+        "columns": "{{ listColumns }}",
+        "emptyState": "{{ emptyState }}",
+        "loading": "{{ listLoading }}",
+        "onColumnResize": "(payload) => resizeColumn(payload)",
+        "onLoadMore": "() => loadMore()",
+        "onRowClick": "(row) => openTicket(row)",
+        "pageLength": {
+         "$type": "variable",
+         "name": "pageLength"
+        },
+        "pageLengthOptions": "{{ pageLengthOptions }}",
+        "rowCount": "{{ rowCount }}",
+        "rows": "{{ rows }}",
+        "totalCount": "{{ totalCount }}"
+       },
+       "isCustomVueComponent": true
+      }
+     ],
+     "classes": [],
+     "componentId": "container-0hnrdwrty",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "children": [],
+     "classes": [],
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    },
+    {
+     "children": [],
+     "classes": [],
+     "componentEvents": {
+      "submit": {
+       "action": "Run Script",
+       "script": "submitViewModal()"
+      },
+      "update:modelValue": {
+       "action": "Run Script",
+       "script": "setViewModal(eventArgs[0])"
+      }
+     },
+     "componentId": "KbViewModal-ref",
+     "componentName": "KbViewModal",
+     "componentProps": {
+      "modelValue": "{{ viewModal }}"
+     },
+     "isCustomVueComponent": true
+    }
+   ],
+   "classes": [],
+   "componentId": "container-49ytfizfq",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-08-13 19:05:47.233327",
+ "doctype": "Studio Page",
+ "draft_blocks": [
+  {
+   "baseStyles": {
+    "backgroundColor": "var(--surface-base)",
+    "display": "flex",
+    "flexDirection": "column",
+    "height": "100%",
+    "overflowX": "hidden",
+    "width": "inherit"
+   },
+   "blockName": "body",
+   "children": [
+    {
+     "baseStyles": {
+      "alignItems": "center",
+      "backgroundColor": "var(--surface-base)",
+      "borderBottom": "1px solid var(--outline-gray-2)",
+      "display": "flex",
+      "flexShrink": "0",
+      "height": "52px",
+      "justifyContent": "space-between",
+      "padding": "0 20px",
+      "width": "100%"
+     },
+     "blockName": "navbar",
+     "children": [
+      {
+       "blockName": "Header",
+       "children": [],
+       "classes": [],
+       "componentId": "header-topbar",
+       "componentName": "header",
+       "componentProps": {
+        "currentView": "{{ currentView }}",
+        "viewActions": "{{ viewActions }}",
+        "viewLabel": "Tickets",
+        "viewOptions": "{{ viewOptions }}"
+       },
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [],
+     "componentId": "container-suug88a18",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "baseStyles": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexShrink": "0",
+      "gap": "8px",
+      "justifyContent": "space-between",
+      "padding": "16px 20px",
+      "width": "100%"
+     },
+     "blockName": "toolbar",
+     "children": [
+      {
+       "baseStyles": {
+        "alignItems": "center",
+        "display": "flex",
+        "flex": "1",
+        "gap": "8px",
+        "minWidth": "0"
+       },
+       "blockName": "toolbar-left",
+       "children": [
+        {
+         "baseStyles": {
+          "flexShrink": "0"
+         },
+         "blockName": "tickets-org-switcher",
+         "children": [],
+         "classes": [],
+         "componentId": "KbOrgSwitcher-tickets",
+         "componentName": "KbOrgSwitcher",
+         "componentProps": {
+          "onSelect": "(customers) => selectOrganization(customers)",
+          "organizations": "{{ organizations }}",
+          "selectedOrganizations": "{{ selectedOrganizations }}"
+         },
+         "isCustomVueComponent": true
+        },
+        {
+         "baseStyles": {
+          "display": "block",
+          "flex": "1",
+          "minWidth": "0"
+         },
+         "children": [
+          {
+           "blockName": "tickets-quickfilter",
+           "children": [],
+           "classes": [],
+           "componentId": "QuickFilter-tickets-quickfilter",
+           "componentName": "QuickFilter",
+           "componentProps": {
+            "customizing": {
+             "$type": "variable",
+             "name": "quickFilterCustomizing"
+            },
+            "doctype": "HD Ticket",
+            "fields": {
+             "$type": "variable",
+             "name": "quickFilterFields"
+            },
+            "filters": {
+             "$type": "variable",
+             "name": "filters"
+            }
+           }
+          }
+         ],
+         "classes": [],
+         "componentId": "container-toolbar-quickfilter",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [],
+       "componentId": "container-toolbar-left",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "baseStyles": {
+        "borderLeft": "1px solid var(--outline-gray-2)",
+        "flexShrink": "0",
+        "height": "20px",
+        "marginLeft": "-8px"
+       },
+       "blockName": "toolbar-divider",
+       "children": [],
+       "classes": [],
+       "componentId": "container-toolbar-divider",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "baseStyles": {
+        "alignItems": "center",
+        "display": "flex",
+        "flexShrink": "0",
+        "gap": "8px"
+       },
+       "blockName": "toolbar-right",
+       "children": [
+        {
+         "blockName": "tickets-reload",
+         "children": [],
+         "classes": [],
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "reload()"
+          }
+         },
+         "componentId": "Button-tickets-reload",
+         "componentName": "Button",
+         "componentProps": {
+          "iconLeft": "refresh-cw",
+          "label": "Refresh",
+          "variant": "subtle"
+         }
+        },
+        {
+         "children": [],
+         "classes": [],
+         "componentEvents": {
+          "update:conditions": {
+           "action": "Run Script",
+           "script": "setFilterConditions(eventArgs[0])"
+          }
+         },
+         "componentId": "KbFilter-tickets-filter",
+         "componentName": "KbFilter",
+         "componentProps": {
+          "conditions": "{{ filterConditions }}",
+          "fields": "{{ filterFields }}"
+         },
+         "isCustomVueComponent": true
+        },
+        {
+         "blockName": "tickets-sort",
+         "children": [],
+         "classes": [],
+         "componentId": "SortBy-tickets-sort",
+         "componentName": "SortBy",
+         "componentProps": {
+          "doctype": "HD Ticket",
+          "modelValue": {
+           "$type": "variable",
+           "name": "sort"
+          }
+         }
+        },
+        {
+         "blockName": "tickets-columns",
+         "children": [],
+         "classes": [],
+         "componentId": "ColumnSettings-tickets-columns",
+         "componentName": "ColumnSettings",
+         "componentProps": {
+          "canReset": false,
+          "doctype": "HD Ticket",
+          "modelValue": {
+           "$type": "variable",
+           "name": "columns"
+          },
+          "synthetic": "{{ syntheticColumns }}"
+         }
+        }
+       ],
+       "classes": [],
+       "componentId": "container-toolbar-right",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [],
+     "componentId": "container-xrv76su96",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "baseStyles": {
+      "display": "flex",
+      "flex": "1",
+      "flexDirection": "column",
+      "minHeight": "0",
+      "width": "100%"
+     },
+     "blockName": "table-wrap",
+     "children": [
+      {
+       "baseStyles": {
+        "display": "flex",
+        "flex": "1",
+        "minHeight": "0",
+        "width": "100%"
+       },
+       "blockName": "tickets-listview",
+       "children": [],
+       "classes": [],
+       "componentId": "KbTicketList-tickets",
+       "componentName": "KbTicketList",
+       "componentProps": {
+        "columns": "{{ listColumns }}",
+        "emptyState": "{{ emptyState }}",
+        "loading": "{{ listLoading }}",
+        "onColumnResize": "(payload) => resizeColumn(payload)",
+        "onLoadMore": "() => loadMore()",
+        "onRowClick": "(row) => openTicket(row)",
+        "pageLength": {
+         "$type": "variable",
+         "name": "pageLength"
+        },
+        "pageLengthOptions": "{{ pageLengthOptions }}",
+        "rowCount": "{{ rowCount }}",
+        "rows": "{{ rows }}",
+        "totalCount": "{{ totalCount }}"
+       },
+       "isCustomVueComponent": true
+      }
+     ],
+     "classes": [],
+     "componentId": "container-0hnrdwrty",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "children": [],
+     "classes": [],
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    },
+    {
+     "children": [],
+     "classes": [],
+     "componentEvents": {
+      "submit": {
+       "action": "Run Script",
+       "script": "submitViewModal()"
+      },
+      "update:modelValue": {
+       "action": "Run Script",
+       "script": "setViewModal(eventArgs[0])"
+      }
+     },
+     "componentId": "KbViewModal-ref",
+     "componentName": "KbViewModal",
+     "componentProps": {
+      "modelValue": "{{ viewModal }}"
+     },
+     "isCustomVueComponent": true
+    }
+   ],
+   "classes": [],
+   "componentId": "container-49ytfizfq",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "frappe_app": "helpdesk",
+ "is_standard": 1,
+ "modified": "2026-08-18 03:56:32.338222",
+ "modified_by": "Administrator",
+ "name": "customer_tickets",
+ "owner": "Administrator",
+ "page_name": "page-e0f4b5bc",
+ "page_title": "Customer tickets",
+ "published": 1,
+ "resources": [],
+ "route": "/customer-tickets",
+ "studio_app": "helpdesk",
+ "variables": []
+}
