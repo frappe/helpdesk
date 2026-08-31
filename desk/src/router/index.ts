@@ -227,6 +227,17 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
+  // The studio app at /kb has replaced the customer portal. Hand these
+  // navigations to the server, whose redirects (hooks: website_redirects) map
+  // the old ticket URLs onto the new pages. A hard load that still got this far
+  // means the server redirect didn't fire — render the old page rather than loop.
+  if (to.path === "/my-tickets" || to.path.startsWith("/my-tickets/")) {
+    if (window.location.pathname !== "/helpdesk" + to.path) {
+      window.location.replace("/helpdesk" + to.fullPath);
+      return;
+    }
+  }
+
   const authStore = useAuthStore();
   isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {

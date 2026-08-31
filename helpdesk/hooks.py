@@ -67,6 +67,26 @@ website_route_rules = [
     },
 ]
 
+# The studio portal at /kb replaces the old customer portal. Its ticket URLs keep
+# working through these redirects until the old pages are deleted; the desk router
+# hard-navigates its legacy customer routes so they resolve here too.
+website_redirects = [
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/kb/new-ticket",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/kb/customer-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/kb/tickets/\1",
+    },
+]
+
 user_invitation = {
     "allowed_roles": {
         "Agent Manager": [
