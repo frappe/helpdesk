@@ -13,6 +13,7 @@ DOCTYPE_TICKET = "HD Ticket"
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_one(name: str):
     check_permissions(DOCTYPE_TEMPLATE, None)
     found, about, description_template = frappe.get_value(

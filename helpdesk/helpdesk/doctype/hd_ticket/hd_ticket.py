@@ -598,6 +598,7 @@ class HDTicket(Document):
         return bool(int(check))
 
     @frappe.whitelist()
+    @frappe.read_only()
     def get_last_communication(self):
         filters = {
             "reference_doctype": "HD Ticket",

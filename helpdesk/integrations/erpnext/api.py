@@ -7,6 +7,7 @@ from helpdesk.integrations.erpnext.utils import set_links, should_sync
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_sync_info() -> dict:
     """Drive the ERPNext integration settings UI. `in_sync` gates the 'Sync now'
     action. Whether ERPNext is installed is read on the frontend from the boot

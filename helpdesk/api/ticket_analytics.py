@@ -39,6 +39,7 @@ TICKET_FIELDS = [
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_ticket_analytics(ticket: str) -> dict:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)

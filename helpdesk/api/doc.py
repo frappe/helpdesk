@@ -19,6 +19,7 @@ SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_list_data(
     doctype: str,
     # flake8: noqa
@@ -244,6 +245,7 @@ def get_list_data(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @redis_cache()
 def get_filterable_fields(
     doctype: str,
@@ -393,6 +395,7 @@ def get_filterable_fields(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def sort_options(doctype: str, show_customer_portal_fields: bool = False):
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
@@ -422,6 +425,7 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]

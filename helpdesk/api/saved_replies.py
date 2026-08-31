@@ -13,6 +13,7 @@ from helpdesk.utils import agent_only
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_rendered_saved_reply(ticket_id: str, saved_reply_id: str | None = None):
     if not saved_reply_id:

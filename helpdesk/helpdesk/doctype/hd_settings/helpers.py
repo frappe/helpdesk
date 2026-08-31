@@ -94,6 +94,7 @@ default_banner_msg = """Thanks for reaching out 👋. This ticket was created ou
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_banner_msg():
     """Get current and default banner message for settings UI"""
 

@@ -3,6 +3,7 @@ from frappe.translate import get_all_translations
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
+@frappe.read_only()
 def get_translations():
     language = None
     if frappe.session.user != "Guest":

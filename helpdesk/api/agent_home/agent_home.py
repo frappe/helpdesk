@@ -18,6 +18,7 @@ from helpdesk.utils import agent_only, format_time_difference
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_dashboard(reset_layout: bool = False):
     dashboard = frappe.db.exists("HD Field Layout", {"user": frappe.session.user})
@@ -78,6 +79,7 @@ def _resolve_window(period: str):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_agent_tickets(period: str = "last month"):
     current_from, current_to, previous_from, previous_to = _resolve_window(period)
@@ -139,18 +141,21 @@ def get_agent_tickets(period: str = "last month"):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_first_response_time(period: str = "last month"):
     return get_avg_time_metric(period, "first_response_time", scope="agent")
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_resolution_time(period: str = "last month"):
     return get_avg_time_metric(period, "resolution_time", scope="agent")
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_recent_feedback(
     period: str = "all_time",
@@ -275,6 +280,7 @@ def get_recent_feedback(
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_avg_time_metrics(
     period: str = "6m", from_date: str = None, to_date: str = None
@@ -571,6 +577,7 @@ def _get_pending_response_tickets(limit=10):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_pending_tickets(ticket_type: str = "upcoming_sla"):
     if ticket_type == "upcoming_sla":
@@ -625,6 +632,7 @@ ACTIVITY_SOURCES = [
 
 
 @frappe.whitelist()
+@frappe.read_only()
 @agent_only
 def get_recent_activity() -> list[dict]:
     """The current agent's latest action per ticket (replied, commented, updated,

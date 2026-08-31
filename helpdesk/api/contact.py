@@ -9,6 +9,7 @@ from helpdesk.utils import get_country_from_timezone, get_customers
 
 
 @frappe.whitelist(methods=["GET"])
+@frappe.read_only()
 def search_contacts(
     txt: str, additional_filters: str | list | None = None
 ) -> list[dict[Literal["full_name", "name", "email_id"], str]]:
@@ -159,6 +160,7 @@ def edit_contact(name: str, doc: dict):
 
 
 @frappe.whitelist(methods=["GET"])
+@frappe.read_only()
 def get_contact_info(name: str) -> dict:
     frappe.has_permission("Contact", "read", doc=name, throw=True)
     contact = frappe.get_doc("Contact", name)
