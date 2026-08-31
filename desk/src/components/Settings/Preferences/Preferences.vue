@@ -44,9 +44,7 @@
                 </span>
                 <span class="text-p-sm text-ink-gray-6">
                   {{
-                    __(
-                      "Show timestamps in the activity timeline as relative time (5 mins ago) or an exact date & time."
-                    )
+                    __("Change how timestamps appear in the activity timeline.")
                   }}
                 </span>
               </div>
@@ -56,6 +54,7 @@
                   v-model="timestampFormat"
                   type="select"
                   :options="timestampFormatOptions"
+                  @update:model-value="syncDeskTimelineSetting"
                 />
               </div>
             </div>
@@ -75,7 +74,7 @@ import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { useTimelinePreferences } from "@/composables/timelinePreferences";
+import { timestampFormat } from "@/composables/timelinePreferences";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
 import LanguageTimezoneSetting from "./components/LanguageTimezoneSetting.vue";
@@ -85,11 +84,22 @@ const { userId } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
 // stored per user in localStorage, applies instantly — no Save needed
-const { timestampFormat } = useTimelinePreferences();
 const timestampFormatOptions = [
   { label: __("Relative"), value: "Relative" },
   { label: __("Exact"), value: "Exact" },
 ];
+
+// one-way mirror into desk's "Show absolute datetime in timeline" user
+// setting — helpdesk's preference stays the source of truth and the desk
+// field is never read back. It only exists on newer frappe, so skip when
+// the loaded doc lacks it.
+const deskAbsoluteDatetimeField = "show_absolute_datetime_in_timeline";
+function syncDeskTimelineSetting(value: "Relative" | "Exact") {
+  if (!user.doc || !(deskAbsoluteDatetimeField in user.doc)) return;
+  user.setValue.submit({
+    [deskAbsoluteDatetimeField]: value === "Exact" ? 1 : 0,
+  });
+}
 
 const isDirty = computed(() => {
   if (!user.originalDoc) return false;
