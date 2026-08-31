@@ -139,7 +139,10 @@ export function useView(dt: string = null) {
   function updateView(view: any, successCB: Function = () => {}) {
     if (view.name !== "default") {
       // handle custom view
-      debouncedSetValue("HD View", view.name, view, successCB);
+      // `frappe.client.set_value` should only receive mutable fields; keeping
+      // the docname out of the payload avoids a no-op or rejected save.
+      const { name, doctype, ...fields } = view;
+      debouncedSetValue("HD View", name, fields, successCB);
     } else {
       // handle default view
       createOrUpdateDefaultView(view);
@@ -162,9 +165,9 @@ export function useView(dt: string = null) {
     );
     view.is_customer_portal = isCustomerPortal.value;
     if (defaultView) {
-      delete view["name"];
-
-       debouncedSetValue("HD View", defaultView.name, view);
+      // Same rule as above: update only editable fields, not the docname.
+      const { name, doctype, ...fields } = view as any;
+      debouncedSetValue("HD View", defaultView.name, fields);
     } else {
       view["doctype"] = "HD View";
       // create default view
