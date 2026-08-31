@@ -215,7 +215,7 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 
 **Data Query Patterns**:
 
-- Always prefer `frappe.qb.get_query()` over `frappe.db.get_all()` for new code
+- Always prefer `frappe.get_list()` over `frappe.get_all()` for new code. It handles perms out of the box and is more flexible.
 - Use `frappe.qb.get_query(..., ignore_permissions=False)` when permission checks are needed
 - Example query patterns from helpdesk context
 

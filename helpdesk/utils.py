@@ -52,7 +52,7 @@ def is_agent(user: str | None = None) -> bool:
     """
     user = user or frappe.session.user
     return (
-        is_admin()
+        is_admin(user)
         or "Agent Manager" in frappe.get_roles(user)
         or "Agent" in frappe.get_roles(user)
         or bool(frappe.db.exists("HD Agent", {"name": user}))

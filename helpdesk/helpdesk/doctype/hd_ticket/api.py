@@ -57,6 +57,8 @@ def get_one(name: str, is_customer_portal: bool = False):
     if not len(ticket):
         frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
     ticket = ticket.pop()
+    # core caches comment and email snippets here; nothing in the SPA reads it
+    ticket.pop("_comments", None)
 
     contact = (
         frappe.qb.from_(QBContact)
@@ -114,8 +116,6 @@ def get_one(name: str, is_customer_portal: bool = False):
         **ticket,
         "comments": get_comments(name),
         "communications": get_communications(name),
-        "history": get_history(name),
-        "views": get_views(name),
         "contact": contact,
         "tags": get_tags(name),
         "template": get_template(template),
@@ -199,65 +199,28 @@ def get_communications(ticket: str):
 
 
 def get_comments(ticket: str):
-    if not frappe.has_permission("HD Ticket Comment", "read"):
+    if not frappe.has_permission("Comment", "read"):
         return []
-    QBComment = frappe.qb.DocType("HD Ticket Comment")
+    QBComment = frappe.qb.DocType("Comment")
     comments = (
         frappe.qb.from_(QBComment)
         .select(
-            QBComment.commented_by,
+            QBComment.comment_email.as_("commented_by"),
             QBComment.content,
             QBComment.creation,
             QBComment.is_pinned,
             QBComment.name,
         )
-        .where(QBComment.reference_ticket == ticket)
+        .where(QBComment.reference_doctype == "HD Ticket")
+        .where(QBComment.reference_name == ticket)
+        .where(QBComment.comment_type == "Comment")
         .orderby(QBComment.creation, order=Order.asc)
         .run(as_dict=True)
     )
     for c in comments:
         c.user = get_user_info_for_avatar(c.commented_by)
-        c.attachments = get_attachments("HD Ticket Comment", c.name)
+        c.attachments = get_attachments("Comment", c.name)
     return comments
-
-
-def get_history(ticket: str):
-    if not frappe.has_permission("HD Ticket Activity", "read"):
-        return []
-    QBActivity = frappe.qb.DocType("HD Ticket Activity")
-    history = (
-        frappe.qb.from_(QBActivity)
-        .select(
-            QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
-        )
-        .where(QBActivity.ticket == str(ticket))
-        .orderby(QBActivity.creation, order=Order.desc)
-    )
-    history = history.run(as_dict=True)
-    for h in history:
-        h.user = get_user_info_for_avatar(h.owner)
-    return history
-
-
-def get_views(ticket: str):
-    if not frappe.has_permission("HD Ticket", "read", ticket):
-        return []
-    QBViewLog = frappe.qb.DocType("View Log")
-    views = (
-        frappe.qb.from_(QBViewLog)
-        .select(
-            QBViewLog.creation,
-            QBViewLog.name,
-            QBViewLog.viewed_by,
-        )
-        .where(QBViewLog.reference_doctype == "HD Ticket")
-        .where(QBViewLog.reference_name == ticket)
-        .orderby(QBViewLog.creation, order=Order.desc)
-        .run(as_dict=True)
-    )
-    for v in views:
-        v.user = get_user_info_for_avatar(v.viewed_by)
-    return views
 
 
 def get_tags(ticket: str):
@@ -336,11 +299,11 @@ def merge_ticket(source: str, target: str):
     controller = get_controller("HD Ticket")
 
     source_comments = frappe.db.get_list(
-        "HD Ticket Comment", filters={"reference_ticket": source}, pluck="name"
+        "Comment",
+        filters={"reference_doctype": "HD Ticket", "reference_name": source},
+        pluck="name",
     )
-    duplicate_list_retain_timestamp(
-        "HD Ticket Comment", source_comments, target, controller
-    )
+    duplicate_list_retain_timestamp("Comment", source_comments, target, controller)
 
     source_communications = frappe.db.get_list(
         "Communication",
@@ -374,9 +337,11 @@ def merge_ticket(source: str, target: str):
     )
 
     # comment in target ticket that
-    c = frappe.new_doc("HD Ticket Comment")
-    c.commented_by = frappe.session.user
-    c.reference_ticket = target
+    c = frappe.new_doc("Comment")
+    c.comment_type = "Comment"
+    c.comment_email = frappe.session.user
+    c.reference_doctype = "HD Ticket"
+    c.reference_name = target
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
     target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
     c.content = _(
@@ -388,7 +353,7 @@ def merge_ticket(source: str, target: str):
 def duplicate_list_retain_timestamp(doctype, activities: list, target: str, controller):
     for activity in activities:
         attachments = get_attachments(
-            "HD Ticket Comment",
+            "Comment",
             activity,
         )
 
@@ -403,8 +368,8 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
                 activity,
             )
 
-        elif doctype == "HD Ticket Comment":
-            duplicate_doc.reference_ticket = target
+        elif doctype == "Comment":
+            duplicate_doc.reference_name = target
             attachments = get_attachments(
                 "Communication",
                 activity,
@@ -466,12 +431,13 @@ def split_ticket(subject: str, communication_id: str):
 
     # update comments
     frappe.db.set_value(
-        "HD Ticket Comment",
+        "Comment",
         {
-            "reference_ticket": ticket_id,
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_id,
             "creation": [">=", communicaton_creation_time],
         },
-        "reference_ticket",
+        "reference_name",
         new_ticket,
         update_modified=False,
     )
@@ -624,7 +590,7 @@ def _parse_view_filters(raw) -> dict | list:
         return []
     try:
         return (json.loads(raw) if isinstance(raw, str) else raw) or []
-    except (json.JSONDecodeError, TypeError):
+    except json.JSONDecodeError, TypeError:
         return []
 
 
@@ -732,19 +698,6 @@ def get_recent_tickets(ticket: str):
             or []
         )
     return org_tickets + user_tickets
-
-
-@frappe.whitelist()
-def get_ticket_activities(ticket: str):
-    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    activities = {
-        "comments": get_comments(ticket),
-        "communications": get_communications(ticket),
-        "history": get_history(ticket),
-        "views": get_views(ticket),
-        "calls": get_call_logs(ticket),
-    }
-    return activities
 
 
 @frappe.whitelist()

@@ -424,70 +424,6 @@ export interface Breadcrumb {
   };
 }
 
-// Activity Types
-interface BaseActivity {
-  type: string;
-  key: string;
-  creation: string;
-  content: string;
-}
-
-interface HistoryActivity extends BaseActivity {
-  type: "history";
-  user: string;
-  relatedActivities: HistoryActivity[];
-}
-
-export interface EmailActivity extends BaseActivity {
-  type: "email";
-  attachments: FileAttachment;
-  bcc: string;
-  cc: string;
-  name: string;
-  sender: { full_name: string; name: string };
-  subject: string;
-  to: string;
-  isFirstEmail: boolean;
-}
-
-export interface CommentActivity extends BaseActivity {
-  type: "comment";
-  name: string;
-  commenter: string;
-  commentedBy: string;
-  attachments: FileAttachment[];
-}
-
-export interface CallActivity extends BaseActivity {
-  type: "call";
-  name: string;
-  caller: string;
-  calledBy: string;
-  attachments: FileAttachment[];
-  call_type: "Incoming" | "Outgoing";
-}
-
-export interface FeedbackActivity {
-  type: "feedback";
-  feedback_rating: number;
-  feedback: string; // option seletor
-  feedback_extra?: string; // free flow text
-  sender: { name: string; full_name: string };
-  key: string;
-}
-
-export type TicketActivity =
-  | HistoryActivity
-  | EmailActivity
-  | CommentActivity
-  | CallActivity
-  | FeedbackActivity;
-
-interface FileAttachment {
-  name: string;
-  file_name: string;
-  file_url: string;
-}
 
 export interface FieldCriteriaState {
   selectedParentField: string;
@@ -625,13 +561,6 @@ export interface RecentSimilarTicket {
   similar_tickets: SimilarTicket[];
 }
 
-export interface TicketActivities {
-  comments: Comment[];
-  communications: Communication[];
-  history: Activity[];
-  views: ViewLog[];
-}
-
 export interface HDSettings {
   brandName: string;
   brandLogo: string;
@@ -746,10 +675,6 @@ export const TicketContactSymbol: InjectionKey<
 export const RecentSimilarTicketsSymbol: InjectionKey<
   ComputedRef<Resource<RecentSimilarTicket>>
 > = Symbol("recentSimilarTickets");
-
-export const ActivitiesSymbol: InjectionKey<
-  ComputedRef<Resource<TicketActivities>>
-> = Symbol("activities");
 
 export const AssignmentRuleListResourceSymbol: InjectionKey<
   Resource<AssignmentRule[]>
