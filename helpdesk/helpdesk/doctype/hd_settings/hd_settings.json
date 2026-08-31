@@ -27,6 +27,7 @@
   "column_break_zxek",
   "feedback_section",
   "is_feedback_mandatory",
+  "confirm_resolution_after_days",
   "column_break_kegb",
   "comments_section",
   "enable_comment_reactions",
@@ -84,7 +85,9 @@
   "reply_email_to_agent_content",
   "reply_from_agent_section",
   "enable_reply_email_via_agent",
-  "reply_via_agent_email_content"
+  "reply_via_agent_email_content",
+  "allow_customer_managers_to_invite",
+  "allow_customer_managers_to_edit_organization"
  ],
  "fields": [
   {
@@ -325,6 +328,13 @@
    "label": "Enable feedback for Customer Portal"
   },
   {
+   "default": "5",
+   "description": "How long a resolution stands before the customer portal asks the requester to confirm it. Set 0 to ask as soon as a ticket is resolved.",
+   "fieldname": "confirm_resolution_after_days",
+   "fieldtype": "Int",
+   "label": "Ask to confirm resolution after (Days)"
+  },
+  {
    "fieldname": "column_break_iarl",
    "fieldtype": "Column Break"
   },
@@ -552,6 +562,20 @@
    "fieldname": "auto_set_customer_from_contact",
    "fieldtype": "Check",
    "label": "Auto-set customer from contact"
+  },
+  {
+   "fieldname": "allow_customer_managers_to_invite",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to invite members",
+   "description": "Lets a customer manager invite people into their own organization from the portal. This creates logins for your helpdesk."
+  },
+  {
+   "fieldname": "allow_customer_managers_to_edit_organization",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to edit organization details",
+   "description": "Lets a customer manager change their organization's logo from the portal."
   }
  ],
  "grid_page_length": 50,

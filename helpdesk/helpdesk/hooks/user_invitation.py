@@ -1,6 +1,44 @@
 import frappe
+from frappe import _
 from frappe.core.doctype.user.user import create_contact
 from frappe.model.document import Document
+
+from helpdesk.utils import get_customers
+
+
+def validate_customer_scope(invitation: Document, method=None) -> None:
+    """Customer managers may only invite members into an organization they manage.
+
+    Agents and system users are unrestricted; role validity is already enforced
+    by the `user_invitation.allowed_roles` hook.
+    """
+    if invitation.app_name != "helpdesk":
+        return
+    if {"System Manager", "Agent Manager"} & set(frappe.get_roles()):
+        return
+
+    # Managing an organization is necessary but not sufficient — the helpdesk has to
+    # allow customer-side invites at all. Enforced here rather than in the portal API
+    # because the invite goes through frappe's own `user_invitation.invite_by_email`,
+    # so this before_insert hook is the only chokepoint every caller passes through.
+    if not frappe.db.get_single_value(
+        "HD Settings", "allow_customer_managers_to_invite"
+    ):
+        frappe.throw(
+            _("Your helpdesk does not allow customers to invite members"),
+            frappe.PermissionError,
+        )
+
+    managed = {
+        member["name"]
+        for member in get_customers(get_roles=True)
+        if member.get("is_manager")
+    }
+    if not invitation.customer or invitation.customer not in managed:
+        frappe.throw(
+            _("You can only invite members to an organization you manage"),
+            frappe.PermissionError,
+        )
 
 
 def after_accept(invitation: Document, user: Document, user_inserted: bool) -> None:
