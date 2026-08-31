@@ -2328,6 +2328,27 @@ class TestHDTicket(IntegrationTestCase):
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
 
+    def test_customer_managers_see_their_tickets_in_lists(self):
+        """Customer-link access must survive both doc checks and list queries."""
+        contact = create_contact("Account Manager", agent, user=True, role="Agent")
+        customer = create_customer("Manager Visibility Customer")
+        add_contact_in_customer(customer, contact["contact"], is_manager=True)
+        make_team("Team B", members=[agent2])
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "restrict_tickets_by_agent_group",
+            0,
+        )
+
+        ticket = make_ticket(customer=customer.name, agent_group="Team B")
+
+        frappe.set_user(agent)
+        self.assertTrue(has_permission(ticket, user=agent))
+        self.assertIn(ticket.name, frappe.get_list("HD Ticket", pluck="name"))
+        self.assertIn(customer.name, permission_query(agent))
+
     def tearDown(self):
         frappe.set_user("Administrator")
         remove_holidays()
