@@ -93,7 +93,6 @@ const PREVIEWS: Record<string, Preview> = {
   "video/mp4": "video",
   "video/webm": "video",
   "video/ogg": "video",
-  "video/quicktime": "video",
   "video/x-m4v": "video",
   "text/plain": "text",
 };
