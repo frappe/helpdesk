@@ -25,6 +25,13 @@ except ImportError:
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
+from helpdesk.search_i18n import (
+    cjk_index_terms,
+    expand_cjk_query,
+    indexed_field_names,
+    normalize_search_text,
+)
+
 if TYPE_CHECKING:
     from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
@@ -93,8 +100,6 @@ def get_synonym_words() -> list[str]:
 
 
 class Search:
-    unsafe_chars = re.compile(r"[^a-zA-Z0-9\s]")
-
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
         self.index_name = index_name
@@ -155,8 +160,10 @@ class Search:
         start=0,
         page_length=NUM_RESULTS,
         highlight=False,
+        prepared=False,
     ):
-        query = self.clean_query(query)
+        if not prepared:
+            query = self.clean_query(query)
         query = Query(query).paging(start, page_length)
         if highlight:
             query = query.highlight()
@@ -178,11 +185,7 @@ class Search:
         return out
 
     def clean_query(self, query):
-        query = query.strip().replace("-*", "*")
-        query = self.unsafe_chars.sub(" ", query)
-        # Collapse multiple spaces
-        query = re.sub(r"\s+", " ", query)
-        return query.strip().lower()
+        return normalize_search_text(query)
 
     def spellcheck(self, query, **kwargs):
         return self.redis.ft(self.index_name).spellcheck(query, **kwargs)
@@ -200,14 +203,26 @@ class Search:
             num += self.get_count(doctype)
         return num
 
+    def index_fields(self) -> set[str]:
+        """Field names declared in this class's schema."""
+        return {f["name"] for f in self.schema if isinstance(f, dict) and f.get("name")}
+
     def index_exists(self):
         if hasattr(self, "_index_exists"):
             return self._index_exists
         self._index_exists = False
         with suppress(ResponseError):
             ftinfo = self.redis.ft(self.index_name).info()
-            if isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
-                self._index_exists = True
+            if not isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
+                return self._index_exists
+            # The document count alone cannot tell us whether the index was built
+            # from the current schema. An index created before a field was added
+            # has the right number of documents but cannot serve queries against
+            # the new field, so treat it as missing and let it be rebuilt.
+            existing = indexed_field_names(ftinfo.get("attributes"))
+            if existing and not self.index_fields() <= existing:
+                return self._index_exists
+            self._index_exists = True
         return self._index_exists
 
 
@@ -231,6 +246,11 @@ class HelpdeskSearch(Search):
             {"name": "subject", "weight": settings.subject_weight or 6},
             {"name": "description", "weight": settings.description_weight or 5},
             {"name": "headings", "weight": settings.headings_weight or 8},
+            {
+                "name": "cjk_terms",
+                "weight": settings.description_weight or 5,
+                "no_stem": True,
+            },
             {"name": "modified", "sortable": True},
             {"name": "creation", "sortable": True},
         ]
@@ -255,6 +275,15 @@ class HelpdeskSearch(Search):
                 "subject": doc.title,
                 "description": strip_html_tags(doc.content),
                 "headings": doc.headings,
+                "cjk_terms": cjk_index_terms(
+                    " ".join(
+                        (
+                            doc.title or "",
+                            strip_html_tags(doc.content or ""),
+                            doc.headings or "",
+                        )
+                    )
+                ),
                 "modified": doc.modified,
             }
             self.add_document(id, fields)
@@ -323,7 +352,7 @@ class HelpdeskSearch(Search):
 
 def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
-    query = search.clean_query(query)
+    query = expand_cjk_query(search.clean_query(query))
     query_parts: list[str] = query.split()
     query = ""
     sep = " " if qtype == "and" else "|"
@@ -339,7 +368,7 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
             query += f"{sep}{part}*"
 
     query = query.lstrip(sep)  # Remove leading separator (| at beginning is invalid)
-    result = search.search(query, start=0, highlight=True)
+    result = search.search(query, start=0, highlight=True, prepared=True)
     groups = {}
     for r in result.docs:
         doctype, name = r.id.split(":")
