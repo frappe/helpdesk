@@ -27,6 +27,13 @@
   display: none !important;
 }
 
+/* Dialogs (e.g. saved replies) must sit above a detached FloatingWindow
+   (z-50); the frappe-ui overlay has no z-index of its own. Deletable once
+   frappe-ui is ≥ beta.55, where the window drops to z-40 under dialogs. */
+body.has-floating-window .dialog-overlay {
+  z-index: 100;
+}
+
 html,
 body {
   color: var(--ink-gray-9);
