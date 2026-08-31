@@ -425,10 +425,12 @@ class HDTicket(Document):
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent() or not self.via_customer_portal:
             return
-        is_closed = old_doc.status == "Closed"
-        is_rated = bool(old_doc.feedback)
-        if is_closed or is_rated:
-            text = _("Closed or rated tickets cannot be updated by non-agents")
+        # Only a closed ticket is out of the requester's hands. A rating used to freeze it
+        # too, but `feedback` is never cleared — so one rating made every later version of
+        # the ticket read-only to them, including after an agent reopened it: they could
+        # neither reply (a reply reopens through this same save) nor close it.
+        if old_doc.status == "Closed":
+            text = _("Closed tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
     def handle_ticket_activity_update(self):
@@ -842,7 +844,11 @@ class HDTicket(Document):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        c.sender = frappe.session.user
+        # A signed-out requester has no session identity, so the first message would
+        # read as coming from "Guest"; the address they gave is who it is from.
+        c.sender = (
+            self.raised_by if frappe.session.user == "Guest" else frappe.session.user
+        )
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
@@ -918,10 +924,14 @@ class HDTicket(Document):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                # Queued, not flushed inline. `now=True` sends during the request's own
+                # `db.commit()`, so an unreachable outgoing server turned a customer's
+                # reply into a 500 — after the reply had already been written, and past
+                # the point any `except` here could catch it.
             )
-        except Exception as e:
-            frappe.throw(_(e))
+        except Exception:
+            # Telling the agents is not worth failing the reply the customer just sent.
+            self.log_error("Could not queue the reply notification to agents")
 
     def send_acknowledgement_email(self):
         acknowledgement_email_content = frappe.db.get_single_value(
@@ -941,14 +951,13 @@ class HDTicket(Document):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
+                # Queued for the same reason as the reply notification above: raising a
+                # ticket must not fail on the acknowledgement it triggers.
             )
-        except Exception as e:
-            frappe.throw(
-                _("Could not send an acknowledgement email due to: {0}").format(e)
-            )
+        except Exception:
+            self.log_error("Could not queue the acknowledgement email")
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -1113,8 +1122,10 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
-        # Save the ticket, allowing for hooks to run.
-        self.save()
+        # Save the ticket, allowing for hooks to run. Unchecked like the other saves
+        # in this path: the permission was asserted when the communication was
+        # written, and this is only the bookkeeping that follows from it.
+        self.save(ignore_permissions=True)
 
     def attach_file_with_doc(self, doctype, docname, file_url):
         if frappe.db.exists(

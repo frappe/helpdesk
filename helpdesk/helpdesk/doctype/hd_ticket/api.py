@@ -63,6 +63,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         .select(
             QBContact.company_name,
             QBContact.email_id,
+            QBContact.full_name,
             QBContact.image,
             QBContact.mobile_no,
             QBContact.name,
