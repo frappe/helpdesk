@@ -106,26 +106,6 @@
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-base-medium text-ink-gray-8">{{
-            __("Allow anyone to create tickets")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6"
-            >{{
-              __(
-                "Anyone will be able to create tickets without any permission. e.g. from webform."
-              )
-            }}
-          </span>
-        </div>
-        <Switch
-          :model-value="settingsData.allowAnyoneToCreateTickets"
-          @update:model-value="
-            (value) => (settingsData.allowAnyoneToCreateTickets = value)
-          "
-        />
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
             __("Default ticket type")
           }}</span>
           <span class="text-p-sm text-ink-gray-6">{{

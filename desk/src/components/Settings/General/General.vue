@@ -97,7 +97,6 @@ const settingsData = ref({
   autoUpdateStatus: false,
   isFeedbackMandatory: false,
   enableCommentReactions: false,
-  allowAnyoneToCreateTickets: false,
   defaultTicketType: "",
   preferKnowledgeBase: false,
   skipEmailWorkflow: false,
@@ -149,8 +148,6 @@ const saveSettingsResource = createResource({
         auto_update_status: settingsData.value.autoUpdateStatus,
         is_feedback_mandatory: settingsData.value.isFeedbackMandatory,
         enable_comment_reactions: settingsData.value.enableCommentReactions,
-        allow_anyone_to_create_tickets:
-          settingsData.value.allowAnyoneToCreateTickets,
         default_ticket_type: settingsData.value.defaultTicketType,
         prefer_knowledge_base: settingsData.value.preferKnowledgeBase,
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
@@ -188,7 +185,6 @@ const transformData = (data: any) => {
     autoUpdateStatus: data.auto_update_status,
     isFeedbackMandatory: Boolean(data.is_feedback_mandatory),
     enableCommentReactions: Boolean(data.enable_comment_reactions),
-    allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),
     defaultTicketType: data.default_ticket_type,
     preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
@@ -258,7 +254,6 @@ const toggleFields = [
   "isFeedbackMandatory",
   "enableCommentReactions",
   "disableSavedRepliesGlobalScope",
-  "allowAnyoneToCreateTickets",
   "preferKnowledgeBase",
   "skipEmailWorkflow",
 ] as const;
