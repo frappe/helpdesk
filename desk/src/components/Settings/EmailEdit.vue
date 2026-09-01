@@ -141,6 +141,7 @@
           />
           <div class="flex gap-2">
             <Button
+              v-if="hasChanges"
               :label="__('Update Account')"
               variant="solid"
               @click="updateAccount"
@@ -232,7 +233,7 @@ const props = withDefaults(defineProps<P>(), {
 
 const emit = defineEmits<E>();
 
-const state = reactive<EmailAccountProviderAuthState>({
+const getInitialState = (): EmailAccountProviderAuthState => ({
   email_account_name: props.accountData.email_account_name || "",
   service: props.accountData.service || "",
   email_id: props.accountData.email_id || "",
@@ -245,6 +246,8 @@ const state = reactive<EmailAccountProviderAuthState>({
   default_outgoing: props.accountData.default_outgoing || false,
   default_incoming: props.accountData.default_incoming || false,
 });
+
+const state = reactive<EmailAccountProviderAuthState>(getInitialState());
 
 const getInitialCustomState = (): CustomEmailAccountState => ({
   domain: props.accountData?.domain || "",
@@ -330,9 +333,8 @@ async function updateAccount() {
     : currentServiceName.value;
   error.value = validateInputs(validationState, validationService, true);
   if (error.value) return;
-  const old = { ...props.accountData };
-  const updatedEmailAccount = { ...state };
 
+<<<<<<< HEAD
   const nameChanged =
     old.email_account_name !== updatedEmailAccount.email_account_name;
   delete old.email_account_name;
@@ -349,6 +351,9 @@ async function updateAccount() {
   }
 
   if (nameChanged) {
+=======
+  if (nameChanged.value) {
+>>>>>>> a989a6b (fix(settings): show Update Account only when the account changed)
     try {
       loading.value = true;
       await callRenameDoc();
@@ -357,10 +362,10 @@ async function updateAccount() {
       errorHandler();
     }
   }
-  if (otherFieldsChanged) {
+  if (isDirty.value) {
     try {
       loading.value = true;
-      await callSetValue(values);
+      await callSetValue(buildUpdatePayload());
       succesHandler();
     } catch (err) {
       errorHandler();
@@ -424,7 +429,12 @@ function pullEmails() {
     });
 }
 
+// Compare against the initial values rather than the account itself. The form
+// normalises what the server sends (a 0 becomes false, a null becomes ""), so
+// comparing straight to the account reported every custom account as changed.
+// Renaming goes through a separate API, so it is tracked by nameChanged.
 const isDirty = computed(() => {
+<<<<<<< HEAD
   const customDirty = isCustomProvider.value
     ? customState.domain !== props.accountData.domain ||
       customState.email_server !== props.accountData.email_server ||
@@ -446,8 +456,28 @@ const isDirty = computed(() => {
     state.default_outgoing !== props.accountData.default_outgoing ||
     state.default_incoming !== props.accountData.default_incoming ||
     state.frappe_mail_site !== props.accountData.frappe_mail_site
+=======
+  const initialState = getInitialState();
+  const baseChanged = (
+    Object.keys(initialState) as (keyof EmailAccountProviderAuthState)[]
+  ).some(
+    (field) =>
+      field !== "email_account_name" && state[field] !== initialState[field]
+>>>>>>> a989a6b (fix(settings): show Update Account only when the account changed)
   );
+  if (baseChanged || !isCustomProvider.value) return baseChanged;
+
+  const initialCustomState = getInitialCustomState();
+  return (
+    Object.keys(initialCustomState) as (keyof CustomEmailAccountState)[]
+  ).some((field) => customState[field] !== initialCustomState[field]);
 });
+
+const nameChanged = computed(
+  () => state.email_account_name !== getInitialState().email_account_name
+);
+
+const hasChanges = computed(() => nameChanged.value || isDirty.value);
 
 async function callRenameDoc() {
   return call("frappe.client.rename_doc", {
