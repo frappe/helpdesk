@@ -23,18 +23,12 @@ function createSessionStore() {
   // showing "Log in" to a signed-in user for a moment beats the reverse.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
 
-  /** Signed-in customers always may; a visitor only when the helpdesk allows it. */
-  const canCreateTicket = computed(
-    () => !isGuest.value || Boolean(config.value?.allow_anyone_to_create_tickets)
-  )
+  /** Raising a ticket needs an account to put it on. */
+  const canCreateTicket = computed(() => !isGuest.value)
 
   const isPublicKnowledgeBase = computed(
     () => Boolean(config.value?.public_knowledge_base)
   )
-
-  // The form for raising one lives inside the portal, so a private knowledge base
-  // would take anonymous tickets down with it — the two settings are separate.
-  const TICKET_FORM_PATH = '/new-ticket'
 
   // Back to the page they were reading, not to the agent desk.
   const loginUrl = computed(
@@ -72,7 +66,6 @@ function createSessionStore() {
   // every call, so send them to sign in rather than render a shell that cannot fill.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value) return
-    if (window.location.pathname.endsWith(TICKET_FORM_PATH) && canCreateTicket.value) return
     signIn()
   }
 

@@ -16,7 +16,6 @@ def get_config():
         "assign_within_team",
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
-        "allow_anyone_to_create_tickets",
         "show_customer_portal_permission_notice",
         # Drive whether the portal offers the org-management controls at all; the
         # server still enforces them independently.

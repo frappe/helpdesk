@@ -844,11 +844,7 @@ class HDTicket(Document):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        # A signed-out requester has no session identity, so the first message would
-        # read as coming from "Guest"; the address they gave is who it is from.
-        c.sender = (
-            self.raised_by if frappe.session.user == "Guest" else frappe.session.user
-        )
+        c.sender = frappe.session.user
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
@@ -1122,10 +1118,8 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
-        # Save the ticket, allowing for hooks to run. Unchecked like the other saves
-        # in this path: the permission was asserted when the communication was
-        # written, and this is only the bookkeeping that follows from it.
-        self.save(ignore_permissions=True)
+        # Save the ticket, allowing for hooks to run.
+        self.save()
 
     def attach_file_with_doc(self, doctype, docname, file_url):
         if frappe.db.exists(

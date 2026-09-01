@@ -10,24 +10,6 @@
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
             <span class="text-base-medium text-ink-gray-8">{{
-              __("Allow anyone to create tickets")
-            }}</span>
-            <span class="text-p-sm text-ink-gray-6">{{
-              __(
-                "Visitors can raise a ticket from the customer portal without signing in."
-              )
-            }}</span>
-          </div>
-          <Switch
-            :model-value="Boolean(settings.doc?.allow_anyone_to_create_tickets)"
-            @update:model-value="
-              (value) => update('allow_anyone_to_create_tickets', value)
-            "
-          />
-        </div>
-        <div class="flex items-center justify-between">
-          <div class="flex flex-col gap-1">
-            <span class="text-base-medium text-ink-gray-8">{{
               __("Invite and manage members")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">{{
@@ -74,11 +56,9 @@
 </template>
 
 <script setup lang="ts">
-// Who may do what from the customer portal, in one place — "allow anyone to create
-// tickets" used to sit in both General and Knowledge Base, which meant two switches
-// writing one field and neither tab obviously owning it.
+// What customer managers may do from the customer portal, in one place.
 //
-// The manager switches default off: most helpdesks keep user administration agent-side,
+// The switches default off: most helpdesks keep user administration agent-side,
 // and turning the first one on lets a customer create logins for your helpdesk. They only
 // decide whether the portal draws the controls — the server enforces them independently,
 // in `helpdesk/api/organization.py` and the `User Invitation` before_insert hook.
