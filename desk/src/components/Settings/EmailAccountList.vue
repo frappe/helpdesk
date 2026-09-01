@@ -45,8 +45,13 @@
         </div>
       </div>
       <!-- fallback if no email accounts -->
+<<<<<<< HEAD
       <div
         v-else
+=======
+      <EmptyState
+        v-else-if="!emailAccounts.loading"
+>>>>>>> b8d701a (fix(settings): import EmptyState so empty screens render)
         variant="badge"
         :icon="EmailIcon"
         :title="__('No email account found')"
@@ -57,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import EmptyState from "@/components/EmptyState.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
