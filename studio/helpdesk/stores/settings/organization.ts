@@ -1,4 +1,5 @@
 import { ref, computed, watch } from 'vue'
+import { ROUTES } from '@app/routes'
 import { call, toast } from 'frappe-ui'
 import { t } from '@app/stores/translations'
 
@@ -148,7 +149,7 @@ export function createOrganizationSettings(core) {
       const result = await call('frappe.core.api.user_invitation.invite_by_email', {
         emails: emails.join(','),
         roles: [inviteRole.value === 'Manager' ? MANAGER_ROLE : MEMBER_ROLE],
-        redirect_to_path: '/helpdesk',
+        redirect_to_path: ROUTES.appRoot,
         app_name: 'helpdesk',
         customer: selectedOrg.value,
       })
