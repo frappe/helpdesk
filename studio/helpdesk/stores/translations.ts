@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { call } from 'frappe-ui'
+import { createResource } from 'frappe-ui'
 
 // The same translations the agent portal reads: `helpdesk.api.general.get_translations`
 // serves the .po-backed map for the session's language (System Settings' language for a
@@ -10,14 +10,19 @@ import { call } from 'frappe-ui'
 
 const words = ref<Record<string, string>>({})
 
-async function loadTranslations() {
-  try {
-    words.value = (await call('helpdesk.api.general.get_translations')) || {}
-  } catch (error) {
-    console.error(error)
-  }
+// GET, as the endpoint requires — and cached under the same key the desk uses, so
+// the two portals in one browser share the download.
+const translations = createResource({
+  url: 'helpdesk.api.general.get_translations',
+  method: 'GET',
+  cache: 'translations',
+  auto: true,
+  onSuccess: (data) => (words.value = data || {}),
+})
+
+function loadTranslations() {
+  translations.reload()
 }
-loadTranslations()
 
 /** What the reader chose — `hi-IN` and `hi` both read as Hindi.
  *
