@@ -1,29 +1,11 @@
 {
  "blocks": [
   {
-   "baseStyles": {
-    "alignItems": "center",
-    "display": "flex",
-    "flexDirection": "column",
-    "height": "100%",
-    "justifyContent": "center",
-    "overflowX": "hidden",
-    "width": "inherit"
-   },
+   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "backgroundColor": "var(--surface-base)",
-      "borderBottom": "1px solid var(--outline-gray-2)",
-      "display": "flex",
-      "flexDirection": "row",
-      "flexShrink": 0,
-      "height": "52px",
-      "padding": "0 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "topbar",
      "children": [
       {
@@ -41,50 +23,43 @@
        "isStudioComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "flex-row",
+      "shrink-0",
+      "h-13",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-topbar-nt",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "alignItems": "flex-start",
-      "display": "flex",
-      "flexDirection": "column",
-      "flexGrow": 1,
-      "flexShrink": 1,
-      "justifyContent": "flex-start",
-      "maxWidth": "552px",
-      "overflowY": "auto"
-     },
+     "baseStyles": {},
      "blockName": "content",
      "children": [
       {
-       "baseStyles": {
-        "display": "flex",
-        "flexDirection": "column",
-        "gap": "20px",
-        "margin": "0 auto",
-        "paddingBottom": "0px",
-        "paddingLeft": "0px",
-        "paddingRight": "0px",
-        "paddingTop": "50px",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "stack",
        "children": [
         {
-         "baseStyles": {
-          "color": "var(--ink-gray-8, oklch(0.205 0 0))",
-          "fontWeight": "600",
-          "marginBottom": "4px",
-          "marginLeft": "0px",
-          "marginRight": "0px",
-          "marginTop": "0px"
-         },
+         "baseStyles": {},
          "blockName": "title",
          "children": [],
-         "classes": [],
+         "classes": [
+          "font-semibold",
+          "mb-1",
+          "ml-0",
+          "mr-0",
+          "mt-0",
+          "text-ink-gray-8"
+         ],
          "componentId": "title",
          "componentName": "TextBlock",
          "componentProps": {
@@ -94,20 +69,16 @@
          }
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-subject",
          "children": [
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "blockName": "c-subject",
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentId": "c-subject",
            "componentName": "FormControl",
            "componentProps": {
@@ -125,28 +96,28 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-subject",
          "componentName": "container",
          "originalElement": "div"
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-desc",
          "children": [
           {
-           "baseStyles": {
-            "color": "var(--ink-gray-5)",
-            "display": "block",
-            "marginBottom": "6px"
-           },
+           "baseStyles": {},
            "blockName": "l-desc",
            "children": [],
-           "classes": [],
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
            "componentId": "l-desc",
            "componentName": "TextBlock",
            "componentProps": {
@@ -156,14 +127,14 @@
            }
           },
           {
-           "baseStyles": {
-            "border": "1px solid var(--outline-gray-2)",
-            "width": "auto"
-           },
+           "baseStyles": {},
            "blockName": "c-desc",
            "children": [],
            "classes": [
-            "border-none"
+            "border-none",
+            "border",
+            "border-outline-gray-2",
+            "w-auto"
            ],
            "componentEvents": {
             "change": {
@@ -188,28 +159,26 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-desc",
          "componentName": "container",
          "originalElement": "div"
         },
         {
-         "baseStyles": {
-          "display": "grid",
-          "flexDirection": "column",
-          "gap": "20px",
-          "gridTemplateColumns": "repeat(2, minmax(200px, 1fr))",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "fields",
          "children": [
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "blockName": "field-control",
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentEvents": {
             "update:modelValue": {
              "action": "Run Script",
@@ -231,7 +200,13 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "grid",
+          "flex-col",
+          "gap-5",
+          "grid-cols-[repeat(2,_minmax(200px,_1fr))]",
+          "w-full"
+         ],
          "componentId": "fields",
          "componentName": "Repeater",
          "componentProps": {
@@ -241,22 +216,18 @@
          "visibilityCondition": "{{ fields && fields.length }}"
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-attach",
          "children": [
           {
-           "baseStyles": {
-            "color": "var(--ink-gray-5)",
-            "display": "block",
-            "marginBottom": "6px"
-           },
+           "baseStyles": {},
            "blockName": "l-attach",
            "children": [],
-           "classes": [],
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
            "componentId": "l-attach",
            "componentName": "TextBlock",
            "componentProps": {
@@ -266,11 +237,11 @@
            }
           },
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentId": "KbFileAttachment-attach",
            "componentName": "KbFileAttachment",
            "componentProps": {
@@ -282,41 +253,45 @@
            "isCustomVueComponent": true
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-attach",
          "componentName": "container",
          "originalElement": "div",
          "visibilityCondition": null
         }
        ],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "my-0",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[50px]",
+        "w-full"
+       ],
        "componentId": "stack",
        "componentName": "container",
        "originalElement": "div",
        "visibilityCondition": null
       },
       {
-       "baseStyles": {
-        "display": "flex",
-        "flexDirection": "column",
-        "flexShrink": 1,
-        "gap": "20px",
-        "height": "fit-content",
-        "paddingBottom": "0px",
-        "paddingLeft": "0px",
-        "paddingRight": "0px",
-        "paddingTop": "39px",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "container",
        "children": [
         {
-         "baseStyles": {
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "submit",
          "children": [],
-         "classes": [],
+         "classes": [
+          "w-full"
+         ],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -337,14 +312,34 @@
          }
         }
        ],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-col",
+        "shrink",
+        "gap-5",
+        "h-fit",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[39px]",
+        "w-full"
+       ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
        "originalElement": "div",
        "visibilityCondition": null
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-start",
+      "flex",
+      "flex-col",
+      "grow",
+      "shrink",
+      "justify-start",
+      "max-w-[552px]",
+      "overflow-y-auto"
+     ],
      "componentId": "content",
      "componentName": "container",
      "originalElement": "div"
@@ -358,7 +353,15 @@
      "isStudioComponent": true
     }
    ],
-   "classes": [],
+   "classes": [
+    "items-center",
+    "flex",
+    "flex-col",
+    "h-full",
+    "justify-center",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
    "componentId": "body",
    "componentName": "container",
    "originalElement": "div"
@@ -368,29 +371,11 @@
  "doctype": "Studio Page",
  "draft_blocks": [
   {
-   "baseStyles": {
-    "alignItems": "center",
-    "display": "flex",
-    "flexDirection": "column",
-    "height": "100%",
-    "justifyContent": "center",
-    "overflowX": "hidden",
-    "width": "inherit"
-   },
+   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "backgroundColor": "var(--surface-base)",
-      "borderBottom": "1px solid var(--outline-gray-2)",
-      "display": "flex",
-      "flexDirection": "row",
-      "flexShrink": 0,
-      "height": "52px",
-      "padding": "0 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "topbar",
      "children": [
       {
@@ -408,50 +393,43 @@
        "isStudioComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "flex-row",
+      "shrink-0",
+      "h-13",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-topbar-nt",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "alignItems": "flex-start",
-      "display": "flex",
-      "flexDirection": "column",
-      "flexGrow": 1,
-      "flexShrink": 1,
-      "justifyContent": "flex-start",
-      "maxWidth": "552px",
-      "overflowY": "auto"
-     },
+     "baseStyles": {},
      "blockName": "content",
      "children": [
       {
-       "baseStyles": {
-        "display": "flex",
-        "flexDirection": "column",
-        "gap": "20px",
-        "margin": "0 auto",
-        "paddingBottom": "0px",
-        "paddingLeft": "0px",
-        "paddingRight": "0px",
-        "paddingTop": "50px",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "stack",
        "children": [
         {
-         "baseStyles": {
-          "color": "var(--ink-gray-8, oklch(0.205 0 0))",
-          "fontWeight": "600",
-          "marginBottom": "4px",
-          "marginLeft": "0px",
-          "marginRight": "0px",
-          "marginTop": "0px"
-         },
+         "baseStyles": {},
          "blockName": "title",
          "children": [],
-         "classes": [],
+         "classes": [
+          "font-semibold",
+          "mb-1",
+          "ml-0",
+          "mr-0",
+          "mt-0",
+          "text-ink-gray-8"
+         ],
          "componentId": "title",
          "componentName": "TextBlock",
          "componentProps": {
@@ -461,20 +439,16 @@
          }
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-subject",
          "children": [
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "blockName": "c-subject",
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentId": "c-subject",
            "componentName": "FormControl",
            "componentProps": {
@@ -492,28 +466,28 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-subject",
          "componentName": "container",
          "originalElement": "div"
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-desc",
          "children": [
           {
-           "baseStyles": {
-            "color": "var(--ink-gray-5)",
-            "display": "block",
-            "marginBottom": "6px"
-           },
+           "baseStyles": {},
            "blockName": "l-desc",
            "children": [],
-           "classes": [],
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
            "componentId": "l-desc",
            "componentName": "TextBlock",
            "componentProps": {
@@ -523,14 +497,14 @@
            }
           },
           {
-           "baseStyles": {
-            "border": "1px solid var(--outline-gray-2)",
-            "width": "auto"
-           },
+           "baseStyles": {},
            "blockName": "c-desc",
            "children": [],
            "classes": [
-            "border-none"
+            "border-none",
+            "border",
+            "border-outline-gray-2",
+            "w-auto"
            ],
            "componentEvents": {
             "change": {
@@ -555,28 +529,26 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-desc",
          "componentName": "container",
          "originalElement": "div"
         },
         {
-         "baseStyles": {
-          "display": "grid",
-          "flexDirection": "column",
-          "gap": "20px",
-          "gridTemplateColumns": "repeat(2, minmax(200px, 1fr))",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "fields",
          "children": [
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "blockName": "field-control",
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentEvents": {
             "update:modelValue": {
              "action": "Run Script",
@@ -598,7 +570,13 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "grid",
+          "flex-col",
+          "gap-5",
+          "grid-cols-[repeat(2,_minmax(200px,_1fr))]",
+          "w-full"
+         ],
          "componentId": "fields",
          "componentName": "Repeater",
          "componentProps": {
@@ -608,22 +586,18 @@
          "visibilityCondition": "{{ fields && fields.length }}"
         },
         {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "f-attach",
          "children": [
           {
-           "baseStyles": {
-            "color": "var(--ink-gray-5)",
-            "display": "block",
-            "marginBottom": "6px"
-           },
+           "baseStyles": {},
            "blockName": "l-attach",
            "children": [],
-           "classes": [],
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
            "componentId": "l-attach",
            "componentName": "TextBlock",
            "componentProps": {
@@ -633,11 +607,11 @@
            }
           },
           {
-           "baseStyles": {
-            "width": "100%"
-           },
+           "baseStyles": {},
            "children": [],
-           "classes": [],
+           "classes": [
+            "w-full"
+           ],
            "componentId": "KbFileAttachment-attach",
            "componentName": "KbFileAttachment",
            "componentProps": {
@@ -649,41 +623,45 @@
            "isCustomVueComponent": true
           }
          ],
-         "classes": [],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
          "componentId": "f-attach",
          "componentName": "container",
          "originalElement": "div",
          "visibilityCondition": null
         }
        ],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "my-0",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[50px]",
+        "w-full"
+       ],
        "componentId": "stack",
        "componentName": "container",
        "originalElement": "div",
        "visibilityCondition": null
       },
       {
-       "baseStyles": {
-        "display": "flex",
-        "flexDirection": "column",
-        "flexShrink": 1,
-        "gap": "20px",
-        "height": "fit-content",
-        "paddingBottom": "0px",
-        "paddingLeft": "0px",
-        "paddingRight": "0px",
-        "paddingTop": "39px",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "container",
        "children": [
         {
-         "baseStyles": {
-          "width": "100%"
-         },
+         "baseStyles": {},
          "blockName": "submit",
          "children": [],
-         "classes": [],
+         "classes": [
+          "w-full"
+         ],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -704,14 +682,34 @@
          }
         }
        ],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-col",
+        "shrink",
+        "gap-5",
+        "h-fit",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[39px]",
+        "w-full"
+       ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
        "originalElement": "div",
        "visibilityCondition": null
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-start",
+      "flex",
+      "flex-col",
+      "grow",
+      "shrink",
+      "justify-start",
+      "max-w-[552px]",
+      "overflow-y-auto"
+     ],
      "componentId": "content",
      "componentName": "container",
      "originalElement": "div"
@@ -725,7 +723,15 @@
      "isStudioComponent": true
     }
    ],
-   "classes": [],
+   "classes": [
+    "items-center",
+    "flex",
+    "flex-col",
+    "h-full",
+    "justify-center",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
    "componentId": "body",
    "componentName": "container",
    "originalElement": "div"

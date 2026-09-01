@@ -1,28 +1,11 @@
 {
  "blocks": [
   {
-   "baseStyles": {
-    "backgroundColor": "var(--surface-base)",
-    "display": "flex",
-    "flexDirection": "column",
-    "height": "100%",
-    "overflowX": "hidden",
-    "width": "inherit"
-   },
+   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "backgroundColor": "var(--surface-base)",
-      "borderBottom": "1px solid var(--outline-gray-2)",
-      "display": "flex",
-      "flexShrink": "0",
-      "height": "52px",
-      "justifyContent": "space-between",
-      "padding": "0 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "navbar",
      "children": [
       {
@@ -40,40 +23,38 @@
        "isStudioComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "shrink-0",
+      "h-13",
+      "justify-between",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-suug88a18",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "display": "flex",
-      "flexShrink": "0",
-      "gap": "8px",
-      "justifyContent": "space-between",
-      "padding": "16px 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "toolbar",
      "children": [
       {
-       "baseStyles": {
-        "alignItems": "center",
-        "display": "flex",
-        "flex": "1",
-        "gap": "8px",
-        "minWidth": "0"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-left",
        "children": [
         {
-         "baseStyles": {
-          "flexShrink": "0"
-         },
+         "baseStyles": {},
          "blockName": "tickets-org-switcher",
          "children": [],
-         "classes": [],
+         "classes": [
+          "shrink-0"
+         ],
          "componentId": "KbOrgSwitcher-tickets",
          "componentName": "KbOrgSwitcher",
          "componentProps": {
@@ -84,11 +65,7 @@
          "isCustomVueComponent": true
         },
         {
-         "baseStyles": {
-          "display": "block",
-          "flex": "1",
-          "minWidth": "0"
-         },
+         "baseStyles": {},
          "children": [
           {
            "blockName": "tickets-quickfilter",
@@ -113,38 +90,44 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "block",
+          "flex-1",
+          "min-w-0"
+         ],
          "componentId": "container-toolbar-quickfilter",
          "componentName": "container",
          "originalElement": "div"
         }
        ],
-       "classes": [],
+       "classes": [
+        "items-center",
+        "flex",
+        "flex-1",
+        "gap-2",
+        "min-w-0"
+       ],
        "componentId": "container-toolbar-left",
        "componentName": "container",
        "originalElement": "div"
       },
       {
-       "baseStyles": {
-        "borderLeft": "1px solid var(--outline-gray-2)",
-        "flexShrink": "0",
-        "height": "20px",
-        "marginLeft": "-8px"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-divider",
        "children": [],
-       "classes": [],
+       "classes": [
+        "border-l",
+        "border-outline-gray-2",
+        "shrink-0",
+        "h-5",
+        "-ml-2"
+       ],
        "componentId": "container-toolbar-divider",
        "componentName": "container",
        "originalElement": "div"
       },
       {
-       "baseStyles": {
-        "alignItems": "center",
-        "display": "flex",
-        "flexShrink": "0",
-        "gap": "8px"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-right",
        "children": [
         {
@@ -214,37 +197,45 @@
          }
         }
        ],
-       "classes": [],
+       "classes": [
+        "items-center",
+        "flex",
+        "shrink-0",
+        "gap-2"
+       ],
        "componentId": "container-toolbar-right",
        "componentName": "container",
        "originalElement": "div"
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "flex",
+      "shrink-0",
+      "gap-2",
+      "justify-between",
+      "py-4",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-xrv76su96",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "display": "flex",
-      "flex": "1",
-      "flexDirection": "column",
-      "minHeight": "0",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "table-wrap",
      "children": [
       {
-       "baseStyles": {
-        "display": "flex",
-        "flex": "1",
-        "minHeight": "0",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "tickets-listview",
        "children": [],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-1",
+        "min-h-0",
+        "w-full"
+       ],
        "componentId": "KbTicketList-tickets",
        "componentName": "KbTicketList",
        "componentProps": {
@@ -266,7 +257,13 @@
        "isCustomVueComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-col",
+      "min-h-0",
+      "w-full"
+     ],
      "componentId": "container-0hnrdwrty",
      "componentName": "container",
      "originalElement": "div"
@@ -300,7 +297,14 @@
      "isCustomVueComponent": true
     }
    ],
-   "classes": [],
+   "classes": [
+    "bg-surface-base",
+    "flex",
+    "flex-col",
+    "h-full",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
    "componentId": "container-49ytfizfq",
    "componentName": "container",
    "originalElement": "div"
@@ -310,28 +314,11 @@
  "doctype": "Studio Page",
  "draft_blocks": [
   {
-   "baseStyles": {
-    "backgroundColor": "var(--surface-base)",
-    "display": "flex",
-    "flexDirection": "column",
-    "height": "100%",
-    "overflowX": "hidden",
-    "width": "inherit"
-   },
+   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "backgroundColor": "var(--surface-base)",
-      "borderBottom": "1px solid var(--outline-gray-2)",
-      "display": "flex",
-      "flexShrink": "0",
-      "height": "52px",
-      "justifyContent": "space-between",
-      "padding": "0 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "navbar",
      "children": [
       {
@@ -349,40 +336,38 @@
        "isStudioComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "shrink-0",
+      "h-13",
+      "justify-between",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-suug88a18",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "alignItems": "center",
-      "display": "flex",
-      "flexShrink": "0",
-      "gap": "8px",
-      "justifyContent": "space-between",
-      "padding": "16px 20px",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "toolbar",
      "children": [
       {
-       "baseStyles": {
-        "alignItems": "center",
-        "display": "flex",
-        "flex": "1",
-        "gap": "8px",
-        "minWidth": "0"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-left",
        "children": [
         {
-         "baseStyles": {
-          "flexShrink": "0"
-         },
+         "baseStyles": {},
          "blockName": "tickets-org-switcher",
          "children": [],
-         "classes": [],
+         "classes": [
+          "shrink-0"
+         ],
          "componentId": "KbOrgSwitcher-tickets",
          "componentName": "KbOrgSwitcher",
          "componentProps": {
@@ -393,11 +378,7 @@
          "isCustomVueComponent": true
         },
         {
-         "baseStyles": {
-          "display": "block",
-          "flex": "1",
-          "minWidth": "0"
-         },
+         "baseStyles": {},
          "children": [
           {
            "blockName": "tickets-quickfilter",
@@ -422,38 +403,44 @@
            }
           }
          ],
-         "classes": [],
+         "classes": [
+          "block",
+          "flex-1",
+          "min-w-0"
+         ],
          "componentId": "container-toolbar-quickfilter",
          "componentName": "container",
          "originalElement": "div"
         }
        ],
-       "classes": [],
+       "classes": [
+        "items-center",
+        "flex",
+        "flex-1",
+        "gap-2",
+        "min-w-0"
+       ],
        "componentId": "container-toolbar-left",
        "componentName": "container",
        "originalElement": "div"
       },
       {
-       "baseStyles": {
-        "borderLeft": "1px solid var(--outline-gray-2)",
-        "flexShrink": "0",
-        "height": "20px",
-        "marginLeft": "-8px"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-divider",
        "children": [],
-       "classes": [],
+       "classes": [
+        "border-l",
+        "border-outline-gray-2",
+        "shrink-0",
+        "h-5",
+        "-ml-2"
+       ],
        "componentId": "container-toolbar-divider",
        "componentName": "container",
        "originalElement": "div"
       },
       {
-       "baseStyles": {
-        "alignItems": "center",
-        "display": "flex",
-        "flexShrink": "0",
-        "gap": "8px"
-       },
+       "baseStyles": {},
        "blockName": "toolbar-right",
        "children": [
         {
@@ -523,37 +510,45 @@
          }
         }
        ],
-       "classes": [],
+       "classes": [
+        "items-center",
+        "flex",
+        "shrink-0",
+        "gap-2"
+       ],
        "componentId": "container-toolbar-right",
        "componentName": "container",
        "originalElement": "div"
       }
      ],
-     "classes": [],
+     "classes": [
+      "items-center",
+      "flex",
+      "shrink-0",
+      "gap-2",
+      "justify-between",
+      "py-4",
+      "px-5",
+      "w-full"
+     ],
      "componentId": "container-xrv76su96",
      "componentName": "container",
      "originalElement": "div"
     },
     {
-     "baseStyles": {
-      "display": "flex",
-      "flex": "1",
-      "flexDirection": "column",
-      "minHeight": "0",
-      "width": "100%"
-     },
+     "baseStyles": {},
      "blockName": "table-wrap",
      "children": [
       {
-       "baseStyles": {
-        "display": "flex",
-        "flex": "1",
-        "minHeight": "0",
-        "width": "100%"
-       },
+       "baseStyles": {},
        "blockName": "tickets-listview",
        "children": [],
-       "classes": [],
+       "classes": [
+        "flex",
+        "flex-1",
+        "min-h-0",
+        "w-full"
+       ],
        "componentId": "KbTicketList-tickets",
        "componentName": "KbTicketList",
        "componentProps": {
@@ -575,7 +570,13 @@
        "isCustomVueComponent": true
       }
      ],
-     "classes": [],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-col",
+      "min-h-0",
+      "w-full"
+     ],
      "componentId": "container-0hnrdwrty",
      "componentName": "container",
      "originalElement": "div"
@@ -609,7 +610,14 @@
      "isCustomVueComponent": true
     }
    ],
-   "classes": [],
+   "classes": [
+    "bg-surface-base",
+    "flex",
+    "flex-col",
+    "h-full",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
    "componentId": "container-49ytfizfq",
    "componentName": "container",
    "originalElement": "div"
