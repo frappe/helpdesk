@@ -7,7 +7,7 @@ from frappe import _
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
-from pypika import Criterion, Order
+from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
@@ -15,13 +15,7 @@ from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_scr
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import (
-    agent_only,
-    check_permissions,
-    get_customers,
-    is_agent,
-    parse_call_logs,
-)
+from helpdesk.utils import agent_only, is_agent, is_agent_staff, parse_call_logs
 
 
 @frappe.whitelist()
@@ -32,6 +26,8 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
+    # strips permlevel fields the caller cannot read; no-op for agents
+    d.apply_fieldlevel_read_permissions()
     return d
 
 
@@ -39,24 +35,11 @@ def new(doc: dict, attachments: list[dict] = []):
 def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
-    QBTicket = frappe.qb.DocType("HD Ticket")
 
-    _is_agent = is_agent()
-
-    query = (
-        frappe.qb.from_(QBTicket)
-        .select(QBTicket.star)
-        .where(QBTicket.name == name)
-        .limit(1)
-    )
-
-    if not _is_agent:
-        query = query.where(get_customer_criteria())
-
-    ticket = query.run(as_dict=True)
-    if not len(ticket):
-        frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
-    ticket = ticket.pop()
+    doc = frappe.get_doc("HD Ticket", name)
+    # strips permlevel fields the caller cannot read; no-op for agents
+    doc.apply_fieldlevel_read_permissions()
+    ticket = doc.as_dict()
 
     contact = (
         frappe.qb.from_(QBContact)
@@ -120,7 +103,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         "tags": get_tags(name),
         "template": get_template(template),
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=is_customer_portal
+            "HD Ticket", is_customer_portal=is_customer_portal or not is_agent_staff()
         ),
         "fields": get_meta(template),
         "calls": call_logs,
@@ -143,20 +126,6 @@ def get_meta(template: str):
 
     fields.extend(meta_fields)
     return fields
-
-
-def get_customer_criteria():
-    QBTicket = frappe.qb.DocType("HD Ticket")
-    user = frappe.session.user
-    conditions = [
-        QBTicket.contact == user,
-        QBTicket.raised_by == user,
-        QBTicket.owner == user,
-    ]
-    customer = get_customers(user)
-    for c in customer:
-        conditions.append(QBTicket.customer == c)
-    return Criterion.any(conditions)
 
 
 def get_assignee(_assign: str):

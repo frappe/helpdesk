@@ -120,12 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  slaLabel,
-  slaTextColor,
-  useSLA,
-  type SLAMetric,
-} from "@/composables/useSLA";
+import { slaLabel, slaTextColor, useSLA } from "@/composables/useSLA";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat } from "@/utils";
@@ -135,12 +130,6 @@ import { computed, inject } from "vue";
 const emit = defineEmits(["open"]);
 
 const ticket = inject(ITicket);
-
-interface SLARow {
-  title: string;
-  metric: SLAMetric;
-  value: string;
-}
 
 const { firstResponse, resolution } = useSLA(
   computed(() => ({ doc: ticket.data }))
@@ -159,12 +148,16 @@ const slaData = computed(() =>
       value: ticket.data.resolution_date || ticket.data.resolution_by,
     },
   ]
-    .filter((row): row is SLARow => Boolean(row.metric))
+    // a ticket with no SLA still has a first response and a resolution; report
+    // them as plain facts rather than a verdict against a target it never had
+    .filter((row) => Boolean(row.metric) || Boolean(row.value))
     .map((row) => ({
       title: row.title,
       value: row.value,
-      label: slaLabel(row.metric),
-      textColor: slaTextColor(row.metric),
+      label: row.metric
+        ? slaLabel(row.metric)
+        : dateFormat(row.value, dateTooltipFormat),
+      textColor: row.metric ? slaTextColor(row.metric) : "text-ink-gray-8",
     }))
 );
 
