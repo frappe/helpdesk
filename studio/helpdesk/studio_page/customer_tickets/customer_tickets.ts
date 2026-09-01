@@ -16,8 +16,11 @@ import { useViews } from '@app/stores/views'
 // @framework/ui's list composables; the columns and cells mirror the agent
 // portal's list (HD Ticket's `default_list_data` + Tickets.vue) so the two read
 // as one design.
-// NOTE: unscoped (all tickets) for demo data — filter by the logged-in
-// contact/customer for a real portal.
+// No client-side scoping filter on purpose: rows come through
+// frappe.client.get_list, and HD Ticket's permission_query already limits a
+// non-agent to their own tickets plus those of customers they manage
+// (hd_ticket.permission_query → _customer_query). Agents and admins see all,
+// as they do in the desk.
 
 const DOCTYPE = 'HD Ticket'
 const PAGE_LENGTHS = [20, 50, 100]
