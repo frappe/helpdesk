@@ -20,14 +20,9 @@ export function useEventListener(
   return stop;
 }
 
-/** `@vueuse/core`'s `useDebounceFn`: the trailing call wins, the rest are dropped. */
-export function useDebounceFn<T extends (...args: any[]) => void>(fn: T, wait: number) {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  return (...args: Parameters<T>) => {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), wait);
-  };
-}
+/** `@vueuse/core`'s `useDebounceFn` in shape, frappe-ui's `debounce` in body —
+ *  the one dependency the Studio build does resolve already ships it. */
+export { debounce as useDebounceFn } from "frappe-ui";
 
 /** The desk spells it `__`; the portal's stand-in dictionary answers it. */
 export { t as __ } from '@app/stores/translations'

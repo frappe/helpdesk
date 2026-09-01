@@ -98,7 +98,7 @@ export function loadAssignees(rows: any[]) {
   if (!wanted.size) return
   // Claimed before the answer lands, so a second page does not ask again.
   wanted.forEach((email) => (agents[email] = { name: guessName(email) }))
-  call('helpdesk.api.session.get_agent_avatars', { agents: [...wanted] })
+  call('helpdesk.api.agent.get_agent_avatars', { agents: [...wanted] })
     .then((found) => Object.assign(agents, found || {}))
     .catch(() => {})
 }
