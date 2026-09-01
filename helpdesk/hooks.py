@@ -71,6 +71,13 @@ website_route_rules = [
 # working through these redirects until the old pages are deleted; the desk router
 # hard-navigates its legacy customer routes so they resolve here too.
 website_redirects = [
+    # The studio renderer serves the app root from the page whose route is "/",
+    # which the knowledge base pages will claim when they land — until then the
+    # portal root is the ticket list.
+    {
+        "source": "/kb",
+        "target": "/kb/customer-tickets",
+    },
     {
         "source": "/helpdesk/my-tickets/new",
         "target": "/kb/new-ticket",
