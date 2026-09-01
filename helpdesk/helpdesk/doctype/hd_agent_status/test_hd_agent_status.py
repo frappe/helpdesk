@@ -185,10 +185,13 @@ class TestHDAgentStatus(FrappeTestCase):
             frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
         )
 
-    # the status HD Settings names cannot be deleted
+    # the status HD Settings names cannot be deleted -- not even with force,
+    # which skips only the link check while on_trash still runs
     def test_default_status_cannot_be_deleted(self):
         with self.assertRaises(frappe.ValidationError):
             frappe.delete_doc("HD Agent Status", "Active")
+        with self.assertRaises(frappe.ValidationError):
+            frappe.delete_doc("HD Agent Status", "Active", force=True)
 
     # any other status can be deleted
     def test_non_default_status_can_be_deleted(self):
