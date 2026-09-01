@@ -216,6 +216,25 @@ class TestHDAgentStatus(FrappeTestCase):
 
         self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
 
+    # the migration freezes the status the site was already resolving to, so an
+    # upgrade does not silently move every new agent onto a different one
+    def test_patch_picks_the_status_the_old_lookup_returned(self):
+        from helpdesk.patches.set_default_agent_status_in_settings import (
+            execute as name_the_default,
+        )
+
+        # "Online" is created now, so it is newer than the seeded "Active" --
+        # which makes it what the replaced lookup was already returning here
+        make_agent_status("Online", category="Active")
+        set_default_agent_status(None)
+        self.addCleanup(set_default_agent_status, "Active")
+
+        name_the_default()
+
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
+        )
+
     # a disabled default would break agent creation, so HD Settings refuses one
     def test_hd_settings_rejects_disabled_default_status(self):
         make_agent_status("Focusing", category="Away", enabled=0)
