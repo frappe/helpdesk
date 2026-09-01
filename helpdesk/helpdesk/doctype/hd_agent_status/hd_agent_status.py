@@ -8,74 +8,77 @@ from frappe.model.document import Document
 
 class HDAgentStatus(Document):
     def validate(self):
-        self.validate_at_least_one_active()
+        self.validate_default_stays_enabled()
 
     def on_update(self):
-        if not self.enabled and self.has_value_changed("enabled"):
-            self.reset_agents_to_active()
+        self.reset_agents_to_default()
 
-    def reset_agents_to_active(self):
+    def on_trash(self):
+        self.reject_if_default()
+
+    def validate_default_stays_enabled(self):
+        if self.enabled:
+            return
+
+        self.reject_if_default()
+
+    def reject_if_default(self):
+        """The status HD Settings points at has to stay available: it is where
+        new agents start and where agents land when their status is retired.
+
+        Reads the setting directly rather than through get_default_agent_status:
+        if no default is named, there is nothing to protect, not an error.
+        """
+        if self.name != frappe.db.get_single_value(
+            "HD Settings", "default_agent_status"
+        ):
+            return
+
+        frappe.throw(
+            _(
+                "{0} is the default agent status. Set a different default in HD Settings first."
+            ).format(self.name)
+        )
+
+    def reset_agents_to_default(self):
         """Move agents off a status the admin just retired.
 
         Left alone they keep a status that is no longer offered: it is filtered
         out of the picker, so their own menu renders empty while everyone else
         still sees the retired status against their name.
 
-        Saved one at a time rather than bulk-updated so HD Agent's controller
-        does the validation, the availability_changed_on stamp and the realtime
-        broadcast — the same path every other availability change takes.
-
-        TODO: notify each agent that their status was reset because it was
-        disabled. HD Notification is ticket-shaped today (notification_type is a
-        Select of Assignment/Mention/Reaction and user_from is mandatory), so
-        this waits on the notification refactor; the socket toast covers it
-        meanwhile.
+        TODO: notify each agent that their status was reset. HD Notification is
+        ticket-shaped today (notification_type is a Select of
+        Assignment/Mention/Reaction and user_from is mandatory), so this waits
+        on the notification refactor; the socket toast covers it meanwhile.
         """
-        active_status = get_active_status()
-        if not active_status:
+        if self.enabled or not self.has_value_changed("enabled"):
             return
 
+        default_status = get_default_agent_status()
+        # One save at a time so HD Agent's controller does the validation, the
+        # availability_changed_on stamp and the realtime broadcast. save() also
+        # re-reads under a lock, so an agent who moved themselves meanwhile wins.
+        # ponytail: synchronous. Enqueue if one status ever holds enough agents
+        # for the request to time out.
         for name in frappe.get_all(
             "HD Agent", filters={"availability": self.name}, pluck="name"
         ):
             agent = frappe.get_doc("HD Agent", name)
-            agent.availability = active_status
+            agent.availability = default_status
             agent.save(ignore_permissions=True)
 
-    def validate_at_least_one_active(self):
-        """There must always be at least one enabled status in the Active category."""
-        if self.category == "Active" and self.enabled:
-            return  # this status keeps an enabled Active status around
 
-        if self.is_new():
-            return  # a new status cannot remove an existing one
+def get_default_agent_status() -> str:
+    """The status new agents start on, and where agents land when the status
+    they are on is retired.
 
-        if self.has_other_enabled_active():
-            return
-
-        frappe.throw(_("At least one enabled Active status is required."))
-
-    def on_trash(self):
-        if self.category == "Active" and not self.has_other_enabled_active():
-            frappe.throw(_("At least one enabled Active status is required."))
-
-    def has_other_enabled_active(self) -> bool:
-        return bool(
-            frappe.db.exists(
-                "HD Agent Status",
-                {"category": "Active", "enabled": 1, "name": ["!=", self.name]},
-            )
-        )
-
-
-def get_active_status() -> str | None:
-    """Name of an enabled status in the Active category (the default availability).
-
-    With more than one enabled Active status the oldest wins: frappe.db.get_value
-    resolves its default order_by to `creation`. Deliberately not `status_order` —
-    the shipped statuses are 10/20/30 and a new one defaults to 0, so ordering by
-    it would silently promote any custom status above "Active".
+    Named in HD Settings rather than inferred from an ordering: with more than
+    one enabled status any ordering picks a winner silently, and this now moves
+    existing agents in bulk.
     """
-    return frappe.db.get_value(
-        "HD Agent Status", {"category": "Active", "enabled": 1}, "name"
-    )
+    status = frappe.db.get_single_value("HD Settings", "default_agent_status")
+    if not status:
+        frappe.throw(_("Set a default agent status in HD Settings."))
+
+    return status

@@ -326,10 +326,15 @@ def make_agent(email: str, first_name: str = "Test Agent"):
 def set_agent_status_enabled(status: str, enabled: bool | int):
     """Toggle an HD Agent Status without running its controller.
 
-    Skips both the at-least-one-Active validation and the on_update reset, so a
-    test can leave an agent sitting on a disabled status.
+    Skips both the default-status guard and the on_update reset, so a test can
+    leave an agent sitting on a disabled status.
     """
     frappe.db.set_value("HD Agent Status", status, "enabled", int(enabled))
+
+
+def set_default_agent_status(status: str):
+    """Point HD Settings at a different default, without going through the form."""
+    frappe.db.set_single_value("HD Settings", "default_agent_status", status)
 
 
 def set_agent_availability(user: str, availability: str | None):

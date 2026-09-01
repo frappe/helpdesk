@@ -19,6 +19,8 @@
   "base_support_rotation",
   "knowledge_base_section",
   "prefer_knowledge_base",
+  "agent_status_section",
+  "default_agent_status",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -229,6 +231,20 @@
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
    "label": "Prefer knowledge base"
+  },
+  {
+   "fieldname": "agent_status_section",
+   "fieldtype": "Section Break",
+   "label": "Agent Status"
+  },
+  {
+   "description": "New agents start on this status, and agents are moved here when the status they are on is disabled.",
+   "fieldname": "default_agent_status",
+   "fieldtype": "Link",
+   "label": "Default agent status",
+   "link_filters": "[[\"HD Agent Status\",\"enabled\",\"=\",1]]",
+   "options": "HD Agent Status",
+   "reqd": 1
   },
   {
    "fieldname": "priority_section",
@@ -541,7 +557,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-07-10 14:58:15.922364",
+ "modified": "2026-09-02 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

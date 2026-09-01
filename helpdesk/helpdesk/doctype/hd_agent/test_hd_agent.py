@@ -47,8 +47,8 @@ class TestHDAgent(FrappeTestCase):
             value=availability,
         )
 
-    # a new agent defaults to the Active-category status (looked up, not hardcoded)
-    def test_new_agent_defaults_to_active_status(self):
+    # a new agent defaults to the status HD Settings names
+    def test_new_agent_defaults_to_configured_status(self):
         agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
 
         self.assertEqual(

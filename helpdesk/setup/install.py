@@ -434,6 +434,8 @@ def add_default_agent_status():
                 {"doctype": "HD Agent Status", "enabled": 1, **status}
             ).insert()
 
+    frappe.db.set_single_value("HD Settings", "default_agent_status", "Active")
+
 
 def add_fts_index():
     indexes = [

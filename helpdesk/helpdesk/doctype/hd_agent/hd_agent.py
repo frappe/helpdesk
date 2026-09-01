@@ -5,14 +5,16 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import get_active_status
+from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import (
+    get_default_agent_status,
+)
 from helpdesk.utils import capture_event, is_agent_manager, publish_event
 
 
 class HDAgent(Document):
     def before_insert(self):
         if not self.availability:
-            self.availability = get_active_status()
+            self.availability = get_default_agent_status()
 
     def validate(self):
         self.validate_availability()
