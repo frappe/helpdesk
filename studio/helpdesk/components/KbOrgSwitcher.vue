@@ -2,7 +2,7 @@
   <!-- One width for the trigger and its menu: organization names vary in length,
        so a hugging trigger made the control resize on every change. -->
   <MultiSelect
-    class="kb-org-switcher"
+    class="w-[220px]"
     size="sm"
     variant="subtle"
     align="start"
@@ -91,12 +91,3 @@ const options = computed(() =>
   }))
 );
 </script>
-
-<style>
-/* Unscoped: the class lands on MultiSelect's own trigger, which carries no scope
-   attribute of ours. Plain CSS because this app sits outside the bench's
-   Tailwind content globs, so an arbitrary width class would not compile. */
-.kb-org-switcher {
-  width: 220px;
-}
-</style>

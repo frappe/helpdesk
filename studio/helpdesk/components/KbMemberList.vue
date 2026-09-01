@@ -1,13 +1,11 @@
 <template>
   <div>
-    <div class="kb-members__toolbar">
-      <!-- Inline, not the scoped class: TextInput's root takes no scope id, so a
-           scoped rule for it never matches. -->
+    <div class="mb-3 flex items-center gap-2">
       <TextInput
         v-model="search"
         type="text"
         :placeholder="t('Search')"
-        :style="{ flex: 1, minWidth: 0 }"
+        class="min-w-0 flex-1"
       >
         <template #prefix>
           <LucideSearch class="size-4 text-ink-gray-5" />
@@ -20,8 +18,8 @@
       <Select v-model="role" :options="ROLE_FILTERS" size="sm" />
     </div>
 
-    <div class="kb-members__table">
-      <div class="kb-members__row kb-members__head">
+    <div>
+      <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ t("Members") }}</span>
         <span>{{ t("Last seen") }}</span>
         <span>{{ t("Role") }}</span>
@@ -31,19 +29,19 @@
       <div
         v-for="member in matches"
         :key="keyOf(member)"
-        class="kb-members__row kb-members__body-row"
+        :class="[ROW, 'min-h-13']"
       >
-        <div class="kb-members__person">
+        <div class="flex min-w-0 items-center gap-2">
           <Avatar
             shape="circle"
             size="lg"
             :image="member.image"
             :label="member.full_name"
           />
-          <div class="kb-members__identity">
-            <div class="kb-members__name">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-base-medium text-ink-gray-8">
               {{ member.full_name }}
-              <span v-if="member.is_you" class="kb-members__you">You</span>
+              <span v-if="member.is_you" class="text-p-xs font-normal text-ink-gray-5">You</span>
               <Badge
                 v-if="member.pending"
                 label="Pending"
@@ -51,18 +49,18 @@
                 variant="subtle"
               />
             </div>
-            <div class="kb-members__email">{{ member.email }}</div>
+            <div class="overflow-hidden text-ellipsis whitespace-nowrap text-p-sm text-ink-gray-5">{{ member.email }}</div>
           </div>
         </div>
 
-        <div class="kb-members__last-seen">{{ lastSeen(member) }}</div>
+        <div class="text-p-sm text-ink-gray-5">{{ lastSeen(member) }}</div>
 
-        <span class="kb-members__role">
+        <span class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7">
           <component :is="roleIcon(member)" class="size-4" />
           {{ roleLabel(member) }}
         </span>
 
-        <div class="kb-members__actions">
+        <div class="flex justify-end">
           <!-- `canRemove` is the wider of the two guards, so a row that has any
                action at all has this one. -->
           <Dropdown
@@ -77,7 +75,7 @@
         </div>
       </div>
 
-      <div v-if="!matches.length" class="kb-members__empty">
+      <div v-if="!matches.length" class="py-6 text-center text-p-sm text-ink-gray-5">
         {{ t("No members match this filter.") }}
       </div>
     </div>
@@ -103,6 +101,11 @@ import LucideSearch from "~icons/lucide/search";
 import LucideUser from "~icons/lucide/user";
 import LucideUsers from "~icons/lucide/users";
 import { computed, ref } from "vue";
+
+// No container, no fills: rows are separated by a hairline and nothing else — and
+// under the last row the hairline would be a line under nothing, hence last:border-b-0.
+const ROW =
+  "grid grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
 type Member = {
   contact?: string;
@@ -224,102 +227,3 @@ function keyOf(member: Member) {
   return member.contact || member.invitation || member.email;
 }
 </script>
-
-<style scoped>
-/* Plain CSS: this app sits outside the bench's Tailwind content globs, so only
-   utilities the rest of the bundle already uses are safe here. */
-.kb-members__toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-/* No container, no fills: rows are separated by a hairline and nothing else. */
-.kb-members__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px 132px 32px;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--outline-gray-1);
-}
-
-/* A hairline separates two rows; under the last one it is a line under nothing. */
-.kb-members__row:last-child {
-  border-bottom: 0;
-}
-
-.kb-members__head {
-  min-height: 32px;
-  padding-top: 0;
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--ink-gray-5);
-}
-
-.kb-members__body-row {
-  min-height: 52px;
-}
-
-.kb-members__role {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: var(--ink-gray-7);
-}
-
-.kb-members__person {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.kb-members__identity {
-  min-width: 0;
-}
-
-.kb-members__name {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 500;
-  color: var(--ink-gray-8);
-}
-
-.kb-members__you {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--ink-gray-5);
-}
-
-.kb-members__email,
-.kb-members__last-seen {
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--ink-gray-5);
-}
-
-.kb-members__name,
-.kb-members__email {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.kb-members__actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.kb-members__empty {
-  padding: 24px 0;
-  text-align: center;
-  font-size: 13px;
-  color: var(--ink-gray-5);
-}
-</style>

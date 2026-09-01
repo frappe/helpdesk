@@ -1,24 +1,27 @@
 <template>
-  <div v-if="organizations.length" class="kb-org-avatars">
+  <div v-if="organizations.length" class="group flex items-center">
     <!-- One organization has room for its name, so it gets one: a lone avatar with a
-         tooltip asks the reader to hover to find out where they belong. -->
-    <span v-if="alone" class="kb-org-avatars__item kb-org-avatars__solo">
+         tooltip asks the reader to hover to find out where they belong. Nothing to
+         spread or scale either — the name is already on screen. -->
+    <span v-if="alone" class="flex items-center gap-2">
       <Avatar
-        class="kb-org-avatars__avatar"
+        :class="RING"
         shape="circle"
         :size="size"
         :image="organizations[0].image"
         :label="organizations[0].customer_name"
       />
-      <span class="kb-org-avatars__name">{{
+      <span class="text-p-base text-ink-gray-7">{{
         organizations[0].customer_name
       }}</span>
     </span>
+    <!-- Overlapped stack that opens up on hover, so every organization is legible
+         before any one avatar is pointed at. -->
     <template v-else>
-      <span v-for="org in visible" :key="org.name" class="kb-org-avatars__item">
+      <span v-for="org in visible" :key="org.name" :class="ITEM">
         <Tooltip :text="org.customer_name">
           <Avatar
-            class="kb-org-avatars__avatar"
+            :class="[RING, POP]"
             shape="circle"
             :size="size"
             :image="org.image"
@@ -26,9 +29,13 @@
           />
         </Tooltip>
       </span>
-      <span v-if="hidden.length" class="kb-org-avatars__item">
+      <span v-if="hidden.length" :class="ITEM">
         <Tooltip :text="hiddenNames">
-          <div class="kb-org-avatars__avatar kb-org-avatars__overflow">
+          <!-- size-6 matches frappe-ui's Avatar md. -->
+          <div
+            class="flex size-6 shrink-0 items-center justify-center rounded-full bg-surface-gray-3 text-p-xs text-ink-gray-7"
+            :class="[RING, POP]"
+          >
             +{{ hidden.length }}
           </div>
         </Tooltip>
@@ -54,6 +61,14 @@ const props = withDefaults(
   { organizations: () => [], max: 3, size: "md" }
 );
 
+// `[&+&]` is the sibling combinator on the item itself: every avatar after the
+// first tucks under its neighbour, and the whole stack relaxes open when the
+// group is hovered.
+const ITEM =
+  "flex [&+&]:-ml-1.5 [&+&]:transition-[margin-left] [&+&]:duration-150 group-hover:[&+&]:ml-1";
+const RING = "shadow-[0_0_0_2px_var(--surface-base)]";
+const POP = "transition-transform duration-150 hover:scale-110";
+
 const alone = computed(() => props.organizations.length === 1);
 const visible = computed(() => props.organizations.slice(0, props.max));
 const hidden = computed(() => props.organizations.slice(props.max));
@@ -61,60 +76,3 @@ const hiddenNames = computed(() =>
   hidden.value.map((org) => org.customer_name).join(", ")
 );
 </script>
-
-<style scoped>
-/* Plain CSS: this app is outside the bench's Tailwind content globs, so the
-   arbitrary ring/hover utilities helpdesk uses never compile here. */
-.kb-org-avatars {
-  display: flex;
-  align-items: center;
-}
-
-.kb-org-avatars__item + .kb-org-avatars__item {
-  margin-left: -6px;
-  transition: margin-left 150ms ease;
-}
-
-/* Nothing to spread or scale when there is one — the name is already on screen. */
-.kb-org-avatars__solo {
-  align-items: center;
-  gap: 8px;
-}
-
-.kb-org-avatars__name {
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ink-gray-7);
-}
-
-/* Open the stack up so every organization is legible before it is hovered. */
-.kb-org-avatars:hover .kb-org-avatars__item + .kb-org-avatars__item {
-  margin-left: 4px;
-}
-
-.kb-org-avatars__item {
-  display: flex;
-}
-
-.kb-org-avatars__avatar {
-  box-shadow: 0 0 0 2px var(--surface-base);
-  transition: transform 150ms ease;
-}
-
-.kb-org-avatars__item:not(.kb-org-avatars__solo):hover .kb-org-avatars__avatar {
-  transform: scale(1.1);
-}
-
-.kb-org-avatars__overflow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 24px; /* frappe-ui Avatar md */
-  height: 24px;
-  border-radius: 9999px;
-  background: var(--surface-gray-3);
-  color: var(--ink-gray-7);
-  font-size: 12px;
-}
-</style>

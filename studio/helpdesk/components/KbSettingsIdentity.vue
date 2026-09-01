@@ -3,9 +3,10 @@
        the avatar itself opens the native file picker — no intermediate dialog — and a
        hover-revealed × clears it. The name is edited inline rather than in a form. -->
   <div class="flex items-center gap-4 pt-1.5">
-    <div class="group relative shrink-0" :style="avatarBox">
-      <!-- Avatar's size enum stops at 46px, so both scales set it directly. -->
-      <Avatar :style="avatarBox" :image="image" :label="name" :shape="shape" />
+    <div class="group relative shrink-0" :class="avatarBox">
+      <!-- Avatar's size enum stops at 46px, so both scales size it themselves:
+           52px beside a page title, 64px (size-16) in settings. -->
+      <Avatar :class="avatarBox" :image="image" :label="name" :shape="shape" />
       <Tooltip
         v-if="editable"
         :hover-delay="0"
@@ -20,8 +21,7 @@
       </Tooltip>
       <div
         v-if="image && editable"
-        class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2"
-        style="outline-color: rgb(0 0 0 / 0.05)"
+        class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline outline-black/5 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2"
         @click.stop="$emit('remove')"
       >
         <FeatherIcon name="x" class="size-3.5 text-ink-gray-4" />
@@ -30,13 +30,12 @@
 
     <div class="flex min-w-0 flex-col gap-1">
       <!-- Both states share the input's height so switching doesn't move the block. -->
-      <div class="flex items-center gap-1" style="min-height: 28px">
+      <div class="flex min-h-7 items-center gap-1">
         <template v-if="!editing">
           <span class="text-ink-gray-8" :class="titleClass">{{ name }}</span>
           <Button
             v-if="editable"
-            class="!h-5"
-            style="padding-inline: 4px"
+            class="!h-5 !px-1"
             variant="ghost"
             @click="startEditing"
           >
@@ -88,10 +87,9 @@ const props = withDefaults(
   { shape: "circle", editable: true, scale: "settings" }
 );
 
-const avatarBox = computed(() => {
-  const size = props.scale === "page" ? "52px" : "64px";
-  return { width: size, height: size };
-});
+const avatarBox = computed(() =>
+  props.scale === "page" ? "size-[52px]" : "size-16"
+);
 
 const titleClass = computed(() =>
   props.scale === "page" ? "text-2xl font-medium" : "text-md font-semibold"

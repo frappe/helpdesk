@@ -1,8 +1,8 @@
 <template>
-  <div class="kb-org-list">
+  <div>
     <!-- Wrapped rather than styled directly: scoped rules don't reach a child
          component's own root, so the spacing lives on an element of ours. -->
-    <div class="kb-org-list__search">
+    <div class="mb-6">
       <TextInput v-model="search" type="text" :placeholder="t('Search')">
         <template #prefix>
           <LucideSearch class="size-4 text-ink-gray-5" />
@@ -21,17 +21,20 @@
       "
     />
 
-    <div v-else class="kb-org-list__grid">
+    <!-- Cards wide enough that "n tickets · n members" stays on one line. -->
+    <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
+      <!-- On hover the elevation token draws its own hairline, so the resting
+           border gives way — keeping both double-draws the edge instead of lifting. -->
       <div
         v-for="organization in matches"
         :key="organization.name"
-        class="kb-org-list__card"
+        class="cursor-pointer rounded-[10px] border border-outline-gray-1 p-4 transition-[box-shadow,border-color] duration-150 hover:border-transparent hover:bg-surface-elevation-1 hover:shadow-[var(--elevation-sm)]"
         role="button"
         tabindex="0"
         @click="onSelect?.(organization.name)"
         @keydown.enter="onSelect?.(organization.name)"
       >
-        <div class="kb-org-list__card-top">
+        <div class="mb-3 flex items-start justify-between gap-2">
           <Avatar
             shape="square"
             size="3xl"
@@ -45,18 +48,18 @@
             variant="outline"
           />
         </div>
-        <div class="kb-org-list__card-name">
+        <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-semibold leading-5 text-ink-gray-9">
           {{ organization.customer_name }}
         </div>
-        <div class="kb-org-list__domain">{{ organization.domain }}</div>
-        <div class="kb-org-list__card-meta">
-          <span class="kb-org-list__fact">
-            <LucideTicket class="kb-org-list__icon" />
+        <div class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-p-base text-ink-gray-5">{{ organization.domain }}</div>
+        <div class="mt-3 flex items-center gap-1.5 border-t border-outline-gray-1 pt-3 text-p-sm text-ink-gray-5">
+          <span class="flex items-center gap-1 whitespace-nowrap">
+            <LucideTicket class="size-3.5 shrink-0" />
             {{ count(organization.ticket_count, "ticket") }}
           </span>
-          <span class="kb-org-list__dot">·</span>
-          <span class="kb-org-list__fact">
-            <LucideSquareUser class="kb-org-list__icon" />
+          <span class="text-ink-gray-4">·</span>
+          <span class="flex items-center gap-1 whitespace-nowrap">
+            <LucideSquareUser class="size-3.5 shrink-0" />
             {{ count(organization.member_count, "member") }}
           </span>
         </div>
@@ -119,96 +122,3 @@ function count(total: number | undefined, noun: string) {
   return `${total || 0} ${total === 1 ? noun : noun + "s"}`;
 }
 </script>
-
-<style scoped>
-/* Plain CSS: this app sits outside the bench's Tailwind content globs, so only
-   utilities the rest of the bundle already uses are safe here. */
-.kb-org-list__search {
-  margin-bottom: 24px;
-}
-
-.kb-org-list__domain,
-.kb-org-list__card-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.kb-org-list__domain {
-  margin-top: 2px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ink-gray-5);
-}
-
-.kb-org-list__grid {
-  display: grid;
-  /* Wide enough that "n tickets · n members" stays on one line. */
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 12px;
-}
-
-.kb-org-list__card {
-  padding: 16px;
-  border: 1px solid var(--outline-gray-1);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: box-shadow 150ms ease, border-color 150ms ease;
-}
-
-/* The elevation tokens draw their own hairline, so the resting border has to
-   give way on hover — keeping both double-draws the edge instead of lifting. */
-.kb-org-list__card:hover {
-  border-color: transparent;
-  background: var(--surface-elevation-1);
-  box-shadow: var(--elevation-sm);
-}
-
-.kb-org-list__card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.kb-org-list__card-name {
-  font-size: 15px;
-  line-height: 20px;
-  font-weight: 600;
-  color: var(--ink-gray-9);
-}
-
-.kb-org-list__card-meta {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--outline-gray-1);
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--ink-gray-5);
-}
-
-/* Icon then value, dot between the pairs — the agent portal's PageInfo row. */
-.kb-org-list__card-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.kb-org-list__fact {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.kb-org-list__icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.kb-org-list__dot {
-  color: var(--ink-gray-4);
-}
-</style>
