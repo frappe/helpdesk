@@ -1,4 +1,5 @@
 import { computed, nextTick, ref, watch } from 'vue'
+import { clone, parseJson } from '@app/utils'
 import { call, createListResource, toast } from 'frappe-ui'
 import { parseOrderBy, serializeOrderBy } from '@framework/ui/SortBy'
 import { useSession } from '@app/stores/session'
@@ -333,16 +334,3 @@ function snapshotOf(listView) {
   })
 }
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value))
-}
-
-function parseJson(value, fallback) {
-  if (!value) return fallback
-  if (typeof value !== 'string') return value
-  try {
-    return JSON.parse(value) ?? fallback
-  } catch {
-    return fallback
-  }
-}

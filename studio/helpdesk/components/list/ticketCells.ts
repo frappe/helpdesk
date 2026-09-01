@@ -4,6 +4,7 @@
 // (IndicatorIcon, TicketPriority, StarRating, MultipleAvatar) live under `@/` in
 // the desk SPA, which the Studio build cannot resolve — hence the local ports.
 import { Avatar, Badge, Tooltip, call, createListResource, dayjs } from 'frappe-ui'
+import { parseJsonArray, shortDuration } from '@app/utils'
 import { h, reactive } from 'vue'
 
 // Status colour and portal-facing label come from HD Ticket Status, exactly as
@@ -90,7 +91,7 @@ const agents = reactive<Record<string, { name: string; image?: string }>>({})
 export function loadAssignees(rows: any[]) {
   const wanted = new Set<string>()
   for (const row of rows || []) {
-    for (const email of parseJson(row?._assign)) {
+    for (const email of parseJsonArray(row?._assign)) {
       if (email && !(email in agents)) wanted.add(email)
     }
   }
@@ -220,7 +221,7 @@ export function avatarCell({ item }: any) {
 
 /** Subject carries the unread weight: bold until the reader has opened the ticket. */
 export function subjectCell({ row, item }: any, reader: string) {
-  const seen = parseJson(row._seen).includes(reader)
+  const seen = parseJsonArray(row._seen).includes(reader)
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)
 }
 
@@ -250,7 +251,7 @@ export function idCell({ row }: any) {
 
 /** `formatFullName` from the desk's user store: the local part, capitalised. */
 function parseAssignees(raw: string) {
-  return parseJson(raw).map((email: string) => ({
+  return parseJsonArray(raw).map((email: string) => ({
     email,
     name: agents[email]?.name || guessName(email),
     image: agents[email]?.image,
@@ -264,36 +265,6 @@ function guessName(email: string) {
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
-function parseJson(raw: string): any[] {
-  try {
-    const parsed = JSON.parse(raw || '[]')
-    return Array.isArray(parsed) ? parsed : []
-  } catch (error) {
-    return []
-  }
-}
-
-/** `shortDuration` from desk/src/utils.ts — compact, direction-agnostic. */
-const MINUTE = 60
-const HOUR = 60 * MINUTE
-const DAY = 24 * HOUR
-
-function shortDuration(target: string) {
-  const seconds = Math.abs(dayjs(target).diff(dayjs(), 'second'))
-  if (seconds >= DAY) {
-    const days = Math.floor(seconds / DAY)
-    const hours = Math.floor((seconds % DAY) / HOUR)
-    const label = `${days} ${days === 1 ? 'day' : 'days'}`
-    return hours ? `${label} ${hours}h` : label
-  }
-  if (seconds >= HOUR) {
-    const hours = Math.floor(seconds / HOUR)
-    const minutes = Math.floor((seconds % HOUR) / MINUTE)
-    return minutes ? `${hours}h ${minutes}m` : `${hours}h`
-  }
-  return `${Math.floor(seconds / MINUTE)}m`
 }
 
 const STAR_PATH = `<path d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757

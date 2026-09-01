@@ -1,4 +1,5 @@
 import { computed, nextTick, ref, watch } from 'vue'
+import { timeAgo } from '@app/utils'
 import { call, createResource, dayjs, toast } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 
@@ -212,34 +213,6 @@ export function useTicketThread(ticket) {
     if (at.isSame(dayjs(), 'day')) return time
     const day = at.isSame(dayjs(), 'year') ? DAY_FORMAT : YEAR_FORMAT
     return `${at.format(day)} at ${time}`
-  }
-
-  // `prettyDate` from desk/src/utils.ts, not dayjs's own `fromNow`: the agent portal
-  // words a week as a week where dayjs would still be counting days.
-  function timeAgo(value: string) {
-    const seconds = dayjs().diff(dayjs(value), 'second')
-    const days = Math.floor(seconds / 86400)
-    if (days < 1) return withinDay(seconds)
-    if (days < 2) return 'Yesterday'
-    return olderThanDay(days)
-  }
-
-  function withinDay(seconds: number) {
-    if (seconds < 60) return 'Just now'
-    if (seconds < 120) return '1 minute ago'
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`
-    if (seconds < 7200) return '1 hour ago'
-    return `${Math.floor(seconds / 3600)} hours ago`
-  }
-
-  function olderThanDay(days: number) {
-    if (days < 7) return `${days} days ago`
-    if (days < 14) return '1 week ago'
-    if (days < 31) return `${Math.floor(days / 7)} weeks ago`
-    if (days < 62) return '1 month ago'
-    if (days < 365) return `${Math.floor(days / 30)} months ago`
-    if (days < 730) return '1 year ago'
-    return `${Math.floor(days / 365)} years ago`
   }
 
   return {

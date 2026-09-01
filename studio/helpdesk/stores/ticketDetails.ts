@@ -1,6 +1,7 @@
 import { computed } from 'vue'
+import { compactDuration, parseJsonArray } from '@app/utils'
 import { dayjs } from 'frappe-ui'
-import { statusMeta } from '@app/components/ticketCells'
+import { statusMeta } from '@app/components/list/ticketCells'
 import { t, tFormat } from '@app/stores/translations'
 
 // Everything the summary sidebar shows, finished for display — label, wording, colour —
@@ -119,11 +120,7 @@ export function useTicketDetails(ticket, thread) {
   }
 
   function assignees() {
-    try {
-      return JSON.parse(data.value._assign || '[]')
-    } catch {
-      return []
-    }
+    return parseJsonArray(data.value._assign)
   }
 
   function answered() {
@@ -137,7 +134,7 @@ export function useTicketDetails(ticket, thread) {
   function speedOf(reply) {
     const waited = Math.max(dayjs(reply.creation).diff(dayjs(data.value.creation), 's'), 0)
     const answered =
-      waited <= IMMEDIATE_SECONDS ? 'Answered immediately' : `Answered in ${duration(waited)}`
+      waited <= IMMEDIATE_SECONDS ? 'Answered immediately' : `Answered in ${compactDuration(waited)}`
     return withLateness(
       answered,
       lateBy(reply.creation, data.value.response_by, data.value.first_response_failed_by),
@@ -170,7 +167,7 @@ export function useTicketDetails(ticket, thread) {
   /** How long it took, and by how much that missed the target. */
   function resolvedAt(on: string) {
     const took = Math.max(dayjs(on).diff(dayjs(data.value.creation), 's'), 0)
-    const taken = took <= IMMEDIATE_SECONDS ? 'Resolved immediately' : `Resolved in ${duration(took)}`
+    const taken = took <= IMMEDIATE_SECONDS ? 'Resolved immediately' : `Resolved in ${compactDuration(took)}`
     return withLateness(
       taken,
       lateBy(on, data.value.resolution_by, data.value.resolution_failed_by),
@@ -181,7 +178,7 @@ export function useTicketDetails(ticket, thread) {
    *  moments with a red "Failed" badge, so a rail that reported only the elapsed time read
    *  as a different account of the same ticket — this is that fact in the sidebar's voice. */
   function withLateness(said: string, by: number) {
-    return by ? `${said} · ${duration(by)} late` : said
+    return by ? `${said} · ${compactDuration(by)} late` : said
   }
 
   /** How far past its target a milestone landed, zero when it was in time. */
@@ -224,7 +221,7 @@ export function useTicketDetails(ticket, thread) {
   /** "9 minutes later", from the moment the ticket arrived. */
   function since(on: string) {
     const elapsed = Math.max(dayjs(on).diff(dayjs(data.value.creation), 's'), 0)
-    return elapsed <= IMMEDIATE_SECONDS ? 'moments later' : `${duration(elapsed)} later`
+    return elapsed <= IMMEDIATE_SECONDS ? 'moments later' : `${compactDuration(elapsed)} later`
   }
 
   function at(value: string) {
@@ -241,32 +238,7 @@ export function useTicketDetails(ticket, thread) {
 
   /** Distance to a target, either side of it — the caller words the direction. */
   function countdown(target: string) {
-    return duration(Math.abs(dayjs(target).diff(dayjs(), 's')))
-  }
-
-  // The two most significant units, as `formatSeconds` words them in the agent portal's
-  // analytics: "2d 9h", "44m". Never four — and never trailing seconds on anything larger,
-  // because a countdown that only re-renders on load reads as a frozen timer when it shows
-  // them (the reasoning behind `coarseDuration` in desk's useSLA.ts).
-  function duration(seconds: number) {
-    return units(seconds)
-      .map(([value, unit]) => `${value}${unit}`)
-      .join(' ') || '0s'
-  }
-
-  /** The largest unit with anything in it, plus the one below it — and only that one, so a
-   *  span of 83 days and 59 minutes reads as "83 days" rather than skipping the empty hours
-   *  to pair two units that were never adjacent. */
-  function units(seconds: number) {
-    const all = [
-      [Math.floor(seconds / 86400), 'd'],
-      [Math.floor((seconds % 86400) / 3600), 'h'],
-      [Math.floor((seconds % 3600) / 60), 'm'],
-      [Math.floor(seconds % 60), 's'],
-    ]
-    const largest = all.findIndex(([value]) => value)
-    if (largest < 0) return []
-    return all.slice(largest, largest + 2).filter(([value]) => value)
+    return compactDuration(Math.abs(dayjs(target).diff(dayjs(), 's')))
   }
 
   return {
