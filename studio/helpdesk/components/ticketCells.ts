@@ -22,10 +22,10 @@ function getStatus(label: string) {
   )
 }
 
-// `parseColor` from the desk store, as espresso tokens rather than its
-// `!text-<color>-500` classes: those are Tailwind utilities nothing else in the
-// bundle uses, and this app sits outside the bench's content globs — so every
-// status drew in the inherited ink instead of its own colour.
+// `parseColor` from the desk store, resolved to espresso tokens rather than its
+// `!text-<color>-500` classes: the colour name is data, and a class built from
+// data is invisible to Tailwind's scanner — a token var is theme-correct and
+// needs no safelist.
 const INK_COLORS = [
   'amber', 'blue', 'cyan', 'gray', 'green', 'orange',
   'pink', 'purple', 'red', 'teal', 'violet', 'yellow',
@@ -114,9 +114,6 @@ const BARS = [
   { x: 8, y: 0, height: 12 },
 ]
 
-// Fills are inline rather than `fill-ink-gray-6` classes: this app sits outside
-// the bench's Tailwind content globs, and a fill utility nothing else uses never
-// compiles — which drew the whole icon in transparent.
 function bar(index: number, level: string) {
   const faded = FADED_BARS[level] ?? 0
   // Bars are drawn shortest-first, so the "from the top" index counts down.
@@ -124,16 +121,16 @@ function bar(index: number, level: string) {
   const { x, y, height } = BARS[index]
   return h('rect', {
     x, y, width: 2.5, height, rx: 0.5,
-    style: { fill: fromTop < faded ? 'var(--ink-gray-3)' : 'var(--ink-gray-6)' },
+    class: fromTop < faded ? 'fill-ink-gray-3' : 'fill-ink-gray-6',
   })
 }
 
 function urgentIcon() {
-  const glyph = { fill: 'var(--surface-gray-1)' }
-  return h('svg', { class: 'h-3.5 w-3.5', viewBox: '0 0 14 14', fill: 'none' }, [
-    h('rect', { width: 14, height: 14, rx: 4, style: { fill: 'var(--ink-gray-6)' } }),
-    h('rect', { x: 6.25, y: 3, width: 1.5, height: 4.75, rx: 0.75, style: glyph }),
-    h('circle', { cx: 7, cy: 10, r: 0.9, style: glyph }),
+  const glyph = 'fill-[var(--surface-gray-1)]'
+  return h('svg', { class: 'size-3.5', viewBox: '0 0 14 14', fill: 'none' }, [
+    h('rect', { width: 14, height: 14, rx: 4, class: 'fill-ink-gray-6' }),
+    h('rect', { x: 6.25, y: 3, width: 1.5, height: 4.75, rx: 0.75, class: glyph }),
+    h('circle', { cx: 7, cy: 10, r: 0.9, class: glyph }),
   ])
 }
 

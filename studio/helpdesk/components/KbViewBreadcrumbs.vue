@@ -47,7 +47,7 @@
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="kebab-btn !size-4 ms-0 rounded-sm"
+                class="ms-0 !size-4 rounded-sm [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop
@@ -124,10 +124,3 @@ withDefaults(
 
 const emit = defineEmits<{ (e: "parentClick"): void }>();
 </script>
-
-<style>
-[data-slot="item"][data-highlighted] .kebab-btn,
-[data-slot="item"][data-state="checked"] .kebab-btn {
-  display: block;
-}
-</style>
