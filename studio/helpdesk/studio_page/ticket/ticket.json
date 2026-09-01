@@ -961,8 +961,10 @@
      },
      "componentSlots": {
       "actions": {
+       "parentBlockId": "Dialog-ticket-feedback",
        "slotContent": [
         {
+         "attributes": {},
          "baseStyles": {
           "width": "100%"
          },
@@ -982,15 +984,20 @@
           "label": "Submit",
           "loading": "{{ feedbackSaving }}",
           "variant": "solid"
-         }
+         },
+         "componentSlots": {},
+         "mobileStyles": {},
+         "tabletStyles": {}
         }
        ],
        "slotId": "Dialog-ticket-feedback:actions",
        "slotName": "actions"
       },
       "body-content": {
+       "parentBlockId": "Dialog-ticket-feedback",
        "slotContent": [
         {
+         "attributes": {},
          "baseStyles": {
           "color": "var(--ink-gray-7)",
           "display": "{{ dataItem.rowDisplay }}",
@@ -999,6 +1006,7 @@
          },
          "children": [
           {
+           "attributes": {},
            "baseStyles": {
             "display": "flex",
             "flexDirection": "column",
@@ -1006,45 +1014,65 @@
            },
            "children": [
             {
+             "attributes": {},
              "baseStyles": {
               "display": "flex",
               "gap": "2px"
              },
              "children": [
               {
+               "attributes": {},
+               "baseStyles": {},
                "children": [],
                "classes": [],
+               "componentEvents": {},
                "componentId": "TextBlock-ticket-feedback-rating",
                "componentName": "TextBlock",
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
                 "text": "Select a rating"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               },
               {
+               "attributes": {},
                "baseStyles": {
                 "color": "var(--ink-red-6)"
                },
                "children": [],
                "classes": [],
+               "componentEvents": {},
                "componentId": "TextBlock-ticket-feedback-rating-required",
                "componentName": "TextBlock",
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
                 "text": "*"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               }
              ],
              "classes": [],
+             "componentEvents": {},
              "componentId": "container-ticket-feedback-rating-label",
              "componentName": "container",
-             "originalElement": "div"
+             "componentProps": {},
+             "componentSlots": {},
+             "mobileStyles": {},
+             "originalElement": "div",
+             "tabletStyles": {}
             },
             {
+             "attributes": {},
+             "baseStyles": {},
              "children": [],
              "classes": [],
+             "componentEvents": {},
              "componentId": "Rating-ticket-feedback",
              "componentName": "Rating",
              "componentProps": {
@@ -1053,15 +1081,24 @@
                "name": "feedbackStars"
               },
               "size": "md"
-             }
+             },
+             "componentSlots": {},
+             "mobileStyles": {},
+             "tabletStyles": {}
             }
            ],
            "classes": [],
+           "componentEvents": {},
            "componentId": "container-ticket-feedback-rating",
            "componentName": "container",
-           "originalElement": "div"
+           "componentProps": {},
+           "componentSlots": {},
+           "mobileStyles": {},
+           "originalElement": "div",
+           "tabletStyles": {}
           },
           {
+           "attributes": {},
            "baseStyles": {
             "display": "flex",
             "flexDirection": "column",
@@ -1069,43 +1106,61 @@
            },
            "children": [
             {
+             "attributes": {},
              "baseStyles": {
               "display": "flex",
               "gap": "2px"
              },
              "children": [
               {
+               "attributes": {},
+               "baseStyles": {},
                "children": [],
                "classes": [],
+               "componentEvents": {},
                "componentId": "TextBlock-ticket-feedback-option",
                "componentName": "TextBlock",
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
                 "text": "Pick an option"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               },
               {
+               "attributes": {},
                "baseStyles": {
                 "color": "var(--ink-red-6)"
                },
                "children": [],
                "classes": [],
+               "componentEvents": {},
                "componentId": "TextBlock-ticket-feedback-option-required",
                "componentName": "TextBlock",
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
                 "text": "*"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               }
              ],
              "classes": [],
+             "componentEvents": {},
              "componentId": "container-ticket-feedback-option-label",
              "componentName": "container",
-             "originalElement": "div"
+             "componentProps": {},
+             "componentSlots": {},
+             "mobileStyles": {},
+             "originalElement": "div",
+             "tabletStyles": {}
             },
             {
+             "attributes": {},
              "baseStyles": {
               "display": "flex",
               "flexDirection": "row",
@@ -1114,6 +1169,8 @@
              },
              "children": [
               {
+               "attributes": {},
+               "baseStyles": {},
                "children": [],
                "classes": [],
                "componentEvents": {
@@ -1129,25 +1186,38 @@
                 "label": "{{ dataItem.label }}",
                 "theme": "{{ dataItem.theme }}",
                 "variant": "subtle"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               }
              ],
              "classes": [],
+             "componentEvents": {},
              "componentId": "Repeater-ticket-feedback-options",
              "componentName": "Repeater",
              "componentProps": {
               "data": "{{ feedbackOptions }}",
               "dataKey": "name"
-             }
+             },
+             "componentSlots": {},
+             "mobileStyles": {},
+             "tabletStyles": {}
             }
            ],
            "classes": [],
+           "componentEvents": {},
            "componentId": "container-ticket-feedback-option",
            "componentName": "container",
+           "componentProps": {},
+           "componentSlots": {},
+           "mobileStyles": {},
            "originalElement": "div",
+           "tabletStyles": {},
            "visibilityCondition": "{{ feedbackOptions.length }}"
           },
           {
+           "attributes": {},
            "baseStyles": {
             "display": "flex",
             "flexDirection": "column",
@@ -1155,31 +1225,46 @@
            },
            "children": [
             {
+             "attributes": {},
              "baseStyles": {
               "display": "flex",
               "gap": "2px"
              },
              "children": [
               {
+               "attributes": {},
+               "baseStyles": {},
                "children": [],
                "classes": [],
+               "componentEvents": {},
                "componentId": "TextBlock-ticket-feedback-text",
                "componentName": "TextBlock",
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
                 "text": "Other"
-               }
+               },
+               "componentSlots": {},
+               "mobileStyles": {},
+               "tabletStyles": {}
               }
              ],
              "classes": [],
+             "componentEvents": {},
              "componentId": "container-ticket-feedback-text-label",
              "componentName": "container",
-             "originalElement": "div"
+             "componentProps": {},
+             "componentSlots": {},
+             "mobileStyles": {},
+             "originalElement": "div",
+             "tabletStyles": {}
             },
             {
+             "attributes": {},
+             "baseStyles": {},
              "children": [],
              "classes": [],
+             "componentEvents": {},
              "componentId": "FormControl-ticket-feedback-text",
              "componentName": "FormControl",
              "componentProps": {
@@ -1189,19 +1274,32 @@
               },
               "placeholder": "Tell us more",
               "type": "textarea"
-             }
+             },
+             "componentSlots": {},
+             "mobileStyles": {},
+             "tabletStyles": {}
             }
            ],
            "classes": [],
+           "componentEvents": {},
            "componentId": "container-ticket-feedback-text",
            "componentName": "container",
-           "originalElement": "div"
+           "componentProps": {},
+           "componentSlots": {},
+           "mobileStyles": {},
+           "originalElement": "div",
+           "tabletStyles": {}
           }
          ],
          "classes": [],
+         "componentEvents": {},
          "componentId": "container-ticket-feedback",
          "componentName": "container",
-         "originalElement": "div"
+         "componentProps": {},
+         "componentSlots": {},
+         "mobileStyles": {},
+         "originalElement": "div",
+         "tabletStyles": {}
         }
        ],
        "slotId": "Dialog-ticket-feedback:body-content",

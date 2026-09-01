@@ -553,22 +553,6 @@
             "placeholder": "Describe your issue\u2026",
             "tags": null
            }
-          },
-          {
-           "children": [],
-           "classes": [],
-           "componentId": "TextEditor-3wgb5m43r",
-           "componentName": "TextEditor",
-           "componentProps": {
-            "bubbleMenu": true,
-            "content": "{{ description }}",
-            "editable": true,
-            "editorClass": "prose-sm max-w-none min-h-[4rem] border rounded-b-lg border-t-0 p-2",
-            "fixedMenu": true,
-            "modelValue": "Type something...",
-            "placeholder": "Describe your issue\u2026",
-            "starterkitOptions": ""
-           }
           }
          ],
          "classes": [],
