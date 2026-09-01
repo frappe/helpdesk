@@ -72,8 +72,8 @@
 // gutters (`mx-5`), same footer chrome — so both list views read as one design.
 // It draws nothing itself: every cell comes from its column's `cell()`, the way
 // ListViewBuilder defers to `listCell`.
-import KbEmptyState from "@app/components/KbEmptyState.vue";
-import { loadTicketMeta } from "@app/components/ticketCells";
+import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
+import { loadTicketMeta } from "./ticketCells";
 import {
   ListFooter,
   ListHeader,

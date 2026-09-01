@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import FilterIcon from "~icons/lucide/list-filter";
-import { __ } from "./kbFilterSupport";
+import { __ } from "./support";
 import { Button, Tooltip } from "frappe-ui";
 
 interface P {

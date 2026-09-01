@@ -65,7 +65,7 @@
 import { ref, watch } from "vue";
 import { TextInput, call, dayjs, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
-import { statusMeta } from "@app/components/ticketCells";
+import { statusMeta } from "@app/components/list/ticketCells";
 import { t } from "@app/stores/translations";
 
 const ROW =

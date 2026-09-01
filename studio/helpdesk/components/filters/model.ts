@@ -1,4 +1,4 @@
-import { useDebounceFn } from "./kbFilterSupport";
+import { useDebounceFn } from "./support";
 import { createResource } from "frappe-ui";
 import { computed, Component, ComputedRef, Ref } from "vue";
 import LucideCalendar from "~icons/lucide/calendar";

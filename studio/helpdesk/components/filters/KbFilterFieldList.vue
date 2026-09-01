@@ -55,10 +55,10 @@
 
 <script setup lang="ts">
 import ShortcutKey from "./KbFilterShortcutKey.vue";
-import { __ } from "./kbFilterSupport";
+import { __ } from "./support";
 import { TextInput } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { fieldIcon, FilterField } from "./kbFilterModel";
+import { fieldIcon, FilterField } from "./model";
 
 interface P {
   fields: FilterField[];

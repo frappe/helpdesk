@@ -77,7 +77,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideSquareUser from "~icons/lucide/square-user";
 import LucideTicket from "~icons/lucide/ticket";
 import { computed, ref } from "vue";
-import KbEmptyState from "./KbEmptyState.vue";
+import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
 
 type Organization = {
   name: string;

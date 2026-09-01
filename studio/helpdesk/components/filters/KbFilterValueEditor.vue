@@ -120,9 +120,9 @@
 
 <script setup lang="ts">
 import BackButton from "./KbFilterBack.vue";
-import { useDevice } from "./kbFilterSupport";
-import { __ } from "./kbFilterSupport";
-import { useDebounceFn, useEventListener } from "./kbFilterSupport";
+import { useDevice } from "./support";
+import { __ } from "./support";
+import { useDebounceFn, useEventListener } from "./support";
 import {
   DatePicker,
   DateRangePicker,
@@ -138,7 +138,7 @@ import {
   multiValueFields,
   useFilter,
   useLinkSearch,
-} from "./kbFilterModel";
+} from "./model";
 
 interface P {
   field: FilterField;

@@ -147,9 +147,9 @@
 
 <script setup lang="ts">
 import BackButton from "./KbFilterBack.vue";
-import { useShortcut } from "./kbFilterSupport";
-import { __ } from "./kbFilterSupport";
-import { useEventListener } from "./kbFilterSupport";
+import { useShortcut } from "./support";
+import { __ } from "./support";
+import { useEventListener } from "./support";
 import { Button, Popover } from "frappe-ui";
 import { computed, nextTick, ref, watch } from "vue";
 import {
@@ -158,13 +158,13 @@ import {
   FilterField,
   filterSummary,
   useFilter,
-} from "./kbFilterModel";
+} from "./model";
 import FilterFieldList from "./KbFilterFieldList.vue";
 import FilterTrigger from "./KbFilterTrigger.vue";
 import FilterValueEditor from "./KbFilterValueEditor.vue";
 
 // The agent portal's filter, driven by props instead of the desk's two injects — see
-// `FilterSource` in kbFilterModel.ts. `conditions` is the Frappe wire form
+// `FilterSource` in model.ts. `conditions` is the Frappe wire form
 // (`[fieldname, operator, value]`), which is what this control has always spoken; the
 // page converts to and from its own condition objects on either side.
 const props = withDefaults(
