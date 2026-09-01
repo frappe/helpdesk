@@ -1,7 +1,9 @@
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { timeAgo } from '@app/utils'
-import { call, createResource, dayjs, toast } from 'frappe-ui'
+import { createResource, dayjs } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
+import { layoutOf, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/components/ticket/bubbleLayout'
+import { useReplyComposer } from './composer'
 
 // The message thread, the outside-working-hours banner and the reply composer —
 // the data behind `desk/src/pages/ticket/TicketConversation.vue` and
@@ -13,77 +15,9 @@ const DATE_FORMAT = 'ddd, MMM D, YYYY h:mm A'
 const CLOCK_FORMAT = 'h:mm A'
 const DAY_FORMAT = 'D MMMM'
 const YEAR_FORMAT = 'D MMMM YYYY'
-const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
-
-// The two thread layouts, as the style values the blocks bind — Studio evaluates
-// `baseStyles`, so a row carries its own geometry rather than the page forking into two
-// templates. Timeline is the default: every message in one column, hung off the rail.
-const TIMELINE = {
-  // The face lives beside the card, never in it — the rail is its column.
-  showRail: true,
-  // Lined up with the first line of the card, which is the byline.
-  avatarOffset: '6px',
-  avatarLeft: '0px',
-  rowDisplay: 'grid',
-  rowDirection: 'row',
-  // How far the row sits from the thread's own left edge. The timeline starts at it.
-  rowLeft: '0px',
-  contentAlign: 'stretch',
-  // A record, not a bubble: the card takes the column and every message lines up.
-  cardWidth: 'auto',
-  cardMaxWidth: 'none',
-  cardPadding: '10px 12px 8px',
-  cardBackground: 'var(--surface-elevation-1)',
-  cardBorder: '1px solid var(--outline-gray-2)',
-}
-// Chat drops the grid for a flex row, so the reader's own messages can turn around and
-// sit against the other edge. A bubble is as wide as what was said and no wider: the frame
-// inside reports the width its content wants (`hug` in KbEmailContent), so the card can
-// shrink to it, and three quarters of the column is where a long message stops and wraps
-// instead of running the width of the thread.
-const THEIR_BUBBLE = {
-  ...TIMELINE,
-  // Chat's byline sits above the bubble, so the face sits at the top of the row and shifts
-  // in towards the name it belongs to.
-  avatarOffset: '-4px',
-  avatarLeft: '23px',
-  rowDisplay: 'flex',
-  contentAlign: 'flex-start',
-  // Chat pulls an incoming row out past that edge, so the face — not the bubble — is what
-  // lines up with everything else in the column.
-  rowLeft: '-16px',
-  cardWidth: 'fit-content',
-  cardMaxWidth: '76%',
-  cardPadding: '12px 16px 14px',
-}
-// How long a run of messages stays one turn, and how tightly those messages sit.
-const GROUP_SECONDS = 5 * 60
-const GROUPED_GAP = '12px'
-const ROW_GAP = '24px'
-
-const OWN_BUBBLE = {
-  ...THEIR_BUBBLE,
-  // Nobody needs their own face shown back at them: the side of the thread says whose it
-  // is, so the bubble takes the whole width and sits flush against the edge.
-  showRail: false,
-  rowDirection: 'row-reverse',
-  // Nothing hangs off the left of your own message, so it keeps to the edge.
-  rowLeft: '0px',
-  contentAlign: 'flex-end',
-  // Tinted and borderless, the way every chat marks the side you are on.
-  cardBackground: 'var(--surface-gray-1)',
-  cardBorder: '1px solid transparent',
-}
-
 export function useTicketThread(ticket) {
   const { conversationLayout } = usePreferences()
   const isChat = computed(() => conversationLayout.value === 'chat')
-
-  /** The layout values a row carries, by whose message it is. */
-  function layoutOf(isOwn: boolean) {
-    if (!isChat.value) return TIMELINE
-    return isOwn ? OWN_BUBBLE : THEIR_BUBBLE
-  }
 
   const conversation = computed(() => {
     const rows = sortByCreation().map(toMessageRow)
@@ -158,7 +92,7 @@ export function useTicketThread(ticket) {
       // own included — look like an agent reply.
       isAgentReply: message.sent_or_received === 'Sent',
       railHeight: '100%',
-      ...layoutOf(message.sent_or_received !== 'Sent'),
+      ...layoutOf(isChat.value, message.sent_or_received !== 'Sent'),
     }
   }
 
@@ -257,135 +191,5 @@ function useOutsideHoursBanner(ticket) {
     showBanner: computed(() => Boolean(banner.data?.show) && !dismissed.value),
     bannerMessage: computed(() => banner.data?.msg || ''),
     dismissBanner,
-  }
-}
-
-// How much of the thread the composer covers, by state. It floats over the messages, so
-// the thread reserves the room rather than being overlapped: enough for the one-line
-// prompt, and enough for the open editor (measured at 194px, plus room to breathe).
-const PROMPT_TAIL = '96px'
-const EDITOR_TAIL = '208px'
-/** Long enough for the message frames to have reported their real height. */
-const SETTLE_MS = 300
-/** The ride down, matched to the editor's own opening so they read as one movement. */
-const SCROLL_MS = 220
-
-function useReplyComposer(ticket) {
-  const composerOpen = ref(false)
-  const reply = ref('')
-  const attachments = ref<any[]>([])
-  const sending = ref(false)
-
-  // Only a closed ticket refuses replies — `TicketCustomer.vue`'s `showEditor`.
-  // Resolved is not closed: replying to it reopens the ticket, which is what
-  // `create_communication_via_contact` does with `ticket_reopen_status`.
-  const canReply = computed(() => ticket.data?.status !== 'Closed')
-
-  // Tags alone are not a message: an empty editor still reports `<p></p>`.
-  const canSend = computed(
-    () => reply.value.replace(/<[^>]*>/g, '').trim().length > 0,
-  )
-
-  /** The space the thread keeps clear beneath itself for whatever the composer is. */
-  const threadTailSpace = computed(() =>
-    composerOpen.value ? EDITOR_TAIL : PROMPT_TAIL,
-  )
-
-  function openComposer() {
-    composerOpen.value = true
-    // The editor is some 110px taller than the prompt it replaces, and it opens over the
-    // thread — so the message being replied to would end up behind it. Riding the thread
-    // down to its new end carries that message up above the composer instead, and reads
-    // as one movement with the editor growing into place.
-    nextTick(scrollThreadToEnd)
-    // Message bodies are iframes and settle their height a beat after they paint, which
-    // moves the end of the thread out from under the first pass. This one catches it.
-    setTimeout(scrollThreadToEnd, SETTLE_MS)
-  }
-
-  /** Ride the thread down to its new end.
-   *
-   *  Animated by hand rather than with `behavior: 'smooth'`, which this container ignores
-   *  — `scrollTo` and `scrollBy` both leave it where it was, while assigning `scrollTop`
-   *  moves it. Same ease-out as the editor's own opening, so the two read as one movement.
-   */
-  function scrollThreadToEnd() {
-    const thread = document.querySelector(
-      '[data-component-id="container-ticket-thread"]',
-    )
-    if (!thread) return
-    const from = thread.scrollTop
-    const distance = thread.scrollHeight - thread.clientHeight - from
-    if (distance <= 0) return
-
-    const started = performance.now()
-    const step = (now: number) => {
-      const progress = Math.min((now - started) / SCROLL_MS, 1)
-      thread.scrollTop = from + distance * (1 - (1 - progress) ** 3)
-      if (progress < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }
-
-  function setReply(content: string) {
-    reply.value = content
-  }
-
-  function addAttachment(file) {
-    attachments.value = [...attachments.value, file]
-  }
-
-  function removeAttachment(file) {
-    attachments.value = attachments.value.filter(
-      (attached) => attached.file_url !== file.file_url,
-    )
-  }
-
-  function discard() {
-    reply.value = ''
-    attachments.value = []
-    composerOpen.value = false
-  }
-
-  // `create_communication_via_contact` is the requester's reply path — it is what
-  // attributes the message to them rather than to an agent.
-  async function send() {
-    if (!canSend.value || sending.value) return
-    sending.value = true
-    try {
-      await call('run_doc_method', {
-        dt: 'HD Ticket',
-        dn: ticket.data.name,
-        method: 'create_communication_via_contact',
-        args: { message: reply.value, attachments: attachments.value },
-      })
-      discard()
-      await ticket.fetch()
-      // What was just written is the point of the thread now, and the composer has folded
-      // back to a line — so ride down to it rather than leaving it behind the editor.
-      nextTick(scrollThreadToEnd)
-      setTimeout(scrollThreadToEnd, SETTLE_MS)
-    } catch (error) {
-      toast.error(error?.messages?.[0] || 'Could not send the message')
-    } finally {
-      sending.value = false
-    }
-  }
-
-  return {
-    canReply,
-    composerOpen,
-    threadTailSpace,
-    openComposer,
-    reply,
-    setReply,
-    attachments,
-    addAttachment,
-    removeAttachment,
-    uploadArgs: UPLOAD_ARGS,
-    canSend,
-    sending,
-    send,
-    discard,
   }
 }

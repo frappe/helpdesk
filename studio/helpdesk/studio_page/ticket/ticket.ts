@@ -1,10 +1,10 @@
 import { computed, watch } from 'vue'
 import { call, createResource, dayjs, toast } from 'frappe-ui'
 import { useSettingsModal } from '@app/stores/settings'
-import { useTicketThread } from '@app/stores/ticketThread'
-import { useTicketDetails } from '@app/stores/ticketDetails'
-import { useTicketFeedback } from '@app/stores/ticketFeedback'
-import { loadTicketMeta } from '@app/components/ticketCells'
+import { useTicketThread } from '@app/stores/ticket/thread'
+import { useTicketDetails } from '@app/stores/ticket/details'
+import { useTicketFeedback } from '@app/stores/ticket/feedback'
+import { loadTicketMeta } from '@app/components/list/ticketCells'
 
 // One ticket, read and replied to from the portal — the customer half of the agent
 // portal's `desk/src/pages/ticket/TicketCustomer.vue`. The page is drawn entirely
