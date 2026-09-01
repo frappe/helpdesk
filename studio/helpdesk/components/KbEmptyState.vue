@@ -7,18 +7,13 @@
          the root: a comment beside it makes this a multi-root component, and Vue then
          drops the caller's class — which is how the caller sizes this. -->
     <div
-      class="flex items-center justify-center rounded-full bg-surface-gray-1"
-      style="width: 58px; height: 58px"
+      class="flex size-[58px] items-center justify-center rounded-full bg-surface-gray-1"
     >
       <component :is="glyph" class="size-6 text-ink-gray-6" />
     </div>
     <div class="flex flex-col items-center gap-1">
       <div class="text-base font-medium text-ink-gray-6">{{ title }}</div>
-      <div
-        v-if="description"
-        class="text-p-sm text-ink-gray-5"
-        style="max-width: 15rem"
-      >
+      <div v-if="description" class="max-w-60 text-p-sm text-ink-gray-5">
         {{ description }}
       </div>
     </div>

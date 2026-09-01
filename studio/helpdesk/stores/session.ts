@@ -42,10 +42,7 @@ function createSessionStore() {
   // works signed out.
   const accountMenuOptions = computed(() =>
     isGuest.value
-      // `lucide-user` rather than `lucide-log-in`: icons are collected from the
-      // scanned sources, and this app sits outside them — an icon no other bundled
-      // file uses renders as an empty slot.
-      ? [{ icon: 'lucide-user', label: 'Log in', onClick: signIn }]
+      ? [{ icon: 'lucide-log-in', label: 'Log in', onClick: signIn }]
       : [
           { icon: 'lucide-inbox', label: 'My tickets', onClick: () => go('/customer-tickets') },
           { icon: 'lucide-user', label: 'My account', onClick: openSettings },

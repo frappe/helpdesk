@@ -1,9 +1,11 @@
 <template>
-  <div class="kb-attach">
+  <div class="flex flex-col gap-2">
+    <!-- A drop target has to look like one: a dashed edge and enough height to aim
+         at, where the single-file row could pass for a text input. -->
     <button
       type="button"
-      class="kb-attach__drop"
-      :class="{ 'kb-attach__drop--over': isOver }"
+      class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
+      :class="{ '!border-outline-gray-4 !bg-surface-gray-2': isOver }"
       @click="openFileSelector"
       @dragenter.prevent="isOver = true"
       @dragover.prevent="isOver = true"
@@ -11,33 +13,35 @@
       @drop.prevent="onDrop"
     >
       <FeatherIcon name="upload" class="size-4 shrink-0 text-ink-gray-5" />
-      <span class="kb-attach__hint">
+      <span class="text-p-base text-ink-gray-5">
         {{
           uploading
             ? `Uploading ${pending} file${pending === 1 ? "" : "s"}…`
             : "Drop files here, or click to choose"
         }}
       </span>
+      <!-- Covers the drop target so a file released anywhere on it lands on the
+           input too. -->
       <input
         ref="input"
         type="file"
         multiple
-        class="kb-attach__input"
+        class="absolute inset-0 cursor-pointer opacity-0"
         @click.stop
         @change="onPick"
       />
     </button>
 
-    <ul v-if="files.length" class="kb-attach__list">
-      <li v-for="file in files" :key="file.name" class="kb-attach__file">
+    <ul v-if="files.length" class="m-0 flex list-none flex-col gap-1 p-0">
+      <li v-for="file in files" :key="file.name" class="flex min-w-0 items-center gap-1.5 rounded-md bg-surface-gray-2 px-2 py-1 text-p-sm text-ink-gray-7">
         <FeatherIcon
           name="paperclip"
           class="size-3.5 shrink-0 text-ink-gray-5"
         />
-        <span class="kb-attach__name">{{ file.file_name || file.name }}</span>
+        <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ file.file_name || file.name }}</span>
         <button
           type="button"
-          class="kb-attach__remove"
+          class="grid place-items-center rounded text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
           :aria-label="`Remove ${file.file_name || file.name}`"
           @click.stop="remove(file)"
         >
@@ -46,7 +50,7 @@
       </li>
     </ul>
 
-    <p v-if="error" class="kb-attach__error">{{ error }}</p>
+    <p v-if="error" class="text-p-sm text-ink-red-6">{{ error }}</p>
   </div>
 </template>
 
@@ -121,95 +125,3 @@ function remove(file: any) {
   );
 }
 </script>
-
-<style scoped>
-.kb-attach {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* A drop target has to look like one: a dashed edge and enough height to aim at, where the
-   single-file row could pass for a text input. */
-.kb-attach__drop {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 16px 12px;
-  border: 1px dashed var(--outline-gray-3);
-  border-radius: 8px;
-  background: var(--surface-gray-1);
-  cursor: pointer;
-}
-
-.kb-attach__drop:hover,
-.kb-attach__drop--over {
-  border-color: var(--outline-gray-4);
-  background: var(--surface-gray-2);
-}
-
-.kb-attach__hint {
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ink-gray-5);
-}
-
-/* Covers the drop target so a file released anywhere on it lands on the input too. */
-.kb-attach__input {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.kb-attach__list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.kb-attach__file {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: var(--surface-gray-2);
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--ink-gray-7);
-}
-
-.kb-attach__name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.kb-attach__remove {
-  display: grid;
-  place-items: center;
-  border-radius: 4px;
-  color: var(--ink-gray-5);
-}
-
-.kb-attach__remove:hover {
-  background: var(--surface-gray-3);
-  color: var(--ink-gray-8);
-}
-
-.kb-attach__error {
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--ink-red-6);
-}
-</style>
