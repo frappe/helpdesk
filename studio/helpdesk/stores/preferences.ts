@@ -9,7 +9,7 @@ import { createDocumentResource, createResource, toast } from 'frappe-ui'
 
 // How the ticket thread is laid out. Kept in the browser rather than on the User doc:
 // it describes this screen on this device, and there is no field for it to live in.
-const LAYOUT_KEY = 'kb-conversation-layout'
+const LAYOUT_KEY = 'kb:conversation-layout'
 const LAYOUT_OPTIONS = [
   { label: 'Timeline', value: 'timeline' },
   { label: 'Chat', value: 'chat' },

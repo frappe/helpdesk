@@ -12,7 +12,7 @@
 // own markup and styles from reaching the portal around it, and it is why the desk
 // can show the HTML as sent rather than as some editor re-parsed it.
 //
-// The frame gets this app's own built stylesheet, the way the desk gives its frame the
+// The frame mirrors the page's own stylesheets, the way the desk gives its frame the
 // desk bundle: a message written in the editor is prose markup — aligned images, sized
 // video, headings, lists, code — and only those rules render it as it was written.
 // Inlining a handful of substitutes is what lost the formatting.
@@ -41,36 +41,22 @@ function asHtml(content: string) {
   return `<div style="white-space: pre-wrap">${doc.body.innerHTML}</div>`;
 }
 
-/** This app's stylesheet, as the page itself loaded it — hashed at build time, so it is
- *  read off the document rather than named here. */
-const BUILD_BASE = "/assets/helpdesk/app_builds/helpdesk/";
-const stylesheet = ref(linkedStylesheet());
-
-function linkedStylesheet() {
+/** The page's own stylesheets, mirrored into the frame: link hrefs as links,
+ *  vite's injected <style> tags as text. The frame then renders prose exactly as
+ *  the portal does — dev and prod alike — with no build path named anywhere.
+ *  Captured once per page load: styles do not change under a running page, and a
+ *  per-frame capture would re-serialize them for every message in a thread. */
+let capturedStyles = "";
+function mirroredStyles() {
+  if (capturedStyles) return capturedStyles;
   const links = Array.from(
     document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')
+  ).map((link) => `<link rel="stylesheet" href="${link.href}" />`);
+  const styles = Array.from(document.querySelectorAll("style")).map(
+    (style) => `<style>${style.textContent}</style>`
   );
-  const found = links.find((link) => {
-    const href = link.getAttribute("href") || "";
-    return href.includes("/assets/helpdesk/") && href.endsWith(".css");
-  });
-  return found?.getAttribute("href") || "";
-}
-
-/** The dev renderer styles the page through vite, so it has no <link> to reuse —
- *  resolve the built stylesheet from the app build's manifest instead. */
-async function manifestStylesheet() {
-  try {
-    const manifest = await fetch(`${BUILD_BASE}.vite/manifest.json`).then((r) =>
-      r.json()
-    );
-    const entry = Object.values(manifest).find(
-      (chunk: any) => chunk.isEntry && chunk.css?.length
-    ) as any;
-    return entry ? BUILD_BASE + entry.css[0] : "";
-  } catch {
-    return "";
-  }
+  capturedStyles = links.join("") + styles.join("");
+  return capturedStyles;
 }
 
 // Everything below the first quote marker is folded behind a "..." toggle, so a long
@@ -134,27 +120,22 @@ function hash(value: string) {
   return result;
 }
 
-// An iframe document inherits no CSS from the page, so hand its body the computed font
-// of the spot the frame sits in — keeps the message on the portal face and size even
-// when there is no built stylesheet to link (vite dev injects <style> tags, not links).
+// An iframe document inherits no CSS from the page, so its body also gets the computed
+// font of the spot the frame sits in — the face survives even before the mirrored
+// stylesheets finish loading inside the frame.
 const pageStyle = getComputedStyle(document.body);
 const contextFont = ref({
   family: pageStyle.fontFamily,
   size: pageStyle.fontSize,
 });
-onMounted(async () => {
+onMounted(() => {
   const style = getComputedStyle(frame.value?.parentElement || document.body);
   contextFont.value = { family: style.fontFamily, size: style.fontSize };
-  if (!stylesheet.value) stylesheet.value = await manifestStylesheet();
 });
 
 const srcdoc = computed(
   () => `<!DOCTYPE html><html><head><base target="_blank" />
-  ${
-    stylesheet.value
-      ? `<link rel="stylesheet" href="${stylesheet.value}" />`
-      : ""
-  }
+  ${mirroredStyles()}
   <style>
     body { margin: 0; font-family: ${contextFont.value.family}; font-size: ${
     contextFont.value.size
@@ -170,13 +151,13 @@ const srcdoc = computed(
       font-weight: 700;
       height: 12px;
       line-height: 0.1;
-      color: #383838;
-      background: #e8eaed;
+      color: var(--ink-gray-8);
+      background: var(--surface-gray-2);
       width: 23px;
       justify-content: center;
       border-radius: 5px;
     }
-    .replied-content .collapse:hover { background: #dadce0; }
+    .replied-content .collapse:hover { background: var(--surface-gray-3); }
     .replied-content .collapse + input { display: none; }
     .replied-content .collapse + input + div { display: none; }
     .replied-content .collapse + input:checked + div { display: block; }

@@ -1,4 +1,5 @@
 import { reactive, computed, ref, watch } from 'vue'
+import { ROUTES } from '@app/routes'
 import { toast } from 'frappe-ui'
 import { useSettingsModal } from '@app/stores/settings'
 
@@ -87,7 +88,7 @@ export default function setup(context) {
         doc: { subject: subject.value, description: description.value, template: 'Default', ...model },
         attachments: attachments.value,
       })
-      .then(() => router.push('/customer-tickets'))
+      .then(() => router.push(ROUTES.ticketList))
       .catch((error) => toast.error(error?.messages?.[0] || 'Could not create the ticket'))
   }
 

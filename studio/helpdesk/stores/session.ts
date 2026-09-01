@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { ROUTES } from '@app/routes'
 import { call } from 'frappe-ui'
 
 // Who is looking at the portal, and what it may offer them. The published Studio app
@@ -44,7 +45,7 @@ function createSessionStore() {
     isGuest.value
       ? [{ icon: 'lucide-log-in', label: 'Log in', onClick: signIn }]
       : [
-          { icon: 'lucide-inbox', label: 'My tickets', onClick: () => go('/customer-tickets') },
+          { icon: 'lucide-inbox', label: 'My tickets', onClick: () => go(ROUTES.ticketList) },
           { icon: 'lucide-user', label: 'My account', onClick: openSettings },
           { icon: 'lucide-log-out', label: 'Log out', onClick: signOut },
         ]
@@ -91,7 +92,7 @@ function createSessionStore() {
     } catch (error) {
       console.error(error)
     }
-    window.location.href = '/kb'
+    window.location.href = ROUTES.appRoot
   }
 
   /** `isFeedbackMandatory` is read straight off it, so the payload itself is exported. */

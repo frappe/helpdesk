@@ -22,7 +22,7 @@ const DEFAULT_VIEW = { name: '', label: 'List', icon: 'text-align-justify' }
 // URL cannot carry — page length, scroll position. Here it has to be storage: every way
 // back into this list (breadcrumb, account menu, post-submit redirect) pushes a bare
 // `/customer-tickets`, so a query string would survive the Back button and nothing else.
-const MEMORY_PREFIX = 'kb-list'
+const MEMORY_PREFIX = 'kb:list'
 
 const store = createViewsStore()
 

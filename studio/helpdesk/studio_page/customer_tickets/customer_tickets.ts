@@ -1,4 +1,5 @@
 import { computed, ref, watch } from 'vue'
+import { ROUTES } from '@app/routes'
 import { createResource } from 'frappe-ui'
 import { useListData, useListView } from '@framework/ui/ListView'
 import { parseFilters, serializeFilters } from '@framework/ui/Filter'
@@ -6,7 +7,7 @@ import {
   loadAssignees,
   avatarCell, datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
-} from '@app/components/ticketCells'
+} from '@app/components/list/ticketCells'
 import { useSettingsModal } from '@app/stores/settings'
 import { language, t } from '@app/stores/translations'
 import { useViews } from '@app/stores/views'
@@ -155,7 +156,7 @@ export default function setup(context) {
   // Stays inside the portal now that it has a ticket page of its own; it used to
   // hand the reader over to the desk SPA and its own chrome.
   function openTicket(row) {
-    context.router.push('/tickets/' + row.name)
+    context.router.push(ROUTES.ticket(row.name))
   }
 
   // --- Organization switcher ---

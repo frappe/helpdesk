@@ -179,7 +179,7 @@ function useOutsideHoursBanner(ticket) {
   )
 
   function dismissKey(name: string) {
-    return `dismissBanner_${name}_${new Date().toISOString().split('T')[0]}`
+    return `kb:banner-dismissed:${name}:${new Date().toISOString().split('T')[0]}`
   }
 
   function dismissBanner() {
