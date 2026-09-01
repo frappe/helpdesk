@@ -11,6 +11,7 @@ from helpdesk.test_utils import (
     make_agent,
     make_agent_status,
     set_agent_availability,
+    set_agent_status_enabled,
     set_default_agent_status,
 )
 
@@ -234,6 +235,32 @@ class TestHDAgentStatus(FrappeTestCase):
         self.assertEqual(
             frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
         )
+
+    # mirrors HD Agent's since-disabled rule: a status disabled behind the
+    # controller's back can still save unrelated fields, even as the default
+    def test_disabled_default_can_still_save_unrelated_fields(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        self._use_default("Focusing")
+        set_agent_status_enabled("Focusing", 0)
+
+        focusing.reload()
+        focusing.color = "Blue"
+        focusing.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent Status", "Focusing", "color"), "Blue"
+        )
+
+    # a status nobody holds can be retired without consulting the default --
+    # a status created disabled takes the same path
+    def test_disabling_an_unheld_status_needs_no_default(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        self._use_default(None)
+
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertFalse(focusing.enabled)
 
     # a disabled default would break agent creation, so HD Settings refuses one
     def test_hd_settings_rejects_disabled_default_status(self):

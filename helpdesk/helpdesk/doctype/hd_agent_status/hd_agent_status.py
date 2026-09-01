@@ -17,7 +17,10 @@ class HDAgentStatus(Document):
         self.reject_if_default()
 
     def validate_default_stays_enabled(self):
-        if self.enabled:
+        # Guarded on the value actually changing, like HD Agent's availability
+        # check: a status disabled behind the controller's back can still save
+        # unrelated fields.
+        if self.enabled or not self.has_value_changed("enabled"):
             return
 
         self.reject_if_default()
@@ -55,15 +58,21 @@ class HDAgentStatus(Document):
         if self.enabled or not self.has_value_changed("enabled"):
             return
 
+        # on_update runs on insert too, so this covers a status created
+        # disabled: nobody holds it, and the default is never consulted.
+        agents = frappe.get_all(
+            "HD Agent", filters={"availability": self.name}, pluck="name"
+        )
+        if not agents:
+            return
+
         default_status = get_default_agent_status()
         # One save at a time so HD Agent's controller does the validation, the
         # availability_changed_on stamp and the realtime broadcast. save() also
         # re-reads under a lock, so an agent who moved themselves meanwhile wins.
         # ponytail: synchronous. Enqueue if one status ever holds enough agents
         # for the request to time out.
-        for name in frappe.get_all(
-            "HD Agent", filters={"availability": self.name}, pluck="name"
-        ):
+        for name in agents:
             agent = frappe.get_doc("HD Agent", name)
             agent.availability = default_status
             agent.save(ignore_permissions=True)

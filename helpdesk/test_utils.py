@@ -332,7 +332,7 @@ def set_agent_status_enabled(status: str, enabled: bool | int):
     frappe.db.set_value("HD Agent Status", status, "enabled", int(enabled))
 
 
-def set_default_agent_status(status: str):
+def set_default_agent_status(status: str | None):
     """Point HD Settings at a different default, without going through the form."""
     frappe.db.set_single_value("HD Settings", "default_agent_status", status)
 
