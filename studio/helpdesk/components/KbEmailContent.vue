@@ -1,5 +1,9 @@
 <template>
-  <iframe ref="frame" :srcdoc="srcdoc" class="kb-email" />
+  <iframe
+    ref="frame"
+    :srcdoc="srcdoc"
+    class="block h-10 max-h-[500px] w-full max-w-full border-0"
+  />
 </template>
 
 <script setup lang="ts">
@@ -256,14 +260,3 @@ function hug(element: HTMLIFrameElement) {
   if (natural) element.style.width = `${natural}px`;
 }
 </script>
-
-<style scoped>
-.kb-email {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: 40px;
-  max-height: 500px;
-  border: 0;
-}
-</style>

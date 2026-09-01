@@ -12,21 +12,13 @@
         <template #default="{ editor, isEmpty }">
           <EditorBubbleMenu :items="commentToolbar" />
 
-          <!-- Sized inline, not in the stylesheet: the class lands on the ProseMirror node
-           but the scope attribute does not, so a scoped rule never matches it. Same
-           numbers the desk uses — `max-h-64 my-4 min-h-[5rem]`. -->
+          <!-- Utilities, not a scoped rule: the class lands on the ProseMirror node
+           but the scope attribute does not, so scoped CSS never matches it. -->
           <EditorContent
-            class="kb-reply__content prose prose-sm"
-            :style="{
-              maxHeight: '16rem',
-              minHeight: '5rem',
-              maxWidth: 'none',
-              overflowY: 'auto',
-              margin: '8px 0',
-            }"
+            class="prose prose-sm my-2 max-h-64 min-h-[5rem] max-w-none overflow-y-auto"
           />
 
-          <div v-if="attachments.length" class="kb-reply__files">
+          <div v-if="attachments.length" class="mb-2 flex flex-wrap gap-2">
             <Button
               v-for="file in attachments"
               :key="file.file_url"
@@ -38,15 +30,15 @@
             />
           </div>
 
-          <div class="kb-reply__bar">
-            <div class="kb-reply__tools">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex min-w-0 items-center gap-1 overflow-x-auto">
               <!-- Own input rather than frappe-ui's FileUploader: that one holds a single
                `<input>` with no `multiple`, so three screenshots meant three trips. -->
               <input
                 ref="fileInput"
                 type="file"
                 multiple
-                class="kb-reply__input"
+                class="hidden"
                 @change="pickFiles"
               />
               <Button
@@ -59,7 +51,7 @@
               <EditorFixedMenu :items="replyToolbar" />
             </div>
 
-            <div class="kb-reply__actions">
+            <div class="flex shrink-0 items-center gap-2">
               <Button
                 variant="ghost"
                 label="Discard"
@@ -243,8 +235,9 @@ defineExpose({ editor: computed(() => editorRef.value?.editor) });
 </script>
 
 <style scoped>
-/* A height animation without knowing the height: a grid row grows from nothing to its
-   content's size, which is interpolable where an `auto` height is not. */
+/* Plain CSS on purpose: a height animation without knowing the height — a grid row
+   grows from nothing to its content's size, which is interpolable where an `auto`
+   height is not. Keyframes over grid-template-rows have no utility equivalent. */
 .kb-reply--opening {
   display: grid;
   grid-template-rows: 0fr;
@@ -265,40 +258,5 @@ defineExpose({ editor: computed(() => editorRef.value?.editor) });
     grid-template-rows: 1fr;
     opacity: 1;
   }
-}
-
-.kb-reply__input {
-  display: none;
-}
-
-.kb-reply__files {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.kb-reply__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* The toolbar sits beside the attach button, as it does in the desk — one row of tools
-   under the message rather than a strip boxed in above it. */
-.kb-reply__tools {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  overflow-x: auto;
-}
-
-.kb-reply__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="kb-attachments">
+  <div class="flex flex-row flex-wrap gap-2 pt-4">
     <Button
       v-for="(attachment, index) in attachments"
       :key="attachment.file_url"
@@ -11,16 +11,16 @@
 
     <Dialog v-model="showDialog" size="4xl">
       <template #title>
-        <div class="kb-attachments__head">
-          <div class="kb-attachments__title">
+        <div class="flex min-w-0 items-center justify-between gap-3">
+          <div class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9">
             {{ current?.file_name }}
             <!-- Which of how many, the way any gallery says it. Only worth saying when
                  there is more than one to step through. -->
-            <span v-if="viewable.length > 1" class="kb-attachments__count">
+            <span v-if="viewable.length > 1" class="shrink-0 text-p-xs font-normal text-ink-gray-5">
               {{ position + 1 }} of {{ viewable.length }}
             </span>
           </div>
-          <div class="kb-attachments__controls">
+          <div class="flex shrink-0 items-center gap-1">
             <Button
               v-if="viewable.length > 1"
               variant="ghost"
@@ -48,20 +48,20 @@
       </template>
 
       <template #body-content>
-        <div class="kb-attachments__body">
+        <div class="flex justify-center">
           <img
             v-if="kindOf(current) === 'image'"
             :src="current?.file_url"
             :alt="current?.file_name"
-            class="kb-attachments__media"
+            class="m-auto max-h-[70vh] max-w-full rounded-md border border-outline-gray-2"
           />
           <video
             v-else-if="kindOf(current) === 'video'"
             :src="current?.file_url"
             controls
-            class="kb-attachments__media"
+            class="m-auto max-h-[70vh] max-w-full rounded-md border border-outline-gray-2"
           />
-          <div v-else class="kb-attachments__text prose prose-sm">
+          <div v-else class="prose prose-sm max-h-[70vh] w-full max-w-none overflow-auto whitespace-pre-wrap font-mono text-p-sm text-ink-gray-8">
             {{ text }}
           </div>
         </div>
@@ -186,71 +186,3 @@ watch([current, showDialog], () => {
     .catch(() => (text.value = "This file could not be read."));
 });
 </script>
-
-<style scoped>
-.kb-attachments {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 16px;
-}
-
-.kb-attachments__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-}
-
-.kb-attachments__title {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
-  color: var(--ink-gray-9);
-}
-
-.kb-attachments__count {
-  flex-shrink: 0;
-  font-weight: 400;
-  font-size: 12px;
-  color: var(--ink-gray-5);
-}
-
-.kb-attachments__controls {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.kb-attachments__body {
-  display: flex;
-  justify-content: center;
-}
-
-.kb-attachments__media {
-  max-height: 70vh;
-  max-width: 100%;
-  margin: auto;
-  border: 1px solid var(--outline-gray-2);
-  border-radius: 6px;
-}
-
-.kb-attachments__text {
-  max-height: 70vh;
-  width: 100%;
-  overflow: auto;
-  white-space: pre-wrap;
-  max-width: none;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
-  color: var(--ink-gray-8);
-}
-</style>
