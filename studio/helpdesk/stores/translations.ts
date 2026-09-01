@@ -234,6 +234,4 @@ export function tFormat(text: string, value: string) {
   return `${t(text)} ${value}`.trim()
 }
 
-export function useTranslations() {
-  return { t, tFormat, language }
 }

@@ -115,7 +115,7 @@
       "componentId": "Button-raise-ticket",
       "componentName": "Button",
       "componentProps": {
-       "label": "Raise a ticket",
+       "label": "{{ words.raiseTicket }}",
        "variant": "subtle"
       },
       "visibilityCondition": "{{ canCreateTicket && !['/', '/new-ticket'].includes(route.path) }}"
@@ -138,7 +138,7 @@
       "componentProps": {
        "fontSize": "text-base",
        "tag": "span",
-       "text": "Login"
+       "text": "{{ t('Login') }}"
       },
       "visibilityCondition": "{{ isGuest }}"
      },

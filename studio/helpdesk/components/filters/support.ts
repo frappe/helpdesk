@@ -29,11 +29,8 @@ export function useDebounceFn<T extends (...args: any[]) => void>(fn: T, wait: n
   };
 }
 
-/** The portal ships no translations, so this is the identity the desk's `__` collapses to
- *  here. Kept as a call rather than removed, so a future i18n pass has one place to fill. */
-export function __(text: string): string {
-  return text;
-}
+/** The desk spells it `__`; the portal's stand-in dictionary answers it. */
+export { t as __ } from '@app/stores/translations'
 
 export function useDevice() {
   return { isMac: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) };

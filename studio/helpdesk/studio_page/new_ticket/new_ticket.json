@@ -65,7 +65,7 @@
          "componentProps": {
           "fontSize": "text-2xl",
           "tag": "span",
-          "text": "Create new ticket"
+          "text": "{{ t('Create new ticket') }}"
          }
         },
         {
@@ -88,7 +88,7 @@
              "$type": "variable",
              "name": "subject"
             },
-            "placeholder": "A short description",
+            "placeholder": "{{ t('A short description') }}",
             "required": true,
             "size": "sm",
             "type": "text",
@@ -154,7 +154,7 @@
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
-            "placeholder": "Describe your issue\u2026",
+            "placeholder": "{{ t('Describe your issue\u2026') }}",
             "tags": null
            }
           }
@@ -192,7 +192,7 @@
             "label": "{{ dataItem.label }}",
             "modelValue": "{{ getField(dataItem.fieldname) }}",
             "options": "{{ optionsFor(dataItem) }}",
-            "placeholder": "Select option",
+            "placeholder": "{{ t('Select option') }}",
             "required": "{{ !!dataItem.required }}",
             "size": "sm",
             "type": "{{ controlType(dataItem.fieldtype) }}",
@@ -303,7 +303,7 @@
          "componentName": "Button",
          "componentProps": {
           "disabled": "{{ !canSubmit }}",
-          "label": "Create ticket",
+          "label": "{{ t('Create ticket') }}",
           "loading": false,
           "size": "md",
           "theme": "gray",
@@ -435,7 +435,7 @@
          "componentProps": {
           "fontSize": "text-2xl",
           "tag": "span",
-          "text": "Create new ticket"
+          "text": "{{ t('Create new ticket') }}"
          }
         },
         {
@@ -458,7 +458,7 @@
              "$type": "variable",
              "name": "subject"
             },
-            "placeholder": "A short description",
+            "placeholder": "{{ t('A short description') }}",
             "required": true,
             "size": "sm",
             "type": "text",
@@ -524,7 +524,7 @@
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
-            "placeholder": "Describe your issue\u2026",
+            "placeholder": "{{ t('Describe your issue\u2026') }}",
             "tags": null
            }
           }
@@ -562,7 +562,7 @@
             "label": "{{ dataItem.label }}",
             "modelValue": "{{ getField(dataItem.fieldname) }}",
             "options": "{{ optionsFor(dataItem) }}",
-            "placeholder": "Select option",
+            "placeholder": "{{ t('Select option') }}",
             "required": "{{ !!dataItem.required }}",
             "size": "sm",
             "type": "{{ controlType(dataItem.fieldtype) }}",
@@ -673,7 +673,7 @@
          "componentName": "Button",
          "componentProps": {
           "disabled": "{{ !canSubmit }}",
-          "label": "Create ticket",
+          "label": "{{ t('Create ticket') }}",
           "loading": false,
           "size": "md",
           "theme": "gray",

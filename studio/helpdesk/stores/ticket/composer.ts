@@ -56,9 +56,10 @@ export function useReplyComposer(ticket) {
    *  moves it. Same ease-out as the editor's own opening, so the two read as one movement.
    */
   function scrollThreadToEnd() {
-    const thread = document.querySelector(
-      '[data-component-id="container-ticket-thread"]',
-    )
+    // `.js-ticket-thread` is a class of ours on the thread block's `classes`
+    // list — a contract, where the studio-generated block id would silently
+    // break the ride the first time someone renamed the block in the editor.
+    const thread = document.querySelector('.js-ticket-thread')
     if (!thread) return
     const from = thread.scrollTop
     const distance = thread.scrollHeight - thread.clientHeight - from

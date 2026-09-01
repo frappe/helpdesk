@@ -442,7 +442,8 @@
             "flex-1",
             "overflow-y-auto",
             "py-0",
-            "px-10"
+            "px-10",
+            "js-ticket-thread"
            ],
            "componentId": "container-ticket-thread",
            "componentName": "container",
@@ -539,7 +540,7 @@
                 },
                 "onAttach": "{{ addAttachment }}",
                 "onRemoveAttachment": "{{ removeAttachment }}",
-                "placeholder": "Type a message",
+                "placeholder": "{{ t('Type a message') }}",
                 "sending": "{{ sending }}",
                 "uploadArgs": "{{ uploadArgs }}"
                },
@@ -1279,7 +1280,7 @@
                "$type": "variable",
                "name": "feedbackText"
               },
-              "placeholder": "Tell us more",
+              "placeholder": "{{ t('Tell us more') }}",
               "type": "textarea"
              },
              "componentSlots": {},
@@ -1788,7 +1789,8 @@
             "flex-1",
             "overflow-y-auto",
             "py-0",
-            "px-10"
+            "px-10",
+            "js-ticket-thread"
            ],
            "componentId": "container-ticket-thread",
            "componentName": "container",
@@ -1885,7 +1887,7 @@
                 },
                 "onAttach": "{{ addAttachment }}",
                 "onRemoveAttachment": "{{ removeAttachment }}",
-                "placeholder": "Type a message",
+                "placeholder": "{{ t('Type a message') }}",
                 "sending": "{{ sending }}",
                 "uploadArgs": "{{ uploadArgs }}"
                },
@@ -2625,7 +2627,7 @@
                "$type": "variable",
                "name": "feedbackText"
               },
-              "placeholder": "Tell us more",
+              "placeholder": "{{ t('Tell us more') }}",
               "type": "textarea"
              },
              "componentSlots": {},
