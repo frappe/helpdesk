@@ -233,5 +233,3 @@ export function t(text: string) {
 export function tFormat(text: string, value: string) {
   return `${t(text)} ${value}`.trim()
 }
-
-}
