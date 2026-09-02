@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/stores/auth";
-import { userStorage } from "@/components/command-palette/userStorage";
+import { userStorage } from "@/composables/userStorage";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
