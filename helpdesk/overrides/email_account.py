@@ -7,6 +7,7 @@ from frappe.core.doctype.communication.communication import Communication
 from frappe.email.doctype.email_account.email_account import EmailAccount
 from frappe.email.doctype.email_queue.email_queue import EmailQueue
 from frappe.email.receive import InboundMail
+from frappe.utils import parse_addr
 
 
 def auto_generated_reason(msg) -> str | None:
@@ -25,10 +26,8 @@ def auto_generated_reason(msg) -> str | None:
     if msg.get("X-Auto-Generated"):
         return "X-Auto-Generated"
 
-    # RFC 3834: "no" is the only human-sent value, and it may carry parameters
-    auto_submitted = (msg.get("Auto-Submitted") or "no").split(";")[0].strip().lower()
-    if auto_submitted != "no":
-        return f"Auto-Submitted: {auto_submitted}"
+    # bounce markers first, so the reason distinguishes a dead address from a
+    # mere autoresponder (a DSN usually carries Auto-Submitted too)
 
     # RFC 3464 delivery status notification -- survives a stripped Return-Path
     if (
@@ -41,6 +40,23 @@ def auto_generated_reason(msg) -> str | None:
     if (msg.get("Return-Path") or "").strip() == "<>":
         return "null return-path"
 
+    # RFC 3834: "no" is the only human-sent value, and it may carry parameters
+    auto_submitted = (msg.get("Auto-Submitted") or "no").split(";")[0].strip().lower()
+    if auto_submitted != "no":
+        return f"Auto-Submitted: {auto_submitted}"
+
+    return None
+
+
+def _failed_recipient(msg) -> str | None:
+    """The address a DSN reports as undeliverable, if it names one."""
+    for part in msg.walk():
+        if part.get_content_type() != "message/delivery-status":
+            continue
+        for status_block in part.get_payload():
+            recipient = status_block.get("Final-Recipient") or ""
+            if ";" in recipient:
+                return recipient.split(";", 1)[1].strip()
     return None
 
 
@@ -92,6 +108,67 @@ class CustomInboundMail(InboundMail):
 
 
 class CustomEmailAccount(EmailAccount):
+    def handle_bad_emails(self, uid, raw, reason):
+        """Same record as the framework version, without its use_imap gate.
+
+        POP3 and Frappe Mail hit the same drop paths as IMAP, and nothing
+        that reads Unhandled Email is IMAP-specific -- a silent drop would
+        hide a misclassified customer mail, so record on every transport.
+        """
+        try:
+            raw_str = (
+                raw.decode("ASCII", "replace")
+                if isinstance(raw, bytes)
+                else raw.encode(errors="replace").decode()
+            )
+            message_id = message_from_string(raw_str).get("Message-ID")
+        except Exception:
+            raw_str = message_id = "can't be parsed"
+
+        frappe.get_doc(
+            {
+                "doctype": "Unhandled Email",
+                "raw": raw_str,
+                "uid": uid,
+                "reason": reason,
+                "message_id": message_id,
+                "email_account": self.name,
+            }
+        ).insert(ignore_permissions=True)
+        frappe.db.commit()
+
+    def notify_ticket_of_parked_mail(self, message, msg, reason):
+        """Parked mail no longer threads onto tickets, so agents would never
+        learn that a reply bounced or that the customer is out of office.
+        Leave an internal comment on the ticket the mail belongs to."""
+        communication = CustomInboundMail(message, self).parent_communication()
+        if not communication or communication.reference_doctype != "HD Ticket":
+            return
+
+        if reason.startswith("Auto-Submitted"):
+            sender = parse_addr(msg.get("From") or "")[1]
+            content = _("Auto-reply received from {0}.").format(
+                sender or _("the customer")
+            )
+        else:
+            recipient = _failed_recipient(msg)
+            content = (
+                _(
+                    "Delivery failed: the reply to this ticket could not be delivered to {0}."
+                ).format(recipient)
+                if recipient
+                else _(
+                    "Delivery failed: the reply to this ticket could not be delivered."
+                )
+            )
+
+        comment = frappe.new_doc("HD Ticket Comment")
+        # not frappe.session.user: no human acted, even on a manual pull
+        comment.commented_by = "Administrator"
+        comment.reference_ticket = communication.reference_name
+        comment.content = content
+        comment.save(ignore_permissions=True)
+
     def get_inbound_mails(self) -> list[InboundMail]:
         """retrive and return inbound mails."""
         mails = []
@@ -114,6 +191,15 @@ class CustomEmailAccount(EmailAccount):
                     # it in Unhandled Email instead of dropping it without a trace.
                     if reason := auto_generated_reason(_msg):
                         self.handle_bad_emails(uid, message, reason)
+                        # our own looped-back ack carries no news for agents
+                        if reason != "X-Auto-Generated":
+                            try:
+                                self.notify_ticket_of_parked_mail(message, _msg, reason)
+                            except Exception:
+                                frappe.log_error(
+                                    title=_("Could not note parked mail on ticket"),
+                                    message=frappe.get_traceback(),
+                                )
                         continue
 
                     seen_status = messages.get("seen_status", {}).get(uid)
