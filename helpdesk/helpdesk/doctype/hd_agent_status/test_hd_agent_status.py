@@ -22,21 +22,17 @@ class TestHDAgentStatus(FrappeTestCase):
     DEFAULT_STATUSES = ("Active", "Away", "Unavailable")
 
     def setUp(self):
-        # starts from the install-seeded defaults (Active / Away / Unavailable).
+        # start from the shipped defaults (Active / Away / Unavailable)
         add_default_agent_status()
 
     def tearDown(self):
-        # Delete only the statuses a test created or renamed (e.g. the Active ->
-        # Online rename); keep the seeded defaults so other suites that rely on
-        # them (e.g. HD Agent) are unaffected. setUp restores any renamed default.
+        # delete statuses created by tests, keep the shipped ones
         frappe.db.delete("HD Agent Status", {"name": ["not in", self.DEFAULT_STATUSES]})
-        # The delete above skips link checks, so a renamed default would leave
-        # HD Settings pointing at a row that is gone. setUp covers the next test
-        # in this class; this covers whatever suite runs after the last one.
+        # db.delete skips link checks, re-seed so the default always exists
         add_default_agent_status()
 
     def _use_default(self, status: str):
-        """Name a different default, restored after the test."""
+        """Set a different default for this test, restores it after."""
         current = frappe.db.get_single_value("HD Settings", "default_agent_status")
         set_default_agent_status(status)
         self.addCleanup(set_default_agent_status, current)
@@ -100,22 +96,21 @@ class TestHDAgentStatus(FrappeTestCase):
         with self.assertRaises(frappe.MandatoryError):
             make_agent_status("No Category", category="")
 
-    # the status HD Settings names cannot be disabled
+    # the default status cannot be disabled
     def test_default_status_cannot_be_disabled(self):
         active = frappe.get_doc("HD Agent Status", "Active")
         active.enabled = 0
         with self.assertRaises(frappe.ValidationError):
             active.save()
 
-    # any status that is not the default can be disabled, Active category or not
+    # any other status can be disabled, Active category or not
     def test_non_default_status_can_be_disabled(self):
         online = make_agent_status("Online", category="Active")
         online.enabled = 0
         online.save()
         self.assertFalse(online.enabled)
 
-    # disabling a status moves the agents holding it to the default — the picker
-    # hides disabled statuses, so they would be left with an empty menu
+    # agents get moved to the default, else their picker goes blank
     def test_disabling_status_resets_agents_to_default(self):
         focusing = make_agent_status("Focusing", category="Away")
         agent = make_agent("disable_status@test.com", first_name="Disable Status")
@@ -161,7 +156,7 @@ class TestHDAgentStatus(FrappeTestCase):
 
         self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
 
-    # category no longer decides the default, so demotion is unconstrained
+    # category doesn't decide the default anymore, changing it is fine
     def test_status_can_be_demoted(self):
         online = make_agent_status("Online", category="Active")
         online.category = "Away"
@@ -185,8 +180,7 @@ class TestHDAgentStatus(FrappeTestCase):
             frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
         )
 
-    # the status HD Settings names cannot be deleted -- not even with force,
-    # which skips only the link check while on_trash still runs
+    # can't delete the default, even force delete (that only skips the link check)
     def test_default_status_cannot_be_deleted(self):
         with self.assertRaises(frappe.ValidationError):
             frappe.delete_doc("HD Agent Status", "Active")
@@ -199,8 +193,7 @@ class TestHDAgentStatus(FrappeTestCase):
         frappe.delete_doc("HD Agent Status", "Online")
         self.assertFalse(frappe.db.exists("HD Agent Status", "Online"))
 
-    # agents land on whatever HD Settings names, not on whichever Active status
-    # the database happens to return first
+    # agents move to the status set in HD Settings, not whatever the db returns first
     def test_agents_move_to_the_configured_default(self):
         self._use_default("Away")
         focusing = make_agent_status("Focusing", category="Away")
@@ -212,7 +205,7 @@ class TestHDAgentStatus(FrappeTestCase):
 
         self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
 
-    # a new agent starts on the configured default, not on the Active category
+    # new agents start on the chosen default, not just any Active status
     def test_new_agent_uses_the_configured_default(self):
         self._use_default("Away")
 
@@ -220,15 +213,13 @@ class TestHDAgentStatus(FrappeTestCase):
 
         self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
 
-    # the migration freezes the status the site was already resolving to, so an
-    # upgrade does not silently move every new agent onto a different one
+    # the patch keeps whatever default the site was already using
     def test_patch_picks_the_status_the_old_lookup_returned(self):
         from helpdesk.patches.set_default_agent_status_in_settings import (
             execute as name_the_default,
         )
 
-        # "Online" is created now, so it is newer than the seeded "Active" --
-        # which makes it what the replaced lookup was already returning here
+        # "Online" is newer than "Active", so the old query would have picked it
         make_agent_status("Online", category="Active")
         set_default_agent_status(None)
         self.addCleanup(set_default_agent_status, "Active")
@@ -239,8 +230,7 @@ class TestHDAgentStatus(FrappeTestCase):
             frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
         )
 
-    # mirrors HD Agent's since-disabled rule: a status disabled behind the
-    # controller's back can still save unrelated fields, even as the default
+    # a default disabled via db can still save other fields
     def test_disabled_default_can_still_save_unrelated_fields(self):
         focusing = make_agent_status("Focusing", category="Away")
         self._use_default("Focusing")
@@ -254,8 +244,7 @@ class TestHDAgentStatus(FrappeTestCase):
             frappe.db.get_value("HD Agent Status", "Focusing", "color"), "Blue"
         )
 
-    # a status nobody holds can be retired without consulting the default --
-    # a status created disabled takes the same path
+    # disabling a status nobody is on works even with no default set
     def test_disabling_an_unheld_status_needs_no_default(self):
         focusing = make_agent_status("Focusing", category="Away")
         self._use_default(None)
@@ -265,7 +254,7 @@ class TestHDAgentStatus(FrappeTestCase):
 
         self.assertFalse(focusing.enabled)
 
-    # a disabled default would break agent creation, so HD Settings refuses one
+    # HD Settings refuses a disabled status as the default
     def test_hd_settings_rejects_disabled_default_status(self):
         make_agent_status("Focusing", category="Away", enabled=0)
 

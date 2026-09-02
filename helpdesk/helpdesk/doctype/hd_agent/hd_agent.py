@@ -87,8 +87,7 @@ class HDAgent(Document):
                 "agent": self.name,
                 "availability": self.availability,
                 "availability_changed_on": self.availability_changed_on,
-                # Who moved it, so a client can tell its own change (from any of
-                # its sessions) from one an admin made for it.
+                # so the client can tell if someone else changed their status
                 "changed_by": frappe.session.user,
             },
         )

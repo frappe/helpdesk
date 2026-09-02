@@ -17,21 +17,16 @@ class HDAgentStatus(Document):
         self.reject_if_default()
 
     def validate_default_stays_enabled(self):
-        # Guarded on the value actually changing, like HD Agent's availability
-        # check: a status disabled behind the controller's back can still save
-        # unrelated fields.
+        # check only when disabling, already disabled statuses should still
+        # save fine
         if self.enabled or not self.has_value_changed("enabled"):
             return
 
         self.reject_if_default()
 
     def reject_if_default(self):
-        """The status HD Settings points at has to stay available: it is where
-        new agents start and where agents land when their status is retired.
-
-        Reads the setting directly rather than through get_default_agent_status:
-        if no default is named, there is nothing to protect, not an error.
-        """
+        """Block disabling or deleting the default status, agents get created
+        on it and moved to it."""
         if self.name != frappe.db.get_single_value(
             "HD Settings", "default_agent_status"
         ):
@@ -44,22 +39,16 @@ class HDAgentStatus(Document):
         )
 
     def reset_agents_to_default(self):
-        """Move agents off a status the admin just retired.
+        """Move agents off a disabled status, else they get stuck on a status
+        the picker no longer shows.
 
-        Left alone they keep a status that is no longer offered: it is filtered
-        out of the picker, so their own menu renders empty while everyone else
-        still sees the retired status against their name.
-
-        TODO: notify each agent that their status was reset. HD Notification is
-        ticket-shaped today (notification_type is a Select of
-        Assignment/Mention/Reaction and user_from is mandatory), so this waits
-        on the notification refactor; the socket toast covers it meanwhile.
+        TODO: send an in-app notification too, HD Notification only supports
+        ticket notifications right now. The toast covers it for now.
         """
         if self.enabled or not self.has_value_changed("enabled"):
             return
 
-        # on_update runs on insert too, so this covers a status created
-        # disabled: nobody holds it, and the default is never consulted.
+        # on_update fires on insert too, a new status has no agents anyway
         agents = frappe.get_all(
             "HD Agent", filters={"availability": self.name}, pluck="name"
         )
@@ -67,11 +56,9 @@ class HDAgentStatus(Document):
             return
 
         default_status = get_default_agent_status()
-        # One save at a time so HD Agent's controller does the validation, the
-        # availability_changed_on stamp and the realtime broadcast. save() also
-        # re-reads under a lock, so an agent who moved themselves meanwhile wins.
-        # ponytail: synchronous. Enqueue if one status ever holds enough agents
-        # for the request to time out.
+        # save via the controller so validation, timestamp and realtime
+        # updates all happen. save() also catches an agent changing their
+        # status at the same time
         for name in agents:
             agent = frappe.get_doc("HD Agent", name)
             agent.availability = default_status
@@ -79,13 +66,8 @@ class HDAgentStatus(Document):
 
 
 def get_default_agent_status() -> str:
-    """The status new agents start on, and where agents land when the status
-    they are on is retired.
-
-    Named in HD Settings rather than inferred from an ordering: with more than
-    one enabled status any ordering picks a winner silently, and this now moves
-    existing agents in bulk.
-    """
+    """Default status from HD Settings, new agents start on it and agents
+    get moved to it when their status is disabled."""
     status = frappe.db.get_single_value("HD Settings", "default_agent_status")
     if not status:
         frappe.throw(_("Set a default agent status in HD Settings."))

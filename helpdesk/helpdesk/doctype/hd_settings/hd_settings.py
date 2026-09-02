@@ -25,11 +25,8 @@ class HDSettings(Document):
         self.validate_default_agent_status()
 
     def validate_default_agent_status(self):
-        """New agents are created on this status and HD Agent rejects a disabled
-        one, so a disabled default would break agent creation.
-
-        Empty is left to the field's own mandatory check, which says so better.
-        """
+        """The default status should be enabled, else agent creation breaks.
+        Empty is handled by the mandatory check."""
         if not self.default_agent_status:
             return
 

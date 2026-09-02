@@ -69,11 +69,10 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
 
   const { $socket } = globalStore();
   $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
-    // Our status, moved by someone else — an admin disabled the status we were
-    // on. Keyed on who did it rather than on the value changing, so a change we
-    // made in another tab stays silent.
+    // toast only when someone else changed our status, our own change
+    // from another tab should stay quiet
     if (data.agent === myAgentName && data.changed_by !== window.session_user) {
-      // Status names go through __() in the picker, so translate it here too.
+      // status names are translated in the picker, so translate here too
       toast.info(__("Your status was changed to {0}.", __(data.availability)));
     }
     applyLive(data.agent, data.availability, data.availability_changed_on);

@@ -47,7 +47,7 @@ class TestHDAgent(FrappeTestCase):
             value=availability,
         )
 
-    # a new agent defaults to the status HD Settings names
+    # a new agent starts on the default from HD Settings
     def test_new_agent_defaults_to_configured_status(self):
         agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
 
