@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/auth";
+import { userStorage } from "@/components/command-palette/userStorage";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
@@ -41,6 +42,24 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // Set only for sessions that have an HD Agent record; null otherwise.
   const myAgentName = window.agent;
 
+  // One status change = one greeting per device. An empty marker means this
+  // device has no baseline yet: record without greeting, so a fresh browser
+  // is not told about changes that predate it.
+  const lastSeenStatusChange = userStorage("hd_status_change_seen", "");
+
+  function noteStatusChange(
+    availability: string,
+    changedOn: string,
+    changedBy: string
+  ) {
+    if (!changedOn || changedOn === lastSeenStatusChange.value) return;
+    const firstVisit = !lastSeenStatusChange.value;
+    lastSeenStatusChange.value = changedOn;
+    if (firstVisit || !changedBy || changedBy === window.session_user) return;
+    // status names are translated in the picker, so translate here too
+    toast.info(__("Your status was changed to {0}.", __(availability)));
+  }
+
   const statuses = createListResource({
     doctype: "HD Agent Status",
     cache: ["HD Agent Status", "list"],
@@ -69,11 +88,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
 
   const { $socket } = globalStore();
   $socket.on("agent_availability_updated", (data: AvailabilityEvent) => {
-    // toast only when someone else changed our status, our own change
-    // from another tab should stay quiet
-    if (data.agent === myAgentName && data.changed_by !== window.session_user) {
-      // status names are translated in the picker, so translate here too
-      toast.info(__("Your status was changed to {0}.", __(data.availability)));
+    if (data.agent === myAgentName) {
+      noteStatusChange(
+        data.availability,
+        data.availability_changed_on,
+        data.changed_by
+      );
     }
     applyLive(data.agent, data.availability, data.availability_changed_on);
   });
@@ -88,6 +108,15 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       applyLive(myAgentName ?? "", availability, auth.availabilityChangedOn),
     { immediate: true }
   );
+
+  // greet a login that missed the live toast
+  if (myAgentName) {
+    noteStatusChange(
+      auth.availability,
+      auth.availabilityChangedOn,
+      auth.availabilityChangedBy
+    );
+  }
 
   // A plain document write: HD Agent's controller owns the validation, the
   // availability_changed_on stamp and the socket broadcast, so every write path

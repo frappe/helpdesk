@@ -102,12 +102,18 @@ class TestHDAgent(FrappeTestCase):
     # managers still administer everyone — the Agents settings page depends on it
     def test_manager_can_set_another_agents_availability(self):
         other = make_agent("managed_agent@test.com", first_name="Managed Agent")
+        # known starting point, so the write below is a real change
+        set_agent_availability(other, "Active")
         manager = make_agent("agent_manager@test.com", first_name="Agent Manager")
         frappe.get_doc("User", manager).add_roles("Agent Manager")
 
         self._set_availability_as(manager, other, "Away")
 
         self.assertEqual(frappe.db.get_value("HD Agent", other, "availability"), "Away")
+        # the stamp is what lets a login tell someone else changed it
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", other, "availability_changed_by"), manager
+        )
 
     # reads stay open — presence dots and assignment pickers list every agent
     def test_agent_can_still_read_another_agent(self):
@@ -180,6 +186,7 @@ class TestHDAgent(FrappeTestCase):
 
         self.assertEqual(result["availability"], "Away")
         self.assertIsNotNone(result["availability_changed_on"])
+        self.assertEqual(result["availability_changed_by"], "Administrator")
 
     def _make_assignment_rule(self, team_name: str, members: list[str], rule: str):
         team = make_team(team_name, members)

@@ -23,6 +23,7 @@ class HDAgent(Document):
         old_doc = self.get_doc_before_save()
         if self.has_value_changed("availability"):
             self.availability_changed_on = frappe.utils.now()
+            self.availability_changed_by = frappe.session.user
         if old_doc and old_doc.agent_name != self.agent_name:
             if self.agent_name:
                 agent_name = self.agent_name.split()
