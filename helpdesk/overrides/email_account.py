@@ -20,8 +20,12 @@ def auto_generated_reason(msg) -> str | None:
     (mail_cc), and an account with enable_auto_reply answers mailer-daemon.
 
     X-Auto-Generated only catches helpdesk's own acks, which stamp it. Real
-    bounces announce themselves with RFC 3834 Auto-Submitted, the RFC 3464
-    report type, or the RFC 5321 null return-path.
+    bounces announce themselves with the RFC 3464 report type or the RFC 5321
+    null return-path; other machine mail with RFC 3834 Auto-Submitted.
+
+    Auto-replied mail (out of office, read receipts) is deliberately let
+    through: it threads onto its ticket so agents see it, and well-behaved
+    responders rate-limit themselves, so it cannot sustain a loop.
     """
     if msg.get("X-Auto-Generated"):
         return "X-Auto-Generated"
@@ -40,9 +44,11 @@ def auto_generated_reason(msg) -> str | None:
     if (msg.get("Return-Path") or "").strip() == "<>":
         return "null return-path"
 
-    # RFC 3834: "no" is the only human-sent value, and it may carry parameters
+    # RFC 3834 ("no" may carry parameters, e.g. "no; owner=..."). auto-replied
+    # passes: an out-of-office should reach the ticket, and it is rate-limited
+    # by the sender so it cannot loop the way a bounce or an alert feed can
     auto_submitted = (msg.get("Auto-Submitted") or "no").split(";")[0].strip().lower()
-    if auto_submitted != "no":
+    if auto_submitted not in ("no", "auto-replied"):
         return f"Auto-Submitted: {auto_submitted}"
 
     return None
@@ -141,8 +147,8 @@ class CustomEmailAccount(EmailAccount):
 
     def notify_ticket_of_parked_mail(self, message, msg, reason):
         """Parked mail no longer threads onto tickets, so agents would never
-        learn that a reply bounced or that the customer is out of office.
-        Leave an internal comment on the ticket the mail belongs to."""
+        learn that a reply bounced or that a machine answered. Leave an
+        internal comment on the ticket the mail belongs to."""
         communication = CustomInboundMail(message, self).parent_communication()
         if not communication or communication.reference_doctype != "HD Ticket":
             return
