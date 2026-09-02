@@ -1,11 +1,19 @@
 # Copyright (c) 2026, Frappe Technologies and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.setup.install import add_default_agent_status
-from helpdesk.test_utils import make_agent, make_agent_status
+from helpdesk.test_utils import (
+    make_agent,
+    make_agent_status,
+    set_agent_availability,
+    set_agent_status_enabled,
+    set_default_agent_status,
+)
 
 
 class TestHDAgentStatus(FrappeTestCase):
@@ -14,14 +22,20 @@ class TestHDAgentStatus(FrappeTestCase):
     DEFAULT_STATUSES = ("Active", "Away", "Unavailable")
 
     def setUp(self):
-        # starts from the install-seeded defaults (Active / Away / Unavailable).
+        # start from the shipped defaults (Active / Away / Unavailable)
         add_default_agent_status()
 
     def tearDown(self):
-        # Delete only the statuses a test created or renamed (e.g. the Active ->
-        # Online rename); keep the seeded defaults so other suites that rely on
-        # them (e.g. HD Agent) are unaffected. setUp restores any renamed default.
+        # delete statuses created by tests, keep the shipped ones
         frappe.db.delete("HD Agent Status", {"name": ["not in", self.DEFAULT_STATUSES]})
+        # db.delete skips link checks, re-seed so the default always exists
+        add_default_agent_status()
+
+    def _use_default(self, status: str):
+        """Set a different default for this test, restores it after."""
+        current = frappe.db.get_single_value("HD Settings", "default_agent_status")
+        set_default_agent_status(status)
+        self.addCleanup(set_default_agent_status, current)
 
     # The statuses created on install exist with the expected categories
     def test_default_statuses_are_seeded(self):
@@ -35,6 +49,10 @@ class TestHDAgentStatus(FrappeTestCase):
             self.assertEqual(
                 frappe.db.get_value("HD Agent Status", status, "category"), category
             )
+
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "default_agent_status"), "Active"
+        )
 
     # autoname is field:agent_status, so the record name is the status value
     def test_name_is_the_status_value(self):
@@ -78,29 +96,68 @@ class TestHDAgentStatus(FrappeTestCase):
         with self.assertRaises(frappe.MandatoryError):
             make_agent_status("No Category", category="")
 
-    # the last enabled Active status cannot be disabled
-    def test_last_active_status_cannot_be_disabled(self):
+    # the default status cannot be disabled
+    def test_default_status_cannot_be_disabled(self):
         active = frappe.get_doc("HD Agent Status", "Active")
-        active.enable = 0
+        active.enabled = 0
         with self.assertRaises(frappe.ValidationError):
             active.save()
 
-    # an Active status can be disabled while another enabled Active status remains
-    def test_active_status_can_be_disabled_with_another_active(self):
+    # any other status can be disabled, Active category or not
+    def test_non_default_status_can_be_disabled(self):
         online = make_agent_status("Online", category="Active")
-        online.enable = 0
+        online.enabled = 0
         online.save()
-        self.assertFalse(online.enable)
+        self.assertFalse(online.enabled)
 
-    # the last Active status cannot be moved out of the Active category
-    def test_last_active_status_cannot_be_demoted(self):
-        active = frappe.get_doc("HD Agent Status", "Active")
-        active.category = "Away"
-        with self.assertRaises(frappe.ValidationError):
-            active.save()
+    # agents get moved to the default, else their picker goes blank
+    def test_disabling_status_resets_agents_to_default(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        agent = make_agent("disable_status@test.com", first_name="Disable Status")
+        set_agent_availability(agent, "Focusing")
 
-    # an Active status can be demoted while another enabled Active status remains
-    def test_active_status_can_be_demoted_with_another_active(self):
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", agent, "availability"), "Active"
+        )
+
+    # the reset runs through HD Agent, so every connected client hears about it
+    def test_disabling_status_publishes_for_each_agent(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        first = make_agent("disable_publish_1@test.com", first_name="Disable Publish 1")
+        second = make_agent(
+            "disable_publish_2@test.com", first_name="Disable Publish 2"
+        )
+        set_agent_availability(first, "Focusing")
+        set_agent_availability(second, "Focusing")
+
+        with patch(
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+        ) as publish:
+            focusing.enabled = 0
+            focusing.save()
+
+        self.assertEqual(publish.call_count, 2)
+        self.assertEqual(
+            {call.kwargs["data"]["agent"] for call in publish.call_args_list},
+            {first, second},
+        )
+
+    # only agents on the disabled status are touched
+    def test_disabling_status_leaves_other_agents_alone(self):
+        online = make_agent_status("Online", category="Active")
+        agent = make_agent("unused_status@test.com", first_name="Unused Status")
+        set_agent_availability(agent, "Away")
+
+        online.enabled = 0
+        online.save()
+
+        self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
+
+    # category doesn't decide the default anymore, changing it is fine
+    def test_status_can_be_demoted(self):
         online = make_agent_status("Online", category="Active")
         online.category = "Away"
         online.save()
@@ -118,14 +175,90 @@ class TestHDAgentStatus(FrappeTestCase):
         self.assertEqual(
             frappe.db.get_value("HD Agent", agent, "availability"), "Online"
         )
+        # frappe rewrites link fields on Singles too, so the setting follows
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
+        )
 
-    # the last Active status cannot be deleted
-    def test_last_active_status_cannot_be_deleted(self):
+    # can't delete the default, even force delete (that only skips the link check)
+    def test_default_status_cannot_be_deleted(self):
         with self.assertRaises(frappe.ValidationError):
             frappe.delete_doc("HD Agent Status", "Active")
+        with self.assertRaises(frappe.ValidationError):
+            frappe.delete_doc("HD Agent Status", "Active", force=True)
 
-    # an Active status can be deleted while another enabled Active status remains
-    def test_active_status_can_be_deleted_with_another_active(self):
+    # any other status can be deleted
+    def test_non_default_status_can_be_deleted(self):
         make_agent_status("Online", category="Active")
         frappe.delete_doc("HD Agent Status", "Online")
         self.assertFalse(frappe.db.exists("HD Agent Status", "Online"))
+
+    # agents move to the status set in HD Settings, not whatever the db returns first
+    def test_agents_move_to_the_configured_default(self):
+        self._use_default("Away")
+        focusing = make_agent_status("Focusing", category="Away")
+        agent = make_agent("configured_default@test.com", first_name="Configured")
+        set_agent_availability(agent, "Focusing")
+
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
+
+    # new agents start on the chosen default, not just any Active status
+    def test_new_agent_uses_the_configured_default(self):
+        self._use_default("Away")
+
+        agent = make_agent("new_agent_default@test.com", first_name="New Default")
+
+        self.assertEqual(frappe.db.get_value("HD Agent", agent, "availability"), "Away")
+
+    # the patch keeps whatever default the site was already using
+    def test_patch_picks_the_status_the_old_lookup_returned(self):
+        from helpdesk.patches.set_default_agent_status_in_settings import (
+            execute as name_the_default,
+        )
+
+        # "Online" is newer than "Active", so the old query would have picked it
+        make_agent_status("Online", category="Active")
+        set_default_agent_status(None)
+        self.addCleanup(set_default_agent_status, "Active")
+
+        name_the_default()
+
+        self.assertEqual(
+            frappe.db.get_single_value("HD Settings", "default_agent_status"), "Online"
+        )
+
+    # a default disabled via db can still save other fields
+    def test_disabled_default_can_still_save_unrelated_fields(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        self._use_default("Focusing")
+        set_agent_status_enabled("Focusing", 0)
+
+        focusing.reload()
+        focusing.color = "Blue"
+        focusing.save()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent Status", "Focusing", "color"), "Blue"
+        )
+
+    # disabling a status nobody is on works even with no default set
+    def test_disabling_an_unheld_status_needs_no_default(self):
+        focusing = make_agent_status("Focusing", category="Away")
+        self._use_default(None)
+
+        focusing.enabled = 0
+        focusing.save()
+
+        self.assertFalse(focusing.enabled)
+
+    # HD Settings refuses a disabled status as the default
+    def test_hd_settings_rejects_disabled_default_status(self):
+        make_agent_status("Focusing", category="Away", enabled=0)
+
+        settings = frappe.get_doc("HD Settings")
+        settings.default_agent_status = "Focusing"
+        with self.assertRaises(frappe.ValidationError):
+            settings.save()

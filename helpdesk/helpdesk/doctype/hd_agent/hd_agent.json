@@ -11,7 +11,8 @@
   "user_image",
   "is_active",
   "availability",
-  "availability_changed_on"
+  "availability_changed_on",
+  "availability_changed_by"
  ],
  "fields": [
   {
@@ -52,11 +53,18 @@
    "fieldtype": "Datetime",
    "label": "Availability Changed On",
    "read_only": 1
+  },
+  {
+   "fieldname": "availability_changed_by",
+   "fieldtype": "Link",
+   "label": "Availability Changed By",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-27 16:57:56.129699",
+ "modified": "2026-09-02 19:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
