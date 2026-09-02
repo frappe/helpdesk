@@ -193,7 +193,9 @@ class TestHandleBadEmailsRecordsAllTransports(IntegrationTestCase):
 
     def tearDown(self):
         frappe.db.delete("Unhandled Email", {"reason": self.REASON})
-        frappe.db.commit()
+        # handle_bad_emails commits, so the cleanup must commit too or the
+        # class-level rollback would resurrect the row
+        frappe.db.commit()  # nosemgrep
         super().tearDown()
 
     def test_non_imap_drop_lands_in_unhandled_email(self):

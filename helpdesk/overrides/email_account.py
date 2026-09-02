@@ -135,7 +135,9 @@ class CustomEmailAccount(EmailAccount):
                 "email_account": self.name,
             }
         ).insert(ignore_permissions=True)
-        frappe.db.commit()
+        # the record must survive a later mail in the batch failing mid-pull;
+        # the framework version commits here for the same reason
+        frappe.db.commit()  # nosemgrep
 
     def notify_ticket_of_parked_mail(self, message, msg, reason):
         """Parked mail no longer threads onto tickets, so agents would never
