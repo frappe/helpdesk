@@ -4,10 +4,7 @@ from email import message_from_string
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.overrides.email_account.email_account import (
-    _failed_recipient,
-    auto_generated_reason,
-)
+from helpdesk.overrides.email_account import _failed_recipient, auto_generated_reason
 from helpdesk.test_utils import make_ticket
 
 # Real Gmail DSN headers -- the shape that caused the 95-mail loop on ticket 74703
