@@ -139,6 +139,7 @@
           />
           <div class="flex gap-2">
             <Button
+              v-if="hasChanges"
               :label="__('Update Account')"
               variant="solid"
               @click="updateAccount"
@@ -229,7 +230,7 @@ const props = withDefaults(defineProps<P>(), {
 
 const emit = defineEmits<E>();
 
-const state = reactive<EmailAccountProviderAuthState>({
+const getInitialState = (): EmailAccountProviderAuthState => ({
   email_account_name: props.accountData.email_account_name || "",
   service: props.accountData.service || "",
   email_id: props.accountData.email_id || "",
@@ -242,6 +243,8 @@ const state = reactive<EmailAccountProviderAuthState>({
   default_outgoing: props.accountData.default_outgoing || false,
   default_incoming: props.accountData.default_incoming || false,
 });
+
+const state = reactive<EmailAccountProviderAuthState>(getInitialState());
 
 const getInitialCustomState = (): CustomEmailAccountState => ({
   domain: props.accountData?.domain || "",
@@ -328,26 +331,8 @@ async function updateAccount() {
     : currentServiceName.value;
   error.value = validateInputs(validationState, validationService, true);
   if (error.value) return;
-  const old = { ...props.accountData };
-  const updatedEmailAccount = { ...state };
 
-  const nameChanged =
-    old.email_account_name !== updatedEmailAccount.email_account_name;
-  delete old.email_account_name;
-  delete updatedEmailAccount.email_account_name;
-
-  const otherFieldsChanged = isDirty.value;
-  const values = buildUpdatePayload();
-
-  if (!nameChanged && !otherFieldsChanged) {
-    toast.create({
-      message: __("No changes made"),
-      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
-    });
-    return;
-  }
-
-  if (nameChanged) {
+  if (nameChanged.value) {
     try {
       loading.value = true;
       await callRenameDoc();
@@ -356,10 +341,10 @@ async function updateAccount() {
       errorHandler();
     }
   }
-  if (otherFieldsChanged) {
+  if (isDirty.value) {
     try {
       loading.value = true;
-      await callSetValue(values);
+      await callSetValue(buildUpdatePayload());
       succesHandler();
     } catch (err) {
       errorHandler();
@@ -423,31 +408,31 @@ function pullEmails() {
     });
 }
 
+// Compare against the initial values rather than the account itself. The form
+// normalises what the server sends (a 0 becomes false, a null becomes ""), so
+// comparing straight to the account reported every custom account as changed.
+// Renaming goes through a separate API, so it is tracked by nameChanged.
 const isDirty = computed(() => {
-  const customDirty = isCustomProvider.value
-    ? customState.domain !== props.accountData.domain ||
-      customState.email_server !== props.accountData.email_server ||
-      customState.smtp_server !== props.accountData.smtp_server ||
-      customState.incoming_port !== props.accountData.incoming_port ||
-      customState.smtp_port !== props.accountData.smtp_port ||
-      customState.use_ssl !== props.accountData.use_ssl ||
-      customState.use_starttls !== props.accountData.use_starttls
-    : false;
-
-  return (
-    customDirty ||
-    state.service !== props.accountData.service ||
-    state.email_id !== props.accountData.email_id ||
-    state.api_key !== props.accountData.api_key ||
-    state.api_secret !== props.accountData.api_secret ||
-    state.password !== props.accountData.password ||
-    state.enable_incoming !== props.accountData.enable_incoming ||
-    state.enable_outgoing !== props.accountData.enable_outgoing ||
-    state.default_outgoing !== props.accountData.default_outgoing ||
-    state.default_incoming !== props.accountData.default_incoming ||
-    state.frappe_mail_site !== props.accountData.frappe_mail_site
+  const initialState = getInitialState();
+  const baseChanged = (
+    Object.keys(initialState) as (keyof EmailAccountProviderAuthState)[]
+  ).some(
+    (field) =>
+      field !== "email_account_name" && state[field] !== initialState[field]
   );
+  if (baseChanged || !isCustomProvider.value) return baseChanged;
+
+  const initialCustomState = getInitialCustomState();
+  return (
+    Object.keys(initialCustomState) as (keyof CustomEmailAccountState)[]
+  ).some((field) => customState[field] !== initialCustomState[field]);
 });
+
+const nameChanged = computed(
+  () => state.email_account_name !== getInitialState().email_account_name
+);
+
+const hasChanges = computed(() => nameChanged.value || isDirty.value);
 
 async function callRenameDoc() {
   return call("frappe.client.rename_doc", {

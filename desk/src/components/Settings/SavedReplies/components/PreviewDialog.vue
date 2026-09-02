@@ -32,7 +32,7 @@
             >
               <template #default>
                 <EditorContent
-                  class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors flex"
+                  class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
                 />
               </template>
             </Editor>
@@ -50,20 +50,21 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
+import { buildEditorExtensions } from "@/components/editor/config";
+import { __ } from "@/translation";
+import { RenderedSavedReply } from "@/types";
 import {
   createListResource,
   createResource,
   Dialog,
   FormLabel,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
-import { LoadingIndicator } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { buildEditorExtensions } from "@/components/editor/config";
-const extensions = buildEditorExtensions();
-import { Link } from "@/components";
 import { watch } from "vue";
-import { __ } from "@/translation";
+const extensions = buildEditorExtensions();
 
 const dialogModel = defineModel<{
   show: boolean;
@@ -74,8 +75,8 @@ const dialogModel = defineModel<{
 
 const getResponsePreviewResource = createResource({
   url: "helpdesk.api.saved_replies.get_rendered_saved_reply",
-  onSuccess: (data) => {
-    dialogModel.value.preview = data;
+  onSuccess: (data: RenderedSavedReply) => {
+    dialogModel.value.preview = data.message;
   },
 });
 

@@ -15,7 +15,11 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
     show_outside_hours_banner,
     split_ticket,
 )
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import close_tickets_after_n_days
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
+    close_tickets_after_n_days,
+    has_permission,
+    permission_query,
+)
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
     add_comment,
@@ -29,6 +33,7 @@ from helpdesk.test_utils import (
     make_priority,
     make_sla,
     make_status,
+    make_team,
     make_ticket,
     remove_holidays,
     set_ticket_status_and_communication_date,
@@ -113,6 +118,15 @@ class TestHDTicket(IntegrationTestCase):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
         self.assertTrue(ticket.name)
+
+    def test_update_perms_skipped_without_a_previous_version(self):
+        # a before_insert hook that persists the ticket clears __islocal, so is_new()
+        # can be False on create while there is still no previous version to check
+        frappe.set_user(non_agent)
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.set("__islocal", False)
+        ticket.check_update_perms()
+        frappe.set_user("Administrator")
 
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
@@ -866,6 +880,34 @@ class TestHDTicket(IntegrationTestCase):
         with self.freeze_time(next_working_day):
             banner_shown = show_outside_hours_banner(ticket.name)["show"]
             self.assertFalse(banner_shown)
+
+    def test_ticket_outside_working_hours_next_day_holiday(self):
+        tuesday = add_to_date(get_current_week_monday(), days=1)
+        add_holiday(getdate(tuesday), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(get_current_week_monday(hours=20)):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=1)):
+            # Tuesday is a holiday, so the banner stays up
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+
+        with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=2)):
+            # Wednesday is the next working day
+            self.assertFalse(show_outside_hours_banner(ticket.name)["show"])
+
+    def test_ticket_raised_on_holiday(self):
+        tuesday_afternoon = add_to_date(get_current_week_monday(hours=14), days=1)
+        add_holiday(getdate(tuesday_afternoon), "Test Holiday")
+        self.addCleanup(remove_holidays)
+
+        with self.freeze_time(tuesday_afternoon):
+            ticket = make_ticket(priority="High")
+            self.assertTrue(ticket.raised_outside_working_hours)
+            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
 
     def test_contact_ticket_visibility(self):
         """
@@ -2262,6 +2304,29 @@ class TestHDTicket(IntegrationTestCase):
 
         self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
         self.assertFalse(ticket.total_hold_time)
+
+    def test_permission_check_answers_for_passed_user_not_session(self):
+        """A check made on behalf of another user must use that user's teams.
+
+        Session is an agent on the ticket's team, the checked user is not, so a
+        session-bound lookup would wrongly grant access.
+        """
+        make_team("Team A", members=[agent])
+        make_team("Team B", members=[agent2])
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "restrict_tickets_by_agent_group",
+            0,
+        )
+
+        ticket = make_ticket(agent_group="Team B", raised_by=non_agent)
+
+        frappe.set_user(agent2)
+        self.assertTrue(has_permission(ticket, user=agent2))
+        self.assertFalse(has_permission(ticket, user=agent))
+        self.assertNotIn("Team B", permission_query(agent))
 
     def tearDown(self):
         frappe.set_user("Administrator")

@@ -106,6 +106,10 @@
           />
           <ErrorMessage class="text-p-sm" :message="errors.message" />
         </div>
+        <ActionsEditor
+          v-model="savedReplyData.actions"
+          :error="errors.actions"
+        />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -146,6 +150,8 @@ import { FieldAutocomplete } from "../../../tiptap-extensions";
 import { SavedReply, SavedReplyListResourceSymbol, Team } from "../../../types";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import ActionsEditor from "./components/ActionsEditor.vue";
+import { actionNeedsValue, isActionValueEmpty } from "./components/actionTypes";
 import PreviewDialog from "./components/PreviewDialog.vue";
 
 const showConfirmDialog = ref({
@@ -176,12 +182,14 @@ const savedReplyData = ref({
   scope: savedRepliesActiveScreen.value.data?.scope || "Personal",
   message: "",
   teams: [],
+  actions: [],
 });
 const initialData = ref("");
 const errors = ref({
   title: "",
   message: "",
   teams: "",
+  actions: "",
 });
 
 const scopeDropdownOptions = computed(() => {
@@ -226,6 +234,7 @@ const getSavedReplyData = createResource({
       scope: data.scope,
       message: data.message,
       teams: data.teams?.map((team) => team.team) || [],
+      actions: JSON.parse(data.actions || "[]"),
     };
     initialData.value = JSON.stringify(savedReplyData.value);
   },
@@ -299,10 +308,8 @@ const goBack = () => {
 const onSave = () => {
   validateData();
 
-  if (Object.values(errors.value).some((e) => e)) {
-    toast.error(__("Please fill all the required fields"));
-    return;
-  }
+  // Each field shows its own inline error; no toast needed
+  if (Object.values(errors.value).some((e) => e)) return;
 
   if (savedRepliesActiveScreen.value.data?.name) {
     updateSavedReply();
@@ -320,6 +327,7 @@ const createSavedReply = () => {
       teams: savedReplyData.value.teams.map((team) => ({
         team: team,
       })),
+      actions: savedReplyData.value.actions,
     },
     {
       onSuccess: (data) => {
@@ -359,6 +367,7 @@ const updateSavedReply = async () => {
     teams: savedReplyData.value.teams.map((team) => ({
       team: team,
     })),
+    actions: savedReplyData.value.actions,
   });
 
   if (savedReplyData.value.name !== savedReplyData.value.title) {
@@ -421,6 +430,16 @@ const validateData = (key?: string) => {
         }
         break;
 
+      case "actions": {
+        const hasEmpty = savedReplyData.value.actions.some(
+          (action) =>
+            actionNeedsValue(action.action_type) &&
+            isActionValueEmpty(action.action_type, action.value)
+        );
+        errors.value.actions = hasEmpty ? __("Values can't be empty") : "";
+        break;
+      }
+
       default:
         break;
     }
@@ -437,6 +456,7 @@ const validateData = (key?: string) => {
 watch(
   savedReplyData,
   (newVal) => {
+    if (errors.value.actions) validateData("actions");
     if (!initialData.value) return;
     isDirty.value = JSON.stringify(newVal) != initialData.value;
     if (isDirty.value) {

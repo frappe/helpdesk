@@ -1,7 +1,11 @@
-import { replyComposer } from "@/components/replyComposer";
-import { showEmailBox, toggleEmailBox } from "@/pages/ticket/modalStates";
+import {
+  replyComposer,
+  showEmailBox,
+  toggleEmailBox,
+} from "@/pages/ticket/modalStates";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
+import { RenderedSavedReply } from "@/types";
 import { createListResource, createResource, toast } from "frappe-ui";
 import { nextTick } from "vue";
 import {
@@ -17,7 +21,7 @@ import {
   withoutReply,
   type SavedReplyUsage,
 } from "./savedReplyRanking";
-import { userStorage } from "./userStorage";
+import { userStorage } from "@/composables/userStorage";
 
 import LucideMessageSquareQuote from "~icons/lucide/message-square-quote";
 
@@ -101,9 +105,9 @@ async function applySavedReply(
   replyId: string,
   title: string
 ): Promise<void> {
-  let html: string;
+  let reply: RenderedSavedReply;
   try {
-    html = await renderSavedReply.submit({
+    reply = await renderSavedReply.submit({
       saved_reply_id: replyId,
       ticket_id: ticketId,
     });
@@ -123,15 +127,13 @@ async function applySavedReply(
     toast.error(__("Could not open the reply box"));
     return;
   }
-  insert(html);
+  insert(reply);
   recordSavedReplyUse(replyId, title);
   capture("saved_reply_applied", { data: { source: "command_palette" } });
 }
 
 // --- per-agent usage -----------------------------------------------------
 
-// ponytail: frequency, not frecency — add recency decay only if someone reports
-// needing it. Per-device localStorage; move server-side if hot-desking bites.
 const usage = userStorage<SavedReplyUsage>("hd_saved_reply_uses", {});
 
 /** Also called by the composer's selector modal, so promotion counts both surfaces. */

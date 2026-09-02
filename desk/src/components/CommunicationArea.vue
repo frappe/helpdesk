@@ -234,12 +234,23 @@ const IGNORED_SELECTORS = [
   '[role="presentation"]',
   '[role="menu"]',
   ".dialog-overlay",
+  // Grammarly suggestions appear outside the box, allow them to stop collapsing.
+  "grammarly-extension",
+  "grammarly-popups",
+  "[data-grammarly-part]",
 ];
+
+// `ignore` is only consulted on pointerdown, which dialogs stop, so the click
+// through has to be checked too. Without this a dialog button closes the box.
+function isIgnored(event: Event): boolean {
+  const target = event.target as HTMLElement | null;
+  return Boolean(target?.closest?.(IGNORED_SELECTORS.join(", ")));
+}
 
 onClickOutside(
   emailBoxRef,
-  () => {
-    if (showEmailBox.value) {
+  (event) => {
+    if (showEmailBox.value && !isIgnored(event)) {
       showEmailBox.value = false;
     }
   },
@@ -250,8 +261,8 @@ onClickOutside(
 
 onClickOutside(
   commentBoxRef,
-  () => {
-    if (showCommentBox.value) {
+  (event) => {
+    if (showCommentBox.value && !isIgnored(event)) {
       showCommentBox.value = false;
     }
   },

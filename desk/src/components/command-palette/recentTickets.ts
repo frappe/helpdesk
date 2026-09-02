@@ -1,4 +1,4 @@
-import { userStorage } from "./userStorage";
+import { userStorage } from "@/composables/userStorage";
 
 export interface RecentTicket {
   name: string;
