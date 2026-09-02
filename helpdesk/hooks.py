@@ -121,9 +121,9 @@ has_permission = {
 # ---------------
 # Override standard doctype classes
 override_doctype_class = {
-    "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
-    "Assignment Rule": "helpdesk.overrides.assignment_rule.HelpdeskAssignmentRule",
-    "User Invitation": "helpdesk.overrides.user_invitation.HelpdeskUserInvitation",
+    "Email Account": "helpdesk.overrides.email_account.email_account.CustomEmailAccount",
+    "Assignment Rule": "helpdesk.overrides.assignment_rule.assignment_rule.HelpdeskAssignmentRule",
+    "User Invitation": "helpdesk.overrides.user_invitation.user_invitation.HelpdeskUserInvitation",
 }
 
 ignore_links_on_delete = [

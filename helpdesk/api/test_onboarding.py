@@ -2,7 +2,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.onboarding import mark_persona_captured
-from helpdesk.overrides.user_invitation import HelpdeskUserInvitation
+from helpdesk.overrides.user_invitation.user_invitation import HelpdeskUserInvitation
 
 BRAND = "Acme Support"
 
