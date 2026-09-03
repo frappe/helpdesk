@@ -118,6 +118,11 @@ class CustomEmailAccount(EmailAccount):
                 email_server = self.get_incoming_server(
                     in_receive=True, email_sync_rule=email_sync_rule
                 )
+                if not email_server:
+                    # @dokos: the failure was already logged/handled in
+                    # get_incoming_server() - avoid select_imap_folder() on a dead
+                    # (NONAUTH) connection.
+                    return []
                 if self.use_imap:
                     # process all given imap folder
                     for folder in self.imap_folder:
