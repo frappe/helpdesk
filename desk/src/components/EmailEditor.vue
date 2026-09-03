@@ -623,7 +623,14 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 watch(newEmail, (newValue, oldValue) => {
-  if (newValue !== oldValue && newValue) {
+  // The signature drops into an empty editor on load and on every reply. That
+  // is not the agent typing, and broadcasting it would show a typing indicator
+  // to everyone else on the ticket.
+  if (
+    newValue !== oldValue &&
+    !isContentEmpty(newValue) &&
+    !isOnlySignature(newValue)
+  ) {
     onUserType();
   }
   cachedEmail.value = isOnlySignature(newValue) ? null : newValue;
