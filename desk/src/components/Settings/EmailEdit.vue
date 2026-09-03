@@ -334,26 +334,7 @@ async function updateAccount() {
   error.value = validateInputs(validationState, validationService, true);
   if (error.value) return;
 
-<<<<<<< HEAD
-  const nameChanged =
-    old.email_account_name !== updatedEmailAccount.email_account_name;
-  delete old.email_account_name;
-  delete updatedEmailAccount.email_account_name;
-
-  const otherFieldsChanged = isDirty.value;
-  const values = buildUpdatePayload();
-  if (!nameChanged && !otherFieldsChanged) {
-    toast.create({
-      message: __("No changes made"),
-      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
-    });
-    return;
-  }
-
-  if (nameChanged) {
-=======
   if (nameChanged.value) {
->>>>>>> a989a6b (fix(settings): show Update Account only when the account changed)
     try {
       loading.value = true;
       await callRenameDoc();
@@ -434,36 +415,12 @@ function pullEmails() {
 // comparing straight to the account reported every custom account as changed.
 // Renaming goes through a separate API, so it is tracked by nameChanged.
 const isDirty = computed(() => {
-<<<<<<< HEAD
-  const customDirty = isCustomProvider.value
-    ? customState.domain !== props.accountData.domain ||
-      customState.email_server !== props.accountData.email_server ||
-      customState.smtp_server !== props.accountData.smtp_server ||
-      customState.incoming_port !== props.accountData.incoming_port ||
-      customState.smtp_port !== props.accountData.smtp_port ||
-      customState.use_ssl !== props.accountData.use_ssl ||
-      customState.use_starttls !== props.accountData.use_starttls
-    : false;
-  return (
-    customDirty ||
-    state.service !== props.accountData.service ||
-    state.email_id !== props.accountData.email_id ||
-    state.api_key !== props.accountData.api_key ||
-    state.api_secret !== props.accountData.api_secret ||
-    state.password !== props.accountData.password ||
-    state.enable_incoming !== props.accountData.enable_incoming ||
-    state.enable_outgoing !== props.accountData.enable_outgoing ||
-    state.default_outgoing !== props.accountData.default_outgoing ||
-    state.default_incoming !== props.accountData.default_incoming ||
-    state.frappe_mail_site !== props.accountData.frappe_mail_site
-=======
   const initialState = getInitialState();
   const baseChanged = (
     Object.keys(initialState) as (keyof EmailAccountProviderAuthState)[]
   ).some(
     (field) =>
       field !== "email_account_name" && state[field] !== initialState[field]
->>>>>>> a989a6b (fix(settings): show Update Account only when the account changed)
   );
   if (baseChanged || !isCustomProvider.value) return baseChanged;
 

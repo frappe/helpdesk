@@ -45,13 +45,8 @@
         </div>
       </div>
       <!-- fallback if no email accounts -->
-<<<<<<< HEAD
-      <div
-        v-else
-=======
       <EmptyState
         v-else-if="!emailAccounts.loading"
->>>>>>> b8d701a (fix(settings): import EmptyState so empty screens render)
         variant="badge"
         :icon="EmailIcon"
         :title="__('No email account found')"
