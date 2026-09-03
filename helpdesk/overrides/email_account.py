@@ -11,42 +11,30 @@ from frappe.utils import parse_addr
 
 
 def auto_generated_reason(msg) -> str | None:
-    """Why this mail is machine-generated (bounce or autoresponder), else None.
+    """Why this mail must not become a ticket or a reply, else None.
 
-    One such mail can start three different loops: opening a ticket acks
-    raised_by straight back to the address that just bounced
-    (HD Ticket.after_insert), threading onto a portal ticket makes frappe CC the
-    parent doc's owner -- the same dead address -- on every inbound mail
-    (mail_cc), and an account with enable_auto_reply answers mailer-daemon.
-
-    X-Auto-Generated only catches helpdesk's own acks, which stamp it. Real
-    bounces announce themselves with the RFC 3464 report type or the RFC 5321
-    null return-path; other machine mail with RFC 3834 Auto-Submitted.
-
-    Auto-replied mail (out of office, read receipts) is deliberately let
-    through: it threads onto its ticket so agents see it, and well-behaved
-    responders rate-limit themselves, so it cannot sustain a loop.
+    A bounce or alert that gets in starts a mail loop: the new-ticket ack,
+    the portal CC, and enable_auto_reply all answer it, and it answers back.
+    Out-of-office mail (auto-replied) passes on purpose: senders rate-limit
+    it, and agents should see it on the ticket.
     """
     if msg.get("X-Auto-Generated"):
         return "X-Auto-Generated"
 
-    # bounce markers first, so the reason distinguishes a dead address from a
-    # mere autoresponder (a DSN usually carries Auto-Submitted too)
+    # bounce markers first: a DSN usually carries Auto-Submitted too
 
-    # RFC 3464 delivery status notification -- survives a stripped Return-Path
+    # RFC 3464 delivery report -- works even without a Return-Path
     if (
         msg.get_content_type() == "multipart/report"
         and msg.get_param("report-type") == "delivery-status"
     ):
         return "delivery status notification"
 
-    # bounces MUST carry a null envelope sender (RFC 5321 §6.1)
+    # bounces must use an empty sender (RFC 5321)
     if (msg.get("Return-Path") or "").strip() == "<>":
         return "null return-path"
 
-    # RFC 3834 ("no" may carry parameters, e.g. "no; owner=..."). auto-replied
-    # passes: an out-of-office should reach the ticket, and it is rate-limited
-    # by the sender so it cannot loop the way a bounce or an alert feed can
+    # RFC 3834; "no" means a human sent it and may carry parameters
     auto_submitted = (msg.get("Auto-Submitted") or "no").split(";")[0].strip().lower()
     if auto_submitted not in ("no", "auto-replied"):
         return f"Auto-Submitted: {auto_submitted}"
@@ -115,12 +103,8 @@ class CustomInboundMail(InboundMail):
 
 class CustomEmailAccount(EmailAccount):
     def handle_bad_emails(self, uid, raw, reason):
-        """Same record as the framework version, without its use_imap gate.
-
-        POP3 and Frappe Mail hit the same drop paths as IMAP, and nothing
-        that reads Unhandled Email is IMAP-specific -- a silent drop would
-        hide a misclassified customer mail, so record on every transport.
-        """
+        """The framework version only records for IMAP; POP3 and Frappe
+        Mail drops deserve the same trace, so this one has no gate."""
         try:
             raw_str = (
                 raw.decode("ASCII", "replace")
@@ -141,14 +125,12 @@ class CustomEmailAccount(EmailAccount):
                 "email_account": self.name,
             }
         ).insert(ignore_permissions=True)
-        # the record must survive a later mail in the batch failing mid-pull;
-        # the framework version commits here for the same reason
+        # keep the record even if a later mail in this batch fails
         frappe.db.commit()  # nosemgrep
 
     def notify_ticket_of_parked_mail(self, message, msg, reason):
-        """Parked mail no longer threads onto tickets, so agents would never
-        learn that a reply bounced or that a machine answered. Leave an
-        internal comment on the ticket the mail belongs to."""
+        """Parked mail never shows on the ticket, so leave a comment
+        there -- agents must know their reply bounced."""
         communication = CustomInboundMail(message, self).parent_communication()
         if not communication or communication.reference_doctype != "HD Ticket":
             return
@@ -171,7 +153,7 @@ class CustomEmailAccount(EmailAccount):
             )
 
         comment = frappe.new_doc("HD Ticket Comment")
-        # not frappe.session.user: no human acted, even on a manual pull
+        # a system note, not the pulling user's
         comment.commented_by = "Administrator"
         comment.reference_ticket = communication.reference_name
         comment.content = content
@@ -194,12 +176,10 @@ class CustomEmailAccount(EmailAccount):
                         else None
                     )
 
-                    # Important: auto-generated mail must never reach a ticket, it
-                    # starts a mail loop. The fetch already marked it seen, so park
-                    # it in Unhandled Email instead of dropping it without a trace.
+                    # machine mail starts loops -- park it, with a trace
                     if reason := auto_generated_reason(_msg):
                         self.handle_bad_emails(uid, message, reason)
-                        # our own looped-back ack carries no news for agents
+                        # our own looped-back ack is not news for agents
                         if reason != "X-Auto-Generated":
                             try:
                                 self.notify_ticket_of_parked_mail(message, _msg, reason)
