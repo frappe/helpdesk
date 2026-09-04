@@ -87,9 +87,11 @@ export function usePushNotifications() {
   }
 
   function showsOpen(filters: Record<string, any>): boolean {
+    // Require an explicit open-status filter. Without one, another filter
+    // (e.g. the "My Feedback" view needs feedback set) can still hide a freshly
+    // assigned open ticket, so we must not assume the view shows it.
     const status = filters.status_category ?? filters.status;
-    if (status == null) return true; // no status filter -> open tickets show too
-    return JSON.stringify(status).includes("Open");
+    return status != null && JSON.stringify(status).includes("Open");
   }
 
   if (isSupported && !listening) {
