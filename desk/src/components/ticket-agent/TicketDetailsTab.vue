@@ -192,16 +192,21 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  return CORE_FIELDS.map((fieldname) => {
-    let field = getField(fieldname);
-    if (!field) return null;
-    field = parseField(field, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB on change
-    field["required"] = field.reqd;
-    const formatted = getFieldInFormat(field, field);
-    formatted["visible"] = true;
-    return formatted;
-  }).filter(Boolean);
+  // fields hidden for this agent arrive blanked; skip their widgets rather
+  // than render inputs that can never show a value
+  const hiddenFields = customizations.value.data?.hidden_fields || [];
+  return CORE_FIELDS.filter((f) => !hiddenFields.includes(f))
+    .map((fieldname) => {
+      let field = getField(fieldname);
+      if (!field) return null;
+      field = parseField(field, ticket.value.doc);
+      // cant handle required depends on as we directly set the value in DB on change
+      field["required"] = field.reqd;
+      const formatted = getFieldInFormat(field, field);
+      formatted["visible"] = true;
+      return formatted;
+    })
+    .filter(Boolean);
 });
 
 const customFields = computed(() => {

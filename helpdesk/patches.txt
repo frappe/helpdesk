@@ -52,3 +52,4 @@ helpdesk.patches.add_tag_custom_fields
 helpdesk.patches.rename_purple_status_color
 helpdesk.patches.set_default_portal_settings
 helpdesk.patches.harden_hd_ticket_field_permissions
+helpdesk.patches.backfill_template_field_visible_to

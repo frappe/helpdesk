@@ -186,6 +186,31 @@ def other_priority(current: str) -> str:
     return "Urgent" if current != "Urgent" else "Low"
 
 
+def tier_default_template_field(fieldname: str, visible_to: str):
+    """Add or retier a row on the Default template — the one the field
+    visibility resolver reads — and return an undo callable for addCleanup."""
+    template = frappe.get_doc("HD Ticket Template", "Default")
+    row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
+    original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
+
+    row = next((r for r in template.fields if r.fieldname == fieldname), None)
+    if row:
+        row.visible_to = visible_to
+    else:
+        template.append("fields", {"fieldname": fieldname, "visible_to": visible_to})
+    template.save(ignore_permissions=True)
+
+    def undo():
+        doc = frappe.get_doc("HD Ticket Template", "Default")
+        doc.fields = []
+        for original in original_rows:
+            doc.append("fields", original)
+        # the save clears the resolver cache along with restoring the rows
+        doc.save(ignore_permissions=True)
+
+    return undo
+
+
 def get_customer_ticket(email: str):
     """Make a ticket and return it as the customer `email` sees it."""
     ticket = make_ticket(raised_by=email)

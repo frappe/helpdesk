@@ -7,6 +7,7 @@ from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
+from helpdesk.field_visibility import TicketFieldVisibility
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -118,6 +119,9 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
+        # template visibility tiers: saved views quietly lose columns tiered
+        # above the caller instead of leaking or erroring
+        rows = TicketFieldVisibility().filter_fieldnames(rows)
     data = (
         frappe.get_list(
             doctype,
@@ -167,6 +171,11 @@ def get_list_data(
 
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
+
+    if doctype == "HD Ticket":
+        visibility = TicketFieldVisibility()
+        fields = visibility.filter_field_dicts(fields, key="value")
+        rows = visibility.filter_fieldnames(rows)
 
     if group_by_field and view_type == "group_by":
 
@@ -244,7 +253,8 @@ def get_list_data(
 
 
 @frappe.whitelist()
-@redis_cache()
+# per-user: the visibility filter below makes the output role-dependent
+@redis_cache(user=True)
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
@@ -389,6 +399,8 @@ def get_filterable_fields(
     for field in standard_fields:
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
+    if doctype == "HD Ticket":
+        res = TicketFieldVisibility().filter_field_dicts(res, key="fieldname")
     return res
 
 
@@ -407,6 +419,9 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
+
+    if doctype == "HD Ticket":
+        fields = TicketFieldVisibility().filter_field_dicts(fields, key="value")
 
     standard_fields = [
         {"label": "Name", "value": "name"},

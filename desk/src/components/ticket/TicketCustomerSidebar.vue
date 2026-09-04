@@ -174,23 +174,29 @@ const ticketBasicInfo = computed(() => [
 ]);
 
 const ticketAdditionalInfo = computed(() => {
+  // fields hidden for this viewer arrive blanked; drop their rows rather
+  // than render empty labels
+  const hiddenFields: string[] = ticket.data._hidden_fields || [];
   const fields = [
     {
       fieldname: "subject",
+      source: "subject",
       label: "Subject",
       value: ticket.data.subject,
     },
     {
       fieldname: "team",
+      source: "agent_group",
       label: "Team",
       value: ticket.data.agent_group || "-",
     },
     {
       fieldname: "priority",
+      source: "priority",
       label: "Priority",
       value: ticket.data.priority,
     },
-  ];
+  ].filter((field) => !hiddenFields.includes(field.source));
   const custom_fields = ticket.data.template.fields
     .filter(
       (field: Field) =>

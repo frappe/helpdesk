@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Hide a custom field to keep it for agents only: its permission level moves to the internal tier, so the API stops returning it. Show it and the level moves to the customer-visible tier. Removing a field from the template never lowers its level: a higher pre-template level is restored, anything else stays. To expose a removed field, lower its level in Customize Form. Hiding a standard field only takes it off the customer's form: what customers may read of the app's own fields is set by the field's permission level, which you change in Customize Form. Show a field to let customers fill it while creating a ticket and read it afterwards, though they cannot change it later. Fields the system sets cannot be shown. Only the Default template affects permission levels. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
+   "description": "Visible to sets the minimum role that may see a field on helpdesk pages; the Default template's choices apply everywhere, other templates only shape their own form. Templates never change a field's permission level: what the API returns is decided by permission levels alone, which you change in Customize Form. A field visible to Everyone can be filled while creating a ticket and read afterwards, though customers cannot change it later. Fields the system sets, and internal-level fields, cannot be shown to Everyone. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",

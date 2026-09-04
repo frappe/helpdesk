@@ -4,6 +4,7 @@ from datetime import timedelta
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.model import get_permitted_fields
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
@@ -11,6 +12,7 @@ from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.field_visibility import TicketFieldVisibility
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
@@ -28,7 +30,18 @@ def new(doc: dict, attachments: list[dict] = []):
     d = frappe.get_doc(doc).insert()
     # strips permlevel fields the caller cannot read; no-op for agents
     d.apply_fieldlevel_read_permissions()
-    return d
+    return strip_unreadable_field_names(d.as_dict())
+
+
+def strip_unreadable_field_names(ticket: dict) -> dict:
+    """The permlevel strip blanks the values, but serialising puts every
+    field name back with an empty default. Drop the names the caller
+    cannot read; no-op for agents."""
+    permitted = set(get_permitted_fields("HD Ticket"))
+    for field in frappe.get_meta("HD Ticket").fields:
+        if field.fieldname not in permitted:
+            ticket.pop(field.fieldname, None)
+    return ticket
 
 
 @frappe.whitelist()
@@ -39,7 +52,7 @@ def get_one(name: str, is_customer_portal: bool = False):
     doc = frappe.get_doc("HD Ticket", name)
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
-    ticket = doc.as_dict()
+    ticket = strip_unreadable_field_names(doc.as_dict())
 
     contact = (
         frappe.qb.from_(QBContact)
@@ -100,13 +113,17 @@ def get_one(name: str, is_customer_portal: bool = False):
         "history": get_history(name),
         "views": get_views(name),
         "contact": contact,
-        "tags": get_tags(name),
+        # tags are agent workflow data, same as _user_tags
+        "tags": get_tags(name) if is_agent_staff() else [],
         "template": get_template(template),
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=is_customer_portal or not is_agent_staff()
         ),
         "fields": get_meta(template),
         "calls": call_logs,
+        # so hardcoded rows in the UI can drop fields hidden for this caller
+        # instead of rendering empty labels
+        "_hidden_fields": sorted(TicketFieldVisibility().hidden_fields()),
     }
 
 
@@ -125,7 +142,7 @@ def get_meta(template: str):
     meta_fields = [f for f in meta_fields if f["fieldname"] not in default_fields]
 
     fields.extend(meta_fields)
-    return fields
+    return TicketFieldVisibility().filter_field_dicts(fields, key="fieldname")
 
 
 def get_assignee(_assign: str):
@@ -531,8 +548,17 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
+    # an agent must not get widgets for fields tiered above their rank —
+    # the read strip blanks the values, so they would render forever empty
+    visibility = TicketFieldVisibility()
+    custom_fields = visibility.filter_template_rows(custom_fields)
     form_scripts = get_form_script("HD Ticket")
-    return {"custom_fields": custom_fields, "_form_script": form_scripts}
+    return {
+        "custom_fields": custom_fields,
+        "_form_script": form_scripts,
+        # for the hardcoded core widgets, which are not template rows
+        "hidden_fields": sorted(visibility.hidden_fields()),
+    }
 
 
 @frappe.whitelist()

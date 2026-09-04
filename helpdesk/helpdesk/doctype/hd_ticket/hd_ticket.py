@@ -25,6 +25,7 @@ from helpdesk.consts import (
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
+from helpdesk.field_visibility import TicketFieldVisibility
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -77,6 +78,16 @@ class HDTicket(Document):
 
     def autoname(self):
         return self.name
+
+    def apply_fieldlevel_read_permissions(self):
+        # permission levels do the real stripping in super(); the template's
+        # visible_to tiers then narrow further for helpdesk pages. The
+        # framework calls this on every doc-serialising endpoint (form load,
+        # frappe.client.get, run_doc_method, REST).
+        super().apply_fieldlevel_read_permissions()
+        if frappe.session.user == "Administrator":
+            return
+        TicketFieldVisibility().strip(self)
 
     def before_insert(self):
         self.generate_key()

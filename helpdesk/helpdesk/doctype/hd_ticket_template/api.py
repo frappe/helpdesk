@@ -4,6 +4,7 @@ from typing import Literal
 import frappe
 from pypika import JoinType
 
+from helpdesk.field_visibility import TicketFieldVisibility
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.utils import check_permissions, get_customers, is_agent
 
@@ -74,7 +75,9 @@ def get_fields_meta(template: str):
     fields = get_fields(template, "DocField")
     fields.extend(get_fields(template, "Custom Field"))
     fields = sorted(fields, key=lambda x: x.idx)
-    return fields
+    # the served template shapes the form; which rows survive is decided by
+    # the Default template's visible_to tiers
+    return TicketFieldVisibility().filter_template_rows(fields)
 
 
 def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):

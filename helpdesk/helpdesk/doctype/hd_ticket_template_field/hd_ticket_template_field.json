@@ -10,9 +10,9 @@
   "fieldname",
   "url_method",
   "required",
+  "visible_to",
   "hide_from_customer",
-  "placeholder",
-  "base_permlevel"
+  "placeholder"
  ],
  "fields": [
   {
@@ -29,10 +29,18 @@
    "label": "Required"
   },
   {
+   "description": "Minimum role that may see this field on helpdesk pages. The API answers to the field's permission level, not this.",
+   "fieldname": "visible_to",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Visible to",
+   "options": "Everyone\nAgents and above\nAgent Managers and above\nSystem Managers only"
+  },
+  {
    "default": "0",
    "fieldname": "hide_from_customer",
    "fieldtype": "Check",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Hide from customer"
   },
   {
@@ -45,14 +53,6 @@
    "fieldname": "placeholder",
    "fieldtype": "Data",
    "label": "Placeholder"
-  },
-  {
-   "default": "-1",
-   "description": "The permission level the custom field had before this template took it over. -1 means not recorded yet.",
-   "fieldname": "base_permlevel",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Base Permlevel"
   }
  ],
  "index_web_pages_for_search": 1,

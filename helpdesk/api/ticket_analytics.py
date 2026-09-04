@@ -14,6 +14,7 @@ from frappe.utils import (
     time_diff_in_seconds,
 )
 
+from helpdesk.field_visibility import TicketFieldVisibility
 from helpdesk.utils import agent_only
 
 WorkingSeconds = Callable[[object, object], int | None]
@@ -42,9 +43,15 @@ TICKET_FIELDS = [
 @agent_only
 def get_ticket_analytics(ticket: str) -> dict:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    details = frappe.db.get_value("HD Ticket", ticket, TICKET_FIELDS, as_dict=True)
+    # frappe.db reads skip permissions, so apply the visibility tiers by hand
+    fields = TicketFieldVisibility().filter_fieldnames(TICKET_FIELDS)
+    details = frappe.db.get_value("HD Ticket", ticket, fields, as_dict=True)
     if not details:
         frappe.throw(_("Ticket {0} not found.").format(ticket))
+    for fieldname in TICKET_FIELDS:
+        # fields above the caller's rank read as empty, so the timeline
+        # degrades instead of crashing
+        details.setdefault(fieldname, None)
 
     working_seconds = working_seconds_fn(details.sla)
     messages = conversation(ticket)
