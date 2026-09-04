@@ -15,6 +15,18 @@
     >
       <span class="text-lg-medium">{{ __("Notifications") }}</span>
       <div>
+        <Tooltip :text="__('Enable browser notifications')">
+          <Button
+            v-if="isSupported && permission === 'default'"
+            theme="gray"
+            variant="ghost"
+            @click="enable"
+          >
+            <template #icon>
+              <LucideBellRing class="h-4 w-4" />
+            </template>
+          </Button>
+        </Tooltip>
         <Button
           theme="blue"
           variant="ghost"
@@ -96,6 +108,7 @@
 
 <script setup lang="ts">
 import { UserAvatar } from "@/components";
+import { usePushNotifications } from "@/composables/usePushNotifications";
 import { dayjs } from "frappe-ui";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -105,6 +118,7 @@ import { ref } from "vue";
 
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
+const { isSupported, permission, enable } = usePushNotifications();
 const target = ref(null);
 onClickOutside(
   target,
