@@ -100,7 +100,7 @@
           <div class="pt-1.5">
             <!-- Loading state -->
             <div
-              v-if="agentResource.loading"
+              v-if="agentResource.loading || isFetchingTeam"
               class="px-2 py-4 text-center text-sm text-ink-gray-5"
             >
               {{ __("Loading...") }}
@@ -168,7 +168,8 @@
 <script setup lang="ts">
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
-import { useAgentStatusStore } from "@/stores/agentStatus.ts";
+import { useAgentStatusStore } from "@/stores/agentStatus";
+import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -179,7 +180,7 @@ import {
   LocalAssignee,
   TicketSymbol,
 } from "@/types";
-import { prettyDate } from "@/utils.ts";
+import { prettyDate } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
 import {
   Button,
@@ -196,6 +197,7 @@ import {
 import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import UserAvatar from "../UserAvatar.vue";
+
 interface Props {
   hideLabel?: boolean;
   ghost?: boolean;
@@ -221,10 +223,19 @@ const emptyLabel = computed(() =>
   ticket ? __("No one") : __("Select agents")
 );
 
+const configStore = useConfigStore();
 const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const agentStatusStore = useAgentStatusStore();
 const currentAgentName = window.agent;
+
+const isTeamRestricted = computed(() =>
+  Boolean(configStore.assignWithinTeam && ticket?.value?.doc?.agent_group)
+);
+const currentTeamGroup = computed(() => ticket?.value?.doc?.agent_group || "");
+
+const teamMembers = ref<string[]>([]);
+const isFetchingTeam = ref(false);
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -264,32 +275,28 @@ watch(selection, (names) => {
   localAssignees.value = [];
 });
 
-// Watch popover open/close — same pattern as old AssignToBody
-watch(popoverIsOpen, (isOpen) => {
-  if (isOpen) {
-    // Opening: take snapshot
-    hasBeenOpened.value = true;
-    snapshotAssignees.value = localAssignees.value.map((a) => ({ ...a }));
-    pinnedSelectedNames.value = new Set(
-      localAssignees.value.map((a) => a.name)
-    );
-    searchText.value = "";
-    highlightedIndex.value = 0;
-    nextTick(() => {
-      inputRef.value?.el?.focus();
-    });
-  } else if (hasBeenOpened.value) {
-    // Closing after a real open: compute diff and save
-    hasBeenOpened.value = false;
-    searchText.value = "";
-    if (!ticket) return;
-    const currentNames = localAssignees.value.map((a) => a.name);
-    const oldNames = snapshotAssignees.value.map((a) => a.name);
-    const added = currentNames.filter((n) => !oldNames.includes(n));
-    const removed = oldNames.filter((n) => !currentNames.includes(n));
-    saveAssignees(added, removed);
-  }
+const teamMembersResource = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
 });
+
+const fetchTeamMembers = async (): Promise<string[]> => {
+  if (!isTeamRestricted.value || !currentTeamGroup.value) {
+    teamMembers.value = [];
+    return [];
+  }
+  isFetchingTeam.value = true;
+  try {
+    const members = await teamMembersResource.submit({
+      team: currentTeamGroup.value,
+    });
+    teamMembers.value = Array.isArray(members) ? members : [];
+  } catch {
+    teamMembers.value = [];
+  } finally {
+    isFetchingTeam.value = false;
+  }
+  return teamMembers.value;
+};
 
 const agentResource = createListResource({
   doctype: "HD Agent",
@@ -305,17 +312,68 @@ const agentResource = createListResource({
   auto: true,
 });
 
-const debouncedSearch = useDebounceFn((text: string) => {
+const applyFiltersAndReload = (text: string) => {
   const filters: Record<string, any> = { is_active: true };
+
   if (text) {
     filters.agent_name = ["like", `%${text}%`];
   }
+
+  if (isTeamRestricted.value) {
+    const members = teamMembers.value;
+    filters.name = [
+      "in",
+      members.length > 0 ? members : ["__no_members_found__"],
+    ];
+  }
+
   agentResource.filters = filters;
   agentResource.reload();
+};
+
+// Watch popover open/close — same pattern as old AssignToBody
+watch(popoverIsOpen, async (isOpen) => {
+  if (isOpen) {
+    // Opening: take snapshot
+    hasBeenOpened.value = true;
+    snapshotAssignees.value = localAssignees.value.map((a) => ({ ...a }));
+    pinnedSelectedNames.value = new Set(
+      localAssignees.value.map((a) => a.name)
+    );
+    searchText.value = "";
+    highlightedIndex.value = 0;
+    nextTick(() => {
+      inputRef.value?.el?.focus();
+    });
+
+    if (isTeamRestricted.value) {
+      await fetchTeamMembers();
+    } else {
+      teamMembers.value = [];
+    }
+    applyFiltersAndReload("");
+  } else if (hasBeenOpened.value) {
+    // Closing after a real open: compute diff and save
+    hasBeenOpened.value = false;
+    searchText.value = "";
+    if (!ticket) return;
+    const currentNames = localAssignees.value.map((a) => a.name);
+    const oldNames = snapshotAssignees.value.map((a) => a.name);
+    const added = currentNames.filter((n) => !oldNames.includes(n));
+    const removed = oldNames.filter((n) => !currentNames.includes(n));
+    saveAssignees(added, removed);
+  }
+});
+
+const debouncedSearch = useDebounceFn((text: string) => {
+  if (!popoverIsOpen.value) return;
+  applyFiltersAndReload(text);
 }, 300);
 
 watch(searchText, (text) => {
-  debouncedSearch(text);
+  if (popoverIsOpen.value) {
+    debouncedSearch(text);
+  }
 });
 
 // Prefer the live status pushed over the socket (agentStatusStore.liveStatuses)
@@ -337,9 +395,12 @@ const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const seen = new Set<string>();
 
-  // Include current agent only when not searching. Built from the session user
-  // and the store's live status (seeded from auth.get_user) — no extra fetch.
-  if (!searchText.value && currentAgentName) {
+  const isCurrentAgentAllowed =
+    !isTeamRestricted.value ||
+    (currentAgentName && teamMembers.value.includes(currentAgentName));
+
+  // Include current agent only when not searching and allowed by team rules
+  if (!searchText.value && currentAgentName && isCurrentAgentAllowed) {
     agents.push({
       value: currentAgentName,
       label: currentUser.value.full_name || currentAgentName,
@@ -629,3 +690,4 @@ useShortcut("a", () => {
   @apply pe-0;
 }
 </style>
+
