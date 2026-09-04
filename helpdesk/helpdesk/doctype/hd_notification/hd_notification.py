@@ -49,18 +49,43 @@ class HDNotification(Document):
             }
 
     def after_insert(self):
-        if self.notification_type == "Mention":
-            skip_email_workflow = frappe.db.get_single_value(
-                "HD Settings", "skip_email_workflow"
-            )
+        self.notify_via_email()
+        self.notify_via_push()
 
-            if skip_email_workflow:
-                return
+    def notify_via_email(self):
+        if self.notification_type != "Mention":
+            return
 
-            frappe.sendmail(
-                recipients=self.user_to,
-                subject="New notification",
-                message=self.format_message(),
-                template="notification",
-                args=self.get_args(),
-            )
+        if frappe.db.get_single_value("HD Settings", "skip_email_workflow"):
+            return
+
+        frappe.sendmail(
+            recipients=self.user_to,
+            subject="New notification",
+            message=self.format_message(),
+            template="notification",
+            args=self.get_args(),
+        )
+
+    def notify_via_push(self):
+        if not self.should_push():
+            return
+
+        # Browser push cue so the agent is alerted even when Helpdesk is not focused.
+        frappe.publish_realtime(
+            "helpdesk:new-notification",
+            message={
+                "notification_type": self.notification_type,
+                "user_from": self.get_from() or self.user_from,
+                "reference_ticket": self.reference_ticket,
+            },
+            user=self.user_to,
+            after_commit=True,
+        )
+
+    def should_push(self):
+        if self.notification_type in ("Assignment", "Mention"):
+            return True
+        # "Reaction" covers both comment emoji-reactions and ticket reopens.
+        # Only a reopen (no linked comment) is worth a push.
+        return self.notification_type == "Reaction" and not self.reference_comment

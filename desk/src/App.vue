@@ -7,6 +7,7 @@
 
 <script setup lang="ts">
 import { Dialogs } from "@/components/dialogs";
+import { usePushNotifications } from "@/composables/usePushNotifications";
 import { useConfigStore } from "@/stores/config";
 import { useFavicon } from "@vueuse/core";
 import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
@@ -21,6 +22,7 @@ const configStore = useConfigStore();
 const { favicon } = storeToRefs(configStore);
 
 useFavicon(favicon);
+usePushNotifications();
 
 if (!localStorage.getItem("theme")) {
   localStorage.setItem("theme", "light");
