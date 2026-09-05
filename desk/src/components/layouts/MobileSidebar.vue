@@ -40,7 +40,7 @@ import { computed, h, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
-import { isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
 import { useTheme } from "frappe-ui";
 import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
@@ -108,10 +108,7 @@ const agentPortalDropdown = computed(() => [
   {
     label: __("Customer portal"),
     icon: "lucide-users",
-    onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
-    },
+    onClick: () => window.open(CUSTOMER_PORTAL_ROOT),
   },
   {
     icon: "lucide-life-buoy",

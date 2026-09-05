@@ -265,6 +265,14 @@ export function getTimeInSeconds(time: string) {
 
 export const isCustomerPortal = ref(false);
 
+// The studio-built customer portal, served outside the desk SPA. Customer
+// ticket pages live there; the desk only hard-navigates to it.
+export const CUSTOMER_PORTAL_ROOT = "/kb";
+
+export function customerPortalTicketUrl(ticketId: string) {
+  return `${CUSTOMER_PORTAL_ROOT}/tickets/${ticketId}`;
+}
+
 export async function copyToClipboard(
   msg: string = "",
   toastMessage: string = __("Copied to clipboard.")
