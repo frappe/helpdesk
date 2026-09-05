@@ -2,7 +2,11 @@ import { useScreenSize } from "@/composables/screen";
 import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { isCustomerPortal } from "@/utils";
+import {
+  CUSTOMER_PORTAL_ROOT,
+  customerPortalTicketUrl,
+  isCustomerPortal,
+} from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
@@ -132,38 +136,8 @@ const portalRoutes = [
     component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
-  // Customer Portal Routes
-  {
-    path: "/my-tickets",
-    name: "TicketsCustomer",
-    component: () => import("@/pages/ticket/Tickets.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/my-tickets/:ticketId",
-    name: "TicketCustomer",
-    component: () => import("@/pages/ticket/TicketCustomer.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-    props: true,
-  },
-  {
-    path: "/my-tickets/new",
-    name: "TicketNew",
-    component: () => import("@/pages/ticket/TicketNew.vue"),
-    props: true,
-    meta: {
-      onSuccessRoute: "TicketCustomer",
-      parent: "TicketsCustomer",
-      public: true,
-      auth: true,
-    },
-  },
+  // Customer Portal Routes — the ticket pages moved to the studio portal at
+  // /kb; only the knowledge base still renders here.
   {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",
@@ -227,6 +201,18 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
+  // The studio app at /kb has replaced the customer ticket portal. Hand these
+  // navigations to the server, whose redirects (hooks: website_redirects) map
+  // the old ticket URLs onto the new pages. A hard load that still got this far
+  // means the server redirect didn't fire — fall through to the catch-all
+  // rather than loop.
+  if (to.path === "/my-tickets" || to.path.startsWith("/my-tickets/")) {
+    if (window.location.pathname !== "/helpdesk" + to.path) {
+      window.location.replace("/helpdesk" + to.fullPath);
+      return;
+    }
+  }
+
   const authStore = useAuthStore();
   isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
@@ -243,13 +229,11 @@ router.beforeEach(async (to, _, next) => {
       LOGIN_PAGE +
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    next({ name: "TicketsCustomer" });
+    window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
-    const ticketId = to.params.ticketId;
-    next({
-      name: "TicketCustomer",
-      params: { ticketId },
-    });
+    window.location.replace(
+      customerPortalTicketUrl(to.params.ticketId as string)
+    );
   } else {
     next();
   }

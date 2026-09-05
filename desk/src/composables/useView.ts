@@ -310,9 +310,7 @@ export function useView(dt: string = null) {
           onClick({ close }: any) {
             if (route.query.view === _view.name) {
               router.push({
-                name: isCustomerPortal.value
-                  ? "TicketsCustomer"
-                  : "TicketsAgent",
+                name: "TicketsAgent",
               });
             }
             deleteView(_view.name);
@@ -404,7 +402,7 @@ export function useView(dt: string = null) {
         icon: getIcon(d.icon),
       };
       router.push({
-        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        name: "TicketsAgent",
         query: { view: d.name },
       });
       handleViewSuccess(viewDialogConfig);

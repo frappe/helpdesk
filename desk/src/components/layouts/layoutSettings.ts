@@ -7,6 +7,7 @@ import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 
 /**
  * Shared rather than local to Sidebar.vue: the command palette opens it too, and
@@ -14,7 +15,15 @@ import { __ } from "@/translation";
  */
 export const showShortcutsModal = ref(false);
 
-export const agentPortalSidebarOptions = [
+// `to` is a desk route name; `url` leaves the SPA (the studio portal).
+type SidebarOption = {
+  label: string;
+  icon: unknown;
+  to?: string;
+  url?: string;
+};
+
+export const agentPortalSidebarOptions: SidebarOption[] = [
   {
     label: __("Home"),
     icon: LucideHome,
@@ -52,11 +61,13 @@ export const agentPortalSidebarOptions = [
   },
 ];
 
-export const customerPortalSidebarOptions = [
+// The customer shell only renders the knowledge base now — tickets live in
+// the studio portal, reached by URL rather than route name.
+export const customerPortalSidebarOptions: SidebarOption[] = [
   {
     label: __("Tickets"),
     icon: LucideTicket,
-    to: "TicketsCustomer",
+    url: CUSTOMER_PORTAL_ROOT,
   },
   {
     label: __("Knowledge Base"),

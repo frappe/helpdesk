@@ -128,6 +128,37 @@ class TestHDTicket(IntegrationTestCase):
         ticket.check_update_perms()
         frappe.set_user("Administrator")
 
+    def test_update_perms_allowed_on_a_reopened_rated_ticket(self):
+        # `feedback` is never cleared, so a ticket the requester rated and an agent later
+        # reopened must not stay read-only to them — they still have to reply and close it.
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.insert()
+        ticket.db_set(
+            "feedback", frappe.db.get_value("HD Ticket Feedback Option", {}, "name")
+        )
+        ticket.db_set("status", "Open")
+
+        frappe.set_user(non_agent)
+        reopened = frappe.get_doc("HD Ticket", ticket.name)
+        reopened.subject = "Reopened and still rated"
+        # What `save()` does before `before_validate` — the check reads the stored version.
+        reopened.load_doc_before_save()
+        reopened.check_update_perms()
+        frappe.set_user("Administrator")
+
+    def test_update_perms_blocked_on_a_closed_ticket(self):
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.insert()
+        ticket.db_set("status", "Closed")
+
+        frappe.set_user(non_agent)
+        closed = frappe.get_doc("HD Ticket", ticket.name)
+        closed.subject = "Should not be editable"
+        closed.load_doc_before_save()
+        with self.assertRaises(frappe.PermissionError):
+            closed.check_update_perms()
+        frappe.set_user("Administrator")
+
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
