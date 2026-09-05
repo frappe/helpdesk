@@ -127,10 +127,17 @@ const themeMenuItem = computed(() => ({
   onClick: () => toggleTheme(),
 }));
 
+const helpdeskMenuItem = computed(() => ({
+  label: __("Helpdesk"),
+  icon: HDLogo,
+  onClick: () => router.push({ name: "Home" }),
+}));
+
 const isFCSite = ref(window.is_fc_site);
 
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
+  helpdeskMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,

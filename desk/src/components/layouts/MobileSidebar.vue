@@ -45,6 +45,7 @@ import { useTheme } from "frappe-ui";
 import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
 
+import HDLogo from "@/assets/logos/HDLogo.vue";
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
 import { __ } from "@/translation";
@@ -93,8 +94,15 @@ const themeMenuItem = computed(() => ({
   onClick: () => toggleTheme(),
 }));
 
+const helpdeskMenuItem = computed(() => ({
+  label: __("Helpdesk"),
+  icon: HDLogo,
+  onClick: () => router.push({ name: "Home" }),
+}));
+
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
+  helpdeskMenuItem.value,
   {
     label: __("Log out"),
     icon: "lucide-log-out",
