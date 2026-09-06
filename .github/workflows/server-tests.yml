@@ -24,6 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
+    strategy:
+      fail-fast: false
+      matrix:
+        container: [1, 2, 3, 4]
+
     services:
         mysql:
           image: mariadb:10.6
@@ -31,7 +36,7 @@ jobs:
             MARIADB_ROOT_PASSWORD: 'root'
           ports:
             - 3306:3306
-          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3 --tmpfs=/var/lib/mysql:rw,noexec,nosuid,size=2g
 
     steps:
       - name: Clone
@@ -59,6 +64,14 @@ jobs:
 
       - name: Install Yarn
         run: npm install -g yarn
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/requirements*.txt
 
       - name: Add to Hosts
         run: echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
@@ -104,7 +117,7 @@ jobs:
           FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
 
       - name: Run Tests
-        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk --coverage'
+        run: 'cd ~/frappe-bench/ && bench --site test_site run-parallel-tests --app helpdesk --with-coverage --total-builds 4 --build-number ${{ matrix.container }}'
         env:
           TYPE: server
           CI_BUILD_ID: ${{ github.run_id }}
