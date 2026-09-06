@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-08-30 14:54+0000\n"
-"PO-Revision-Date: 2026-08-30 14:54+0000\n"
+"POT-Creation-Date: 2026-09-06 13:44+0000\n"
+"PO-Revision-Date: 2026-09-06 13:44+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -2286,7 +2286,7 @@ msgstr ""
 msgid "Email account name"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:471
+#: desk/src/components/Settings/EmailEdit.vue:458
 msgid "Email account updated successfully"
 msgstr ""
 
@@ -2309,7 +2309,7 @@ msgstr ""
 msgid "Emails & Signature"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:418
+#: desk/src/components/Settings/EmailEdit.vue:404
 msgid "Emails pulled successfully"
 msgstr ""
 
@@ -2497,7 +2497,7 @@ msgstr ""
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:423
+#: desk/src/components/Settings/EmailEdit.vue:409
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -2524,11 +2524,11 @@ msgstr ""
 msgid "Failed to update category."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:476
+#: desk/src/components/Settings/EmailEdit.vue:463
 msgid "Failed to update email account, Invalid credentials"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:184
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:185
 msgid "Failed to update field dependency."
 msgstr ""
 
@@ -2633,11 +2633,11 @@ msgstr ""
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:160
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:161
 msgid "Field dependency deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:180
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:181
 msgid "Field dependency updated successfully."
 msgstr ""
 
@@ -4152,10 +4152,6 @@ msgstr ""
 msgid "No categories available"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:345
-msgid "No changes made"
-msgstr ""
-
 #: desk/src/pages/home/Home.vue:88
 msgid "No charts added"
 msgstr ""
@@ -4840,11 +4836,11 @@ msgstr ""
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:151
+#: desk/src/components/Settings/EmailEdit.vue:152
 msgid "Pull Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:408
+#: desk/src/components/Settings/EmailEdit.vue:394
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -6840,7 +6836,7 @@ msgstr ""
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:271
+#: desk/src/components/Settings/EmailEdit.vue:274
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
@@ -7006,7 +7002,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:144
+#: desk/src/components/Settings/EmailEdit.vue:145
 msgid "Update Account"
 msgstr ""
 
