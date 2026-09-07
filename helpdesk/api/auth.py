@@ -16,6 +16,7 @@ def get_user():
         "username",
         "time_zone",
         "language",
+        "show_absolute_datetime_in_timeline",
     ]
     user = frappe.get_value(
         doctype="User",
@@ -74,6 +75,7 @@ def get_user():
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
         "persona_captured": persona_captured,
+        "show_absolute_datetime_in_timeline": user.show_absolute_datetime_in_timeline,
     }
 
 

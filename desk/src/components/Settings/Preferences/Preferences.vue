@@ -40,23 +40,20 @@
             <div class="flex items-center justify-between gap-4">
               <div class="flex flex-col gap-1">
                 <span class="text-base-medium text-ink-gray-8">
-                  {{ __("Timeline timestamp format") }}
+                  {{ __("Show exact timestamps") }}
                 </span>
                 <span class="text-p-sm text-ink-gray-6">
                   {{
-                    __("Change how timestamps appear in the activity timeline.")
+                    __(
+                      "Show the exact date & time in the activity timeline instead of relative time."
+                    )
                   }}
                 </span>
               </div>
-              <!-- select-type FormControl forces w-full, so the wrapper caps it -->
-              <div class="w-40 shrink-0">
-                <FormControl
-                  v-model="timestampFormat"
-                  type="select"
-                  :options="timestampFormatOptions"
-                  @update:model-value="syncDeskTimelineSetting"
-                />
-              </div>
+              <Switch
+                :model-value="showExactTimestamp"
+                @update:model-value="setShowExactTimestamp"
+              />
             </div>
           </div>
         </div>
@@ -67,54 +64,52 @@
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { Button, FormControl, createDocumentResource, toast } from "frappe-ui";
+import { Button, Switch, createDocumentResource, toast } from "frappe-ui";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { timestampFormat } from "@/composables/timelinePreferences";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
 import LanguageTimezoneSetting from "./components/LanguageTimezoneSetting.vue";
 
+const TIMESTAMP_FIELD = "show_absolute_datetime_in_timeline";
+
 const config = useConfigStore();
-const { userId } = useAuthStore();
+const { userId, reloadUser } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
-// stored per user in localStorage, applies instantly — no Save needed
-const timestampFormatOptions = [
-  { label: __("Relative"), value: "Relative" },
-  { label: __("Exact"), value: "Exact" },
-];
-
-// one-way mirror into desk's "Show absolute datetime in timeline" user
-// setting — helpdesk's preference stays the source of truth and the desk
-// field is never read back. It only exists on newer frappe, so skip when
-// the loaded doc lacks it.
-const deskAbsoluteDatetimeField = "show_absolute_datetime_in_timeline";
-function syncDeskTimelineSetting(value: "Relative" | "Exact") {
-  if (!user.doc || !(deskAbsoluteDatetimeField in user.doc)) return;
-  user.setValue.submit({
-    [deskAbsoluteDatetimeField]: value === "Exact" ? 1 : 0,
-  });
+const showExactTimestamp = computed(() => !!user.doc?.[TIMESTAMP_FIELD]);
+function setShowExactTimestamp(value: boolean) {
+  user.doc[TIMESTAMP_FIELD] = value ? 1 : 0;
 }
 
 const isDirty = computed(() => {
   if (!user.originalDoc) return false;
   return (
     user.doc?.language !== user.originalDoc?.language ||
-    user.doc?.time_zone !== user.originalDoc?.time_zone
+    user.doc?.time_zone !== user.originalDoc?.time_zone ||
+    user.doc?.[TIMESTAMP_FIELD] !== user.originalDoc?.[TIMESTAMP_FIELD]
   );
 });
 
 function save() {
+  // Language/timezone changes take effect app-wide only after a reload; the
+  // timestamp preference just needs the auth store refreshed.
+  const needsReload =
+    user.doc?.language !== user.originalDoc?.language ||
+    user.doc?.time_zone !== user.originalDoc?.time_zone;
+
   user.save.submit(null, {
     onSuccess: () => {
       toast.success(__("Preferences updated successfully."));
-      // Language/timezone changes require a reload to take effect app-wide.
-      window.location.reload();
+      if (needsReload) {
+        window.location.reload();
+        return;
+      }
+      reloadUser();
     },
     onError: (error: { message: string; messages: string[] }) => {
       toast.error(error.message + ": " + error.messages?.[0]);

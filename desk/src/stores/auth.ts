@@ -57,6 +57,14 @@ export const useAuthStore = defineStore("auth", () => {
   const personaCaptured: ComputedRef<boolean> = computed(
     () => !!user__.value.persona_captured
   );
+  // frappe's per-user "Show absolute datetime in timeline" field. Desk reads
+  // it as `user field || system default`, so a site-wide System Settings
+  // toggle force-enables it there. We read the User row alone on purpose:
+  // this is a personal preference, and an agent who wants relative time
+  // should keep it whatever the admin sets.
+  const showExactTimestamp: ComputedRef<boolean> = computed(
+    () => !!user__.value.show_absolute_datetime_in_timeline
+  );
 
   function sessionUser() {
     const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
@@ -98,6 +106,7 @@ export const useAuthStore = defineStore("auth", () => {
     userTeams,
     language,
     personaCaptured,
+    showExactTimestamp,
     user,
     logout,
   };

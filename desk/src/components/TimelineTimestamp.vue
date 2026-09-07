@@ -7,8 +7,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Tooltip } from "frappe-ui";
+import { storeToRefs } from "pinia";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
-import { showExactTimestamp } from "@/composables/timelinePreferences";
+import { useAuthStore } from "@/stores/auth";
 
 const props = withDefaults(
   defineProps<{
@@ -19,6 +20,8 @@ const props = withDefaults(
   }>(),
   { className: "text-sm text-ink-gray-5" }
 );
+
+const { showExactTimestamp } = storeToRefs(useAuthStore());
 
 const relative = computed(() => timeAgo(props.date));
 const exact = computed(() => dateFormat(props.date, dateTooltipFormat));
