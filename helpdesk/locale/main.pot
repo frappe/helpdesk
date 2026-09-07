@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-08-30 14:54+0000\n"
-"PO-Revision-Date: 2026-08-30 14:54+0000\n"
+"POT-Creation-Date: 2026-09-06 13:44+0000\n"
+"PO-Revision-Date: 2026-09-06 13:44+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -401,7 +401,10 @@ msgid "Agent Name"
 msgstr ""
 
 #. Label of the agent_status (Data) field in DocType 'HD Agent Status'
+#. Label of the agent_status_section (Section Break) field in DocType 'HD
+#. Settings'
 #: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Agent Status"
 msgstr ""
 
@@ -434,7 +437,7 @@ msgid "Agents will no longer be able to view and create saved replies with globa
 msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:185
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:299
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:300
 #: desk/src/components/contact/FeedbackList.vue:118
 #: desk/src/components/ticket/TicketSplitModal.vue:6
 msgid "All"
@@ -781,11 +784,6 @@ msgstr ""
 msgid "Assignment rule {0} updated successfully."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:24
-#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:28
-msgid "At least one enabled Active status is required."
-msgstr ""
-
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.py:73
 msgid "At least one enabled status for <u>{0}</u> category must be enabled."
 msgstr ""
@@ -836,6 +834,10 @@ msgstr ""
 msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
 msgstr ""
 
+#: helpdesk/overrides/email_account.py:140
+msgid "Auto-reply received from {0}."
+msgstr ""
+
 #. Label of the auto_set_customer_from_contact (Check) field in DocType 'HD
 #. Settings'
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -866,6 +868,11 @@ msgstr ""
 #: desk/src/components/Settings/Profile/Profile.vue:117
 #: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
 msgid "Availability"
+msgstr ""
+
+#. Label of the availability_changed_by (Link) field in DocType 'HD Agent'
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.json
+msgid "Availability Changed By"
 msgstr ""
 
 #. Label of the availability_changed_on (Datetime) field in DocType 'HD Agent'
@@ -1588,6 +1595,10 @@ msgstr ""
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
 msgstr ""
 
+#: helpdesk/overrides/email_account.py:188
+msgid "Could not note parked mail on ticket"
+msgstr ""
+
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py:950
 msgid "Could not send an acknowledgement email due to: {0}"
 msgstr ""
@@ -1824,7 +1835,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:29
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:41
 msgid "Day count for auto closing tickets cannot be negative or zero"
 msgstr ""
 
@@ -1876,6 +1887,11 @@ msgstr ""
 #: desk/src/components/ticket-agent/TicketHeader.vue:259
 #: desk/src/components/ticket-agent/TicketHeader.vue:270
 msgid "Default actions"
+msgstr ""
+
+#. Label of the default_agent_status (Link) field in DocType 'HD Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "Default agent status"
 msgstr ""
 
 #: desk/src/components/Settings/Telephony/Telephony.vue:45
@@ -1941,6 +1957,14 @@ msgstr ""
 
 #: desk/src/components/DeleteWithTicketsDialog.vue:10
 msgid "Delete {0} ticket(s)"
+msgstr ""
+
+#: helpdesk/overrides/email_account.py:146
+msgid "Delivery failed: the reply to this ticket could not be delivered to {0}."
+msgstr ""
+
+#: helpdesk/overrides/email_account.py:150
+msgid "Delivery failed: the reply to this ticket could not be delivered."
 msgstr ""
 
 #. Label of the description (Text) field in DocType 'HD Article Category'
@@ -2101,7 +2125,7 @@ msgstr ""
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:50
 #: desk/src/components/Settings/Holiday/HolidayListItem.vue:90
 #: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:174
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:238
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:239
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:59
 #: desk/src/components/Settings/Sla/SlaPolicyListItem.vue:100
 msgid "Duplicate"
@@ -2275,7 +2299,7 @@ msgstr ""
 msgid "Email account name"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:471
+#: desk/src/components/Settings/EmailEdit.vue:456
 msgid "Email account updated successfully"
 msgstr ""
 
@@ -2298,7 +2322,7 @@ msgstr ""
 msgid "Emails & Signature"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:417
+#: desk/src/components/Settings/EmailEdit.vue:402
 msgid "Emails pulled successfully"
 msgstr ""
 
@@ -2309,11 +2333,6 @@ msgstr ""
 
 #: desk/src/components/view-controls/SortBy.vue:134
 msgid "Empty - Choose a field to sort by"
-msgstr ""
-
-#. Label of the enable (Check) field in DocType 'HD Agent Status'
-#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
-msgid "Enable"
 msgstr ""
 
 #: desk/src/components/erpnext-integration/ERPNextIntegrationSettings.vue:36
@@ -2332,6 +2351,7 @@ msgid "Enable feedback for Customer Portal"
 msgstr ""
 
 #. Label of the enabled (Check) field in DocType 'ERPNext HD Settings'
+#. Label of the enabled (Check) field in DocType 'HD Agent Status'
 #. Label of the enabled (Check) field in DocType 'HD Form Script'
 #. Label of the enabled (Check) field in DocType 'HD Service Level Agreement'
 #. Label of the enable_email_ticket_feedback (Check) field in DocType 'HD
@@ -2356,6 +2376,7 @@ msgstr ""
 #: desk/src/components/Settings/Telephony/ExotelSettings.vue:25
 #: desk/src/components/Settings/Telephony/TwilioSettings.vue:24
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.json
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.json
 #: helpdesk/helpdesk/doctype/hd_form_script/hd_form_script.json
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.json
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
@@ -2402,11 +2423,11 @@ msgstr ""
 msgid "Error moving article to category"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:93
+#: helpdesk/overrides/email_account.py:206
 msgid "Error processing email at index {0}, message: {1}"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:142
+#: helpdesk/overrides/email_account.py:255
 msgid "Error while connecting to email account {0}"
 msgstr ""
 
@@ -2482,7 +2503,7 @@ msgstr ""
 msgid "Failed to load telephony agent"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:422
+#: desk/src/components/Settings/EmailEdit.vue:407
 msgid "Failed to pull emails"
 msgstr ""
 
@@ -2509,11 +2530,11 @@ msgstr ""
 msgid "Failed to update category."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:476
+#: desk/src/components/Settings/EmailEdit.vue:461
 msgid "Failed to update email account, Invalid credentials"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:184
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:185
 msgid "Failed to update field dependency."
 msgstr ""
 
@@ -2618,11 +2639,11 @@ msgstr ""
 msgid "Field `{0}` is not allowed in Ticket Template"
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:160
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:161
 msgid "Field dependency deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:180
+#: desk/src/components/Settings/FieldDependency/FieldDependencyList.vue:181
 msgid "Field dependency updated successfully."
 msgstr ""
 
@@ -2797,8 +2818,8 @@ msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:188
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:302
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:342
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:303
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:343
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:208
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Global"
@@ -3315,7 +3336,7 @@ msgstr ""
 msgid "Invalid action: {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.py:63
+#: helpdesk/helpdesk/doctype/hd_agent/hd_agent.py:66
 msgid "Invalid availability"
 msgstr ""
 
@@ -3893,7 +3914,7 @@ msgid "My Stats"
 msgstr ""
 
 #: desk/src/components/SavedRepliesSelectorModal.vue:187
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:301
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:302
 msgid "My Team(s)"
 msgstr ""
 
@@ -4034,6 +4055,12 @@ msgstr ""
 msgid "New Ticket"
 msgstr ""
 
+#. Description of the 'Default agent status' (Link) field in DocType 'HD
+#. Settings'
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
+msgid "New agents start on this status, and agents are moved here when the status they are on is disabled."
+msgstr ""
+
 #: desk/src/components/Settings/Teams/RenameTeamModal.vue:53
 msgid "New and old title cannot be same"
 msgstr ""
@@ -4122,10 +4149,6 @@ msgstr ""
 
 #: desk/src/components/knowledge-base/CategoryFolderContainer.vue:17
 msgid "No categories available"
-msgstr ""
-
-#: desk/src/components/Settings/EmailEdit.vue:344
-msgid "No changes made"
 msgstr ""
 
 #: desk/src/pages/home/Home.vue:88
@@ -4537,8 +4560,8 @@ msgstr ""
 
 #. Option for the 'Scope' (Select) field in DocType 'HD Saved Reply'
 #: desk/src/components/SavedRepliesSelectorModal.vue:186
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:300
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:334
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:301
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:335
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:198
 #: helpdesk/helpdesk/doctype/hd_saved_reply/hd_saved_reply.json
 msgid "Personal"
@@ -4805,11 +4828,11 @@ msgstr ""
 msgid "Published articles must have content."
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:149
+#: desk/src/components/Settings/EmailEdit.vue:150
 msgid "Pull Emails"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:407
+#: desk/src/components/Settings/EmailEdit.vue:392
 msgid "Pulling emails, this may take a few minutes."
 msgstr ""
 
@@ -5406,11 +5429,11 @@ msgstr ""
 msgid "Saved replies"
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:263
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:264
 msgid "Saved reply deleted successfully."
 msgstr ""
 
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:280
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:281
 msgid "Saved reply duplicated successfully."
 msgstr ""
 
@@ -5723,6 +5746,10 @@ msgstr ""
 
 #: helpdesk/helpdesk/doctype/hd_service_level_agreement/hd_service_level_agreement.py:50
 msgid "Set Response Time for Priority {0} in row {1}."
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:73
+msgid "Set a default agent status in HD Settings."
 msgstr ""
 
 #: desk/src/components/customer/ContactCard.vue:156
@@ -6240,7 +6267,7 @@ msgstr ""
 #. Label of the team (Link) field in DocType 'HD Saved Reply Team'
 #. Label of the agent_group (Link) field in DocType 'HD Ticket'
 #. Label of a Link in the Helpdesk Workspace
-#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:338
+#: desk/src/components/Settings/SavedReplies/SavedRepliesList.vue:339
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:203
 #: desk/src/components/layouts/Sidebar.vue:403
 #: desk/src/pages/SearchAgent.vue:50 desk/src/pages/SearchAgent.vue:51
@@ -6365,6 +6392,10 @@ msgstr ""
 msgid "The contact {0} is linked to multiple customers. Please select the customer manually."
 msgstr ""
 
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:36
+msgid "The default agent status must be enabled."
+msgstr ""
+
 #: desk/src/components/Settings/General/components/TicketSettings.vue:13
 msgid "The feedback dialog will be shown, when a user tries to close a ticket from the customer portal."
 msgstr ""
@@ -6381,7 +6412,7 @@ msgstr ""
 msgid "The selected customer {0} is not linked to the contact {1}.Please select a valid customer or update the contact's linked customers."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:40
+#: helpdesk/helpdesk/doctype/hd_settings/hd_settings.py:52
 msgid "The status for sending feedback must be of <u>Resolved</u> category."
 msgstr ""
 
@@ -6778,7 +6809,7 @@ msgstr ""
 msgid "To is required"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:268
+#: desk/src/components/Settings/EmailEdit.vue:271
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
@@ -6944,7 +6975,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: desk/src/components/Settings/EmailEdit.vue:142
+#: desk/src/components/Settings/EmailEdit.vue:143
 msgid "Update Account"
 msgstr ""
 
@@ -7506,6 +7537,10 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
+#: helpdesk/overrides/email_account.py:141
+msgid "the customer"
+msgstr ""
+
 #: desk/src/pages/home/components/PendingTickets.vue:153
 msgid "ticket"
 msgstr ""
@@ -7576,6 +7611,10 @@ msgstr ""
 
 #: desk/src/components/ticket-agent/BulkEditModal.vue:126
 msgid "{0} is required"
+msgstr ""
+
+#: helpdesk/helpdesk/doctype/hd_agent_status/hd_agent_status.py:36
+msgid "{0} is the default agent status. Set a different default in HD Settings first."
 msgstr ""
 
 #: desk/src/components/ListViewBuilder.vue:319
