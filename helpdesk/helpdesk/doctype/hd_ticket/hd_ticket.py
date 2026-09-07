@@ -25,7 +25,7 @@ from helpdesk.consts import (
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
-from helpdesk.field_visibility import TicketFieldVisibility
+from helpdesk.field_visibility import TicketFieldVisibility, row_tier
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -125,7 +125,9 @@ class HDTicket(Document):
             return []
         fillable = []
         for row in template.fields:
-            if row.hide_from_customer:
+            # only fields shown to everyone are customer-fillable; read the
+            # visibility tier, not the flag synced from it
+            if row_tier(row) != 0:
                 continue
             if self.customer_may_fill_at_creation(row.fieldname):
                 fillable.append(row.fieldname)
