@@ -179,6 +179,7 @@
 </template>
 
 <script setup lang="ts">
+import EmptyState from "@/components/EmptyState.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";

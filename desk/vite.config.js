@@ -112,8 +112,12 @@ export default defineConfig(async ({ mode }) => {
       dedupe: [
         // @framework/ui imports from vue/frappe-ui; force a single instance of
         // each so its Combobox shares helpdesk's frappe-ui, not a second copy.
+        // vue-router and dompurify are peers of @framework/ui, so they have
+        // to come from helpdesk's copies
         "vue",
+        "vue-router",
         "frappe-ui",
+        "dompurify",
         "reka-ui",
         "@tiptap/core",
         "@tiptap/pm",

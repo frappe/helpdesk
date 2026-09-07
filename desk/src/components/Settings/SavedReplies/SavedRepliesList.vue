@@ -178,6 +178,7 @@
 </template>
 
 <script setup lang="ts">
+import EmptyState from "@/components/EmptyState.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { ConfirmDelete } from "@/utils";

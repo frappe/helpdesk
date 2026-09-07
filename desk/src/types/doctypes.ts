@@ -315,8 +315,8 @@ export interface HDAgentStatus extends DocType {
   category?: 'Active' | 'Away' | 'Unavailable';
   /** Color: Select */
   color?: 'Black' | 'Gray' | 'Blue' | 'Green' | 'Red' | 'Pink' | 'Orange' | 'Amber' | 'Yellow' | 'Cyan' | 'Teal' | 'Violet' | 'purple';
-  /** Enable: Check */
-  enable: 0 | 1;
+  /** Enabled: Check */
+  enabled: 0 | 1;
 }
 
 // Last updated: 2022-12-22 18:52:50.658355

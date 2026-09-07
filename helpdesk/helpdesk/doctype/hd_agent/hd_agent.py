@@ -5,14 +5,16 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import get_active_status
+from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import (
+    get_default_agent_status,
+)
 from helpdesk.utils import capture_event, is_agent_manager, publish_event
 
 
 class HDAgent(Document):
     def before_insert(self):
         if not self.availability:
-            self.availability = get_active_status()
+            self.availability = get_default_agent_status()
 
     def validate(self):
         self.validate_availability()
@@ -21,6 +23,7 @@ class HDAgent(Document):
         old_doc = self.get_doc_before_save()
         if self.has_value_changed("availability"):
             self.availability_changed_on = frappe.utils.now()
+            self.availability_changed_by = frappe.session.user
         if old_doc and old_doc.agent_name != self.agent_name:
             if self.agent_name:
                 agent_name = self.agent_name.split()
@@ -58,7 +61,7 @@ class HDAgent(Document):
             return
 
         if not frappe.db.exists(
-            "HD Agent Status", {"name": self.availability, "enable": 1}
+            "HD Agent Status", {"name": self.availability, "enabled": 1}
         ):
             frappe.throw(_("Invalid availability"), frappe.ValidationError)
 
@@ -85,6 +88,8 @@ class HDAgent(Document):
                 "agent": self.name,
                 "availability": self.availability,
                 "availability_changed_on": self.availability_changed_on,
+                # so the client can tell if someone else changed their status
+                "changed_by": frappe.session.user,
             },
         )
 
