@@ -18,7 +18,13 @@ from helpdesk.patches import (
     migrate_ticket_comments_to_comment,
     repoint_comment_reactions_and_files,
 )
-from helpdesk.test_utils import create_agent, create_user, make_team, make_ticket
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    create_user,
+    make_team,
+    make_ticket,
+)
 
 AGENT_ONE = "core-comments-agent-one@example.com"
 AGENT_TWO = "core-comments-agent-two@example.com"
@@ -69,7 +75,9 @@ class CoreCommentsTestCase(FrappeTestCase):
         super().setUpClass()
         for email in (AGENT_ONE, AGENT_TWO, AGENT_THREE):
             create_agent(email)
-        create_user(CUSTOMER)
+        # a real portal contact, else the customer has no read at all and the
+        # trust-boundary assertions pass for the wrong reason
+        create_contact("Core Comments Customer", CUSTOMER)
 
     def setUp(self):
         frappe.set_user("Administrator")
@@ -327,10 +335,8 @@ class TestActivityRider(CoreCommentsTestCase):
         )
 
     def test_field_change_writes_no_activity_row(self):
-        """Field changes leave no activity or Info rows; the history feed
+        """Field changes leave no activity or Info rows; the timeline
         serves them from Version rows instead."""
-        from helpdesk.helpdesk.doctype.hd_ticket.api import get_history
-
         ticket = make_ticket()
         before = frappe.db.count("HD Ticket Activity", {"ticket": ticket.name})
         info_before = len(ticket_comments(ticket.name, comment_type="Info"))
@@ -344,9 +350,17 @@ class TestActivityRider(CoreCommentsTestCase):
         self.assertEqual(
             len(ticket_comments(ticket.name, comment_type="Info")), info_before
         )
-        frappe.set_user(AGENT_ONE)
-        actions = [h.action for h in get_history(ticket.name)]
-        self.assertIn("set priority to High", actions)
+        versions = frappe.get_all(
+            "Version",
+            filters={"ref_doctype": "HD Ticket", "docname": ticket.name},
+            pluck="data",
+        )
+        changed = [
+            row[0]
+            for version in versions
+            for row in frappe.parse_json(version).get("changed", [])
+        ]
+        self.assertIn("priority", changed)
 
 
 class TestMigrationPatches(FrappeTestCase):
