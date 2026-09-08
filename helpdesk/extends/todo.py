@@ -13,9 +13,11 @@ def validate_team_assignment(doc, event=None):
     """
     if doc.reference_type != "HD Ticket" or not doc.allocated_to:
         return
-    # Assignment rules pick from an admin-configured user list and run inside
-    # the ticket's own save, so throwing here would break saving the ticket.
-    if doc.assignment_rule or is_admin():
+    # Rule-driven assignments pick from an admin-configured user list and run
+    # inside the ticket's own save, so throwing here would break saving the
+    # ticket. The flag is set server-side; `doc.assignment_rule` comes from the
+    # caller and would let anyone opt out of the check.
+    if frappe.flags.in_assignment_rule or is_admin():
         return
     if not is_assignment_restricted_to_team():
         return

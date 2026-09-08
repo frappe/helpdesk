@@ -21,6 +21,16 @@ def get_agents_by_category(category: str) -> set[str]:
 
 
 class HelpdeskAssignmentRule(AssignmentRule):
+    def do_assignment(self, doc):
+        """Mark assignments as rule-driven so the team-assignment guard can tell
+        them apart from a user's own request, which carries a caller-supplied
+        `assignment_rule` and cannot be trusted."""
+        frappe.flags.in_assignment_rule = True
+        try:
+            return super().do_assignment(doc)
+        finally:
+            frappe.flags.in_assignment_rule = False
+
     def get_user(self, doc):
         """
         Override get_user method from framework.
