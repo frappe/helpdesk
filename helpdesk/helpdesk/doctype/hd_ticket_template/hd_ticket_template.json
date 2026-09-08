@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Visible to sets the minimum role that may see a field on helpdesk pages; the Default template's choices apply everywhere, other templates only shape their own form. Templates never change a field's permission level: what the API returns is decided by permission levels alone, which you change in Customize Form. A field visible to Everyone can be filled while creating a ticket and read afterwards, though customers cannot change it later. Fields the system sets, and internal-level fields, cannot be shown to Everyone. See <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">Users and Permissions</a> to understand how permissions work.",
+   "description": "Visible To controls who sees each field of the ticket. Setting it to Customers or Everyone lets customers fill that field while raising a ticket and see it in the ticket sidebar afterwards; read the documentation <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">here</a>.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",
@@ -43,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-28 19:00:00.000000",
+ "modified": "2026-09-08 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",

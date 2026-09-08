@@ -186,8 +186,8 @@ def other_priority(current: str) -> str:
     return "Urgent" if current != "Urgent" else "Low"
 
 
-def tier_default_template_field(fieldname: str, visible_to: str):
-    """Add or retier a Default-template row; returns an undo callable for addCleanup."""
+def set_default_template_visibility(fieldname: str, visible_to: str):
+    """Set who sees a field on the Default template; returns an undo for addCleanup."""
     template = frappe.get_doc("HD Ticket Template", "Default")
     row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
     original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]

@@ -11,7 +11,7 @@ from helpdesk.consts import (
     SERVER_COMPUTED_FIELDS,
     TICKET_INTERNAL_FIELD_PERMLEVEL,
 )
-from helpdesk.field_visibility import VISIBILITY_RANKS, get_field_tiers
+from helpdesk.field_visibility import VISIBLE_TO_AUDIENCES, get_field_audiences
 from helpdesk.utils import capture_event
 
 
@@ -55,20 +55,18 @@ class HDTicketTemplate(Document):
     def sync_visibility_flags(self):
         # admins edit visible_to; hide_from_customer is derived for the portal Vue
         for row in self.fields:
-            # unrecognised tier, or the Select default beside an old flag: the flag wins
-            legacy_row = row.visible_to not in VISIBILITY_RANKS or (
+            # unrecognised value, or the Select default beside an old flag: the flag wins
+            legacy_row = row.visible_to not in VISIBLE_TO_AUDIENCES or (
                 row.is_new() and row.visible_to == "Everyone" and row.hide_from_customer
             )
             if legacy_row:
-                row.visible_to = (
-                    "Agents and above" if row.hide_from_customer else "Everyone"
-                )
-            row.hide_from_customer = int(row.visible_to != "Everyone")
+                row.visible_to = "Agents" if row.hide_from_customer else "Everyone"
+            row.hide_from_customer = int(row.visible_to == "Agents")
 
     def validate_unfillable_fields_stay_hidden(self):
         """Templates only narrow what permission levels allow, never widen."""
         for f in self.fields:
-            if not f.fieldname or f.visible_to != "Everyone":
+            if not f.fieldname or f.hide_from_customer:
                 continue
             if f.fieldname in NEVER_CUSTOMER_VISIBLE_FIELDS:
                 text = _(
@@ -88,14 +86,14 @@ class HDTicketTemplate(Document):
                 frappe.throw(text)
 
     def warn_when_meta_narrower_than_permlevel(self):
-        """Tiers cover helpdesk pages only; warn when the API still serves the field."""
+        """Hiding covers helpdesk pages only; warn when the API still serves the field."""
         if frappe.flags.in_migrate or frappe.flags.in_patch:
             return
         exposed = [
             f.fieldname
             for f in self.fields
             if f.fieldname
-            and f.visible_to != "Everyone"
+            and f.hide_from_customer
             and self.current_permlevel(f.fieldname) < TICKET_INTERNAL_FIELD_PERMLEVEL
         ]
         if not exposed:
@@ -119,7 +117,7 @@ class HDTicketTemplate(Document):
         )
 
     def on_update(self):
-        get_field_tiers.clear_cache()
+        get_field_audiences.clear_cache()
         capture_event("ticket_template_updated")
 
     def current_permlevel(self, fieldname: str) -> int:

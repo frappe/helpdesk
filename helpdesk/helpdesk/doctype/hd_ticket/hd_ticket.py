@@ -25,7 +25,7 @@ from helpdesk.consts import (
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
-from helpdesk.field_visibility import TicketFieldVisibility, row_tier
+from helpdesk.field_visibility import CUSTOMER, TicketFieldVisibility, row_audiences
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -80,7 +80,7 @@ class HDTicket(Document):
         return self.name
 
     def apply_fieldlevel_read_permissions(self):
-        # permission levels strip first; the template's tiers then narrow
+        # permission levels strip first; the template's visible_to then narrows
         # further for helpdesk pages
         super().apply_fieldlevel_read_permissions()
         if frappe.session.user == "Administrator":
@@ -112,7 +112,7 @@ class HDTicket(Document):
         return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
 
     def creation_fillable_template_fields(self) -> list[str]:
-        """Default-template fields shown to everyone, at a level a customer may write."""
+        """Default-template fields shown to customers, at a level a customer may write."""
         try:
             template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
         except frappe.DoesNotExistError:
@@ -120,8 +120,8 @@ class HDTicket(Document):
             return []
         fillable = []
         for row in template.fields:
-            # read the tier, not the flag synced from it
-            if row_tier(row) != 0:
+            # read visible_to, not the flag synced from it
+            if CUSTOMER not in row_audiences(row):
                 continue
             if self.customer_may_fill_at_creation(row.fieldname):
                 fillable.append(row.fieldname)

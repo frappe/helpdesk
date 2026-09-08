@@ -2535,7 +2535,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
         try:
             self.set_default_template_fields(
-                [{"fieldname": fieldname, "hide_from_customer": 1}]
+                [{"fieldname": fieldname, "visible_to": "Agents"}]
             )
             frappe.set_user(PERMS_CUSTOMER)
             hidden = frappe.get_doc(
@@ -2547,7 +2547,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.set_user("Administrator")
             self.set_custom_field_permlevel(fieldname, 7)
             self.set_default_template_fields(
-                [{"fieldname": fieldname, "hide_from_customer": 0}]
+                [{"fieldname": fieldname, "visible_to": "Everyone"}]
             )
             frappe.set_user(PERMS_CUSTOMER)
             visible = frappe.get_doc(
@@ -2591,7 +2591,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             with self.assertRaises(frappe.ValidationError):
                 make_template(
                     "Perms Sidecar Show",
-                    [{"fieldname": fieldname, "hide_from_customer": 0}],
+                    [{"fieldname": fieldname, "visible_to": "Everyone"}],
                 )
             self.assertEqual(self.custom_field_permlevel(fieldname), 8)
         finally:
@@ -2778,13 +2778,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         `key` authenticates the guest feedback flow."""
         with self.assertRaises(frappe.ValidationError):
             self.set_default_template_fields(
-                [{"fieldname": "key", "hide_from_customer": 0}]
+                [{"fieldname": "key", "visible_to": "Everyone"}]
             )
         self.assertEqual(self.hd_ticket_permlevel("key"), 8)
         # listing it hidden, for the agent form, stays allowed
-        self.set_default_template_fields(
-            [{"fieldname": "key", "hide_from_customer": 1}]
-        )
+        self.set_default_template_fields([{"fieldname": "key", "visible_to": "Agents"}])
         self.assertEqual(self.hd_ticket_permlevel("key"), 8)
 
     def test_secret_field_never_exposable_via_template(self):
@@ -2804,7 +2802,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             self.assertEqual(self.hd_ticket_permlevel("key"), 7)
             with self.assertRaises(frappe.ValidationError):
                 self.set_default_template_fields(
-                    [{"fieldname": "key", "hide_from_customer": 0}]
+                    [{"fieldname": "key", "visible_to": "Everyone"}]
                 )
         finally:
             frappe.db.delete(
@@ -2821,22 +2819,20 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         """Showing sla would offer a picker the server throws away; hidden is fine."""
         with self.assertRaises(frappe.ValidationError):
             self.set_default_template_fields(
-                [{"fieldname": "sla", "hide_from_customer": 0}]
+                [{"fieldname": "sla", "visible_to": "Everyone"}]
             )
-        self.set_default_template_fields(
-            [{"fieldname": "sla", "hide_from_customer": 1}]
-        )
+        self.set_default_template_fields([{"fieldname": "sla", "visible_to": "Agents"}])
 
     def test_template_never_moves_standard_field_permlevels(self):
         """Standard field levels belong to the doctype; the template writes no Property Setter."""
         shipped = self.hd_ticket_permlevel("priority")
         template = self.set_default_template_fields(
-            [{"fieldname": "priority", "hide_from_customer": 0}]
+            [{"fieldname": "priority", "visible_to": "Everyone"}]
         )
         self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
 
         template.reload()
-        template.fields[0].hide_from_customer = 1
+        template.fields[0].visible_to = "Agents"
         template.save()
         self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
 
@@ -2872,7 +2868,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         """A standard field the default template shows can be filled on the
         creation form; afterwards it is read-only for the customer."""
         self.set_default_template_fields(
-            [{"fieldname": "priority", "hide_from_customer": 0}]
+            [{"fieldname": "priority", "visible_to": "Everyone"}]
         )
         frappe.set_user(PERMS_CUSTOMER)
         default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
@@ -2896,14 +2892,14 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertFalse(ticket.first_responded_on)
 
     def test_site_permlevel_not_fillable_at_creation(self):
-        """Only the app tiers 0 and 7 are creation-fillable; a field moved
+        """Only levels 0 and 7 are creation-fillable; a field moved
         to a site-owned level (1-6) after the template save is not."""
         from frappe.custom.doctype.property_setter.property_setter import (
             make_property_setter,
         )
 
         self.set_default_template_fields(
-            [{"fieldname": "priority", "hide_from_customer": 0}]
+            [{"fieldname": "priority", "visible_to": "Everyone"}]
         )
         make_property_setter("HD Ticket", "priority", "permlevel", 3, "Int")
         frappe.clear_cache(doctype="HD Ticket")

@@ -8,7 +8,7 @@ def execute():
         "HD Ticket Template Field",
         {"visible_to": ("in", ("", None)), "hide_from_customer": 1},
         "visible_to",
-        "Agents and above",
+        "Agents",
         update_modified=False,
     )
     frappe.db.set_value(

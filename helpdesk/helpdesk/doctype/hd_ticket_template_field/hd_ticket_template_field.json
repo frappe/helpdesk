@@ -29,12 +29,12 @@
    "label": "Required"
   },
   {
-   "description": "Minimum role that may see this field on helpdesk pages. The API answers to the field's permission level, not this.",
+   "description": "Who sees this field on helpdesk pages. The API answers to the field's permission level, not this.",
    "fieldname": "visible_to",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Visible to",
-   "options": "Everyone\nAgents and above\nAgent Managers and above\nSystem Managers only"
+   "options": "Everyone\nCustomers\nAgents"
   },
   {
    "default": "0",
@@ -58,7 +58,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-28 17:00:00.000000",
+ "modified": "2026-09-08 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

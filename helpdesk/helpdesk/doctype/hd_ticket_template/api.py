@@ -75,7 +75,7 @@ def get_fields_meta(template: str):
     fields = get_fields(template, "DocField")
     fields.extend(get_fields(template, "Custom Field"))
     fields = sorted(fields, key=lambda x: x.idx)
-    # any template shapes the form; the Default template's tiers decide who sees what
+    # any template shapes the form; the Default template's Visible to decides who sees what
     return TicketFieldVisibility().filter_template_rows(fields)
 
 

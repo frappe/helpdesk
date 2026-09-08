@@ -43,13 +43,13 @@ TICKET_FIELDS = [
 @agent_only
 def get_ticket_analytics(ticket: str) -> dict:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
-    # frappe.db reads skip permissions, so apply the visibility tiers by hand
+    # frappe.db reads skip permissions, so apply visible_to by hand
     fields = TicketFieldVisibility().filter_fieldnames(TICKET_FIELDS)
     details = frappe.db.get_value("HD Ticket", ticket, fields, as_dict=True)
     if not details:
         frappe.throw(_("Ticket {0} not found.").format(ticket))
     for fieldname in TICKET_FIELDS:
-        # fields above the caller's rank read as empty instead of crashing the timeline
+        # fields hidden from the caller read as empty instead of crashing the timeline
         details.setdefault(fieldname, None)
 
     working_seconds = working_seconds_fn(details.sla)

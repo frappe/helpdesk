@@ -545,7 +545,7 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    # no widgets for fields tiered above the agent: their values arrive blanked
+    # no widgets for fields hidden from agents: their values arrive blanked
     visibility = TicketFieldVisibility()
     custom_fields = visibility.filter_template_rows(custom_fields)
     form_scripts = get_form_script("HD Ticket")
