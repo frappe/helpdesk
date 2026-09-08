@@ -1,0 +1,14 @@
+{
+ "app_home": "page-e0f4b5bc",
+ "app_name": "helpdesk",
+ "app_title": "Helpdesk",
+ "creation": "2026-07-05 12:13:54.890876",
+ "doctype": "Studio App",
+ "frappe_app": "helpdesk",
+ "is_standard": 1,
+ "modified": "2026-07-05 12:18:02.223005",
+ "modified_by": "Administrator",
+ "name": "helpdesk",
+ "owner": "Administrator",
+ "route": "kb"
+}

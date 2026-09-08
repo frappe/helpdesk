@@ -206,7 +206,10 @@ const navItems = computed(() => {
       label: option.label,
       icon: option.icon,
       isActive: activeItem.value === option.to,
-      onClick: () => selectItem(option.to, { name: option.to }),
+      onClick: () =>
+        option.url
+          ? window.location.assign(option.url)
+          : selectItem(option.to, { name: option.to }),
       // Separate the nav group from the search/notification tools above it.
       spacedTop: index === 0 && !isCustomerPortal.value,
       key: option.label,

@@ -74,6 +74,11 @@
     @update="ticket.reload()"
   />
   <TicketSubjectModal v-model="showSubjectDialog" />
+  <ResolutionDetailsModal
+    v-model="showResolutionDialog"
+    :status="pendingStatus"
+    @saved="activities.reload()"
+  />
 </template>
 
 <script setup lang="ts">
@@ -119,6 +124,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
+import ResolutionDetailsModal from "./ResolutionDetailsModal.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
@@ -139,6 +145,8 @@ const ticket = inject(TicketSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
 const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
+const showResolutionDialog = ref(false);
+const pendingStatus = ref("");
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const statusDropdown = computed(() => {
@@ -150,6 +158,15 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
+      // Finishing a ticket is the transition worth pausing on: it is the agent's last
+      // chance to say what they did, and the customer portal shows that note on its
+      // resolution card. Keyed on the category so Resolved, Closed and any custom status
+      // filed under it all ask. The dialog writes the status itself, so it is not set twice.
+      if (o.category === "Resolved") {
+        pendingStatus.value = o.label_agent;
+        showResolutionDialog.value = true;
+        return;
+      }
       ticket.value.setValue.submit(
         { status: o.label_agent },
         {

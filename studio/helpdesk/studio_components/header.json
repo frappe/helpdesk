@@ -1,0 +1,242 @@
+{
+ "block": {
+  "attributes": {},
+  "baseStyles": {
+   "alignItems": "center",
+   "display": "flex",
+   "height": "fit-content",
+   "justifyContent": "space-between",
+   "width": "100%"
+  },
+  "children": [
+   {
+    "attributes": {},
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "flexShrink": 1,
+     "gap": "8px",
+     "height": "fit-content",
+     "justifyContent": "center",
+     "width": "fit-content"
+    },
+    "blockName": "container",
+    "children": [
+     {
+      "attributes": {},
+      "baseStyles": {},
+      "children": [],
+      "classes": [],
+      "componentEvents": {},
+      "componentId": "topbar_logo-1k0b8u75h",
+      "componentName": "topbar_logo",
+      "componentProps": {},
+      "componentSlots": {},
+      "isStudioComponent": true,
+      "mobileStyles": {},
+      "tabletStyles": {}
+     },
+     {
+      "attributes": {},
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "children": [],
+      "classes": [],
+      "componentEvents": {},
+      "componentId": "Breadcrumbs-header",
+      "componentName": "Breadcrumbs",
+      "componentProps": {
+       "items": "{{ (inputs.hideRoot ? [] : [{ label: 'Knowledge base', route: '/' }]).concat(inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(route.path === '/' ? [] : [{ label: inputs.crumb || route.name }]) }}"
+      },
+      "componentSlots": {},
+      "mobileStyles": {},
+      "tabletStyles": {},
+      "visibilityCondition": "{{ !inputs.currentView }}"
+     },
+     {
+      "attributes": {},
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "children": [],
+      "classes": [],
+      "componentEvents": {},
+      "componentId": "KbViewBreadcrumbs-header",
+      "componentName": "KbViewBreadcrumbs",
+      "componentProps": {
+       "currentView": "{{ inputs.currentView }}",
+       "label": "{{ inputs.viewLabel || 'Tickets' }}",
+       "options": "{{ inputs.viewOptions }}",
+       "viewActions": "{{ inputs.viewActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "mobileStyles": {},
+      "tabletStyles": {},
+      "visibilityCondition": "{{ inputs.currentView }}"
+     }
+    ],
+    "classes": [],
+    "componentEvents": {},
+    "componentId": "container-xy0t2y8tg",
+    "componentName": "container",
+    "componentProps": {},
+    "componentSlots": {},
+    "mobileStyles": {},
+    "originalElement": "div",
+    "tabletStyles": {}
+   },
+   {
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "gap": "12px"
+    },
+    "blockName": "header-right",
+    "children": [
+     {
+      "baseStyles": {},
+      "children": [],
+      "classes": [],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "router.push('/new-ticket')"
+       }
+      },
+      "componentId": "Button-raise-ticket",
+      "componentName": "Button",
+      "componentProps": {
+       "label": "{{ words.raiseTicket }}",
+       "variant": "subtle"
+      },
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/new-ticket'].includes(route.path) }}"
+     },
+     {
+      "baseStyles": {
+       "cursor": "pointer"
+      },
+      "children": [],
+      "classes": [],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "window.location.href = loginUrl"
+       }
+      },
+      "componentId": "TextBlock-login",
+      "componentName": "TextBlock",
+      "componentProps": {
+       "fontSize": "text-base",
+       "tag": "span",
+       "text": "{{ t('Login') }}"
+      },
+      "visibilityCondition": "{{ isGuest }}"
+     },
+     {
+      "attributes": {},
+      "baseStyles": {},
+      "children": [],
+      "classes": [],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "onPageAction()"
+       }
+      },
+      "componentId": "Button-page-action",
+      "componentName": "Button",
+      "componentProps": {
+       "iconLeft": "{{ pageActionIcon }}",
+       "label": "{{ pageActionLabel }}",
+       "variant": "solid"
+      },
+      "componentSlots": {},
+      "mobileStyles": {},
+      "tabletStyles": {},
+      "visibilityCondition": "{{ pageActionLabel }}"
+     }
+    ],
+    "classes": [],
+    "componentId": "container-header-right",
+    "componentName": "container",
+    "originalElement": "div"
+   }
+  ],
+  "classes": [],
+  "componentEvents": {},
+  "componentId": "container-v2fhlmh1f",
+  "componentName": "container",
+  "componentProps": {},
+  "componentSlots": {},
+  "mobileStyles": {},
+  "originalElement": "div",
+  "tabletStyles": {}
+ },
+ "component_id": "header",
+ "component_name": "Header",
+ "creation": "2026-08-13 18:27:55.278065",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [
+  {
+   "default": "",
+   "input_name": "crumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "default": "",
+   "input_name": "parentCrumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "default": "",
+   "input_name": "parentRoute",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "currentView",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewOptions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewActions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewLabel",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "hideRoot",
+   "required": 0,
+   "type": "Data"
+  }
+ ],
+ "is_disabled": 0,
+ "modified": "2026-08-19 13:04:36.826122",
+ "modified_by": "Administrator",
+ "name": "header",
+ "owner": "Administrator"
+}

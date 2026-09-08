@@ -53,3 +53,4 @@ helpdesk.patches.rename_purple_status_color
 helpdesk.patches.set_default_portal_settings
 helpdesk.patches.rename_agent_status_enable_field
 helpdesk.patches.set_default_agent_status_in_settings
+helpdesk.patches.point_portal_home_to_studio

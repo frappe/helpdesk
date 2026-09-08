@@ -52,6 +52,46 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
+    # Frappe ships a legacy "/kb/<category>" rule (Help Article portal) that would
+    # otherwise shadow single-segment pages of the Studio-built KB app at /kb.
+    # Only a fully static rule outranks that dynamic one in werkzeug's route map, so
+    # every single-segment KB page needs its own entry here (multi-segment routes
+    # like /kb/articles/<name> don't collide and resolve via the app renderer).
+    {
+        "from_route": "/kb/customer-tickets",
+        "to_route": "kb",
+    },
+    {
+        "from_route": "/kb/new-ticket",
+        "to_route": "kb",
+    },
+]
+
+# The studio portal at /kb replaces the old customer portal. Its ticket URLs keep
+# working through these redirects until the old pages are deleted; the desk router
+# hard-navigates its legacy customer routes so they resolve here too.
+website_redirects = [
+    # The studio renderer serves the app root from the page whose route is "/",
+    # which the knowledge base pages will claim when they land — until then the
+    # portal root is the ticket list.
+    {
+        "source": "/kb",
+        "target": "/kb/customer-tickets",
+    },
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/kb/new-ticket",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/kb/customer-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/kb/tickets/\1",
+    },
 ]
 
 user_invitation = {
@@ -69,12 +109,21 @@ user_invitation = {
             "HD Customer",
             "HD Customer Manager",
         ],
+        # Customer managers can invite members into their own organization only;
+        # scoping is enforced by the User Invitation before_insert hook below.
+        "HD Customer Manager": [
+            "HD Customer",
+            "HD Customer Manager",
+        ],
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
 
 doc_events = {
+    "User Invitation": {
+        "before_insert": "helpdesk.helpdesk.hooks.user_invitation.validate_customer_scope",
+    },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",

@@ -273,7 +273,7 @@ const ticket = createResource({
   },
   onSuccess: (data) => {
     router.push({
-      name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+      name: "TicketAgent",
       params: {
         ticketId: data.name,
       },
@@ -297,13 +297,13 @@ const breadcrumbs = computed(() => {
     {
       label: __("Tickets"),
       route: {
-        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        name: "TicketsAgent",
       },
     },
     {
       label: __("New Ticket"),
       route: {
-        name: "TicketNew",
+        name: "TicketAgentNew",
       },
     },
   ];
