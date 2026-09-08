@@ -590,7 +590,7 @@ def _parse_view_filters(raw) -> dict | list:
         return []
     try:
         return (json.loads(raw) if isinstance(raw, str) else raw) or []
-    except json.JSONDecodeError, TypeError:
+    except (json.JSONDecodeError, TypeError):
         return []
 
 

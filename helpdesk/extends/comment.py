@@ -21,6 +21,7 @@ def before_insert(doc, method: str | None = None):
 
 
 def has_permission(doc, ptype: str = "read", user: str | None = None) -> bool:
+    user = user or frappe.session.user
     # only read: write/delete stay a role question, or no one but Administrator could moderate
     if ptype != "read":
         return True

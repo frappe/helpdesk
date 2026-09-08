@@ -269,6 +269,10 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         self.assertIn(mine.name, extras)
         self.assertNotIn(hidden.name, extras)
 
+        # Administrator keeps its own, the hook must not read user as unset
+        frappe.set_user("Administrator")
+        self.assertIn(hidden.name, get_comment_extras(ticket.name))
+
     def test_customer_cannot_join_own_ticket_room(self):
         """The customer reads their ticket over HTTP, but must not enter the
         doc room where internal comment payloads are pushed."""
