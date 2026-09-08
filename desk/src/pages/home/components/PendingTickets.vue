@@ -26,13 +26,13 @@
             <th class="p-2 text-start font-normal w-full">
               {{ __("Subject") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-20 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-16 whitespace-nowrap">
               {{ __("Status") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-20 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-28 whitespace-nowrap">
               {{ __("Priority") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-32 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-44 whitespace-nowrap">
               {{ __("Team") }}
             </th>
             <th class="p-2 text-start font-normal min-w-40 whitespace-nowrap">
@@ -54,13 +54,13 @@
             <td class="p-2 py-3 w-full max-w-0 truncate">
               {{ ticket.subject }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate">
+            <td class="p-2 py-3 min-w-16 truncate">
               {{ ticket.status }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate">
+            <td class="p-2 py-3 min-w-28 truncate">
               <TicketPriority :priority="ticket.priority" />
             </td>
-            <td class="p-2 py-3 min-w-36 truncate">
+            <td class="p-2 py-3 min-w-44 truncate">
               {{ ticket.agent_group || __("Not Assigned") }}
             </td>
             <td class="p-2 py-3 min-w-40">
@@ -160,17 +160,17 @@
 </template>
 
 <script setup lang="ts">
+import EmptyState from "@/components/EmptyState.vue";
+import TicketPriority from "@/components/TicketPriority.vue";
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
+import { View } from "@/types";
 import { createResource, FeatherIcon, TabButtons } from "frappe-ui";
-import TicketPriority from "@/components/TicketPriority.vue";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
-import TimerIcon from "~icons/lucide/timer";
-import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
-import { View } from "@/types";
-import EmptyState from "@/components/EmptyState.vue";
+import TicketPlusIcon from "~icons/lucide/ticket-plus";
+import TimerIcon from "~icons/lucide/timer";
 
 interface TicketReason {
   type: string;

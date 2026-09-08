@@ -23,7 +23,7 @@
                 />
                 <div
                   v-if="agentStatusStore.myStatus"
-                  class="absolute bottom-0.5 right-0.5 rounded-full bg-surface-elevation-2 p-1"
+                  class="absolute -bottom-0.5 rounded-full bg-surface-elevation-2 p-1"
                 >
                   <div
                     class="size-3.5 rounded-full"
