@@ -207,7 +207,11 @@ const template = createResource({
 
 function setupTemplateFields(fields) {
   fields.forEach((field: Field) => {
-    templateFields[field.fieldname] = field.default || "";
+    // Frappe stores defaults as strings, and "0" on a Check is truthy in JS.
+    templateFields[field.fieldname] =
+      field.fieldtype === "Check"
+        ? Number(field.default) || 0
+        : field.default || "";
   });
 }
 
