@@ -260,6 +260,7 @@ export interface Field {
   disabled?: boolean;
   placeholder?: string | null;
   readonly?: boolean;
+  default?: string | null;
 }
 
 export type FieldValue = string | number | boolean | null | undefined | Dayjs;

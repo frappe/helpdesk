@@ -100,6 +100,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
             QBFetch.link_filters,
             QBFetch.depends_on,
             QBFetch.mandatory_depends_on,
+            QBFetch.default,
             fields.fieldname,
             fields.hide_from_customer,
             fields.required,
@@ -113,7 +114,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
         .orderby(fields.idx)
         .run(as_dict=True)
     )
-    docfields = ["link_filters", "depends_on", "mandatory_depends_on"]
+    docfields = ["link_filters", "depends_on", "mandatory_depends_on", "default"]
 
     for df in docfields:
         for field in result:
