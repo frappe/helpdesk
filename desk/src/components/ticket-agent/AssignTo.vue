@@ -169,6 +169,7 @@
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
+import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -225,6 +226,20 @@ const { getUser } = useUserStore();
 const currentUser = computed(() => getUser("")); // empty string returns current user
 const agentStatusStore = useAgentStatusStore();
 const currentAgentName = window.agent;
+const configStore = useConfigStore();
+
+// Empty unless both team settings are on and the ticket has a team, mirroring
+// the server guard in helpdesk/extends/todo.py.
+const restrictedTeam = computed(() =>
+  configStore.teamRestrictionApplied && configStore.assignWithinTeam
+    ? ticket?.value?.doc?.agent_group || ""
+    : ""
+);
+
+const teamMembersResource = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+  makeParams: () => ({ team: restrictedTeam.value }),
+});
 
 const searchText = ref("");
 const highlightedIndex = ref(0);
@@ -278,6 +293,7 @@ watch(popoverIsOpen, (isOpen) => {
     nextTick(() => {
       inputRef.value?.el?.focus();
     });
+    loadAgents();
   } else if (hasBeenOpened.value) {
     // Closing after a real open: compute diff and save
     hasBeenOpened.value = false;
@@ -302,20 +318,28 @@ const agentResource = createListResource({
   ],
   filters: { is_active: true },
   pageLength: 20,
-  auto: true,
 });
 
-const debouncedSearch = useDebounceFn((text: string) => {
+async function loadAgents(text = "") {
   const filters: Record<string, any> = { is_active: true };
   if (text) {
     filters.agent_name = ["like", `%${text}%`];
   }
+  if (restrictedTeam.value) {
+    const members: string[] = (await teamMembersResource.fetch()) || [];
+    // [""] rather than [] so an empty team yields no rows instead of `IN ()`.
+    filters.name = ["in", members.length ? members : [""]];
+  }
   agentResource.filters = filters;
-  agentResource.reload();
+  await agentResource.reload();
+}
+
+const debouncedSearch = useDebounceFn((text: string) => {
+  loadAgents(text);
 }, 300);
 
 watch(searchText, (text) => {
-  debouncedSearch(text);
+  if (popoverIsOpen.value) debouncedSearch(text);
 });
 
 // Prefer the live status pushed over the socket (agentStatusStore.liveStatuses)
@@ -337,9 +361,13 @@ const agentOptions = computed<AgentOption[]>(() => {
   const agents: AgentOption[] = [];
   const seen = new Set<string>();
 
+  const currentAgentAllowed =
+    !restrictedTeam.value ||
+    !!teamMembersResource.data?.includes(currentAgentName);
+
   // Include current agent only when not searching. Built from the session user
   // and the store's live status (seeded from auth.get_user) — no extra fetch.
-  if (!searchText.value && currentAgentName) {
+  if (!searchText.value && currentAgentName && currentAgentAllowed) {
     agents.push({
       value: currentAgentName,
       label: currentUser.value.full_name || currentAgentName,

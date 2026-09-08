@@ -2,6 +2,7 @@ from datetime import datetime
 
 import frappe
 from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.desk.form.assign_to import add as assign
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
@@ -612,3 +613,49 @@ def upload_test_file(file_name: str) -> str:
         }
     ).insert(ignore_permissions=True)
     return file_doc.name
+
+
+def enable_team_assignment_restriction(restrict_by_team: int = 1, within_team: int = 1):
+    """Toggle the two HD Settings that gate assigning a ticket to its own team."""
+    frappe.db.set_single_value(
+        "HD Settings",
+        {
+            "restrict_tickets_by_agent_group": restrict_by_team,
+            "assign_within_team": within_team,
+        },
+    )
+
+
+def disable_team_assignment_restriction():
+    enable_team_assignment_restriction(restrict_by_team=0, within_team=0)
+
+
+def assign_ticket(ticket: str, *users: str, assignment_rule: str | None = None):
+    """Assign a ticket through the whitelisted API, as the session user."""
+    assign(
+        {
+            "doctype": "HD Ticket",
+            "name": ticket,
+            "assign_to": list(users),
+            "assignment_rule": assignment_rule,
+        }
+    )
+
+
+def get_ticket_assignees(ticket: str) -> list[str]:
+    """Users with an open assignment ToDo on the ticket."""
+    return frappe.get_all(
+        "ToDo",
+        filters={
+            "reference_type": "HD Ticket",
+            "reference_name": ticket,
+            "status": "Open",
+        },
+        pluck="allocated_to",
+    )
+
+
+def clear_ticket_assignments(ticket: str):
+    """Drop assignment ToDos, e.g. the ones a team's assignment rule creates on
+    insert, so a test starts from an unassigned ticket."""
+    frappe.db.delete("ToDo", {"reference_type": "HD Ticket", "reference_name": ticket})
