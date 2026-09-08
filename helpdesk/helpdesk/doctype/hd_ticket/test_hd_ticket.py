@@ -2349,20 +2349,8 @@ PERMS_SYSADMIN = "perms.sysadmin@example.com"
 
 
 class TestHDTicketFieldPermissions(IntegrationTestCase):
-    """Non-agents may only write customer-facing HD Ticket fields.
-
-    Protected fields sit at permlevel 7 (customer-visible) and 8
-    (internal), so the framework silently resets any change to them
-    made by a user without write access at that level. Standard fields
-    keep the level the doctype ships. The default template owns custom
-    field levels: hidden -> 8, shown -> 7. A removed row restores the
-    level the field arrived with only when that raises it; removal
-    never lowers a level, so it can never expose a field.
-
-    Note the two shapes of refusal: a change to a permlevel-protected
-    field is reverted without a word, while a change to a permlevel-0
-    field a customer may fill at creation raises PermissionError.
-    """
+    """Customers may only fill customer-facing fields, and only while creating.
+    Permlevel-protected fields revert silently; level-0 fields raise PermissionError."""
 
     def setUp(self):
         frappe.set_user("Administrator")
@@ -2419,9 +2407,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.response_by, original_response_by)
 
     def test_customer_cannot_edit_ticket_after_creation(self):
-        """subject and description sit at permlevel 0, which a customer must
-        keep write access to in order to raise a ticket at all. Freezing them
-        afterwards is the guard's job, not the permission level's."""
+        """Level-0 fields stay writable to raise a ticket; freezing them is the guard's job."""
         ticket = get_customer_ticket(PERMS_CUSTOMER)
         original_subject = ticket.subject
         ticket.subject = "Updated by customer"
@@ -2432,9 +2418,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(ticket.subject, original_subject)
 
     def test_customer_can_close_own_ticket(self):
-        """The portal's Close button. Closing also flips status_category
-        through `fetch_from`, so a guard that froze everything but `status`
-        would break the one write customers are meant to make."""
+        """Closing also flips status_category via fetch_from; the guard must allow both."""
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         frappe.set_user(PERMS_CUSTOMER)
         client_set_value("HD Ticket", ticket.name, "status", "Closed")
@@ -2443,14 +2427,10 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
 
     def test_customer_cannot_tamper_via_run_doc_method(self):
-        """`run_doc_method` builds the document from the caller's own payload
-        when `dt` is absent, and `create_communication_via_contact` saves with
-        ignore_permissions, which skips the permlevel reset. Only a check that
-        runs inside validate stops the tampered value landing."""
+        """run_doc_method builds the doc from the caller's payload and the save skips
+        permissions, so only a check inside validate stops the tampered value."""
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
-        # resolution_details is agent-authored internal text at permlevel 8.
-        # agreement_status makes a poor probe: the SLA engine recomputes it on
-        # every save, so it masks the write rather than preventing it.
+        # agreement_status is a poor probe: the SLA engine recomputes it on every save
         before = frappe.db.get_value("HD Ticket", ticket.name, "resolution_details")
 
         frappe.set_user(PERMS_CUSTOMER)
@@ -2499,10 +2479,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertNotEqual(spoofed.contact, other_contact)
 
     def test_hidden_custom_field_is_absent_from_the_api(self):
-        """A custom field at the internal level stops being served, not just
-        drawn. The list path is the one that matters: it never consults the
-        controller, only the permission level.
-        """
+        """The list path never consults the controller, only the permission level."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_api_hidden"
@@ -2543,9 +2520,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.clear_cache(doctype="HD Ticket")
 
     def test_custom_field_permlevel_governs_customer_access(self):
-        """The permission level is what governs access: at 8 a customer's
-        value is dropped, at 7 they may fill it while creating the ticket,
-        then it freezes like any other level-7 field."""
+        """At 8 a customer's value is dropped; at 7 it is fillable at creation, then frozen."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_admin_set"
@@ -2598,8 +2573,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.clear_cache(doctype="HD Ticket")
 
     def test_non_default_template_cannot_show_internal_custom_field(self):
-        """A sidecar template does not drive levels, so showing a custom
-        field the site keeps internal is refused instead of lowered."""
+        """A sidecar template cannot show a field the site keeps internal."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 
         fieldname = "custom_perms_sidecar_internal"
@@ -2656,9 +2630,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
 
     def test_system_manager_can_edit_ticket_after_creation(self):
-        """A System Manager is not an agent, but HD Ticket grants them write at
-        every level. The guard must let them through or it contradicts the
-        permission rows it is supposed to be backing up."""
+        """HD Ticket grants System Managers write at every level; the guard must agree."""
         if not frappe.db.exists("User", PERMS_SYSADMIN):
             frappe.get_doc(
                 {
@@ -2669,9 +2641,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 }
             ).insert()
         frappe.set_user(PERMS_SYSADMIN)
-        # raised from the desk, so has_permission lets them back in as owner:
-        # helpdesk denies non-agents any ticket they have no link to, which is
-        # a document-level rule and not what this guard is about
+        # raised from the desk so has_permission admits them as owner
         ticket = frappe.get_doc(get_ticket_obj()).insert()
         doc = frappe.get_doc("HD Ticket", ticket.name)
         doc.subject = "Retitled by staff"
@@ -2680,18 +2650,14 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(doc.subject, "Retitled by staff")
 
     def test_customer_cannot_set_agent_side_status(self):
-        """Closing is the only status move a customer makes for themselves.
-        `Replied` means an agent answered, so letting a customer set it lets
-        them misrepresent the queue."""
+        """Replied means an agent answered; a customer may only close."""
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         frappe.set_user(PERMS_CUSTOMER)
         with self.assertRaises(frappe.PermissionError):
             client_set_value("HD Ticket", ticket.name, "status", "Replied")
 
     def test_customer_cannot_rewrite_feedback_once_rated(self):
-        """A rated ticket is settled. This held only for portal-raised tickets
-        before, so a ticket an agent opened on the customer's behalf let them
-        revise the rating afterwards."""
+        """Held only for portal-raised tickets before; agent-raised ones were revisable."""
         option, other = frappe.get_all(
             "HD Ticket Feedback Option", fields=["name"], limit=2
         )
@@ -2710,17 +2676,13 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             client_set_value("HD Ticket", ticket.name, "feedback", other.name)
 
     def test_customer_cannot_read_form_scripts(self):
-        """Form scripts are agent tooling — ours carry internal URLs and the
-        name of an access-request method, so a portal login reading them maps
-        the support setup."""
+        """Agent form scripts carry internal URLs and method names."""
         frappe.set_user(PERMS_CUSTOMER)
         with self.assertRaises(frappe.PermissionError):
             frappe.get_list("HD Form Script", fields=["name", "script"])
 
     def test_customer_gets_portal_scripts_and_never_agent_ones(self):
-        """`is_customer_portal` is supplied by the caller, so asking for the
-        agent scripts must not produce them. The customer still gets their own,
-        otherwise portal customisations would stop running."""
+        """is_customer_portal comes from the caller; a customer never gets agent scripts."""
         for name, portal, body in (
             ("Perms Portal Script", 1, "PORTAL"),
             ("Perms Agent Script", 0, "AGENT"),
@@ -2856,9 +2818,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.clear_cache(doctype="HD Ticket")
 
     def test_system_set_field_not_exposable_via_template(self):
-        """A customer may read `sla` for the SLA card, but showing it on the
-        form would offer a picker the server throws away, so the template
-        refuses it. Listing it hidden, for the agent form, stays allowed."""
+        """Showing sla would offer a picker the server throws away; hidden is fine."""
         with self.assertRaises(frappe.ValidationError):
             self.set_default_template_fields(
                 [{"fieldname": "sla", "hide_from_customer": 0}]
@@ -2868,9 +2828,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
 
     def test_template_never_moves_standard_field_permlevels(self):
-        """Standard fields keep the level the app ships, however the template
-        is filled in. Their levels are part of the doctype, not site config,
-        so nothing here writes a Property Setter over them."""
+        """Standard field levels belong to the doctype; the template writes no Property Setter."""
         shipped = self.hd_ticket_permlevel("priority")
         template = self.set_default_template_fields(
             [{"fieldname": "priority", "hide_from_customer": 0}]
@@ -3001,9 +2959,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertTrue(new(get_ticket_obj()).get("agreement_status"))
 
     def test_sla_output_not_fillable_at_creation(self):
-        """SLA outputs are customer-readable so the portal can show them,
-        but the engine owns their values: a customer-supplied value at
-        creation is recomputed."""
+        """SLA outputs are readable, but the engine owns their values and recomputes them."""
         supplied = "2000-01-01 00:00:00"
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc({**get_ticket_obj(), "response_by": supplied}).insert()
@@ -3011,9 +2967,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertNotEqual(str(ticket.response_by), supplied)
 
     def test_server_computed_fields_never_creation_fillable(self):
-        """Second line of defence: the template guard only runs on save, so
-        a template stored before it existed can still list a system-set
-        field. The ticket refuses to fill it either way."""
+        """A template saved before the guard existed can still list a system-set field."""
         ticket = frappe.new_doc("HD Ticket")
         for fieldname in ("sla", "response_by", "first_responded_on"):
             self.assertFalse(ticket.customer_may_fill_at_creation(fieldname))

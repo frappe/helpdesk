@@ -148,8 +148,7 @@ const slaData = computed(() =>
       value: ticket.data.resolution_date || ticket.data.resolution_by,
     },
   ]
-    // a ticket with no SLA still has a first response and a resolution; report
-    // them as plain facts rather than a verdict against a target it never had
+    // without an SLA there is no verdict, so show the timestamps as plain facts
     .filter((row) => Boolean(row.metric) || Boolean(row.value))
     .map((row) => ({
       title: row.title,
@@ -174,8 +173,7 @@ const ticketBasicInfo = computed(() => [
 ]);
 
 const ticketAdditionalInfo = computed(() => {
-  // fields hidden for this viewer arrive blanked; drop their rows rather
-  // than render empty labels
+  // fields hidden for this viewer arrive blanked; drop their rows
   const hiddenFields: string[] = ticket.data._hidden_fields || [];
   const fields = [
     {

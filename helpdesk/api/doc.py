@@ -119,8 +119,7 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-        # template visibility tiers: saved views quietly lose columns tiered
-        # above the caller instead of leaking or erroring
+        # saved views quietly lose columns tiered above the caller
         rows = TicketFieldVisibility().filter_fieldnames(rows)
     data = (
         frappe.get_list(

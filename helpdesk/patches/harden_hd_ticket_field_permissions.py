@@ -1,10 +1,8 @@
 import frappe
 from frappe.permissions import add_permission, update_permission_property
 
-# level -> role -> has write access at that level. Level 7 holds the
-# customer-visible operational fields and level 8 the agent-only internals.
-# High numbers avoid colliding with permlevel schemes a site may have built
-# itself.
+# level -> role -> can write. 7 holds customer-visible fields, 8 agent-only ones;
+# high numbers stay clear of a site's own permlevel scheme
 LEVEL_GRANTS = {
     7: {
         "System Manager": 1,
@@ -26,9 +24,8 @@ def execute():
 
 
 def mirror_permlevel_grants_into_custom_docperms():
-    """Any Custom DocPerm row makes Frappe ignore the JSON perms wholesale,
-    so customised sites need the permlevel rows added explicitly or agents
-    lose access to the protected fields."""
+    """Any Custom DocPerm row makes Frappe ignore the JSON perms, so customised
+    sites need the level rows added or agents lose the protected fields."""
     existing = frappe.get_all(
         "Custom DocPerm",
         filters={"parent": "HD Ticket"},

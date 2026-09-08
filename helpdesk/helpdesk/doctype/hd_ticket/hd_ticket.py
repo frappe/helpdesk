@@ -80,10 +80,8 @@ class HDTicket(Document):
         return self.name
 
     def apply_fieldlevel_read_permissions(self):
-        # permission levels do the real stripping in super(); the template's
-        # visible_to tiers then narrow further for helpdesk pages. The
-        # framework calls this on every doc-serialising endpoint (form load,
-        # frappe.client.get, run_doc_method, REST).
+        # permission levels strip first; the template's tiers then narrow
+        # further for helpdesk pages
         super().apply_fieldlevel_read_permissions()
         if frappe.session.user == "Administrator":
             return
@@ -94,9 +92,8 @@ class HDTicket(Document):
         self.apply_portal_insert_rules()
 
     def apply_portal_insert_rules(self):
-        """The framework wipes every field the user cannot write right after
-        this hook, so exempt what the server just set and what the default
-        template lets a customer fill. Staff skip these portal rules."""
+        """The permlevel reset after this hook wipes fields the user cannot write;
+        exempt server-set fields and the ones the template lets a customer fill."""
         if is_agent_staff():
             return
         if frappe.session.user != "Guest":
@@ -107,17 +104,15 @@ class HDTicket(Document):
         )
 
     def customer_may_fill_at_creation(self, fieldname: str) -> bool:
-        """Server-computed fields never qualify — they sit at a
-        customer-readable level, so the permlevel check alone would admit
-        them."""
+        """Server-computed fields sit at a customer-readable level, so the level
+        check alone would admit them."""
         if fieldname in SERVER_COMPUTED_FIELDS:
             return False
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
 
     def creation_fillable_template_fields(self) -> list[str]:
-        """Fields a customer may fill on the creation form: the fields the
-        default template shows, at a level a customer may write."""
+        """Default-template fields shown to everyone, at a level a customer may write."""
         try:
             template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
         except frappe.DoesNotExistError:
@@ -125,8 +120,7 @@ class HDTicket(Document):
             return []
         fillable = []
         for row in template.fields:
-            # only fields shown to everyone are customer-fillable; read the
-            # visibility tier, not the flag synced from it
+            # read the tier, not the flag synced from it
             if row_tier(row) != 0:
                 continue
             if self.customer_may_fill_at_creation(row.fieldname):
@@ -232,8 +226,7 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
-        # the creation-form exemption is for the insert only; drop it so a
-        # later save cannot reuse it
+        # the creation-form exemption must not survive into a later save
         self.flags.pop("ignore_permlevel_for_fields", None)
 
         # Telemetry Event
@@ -487,9 +480,7 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
-        # not gated on via_customer_portal: a ticket an agent raised on the
-        # customer's behalf is still their ticket, and rewriting a rating after
-        # the fact should be refused there too
+        # not gated on via_customer_portal: agent-raised tickets are still the customer's
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent_staff():
             return
@@ -500,8 +491,7 @@ class HDTicket(Document):
             frappe.throw(text, frappe.PermissionError)
 
     def customer_editable_fields(self) -> set[str]:
-        """A customer may move the ticket into the Resolved category, nothing
-        else. Reopening happens on reply, which the server does for them."""
+        """Customers may only close; replies reopen the ticket server-side."""
         editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved":
@@ -509,11 +499,8 @@ class HDTicket(Document):
         return editable
 
     def prevent_customer_edits(self):
-        """Freeze the ticket against its customer once it exists.
-
-        Permission levels cannot do this alone: raising a ticket needs write
-        at level 0, and the reset is skipped on ignore_permissions saves.
-        """
+        """Freeze the ticket against its customer once it exists. Permission levels
+        cannot: creating needs level-0 write, and ignore_permissions skips the reset."""
         if self.is_new() or is_agent_staff():
             return
         if self.flags.get("ignore_customer_edit_guard"):
@@ -1218,13 +1205,10 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
-        # portal replies save under the customer session; exempt the fields the
-        # server works out so the permlevel reset keeps them
+        # portal replies save as the customer; the reset must keep server-set fields
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
-        # the same save reopens the ticket and stamps the response times, so the
-        # customer edit guard has to stand aside too. The framework hands this
-        # method a freshly loaded ticket, never a caller's payload, so the
-        # exemption cannot be reached from outside.
+        # this save reopens the ticket and stamps response times. The doc comes
+        # freshly loaded, never from a caller's payload, so this cannot be abused
         self.flags.ignore_customer_edit_guard = True
         # Save the ticket, allowing for hooks to run.
         self.save()

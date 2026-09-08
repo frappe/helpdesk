@@ -2,9 +2,8 @@ import frappe
 
 
 def execute():
-    """Fill the visible_to tier on template rows that predate the column, so
-    the grid shows the truth from day one. Reads already fall back to the
-    hide_from_customer flag, so this is cosmetic and safe to re-run."""
+    """Fill visible_to on rows older than the column.
+    Cosmetic: reads already fall back to hide_from_customer, so re-runs are safe."""
     frappe.db.set_value(
         "HD Ticket Template Field",
         {"visible_to": ("in", ("", None)), "hide_from_customer": 1},

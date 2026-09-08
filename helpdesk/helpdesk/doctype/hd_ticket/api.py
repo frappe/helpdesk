@@ -34,9 +34,7 @@ def new(doc: dict, attachments: list[dict] = []):
 
 
 def strip_unreadable_field_names(ticket: dict) -> dict:
-    """The permlevel strip blanks the values, but serialising puts every
-    field name back with an empty default. Drop the names the caller
-    cannot read; no-op for agents."""
+    """as_dict puts blanked field names back; drop the ones the caller cannot read."""
     permitted = set(get_permitted_fields("HD Ticket"))
     for field in frappe.get_meta("HD Ticket").fields:
         if field.fieldname not in permitted:
@@ -121,8 +119,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         ),
         "fields": get_meta(template),
         "calls": call_logs,
-        # so hardcoded rows in the UI can drop fields hidden for this caller
-        # instead of rendering empty labels
+        # lets hardcoded UI rows drop hidden fields instead of rendering empty labels
         "_hidden_fields": sorted(TicketFieldVisibility().hidden_fields()),
     }
 
@@ -548,8 +545,7 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    # an agent must not get widgets for fields tiered above their rank —
-    # the read strip blanks the values, so they would render forever empty
+    # no widgets for fields tiered above the agent: their values arrive blanked
     visibility = TicketFieldVisibility()
     custom_fields = visibility.filter_template_rows(custom_fields)
     form_scripts = get_form_script("HD Ticket")

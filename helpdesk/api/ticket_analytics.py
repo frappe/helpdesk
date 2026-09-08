@@ -49,8 +49,7 @@ def get_ticket_analytics(ticket: str) -> dict:
     if not details:
         frappe.throw(_("Ticket {0} not found.").format(ticket))
     for fieldname in TICKET_FIELDS:
-        # fields above the caller's rank read as empty, so the timeline
-        # degrades instead of crashing
+        # fields above the caller's rank read as empty instead of crashing the timeline
         details.setdefault(fieldname, None)
 
     working_seconds = working_seconds_fn(details.sla)

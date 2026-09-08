@@ -53,14 +53,9 @@ class HDTicketTemplate(Document):
                 frappe.throw(text)
 
     def sync_visibility_flags(self):
-        # visible_to is what admins edit; hide_from_customer stays synced for
-        # the portal Vue, and rows saved before the tier column existed
-        # self-heal from the old flag
+        # admins edit visible_to; hide_from_customer is derived for the portal Vue
         for row in self.fields:
-            # the save pipeline fills Select defaults into brand-new rows, so
-            # a fresh row carrying "Everyone" next to an explicit hide flag is
-            # legacy input and the flag wins; saved rows trust visible_to.
-            # unrecognised values (a renamed label) re-derive from the flag too
+            # unrecognised tier, or the Select default beside an old flag: the flag wins
             legacy_row = row.visible_to not in VISIBILITY_RANKS or (
                 row.is_new() and row.visible_to == "Everyone" and row.hide_from_customer
             )
@@ -71,9 +66,7 @@ class HDTicketTemplate(Document):
             row.hide_from_customer = int(row.visible_to != "Everyone")
 
     def validate_unfillable_fields_stay_hidden(self):
-        """Templates only narrow what permission levels allow, never widen.
-        Showing an internal field offers the customer an input the server
-        throws away."""
+        """Templates only narrow what permission levels allow, never widen."""
         for f in self.fields:
             if not f.fieldname or f.visible_to != "Everyone":
                 continue
@@ -95,8 +88,7 @@ class HDTicketTemplate(Document):
                 frappe.throw(text)
 
     def warn_when_meta_narrower_than_permlevel(self):
-        """Hiding here only affects helpdesk pages; the API answers to
-        permission levels. Tell the admin when the two disagree."""
+        """Tiers cover helpdesk pages only; warn when the API still serves the field."""
         if frappe.flags.in_migrate or frappe.flags.in_patch:
             return
         exposed = [
@@ -131,8 +123,7 @@ class HDTicketTemplate(Document):
         capture_event("ticket_template_updated")
 
     def current_permlevel(self, fieldname: str) -> int:
-        """Read from live meta, not the shipped DocField row, so a level an
-        administrator changed in Customize Form is recognised."""
+        """Live meta, so a level changed in Customize Form counts."""
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return field.permlevel if field else 0
 

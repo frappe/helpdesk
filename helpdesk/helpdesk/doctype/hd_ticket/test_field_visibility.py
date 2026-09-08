@@ -21,9 +21,7 @@ CUSTOMER_EMAIL = "fv_customer@example.com"
 
 
 class TestTicketFieldVisibility(IntegrationTestCase):
-    """The Default template's visible_to tiers narrow, at helpdesk level,
-    what permission levels allow — and never widen it. Templates do not
-    write permission levels."""
+    """Default-template tiers narrow what permission levels allow; they never widen."""
 
     def setUp(self):
         frappe.set_user("Administrator")
@@ -65,8 +63,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         )
 
     def test_meta_narrows_below_the_permission_level(self):
-        # response_by sits at the customer-visible level; the tier alone
-        # takes it off the portal
+        # response_by is at the customer-readable level; the tier alone hides it
         self.tier("response_by", "Agents and above")
         ticket = self.make_customer_ticket()
         frappe.set_user(CUSTOMER_EMAIL)
@@ -175,9 +172,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertEqual(get_field_tiers().get("priority"), 1)
 
     def test_agent_workflow_columns_hidden_from_customers(self):
-        """_user_tags and friends are framework columns permission levels
-        cannot cover; they carry agent workflow data and never reach the
-        portal."""
+        """_user_tags and friends bypass permission levels and must never reach the portal."""
         ticket = self.make_customer_ticket()
         frappe.db.set_value(
             "HD Ticket",

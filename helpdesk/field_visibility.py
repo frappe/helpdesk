@@ -1,15 +1,5 @@
-"""Role-based field visibility for HD Ticket, on top of permission levels.
-
-Permission levels are the security floor: the framework strips what a user
-may not read on every path. The Default ticket template's rows narrow that
-further for helpdesk's own pages — each row's `visible_to` names the minimum
-role that may see the field, on the fixed ladder customer < Agent < Agent
-Manager < System Manager. Templates never widen access and never write
-permission levels; a field the template does not list is untouched.
-
-Enforced only at helpdesk level: the HDTicket controller's
-`apply_fieldlevel_read_permissions` override and helpdesk's own endpoints.
-Raw framework queries answer to permission levels alone.
+"""Per-role display visibility for HD Ticket fields, layered over permission levels.
+The Default template's tiers only narrow what levels allow; raw framework queries ignore them.
 """
 
 import frappe
@@ -24,10 +14,8 @@ VISIBILITY_RANKS = {
     "System Managers only": 3,
 }
 
-# framework-managed columns permission levels cannot cover: they are not
-# DocFields, and get_permitted_fields hands them to every reader. Agent
-# workflow data, so customers never see them. _seen stays out of this set —
-# the portal list parses it for unread dots.
+# framework columns permission levels cannot cover; agent workflow data, so hidden
+# from customers. _seen stays out: the portal list reads it for unread dots
 STAFF_STANDARD_FIELDS = frozenset({"_assign", "_comments", "_liked_by", "_user_tags"})
 
 
@@ -42,9 +30,6 @@ class TicketFieldVisibility:
         return fieldname not in self.hidden_fields()
 
     def hidden_fields(self) -> set[str]:
-        """Template rows tiered above the user's rank, plus the framework's
-        agent-workflow columns for customers; everything else is left to
-        permission levels."""
         hidden = {f for f, tier in get_field_tiers().items() if tier > self.rank}
         if not self.rank:
             hidden |= STAFF_STANDARD_FIELDS
@@ -57,21 +42,18 @@ class TicketFieldVisibility:
         return [f for f in fields if self.is_readable(f.get(key))]
 
     def filter_template_rows(self, rows: list[dict]) -> list[dict]:
-        # judged against the Default tier map, not the row's own visible_to:
-        # the Default template is the one source of visibility rules
+        # judged against the Default tier map, not the row's own visible_to
         return self.filter_field_dicts(rows, key="fieldname")
 
     def strip(self, ticket) -> None:
-        """Blank the fields the user may not see; serializers then return
-        them empty, the same shape the permission-level strip produces."""
+        """Blank hidden fields, the same shape the permission-level strip produces."""
         for fieldname in self.hidden_fields():
             if hasattr(ticket, fieldname):
                 ticket.set(fieldname, None)
 
 
 def user_rank(user: str) -> int:
-    # judged from the user's own roles, not is_agent(): that helper answers
-    # for the session user when an Administrator asks about someone else
+    # not is_agent(): it answers for the session user, not the one asked about
     roles = frappe.get_roles(user)
     if "System Manager" in roles:
         return VISIBILITY_RANKS["System Managers only"]
@@ -84,8 +66,7 @@ def user_rank(user: str) -> int:
 
 @redis_cache
 def get_field_tiers() -> dict[str, int]:
-    """fieldname -> minimum rank that may see it, from the Default template.
-    Matched by fieldname because template saves replace child rows wholesale."""
+    """fieldname -> minimum rank that may see it, from the Default template."""
     rows = frappe.get_all(
         "HD Ticket Template Field",
         filters={
@@ -99,8 +80,7 @@ def get_field_tiers() -> dict[str, int]:
 
 
 def row_tier(row) -> int:
-    # a blank or unrecognised visible_to falls back to the old flag, so rows
-    # saved before the tier column (or before a label rename) keep working
+    # a blank or unrecognised tier falls back to the old flag
     tier = VISIBILITY_RANKS.get(row.get("visible_to"))
     if tier is not None:
         return tier

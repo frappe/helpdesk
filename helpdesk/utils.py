@@ -60,15 +60,8 @@ def is_agent(user: str | None = None) -> bool:
 
 
 def is_agent_staff(user: str | None = None) -> bool:
-    """
-    Check whether `user` works the helpdesk rather than raising tickets in it
-
-    System Managers count: HD Ticket grants them write at every permission
-    level, so gating on agents alone would lock them out.
-
-    :param user: User to check against, defaults to current user
-    :return: Whether `user` is an agent or a System Manager
-    """
+    """Whether `user` works the helpdesk: an agent or a System Manager.
+    System Managers count because HD Ticket grants them write at every level."""
     user = user or frappe.session.user
     return is_agent(user) or "System Manager" in frappe.get_roles(user)
 

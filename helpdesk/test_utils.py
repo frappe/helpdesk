@@ -187,8 +187,7 @@ def other_priority(current: str) -> str:
 
 
 def tier_default_template_field(fieldname: str, visible_to: str):
-    """Add or retier a row on the Default template — the one the field
-    visibility resolver reads — and return an undo callable for addCleanup."""
+    """Add or retier a Default-template row; returns an undo callable for addCleanup."""
     template = frappe.get_doc("HD Ticket Template", "Default")
     row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
     original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]

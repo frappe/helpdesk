@@ -192,8 +192,7 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  // fields hidden for this agent arrive blanked; skip their widgets rather
-  // than render inputs that can never show a value
+  // fields hidden for this agent arrive blanked; skip their widgets
   const hiddenFields = customizations.value.data?.hidden_fields || [];
   return CORE_FIELDS.filter((f) => !hiddenFields.includes(f))
     .map((fieldname) => {
