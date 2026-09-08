@@ -4,6 +4,7 @@ comment reactions nor comment attachments, and calls are helpdesk-only rows."""
 import frappe
 from frappe import _
 
+from helpdesk.extends.comment import has_permission as can_read_comment
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_attachments, get_call_logs
 from helpdesk.utils import is_agent
 
@@ -13,15 +14,18 @@ def get_comment_extras(ticket: str) -> dict[str, dict]:
     """One batched call per ticket open: {comment_name: {reactions, attachments}}.
     Re-fetched by the client on helpdesk:comment-reaction-update."""
     ensure_agent_can_read(ticket)
-    names = frappe.get_all(
+    rows = frappe.get_list(
         "Comment",
         filters={
             "reference_doctype": "HD Ticket",
             "reference_name": ticket,
             "comment_type": "Comment",
         },
-        pluck="name",
+        fields=["name", "owner", "comment_type", "reference_doctype", "reference_name"],
+        limit_page_length=0,
     )
+    # get_list applies role perms and query conditions, not the doc-level hook
+    names = [row.name for row in rows if can_read_comment(row)]
     extras = {name: {"reactions": [], "attachments": []} for name in names}
     if not names:
         return extras

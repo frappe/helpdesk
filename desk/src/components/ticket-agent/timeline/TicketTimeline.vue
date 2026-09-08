@@ -66,14 +66,11 @@
         <CallArea :activity="activity.data" />
       </template>
       <template #icon-call="{ activity }">
-        <FeatherIcon
-          :name="
-            activity.data.call_type === 'Incoming'
-              ? 'phone-incoming'
-              : 'phone-outgoing'
-          "
+        <LucidePhoneIncoming
+          v-if="activity.data.call_type === 'Incoming'"
           class="size-4 text-ink-gray-5"
         />
+        <LucidePhoneOutgoing v-else class="size-4 text-ink-gray-5" />
       </template>
     </ActivityTimeline>
   </TimelineContainer>
@@ -143,7 +140,7 @@ import {
   type EmailActivity,
   type LogActivity,
 } from "@framework/ui/ActivityTimeline";
-import { Button, Dropdown, FeatherIcon, call, createResource } from "frappe-ui";
+import { Button, Dropdown, call, createResource } from "frappe-ui";
 import {
   computed,
   inject,

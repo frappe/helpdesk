@@ -10,6 +10,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.comment import get_reactions, toggle_reaction
 from helpdesk.api.tags import update_tags
+from helpdesk.api.timeline import get_comment_extras
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_one
 from helpdesk.overrides import desk_form, realtime
 from helpdesk.patches import (
@@ -254,6 +255,19 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         comment = self.make_comment(ticket, "internal note")
         frappe.set_user(AGENT_TWO)
         self.assertTrue(frappe.has_permission("Comment", "read", comment.name))
+
+    def test_extras_skip_comments_the_agent_cannot_read(self):
+        """The hook hides Administrator-owned comments; their reactions and
+        attachments must not ride along in the batched extras payload."""
+        ticket = make_ticket(raised_by=CUSTOMER)
+        mine = self.make_comment(ticket, "agent note")
+        frappe.set_user("Administrator")
+        hidden = ticket.add_comment("Comment", "admin only")
+
+        frappe.set_user(AGENT_ONE)
+        extras = get_comment_extras(ticket.name)
+        self.assertIn(mine.name, extras)
+        self.assertNotIn(hidden.name, extras)
 
     def test_customer_cannot_join_own_ticket_room(self):
         """The customer reads their ticket over HTTP, but must not enter the
