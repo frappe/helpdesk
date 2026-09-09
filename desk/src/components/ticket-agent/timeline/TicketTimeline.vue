@@ -121,7 +121,7 @@ import {
 } from "@/components/icons";
 import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import TicketSplitModal from "@/components/ticket/TicketSplitModal.vue";
-import { registerTicketFeed } from "@/composables/useTicket";
+import { registerTicketFeed, useTicket } from "@/composables/useTicket";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
@@ -139,7 +139,7 @@ import {
   type EmailActivity,
   type LogActivity,
 } from "@framework/ui/ActivityTimeline";
-import { Button, Dropdown, call, createResource } from "frappe-ui";
+import { Button, Dropdown, call } from "frappe-ui";
 import {
   computed,
   inject,
@@ -178,21 +178,9 @@ const { activities, loading, paginate, reload } = useActivityTimeline(
   SHARED_VISIBLE_TYPES
 );
 
-const calls = createResource({
-  url: "helpdesk.api.timeline.get_ticket_calls",
-  makeParams: () => ({ ticket: props.ticketId }),
-  cache: ["ticket-calls", props.ticketId],
-  auto: props.tab === "activity" || props.tab === "call",
-});
+const { calls, commentExtras: extras } = useTicket(props.ticketId);
 
 const _loading = computed(() => loading.value || calls.loading);
-
-const extras = createResource({
-  url: "helpdesk.api.timeline.get_comment_extras",
-  makeParams: () => ({ ticket: props.ticketId }),
-  cache: ["comment-extras", props.ticketId],
-  auto: props.tab === "activity" || props.tab === "comment",
-});
 
 const feed = computed<Array<Activity | CustomActivity>>(() => {
   const callRows: CustomActivity[] = (calls.data ?? []).map((call: any) => ({

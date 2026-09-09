@@ -1,4 +1,5 @@
 import type { TicketAnalytics } from "@/components/ticket-agent/analytics/types";
+import type { CommentExtras } from "@/components/ticket-agent/timeline/TimelineCommentRow.vue";
 import { __ } from "@/translation";
 import type {
   DocumentResource,
@@ -17,6 +18,9 @@ interface MapValue {
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
   analytics: Resource<TicketAnalytics>;
+  // shared by every timeline tab instance, fetched once per ticket
+  calls: Resource<Record<string, any>[]>;
+  commentExtras: Resource<Record<string, CommentExtras>>;
   // lent by the mounted timeline; see registerTicketFeed
   reloadFeed?: () => void;
 }
@@ -64,6 +68,16 @@ export const useTicket = (ticketId: string): MapValue => {
         url: "helpdesk.api.ticket_analytics.get_ticket_analytics",
         params: { ticket: ticketId },
         cache: ["Ticket", ticketId, "analytics"],
+      }),
+      calls: createResource({
+        url: "helpdesk.api.timeline.get_ticket_calls",
+        params: { ticket: ticketId },
+        auto: true,
+      }),
+      commentExtras: createResource({
+        url: "helpdesk.api.timeline.get_comment_extras",
+        params: { ticket: ticketId },
+        auto: true,
       }),
     };
   }
