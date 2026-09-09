@@ -7,7 +7,7 @@
         <Button
           ref="sendEmailRef"
           variant="ghost"
-          label="Reply"
+          :label="__('Reply')"
           :class="[
             showEmailBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
           ]"
@@ -19,7 +19,7 @@
         </Button>
         <Button
           variant="ghost"
-          label="Comment"
+          :label="__('Comment')"
           :class="[
             showCommentBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
           ]"
@@ -79,10 +79,10 @@
             ref="commentTextEditorRef"
             :label="
               isMobileView
-                ? 'Comment'
+                ? __('Comment')
                 : isMac
-                ? 'Comment (⌘ + ⏎)'
-                : 'Comment (Ctrl + ⏎)'
+                ? __('Comment (⌘ + ⏎)')
+                : __('Comment (Ctrl + ⏎)')
             "
             :ticketId="ticketId"
             :editable="showCommentBox"
