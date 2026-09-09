@@ -293,8 +293,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update"]);
-// MobileTicketAgent binds v-model="ticket.doc"; keep the model registered.
-const doc = defineModel();
 
 const { isMac } = useDevice();
 const { isMobileView } = useScreenSize();
