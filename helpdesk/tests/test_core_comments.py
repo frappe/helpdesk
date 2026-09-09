@@ -132,6 +132,21 @@ class TestNotificationFunnel(CoreCommentsTestCase):
         self.assertEqual(row.app, "helpdesk")
         self.assertEqual(frappe.db.count("Email Queue"), emails_before + 1)
 
+    def test_deleting_a_comment_removes_its_notifications(self):
+        ticket = make_ticket()
+        comment = self.make_comment(ticket, f"gone soon {mention(AGENT_TWO)}")
+        frappe.set_user(AGENT_TWO)
+        self.assertEqual(
+            len(notification_rows(for_user=AGENT_TWO, source_name=comment.name)), 1
+        )
+
+        frappe.set_user(AGENT_ONE)
+        comment.delete()
+        frappe.set_user(AGENT_TWO)
+        self.assertEqual(
+            notification_rows(for_user=AGENT_TWO, source_name=comment.name), []
+        )
+
     def test_self_mention_is_suppressed(self):
         ticket = make_ticket()
         comment = self.make_comment(ticket, f"note to self {mention(AGENT_ONE)}")

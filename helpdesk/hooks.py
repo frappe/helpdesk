@@ -103,6 +103,7 @@ doc_events = {
     },
     "Comment": {
         "before_insert": "helpdesk.extends.comment.before_insert",
+        "on_trash": "helpdesk.extends.comment.on_trash",
     },
 }
 

@@ -20,6 +20,15 @@ def before_insert(doc, method: str | None = None):
         )
 
 
+def on_trash(doc, method: str | None = None):
+    """Core only clears notifications by document, not by source."""
+    if doc.reference_doctype != "HD Ticket":
+        return
+    frappe.db.delete(
+        "Notification Log", {"source_doctype": "Comment", "source_name": doc.name}
+    )
+
+
 def has_permission(doc, ptype: str = "read", user: str | None = None) -> bool:
     user = user or frappe.session.user
     # only read: write/delete stay a role question, or no one but Administrator could moderate
