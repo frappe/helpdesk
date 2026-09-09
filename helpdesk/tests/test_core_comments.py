@@ -15,6 +15,7 @@ from helpdesk.api.timeline import get_comment_extras
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_one
 from helpdesk.overrides import realtime
 from helpdesk.patches import (
+    mark_old_assignment_notifications_read,
     migrate_hd_notifications_to_notification_log,
     migrate_hd_ticket_comment_to_comment,
     migrate_ticket_activities_to_info_comments,
@@ -497,6 +498,43 @@ class TestMigrationPatches(FrappeTestCase):
         cls.remove_leftovers()
         cls.ticket = make_ticket()
 
+    def test_assignment_backlog_is_cleared_without_touching_anything_else(self):
+        """Only helpdesk assignments. A mention, or another app's row, is
+        somebody else's unread."""
+        rows = {
+            "bklogassign": {"type": "Assignment", "app": "helpdesk"},
+            "bklogmention": {"type": "Mention", "app": "helpdesk"},
+            "bklogother": {"type": "Assignment", "app": "frappe"},
+        }
+        for name, values in rows.items():
+            self.seed_notification_log(name, **values)
+
+        mark_old_assignment_notifications_read.execute()
+
+        read_flags = {
+            name: frappe.db.get_value("Notification Log", name, "read") for name in rows
+        }
+        self.assertTrue(read_flags["bklogassign"])
+        self.assertFalse(read_flags["bklogmention"], "a mention is still news")
+        self.assertFalse(read_flags["bklogother"], "not helpdesk's to clear")
+
+    def seed_notification_log(self, name: str, **values) -> None:
+        frappe.db.delete("Notification Log", {"name": name})
+        doc = frappe.new_doc("Notification Log")
+        doc.name = name
+        doc.update(
+            {
+                "for_user": AGENT_ONE,
+                "from_user": AGENT_ONE,
+                "document_type": "HD Ticket",
+                "document_name": self.ticket.name,
+                "subject": "backlog row",
+                "read": 0,
+                **values,
+            }
+        )
+        doc.db_insert()
+
     @classmethod
     def remove_leftovers(cls):
         """The patches commit, so seeds from previous runs survive on the
@@ -514,6 +552,10 @@ class TestMigrationPatches(FrappeTestCase):
         frappe.db.delete("Comment", {"name": ["in", seeded_names]})
         frappe.db.delete("Comment", {"content": ["in", cls.SEEDED_CONTENTS]})
         frappe.db.delete("HD Comment Reaction", {"user": AGENT_ONE})
+        frappe.db.delete(
+            "Notification Log",
+            {"name": ["in", ["bklogassign", "bklogmention", "bklogother"]]},
+        )
 
     def seed_legacy_comment(self, name: str, content: str = "legacy words") -> None:
         if frappe.db.exists("HD Ticket Comment", name):
