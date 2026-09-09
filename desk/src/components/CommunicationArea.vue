@@ -476,7 +476,10 @@ watch(
 );
 
 watch(emailBody, (value, oldValue) => {
-  if (value !== oldValue && value) {
+  // The signature drops into an empty editor on load and on every reply. That
+  // is not the agent typing, and broadcasting it would show a typing indicator
+  // to everyone else on the ticket.
+  if (value !== oldValue && !isContentEmpty(value) && !isOnlySignature(value)) {
     onUserType();
   }
   // Only the composer's internal Discard/Esc reset the model to exactly "";
@@ -771,6 +774,10 @@ const IGNORED_SELECTORS = [
   '[role="menu"]',
   ".dialog-overlay",
   "[data-reka-popper-content-wrapper]",
+  // Grammarly suggestions appear outside the box, allow them to stop collapsing.
+  "grammarly-extension",
+  "grammarly-popups",
+  "[data-grammarly-part]",
 ];
 
 // `ignore` is only consulted on pointerdown, which dialogs stop, so the click
