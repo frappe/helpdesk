@@ -15,7 +15,12 @@ def iter_name_chunks(
     Name-ordered ranges keep each insert-select bounded; committing per chunk
     plus NOT EXISTS in the consumer makes an interrupted migrate resumable.
     """
+    total = frappe.db.count(doctype, filters)
+    if not total:
+        return
+    done = 0
     last = ""
+    print(f"Migrating {doctype}: {done} of {total}")
     while True:
         names = frappe.get_all(
             doctype,
@@ -28,3 +33,5 @@ def iter_name_chunks(
             return
         yield last, names[-1]
         last = names[-1]
+        done += len(names)
+        print(f"Migrating {doctype}: {done} of {total}")
