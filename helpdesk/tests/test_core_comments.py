@@ -15,8 +15,8 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import get_one
 from helpdesk.overrides import desk_form, realtime
 from helpdesk.patches import (
     migrate_hd_notifications_to_notification_log,
+    migrate_hd_ticket_comment_to_comment,
     migrate_ticket_activities_to_info_comments,
-    migrate_ticket_comments_to_comment,
     repoint_comment_reactions_and_files,
 )
 from helpdesk.test_utils import (
@@ -26,6 +26,7 @@ from helpdesk.test_utils import (
     make_team,
     make_ticket,
 )
+from helpdesk.utils import is_agent
 
 AGENT_ONE = "core-comments-agent-one@example.com"
 AGENT_TWO = "core-comments-agent-two@example.com"
@@ -52,6 +53,21 @@ def ticket_comments(ticket: str, comment_type: str = "Comment") -> list[str]:
     )
 
 
+def allow_email_type(user: str, notification_type: str) -> None:
+    """New users get every emailable type by default; a user seeded while a
+    type was in the skip list does not, so state the precondition."""
+    settings = frappe.get_doc("Notification Settings", user)
+    if any(
+        r.notification_type == notification_type
+        for r in settings.email_notification_types
+    ):
+        return
+    settings.append(
+        "email_notification_types", {"notification_type": notification_type}
+    )
+    settings.save(ignore_permissions=True)
+
+
 def notification_rows(**filters) -> list[dict]:
     return frappe.get_list(
         "Notification Log",
@@ -66,6 +82,7 @@ def notification_rows(**filters) -> list[dict]:
             "app",
             "read",
             "subject",
+            "from_user",
         ],
     )
 
@@ -97,8 +114,9 @@ class CoreCommentsTestCase(FrappeTestCase):
 class TestNotificationFunnel(CoreCommentsTestCase):
     def test_mention_notification_points_at_ticket_and_comment(self):
         """Core owns mentions: one row, referencing the ticket, with the
-        comment as source. It is app-scoped for the panel and never emails."""
+        comment as source, app-scoped for the panel, emailed once by core."""
         ticket = make_ticket()
+        allow_email_type(AGENT_TWO, "Mention")
         emails_before = frappe.db.count("Email Queue")
         comment = self.make_comment(ticket, f"look {mention(AGENT_TWO)}")
 
@@ -111,7 +129,7 @@ class TestNotificationFunnel(CoreCommentsTestCase):
         self.assertEqual(row.document_name, ticket.name)
         self.assertEqual(row.source_doctype, "Comment")
         self.assertEqual(row.app, "helpdesk")
-        self.assertEqual(frappe.db.count("Email Queue"), emails_before)
+        self.assertEqual(frappe.db.count("Email Queue"), emails_before + 1)
 
     def test_self_mention_is_suppressed(self):
         ticket = make_ticket()
@@ -140,6 +158,17 @@ class TestNotificationFunnel(CoreCommentsTestCase):
         self.assertEqual(len(rows), 1, "reaction rolls up into one row")
         self.assertFalse(rows[0].read, "roll-up re-marks the row unread")
         self.assertIn("2 people", rows[0].subject)
+
+        frappe.set_user(AGENT_TWO)
+        toggle_reaction(comment.name, "👍")
+        frappe.set_user(AGENT_THREE)
+        toggle_reaction(comment.name, "🎉")
+        frappe.set_user(AGENT_ONE)
+        self.assertEqual(
+            notification_rows(for_user=AGENT_ONE, source_name=comment.name),
+            [],
+            "nobody left reacting, the row goes",
+        )
 
     def test_reaction_toggle_off_and_response_shape(self):
         frappe.db.set_single_value("HD Settings", "enable_comment_reactions", 1)
@@ -220,6 +249,42 @@ class TestNotificationFunnel(CoreCommentsTestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0].document_type, "HD Ticket")
         self.assertEqual(rows[0].app, "helpdesk")
+        self.assertEqual(rows[0].from_user, AGENT_TWO)
+
+    def test_reopen_by_inbound_email_names_the_sender(self):
+        ticket = make_ticket(raised_by=CUSTOMER)
+        frappe.set_user(AGENT_ONE)
+        ticket.assign_agent(AGENT_ONE)
+        for direction in ("Sent", "Received"):
+            self.make_communication(ticket, direction)
+        ticket.reload()
+        ticket.status = "Resolved"
+        ticket.save()
+
+        frappe.set_user("Administrator")
+        self.make_communication(ticket, "Received")
+
+        rows = notification_rows(
+            for_user=AGENT_ONE, type="Ticket Reopened", document_name=ticket.name
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].from_user, CUSTOMER)
+
+    @staticmethod
+    def make_communication(ticket, direction: str):
+        frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": direction,
+                "sender": CUSTOMER if direction == "Received" else AGENT_ONE,
+                "subject": f"Re: {ticket.subject}",
+                "content": f"{direction} by email",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+            }
+        ).insert(ignore_permissions=True)
 
 
 class TestCommentTrustBoundary(CoreCommentsTestCase):
@@ -256,22 +321,30 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         frappe.set_user(AGENT_TWO)
         self.assertTrue(frappe.has_permission("Comment", "read", comment.name))
 
-    def test_extras_skip_comments_the_agent_cannot_read(self):
-        """The hook hides Administrator-owned comments; their reactions and
-        attachments must not ride along in the batched extras payload."""
+    def test_deactivated_agent_is_not_an_agent(self):
+        ticket = make_ticket()
+        comment = self.make_comment(ticket, "internal note")
+        frappe.db.set_value("HD Agent", AGENT_TWO, "is_active", 0)
+        try:
+            frappe.set_user(AGENT_TWO)
+            self.assertFalse(is_agent())
+            self.assertFalse(frappe.has_permission("Comment", "read", comment.name))
+        finally:
+            frappe.db.set_value("HD Agent", AGENT_TWO, "is_active", 1)
+
+    def test_extras_include_administrator_owned_comments(self):
+        """Bot and script comments are owned by Administrator with a real
+        author in comment_email; agents must see them like any other."""
         ticket = make_ticket(raised_by=CUSTOMER)
         mine = self.make_comment(ticket, "agent note")
         frappe.set_user("Administrator")
-        hidden = ticket.add_comment("Comment", "admin only")
+        by_admin = ticket.add_comment("Comment", "posted by a bot")
 
         frappe.set_user(AGENT_ONE)
+        self.assertTrue(frappe.has_permission("Comment", "read", by_admin.name))
         extras = get_comment_extras(ticket.name)
         self.assertIn(mine.name, extras)
-        self.assertNotIn(hidden.name, extras)
-
-        # Administrator keeps its own, the hook must not read user as unset
-        frappe.set_user("Administrator")
-        self.assertIn(hidden.name, get_comment_extras(ticket.name))
+        self.assertIn(by_admin.name, extras)
 
     def test_customer_cannot_join_own_ticket_room(self):
         """The customer reads their ticket over HTTP, but must not enter the
@@ -386,7 +459,7 @@ class TestMigrationPatches(FrappeTestCase):
     gone) and runs the patches over them."""
 
     SEEDED_COMMENTS = ("lgcy0000c1", "lgcy0000c2", "lgcy0000c9")
-    SEEDED_SIDECARS = ("lgcyattach1", "lgcytomb001")
+    SEEDED_SIDECARS = ("lgcyattach1", "lgcyattach2", "lgcytomb001")
     SEEDED_NOTIFICATIONS = ("lgcynotif1", "lgcynotif2", "lgcynotif3", "lgcynotif4")
     SEEDED_ACTIVITIES = ("lgcyact001", "lgcyact002", "lgcyact003")
     SEEDED_CONTENTS = (
@@ -475,9 +548,9 @@ class TestMigrationPatches(FrappeTestCase):
         self.seed_legacy_comment("lgcy0000c1")
         self.seed_legacy_comment("lgcy0000c2")
 
-        migrate_ticket_comments_to_comment.execute()
+        migrate_hd_ticket_comment_to_comment.execute()
         first = frappe.db.count("Comment", {"reference_name": self.ticket.name})
-        migrate_ticket_comments_to_comment.execute()
+        migrate_hd_ticket_comment_to_comment.execute()
         self.assertEqual(
             frappe.db.count("Comment", {"reference_name": self.ticket.name}), first
         )
@@ -523,8 +596,9 @@ class TestMigrationPatches(FrappeTestCase):
         reaction_name = frappe.db.get_value(
             "HD Comment Reaction", {"parent": colliding, "user": AGENT_ONE}, "name"
         )
+        self.seed_sidecar_comment("lgcyattach2", "Attachment", colliding)
 
-        migrate_ticket_comments_to_comment.execute()
+        migrate_hd_ticket_comment_to_comment.execute()
 
         renamed = frappe.get_list(
             "Comment", filters={"content": "collided words"}, pluck="name"
@@ -532,7 +606,15 @@ class TestMigrationPatches(FrappeTestCase):
         self.assertEqual(len(renamed), 1)
         self.assertNotEqual(renamed[0], colliding)
         self.assertEqual(
+            frappe.db.get_value("Comment", renamed[0], "comment_by"),
+            frappe.db.get_value("User", AGENT_ONE, "full_name"),
+        )
+        self.assertEqual(
             frappe.db.get_value("HD Comment Reaction", reaction_name, "parent"),
+            renamed[0],
+        )
+        self.assertEqual(
+            frappe.db.get_value("Comment", "lgcyattach2", "reference_name"),
             renamed[0],
         )
 
@@ -540,6 +622,12 @@ class TestMigrationPatches(FrappeTestCase):
         self.assertEqual(
             frappe.db.get_value("HD Comment Reaction", reaction_name, "parenttype"),
             "Comment",
+        )
+        self.assertEqual(
+            frappe.db.get_value(
+                "Comment", "lgcyattach2", ["reference_doctype", "reference_name"]
+            ),
+            ("Comment", renamed[0]),
         )
 
     def test_attachment_sidecar_repoints_but_tombstone_does_not(self):
@@ -549,7 +637,7 @@ class TestMigrationPatches(FrappeTestCase):
         self.seed_sidecar_comment("lgcyattach1", "Attachment", "lgcy0000c1")
         self.seed_sidecar_comment("lgcytomb001", "Deleted", "gonelongago")
 
-        migrate_ticket_comments_to_comment.execute()
+        migrate_hd_ticket_comment_to_comment.execute()
         repoint_comment_reactions_and_files.execute()
 
         self.assertEqual(
@@ -583,7 +671,7 @@ class TestMigrationPatches(FrappeTestCase):
 
     def test_notifications_patch_maps_types_and_references(self):
         self.seed_legacy_comment("lgcy0000c9")
-        migrate_ticket_comments_to_comment.execute()
+        migrate_hd_ticket_comment_to_comment.execute()
         self.seed_legacy_notification(
             "lgcynotif1", notification_type="Mention", reference_comment="lgcy0000c9"
         )

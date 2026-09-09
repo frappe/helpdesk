@@ -16,6 +16,7 @@ import frappe
 from frappe import _
 from frappe.desk.doctype.notification_log.notification_log import (
     enqueue_create_notification,
+    make_notification_logs,
     set_notifications_as_unseen,
 )
 from frappe.utils import get_fullname
@@ -34,14 +35,6 @@ def notify_reaction(comment, reacting_user: str) -> None:
     if author == reacting_user:
         return
     reacting_users = {r.user for r in comment.reactions if r.user != author}
-    if not reacting_users:
-        return
-    count = len(reacting_users)
-    if count == 1:
-        message = _("1 person reacted to your comment")
-    else:
-        message = _("{0} people reacted to your comment").format(count)
-
     existing = frappe.db.get_value(
         "Notification Log",
         {
@@ -52,6 +45,17 @@ def notify_reaction(comment, reacting_user: str) -> None:
         },
         "name",
     )
+    if not reacting_users:
+        if existing:
+            frappe.db.delete("Notification Log", {"name": existing})
+            frappe.publish_realtime("notification", after_commit=True, user=author)
+        return
+    count = len(reacting_users)
+    if count == 1:
+        message = _("1 person reacted to your comment")
+    else:
+        message = _("{0} people reacted to your comment").format(count)
+
     if existing:
         frappe.db.set_value(
             "Notification Log",
@@ -67,18 +71,19 @@ def notify_reaction(comment, reacting_user: str) -> None:
         frappe.publish_realtime("notification", after_commit=True, user=author)
         set_notifications_as_unseen(author)
         return
-    enqueue_create_notification(
+    # inserted in-request, not enqueued: the existence check above must see it
+    make_notification_logs(
+        frappe._dict(
+            type="Reaction",
+            document_type="HD Ticket",
+            document_name=comment.reference_name,
+            source_doctype="Comment",
+            source_name=comment.name,
+            subject=message,
+            from_user=reacting_user,
+            app=HELPDESK_APP,
+        ),
         [author],
-        {
-            "type": "Reaction",
-            "document_type": "HD Ticket",
-            "document_name": comment.reference_name,
-            "source_doctype": "Comment",
-            "source_name": comment.name,
-            "subject": message,
-            "from_user": reacting_user,
-            "app": HELPDESK_APP,
-        },
     )
 
 
@@ -101,12 +106,20 @@ def clear(ticket: str | None = None, comment: str | None = None) -> None:
 
 def mark_read(filters: dict) -> None:
     frappe.db.set_value("Notification Log", filters, "read", 1, update_modified=False)
+    frappe.publish_realtime("indicator_hide", user=frappe.session.user)
 
 
-def notify_ticket_reopened(ticket: str, agents: list[str]) -> None:
-    """Notify assigned agents that a resolved ticket went back to Open."""
+def notify_ticket_reopened(
+    ticket: str, agents: list[str], reopened_by: str | None = None
+) -> None:
+    """Notify assigned agents that a resolved ticket went back to Open.
+
+    An inbound email is pulled as Administrator, so that caller passes the
+    sender as ``reopened_by``; everyone else is the session user.
+    """
     if not agents:
         return
+    reopened_by = reopened_by or frappe.session.user
     enqueue_create_notification(
         agents,
         {
@@ -114,9 +127,9 @@ def notify_ticket_reopened(ticket: str, agents: list[str]) -> None:
             "document_type": "HD Ticket",
             "document_name": ticket,
             "subject": _("{0} reopened ticket #{1}").format(
-                get_fullname(frappe.session.user), ticket
+                get_fullname(reopened_by), ticket
             ),
-            "from_user": frappe.session.user,
+            "from_user": reopened_by,
             "app": HELPDESK_APP,
         },
     )

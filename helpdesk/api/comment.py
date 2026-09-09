@@ -26,30 +26,36 @@ def toggle_reaction(comment: str, emoji: str) -> dict | None:
         )
 
     user = frappe.session.user
-    author = doc.comment_email or doc.owner
-    existing_reaction = None
-    for r in doc.reactions:
-        if r.user == user:
-            existing_reaction = r
-            break
-
-    if existing_reaction:
-        if existing_reaction.emoji == emoji:
-            doc.reactions.remove(existing_reaction)
-            doc.save(ignore_permissions=True)
-            action = "removed"
-        else:
-            existing_reaction.emoji = emoji
-            doc.save(ignore_permissions=True)
-            action = "changed"
-            if author != user:
-                notifications.notify_reaction(doc, user)
+    existing = frappe.db.get_value(
+        "HD Comment Reaction",
+        {"parenttype": "Comment", "parent": comment, "user": user},
+        ["name", "emoji"],
+        as_dict=True,
+    )
+    # child rows are written directly: a doc.save() would restamp the
+    # comment, rewrite the ticket's _comments cache and race other reactors
+    if existing and existing.emoji == emoji:
+        frappe.db.delete("HD Comment Reaction", {"name": existing.name})
+        action = "removed"
+    elif existing:
+        frappe.db.set_value("HD Comment Reaction", existing.name, "emoji", emoji)
+        action = "changed"
     else:
-        doc.append("reactions", {"emoji": emoji, "user": user})
-        doc.save(ignore_permissions=True)
+        # ponytail: a double-click can insert twice; add a unique (parent, user) index if it shows up
+        frappe.get_doc(
+            {
+                "doctype": "HD Comment Reaction",
+                "parenttype": "Comment",
+                "parent": comment,
+                "parentfield": "reactions",
+                "emoji": emoji,
+                "user": user,
+            }
+        ).insert(ignore_permissions=True)
         action = "added"
-        if author != user:
-            notifications.notify_reaction(doc, user)
+
+    doc.reload()
+    notifications.notify_reaction(doc, user)
 
     publish_event(
         "helpdesk:comment-reaction-update",

@@ -229,7 +229,11 @@ class HDTicket(Document):
             ):
                 agents = self.get_assigned_agents()
                 if agents:
-                    notify_ticket_reopened(self.name, [agent.name for agent in agents])
+                    notify_ticket_reopened(
+                        self.name,
+                        [agent.name for agent in agents],
+                        reopened_by=self.flags.reopened_by,
+                    )
 
         self.remove_assignment_if_not_in_team()
         self.publish_update()
@@ -1073,6 +1077,7 @@ class HDTicket(Document):
 
             if self.has_agent_replied:
                 self.status = self.ticket_reopen_status
+                self.flags.reopened_by = c.sender
             else:
                 self.status = self.default_open_status
             # if received that means customer has replied

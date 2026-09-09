@@ -105,7 +105,6 @@ export const SHARED_VISIBLE_TYPES: VisibleTypes = [
   "email",
   "comment",
   "log",
-  "attachment_log",
   { version: VERSION_FIELDS },
 ];
 </script>

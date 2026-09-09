@@ -32,8 +32,6 @@ def has_permission(doc, ptype: str = "read", user: str | None = None) -> bool:
         "Assignment Completed",
     ) and "Customer" in frappe.get_roles(user):
         return False
-    if doc.owner == "Administrator" and user != "Administrator":
-        return False
     return can_see_ticket_comments(doc.reference_name, user)
 
 

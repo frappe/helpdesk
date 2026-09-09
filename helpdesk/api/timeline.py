@@ -4,8 +4,7 @@ comment reactions nor comment attachments, and calls are helpdesk-only rows."""
 import frappe
 from frappe import _
 
-from helpdesk.extends.comment import has_permission as can_read_comment
-from helpdesk.helpdesk.doctype.hd_ticket.api import get_attachments, get_call_logs
+from helpdesk.helpdesk.doctype.hd_ticket.api import get_call_logs
 from helpdesk.utils import is_agent
 
 
@@ -21,16 +20,15 @@ def get_comment_extras(ticket: str) -> dict[str, dict]:
             "reference_name": ticket,
             "comment_type": "Comment",
         },
-        fields=["name", "owner", "comment_type", "reference_doctype", "reference_name"],
+        fields=["name", "owner"],
         limit_page_length=0,
     )
-    # get_list applies role perms and query conditions, not the doc-level hook
-    names = [row.name for row in rows if can_read_comment(row)]
+    # the ticket gate above is the whole read rule for agent comments
+    names = [row.name for row in rows]
     extras = {name: {"reactions": [], "attachments": []} for name in names}
     if not names:
         return extras
-    for name in names:
-        extras[name]["attachments"] = get_attachments("Comment", name)
+    add_attachments(extras, names)
     if frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
         add_reactions(extras, names)
     return extras
@@ -47,6 +45,16 @@ def ensure_agent_can_read(ticket: str) -> None:
     frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not is_agent():
         frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+
+def add_attachments(extras: dict[str, dict], names: list[str]) -> None:
+    files = frappe.get_all(
+        "File",
+        filters={"attached_to_doctype": "Comment", "attached_to_name": ["in", names]},
+        fields=["name", "file_url", "file_name", "attached_to_name"],
+    )
+    for file in files:
+        extras[file.pop("attached_to_name")]["attachments"].append(file)
 
 
 def add_reactions(extras: dict[str, dict], names: list[str]) -> None:

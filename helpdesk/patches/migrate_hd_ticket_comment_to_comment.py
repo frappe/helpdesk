@@ -144,6 +144,7 @@ def reinsert_with_fresh_name(old_name: str) -> None:
             "docstatus",
             "comment_type",
             "comment_email",
+            "comment_by",
             "content",
             "reference_doctype",
             "reference_name",
@@ -158,6 +159,7 @@ def reinsert_with_fresh_name(old_name: str) -> None:
             0,
             "Comment",
             row.commented_by or row.owner,
+            frappe.db.get_value("User", row.commented_by, "full_name"),
             row.content,
             "HD Ticket",
             row.reference_ticket,
@@ -193,6 +195,15 @@ def relink_legacy_references(old_name: str, new_name: str) -> None:
         "HD Notification",
         {"reference_comment": old_name},
         "reference_comment",
+        new_name,
+        update_modified=False,
+    )
+    # frappe adds an "Attachment" Comment on the document whenever a file is
+    # attached; those rows still reference the old name, so update them too
+    frappe.db.set_value(
+        "Comment",
+        {"reference_doctype": "HD Ticket Comment", "reference_name": old_name},
+        "reference_name",
         new_name,
         update_modified=False,
     )

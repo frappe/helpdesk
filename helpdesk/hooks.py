@@ -128,7 +128,6 @@ override_whitelisted_methods = {
 
 
 notification_skip_email_types = [
-    "Mention",
     "Reaction",
     "Ticket Reopened",
 ]
