@@ -122,6 +122,7 @@
                 :senders="senders"
                 :search-recipients="searchRecipients"
                 :upload-function="uploadFile"
+                :extensions="helpdeskExtensions"
                 placeholder="Hi John, we are looking into this issue."
                 :submit-label="emailSubmitLabel"
                 @submit="onEmailSubmit"
@@ -139,6 +140,14 @@
                   >
                     <template #icon><ZapIcon class="h-4 w-4" /></template>
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    :icon="ClearFormatting.icon"
+                    :label="__('Clear formatting')"
+                    :tooltip="__('Clear formatting')"
+                    @click="clearFormatting(emailComposerRef?.editor)"
+                  />
                 </template>
               </EmailComposer>
               <!-- Saved reply actions, applied once the reply is sent -->
@@ -159,13 +168,25 @@
                 class="min-h-0 flex-1"
                 :mentions="mentionOptions"
                 :upload-function="uploadFile"
+                :extensions="helpdeskExtensions"
                 placeholder="@John could you please look into this?"
                 :submit-label="commentSubmitLabel"
                 @submit="onCommentSubmit"
                 @remove-attachment="
                   (file) => removeAttachmentFromServer(file.name)
                 "
-              />
+              >
+                <template #actions>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    :icon="ClearFormatting.icon"
+                    :label="__('Clear formatting')"
+                    :tooltip="__('Clear formatting')"
+                    @click="clearFormatting(commentComposerRef?.editor)"
+                  />
+                </template>
+              </CommentComposer>
             </div>
           </div>
         </FloatingWindow>
@@ -183,6 +204,10 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
+import {
+  ClearFormatting,
+  helpdeskExtensions,
+} from "@/components/editor/config";
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
@@ -562,6 +587,15 @@ async function searchRecipients(query: string): Promise<Recipient[]> {
       label: contact.full_name || contact.name || contact.email_id,
     })
   );
+}
+
+// The framework toolbar has no clear-formatting button, so both composers
+// carry one in their utilities slot, driving the same menu item as the
+// other helpdesk editors.
+function clearFormatting(
+  editor?: Parameters<typeof ClearFormatting.action>[0]
+) {
+  if (editor) ClearFormatting.action(editor);
 }
 
 // ─── Attachments ──────────────────────────────────────────────
