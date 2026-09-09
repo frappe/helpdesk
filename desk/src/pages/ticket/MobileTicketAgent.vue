@@ -160,8 +160,6 @@
             ref="communicationAreaRef"
             :ticketId="ticket.doc?.name"
             :to-emails="[ticket.doc.raised_by]"
-            :cc-emails="[]"
-            :bcc-emails="[]"
             :key="ticket.doc?.name"
             @update="
               () => {

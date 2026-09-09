@@ -282,14 +282,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  ccEmails: {
-    type: Array,
-    default: () => [],
-  },
-  bccEmails: {
-    type: Array,
-    default: () => [],
-  },
 });
 
 const emit = defineEmits(["update"]);
@@ -564,8 +556,8 @@ const bcc = ref<Recipient[]>([]);
 
 function resetRecipients() {
   to.value = toRecipientList(props.toEmails);
-  cc.value = toRecipientList(props.ccEmails);
-  bcc.value = toRecipientList(props.bccEmails);
+  cc.value = [];
+  bcc.value = [];
 }
 resetRecipients();
 
