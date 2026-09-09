@@ -1,5 +1,5 @@
 <template>
-  <div v-if="ticket.doc?.name && feedReady" class="flex-1">
+  <div v-if="ticket.doc?.name && feedReady" :key="ticketId" class="flex-1">
     <TicketHeader :viewers="viewers" />
     <div class="h-full flex overflow-hidden">
       <div class="flex-1 flex flex-col overflow-hidden">

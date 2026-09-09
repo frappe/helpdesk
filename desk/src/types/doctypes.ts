@@ -289,7 +289,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-07-27 16:57:56.129699
+// Last updated: 2026-09-02 19:00:00.000000
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
@@ -303,6 +303,8 @@ export interface HDAgent extends DocType {
   availability?: string;
   /** Availability Changed On: Datetime */
   availability_changed_on?: string;
+  /** Availability Changed By: Link (User) */
+  availability_changed_by?: string;
 }
 
 // Last updated: 2026-06-02 01:18:56.023594

@@ -79,7 +79,11 @@
         />
       </div>
     </header>
-    <div v-if="ticket.doc?.name" class="flex min-h-0 flex-1 overflow-x-hidden">
+    <div
+      v-if="ticket.doc?.name"
+      :key="ticketId"
+      class="flex min-h-0 flex-1 overflow-x-hidden"
+    >
       <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden">
         <div class="flex min-h-0 flex-1 flex-col">
           <Tabs
