@@ -21,7 +21,7 @@
           :tooltip="__('Expand')"
           @click.stop="openFloatingComposer"
         >
-          <template #icon><LucideMaximize2 class="h-4 w-4" /></template>
+          <template #icon><LucideMaximize2 class="size-4" /></template>
         </Button>
       </div>
     </div>
@@ -78,7 +78,7 @@
                       :is="
                         mode === 'floating' ? LucideMinimize2 : LucideMaximize2
                       "
-                      class="h-4 w-4"
+                      class="size-4"
                     />
                   </template>
                 </Button>
@@ -88,7 +88,7 @@
                   :tooltip="__('Close')"
                   @click="closeComposer"
                 >
-                  <template #icon><LucideX class="h-4 w-4" /></template>
+                  <template #icon><LucideX class="size-4" /></template>
                 </Button>
               </div>
             </div>
@@ -138,7 +138,7 @@
                     :tooltip="__('Saved replies')"
                     @click="showSavedRepliesSelectorModal = true"
                   >
-                    <template #icon><ZapIcon class="h-4 w-4" /></template>
+                    <template #icon><ZapIcon class="size-4" /></template>
                   </Button>
                   <Button
                     variant="ghost"
@@ -572,12 +572,10 @@ async function searchRecipients(query: string): Promise<Recipient[]> {
     method: "GET",
     params: { txt: query },
   });
-  return (contacts ?? []).map(
-    (contact: { full_name?: string; name: string; email_id: string }) => ({
-      email: contact.email_id,
-      label: contact.full_name || contact.name || contact.email_id,
-    })
-  );
+  return (contacts ?? []).map((contact) => ({
+    email: contact.email_id,
+    label: contact.full_name || contact.name || contact.email_id,
+  }));
 }
 
 // The framework toolbar has no clear-formatting button, so both composers
