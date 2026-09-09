@@ -17,8 +17,8 @@
         <TypingIndicator :ticketId="ticketId" />
         <Button
           variant="ghost"
-          label="Expand"
-          tooltip="Expand"
+          :label="__('Expand')"
+          :tooltip="__('Expand')"
           @click.stop="openFloatingComposer"
         >
           <template #icon><LucideMaximize2 class="h-4 w-4" /></template>
@@ -54,7 +54,7 @@
                 v-if="mode === 'docked'"
                 type="button"
                 class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 sm:flex"
-                aria-label="Resize composer"
+                :aria-label="__('Resize composer')"
                 @pointerdown.stop.prevent="startDockedResize($event)"
                 @keydown.up.prevent="resizeDockedBy(16)"
                 @keydown.down.prevent="resizeDockedBy(-16)"
@@ -69,8 +69,8 @@
                 <Button
                   v-if="!isMobileView"
                   variant="ghost"
-                  :label="mode === 'floating' ? 'Dock' : 'Pop out'"
-                  :tooltip="mode === 'floating' ? 'Dock' : 'Pop out'"
+                  :label="mode === 'floating' ? __('Dock') : __('Pop out')"
+                  :tooltip="mode === 'floating' ? __('Dock') : __('Pop out')"
                   @click="mode === 'floating' ? dock() : float()"
                 >
                   <template #icon>
@@ -84,8 +84,8 @@
                 </Button>
                 <Button
                   variant="ghost"
-                  label="Close"
-                  tooltip="Close"
+                  :label="__('Close')"
+                  :tooltip="__('Close')"
                   @click="closeComposer"
                 >
                   <template #icon><LucideX class="h-4 w-4" /></template>
@@ -123,7 +123,7 @@
                 :search-recipients="searchRecipients"
                 :upload-function="uploadFile"
                 :extensions="helpdeskExtensions"
-                placeholder="Hi John, we are looking into this issue."
+                :placeholder="__('Hi John, we are looking into this issue.')"
                 :submit-label="emailSubmitLabel"
                 @submit="onEmailSubmit"
                 @remove-attachment="
@@ -134,8 +134,8 @@
                   <Button
                     variant="ghost"
                     size="sm"
-                    label="Saved replies"
-                    tooltip="Saved replies"
+                    :label="__('Saved replies')"
+                    :tooltip="__('Saved replies')"
                     @click="showSavedRepliesSelectorModal = true"
                   >
                     <template #icon><ZapIcon class="h-4 w-4" /></template>
@@ -169,7 +169,7 @@
                 :mentions="mentionOptions"
                 :upload-function="uploadFile"
                 :extensions="helpdeskExtensions"
-                placeholder="@John could you please look into this?"
+                :placeholder="__('@John could you please look into this?')"
                 :submit-label="commentSubmitLabel"
                 @submit="onCommentSubmit"
                 @remove-attachment="
@@ -330,8 +330,8 @@ function closeComposer() {
 // The two show flags stay the source of truth so external writers (Sidebar
 // onboarding, mobile toggles, shortcuts) keep working.
 const channelOptions = [
-  { label: "Email", value: "email" },
-  { label: "Comment", value: "comment" },
+  { label: __("Email"), value: "email" },
+  { label: __("Comment"), value: "comment" },
 ];
 
 const channel = computed({
@@ -379,7 +379,7 @@ const minimizedLabel = computed(() => {
     draft = commentBody.value;
   }
   const preview = draft ? htmlToText(draft).trim() : "";
-  return preview || "Send a reply";
+  return preview || __("Send a reply");
 });
 
 // ─── Docked-height resize ─────────────────────────────────────
@@ -669,12 +669,12 @@ const sendMail = createResource({
 });
 
 const emailSubmitLabel = computed(() => {
-  if (sendMail.loading) return "Sending...";
+  if (sendMail.loading) return __("Sending...");
   return isMobileView.value
-    ? "Send"
+    ? __("Send")
     : isMac
-    ? "Send (⌘ + ⏎)"
-    : "Send (Ctrl + ⏎)";
+    ? __("Send (⌘ + ⏎)")
+    : __("Send (Ctrl + ⏎)");
 });
 
 function onEmailSubmit(payload: EmailPayload) {
@@ -682,7 +682,9 @@ function onEmailSubmit(payload: EmailPayload) {
   const { to, cc, bcc } = payload;
   if (!to.length && !cc.length && !bcc.length) {
     toast.warning(
-      "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+      __(
+        "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+      )
     );
     return;
   }
@@ -727,12 +729,12 @@ const sendComment = createResource({
 });
 
 const commentSubmitLabel = computed(() => {
-  if (sendComment.loading) return "Commenting...";
+  if (sendComment.loading) return __("Commenting...");
   return isMobileView.value
-    ? "Comment"
+    ? __("Comment")
     : isMac
-    ? "Comment (⌘ + ⏎)"
-    : "Comment (Ctrl + ⏎)";
+    ? __("Comment (⌘ + ⏎)")
+    : __("Comment (Ctrl + ⏎)");
 });
 
 function onCommentSubmit(payload: CommentPayload) {
