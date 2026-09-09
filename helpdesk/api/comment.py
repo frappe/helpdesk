@@ -26,11 +26,14 @@ def toggle_reaction(comment: str, emoji: str) -> dict | None:
         )
 
     user = frappe.session.user
+    # serialise concurrent toggles on this comment so two requests can't both insert
+    frappe.db.get_value("Comment", comment, "name", for_update=True)
     existing = frappe.db.get_value(
         "HD Comment Reaction",
         {"parenttype": "Comment", "parent": comment, "user": user},
         ["name", "emoji"],
         as_dict=True,
+        for_update=True,  # locking read sees the row a just-committed toggle inserted
     )
     # child rows are written directly: a doc.save() would restamp the
     # comment, rewrite the ticket's _comments cache and race other reactors
@@ -41,7 +44,6 @@ def toggle_reaction(comment: str, emoji: str) -> dict | None:
         frappe.db.set_value("HD Comment Reaction", existing.name, "emoji", emoji)
         action = "changed"
     else:
-        # ponytail: a double-click can insert twice; add a unique (parent, user) index if it shows up
         frappe.get_doc(
             {
                 "doctype": "HD Comment Reaction",
