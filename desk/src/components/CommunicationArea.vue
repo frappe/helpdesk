@@ -832,13 +832,28 @@ defineExpose({
 </script>
 
 <style>
+/* `.max-h-\[50vh\]` is ComposerEditor's scroll region, selected by the cap it
+   carries; `.overflow-y-auto` would also catch the staged-comment editor. */
+
 /* When the window's height is fixed (floating, or docked at a dragged height),
-   release the editor's internal 50vh cap so it fills and the toolbar pins to
-   the bottom. `.overflow-y-auto` matches exactly one element inside the
-   window: ComposerEditor's scroll region. */
-.ticket-composer-window[data-state="floating"] .overflow-y-auto,
-.ticket-composer-window.composer-resized[data-state="docked"] .overflow-y-auto {
+   release that cap so the body fills and the toolbar pins to the bottom. */
+.ticket-composer-window[data-state="floating"] .max-h-\[50vh\],
+.ticket-composer-window.composer-resized[data-state="docked"] .max-h-\[50vh\] {
   max-height: none;
+}
+
+/* The body scrolls straight into the toolbar with no separator, so a scrolled
+   line is sliced at the toolbar edge. Fade the bottom 18px instead, the same
+   mask the framework uses for clipped emails and code fields. The body's own
+   bottom padding keeps the last line clear of the fade at the scroll end, so
+   it only ever touches content that is genuinely cut off. */
+.ticket-composer-window .max-h-\[50vh\] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 18px),
+    transparent
+  );
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
 }
 
 /* The built-in title bar doubles as the docked resize surface. Positional
