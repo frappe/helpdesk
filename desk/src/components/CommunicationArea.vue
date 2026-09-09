@@ -25,11 +25,14 @@
         </Button>
       </div>
     </div>
-    <!-- Enter classes only: closing is instant, so the composers can hide in
-         the same patch without a keep-alive dance. -->
+    <!-- Enter classes only. Vue keeps a leaving element on screen for two
+         frames even with no leave animation, and the pill above shows at once,
+         so both stacked and then jumped. Finishing the leave synchronously
+         hides the window in the same patch as the pill. -->
     <Transition
       enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
       enter-from-class="translate-y-1 opacity-0"
+      @leave="(_, done) => done()"
     >
       <div v-show="windowOpen" class="px-4 pb-3">
         <FloatingWindow
