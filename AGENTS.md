@@ -265,6 +265,7 @@ class HDFoo(Document):
 - Methods that mutate a related document (e.g. an Assignment Rule) receive that doc as an argument and mutate it in memory. The **caller** is responsible for the final `doc.save()` — this keeps saves to a minimum (one save per hook).
 - Never fetch the same document twice in one hook. Fetch once, pass the doc through the call chain.
 - `@staticmethod` is allowed for pure transformations (e.g. building a condition string) that don't touch `self` or any Frappe doc.
+- If there is an issue in framework/ui or frappe-ui or frappe framework, dont do a workaround. Instead, raise a blocker in the spec and wait for a fix. Do not implement workarounds that will be removed later. If possible, raise a PR to fix the issue in the framework instead of implementing a workaround in helpdesk.
 
 **Save discipline:**
 
