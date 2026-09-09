@@ -6,13 +6,14 @@ set-based data patches (idempotency, name preservation, collisions).
 """
 
 import frappe
+from frappe.desk.form import activity, load
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.comment import get_reactions, toggle_reaction
 from helpdesk.api.tags import update_tags
 from helpdesk.api.timeline import get_comment_extras
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_one
-from helpdesk.overrides import desk_form, realtime
+from helpdesk.overrides import realtime
 from helpdesk.patches import (
     migrate_hd_notifications_to_notification_log,
     migrate_hd_ticket_comment_to_comment,
@@ -303,10 +304,13 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         self.assertFalse(frappe.has_permission("Comment", "read", comment.name))
         with self.assertRaises(frappe.PermissionError):
             frappe.get_list("Comment", filters={"reference_name": ticket.name})
-        with self.assertRaises(frappe.PermissionError):
-            desk_form.get_docinfo(doctype="HD Ticket", name=ticket.name)
-        with self.assertRaises(frappe.PermissionError):
-            desk_form.get_activity_timeline("HD Ticket", ticket.name)
+        # core desk endpoints filter through the Comment permission hook
+        load.get_docinfo(doctype="HD Ticket", name=ticket.name)
+        self.assertEqual(frappe.response["docinfo"].comments, [])
+        timeline = activity.get_activity_timeline("HD Ticket", ticket.name)
+        self.assertNotIn(
+            f"comment:{comment.name}", [a["key"] for a in timeline["activities"]]
+        )
 
     def test_ticket_payload_omits_the_comment_cache(self):
         """Core caches comment and email snippets in `_comments`, which skips

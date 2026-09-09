@@ -1,15 +1,9 @@
-"""Helpdesk's funnel into core Notification Log.
+"""Helpdesk notifications, written to core Notification Log.
 
-Every notification helpdesk produces itself goes through here. All of them
-reference the ticket; the ones about a comment additionally carry it as the
-source, so a reader lands on the exact comment. Core owns the rest: per-user
-enabled gate, self-notify suppression, dedupe, realtime, and the per-type
-email allow-list (Reaction and Ticket Reopened are in
-``notification_skip_email_types``, in-app only, as HD Notification was).
-
-Two types are core's, not ours: mentions come from ``Comment.after_insert``
-and assignments from ``assign_to``. Both reference the ticket and derive
-``app="helpdesk"`` from it, so they land in the panel without our help.
+Every row references the ticket. Comment notifications also carry the comment as
+source so the reader lands on it. Core handles the per-user gate, self-notify
+suppression, dedupe, realtime and email. Mentions and assignments are created by
+core itself.
 """
 
 import frappe
