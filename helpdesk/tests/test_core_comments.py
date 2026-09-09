@@ -25,6 +25,7 @@ from helpdesk.test_utils import (
     create_agent,
     create_contact,
     create_user,
+    make_notification_log,
     make_team,
     make_ticket,
 )
@@ -507,7 +508,7 @@ class TestMigrationPatches(FrappeTestCase):
             "bklogother": {"type": "Assignment", "app": "frappe"},
         }
         for name, values in rows.items():
-            self.seed_notification_log(name, **values)
+            make_notification_log(name, self.ticket.name, AGENT_ONE, **values)
 
         mark_old_assignment_notifications_read.execute()
 
@@ -517,23 +518,6 @@ class TestMigrationPatches(FrappeTestCase):
         self.assertTrue(read_flags["bklogassign"])
         self.assertFalse(read_flags["bklogmention"], "a mention is still news")
         self.assertFalse(read_flags["bklogother"], "not helpdesk's to clear")
-
-    def seed_notification_log(self, name: str, **values) -> None:
-        frappe.db.delete("Notification Log", {"name": name})
-        doc = frappe.new_doc("Notification Log")
-        doc.name = name
-        doc.update(
-            {
-                "for_user": AGENT_ONE,
-                "from_user": AGENT_ONE,
-                "document_type": "HD Ticket",
-                "document_name": self.ticket.name,
-                "subject": "backlog row",
-                "read": 0,
-                **values,
-            }
-        )
-        doc.db_insert()
 
     @classmethod
     def remove_leftovers(cls):

@@ -621,3 +621,26 @@ def upload_test_file(file_name: str) -> str:
         }
     ).insert(ignore_permissions=True)
     return file_doc.name
+
+
+def make_notification_log(name: str, ticket: str, user: str, **values) -> None:
+    """Write a Notification Log row straight to the table under a fixed name.
+
+    Inserted rather than raised through the real producers so a test can state
+    the exact type, app and read flag it needs.
+    """
+    frappe.db.delete("Notification Log", {"name": name})
+    doc = frappe.new_doc("Notification Log")
+    doc.name = name
+    doc.update(
+        {
+            "for_user": user,
+            "from_user": user,
+            "document_type": "HD Ticket",
+            "document_name": ticket,
+            "subject": "seeded notification",
+            "read": 0,
+            **values,
+        }
+    )
+    doc.db_insert()
