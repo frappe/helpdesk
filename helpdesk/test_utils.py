@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import frappe
+from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.utils import add_to_date, getdate
 
@@ -293,13 +294,13 @@ def make_status(name: str = "Test Status", category: str = "Open"):
     return doc.insert(ignore_if_duplicate=True)
 
 
-def make_agent_status(agent_status: str, category="Away", enable=1, status_order=None):
+def make_agent_status(agent_status: str, category="Away", enabled=1, status_order=None):
     return frappe.get_doc(
         {
             "doctype": "HD Agent Status",
             "agent_status": agent_status,
             "category": category,
-            "enable": enable,
+            "enabled": enabled,
             "status_order": status_order,
         }
     ).insert()
@@ -323,9 +324,15 @@ def make_agent(email: str, first_name: str = "Test Agent"):
     return email
 
 
-def set_agent_status_enabled(status: str, enable: bool | int):
-    """Toggle an HD Agent Status, bypassing its own at-least-one-Active validation."""
-    frappe.db.set_value("HD Agent Status", status, "enable", int(enable))
+def set_agent_status_enabled(status: str, enabled: bool | int):
+    """Toggle a status directly in db, skips the controller checks and the
+    agent reset."""
+    frappe.db.set_value("HD Agent Status", status, "enabled", int(enabled))
+
+
+def set_default_agent_status(status: str | None):
+    """Set the default agent status directly in db."""
+    frappe.db.set_single_value("HD Settings", "default_agent_status", status)
 
 
 def set_agent_availability(user: str, availability: str | None):
@@ -385,18 +392,20 @@ def add_comment(
     save: bool = True,
 ):
     """
-    Creates a test HD Ticket Comment for a given ticket.
+    Creates a test agent comment (core Comment) for a given ticket.
     """
     comment = frappe.get_doc(
         {
-            "doctype": "HD Ticket Comment",
-            "reference_ticket": ticket,
+            "doctype": "Comment",
+            "comment_type": "Comment",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
             "content": content,
-            "comment_by": comment_by,
+            "comment_email": comment_by,
         }
     )
     if save:
-        return comment.insert()
+        return comment.insert(ignore_permissions=True)
     return comment
 
 
@@ -566,6 +575,12 @@ def make_team(team_name, members=[], disabled=False):
     """Create an HD Team with optional members. A default agent is created if no members are provided."""
     if not members:
         members = [make_agent("default_team_agent@example.com")]
+
+    # The team's auto-created Assignment Rule lands in the cached doctype map,
+    # which a test rollback cannot undo; re-sync the cache when that happens.
+    frappe.db.after_rollback.add(
+        lambda: clear_doctype_map("Assignment Rule", "HD Ticket")
+    )
 
     if frappe.db.exists("HD Team", team_name):
         team = frappe.get_doc("HD Team", team_name)

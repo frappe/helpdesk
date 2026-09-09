@@ -68,7 +68,6 @@
                   doctype="HD Ticket"
                   :name="ticket.doc?.name"
                   :tags="ticket.doc?._user_tags"
-                  @change="onTagsChange"
                 />
               </div>
             </div>
@@ -155,7 +154,6 @@ import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation.ts";
 import {
-  ActivitiesSymbol,
   AssigneeSymbol,
   CustomizationSymbol,
   FieldValue,
@@ -177,7 +175,6 @@ import TicketSLA from "./TicketSLA.vue";
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
-const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -352,20 +349,12 @@ function handleFieldUpdate(
     { [fieldname]: value },
     {
       onSuccess: () => {
-        // TODO: emit the event for notification to listeners
         if (fieldname === "agent_group") {
           assignees.value.reload();
         }
-        activities.value.reload();
       },
     }
-
-    //show error toast
   );
-}
-
-function onTagsChange() {
-  activities.value.reload();
 }
 
 const fieldRefs = ref<Record<string, any>>({});

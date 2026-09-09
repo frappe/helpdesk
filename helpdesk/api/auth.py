@@ -35,7 +35,7 @@ def get_user():
         frappe.db.get_value(
             "HD Agent",
             agent_name,
-            ["availability", "availability_changed_on"],
+            ["availability", "availability_changed_on", "availability_changed_by"],
             as_dict=True,
         )
         if agent_name
@@ -73,6 +73,7 @@ def get_user():
         "language": language,
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
+        "availability_changed_by": availability.get("availability_changed_by"),
         "persona_captured": persona_captured,
     }
 

@@ -173,7 +173,6 @@ import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import {
-  ActivitiesSymbol,
   AgentOption,
   AssigneeSymbol,
   LocalAssignee,
@@ -212,7 +211,6 @@ const { hideLabel, ghost } = props;
 // just reports its selection through v-model and the parent decides what to do.
 const ticket = inject(TicketSymbol, null);
 const assignees = inject(AssigneeSymbol, null);
-const activities = inject(ActivitiesSymbol, null);
 const selection = defineModel<string[]>({ default: () => [] });
 
 // On a ticket the trigger reports state ("No one" is assigned); standalone it is
@@ -602,7 +600,6 @@ async function saveAssignees(added: string[], removed: string[]) {
     }, successDelay);
 
     assignees?.value.reload();
-    activities?.value.reload();
   } catch {
     toast.error(__("Failed to update Assignees."));
     localAssignees.value = [...snapshotAssignees.value];

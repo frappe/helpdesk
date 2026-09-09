@@ -223,6 +223,7 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";
 import {
@@ -715,6 +716,7 @@ const mentionOptions = computed<MentionOption[]>(() => dropdown.value ?? []);
 const sendComment = createResource({
   url: "run_doc_method",
   onSuccess: () => {
+    capture("comment_added");
     commentComposerRef.value?.reset();
     showCommentBox.value = false;
     emit("update");
