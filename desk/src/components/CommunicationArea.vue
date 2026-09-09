@@ -330,10 +330,11 @@ function openComposer() {
   showCommentBox.value = false;
 }
 
-// The pill's expand button skips the docked stage and pops straight out
-// (the mode watcher forces docked back on mobile, where it just opens).
+// The pill's expand button and the `e` shortcut skip the docked stage and pop
+// straight out (the mode watcher forces docked back on mobile, where it just
+// opens). An already open window keeps its channel and only changes mode.
 function openFloatingComposer() {
-  openComposer();
+  if (!windowOpen.value) openComposer();
   windowMode.value = "floating";
 }
 
@@ -764,6 +765,9 @@ useShortcut("r", () => {
 });
 useShortcut("c", () => {
   toggleCommentBox();
+});
+useShortcut("e", () => {
+  openFloatingComposer();
 });
 
 const IGNORED_SELECTORS = [

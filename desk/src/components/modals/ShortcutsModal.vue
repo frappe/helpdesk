@@ -99,6 +99,7 @@ const shortcutGroups = computed<ShortcutGroup[]>(() => [
     shortcuts: [
       { keys: ["R"], description: __("Open reply box") },
       { keys: ["C"], description: __("Open comment box") },
+      { keys: ["E"], description: __("Expand reply box") },
     ],
     hideBorder: true,
   },
