@@ -27,9 +27,10 @@
   display: none !important;
 }
 
-/* Dialogs (e.g. saved replies) must sit above a detached FloatingWindow
-   (z-50); the frappe-ui overlay has no z-index of its own. Deletable once
-   frappe-ui is ≥ beta.55, where the window drops to z-40 under dialogs. */
+/* TODO: remove once frappe-ui is upgraded to >= 1.0.0-beta.55.
+   Dialogs (e.g. saved replies) must sit above a detached FloatingWindow
+   (z-50); the frappe-ui overlay has no z-index of its own. From beta.55 the
+   window drops to z-40 under dialogs and this rule is dead. */
 body.has-floating-window .dialog-overlay {
   z-index: 100;
 }
