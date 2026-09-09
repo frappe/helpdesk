@@ -42,8 +42,8 @@ class HDAgentStatus(Document):
         """Move agents off a disabled status, else they get stuck on a status
         the picker no longer shows.
 
-        TODO: send an in-app notification too, HD Notification only supports
-        ticket notifications right now. The toast covers it for now.
+        TODO: send an in-app notification too. Every helpdesk Notification Log
+        row references a ticket, and this one has none. The toast covers it.
         """
         if self.enabled or not self.has_value_changed("enabled"):
             return

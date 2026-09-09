@@ -442,18 +442,6 @@ def split_ticket(subject: str, communication_id: str):
         update_modified=False,
     )
 
-    # update activities
-    frappe.db.set_value(
-        "HD Ticket Activity",
-        {
-            "ticket": ticket_id,
-            "creation": [">=", communicaton_creation_time],
-        },
-        "ticket",
-        new_ticket,
-        update_modified=False,
-    )
-
     # update attachments
     frappe.db.set_value(
         "File",
