@@ -801,6 +801,20 @@ defineExpose({
 </script>
 
 <style>
+/* Frosted only once expanded — the pill keeps its solid surface. The attribute
+   selector outranks FloatingWindow's own bg-surface-elevation-1. */
+.ticket-composer-window[data-state] {
+  background-color: color-mix(
+    in srgb,
+    var(--surface-elevation-2) 75%,
+    transparent
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  /* A hairline for the frost to sit against; without it the panel has no edge. */
+  border: 1px solid color-mix(in srgb, var(--outline-gray-3) 70%, transparent);
+}
+
 /* The composer body caps itself at 50vh; release it when the window height is
    fixed so the body fills and the toolbar pins to the bottom. */
 .ticket-composer-window[data-state="floating"] .max-h-\[50vh\],
