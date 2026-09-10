@@ -65,16 +65,13 @@
           :class="{ 'composer-resized': dockedHeight > 0 }"
           @pointerdown="onPanelPointerDown"
         >
-          <!-- Single chrome row: channel switcher left, window controls right.
-               Doubles as the library's drag handle while floating and our
-               resize surface while docked. -->
+          <!-- header area having switcher and actions left and right respectively -->
           <template #header="{ mode, dock, float }">
             <div
               class="flex w-full items-center justify-between gap-2 px-2.5 py-2"
               :class="mode === 'docked' ? 'sm:cursor-ns-resize' : ''"
             >
-              <!-- Visible grab pill at the window's top edge (the panel root is
-                   the positioned ancestor); also the keyboard resize handle. -->
+              <!-- handle to resize in docked state -->
               <div
                 v-if="mode === 'docked'"
                 role="separator"
@@ -120,10 +117,7 @@
               </div>
             </div>
           </template>
-          <!-- Esc closes the window before the composer's internal Esc-reset,
-               so drafts survive. Full-height column while floating pins the
-               composer toolbar to the window bottom; a dragged docked height
-               sizes the in-flow window through this column. -->
+          <!-- Esc button and close button minmize and put composer in dockd state-->
           <div
             ref="columnRef"
             class="flex min-h-0 flex-col"
@@ -131,9 +125,6 @@
             :style="dockedColumnStyle"
             @keydown.esc.capture.stop="collapseToPill"
           >
-            <!-- v-show keeps both mounted so each draft survives a tab switch.
-                 Start padding only: the composer's own px-2.5 then puts its text
-                 under the tab labels and its buttons under the chrome controls. -->
             <div
               v-show="showEmailBox"
               class="flex min-h-0 flex-1 flex-col ps-2.5 py-2"
