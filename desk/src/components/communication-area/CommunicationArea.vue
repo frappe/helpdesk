@@ -49,10 +49,6 @@
         </Button>
       </div>
     </div>
-    <!-- Enter classes only. Vue keeps a leaving element on screen for two
-         frames even with no leave animation, and the pill above shows at once,
-         so both stacked and then jumped. Finishing the leave synchronously
-         hides the window in the same patch as the pill. -->
     <Transition
       enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
       enter-from-class="translate-y-1 opacity-0"
@@ -228,8 +224,6 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
-// The same speech bubble the timeline badges a comment with; Lucide has no
-// match for it, and the two sit inches apart on screen.
 import { CommentIcon } from "@/components/icons";
 import {
   ClearFormatting,
@@ -394,8 +388,7 @@ watch(commentBody, (value, oldValue) => {
 const windowOpen = computed(() => showEmailBox.value || showCommentBox.value);
 const windowMode = ref<WindowMode>("docked");
 
-// A non-docked panel teleports to <body>, so the wrapper's v-show can't hide
-// it: force docked whenever the window is closed or the viewport is mobile.
+// if mobile view switch to docked
 watch([windowOpen, isMobileView, windowMode], ([open, mobile, mode]) => {
   if (mode !== "docked" && (!open || mobile)) {
     windowMode.value = "docked";
@@ -801,8 +794,7 @@ defineExpose({
 </script>
 
 <style>
-/* Frosted only once expanded — the pill keeps its solid surface. The attribute
-   selector outranks FloatingWindow's own bg-surface-elevation-1. */
+/* glass transperancy effect*/
 .ticket-composer-window[data-state] {
   background-color: color-mix(
     in srgb,
@@ -811,7 +803,6 @@ defineExpose({
   );
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
-  /* A hairline for the frost to sit against; without it the panel has no edge. */
   border: 1px solid color-mix(in srgb, var(--outline-gray-3) 70%, transparent);
 }
 

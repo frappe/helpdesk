@@ -62,9 +62,7 @@ const panelRef = useTemplateRef<HTMLElement>("panelRef");
 const composerRef = useTemplateRef<HTMLElement>("composerRef");
 const { height: composerHeight } = useElementSize(composerRef);
 
-// The timeline is bottom-anchored (flex-col-reverse), so reserving room for a
-// taller composer shoves the thread up. Scroll back by the same amount to hold
-// it still — except on first render, where the reserve appears with the pill.
+// The timeline is bottom-anchored so avoid it to push upwards when composer is dragged
 watch(
   composerHeight,
   (height, previous) => {
