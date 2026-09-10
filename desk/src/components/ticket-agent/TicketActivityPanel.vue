@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import CommunicationArea from "@/components/CommunicationArea.vue";
+import CommunicationArea from "@/components/communication-area/CommunicationArea.vue";
 import {
   ActivityIcon,
   CommentIcon,
