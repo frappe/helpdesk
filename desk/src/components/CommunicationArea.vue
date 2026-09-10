@@ -236,7 +236,6 @@ import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
-import { useTicket } from "@/composables/useTicket";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import {
   replyComposer,
@@ -286,6 +285,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  type Ref,
   watch,
 } from "vue";
 import LucideMaximize2 from "~icons/lucide/maximize-2";
@@ -557,8 +557,6 @@ watch(
 );
 
 // ─── Recipients ───────────────────────────────────────────────
-const ticketContact = props.ticketId ? useTicket(props.ticketId).contact : null;
-
 // Bare addresses and the `Name <email>` form the timeline hands over.
 function toRecipient(address: string): Recipient {
   const match = address.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
@@ -567,39 +565,35 @@ function toRecipient(address: string): Recipient {
   return label ? { email: match[2].trim(), label } : { email: match[2].trim() };
 }
 
-// The ticket's contact knows its own name and avatar; seeds arrive bare.
-function withContactName(recipient: Recipient): Recipient {
-  const contact = ticketContact?.data;
-  if (!contact || recipient.label || contact.email_id !== recipient.email) {
-    return recipient;
-  }
-  return { ...recipient, label: contact.name, image: contact.image };
-}
-
 function toRecipientList(addresses: unknown[] | undefined): Recipient[] {
   return (addresses ?? [])
     .filter(Boolean)
-    .map((address) => withContactName(toRecipient(String(address))));
+    .map((address) => toRecipient(String(address)));
 }
 
 const to = ref<Recipient[]>([]);
 const cc = ref<Recipient[]>([]);
 const bcc = ref<Recipient[]>([]);
 
+// Seeds arrive as bare addresses; a Contact with that address names the chip.
+async function nameRecipients(list: Ref<Recipient[]>) {
+  for (const { email } of list.value.filter((r) => !r.label)) {
+    const results = await searchRecipients(email).catch(() => []);
+    const match = results.find((r) => r.email === email);
+    if (!match) continue;
+    list.value = list.value.map((r) =>
+      r.email === email && !r.label ? match : r
+    );
+  }
+}
+
 function resetRecipients() {
   to.value = toRecipientList(props.toEmails);
   cc.value = [];
   bcc.value = [];
+  nameRecipients(to);
 }
 resetRecipients();
-
-// The contact usually loads after the seed; name the chip once it does.
-watch(
-  () => ticketContact?.data,
-  () => {
-    to.value = to.value.map(withContactName);
-  }
-);
 
 // Plain request, not createResource: RecipientSelect evaluates this inside a
 // computedAsync, and touching a reactive resource there re-triggers evaluation
@@ -804,6 +798,9 @@ function replyToEmail(data: {
   to.value = toRecipientList(splitIfString(data.to));
   cc.value = toRecipientList(splitIfString(data.cc));
   bcc.value = toRecipientList(splitIfString(data.bcc));
+  nameRecipients(to);
+  nameRecipients(cc);
+  nameRecipients(bcc);
 
   // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their
   // newlines/spacing would be lost in the quoted block.
