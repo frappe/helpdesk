@@ -236,6 +236,7 @@ import { useDevice } from "@/composables";
 import { useTyping } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
+import { useTicket } from "@/composables/useTicket";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import {
   replyComposer,
@@ -556,10 +557,29 @@ watch(
 );
 
 // ─── Recipients ───────────────────────────────────────────────
-function toRecipientList(emails: unknown[] | undefined): Recipient[] {
-  return (emails ?? []).filter(Boolean).map((email) => ({
-    email: String(email),
-  }));
+const ticketContact = props.ticketId ? useTicket(props.ticketId).contact : null;
+
+// Bare addresses and the `Name <email>` form the timeline hands over.
+function toRecipient(address: string): Recipient {
+  const match = address.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  if (!match) return { email: address.trim() };
+  const label = match[1].trim();
+  return label ? { email: match[2].trim(), label } : { email: match[2].trim() };
+}
+
+// The ticket's contact knows its own name and avatar; seeds arrive bare.
+function withContactName(recipient: Recipient): Recipient {
+  const contact = ticketContact?.data;
+  if (!contact || recipient.label || contact.email_id !== recipient.email) {
+    return recipient;
+  }
+  return { ...recipient, label: contact.name, image: contact.image };
+}
+
+function toRecipientList(addresses: unknown[] | undefined): Recipient[] {
+  return (addresses ?? [])
+    .filter(Boolean)
+    .map((address) => withContactName(toRecipient(String(address))));
 }
 
 const to = ref<Recipient[]>([]);
@@ -572,6 +592,14 @@ function resetRecipients() {
   bcc.value = [];
 }
 resetRecipients();
+
+// The contact usually loads after the seed; name the chip once it does.
+watch(
+  () => ticketContact?.data,
+  () => {
+    to.value = to.value.map(withContactName);
+  }
+);
 
 // Plain request, not createResource: RecipientSelect evaluates this inside a
 // computedAsync, and touching a reactive resource there re-triggers evaluation
