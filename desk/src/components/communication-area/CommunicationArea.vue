@@ -228,7 +228,6 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
-import { CommentIcon, EmailIcon } from "@/components/icons";
 import {
   ClearFormatting,
   helpdeskExtensions,
@@ -283,7 +282,9 @@ import {
   ref,
   watch,
 } from "vue";
+import LucideMail from "~icons/lucide/mail";
 import LucideMaximize2 from "~icons/lucide/maximize-2";
+import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideMinimize2 from "~icons/lucide/minimize-2";
 import LucideX from "~icons/lucide/x";
 import ZapIcon from "~icons/lucide/zap";
@@ -418,14 +419,14 @@ const channels = {
   email: {
     box: showEmailBox,
     label: __("Email"),
-    icon: EmailIcon,
+    icon: LucideMail,
     composer: emailComposerRef,
     hasDraft: hasEmailDraft,
   },
   comment: {
     box: showCommentBox,
     label: __("Comment"),
-    icon: CommentIcon,
+    icon: LucideMessageSquare,
     composer: commentComposerRef,
     hasDraft: hasCommentDraft,
   },
