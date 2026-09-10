@@ -660,7 +660,8 @@ const commentBody = useStorage<string | null>(
   null
 );
 
-const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
+const agentStore = useAgentStore();
+const { dropdown } = storeToRefs(agentStore);
 const mentionOptions = computed<MentionOption[]>(() => dropdown.value ?? []);
 
 const sendComment = createResource({
@@ -780,14 +781,7 @@ onMounted(() => {
   // Published for the command palette, which opens the email box itself
   // before inserting. See modalStates.ts.
   replyComposer.value = applySavedReplies;
-  if (
-    agentsList.value.loading ||
-    agentsList.value.data?.length ||
-    agentsList.value.list.promise
-  ) {
-    return;
-  }
-  agentsList.value.fetch();
+  agentStore.loadOnce();
 });
 
 onBeforeUnmount(() => {

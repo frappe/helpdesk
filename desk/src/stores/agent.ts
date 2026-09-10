@@ -24,9 +24,15 @@ export const useAgentStore = defineStore("agent", () => {
     );
   }
 
+  // Readers of the list share one fetch; a fetch already in flight counts.
+  function loadOnce() {
+    if (!agents.data && !agents.loading) agents.fetch();
+  }
+
   return {
     dropdown,
     agents,
     searchAgents,
+    loadOnce,
   };
 });
