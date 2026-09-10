@@ -316,6 +316,76 @@ const emailComposerRef = ref<InstanceType<typeof EmailComposer> | null>(null);
 const commentComposerRef = ref<InstanceType<typeof CommentComposer> | null>(
   null
 );
+const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
+
+// ─── Drafts & signature ──────────────────────────────────────
+// Declared first: the channel table and the pill read these.
+const cachedEmail = useStorage<string | null>(
+  "emailBoxContent" + props.ticketId,
+  null
+);
+const emailBody = ref<string>(cachedEmail.value ?? "");
+const quotedContent = useStorage<string | null>(
+  "quotedEmailBoxContent" + props.ticketId,
+  null
+);
+const emailSignature = ref<string | null>(null);
+const commentBody = useStorage<string | null>(
+  "commentBoxContent" + props.ticketId,
+  null
+);
+
+function isOnlySignature(content: string | null) {
+  if (!content || !emailSignature.value) return false;
+  return htmlToText(content) === htmlToText(emailSignature.value);
+}
+
+const hasTypedEmail = computed(
+  () => !isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)
+);
+const hasEmailDraft = computed(
+  () => hasTypedEmail.value || !!quotedContent.value
+);
+const hasCommentDraft = computed(() => !isContentEmpty(commentBody.value));
+
+const userResource = getUserEmailInfo();
+
+watch(
+  () => userResource.data,
+  (data: { email_signature?: string } | null) => {
+    if (!data?.email_signature) return;
+    emailSignature.value = `<br>${data.email_signature}`;
+    if (isOnlySignature(cachedEmail.value)) {
+      cachedEmail.value = null;
+    }
+    if (isContentEmpty(emailBody.value) && !quotedContent.value) {
+      emailBody.value = emailSignature.value;
+    }
+  },
+  { immediate: true }
+);
+
+watch(emailBody, (value, oldValue) => {
+  // The signature drops into an empty editor on load and on every reply. That
+  // is not the agent typing, and broadcasting it would show a typing indicator
+  // to everyone else on the ticket.
+  if (value !== oldValue && hasTypedEmail.value) {
+    onUserType();
+  }
+  // Only the composer's internal Discard/Esc reset the model to exactly "";
+  // deleting text by hand leaves an empty paragraph. A discarded draft takes
+  // its staged saved-reply actions with it.
+  if (!value) {
+    savedReplyActionsRef.value?.clear();
+  }
+  cachedEmail.value = isOnlySignature(value) ? null : value || null;
+});
+
+watch(commentBody, (value, oldValue) => {
+  if (value !== oldValue && value) {
+    onUserType();
+  }
+});
 
 // ─── Window state ─────────────────────────────────────────────
 const windowOpen = computed(() => showEmailBox.value || showCommentBox.value);
@@ -339,14 +409,6 @@ function closeComposer() {
 // onboarding, mobile toggles, shortcuts) keep working; the table only reads
 // and writes them.
 type Channel = "email" | "comment";
-
-const hasTypedEmail = computed(
-  () => !isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)
-);
-const hasEmailDraft = computed(
-  () => hasTypedEmail.value || !!quotedContent.value
-);
-const hasCommentDraft = computed(() => !isContentEmpty(commentBody.value));
 
 const channels = {
   email: {
@@ -444,56 +506,6 @@ const {
   onCollapse: closeComposer,
 });
 
-// ─── Email draft & signature ──────────────────────────────────
-const cachedEmail = useStorage<string | null>(
-  "emailBoxContent" + props.ticketId,
-  null
-);
-const emailBody = ref<string>(cachedEmail.value ?? "");
-const quotedContent = useStorage<string | null>(
-  "quotedEmailBoxContent" + props.ticketId,
-  null
-);
-const emailSignature = ref<string | null>(null);
-
-function isOnlySignature(content: string | null) {
-  if (!content || !emailSignature.value) return false;
-  return htmlToText(content) === htmlToText(emailSignature.value);
-}
-
-const userResource = getUserEmailInfo();
-
-watch(
-  () => userResource.data,
-  (data: { email_signature?: string } | null) => {
-    if (!data?.email_signature) return;
-    emailSignature.value = `<br>${data.email_signature}`;
-    if (isOnlySignature(cachedEmail.value)) {
-      cachedEmail.value = null;
-    }
-    if (isContentEmpty(emailBody.value) && !quotedContent.value) {
-      emailBody.value = emailSignature.value;
-    }
-  },
-  { immediate: true }
-);
-
-watch(emailBody, (value, oldValue) => {
-  // The signature drops into an empty editor on load and on every reply. That
-  // is not the agent typing, and broadcasting it would show a typing indicator
-  // to everyone else on the ticket.
-  if (value !== oldValue && hasTypedEmail.value) {
-    onUserType();
-  }
-  // Only the composer's internal Discard/Esc reset the model to exactly "";
-  // deleting text by hand leaves an empty paragraph. A discarded draft takes
-  // its staged saved-reply actions with it.
-  if (!value) {
-    savedReplyActionsRef.value?.clear();
-  }
-  cachedEmail.value = isOnlySignature(value) ? null : value || null;
-});
-
 // ─── Sender identities ────────────────────────────────────────
 const fromEmail = useStorage<string>("from-email", "");
 
@@ -555,7 +567,6 @@ function uploadFile(file: File) {
 
 // ─── Saved replies ────────────────────────────────────────────
 const showSavedRepliesSelectorModal = ref(false);
-const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 
 /** A reply is only replaced when another one is already applied. */
 function applySavedReplies(reply: RenderedSavedReply) {
@@ -658,11 +669,6 @@ function onEmailSubmit(payload: EmailPayload) {
 }
 
 // ─── Comment ──────────────────────────────────────────────────
-const commentBody = useStorage<string | null>(
-  "commentBoxContent" + props.ticketId,
-  null
-);
-
 const agentStore = useAgentStore();
 const { dropdown } = storeToRefs(agentStore);
 const mentionOptions = computed<MentionOption[]>(() => dropdown.value ?? []);
@@ -696,12 +702,6 @@ function onCommentSubmit(payload: CommentPayload) {
     },
   });
 }
-
-watch(commentBody, (value, oldValue) => {
-  if (value !== oldValue && value) {
-    onUserType();
-  }
-});
 
 // ─── Reply from the activity feed ─────────────────────────────
 function replyToEmail(data: {
