@@ -152,14 +152,16 @@
                     @click="clearFormatting(emailComposerRef?.editor)"
                   />
                 </template>
+                <!-- Saved reply actions, applied once the reply is sent -->
+                <template #footer>
+                  <SavedReplyActions
+                    ref="savedReplyActionsRef"
+                    class="mx-2.5 mb-2"
+                    :ticket-id="ticketId"
+                    :doctype="doctype"
+                  />
+                </template>
               </EmailComposer>
-              <!-- Saved reply actions, applied once the reply is sent -->
-              <SavedReplyActions
-                ref="savedReplyActionsRef"
-                class="mx-2.5 mt-2 shrink-0"
-                :ticket-id="ticketId"
-                :doctype="doctype"
-              />
             </div>
             <div
               v-show="showCommentBox"
