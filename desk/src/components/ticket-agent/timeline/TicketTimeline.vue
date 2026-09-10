@@ -159,7 +159,11 @@ const props = defineProps<{
   tab: string;
   tabLabel: string;
 }>();
-const emit = defineEmits<{ "email:reply": [payload: object] }>();
+const emit = defineEmits<{
+  "email:reply": [
+    payload: { content: string; to: string[]; cc?: string[]; bcc?: string[] }
+  ];
+}>();
 
 const route = useRoute();
 const router = useRouter();
@@ -309,7 +313,9 @@ function reply(activity: EmailActivity) {
   const { sender, content } = activity.data;
   emit("email:reply", {
     content,
-    to: isSelf(sender) ? activity.data.to : senderAddress(activity),
+    to: isSelf(sender)
+      ? splitRecipients(activity.data.to, [])
+      : [senderAddress(activity)],
   });
 }
 
@@ -322,7 +328,7 @@ function replyAll(activity: EmailActivity) {
   const isSender = isSelf(sender);
   emit("email:reply", {
     content,
-    to: isSender ? filteredTo.join(", ") : senderAddress(activity),
+    to: isSender ? filteredTo : [senderAddress(activity)],
     cc: isSender ? filteredCc : [...filteredTo, ...filteredCc],
     bcc: filteredBcc,
   });

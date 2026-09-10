@@ -289,20 +289,15 @@ import { toRecipientList } from "./addresses";
 import { nameRecipients, searchRecipients } from "./recipients";
 import { useDockedResize } from "./useDockedResize";
 
-const props = defineProps({
-  doctype: {
-    type: String,
-    default: "HD Ticket",
-  },
-  ticketId: {
-    type: String,
-    default: null,
-  },
-  toEmails: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    ticketId: string;
+    doctype?: string;
+    /** Addresses the To row starts with; `Name <email>` is accepted. */
+    toEmails?: (string | undefined)[];
+  }>(),
+  { doctype: "HD Ticket", toEmails: () => [] }
+);
 
 const emit = defineEmits(["update"]);
 
@@ -705,25 +700,18 @@ watch(commentBody, (value, oldValue) => {
 });
 
 // ─── Reply from the activity feed ─────────────────────────────
-function splitIfString(value: string | string[]) {
-  if (typeof value === "string") {
-    return value.split(",");
-  }
-  return value;
-}
-
 function replyToEmail(data: {
   content: string;
-  to: string | string[];
-  cc: string | string[];
-  bcc: string | string[];
+  to: string[];
+  cc?: string[];
+  bcc?: string[];
 }) {
   showCommentBox.value = false;
   showEmailBox.value = true;
 
-  to.value = toRecipientList(splitIfString(data.to));
-  cc.value = toRecipientList(splitIfString(data.cc));
-  bcc.value = toRecipientList(splitIfString(data.bcc));
+  to.value = toRecipientList(data.to);
+  cc.value = toRecipientList(data.cc);
+  bcc.value = toRecipientList(data.bcc);
   nameRecipients(to, cc, bcc);
 
   // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their

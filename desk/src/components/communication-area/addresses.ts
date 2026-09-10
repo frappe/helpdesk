@@ -8,8 +8,8 @@ export function toRecipient(address: string): Recipient {
   return { email: match[2].trim(), ...(label && { label }) };
 }
 
-export function toRecipientList(addresses: unknown[] | undefined): Recipient[] {
-  return (addresses ?? [])
-    .filter(Boolean)
-    .map((address) => toRecipient(String(address)));
+export function toRecipientList(
+  addresses: (string | undefined)[] = []
+): Recipient[] {
+  return addresses.filter((a): a is string => !!a).map(toRecipient);
 }
