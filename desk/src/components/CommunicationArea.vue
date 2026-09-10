@@ -355,9 +355,7 @@ function openComposer() {
   showCommentBox.value = false;
 }
 
-// The pill's expand button and the `e` shortcut skip the docked stage and pop
-// straight out (the mode watcher forces docked back on mobile, where it just
-// opens). An already open window keeps its channel and only changes mode.
+// Pops straight out; an already open window keeps its channel.
 function openFloatingComposer() {
   if (!windowOpen.value) openComposer();
   windowMode.value = "floating";
@@ -379,10 +377,7 @@ const minimizedLabel = computed(() => {
 });
 
 // ─── Docked-height resize ─────────────────────────────────────
-// Dragging the title bar sizes the in-flow window by setting an explicit
-// height on our body column — no library hook needed. 0 means natural height.
-// The number default keeps useStorage on the number serializer, so reloads
-// can't rehydrate the value as a string.
+// Dragging the title bar sets the body column's height; 0 means natural.
 const dockedHeight = useStorage("helpdesk-composer-height", 0);
 
 const MIN_BODY_HEIGHT = 240;
@@ -408,10 +403,6 @@ let resizing: { startY: number; startHeight: number } | null = null;
 // A pointer released outside the window must not count as an outside click.
 let justResized = false;
 
-// Bound on <FloatingWindow>, so it lands on the panel root and catches
-// pointerdowns bubbling from the built-in title bar. The column containment
-// test limits the resize surface to the chrome without naming its internals;
-// the button filter matches the library's own drag bail-out.
 function onPanelPointerDown(event: PointerEvent) {
   if (windowMode.value !== "docked" || isMobileView.value) return;
   const target = event.target as HTMLElement;
@@ -427,8 +418,6 @@ function startDockedResize(event: PointerEvent) {
     startY: event.clientY,
     startHeight: currentBodyHeight(),
   };
-  // Best-effort: a successful capture keeps the post-drag click inside the
-  // panel; synthetic pointers without an id fall back to the guard flag.
   try {
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
   } catch {}
