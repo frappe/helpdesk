@@ -104,10 +104,12 @@
             :style="dockedColumnStyle"
             @keydown.esc.capture.stop="closeComposer"
           >
-            <!-- v-show keeps both mounted so each draft survives a tab switch. -->
+            <!-- v-show keeps both mounted so each draft survives a tab switch.
+                 Start padding only: the composer's own px-2.5 then puts its text
+                 under the tab labels and its buttons under the chrome controls. -->
             <div
               v-show="showEmailBox"
-              class="flex min-h-0 flex-1 flex-col px-2.5 py-2"
+              class="flex min-h-0 flex-1 flex-col ps-2.5 py-2"
             >
               <EmailComposer
                 ref="emailComposerRef"
@@ -154,14 +156,14 @@
               <!-- Saved reply actions, applied once the reply is sent -->
               <SavedReplyActions
                 ref="savedReplyActionsRef"
-                class="mt-2 shrink-0"
+                class="mx-2.5 mt-2 shrink-0"
                 :ticket-id="ticketId"
                 :doctype="doctype"
               />
             </div>
             <div
               v-show="showCommentBox"
-              class="flex min-h-0 flex-1 flex-col px-2.5 py-2"
+              class="flex min-h-0 flex-1 flex-col ps-2.5 py-2"
             >
               <CommentComposer
                 ref="commentComposerRef"
