@@ -2,6 +2,20 @@ import type { Recipient } from "@framework/ui/components/Composer/index.ts";
 import { call, frappeRequest } from "frappe-ui";
 import type { Ref } from "vue";
 
+// Bare addresses and the `Name <email>` form the timeline hands over.
+function toRecipient(address: string): Recipient {
+  const match = address.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  if (!match) return { email: address.trim() };
+  const label = match[1].trim();
+  return { email: match[2].trim(), ...(label && { label }) };
+}
+
+export function toRecipientList(
+  addresses: (string | undefined)[] = []
+): Recipient[] {
+  return addresses.filter((a): a is string => !!a).map(toRecipient);
+}
+
 // Seeds arrive as bare addresses; a Contact with that address names the chip.
 // One indexed query covers every list at once; answers are kept per address
 // for the session, misses included, so a reopen or a repeat reply is instant.

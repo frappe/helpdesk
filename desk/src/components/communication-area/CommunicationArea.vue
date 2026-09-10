@@ -285,8 +285,11 @@ import LucideMaximize2 from "~icons/lucide/maximize-2";
 import LucideMinimize2 from "~icons/lucide/minimize-2";
 import LucideX from "~icons/lucide/x";
 import ZapIcon from "~icons/lucide/zap";
-import { toRecipientList } from "./addresses";
-import { nameRecipients, searchRecipients } from "./recipients";
+import {
+  nameRecipients,
+  searchRecipients,
+  toRecipientList,
+} from "./recipients";
 import { useDockedResize } from "./useDockedResize";
 
 const props = withDefaults(
