@@ -47,6 +47,7 @@
           <template #header="{ mode, dock, float }">
             <div
               class="flex w-full items-center justify-between gap-2 px-2.5 py-2"
+              :class="mode === 'docked' ? 'sm:cursor-ns-resize' : ''"
             >
               <!-- Visible grab pill at the window's top edge (the panel root is
                    the positioned ancestor); also the keyboard resize handle. -->
@@ -860,22 +861,10 @@ defineExpose({
 </script>
 
 <style>
-/* `.max-h-\[50vh\]` is ComposerEditor's scroll region, selected by the cap it
-   carries; `.overflow-y-auto` would also catch the staged-comment editor. */
-
-/* When the window's height is fixed (floating, or docked at a dragged height),
-   release that cap so the body fills and the toolbar pins to the bottom. */
+/* The composer body caps itself at 50vh; release it when the window height is
+   fixed so the body fills and the toolbar pins to the bottom. */
 .ticket-composer-window[data-state="floating"] .max-h-\[50vh\],
 .ticket-composer-window.composer-resized[data-state="docked"] .max-h-\[50vh\] {
   max-height: none;
-}
-
-/* The built-in title bar doubles as the docked resize surface. Positional
-   selector into the library chrome; worst case on a library change is a wrong
-   cursor, nothing functional. */
-@media (min-width: 640px) {
-  .ticket-composer-window[data-state="docked"] > div:first-child {
-    cursor: ns-resize;
-  }
 }
 </style>
