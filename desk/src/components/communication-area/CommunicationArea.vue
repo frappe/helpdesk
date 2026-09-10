@@ -269,14 +269,7 @@ import {
   EmailComposer,
 } from "@framework/ui/components/Composer/index.ts";
 import { onClickOutside, useEventListener, useStorage } from "@vueuse/core";
-import {
-  Avatar,
-  TabButtons,
-  call,
-  createResource,
-  frappeRequest,
-  toast,
-} from "frappe-ui";
+import { Avatar, TabButtons, createResource, toast } from "frappe-ui";
 import { FloatingWindow, type WindowMode } from "frappe-ui/experimental";
 import { useOnboarding } from "frappe-ui/frappe";
 import { storeToRefs } from "pinia";
@@ -286,13 +279,14 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
-  type Ref,
   watch,
 } from "vue";
 import LucideMaximize2 from "~icons/lucide/maximize-2";
 import LucideMinimize2 from "~icons/lucide/minimize-2";
 import LucideX from "~icons/lucide/x";
 import ZapIcon from "~icons/lucide/zap";
+import { toRecipientList } from "./addresses";
+import { nameRecipients, searchRecipients } from "./recipients";
 
 const props = defineProps({
   doctype: {
@@ -581,58 +575,9 @@ watch(
 );
 
 // ─── Recipients ───────────────────────────────────────────────
-// Bare addresses and the `Name <email>` form the timeline hands over.
-function toRecipient(address: string): Recipient {
-  const match = address.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
-  if (!match) return { email: address.trim() };
-  const label = match[1].trim();
-  return label ? { email: match[2].trim(), label } : { email: match[2].trim() };
-}
-
-function toRecipientList(addresses: unknown[] | undefined): Recipient[] {
-  return (addresses ?? [])
-    .filter(Boolean)
-    .map((address) => toRecipient(String(address)));
-}
-
 const to = ref<Recipient[]>([]);
 const cc = ref<Recipient[]>([]);
 const bcc = ref<Recipient[]>([]);
-
-// Seeds arrive as bare addresses; a Contact with that address names the chip.
-// One indexed query covers every list at once; answers are kept per address
-// for the session, misses included, so a reopen or a repeat reply is instant.
-const contactByEmail = new Map<string, Recipient | null>();
-
-async function nameRecipients(...lists: Ref<Recipient[]>[]) {
-  const bare = lists.flatMap((list) => list.value).filter((r) => !r.label);
-  const unknown = [
-    ...new Set(bare.map((r) => r.email).filter((e) => !contactByEmail.has(e))),
-  ];
-  if (unknown.length) {
-    const contacts = await call<
-      { email_id: string; full_name?: string; name: string; image?: string }[]
-    >("frappe.client.get_list", {
-      doctype: "Contact",
-      fields: ["email_id", "full_name", "name", "image"],
-      filters: { email_id: ["in", unknown] },
-      limit_page_length: unknown.length,
-    }).catch(() => []);
-    for (const email of unknown) contactByEmail.set(email, null);
-    for (const c of contacts) {
-      contactByEmail.set(c.email_id, {
-        email: c.email_id,
-        label: c.full_name || c.name,
-        image: c.image,
-      });
-    }
-  }
-  for (const list of lists) {
-    list.value = list.value.map((r) =>
-      r.label ? r : contactByEmail.get(r.email) ?? r
-    );
-  }
-}
 
 function resetRecipients() {
   to.value = toRecipientList(props.toEmails);
@@ -641,23 +586,6 @@ function resetRecipients() {
   nameRecipients(to);
 }
 resetRecipients();
-
-// Plain request, not createResource: RecipientSelect evaluates this inside a
-// computedAsync, and touching a reactive resource there re-triggers evaluation
-// forever.
-async function searchRecipients(query: string): Promise<Recipient[]> {
-  const contacts = await frappeRequest<
-    { full_name?: string; name: string; email_id: string }[]
-  >({
-    url: "/api/method/helpdesk.api.contact.search_contacts",
-    method: "GET",
-    params: { txt: query },
-  });
-  return (contacts ?? []).map((contact) => ({
-    email: contact.email_id,
-    label: contact.full_name || contact.name || contact.email_id,
-  }));
-}
 
 // The framework toolbar has no clear-formatting button, so both composers
 // carry one in their utilities slot, driving the same menu item as the
