@@ -75,9 +75,11 @@
             >
               <!-- Visible grab pill at the window's top edge (the panel root is
                    the positioned ancestor); also the keyboard resize handle. -->
-              <button
+              <div
                 v-if="mode === 'docked'"
-                type="button"
+                role="separator"
+                aria-orientation="horizontal"
+                tabindex="0"
                 class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 sm:flex"
                 :aria-label="__('Resize composer')"
                 @pointerdown.stop.prevent="startDockedResize($event)"
@@ -85,7 +87,7 @@
                 @keydown.down.prevent="resizeDockedBy(-16)"
               >
                 <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
-              </button>
+              </div>
               <TabButtons v-model="channel" :options="channelOptions" />
               <div class="min-w-0 flex-1">
                 <TypingIndicator :ticketId="ticketId" />
