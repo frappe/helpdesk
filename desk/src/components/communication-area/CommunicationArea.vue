@@ -33,11 +33,11 @@
       <button
         type="button"
         class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-elevation-2 text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 hover:text-ink-gray-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
-        :aria-label="otherChannelLabel"
-        :title="otherChannelLabel"
+        :aria-label="channels[otherChannel].label"
+        :title="channels[otherChannel].label"
         @click="channel = otherChannel"
       >
-        <component :is="otherChannelIcon" class="size-4" />
+        <component :is="channels[otherChannel].icon" class="size-4" />
       </button>
     </div>
     <!-- Enter classes only. Vue keeps a leaving element on screen for two
@@ -338,59 +338,80 @@ function closeComposer() {
 
 // ─── Channel & pill ───────────────────────────────────────────
 // The two show flags stay the source of truth so external writers (Sidebar
-// onboarding, mobile toggles, shortcuts) keep working.
-const channelOptions = [
-  { label: __("Email"), value: "email" },
-  { label: __("Comment"), value: "comment" },
-];
+// onboarding, mobile toggles, shortcuts) keep working; the table only reads
+// and writes them.
+type Channel = "email" | "comment";
+
+const hasTypedEmail = computed(
+  () => !isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)
+);
+const hasEmailDraft = computed(
+  () => hasTypedEmail.value || !!quotedContent.value
+);
+const hasCommentDraft = computed(() => !isContentEmpty(commentBody.value));
+
+const channels = {
+  email: {
+    box: showEmailBox,
+    label: __("Email"),
+    icon: EmailIcon,
+    composer: emailComposerRef,
+    hasDraft: hasEmailDraft,
+  },
+  comment: {
+    box: showCommentBox,
+    label: __("Comment"),
+    icon: CommentIcon,
+    composer: commentComposerRef,
+    hasDraft: hasCommentDraft,
+  },
+};
+
+const channelOptions = (Object.keys(channels) as Channel[]).map((value) => ({
+  label: channels[value].label,
+  value,
+}));
 
 const channel = computed({
-  get: () => (showCommentBox.value ? "comment" : "email"),
-  set: (value) => {
+  get: (): Channel => (showCommentBox.value ? "comment" : "email"),
+  set: (value: Channel) => {
     showEmailBox.value = value === "email";
     showCommentBox.value = value === "comment";
   },
 });
 
-const hasEmailDraft = computed(
-  () =>
-    (!isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)) ||
-    !!quotedContent.value
-);
-const hasCommentDraft = computed(() => !isContentEmpty(commentBody.value));
+function otherOf(name: Channel): Channel {
+  return name === "email" ? "comment" : "email";
+}
 
 // The channel the agent last had open, kept per ticket like the drafts.
-const lastChannel = useStorage<"email" | "comment">(
+const lastChannel = useStorage<Channel>(
   "composerChannel" + props.ticketId,
   "email"
 );
-watch([showEmailBox, showCommentBox], ([email, comment]) => {
-  if (email) lastChannel.value = "email";
-  if (comment) lastChannel.value = "comment";
-});
+
+// Opening a channel records it and focuses its composer.
+for (const [name, { box, composer }] of Object.entries(channels)) {
+  watch(box, (open) => {
+    if (!open) return;
+    lastChannel.value = name as Channel;
+    nextTick(() => composer.value?.focus());
+  });
+}
 
 // Reopen where the agent left off, unless only the other channel holds a draft.
-const nextChannel = computed(() => {
-  const drafts = { email: hasEmailDraft.value, comment: hasCommentDraft.value };
-  const other = lastChannel.value === "email" ? "comment" : "email";
-  return !drafts[lastChannel.value] && drafts[other]
+const nextChannel = computed<Channel>(() => {
+  const last = lastChannel.value;
+  const other = otherOf(last);
+  return !channels[last].hasDraft.value && channels[other].hasDraft.value
     ? other
-    : lastChannel.value;
+    : last;
 });
+const otherChannel = computed(() => otherOf(nextChannel.value));
 
 function openComposer() {
   channel.value = nextChannel.value;
 }
-
-const otherChannel = computed(() =>
-  nextChannel.value === "email" ? "comment" : "email"
-);
-const otherChannelLabel = computed(() =>
-  otherChannel.value === "email" ? __("Email") : __("Comment")
-);
-const otherChannelIcon = computed(() =>
-  otherChannel.value === "email" ? EmailIcon : CommentIcon
-);
 
 // Pops straight out; an already open window keeps its channel.
 function openFloatingComposer() {
@@ -404,10 +425,7 @@ const minimizedLabel = computed(() => {
     draft = commentBody.value;
   } else if (hasEmailDraft.value) {
     // Quoted-only drafts (reply started, nothing typed) preview the quote.
-    draft =
-      !isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)
-        ? emailBody.value
-        : quotedContent.value;
+    draft = hasTypedEmail.value ? emailBody.value : quotedContent.value;
   }
   const preview = draft ? htmlToText(draft).trim() : "";
   return preview || __("Send a reply");
@@ -466,7 +484,7 @@ watch(emailBody, (value, oldValue) => {
   // The signature drops into an empty editor on load and on every reply. That
   // is not the agent typing, and broadcasting it would show a typing indicator
   // to everyone else on the ticket.
-  if (value !== oldValue && !isContentEmpty(value) && !isOnlySignature(value)) {
+  if (value !== oldValue && hasTypedEmail.value) {
     onUserType();
   }
   // Only the composer's internal Discard/Esc reset the model to exactly "";
@@ -601,14 +619,16 @@ const sendMail = createResource({
   },
 });
 
-const emailSubmitLabel = computed(() => {
-  if (sendMail.loading) return __("Sending");
-  return isMobileView.value
-    ? __("Send")
-    : isMac
-    ? __("Send (⌘ + ⏎)")
-    : __("Send (Ctrl + ⏎)");
-});
+// Short on mobile, shortcut hint on desktop, the progressive form while busy.
+function submitLabel(verb: string, busy: string, loading: boolean) {
+  if (loading) return busy;
+  if (isMobileView.value) return verb;
+  return isMac ? `${verb} (⌘ + ⏎)` : `${verb} (Ctrl + ⏎)`;
+}
+
+const emailSubmitLabel = computed(() =>
+  submitLabel(__("Send"), __("Sending"), sendMail.loading)
+);
 
 function onEmailSubmit(payload: EmailPayload) {
   if (sendMail.loading) return;
@@ -661,14 +681,9 @@ const sendComment = createResource({
   },
 });
 
-const commentSubmitLabel = computed(() => {
-  if (sendComment.loading) return __("Commenting");
-  return isMobileView.value
-    ? __("Comment")
-    : isMac
-    ? __("Comment (⌘ + ⏎)")
-    : __("Comment (Ctrl + ⏎)");
-});
+const commentSubmitLabel = computed(() =>
+  submitLabel(__("Comment"), __("Commenting"), sendComment.loading)
+);
 
 function onCommentSubmit(payload: CommentPayload) {
   if (sendComment.loading) return;
@@ -726,15 +741,7 @@ function replyToEmail(data: {
   });
 }
 
-// ─── Open/close behavior ──────────────────────────────────────
-watch(showEmailBox, (open) => {
-  if (open) nextTick(() => emailComposerRef.value?.focus());
-});
-
-watch(showCommentBox, (open) => {
-  if (open) nextTick(() => commentComposerRef.value?.focus());
-});
-
+// ─── Shortcuts & outside clicks ───────────────────────────────
 useShortcut("r", () => {
   toggleEmailBox();
 });
