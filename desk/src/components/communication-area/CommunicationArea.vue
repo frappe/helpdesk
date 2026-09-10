@@ -228,6 +228,9 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
+// The same speech bubble the timeline badges a comment with; Lucide has no
+// match for it, and the two sit inches apart on screen.
+import { CommentIcon } from "@/components/icons";
 import {
   ClearFormatting,
   helpdeskExtensions,
@@ -284,7 +287,6 @@ import {
 } from "vue";
 import LucideMail from "~icons/lucide/mail";
 import LucideMaximize2 from "~icons/lucide/maximize-2";
-import LucideMessageSquare from "~icons/lucide/message-square";
 import LucideMinimize2 from "~icons/lucide/minimize-2";
 import LucideX from "~icons/lucide/x";
 import ZapIcon from "~icons/lucide/zap";
@@ -426,7 +428,7 @@ const channels = {
   comment: {
     box: showCommentBox,
     label: __("Comment"),
-    icon: LucideMessageSquare,
+    icon: CommentIcon,
     composer: commentComposerRef,
     hasDraft: hasCommentDraft,
   },
