@@ -389,6 +389,7 @@ const list = createResource({
     data.columns.forEach((column) => {
       handleFetchFromField(column);
       handleColumnConfig(column);
+      column.label = __(column.label);
     });
     return data;
   },
