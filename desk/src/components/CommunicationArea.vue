@@ -125,6 +125,7 @@
                 :extensions="helpdeskExtensions"
                 :placeholder="__('Hi John, we are looking into this issue.')"
                 :submit-label="emailSubmitLabel"
+                :submitting="sendMail.loading"
                 @submit="onEmailSubmit"
                 @remove-attachment="
                   (file) => removeAttachmentFromServer(file.name)
@@ -171,6 +172,7 @@
                 :extensions="helpdeskExtensions"
                 :placeholder="__('@John could you please look into this?')"
                 :submit-label="commentSubmitLabel"
+                :submitting="sendComment.loading"
                 @submit="onCommentSubmit"
                 @remove-attachment="
                   (file) => removeAttachmentFromServer(file.name)
@@ -657,7 +659,7 @@ const sendMail = createResource({
 });
 
 const emailSubmitLabel = computed(() => {
-  if (sendMail.loading) return __("Sending...");
+  if (sendMail.loading) return __("Sending");
   return isMobileView.value
     ? __("Send")
     : isMac
@@ -717,7 +719,7 @@ const sendComment = createResource({
 });
 
 const commentSubmitLabel = computed(() => {
-  if (sendComment.loading) return __("Commenting...");
+  if (sendComment.loading) return __("Commenting");
   return isMobileView.value
     ? __("Comment")
     : isMac
