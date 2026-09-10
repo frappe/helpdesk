@@ -879,20 +879,6 @@ defineExpose({
   max-height: none;
 }
 
-/* The body scrolls straight into the toolbar with no separator, so a scrolled
-   line is sliced at the toolbar edge. Fade the bottom 18px instead, the same
-   mask the framework uses for clipped emails and code fields. The body's own
-   bottom padding keeps the last line clear of the fade at the scroll end, so
-   it only ever touches content that is genuinely cut off. */
-.ticket-composer-window .max-h-\[50vh\] {
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 calc(100% - 18px),
-    transparent
-  );
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
-}
-
 /* The built-in title bar doubles as the docked resize surface. Positional
    selector into the library chrome; worst case on a library change is a wrong
    cursor, nothing functional. */
