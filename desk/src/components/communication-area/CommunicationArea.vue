@@ -18,7 +18,7 @@
         <TypingIndicator :ticketId="ticketId" />
         <Button
           variant="ghost"
-          class="group"
+          class="group hover:bg-transparent active:bg-transparent"
           :label="__('Expand')"
           :tooltip="__('Expand')"
           @click.stop="openFloatingComposer"
