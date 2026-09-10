@@ -1,34 +1,41 @@
 <template>
-  <Tabs
-    :modelValue="tabIndex"
-    :tabs="tabs"
-    @update:modelValue="changeTabTo"
-    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
+  <div
+    ref="panelRef"
+    class="relative flex min-h-0 flex-1 flex-col"
+    :style="{ '--composer-reserve': `${composerHeight}px` }"
   >
-    <template #tab-panel="{ tab }">
-      <TicketAnalyticsTab v-if="tab.name === 'analytics'" />
-      <TicketTimeline
-        v-else
-        :ticket-id="String(ticket.doc?.name)"
-        :tab="tab.name"
-        :tab-label="tab.label"
-        @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
+    <Tabs
+      :modelValue="tabIndex"
+      :tabs="tabs"
+      @update:modelValue="changeTabTo"
+      class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
+    >
+      <template #tab-panel="{ tab }">
+        <TicketAnalyticsTab v-if="tab.name === 'analytics'" />
+        <TicketTimeline
+          v-else
+          :ticket-id="String(ticket.doc?.name)"
+          :tab="tab.name"
+          :tab-label="tab.label"
+          @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
+        />
+      </template>
+    </Tabs>
+    <!-- The composer floats over the thread instead of taking a row in it, so
+         opening or resizing it never reflows the timeline. -->
+    <div ref="composerRef" class="absolute inset-x-0 bottom-0 z-10">
+      <CommunicationArea
+        ref="communicationAreaRef"
+        :ticketId="String(ticket.doc?.name)"
+        :to-emails="[ticket.doc?.raised_by]"
+        :key="ticket.doc?.name"
       />
-    </template>
-  </Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-  />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import CommunicationArea from "@/components/CommunicationArea.vue";
+import CommunicationArea from "@/components/communication-area/CommunicationArea.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -39,9 +46,10 @@ import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyt
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import { TabObject, TicketSymbol } from "@/types";
+import { useElementSize } from "@vueuse/core";
 import { Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, inject, ref } from "vue";
+import { computed, ComputedRef, inject, ref, useTemplateRef, watch } from "vue";
 import LucideChartNoAxesColumn from "~icons/lucide/chart-no-axes-column";
 import TicketTimeline from "./timeline/TicketTimeline.vue";
 
@@ -50,6 +58,23 @@ const ticket = inject(TicketSymbol)!;
 const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
   null
 );
+const panelRef = useTemplateRef<HTMLElement>("panelRef");
+const composerRef = useTemplateRef<HTMLElement>("composerRef");
+const { height: composerHeight } = useElementSize(composerRef);
+
+// The timeline is bottom-anchored so avoid it to push upwards when composer is dragged
+watch(
+  composerHeight,
+  (height, previous) => {
+    if (!previous) return;
+    const scroller = panelRef.value?.querySelector<HTMLElement>(
+      "[role='tabpanel'][data-state='active'] .activity-timeline"
+    );
+    if (scroller) scroller.scrollTop -= height - previous;
+  },
+  { flush: "post" }
+);
+
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 

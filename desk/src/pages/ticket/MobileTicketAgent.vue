@@ -156,13 +156,9 @@
             </template>
           </Tabs>
           <CommunicationArea
-            class="bg-surface-base"
             ref="communicationAreaRef"
-            v-model="ticket.doc"
             :ticketId="ticket.doc?.name"
             :to-emails="[ticket.doc.raised_by]"
-            :cc-emails="[]"
-            :bcc-emails="[]"
             :key="ticket.doc?.name"
             @update="
               () => {

@@ -3,7 +3,7 @@
   <TimelineContainer>
     <ActivityTimeline
       ref="timelineRef"
-      class="px-5 pt-1 pb-6"
+      class="px-5 pt-1 pb-[calc(1.5rem+var(--composer-reserve,0px))]"
       :activities="filtered"
       :loading="_loading"
       :paginate="paginate"
@@ -126,7 +126,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
-import { TicketSymbol } from "@/types";
+import { ReplyPayload, TicketSymbol } from "@/types";
 import { copyActivityLink } from "@/utils";
 import {
   ActivityTimeline,
@@ -159,7 +159,9 @@ const props = defineProps<{
   tab: string;
   tabLabel: string;
 }>();
-const emit = defineEmits<{ "email:reply": [payload: object] }>();
+const emit = defineEmits<{
+  "email:reply": [payload: ReplyPayload];
+}>();
 
 const route = useRoute();
 const router = useRouter();
@@ -297,11 +299,21 @@ function isSelf(email: string): boolean {
   );
 }
 
+// The feed already resolved the sender's name; hand it over so the composer
+// needs no lookup to label the chip.
+function senderAddress(activity: EmailActivity) {
+  const { sender } = activity.data;
+  const name = activity.author?.fullname;
+  return name && name !== sender ? `${name} <${sender}>` : sender;
+}
+
 function reply(activity: EmailActivity) {
   const { sender, content } = activity.data;
   emit("email:reply", {
     content,
-    to: isSelf(sender) ? activity.data.to : sender,
+    to: isSelf(sender)
+      ? splitRecipients(activity.data.to, [])
+      : [senderAddress(activity)],
   });
 }
 
@@ -314,7 +326,7 @@ function replyAll(activity: EmailActivity) {
   const isSender = isSelf(sender);
   emit("email:reply", {
     content,
-    to: isSender ? filteredTo.join(", ") : sender,
+    to: isSender ? filteredTo : [senderAddress(activity)],
     cc: isSender ? filteredCc : [...filteredTo, ...filteredCc],
     bcc: filteredBcc,
   });

@@ -2,7 +2,7 @@
   <div
     v-if="pendingActions.length"
     ref="container"
-    class="overflow-hidden rounded-lg border border-outline-gray-1 bg-surface-gray-1"
+    class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1"
   >
     <div class="flex h-8 items-center gap-1.5 ps-3.5 pe-1.5">
       <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />

@@ -118,7 +118,7 @@ function buildActionOptions() {
     }
   }
 
-  if (!agentStore.agents.data) agentStore.agents.fetch();
+  agentStore.loadOnce();
 
   return { valueOptions, tagOptions, search };
 }

@@ -37,6 +37,9 @@ export interface MentionItem {
   label: string;
 }
 
+/** Helpdesk's additions on top of the kit, shared by every editor and composer. */
+export const helpdeskExtensions = [ComponentUtils, HandleExcelPaste, CleanStyles];
+
 /**
  * Build the extension list for a Helpdesk rich-text editor.
  *
@@ -53,13 +56,7 @@ export function buildEditorExtensions(
     heading: { levels: [2, 3, 4, 5, 6] },
     ...(options.mentions ? { mention: { items: options.mentions } } : {}),
   });
-  return [
-    kit,
-    ComponentUtils,
-    HandleExcelPaste,
-    CleanStyles,
-    ...(options.extra ?? []),
-  ];
+  return [kit, ...helpdeskExtensions, ...(options.extra ?? [])];
 }
 
 /** Clear-formatting toolbar button (ports the v0 `ClearFormattingUtility`). */
