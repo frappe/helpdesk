@@ -126,7 +126,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
-import { TicketSymbol } from "@/types";
+import { ReplyPayload, TicketSymbol } from "@/types";
 import { copyActivityLink } from "@/utils";
 import {
   ActivityTimeline,
@@ -160,9 +160,7 @@ const props = defineProps<{
   tabLabel: string;
 }>();
 const emit = defineEmits<{
-  "email:reply": [
-    payload: { content: string; to: string[]; cc?: string[]; bcc?: string[] }
-  ];
+  "email:reply": [payload: ReplyPayload];
 }>();
 
 const route = useRoute();

@@ -248,7 +248,7 @@ import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { RenderedSavedReply } from "@/types";
+import { RenderedSavedReply, ReplyPayload } from "@/types";
 import {
   htmlToText,
   isContentEmpty,
@@ -704,12 +704,7 @@ function onCommentSubmit(payload: CommentPayload) {
 }
 
 // ─── Reply from the activity feed ─────────────────────────────
-function replyToEmail(data: {
-  content: string;
-  to: string[];
-  cc?: string[];
-  bcc?: string[];
-}) {
+function replyToEmail(data: ReplyPayload) {
   showCommentBox.value = false;
   showEmailBox.value = true;
 
