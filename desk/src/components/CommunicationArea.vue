@@ -364,14 +364,27 @@ const hasEmailDraft = computed(
 );
 const hasCommentDraft = computed(() => !isContentEmpty(commentBody.value));
 
+// The channel the agent last had open, kept per ticket like the drafts.
+const lastChannel = useStorage<"email" | "comment">(
+  "composerChannel" + props.ticketId,
+  "email"
+);
+watch([showEmailBox, showCommentBox], ([email, comment]) => {
+  if (email) lastChannel.value = "email";
+  if (comment) lastChannel.value = "comment";
+});
+
+// Reopen where the agent left off, unless only the other channel holds a draft.
+const nextChannel = computed(() => {
+  const drafts = { email: hasEmailDraft.value, comment: hasCommentDraft.value };
+  const other = lastChannel.value === "email" ? "comment" : "email";
+  return !drafts[lastChannel.value] && drafts[other]
+    ? other
+    : lastChannel.value;
+});
+
 function openComposer() {
-  if (hasCommentDraft.value && !hasEmailDraft.value) {
-    showCommentBox.value = true;
-    showEmailBox.value = false;
-    return;
-  }
-  showEmailBox.value = true;
-  showCommentBox.value = false;
+  channel.value = nextChannel.value;
 }
 
 // Pops straight out; an already open window keeps its channel.
@@ -382,14 +395,14 @@ function openFloatingComposer() {
 
 const minimizedLabel = computed(() => {
   let draft: string | null = null;
-  if (hasEmailDraft.value) {
+  if (nextChannel.value === "comment") {
+    draft = commentBody.value;
+  } else if (hasEmailDraft.value) {
     // Quoted-only drafts (reply started, nothing typed) preview the quote.
     draft =
       !isContentEmpty(emailBody.value) && !isOnlySignature(emailBody.value)
         ? emailBody.value
         : quotedContent.value;
-  } else if (hasCommentDraft.value) {
-    draft = commentBody.value;
   }
   const preview = draft ? htmlToText(draft).trim() : "";
   return preview || __("Send a reply");
