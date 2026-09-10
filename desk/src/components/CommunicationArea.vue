@@ -29,15 +29,15 @@
           </template>
         </Button>
       </div>
-      <!-- Floating comment shortcut beside the pill; gone once the window opens. -->
+      <!-- The pill resumes the last channel; this opens the other one. -->
       <button
         type="button"
         class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-elevation-2 text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 hover:text-ink-gray-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
-        :aria-label="__('Comment')"
-        :title="__('Comment')"
-        @click="toggleCommentBox"
+        :aria-label="otherChannelLabel"
+        :title="otherChannelLabel"
+        @click="channel = otherChannel"
       >
-        <CommentIcon class="size-4" />
+        <component :is="otherChannelIcon" class="size-4" />
       </button>
     </div>
     <!-- Enter classes only. Vue keeps a leaving element on screen for two
@@ -226,7 +226,7 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
-import { CommentIcon } from "@/components/icons";
+import { CommentIcon, EmailIcon } from "@/components/icons";
 import {
   ClearFormatting,
   helpdeskExtensions,
@@ -386,6 +386,16 @@ const nextChannel = computed(() => {
 function openComposer() {
   channel.value = nextChannel.value;
 }
+
+const otherChannel = computed(() =>
+  nextChannel.value === "email" ? "comment" : "email"
+);
+const otherChannelLabel = computed(() =>
+  otherChannel.value === "email" ? __("Email") : __("Comment")
+);
+const otherChannelIcon = computed(() =>
+  otherChannel.value === "email" ? EmailIcon : CommentIcon
+);
 
 // Pops straight out; an already open window keeps its channel.
 function openFloatingComposer() {
