@@ -1,7 +1,7 @@
 <template>
   <div ref="rootRef" class="max-sm:w-screen">
     <!-- Minimized pill — the default state; opens the composer window. -->
-    <div v-show="!windowOpen" class="px-4 py-3">
+    <div v-show="!windowOpen" class="flex items-center gap-2 px-4 py-3">
       <div
         role="button"
         tabindex="0"
@@ -17,13 +17,28 @@
         <TypingIndicator :ticketId="ticketId" />
         <Button
           variant="ghost"
+          class="group"
           :label="__('Expand')"
           :tooltip="__('Expand')"
           @click.stop="openFloatingComposer"
         >
-          <template #icon><LucideMaximize2 class="size-4" /></template>
+          <template #icon>
+            <LucideMaximize2
+              class="size-4 text-ink-gray-5 group-hover:text-ink-gray-8"
+            />
+          </template>
         </Button>
       </div>
+      <!-- Floating comment shortcut beside the pill; gone once the window opens. -->
+      <button
+        type="button"
+        class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-elevation-2 text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 hover:text-ink-gray-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
+        :aria-label="__('Comment')"
+        :title="__('Comment')"
+        @click="toggleCommentBox"
+      >
+        <CommentIcon class="size-4" />
+      </button>
     </div>
     <!-- Enter classes only. Vue keeps a leaving element on screen for two
          frames even with no leave animation, and the pill above shows at once,
@@ -211,6 +226,7 @@
 <script setup lang="ts">
 import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
 import { createDialog } from "@/components/dialogs";
+import { CommentIcon } from "@/components/icons";
 import {
   ClearFormatting,
   helpdeskExtensions,
