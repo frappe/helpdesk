@@ -2,7 +2,7 @@ import type { Recipient } from "@framework/ui/components/Composer/index.ts";
 import { call, frappeRequest } from "frappe-ui";
 import type { Ref } from "vue";
 
-// Bare addresses and the `Name <email>` form the timeline hands over.
+// helpers to convert weird formatted mail addresses in the type Recipent
 function toRecipient(address: string): Recipient {
   const match = address.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
   if (!match) return { email: address.trim() };
@@ -10,6 +10,8 @@ function toRecipient(address: string): Recipient {
   return { email: match[2].trim(), ...(label && { label }) };
 }
 
+// helper to prepare a list of recipients for mails recived ex. r@x.io becomes { email }, Riya Kapoor <r@x.io>  "Kapoor, Riya" <r@x.io> { "name", email}
+// then export the formatted list
 export function toRecipientList(
   addresses: (string | undefined)[] = []
 ): Recipient[] {
@@ -21,21 +23,24 @@ export function toRecipientList(
 // for the session, misses included, so a reopen or a repeat reply is instant.
 const contactByEmail = new Map<string, Recipient | null>();
 
+
+// get contact list for and fill names from Contacts for chips that have none
 export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
+  // get recipients which have missing labels
   const bare = lists.flatMap((list) => list.value).filter((r) => !r.label);
-  const unknown = [
+  const unknownContacts = [
     ...new Set(bare.map((r) => r.email).filter((e) => !contactByEmail.has(e))),
   ];
-  if (unknown.length) {
+  if (unknownContacts.length) {
     const contacts = await call<
       { email_id: string; full_name?: string; name: string; image?: string }[]
     >("frappe.client.get_list", {
       doctype: "Contact",
       fields: ["email_id", "full_name", "name", "image"],
-      filters: { email_id: ["in", unknown] },
-      limit_page_length: unknown.length,
+      filters: { email_id: ["in", unknownContacts] },
+      limit_page_length: unknownContacts.length,
     }).catch(() => []);
-    for (const email of unknown) contactByEmail.set(email, null);
+    for (const email of unknownContacts) contactByEmail.set(email, null);
     for (const c of contacts) {
       contactByEmail.set(c.email_id, {
         email: c.email_id,

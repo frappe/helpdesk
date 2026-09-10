@@ -3,9 +3,10 @@
     <!-- Minimized pill — the default state; opens the composer window. -->
     <div v-show="!windowOpen" class="flex items-center gap-2 px-4 py-3">
       <div
+        ref="pillRef"
         role="button"
         tabindex="0"
-        class="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-surface-elevation-2 py-1 pl-2 pr-1 text-base text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
+        class="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-lg bg-surface-elevation-2 py-1 pl-2 pr-1 text-base text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
         @click="openComposer()"
         @keydown.enter.prevent="openComposer()"
         @keydown.space.prevent="openComposer()"
@@ -29,16 +30,24 @@
           </template>
         </Button>
       </div>
-      <!-- The pill resumes the last channel; this opens the other one. -->
-      <button
-        type="button"
-        class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface-elevation-2 text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 hover:text-ink-gray-8 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
-        :aria-label="channels[otherChannel].label"
-        :title="channels[otherChannel].label"
-        @click="channel = otherChannel"
+      <div
+        class="flex shrink-0 rounded-lg bg-surface-elevation-2 p-1 shadow-md"
       >
-        <component :is="channels[otherChannel].icon" class="size-4" />
-      </button>
+        <Button
+          variant="ghost"
+          class="group hover:bg-transparent active:bg-transparent"
+          :label="channels[otherChannel].label"
+          :tooltip="channels[otherChannel].label"
+          @click="channel = otherChannel"
+        >
+          <template #icon>
+            <component
+              :is="channels[otherChannel].icon"
+              class="size-4 text-ink-gray-5 group-hover:text-ink-gray-8"
+            />
+          </template>
+        </Button>
+      </div>
     </div>
     <!-- Enter classes only. Vue keeps a leaving element on screen for two
          frames even with no leave animation, and the pill above shows at once,
@@ -102,7 +111,7 @@
                   variant="ghost"
                   :label="__('Close')"
                   :tooltip="__('Close')"
-                  @click="closeComposer"
+                  @click="collapseToPill"
                 >
                   <template #icon><LucideX class="size-4" /></template>
                 </Button>
@@ -118,7 +127,7 @@
             class="flex min-h-0 flex-col"
             :class="windowMode === 'floating' ? 'h-full' : ''"
             :style="dockedColumnStyle"
-            @keydown.esc.capture.stop="closeComposer"
+            @keydown.esc.capture.stop="collapseToPill"
           >
             <!-- v-show keeps both mounted so each draft survives a tab switch.
                  Start padding only: the composer's own px-2.5 then puts its text
@@ -214,13 +223,13 @@
         </FloatingWindow>
       </div>
     </Transition>
+    <SavedRepliesSelectorModal
+      v-model="showSavedRepliesSelectorModal"
+      :doctype="doctype"
+      :ticketId="ticketId"
+      @apply="applySavedReplies"
+    />
   </div>
-  <SavedRepliesSelectorModal
-    v-model="showSavedRepliesSelectorModal"
-    :doctype="doctype"
-    :ticketId="ticketId"
-    @apply="applySavedReplies"
-  />
 </template>
 
 <script setup lang="ts">
@@ -296,7 +305,6 @@ const props = withDefaults(
   defineProps<{
     ticketId: string;
     doctype?: string;
-    /** Addresses the To row starts with; `Name <email>` is accepted. */
     toEmails?: (string | undefined)[];
   }>(),
   { doctype: "HD Ticket", toEmails: () => [] }
@@ -311,6 +319,7 @@ const { isManager, userImage, userName } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const rootRef = ref(null);
+const pillRef = ref<HTMLElement | null>(null);
 const columnRef = ref<HTMLElement | null>(null);
 const emailComposerRef = ref<InstanceType<typeof EmailComposer> | null>(null);
 const commentComposerRef = ref<InstanceType<typeof CommentComposer> | null>(
@@ -404,10 +413,14 @@ function closeComposer() {
   showCommentBox.value = false;
 }
 
+// Esc and Close hand focus to the pill. An open recipient list is rendered
+// outside the hidden window and only dismisses once focus lands elsewhere.
+function collapseToPill() {
+  closeComposer();
+  nextTick(() => pillRef.value?.focus());
+}
+
 // ─── Channel & pill ───────────────────────────────────────────
-// The two show flags stay the source of truth so external writers (Sidebar
-// onboarding, mobile toggles, shortcuts) keep working; the table only reads
-// and writes them.
 type Channel = "email" | "comment";
 
 const channels = {
@@ -543,17 +556,8 @@ const to = ref<Recipient[]>([]);
 const cc = ref<Recipient[]>([]);
 const bcc = ref<Recipient[]>([]);
 
-function resetRecipients() {
-  to.value = toRecipientList(props.toEmails);
-  cc.value = [];
-  bcc.value = [];
-  nameRecipients(to);
-}
-resetRecipients();
+// ─── Extensions ───────────────────────────────────────────────
 
-// The framework toolbar has no clear-formatting button, so both composers
-// carry one in their utilities slot, driving the same menu item as the
-// other helpdesk editors.
 function clearFormatting(
   editor?: Parameters<typeof ClearFormatting.action>[0]
 ) {
@@ -610,7 +614,7 @@ function replaceSavedReply(reply: RenderedSavedReply) {
   nextTick(() => emailComposerRef.value?.focus());
 }
 
-// ─── Send email ───────────────────────────────────────────────
+// ─── Email Helpers ───────────────────────────────────────────────
 const sendMail = createResource({
   url: "run_doc_method",
   debounce: 300,
@@ -628,82 +632,14 @@ const sendMail = createResource({
   },
 });
 
-// Short on mobile, shortcut hint on desktop, the progressive form while busy.
-function submitLabel(verb: string, busy: string, loading: boolean) {
-  if (loading) return busy;
-  if (isMobileView.value) return verb;
-  return isMac ? `${verb} (⌘ + ⏎)` : `${verb} (Ctrl + ⏎)`;
+function resetRecipients() {
+  to.value = toRecipientList(props.toEmails);
+  cc.value = [];
+  bcc.value = [];
+  nameRecipients(to);
 }
+resetRecipients();
 
-const emailSubmitLabel = computed(() =>
-  submitLabel(__("Send"), __("Sending"), sendMail.loading)
-);
-
-function onEmailSubmit(payload: EmailPayload) {
-  if (sendMail.loading) return;
-  const { to, cc, bcc } = payload;
-  if (!to.length && !cc.length && !bcc.length) {
-    toast.warning(
-      __(
-        "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
-      )
-    );
-    return;
-  }
-  // The composer already appended the quoted block to `body` in the exact
-  // wire format reply_via_agent expects; a failed send leaves the draft
-  // untouched because nothing is cleared until onSuccess.
-  sendMail.submit({
-    dt: props.doctype,
-    dn: props.ticketId,
-    method: "reply_via_agent",
-    args: {
-      attachments: payload.attachments.map((file) => file.name),
-      from_email: outgoingEmails.value.find((e) => e.email_id === payload.from),
-      to: to.map((recipient) => recipient.email).join(","),
-      cc: cc.map((recipient) => recipient.email).join(","),
-      bcc: bcc.map((recipient) => recipient.email).join(","),
-      message: payload.body,
-    },
-  });
-}
-
-// ─── Comment ──────────────────────────────────────────────────
-const agentStore = useAgentStore();
-const { dropdown } = storeToRefs(agentStore);
-const mentionOptions = computed<MentionOption[]>(() => dropdown.value ?? []);
-
-const sendComment = createResource({
-  url: "run_doc_method",
-  onSuccess: () => {
-    capture("comment_added");
-    commentComposerRef.value?.reset();
-    showCommentBox.value = false;
-    emit("update");
-    if (isManager) {
-      updateOnboardingStep("comment_on_ticket");
-    }
-  },
-});
-
-const commentSubmitLabel = computed(() =>
-  submitLabel(__("Comment"), __("Commenting"), sendComment.loading)
-);
-
-function onCommentSubmit(payload: CommentPayload) {
-  if (sendComment.loading) return;
-  sendComment.submit({
-    dt: props.doctype,
-    dn: props.ticketId,
-    method: "new_comment",
-    args: {
-      content: payload.body,
-      attachments: payload.attachments,
-    },
-  });
-}
-
-// ─── Reply from the activity feed ─────────────────────────────
 function replyToEmail(data: ReplyPayload) {
   showCommentBox.value = false;
   showEmailBox.value = true;
@@ -728,7 +664,81 @@ function replyToEmail(data: ReplyPayload) {
   });
 }
 
-// ─── Shortcuts & outside clicks ───────────────────────────────
+// ─── Comment Helpers ──────────────────────────────────────────────────
+const agentStore = useAgentStore();
+const { dropdown } = storeToRefs(agentStore);
+const mentionOptions = computed<MentionOption[]>(() => dropdown.value ?? []);
+
+const sendComment = createResource({
+  url: "run_doc_method",
+  onSuccess: () => {
+    capture("comment_added");
+    commentComposerRef.value?.reset();
+    showCommentBox.value = false;
+    emit("update");
+    if (isManager) {
+      updateOnboardingStep("comment_on_ticket");
+    }
+  },
+});
+
+// ─── Sending ──────────────────────────────────────────────────
+// Short on mobile, shortcut hint on desktop, the progressive form while busy.
+function submitLabel(verb: string, busy: string, loading: boolean) {
+  if (loading) return busy;
+  if (isMobileView.value) return verb;
+  return isMac ? `${verb} (⌘ + ⏎)` : `${verb} (Ctrl + ⏎)`;
+}
+
+const emailSubmitLabel = computed(() =>
+  submitLabel(__("Send"), __("Sending"), sendMail.loading)
+);
+
+const commentSubmitLabel = computed(() =>
+  submitLabel(__("Comment"), __("Commenting"), sendComment.loading)
+);
+
+function onEmailSubmit(payload: EmailPayload) {
+  if (sendMail.loading) return;
+  const { to, cc, bcc } = payload;
+  if (!to.length && !cc.length && !bcc.length) {
+    toast.warning(
+      __(
+        "Email has no recipients. Please add at least one recipient (To, Cc, or Bcc) before sending."
+      )
+    );
+    return;
+  }
+
+  sendMail.submit({
+    dt: props.doctype,
+    dn: props.ticketId,
+    method: "reply_via_agent",
+    args: {
+      attachments: payload.attachments.map((file) => file.name),
+      from_email: outgoingEmails.value.find((e) => e.email_id === payload.from),
+      to: to.map((recipient) => recipient.email).join(","),
+      cc: cc.map((recipient) => recipient.email).join(","),
+      bcc: bcc.map((recipient) => recipient.email).join(","),
+      message: payload.body,
+    },
+  });
+}
+
+function onCommentSubmit(payload: CommentPayload) {
+  if (sendComment.loading) return;
+  sendComment.submit({
+    dt: props.doctype,
+    dn: props.ticketId,
+    method: "new_comment",
+    args: {
+      content: payload.body,
+      attachments: payload.attachments,
+    },
+  });
+}
+
+// ─── Shortcuts ───────────────────────────────
 useShortcut("r", () => {
   toggleEmailBox();
 });
@@ -739,6 +749,7 @@ useShortcut("e", () => {
   openFloatingComposer();
 });
 
+// Overlays that open outside the composer but belong to it.
 const IGNORED_SELECTORS = [
   ".tippy-content",
   ".PopoverContent",
@@ -753,8 +764,6 @@ const IGNORED_SELECTORS = [
   "[data-grammarly-part]",
 ];
 
-// `ignore` is only consulted on pointerdown, which dialogs stop, so the click
-// through has to be checked too. Without this a dialog button closes the box.
 function isIgnored(event: Event): boolean {
   const target = event.target as HTMLElement | null;
   return Boolean(target?.closest?.(IGNORED_SELECTORS.join(", ")));
