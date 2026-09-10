@@ -297,11 +297,19 @@ function isSelf(email: string): boolean {
   );
 }
 
+// The feed already resolved the sender's name; hand it over so the composer
+// needs no lookup to label the chip.
+function senderAddress(activity: EmailActivity) {
+  const { sender } = activity.data;
+  const name = activity.author?.fullname;
+  return name && name !== sender ? `${name} <${sender}>` : sender;
+}
+
 function reply(activity: EmailActivity) {
   const { sender, content } = activity.data;
   emit("email:reply", {
     content,
-    to: isSelf(sender) ? activity.data.to : sender,
+    to: isSelf(sender) ? activity.data.to : senderAddress(activity),
   });
 }
 
@@ -314,7 +322,7 @@ function replyAll(activity: EmailActivity) {
   const isSender = isSelf(sender);
   emit("email:reply", {
     content,
-    to: isSender ? filteredTo.join(", ") : sender,
+    to: isSender ? filteredTo.join(", ") : senderAddress(activity),
     cc: isSender ? filteredCc : [...filteredTo, ...filteredCc],
     bcc: filteredBcc,
   });
