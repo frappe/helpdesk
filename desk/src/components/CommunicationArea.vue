@@ -577,27 +577,37 @@ const cc = ref<Recipient[]>([]);
 const bcc = ref<Recipient[]>([]);
 
 // Seeds arrive as bare addresses; a Contact with that address names the chip.
-// One indexed query covers every list at once.
+// One indexed query covers every list at once; answers are kept per address
+// for the session, misses included, so a reopen or a repeat reply is instant.
+const contactByEmail = new Map<string, Recipient | null>();
+
 async function nameRecipients(...lists: Ref<Recipient[]>[]) {
   const bare = lists.flatMap((list) => list.value).filter((r) => !r.label);
-  const emails = [...new Set(bare.map((r) => r.email))];
-  if (!emails.length) return;
-  const contacts = await call<
-    { email_id: string; full_name?: string; name: string; image?: string }[]
-  >("frappe.client.get_list", {
-    doctype: "Contact",
-    fields: ["email_id", "full_name", "name", "image"],
-    filters: { email_id: ["in", emails] },
-    limit_page_length: emails.length,
-  }).catch(() => []);
-  const named = new Map(
-    contacts.map((c) => [
-      c.email_id,
-      { email: c.email_id, label: c.full_name || c.name, image: c.image },
-    ])
-  );
+  const unknown = [
+    ...new Set(bare.map((r) => r.email).filter((e) => !contactByEmail.has(e))),
+  ];
+  if (unknown.length) {
+    const contacts = await call<
+      { email_id: string; full_name?: string; name: string; image?: string }[]
+    >("frappe.client.get_list", {
+      doctype: "Contact",
+      fields: ["email_id", "full_name", "name", "image"],
+      filters: { email_id: ["in", unknown] },
+      limit_page_length: unknown.length,
+    }).catch(() => []);
+    for (const email of unknown) contactByEmail.set(email, null);
+    for (const c of contacts) {
+      contactByEmail.set(c.email_id, {
+        email: c.email_id,
+        label: c.full_name || c.name,
+        image: c.image,
+      });
+    }
+  }
   for (const list of lists) {
-    list.value = list.value.map((r) => (r.label ? r : named.get(r.email) ?? r));
+    list.value = list.value.map((r) =>
+      r.label ? r : contactByEmail.get(r.email) ?? r
+    );
   }
 }
 
