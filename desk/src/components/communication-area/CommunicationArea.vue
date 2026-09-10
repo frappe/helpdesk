@@ -268,7 +268,7 @@ import {
   CommentComposer,
   EmailComposer,
 } from "@framework/ui/components/Composer/index.ts";
-import { onClickOutside, useEventListener, useStorage } from "@vueuse/core";
+import { onClickOutside, useStorage } from "@vueuse/core";
 import { Avatar, TabButtons, createResource, toast } from "frappe-ui";
 import { FloatingWindow, type WindowMode } from "frappe-ui/experimental";
 import { useOnboarding } from "frappe-ui/frappe";
@@ -287,6 +287,7 @@ import LucideX from "~icons/lucide/x";
 import ZapIcon from "~icons/lucide/zap";
 import { toRecipientList } from "./addresses";
 import { nameRecipients, searchRecipients } from "./recipients";
+import { useDockedResize } from "./useDockedResize";
 
 const props = defineProps({
   doctype: {
@@ -413,84 +414,19 @@ const minimizedLabel = computed(() => {
 });
 
 // ─── Docked-height resize ─────────────────────────────────────
-// Dragging the title bar sets the body column's height; 0 means natural.
-const dockedHeight = useStorage("helpdesk-composer-height", 0);
-
-const MIN_BODY_HEIGHT = 240;
-// Dragging this far below the minimum collapses the window back to the pill.
-const MINIMIZE_OVERDRAG = 60;
-
-const dockedColumnStyle = computed(() =>
-  windowMode.value === "docked" && dockedHeight.value > 0
-    ? { height: `${dockedHeight.value}px` }
-    : undefined
-);
-
-function clampBodyHeight(value: number) {
-  return Math.min(
-    Math.max(value, MIN_BODY_HEIGHT),
-    Math.round(window.innerHeight * 0.8)
-  );
-}
-
-// The live drag; move/up listeners are registered once below and no-op while
-// this is null, so nothing can stack or leak.
-let resizing: { startY: number; startHeight: number } | null = null;
-// A pointer released outside the window must not count as an outside click.
-let justResized = false;
-
-function onPanelPointerDown(event: PointerEvent) {
-  if (windowMode.value !== "docked" || isMobileView.value) return;
-  const target = event.target as HTMLElement;
-  if (target.closest("button, a, input, select, textarea, [role='button']"))
-    return;
-  if (columnRef.value?.contains(target)) return;
-  event.preventDefault();
-  startDockedResize(event);
-}
-
-function startDockedResize(event: PointerEvent) {
-  resizing = {
-    startY: event.clientY,
-    startHeight: currentBodyHeight(),
-  };
-  try {
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-  } catch {}
-}
-
-function currentBodyHeight() {
-  return dockedHeight.value || columnRef.value?.offsetHeight || MIN_BODY_HEIGHT;
-}
-
-function resizeDockedBy(delta: number) {
-  dockedHeight.value = clampBodyHeight(currentBodyHeight() + delta);
-}
-
-useEventListener(window, "pointermove", (event: PointerEvent) => {
-  if (!resizing) return;
-  const next = resizing.startHeight + (resizing.startY - event.clientY);
-  if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
-    // Dragged well past the floor: collapse to the pill, keeping the pre-drag
-    // height so reopening restores it.
-    const previous = resizing.startHeight;
-    stopDockedResize();
-    dockedHeight.value = clampBodyHeight(previous);
-    closeComposer();
-    return;
-  }
-  dockedHeight.value = clampBodyHeight(next);
+const {
+  dockedHeight,
+  dockedColumnStyle,
+  justResized,
+  onPanelPointerDown,
+  startDockedResize,
+  resizeDockedBy,
+} = useDockedResize({
+  windowMode,
+  column: columnRef,
+  isMobileView,
+  onCollapse: closeComposer,
 });
-useEventListener(window, "pointerup", stopDockedResize);
-useEventListener(window, "pointercancel", stopDockedResize);
-
-function stopDockedResize() {
-  if (!resizing) return;
-  resizing = null;
-  justResized = true;
-  // The click event fires after pointerup; lift the guard a task later.
-  setTimeout(() => (justResized = false), 0);
-}
 
 // ─── Email draft & signature ──────────────────────────────────
 const cachedEmail = useStorage<string | null>(
@@ -836,7 +772,7 @@ onClickOutside(
     // A floating window lives outside the page flow — only the docked
     // composer closes on outside clicks.
     if (windowMode.value !== "docked") return;
-    if (justResized) return;
+    if (justResized.value) return;
     if (isIgnored(event)) return;
     closeComposer();
   },
