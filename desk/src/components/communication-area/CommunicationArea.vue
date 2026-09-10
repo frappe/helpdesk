@@ -383,9 +383,7 @@ watch(emailBody, (value, oldValue) => {
   if (value !== oldValue && hasTypedEmail.value) {
     onUserType();
   }
-  // Only the composer's internal Discard/Esc reset the model to exactly "";
-  // deleting text by hand leaves an empty paragraph. A discarded draft takes
-  // its staged saved-reply actions with it.
+
   if (!value) {
     savedReplyActionsRef.value?.clear();
   }

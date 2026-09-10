@@ -18,9 +18,7 @@ export function toRecipientList(
   return addresses.filter((a): a is string => !!a).map(toRecipient);
 }
 
-// Seeds arrive as bare addresses; a Contact with that address names the chip.
-// One indexed query covers every list at once; answers are kept per address
-// for the session, misses included, so a reopen or a repeat reply is instant.
+
 const contactByEmail = new Map<string, Recipient | null>();
 
 
