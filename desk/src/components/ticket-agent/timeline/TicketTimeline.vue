@@ -3,7 +3,7 @@
   <TimelineContainer>
     <ActivityTimeline
       ref="timelineRef"
-      class="px-5 pt-1 pb-6"
+      class="px-5 pt-1 pb-[calc(1.5rem+var(--composer-reserve,0px))]"
       :activities="filtered"
       :loading="_loading"
       :paginate="paginate"
