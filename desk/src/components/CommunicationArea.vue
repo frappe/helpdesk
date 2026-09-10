@@ -272,6 +272,7 @@ import { onClickOutside, useEventListener, useStorage } from "@vueuse/core";
 import {
   Avatar,
   TabButtons,
+  call,
   createResource,
   frappeRequest,
   toast,
@@ -576,14 +577,27 @@ const cc = ref<Recipient[]>([]);
 const bcc = ref<Recipient[]>([]);
 
 // Seeds arrive as bare addresses; a Contact with that address names the chip.
-async function nameRecipients(list: Ref<Recipient[]>) {
-  for (const { email } of list.value.filter((r) => !r.label)) {
-    const results = await searchRecipients(email).catch(() => []);
-    const match = results.find((r) => r.email === email);
-    if (!match) continue;
-    list.value = list.value.map((r) =>
-      r.email === email && !r.label ? match : r
-    );
+// One indexed query covers every list at once.
+async function nameRecipients(...lists: Ref<Recipient[]>[]) {
+  const bare = lists.flatMap((list) => list.value).filter((r) => !r.label);
+  const emails = [...new Set(bare.map((r) => r.email))];
+  if (!emails.length) return;
+  const contacts = await call<
+    { email_id: string; full_name?: string; name: string; image?: string }[]
+  >("frappe.client.get_list", {
+    doctype: "Contact",
+    fields: ["email_id", "full_name", "name", "image"],
+    filters: { email_id: ["in", emails] },
+    limit_page_length: emails.length,
+  }).catch(() => []);
+  const named = new Map(
+    contacts.map((c) => [
+      c.email_id,
+      { email: c.email_id, label: c.full_name || c.name, image: c.image },
+    ])
+  );
+  for (const list of lists) {
+    list.value = list.value.map((r) => (r.label ? r : named.get(r.email) ?? r));
   }
 }
 
@@ -798,9 +812,7 @@ function replyToEmail(data: {
   to.value = toRecipientList(splitIfString(data.to));
   cc.value = toRecipientList(splitIfString(data.cc));
   bcc.value = toRecipientList(splitIfString(data.bcc));
-  nameRecipients(to);
-  nameRecipients(cc);
-  nameRecipients(bcc);
+  nameRecipients(to, cc, bcc);
 
   // Plain-text emails (e.g. Thunderbird) have no HTML tags, so their
   // newlines/spacing would be lost in the quoted block.
