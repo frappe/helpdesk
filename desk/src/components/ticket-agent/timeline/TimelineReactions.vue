@@ -4,7 +4,7 @@
       <template #trigger="{ toggle: togglePopover }">
         <Button
           variant="ghost"
-          class="text-ink-gray- 5 -ml-1.5"
+          class="text-ink-gray-5 -ml-1.5"
           @click="togglePopover"
         >
           <template #icon>

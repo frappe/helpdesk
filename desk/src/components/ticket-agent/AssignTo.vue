@@ -69,7 +69,7 @@
     <!-- body-main (not body) so the shared PopoverPanel supplies the shell
          chrome and the combobox's scale-from-trigger open animation. -->
     <template #default="{ open: isOpen }">
-      <!-- Pin to the trigger width. matchTargetWidth only sets min-width, so the
+      <!-- Pin to the trigger width. matchTriggerWidth only sets min-width, so the
            panel is otherwise shrink-to-fit and grows to the widest agent name
            (then collapses as you filter) -> width jitter. Fixing the width lets
            the rows' min-w-0 truncate instead. -->
