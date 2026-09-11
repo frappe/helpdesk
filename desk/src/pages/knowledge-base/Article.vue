@@ -652,7 +652,7 @@ const articleActions = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       ...ConfirmDelete({
         onConfirmDelete: handleDelete,
         isConfirmingDelete: isConfirmingDeleteArticle,

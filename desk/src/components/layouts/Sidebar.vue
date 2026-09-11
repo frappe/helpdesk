@@ -134,7 +134,7 @@ const customerPortalDropdown = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Log out"),
         icon: "lucide-log-out",
@@ -183,7 +183,7 @@ const agentPortalDropdown = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Log out"),
         icon: "lucide-log-out",

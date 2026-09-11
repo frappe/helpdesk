@@ -530,7 +530,7 @@ const options = computed(() => [
   {
     group: __("Presets"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Today"),
         onClick: () => {

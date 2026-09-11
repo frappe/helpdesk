@@ -211,7 +211,7 @@ const dropdownActions = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Delete"),
         icon: LucideTrash2,

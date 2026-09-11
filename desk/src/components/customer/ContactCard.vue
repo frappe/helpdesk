@@ -190,7 +190,7 @@ const dropdownOptions = computed(() => {
   const deleteActionGroup = {
     group: "",
     hideLabel: true,
-    items: destructiveActions,
+    options: destructiveActions,
   };
 
   if (props.contact.is_primary) {
@@ -201,7 +201,7 @@ const dropdownOptions = computed(() => {
     {
       group: "",
       hideLabel: true,
-      items: [...primaryActions, ...roleActions],
+      options: [...primaryActions, ...roleActions],
     },
     deleteActionGroup,
   ];

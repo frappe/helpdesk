@@ -304,12 +304,12 @@ const dropdownActions = computed(() => {
     {
       group: __("Actions"),
       hideLabel: true,
-      items: baseActions,
+      options: baseActions,
     },
     {
       group: __("Danger"),
       hideLabel: true,
-      items: [
+      options: [
         {
           label: __("Delete"),
           icon: LucideTrash2,
