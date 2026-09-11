@@ -251,7 +251,7 @@ export function useView(dt: string = null) {
           actions[0].options.push({
             label: _view?.public ? __("Make Private") : __("Make Public"),
             icon: h(Icon, {
-              name: _view?.public ? "lock" : "unlock",
+              name: _view?.public ? "lock" : "lock-open",
               class: "h-4 w-4",
             }),
             onClick: () =>

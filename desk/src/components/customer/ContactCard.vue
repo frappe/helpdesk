@@ -159,7 +159,7 @@ const dropdownOptions = computed(() => {
       submenu: [
         {
           label: __("Customer"),
-          icon: props.contact.is_manager ? undefined : "check",
+          icon: props.contact.is_manager ? undefined : "lucide-check",
           onClick: () => {
             if (!props.contact.is_manager) return;
             updateManagerRole(0);
@@ -167,7 +167,7 @@ const dropdownOptions = computed(() => {
         },
         {
           label: __("Customer Manager"),
-          icon: props.contact.is_manager ? "check" : undefined,
+          icon: props.contact.is_manager ? "lucide-check" : undefined,
           onClick: () => {
             if (props.contact.is_manager) return;
             updateManagerRole(1);

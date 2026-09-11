@@ -141,9 +141,9 @@
                     iconRight: 'lucide-chevron-down',
                     iconLeft:
                       getUserRole(agent.name) === 'Agent'
-                        ? 'user'
+                        ? 'lucide-user'
                         : getUserRole(agent.name) === 'Manager'
-                        ? 'briefcase'
+                        ? 'lucide-briefcase'
                         : null,
                   }"
                   align="end"

@@ -393,7 +393,7 @@ export function getIcon(icon) {
     );
   }
   if (typeof icon === "string") {
-    return h(Icon, { name: icon });
+    return h(Icon, { name: icon.replace("lucide-", "") });
   }
   return icon;
 }
@@ -496,12 +496,13 @@ export function renderOptionIcon(
   classes: string[] = ["h-4 w-4 shrink-0"]
 ) {
   if (!icon) return null;
+  // `lucide-*` renders as a Tailwind mask class; the sprite only carries
+  // canonical names, so aliases like `trash-2` exist there but not in it.
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: [icon, ...classes], "aria-hidden": true });
+  }
   if (typeof icon === "string") {
-    return h(Icon, {
-      name: icon.replace("lucide-", ""),
-      class: classes,
-      "aria-hidden": true,
-    });
+    return h(Icon, { name: icon, class: classes, "aria-hidden": true });
   }
   return h(icon, { class: classes, "aria-hidden": true });
 }
