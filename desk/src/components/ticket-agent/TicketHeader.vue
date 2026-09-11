@@ -84,7 +84,10 @@ import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { showMergeModal } from "@/pages/ticket/modalStates";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import {
+  createToast,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
 import { useView } from "@/composables/useView";
@@ -194,7 +197,7 @@ function handleDeleteTicket() {
       {
         label: __("Delete"),
         theme: "red",
-        iconLeft: "trash-2",
+        iconLeft: "lucide-trash-2",
         variant: "solid",
         onClick({ close }) {
           call("helpdesk.api.ticket.delete_ticket", {
@@ -314,7 +317,7 @@ const customizationCtx = computed(() => ({
   toast,
   $dialog: globalStore().$dialog,
   updateField,
-  createToast: toast.create,
+  createToast,
 }));
 
 // to manage the correct  customization context for actions, happens because of navigation between tickets using buttons

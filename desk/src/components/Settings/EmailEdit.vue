@@ -388,9 +388,8 @@ function buildUpdatePayload() {
 function pullEmails() {
   loadingPull.value = true;
 
-  toast.create({
-    message: __("Pulling emails, this may take a few minutes."),
-    icon: h(CircleAlert, { class: "text-ink-blue-5" }),
+  toast(__("Pulling emails, this may take a few minutes."), {
+    icon: () => h(CircleAlert, { class: "text-ink-blue-5" }),
   });
 
   call("frappe.email.doctype.email_account.email_account.pull_emails", {

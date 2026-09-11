@@ -206,7 +206,7 @@ const selectBannerActions = [
           {
             label: __("Delete"),
             theme: "red",
-            iconLeft: "trash-2",
+            iconLeft: "lucide-trash-2",
             variant: "solid",
             onClick({ close }) {
               handleDeleteArticles();

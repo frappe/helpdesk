@@ -305,7 +305,7 @@ export function useView(dt: string = null) {
         {
           label: __("Confirm"),
           variant: "solid",
-          iconLeft: "trash-2",
+          iconLeft: "lucide-trash-2",
           theme: "red",
           onClick({ close }: any) {
             if (route.query.view === _view.name) {

@@ -96,7 +96,10 @@
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import {
+  createToast,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
 import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 
@@ -157,7 +160,7 @@ const ticket = createResource({
       toast,
       $dialog,
       updateField,
-      createToast: toast.create,
+      createToast,
     });
   },
   onError: () => {

@@ -7,6 +7,9 @@
 	},
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12",
-		"prosemirror-model": "1.25.7"
+		"prosemirror-model": "1.25.7",
+		"prosemirror-state": "1.4.4",
+		"prosemirror-view": "1.41.8",
+		"prosemirror-transform": "1.12.0"
 	}
 }

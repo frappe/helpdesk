@@ -1,4 +1,26 @@
 import { Field } from "@/types";
+import { toast } from "frappe-ui";
+
+type ToastType = "success" | "error" | "warning" | "info";
+
+/**
+ * `toast.create({ message, ... })` shape kept alive for customer-written form
+ * scripts. frappe-ui v1 dropped `toast.create` for `toast(message, options)`.
+ */
+export function createToast({
+  message,
+  type,
+  icon,
+  ...options
+}: {
+  message: string;
+  type?: ToastType;
+  icon?: unknown;
+  [key: string]: unknown;
+}) {
+  const data = icon ? { ...options, icon: () => icon } : options;
+  return type ? toast[type](message, data) : toast(message, data);
+}
 
 export async function setupCustomizations(doc, obj) {
   // Supporting old format, will have to refactor later

@@ -29,7 +29,7 @@
               </div>
             </Button>
             <Dropdown :options="dropdownActions" align="end">
-              <Button icon="more-horizontal" variant="subtle" />
+              <Button icon="lucide-more-horizontal" variant="subtle" />
             </Dropdown>
           </div>
         </template>

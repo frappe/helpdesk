@@ -79,7 +79,7 @@
         <Button
           :loading="feedbackListResource.loading"
           :label="__('Load More')"
-          icon-left="refresh-cw"
+          icon-left="lucide-refresh-cw"
           @click="feedbackListResource.next()"
         />
       </div>

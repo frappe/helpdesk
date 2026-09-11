@@ -29,16 +29,14 @@ useColorScheme();
 
 onMounted(() => {
   window.addEventListener("online", () => {
-    toast.create({
-      message: __("You are now online."),
-      icon: h(Wifi, { class: "text-ink-base" }),
+    toast(__("You are now online."), {
+      icon: () => h(Wifi, { class: "text-ink-base" }),
     });
   });
 
   window.addEventListener("offline", () => {
-    toast.create({
-      message: __("You are now offline."),
-      icon: h(WifiOff, { class: "text-ink-base" }),
+    toast(__("You are now offline."), {
+      icon: () => h(WifiOff, { class: "text-ink-base" }),
     });
   });
   !isCustomerPortal.value && setConfig("localTimezone", window.timezone?.user);

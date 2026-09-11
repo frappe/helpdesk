@@ -73,7 +73,7 @@
             <div
               v-for="idx in 5"
               :key="idx"
-              class="border-t border-dashed border-surface-gray-2 w-full"
+              class="border-t border-dashed border-outline-gray-2 w-full"
             />
           </div>
           <div

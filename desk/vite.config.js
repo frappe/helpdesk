@@ -141,7 +141,6 @@ export default defineConfig(async ({ mode }) => {
     },
     optimizeDeps: {
       include: [
-        "feather-icons",
         "tailwind.config.js",
         "prosemirror-state",
         "prosemirror-view",

@@ -479,7 +479,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
         "group flex w-full gap-2 items-center rounded-5 px-2 py-2 text-base hover:bg-surface-gray-3",
-        variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
+        variant == "danger" ? "text-ink-red-6 hover:bg-surface-red-1" : "",
       ],
       onClick: onClick,
     },

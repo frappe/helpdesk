@@ -138,7 +138,7 @@
                   :label="getUserRole(agent.name)"
                   :button="{
                     label: getUserRole(agent.name),
-                    iconRight: 'chevron-down',
+                    iconRight: 'lucide-chevron-down',
                     iconLeft:
                       getUserRole(agent.name) === 'Agent'
                         ? 'user'

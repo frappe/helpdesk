@@ -146,7 +146,7 @@ const dropdownOptions = computed(() => {
   if (!props.contact.is_primary) {
     primaryActions.push({
       label: __("Set as Primary"),
-      icon: "star",
+      icon: "lucide-star",
       onClick: () => {
         updatePrimaryContact();
       },
@@ -155,7 +155,7 @@ const dropdownOptions = computed(() => {
   const roleActions = [
     {
       label: __("Role"),
-      icon: "briefcase",
+      icon: "lucide-briefcase",
       submenu: [
         {
           label: __("Customer"),
@@ -180,7 +180,7 @@ const dropdownOptions = computed(() => {
   const destructiveActions = [
     {
       label: __("Remove Contact"),
-      icon: "x",
+      icon: "lucide-x",
       theme: "red" as const,
       onClick: () => {
         removeContact();

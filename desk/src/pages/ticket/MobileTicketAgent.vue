@@ -259,6 +259,7 @@ import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import {
+  createToast,
   parseField,
   setupCustomizations,
 } from "@/composables/formCustomisation";
@@ -337,7 +338,7 @@ const customizationCtx = computed(() => ({
   toast,
   $dialog,
   updateField,
-  createToast: toast.create,
+  createToast,
 }));
 
 watchEffect(async () => {

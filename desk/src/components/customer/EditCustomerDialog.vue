@@ -20,7 +20,7 @@
               theme="amber"
             />
           </div>
-          <Button icon="x" @click="model = false" variant="ghost" />
+          <Button icon="lucide-x" @click="model = false" variant="ghost" />
         </div>
         <div class="space-y-4">
           <!-- Image section -->

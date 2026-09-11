@@ -45,9 +45,8 @@ setConfig("serverMessagesHandler", (msgs) => {
       toast.success(msg.message);
       return;
     }
-    toast.create({
-      message: msg.message,
-      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
+    toast(msg.message, {
+      icon: () => h(CircleAlert, { class: "text-ink-blue-5" }),
     });
   });
 });

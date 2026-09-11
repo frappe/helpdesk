@@ -229,7 +229,7 @@ function getCallLogDetail(row, log, columns = []) {
   } else if (row === "type") {
     return {
       label: log.type,
-      icon: incoming ? "phone-incoming" : "phone-outgoing",
+      icon: incoming ? "lucide-phone-incoming" : "lucide-phone-outgoing",
     };
   } else if (row === "status") {
     return {

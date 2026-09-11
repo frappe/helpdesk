@@ -250,7 +250,7 @@
               <div class="flex items-center gap-1 py-1">
                 <div class="w-64 h-4 bg-surface-gray-1 rounded-1" />
               </div>
-              <hr class="my-2 border-surface-gray-2" />
+              <hr class="my-2 border-outline-gray-2" />
               <div class="flex items-center gap-2 mb-3 mt-1">
                 <div class="w-12 h-5 bg-surface-gray-1 rounded-1" />
                 <div class="w-56 h-5 bg-surface-gray-1 rounded-1" />

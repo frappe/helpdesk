@@ -16,7 +16,7 @@
         <Button
           variant="solid"
           theme="red"
-          icon-left="trash-2"
+          icon-left="lucide-trash-2"
           :label="__('Delete')"
           :loading="isDeleting"
           @click="confirmDelete"

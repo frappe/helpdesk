@@ -38,7 +38,7 @@
               align="end"
               v-if="hasPermission()"
             >
-              <Button icon="more-horizontal" variant="subtle" />
+              <Button icon="lucide-more-horizontal" variant="subtle" />
             </Dropdown>
           </div>
         </template>
@@ -269,7 +269,7 @@ const dropdownActions = computed(() => {
   if (!contact.doc?.user && !invitation.value?.name) {
     baseActions.push({
       label: __("Invite as User"),
-      icon: "user-plus",
+      icon: "lucide-user-plus",
       onClick: async () => {
         await inviteAsUser(props.id, contact.doc?.email_id);
         contactInfoResource.reload();
@@ -279,7 +279,7 @@ const dropdownActions = computed(() => {
   if (invitation.value?.name) {
     baseActions.push({
       label: __("Resend Invite"),
-      icon: "mail",
+      icon: "lucide-mail",
       onClick: async () => {
         await resendInvite(
           invitation.value!.name,
@@ -294,7 +294,7 @@ const dropdownActions = computed(() => {
   if (contact.doc?.user) {
     baseActions.push({
       label: __("Send reset password email"),
-      icon: "mail",
+      icon: "lucide-mail",
       onClick: () => {
         resetPassword();
       },

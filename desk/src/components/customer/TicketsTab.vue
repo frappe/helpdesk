@@ -140,7 +140,7 @@
             <Button
               :loading="ticketsListResource.loading"
               :label="__('Load More')"
-              icon-left="refresh-cw"
+              icon-left="lucide-refresh-cw"
               @click="
                 () => {
                   ticketsListResource.next();

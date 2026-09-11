@@ -14,7 +14,7 @@
               theme="amber"
             />
           </div>
-          <Button icon="x" variant="ghost" @click="open = false" />
+          <Button icon="lucide-x" variant="ghost" @click="open = false" />
         </div>
 
         <div class="space-y-4">
