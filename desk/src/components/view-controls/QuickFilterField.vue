@@ -28,7 +28,7 @@
     v-else-if="['Date', 'Datetime'].includes(filter.type)"
     class="border-none !min-w-36 max-w-36"
     :is="filter.type === 'Date' ? DatePicker : DateTimePicker"
-    :value="props.value"
+    :model-value="props.value"
     @change="(v) => updateFilter(filter, v)"
     :placeholder="filter.label"
   />

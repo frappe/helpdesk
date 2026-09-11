@@ -310,12 +310,12 @@ function removeValue(value) {
 
 function removeLastValue() {
   if (query.value) return;
-  let emailRef = emails.value[emails.value.length - 1]?.rootRef;
+  let emailRef = emails.value[emails.value.length - 1]?.$el;
   if (document.activeElement === emailRef) {
     values.value.pop();
     nextTick(() => {
       if (values.value.length) {
-        emailRef = emails.value[emails.value.length - 1].rootRef;
+        emailRef = emails.value[emails.value.length - 1].$el;
         emailRef?.focus();
       } else {
         setFocus();

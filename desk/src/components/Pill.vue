@@ -38,6 +38,6 @@ const handleClick = (label) => {
 };
 
 defineExpose({
-  rootRef: computed(() => buttonRef.value?.rootRef),
+  rootRef: computed(() => buttonRef.value?.$el),
 });
 </script>

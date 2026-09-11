@@ -392,8 +392,11 @@ export function getIcon(icon) {
       icon
     );
   }
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: icon });
+  }
   if (typeof icon === "string") {
-    return h(Icon, { name: icon.replace("lucide-", "") });
+    return h(Icon, { name: icon });
   }
   return icon;
 }

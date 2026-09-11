@@ -6,6 +6,7 @@
     :options="pickerOptions"
     :placeholder="__('Select {0}', label.toLowerCase())"
     @update:model-value="pick($event as string)"
+    v-model:query="queryText"
     @update:query="search(action.action_type, $event)"
   >
     <template #trigger="{ setOpen }">
@@ -64,8 +65,10 @@ import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOpt
 import { __ } from "@/translation";
 import { SavedReplyAction } from "@/types";
 import { Badge, Combobox, Tooltip } from "frappe-ui";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import LucideX from "~icons/lucide/x";
+
+const queryText = ref("");
 
 const props = defineProps<{
   action: SavedReplyAction;

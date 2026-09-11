@@ -14,7 +14,7 @@
         :loading="tagListResource.loading"
         :placeholder="__('Search or create tags')"
         side="left"
-        @update:query="queryText = $event"
+        v-model:query="queryText"
       >
         <template #trigger>
           <div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">

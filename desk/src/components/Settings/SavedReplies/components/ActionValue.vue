@@ -17,6 +17,7 @@
     :options="options"
     :placeholder="placeholder"
     @update:model-value="emit('update:modelValue', $event as string)"
+    v-model:query="queryText"
     @update:query="emit('search', $event)"
   >
     <template v-if="type === 'Assign Agent'" #item-prefix="{ item }">
@@ -90,8 +91,10 @@ import { __ } from "@/translation";
 import { SavedReplyActionType } from "@/types";
 import { Avatar, Combobox, MultiSelect, Select } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ACTION_TYPES, type ActionOption } from "./actionTypes";
+
+const queryText = ref("");
 
 const props = defineProps<{
   type: SavedReplyActionType;
