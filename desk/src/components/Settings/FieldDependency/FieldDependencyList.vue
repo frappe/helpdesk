@@ -138,6 +138,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
+import EmptyState from "@/components/EmptyState.vue";
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";

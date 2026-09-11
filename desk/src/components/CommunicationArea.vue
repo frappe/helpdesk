@@ -234,6 +234,10 @@ const IGNORED_SELECTORS = [
   '[role="presentation"]',
   '[role="menu"]',
   ".dialog-overlay",
+  // Grammarly suggestions appear outside the box, allow them to stop collapsing.
+  "grammarly-extension",
+  "grammarly-popups",
+  "[data-grammarly-part]",
 ];
 
 // `ignore` is only consulted on pointerdown, which dialogs stop, so the click

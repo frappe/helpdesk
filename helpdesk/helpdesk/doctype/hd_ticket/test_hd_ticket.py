@@ -7,6 +7,7 @@ from unittest.mock import patch
 import frappe
 from frappe.client import get as client_get
 from frappe.client import set_value as client_set_value
+from frappe.desk.form.utils import add_comment as desk_add_comment
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -154,12 +155,14 @@ class TestHDTicket(IntegrationTestCase):
         ticket.assign_agent(agent)
         ticket.assign_agent(agent2)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -172,12 +175,14 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(ticket)
 
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Reaction",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Ticket Reopened",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -196,12 +201,14 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket.assign_agent(non_agent)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": non_agent,
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": non_agent,
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 1)
@@ -680,9 +687,11 @@ class TestHDTicket(IntegrationTestCase):
 
         ticket2.reload()
         comments = frappe.get_all(
-            "HD Ticket Comment",
+            "Comment",
             filters={
-                "reference_ticket": ticket2.name,
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket2.name,
+                "comment_type": "Comment",
             },
             fields=["content", "name"],
         )
@@ -2334,6 +2343,28 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(has_permission(ticket, user=agent2))
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
+
+    def test_only_agents_can_comment_on_a_ticket(self):
+        contact = create_contact("Commenter", "commenter@test.com")
+        customer = contact.get("user")
+        ticket = make_ticket(raised_by=customer, via_customer_portal=1)
+
+        frappe.set_user(customer)
+        self.assertTrue(frappe.has_permission("HD Ticket", "read", doc=ticket.name))
+        with self.assertRaises(frappe.PermissionError):
+            desk_add_comment("HD Ticket", ticket.name, "sneaky", customer, "Commenter")
+
+        frappe.set_user(agent)
+        comment = desk_add_comment("HD Ticket", ticket.name, "internal", agent, "agent")
+        self.assertTrue(frappe.db.exists("Comment", comment.name))
+
+        # system comments carry no author intent, so the session user is irrelevant
+        frappe.set_user(customer)
+        assigned = frappe.get_doc("HD Ticket", ticket.name).add_comment(
+            "Assigned", "assigned to agent"
+        )
+        self.assertTrue(frappe.db.exists("Comment", assigned.name))
+        frappe.set_user("Administrator")
 
     def tearDown(self):
         frappe.set_user("Administrator")

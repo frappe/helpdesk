@@ -1,3 +1,4 @@
+import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
@@ -282,6 +283,23 @@ export async function copyToClipboard(
   }
 
   toast.success(toastMessage);
+}
+
+/**
+ * Shareable link to one row of the ticket feed. `?highlight` is what
+ * TicketTimeline scrolls to; the hash only selects the Activity tab.
+ */
+export function copyActivityLink(
+  prefix: "comment" | "communication",
+  name: string
+) {
+  const { href } = router.resolve({
+    name: "TicketAgent",
+    params: { ticketId: router.currentRoute.value.params.ticketId },
+    hash: "#activity",
+    query: { highlight: `${prefix}-${name}` },
+  });
+  copyToClipboard(window.location.origin + href, __("Link copied."));
 }
 
 export const ClearFormattingUtility = {

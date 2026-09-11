@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { isTagAction } from "@/components/Settings/SavedReplies/components/actionTypes";
-import { reloadTicket } from "@/composables/useTicket";
+import { reloadTicket, reloadTicketFeed } from "@/composables/useTicket";
 import { userStorage } from "@/composables/userStorage";
 import { __ } from "@/translation";
 import { RenderedSavedReply, SavedReplyAction } from "@/types";
@@ -194,6 +194,11 @@ function setNoteValue(value: string) {
   if (noteAction.value) noteAction.value.value = value;
 }
 
+function reloadFeed() {
+  reloadTicket(props.ticketId);
+  reloadTicketFeed(props.ticketId);
+}
+
 const applyActions = createResource({
   url: "helpdesk.api.saved_replies.apply_saved_reply_actions",
   onSuccess: (result: {
@@ -214,7 +219,7 @@ const applyActions = createResource({
       );
     }
     pendingActions.value = [];
-    reloadTicket(props.ticketId);
+    reloadFeed();
   },
   onError: (error: { status?: number }) => {
     const failed = [...pendingActions.value];
@@ -228,7 +233,7 @@ const applyActions = createResource({
         ? { action: { label: __("Retry"), onClick: () => retry(failed) } }
         : { description: __("Please apply the actions manually") }),
     });
-    reloadTicket(props.ticketId);
+    reloadFeed();
   },
 });
 
