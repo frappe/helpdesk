@@ -150,10 +150,10 @@ import {
   Button,
   createResource,
   Dropdown,
-  GridLayout,
   LoadingIndicator,
   toast,
 } from "frappe-ui";
+import { GridLayout } from "@/components/frappe-ui/GridLayout";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";

@@ -69,7 +69,8 @@
 </template>
 
 <script setup lang="ts">
-import { NestedPopover, Button, createListResource } from "frappe-ui";
+import { Button, createListResource } from "frappe-ui";
+import NestedPopover from "@/components/NestedPopover.vue";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { setActiveSettingsTab } from "../settingsModal";
 import {

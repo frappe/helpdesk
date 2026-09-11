@@ -156,7 +156,7 @@ import {
   FormControl,
   usePageMeta,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";

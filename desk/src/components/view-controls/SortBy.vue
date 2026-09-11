@@ -169,7 +169,7 @@
 
 <script setup>
 import { computed, inject } from "vue";
-import { NestedPopover } from "frappe-ui";
+import NestedPopover from "@/components/NestedPopover.vue";
 import { useSortable } from "@vueuse/integrations/useSortable";
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import {

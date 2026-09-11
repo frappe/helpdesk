@@ -300,8 +300,8 @@ import {
   Dropdown,
   FeatherIcon,
   TabButtons,
-  ECharts,
 } from "frappe-ui";
+import { ECharts } from "frappe-ui/experimental";
 import { dataTheme } from "@/utils";
 import LucideStar from "~icons/lucide/star";
 import { useRouter } from "vue-router";

@@ -71,7 +71,7 @@ import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { isCustomerPortal, isEmoji } from "@/utils";
 import { Dialog } from "frappe-ui";
-import { IconPicker } from "frappe-ui/icons";
+import { IconPicker } from "frappe-ui/experimental";
 import { computed, ref } from "vue";
 
 let viewDialogConfig = defineModel();

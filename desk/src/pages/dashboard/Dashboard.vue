@@ -204,17 +204,15 @@
 import { Link } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import {
-  AxisChart,
   DateRangePicker,
-  DonutChart,
   Dropdown,
   TabButtons,
-  NumberChart,
   createResource,
   dayjs,
   usePageMeta,
   Tooltip,
 } from "frappe-ui";
+import { AxisChart, DonutChart, NumberChart } from "frappe-ui/experimental";
 const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import { __ } from "@/translation";

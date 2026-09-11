@@ -75,7 +75,7 @@ import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 const extensions = buildEditorExtensions();
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import Link from "@/components/frappe-ui/Link.vue";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";

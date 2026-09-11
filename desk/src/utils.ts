@@ -13,7 +13,7 @@ import {
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
-import { Icon } from "frappe-ui/icons";
+import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 

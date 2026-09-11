@@ -15,11 +15,11 @@ import {
 } from "frappe-ui";
 import { createPinia } from "pinia";
 import App from "./App.vue";
-import { spritePlugin } from "frappe-ui/icons";
+import { spritePlugin } from "frappe-ui/experimental";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
-import { telemetryPlugin } from "frappe-ui/frappe";
+import { telemetryPlugin } from "@framework/ui";
 import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";

@@ -244,7 +244,7 @@ import {
   toast,
 } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import {
   computed,
   nextTick,

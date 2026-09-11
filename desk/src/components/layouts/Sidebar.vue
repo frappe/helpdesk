@@ -75,7 +75,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { call, SidebarItem, toast, useTheme } from "frappe-ui";
+import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -84,7 +84,7 @@ import {
   showHelpModal,
   TrialBanner,
   useOnboarding,
-} from "frappe-ui/frappe";
+} from "@framework/ui";
 
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
@@ -119,12 +119,12 @@ const authStore = useAuthStore();
 const configStore = useConfigStore();
 
 const { appsMenuOption } = useApps();
-const { currentTheme, toggleTheme } = useTheme();
+const { colorScheme, toggleColorScheme } = useColorScheme();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
-  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleTheme(),
+  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleColorScheme(),
 }));
 
 const isFCSite = ref(window.is_fc_site);

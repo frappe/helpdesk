@@ -116,7 +116,7 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, ref } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 

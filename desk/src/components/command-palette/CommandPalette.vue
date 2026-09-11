@@ -171,7 +171,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Badge, FormControl, useShortcut } from "frappe-ui";
+import { Badge, FormControl, useKeyboardShortcut } from "frappe-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -409,17 +409,16 @@ watch(isOpen, (open) => {
 // Drilling into a sub-list swaps the whole list out; refocus for the next query.
 watch(depth, () => nextTick(() => inputRef.value?.focus()));
 
-// frappe-ui's useShortcut: the local one suppresses bindings in inputs and
-// dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its own
-// Mod-k (insert link), so bow out there.
-useShortcut({
-  key: "k",
-  ctrl: true,
+// frappe-ui's useKeyboardShortcut: the local one suppresses bindings in inputs
+// and dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its
+// own Mod-k (insert link), so bow out there.
+useKeyboardShortcut({
+  combo: "Mod+K",
   description: __("Open command palette"),
   group: __("General"),
   allowInInput: true,
   allowInDialog: true,
-  condition: () =>
+  enabled: () =>
     isPaletteAvailable.value &&
     !document.activeElement?.closest?.(".ProseMirror"),
   handler: () => (isOpen.value ? closePalette() : openPalette()),

@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { FileUploader, LoadingIndicator, createResource } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentList } from "@/components/";

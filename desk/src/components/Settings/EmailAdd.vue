@@ -167,7 +167,7 @@ import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { call, createResource, toast } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, reactive, Ref, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import {

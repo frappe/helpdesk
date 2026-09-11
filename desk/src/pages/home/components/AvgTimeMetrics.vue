@@ -147,8 +147,8 @@ import {
   DateRangePicker,
   Button,
   FeatherIcon,
-  ECharts,
 } from "frappe-ui";
+import { ECharts } from "frappe-ui/experimental";
 import { dataTheme, formatTime } from "@/utils";
 import { __ } from "@/translation";
 import EmptyState from "@/components/EmptyState.vue";

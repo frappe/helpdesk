@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { useTheme, type Theme } from "frappe-ui";
+import { useColorScheme, type ColorScheme } from "frappe-ui";
 import { computed, type Component } from "vue";
 
 type Pane = {
@@ -112,7 +112,7 @@ type Pane = {
 const props = withDefaults(
   defineProps<{
     /** Controlled value. When omitted the global frappe-ui theme is used. */
-    modelValue?: Theme;
+    modelValue?: ColorScheme;
     /** Brand logo shown in the previews: image URL or component. */
     logo?: string | Component;
     /** Brand name shown in the previews. */
@@ -121,12 +121,12 @@ const props = withDefaults(
   { logo: "", name: "" }
 );
 
-const emit = defineEmits<{ "update:modelValue": [theme: Theme] }>();
+const emit = defineEmits<{ "update:modelValue": [theme: ColorScheme] }>();
 
-const { currentTheme, setTheme } = useTheme();
+const { colorScheme, setColorScheme } = useColorScheme();
 
 const themeOptions: {
-  value: Theme;
+  value: ColorScheme;
   label: string;
   panes: Pane[];
   bars: boolean;
@@ -180,15 +180,15 @@ const logoIsImage = computed(
   () => typeof props.logo === "string" && props.logo.length > 0
 );
 
-const theme = computed<Theme>({
+const theme = computed<ColorScheme>({
   get() {
-    const value = props.modelValue ?? currentTheme.value;
+    const value = props.modelValue ?? colorScheme.value;
     if (value === "light") return "light";
     if (value === "dark") return "dark";
     return "system";
   },
   set(value) {
-    setTheme(value);
+    setColorScheme(value);
     emit("update:modelValue", value);
   },
 });

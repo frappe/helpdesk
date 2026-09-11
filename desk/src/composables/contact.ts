@@ -17,7 +17,7 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, ComputedRef, h, markRaw, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 

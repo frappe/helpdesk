@@ -9,7 +9,7 @@
 import { Dialogs } from "@/components/dialogs";
 import { useConfigStore } from "@/stores/config";
 import { useFavicon } from "@vueuse/core";
-import { FrappeUIProvider, setConfig, toast, useTheme } from "frappe-ui";
+import { FrappeUIProvider, setConfig, toast, useColorScheme } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { h, onMounted } from "vue";
 import Wifi from "~icons/lucide/wifi";
@@ -25,7 +25,7 @@ useFavicon(favicon);
 if (!localStorage.getItem("theme")) {
   localStorage.setItem("theme", "light");
 }
-useTheme();
+useColorScheme();
 
 onMounted(() => {
   window.addEventListener("online", () => {

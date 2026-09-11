@@ -119,7 +119,8 @@
 <script setup lang="ts">
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { Dropdown, ECharts, FeatherIcon } from "frappe-ui";
+import { Dropdown, FeatherIcon } from "frappe-ui";
+import { ECharts } from "frappe-ui/experimental";
 import { computed, type PropType } from "vue";
 
 const props = defineProps({

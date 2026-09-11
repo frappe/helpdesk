@@ -84,7 +84,7 @@ import {
   TextInput,
   toast,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { ref } from "vue";
 
 const props = defineProps({
