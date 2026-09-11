@@ -164,6 +164,7 @@ import {
   toast,
 } from "frappe-ui";
 import {
+  Icon as SpriteIcon,
   ListFooter,
   ListHeader,
   ListHeaderItem,

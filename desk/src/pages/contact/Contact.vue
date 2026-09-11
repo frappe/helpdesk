@@ -48,7 +48,7 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3"
+          class="tabs-sticky-header flex-1 overflow-hidden [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
           <template #tab-prefix="{ tab }: any">
             <component :is="tab.icon" v-if="tab.icon" class="h-5" />
