@@ -254,7 +254,7 @@ const invitationBadge = computed(() => {
   }
   return {
     label: __("Invited"),
-    theme: "orange" as const,
+    theme: "amber" as const,
     tooltip: __("Invite sent. Waiting for the user to accept."),
   };
 });

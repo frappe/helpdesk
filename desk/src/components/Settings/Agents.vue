@@ -186,7 +186,6 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
-import { renderOptionIcon } from "@/utils";
 import { Avatar, Button, call, Dropdown, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
 import AgentIcon from "../icons/AgentIcon.vue";
@@ -202,65 +201,20 @@ const agents = agentStore.agents;
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
-  const roles = [
-    {
-      label: "Agent",
-      component: (props) =>
-        RoleOption({
-          role: "Agent",
-          active: props.active,
-          selected: agentRole === "Agent",
-          icon: "lucide-user",
-          onClick: () => {
-            updateRole(agent, "Agent");
-          },
-        }),
-    },
-  ];
+  const role = (label: string, icon: string) => ({
+    label,
+    icon,
+    selected: agentRole === label,
+    onClick: () => updateRole(agent, label),
+  });
+  const roles = [role("Agent", "lucide-user")];
   if (isManager) {
-    roles.unshift({
-      label: "Manager",
-      component: (props) =>
-        RoleOption({
-          role: "Manager",
-          active: props.active,
-          selected: agentRole === "Manager",
-          icon: "lucide-briefcase",
-          onClick: () => {
-            updateRole(agent, "Manager");
-          },
-        }),
-    });
+    roles.unshift(role("Manager", "lucide-briefcase"));
   }
 
   return roles;
 }
 
-function RoleOption({ active, role, onClick, selected, icon = null }) {
-  return h(
-    "button",
-    {
-      class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-7",
-
-        "group flex w-full text-ink-gray-8 justify-between items-center rounded-5 px-2 py-2 text-sm hover:bg-surface-gray-3",
-      ],
-      onClick: !selected ? onClick : null,
-    },
-    [
-      h("div", { class: "flex gap-2" }, [
-        renderOptionIcon(icon),
-        h("span", { class: "whitespace-nowrap" }, role),
-      ]),
-      selected
-        ? h(LucideCheck, {
-            class: ["h-4 w-4 shrink-0 text-ink-gray-7"],
-            "aria-hidden": true,
-          })
-        : null,
-    ]
-  );
-}
 function updateRole(agent: string, newRole: string) {
   const currentRole = getUserRole(agent);
   if (currentRole === newRole) {

@@ -445,7 +445,7 @@ const statusMap = {
   },
   Draft: {
     label: __("Draft"),
-    theme: "orange",
+    theme: "amber",
   },
   Archived: {
     label: __("Archived"),

@@ -730,34 +730,22 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
       label: "Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Delete",
-          icon: "lucide-trash-2",
-          active: props.active,
-          variant: "grey",
-          onClick: (event) => {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            isConfirmingDelete.value = true;
-          },
-        }),
+      icon: "lucide-trash-2",
+      // preventDefault keeps the menu open so the confirm row can replace this one
+      onClick: (event) => {
+        event.preventDefault();
+        isConfirmingDelete.value = true;
+      },
       condition: () => !isConfirmingDelete.value,
     },
     {
       label: "Confirm Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Confirm Delete",
-          icon: "lucide-trash-2",
-          active: props.active,
-          variant: "danger",
-          onClick: () => {
-            onConfirmDelete();
-            // Reset state after confirming
-            isConfirmingDelete.value = false;
-          },
-        }),
+      icon: "lucide-trash-2",
+      theme: "red",
+      onClick: () => {
+        onConfirmDelete();
+        isConfirmingDelete.value = false;
+      },
       condition: () => isConfirmingDelete.value,
     },
   ];

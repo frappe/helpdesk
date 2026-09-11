@@ -264,7 +264,7 @@ function handleResponseByField(row: any, item: string) {
     h(Badge, {
       label: shortDuration(item),
       variant: "subtle",
-      theme: "orange",
+      theme: "amber",
     })
   );
 }
@@ -354,8 +354,8 @@ function reset(reload = false) {
 const slaStatusColorMap = {
   Fulfilled: "gray",
   Failed: "red",
-  "Resolution Due": "orange",
-  "First Response Due": "orange",
+  "Resolution Due": "amber",
+  "First Response Due": "amber",
   Paused: "blue",
 };
 

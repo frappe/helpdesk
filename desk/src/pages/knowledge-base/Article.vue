@@ -7,7 +7,7 @@
           <Badge
             v-if="!article.loading"
             variant="subtle"
-            :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
+            :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
             size="md"
             >{{ article.data?.status }}</Badge
           >

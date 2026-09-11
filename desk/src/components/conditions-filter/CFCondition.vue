@@ -109,7 +109,6 @@
 <script setup lang="ts">
 import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { Link, StarRating } from "@/components";
-import { TemplateOption } from "@/utils";
 import {
   Button,
   DatePicker,
@@ -187,31 +186,21 @@ const dropdownOptions = computed(() => {
 
   options.push({
     label: "Remove",
-    component: (props) =>
-      TemplateOption({
-        option: "Remove",
-        icon: "lucide-trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: () => {
-          emit("remove");
-        },
-      }),
+    icon: "lucide-trash-2",
+    theme: "red",
+    onClick: () => {
+      emit("remove");
+    },
     condition: () => !props.isGroup,
   });
 
   options.push({
     label: "Remove group",
-    component: (props) =>
-      TemplateOption({
-        option: "Remove group",
-        icon: "lucide-trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: () => {
-          emit("remove");
-        },
-      }),
+    icon: "lucide-trash-2",
+    theme: "red",
+    onClick: () => {
+      emit("remove");
+    },
     condition: () => props.isGroup,
   });
 
