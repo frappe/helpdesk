@@ -234,7 +234,7 @@ const customOnChange = computed(() => template.data?._customOnChange);
 
 const visibleFields = computed(() => {
   let _fields = template.data?.fields?.filter(
-    (f) => !isCustomerPortal.value || !f.hide_from_customer
+    (f) => !isCustomerPortal.value || f.visible_to !== "Agents"
   );
   if (!_fields) return [];
   return _fields.map((field) => parseField(field, templateFields));

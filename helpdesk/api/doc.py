@@ -3,11 +3,10 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
-from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.field_visibility import TicketFieldVisibility
+from helpdesk.field_visibility import hidden_ticket_fields
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -120,7 +119,9 @@ def get_list_data(
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
         # saved views quietly lose columns hidden from the caller
-        rows = TicketFieldVisibility().filter_fieldnames(rows)
+        hidden = hidden_ticket_fields()
+        rows = [r for r in rows if r not in hidden]
+        columns = [c for c in columns if c.get("key") not in hidden]
     data = (
         frappe.get_list(
             doctype,
@@ -172,9 +173,9 @@ def get_list_data(
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        visibility = TicketFieldVisibility()
-        fields = visibility.filter_field_dicts(fields, key="value")
-        rows = visibility.filter_fieldnames(rows)
+        hidden = hidden_ticket_fields()
+        fields = [f for f in fields if f["value"] not in hidden]
+        rows = [r for r in rows if r not in hidden]
 
     if group_by_field and view_type == "group_by":
 
@@ -252,8 +253,8 @@ def get_list_data(
 
 
 @frappe.whitelist()
-# per-user: the visibility filter below makes the output role-dependent
-@redis_cache(user=True)
+# uncached: the output depends on the caller and on template edits, and it is
+# only a handful of small metadata queries
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
@@ -399,7 +400,8 @@ def get_filterable_fields(
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
     if doctype == "HD Ticket":
-        res = TicketFieldVisibility().filter_field_dicts(res, key="fieldname")
+        hidden = hidden_ticket_fields()
+        res = [f for f in res if f["fieldname"] not in hidden]
     return res
 
 
@@ -420,7 +422,8 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        fields = TicketFieldVisibility().filter_field_dicts(fields, key="value")
+        hidden = hidden_ticket_fields()
+        fields = [f for f in fields if f["value"] not in hidden]
 
     standard_fields = [
         {"label": "Name", "value": "name"},
@@ -473,6 +476,10 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     if doctype != "HD Ticket":
         return quick_filters
 
+    # a hidden field must not offer its label and options here either
+    hidden = hidden_ticket_fields()
+    quick_filters = [f for f in quick_filters if f["name"] not in hidden]
+
     _list = get_controller(doctype)
     if hasattr(_list, "filter_standard_fields") and show_customer_portal_fields:
         # to filter out more fields from customer remember to update customer_not_allowed_fields in hd_ticket.py
@@ -498,11 +505,13 @@ def get_customer_portal_fields(doctype, fields):
 
 
 def get_visible_custom_fields():
-    return frappe.db.get_all(
+    # filtered in Python, not SQL: `!=` drops NULL rows, which are visible to everyone
+    rows = frappe.db.get_all(
         "HD Ticket Template Field",
-        {"parent": "Default", "hide_from_customer": 0},
-        pluck="fieldname",
+        {"parent": "Default"},
+        ["fieldname", "visible_to"],
     )
+    return [row.fieldname for row in rows if row.visible_to != "Agents"]
 
 
 def default_view_exists(doctype):

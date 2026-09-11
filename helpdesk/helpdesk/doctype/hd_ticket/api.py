@@ -12,12 +12,11 @@ from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
-from helpdesk.field_visibility import TicketFieldVisibility
+from helpdesk.field_visibility import hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
-from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import agent_only, is_agent, is_agent_staff, parse_call_logs
+from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
 
 @frappe.whitelist()
@@ -31,15 +30,6 @@ def new(doc: dict, attachments: list[dict] = []):
     # strips permlevel fields the caller cannot read; no-op for agents
     d.apply_fieldlevel_read_permissions()
     return strip_unreadable_field_names(d.as_dict())
-
-
-def strip_unreadable_field_names(ticket: dict) -> dict:
-    """as_dict puts blanked field names back; drop the ones the caller cannot read."""
-    permitted = set(get_permitted_fields("HD Ticket"))
-    for field in frappe.get_meta("HD Ticket").fields:
-        if field.fieldname not in permitted:
-            ticket.pop(field.fieldname, None)
-    return ticket
 
 
 @frappe.whitelist()
@@ -112,34 +102,33 @@ def get_one(name: str, is_customer_portal: bool = False):
         "views": get_views(name),
         "contact": contact,
         # tags are agent workflow data, same as _user_tags
-        "tags": get_tags(name) if is_agent_staff() else [],
-        "template": get_template(template),
+        "tags": get_tags(name) if is_agent() else [],
+        # only the field list is read here; the rest of the template payload is
+        # for the new-ticket form, and its form script is agent-authored
+        "template": {"fields": get_fields_meta(template)},
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=is_customer_portal or not is_agent_staff()
+            "HD Ticket", is_customer_portal=is_customer_portal or not is_agent()
         ),
-        "fields": get_meta(template),
         "calls": call_logs,
-        # lets hardcoded UI rows drop hidden fields instead of rendering empty labels
-        "_hidden_fields": sorted(TicketFieldVisibility().hidden_fields()),
     }
 
 
-def get_meta(template: str):
-    default_fields = ["ticket_type", "agent_group", "priority", "customer"]
-    DocField = frappe.qb.DocType("DocField")
+def strip_unreadable_field_names(ticket: dict) -> dict:
+    """Drop the names of fields the caller cannot read.
 
-    fields = (
-        frappe.qb.from_(DocField)
-        .select(DocField.star)
-        .where(DocField.parent == "HD Ticket")
-        .where(DocField.fieldname.isin(default_fields))
-        .run(as_dict=True)
-    )
-    meta_fields = get_fields_meta(template)
-    meta_fields = [f for f in meta_fields if f["fieldname"] not in default_fields]
-
-    fields.extend(meta_fields)
-    return TicketFieldVisibility().filter_field_dicts(fields, key="fieldname")
+    Permission levels delete the attribute and as_dict puts the name back; the
+    template's visible_to blanks the value and keeps it. Either way the caller
+    gets nothing, so the name is noise.
+    """
+    permitted = set(get_permitted_fields("HD Ticket"))
+    unreadable = {
+        field.fieldname
+        for field in frappe.get_meta("HD Ticket").fields
+        if field.fieldname not in permitted
+    }
+    for fieldname in unreadable | hidden_ticket_fields():
+        ticket.pop(fieldname, None)
+    return ticket
 
 
 def get_assignee(_assign: str):
@@ -546,14 +535,14 @@ def get_ticket_customizations():
         order_by="idx",
     )
     # no widgets for fields hidden from agents: their values arrive blanked
-    visibility = TicketFieldVisibility()
-    custom_fields = visibility.filter_template_rows(custom_fields)
+    hidden = hidden_ticket_fields()
+    custom_fields = [f for f in custom_fields if f.fieldname not in hidden]
     form_scripts = get_form_script("HD Ticket")
     return {
         "custom_fields": custom_fields,
         "_form_script": form_scripts,
         # for the hardcoded core widgets, which are not template rows
-        "hidden_fields": sorted(visibility.hidden_fields()),
+        "hidden_fields": sorted(hidden),
     }
 
 

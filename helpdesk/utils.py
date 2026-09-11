@@ -55,15 +55,9 @@ def is_agent(user: str | None = None) -> bool:
         is_admin()
         or "Agent Manager" in frappe.get_roles(user)
         or "Agent" in frappe.get_roles(user)
+        or "System Manager" in frappe.get_roles(user)
         or bool(frappe.db.exists("HD Agent", {"name": user}))
     )
-
-
-def is_agent_staff(user: str | None = None) -> bool:
-    """Whether `user` works the helpdesk: an agent or a System Manager.
-    System Managers count because HD Ticket grants them write at every level."""
-    user = user or frappe.session.user
-    return is_agent(user) or "System Manager" in frappe.get_roles(user)
 
 
 def get_agent_name(user: str = None) -> str | None:

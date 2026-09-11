@@ -3,7 +3,7 @@ from frappe.client import get as client_get
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import get_list_data
-from helpdesk.field_visibility import AGENT, get_field_audiences
+from helpdesk.field_visibility import fields_visible_to
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_one, get_ticket_customizations
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.test_utils import (
@@ -63,14 +63,12 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         frappe.set_user(CUSTOMER_EMAIL)
         self.assertTrue(client_get("HD Ticket", ticket.name).get("priority"))
 
-    def test_get_one_reports_hidden_fields(self):
+    def test_get_one_strips_hidden_fields(self):
         self.show_to("response_by", "Agents")
         ticket = self.make_customer_ticket()
         frappe.set_user(CUSTOMER_EMAIL)
         result = get_one(ticket.name, is_customer_portal=True)
         self.assertFalse(result.get("response_by"))
-        # the UI drops hardcoded rows for hidden fields using this list
-        self.assertIn("response_by", result["_hidden_fields"])
 
     def test_get_list_data_drops_hidden_rows(self):
         self.show_to("response_by", "Agents")
@@ -124,26 +122,16 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             template.save(ignore_permissions=True)
 
-    def test_hiding_warns_when_the_api_still_serves_the_field(self):
+    def test_hiding_informs_when_the_api_still_serves_the_field(self):
         frappe.clear_messages()
         self.show_to("priority", "Agents")
         # priority sits below the internal level, so the API keeps serving it
-        self.assertTrue(any("still readable" in str(m) for m in frappe.message_log))
+        self.assertTrue(any("still returns it" in str(m) for m in frappe.message_log))
 
-    def test_template_save_refreshes_audiences(self):
+    def test_template_save_refreshes_the_hidden_fields(self):
+        self.assertNotIn("priority", fields_visible_to("Agents"))
         self.show_to("priority", "Agents")
-        self.assertEqual(get_field_audiences()["priority"], frozenset({AGENT}))
-
-        # a row saved before visible_to existed falls back to the old flag
-        row = frappe.db.get_value(
-            "HD Ticket Template Field",
-            {"parent": "Default", "fieldname": "priority"},
-        )
-        frappe.db.set_value(
-            "HD Ticket Template Field", row, "visible_to", "", update_modified=False
-        )
-        get_field_audiences.clear_cache()
-        self.assertEqual(get_field_audiences()["priority"], frozenset({AGENT}))
+        self.assertIn("priority", fields_visible_to("Agents"))
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""

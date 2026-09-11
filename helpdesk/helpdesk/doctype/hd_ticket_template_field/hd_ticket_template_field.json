@@ -11,7 +11,6 @@
   "url_method",
   "required",
   "visible_to",
-  "hide_from_customer",
   "placeholder"
  ],
  "fields": [
@@ -29,19 +28,13 @@
    "label": "Required"
   },
   {
+   "default": "Everyone",
    "description": "Who sees this field on helpdesk pages. The API answers to the field's permission level, not this.",
    "fieldname": "visible_to",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Visible to",
    "options": "Everyone\nCustomers\nAgents"
-  },
-  {
-   "default": "0",
-   "fieldname": "hide_from_customer",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Hide from customer"
   },
   {
    "fieldname": "url_method",
@@ -58,7 +51,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-09-08 12:00:00.000000",
+ "modified": "2026-09-11 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

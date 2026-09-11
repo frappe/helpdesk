@@ -2379,7 +2379,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "fieldname": f.fieldname,
                 "required": f.required,
                 "visible_to": f.visible_to,
-                "hide_from_customer": f.hide_from_customer,
                 "url_method": f.url_method,
                 "placeholder": f.placeholder,
             }
@@ -2702,9 +2701,13 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         try:
             frappe.set_user(PERMS_CUSTOMER)
-            forced = get_one(ticket.name, is_customer_portal=False).get("_form_script")
+            customer_view = get_one(ticket.name, is_customer_portal=False)
+            forced = customer_view.get("_form_script")
             self.assertTrue(any("PORTAL" in s for s in forced))
             self.assertFalse(any("AGENT" in s for s in forced))
+            # nowhere else either: the nested template payload used to carry the
+            # agent scripts, and checking only the top level is what hid that
+            self.assertNotIn("AGENT", frappe.as_json(customer_view))
 
             frappe.set_user(PERMS_AGENT)
             agent_view = get_one(ticket.name, is_customer_portal=False).get(

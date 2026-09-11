@@ -247,7 +247,7 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer?: 0 | 1;
+  visible_to?: "Everyone" | "Customers" | "Agents";
   label: string;
   options: string;
   required: 0 | 1;
@@ -265,7 +265,7 @@ export interface Field {
 export type FieldValue = string | number | boolean | null | undefined | Dayjs;
 
 export interface Template {
-  about: string;
+  about?: string;
   fields: Field[];
 }
 

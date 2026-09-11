@@ -97,23 +97,7 @@
         :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <span
-          class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
-        >
-          <template
-            v-if="
-              field.value &&
-              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime') &&
-              dayjs(field.value).isValid()
-            "
-          >
-            {{ dateFormat(field.value, dateTooltipFormat) }}
-          </template>
-          <template v-else>
-            {{ field.value || "—" }}
-          </template>
-        </span>
+        <span class="text-base text-ink-gray-8 flex-1">{{ field.value }}</span>
       </div>
     </div>
   </div>
@@ -173,33 +157,29 @@ const ticketBasicInfo = computed(() => [
 ]);
 
 const ticketAdditionalInfo = computed(() => {
-  // fields hidden for this viewer arrive blanked; drop their rows
-  const hiddenFields: string[] = ticket.data._hidden_fields || [];
   const fields = [
     {
       fieldname: "subject",
-      source: "subject",
       label: "Subject",
       value: ticket.data.subject,
     },
     {
       fieldname: "team",
-      source: "agent_group",
       label: "Team",
-      value: ticket.data.agent_group || "-",
+      value: ticket.data.agent_group,
     },
     {
       fieldname: "priority",
-      source: "priority",
       label: "Priority",
       value: ticket.data.priority,
     },
-  ].filter((field) => !hiddenFields.includes(field.source));
+  ];
   const custom_fields = ticket.data.template.fields
     .filter(
       (field: Field) =>
-        !field.hide_from_customer &&
-        ["subject", "team", "priority"].indexOf(field.fieldname) === -1
+        field.visible_to !== "Agents" &&
+        ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
+        ticket.data[field.fieldname]
     )
     .map((field: Field) => {
       const option = {
@@ -220,7 +200,8 @@ const ticketAdditionalInfo = computed(() => {
       return option;
     });
 
-  return [...fields, ...custom_fields];
+  // an empty field tells the customer nothing, so leave its row out
+  return [...fields, ...custom_fields].filter((field) => field.value);
 });
 </script>
 
