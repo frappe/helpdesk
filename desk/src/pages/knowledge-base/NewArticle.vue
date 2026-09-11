@@ -147,7 +147,7 @@ function handleArticleDiscard() {
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }: { close: () => void }) {
           router.push({
             name: "AgentKnowledgeBase",
           });

@@ -320,7 +320,7 @@ function showConfirmationDialog() {
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }: { close: () => void }) {
           ticket.data.status = "Closed";
           setValue.submit(
             { fieldname: "status", value: "Closed" },

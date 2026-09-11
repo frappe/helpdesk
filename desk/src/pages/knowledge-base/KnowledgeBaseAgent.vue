@@ -326,7 +326,7 @@ function handleCategoryDelete(groupedRow) {
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }: { close: () => void }) {
           deleteCategory.submit(
             {
               doctype: "HD Article Category",

@@ -121,7 +121,17 @@
           handlePageLength(count);
         }
       "
-    />
+    >
+      <!-- frappe-ui's ListFooter still feeds TabButtons the removed `buttons`
+           prop, so its own page-length picker renders nothing. -->
+      <template #left>
+        <TabButtons
+          :model-value="defaultParams.page_length_count"
+          :options="[20, 50, 100].map((o) => ({ label: String(o), value: o }))"
+          @update:model-value="(count) => handlePageLength(count)"
+        />
+      </template>
+    </ListFooter>
   </div>
   <!-- Empty State -->
   <EmptyState
@@ -157,10 +167,11 @@ import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   createResource,
+  dayjs,
   Dropdown,
   frappeRequest,
   LoadingIndicator,
-  dayjs,
+  TabButtons,
   toast,
 } from "frappe-ui";
 import {
