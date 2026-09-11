@@ -1,9 +1,8 @@
 import json
-from typing import Literal
 
 import frappe
-from pypika import JoinType
 
+from helpdesk.field_visibility import hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.utils import check_permissions, get_customers, is_agent
 
@@ -20,7 +19,6 @@ def get_one(name: str):
     ) or [None, None, None]
     if not found:
         return {"about": None, "fields": []}
-
     fields = get_fields_meta(name)
     if frappe.db.get_single_value("HD Settings", "auto_set_customer_from_contact"):
         set_customer_field(fields)
@@ -33,6 +31,58 @@ def get_one(name: str):
             "HD Ticket", apply_on_new_page=True, is_customer_portal=False
         ),
     }
+
+
+def get_fields_meta(template: str):
+    """The template's fields, as this user may see them."""
+    hidden = hidden_ticket_fields()
+    meta = frappe.get_meta(DOCTYPE_TICKET)
+    fields = []
+    for row in template_rows(template):
+        field = meta.get_field(row.fieldname)
+        if row.fieldname in hidden or not field:
+            continue
+        fields.append(form_field(row, field))
+    return fields
+
+
+def template_rows(template: str) -> list:
+    return frappe.get_all(
+        DOCTYPE_TEMPLATE_FIELD,
+        filters={"parent": template, "parenttype": DOCTYPE_TEMPLATE},
+        fields=[
+            "fieldname",
+            "visible_to",
+            "required",
+            "url_method",
+            "placeholder",
+            "idx",
+        ],
+        order_by="idx",
+    )
+
+
+def form_field(row, field) -> frappe._dict:
+    """One field for the form: the template's own columns, plus live doctype meta.
+
+    Meta is cached and already carries Customize Form overrides, so nothing here
+    reads DocField or Property Setter directly.
+    """
+    return frappe._dict(
+        fieldname=row.fieldname,
+        visible_to=row.visible_to,
+        required=row.required,
+        url_method=row.url_method,
+        placeholder=row.placeholder,
+        idx=row.idx,
+        label=field.label,
+        fieldtype=field.fieldtype,
+        options=field.options,
+        link_filters=field.link_filters,
+        depends_on=field.depends_on,
+        mandatory_depends_on=field.mandatory_depends_on,
+        read_only_depends_on=field.read_only_depends_on,
+    )
 
 
 def set_customer_field(fields: list) -> None:
@@ -55,7 +105,7 @@ def set_customer_field(fields: list) -> None:
         customer_field.link_filters = link_filters
         if len(customers) > 1:
             customer_field.required = 1
-            customer_field.hide_from_customer = 0
+            customer_field.visible_to = "Everyone"
     elif len(customers) > 1:
         fields.append(
             frappe._dict(
@@ -68,58 +118,3 @@ def set_customer_field(fields: list) -> None:
                 idx=len(fields) + 1,
             )
         )
-
-
-def get_fields_meta(template: str):
-    fields = get_fields(template, "DocField")
-    fields.extend(get_fields(template, "Custom Field"))
-    fields = sorted(fields, key=lambda x: x.idx)
-    return fields
-
-
-def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
-    QBField = frappe.qb.DocType(DOCTYPE_TEMPLATE_FIELD)
-    QBFetch = frappe.qb.DocType(fetch)
-    fields = (
-        frappe.qb.from_(QBField)
-        .select(QBField.star)
-        .where(QBField.parent == template)
-        .where(QBField.parentfield == "fields")
-        .where(QBField.parenttype == DOCTYPE_TEMPLATE)
-    )
-    where_parent = QBFetch.parent == DOCTYPE_TICKET
-    if fetch == "Custom Field":
-        where_parent = QBFetch.dt == DOCTYPE_TICKET
-    result = (
-        frappe.qb.from_(fields)
-        .select(
-            QBFetch.description,
-            QBFetch.fieldtype,
-            QBFetch.label,
-            QBFetch.options,
-            QBFetch.link_filters,
-            QBFetch.depends_on,
-            QBFetch.mandatory_depends_on,
-            fields.fieldname,
-            fields.hide_from_customer,
-            fields.required,
-            fields.url_method,
-            fields.placeholder,
-            fields.idx,
-        )
-        .join(QBFetch, JoinType.inner)
-        .on(QBFetch.fieldname == fields.fieldname)
-        .where(where_parent)
-        .orderby(fields.idx)
-        .run(as_dict=True)
-    )
-    docfields = ["link_filters", "depends_on", "mandatory_depends_on"]
-
-    for df in docfields:
-        for field in result:
-            property_setter_id = "HD Ticket" + "-" + field.fieldname + "-" + df
-            if frappe.db.exists("Property Setter", property_setter_id):
-                field[df] = frappe.get_value(
-                    "Property Setter", property_setter_id, "value"
-                )
-    return result

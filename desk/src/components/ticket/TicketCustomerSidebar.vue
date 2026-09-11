@@ -97,23 +97,7 @@
         :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <span
-          class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
-        >
-          <template
-            v-if="
-              field.value &&
-              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime') &&
-              dayjs(field.value).isValid()
-            "
-          >
-            {{ dateFormat(field.value, dateTooltipFormat) }}
-          </template>
-          <template v-else>
-            {{ field.value || "—" }}
-          </template>
-        </span>
+        <span class="text-base text-ink-gray-8 flex-1">{{ field.value }}</span>
       </div>
     </div>
   </div>
@@ -190,7 +174,7 @@ const ticketAdditionalInfo = computed(() => {
     {
       fieldname: "team",
       label: "Team",
-      value: ticket.data.agent_group || "-",
+      value: ticket.data.agent_group,
     },
     {
       fieldname: "priority",
@@ -201,8 +185,9 @@ const ticketAdditionalInfo = computed(() => {
   const custom_fields = ticket.data.template.fields
     .filter(
       (field: Field) =>
-        !field.hide_from_customer &&
-        ["subject", "team", "priority"].indexOf(field.fieldname) === -1
+        field.visible_to !== "Agents" &&
+        ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
+        ticket.data[field.fieldname]
     )
     .map((field: Field) => {
       const option = {
@@ -223,7 +208,8 @@ const ticketAdditionalInfo = computed(() => {
       return option;
     });
 
-  return [...fields, ...custom_fields];
+  // return only fields with values for customers
+  return [...fields, ...custom_fields].filter((field) => field.value);
 });
 </script>
 

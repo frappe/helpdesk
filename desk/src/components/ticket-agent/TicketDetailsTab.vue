@@ -189,16 +189,21 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  return CORE_FIELDS.map((fieldname) => {
-    let field = getField(fieldname);
-    if (!field) return null;
-    field = parseField(field, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB on change
-    field["required"] = field.reqd;
-    const formatted = getFieldInFormat(field, field);
-    formatted["visible"] = true;
-    return formatted;
-  }).filter(Boolean);
+  // list which contains the hidden fields marked in ticket template
+  const hiddenFields = customizations.value.data?.hidden_fields || [];
+  // filter alongside with core_fields for example ticket_type maybe hidden so remove from UI
+  return CORE_FIELDS.filter((f) => !hiddenFields.includes(f))
+    .map((fieldname) => {
+      let field = getField(fieldname);
+      if (!field) return null;
+      field = parseField(field, ticket.value.doc);
+      // cant handle required depends on as we directly set the value in DB on change
+      field["required"] = field.reqd;
+      const formatted = getFieldInFormat(field, field);
+      formatted["visible"] = true;
+      return formatted;
+    })
+    .filter(Boolean);
 });
 
 const customFields = computed(() => {

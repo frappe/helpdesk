@@ -10,6 +10,7 @@ from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
+from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
@@ -17,6 +18,14 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import (
+    CREATION_FILLABLE_PERMLEVELS,
+    CUSTOMER_EDIT_EXEMPT_FIELDS,
+    DEFAULT_TICKET_TEMPLATE,
+    PORTAL_INSERT_EXEMPT_FIELDS,
+    SERVER_COMPUTED_FIELDS,
+)
+from helpdesk.field_visibility import hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -69,11 +78,61 @@ class HDTicket(Document):
     def autoname(self):
         return self.name
 
+    def apply_fieldlevel_read_permissions(self):
+        # permission levels strip first; the template's visible_to then narrows
+        # further for helpdesk pages
+        super().apply_fieldlevel_read_permissions()
+        if frappe.session.user == "Administrator":
+            return
+        for fieldname in hidden_ticket_fields():
+            self.set(fieldname, None)
+
     def before_insert(self):
         self.generate_key()
+        self.apply_portal_insert_rules()
+
+    def apply_portal_insert_rules(self):
+        """The permlevel reset after this hook wipes fields the user cannot write;
+        exempt server-set fields and the ones the template lets a customer fill."""
+        if is_agent():
+            return
+        if frappe.session.user != "Guest":
+            self.raised_by = frappe.session.user
+        self.via_customer_portal = 1
+        self.flags.ignore_permlevel_for_fields = (
+            list(PORTAL_INSERT_EXEMPT_FIELDS) + self.creation_fillable_template_fields()
+        )
+
+    def creation_fillable_template_fields(self) -> list[str]:
+        """Default-template fields shown to customers, at a level a customer may write."""
+        rows = frappe.get_all(
+            "HD Ticket Template Field",
+            filters={
+                "parent": DEFAULT_TICKET_TEMPLATE,
+                "parenttype": "HD Ticket Template",
+            },
+            fields=["fieldname", "visible_to"],
+        )
+        return [
+            row.fieldname
+            for row in rows
+            if row.visible_to != "Agents"
+            and self.customer_may_fill_at_creation(row.fieldname)
+        ]
+
+    def customer_may_fill_at_creation(self, fieldname: str) -> bool:
+        """check if the specific field can be filled by customer"""
+
+        # return false for any server computed fields as they are more of logic based & calculated outputs
+        if fieldname in SERVER_COMPUTED_FIELDS:
+            return False
+        field = frappe.get_meta("HD Ticket").get_field(fieldname)
+        # check if inside fillable perm level and return
+        return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
 
     def before_validate(self):
         self.check_update_perms()
+        self.prevent_customer_edits()
         self.set_ticket_type()
         self.set_raised_by()
         self.set_priority()
@@ -167,6 +226,8 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
+        # the creation-form exemption must not survive into a later save
+        self.flags.pop("ignore_permlevel_for_fields", None)
 
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
@@ -310,11 +371,6 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        if not frappe.db.get_single_value(
-            "HD Settings", "auto_set_customer_from_contact"
-        ):
-            return
-
         # For existing tickets, only validate if customer value has changed
         if not self.is_new() and not self.has_value_changed("customer"):
             return
@@ -330,6 +386,11 @@ class HDTicket(Document):
                     ).format(self.customer, self.contact),
                     frappe.ValidationError,
                 )
+            return
+
+        if not frappe.db.get_single_value(
+            "HD Settings", "auto_set_customer_from_contact"
+        ):
             return
 
         # Auto-set customer only for new tickets
@@ -408,14 +469,49 @@ class HDTicket(Document):
         )
 
     def check_update_perms(self):
+        # not gated on via_customer_portal: agent-raised tickets are still the customer's
         old_doc = self.get_doc_before_save()
-        if not old_doc or is_agent() or not self.via_customer_portal:
+        if not old_doc or is_agent():
             return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
         if is_closed or is_rated:
             text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
+
+    def prevent_customer_edits(self):
+        """restrict customer from changing ticket values post submission of ticket."""
+        if self.is_new() or is_agent():
+            return
+
+        # custom flag created to allow insertion in special cases
+        if self.flags.get("ignore_customer_edit_guard"):
+            return
+        editable = self.customer_editable_fields()
+        changed = [
+            df
+            for df in self.meta.fields
+            if df.fieldtype not in no_value_fields
+            and df.fieldname not in editable
+            and self.has_value_changed(df.fieldname)
+        ]
+        if not changed:
+            return
+        labels = ", ".join(
+            self.meta.get_translated_label(df.fieldname) for df in changed
+        )
+        frappe.throw(
+            _("You cannot change {0} after the ticket is raised").format(labels),
+            frappe.PermissionError,
+        )
+
+    def customer_editable_fields(self) -> set[str]:
+        """Customers may only close; replies reopen the ticket server-side."""
+        editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
+        category = frappe.db.get_value("HD Ticket Status", self.status, "category")
+        if category == "Resolved":
+            editable.add("status")
+        return editable
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -1091,6 +1187,11 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
+        # portal replies save as the customer; the reset must keep server-set fields
+        self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
+        # this save reopens the ticket and stamps response times. The doc comes
+        # freshly loaded, never from a caller's payload, so this cannot be abused
+        self.flags.ignore_customer_edit_guard = True
         # Save the ticket, allowing for hooks to run.
         self.save()
 
