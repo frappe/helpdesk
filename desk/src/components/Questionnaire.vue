@@ -247,7 +247,7 @@ function select(option: Option) {
   if (!isOtherSelected.value) {
     delete answers[otherKey.value];
   } else if (option.value === "other") {
-    nextTick(() => otherInput.value?.el?.focus({ preventScroll: true }));
+    nextTick(() => otherInput.value?.focus({ preventScroll: true }));
   }
 }
 
@@ -264,7 +264,7 @@ function proceed() {
   // "Other" stays selectable with Next enabled; the ask happens on click.
   if (isOtherSelected.value && !isOtherFilled.value) {
     otherError.value = __("Add a few words so we can continue");
-    otherInput.value?.el?.focus({ preventScroll: true });
+    otherInput.value?.focus({ preventScroll: true });
     return;
   }
   if (isLast.value) finish();

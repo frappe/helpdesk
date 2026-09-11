@@ -173,7 +173,7 @@ const flagCode = computed(
 const localNumber = ref<string>("");
 const isOpen = ref(false);
 const searchQuery = ref("");
-const numberInputRef = ref<{ el?: HTMLInputElement | null } | null>(null);
+const numberInputRef = ref<{ focus: () => void } | null>(null);
 const highlightedIndex = ref(0);
 const itemRefs: HTMLElement[] = [];
 
@@ -318,7 +318,7 @@ function onSelectCountry(name: string, close: () => void) {
   selectedCountry.value = name;
   searchQuery.value = "";
   close();
-  numberInputRef.value?.el?.focus();
+  numberInputRef.value?.focus();
 }
 
 function onBackspace() {

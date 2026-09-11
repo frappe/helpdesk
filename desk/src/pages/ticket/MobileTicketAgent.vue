@@ -483,23 +483,23 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
     {
       value: "details",
       label: __("Details"),
-      icon: DetailsIcon,
+      iconLeft: DetailsIcon,
       condition: () => isMobileView.value,
     },
     {
       value: "activity",
       label: __("Activity"),
-      icon: ActivityIcon,
+      iconLeft: ActivityIcon,
     },
     {
       value: "email",
       label: __("Emails"),
-      icon: EmailIcon,
+      iconLeft: EmailIcon,
     },
     {
       value: "comment",
       label: __("Comments"),
-      icon: CommentIcon,
+      iconLeft: CommentIcon,
     },
   ];
 
@@ -507,7 +507,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
     _tabs.push({
       value: "call",
       label: __("Calls"),
-      icon: PhoneIcon,
+      iconLeft: PhoneIcon,
     });
   }
   return _tabs;

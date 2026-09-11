@@ -58,17 +58,17 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
     {
       value: "activity",
       label: "Activity",
-      icon: ActivityIcon,
+      iconLeft: ActivityIcon,
     },
     {
       value: "email",
       label: "Emails",
-      icon: EmailIcon,
+      iconLeft: EmailIcon,
     },
     {
       value: "comment",
       label: "Comments",
-      icon: CommentIcon,
+      iconLeft: CommentIcon,
     },
   ];
 
@@ -76,13 +76,13 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
     _tabs.push({
       value: "call",
       label: "Calls",
-      icon: PhoneIcon,
+      iconLeft: PhoneIcon,
     });
   }
   _tabs.push({
     value: "analytics",
     label: "Analytics",
-    icon: LucideChartNoAxesColumn,
+    iconLeft: LucideChartNoAxesColumn,
   });
   return _tabs;
 });

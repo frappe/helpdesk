@@ -273,7 +273,7 @@ watch(popoverIsOpen, (isOpen) => {
     searchText.value = "";
     highlightedIndex.value = 0;
     nextTick(() => {
-      inputRef.value?.el?.focus();
+      inputRef.value?.focus();
     });
   } else if (hasBeenOpened.value) {
     // Closing after a real open: compute diff and save

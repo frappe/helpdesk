@@ -213,7 +213,7 @@ const fullName = computed({
 
 function editFullName() {
   editName.value = true;
-  nextTick(() => fullNameRef.value?.el?.focus());
+  nextTick(() => fullNameRef.value?.focus());
 }
 
 const isNameDirty = computed(() => {

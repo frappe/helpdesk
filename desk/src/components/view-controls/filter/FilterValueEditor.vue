@@ -361,7 +361,7 @@ function focusSearch() {
   // preventScroll: the panel mounts mid-swipe, still translated; a default
   // focus would scroll it into view and visually cancel the slide
   nextTick(() =>
-    (searchInput.value || valueInput.value)?.el?.focus({ preventScroll: true })
+    (searchInput.value || valueInput.value)?.focus({ preventScroll: true })
   );
 }
 

@@ -46,9 +46,6 @@
           :tabs="tabs"
           class="tabs-sticky-header flex-1 overflow-hidden [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
-          <template #tab-prefix="{ tab }: any">
-            <component :is="tab.icon" v-if="tab.icon" class="h-5" />
-          </template>
           <template #tab-label="{ tab }: any">
             <span class="group flex items-center gap-2">
               {{ __(tab.label) }}
@@ -146,7 +143,7 @@ const tabs = computed(() => [
     label: __("Tickets"),
     value: "tickets",
     count: ticketsCountResource.data ?? 0,
-    icon: h(TicketHashIcon, { class: "size-4" }),
+    iconLeft: h(TicketHashIcon, { class: "size-4" }),
   },
   {
     label: __("Contacts"),
@@ -154,7 +151,7 @@ const tabs = computed(() => [
     count: customer.getContacts.loading
       ? 0
       : customer.getContacts.data?.length ?? 0,
-    icon: h(LucideSquareUser, { class: "size-4" }),
+    iconLeft: h(LucideSquareUser, { class: "size-4" }),
   },
 ]);
 const { doc: customer, handleDelete } = useCustomer(props.id);
@@ -176,21 +173,14 @@ const contactFilter = computed(() => {
   };
 });
 
-const activeTab = computed<number>({
+const activeTab = computed<string>({
   get() {
-    const index = tabs.value.findIndex((t) => t.hash === route.hash.slice(1));
-    if (index === -1) {
-      router.replace({ hash: "" });
-      return 0;
-    }
-    return index;
+    const hash = route.hash.slice(1);
+    const tab = tabs.value.find((t) => t.value === hash);
+    return tab?.value ?? tabs.value[0].value;
   },
-  set(i) {
-    if (i === 0) {
-      router.replace({ hash: "" });
-      return;
-    }
-    router.replace({ hash: `#${tabs.value[i].hash}` });
+  set(value) {
+    router.replace({ hash: value === tabs.value[0].value ? "" : `#${value}` });
   },
 });
 

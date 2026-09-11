@@ -33,6 +33,7 @@
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
             theme="amber"
+            dismissible
             class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-outline-amber-2"
             @dismiss="dismissBanner"
           >
@@ -182,8 +183,8 @@ const isDismissed = ref(false);
 
 const activeTab = ref("activity");
 const tabs = computed(() => [
-  { value: "activity", label: __("Activity"), icon: ActivityIcon },
-  { value: "details", label: __("Details"), icon: DetailsIcon },
+  { value: "activity", label: __("Activity"), iconLeft: ActivityIcon },
+  { value: "details", label: __("Details"), iconLeft: DetailsIcon },
 ]);
 
 function getTodayKey() {

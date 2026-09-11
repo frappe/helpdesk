@@ -50,9 +50,6 @@
           :tabs="tabs"
           class="tabs-sticky-header flex-1 overflow-hidden [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
-          <template #tab-prefix="{ tab }: any">
-            <component :is="tab.icon" v-if="tab.icon" class="h-5" />
-          </template>
           <template #tab-label="{ tab }: any">
             <span class="group flex items-center gap-2">
               {{ __(tab.label) }}
@@ -174,13 +171,13 @@ const tabs = computed(() => [
     label: __("Tickets"),
     value: "tickets",
     count: ticketsCountResource.data ?? 0,
-    icon: h(TicketHashIcon, { class: "size-4" }),
+    iconLeft: h(TicketHashIcon, { class: "size-4" }),
   },
   {
     label: __("Feedback"),
     value: "feedback",
     count: feedbackCount.data ?? 0,
-    icon: h(TicketFeedbackIcon, { class: "size-4" }),
+    iconLeft: h(TicketFeedbackIcon, { class: "size-4" }),
   },
 ]);
 

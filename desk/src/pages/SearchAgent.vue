@@ -539,7 +539,7 @@ onMounted(() => {
   }
   // add a shortcut when presses "/" focus on this element
   useShortcut("/", () => {
-    searchInput.value.el.focus();
+    searchInput.value?.focus();
   });
 });
 </script>
