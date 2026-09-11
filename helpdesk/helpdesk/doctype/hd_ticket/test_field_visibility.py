@@ -3,7 +3,7 @@ from frappe.client import get as client_get
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import get_list_data
-from helpdesk.field_visibility import fields_only_for
+from helpdesk.field_visibility import fields_visible_to
 from helpdesk.helpdesk.doctype.hd_ticket.api import get_one, get_ticket_customizations
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.test_utils import (
@@ -129,9 +129,9 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertTrue(any("still returns it" in str(m) for m in frappe.message_log))
 
     def test_template_save_refreshes_the_hidden_fields(self):
-        self.assertNotIn("priority", fields_only_for("Agents"))
+        self.assertNotIn("priority", fields_visible_to("Agents"))
         self.show_to("priority", "Agents")
-        self.assertIn("priority", fields_only_for("Agents"))
+        self.assertIn("priority", fields_visible_to("Agents"))
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""

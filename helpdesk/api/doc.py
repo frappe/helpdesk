@@ -514,6 +514,7 @@ def get_visible_custom_fields():
         {"parent": "Default"},
         ["fieldname", "visible_to"],
     )
+    # NULL visible_to would fail an SQL != 'Agents', so filter in Python
     return [row.fieldname for row in rows if row.visible_to != "Agents"]
 
 

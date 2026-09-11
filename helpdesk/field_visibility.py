@@ -19,13 +19,17 @@ def hidden_ticket_fields() -> set[str]:
     """get fields which are to be hidden as per the user role category"""
     if is_agent():
         # if agent is requesting the hidden fields will be that for customers
-        return fields_only_for("Customers")
-    return fields_only_for("Agents") | AGENT_WORKFLOW_FIELDS
+        return fields_visible_to("Customers")
+    return fields_visible_to("Agents") | AGENT_WORKFLOW_FIELDS
 
 
 @redis_cache()
-def fields_only_for(audience: str) -> set[str]:
-    """helper which returns the set of fields according to the role passed"""
+def fields_visible_to(audience: str) -> set[str]:
+    """helper which returns the set of fields according to the role passed
+
+    audience is a Visible to value on the template row: Customers or Agents.
+    Fields left at Everyone belong to neither set.
+    """
     return set(
         frappe.get_all(
             "HD Ticket Template Field",
