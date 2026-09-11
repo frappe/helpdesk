@@ -1,6 +1,5 @@
 <template>
   <Popover
-    class="flex w-full"
     side="bottom"
     align="start"
     :matchTriggerWidth="true"

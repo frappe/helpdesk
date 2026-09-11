@@ -26,12 +26,7 @@
           class="flex w-max min-w-full items-start pl-12 pr-16 pb-16 pt-8"
         >
           <template v-for="(segment, index) in segments" :key="index">
-            <Tooltip
-              bare
-              v-if="segment.kind === 'node'"
-              :hover-delay="0.2"
-              arrow-class="!hidden"
-            >
+            <Tooltip bare v-if="segment.kind === 'node'" :hover-delay="0.2">
               <span
                 class="group relative flex-none rounded-full before:absolute before:-inset-2 before:content-['']"
                 :class="[
