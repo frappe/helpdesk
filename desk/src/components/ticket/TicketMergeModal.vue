@@ -10,14 +10,11 @@
           }}
           <span class="whitespace-nowrap font-semibold">
             #{{ ticket.name
-            }}<Popover
-              trigger="hover"
-              :hoverDelay="0.25"
-              :side="isRtl ? 'left' : 'right'"
-              class="!inline-flex align-middle ms-1 -mt-1"
-            >
+            }}<HoverCard :hoverDelay="0.25" :side="isRtl ? 'left' : 'right'">
               <template #trigger>
-                <LucideInfo class="size-4 cursor-pointer" />
+                <LucideInfo
+                  class="size-4 cursor-pointer !inline-flex align-middle ms-1 -mt-1"
+                />
               </template>
 
               <template #default>
@@ -45,7 +42,7 @@
                   </ul>
                 </div>
               </template>
-            </Popover>
+            </HoverCard>
           </span>
         </p>
 

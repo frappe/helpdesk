@@ -335,7 +335,7 @@ export type TicketTab =
   | "analytics";
 
 export interface TabObject {
-  name: TicketTab;
+  value: TicketTab;
   label: string;
   icon: Component;
   condition?: () => boolean;

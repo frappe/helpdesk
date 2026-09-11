@@ -23,7 +23,7 @@
         />
 
         <div class="space-y-1.5">
-          <FormLabel :label="__('Preview')" size="md" />
+          <FormLabel :label="__('Preview')" />
           <div class="relative pointer-events-none">
             <Editor
               :model-value="dialogModel.preview"

@@ -67,12 +67,11 @@
             </Select>
             <FormLabel
               :label="__('Choose who can view and use this response.')"
-              size="md"
             />
           </div>
         </div>
         <div v-if="savedReplyData.scope === 'Team'" class="space-y-1.5">
-          <FormLabel :label="__('Teams')" required size="md" />
+          <FormLabel :label="__('Teams')" required />
           <MultiSelect
             :options="teamsList"
             v-model="savedReplyData.teams"
@@ -87,7 +86,7 @@
         </div>
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
-            <FormLabel :label="__('Response')" required size="md" />
+            <FormLabel :label="__('Response')" required />
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/saved-replies"
             />

@@ -87,13 +87,13 @@
       <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden">
         <div class="flex min-h-0 flex-1 flex-col">
           <Tabs
-            :modelValue="tabIndex"
+            :modelValue="activeTab"
             :tabs="tabs"
             @update:modelValue="changeTabTo"
             class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-3 [&_[role='tablist']]:gap-7.5 [&_[role='tabpanel'][data-state='active']]:flex-1"
           >
             <template #tab-panel="{ tab }">
-              <div v-if="tab.name === 'details'">
+              <div v-if="tab.value === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
@@ -149,7 +149,7 @@
                 v-else
                 ref="timelineRef"
                 :ticket-id="String(ticket.doc?.name)"
-                :tab="tab.name"
+                :tab="tab.value"
                 :tab-label="tab.label"
                 @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
               />
@@ -480,23 +480,23 @@ const dropdownOptions = computed(() =>
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs = [
     {
-      name: "details",
+      value: "details",
       label: __("Details"),
       icon: DetailsIcon,
       condition: () => isMobileView.value,
     },
     {
-      name: "activity",
+      value: "activity",
       label: __("Activity"),
       icon: ActivityIcon,
     },
     {
-      name: "email",
+      value: "email",
       label: __("Emails"),
       icon: EmailIcon,
     },
     {
-      name: "comment",
+      value: "comment",
       label: __("Comments"),
       icon: CommentIcon,
     },
@@ -504,7 +504,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 
   if (isCallingEnabled.value) {
     _tabs.push({
-      name: "call",
+      value: "call",
       label: __("Calls"),
       icon: PhoneIcon,
     });
@@ -512,7 +512,7 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+const { activeTab, changeTabTo } = useActiveTabManager(tabs);
 
 onMounted(() => {
   document.title = props.ticketId;

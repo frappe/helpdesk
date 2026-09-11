@@ -1,6 +1,6 @@
 <template>
   <Combobox v-model="selectedValue" nullable v-slot="{ open: isComboboxOpen }">
-    <Popover bare class="w-full" v-model:open="showOptions">
+    <Popover bare v-model:open="showOptions">
       <template #trigger="{ open: openPopover, toggle: togglePopover }">
         <slot
           name="target"

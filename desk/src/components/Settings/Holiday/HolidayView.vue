@@ -68,12 +68,7 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel
-                :label="__('From date')"
-                for="from_date"
-                required
-                size="md"
-              />
+              <FormLabel :label="__('From date')" for="from_date" required />
               <DatePicker
                 v-model="holidayData.from_date"
                 variant="subtle"
@@ -94,12 +89,7 @@
               />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel
-                :label="__('To date')"
-                for="to_date"
-                required
-                size="md"
-              />
+              <FormLabel :label="__('To date')" for="to_date" required />
               <DatePicker
                 v-model="holidayData.to_date"
                 variant="subtle"

@@ -54,7 +54,7 @@
               />
             </div>
             <div class="space-y-1.5" v-if="!slaData.default_sla">
-              <FormLabel :label="__('Rank')" for="rank" size="md" />
+              <FormLabel :label="__('Rank')" for="rank" />
               <FormControl
                 id="rank"
                 type="number"
@@ -101,12 +101,7 @@
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
               >
-                <Popover
-                  trigger="hover"
-                  :hoverDelay="0.25"
-                  side="top"
-                  align="end"
-                >
+                <HoverCard :hoverDelay="0.25" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default"
@@ -122,7 +117,7 @@
                       <code>{{ slaData.condition }}</code>
                     </div>
                   </template>
-                </Popover>
+                </HoverCard>
               </div>
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
@@ -163,7 +158,7 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('From date')" for="from_date" size="md" />
+              <FormLabel :label="__('From date')" for="from_date" />
               <DatePicker
                 v-model="slaData.start_date"
                 variant="subtle"
@@ -180,7 +175,7 @@
               <ErrorMessage :message="slaDataErrors.start_date" />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('To date')" for="to_date" size="md" />
+              <FormLabel :label="__('To date')" for="to_date" />
               <DatePicker
                 v-model="slaData.end_date"
                 variant="subtle"

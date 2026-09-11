@@ -46,7 +46,7 @@
           class="[&_[role='tablist']]:px-3"
         >
           <template #tab-panel="{ tab }">
-            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <TicketCustomerTemplateFields v-if="tab.value === 'details'" />
             <TicketConversation v-else :show-header="false" class="grow" />
           </template>
         </Tabs>
@@ -55,7 +55,7 @@
         <TicketConversation v-else class="grow" />
 
         <div
-          v-if="!isMobileView || activeTab === 0"
+          v-if="!isMobileView || activeTab === 'activity'"
           class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
@@ -177,10 +177,10 @@ const { isMobileView } = useScreenSize();
 const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
 
-const activeTab = ref(0);
+const activeTab = ref("activity");
 const tabs = computed(() => [
-  { name: "activity", label: __("Activity"), icon: ActivityIcon },
-  { name: "details", label: __("Details"), icon: DetailsIcon },
+  { value: "activity", label: __("Activity"), icon: ActivityIcon },
+  { value: "details", label: __("Details"), icon: DetailsIcon },
 ]);
 
 function getTodayKey() {

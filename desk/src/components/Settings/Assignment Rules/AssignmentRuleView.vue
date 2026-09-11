@@ -56,7 +56,7 @@
             />
           </div>
           <div class="flex flex-col gap-1.5">
-            <FormLabel :label="__('Priority')" size="md" />
+            <FormLabel :label="__('Priority')" />
             <Popover bare>
               <template #trigger="{ toggle: togglePopover }">
                 <div
@@ -137,12 +137,7 @@
               <div
                 v-if="isAssignConditionOld && assignmentRulesActiveScreen.data"
               >
-                <Popover
-                  trigger="hover"
-                  :hoverDelay="0.25"
-                  side="top"
-                  align="end"
-                >
+                <HoverCard :hoverDelay="0.25" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
@@ -158,7 +153,7 @@
                       <code>{{ assignmentRuleData.assignCondition }}</code>
                     </div>
                   </template>
-                </Popover>
+                </HoverCard>
               </div>
             </div>
           </div>
@@ -223,12 +218,7 @@
                   assignmentRuleData.unassignCondition
                 "
               >
-                <Popover
-                  trigger="hover"
-                  :hoverDelay="0.25"
-                  side="top"
-                  align="end"
-                >
+                <HoverCard :hoverDelay="0.25" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
@@ -244,7 +234,7 @@
                       <code>{{ assignmentRuleData.unassignCondition }}</code>
                     </div>
                   </template>
-                </Popover>
+                </HoverCard>
               </div>
             </div>
           </div>
