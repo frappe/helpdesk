@@ -5,9 +5,18 @@
     nullable
     v-slot="{ open: isComboboxOpen }"
   >
-    <Popover class="w-full" v-model:show="showOptions" :placement="placement">
+    <Popover
+      bare
+      v-model:open="showOptions"
+      :side="splitPlacement(placement).side"
+      :align="splitPlacement(placement).align"
+    >
       <template
-        #target="{ open: openPopover, togglePopover, close: closePopover }"
+        #trigger="{
+          open: openPopover,
+          toggle: togglePopover,
+          close: closePopover,
+        }"
       >
         <slot
           name="target"
@@ -61,7 +70,7 @@
           </div>
         </slot>
       </template>
-      <template #body="{ isOpen, togglePopover }">
+      <template #default="{ open: isOpen, toggle: togglePopover }">
         <div v-show="isOpen">
           <div
             class="relative mt-1 overflow-hidden rounded-6 bg-surface-base text-base shadow-2xl"
@@ -207,6 +216,7 @@ import {
 } from "@headlessui/vue";
 import { LoadingIndicator, Popover } from "frappe-ui";
 import { nextTick } from "vue";
+import { splitPlacement } from "@/utils";
 import LucideCheckSquare from "~icons/lucide/check-square";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideX from "~icons/lucide/x";
@@ -312,6 +322,7 @@ export default {
     },
   },
   methods: {
+    splitPlacement,
     togglePopover(val) {
       this.showOptions = val ?? !this.showOptions;
     },

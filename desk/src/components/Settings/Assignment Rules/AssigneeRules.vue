@@ -24,8 +24,8 @@
         </div>
       </div>
       <div>
-        <Popover placement="bottom-end">
-          <template #target="{ togglePopover }">
+        <Popover bare side="bottom" align="end">
+          <template #trigger="{ toggle: togglePopover }">
             <div
               class="flex items-center justify-between text-base rounded-4 h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] select-none min-w-44"
               @click="togglePopover()"
@@ -40,7 +40,7 @@
               <LucideChevronDown class="size-4" />
             </div>
           </template>
-          <template #body="{ togglePopover }">
+          <template #default="{ toggle: togglePopover }">
             <div
               class="p-1 text-ink-gray-7 mt-1 bg-surface-base shadow-xl rounded-4 w-[--reka-popper-anchor-width]"
             >
@@ -95,7 +95,7 @@
             v-if="user.email == assignmentRuleData.lastUser"
             :text="__('Last user assigned by this rule')"
             :hover-delay="0.35"
-            placement="top"
+            side="top"
           >
             <Badge theme="blue" variant="solid" :label="__('Last')" />
           </Tooltip>

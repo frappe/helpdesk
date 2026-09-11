@@ -1,9 +1,6 @@
 <template>
-  <Popover
-    :popover-class="popoverClass.length > 0 ? popoverClass : ''"
-    class="flex w-full"
-  >
-    <template #target="{ open, close }">
+  <Popover>
+    <template #trigger="{ close, toggle }">
       <div class="flex flex-col gap-1 w-full">
         <slot name="label"></slot>
         <FormControl
@@ -14,7 +11,7 @@
           @update:model-value="
             (e: string) => {
               if (e.length >= 3) {
-                open();
+                toggle(true);
               } else {
                 close();
               }
@@ -27,7 +24,7 @@
         </FormControl>
       </div>
     </template>
-    <template #body-main>
+    <template #default>
       <!-- Searched Articles -->
       <div class="max-h-[320px] md:max-h-[420px] overflow-scroll flex flex-col">
         <SearchArticles

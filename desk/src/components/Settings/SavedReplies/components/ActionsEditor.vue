@@ -52,7 +52,7 @@
             </div>
             <div class="flex min-h-8 items-center justify-end">
               <Dropdown
-                placement="right"
+                align="end"
                 :options="[
                   {
                     label: __('Delete'),

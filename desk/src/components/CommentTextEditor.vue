@@ -29,11 +29,9 @@
             <div class="flex items-center overflow-x-auto w-[60%]">
               <div class="inline-flex items-center gap-1.5 p-1">
                 <FileUploader
-                  :upload-args="{
-                    doctype: doctype,
-                    docname: ticketId,
-                    private: true,
-                  }"
+                  :doctype="doctype"
+                  :docname="ticketId"
+                  private
                   @success="(f) => attachments.push(f)"
                 >
                   <template #default="{ openFileSelector, uploading }">

@@ -150,7 +150,7 @@
               </div>
             </div>
             <TabButtons
-              :buttons="[
+              :options="[
                 {
                   value: 'calendar',
                   icon: 'lucide-calendar',

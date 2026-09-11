@@ -57,8 +57,8 @@
           </div>
           <div class="flex flex-col gap-1.5">
             <FormLabel :label="__('Priority')" size="md" />
-            <Popover>
-              <template #target="{ togglePopover }">
+            <Popover bare>
+              <template #trigger="{ toggle: togglePopover }">
                 <div
                   class="flex items-center justify-between text-base rounded-4 h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
                   @click="togglePopover()"
@@ -73,7 +73,7 @@
                   <LucideChevronDown class="size-4" />
                 </div>
               </template>
-              <template #body="{ togglePopover }">
+              <template #default="{ toggle: togglePopover }">
                 <div
                   class="p-1 text-ink-gray-6 top-1 absolute bg-surface-base shadow-2xl rounded-4 w-[--reka-popper-anchor-width]"
                 >
@@ -137,8 +137,13 @@
               <div
                 v-if="isAssignConditionOld && assignmentRulesActiveScreen.data"
               >
-                <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
-                  <template #target>
+                <Popover
+                  trigger="hover"
+                  :hoverDelay="0.25"
+                  side="top"
+                  align="end"
+                >
+                  <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
@@ -146,7 +151,7 @@
                       <LucideInfo class="size-4" />
                     </div>
                   </template>
-                  <template #body-main>
+                  <template #default>
                     <div
                       class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-5 max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
@@ -218,8 +223,13 @@
                   assignmentRuleData.unassignCondition
                 "
               >
-                <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
-                  <template #target>
+                <Popover
+                  trigger="hover"
+                  :hoverDelay="0.25"
+                  side="top"
+                  align="end"
+                >
+                  <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
                     >
@@ -227,7 +237,7 @@
                       <LucideInfo class="size-4" />
                     </div>
                   </template>
-                  <template #body-main>
+                  <template #default>
                     <div
                       class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-5 max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >

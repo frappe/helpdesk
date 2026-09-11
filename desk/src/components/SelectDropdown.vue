@@ -1,6 +1,10 @@
 <template>
-  <Popover :placement="props.placement">
-    <template #target="{ togglePopover }">
+  <Popover
+    bare
+    :side="splitPlacement(props.placement).side"
+    :align="splitPlacement(props.placement).align"
+  >
+    <template #trigger="{ toggle: togglePopover }">
       <Button
         class="flex items-center justify-between min-w-36"
         @click="togglePopover()"
@@ -14,7 +18,7 @@
         </div>
       </Button>
     </template>
-    <template #body="{ togglePopover }">
+    <template #default="{ toggle: togglePopover }">
       <div
         class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
         :class="bodyClass"
@@ -51,6 +55,7 @@
 </template>
 
 <script setup lang="ts">
+import { splitPlacement } from "@/utils";
 import LucideCheck from "~icons/lucide/check";
 import { Button, Popover } from "frappe-ui";
 

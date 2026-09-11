@@ -3,12 +3,12 @@
     <div class="flex gap-4 items-center justify-between">
       <div class="flex items-center gap-2 text-md-semibold text-ink-gray-8">
         {{ currentTitle }}
-        <Tooltip :text="tooltipText" placement="top">
+        <Tooltip :text="tooltipText" side="top">
           <LucideInfo class="size-3" />
         </Tooltip>
       </div>
       <div class="w-max">
-        <TabButtons :buttons="chartTabs" v-model="currentTab" />
+        <TabButtons :options="chartTabs" v-model="currentTab" />
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">

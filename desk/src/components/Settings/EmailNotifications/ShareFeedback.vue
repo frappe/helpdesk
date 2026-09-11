@@ -15,7 +15,7 @@
   >
     <template #formFields>
       <FormControl
-        type="autocomplete"
+        type="combobox"
         size="sm"
         :label="__('On ticket status')"
         :options="statusOptions"

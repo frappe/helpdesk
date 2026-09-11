@@ -1,7 +1,7 @@
 <template>
   <Combobox v-model="selectedValue" nullable v-slot="{ open: isComboboxOpen }">
-    <Popover class="w-full" v-model:show="showOptions">
-      <template #target="{ open: openPopover, togglePopover }">
+    <Popover bare class="w-full" v-model:open="showOptions">
+      <template #trigger="{ open: openPopover, toggle: togglePopover }">
         <slot
           name="target"
           v-bind="{
@@ -35,7 +35,7 @@
           </div>
         </slot>
       </template>
-      <template #body="{ isOpen }">
+      <template #default="{ open: isOpen }">
         <div v-show="isOpen" class="min-w-[--reka-popper-anchor-width]">
           <div
             class="mt-1 rounded-6 bg-surface-elevation-2 py-1 text-base shadow-2xl"

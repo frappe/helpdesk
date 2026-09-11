@@ -38,7 +38,7 @@
             class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="dropdownOptions" placement="right">
+        <Dropdown :options="dropdownOptions" align="end">
           <template #default="{ open }">
             <Button :label="activeFilter">
               <template #suffix>
@@ -146,13 +146,13 @@
                         ? 'briefcase'
                         : null,
                   }"
-                  placement="right"
+                  align="end"
                 />
                 <Dropdown
                   :options="getOptions(agent)"
                   :key="agent"
                   class="ms-2"
-                  placement="right"
+                  align="end"
                 >
                   <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>

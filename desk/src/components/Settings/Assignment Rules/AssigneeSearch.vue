@@ -1,7 +1,7 @@
 <template>
   <Combobox :multiple="true">
-    <Popover placement="bottom-end">
-      <template #target="{ togglePopover }">
+    <Popover bare side="bottom" align="end">
+      <template #trigger="{ toggle: togglePopover }">
         <Button
           variant="subtle"
           icon-left="lucide-plus"
@@ -10,7 +10,7 @@
           class="rtl:flex-row-reverse"
         />
       </template>
-      <template #body="{ togglePopover }">
+      <template #default="{ toggle: togglePopover }">
         <div
           class="mt-1 rounded-6 bg-surface-base py-1 text-base shadow-2xl w-60"
         >

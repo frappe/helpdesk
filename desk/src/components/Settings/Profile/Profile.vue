@@ -34,7 +34,7 @@
                 </div>
                 <Tooltip
                   :hoverDelay="0"
-                  placement="bottom"
+                  side="bottom"
                   :text="profileTooltipText"
                 >
                   <div

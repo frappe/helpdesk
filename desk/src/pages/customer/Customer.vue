@@ -28,7 +28,7 @@
                 <span>{{ __("Edit") }}</span>
               </div>
             </Button>
-            <Dropdown :options="dropdownActions" placement="right">
+            <Dropdown :options="dropdownActions" align="end">
               <Button icon="more-horizontal" variant="subtle" />
             </Dropdown>
           </div>

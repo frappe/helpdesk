@@ -16,18 +16,19 @@
           {{ cardValue(card) }}
         </span>
         <Popover
-          placement="bottom"
-          :show="openCard === card.title"
-          @update:show="(open: boolean) => (openCard = open ? card.title : null)"
+          side="bottom"
+          align="center"
+          :open="openCard === card.title"
+          @update:open="(open: boolean) => (openCard = open ? card.title : null)"
         >
-          <template #target>
+          <template #trigger>
             <LucideInfo
               class="size-3.5 shrink-0 cursor-pointer text-ink-gray-5"
               @mouseenter="openCard = card.title"
               @mouseleave="openCard = null"
             />
           </template>
-          <template #body-main>
+          <template #default>
             <div class="flex min-w-[170px] flex-col gap-2.5 p-4 text-sm">
               <div
                 v-for="row in cardDetails(card)"

@@ -35,7 +35,7 @@
                 class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
-            <Dropdown :options="filters" placement="right">
+            <Dropdown :options="filters" align="end">
               <Button :label="activeFilterLabel">
                 <template #prefix><FilterIcon class="h-4" /></template>
               </Button>

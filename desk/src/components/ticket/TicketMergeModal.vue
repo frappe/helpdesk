@@ -13,14 +13,14 @@
             }}<Popover
               trigger="hover"
               :hoverDelay="0.25"
-              :placement="isRtl ? 'left' : 'right'"
+              :side="isRtl ? 'left' : 'right'"
               class="!inline-flex align-middle ms-1 -mt-1"
             >
-              <template #target>
+              <template #trigger>
                 <LucideInfo class="size-4 cursor-pointer" />
               </template>
 
-              <template #body-main>
+              <template #default>
                 <div
                   class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-5 max-w-[30rem] whitespace-pre-wrap leading-5"
                 >

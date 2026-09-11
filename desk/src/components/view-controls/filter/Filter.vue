@@ -1,7 +1,10 @@
 <template>
-  <Popover placement="bottom-end">
-    <template #target="{ togglePopover, open }">
-      <div :ref="() => (openPopoverFn = open)" class="w-fit">
+  <Popover bare side="bottom" align="end">
+    <template #trigger="{ toggle: togglePopover }">
+      <div
+        :ref="() => (openPopoverFn = () => togglePopover(true))"
+        class="w-fit"
+      >
         <FilterTrigger
           :count="activeFilters.length"
           @toggle="openPopover(togglePopover)"
@@ -9,7 +12,7 @@
         />
       </div>
     </template>
-    <template #body>
+    <template #default>
       <!-- Dedicated high-z layer the operator dropdown teleports into. Both this
            and the frappe-ui Popover panel land in <body>; the popover panel is
            z-[100], so a body-mounted menu (z-auto) renders behind it. This layer

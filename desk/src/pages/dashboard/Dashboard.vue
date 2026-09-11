@@ -9,7 +9,7 @@
       <template #right-header>
         <!-- Segmented pill toggle: only visible to managers -->
         <div v-if="isManager">
-          <TabButtons v-model="activeTab" :buttons="tabButtons" />
+          <TabButtons v-model="activeTab" :options="tabButtons" />
         </div>
       </template>
     </LayoutHeader>

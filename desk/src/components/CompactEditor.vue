@@ -16,10 +16,7 @@
             v-if="showAttachments"
             class="inline-flex items-center gap-1.5 pe-1"
           >
-            <FileUploader
-              :upload-args="{ private: true }"
-              @success="addAttachment"
-            >
+            <FileUploader private @success="addAttachment">
               <template #default="{ openFileSelector, uploading }">
                 {{ syncUploadingState(uploading) }}
                 <button

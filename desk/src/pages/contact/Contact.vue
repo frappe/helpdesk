@@ -35,7 +35,7 @@
             </Button>
             <Dropdown
               :options="dropdownActions"
-              placement="right"
+              align="end"
               v-if="hasPermission()"
             >
               <Button icon="more-horizontal" variant="subtle" />

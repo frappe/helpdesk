@@ -43,7 +43,7 @@
           </div>
         </div>
         <!-- Status -->
-        <Dropdown :options="statusDropdown" placement="right">
+        <Dropdown :options="statusDropdown" align="end">
           <template #default="{ open }">
             <Button :label="__(ticket.doc.status)" ref="statusRef">
               <template #prefix>
@@ -58,9 +58,9 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions[0]?.items?.length >= 1"
+          v-if="groupedActions[0]?.options?.length >= 1"
           :options="groupedActions"
-          placement="right"
+          align="end"
         >
           <Button icon="lucide-more-horizontal" />
         </Dropdown>
@@ -248,7 +248,7 @@ const defaultActions = computed(() => {
     {
       group: __("Default actions"),
       hideLabel: true,
-      items,
+      options: items,
     },
   ];
 });
@@ -259,17 +259,12 @@ const deleteAction = computed(() => {
     {
       group: __("Default actions"),
       hideLabel: true,
-      items: [
+      options: [
         {
           label: __("Delete"),
-          component: h(Button, {
-            label: __("Delete"),
-            variant: "ghost",
-            iconLeft: "trash-2",
-            theme: "red",
-            style: "width: 100%; justify-content: flex-start;",
-            onClick: handleDeleteTicket,
-          }),
+          icon: "lucide-trash-2",
+          theme: "red",
+          onClick: handleDeleteTicket,
         },
       ],
     },

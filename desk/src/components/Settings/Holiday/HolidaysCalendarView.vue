@@ -3,7 +3,7 @@
     <div class="mb-6.5 flex justify-between items-center">
       <div class="ms-1">
         <Popover v-if="startYear !== endYear">
-          <template #target="{ togglePopover }">
+          <template #trigger="{ toggle: togglePopover }">
             <Button
               class="flex items-center gap-2 text-xl-semibold cursor-pointer select-none"
               variant="ghost"
@@ -12,7 +12,7 @@
               icon-right="lucide-chevron-down"
             />
           </template>
-          <template #body-main="{ togglePopover }">
+          <template #default="{ toggle: togglePopover }">
             <div class="w-24">
               <div ref="yearsContainer" class="max-h-60 overflow-y-auto py-1">
                 <div

@@ -19,7 +19,7 @@
             {{ avatar.label }}
           </p>
           <Tooltip v-if="badge" :text="badge.tooltip ?? ''">
-            <Badge :label="badge.label" :theme="badge.theme ?? 'orange'" />
+            <Badge :label="badge.label" :theme="badge.theme ?? 'amber'" />
           </Tooltip>
         </div>
         <div v-if="!isMobileView" class="flex items-center gap-x-1.5">
@@ -69,7 +69,7 @@ interface DocInfoItem {
 
 interface BadgeInfo {
   label: string;
-  theme?: "gray" | "blue" | "green" | "orange" | "red";
+  theme?: "gray" | "blue" | "green" | "amber" | "red";
   tooltip?: string;
 }
 

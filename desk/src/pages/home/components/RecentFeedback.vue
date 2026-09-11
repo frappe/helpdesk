@@ -7,7 +7,7 @@
             {{ __("Reviews") }}
           </div>
           <TabButtons
-            :buttons="chartTabs"
+            :options="chartTabs"
             v-model="currentTab"
             class="sm:hidden z-20"
           />
@@ -22,7 +22,7 @@
               {{ __("Reviews") }}
             </div>
             <TabButtons
-              :buttons="chartTabs"
+              :options="chartTabs"
               v-model="currentTab"
               class="sm:hidden"
             />
@@ -90,7 +90,7 @@
             <Dropdown
               v-if="chartConfig.totalFeedbacks !== 0"
               :options="sortOptions"
-              placement="left"
+              align="start"
             >
               <template #default>
                 <Button
@@ -118,7 +118,7 @@
               <Dropdown
                 v-if="!showDatePicker && currentPeriod !== 'custom_range'"
                 :options="periodOptions"
-                placement="right"
+                align="end"
               >
                 <template #default>
                   <Button

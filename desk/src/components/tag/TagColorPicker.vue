@@ -1,6 +1,6 @@
 <template>
   <Popover v-model:open="open" side="left" align="start">
-    <template #target>
+    <template #trigger>
       <slot />
     </template>
     <div class="flex w-52 flex-col">

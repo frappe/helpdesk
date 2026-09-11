@@ -7,7 +7,7 @@
   >
     <template v-if="!editing" #actions>
       <Dropdown
-        placement="right"
+        align="end"
         :options="kebabOptions"
         @click="isConfirmingDelete = false"
       >

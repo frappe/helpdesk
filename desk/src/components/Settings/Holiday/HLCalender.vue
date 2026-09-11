@@ -16,13 +16,15 @@
       <div class="flex items-center" v-for="(week, i) in datesAsWeeks" :key="i">
         <div v-for="date in week" :key="getFormattedDate(date)">
           <Popover v-if="isHoliday(date)">
-            <template #target="{ open, close }">
+            <template #trigger="{ close, toggle }">
               <div
                 class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded-4 hover:bg-surface-yellow-2 select-none m-[1px]"
                 :class="{
                   '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
                 }"
-                @mouseover="handleMouseEnter(getFormattedDate(date), open)"
+                @mouseover="
+                  handleMouseEnter(getFormattedDate(date), () => toggle(true))
+                "
                 @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
                 @click="
                   () => {
@@ -35,11 +37,13 @@
                 {{ date.getDate() }}
               </div>
             </template>
-            <template #body-main="{ close: closePopover, open: openPopover }">
+            <template #default="{ close: closePopover, toggle: togglePopover }">
               <div
                 class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-5"
                 @mouseover="
-                  handleMouseEnter(getFormattedDate(date), openPopover)
+                  handleMouseEnter(getFormattedDate(date), () =>
+                    togglePopover(true)
+                  )
                 "
                 @mouseleave="
                   handleMouseLeave(getFormattedDate(date), closePopover)
@@ -60,11 +64,11 @@
                   v-if="!isWeekOff(date)"
                   @close="isConfirmingDelete = false"
                 >
-                  <template #target="{ open, close }">
+                  <template #trigger="{ close, toggle }">
                     <Button
                       icon="lucide-more-horizontal"
                       variant="ghost"
-                      @click="open"
+                      @click="toggle(true)"
                       @mouseleave="
                         handleMouseLeave(
                           getFormattedDate(date) + 'dropdown',
@@ -74,15 +78,17 @@
                     />
                   </template>
                   <template
-                    #body-main="{ close: closeDropdown, open: openDropdown }"
+                    #default="{ close: closeDropdown, toggle: toggleDropdown }"
                   >
                     <div
                       class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-5"
                       @mouseover="
-                        handleMouseEnter(getFormattedDate(date), openPopover);
+                        handleMouseEnter(getFormattedDate(date), () =>
+                          togglePopover(true)
+                        );
                         handleMouseEnter(
                           getFormattedDate(date) + 'dropdown',
-                          openDropdown
+                          () => toggleDropdown(true)
                         );
                       "
                       @mouseleave="

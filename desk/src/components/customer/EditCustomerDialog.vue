@@ -17,7 +17,7 @@
               v-if="isDirty"
               :label="__('Unsaved')"
               variant="subtle"
-              theme="orange"
+              theme="amber"
             />
           </div>
           <Button icon="x" @click="model = false" variant="ghost" />

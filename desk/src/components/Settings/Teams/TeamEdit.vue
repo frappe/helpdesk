@@ -11,7 +11,7 @@
             {{ __("Enabled") }}
           </span>
         </div>
-        <Dropdown placement="right" :options="options">
+        <Dropdown align="end" :options="options">
           <Button variant="ghost">
             <template #icon>
               <LucideMoreHorizontal class="h-4 w-4" />
@@ -65,7 +65,7 @@
                   <Dropdown
                     v-if="teamMembers.length > 1"
                     :options="memberDropdownOptions(member)"
-                    placement="right"
+                    align="end"
                   >
                     <Button
                       icon="lucide-more-horizontal"

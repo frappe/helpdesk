@@ -9,7 +9,7 @@
       v-if="title == 'Calls'"
       :options="callActions"
       @click.stop
-      placement="right"
+      align="end"
     >
       <template v-slot="{ open }">
         <Button variant="subtle" class="flex items-center gap-1">

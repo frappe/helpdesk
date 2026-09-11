@@ -966,3 +966,12 @@ export function handleInviteUserSuccess(
     toast.info(`${emailsStr} already present`);
   }
 }
+
+/**
+ * Splits a legacy `placement` string ("bottom-start") into frappe-ui v1's
+ * `side` + `align` pair. A bare side means centred alignment.
+ */
+export function splitPlacement(placement?: string) {
+  const [side = "bottom", align = "center"] = (placement || "").split("-");
+  return { side, align } as { side: any; align: any };
+}

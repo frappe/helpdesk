@@ -7,7 +7,7 @@
       </h4>
       <TabButtons
         v-model="activeSort"
-        :buttons="sortOptions"
+        :options="sortOptions"
         @update:modelValue="onSortChange"
       />
     </div>

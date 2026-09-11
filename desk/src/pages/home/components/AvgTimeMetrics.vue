@@ -8,7 +8,7 @@
         <Dropdown
           v-if="currentDuration !== 'custom_range'"
           :options="durationOptions"
-          placement="right"
+          align="end"
         >
           <template #default>
             <Button

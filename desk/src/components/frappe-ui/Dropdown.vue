@@ -1,11 +1,12 @@
 <template>
   <Menu as="div" class="relative inline-block text-start" v-slot="{ open }">
     <Popover
-      :transition="dropdownTransition"
-      :show="open"
-      :placement="popoverPlacement"
+      bare
+      :open="open"
+      :side="splitPlacement(popoverPlacement).side"
+      :align="splitPlacement(popoverPlacement).align"
     >
-      <template #target="{ togglePopover }">
+      <template #trigger="{ toggle: togglePopover }">
         <MenuButton as="template">
           <slot v-if="$slots.default" v-bind="{ open, togglePopover }" />
           <Button v-else :active="open" v-bind="button">
@@ -14,7 +15,7 @@
         </MenuButton>
       </template>
 
-      <template #body>
+      <template #default>
         <div
           class="mt-2 min-w-40 divide-y divide-outline-elevation-2 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
           :class="{
@@ -86,6 +87,7 @@
 </template>
 
 <script setup>
+import { splitPlacement } from "@/utils";
 import Icon from "@/components/Icon.vue";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import { Popover, Button } from "frappe-ui";
@@ -109,15 +111,6 @@ const props = defineProps({
 
 const router = useRouter();
 const slots = useSlots();
-
-const dropdownTransition = {
-  enterActiveClass: "transition duration-100 ease-out",
-  enterFromClass: "transform scale-95 opacity-0",
-  enterToClass: "transform scale-100 opacity-100",
-  leaveActiveClass: "transition duration-75 ease-in",
-  leaveFromClass: "transform scale-100 opacity-100",
-  leaveToClass: "transform scale-95 opacity-0",
-};
 
 const groups = computed(() => {
   let groups = props.options[0]?.group

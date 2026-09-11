@@ -32,7 +32,7 @@
           <div v-else>{{ holiday[column.key] }}</div>
         </div>
         <div class="flex justify-end">
-          <Dropdown placement="right" :options="dropdownOptions(holiday)">
+          <Dropdown align="end" :options="dropdownOptions(holiday)">
             <Button
               icon="lucide-more-horizontal"
               variant="ghost"

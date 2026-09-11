@@ -32,7 +32,7 @@
           <Alert
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
-            theme="yellow"
+            theme="amber"
             class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-outline-amber-2"
             @dismiss="dismissBanner"
           >

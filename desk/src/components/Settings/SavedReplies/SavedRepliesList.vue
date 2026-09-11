@@ -39,7 +39,7 @@
             class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="filterOptions" placement="right">
+        <Dropdown :options="filterOptions" align="end">
           <template #default="{ open }">
             <Button :label="activeFilterLabel">
               <template #suffix>
@@ -130,10 +130,7 @@
                 />
                 {{ savedReply.scope }}
               </div>
-              <Dropdown
-                placement="right"
-                :options="dropdownOptions(savedReply)"
-              >
+              <Dropdown align="end" :options="dropdownOptions(savedReply)">
                 <Button
                   icon="lucide-more-horizontal"
                   variant="ghost"

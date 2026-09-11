@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-wrap items-center gap-1.5 pt-1.5">
-    <Popover placement="top-start">
-      <template #target="{ togglePopover }">
+    <Popover side="top" align="start">
+      <template #trigger="{ toggle: togglePopover }">
         <Button
           variant="ghost"
           class="text-ink-gray- 5 -ml-1.5"
@@ -12,7 +12,7 @@
           </template>
         </Button>
       </template>
-      <template #body-main>
+      <template #default>
         <div class="p-2">
           <div class="grid grid-cols-6 gap-2">
             <button
@@ -28,8 +28,8 @@
       </template>
     </Popover>
 
-    <Tooltip v-for="reaction in reactions" :key="reaction.emoji">
-      <template #body>
+    <Tooltip bare v-for="reaction in reactions" :key="reaction.emoji">
+      <template #content>
         <div
           class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded-4"
         >

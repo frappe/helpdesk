@@ -38,10 +38,8 @@
         <slot name="bottom-left" />
         <FileUploader
           class="flex items-center"
-          :upload-args="{
-            folder: 'Home/Helpdesk',
-            private: true,
-          }"
+          folder="Home/Helpdesk"
+          private
           @success="
             (f: File) => $emit('update:attachments', [...attachments, f])
           "

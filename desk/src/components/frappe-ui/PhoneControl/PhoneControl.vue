@@ -4,8 +4,8 @@
       {{ label }}
       <span v-if="required" class="text-ink-red-6">*</span>
     </label>
-    <Popover v-model:open="isOpen" matchTargetWidth>
-      <template #target="{ togglePopover }">
+    <Popover bare v-model:open="isOpen" matchTriggerWidth>
+      <template #trigger="{ toggle: togglePopover }">
         <div :class="containerClasses">
           <button
             type="button"
@@ -60,7 +60,7 @@
         </div>
       </template>
 
-      <template #body="{ close }">
+      <template #default="{ close }">
         <div
           class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-6 border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
         >

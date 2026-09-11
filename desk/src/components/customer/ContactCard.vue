@@ -20,17 +20,13 @@
         <Tooltip
           v-if="contact.is_manager"
           :text="__('Can view tickets raised by all contacts of the customer.')"
-          placement="top"
+          side="top"
         >
           <Badge :label="__('Manager')" theme="green" variant="outline" />
         </Tooltip>
       </div>
       <div class="flex gap-1">
-        <Tooltip
-          v-if="contact.is_primary"
-          :text="__('Primary')"
-          placement="top"
-        >
+        <Tooltip v-if="contact.is_primary" :text="__('Primary')" side="top">
           <span
             class="flex h-6 w-6 items-center justify-center text-ink-amber-5"
             :aria-label="__('Primary')"
@@ -38,11 +34,7 @@
             <LucideStar class="size-4 fill-ink-amber-5" />
           </span>
         </Tooltip>
-        <Dropdown
-          v-if="hasPermission()"
-          placement="right"
-          :options="dropdownOptions"
-        >
+        <Dropdown v-if="hasPermission()" align="end" :options="dropdownOptions">
           <Button
             class="h-6 w-6 p-0 min-w-fit shrink-0"
             variant="ghost"

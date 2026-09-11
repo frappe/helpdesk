@@ -66,7 +66,7 @@
             </div>
             <div class="flex justify-between items-center pe-2">
               <div>
-                <Dropdown placement="right" :options="dropdownOptions(team)">
+                <Dropdown align="end" :options="dropdownOptions(team)">
                   <Button
                     icon="lucide-more-horizontal"
                     variant="ghost"

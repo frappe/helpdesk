@@ -101,8 +101,13 @@
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
               >
-                <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
-                  <template #target>
+                <Popover
+                  trigger="hover"
+                  :hoverDelay="0.25"
+                  side="top"
+                  align="end"
+                >
+                  <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default"
                     >
@@ -110,7 +115,7 @@
                       <LucideInfo class="size-4" />
                     </div>
                   </template>
-                  <template #body-main>
+                  <template #default>
                     <div
                       class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-5 max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >

@@ -14,8 +14,8 @@
         />
         <div>
           <FormLabel label="Response time" required size="md" />
-          <Popover class="mt-2">
-            <template #target="{ togglePopover }" class="w-max">
+          <Popover bare class="mt-2">
+            <template #trigger="{ toggle: togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
                 class="w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
@@ -26,7 +26,7 @@
                 <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
-            <template #body>
+            <template #default>
               <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
@@ -38,8 +38,8 @@
         </div>
         <div>
           <FormLabel label="Resolution time" required size="md" />
-          <Popover class="mt-2">
-            <template #target="{ togglePopover }" class="w-max">
+          <Popover bare class="mt-2">
+            <template #trigger="{ toggle: togglePopover }" class="w-max">
               <div
                 @click="togglePopover()"
                 class="w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
@@ -50,7 +50,7 @@
                 <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
-            <template #body>
+            <template #default>
               <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"

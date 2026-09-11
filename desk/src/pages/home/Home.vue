@@ -49,7 +49,7 @@
           <Dropdown
             v-if="chartsDropdown.length > 0"
             :options="chartsDropdown"
-            placement="right"
+            align="end"
           >
             <Button
               :label="__('New')"

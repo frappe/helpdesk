@@ -25,7 +25,7 @@
               v-if="!tab.hideLabel"
               class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-xs-medium text-ink-gray-5 transition-all duration-300 ease-in-out sticky top-0 z-10 bg-surface-sidebar ml-1"
             >
-              <Tooltip :text="__(tab.label)" placement="right">
+              <Tooltip :text="__(tab.label)" side="right">
                 <span class="truncate">{{ __(tab.label) }}</span>
               </Tooltip>
             </div>
@@ -46,7 +46,7 @@
                   :is="item.icon"
                   class="h-4 w-4 text-ink-gray-7 shrink-0"
                 />
-                <Tooltip :text="__(item.label)" placement="right">
+                <Tooltip :text="__(item.label)" side="right">
                   <span class="text-p-sm text-ink-gray-8 truncate">
                     {{ __(item.label) }}
                   </span>

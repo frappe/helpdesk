@@ -6,7 +6,7 @@
       {{ __("My Recent Activity") }}
       <Tooltip
         :text="__('Tickets you\'ve recently worked on or viewed')"
-        placement="top"
+        side="top"
       >
         <LucideInfo class="size-3.5 cursor-pointer text-ink-gray-5" />
       </Tooltip>

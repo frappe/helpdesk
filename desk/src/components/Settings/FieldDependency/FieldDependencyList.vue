@@ -100,7 +100,7 @@
                     />
                   </div>
                   <div>
-                    <Dropdown placement="right" :options="getOptions(row.name)">
+                    <Dropdown align="end" :options="getOptions(row.name)">
                       <Button
                         variant="ghost"
                         @click.stop="

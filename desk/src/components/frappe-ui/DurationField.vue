@@ -1,6 +1,6 @@
 <template>
-  <Popover v-model:open="isOpen" @close="handlePopoverToggle">
-    <template #target="{ togglePopover }">
+  <Popover bare v-model:open="isOpen" @close="handlePopoverToggle">
+    <template #trigger="{ toggle: togglePopover }">
       <div
         @click="!disabled && togglePopover()"
         class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 rounded-4"
@@ -13,7 +13,7 @@
       </div>
     </template>
 
-    <template #body="{ close }">
+    <template #default="{ close }">
       <div class="absolute bg-surface-base top-2">
         <!-- Built-in Duration Picker -->
         <div
