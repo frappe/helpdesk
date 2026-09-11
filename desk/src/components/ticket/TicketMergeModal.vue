@@ -99,10 +99,10 @@ import { Link } from "@/components";
 import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
 import {
-  Dialog,
   createListResource,
   createResource,
-  Popover,
+  Dialog,
+  HoverCard,
   toast,
 } from "frappe-ui";
 import { ref, watch } from "vue";

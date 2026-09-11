@@ -322,6 +322,7 @@ import {
   ErrorMessage,
   FormControl,
   FormLabel,
+  HoverCard,
   LoadingIndicator,
   Popover,
   Switch,

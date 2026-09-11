@@ -292,8 +292,8 @@ import {
   DatePicker,
   ErrorMessage,
   FormLabel,
+  HoverCard,
   LoadingIndicator,
-  Popover,
   Switch,
   toast,
 } from "frappe-ui";
