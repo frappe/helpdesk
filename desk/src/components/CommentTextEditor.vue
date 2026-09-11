@@ -107,7 +107,7 @@ import {
 import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
 
@@ -179,7 +179,7 @@ async function submitComment() {
     onSuccess: () => {
       capture("comment_added");
       if (isManager) {
-        updateOnboardingStep("comment_on_ticket");
+        updateOnboardingStep?.("comment_on_ticket");
       }
       emit("submit");
       loading.value = false;

@@ -222,7 +222,7 @@ interface E {
 
 const emit = defineEmits<E>();
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const state = reactive<EmailAccountProviderAuthState>({
   service: "",
@@ -308,7 +308,7 @@ const addEmailRes = createResource({
   onSuccess: () => {
     toast.success(__("Email account created"));
     emit("update:step", "email-list");
-    updateOnboardingStep("setup_email_account");
+    updateOnboardingStep?.("setup_email_account");
     capture("email_account_created", { data: { service: state.service } });
   },
   onError: () => {

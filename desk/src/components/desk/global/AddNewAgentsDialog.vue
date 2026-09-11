@@ -95,7 +95,7 @@ const inviteQueue = ref([]);
 const currentInputIsValidEmail = ref(false);
 
 // Stores and utilities
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager } = useAuthStore();
 
 // Methods
@@ -175,7 +175,7 @@ const sentInvitesResource = createResource({
     inviteQueue.value = [];
 
     if (isManager) {
-      updateOnboardingStep("invite_agents");
+      updateOnboardingStep?.("invite_agents");
     }
 
     toast.success("Invites sent successfully!");

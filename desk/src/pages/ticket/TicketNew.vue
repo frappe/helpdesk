@@ -177,7 +177,7 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager, userId: userID } = useAuthStore();
 // Pre-filled by the command palette's "Create ticket …" fallback.
 const subject = ref(String(route.query.subject ?? ""));
@@ -279,7 +279,7 @@ const ticket = createResource({
       },
     });
     if (isManager) {
-      updateOnboardingStep("create_first_ticket", true, false, () =>
+      updateOnboardingStep?.("create_first_ticket", true, false, () =>
         localStorage.setItem("firstTicket", data.name)
       );
     }

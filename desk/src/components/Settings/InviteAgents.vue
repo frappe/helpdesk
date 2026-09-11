@@ -124,7 +124,7 @@ const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
 
 // @ts-expect-error
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
@@ -215,7 +215,7 @@ const inviteByEmailResource = createResource({
     resetInputValues();
     handleInviteUserSuccess(data);
     pendingInvitesResource.reload();
-    updateOnboardingStep("invite_your_team");
+    updateOnboardingStep?.("invite_your_team");
     capture("agents_invited", {
       data: {
         role: role.value,

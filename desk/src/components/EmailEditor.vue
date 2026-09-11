@@ -291,7 +291,7 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "discard"]);
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
@@ -465,7 +465,7 @@ const sendMail = createResource({
     emit("submit");
 
     if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
+      updateOnboardingStep?.("reply_on_ticket");
     }
   },
   debounce: 300,

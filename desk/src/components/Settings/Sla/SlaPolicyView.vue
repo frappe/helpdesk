@@ -309,7 +309,7 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
 import { HDServiceLevelAgreement } from "@/types/doctypes";
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const showConfirmDialog = ref({
   show: false,
@@ -456,7 +456,7 @@ const createSla = () => {
           doctype: "HD Service Level Agreement",
           name: data.name,
         });
-        updateOnboardingStep("setup_sla", true);
+        updateOnboardingStep?.("setup_sla", true);
       },
     }
   );

@@ -475,7 +475,7 @@ function getContactFieldConfig(newDoc: boolean = false): FieldConfigRow[] {
 export function useContactInvite() {
   const isLoading = ref(false);
   // @ts-expect-error
-  const { updateOnboardingStep } = useOnboarding("helpdesk");
+  const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
   async function resendInvite(
     invitationName: string,
     status: string | undefined,
@@ -492,7 +492,7 @@ export function useContactInvite() {
         app_name: "helpdesk",
       });
       toast.success(__("Invitation email resent successfully"));
-      updateOnboardingStep("add_invite_contact");
+      updateOnboardingStep?.("add_invite_contact");
     } catch (error: unknown) {
       isLoading.value = false;
       const parser = new DOMParser();
@@ -525,7 +525,7 @@ export function useContactInvite() {
         contact: contactName,
       });
       toast.success(__("Invitation sent"));
-      updateOnboardingStep("add_invite_contact");
+      updateOnboardingStep?.("add_invite_contact");
     } catch (error: unknown) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(

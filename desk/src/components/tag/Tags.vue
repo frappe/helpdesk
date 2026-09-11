@@ -64,7 +64,7 @@
             </Tooltip>
           </div>
         </template>
-        <template #suffix>
+        <template #search-suffix>
           <ShortcutKey v-if="!queryText" keys="G" />
         </template>
         <template #item-prefix="{ item }">

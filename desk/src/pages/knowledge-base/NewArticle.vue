@@ -94,7 +94,7 @@ const user = userStore.getUser();
 const { $dialog } = globalStore();
 const router = useRouter();
 const route = useRoute();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager } = useAuthStore();
 
 const title = ref("");
@@ -117,7 +117,7 @@ function handleCreateArticle() {
       onSuccess: (article: Article) => {
         toast.success(__("Article created successfully."));
         if (isManager) {
-          updateOnboardingStep("first_article");
+          updateOnboardingStep?.("first_article");
         }
         resetState();
         router.push({
