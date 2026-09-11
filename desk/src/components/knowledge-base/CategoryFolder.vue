@@ -1,6 +1,6 @@
 <template>
   <router-link
-    class="flex flex-col gap-2 rounded-lg border p-3 border-outline-elevation-2 cursor-pointer hover:shadow-xl"
+    class="flex flex-col gap-2 rounded-6 border p-3 border-outline-elevation-2 cursor-pointer hover:shadow-xl"
     :to="{
       name: 'Articles',
       params: {
@@ -9,7 +9,7 @@
     }"
   >
     <div>
-      <FeatherIcon name="folder" class="h-6 w-6 text-ink-gray-4 -ms-[2px]" />
+      <LucideFolder class="h-6 w-6 text-ink-gray-4 -ms-[2px]" />
     </div>
     <div class="gap-1 flex flex-col">
       <p class="text-base-medium text-ink-gray-8 truncate">
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { FeatherIcon } from "frappe-ui";
+import LucideFolder from "~icons/lucide/folder";
 const props = defineProps({
   category: {
     required: true,

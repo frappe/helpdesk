@@ -45,7 +45,7 @@
           <li
             v-for="invite in pendingInvitesResource.data"
             :key="invite.name"
-            class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-2"
+            class="flex items-center justify-between px-3 py-1 rounded-6 bg-surface-gray-2"
           >
             <div class="text-base">
               <span class="text-ink-gray-8">

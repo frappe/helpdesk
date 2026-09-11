@@ -47,7 +47,7 @@
         <LucideTicket class="h-10 w-10 text-ink-gray-4" />
         <div>
           <!-- make font larger -->
-          <p class="text-lg-medium text-ink-gray-7">
+          <p class="text-md-medium text-ink-gray-7">
             {{ __("No tickets found") }}
           </p>
         </div>
@@ -87,7 +87,7 @@
             :key="ticket.name"
           >
             <div
-              class="grid items-center py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
+              class="grid items-center py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded-4 transition-colors"
               :style="gridTemplateStyle"
               @click="goToTicket(ticket.name)"
             >

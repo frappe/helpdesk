@@ -44,7 +44,7 @@
               <button
                 type="button"
                 :aria-label="__('Remove {0}', label)"
-                class="flex items-center rounded-sm text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
+                class="flex items-center rounded-1 text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
                 @click.stop="emit('remove')"
                 @pointerdown.stop
               >

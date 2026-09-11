@@ -107,10 +107,10 @@
 </template>
 
 <script setup lang="ts">
+import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { Link, StarRating } from "@/components";
 import { TemplateOption } from "@/utils";
 import {
-  Autocomplete,
   Button,
   DatePicker,
   DateRangePicker,

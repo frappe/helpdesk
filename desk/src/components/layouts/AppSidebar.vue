@@ -74,7 +74,7 @@
                     <Button
                       variant="ghost"
                       icon="lucide-more-horizontal"
-                      class="me-1 !size-6 rounded !text-ink-gray-7"
+                      class="me-1 !size-6 rounded-4 !text-ink-gray-7"
                       :class="
                         open
                           ? 'opacity-100'

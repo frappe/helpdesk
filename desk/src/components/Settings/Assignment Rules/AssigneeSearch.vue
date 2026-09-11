@@ -12,7 +12,7 @@
       </template>
       <template #body="{ togglePopover }">
         <div
-          class="mt-1 rounded-lg bg-surface-base py-1 text-base shadow-2xl w-60"
+          class="mt-1 rounded-6 bg-surface-base py-1 text-base shadow-2xl w-60"
         >
           <div class="relative px-1.5 pt-0.5">
             <ComboboxInput
@@ -32,7 +32,7 @@
               class="absolute end-1.5 inline-flex h-7 w-7 items-center justify-center"
               @click="query = ''"
             >
-              <FeatherIcon name="x" class="w-4" />
+              <LucideX class="w-4" />
             </button>
           </div>
           <ComboboxOptions class="my-2 max-h-64 overflow-y-auto px-1.5" static>
@@ -51,7 +51,7 @@
               "
             >
               <li
-                class="flex items-center rounded p-1.5 w-full text-base"
+                class="flex items-center rounded-4 p-1.5 w-full text-base"
                 :class="{ 'bg-surface-gray-2': active }"
               >
                 <div class="flex gap-2 items-center w-full select-none">
@@ -74,7 +74,7 @@
             </ComboboxOption>
             <li
               v-if="users.length == 0"
-              class="mt-1.5 rounded-md p-1.5 text-base text-ink-gray-5"
+              class="mt-1.5 rounded-5 p-1.5 text-base text-ink-gray-5"
             >
               {{ __("No results found") }}
             </li>
@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideX from "~icons/lucide/x";
 import { assignmentRuleData } from "@/stores/assignmentRules";
 import {
   Combobox,

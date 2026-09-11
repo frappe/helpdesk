@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded"
+    class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded-4"
   >
     <div
       class="w-full ps-2 flex flex-col justify-center h-14"

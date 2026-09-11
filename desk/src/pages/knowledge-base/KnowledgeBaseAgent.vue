@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">
+        <div class="text-md-medium text-ink-gray-9">
           {{ __("Knowledge Base") }}
         </div>
       </template>
@@ -64,7 +64,6 @@ import {
   Badge,
   Button,
   Dropdown,
-  FeatherIcon,
   createResource,
   toast,
   usePageMeta,
@@ -402,7 +401,7 @@ const options = computed(() => {
     columnConfig: {
       title: {
         prefix: () => {
-          return h(FeatherIcon, {
+          return h({
             name: "file-text",
             class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });

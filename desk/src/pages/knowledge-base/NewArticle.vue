@@ -7,7 +7,7 @@
       <template #right-header> </template>
     </LayoutHeader>
     <div class="pt-6 mx-auto w-full max-w-4xl px-5">
-      <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
+      <div class="flex flex-col gap-3 rounded-6 border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
           <div class="flex gap-1 items-center flex-1 me-7 max-w-fit">
@@ -34,7 +34,7 @@
         </div>
         <!-- Title -->
         <textarea
-          class="w-full resize-none border-0 bg-transparent text-4xl-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-elevation-2 focus:ring-0 focus:border-outline-elevation-2"
+          class="w-full resize-none border-0 bg-transparent text-3xl-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-outline-elevation-2 focus:ring-0 focus:border-outline-elevation-2"
           v-model="title"
           :placeholder="__('Title')"
           rows="1"
@@ -57,7 +57,7 @@
         >
           <template #default>
             <EditorContent
-              class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+              class="rounded-b-6 max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
             />
             <EditorFixedMenu
               class="-ms-1 overflow-x-auto w-full"

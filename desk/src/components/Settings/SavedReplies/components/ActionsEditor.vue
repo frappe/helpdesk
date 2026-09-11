@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-3">
     <div class="flex flex-col gap-1">
-      <span class="text-lg-medium text-ink-gray-8">{{ __("Actions") }}</span>
+      <span class="text-md-medium text-ink-gray-8">{{ __("Actions") }}</span>
       <span class="text-p-base text-ink-gray-6">
         {{ __("Applied to the ticket when this reply is sent") }}
       </span>
     </div>
-    <div class="rounded-md border border-outline-gray-2 px-1 text-sm">
+    <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
       <template v-if="rows.length">
         <div
           class="grid items-center gap-6 p-2"

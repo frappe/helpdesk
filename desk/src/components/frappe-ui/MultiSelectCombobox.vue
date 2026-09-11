@@ -23,7 +23,7 @@
               {{ $props.label }}
             </label>
             <button
-              class="flex h-7 w-full items-center justify-between gap-2 rounded bg-surface-gray-2 py-1 px-2 transition-colors hover:bg-surface-gray-3 focus:ring-2 focus:ring-outline-gray-3"
+              class="flex h-7 w-full items-center justify-between gap-2 rounded-4 bg-surface-gray-2 py-1 px-2 transition-colors hover:bg-surface-gray-3 focus:ring-2 focus:ring-outline-gray-3"
               :class="[
                 isComboboxOpen ? 'bg-surface-gray-3' : '',
                 $props.buttonClasses,
@@ -48,9 +48,8 @@
                 </span>
                 <slot name="suffix" />
               </div>
-              <FeatherIcon
+              <LucideChevronDown
                 v-show="!loading"
-                name="chevron-down"
                 class="h-4 w-4 text-ink-gray-5"
                 aria-hidden="true"
               />
@@ -65,7 +64,7 @@
       <template #body="{ isOpen, togglePopover }">
         <div v-show="isOpen">
           <div
-            class="relative mt-1 overflow-hidden rounded-lg bg-surface-base text-base shadow-2xl"
+            class="relative mt-1 overflow-hidden rounded-6 bg-surface-base text-base shadow-2xl"
             :class="bodyClasses"
           >
             <ComboboxOptions
@@ -89,7 +88,7 @@
                   class="absolute end-0 inline-flex h-7 w-7 items-center justify-center"
                   @click="selectedValue = null"
                 >
-                  <FeatherIcon name="x" class="w-4" />
+                  <LucideX class="w-4" />
                 </button>
               </div>
               <div class="w-full flex-1 overflow-y-auto">
@@ -113,7 +112,7 @@
                   >
                     <li
                       :class="[
-                        'flex h-7 cursor-pointer items-center justify-between rounded px-2.5 text-base',
+                        'flex h-7 cursor-pointer items-center justify-between rounded-4 px-2.5 text-base',
                         { 'bg-surface-gray-2': active },
                       ]"
                     >
@@ -165,7 +164,7 @@
               </div>
               <li
                 v-if="groups.length == 0"
-                class="rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
+                class="rounded-5 px-2.5 py-1.5 text-base text-ink-gray-5"
               >
                 No results found
               </li>
@@ -209,6 +208,8 @@ import {
 import { LoadingIndicator, Popover } from "frappe-ui";
 import { nextTick } from "vue";
 import LucideCheckSquare from "~icons/lucide/check-square";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideX from "~icons/lucide/x";
 import LucideSquare from "~icons/lucide/square";
 
 export default {
@@ -230,6 +231,8 @@ export default {
   ],
   emits: ["update:modelValue", "update:query", "change"],
   components: {
+    LucideChevronDown,
+    LucideX,
     Popover,
     Combobox,
     ComboboxInput,

@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Configure your telephony settings.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("Telephony") }}
         </h1>
         <UnsavedBadge
@@ -35,7 +35,7 @@
         <div class="flex-1 flex flex-col">
           <!-- General -->
           <div
-            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-sidebar rounded px-2"
+            class="flex items-center justify-between gap-8 py-3 hover:bg-surface-sidebar rounded-4 px-2"
           >
             <div class="flex flex-col">
               <div class="text-p-base-medium text-ink-gray-7 truncate">
@@ -64,7 +64,7 @@
           <div class="h-px border-t mx-2 border-outline-elevation-2" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-sidebar px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded-4 hover:bg-surface-sidebar px-2"
             @click="emit('updateStep', 'twilio-settings')"
           >
             <div class="flex flex-col">
@@ -79,16 +79,13 @@
                 }}
               </div>
             </div>
-            <FeatherIcon
-              name="chevron-right"
-              class="size-4 text-ink-gray-5 rtl:rotate-180"
-            />
+            <LucideChevronRight class="size-4 text-ink-gray-5 rtl:rotate-180" />
           </div>
 
           <div class="h-px border-t mx-2 border-outline-elevation-2" />
 
           <div
-            class="flex items-center justify-between py-3 cursor-pointer rounded hover:bg-surface-sidebar px-2"
+            class="flex items-center justify-between py-3 cursor-pointer rounded-4 hover:bg-surface-sidebar px-2"
             @click="emit('updateStep', 'exotel-settings')"
           >
             <div class="flex flex-col">
@@ -103,10 +100,7 @@
                 }}
               </div>
             </div>
-            <FeatherIcon
-              name="chevron-right"
-              class="size-4 text-ink-gray-5 rtl:rotate-180"
-            />
+            <LucideChevronRight class="size-4 text-ink-gray-5 rtl:rotate-180" />
           </div>
         </div>
         <ErrorMessage :message="error" />
@@ -116,6 +110,8 @@
 </template>
 
 <script setup lang="ts">
+import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
+import LucideChevronRight from "~icons/lucide/chevron-right";
 import Password from "@/components/Password.vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import {
@@ -128,7 +124,6 @@ import {
   ErrorMessage,
   createResource,
   Badge,
-  Autocomplete,
 } from "frappe-ui";
 import SelectDropdown from "@/components/SelectDropdown.vue";
 import { nextTick, ref, watch } from "vue";

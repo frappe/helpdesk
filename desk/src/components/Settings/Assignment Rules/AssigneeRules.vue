@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex flex-col gap-1">
-      <span class="text-lg-semibold text-ink-gray-8">{{
+      <span class="text-md-semibold text-ink-gray-8">{{
         __("Assignee Rules")
       }}</span>
       <span class="text-p-sm text-ink-gray-6">
@@ -27,7 +27,7 @@
         <Popover placement="bottom-end">
           <template #target="{ togglePopover }">
             <div
-              class="flex items-center justify-between text-base rounded h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] select-none min-w-44"
+              class="flex items-center justify-between text-base rounded-4 h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] select-none min-w-44"
               @click="togglePopover()"
             >
               <div>
@@ -37,17 +37,17 @@
                   )?.label
                 }}
               </div>
-              <FeatherIcon name="chevron-down" class="size-4" />
+              <LucideChevronDown class="size-4" />
             </div>
           </template>
           <template #body="{ togglePopover }">
             <div
-              class="p-1 text-ink-gray-7 mt-1 bg-surface-base shadow-xl rounded w-[--reka-popper-anchor-width]"
+              class="p-1 text-ink-gray-7 mt-1 bg-surface-base shadow-xl rounded-4 w-[--reka-popper-anchor-width]"
             >
               <div
                 v-for="option in ticketRoutingOptions"
                 :key="option.value"
-                class="p-2 cursor-pointer hover:bg-surface-gray-3 text-sm flex items-center justify-between rounded"
+                class="p-2 cursor-pointer hover:bg-surface-gray-3 text-sm flex items-center justify-between rounded-4"
                 @click="
                   () => {
                     assignmentRuleData.rule = option.value;
@@ -58,9 +58,8 @@
                 <span>
                   {{ option.label }}
                 </span>
-                <FeatherIcon
+                <LucideCheck
                   v-if="assignmentRuleData.rule == option.value"
-                  name="check"
                   class="size-4"
                 />
               </div>
@@ -112,6 +111,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideCheck from "~icons/lucide/check";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import {
   assignmentRuleData,
   assignmentRulesErrors,

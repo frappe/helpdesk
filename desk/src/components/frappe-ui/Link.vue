@@ -54,7 +54,7 @@
             @click="attrs.onCreate(value, close)"
           >
             <template #prefix>
-              <FeatherIcon name="plus" class="h-4" />
+              <LucidePlus class="h-4" />
             </template>
           </Button>
         </div>
@@ -66,7 +66,7 @@
             @click="() => clearValue(close)"
           >
             <template #prefix>
-              <FeatherIcon name="x" class="h-4" />
+              <LucideX class="h-4" />
             </template>
           </Button>
         </div>
@@ -76,6 +76,8 @@
 </template>
 
 <script setup>
+import LucidePlus from "~icons/lucide/plus";
+import LucideX from "~icons/lucide/x";
 import { watchDebounced } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import { computed, ref, useAttrs, watch } from "vue";

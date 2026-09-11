@@ -1,8 +1,8 @@
 <template>
   <div
-    class="flex flex-col rounded-md px-2 py-4 grow w-full h-full overflow-hidden"
+    class="flex flex-col rounded-5 px-2 py-4 grow w-full h-full overflow-hidden"
   >
-    <div class="flex items-center gap-2 px-2 text-lg-semibold text-ink-gray-8">
+    <div class="flex items-center gap-2 px-2 text-md-semibold text-ink-gray-8">
       {{ __("My Recent Activity") }}
       <Tooltip
         :text="__('Tickets you\'ve recently worked on or viewed')"
@@ -22,7 +22,7 @@
               name: 'TicketAgent',
               params: { ticketId: String(activity.name) },
             }"
-            class="flex items-center gap-3 px-2 py-3 text-sm hover:bg-surface-sidebar rounded"
+            class="flex items-center gap-3 px-2 py-3 text-sm hover:bg-surface-sidebar rounded-4"
           >
             <component
               :is="iconFor(activity.activity_type)"
@@ -43,10 +43,10 @@
         </template>
         <div v-else class="flex flex-col">
           <div v-for="i in 6" :key="i" class="flex items-center gap-3 p-2 py-3">
-            <div class="size-4 rounded-sm bg-surface-gray-1 flex-shrink-0" />
+            <div class="size-4 rounded-1 bg-surface-gray-1 flex-shrink-0" />
             <div class="flex flex-col gap-1 grow">
-              <div class="h-4 w-2/3 rounded-sm bg-surface-gray-1" />
-              <div class="h-3 w-1/3 rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-2/3 rounded-1 bg-surface-gray-1" />
+              <div class="h-3 w-1/3 rounded-1 bg-surface-gray-1" />
             </div>
           </div>
         </div>

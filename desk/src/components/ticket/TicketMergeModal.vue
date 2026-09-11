@@ -17,12 +17,12 @@
               class="!inline-flex align-middle ms-1 -mt-1"
             >
               <template #target>
-                <FeatherIcon name="info" class="size-4 cursor-pointer" />
+                <LucideInfo class="size-4 cursor-pointer" />
               </template>
 
               <template #body-main>
                 <div
-                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-5 max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -37,7 +37,7 @@
                       {{ __(condition.text) }}
                       <code
                         v-if="condition.code"
-                        class="bg-surface-gray-2 rounded-md px-1 py-0.5"
+                        class="bg-surface-gray-2 rounded-5 px-1 py-0.5"
                       >
                         {{ __(condition.code) }}
                       </code>
@@ -69,7 +69,7 @@
         />
         <!-- banner -->
         <div
-          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
+          class="flex items-center gap-2 rounded-5 p-2 ring-1 ring-outline-elevation-2"
         >
           <TriangleAlert
             class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-yellow-5"
@@ -97,6 +97,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideInfo from "~icons/lucide/info";
 import { Link } from "@/components";
 import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";

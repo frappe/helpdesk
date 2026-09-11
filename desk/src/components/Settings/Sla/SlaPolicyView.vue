@@ -83,7 +83,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">{{
+            <span class="text-md-semibold text-ink-gray-8">{{
               __("Assignment Conditions")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -107,12 +107,12 @@
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default"
                     >
                       {{ __("Old Conditions") }}
-                      <FeatherIcon name="info" class="size-4" />
+                      <LucideInfo class="size-4" />
                     </div>
                   </template>
                   <template #body-main>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-5 max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
@@ -122,7 +122,7 @@
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
               <div
-                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
+                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-5 p-3 py-4"
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">
@@ -149,7 +149,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Valid From") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -196,7 +196,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Response and Resolution") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -244,7 +244,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Status Details") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -274,6 +274,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideInfo from "~icons/lucide/info";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   resetSlaDataErrors,

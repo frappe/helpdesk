@@ -8,7 +8,7 @@
         v-if="current > 0"
         variant="ghost"
         icon="lucide-chevron-left"
-        class="!size-7 shrink-0 !rounded-md absolute -left-11 mt-4"
+        class="!size-7 shrink-0 !rounded-5 absolute -left-11 mt-4"
         @click="back"
       />
       <div
@@ -16,7 +16,7 @@
         class="mx-0 min-w-0 border-0 p-0 flex gap-5 flex-col"
       >
         <div>
-          <p class="p-0 text-p-2xl font-bold text-ink-gray-9">
+          <p class="p-0 text-p-xl font-bold text-ink-gray-9">
             {{ question.title
             }}<span v-if="titleRequired" class="ms-0.5 text-ink-red-6">*</span>
           </p>
@@ -81,7 +81,7 @@
               :label="option.label"
               :variant="isSelected(option) ? 'subtle' : 'outline'"
               size="sm"
-              class="!rounded-md border border-solid"
+              class="!rounded-5 border border-solid"
               :class="
                 isSelected(option)
                   ? '!bg-surface-gray-3 hover:!bg-surface-gray-4 !border-outline-gray-3'

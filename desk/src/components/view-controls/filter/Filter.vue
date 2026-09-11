@@ -19,7 +19,7 @@
         <div ref="operatorMenuLayer" class="relative z-[101]" />
       </Teleport>
       <div
-        class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
+        class="my-2 w-80 rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="relative overflow-clip rounded-[inherit]">
           <Transition
@@ -43,7 +43,7 @@
                     <div
                       v-for="filter in activeFilters"
                       :key="filter.index"
-                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2 pl-0"
+                      class="group flex h-8 w-full items-center gap-2 rounded-4 px-1.5 hover:bg-surface-gray-2 pl-0"
                     >
                       <Button
                         variant="ghost"

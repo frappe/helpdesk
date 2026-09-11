@@ -53,7 +53,7 @@
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
           <div
-            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
+            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded-4 h-12.5"
           >
             <div
               class="w-full py-3 ps-2 flex gap-1 items-center"

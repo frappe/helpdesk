@@ -31,7 +31,7 @@
         :max-w="l.maxW"
         :max-h="l.maxH"
       >
-        <pre class="h-full w-full rounded bg-surface-base p-4 shadow">{{
+        <pre class="h-full w-full rounded-4 bg-surface-base p-4 shadow">{{
           {
             i: l.i,
             x: l.x,

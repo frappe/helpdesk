@@ -1,9 +1,9 @@
 <template>
   <div class="w-full h-full overflow-hidden">
-    <div class="flex flex-col rounded-md p-4 min-h-48 grow w-full h-full">
+    <div class="flex flex-col rounded-5 p-4 min-h-48 grow w-full h-full">
       <div class="flex flex-col sm:flex-row gap-4 h-full w-full">
         <div class="flex items-center justify-between sm:hidden">
-          <div class="text-ink-gray-8 text-lg-semibold">
+          <div class="text-ink-gray-8 text-md-semibold">
             {{ __("Reviews") }}
           </div>
           <TabButtons
@@ -18,7 +18,7 @@
           :class="{ 'hidden sm:flex': currentTab === 'feedback' }"
         >
           <div class="items-center justify-between hidden sm:flex">
-            <div class="text-ink-gray-8 text-lg-semibold">
+            <div class="text-ink-gray-8 text-md-semibold">
               {{ __("Reviews") }}
             </div>
             <TabButtons
@@ -35,7 +35,7 @@
             <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <LucideStar class="size-4 fill-[#de9735] text-[#de9735]" />
-                <div class="text-3xl-medium text-ink-gray-8">
+                <div class="text-2xl-medium text-ink-gray-8">
                   {{ chartConfig.averageRating }}
                 </div>
               </div>
@@ -44,7 +44,7 @@
                 @click="redirectToSeeAllReviews"
               >
                 {{ __("{0} reviews", chartConfig.totalFeedbacks) }}
-                <FeatherIcon name="arrow-up-right" class="size-3.5 ms-0.5" />
+                <LucideArrowUpRight class="size-3.5 ms-0.5" />
               </div>
             </div>
             <div v-if="chartConfig.totalFeedbacks > 0" class="text-sm">
@@ -55,12 +55,12 @@
           <div v-else>
             <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1">
-                <div class="size-4 bg-surface-gray-1 rounded-sm" />
-                <div class="w-12 h-4 bg-surface-gray-1 rounded-sm" />
+                <div class="size-4 bg-surface-gray-1 rounded-1" />
+                <div class="w-12 h-4 bg-surface-gray-1 rounded-1" />
               </div>
             </div>
             <div class="text-sm mt-3">
-              <div class="w-24 h-4 bg-surface-gray-1 rounded-sm" />
+              <div class="w-24 h-4 bg-surface-gray-1 rounded-1" />
             </div>
           </div>
           <!-- Bar Chart -->
@@ -100,15 +100,14 @@
               </template>
               <template #item-label="{ item }">
                 <div
-                  class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                  class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded-4 px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
                 >
                   <span>{{ item.label }}</span>
                 </div>
               </template>
               <template #item-suffix="{ item }">
-                <FeatherIcon
+                <LucideCheck
                   v-if="item.label == __(sortLabels[currentSort])"
-                  name="check"
                   class="size-4"
                 />
               </template>
@@ -129,7 +128,7 @@
                 </template>
                 <template #item-label="{ item }">
                   <div
-                    class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                    class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded-4 px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
                   >
                     <span>
                       {{ item.label }}
@@ -137,9 +136,8 @@
                   </div>
                 </template>
                 <template #item-suffix="{ item }">
-                  <FeatherIcon
+                  <LucideCheck
                     v-if="item.label == __(periodLabels[currentPeriod])"
-                    name="check"
                     class="size-4"
                   />
                 </template>
@@ -162,7 +160,7 @@
             <!-- Feedback Card -->
             <div
               v-if="currentFeedback && chartConfig.totalFeedbacks > 0"
-              class="flex-1 flex flex-col rounded-lg mt-2 relative z-20"
+              class="flex-1 flex flex-col rounded-6 mt-2 relative z-20"
             >
               <!-- Ticket Info -->
               <div class="flex items-center gap-1 text-base text-ink-gray-5">
@@ -170,7 +168,7 @@
                   class="flex items-center gap-0.5 hover:text-ink-gray-7 cursor-pointer font-medium"
                   @click="goToTicket(currentFeedback)"
                 >
-                  <FeatherIcon name="arrow-up-right" class="size-4" />
+                  <LucideArrowUpRight class="size-4" />
                   {{ currentFeedback.name }}
                 </div>
                 <span class="text-ink-gray-4">·</span>
@@ -182,7 +180,7 @@
               <!-- Rating & Title -->
               <div class="flex items-center gap-2 mb-2">
                 <div
-                  class="flex items-center gap-1 p-1 ps-0 rounded"
+                  class="flex items-center gap-1 p-1 ps-0 rounded-4"
                   :class="[getRatingColor(currentFeedback.star_rating).text]"
                 >
                   <LucideStar
@@ -232,10 +230,7 @@
                     @click="prevFeedback"
                     :disabled="currentIndex === 0"
                   >
-                    <FeatherIcon
-                      name="chevron-left"
-                      class="size-4 rtl:rotate-180"
-                    />
+                    <LucideChevronLeft class="size-4 rtl:rotate-180" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -243,34 +238,31 @@
                     @click="nextFeedback"
                     :disabled="currentIndex >= chartConfig.feedbacks.length - 1"
                   >
-                    <FeatherIcon
-                      name="chevron-right"
-                      class="size-4 rtl:rotate-180"
-                    />
+                    <LucideChevronRight class="size-4 rtl:rotate-180" />
                   </Button>
                 </div>
               </div>
             </div>
             <div
               v-else
-              class="flex-1 flex flex-col rounded-lg mt-2 select-none pointer-events-none"
+              class="flex-1 flex flex-col rounded-6 mt-2 select-none pointer-events-none"
             >
               <div class="flex items-center gap-1 py-1">
-                <div class="w-64 h-4 bg-surface-gray-1 rounded-sm" />
+                <div class="w-64 h-4 bg-surface-gray-1 rounded-1" />
               </div>
               <hr class="my-2 border-surface-gray-2" />
               <div class="flex items-center gap-2 mb-3 mt-1">
-                <div class="w-12 h-5 bg-surface-gray-1 rounded-sm" />
-                <div class="w-56 h-5 bg-surface-gray-1 rounded-sm" />
+                <div class="w-12 h-5 bg-surface-gray-1 rounded-1" />
+                <div class="w-56 h-5 bg-surface-gray-1 rounded-1" />
               </div>
-              <div class="w-48 h-4 bg-surface-gray-1 rounded-sm mb-3" />
+              <div class="w-48 h-4 bg-surface-gray-1 rounded-1 mb-3" />
               <div class="flex items-center justify-between mt-auto">
                 <div class="flex items-center gap-2">
                   <div class="w-6 h-6 rounded-full bg-surface-gray-1" />
-                  <div class="w-32 h-3 bg-surface-gray-1 rounded-sm" />
+                  <div class="w-32 h-3 bg-surface-gray-1 rounded-1" />
                 </div>
                 <div class="flex items-center gap-1">
-                  <div class="w-16 h-6 bg-surface-gray-1 rounded-sm" />
+                  <div class="w-16 h-6 bg-surface-gray-1 rounded-1" />
                 </div>
               </div>
             </div>
@@ -291,6 +283,10 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
+import LucideCheck from "~icons/lucide/check";
+import LucideChevronLeft from "~icons/lucide/chevron-left";
+import LucideChevronRight from "~icons/lucide/chevron-right";
 import { ref, computed, onMounted, nextTick, type PropType } from "vue";
 import {
   Avatar,
@@ -298,7 +294,6 @@ import {
   createResource,
   DateRangePicker,
   Dropdown,
-  FeatherIcon,
   TabButtons,
 } from "frappe-ui";
 import { ECharts } from "frappe-ui/experimental";

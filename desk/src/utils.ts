@@ -3,7 +3,6 @@ import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import {
-  FeatherIcon,
   call,
   dayjs,
   dayjsLocal,
@@ -479,7 +478,7 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
     {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
+        "group flex w-full gap-2 items-center rounded-5 px-2 py-2 text-base hover:bg-surface-gray-3",
         variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
       ],
       onClick: onClick,
@@ -489,19 +488,20 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
 }
 
 /**
- * Renders an option icon: `lucide-*` strings as CSS-mask spans (frappe-ui v1),
- * other strings as legacy FeatherIcon, and components as-is.
+ * Renders an option icon: icon-name strings through the lucide sprite,
+ * components as-is.
  */
 export function renderOptionIcon(
   icon: string | object | null,
   classes: string[] = ["h-4 w-4 shrink-0"]
 ) {
   if (!icon) return null;
-  if (typeof icon === "string" && icon.startsWith("lucide-")) {
-    return h("span", { class: [icon, ...classes], "aria-hidden": true });
-  }
   if (typeof icon === "string") {
-    return h(FeatherIcon, { name: icon, class: classes, "aria-hidden": true });
+    return h(Icon, {
+      name: icon.replace("lucide-", ""),
+      class: classes,
+      "aria-hidden": true,
+    });
   }
   return h(icon, { class: classes, "aria-hidden": true });
 }

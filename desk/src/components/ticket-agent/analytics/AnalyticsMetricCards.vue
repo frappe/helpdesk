@@ -3,7 +3,7 @@
     <div
       v-for="card in cards"
       :key="card.label"
-      class="flex flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-base p-4"
+      class="flex flex-col gap-2 rounded-5 border border-outline-gray-1 bg-surface-base p-4"
     >
       <div class="flex items-center gap-1.5">
         <span class="text-base text-ink-gray-5">{{ card.label }}</span>
@@ -11,7 +11,7 @@
           <LucideInfo class="size-3.5 text-ink-gray-5" />
         </Tooltip>
       </div>
-      <span class="text-lg-medium text-ink-gray-8">
+      <span class="text-md-medium text-ink-gray-8">
         {{ card.value ?? "–" }}
       </span>
     </div>

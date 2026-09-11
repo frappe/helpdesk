@@ -48,10 +48,7 @@
                     @mouseenter="isHoveringRemove = true"
                     @mouseleave="isHoveringRemove = false"
                   >
-                    <FeatherIcon
-                      name="x"
-                      class="size-3.5 cursor-pointer text-ink-gray-4"
-                    />
+                    <LucideX class="size-3.5 cursor-pointer text-ink-gray-4" />
                   </div>
                 </Tooltip>
                 <div
@@ -65,7 +62,7 @@
                 <div class="flex flex-col gap-1">
                   <div v-if="!editName" class="flex items-end gap-1">
                     <span
-                      class="text-lg sm:text-2xl !font-semibold text-ink-gray-8"
+                      class="text-md sm:text-xl !font-semibold text-ink-gray-8"
                     >
                       {{ user?.doc?.full_name }}
                     </span>
@@ -168,6 +165,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideX from "~icons/lucide/x";
 import {
   Avatar,
   Button,

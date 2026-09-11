@@ -24,7 +24,7 @@
         <div v-if="normalActions.length" class="flex gap-2">
           <Button v-for="action in normalActions" v-bind="action">
             <template v-if="action.icon" #prefix>
-              <FeatherIcon :name="action.icon" class="h-4 w-4" />
+              <Icon :icon="action.icon" class="h-4 w-4" />
             </template>
           </Button>
         </div>
@@ -33,8 +33,8 @@
             <Dropdown v-slot="{ open }" :options="g.action">
               <Button :label="__(g.label)">
                 <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
+                  <component
+                    :is="open ? LucideChevronUp : LucideChevronDown"
                     class="h-4"
                   />
                 </template>
@@ -77,6 +77,9 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import Icon from "@/components/Icon.vue";
 import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";

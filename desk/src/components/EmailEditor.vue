@@ -162,7 +162,7 @@
                   {{ void (isUploading = uploading) }}
                   <Tooltip :text="__('Attach file')">
                     <button
-                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                      class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
@@ -178,7 +178,7 @@
               </FileUploader>
               <Tooltip :text="__('Saved replies')">
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                  class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="showSavedRepliesSelectorModal = true"
                 >
                   <ZapIcon class="h-4 w-4" />

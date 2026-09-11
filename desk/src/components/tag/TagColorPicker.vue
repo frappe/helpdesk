@@ -19,7 +19,7 @@
           v-for="(name, index) in TAG_COLOR_NAMES"
           :key="name"
           tabindex="-1"
-          class="flex h-8 shrink-0 items-center gap-2 rounded px-2 text-base text-ink-gray-7"
+          class="flex h-8 shrink-0 items-center gap-2 rounded-4 px-2 text-base text-ink-gray-7"
           :class="{ 'bg-surface-alpha-gray-2': index === colorIndex }"
           @mouseenter="colorIndex = index"
           @click="$emit('select', name)"

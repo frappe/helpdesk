@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
+    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded-4"
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"

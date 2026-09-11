@@ -42,8 +42,8 @@
           <template #default="{ open }">
             <Button :label="activeFilter">
               <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
+                <component
+                  :is="open ? LucideChevronUp : LucideChevronDown"
                   class="h-4"
                 />
               </template>
@@ -51,16 +51,15 @@
           </template>
           <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded-4 text-base"
               @click="item.onClick"
             >
               <div class="flex items-center justify-between flex-1">
                 <span class="whitespace-nowrap">
                   {{ item.label }}
                 </span>
-                <FeatherIcon
+                <LucideCheck
                   v-if="activeFilter === item.label"
-                  name="check"
                   class="size-4 text-ink-gray-7"
                 />
               </div>
@@ -107,7 +106,7 @@
           </div>
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
-            <div class="flex items-center justify-between h-14 group rounded">
+            <div class="flex items-center justify-between h-14 group rounded-4">
               <div class="flex items-center gap-x-3 grow">
                 <Avatar
                   :image="agent.user_image"
@@ -179,15 +178,17 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideCheck from "~icons/lucide/check";
 import EmptyState from "@/components/EmptyState.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { renderOptionIcon } from "@/utils";
-import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
+import { Avatar, Button, call, Dropdown, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
-import LucideCheck from "~icons/lucide/check";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { activeFilter, useAgents } from "./agents";
 import { setActiveSettingsTab } from "./settingsModal";
@@ -242,7 +243,7 @@ function RoleOption({ active, role, onClick, selected, icon = null }) {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-7",
 
-        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-3",
+        "group flex w-full text-ink-gray-8 justify-between items-center rounded-5 px-2 py-2 text-sm hover:bg-surface-gray-3",
       ],
       onClick: !selected ? onClick : null,
     },

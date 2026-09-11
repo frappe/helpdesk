@@ -25,7 +25,7 @@
           <template #target="{ togglePopover }">
             <div
               @click="togglePopover()"
-              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-surface-gray-3 rounded"
+              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-surface-gray-3 rounded-4"
             >
               {{ formatTimeHMS(props.row[column.key]) }}
             </div>
@@ -39,7 +39,7 @@
       </div>
       <div v-else class="ms-2">
         <select
-          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
         >
           <option

@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">Call Logs</div>
+        <div class="text-md-medium text-ink-gray-9">Call Logs</div>
       </template>
       <template #right-header>
         <Button
@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { Avatar, Badge, Button, FeatherIcon, usePageMeta } from "frappe-ui";
+import { Avatar, Badge, Button, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import CallLogDetailModal from "./CallLogDetailModal.vue";
 import CallLogModal from "./CallLogModal.vue";
@@ -93,7 +93,7 @@ const options = computed(() => {
         prefix: ({ row }) => {
           let icon =
             row.type === "Incoming" ? "phone-incoming" : "phone-outgoing";
-          return h(FeatherIcon, {
+          return h({
             name: icon,
             class: ["size-3 shrink-0"],
           });
@@ -110,7 +110,7 @@ const options = computed(() => {
       },
       duration: {
         prefix: () => {
-          return h(FeatherIcon, {
+          return h({
             name: "clock",
             class: ["size-3 shrink-0"],
           });

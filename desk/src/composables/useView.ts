@@ -9,9 +9,9 @@ import {
   call,
   createListResource,
   createResource,
-  FeatherIcon,
   toast,
 } from "frappe-ui";
+import { Icon } from "frappe-ui/experimental";
 import { computed, h, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -204,7 +204,7 @@ export function useView(dt: string = null) {
         items: [
           {
             label: __("Duplicate"),
-            icon: h(FeatherIcon, { name: "copy" }),
+            icon: h(Icon, { name: "copy" }),
             onClick: () => {
               viewDialogConfig.view.label = _view.label + " (New)";
               viewDialogConfig.view.icon = _view.icon;
@@ -231,7 +231,7 @@ export function useView(dt: string = null) {
           label: _view?.public
             ? __("Hide from sidebar")
             : __("Show in sidebar"),
-          icon: h(FeatherIcon, {
+          icon: h(Icon, {
             name: _view?.public ? "eye-off" : "eye",
             class: "h-4 w-4",
           }),
@@ -250,7 +250,7 @@ export function useView(dt: string = null) {
         if (auth.isManager && !isCustomerPortal.value) {
           actions[0].items.push({
             label: _view?.public ? __("Make Private") : __("Make Public"),
-            icon: h(FeatherIcon, {
+            icon: h(Icon, {
               name: _view?.public ? "lock" : "unlock",
               class: "h-4 w-4",
             }),

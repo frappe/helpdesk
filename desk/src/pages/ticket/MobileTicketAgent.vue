@@ -20,8 +20,8 @@
                   />
                 </template>
                 <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
+                  <component
+                    :is="open ? LucideChevronUp : LucideChevronDown"
                     class="h-4"
                   />
                 </template>
@@ -217,6 +217,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import { __ } from "@/translation";
 import {
   Breadcrumbs,

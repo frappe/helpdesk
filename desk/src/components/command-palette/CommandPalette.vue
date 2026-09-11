@@ -5,7 +5,7 @@
         class="palette-overlay fixed inset-0 z-[100] bg-black/30 dark:bg-black/60"
       />
       <DialogContent
-        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
+        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-5 bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
         @open-auto-focus.prevent
         @close-auto-focus.prevent="restoreFocus"
         @escape-key-down.prevent="onEscape"

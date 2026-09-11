@@ -1,9 +1,9 @@
 <template>
   <div
-    class="rounded-md border border-outline-gray-1 bg-surface-base flex flex-col gap-10"
+    class="rounded-5 border border-outline-gray-1 bg-surface-base flex flex-col gap-10"
   >
     <div class="flex items-center px-4 pt-4">
-      <h3 class="text-lg font-semibold text-ink-gray-8">
+      <h3 class="text-md font-semibold text-ink-gray-8">
         {{ __("Ticket Timeline") }}
       </h3>
     </div>
@@ -62,7 +62,7 @@
               </span>
               <template v-if="segment.tooltip.length" #body>
                 <div
-                  class="space-y-1.5 rounded-md border border-outline-gray-1 bg-surface-elevation-2 px-3 py-2 shadow-sm"
+                  class="space-y-1.5 rounded-5 border border-outline-gray-1 bg-surface-elevation-2 px-3 py-2 shadow-sm"
                 >
                   <span
                     v-for="line in segment.tooltip"

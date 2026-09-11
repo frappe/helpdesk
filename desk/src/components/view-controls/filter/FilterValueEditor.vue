@@ -15,7 +15,7 @@
         :portal-to="operatorMenuTarget || 'body'"
       >
         <Button
-          class="flex h-6 max-w-[150px] shrink-0 items-center gap-1 rounded bg-surface-gray-2 ps-2 pe-1 text-sm text-ink-gray-7 hover:bg-surface-gray-3"
+          class="flex h-6 max-w-[150px] shrink-0 items-center gap-1 rounded-4 bg-surface-gray-2 ps-2 pe-1 text-sm text-ink-gray-7 hover:bg-surface-gray-3"
           variant="ghost"
           icon-right="lucide-chevron-down"
           :tooltip="operatorTooltip"
@@ -59,7 +59,7 @@
           role="option"
           :aria-selected="isSelected(option.value)"
           :class="[
-            'flex h-8 w-full items-center gap-2 rounded px-1.5 text-base text-ink-gray-8',
+            'flex h-8 w-full items-center gap-2 rounded-4 px-1.5 text-base text-ink-gray-8',
             index === activeIndex ? 'bg-surface-gray-2' : '',
           ]"
           @mousemove="activeIndex = index"

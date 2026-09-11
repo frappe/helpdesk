@@ -114,6 +114,7 @@
   />
 </template>
 <script setup>
+import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import Password from "@/components/Password.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
@@ -126,7 +127,6 @@ import {
   ErrorMessage,
   createResource,
   Badge,
-  Autocomplete,
 } from "frappe-ui";
 import { nextTick, ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";

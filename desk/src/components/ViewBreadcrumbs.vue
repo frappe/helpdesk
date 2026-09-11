@@ -2,7 +2,7 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      class="ps-0 pe-0.5 py-1 text-md-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
       {{ isMobileView ? "..." : label }}
     </router-link>
@@ -14,7 +14,7 @@
           class="max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
           :class="open && '!bg-surface-gray-3'"
         >
-          <span class="text-lg-medium text-nowrap truncate">{{
+          <span class="text-md-medium text-nowrap truncate">{{
             currentView.label
           }}</span>
           <template #prefix>
@@ -24,8 +24,8 @@
             />
           </template>
           <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
+            <component
+              :is="open ? LucideChevronUp : LucideChevronDown"
               class="h-4 text-ink-gray-8"
             />
           </template>
@@ -57,16 +57,15 @@
           v-if="item.name"
           class="flex items-center justify-end gap-2 min-w-11"
         >
-          <FeatherIcon
+          <LucideCheck
             v-if="isCurrentView(item)"
-            name="check"
             class="size-4 text-ink-gray-7"
           />
           <Dropdown side="right" align="start" :options="dropdownActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="kebab-btn !size-4 ms-0 rounded-sm"
+                class="kebab-btn !size-4 ms-0 rounded-1"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop
@@ -80,9 +79,12 @@
 </template>
 
 <script setup>
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideCheck from "~icons/lucide/check";
 import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
-import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
 import { useRoute } from "vue-router";
 
 const props = defineProps({

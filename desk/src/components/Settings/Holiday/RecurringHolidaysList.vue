@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border p-1 border-outline-gray-2 text-sm">
+  <div class="rounded-5 border p-1 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 items-center"
       :style="{

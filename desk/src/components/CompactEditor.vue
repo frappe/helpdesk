@@ -10,7 +10,7 @@
       <template #default>
         <EditorBubbleMenu :items="commentToolbar" />
         <div
-          class="flex items-center overflow-x-auto rounded-t border border-b-0 border-outline-gray-1 bg-surface-gray-1 px-1 py-1"
+          class="flex items-center overflow-x-auto rounded-t-4 border border-b-0 border-outline-gray-1 bg-surface-gray-1 px-1 py-1"
         >
           <div
             v-if="showAttachments"
@@ -23,7 +23,7 @@
               <template #default="{ openFileSelector, uploading }">
                 {{ syncUploadingState(uploading) }}
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-3 disabled:opacity-40"
+                  class="flex rounded-4 p-1 text-ink-gray-8 transition-colors hover:bg-surface-gray-3 disabled:opacity-40"
                   :disabled="uploading"
                   @click="openFileSelector()"
                 >
@@ -105,7 +105,7 @@ const extensions = buildEditorExtensions({ extra: props.extensions });
 
 const contentClass = [
   "!prose-sm max-w-full overflow-auto py-1.5 px-3",
-  "rounded-b border border-outline-gray-1 bg-surface-base",
+  "rounded-b-4 border border-outline-gray-1 bg-surface-base",
   "placeholder-ink-gray-4 text-ink-gray-8 -mt-0.5",
 ];
 

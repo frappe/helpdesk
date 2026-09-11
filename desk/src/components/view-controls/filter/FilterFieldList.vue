@@ -31,7 +31,7 @@
         role="option"
         :aria-selected="index === activeIndex"
         :class="[
-          'flex h-8 w-full items-center gap-2 rounded px-2 text-base text-ink-gray-8',
+          'flex h-8 w-full items-center gap-2 rounded-4 px-2 text-base text-ink-gray-8',
           index === activeIndex ? 'bg-surface-gray-2' : '',
         ]"
         @mousemove="activeIndex = index"

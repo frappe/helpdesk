@@ -4,7 +4,7 @@
       <div class="bg-surface-elevation-2 px-4 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-2xl-semibold leading-6 text-ink-gray-9">
               {{ __("Edit Contact") }}
             </h3>
             <Badge

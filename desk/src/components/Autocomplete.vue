@@ -25,8 +25,7 @@
                   {{ placeholder || "" }}
                 </span>
               </div>
-              <FeatherIcon
-                name="chevron-down"
+              <LucideChevronDown
                 class="h-4 w-4 text-ink-gray-7"
                 aria-hidden="true"
               />
@@ -36,9 +35,7 @@
       </template>
       <template #body="{ isOpen }">
         <div v-show="isOpen">
-          <div
-            class="mt-1 rounded-lg bg-surface-base py-1 text-base shadow-2xl"
-          >
+          <div class="mt-1 rounded-6 bg-surface-base py-1 text-base shadow-2xl">
             <div class="relative px-1.5 pt-0.5">
               <ComboboxInput
                 ref="search"
@@ -57,7 +54,7 @@
                 class="absolute inset-y-0 end-3 top-px flex items-center"
                 @click="selectedValue = null"
               >
-                <FeatherIcon name="x" class="size-4" />
+                <LucideX class="size-4" />
               </button>
             </div>
             <ComboboxOptions
@@ -85,7 +82,7 @@
                 >
                   <li
                     :class="[
-                      'flex items-center rounded px-2.5 py-1.5 text-base',
+                      'flex items-center rounded-4 px-2.5 py-1.5 text-base',
                       { 'bg-surface-gray-2': active },
                     ]"
                   >
@@ -104,7 +101,7 @@
               </div>
               <li
                 v-if="groups.length == 0"
-                class="mt-1.5 rounded-md px-2.5 py-1.5 text-base text-ink-gray-5"
+                class="mt-1.5 rounded-5 px-2.5 py-1.5 text-base text-ink-gray-5"
               >
                 No results found
               </li>
@@ -123,13 +120,15 @@
 </template>
 
 <script setup>
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideX from "~icons/lucide/x";
 import {
   Combobox,
   ComboboxInput,
   ComboboxOption,
   ComboboxOptions,
 } from "@headlessui/vue";
-import { FeatherIcon, Popover } from "frappe-ui";
+import { Popover } from "frappe-ui";
 import { computed, nextTick, ref, useAttrs, useSlots, watch } from "vue";
 
 const props = defineProps({
@@ -248,10 +247,10 @@ const textColor = computed(() => {
 
 const inputClasses = computed(() => {
   let sizeClasses = {
-    sm: "text-base rounded h-7",
-    md: "text-base rounded h-8",
-    lg: "text-lg rounded-md h-10",
-    xl: "text-2xl rounded-md h-10",
+    sm: "text-base rounded-4 h-7",
+    md: "text-base rounded-4 h-8",
+    lg: "text-md rounded-5 h-10",
+    xl: "text-xl rounded-5 h-10",
   }[props.size];
 
   let paddingClasses = {

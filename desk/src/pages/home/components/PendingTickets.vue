@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
+  <div class="flex flex-col rounded-5 p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
-      <div class="flex items-center gap-2 text-lg-semibold text-ink-gray-8">
+      <div class="flex items-center gap-2 text-md-semibold text-ink-gray-8">
         {{ currentTitle }}
         <Tooltip :text="tooltipText" placement="top">
-          <FeatherIcon name="info" class="size-3" />
+          <LucideInfo class="size-3" />
         </Tooltip>
       </div>
       <div class="w-max">
@@ -98,22 +98,22 @@
             :class="i > 1 ? 'border-t border-outline-elevation-2' : ''"
           >
             <td class="p-2 py-3 min-w-8">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 w-full max-w-0">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1 max-w-full" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1 max-w-full" />
             </td>
             <td class="p-2 py-3 min-w-14">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-21">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-28">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-40">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
           </tr>
           <EmptyState
@@ -141,7 +141,7 @@
             {{
               __("See all {0} tickets", chartConfig?.totalPendingTickets + "")
             }}
-            <FeatherIcon name="arrow-right" class="size-4 rtl:rotate-180" />
+            <LucideArrowRight class="size-4 rtl:rotate-180" />
           </div>
         </div>
         <div v-if="chartConfig?.tickets?.length > 0" class="mt-3 mb-0.5">
@@ -160,12 +160,14 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowRight from "~icons/lucide/arrow-right";
+import LucideInfo from "~icons/lucide/info";
 import EmptyState from "@/components/EmptyState.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { createResource, FeatherIcon, TabButtons } from "frappe-ui";
+import { createResource, TabButtons } from "frappe-ui";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import CalendarIcon from "~icons/lucide/calendar";

@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg-medium text-ink-gray-9">
+        <div class="text-md-medium text-ink-gray-9">
           {{ __(dashboardTitle) }}
         </div>
       </template>
@@ -27,7 +27,7 @@
         >
           <template #default>
             <div
-              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded-4 text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
                 <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
@@ -91,7 +91,7 @@
         >
           <NumberChart
             :key="index"
-            class="border rounded-md min-h-[114px]"
+            class="border rounded-5 min-h-[114px]"
             :config="config"
           />
         </Tooltip>
@@ -107,7 +107,7 @@
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -128,7 +128,7 @@
         >
           <template v-for="(chart, index) in masterData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -150,7 +150,7 @@
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -636,7 +636,7 @@ usePageMeta(() => {
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded-4 h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control button > div) {
   overflow: hidden;

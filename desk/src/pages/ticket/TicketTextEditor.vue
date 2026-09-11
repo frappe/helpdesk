@@ -72,7 +72,7 @@
   </HTextEditor>
   <div
     v-else
-    class="flex w-full cursor-pointer items-center gap-2 rounded bg-surface-gray-2 px-3.5 py-2 hover:bg-surface-gray-3"
+    class="flex w-full cursor-pointer items-center gap-2 rounded-4 bg-surface-gray-2 px-3.5 py-2 hover:bg-surface-gray-3"
     @click="() => $emit('update:expand', !expand)"
   >
     <UserAvatar

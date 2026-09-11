@@ -9,7 +9,7 @@
         <div :class="containerClasses">
           <button
             type="button"
-            class="flex h-full items-center gap-1 rounded-l px-2 min-w-[50px] focus:outline-none"
+            class="flex h-full items-center gap-1 rounded-l-4 px-2 min-w-[50px] focus:outline-none"
             :class="[
               { 'pointer-events-none': disabled },
               flagCode ? '' : 'justify-center',
@@ -21,9 +21,9 @@
               v-if="flagCode"
               :src="`https://flagcdn.com/${flagCode}.svg`"
               :alt="selectedCountry ?? ''"
-              class="h-3 w-4 rounded-sm object-cover"
+              class="h-3 w-4 rounded-1 object-cover"
             />
-            <FeatherIcon name="chevron-down" class="size-3.5 text-ink-gray-5" />
+            <LucideChevronDown class="size-3.5 text-ink-gray-5" />
           </button>
           <div
             class="self-stretch border-l border-outline-gray-2"
@@ -62,7 +62,7 @@
 
       <template #body="{ close }">
         <div
-          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
+          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-6 border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
         >
           <div class="border-b border-outline-gray-1 p-2">
             <FormControl
@@ -84,7 +84,7 @@
               :key="country.name"
               :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
               type="button"
-              class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
+              class="flex w-full items-center gap-2 rounded-5 px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
               :class="
                 idx === highlightedIndex
                   ? 'bg-surface-gray-3'
@@ -96,7 +96,7 @@
               <img
                 :src="`https://flagcdn.com/${country.code}.svg`"
                 :alt="country.name"
-                class="h-3 w-4 rounded-sm object-cover"
+                class="h-3 w-4 rounded-1 object-cover"
               />
               <span class="flex-1 truncate">
                 {{ country.name }}
@@ -120,9 +120,10 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronDown from "~icons/lucide/chevron-down";
 // TODO: replace with reka-ui in future
 import { __ } from "@/translation";
-import { FeatherIcon, FormControl, Popover, TextInput } from "frappe-ui";
+import { FormControl, Popover, TextInput } from "frappe-ui";
 import { computed, ref, useId, watch } from "vue";
 import countries from "./countries.json";
 
@@ -207,8 +208,8 @@ const filteredCountries = computed(() => {
 const sizeClasses = computed(
   () =>
     ({
-      sm: "h-7 rounded",
-      md: "h-8 rounded",
+      sm: "h-7 rounded-4",
+      md: "h-8 rounded-4",
     }[props.size])
 );
 

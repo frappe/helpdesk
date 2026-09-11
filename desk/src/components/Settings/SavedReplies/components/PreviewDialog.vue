@@ -32,13 +32,13 @@
             >
               <template #default>
                 <EditorContent
-                  class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
+                  class="!prose-sm max-w-full overflow-auto min-h-[180px] max-h-80 py-1.5 px-2 rounded-4 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors"
                 />
               </template>
             </Editor>
             <div
               v-if="getResponsePreviewResource.loading"
-              class="absolute top-0 end-0 flex items-center justify-center size-full rounded-md bg-surface-gray-10/20"
+              class="absolute top-0 end-0 flex items-center justify-center size-full rounded-5 bg-surface-gray-10/20"
             >
               <LoadingIndicator class="size-4" />
             </div>

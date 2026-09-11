@@ -158,7 +158,6 @@ import { useStorage } from "@vueuse/core";
 import {
   createResource,
   Dropdown,
-  FeatherIcon,
   frappeRequest,
   LoadingIndicator,
   dayjs,
@@ -467,7 +466,7 @@ function getGroupedByRows(listRows, groupByField) {
       group: option || " ",
       collapsed: false,
       rows: filteredRows,
-      icon: h(FeatherIcon, {
+      icon: h(SpriteIcon, {
         name: "folder",
         class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
       }),

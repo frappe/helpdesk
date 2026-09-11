@@ -4,7 +4,7 @@
       <div class="bg-surface-elevation-2 px-4 pb-6 pt-5 sm:px-6">
         <div class="mb-5 flex items-center justify-between">
           <div>
-            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-2xl-semibold leading-6 text-ink-gray-9">
               {{ __("Call Details") }}
             </h3>
           </div>
@@ -46,8 +46,7 @@
                 <div class="ms-1 flex flex-col gap-1">
                   {{ field.value.caller.label }}
                 </div>
-                <FeatherIcon
-                  name="arrow-right"
+                <LucideArrowRight
                   class="mx-1 h-4 w-4 text-ink-gray-5 rtl:rotate-180"
                 />
                 <Avatar
@@ -92,13 +91,14 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowRight from "~icons/lucide/arrow-right";
 import ArrowUpRightIcon from "@/components/icons/ArrowUpRightIcon.vue";
 import DurationIcon from "@/components/icons/DurationIcon.vue";
 import ContactsIcon from "@/components/icons/ContactsIcon.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
-import { FeatherIcon, Avatar, Tooltip, createResource, dayjs } from "frappe-ui";
+import { Avatar, Tooltip, createResource, dayjs } from "frappe-ui";
 import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
 import { timeAgo } from "@/utils";
@@ -139,7 +139,7 @@ const detailFields = computed(() => {
 
   let details = [
     {
-      icon: h(FeatherIcon, {
+      icon: h({
         name: data.type.icon,
         class: "h-3.5 w-3.5",
       }),
@@ -172,7 +172,7 @@ const detailFields = computed(() => {
       color: data.status.color,
     },
     {
-      icon: h(FeatherIcon, {
+      icon: h({
         name: "play-circle",
         class: "h-4 w-4 mt-2",
       }),

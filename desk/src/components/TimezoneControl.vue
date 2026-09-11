@@ -10,8 +10,9 @@
 </template>
 
 <script setup lang="ts">
+import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { __ } from "@/translation";
-import { Autocomplete, createResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import { computed } from "vue";
 
 const props = defineProps<{

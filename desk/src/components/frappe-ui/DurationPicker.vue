@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-2 border border-outline-gray-2 rounded w-fit min-w-max px-4 select-none shadow-sm"
+    class="flex gap-2 border border-outline-gray-2 rounded-4 w-fit min-w-max px-4 select-none shadow-sm"
   >
     <div
       v-if="displayOptions.hours"
@@ -26,9 +26,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('hours'))"
@@ -37,9 +37,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -70,9 +70,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('minutes'))"
@@ -81,9 +81,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -114,9 +114,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('seconds'))"
@@ -125,9 +125,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -137,6 +137,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideChevronUp from "~icons/lucide/chevron-up";
 import { ref, computed, watch, onUnmounted } from "vue";
 
 interface Options {

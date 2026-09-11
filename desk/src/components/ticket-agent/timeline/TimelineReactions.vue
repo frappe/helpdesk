@@ -18,7 +18,7 @@
             <button
               v-for="emoji in PRESET_EMOJIS"
               :key="emoji"
-              class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-lg transition-colors"
+              class="size-6 flex items-center justify-center rounded-4 hover:bg-surface-gray-2 text-md transition-colors"
               @click="emit('toggle', emoji)"
             >
               {{ emoji }}
@@ -31,7 +31,7 @@
     <Tooltip v-for="reaction in reactions" :key="reaction.emoji">
       <template #body>
         <div
-          class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded"
+          class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded-4"
         >
           {{ reaction.users.map((u) => u.full_name).join(", ") }}
         </div>

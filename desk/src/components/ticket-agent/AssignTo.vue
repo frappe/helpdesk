@@ -17,7 +17,7 @@
           :class="
             ghost
               ? [
-                  '!h-7 !rounded !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
+                  '!h-7 !rounded-4 !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
                   // Hold the ring while the dropdown is open, mirroring the Link
                   // field's data-[state=open]:focus-ring (focus lives in the popover).
                   popoverIsOpen && 'focus-ring',
@@ -111,7 +111,7 @@
                 v-for="(agent, index) in sortedAgentOptions"
                 :key="agent.value"
                 :ref="(el) => setOptionRef(index, el as Element)"
-                class="group flex h-7 w-full items-center rounded px-2 text-base text-ink-gray-6 gap-2"
+                class="group flex h-7 w-full items-center rounded-4 px-2 text-base text-ink-gray-6 gap-2"
                 :class="
                   index === highlightedIndex
                     ? 'bg-surface-gray-3'

@@ -16,14 +16,14 @@
     </template>
     <template #body="{ togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded"
+        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">
           <div
             v-for="option in options"
             :key="option.value"
-            class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded"
+            class="p-2 cursor-pointer hover:bg-surface-gray-3 text-base flex items-center justify-between rounded-4"
             @click="
               () => {
                 onChange(option.value);
@@ -34,11 +34,7 @@
             <div class="w-full truncate">
               {{ option.label }}
             </div>
-            <FeatherIcon
-              v-if="model == option.value"
-              name="check"
-              class="size-4 ms-2"
-            />
+            <LucideCheck v-if="model == option.value" class="size-4 ms-2" />
           </div>
         </div>
         <hr class="my-1" />
@@ -55,7 +51,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button, FeatherIcon, Popover } from "frappe-ui";
+import LucideCheck from "~icons/lucide/check";
+import { Button, Popover } from "frappe-ui";
 
 const model = defineModel();
 

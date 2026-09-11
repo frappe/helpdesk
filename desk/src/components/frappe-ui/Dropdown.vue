@@ -16,7 +16,7 @@
 
       <template #body>
         <div
-          class="mt-2 min-w-40 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+          class="mt-2 min-w-40 divide-y divide-outline-elevation-2 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
           :class="{
             'mt-2': ['bottom', 'left', 'right'].includes(placement),
             'ms-2': placement == 'right-start',
@@ -53,13 +53,13 @@
                     v-else
                     :class="[
                       active ? 'bg-surface-gray-3' : 'text-ink-gray-6',
-                      'group flex h-7 w-full items-center rounded px-2 text-base',
+                      'group flex h-7 w-full items-center rounded-4 px-2 text-base',
                     ]"
                     @click="item.onClick"
                   >
-                    <FeatherIcon
+                    <Icon
+                      :icon="item.icon"
                       v-if="item.icon && typeof item.icon === 'string'"
-                      :name="item.icon"
                       class="me-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
                       aria-hidden="true"
                     />
@@ -86,8 +86,9 @@
 </template>
 
 <script setup>
+import Icon from "@/components/Icon.vue";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
-import { Popover, Button, FeatherIcon } from "frappe-ui";
+import { Popover, Button } from "frappe-ui";
 import { computed, useSlots } from "vue";
 import { useRouter } from "vue-router";
 

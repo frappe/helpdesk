@@ -3,7 +3,7 @@
     <div class="text-base-medium mb-2 text-ink-gray-8 ms-2.5">
       {{ formattedMonth }}
     </div>
-    <div class="rounded-md text-sm">
+    <div class="rounded-5 text-sm">
       <div class="flex items-center text-xs uppercase">
         <div
           class="flex size-7.5 items-center justify-center text-center text-ink-gray-5"
@@ -18,7 +18,7 @@
           <Popover v-if="isHoliday(date)">
             <template #target="{ open, close }">
               <div
-                class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded hover:bg-surface-yellow-2 select-none m-[1px]"
+                class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded-4 hover:bg-surface-yellow-2 select-none m-[1px]"
                 :class="{
                   '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
                 }"
@@ -37,7 +37,7 @@
             </template>
             <template #body-main="{ close: closePopover, open: openPopover }">
               <div
-                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-md"
+                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-5"
                 @mouseover="
                   handleMouseEnter(getFormattedDate(date), openPopover)
                 "
@@ -46,7 +46,7 @@
                 "
               >
                 <div class="w-[5%]">
-                  <div class="size-3.5 bg-surface-orange-5 rounded-sm mt-1" />
+                  <div class="size-3.5 bg-surface-orange-5 rounded-1 mt-1" />
                 </div>
                 <div class="grow">
                   <div class="text-sm-semibold">
@@ -77,7 +77,7 @@
                     #body-main="{ close: closeDropdown, open: openDropdown }"
                   >
                     <div
-                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-md"
+                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-5"
                       @mouseover="
                         handleMouseEnter(getFormattedDate(date), openPopover);
                         handleMouseEnter(
@@ -131,7 +131,7 @@
           </Popover>
           <div
             v-else
-            class="flex size-7 items-center justify-center rounded m-[1px] select-none"
+            class="flex size-7 items-center justify-center rounded-4 m-[1px] select-none"
             :class="{
               'cursor-pointer hover:bg-surface-gray-2': isDateInRange(date),
               'text-ink-gray-3':

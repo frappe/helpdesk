@@ -34,7 +34,7 @@
       <!-- article Info -->
       <div
         class="flex flex-col gap-3 p-4 w-full"
-        :class="editable && 'border rounded-lg overflow-hidden'"
+        :class="editable && 'border rounded-6 overflow-hidden'"
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-4xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -608,7 +608,7 @@ watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
 
 const editorClass = computed(() => {
   return [
-    "rounded-b-lg max-w-[unset] prose-sm",
+    "rounded-b-6 max-w-[unset] prose-sm",
     editable.value &&
       "overflow-auto h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]",
   ];

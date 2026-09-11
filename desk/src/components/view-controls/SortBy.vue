@@ -58,8 +58,8 @@
             <SortIcon class="h-4" />
           </template>
           <template v-if="sortValues?.size" #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
+            <component
+              :is="open ? LucideChevronUp : LucideChevronDown"
               class="h-4 text-ink-gray-5"
             />
           </template>
@@ -68,7 +68,7 @@
     </template>
     <template #body="{ close }">
       <div
-        class="my-2 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
+        class="my-2 rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="min-w-60 p-2">
           <div
@@ -115,10 +115,7 @@
                     >
                       {{ __(displayValue(selectedValue)) }}
                       <template #suffix>
-                        <FeatherIcon
-                          name="chevron-down"
-                          class="h-4 text-ink-gray-5"
-                        />
+                        <LucideChevronDown class="h-4 text-ink-gray-5" />
                       </template>
                     </Button>
                   </template>
@@ -148,7 +145,7 @@
                   :label="__('Add Sort')"
                 >
                   <template #prefix>
-                    <FeatherIcon name="plus" class="h-4" />
+                    <LucidePlus class="h-4" />
                   </template>
                 </Button>
               </template>
@@ -168,6 +165,9 @@
 </template>
 
 <script setup>
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucidePlus from "~icons/lucide/plus";
 import { computed, inject } from "vue";
 import NestedPopover from "@/components/NestedPopover.vue";
 import { useSortable } from "@vueuse/integrations/useSortable";
