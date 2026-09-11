@@ -22,7 +22,9 @@
   }
 }
 
-.tiptap input[placeholder="Add caption"] {
+/* The caption field, hidden by its stable data attribute - the placeholder
+   text it used to be keyed on has changed twice. */
+.tiptap [data-media-text-field] {
   display: none !important;
 }
 

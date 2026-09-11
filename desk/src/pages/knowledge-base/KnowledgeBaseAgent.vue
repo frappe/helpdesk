@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import Icon from "@/components/Icon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
@@ -401,8 +402,8 @@ const options = computed(() => {
     columnConfig: {
       title: {
         prefix: () => {
-          return h({
-            name: "file-text",
+          return h(Icon, {
+            icon: "lucide-file-text",
             class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });
         },

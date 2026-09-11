@@ -38,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import Icon from "@/components/Icon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import { Avatar, Badge, Button, usePageMeta } from "frappe-ui";
@@ -92,9 +93,11 @@ const options = computed(() => {
       type: {
         prefix: ({ row }) => {
           let icon =
-            row.type === "Incoming" ? "phone-incoming" : "phone-outgoing";
-          return h({
-            name: icon,
+            row.type === "Incoming"
+              ? "lucide-phone-incoming"
+              : "lucide-phone-outgoing";
+          return h(Icon, {
+            icon,
             class: ["size-3 shrink-0"],
           });
         },
@@ -110,8 +113,8 @@ const options = computed(() => {
       },
       duration: {
         prefix: () => {
-          return h({
-            name: "clock",
+          return h(Icon, {
+            icon: "lucide-clock",
             class: ["size-3 shrink-0"],
           });
         },

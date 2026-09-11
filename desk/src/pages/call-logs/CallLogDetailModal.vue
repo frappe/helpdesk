@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+import Icon from "@/components/Icon.vue";
 import LucideArrowRight from "~icons/lucide/arrow-right";
 import ArrowUpRightIcon from "@/components/icons/ArrowUpRightIcon.vue";
 import DurationIcon from "@/components/icons/DurationIcon.vue";
@@ -139,8 +140,8 @@ const detailFields = computed(() => {
 
   let details = [
     {
-      icon: h({
-        name: data.type.icon,
+      icon: h(Icon, {
+        icon: data.type.icon,
         class: "h-3.5 w-3.5",
       }),
       name: "type",
@@ -172,8 +173,8 @@ const detailFields = computed(() => {
       color: data.status.color,
     },
     {
-      icon: h({
-        name: "play-circle",
+      icon: h(Icon, {
+        icon: "lucide-circle-play",
         class: "h-4 w-4 mt-2",
       }),
       name: "recording_url",
