@@ -9,7 +9,7 @@
       <Dropdown
         align="end"
         :options="kebabOptions"
-        @click="isConfirmingDelete = false"
+        @update:open="(open) => open && (isConfirmingDelete = false)"
       >
         <Button
           icon="lucide-more-horizontal"

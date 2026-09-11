@@ -39,7 +39,11 @@
             class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="filterOptions" align="end">
+        <Dropdown
+          :options="filterOptions"
+          align="end"
+          @update:open="(open) => open && (isConfirmingDelete = false)"
+        >
           <template #default="{ open }">
             <Button :label="activeFilterLabel">
               <template #suffix>
@@ -134,7 +138,6 @@
                 <Button
                   icon="lucide-more-horizontal"
                   variant="ghost"
-                  @click="isConfirmingDelete = false"
                   class="me-2"
                 />
               </Dropdown>

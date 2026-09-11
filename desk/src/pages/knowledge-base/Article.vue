@@ -131,7 +131,9 @@
                 <Dropdown
                   :options="articleActions"
                   v-if="!editable && !isCustomerPortal"
-                  @click="isConfirmingDeleteArticle = false"
+                  @update:open="
+                    (open) => open && (isConfirmingDeleteArticle = false)
+                  "
                 >
                   <Button size="md" variant="ghost">
                     <template #icon>

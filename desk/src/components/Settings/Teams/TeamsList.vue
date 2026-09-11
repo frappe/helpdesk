@@ -66,12 +66,12 @@
             </div>
             <div class="flex justify-between items-center pe-2">
               <div>
-                <Dropdown align="end" :options="dropdownOptions(team)">
-                  <Button
-                    icon="lucide-more-horizontal"
-                    variant="ghost"
-                    @click="isConfirmingDelete = false"
-                  />
+                <Dropdown
+                  align="end"
+                  :options="dropdownOptions(team)"
+                  @update:open="(open) => open && (isConfirmingDelete = false)"
+                >
+                  <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>
             </div>

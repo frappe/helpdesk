@@ -100,7 +100,13 @@
                     />
                   </div>
                   <div>
-                    <Dropdown align="end" :options="getOptions(row.name)">
+                    <Dropdown
+                      align="end"
+                      :options="getOptions(row.name)"
+                      @update:open="
+                        (open) => open && (isConfirmingDelete = false)
+                      "
+                    >
                       <Button
                         variant="ghost"
                         @click.stop="
