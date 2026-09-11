@@ -4,11 +4,11 @@ DEFAULT_TICKET_TEMPLATE = "Default"
 DEFAULT_SLA = "Standard"
 DEFAULT_ARTICLE_CATEGORY = "General"
 
-# HD Ticket permission levels: 7 is customer-readable, 8 is agent-only
+# 7 is set as customer-readable, 8 is agent reserved
 TICKET_VISIBLE_FIELD_PERMLEVEL = 7
 TICKET_INTERNAL_FIELD_PERMLEVEL = 8
 
-# set by the server: customers may read these but never supply them
+# set by the server: customers reads these but never themselves should submit
 SERVER_COMPUTED_FIELDS = [
     "last_customer_response",
     "last_agent_response",
@@ -37,10 +37,10 @@ PORTAL_INSERT_EXEMPT_FIELDS = [
     "customer",
 ]
 
-# levels a customer may write while creating a ticket
+# Fillable fields between 0 to 7 perm level
 CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
 
-# changes the customer edit guard allows; status_category is fetched from status
+# fields customer can edit, status_category => closed is only allowed
 CUSTOMER_EDIT_EXEMPT_FIELDS = (
     "status_category",
     "feedback",

@@ -42,8 +42,7 @@ class HDEmailFeedback(Document):
         ticket_doc.feedback_rating = self.feedback_rating
         ticket_doc.feedback_extra = self.feedback_extra
         ticket_doc.status = "Closed"
-        # feedback arrives as Guest, which the customer edit guard would refuse;
-        # the ticket key already proves who is answering
+        # email feedback arrives as Guest so ignore perm level's just for this
         ticket_doc.flags.ignore_customer_edit_guard = True
         ticket_doc.save(ignore_permissions=True)
 

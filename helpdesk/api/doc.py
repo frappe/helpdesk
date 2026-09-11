@@ -3,6 +3,7 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
+from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
@@ -118,10 +119,13 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-        # saved views quietly lose columns hidden from the caller
         hidden = hidden_ticket_fields()
+        # pass only rows and columns which user should be able to see
         rows = [r for r in rows if r not in hidden]
         columns = [c for c in columns if c.get("key") not in hidden]
+        if group_by_field in hidden:
+            # every ticket would land outside every group, so show a plain list
+            group_by_field = view_type = None
     data = (
         frappe.get_list(
             doctype,
@@ -174,6 +178,7 @@ def get_list_data(
 
     if doctype == "HD Ticket":
         hidden = hidden_ticket_fields()
+        # pass only rows and columns which user should be able to see
         fields = [f for f in fields if f["value"] not in hidden]
         rows = [r for r in rows if r not in hidden]
 
@@ -253,8 +258,7 @@ def get_list_data(
 
 
 @frappe.whitelist()
-# uncached: the output depends on the caller and on template edits, and it is
-# only a handful of small metadata queries
+@redis_cache(user=True)
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
@@ -505,7 +509,6 @@ def get_customer_portal_fields(doctype, fields):
 
 
 def get_visible_custom_fields():
-    # filtered in Python, not SQL: `!=` drops NULL rows, which are visible to everyone
     rows = frappe.db.get_all(
         "HD Ticket Template Field",
         {"parent": "Default"},

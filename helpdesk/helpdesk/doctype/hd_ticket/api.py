@@ -103,9 +103,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         "contact": contact,
         # tags are agent workflow data, same as _user_tags
         "tags": get_tags(name) if is_agent() else [],
-        # only the field list is read here; the rest of the template payload is
-        # for the new-ticket form, and its form script is agent-authored
-        "template": {"fields": get_fields_meta(template)},
+        "template": {"fields": get_template_fields_meta(template)},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=is_customer_portal or not is_agent()
         ),
@@ -115,10 +113,7 @@ def get_one(name: str, is_customer_portal: bool = False):
 
 def strip_unreadable_field_names(ticket: dict) -> dict:
     """Drop the names of fields the caller cannot read.
-
-    Permission levels delete the attribute and as_dict puts the name back; the
-    template's visible_to blanks the value and keeps it. Either way the caller
-    gets nothing, so the name is noise.
+    app based helper to strip fields based on visible_to meta in ticket template
     """
     permitted = set(get_permitted_fields("HD Ticket"))
     unreadable = {
@@ -129,6 +124,19 @@ def strip_unreadable_field_names(ticket: dict) -> dict:
     for fieldname in unreadable | hidden_ticket_fields():
         ticket.pop(fieldname, None)
     return ticket
+
+
+def get_template_fields_meta(template: str) -> list[dict]:
+    """returns the template fields meta in dict"""
+    return [
+        {
+            "fieldname": field.fieldname,
+            "label": field.label,
+            "fieldtype": field.fieldtype,
+            "visible_to": field.visible_to,
+        }
+        for field in get_fields_meta(template)
+    ]
 
 
 def get_assignee(_assign: str):
@@ -534,14 +542,13 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    # no widgets for fields hidden from agents: their values arrive blanked
     hidden = hidden_ticket_fields()
+    # filter out hidden fields
     custom_fields = [f for f in custom_fields if f.fieldname not in hidden]
     form_scripts = get_form_script("HD Ticket")
     return {
         "custom_fields": custom_fields,
         "_form_script": form_scripts,
-        # for the hardcoded core widgets, which are not template rows
         "hidden_fields": sorted(hidden),
     }
 

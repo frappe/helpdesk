@@ -105,25 +105,29 @@ class HDTicket(Document):
 
     def creation_fillable_template_fields(self) -> list[str]:
         """Default-template fields shown to customers, at a level a customer may write."""
-        try:
-            template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
-        except frappe.DoesNotExistError:
-            # a site set up without the default template exposes nothing extra
-            return []
-        fillable = []
-        for row in template.fields:
-            if row.visible_to == "Agents":
-                continue
-            if self.customer_may_fill_at_creation(row.fieldname):
-                fillable.append(row.fieldname)
-        return fillable
+        rows = frappe.get_all(
+            "HD Ticket Template Field",
+            filters={
+                "parent": DEFAULT_TICKET_TEMPLATE,
+                "parenttype": "HD Ticket Template",
+            },
+            fields=["fieldname", "visible_to"],
+        )
+        return [
+            row.fieldname
+            for row in rows
+            if row.visible_to != "Agents"
+            and self.customer_may_fill_at_creation(row.fieldname)
+        ]
 
     def customer_may_fill_at_creation(self, fieldname: str) -> bool:
-        """Server-computed fields sit at a customer-readable level, so the level
-        check alone would admit them."""
+        """check if the specific field can be filled by customer"""
+
+        # return false for any server computed fields as they are more of logic based & calculated outputs
         if fieldname in SERVER_COMPUTED_FIELDS:
             return False
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
+        # check if inside fillable perm level and return
         return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
 
     def before_validate(self):
@@ -490,10 +494,11 @@ class HDTicket(Document):
             frappe.throw(text, frappe.PermissionError)
 
     def prevent_customer_edits(self):
-        """Freeze the ticket against its customer once it exists. Permission levels
-        cannot: creating needs level-0 write, and ignore_permissions skips the reset."""
+        """restrict customer from changing ticket values post submission of ticket."""
         if self.is_new() or is_agent():
             return
+
+        # custom flag created to allow insertion in special cases
         if self.flags.get("ignore_customer_edit_guard"):
             return
         editable = self.customer_editable_fields()

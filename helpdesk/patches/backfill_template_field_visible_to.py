@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.field_visibility import fields_visible_to
+from helpdesk.field_visibility import fields_only_for
 
 
 def execute():
@@ -22,4 +22,4 @@ def execute():
         " set visible_to = 'Everyone' where coalesce(visible_to, '') = ''"
     )
     # migrate clears the cache before patches run, not after
-    fields_visible_to.clear_cache()
+    fields_only_for.clear_cache()

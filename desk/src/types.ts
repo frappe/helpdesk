@@ -265,7 +265,7 @@ export interface Field {
 export type FieldValue = string | number | boolean | null | undefined | Dayjs;
 
 export interface Template {
-  about?: string;
+  about: string;
   fields: Field[];
 }
 

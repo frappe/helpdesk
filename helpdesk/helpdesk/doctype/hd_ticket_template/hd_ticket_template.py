@@ -12,7 +12,7 @@ from helpdesk.consts import (
     SERVER_COMPUTED_FIELDS,
     TICKET_INTERNAL_FIELD_PERMLEVEL,
 )
-from helpdesk.field_visibility import fields_visible_to
+from helpdesk.field_visibility import fields_only_for
 from helpdesk.utils import capture_event
 
 
@@ -118,7 +118,7 @@ class HDTicketTemplate(Document):
         )
 
     def on_update(self):
-        fields_visible_to.clear_cache()
+        fields_only_for.clear_cache()
         capture_event("ticket_template_updated")
 
     def on_trash(self):

@@ -192,8 +192,9 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  // fields hidden for this agent arrive blanked; skip their widgets
+  // list which contains the hidden fields marked in ticket template
   const hiddenFields = customizations.value.data?.hidden_fields || [];
+  // filter alongside with core_fields for example ticket_type maybe hidden so remove from UI
   return CORE_FIELDS.filter((f) => !hiddenFields.includes(f))
     .map((fieldname) => {
       let field = getField(fieldname);
