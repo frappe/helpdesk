@@ -10,7 +10,11 @@
           class="flex items-center justify-between gap-2 cursor-pointer"
           @click="toggleEnabled"
         >
-          <Switch size="sm" v-model="slaData.enabled" />
+          <Switch
+            size="sm"
+            :model-value="Boolean(slaData.enabled)"
+            @update:model-value="(value) => (slaData.enabled = value)"
+          />
           <span class="text-sm-medium text-ink-gray-7">
             {{ __("Enabled") }}
           </span>
