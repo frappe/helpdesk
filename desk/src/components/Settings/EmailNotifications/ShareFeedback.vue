@@ -25,7 +25,7 @@
           (value) => {
             ticketStatus =
               statusOptions.find((option) => option.value === value) ?? null;
-            compRef.setUnsavedChanges();
+            compRef.markUnsavedChanges();
           }
         "
       />
