@@ -1,7 +1,18 @@
 import { Field } from "@/types";
 import { toast } from "frappe-ui";
+import { h, isVNode, type Component } from "vue";
 
 type ToastType = "success" | "error" | "warning" | "info";
+
+// vue-sonner renders the icon through `<component :is>`, so the three shapes
+// beta.24's toast.create took have to arrive as components.
+function resolveIcon(icon: unknown): Component | undefined {
+  if (icon == null) return undefined;
+  if (typeof icon === "string")
+    return () => h("span", { class: `lucide-${icon} size-4` });
+  if (isVNode(icon)) return () => icon;
+  return icon as Component;
+}
 
 /**
  * `toast.create({ message, ... })` shape kept alive for customer-written form
@@ -18,7 +29,7 @@ export function createToast({
   icon?: unknown;
   [key: string]: unknown;
 }) {
-  const data = icon ? { ...options, icon: () => icon } : options;
+  const data = icon ? { ...options, icon: resolveIcon(icon) } : options;
   return type ? toast[type](message, data) : toast(message, data);
 }
 
