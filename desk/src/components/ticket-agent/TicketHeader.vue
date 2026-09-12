@@ -58,7 +58,7 @@
         </Dropdown>
         <!-- Core Actions + Custom Actions -->
         <Dropdown
-          v-if="groupedActions[0]?.options?.length >= 1"
+          v-if="groupedActions.length"
           :options="groupedActions"
           align="end"
         >
@@ -307,7 +307,9 @@ const groupedActions = computed(() => {
     actions.value.filter((action) => action.group && !__(action.buttonLabel))
   );
   _actions = _actions.concat(deleteAction.value);
-  return _actions;
+  // an empty group would still render its separator, and the kebab itself is
+  // hidden only when every group is empty
+  return _actions.filter((group) => group.options?.length);
 });
 
 const customizationCtx = computed(() => ({
