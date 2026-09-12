@@ -14,7 +14,7 @@
         <Dropdown
           align="end"
           :options="options"
-          @update:open="(open) => open && (isConfirmingDelete = false)"
+          @update:open="(open) => open && (isConfirmingTeamDelete = false)"
         >
           <Button variant="ghost">
             <template #icon>
@@ -70,6 +70,9 @@
                     v-if="teamMembers.length > 1"
                     :options="memberDropdownOptions(member)"
                     align="end"
+                    @update:open="
+                      (open) => open && (isConfirmingDelete = false)
+                    "
                   >
                     <Button icon="lucide-more-horizontal" variant="ghost" />
                   </Dropdown>
