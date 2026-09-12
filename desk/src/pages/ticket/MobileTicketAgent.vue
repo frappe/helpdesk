@@ -95,7 +95,7 @@
             :tabs="tabs"
             @update:modelValue="changeTabTo"
             size="md"
-            class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:gap-7.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
+            class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:py-1.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
           >
             <template #tab-panel="{ tab }">
               <div v-if="tab.value === 'details'">

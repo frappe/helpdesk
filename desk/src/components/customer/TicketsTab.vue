@@ -2,7 +2,7 @@
   <div class="flex flex-col focus-visible:border-none" tabindex="0">
     <!-- Filter bar: sticks below the tablist while the page scrolls -->
     <div
-      class="sticky top-[33px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
+      class="sticky top-[45px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
     >
       <FormControl
         v-model="search"
@@ -55,10 +55,10 @@
       <!-- Main Content -->
       <template v-else>
         <!-- Headers -->
-        <!-- top-[89px] = tablist (29) + filter bar (60); remeasure
+        <!-- top-[105px] = tablist (45) + filter bar (60); remeasure
              if either changes -->
         <div
-          class="sticky top-[89px] z-[5] grid items-center border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
+          class="sticky top-[105px] z-[5] grid items-center border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
           <div
