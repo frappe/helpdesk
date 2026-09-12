@@ -181,6 +181,7 @@
               class="-ms-1 overflow-x-auto w-full"
               :items="fullToolbar"
             />
+            <EditorTableMenu v-if="editable" />
           </template>
         </Editor>
         <div
@@ -292,7 +293,12 @@ import {
   toast,
   usePageMeta,
 } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";

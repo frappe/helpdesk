@@ -36,6 +36,7 @@
             <div class="h-4 w-[2px] border-s ml-1" />
           </div>
           <EditorFixedMenu :items="fullToolbar" />
+          <EditorTableMenu />
         </div>
         <EditorContent :class="editorClass" />
       </template>
@@ -65,6 +66,7 @@ import {
   EditorBubbleMenu,
   EditorContent,
   EditorFixedMenu,
+  EditorTableMenu,
 } from "frappe-ui/editor";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 

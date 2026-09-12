@@ -188,6 +188,7 @@
               <div class="h-4 w-[2px] border-s ml-1" />
             </div>
             <EditorFixedMenu :items="fullToolbar" />
+            <EditorTableMenu />
           </div>
           <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
             <Button label="Discard" @click="handleDiscard" />
@@ -244,7 +245,12 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
 import { useOnboarding } from "@framework/ui";
 import {
   computed,

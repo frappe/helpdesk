@@ -66,6 +66,7 @@
               class="-ms-1 overflow-x-auto w-full"
               :items="fullToolbar"
             />
+            <EditorTableMenu />
           </template>
         </Editor>
       </div>
@@ -75,7 +76,12 @@
 
 <script setup lang="ts">
 import { Breadcrumbs, toast, usePageMeta } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 const extensions = buildEditorExtensions();
 import { useOnboarding } from "@framework/ui";
