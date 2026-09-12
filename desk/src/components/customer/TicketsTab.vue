@@ -2,7 +2,7 @@
   <div class="flex flex-col focus-visible:border-none" tabindex="0">
     <!-- Filter bar: sticks below the tablist while the page scrolls -->
     <div
-      class="sticky top-[29px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
+      class="sticky top-[33px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
     >
       <FormControl
         v-model="search"

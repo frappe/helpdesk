@@ -48,6 +48,7 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
+          size="md"
           class="tabs-sticky-header flex-1 overflow-hidden [&_[role='tablist']]:!bg-surface-base [&_[role='tablist']]:px-5 max-sm:[&_[role='tablist']]:px-3 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
           <template #tab-label="{ tab }: any">
