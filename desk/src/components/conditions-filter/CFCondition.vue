@@ -31,8 +31,9 @@
         </div>
       </div>
       <div v-if="!props.isGroup" class="flex items-center gap-2 w-full">
-        <div id="fieldname" class="w-full">
+        <div id="fieldname" class="flex-1 min-w-0">
           <Combobox
+            class="w-full"
             trigger="button"
             :options="filterableFields.data || []"
             :model-value="props.condition[0]"
@@ -40,13 +41,13 @@
             @update:selected-option="updateField"
           />
         </div>
-        <div id="operator">
+        <div id="operator" class="flex-1 min-w-0">
           <FormControl
             v-if="!props.condition[0]"
             disabled
             type="text"
             :placeholder="'operator'"
-            class="w-[100px]"
+            class="w-full"
           />
           <FormControl
             v-else
@@ -55,10 +56,10 @@
             v-model="props.condition[1]"
             @change="updateOperator"
             :options="getOperators()"
-            class="w-max min-w-[100px]"
+            class="w-full"
           />
         </div>
-        <div id="value" class="w-full">
+        <div id="value" class="flex-1 min-w-0">
           <FormControl
             v-if="!props.condition[0]"
             disabled
@@ -266,7 +267,7 @@ function getValueControl() {
       return h(FormControl, { type: "text" });
     }
     return h(Link, {
-      class: "form-control",
+      class: "form-control w-full",
       doctype: options,
       value: props.condition[2],
     });
