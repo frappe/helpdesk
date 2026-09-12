@@ -36,7 +36,6 @@
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
           :format="'MMM D'"
-          @click="datePickerRef?.open()"
           side="bottom"
           align="end"
           class="!w-48"

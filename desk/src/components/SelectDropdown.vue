@@ -19,7 +19,7 @@
     </template>
     <template #default="{ toggle: togglePopover }">
       <div
-        class="p-1 text-ink-gray-6 top-1 absolute w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
+        class="mt-1 p-1 text-ink-gray-6 w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
         :class="bodyClass"
       >
         <div class="max-h-52 overflow-y-auto">

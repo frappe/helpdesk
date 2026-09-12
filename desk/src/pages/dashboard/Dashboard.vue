@@ -21,9 +21,6 @@
           v-if="!showDatePicker"
           :options="options"
           class="form-control !w-48"
-          v-model="preset"
-          :placeholder="__('Select Range')"
-          @change="filters.period = preset"
         >
           <template #default>
             <div

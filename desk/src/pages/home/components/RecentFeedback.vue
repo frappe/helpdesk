@@ -149,7 +149,6 @@
                 :placeholder="__('Select range')"
                 @update:model-value="onCustomRangeSelected"
                 :format="'MMM D'"
-                @click="datePickerRef?.open()"
                 side="top"
                 align="start"
                 class="!w-48"
