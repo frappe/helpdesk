@@ -34,7 +34,7 @@
         <div id="fieldname" class="w-full">
           <Combobox
             trigger="button"
-            :options="filterableFields.data"
+            :options="filterableFields.data || []"
             :model-value="props.condition[0]"
             :placeholder="__('Field')"
             @update:selected-option="updateField"

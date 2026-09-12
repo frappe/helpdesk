@@ -12,7 +12,7 @@
         }}
       </div>
     </div>
-    <Popover bare :offset="8">
+    <Popover bare align="end" :offset="8">
       <template #trigger="{ open }">
         <Button
           class="text-sm"

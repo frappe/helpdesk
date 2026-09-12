@@ -102,7 +102,7 @@
                 <div class="w-32">
                   <Combobox
                     :model-value="sort.fieldname"
-                    :options="sortOptions.data"
+                    :options="sortOptions.data || []"
                     @update:model-value="
                       (value) => value && updateSort(value, i)
                     "
