@@ -8,14 +8,17 @@
           </template>
         </Button>
       </template>
-      <template #default>
+      <template #default="{ close }">
         <div class="p-2">
           <div class="grid grid-cols-6 gap-2">
             <button
               v-for="emoji in PRESET_EMOJIS"
               :key="emoji"
               class="size-6 flex items-center justify-center rounded-4 hover:bg-surface-gray-2 text-md transition-colors"
-              @click="emit('toggle', emoji)"
+              @click="
+                emit('toggle', emoji);
+                close();
+              "
             >
               {{ emoji }}
             </button>
