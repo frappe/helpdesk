@@ -13,6 +13,7 @@
         :model-value="user.doc?.language"
         doctype="Language"
         class="w-40"
+        hide-clear-button
         @update:model-value="updateLanguage"
       />
     </div>
