@@ -16,8 +16,8 @@
       </Button>
     </template>
   </Combobox>
-  <NestedPopover v-else>
-    <template #target="{ open }">
+  <Popover v-else bare :offset="8">
+    <template #trigger="{ open }">
       <Button v-if="sortValues.size > 1" :label="__('Sort')">
         <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
@@ -65,14 +65,14 @@
         </Button>
       </div>
     </template>
-    <template #body="{ close }">
+    <template #default="{ close }">
       <div
-        class="my-2 rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
+        class="rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="min-w-60 p-2">
           <div
             v-if="sortValues?.size"
-            id="sort-list"
+            ref="sortList"
             class="mb-3 flex flex-col gap-2"
           >
             <div
@@ -159,17 +159,16 @@
         </div>
       </div>
     </template>
-  </NestedPopover>
+  </Popover>
 </template>
 
 <script setup>
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucidePlus from "~icons/lucide/plus";
-import { computed, inject } from "vue";
-import NestedPopover from "@/components/NestedPopover.vue";
+import { computed, inject, ref } from "vue";
 import { useSortable } from "@vueuse/integrations/useSortable";
-import { Combobox } from "frappe-ui";
+import { Combobox, Popover } from "frappe-ui";
 import {
   AscendingIcon,
   DescendingIcon,
@@ -213,15 +212,19 @@ const options = computed(() => {
   if (!sortOptions.data) return [];
   if (!sortValues.value.size) return sortOptions.data;
   const selectedOptions = [...sortValues.value].map((sort) => sort.fieldname);
-  restartSort();
   return sortOptions.data.filter((option) => {
     return !selectedOptions.includes(option.value);
   });
 });
 
-const sortSortable = useSortable("#sort-list", sortValues, {
+const sortList = ref(null);
+
+// watchElement, and a ref rather than a selector: the popover panel unmounts on
+// close, so a one-shot document.querySelector at mount binds nothing.
+useSortable(sortList, sortValues, {
   handle: ".handle",
   animation: 200,
+  watchElement: true,
   onEnd: () => apply(),
 });
 
@@ -237,7 +240,6 @@ function getSortLabel() {
 
 function setSort(fieldname) {
   sortValues.value.add({ fieldname, direction: "asc" });
-  restartSort();
   apply();
 }
 
@@ -273,10 +275,5 @@ function convertToString(values) {
   });
   _sortValues = _sortValues.slice(0, -2);
   return _sortValues;
-}
-
-function restartSort() {
-  sortSortable.stop();
-  sortSortable.start();
 }
 </script>

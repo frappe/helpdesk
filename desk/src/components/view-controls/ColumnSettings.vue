@@ -1,6 +1,6 @@
 <template>
-  <NestedPopover>
-    <template #target>
+  <Popover bare :offset="8">
+    <template #trigger>
       <Button :label="__('Columns')">
         <template v-if="hideLabel" #icon>
           <ColumnsIcon class="h-4" />
@@ -10,9 +10,9 @@
         </template>
       </Button>
     </template>
-    <template #body="{ close }">
+    <template #default="{ close }">
       <div
-        class="my-2 p-1.5 min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="p-1.5 min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <div v-if="!edit">
           <Draggable
@@ -139,7 +139,7 @@
         </div>
       </div>
     </template>
-  </NestedPopover>
+  </Popover>
 </template>
 
 <script setup>
@@ -150,10 +150,9 @@ import {
   EditIcon,
   ReloadIcon,
 } from "@/components/icons";
-import NestedPopover from "@/components/NestedPopover.vue";
 import { isTouchScreenDevice } from "@/utils";
 import { watchOnce } from "@vueuse/core";
-import { Button, Combobox, FormControl } from "frappe-ui";
+import { Button, Combobox, FormControl, Popover } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import Draggable from "vuedraggable";
 

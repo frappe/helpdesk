@@ -10,7 +10,6 @@ export { default as Icon } from "./Icon.vue";
 export { default as LayoutHeader } from "./LayoutHeader.vue";
 export { default as ListViewBuilder } from "./ListViewBuilder.vue";
 export { default as MultipleAvatar } from "./MultipleAvatar.vue";
-export { default as NestedPopover } from "./NestedPopover.vue";
 export { default as Notifications } from "./notifications/Notifications.vue";
 export { default as PageTitle } from "./PageTitle.vue";
 export { default as SavedRepliesSelectorModal } from "./SavedRepliesSelectorModal.vue";

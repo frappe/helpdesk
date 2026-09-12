@@ -12,17 +12,17 @@
         }}
       </div>
     </div>
-    <NestedPopover>
-      <template #target="{ open }">
+    <Popover bare :offset="8">
+      <template #trigger="{ open }">
         <Button
           class="text-sm"
           :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
           :label="slaData.holiday_list"
         />
       </template>
-      <template #body>
+      <template #default>
         <div
-          class="my-2 min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+          class="min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           <div class="max-h-52 overflow-y-auto p-1">
             <div
@@ -61,7 +61,7 @@
           </div>
         </div>
       </template>
-    </NestedPopover>
+    </Popover>
   </div>
   <div class="mt-5">
     <SlaWorkDaysList />
@@ -69,8 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, createListResource } from "frappe-ui";
-import NestedPopover from "@/components/NestedPopover.vue";
+import { Button, createListResource, Popover } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { setActiveSettingsTab } from "../settingsModal";
 import {
