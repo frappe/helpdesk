@@ -67,7 +67,7 @@ function picker(options: { label: string; value: string | number }[]) {
 
 const component = computed(() => {
   if (props.field.url_method) {
-    return picker(apiOptions.data);
+    return picker(apiOptions.data || []);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
       doctype: props.field.options,

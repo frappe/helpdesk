@@ -32,7 +32,10 @@
     </template>
     <template #default>
       <!-- Searched Articles -->
-      <div class="max-h-[320px] md:max-h-[420px] overflow-scroll flex flex-col">
+      <div
+        class="max-h-[320px] md:max-h-[420px] overflow-scroll flex flex-col"
+        :class="popoverClass"
+      >
         <SearchArticles
           :query="query"
           :hideViewAll="true"

@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div class="flex flex-wrap gap-1">
+    <div ref="pills" class="flex flex-wrap gap-1">
       <Button
-        ref="emails"
         v-for="value in values"
         :key="value"
         :label="value"
@@ -149,7 +148,7 @@ const errorMessage = (value) => __("{0} is an Invalid Email Address", [value]);
 const values = defineModel();
 
 // Common state
-const emails = ref([]);
+const pills = ref(null);
 const search = ref(null);
 const error = ref(null);
 const info = ref(null);
@@ -308,21 +307,27 @@ function removeValue(value) {
   values.value = values.value.filter((v) => v !== value);
 }
 
+// Read the pills from the DOM: a Button with a tooltip renders extra root
+// nodes, so its `$el` is not the <button>.
+function lastPill() {
+  const buttons = pills.value?.querySelectorAll(":scope > button");
+  return buttons?.[buttons.length - 1] ?? null;
+}
+
 function removeLastValue() {
   if (query.value) return;
-  let emailRef = emails.value[emails.value.length - 1]?.$el;
-  if (document.activeElement === emailRef) {
+  const pill = lastPill();
+  if (document.activeElement === pill) {
     values.value.pop();
     nextTick(() => {
       if (values.value.length) {
-        emailRef = emails.value[emails.value.length - 1].$el;
-        emailRef?.focus();
+        lastPill()?.focus();
       } else {
         setFocus();
       }
     });
   } else {
-    emailRef?.focus();
+    pill?.focus();
   }
 }
 

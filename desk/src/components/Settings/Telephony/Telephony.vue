@@ -123,7 +123,7 @@ import {
   Badge,
 } from "frappe-ui";
 import SelectDropdown from "@/components/SelectDropdown.vue";
-import { nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -188,13 +188,6 @@ const telephonyAgent = createDocumentResource({
   },
 });
 
-const twilioAppsResource = createResource({
-  url: "telephony.twilio.api.fetch_applications",
-  onSuccess() {
-    twilio.reload();
-  },
-});
-
 const telephonyProviders = [
   { label: "Twilio", value: "Twilio" },
   { label: "Exotel", value: "Exotel" },
@@ -255,16 +248,6 @@ async function save() {
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
   await twilio.reload();
   telephonyStore.fetchCallIntegrationStatus();
-}
-
-function refreshApps(togglePopover) {
-  twilioAppsResource.submit().then(() => {
-    // Close and reopen popover to fix bug where search does not work after refreshing list
-    togglePopover();
-    nextTick(() => {
-      togglePopover();
-    });
-  });
 }
 
 createResource({

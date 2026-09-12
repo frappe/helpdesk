@@ -127,7 +127,7 @@ function combobox(options: Option[]) {
 
 const component = computed(() => {
   if (props.field.url_method) {
-    return combobox(apiOptions.data);
+    return combobox(apiOptions.data || []);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     const linkProps = {
       doctype: props.field.options,
