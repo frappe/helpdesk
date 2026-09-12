@@ -79,7 +79,7 @@
             :loading="agents.loading"
             variant="ghost"
             class="w-full"
-            size="2xl"
+            size="lg"
           />
         </div>
         <!-- Empty State -->
