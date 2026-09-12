@@ -38,11 +38,7 @@
                 $props.buttonClasses,
                 disabled ? 'cursor-not-allowed opacity-50' : '',
               ]"
-              @click="
-                () => {
-                  !disabled && togglePopover();
-                }
-              "
+              :disabled="disabled"
             >
               <div class="flex flex-1 items-center gap-2 overflow-hidden">
                 <slot name="prefix" />

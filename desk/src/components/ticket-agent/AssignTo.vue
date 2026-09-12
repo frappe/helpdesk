@@ -5,7 +5,7 @@
     :matchTriggerWidth="true"
     v-model:open="popoverIsOpen"
   >
-    <template #trigger="{ toggle: togglePopover }">
+    <template #trigger>
       <div class="flex flex-col gap-1.5 w-full">
         <span v-if="!hideLabel" class="block text-base text-ink-gray-5">
           {{ __("Assignee") }}
@@ -24,7 +24,6 @@
                 ]
               : 'hover:shadow-sm'
           "
-          @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
             <template v-if="localAssignees.length > 0">

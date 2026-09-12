@@ -7,7 +7,7 @@
       >
         <FilterTrigger
           :count="activeFilters.length"
-          @toggle="openPopover(togglePopover)"
+          @toggle="resetSteps()"
           @clear="clearFilters()"
         />
       </div>
@@ -222,11 +222,6 @@ useShortcut("f", () => {
   resetSteps();
   openPopoverFn?.();
 });
-
-function openPopover(toggle: () => void) {
-  resetSteps();
-  toggle();
-}
 
 // The popover auto-focuses its first focusable element on open, which would put
 // a focus ring on the first filter row. Pull focus to the (non-tabbable) header

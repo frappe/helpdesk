@@ -4,9 +4,14 @@
       {{ label }}
       <span v-if="required" class="text-ink-red-6">*</span>
     </label>
-    <Popover bare v-model:open="isOpen" matchTriggerWidth>
-      <template #trigger="{ toggle: togglePopover }">
-        <div :class="containerClasses">
+    <div :class="containerClasses">
+      <!--
+        The popover wraps the flag button alone: reka makes the whole #trigger
+        subtree toggle the panel, so a container-level trigger would open the
+        country list on every click in the number field.
+      -->
+      <Popover bare v-model:open="isOpen">
+        <template #trigger>
           <button
             type="button"
             class="flex h-full items-center gap-1 rounded-l-4 px-2 min-w-[50px] focus:outline-none"
@@ -15,7 +20,6 @@
               flagCode ? '' : 'justify-center',
             ]"
             :aria-label="__('Select country')"
-            @click.stop="togglePopover()"
           >
             <img
               v-if="flagCode"
@@ -25,94 +29,91 @@
             />
             <LucideChevronDown class="size-3.5 text-ink-gray-5" />
           </button>
-          <div
-            class="self-stretch border-l border-outline-gray-2"
-            aria-hidden="true"
-          />
-          <span
-            v-if="isd"
-            class="select-none ps-2.5 text-base"
-            :class="textColorClass"
-          >
-            {{ isd }}
-          </span>
-          <TextInput
-            :id="id"
-            ref="numberInputRef"
-            v-model="localNumber"
-            type="tel"
-            variant="ghost"
-            :size="size"
-            :placeholder="placeholder"
-            :disabled="disabled"
-            :autofocus="autofocus"
-            inputmode="tel"
-            autocomplete="off"
-            class="min-w-0 flex-1 [&_input]:!bg-transparent [&_input]:!ps-1"
-            @keydown.backspace="onBackspace"
-          />
-          <div
-            v-if="$slots.suffix"
-            class="flex items-center gap-2 ps-3.5 pe-2.5"
-          >
-            <slot name="suffix" />
-          </div>
-        </div>
-      </template>
+        </template>
 
-      <template #default="{ close }">
-        <div
-          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-6 border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
-        >
-          <div class="border-b border-outline-gray-1 p-2">
-            <FormControl
-              v-model="searchQuery"
-              size="sm"
-              autocomplete="one-time-code"
-              :name="`country-search-${id}`"
-              :placeholder="__('Search country')"
-              :autofocus="true"
-              @keydown.down.prevent="moveHighlight(1)"
-              @keydown.up.prevent="moveHighlight(-1)"
-              @keydown.enter.prevent="commitHighlighted(close)"
-              @keydown.escape.prevent="close()"
-            />
-          </div>
-          <div class="flex-1 overflow-y-auto p-1">
-            <button
-              v-for="(country, idx) in filteredCountries"
-              :key="country.name"
-              :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
-              type="button"
-              class="flex w-full items-center gap-2 rounded-5 px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
-              :class="
-                idx === highlightedIndex
-                  ? 'bg-surface-gray-3'
-                  : 'hover:bg-surface-gray-2'
-              "
-              @mouseenter="highlightedIndex = idx"
-              @click="onSelectCountry(country.name, close)"
-            >
-              <img
-                :src="`https://flagcdn.com/${country.code}.svg`"
-                :alt="country.name"
-                class="h-3 w-4 rounded-1 object-cover"
+        <template #default="{ close }">
+          <div
+            class="mt-1 flex max-h-72 w-72 flex-col overflow-hidden rounded-6 border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
+          >
+            <div class="border-b border-outline-gray-1 p-2">
+              <FormControl
+                v-model="searchQuery"
+                size="sm"
+                autocomplete="one-time-code"
+                :name="`country-search-${id}`"
+                :placeholder="__('Search country')"
+                :autofocus="true"
+                @keydown.down.prevent="moveHighlight(1)"
+                @keydown.up.prevent="moveHighlight(-1)"
+                @keydown.enter.prevent="commitHighlighted(close)"
+                @keydown.escape.prevent="close()"
               />
-              <span class="flex-1 truncate">
-                {{ country.name }}
-              </span>
-              <span class="text-ink-gray-5">{{ country.isd }}</span>
-            </button>
-            <div
-              v-if="filteredCountries.length === 0"
-              class="p-3 text-center text-base text-ink-gray-5"
-            >
-              {{ __("No country found") }}
+            </div>
+            <div class="flex-1 overflow-y-auto p-1">
+              <button
+                v-for="(country, idx) in filteredCountries"
+                :key="country.name"
+                :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
+                type="button"
+                class="flex w-full items-center gap-2 rounded-5 px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
+                :class="
+                  idx === highlightedIndex
+                    ? 'bg-surface-gray-3'
+                    : 'hover:bg-surface-gray-2'
+                "
+                @mouseenter="highlightedIndex = idx"
+                @click="onSelectCountry(country.name, close)"
+              >
+                <img
+                  :src="`https://flagcdn.com/${country.code}.svg`"
+                  :alt="country.name"
+                  class="h-3 w-4 rounded-1 object-cover"
+                />
+                <span class="flex-1 truncate">
+                  {{ country.name }}
+                </span>
+                <span class="text-ink-gray-5">{{ country.isd }}</span>
+              </button>
+              <div
+                v-if="filteredCountries.length === 0"
+                class="p-3 text-center text-base text-ink-gray-5"
+              >
+                {{ __("No country found") }}
+              </div>
             </div>
           </div>
-        </div>
-      </template>
-    </Popover>
+        </template>
+      </Popover>
+      <div
+        class="self-stretch border-l border-outline-gray-2"
+        aria-hidden="true"
+      />
+      <span
+        v-if="isd"
+        class="select-none ps-2.5 text-base"
+        :class="textColorClass"
+      >
+        {{ isd }}
+      </span>
+      <TextInput
+        :id="id"
+        ref="numberInputRef"
+        v-model="localNumber"
+        type="tel"
+        variant="ghost"
+        :size="size"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :autofocus="autofocus"
+        inputmode="tel"
+        autocomplete="off"
+        class="min-w-0 flex-1 [&_input]:!bg-transparent [&_input]:!ps-1"
+        @keydown.backspace="onBackspace"
+      />
+      <div v-if="$slots.suffix" class="flex items-center gap-2 ps-3.5 pe-2.5">
+        <slot name="suffix" />
+      </div>
+    </div>
     <p v-if="description" :class="descriptionClasses">
       {{ description }}
     </p>

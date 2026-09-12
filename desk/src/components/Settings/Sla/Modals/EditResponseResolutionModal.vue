@@ -15,9 +15,8 @@
         <div>
           <FormLabel label="Response time" required />
           <Popover bare>
-            <template #trigger="{ toggle: togglePopover }">
+            <template #trigger>
               <div
-                @click="togglePopover()"
                 class="mt-2 w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.response_time">
@@ -39,9 +38,8 @@
         <div>
           <FormLabel label="Resolution time" required />
           <Popover bare>
-            <template #trigger="{ toggle: togglePopover }">
+            <template #trigger>
               <div
-                @click="togglePopover()"
                 class="mt-2 w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.resolution_time">

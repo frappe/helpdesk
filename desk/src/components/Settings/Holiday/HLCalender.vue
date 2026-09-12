@@ -17,24 +17,30 @@
         <div v-for="date in week" :key="getFormattedDate(date)">
           <Popover v-if="isHoliday(date)">
             <template #trigger="{ close, toggle }">
-              <div
-                class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded-4 hover:bg-surface-yellow-2 select-none m-[1px]"
-                :class="{
-                  '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
-                }"
-                @mouseover="
-                  handleMouseEnter(getFormattedDate(date), () => toggle(true))
-                "
-                @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
-                @click="
-                  () => {
-                    if (isWeekOff(date)) return;
-                    close();
-                    editHoliday(date);
-                  }
-                "
-              >
-                {{ date.getDate() }}
+              <!--
+                Hover opens this one. reka turns the whole trigger subtree into
+                the toggle, so the cell stops its click before it gets there.
+              -->
+              <div>
+                <div
+                  class="flex size-7 cursor-pointer text-ink-orange-6 bg-surface-yellow-2 items-center justify-center rounded-4 hover:bg-surface-yellow-2 select-none m-[1px]"
+                  :class="{
+                    '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
+                  }"
+                  @mouseover="
+                    handleMouseEnter(getFormattedDate(date), () => toggle(true))
+                  "
+                  @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
+                  @click.stop="
+                    () => {
+                      if (isWeekOff(date)) return;
+                      close();
+                      editHoliday(date);
+                    }
+                  "
+                >
+                  {{ date.getDate() }}
+                </div>
               </div>
             </template>
             <template #default="{ close: closePopover, toggle: togglePopover }">
@@ -64,11 +70,10 @@
                   v-if="!isWeekOff(date)"
                   @close="isConfirmingDelete = false"
                 >
-                  <template #trigger="{ close, toggle }">
+                  <template #trigger="{ close }">
                     <Button
                       icon="lucide-more-horizontal"
                       variant="ghost"
-                      @click="toggle(true)"
                       @mouseleave="
                         handleMouseLeave(
                           getFormattedDate(date) + 'dropdown',

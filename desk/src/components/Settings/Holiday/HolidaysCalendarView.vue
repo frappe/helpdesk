@@ -3,11 +3,10 @@
     <div class="mb-6.5 flex justify-between items-center">
       <div class="ms-1">
         <Popover v-if="startYear !== endYear">
-          <template #trigger="{ toggle: togglePopover }">
+          <template #trigger>
             <Button
               class="flex items-center gap-2 text-xl-semibold cursor-pointer select-none"
               variant="ghost"
-              @click="togglePopover"
               :label="currentYear + ''"
               icon-right="lucide-chevron-down"
             />

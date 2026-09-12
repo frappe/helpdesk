@@ -61,11 +61,10 @@
               :options="fields"
               @change="(e) => addColumn(e)"
             >
-              <template #target="{ togglePopover }">
+              <template #target>
                 <Button
                   class="w-full !justify-start !text-ink-gray-5"
                   variant="ghost"
-                  @click="togglePopover()"
                   :label="__('Add Column')"
                 >
                   <template #prefix>

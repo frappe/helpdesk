@@ -82,13 +82,12 @@
             :options="filteredEmails"
             @change="(e) => addEmail(e)"
           >
-            <template #target="{ togglePopover }">
+            <template #target>
               <Button
                 class="!bg-surface-elevation-2"
                 variant="outline"
                 :label="__('Add Email')"
                 iconLeft="lucide-plus"
-                @click="togglePopover()"
               />
             </template>
             <template #item-label="{ option }">

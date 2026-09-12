@@ -6,8 +6,8 @@
     :placeholder="'First Name'"
     @change="(e) => setSort(e)"
   >
-    <template #target="{ togglePopover }">
-      <Button :label="__('Sort')" @click="togglePopover()">
+    <template #target>
+      <Button :label="__('Sort')">
         <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
         </template>
@@ -105,13 +105,10 @@
                   @change="(e) => updateSort(e, i)"
                   :placeholder="'First Name'"
                 >
-                  <template
-                    #target="{ togglePopover, selectedValue, displayValue }"
-                  >
+                  <template #target="{ selectedValue, displayValue }">
                     <Button
                       class="flex w-full items-center justify-between rounded-s-none !text-ink-gray-5 text-xs"
                       size="md"
-                      @click="togglePopover()"
                     >
                       {{ __(displayValue(selectedValue)) }}
                       <template #suffix>
@@ -137,11 +134,10 @@
               :placeholder="'First Name'"
               @change="(e) => setSort(e)"
             >
-              <template #target="{ togglePopover }">
+              <template #target>
                 <Button
                   class="!text-ink-gray-5"
                   variant="ghost"
-                  @click="togglePopover()"
                   :label="__('Add Sort')"
                 >
                   <template #prefix>

@@ -1,12 +1,8 @@
 <template>
   <div class="flex flex-wrap items-center gap-1.5 pt-1.5">
     <Popover side="top" align="start">
-      <template #trigger="{ toggle: togglePopover }">
-        <Button
-          variant="ghost"
-          class="text-ink-gray-5 -ml-1.5"
-          @click="togglePopover"
-        >
+      <template #trigger>
+        <Button variant="ghost" class="text-ink-gray-5 -ml-1.5">
           <template #icon>
             <ReactionIcon class="size-4" />
           </template>

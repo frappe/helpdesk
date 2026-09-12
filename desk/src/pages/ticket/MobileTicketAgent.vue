@@ -45,11 +45,10 @@
           @update:model-value="(val) => updateField('agent_group', val)"
         >
           <!-- Same trigger styling as AssignTo so the header controls match -->
-          <template #target="{ togglePopover }">
+          <template #target>
             <Button
               variant="outline"
               class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
-              @click="togglePopover()"
             >
               <div class="flex items-center min-h-5 gap-2 w-full">
                 <span

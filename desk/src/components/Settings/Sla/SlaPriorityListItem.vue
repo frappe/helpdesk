@@ -22,9 +22,8 @@
         "
       >
         <Popover bare>
-          <template #trigger="{ toggle: togglePopover }">
+          <template #trigger>
             <div
-              @click="togglePopover()"
               class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-surface-gray-3 rounded-4"
             >
               {{ formatTimeHMS(props.row[column.key]) }}

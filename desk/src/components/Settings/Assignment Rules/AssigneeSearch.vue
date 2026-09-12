@@ -1,11 +1,10 @@
 <template>
   <Combobox :multiple="true">
     <Popover bare side="bottom" align="end">
-      <template #trigger="{ toggle: togglePopover }">
+      <template #trigger>
         <Button
           variant="subtle"
           icon-left="lucide-plus"
-          @click="togglePopover()"
           :label="__('Add Assignee')"
           class="rtl:flex-row-reverse"
         />

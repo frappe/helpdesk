@@ -58,10 +58,9 @@
           <div class="flex flex-col gap-1.5">
             <FormLabel :label="__('Priority')" />
             <Popover bare>
-              <template #trigger="{ toggle: togglePopover }">
+              <template #trigger>
                 <div
                   class="flex items-center justify-between text-base rounded-4 h-7 py-1.5 ps-2 pe-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark] cursor-default"
-                  @click="togglePopover()"
                 >
                   <div>
                     {{

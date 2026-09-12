@@ -1,9 +1,9 @@
 <template>
   <Popover bare v-model:open="isOpen" @close="handlePopoverToggle">
-    <template #trigger="{ toggle: togglePopover }">
+    <template #trigger>
       <div
-        @click="!disabled && togglePopover()"
         class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 rounded-4"
+        :class="{ 'pointer-events-none': disabled }"
       >
         <div class="flex items-center justify-between">
           <span :class="{ 'text-ink-gray-5': !modelValue || disabled }">

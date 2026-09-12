@@ -4,10 +4,9 @@
     :side="splitPlacement(props.placement).side"
     :align="splitPlacement(props.placement).align"
   >
-    <template #trigger="{ toggle: togglePopover }">
+    <template #trigger>
       <Button
         class="flex items-center justify-between min-w-36"
-        @click="togglePopover()"
         :class="targetClass"
         icon-right="lucide-chevron-down"
       >

@@ -7,11 +7,7 @@
             <button
               class="flex w-full items-center justify-between focus:outline-none"
               :class="inputClasses"
-              @click="
-                () => {
-                  !disabled && togglePopover();
-                }
-              "
+              :disabled="disabled"
             >
               <div class="flex items-center truncate">
                 <slot name="prefix" />
