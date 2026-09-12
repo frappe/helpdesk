@@ -1,12 +1,11 @@
 <template>
-  <Autocomplete
+  <Combobox
     v-if="!sortValues?.size"
     :options="options"
-    value=""
-    :placeholder="'First Name'"
-    @change="(e) => setSort(e)"
+    :model-value="null"
+    @update:model-value="(value) => value && setSort(value)"
   >
-    <template #target>
+    <template #trigger>
       <Button :label="__('Sort')">
         <template v-if="hideLabel" #icon>
           <SortIcon class="h-4" />
@@ -16,7 +15,7 @@
         </template>
       </Button>
     </template>
-  </Autocomplete>
+  </Combobox>
   <NestedPopover v-else>
     <template #target="{ open }">
       <Button v-if="sortValues.size > 1" :label="__('Sort')">
@@ -98,25 +97,24 @@
                   <AscendingIcon v-if="sort.direction == 'asc'" class="h-4" />
                   <DescendingIcon v-else class="h-4" />
                 </Button>
-                <Autocomplete
+                <Combobox
                   class="!w-32"
-                  :value="sort.fieldname"
+                  :model-value="sort.fieldname"
                   :options="sortOptions.data"
-                  @change="(e) => updateSort(e, i)"
-                  :placeholder="'First Name'"
+                  @update:model-value="(value) => value && updateSort(value, i)"
                 >
-                  <template #target="{ selectedValue, displayValue }">
+                  <template #trigger="{ displayValue }">
                     <Button
                       class="flex w-full items-center justify-between rounded-s-none !text-ink-gray-5 text-xs"
                       size="md"
                     >
-                      {{ __(displayValue(selectedValue)) }}
+                      {{ __(displayValue) }}
                       <template #suffix>
                         <LucideChevronDown class="h-4 text-ink-gray-5" />
                       </template>
                     </Button>
                   </template>
-                </Autocomplete>
+                </Combobox>
               </div>
               <Button variant="ghost" icon="lucide-x" @click="removeSort(i)" />
             </div>
@@ -128,13 +126,12 @@
             {{ __("Empty - Choose a field to sort by") }}
           </div>
           <div class="flex items-center justify-between gap-2">
-            <Autocomplete
+            <Combobox
               :options="options"
-              value=""
-              :placeholder="'First Name'"
-              @change="(e) => setSort(e)"
+              :model-value="null"
+              @update:model-value="(value) => value && setSort(value)"
             >
-              <template #target>
+              <template #trigger>
                 <Button
                   class="!text-ink-gray-5"
                   variant="ghost"
@@ -145,7 +142,7 @@
                   </template>
                 </Button>
               </template>
-            </Autocomplete>
+            </Combobox>
             <Button
               v-if="sortValues?.size"
               class="!text-ink-gray-5"
@@ -167,7 +164,7 @@ import LucidePlus from "~icons/lucide/plus";
 import { computed, inject } from "vue";
 import NestedPopover from "@/components/NestedPopover.vue";
 import { useSortable } from "@vueuse/integrations/useSortable";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
+import { Combobox } from "frappe-ui";
 import {
   AscendingIcon,
   DescendingIcon,
@@ -233,17 +230,17 @@ function getSortLabel() {
   return __(label) || __(sort.fieldname);
 }
 
-function setSort(data) {
-  sortValues.value.add({ fieldname: data.value, direction: "asc" });
+function setSort(fieldname) {
+  sortValues.value.add({ fieldname, direction: "asc" });
   restartSort();
   apply();
 }
 
-function updateSort(data, index) {
+function updateSort(fieldname, index) {
   let oldSort = Array.from(sortValues.value)[index];
   sortValues.value.delete(oldSort);
   sortValues.value.add({
-    fieldname: data.value,
+    fieldname,
     direction: oldSort.direction,
   });
   apply();

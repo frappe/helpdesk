@@ -77,12 +77,12 @@
               </div>
             </div>
           </div>
-          <Autocomplete
-            value=""
+          <Combobox
+            :model-value="null"
             :options="filteredEmails"
-            @change="(e) => addEmail(e)"
+            @update:selected-option="(option) => option && addEmail(option)"
           >
-            <template #target>
+            <template #trigger>
               <Button
                 class="!bg-surface-elevation-2"
                 variant="outline"
@@ -90,15 +90,15 @@
                 iconLeft="lucide-plus"
               />
             </template>
-            <template #item-label="{ option }">
+            <template #item-label="{ item }">
               <div class="flex flex-col gap-1 text-ink-gray-9">
-                <div>{{ option.label }}</div>
+                <div>{{ item.label }}</div>
                 <div class="text-ink-gray-4 text-sm">
-                  {{ option.email }}
+                  {{ item.email }}
                 </div>
               </div>
             </template>
-          </Autocomplete>
+          </Combobox>
         </div>
       </div>
     </template>
@@ -122,13 +122,12 @@
 <script setup>
 import CompactEditor from "@/components/CompactEditor.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { normalize } from "@/utils";
-import { Button, createDocumentResource, toast } from "frappe-ui";
+import { Button, Combobox, createDocumentResource, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 

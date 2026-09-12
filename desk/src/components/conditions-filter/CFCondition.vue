@@ -32,11 +32,12 @@
       </div>
       <div v-if="!props.isGroup" class="flex items-center gap-2 w-full">
         <div id="fieldname" class="w-full">
-          <Autocomplete
+          <Combobox
+            trigger="button"
             :options="filterableFields.data"
-            v-model="props.condition[0]"
-            :placeholder="'Field'"
-            @update:modelValue="updateField"
+            :model-value="props.condition[0]"
+            :placeholder="__('Field')"
+            @update:selected-option="updateField"
           />
         </div>
         <div id="operator">
@@ -107,10 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { Link, StarRating } from "@/components";
 import {
   Button,
+  Combobox,
   DatePicker,
   DateRangePicker,
   DateTimePicker,

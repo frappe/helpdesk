@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete } from "@/components";
 import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
@@ -128,9 +127,7 @@ function combobox(options: Option[]) {
 
 const component = computed(() => {
   if (props.field.url_method) {
-    return h(Autocomplete, {
-      options: apiOptions.data,
-    });
+    return combobox(apiOptions.data);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     const linkProps = {
       doctype: props.field.options,

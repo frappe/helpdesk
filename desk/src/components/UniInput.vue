@@ -28,10 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete, Link } from "@/components";
+import { Link } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import {
+  Combobox,
   createResource,
   DatePicker,
   DateTimePicker,
@@ -58,12 +59,15 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 
+// trigger: "button" keeps the search inside the popover, so the control still
+// reads as a value rather than a text input
+function picker(options: { label: string; value: string | number }[]) {
+  return h(Combobox, { trigger: "button", options, size: "sm" });
+}
+
 const component = computed(() => {
   if (props.field.url_method) {
-    return h(Autocomplete, {
-      options: apiOptions.data,
-      size: "sm",
-    });
+    return picker(apiOptions.data);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
       doctype: props.field.options,
@@ -71,26 +75,16 @@ const component = computed(() => {
       pageLength: 999,
     });
   } else if (props.field.fieldtype === "Select") {
-    return h(Autocomplete, {
-      options: props.field.options
+    return picker(
+      props.field.options
         ? props.field.options.split("\n").map((o) => ({ label: o, value: o }))
-        : [],
-      size: "sm",
-    });
+        : []
+    );
   } else if (props.field.fieldtype === "Check") {
-    return h(Autocomplete, {
-      options: [
-        {
-          label: "Yes",
-          value: 1,
-        },
-        {
-          label: "No",
-          value: 0,
-        },
-      ],
-      size: "sm",
-    });
+    return picker([
+      { label: "Yes", value: 1 },
+      { label: "No", value: 0 },
+    ]);
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
       format: `${window.date_format.toUpperCase()} ${window.time_format}`,
@@ -117,7 +111,8 @@ const apiOptions = createResource({
 
 const transValue = computed(() => {
   if (props.field.fieldtype === "Check") {
-    return props.value ? "Yes" : "No";
+    // the picker matches on option value, so keep the stored 1 / 0
+    return props.value ? 1 : 0;
   }
   return props.value;
 });

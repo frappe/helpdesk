@@ -110,7 +110,6 @@
 </template>
 
 <script setup lang="ts">
-import Autocomplete from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 import Password from "@/components/Password.vue";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";

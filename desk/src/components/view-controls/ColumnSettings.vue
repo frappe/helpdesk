@@ -56,12 +56,12 @@
           <div
             class="mt-1.5 flex flex-col gap-1 border-t border-outline-elevation-2 pt-1.5"
           >
-            <Autocomplete
-              value=""
+            <Combobox
+              :model-value="null"
               :options="fields"
-              @change="(e) => addColumn(e)"
+              @update:selected-option="(option) => option && addColumn(option)"
             >
-              <template #target>
+              <template #trigger>
                 <Button
                   class="w-full !justify-start !text-ink-gray-5"
                   variant="ghost"
@@ -72,7 +72,7 @@
                   </template>
                 </Button>
               </template>
-            </Autocomplete>
+            </Combobox>
             <!-- <Button
               v-if="columnsUpdated"
               class="w-full !justify-start !text-ink-gray-5"
@@ -144,7 +144,6 @@
 
 <script setup>
 import LucidePlus from "~icons/lucide/plus";
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import {
   ColumnsIcon,
   DragIcon,
@@ -154,7 +153,7 @@ import {
 import NestedPopover from "@/components/NestedPopover.vue";
 import { isTouchScreenDevice } from "@/utils";
 import { watchOnce } from "@vueuse/core";
-import { Button, FormControl } from "frappe-ui";
+import { Button, Combobox, FormControl } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import Draggable from "vuedraggable";
 

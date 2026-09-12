@@ -1,87 +1,70 @@
 <template>
-  <div class="space-y-1.5">
-    <label class="block" :class="labelClasses" v-if="attrs.label">
-      {{ attrs.label }}
-    </label>
-    <Autocomplete
-      class="w-full"
-      ref="autocomplete"
-      :options="options.data"
-      v-model="value"
-      :size="attrs.size || 'sm'"
-      :variant="attrs.variant"
-      :placeholder="attrs.placeholder"
-      :filterable="false"
-      :disabled="attrs.disabled"
-    >
-      <template #target="{ open, togglePopover }">
-        <slot name="target" v-bind="{ open, togglePopover }" />
-      </template>
+  <Combobox
+    :model-value="value || null"
+    trigger="button"
+    :options="linkOptions"
+    :loading="options.loading"
+    :filterable="false"
+    :size="size"
+    :variant="variant"
+    :placeholder="placeholder"
+    :disabled="disabled"
+    :label="label"
+    :description="description"
+    :required="required"
+    @update:model-value="(val) => (value = val)"
+    @update:query="(query) => (text = query)"
+  >
+    <template v-if="$slots.trigger" #trigger="slotProps">
+      <slot name="trigger" v-bind="slotProps" />
+    </template>
 
-      <template #prefix>
-        <slot name="prefix" />
-      </template>
+    <template v-if="$slots.prefix" #prefix>
+      <slot name="prefix" />
+    </template>
 
-      <template #item-prefix="{ active, selected, option }">
-        <slot name="item-prefix" v-bind="{ active, selected, option }" />
-      </template>
+    <template v-if="$slots['item-prefix']" #item-prefix="slotProps">
+      <slot name="item-prefix" v-bind="slotProps" />
+    </template>
 
-      <template #item-label="{ active, selected, option }">
-        <slot name="item-label" v-bind="{ active, selected, option }">
-          <div
-            v-if="option.description && showDescription"
-            class="flex flex-col gap-1"
-          >
-            <div class="flex-1 font-semibold truncate text-ink-gray-7">
-              {{ option.label }}
-            </div>
-            <div class="flex-1 text-sm truncate text-ink-gray-5">
-              {{ option.description }}
-            </div>
-          </div>
-          <div v-else class="flex-1 truncate text-ink-gray-7">
-            {{ option.label }}
-          </div>
-        </slot>
-      </template>
+    <template v-if="$slots['item-label']" #item-label="slotProps">
+      <slot name="item-label" v-bind="slotProps" />
+    </template>
 
-      <template #footer="{ value, close }" v-if="!hideClearButton">
-        <div v-if="attrs.onCreate">
-          <Button
-            variant="ghost"
-            class="w-full !justify-start"
-            :label="'Create New'"
-            @click="attrs.onCreate(value, close)"
-          >
-            <template #prefix>
-              <LucidePlus class="h-4" />
-            </template>
-          </Button>
-        </div>
-        <div>
-          <Button
-            variant="ghost"
-            class="w-full !justify-start"
-            :label="'Clear'"
-            @click="() => clearValue(close)"
-          >
-            <template #prefix>
-              <LucideX class="h-4" />
-            </template>
-          </Button>
-        </div>
-      </template>
-    </Autocomplete>
-  </div>
+    <template v-if="onCreate || !hideClearButton" #footer="{ query, setOpen }">
+      <Button
+        v-if="onCreate"
+        variant="ghost"
+        class="w-full !justify-start"
+        :label="__('Create New')"
+        @click="onCreate(query, () => setOpen(false))"
+      >
+        <template #prefix>
+          <LucidePlus class="h-4" />
+        </template>
+      </Button>
+      <Button
+        v-if="!hideClearButton"
+        variant="ghost"
+        class="w-full !justify-start"
+        :label="__('Clear')"
+        @click="clearValue(() => setOpen(false))"
+      >
+        <template #prefix>
+          <LucideX class="h-4" />
+        </template>
+      </Button>
+    </template>
+  </Combobox>
 </template>
 
 <script setup>
 import LucidePlus from "~icons/lucide/plus";
 import LucideX from "~icons/lucide/x";
 import { watchDebounced } from "@vueuse/core";
-import { createResource } from "frappe-ui";
+import { Button, Combobox, createResource } from "frappe-ui";
+import { __ } from "@/translation";
 import { computed, ref, useAttrs, watch } from "vue";
-import Autocomplete from "./Autocomplete.vue";
 
 const props = defineProps({
   doctype: {
@@ -112,6 +95,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  label: String,
+  description: String,
+  placeholder: String,
+  required: Boolean,
+  disabled: Boolean,
+  size: {
+    type: String,
+    default: "sm",
+  },
+  variant: String,
+  onCreate: Function,
 });
 
 const emit = defineEmits(["update:modelValue", "change"]);
@@ -122,49 +116,43 @@ const valuePropPassed = computed(() => "value" in attrs);
 
 const value = computed({
   get: () => (valuePropPassed.value ? attrs.value : props.modelValue),
-  set: (val) => {
-    return (
-      val?.value &&
-      emit(valuePropPassed.value ? "change" : "update:modelValue", val?.value)
-    );
-  },
+  set: (val) =>
+    val && emit(valuePropPassed.value ? "change" : "update:modelValue", val),
 });
 
-const autocomplete = ref(null);
+// The row renderer shows `description` whenever an option carries one, so the
+// field has to drop it rather than hide it.
+const linkOptions = computed(() =>
+  props.showDescription
+    ? options.data || []
+    : (options.data || []).map(({ description, ...rest }) => rest)
+);
+
 const text = ref("");
 
-watchDebounced(
-  () => autocomplete.value?.query,
-  (val) => {
-    val = val || "";
-    if (text.value === val) return;
-    text.value = val;
-    reload(val);
-  },
-  { debounce: 300, immediate: true }
-);
+function clearValue(close) {
+  emit(valuePropPassed.value ? "change" : "update:modelValue", "");
+  close();
+}
 
-watchDebounced(
-  () => props.doctype,
-  () => reload(""),
-  { debounce: 300, immediate: true }
-);
+function reload(val) {
+  if (
+    options.data?.length &&
+    val === options.params?.txt &&
+    props.doctype === options.params?.doctype
+  )
+    return;
 
-watch(
-  () => props?.filters,
-  (newVal) => {
-    options.update({
-      params: {
-        txt: text.value,
-        doctype: props.doctype,
-        filters: newVal,
-        page_length: props.pageLength,
-      },
-    });
-    options.reload();
-  },
-  { deep: true }
-);
+  options.update({
+    params: {
+      txt: val,
+      doctype: props.doctype,
+      filters: props.filters,
+      page_length: props.pageLength,
+    },
+  });
+  options.reload();
+}
 
 const options = createResource({
   url: "frappe.desk.search.search_link",
@@ -198,36 +186,33 @@ const options = createResource({
   },
 });
 
-function reload(val) {
-  if (
-    options.data?.length &&
-    val === options.params?.txt &&
-    props.doctype === options.params?.doctype
-  )
-    return;
-
-  options.update({
-    params: {
-      txt: val,
-      doctype: props.doctype,
-      filters: props.filters,
-      page_length: props.pageLength,
-    },
-  });
-  options.reload();
-}
-
-function clearValue(close) {
-  emit(valuePropPassed.value ? "change" : "update:modelValue", "");
-  close();
-}
-
-const labelClasses = computed(() => {
-  return [
-    "text-base text-ink-gray-5",
-    ...(attrs.required
-      ? ["after:content-['*']", "after:ms-0.5", "after:text-ink-red-6"]
-      : []),
-  ];
+watchDebounced(text, (val) => reload(val || ""), {
+  debounce: 300,
+  immediate: true,
 });
+
+watchDebounced(
+  () => props.doctype,
+  () => reload(""),
+  {
+    debounce: 300,
+    immediate: true,
+  }
+);
+
+watch(
+  () => props?.filters,
+  (newVal) => {
+    options.update({
+      params: {
+        txt: text.value,
+        doctype: props.doctype,
+        filters: newVal,
+        page_length: props.pageLength,
+      },
+    });
+    options.reload();
+  },
+  { deep: true }
+);
 </script>
