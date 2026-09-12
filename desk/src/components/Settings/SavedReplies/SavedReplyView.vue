@@ -95,6 +95,16 @@
           <CompactEditor
             ref="content"
             v-model="savedReplyData.message"
+            :upload-fn="
+              (file: any, options: any) =>
+                uploadFunction(
+                  file,
+                  'HD Saved Reply',
+                  savedReplyData.name,
+                  false,
+                  options
+                )
+            "
             :extensions="[FieldAutocomplete]"
             :placeholder="
               __(
@@ -128,6 +138,7 @@ import DocumentationButton from "@/components/DocumentationButton.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
+import { uploadFunction } from "@/utils";
 import {
   Button,
   createListResource,

@@ -28,6 +28,10 @@
         <div>
           <CompactEditor
             v-model="user.doc.email_signature"
+            :upload-fn="
+              (file: any, options: any) =>
+                uploadFunction(file, 'User', userId, false, options)
+            "
             :placeholder="__('Write your email signature here.')"
           />
         </div>
@@ -126,7 +130,7 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import { normalize } from "@/utils";
+import { normalize, uploadFunction } from "@/utils";
 import { Button, Combobox, createDocumentResource, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
