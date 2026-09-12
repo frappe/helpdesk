@@ -364,13 +364,13 @@ const tabButtons = computed(() => {
   ];
 });
 
-const hasAppliedFilter = computed(() => {
-  return (
+const hasAppliedFilter = computed(() =>
+  Boolean(
     filters.agent ||
-    filters.team ||
-    (filters.period && filters.period !== getLastXDays(30))
-  );
-});
+      filters.team ||
+      (filters.period && filters.period !== getLastXDays(30))
+  )
+);
 
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;

@@ -103,7 +103,6 @@
             <LucideChevronRight class="size-4 text-ink-gray-5 rtl:rotate-180" />
           </div>
         </div>
-        <ErrorMessage :message="error" />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -120,7 +119,6 @@ import {
   FormControl,
   createDocumentResource,
   toast,
-  ErrorMessage,
   createResource,
   Badge,
 } from "frappe-ui";

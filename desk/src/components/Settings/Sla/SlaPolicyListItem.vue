@@ -21,7 +21,7 @@
       <div>
         <Switch
           size="sm"
-          :modelValue="data.enabled"
+          :modelValue="Boolean(data.enabled)"
           @update:modelValue="onToggle"
         />
       </div>

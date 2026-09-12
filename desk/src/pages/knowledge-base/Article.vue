@@ -596,12 +596,15 @@ function scrollToHeading() {
   }, 500);
 }
 
-watch(articleStats.data, () => {
-  if (articleStats.data) {
-    likes.value = articleStats.data.likes;
-    dislikes.value = articleStats.data.dislikes;
+watch(
+  () => articleStats.data,
+  (stats) => {
+    if (stats) {
+      likes.value = stats.likes;
+      dislikes.value = stats.dislikes;
+    }
   }
-});
+);
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =

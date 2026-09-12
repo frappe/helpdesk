@@ -133,7 +133,7 @@
           }}</span>
         </div>
         <SelectDropdown
-          :options="ticketTypeList.data"
+          :options="ticketTypeList.data || []"
           v-model="settingsData.defaultTicketType"
           target-class="max-w-40"
           placement="bottom-start"

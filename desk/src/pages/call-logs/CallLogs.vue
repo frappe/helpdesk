@@ -18,7 +18,6 @@
       ref="listViewRef"
       :options="options"
       @row-click="openCallLog"
-      @empty-state-action="showCallLogModal = true"
     />
     <CallLogDetailModal
       v-model="showCallLogDetailModal"
