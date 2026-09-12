@@ -62,8 +62,11 @@ function buildActionOptions() {
   const search = useDebounceFn((type: SavedReplyActionType, query: string) => {
     const resource = searchResources[type];
     if (!resource) return;
+    // the resources are shared for the session, so an empty query has to take
+    // the clause back out rather than narrow the list for every later reader
+    const { name, ...filters } = resource.filters || {};
     resource.update({
-      filters: { ...resource.filters, name: ["like", `%${query}%`] },
+      filters: query ? { ...filters, name: ["like", `%${query}%`] } : filters,
     });
     resource.reload();
   }, 300);

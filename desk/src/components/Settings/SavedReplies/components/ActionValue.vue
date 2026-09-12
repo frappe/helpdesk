@@ -19,6 +19,7 @@
     @update:model-value="emit('update:modelValue', $event as string)"
     v-model:query="queryText"
     @update:query="emit('search', $event)"
+    @update:open="(open) => !open && (queryText = '')"
   >
     <template v-if="type === 'Assign Agent'" #item-prefix="{ item }">
       <Avatar size="xs" :image="item.image" :label="item.label" />

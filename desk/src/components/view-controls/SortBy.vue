@@ -232,7 +232,7 @@ function getSortLabel() {
     (option) => option.value === values[0].fieldname
   )?.label;
 
-  return __(label) || __(sort.fieldname);
+  return __(label) || __(values[0].fieldname);
 }
 
 function setSort(fieldname) {

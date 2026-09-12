@@ -294,7 +294,8 @@ function resetBannerContent() {
 }
 
 function handleShowBannerToggle(value: boolean) {
-  if (!bannerMsg.data.current) {
+  // the switch is live before the message resource lands
+  if (!bannerMsg.data?.current) {
     if (value) {
       settingsData.value.outsideWorkingHoursBannerMessage =
         bannerMsg.data?.default;

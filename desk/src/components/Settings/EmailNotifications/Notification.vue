@@ -62,7 +62,9 @@
               :required="true"
               :rows="10"
               v-model="content"
-              :oninput="() => setUnsavedChanges()"
+              @update:model-value="
+                (value) => setUnsavedChanges(undefined, value)
+              "
             />
             <div class="flex gap-x-1 items-start justify-between">
               <p class="text-sm text-ink-gray-7 leading-5">

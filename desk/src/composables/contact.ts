@@ -365,7 +365,8 @@ export function useContactState(
       state.phone = "";
       state.timezone = "";
       state.customer = "";
-      state.invite = false;
+      // back to the initial state: the dialog opens with the invite on
+      state.invite = true;
     }
 
     return { state, resetState };

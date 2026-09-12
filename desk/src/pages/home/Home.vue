@@ -435,6 +435,8 @@ const onReset = () => {
   agentDashboard.submit({
     reset_layout: true,
   });
+  // the flag sticks to the resource, so every later reload would reset again
+  agentDashboard.update({ params: {} });
 };
 
 const onLayoutUpdate = (newLayout: Layout[]) => {

@@ -601,12 +601,12 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
 
   if (column.type === "MultipleAvatar") {
+    if (!item?.length) return;
     if (item.length > 1) {
-      let target = e.target as HTMLElement;
-      target = target.closest(".user-avatar");
-      if (target) {
-        item = target.getAttribute("data-name");
-      }
+      const avatar = (e.target as HTMLElement).closest(".user-avatar");
+      // the gap between the faces names nobody to filter by
+      if (!avatar) return;
+      item = avatar.getAttribute("data-name");
     } else {
       item = item[0].name;
     }

@@ -1,10 +1,10 @@
 <template>
   <div v-if="normalActions.length" class="flex gap-2">
+    <!-- onClick rides along in `action`; binding it twice would run it twice -->
     <Button
       v-for="action in normalActions"
       :key="action.label"
       :label="action.label"
-      @click="action.onClick()"
       v-bind="action"
     >
       <template v-if="action.icon" #prefix>

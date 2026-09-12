@@ -148,6 +148,7 @@
                 :model-value="customDateRange ? customDateRange.split(',') : []"
                 :placeholder="__('Select range')"
                 @update:model-value="onCustomRangeSelected"
+                @update:open="onPickerToggle"
                 :format="'MMM D'"
                 side="top"
                 align="start"
@@ -423,6 +424,15 @@ const changeSort = (sort: string) => {
   currentSort.value = sort;
   currentIndex.value = 0;
   getRecentFeedbackResource.fetch();
+};
+
+// dismissing the calendar without a range would otherwise leave an empty
+// field where the period menu used to be, with no way back to it
+const onPickerToggle = (open: boolean) => {
+  if (!open && !customDateRange.value) {
+    showDatePicker.value = false;
+    currentPeriod.value = "all_time";
+  }
 };
 
 const onCustomRangeSelected = (range: string[]) => {

@@ -38,6 +38,7 @@
           variant="outline"
           :placeholder="__('Period')"
           :format="'MMM D'"
+          @update:open="onPickerToggle"
         >
           <template #prefix>
             <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
@@ -518,6 +519,15 @@ const periodRange = computed({
     preset.value = formatter(filters.period);
   },
 });
+
+// dismissing the calendar without a range would otherwise leave an empty
+// field where the preset menu used to be, with no way back to it
+function onPickerToggle(open: boolean) {
+  if (!open && !filters.period) {
+    showDatePicker.value = false;
+    preset.value = formatter("");
+  }
+}
 
 const options = computed(() => [
   {

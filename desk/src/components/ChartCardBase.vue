@@ -34,7 +34,8 @@
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
               <div class="rtl:flex rtl:gap-1">
-                <span>vs</span> <span>{{ currentDuration.toLowerCase() }}</span>
+                <span>vs</span>
+                <span>{{ __(currentDuration).toLowerCase() }}</span>
               </div>
               <LucideChevronDown class="size-4" />
             </div>
@@ -90,7 +91,7 @@
           <div
             class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
           >
-            vs {{ currentDuration.toLowerCase() }}
+            vs {{ __(currentDuration).toLowerCase() }}
             <LucideChevronDown class="size-4" />
           </div>
           <template #item-label="{ item }">
@@ -159,27 +160,14 @@ const currentDuration = computed(() => props.currentDuration);
 
 const emit = defineEmits(["changeDuration"]);
 
-const durationOptions = [
-  {
-    label: __("Last week"),
-    onClick: () => {
-      if (currentDuration.value == __("Last week")) return;
-      emit("changeDuration", __("Last week"));
-    },
+// the emitted value is the untranslated key: it travels to the API as the
+// period, so only the label goes through __()
+const DURATIONS = ["Last week", "Last month", "Last 3 months"];
+
+const durationOptions = DURATIONS.map((duration) => ({
+  label: __(duration),
+  onClick: () => {
+    if (currentDuration.value !== duration) emit("changeDuration", duration);
   },
-  {
-    label: __("Last month"),
-    onClick: () => {
-      if (currentDuration.value == __("Last month")) return;
-      emit("changeDuration", __("Last month"));
-    },
-  },
-  {
-    label: __("Last 3 months"),
-    onClick: () => {
-      if (currentDuration.value == __("Last 3 months")) return;
-      emit("changeDuration", __("Last 3 months"));
-    },
-  },
-];
+}));
 </script>

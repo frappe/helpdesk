@@ -35,6 +35,7 @@
           :model-value="customDateRange ? customDateRange.split(',') : []"
           :placeholder="__('Select range')"
           @update:model-value="onCustomRangeSelected"
+          @update:open="onPickerToggle"
           :format="'MMM D'"
           side="bottom"
           align="end"
@@ -199,6 +200,12 @@ const durationOptions = computed(() => [
     },
   },
 ]);
+
+// dismissing the calendar without a range would otherwise leave an empty
+// field where the preset menu used to be, with no way back to it
+const onPickerToggle = (open: boolean) => {
+  if (!open && !customDateRange.value) currentDuration.value = "6m";
+};
 
 const onCustomRangeSelected = (range: string[]) => {
   if (!range?.length) {

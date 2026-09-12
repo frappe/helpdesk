@@ -19,7 +19,7 @@
           <template #suffix>
             <LucideX
               class="size-4"
-              @click.stop="
+              @click.stop.prevent="
                 () => {
                   $emit(
                     'update:attachments',

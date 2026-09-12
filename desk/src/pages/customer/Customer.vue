@@ -87,7 +87,7 @@
     v-model="showDeleteDialog"
     :name="id"
     link-field="customer"
-    :title="__('Delete Contact')"
+    :title="__('Delete Customer')"
     :message="
       __(
         'Are you sure you want to delete this customer? The reference to this customer will be removed from all the related tickets.'
