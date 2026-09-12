@@ -17,7 +17,12 @@
         v-model:query="queryText"
       >
         <template #trigger>
-          <div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+          <!-- reka turns TagColorPicker's whole wrapper into a trigger, so a
+               click here would open the colour picker as well -->
+          <div
+            class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5"
+            @click.stop
+          >
             <TagChip
               v-for="tag in headTags"
               :key="tag"
