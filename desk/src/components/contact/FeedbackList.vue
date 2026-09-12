@@ -14,7 +14,7 @@
 
     <!-- Loading -->
     <div v-if="feedbackListResource.loading" class="flex justify-center py-10">
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
 
     <!-- Empty state -->

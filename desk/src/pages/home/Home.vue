@@ -66,7 +66,7 @@
         v-if="agentDashboard.loading"
         class="flex items-center justify-center absolute inset-0 z-10"
       >
-        <LoadingIndicator :scale="8" />
+        <LoadingIndicator class="size-8" />
       </div>
       <div
         class="flex flex-col p-1 pt-4 md:p-4 md:ps-3 mx-auto max-w-screen-xl w-full grow relative h-full"

@@ -40,7 +40,7 @@
     v-if="list.loading && !list.data?.data?.length"
     class="flex items-center justify-center h-full w-full absolute top-0 z-100"
   >
-    <LoadingIndicator :scale="8" />
+    <LoadingIndicator class="size-8" />
   </div>
   <!-- List View -->
   <ListView

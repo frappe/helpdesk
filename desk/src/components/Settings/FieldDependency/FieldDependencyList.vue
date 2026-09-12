@@ -39,7 +39,7 @@
           v-if="fieldDependenciesList.loading"
           class="flex items-center justify-center py-4"
         >
-          <LoadingIndicator :scale="5" />
+          <LoadingIndicator class="size-5" />
         </div>
 
         <!-- Empty State -->

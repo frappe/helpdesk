@@ -15,7 +15,7 @@
     </div>
     <!-- Loading -->
     <div v-if="customer.getContacts?.loading" class="flex justify-center py-10">
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
     <!-- Empty state -->
     <div

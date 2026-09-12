@@ -434,12 +434,8 @@ const saveSla = () => {
 };
 
 const createSla = () => {
-  const defaultTicketStatus = slaData.value.default_ticket_status
-    ? slaData.value.default_ticket_status?.value
-    : null;
-  const ticketReopenStatus = slaData.value.reopen_ticket_status
-    ? slaData.value.reopen_ticket_status?.value
-    : null;
+  const defaultTicketStatus = slaData.value.default_ticket_status || null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status || null;
   slaPolicyList?.insert.submit(
     {
       ...slaData.value,
@@ -467,12 +463,8 @@ const createSla = () => {
 };
 
 const updateSla = () => {
-  const defaultTicketStatus = slaData.value.default_ticket_status
-    ? slaData.value.default_ticket_status?.value
-    : null;
-  const ticketReopenStatus = slaData.value.reopen_ticket_status
-    ? slaData.value.reopen_ticket_status?.value
-    : null;
+  const defaultTicketStatus = slaData.value.default_ticket_status || null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status || null;
   slaPolicyList?.setValue.submit(
     {
       ...slaData.value,

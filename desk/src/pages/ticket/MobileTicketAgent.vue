@@ -367,7 +367,7 @@ const mobileCustomActions = computed(() => {
 
   if (!items.length) return [];
 
-  return [{ group: "Actions", hideLabel: true, items }];
+  return [{ group: "Actions", hideLabel: true, options: items }];
 });
 
 const ticketFields = computed(() => {

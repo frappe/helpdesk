@@ -229,7 +229,7 @@
       v-if="article.loading"
       class="w-full h-screen flex items-center justify-center"
     >
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
     <MoveToCategoryModal
       v-model="moveToModal"

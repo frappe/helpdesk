@@ -273,12 +273,9 @@ function getValueControl() {
   } else if (typeNumber.includes(fieldtype)) {
     return h(FormControl, { type: "number" });
   } else if (typeDate.includes(fieldtype) && operator == "between") {
-    return h(DateRangePicker, { value: props.condition[2], iconLeft: "" });
+    return h(DateRangePicker);
   } else if (typeDate.includes(fieldtype)) {
-    return h(fieldtype == "Date" ? DatePicker : DateTimePicker, {
-      value: props.condition[2],
-      iconLeft: "",
-    });
+    return h(fieldtype == "Date" ? DatePicker : DateTimePicker);
   } else if (typeRating.includes(fieldtype)) {
     return h(StarRating, {
       rating: props.condition[2] || 0,
@@ -294,7 +291,9 @@ function getValueControl() {
 function updateValue(value) {
   value = value.target ? value.target.value : value;
   if (props.condition[1] === "between") {
-    props.condition[2] = [value.split(",")[0], value.split(",")[1]];
+    // DateRangePicker emits [from, to]; the text controls still emit "from,to"
+    const range = Array.isArray(value) ? value : String(value).split(",");
+    props.condition[2] = [range[0], range[1]];
   } else {
     props.condition[2] = value + "";
   }

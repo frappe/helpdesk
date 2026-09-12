@@ -20,10 +20,11 @@
         :label="__('On ticket status')"
         :options="statusOptions"
         :required="true"
-        :model-value="ticketStatus"
+        :model-value="ticketStatus?.value ?? null"
         @update:model-value="
-          (val) => {
-            ticketStatus = val;
+          (value) => {
+            ticketStatus =
+              statusOptions.find((option) => option.value === value) ?? null;
             compRef.setUnsavedChanges();
           }
         "

@@ -36,7 +36,7 @@
         <div
           class="py-16 text-center text-sm text-ink-gray-4 flex items-center justify-center"
         >
-          <LoadingIndicator :scale="10" />
+          <LoadingIndicator class="size-10" />
         </div>
       </template>
       <!-- Empty -->
