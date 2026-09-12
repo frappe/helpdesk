@@ -74,13 +74,7 @@
                 :label="label"
                 :disabled="isDisabled"
                 :loading="loading"
-                @click="
-                  () => {
-                    loading = true;
-                    submitComment();
-                    newComment = '';
-                  }
-                "
+                @click="submitComment()"
               />
             </div>
           </div>
@@ -174,6 +168,9 @@ async function submitComment() {
   if (isContentEmpty(newComment.value)) {
     return false;
   }
+  // the editor keeps the text until the request lands: clearing it up front
+  // loses the comment, and its stored draft, whenever the call fails
+  loading.value = true;
   const comment = createResource({
     url: "run_doc_method",
     makeParams: () => ({

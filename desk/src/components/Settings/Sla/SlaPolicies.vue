@@ -86,10 +86,8 @@ watch(slaSearchQuery, (newValue) => {
   slaPolicyList.filters = {
     name: ["like", `%${newValue}%`],
   };
-  if (!newValue) {
-    slaPolicyList.start = 0;
-    slaPolicyList.pageLength = 10;
-  }
+  // no pager on this list, so a shrunken pageLength would hide the rest for good
+  if (!newValue) slaPolicyList.start = 0;
   slaPolicyList.reload();
 });
 </script>

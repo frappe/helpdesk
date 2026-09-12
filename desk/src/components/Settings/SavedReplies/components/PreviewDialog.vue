@@ -19,6 +19,7 @@
           class="form-control flex-1"
           :placeholder="__('Search ticket')"
           :show-description="true"
+          hide-clear-button
           @change="getResponsePreview"
         />
 

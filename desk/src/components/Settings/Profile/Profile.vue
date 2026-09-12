@@ -32,21 +32,22 @@
                     "
                   />
                 </div>
-                <Tooltip
-                  :hoverDelay="0"
-                  side="bottom"
-                  :text="profileTooltipText"
-                >
+                <!-- one Tooltip each: it wires only its first child -->
+                <Tooltip :hoverDelay="0" side="bottom" :text="uploadTooltip">
                   <div
                     class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-16"
                     @click.stop="openFileSelector"
                   />
+                </Tooltip>
+                <Tooltip
+                  v-if="user.doc?.user_image"
+                  :hoverDelay="0"
+                  side="bottom"
+                  :text="__('Remove Photo')"
+                >
                   <div
-                    v-if="user.doc?.user_image"
                     class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
                     @click.stop="updateImage()"
-                    @mouseenter="isHoveringRemove = true"
-                    @mouseleave="isHoveringRemove = false"
                   >
                     <LucideX class="size-3.5 cursor-pointer text-ink-gray-4" />
                   </div>
@@ -192,13 +193,11 @@ const showChangePasswordModal = ref(false);
 const { userId, hasAgentRecord } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
-const isHoveringRemove = ref(false);
 const editName = ref(false);
 
-const profileTooltipText = computed(() => {
-  if (isHoveringRemove.value) return __("Remove Photo");
-  return user.doc?.user_image ? __("Change Photo") : __("Upload Photo");
-});
+const uploadTooltip = computed(() =>
+  user.doc?.user_image ? __("Change Photo") : __("Upload Photo")
+);
 
 const fullNameRef = useTemplateRef("fullNameRef");
 const fullName = computed({
@@ -236,7 +235,6 @@ function save() {
 }
 
 function updateImage(fileUrl = "") {
-  isHoveringRemove.value = false;
   user.doc.user_image = fileUrl;
   save();
 }

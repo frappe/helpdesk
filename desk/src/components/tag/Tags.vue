@@ -344,7 +344,9 @@ watch(localTags, (next) => {
 watch(tagPickerOpen, (open) => {
   queryText.value = "";
   if (open) {
-    appliedAtOpen.value = [...localTags.value];
+    // mid-session the colour step still owns the batch; rebasing here would
+    // drop whatever was unticked before the create started
+    if (!colorPickerOpen.value) appliedAtOpen.value = [...localTags.value];
     tagListResource.reload();
   } else if (!colorPickerOpen.value) {
     // the create flow hands the session to the colour popover

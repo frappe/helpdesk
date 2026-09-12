@@ -13,7 +13,7 @@
           type="number"
           min="0"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('hours')"
+          @blur="validateAndUpdateTime('hours', $event)"
           @keyup.enter="handleEnter"
         />
         <div
@@ -57,7 +57,7 @@
           min="0"
           max="59"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('minutes')"
+          @blur="validateAndUpdateTime('minutes', $event)"
           @keyup.enter="handleEnter"
         />
         <div
@@ -101,7 +101,7 @@
           min="0"
           max="59"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('seconds')"
+          @blur="validateAndUpdateTime('seconds', $event)"
           @keyup.enter="handleEnter"
         />
         <div
@@ -300,18 +300,18 @@ function updateTime(newTime: number, emitEvent = true) {
   }
 }
 
-function validateAndUpdateTime(unit: "hours" | "minutes" | "seconds") {
-  switch (unit) {
-    case "hours":
-      hoursValue.value = hoursValue.value;
-      break;
-    case "minutes":
-      minutesValue.value = minutesValue.value;
-      break;
-    case "seconds":
-      secondsValue.value = secondsValue.value;
-      break;
-  }
+/** Writes the model back into the field: a rejected or cleared entry leaves
+ *  the model untouched, so nothing re-renders and the bad text would stay. */
+function validateAndUpdateTime(
+  unit: "hours" | "minutes" | "seconds",
+  event: FocusEvent
+) {
+  const current = {
+    hours: hoursValue,
+    minutes: minutesValue,
+    seconds: secondsValue,
+  }[unit];
+  (event.target as HTMLInputElement).value = current.value;
 }
 
 function handleEnter(e: KeyboardEvent) {

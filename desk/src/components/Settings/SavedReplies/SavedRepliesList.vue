@@ -134,7 +134,12 @@
                 />
                 {{ savedReply.scope }}
               </div>
-              <Dropdown align="end" :options="dropdownOptions(savedReply)">
+              <!-- the confirm state is shared, so each menu clears it on open -->
+              <Dropdown
+                align="end"
+                :options="dropdownOptions(savedReply)"
+                @update:open="(open) => open && (isConfirmingDelete = false)"
+              >
                 <Button
                   icon="lucide-more-horizontal"
                   variant="ghost"

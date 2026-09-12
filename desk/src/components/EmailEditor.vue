@@ -577,6 +577,9 @@ function handleSelectAll(e: KeyboardEvent) {
   if (!editorDom.contains(active) && !(quotedEl && quotedEl.contains(active))) {
     return;
   }
+  // after the focus check: select-all from a recipient field must not unfold
+  // the quoted reply
+  isQuoteExpanded.value = true;
   e.preventDefault();
   editorContext?.commands.selectAll();
   sel.removeAllRanges();
@@ -618,7 +621,6 @@ function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
 
   if ((e.metaKey || e.ctrlKey) && key === "a") {
-    isQuoteExpanded.value = true;
     handleSelectAll(e);
     return;
   }
