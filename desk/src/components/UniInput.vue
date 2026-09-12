@@ -7,20 +7,15 @@
       </span>
     </span>
     <div class="flex gap-2 items-center [&>div]:flex-1">
+      <!-- model-value only: a stray `value` attr reaches the Combobox search
+           input, whose native change would commit the typed search text -->
       <component
         class="w-full"
         :is="component"
         :placeholder="placeholder"
-        :value="transValue"
         :disabled="field.disabled"
         :model-value="transValue"
         @update:model-value="emitUpdate(field.fieldname, $event)"
-        @change="
-          emitUpdate(
-            field.fieldname,
-            $event.target?.value || $event.value || $event
-          )
-        "
       />
       <slot name="label-extra" />
     </div>
