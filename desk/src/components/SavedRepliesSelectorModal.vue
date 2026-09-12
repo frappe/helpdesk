@@ -366,10 +366,7 @@ watch(
     }
     // Counts don't move with the selected scope, so this is the only refetch
     scopeCounts.reload();
-    nextTick(() => {
-      const inputEl = searchInput.value?.$el?.querySelector("input");
-      inputEl?.focus();
-    });
+    nextTick(() => searchInput.value?.focus());
   },
   { immediate: true }
 );
