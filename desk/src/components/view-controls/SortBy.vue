@@ -97,24 +97,29 @@
                   <AscendingIcon v-if="sort.direction == 'asc'" class="h-4" />
                   <DescendingIcon v-else class="h-4" />
                 </Button>
-                <Combobox
-                  class="!w-32"
-                  :model-value="sort.fieldname"
-                  :options="sortOptions.data"
-                  @update:model-value="(value) => value && updateSort(value, i)"
-                >
-                  <template #trigger="{ displayValue }">
-                    <Button
-                      class="flex w-full items-center justify-between rounded-s-none !text-ink-gray-5 text-xs"
-                      size="md"
-                    >
-                      {{ __(displayValue) }}
-                      <template #suffix>
-                        <LucideChevronDown class="h-4 text-ink-gray-5" />
-                      </template>
-                    </Button>
-                  </template>
-                </Combobox>
+                <!-- width on the wrapper: a Combobox with its own #trigger
+                     slot drops the class it is handed -->
+                <div class="w-32">
+                  <Combobox
+                    :model-value="sort.fieldname"
+                    :options="sortOptions.data"
+                    @update:model-value="
+                      (value) => value && updateSort(value, i)
+                    "
+                  >
+                    <template #trigger="{ displayValue }">
+                      <Button
+                        class="flex w-full items-center justify-between rounded-s-none !text-ink-gray-5 text-xs"
+                        size="md"
+                      >
+                        {{ __(displayValue) }}
+                        <template #suffix>
+                          <LucideChevronDown class="h-4 text-ink-gray-5" />
+                        </template>
+                      </Button>
+                    </template>
+                  </Combobox>
+                </div>
               </div>
               <Button variant="ghost" icon="lucide-x" @click="removeSort(i)" />
             </div>

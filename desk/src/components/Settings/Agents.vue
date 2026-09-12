@@ -148,12 +148,7 @@
                   }"
                   align="end"
                 />
-                <Dropdown
-                  :options="getOptions(agent)"
-                  :key="agent"
-                  class="ms-2"
-                  align="end"
-                >
+                <Dropdown :options="getOptions(agent)" :key="agent" align="end">
                   <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>

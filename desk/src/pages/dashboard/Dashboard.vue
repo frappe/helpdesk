@@ -17,11 +17,7 @@
     <div class="p-5 w-full overflow-y-scroll">
       <!-- Filters -->
       <div class="mb-4 flex items-center gap-4 overflow-x-auto">
-        <Dropdown
-          v-if="!showDatePicker"
-          :options="options"
-          class="form-control !w-48"
-        >
+        <Dropdown v-if="!showDatePicker" :options="options">
           <template #default>
             <div
               class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded-4 text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
