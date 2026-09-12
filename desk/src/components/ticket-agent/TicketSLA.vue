@@ -15,17 +15,12 @@
         >
           {{ cardValue(card) }}
         </span>
-        <Popover
-          side="bottom"
-          align="center"
-          :open="openCard === card.title"
-          @update:open="(open: boolean) => (openCard = open ? card.title : null)"
-        >
+        <!-- HoverCard, not Popover: this opens on hover, and reka's popover
+             trigger would also toggle it on click -->
+        <HoverCard side="bottom" align="center">
           <template #trigger>
             <LucideInfo
               class="size-3.5 shrink-0 cursor-pointer text-ink-gray-5"
-              @mouseenter="openCard = card.title"
-              @mouseleave="openCard = null"
             />
           </template>
           <template #default>
@@ -45,7 +40,7 @@
               </div>
             </div>
           </template>
-        </Popover>
+        </HoverCard>
       </div>
     </div>
   </div>
@@ -57,8 +52,8 @@ import { slaTextColor, useSLA, type SLAMetric } from "@/composables/useSLA";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { dateFormat } from "@/utils";
-import { Popover } from "frappe-ui";
-import { computed, inject, ref } from "vue";
+import { HoverCard } from "frappe-ui";
+import { computed, inject } from "vue";
 import LucideInfo from "~icons/lucide/info";
 
 interface SLACard {
@@ -70,8 +65,6 @@ interface SLACard {
 
 const ticket = inject(TicketSymbol)!;
 const { firstResponse, resolution } = useSLA(ticket);
-
-const openCard = ref<string | null>(null);
 
 const cards = computed<SLACard[]>(() =>
   [

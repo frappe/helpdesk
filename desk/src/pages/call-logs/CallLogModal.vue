@@ -134,7 +134,8 @@ import {
   FormLabel,
   Select,
   toast,
-  type DialogProps,
+  type DialogAction,
+  type DialogSize,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
@@ -217,7 +218,11 @@ const callLogStatusOptions = [
   { label: __("In Progress"), value: "In Progress" },
 ];
 
-const dialogOptions = computed<DialogProps["options"]>(() => ({
+const dialogOptions = computed<{
+  title: string;
+  size: DialogSize;
+  actions: DialogAction[];
+}>(() => ({
   title: !editMode.value ? __("New Call Log") : __("Edit Call Log"),
   size: "xl",
   actions: [
