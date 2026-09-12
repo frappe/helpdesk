@@ -6,16 +6,18 @@
   >
     <template #header-actions>
       <div class="flex gap-4 items-center">
-        <div
-          class="flex items-center justify-between gap-2 cursor-pointer"
-          @click="toggleEnabled"
-        >
+        <div class="flex items-center justify-between gap-2">
           <Switch
             size="sm"
             :model-value="Boolean(slaData.enabled)"
             @update:model-value="(value) => (slaData.enabled = value)"
           />
-          <span class="text-sm-medium text-ink-gray-7">
+          <!-- on the label only: on the wrapper it would undo the switch's
+               own toggle -->
+          <span
+            class="cursor-pointer text-sm-medium text-ink-gray-7"
+            @click="toggleEnabled"
+          >
             {{ __("Enabled") }}
           </span>
         </div>
