@@ -167,7 +167,10 @@
           :model-value="textEditorContentWithIDs"
           :extensions="extensions"
           :editable="editable"
-          :upload-function="(file:any) => uploadFunction(file, 'HD Article', articleId, false)"
+          :upload-function="
+            (file: any, options: any) =>
+              uploadFunction(file, 'HD Article', articleId, false, options)
+          "
           @change="(event:string) => { content = event; }"
           :placeholder="__('Write your article here...')"
         >

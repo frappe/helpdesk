@@ -100,7 +100,7 @@ interface P {
   placeholder: string;
   attachments: File[];
   expand?: boolean;
-  uploadFunction?: (file: any) => Promise<any>;
+  uploadFunction?: (file: any, options?: any) => Promise<any>;
 }
 
 interface E {

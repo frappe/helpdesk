@@ -523,17 +523,23 @@ export function getGridTemplateColumnsForTable(columns) {
   return columnsWidth + " 22px";
 }
 
+/**
+ * `options` carries the editor's `{ signal, onProgress }`, which is what drives
+ * the upload's progress ring and its cancel button.
+ */
 export function uploadFunction(
   file: File,
   doctype: string | null = null,
   docname: string | null = null,
-  isPrivate: boolean = true
+  isPrivate: boolean = true,
+  options: { signal?: AbortSignal; onProgress?: (p: unknown) => void } = {}
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
     private: isPrivate,
     doctype: doctype,
     docname: docname,
+    ...options,
   });
 }
 

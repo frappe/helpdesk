@@ -5,7 +5,10 @@
     :placeholder="placeholder"
     :editable="editable"
     :extensions="extensions"
-    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :upload-function="
+      (file: any, options: any) =>
+        uploadFunction(file, doctype, ticketId, true, options)
+    "
   >
     <template #default>
       <div @keydown.capture="handleKeydown">

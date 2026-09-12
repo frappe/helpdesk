@@ -81,7 +81,7 @@ import {
 interface P {
   modelValue: string;
   autofocus?: boolean;
-  uploadFunction?: (file: any) => Promise<any>;
+  uploadFunction?: (file: any, options?: any) => Promise<any>;
 }
 
 interface E {

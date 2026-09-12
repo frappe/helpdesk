@@ -52,7 +52,10 @@
         <Editor
           v-model="content"
           :extensions="extensions"
-          :upload-function="(file:any) => uploadFunction(file, 'HD Article', null, false)"
+          :upload-function="
+            (file: any, options: any) =>
+              uploadFunction(file, 'HD Article', null, false, options)
+          "
           :placeholder="__('Write your article here...')"
         >
           <template #default>

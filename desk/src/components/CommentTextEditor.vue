@@ -5,7 +5,10 @@
     :extensions="extensions"
     :editable="editable"
     :placeholder="placeholder"
-    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :upload-function="
+      (file: any, options: any) =>
+        uploadFunction(file, doctype, ticketId, true, options)
+    "
   >
     <template #default="{ isEmpty }">
       <EditorContent

@@ -71,7 +71,8 @@
             autofocus
             @clear="() => (isExpanded = false)"
             :uploadFunction="
-              (file: any) => uploadFunction(file, 'HD Ticket', props.ticketId)
+              (file: any, options: any) =>
+                uploadFunction(file, 'HD Ticket', props.ticketId, true, options)
             "
           >
             <template #bottom-right>

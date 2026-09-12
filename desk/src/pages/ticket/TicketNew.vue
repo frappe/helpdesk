@@ -89,7 +89,10 @@
             v-model:content="description"
             :placeholder="__('Detailed explanation')"
             expand
-            :uploadFunction="(file:any)=>uploadFunction(file)"
+            :uploadFunction="
+              (file: any, options: any) =>
+                uploadFunction(file, null, null, true, options)
+            "
           >
             <template #bottom-right>
               <Button
@@ -114,7 +117,10 @@
           v-model:content="description"
           :placeholder="__('Detailed explanation')"
           expand
-          :uploadFunction="(file:any)=>uploadFunction(file)"
+          :uploadFunction="
+            (file: any, options: any) =>
+              uploadFunction(file, null, null, true, options)
+          "
         >
           <template #bottom-right>
             <Button
