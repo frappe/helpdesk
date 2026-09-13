@@ -34,14 +34,24 @@ const globalComponents = {
   TextInput,
 };
 
-setConfig("resourceFetcher", frappeRequest);
-setConfig("serverMessagesHandler", (msgs) => {
+// Attached to the fetcher, not set as the global `serverMessagesHandler`: the
+// global one also governs `call()`, which beta.63 started routing a response's
+// `_server_messages` through. Resources keep toasting, `call()` stays silent.
+setConfig("resourceFetcher", (options) =>
+  frappeRequest({ ...options, onServerMessages: showServerMessages })
+);
+
+function showServerMessages(msgs) {
   if (isCustomerPortal.value) {
     return;
   }
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
-    if (msg && msg.message == "Feedback email has been sent to the customer.") {
+    // `alert` is frappe's own flag for throwaway desk chatter ("Document
+    // renamed from X to Y"), which our own toasts already cover. No helpdesk
+    // msgprint sets it.
+    if (!msg || msg.alert) return;
+    if (msg.message == "Feedback email has been sent to the customer.") {
       toast.success(msg.message);
       return;
     }
@@ -49,7 +59,7 @@ setConfig("serverMessagesHandler", (msgs) => {
       icon: () => h(CircleAlert, { class: "text-ink-blue-5" }),
     });
   });
-});
+}
 setConfig("fallbackErrorHandler", (error) => {
   const msg = error.exc_type
     ? (error.messages || error.message || []).join(", ")
