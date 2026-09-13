@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-09-06 13:44+0000\n"
-"PO-Revision-Date: 2026-09-06 13:44+0000\n"
+"POT-Creation-Date: 2026-09-13 14:30+0000\n"
+"PO-Revision-Date: 2026-09-13 14:30+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -425,7 +425,7 @@ msgstr ""
 msgid "Agent replies"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:157
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:266
 msgid "Agent reply"
 msgstr ""
 
@@ -1044,11 +1044,11 @@ msgstr ""
 msgid "Bulk Operation Successful"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:105
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:104
 msgid "Bulk reply sent successfully to 1 ticket."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:106
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:105
 msgid "Bulk reply sent successfully to {0} tickets."
 msgstr ""
 
@@ -1359,7 +1359,7 @@ msgid "Close Ticket"
 msgstr ""
 
 #. Option in a Select field in the tickets Web Form
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:715
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:730
 #: helpdesk/helpdesk/web_form/tickets/tickets.json
 msgid "Closed"
 msgstr ""
@@ -1669,7 +1669,7 @@ msgstr ""
 msgid "Create new business holiday"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:237
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:230
 msgid "Created"
 msgstr ""
 
@@ -1749,8 +1749,8 @@ msgstr ""
 msgid "Customer created · invitation sent to {0}"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:156
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:548
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:265
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:563
 msgid "Customer message"
 msgstr ""
 
@@ -2038,7 +2038,7 @@ msgid "Disables all email notifications for the ticket - including creation, upd
 msgstr ""
 
 #: desk/src/components/TextEditor.vue:43
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:24
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:23
 #: desk/src/pages/knowledge-base/NewArticle.vue:27
 msgid "Discard"
 msgstr ""
@@ -2709,19 +2709,19 @@ msgstr ""
 msgid "First Response Time for Tickets"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:292
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:307
 msgid "First response"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:318
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:333
 msgid "First response due"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:346
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:361
 msgid "First response overdue"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:556
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:571
 msgid "Follow-up"
 msgstr ""
 
@@ -3547,7 +3547,7 @@ msgstr ""
 msgid "Language & Time"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:102
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:101
 msgid "Last"
 msgstr ""
 
@@ -3624,7 +3624,7 @@ msgstr ""
 msgid "Last seen"
 msgstr ""
 
-#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:95
+#: desk/src/components/Settings/Assignment Rules/AssigneeRules.vue:97
 msgid "Last user assigned by this rule"
 msgstr ""
 
@@ -3731,6 +3731,10 @@ msgstr ""
 #: desk/src/components/customer/NewCustomerDialog.vue:13
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Logo"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:279
+msgid "Longest wait"
 msgstr ""
 
 #. Option for the 'Level' (Select) field in DocType 'HD Ticket Priority'
@@ -4279,7 +4283,7 @@ msgstr ""
 msgid "No tickets found to preview."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:84
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:83
 msgid "No tickets selected"
 msgstr ""
 
@@ -4522,10 +4526,11 @@ msgstr ""
 msgid "Paused"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:616
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:631
 msgid "Paused {0} so far"
 msgstr ""
 
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:267
 #: desk/src/pages/home/components/PendingTickets.vue:215
 msgid "Pending"
 msgstr ""
@@ -5145,9 +5150,9 @@ msgstr ""
 
 #. Label of the resolution_tab (Tab Break) field in DocType 'HD Ticket'
 #: desk/src/components/customer/TicketsTab.vue:226
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:597
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:634
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:716
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:612
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:649
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:731
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Resolution"
 msgstr ""
@@ -5185,25 +5190,25 @@ msgstr ""
 msgid "Resolution Time"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:429
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:444
 msgid "Resolution due"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:429
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:444
 msgid "Resolution overdue"
 msgstr ""
 
 #. Option for the 'Category' (Select) field in DocType 'HD Ticket Status'
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:715
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:730
 #: helpdesk/helpdesk/doctype/hd_ticket_status/hd_ticket_status.json
 msgid "Resolved"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:713
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:728
 msgid "Resolved late"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:292
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:307
 msgid "Responded late"
 msgstr ""
 
@@ -5348,15 +5353,19 @@ msgstr ""
 msgid "SLA disabled"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:154
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:263
 msgid "SLA met"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:155
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:279
+msgid "SLA missed"
+msgstr ""
+
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:278
 msgid "SLA missed / longest wait"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:619
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:634
 msgid "SLA paused"
 msgstr ""
 
@@ -5687,7 +5696,7 @@ msgstr ""
 msgid "Send Invites"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:32
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:31
 msgid "Send Reply"
 msgstr ""
 
@@ -5701,7 +5710,7 @@ msgstr ""
 msgid "Send reset password email"
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:33
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:32
 msgid "Send to {0} tickets"
 msgstr ""
 
@@ -6840,7 +6849,7 @@ msgstr ""
 msgid "To know more about setting up email accounts, click"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:387
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:402
 #: desk/src/pages/dashboard/Dashboard.vue:537
 #: desk/src/pages/dashboard/Dashboard.vue:539
 msgid "Today"
@@ -7141,6 +7150,10 @@ msgstr ""
 msgid "Violet"
 msgstr ""
 
+#: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:58
+msgid "Visibility"
+msgstr ""
+
 #: desk/src/components/SavedReplyActions/SavedReplyActionComment.vue:34
 msgid "Visible to your team only, never sent to the customer."
 msgstr ""
@@ -7284,7 +7297,7 @@ msgstr ""
 msgid "Write your email signature here."
 msgstr ""
 
-#: desk/src/components/ticket-agent/BulkReplyModal.vue:13
+#: desk/src/components/ticket-agent/BulkReplyModal.vue:12
 msgid "Write your reply..."
 msgstr ""
 
@@ -7431,11 +7444,11 @@ msgstr ""
 msgid "changes from"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:628
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:643
 msgid "clock resumes when the ticket reopens"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:610
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:625
 msgid "clock stopped"
 msgstr ""
 
@@ -7451,7 +7464,7 @@ msgstr ""
 msgid "documentation"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:728
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:743
 msgid "due {0}"
 msgstr ""
 
@@ -7533,12 +7546,12 @@ msgstr ""
 msgid "mentioned you in ticket"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:515
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:530
 msgid "next day"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:301
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:634
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:316
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:649
 msgid "pending"
 msgstr ""
 
@@ -7555,7 +7568,7 @@ msgstr ""
 msgid "reviews"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:621
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:636
 msgid "since {0}"
 msgstr ""
 
@@ -7612,7 +7625,7 @@ msgstr ""
 msgid "{0} actions will be applied after sending the email"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:515
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:530
 msgid "{0} days"
 msgstr ""
 
@@ -7668,7 +7681,7 @@ msgstr ""
 msgid "{0} open tickets will lose this SLA the next time they are updated, unless another policy matches them."
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:549
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:564
 msgid "{0} replied"
 msgstr ""
 
@@ -7684,7 +7697,7 @@ msgstr ""
 msgid "{0} times"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:553
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:568
 msgid "{0} wait"
 msgstr ""
 
@@ -7692,7 +7705,7 @@ msgstr ""
 msgid "{0} · Last active {1}"
 msgstr ""
 
-#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:553
+#: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:568
 msgid "{0} · longest wait"
 msgstr ""
 
