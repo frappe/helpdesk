@@ -79,6 +79,9 @@ doc_events = {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
     },
+    "ToDo": {
+        "validate": "helpdesk.extends.todo.validate_team_assignment",
+    },
     "Customer": {
         "after_insert": "helpdesk.integrations.erpnext.customer.after_insert",
         "on_update": "helpdesk.integrations.erpnext.customer.on_update",
