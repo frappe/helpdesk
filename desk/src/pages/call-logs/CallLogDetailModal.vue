@@ -79,7 +79,7 @@
                   />
                 </div>
               </div>
-              <div v-else :class="field.color ? `text-${field.color}-600` : ''">
+              <div v-else :class="statusTextColorMap[field.color] ?? ''">
                 {{ field.value }}
               </div>
             </div>
@@ -103,7 +103,7 @@ import { Avatar, Tooltip, createResource, dayjs } from "frappe-ui";
 import { computed, h, nextTick, ref, watch } from "vue";
 import { formatDate } from "@vueuse/core";
 import { timeAgo } from "@/utils";
-import { statusColorMap, statusLabelMap } from "./utils";
+import { statusColorMap, statusLabelMap, statusTextColorMap } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 
 const show = defineModel();
