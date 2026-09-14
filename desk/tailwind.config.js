@@ -11,7 +11,6 @@ export default {
     "./node_modules/frappe-ui/experimental/ListView/**/*.{vue,js,ts,jsx,tsx}",
     "../../frappe/ui/src/**/*.{vue,js,ts,jsx,tsx}",
   ],
-  safelist: [{ pattern: /!(text|bg)-/, variants: ["hover", "active"] }],
   theme: {
     extend: {
       height: {
