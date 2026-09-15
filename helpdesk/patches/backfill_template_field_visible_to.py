@@ -1,6 +1,10 @@
 import frappe
 
-from helpdesk.field_visibility import fields_visible_to
+from helpdesk.consts import (
+    NEVER_CUSTOMER_VISIBLE_FIELDS,
+    SERVER_COMPUTED_FIELDS,
+    TICKET_INTERNAL_FIELD_PERMLEVEL,
+)
 
 
 def execute():
@@ -11,15 +15,33 @@ def execute():
     """
     if not frappe.db.has_column("HD Ticket Template Field", "hide_from_customer"):
         return
-    # keyed off the flag, never off a blank visible_to: schema sync fills every
-    # existing row with the column default before this patch runs
+    # migrate hide_from_customers to visible_to
     frappe.db.sql(
         "update `tabHD Ticket Template Field`"
         " set visible_to = 'Agents' where hide_from_customer = 1"
     )
+    # everything rest is visible to everyone by default
     frappe.db.sql(
         "update `tabHD Ticket Template Field`"
         " set visible_to = 'Everyone' where coalesce(visible_to, '') = ''"
     )
-    # migrate clears the cache before patches run, not after
-    fields_visible_to.clear_cache()
+    hide_rows_the_template_may_not_show()
+
+
+def hide_rows_the_template_may_not_show():
+    """fields that maybe in hd ticket template which should be internal"""
+    frappe.db.sql(
+        "update `tabHD Ticket Template Field`"
+        " set visible_to = 'Agents' where fieldname in %(fields)s",
+        {"fields": tuple(never_customer_visible_fieldnames())},
+    )
+
+
+def never_customer_visible_fieldnames() -> set[str]:
+    """The same set validate_customer_visible_fields refuses to widen."""
+    internal = {
+        field.fieldname
+        for field in frappe.get_meta("HD Ticket").fields
+        if (field.permlevel or 0) >= TICKET_INTERNAL_FIELD_PERMLEVEL
+    }
+    return internal | set(SERVER_COMPUTED_FIELDS) | set(NEVER_CUSTOMER_VISIBLE_FIELDS)
