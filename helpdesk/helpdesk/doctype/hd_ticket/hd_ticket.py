@@ -25,7 +25,6 @@ from helpdesk.consts import (
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
-from helpdesk.field_visibility import hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -77,15 +76,6 @@ class HDTicket(Document):
 
     def autoname(self):
         return self.name
-
-    def apply_fieldlevel_read_permissions(self):
-        # permission levels strip first; the template's visible_to then narrows
-        # further for helpdesk pages
-        super().apply_fieldlevel_read_permissions()
-        if frappe.session.user == "Administrator":
-            return
-        for fieldname in hidden_ticket_fields():
-            self.set(fieldname, None)
 
     def before_insert(self):
         self.generate_key()
@@ -473,6 +463,9 @@ class HDTicket(Document):
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent():
             return
+        # rating the ticket is the one thing a closing email asks the customer to do
+        if self.flags.get("ignore_closed_ticket_guard"):
+            return
         is_closed = old_doc.status == "Closed"
         is_rated = bool(old_doc.feedback)
         if is_closed or is_rated:
@@ -509,7 +502,7 @@ class HDTicket(Document):
         """Customers may only close; replies reopen the ticket server-side."""
         editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
-        if category == "Resolved":
+        if category == "Resolved" or self.flags.get("customer_reply_reopen"):
             editable.add("status")
         return editable
 
@@ -907,6 +900,9 @@ class HDTicket(Document):
         # if self.status_category == "Paused" and not new_ticket:
         if not new_ticket:
             self.status = self.ticket_reopen_status
+            # the reopen is the server's doing, but the rest of this document
+            # came from the caller, so only the status is let through
+            self.flags.customer_reply_reopen = True
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")

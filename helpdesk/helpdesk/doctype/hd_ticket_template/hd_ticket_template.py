@@ -128,3 +128,10 @@ class HDTicketTemplate(Document):
         if self.name == DEFAULT_TICKET_TEMPLATE:
             text = _("Default template can not be deleted")
             frappe.throw(text, frappe.PermissionError)
+
+    def before_rename(self, old_name, new_name, merge=False):
+        # every visible_to lookup finds this template by name, so renaming it
+        # turns field visibility off without saying so
+        if old_name == DEFAULT_TICKET_TEMPLATE:
+            text = _("Default template can not be renamed")
+            frappe.throw(text, frappe.PermissionError)

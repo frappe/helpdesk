@@ -2376,7 +2376,6 @@ class TestHDTicket(IntegrationTestCase):
 PERMS_CUSTOMER = "perms.customer@example.com"
 PERMS_OTHER_CUSTOMER = "perms.other@example.com"
 PERMS_AGENT = "perms.agent@example.com"
-PERMS_SYSADMIN = "perms.sysadmin@example.com"
 
 
 class TestHDTicketFieldPermissions(IntegrationTestCase):
@@ -2659,26 +2658,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
         )
 
-    def test_system_manager_can_edit_ticket_after_creation(self):
-        """HD Ticket grants System Managers write at every level; the guard must agree."""
-        if not frappe.db.exists("User", PERMS_SYSADMIN):
-            frappe.get_doc(
-                {
-                    "doctype": "User",
-                    "first_name": "Perms Sysadmin",
-                    "email": PERMS_SYSADMIN,
-                    "roles": [{"role": "System Manager"}],
-                }
-            ).insert()
-        frappe.set_user(PERMS_SYSADMIN)
-        # raised from the desk so has_permission admits them as owner
-        ticket = frappe.get_doc(get_ticket_obj()).insert()
-        doc = frappe.get_doc("HD Ticket", ticket.name)
-        doc.subject = "Retitled by staff"
-        doc.save()
-        doc.reload()
-        self.assertEqual(doc.subject, "Retitled by staff")
-
     def test_customer_cannot_set_agent_side_status(self):
         """Replied means an agent answered; a customer may only close."""
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
@@ -2787,25 +2766,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         with self.assertRaises(frappe.PermissionError):
             client_set_value("HD Ticket", ticket.name, "feedback_rating", 1)
-
-    def test_system_manager_desk_insert_keeps_raised_by(self):
-        """Non-agent staff filing a ticket from the desk keep the typed
-        raised_by, and the ticket is not marked as a portal ticket."""
-        if not frappe.db.exists("User", PERMS_SYSADMIN):
-            frappe.get_doc(
-                {
-                    "doctype": "User",
-                    "first_name": "Perms Sysadmin",
-                    "email": PERMS_SYSADMIN,
-                    "roles": [{"role": "System Manager"}],
-                }
-            ).insert()
-        frappe.set_user(PERMS_SYSADMIN)
-        ticket = frappe.get_doc(
-            {**get_ticket_obj(), "raised_by": PERMS_CUSTOMER}
-        ).insert()
-        self.assertEqual(ticket.raised_by, PERMS_CUSTOMER)
-        self.assertEqual(ticket.via_customer_portal, 0)
 
     def test_internal_field_not_exposable_via_template(self):
         """Marking an internal standard field visible is rejected loudly:

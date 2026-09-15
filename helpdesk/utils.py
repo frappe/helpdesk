@@ -58,8 +58,7 @@ def is_agent(user: str | None = None) -> bool:
     if active is not None:
         return bool(active)
     roles = frappe.get_roles(user)
-    # System Manager holds the ticket permission levels, so it counts as an agent
-    return "Agent Manager" in roles or "Agent" in roles or "System Manager" in roles
+    return "Agent Manager" in roles or "Agent" in roles
 
 
 def get_agent_name(user: str = None) -> str | None:

@@ -4,7 +4,6 @@ from datetime import timedelta
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
-from frappe.model import get_permitted_fields
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
@@ -57,13 +56,7 @@ def get_one(name: str, is_customer_portal: bool = False):
         .where(QBContact.name == ticket.contact)
         .run(as_dict=True)
     )
-    if contact:
-        contact = contact[0]
-    else:
-        contact = {
-            "email_id": ticket.raised_by,
-            "name": ticket.raised_by.split("@")[0],
-        }
+    contact = contact[0] if contact else contact_from_email(ticket.raised_by)
     template = ticket.template or DEFAULT_TICKET_TEMPLATE
 
     linked_calls = frappe.db.get_all(
@@ -111,17 +104,23 @@ def get_one(name: str, is_customer_portal: bool = False):
     }
 
 
+def contact_from_email(email: str | None) -> dict:
+    """Stand-in card for a ticket with no contact. The email is all there is,
+    and it is missing entirely when the reader cannot see `raised_by`."""
+    return {
+        "email_id": email,
+        "name": (email or "").split("@")[0],
+        "phone": "",
+        "mobile_no": "",
+        "image": "",
+    }
+
+
 def strip_unreadable_field_names(ticket: dict) -> dict:
     """Drop the names of fields the caller cannot read.
     app based helper to strip fields based on visible_to meta in ticket template
     """
-    permitted = set(get_permitted_fields("HD Ticket"))
-    unreadable = {
-        field.fieldname
-        for field in frappe.get_meta("HD Ticket").fields
-        if field.fieldname not in permitted
-    }
-    for fieldname in unreadable | hidden_ticket_fields():
+    for fieldname in hidden_ticket_fields():
         ticket.pop(fieldname, None)
     return ticket
 
@@ -306,6 +305,9 @@ def merge_ticket(source: str, target: str):
     doc.status = "Closed"
     doc.is_merged = 1
     doc.merged_with = target
+    # the server owns the merge link; without this the permlevel reset drops it
+    # and closes the source anyway, leaving nothing to say where it went
+    doc.flags.ignore_permlevel_for_fields = ["is_merged", "merged_with"]
     doc.save()
 
     message = _(
@@ -610,13 +612,7 @@ def get_ticket_contact(ticket: str):
             as_dict=1,
         )
     else:
-        data = {
-            "email_id": raised_by,
-            "name": raised_by.split("@")[0],
-            "phone": "",
-            "mobile_no": "",
-            "image": "",
-        }
+        data = contact_from_email(raised_by)
     return data
 
 
