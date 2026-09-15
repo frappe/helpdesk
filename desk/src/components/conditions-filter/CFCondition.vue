@@ -302,9 +302,11 @@ function getValueControl() {
 }
 
 function updateValue(value) {
-  value = value.target ? value.target.value : value;
+  value = value?.target ? value.target.value : value;
   if (props.condition[1] === "between") {
-    props.condition[2] = [value.split(",")[0], value.split(",")[1]];
+    props.condition[2] = Array.isArray(value)
+      ? value
+      : [value.split(",")[0]?.trim() ?? "", value.split(",")[1]?.trim() ?? ""];
   } else {
     props.condition[2] = value + "";
   }
