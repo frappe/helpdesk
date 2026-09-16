@@ -122,11 +122,19 @@ const value = computed({
 
 // The row renderer shows `description` whenever an option carries one, so the
 // field has to drop it rather than hide it.
-const linkOptions = computed(() =>
-  props.showDescription
-    ? options.data || []
-    : (options.data || []).map(({ description, ...rest }) => rest)
-);
+const linkOptions = computed(() => {
+  const data = options.data || [];
+  const rows = props.showDescription
+    ? data
+    : data.map(({ description, ...rest }) => rest);
+  // The button trigger prints only an option it has loaded, and the search
+  // returns one page. A value saved outside that page needs a row of its own
+  // or the field reads as empty.
+  if (value.value && !rows.some((row) => row.value === value.value)) {
+    return [{ label: value.value, value: value.value }, ...rows];
+  }
+  return rows;
+});
 
 const text = ref("");
 

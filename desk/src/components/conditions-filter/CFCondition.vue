@@ -109,7 +109,8 @@
 </template>
 
 <script setup lang="ts">
-import { Link, StarRating } from "@/components";
+import { StarRating } from "@/components";
+import { Link } from "@framework/ui";
 import {
   Button,
   Combobox,
@@ -267,9 +268,9 @@ function getValueControl() {
       return h(FormControl, { type: "text" });
     }
     return h(Link, {
-      class: "form-control w-full",
+      class: "w-full",
       doctype: options,
-      value: props.condition[2],
+      title: props.condition[2],
     });
   } else if (typeNumber.includes(fieldtype)) {
     return h(FormControl, { type: "number" });
