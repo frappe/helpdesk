@@ -55,17 +55,8 @@
 </template>
 
 <script setup lang="ts">
-// Asked when an agent moves a ticket into the Resolved category, so the account of the fix
-// is written while it is still in their head. It lands in `resolution_details`, which is
-// what the customer portal shows on its resolution card — the customer otherwise sees only
-// the last reply.
-//
-// Keyed on the category rather than on "Closed" alone, so it also catches Resolved and any
-// custom status a helpdesk files under it. The chosen status arrives as a prop because the
-// dialog is what finally writes it.
-//
-// Never blocks the transition: the note is optional, and submitting empty behaves exactly
-// as picking the status from the dropdown used to.
+// Keyed on the resolved category, not on "Closed" alone, so a custom status catches too.
+// Never blocks the transition: the note is optional and submitting empty is the old path.
 import {
   buildEditorExtensions,
   ticketToolbar,
@@ -88,22 +79,19 @@ const details = ref("");
 const isSaving = ref(false);
 const editorRef = ref<any>(null);
 
-// The same editor the reply composer uses, minus mentions: this note is written for the
-// customer, and there is nobody to mention in it.
+// Minus mentions: this note is written for the customer.
 const extensions = buildEditorExtensions();
 
 watch(show, async (open) => {
   if (!open) return;
-  // Whatever is already recorded, so reopening the dialog edits rather than discards it.
+  // Whatever is already recorded, so reopening edits rather than discards it.
   details.value = ticket.value?.doc?.resolution_details || "";
   await nextTick();
   editorRef.value?.editor?.commands.focus();
 });
 
-// One write, so the note and the status can never disagree. An untouched editor still
-// reports `<p></p>`, which would give the customer's resolution card an empty body instead
-// of its "no details" line — so nothing written means nothing saved. Asked of the editor
-// rather than of the markup, because a note that is only a screenshot is not empty.
+// Asked of the editor, not the markup: an untouched one still reports `<p></p>`, and a
+// note that is only a screenshot is not empty.
 function submit() {
   if (isSaving.value) return;
   isSaving.value = true;

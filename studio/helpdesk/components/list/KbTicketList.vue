@@ -67,11 +67,7 @@
 </template>
 
 <script setup lang="ts">
-// The KB portal's ticket table. Deliberately a mirror of the agent portal's
-// `desk/src/components/ListViewBuilder.vue` — same frappe-ui primitives, same
-// gutters (`mx-5`), same footer chrome — so both list views read as one design.
-// It draws nothing itself: every cell comes from its column's `cell()`, the way
-// ListViewBuilder defers to `listCell`.
+// Draws nothing itself: every cell comes from its column's `cell()`.
 import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
 import { loadTicketMeta } from "./ticketCells";
 import {
@@ -86,9 +82,7 @@ import {
   LoadingIndicator,
 } from "frappe-ui";
 
-// The status colours and priority levels the cells draw with. Asked for here
-// rather than at module load: this file ships in every page bundle, including the
-// public ones a guest sees.
+// Here, not at module load: this file ships in the public page bundles too.
 loadTicketMeta();
 
 withDefaults(

@@ -25,8 +25,7 @@
       <div class="mt-4">
         <div class="mb-1.5 text-base text-ink-gray-5">Icon</div>
         <div class="flex items-center gap-2">
-          <!-- Existing views mostly carry an emoji (that is what the desk's picker
-               wrote), which the icon list can't show — so it previews beside it. -->
+          <!-- The icon list cannot show an emoji, which is what the desk's picker wrote. -->
           <div
             v-if="isEmojiIcon"
             class="grid size-7 shrink-0 place-items-center rounded bg-surface-gray-3 text-base leading-none"
@@ -52,13 +51,10 @@
 </template>
 
 <script setup lang="ts">
-// Create/rename dialog for a saved view. The desk's ViewModal also offers "Pin to
-// sidebar" and "Make it public"; neither applies here — this portal has no sidebar,
-// and the desk itself hides "public" outside the agent view (`isManager &&
-// !isCustomerPortal`). So a customer's view is just a name over the current layout.
+// No "Pin to sidebar" or "Make it public": this portal has no sidebar, and the desk
+// hides public outside the agent view. A customer's view is a name over the layout.
 import { Dialog, FormControl } from "frappe-ui";
-// Reads the lucide sprite the studio renderer's `spritePlugin` injects — verified to
-// carry the full set (1713 symbols), not just icons the bundle happens to reference.
+// Reads the full lucide sprite the studio renderer injects, not just what the bundle uses.
 import { IconPicker } from "frappe-ui/icons";
 import { computed } from "vue";
 

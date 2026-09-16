@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-/** Space-separated keys render as separate caps: "L A" -> [L][A]. */
+// Space-separated keys render as separate caps: "L A" -> [L][A].
 const props = defineProps<{ keys: string }>();
 
 const keyList = computed(() => props.keys.trim().split(/\s+/));

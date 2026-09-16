@@ -1,13 +1,9 @@
-// The desk utilities the ported filter leans on, in the smallest form this app needs.
-//
-// Ported rather than imported for two reasons: `@/` resolves inside the desk SPA only, and
-// the Studio build re-resolves just `vue`, `vue-router`, `pinia`, `frappe-ui`, `reka-ui`
-// and `@tiptap` for files outside its own project — so `@vueuse/core`, which the desk
-// versions use, cannot be reached from here at all.
+// Ported, not imported: the Studio build resolves only vue/vue-router/pinia/frappe-ui/
+// reka-ui/@tiptap for files outside its project, so `@vueuse/core` cannot be reached.
 
 import { getCurrentScope, onScopeDispose } from "vue";
 
-/** `@vueuse/core`'s, in the form this port uses: bind for the life of the calling scope. */
+// Bound for the life of the calling scope.
 export function useEventListener(
   target: EventTarget,
   event: string,
@@ -20,11 +16,9 @@ export function useEventListener(
   return stop;
 }
 
-/** `@vueuse/core`'s `useDebounceFn` in shape, frappe-ui's `debounce` in body —
- *  the one dependency the Studio build does resolve already ships it. */
 export { debounce as useDebounceFn } from "frappe-ui";
 
-/** The desk spells it `__`; the portal's stand-in dictionary answers it. */
+// The desk spells it `__`.
 export { t as __ } from '@app/stores/translations'
 
 export function useDevice() {
@@ -39,12 +33,7 @@ interface ShortcutBinding {
   meta?: boolean;
 }
 
-/**
- * A single keyboard shortcut, ignored while the reader is typing.
- *
- * The desk keeps a global registry so its shortcut sheet can list every binding; nothing
- * in this portal lists them, so the registry goes and this is just the listener.
- */
+// No global registry: nothing in this portal lists its shortcuts.
 export function useShortcut(binding: string | ShortcutBinding, callback: () => void) {
   const shortcut = normalize(binding);
 
@@ -60,7 +49,7 @@ export function useShortcut(binding: string | ShortcutBinding, callback: () => v
   });
 }
 
-/** `meta` means Cmd on a Mac and Ctrl everywhere else, as the desk's parser resolves it. */
+// `meta` means Cmd on a Mac and Ctrl everywhere else.
 function normalize(binding: string | ShortcutBinding): ShortcutBinding {
   const parsed: ShortcutBinding =
     typeof binding === "string" ? { key: binding } : { ...binding };
@@ -71,7 +60,6 @@ function normalize(binding: string | ShortcutBinding): ShortcutBinding {
   return parsed;
 }
 
-/** A shortcut must never steal a keystroke meant for a field. */
 function typing(): boolean {
   const active = document.activeElement as HTMLElement | null;
   return Boolean(

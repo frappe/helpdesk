@@ -56,12 +56,8 @@
 </template>
 
 <script setup lang="ts">
-// What customer managers may do from the customer portal, in one place.
-//
-// The switches default off: most helpdesks keep user administration agent-side,
-// and turning the first one on lets a customer create logins for your helpdesk. They only
-// decide whether the portal draws the controls — the server enforces them independently,
-// in `helpdesk/api/organization.py` and the `User Invitation` before_insert hook.
+// Off by default: the first one lets a customer create logins. These only draw the
+// controls; the server enforces them independently.
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
@@ -73,8 +69,7 @@ const settings = createDocumentResource({
   name: "HD Settings",
 });
 
-// Each switch saves itself, so the tab never carries a dirty state — same as the
-// Knowledge Base tab it sits beside.
+// Each switch saves itself, so the tab never carries a dirty state.
 function update(fieldname: string, value: boolean) {
   settings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
 }

@@ -54,14 +54,7 @@
 </template>
 
 <script setup lang="ts">
-// What this organization has raised lately, beside its people — the settings panel's
-// second tab. Ten rows, newest first: enough to answer "is anything open with them at the
-// moment", which is the question the panel is being read for. Anything longer belongs in
-// the ticket list, which is a click away and made for it.
-//
-// A plain call rather than `createListResource`: the panel keeps one organization at a
-// time, so this is one request per organization opened, and the loading state is the
-// thing the empty message has to wait for.
+// Ten rows, newest first: anything longer belongs in the ticket list, a click away.
 import { ref, watch } from "vue";
 import { TextInput, call, dayjs, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
@@ -71,11 +64,7 @@ import { t } from "@app/stores/translations";
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
 
-// The hover fill is a ::before rather than the row's own background: it reaches past
-// the text on both sides without widening the row, and stops a pixel short top and
-// bottom so a hovered row still reads as separated from its neighbours instead of
-// swallowing the hairlines into one grey band. `isolate` on the table keeps its -z-10
-// inside the table rather than letting it slip behind the panel.
+// A ::before, so the fill reaches past the text without widening the row.
 const BODY_ROW =
   "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-md before:content-[''] hover:before:bg-surface-gray-2";
 
@@ -86,8 +75,7 @@ const tickets = ref<any[]>([]);
 const loading = ref(false);
 const search = ref("");
 
-// Searched at the source, not among the ten already on screen: what the reader is looking
-// for is usually older than the newest ten, which is the whole reason to type.
+// Searched at the source: what the reader wants is usually older than the newest ten.
 async function load() {
   const customer = props.customer;
   if (!customer) {

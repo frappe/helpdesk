@@ -3,22 +3,17 @@ import { ROUTES } from '@app/routes'
 import { toast } from 'frappe-ui'
 import { useSettingsModal } from '@app/stores/settings'
 
-// New ticket form. The middle fields render through a Repeater over the HD Ticket
-// Template's field list (`fields`); each repeated FormControl reads its value with
-// `{{ getField(dataItem.fieldname) }}` and writes back via an `update:modelValue`
-// Run-Script calling `setField`.
+// The middle fields render through a Repeater over the template's field list, reading
+// with `getField` and writing back through an `update:modelValue` Run Script.
 export default function setup(context) {
   const { subject, description, template, ticketTypes, newTicket, router, route } = context
   const session = useSettingsModal(context)
 
-  // Arriving from a search: whatever was searched for becomes the subject, so
-  // nobody retypes it.
+  // Arriving from a search: what was searched for becomes the subject.
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
 
-  // The template and its ticket types are permission-gated, so they are fetched once
-  // the session is known rather than on mount — a guest asking for them only 403s
-  // while being sent to the login page.
+  // Permission-gated, so fetched once the session is known: a guest would only 403.
   watch(
     session.isGuest,
     (guest) => {
@@ -32,8 +27,7 @@ export default function setup(context) {
   // Values for the template-driven fields, keyed by fieldname.
   const model = reactive({})
 
-  // File docs the attachment field has already uploaded. They ride along with the insert,
-  // which is what `hd_ticket.api.new` does with its `attachments` argument.
+  // Already uploaded; they ride along with the insert as `attachments`.
   const attachments = ref([])
   const setAttachments = (files) => (attachments.value = files || [])
 
@@ -48,9 +42,7 @@ export default function setup(context) {
     model[name] = value
   }
 
-  // TextEditor models `content` and emits `change` — it has no `modelValue`, so
-  // Studio's automatic variable binding never fires and the description block
-  // writes back through here instead.
+  // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
     description.value = html
   }

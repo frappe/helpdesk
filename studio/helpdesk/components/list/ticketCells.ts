@@ -1,14 +1,9 @@
-// Cell renderers for the KB portal's ticket list, ported one-for-one from the
-// agent portal's `desk/src/pages/ticket/Tickets.vue` (`columnConfig` + `listCell`)
-// so both list views draw a ticket the same way. The desk components they mirror
-// (IndicatorIcon, TicketPriority, StarRating, MultipleAvatar) live under `@/` in
-// the desk SPA, which the Studio build cannot resolve — hence the local ports.
+// Ported from the agent list: the desk components it mirrors live under `@/`, which
+// the Studio build cannot resolve.
 import { Avatar, Badge, Tooltip, call, createListResource, dayjs } from 'frappe-ui'
 import { parseJsonArray, shortDuration } from '@app/utils'
 import { h, reactive } from 'vue'
 
-// Status colour and portal-facing label come from HD Ticket Status, exactly as
-// `useTicketStatusStore` supplies them to the agent list.
 const statuses = createListResource({
   doctype: 'HD Ticket Status',
   cache: ['HD Ticket Status', 'list'],
@@ -23,10 +18,7 @@ function getStatus(label: string) {
   )
 }
 
-// `parseColor` from the desk store, resolved to espresso tokens rather than its
-// `!text-<color>-500` classes: the colour name is data, and a class built from
-// data is invisible to Tailwind's scanner — a token var is theme-correct and
-// needs no safelist.
+// Tokens, not classes: a class built from data is invisible to Tailwind's scanner.
 const INK_COLORS = [
   'amber', 'blue', 'cyan', 'gray', 'green', 'orange',
   'pink', 'purple', 'red', 'teal', 'violet', 'yellow',
@@ -34,7 +26,7 @@ const INK_COLORS = [
 
 function statusColor(color: string) {
   const name = (color || 'gray').toLowerCase()
-  // Espresso has no black ink; the desk maps it to the darkest gray too.
+  // Espresso has no black ink.
   if (name === 'black') return 'var(--ink-gray-9)'
   return `var(--ink-${INK_COLORS.includes(name) ? name : 'gray'}-6)`
 }
@@ -58,15 +50,12 @@ export function statusCell({ item }: any) {
   ])
 }
 
-/** The same status, for anywhere that draws its own pill rather than a list cell. */
 export function statusMeta(label: string) {
   const status = getStatus(label)
   return { label: status?.label_customer || label || '', color: statusColor(status?.color) }
 }
 
-// --- priority: the signal-bars icon + name from TicketPriority.vue. The level is
-// the priority's own `level` field, read the way `useTicketPriorityStore` reads it,
-// so a custom priority draws the bars its level says rather than falling to Medium.
+// --- priority
 const priorities = createListResource({
   doctype: 'HD Ticket Priority',
   cache: ['HD Ticket Priority', 'list'],
@@ -74,20 +63,16 @@ const priorities = createListResource({
   pageLength: 1000,
 })
 
-/** Fetched when a ticket list actually mounts, not when this module loads: both read
- *  through `frappe.client.get_list`, which a signed-out visitor cannot call — and this
- *  module is bundled into every page, including the public ones. */
+// On mount, not at import: this module is bundled into public pages too, and a
+// signed-out visitor cannot call `frappe.client.get_list`.
 export function loadTicketMeta() {
   statuses.fetch()
   priorities.fetch()
 }
 
-// Who an assignee is, by user id. `_assign` carries bare ids, so without this the list
-// draws an initial and a name guessed from the email — while the ticket's own thread
-// shows the same agent with their real name and face.
+// `_assign` carries bare ids, so without this the list guesses a name from the email.
 const agents = reactive<Record<string, { name: string; image?: string }>>({})
 
-/** Look up the assignees on a page of rows, once per agent. */
 export function loadAssignees(rows: any[]) {
   const wanted = new Set<string>()
   for (const row of rows || []) {
@@ -107,7 +92,7 @@ function getLevel(name: string) {
   return (priorities.data || []).find((priority: any) => priority.name === name)?.level ?? 'Medium'
 }
 
-/** Tallest bars faded per level: High is fully solid, None is empty. */
+// Bars faded per level: High is fully solid, None is empty.
 const FADED_BARS: Record<string, number> = { High: 0, Medium: 1, Low: 2, None: 3 }
 const BARS = [
   { x: 0, y: 8, height: 4 },
@@ -148,7 +133,7 @@ export function priorityCell({ item }: any) {
   ])
 }
 
-// --- SLA: subtle badges, themed the way the agent list themes them.
+// --- SLA
 const badge = (label: string, theme: string) => h(Badge, { label, theme, variant: 'subtle' })
 const countdown = (deadline: string) =>
   h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
@@ -174,15 +159,12 @@ export function resolutionCell({ row, item }: any) {
   return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdown(item)
 }
 
-// --- the plain `listCell` types the agent list falls back to.
+// --- fallback cell types
 export function datetimeCell({ item }: any) {
   return item ? h('span', { class: 'text-base' }, dayjs(item).fromNow()) : null
 }
 
-// MultipleAvatar.vue: one assignee reads as an avatar plus a name, several stack
-// into overlapping discs. Names are derived from the email rather than looked up —
-// `helpdesk.api.session.get_users`, which the agent list resolves them through, is
-// agent-only.
+// Names come from the email: `session.get_users`, which the agent list uses, is agent-only.
 export function avatarCell({ item }: any) {
   const assignees = parseAssignees(item)
   if (!assignees.length) return null
@@ -205,9 +187,7 @@ export function avatarCell({ item }: any) {
     assignees.map((assignee) =>
       h(Tooltip, { text: assignee.email }, () =>
         h(Avatar, {
-          // my-1: the ring paints outside the border box, so it adds no height — and the
-          // list cell's `overflow-x-hidden` forces overflow-y to `auto`, clipping it top
-          // and bottom. The margin gives the cell room to contain its own ring.
+          // my-1: the ring paints outside the border box, which the cell would clip.
           class: 'user-avatar -mr-1.5 my-1 ring-2 ring-[var(--surface-base)] transition hover:z-20 hover:scale-110',
           shape: 'circle',
           size: 'sm',
@@ -219,7 +199,7 @@ export function avatarCell({ item }: any) {
   )
 }
 
-/** Subject carries the unread weight: bold until the reader has opened the ticket. */
+// Bold until the reader has opened the ticket.
 export function subjectCell({ row, item }: any, reader: string) {
   const seen = parseJsonArray(row._seen).includes(reader)
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)
@@ -244,12 +224,10 @@ export function textCell({ item }: any) {
   return h('span', { class: 'truncate flex-1' }, item ?? '')
 }
 
-// Leading cell: muted, the way the agent list renders index 0.
 export function idCell({ row }: any) {
   return h('span', { class: 'truncate text-base text-ink-gray-6' }, row.name)
 }
 
-/** `formatFullName` from the desk's user store: the local part, capitalised. */
 function parseAssignees(raw: string) {
   return parseJsonArray(raw).map((email: string) => ({
     email,
@@ -258,7 +236,7 @@ function parseAssignees(raw: string) {
   }))
 }
 
-/** Until the lookup answers: the local part, capitalised. */
+// Until the lookup answers.
 function guessName(email: string) {
   return capitalize(String(email).split('@')[0])
 }

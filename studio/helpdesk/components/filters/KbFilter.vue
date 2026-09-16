@@ -163,10 +163,7 @@ import FilterFieldList from "./KbFilterFieldList.vue";
 import FilterTrigger from "./KbFilterTrigger.vue";
 import FilterValueEditor from "./KbFilterValueEditor.vue";
 
-// The agent portal's filter, driven by props instead of the desk's two injects — see
-// `FilterSource` in model.ts. `conditions` is the Frappe wire form
-// (`[fieldname, operator, value]`), which is what this control has always spoken; the
-// page converts to and from its own condition objects on either side.
+// Driven by props instead of the desk's two injects — see `FilterSource` in model.ts.
 const props = withDefaults(
   defineProps<{ fields?: FilterField[]; conditions?: any[] }>(),
   { fields: () => [], conditions: () => [] }

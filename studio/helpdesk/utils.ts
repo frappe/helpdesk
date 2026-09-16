@@ -1,8 +1,6 @@
 import { dayjs } from 'frappe-ui'
 
-// The portal's shared helpers, one home each — the same shape as desk/src/utils.ts.
-// Three duration formats coexist on purpose: a list chip, the sidebar's SLA wording
-// and a message byline each read differently, exactly as they do in the agent portal.
+// Three duration formats coexist on purpose, as they do in the agent portal.
 
 export function parseJson(value: unknown, fallback: any = undefined) {
   if (!value) return fallback
@@ -14,7 +12,6 @@ export function parseJson(value: unknown, fallback: any = undefined) {
   }
 }
 
-/** A JSON-string field that should hold an array (`_assign`, `_seen`, filters…). */
 export function parseJsonArray(value: unknown): any[] {
   const parsed = parseJson(value, [])
   return Array.isArray(parsed) ? parsed : []
@@ -28,7 +25,7 @@ const MINUTE = 60
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
-/** `shortDuration` from desk/src/utils.ts — compact, direction-agnostic: "2 days 3h". */
+// Compact and direction-agnostic: "2 days 3h".
 export function shortDuration(target: string) {
   const seconds = Math.abs(dayjs(target).diff(dayjs(), 'second'))
   if (seconds >= DAY) {
@@ -45,10 +42,8 @@ export function shortDuration(target: string) {
   return `${Math.floor(seconds / MINUTE)}m`
 }
 
-// The two most significant units, as `formatSeconds` words them in the agent portal's
-// analytics: "2d 9h", "44m". Never four — and never trailing seconds on anything larger,
-// because a countdown that only re-renders on load reads as a frozen timer when it shows
-// them (the reasoning behind `coarseDuration` in desk's useSLA.ts).
+// Two units at most, and no trailing seconds: a countdown that re-renders only on load
+// reads as a frozen timer when it shows them.
 export function compactDuration(seconds: number) {
   return (
     compactUnits(seconds)
@@ -57,9 +52,7 @@ export function compactDuration(seconds: number) {
   )
 }
 
-/** The largest unit with anything in it, plus the one below it — and only that one, so a
- *  span of 83 days and 59 minutes reads as "83 days" rather than skipping the empty hours
- *  to pair two units that were never adjacent. */
+// The largest unit and the one below it, so 83 days and 59 minutes reads as "83 days".
 function compactUnits(seconds: number) {
   const all: [number, string][] = [
     [Math.floor(seconds / DAY), 'd'],
@@ -72,8 +65,7 @@ function compactUnits(seconds: number) {
   return all.slice(largest, largest + 2).filter(([value]) => value)
 }
 
-// `prettyDate` from desk/src/utils.ts, not dayjs's own `fromNow`: the agent portal
-// words a week as a week where dayjs would still be counting days.
+// Not dayjs's `fromNow`: that words a week as days.
 export function timeAgo(value: string) {
   const seconds = dayjs().diff(dayjs(value), 'second')
   const days = Math.floor(seconds / DAY)

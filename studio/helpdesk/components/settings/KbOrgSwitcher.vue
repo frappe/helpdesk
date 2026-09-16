@@ -1,6 +1,5 @@
 <template>
-  <!-- One width for the trigger and its menu: organization names vary in length,
-       so a hugging trigger made the control resize on every change. -->
+  <!-- One width for both: a hugging trigger resized on every change. -->
   <MultiSelect
     class="w-[220px]"
     size="sm"
@@ -11,8 +10,7 @@
     :model-value="selectedOrganizations"
     @update:model-value="(value) => onSelect?.(value)"
   >
-    <!-- Owns the whole prefix area, so one template covers none / one / many:
-         a logo when a single organization is picked, the generic mark otherwise. -->
+    <!-- Owns the whole prefix area, so one template covers none / one / many. -->
     <template #prefix="{ selectedOptions }">
       <Avatar
         v-if="selectedOptions.length === 1"
@@ -58,25 +56,20 @@
 </template>
 
 <script setup lang="ts">
-// Organization switcher for the portal ticket list: the caller's organizations,
-// any number of them at once, narrowing the list to those customers. Its value
-// lives in the list's own filter conditions rather than beside them, so the
-// Filter and QuickFilter controls and this switcher can never disagree.
+// Its value lives in the list's filter conditions, so the controls cannot disagree.
 import { Avatar, Checkbox, ItemListRow, MultiSelect } from "frappe-ui";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import { computed } from "vue";
 
 type Organization = { name: string; customer_name?: string; image?: string };
 
-// MultiSelect drives both the empty trigger and the menu's search field from this one
-// prop, so it reads as an invitation to pick rather than "All organizations" repeated
-// back inside its own dropdown.
+// Drives both the empty trigger and the menu's search field, so it invites a pick.
 const PLACEHOLDER = "Select organizations";
 
 const props = withDefaults(
   defineProps<{
     organizations?: Organization[];
-    /** Docnames in play; empty means every organization. */
+    // Docnames in play; empty means every organization.
     selectedOrganizations?: string[];
     onSelect?: (names: string[]) => void;
   }>(),

@@ -14,8 +14,6 @@
         <div class="flex min-w-0 items-center justify-between gap-3">
           <div class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9">
             {{ current?.file_name }}
-            <!-- Which of how many, the way any gallery says it. Only worth saying when
-                 there is more than one to step through. -->
             <span v-if="viewable.length > 1" class="shrink-0 text-p-xs font-normal text-ink-gray-5">
               {{ position + 1 }} of {{ viewable.length }}
             </span>
@@ -71,13 +69,7 @@
 </template>
 
 <script setup lang="ts">
-// A message's attachments, and the viewer behind them — the agent portal's
-// `desk/src/components/AttachmentItem.vue`: the same file-kind icon on the chip, the same
-// 4xl dialog, images and video centred, plain text read out as text. Anything the browser
-// cannot show inline (a PDF, a spreadsheet) opens in a tab, as it does there.
-//
-// The one addition: a message often carries several files, so the dialog steps between
-// them instead of making the reader close it and pick the next chip.
+// The desk's AttachmentItem, plus stepping between a message's files inside the dialog.
 import { computed, ref, watch } from "vue";
 import { Button, Dialog } from "frappe-ui";
 
@@ -92,8 +84,7 @@ const props = withDefaults(defineProps<{ attachments?: Attachment[] }>(), {
 
 type Kind = "image" | "video" | "text" | "pdf" | "spreadsheet" | "file";
 
-// By extension: the payload carries a name and a URL, not a mime type, and the desk's
-// `mime` lookup keys off the name in the end too.
+// By extension: the payload carries a name and a URL, not a mime type.
 const KINDS: Record<string, Kind> = {
   png: "image",
   jpg: "image",
@@ -129,7 +120,7 @@ const ICONS: Record<Kind, string> = {
   file: "lucide-file",
 };
 
-/** What the dialog can show; the rest belong in a tab. */
+// What the dialog can show; the rest belong in a tab.
 const VIEWABLE: Kind[] = ["image", "video", "text"];
 
 const showDialog = ref(false);
@@ -170,8 +161,7 @@ function openInTab(attachment?: Attachment | null) {
   if (attachment) window.open(attachment.file_url, "_blank");
 }
 
-// A text file has to be fetched before it can be read; images and video are fetched by
-// the elements themselves.
+// Only text needs fetching; the elements fetch images and video themselves.
 watch([current, showDialog], () => {
   text.value = "";
   if (!showDialog.value || !current.value || kindOf(current.value) !== "text")

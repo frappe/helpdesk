@@ -7,9 +7,7 @@
       >
         <div class="size-full bg-[var(--ink-gray-8)]" />
       </TabsIndicator>
-      <!-- One weight for every tab: bolding the active one would change its width,
-           and the indicator is sized from that width — the bar would resize under
-           itself mid-travel. -->
+      <!-- One weight for every tab: the indicator is sized from the tab's width. -->
       <TabsTrigger
         v-for="option in options"
         :key="option.value"
@@ -23,17 +21,8 @@
 </template>
 
 <script setup lang="ts">
-// Underline tabs, built on the same reka-ui primitives frappe-ui's own `Tabs` uses.
-//
-// It was `TabButtons type="underline"` before, which draws the underline as a static
-// `::after` on whichever tab is active — so switching tabs made the bar disappear here
-// and reappear there. `TabsIndicator` is one element that reka positions from the active
-// tab's own box, handing over its width and offset as CSS variables, so the bar can
-// travel between tabs instead of cutting.
-//
-// Not frappe-ui's `Tabs` itself: that one owns the panels too, keys its model by tab
-// index, and carries page-level padding on the strip. Here the panels are separate Studio
-// blocks and the model is the tab's own name.
+// `TabsIndicator` is one element reka positions from the active tab, so the bar travels
+// instead of cutting. Not frappe-ui's `Tabs`: that owns the panels and keys them by index.
 import { computed } from "vue";
 import { TabsIndicator, TabsList, TabsRoot, TabsTrigger } from "reka-ui";
 

@@ -3,10 +3,8 @@ import { call, toast, FileUploadHandler } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 import { useSession } from '@app/stores/session'
 
-// The settings modules' shared plumbing: the server payload, the busy/confirm
-// machinery every mutating action runs through, and the dialog's open/tab state
-// (state lives here so the organization module can watch the tab without
-// depending on the dialog module that drives it).
+// Tab state lives here so the organization module can watch it without depending on
+// the dialog module that drives it.
 
 export function createSettingsCore() {
   const settingsOpen = ref(false)
@@ -18,19 +16,11 @@ export function createSettingsCore() {
   const organizations = computed(() => settingsData.value?.organizations || [])
   const isAgentUser = computed(() => Boolean(settingsData.value?.is_agent))
 
-  // Managing an organization takes two yeses: you manage *this* one, and the helpdesk
-  // allows customer-side self-service at all (HD Settings, off by default — most
-  // helpdesks keep user administration agent-side). The server enforces both
-  // independently; these only decide whether the controls are worth drawing.
+  // The server enforces this; here it only decides whether the controls are worth drawing.
   const portalConfig = computed(() => useSession().config.value || {})
 
-  // Destructive actions route through one dialog rather than window.confirm, the
-  // way the agent portal's ConfirmDialog does.
   const confirmAction = ref(null)
-  // Open state kept apart from the options, so what is on the dialog survives its own
-  // closing animation. Clearing the options to close it meant every binding fell back to
-  // its default on the way out — a role change, which asks in grey, turned red for the
-  // length of the fade.
+  // Apart from the options, so what is on the dialog survives its own closing animation.
   const confirmOpen = ref(false)
 
   function askConfirm(options) {
@@ -56,8 +46,7 @@ export function createSettingsCore() {
   async function loadSettings() {
     try {
       settingsData.value = await call('helpdesk.api.organization.get_settings')
-      // By docname, not email: they differ for Administrator, and keying by email
-      // loaded a different User doc — so language and timezone never took effect.
+      // By docname, not email: they differ for Administrator.
       usePreferences().loadPreferences(settingsUser.value.name)
       for (const hook of reloadHooks) await hook()
     } catch (error) {
@@ -66,10 +55,8 @@ export function createSettingsCore() {
     }
   }
 
-  /** `landed` is for actions that email as part of the same request: the notice is
-   *  sent synchronously, so a mail failure fails the whole request even though the
-   *  change is already saved. It re-checks the reloaded data and returns the wording
-   *  for that case, or nothing if the action really did fail. */
+  // `landed` covers actions that mail synchronously, where a mail failure fails a
+  // request whose change is already saved.
   async function run(action, successMessage, landed) {
     if (settingsBusy.value) return
     settingsBusy.value = true

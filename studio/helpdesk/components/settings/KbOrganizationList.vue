@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- Wrapped rather than styled directly: scoped rules don't reach a child
-         component's own root, so the spacing lives on an element of ours. -->
+    <!-- Wrapped: scoped rules don't reach a child component's own root. -->
     <div class="mb-6">
       <TextInput v-model="search" type="text" :placeholder="t('Search')">
         <template #prefix>
@@ -23,8 +22,7 @@
 
     <!-- Cards wide enough that "n tickets · n members" stays on one line. -->
     <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
-      <!-- On hover the elevation token draws its own hairline, so the resting
-           border gives way — keeping both double-draws the edge instead of lifting. -->
+      <!-- The elevation token draws its own hairline, so the resting border gives way. -->
       <div
         v-for="organization in matches"
         :key="organization.name"
@@ -70,8 +68,7 @@
 
 <script setup lang="ts">
 import { t } from "@app/stores/translations";
-// A card per organization, each carrying a role badge — Owner, Manager or
-// Member — rather than being sorted into sections.
+// A role badge per card, rather than sorting the cards into sections.
 import { Avatar, Badge, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import LucideSquareUser from "~icons/lucide/square-user";
@@ -92,7 +89,6 @@ type Organization = {
 const props = withDefaults(
   defineProps<{
     organizations?: Organization[];
-    /** Called with the organization's docname when one is picked. */
     onSelect?: (name: string) => void;
   }>(),
   { organizations: () => [] }
@@ -110,8 +106,7 @@ const matches = computed(() => {
   );
 });
 
-// Owner and Manager both act on the organization, so they get colour; a plain
-// member stays neutral.
+// Owner and Manager act on the organization, so they get colour.
 const ROLE_THEMES = { Owner: "blue", Manager: "green" };
 
 function roleTheme(role: string) {

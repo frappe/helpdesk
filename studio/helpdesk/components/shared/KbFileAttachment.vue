@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <!-- A drop target has to look like one: a dashed edge and enough height to aim
-         at, where the single-file row could pass for a text input. -->
+    <!-- A drop target has to look like one, where a single-file row reads as an input. -->
     <button
       type="button"
       class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
@@ -20,8 +19,7 @@
             : "Drop files here, or click to choose"
         }}
       </span>
-      <!-- Covers the drop target so a file released anywhere on it lands on the
-           input too. -->
+      <!-- Covers the target, so a file released anywhere on it lands on the input. -->
       <input
         ref="input"
         type="file"
@@ -55,18 +53,13 @@
 </template>
 
 <script setup lang="ts">
-// Attachment field for the KB new-ticket form: a drop target that takes several files at
-// once, uploads each and hands the resulting File docs back to the page.
-//
-// Not frappe-ui's `FileUploader`: it owns a single `<input>` with no `multiple`, and one
-// upload at a time — so a requester with three screenshots had to attach, wait, attach
-// again. This drives the same `FileUploadHandler` it uses, once per file.
+// Not frappe-ui's `FileUploader`: that has no `multiple` and uploads one at a time. This
+// drives the same `FileUploadHandler`, once per file.
 
 import { computed, ref } from "vue";
 import { FeatherIcon, FileUploadHandler } from "frappe-ui";
 
-// Private, and in the folder the ticket thread's own uploads go to — an attachment on a
-// support ticket is not public content.
+// Private: an attachment on a support ticket is not public content.
 const UPLOAD_ARGS = { folder: "Home/Helpdesk", private: true };
 
 const props = withDefaults(defineProps<{ files?: any[] }>(), {
@@ -101,8 +94,7 @@ function onDrop(event: DragEvent) {
 async function upload(selected: File[]) {
   error.value = "";
   pending.value += selected.length;
-  // Settled, not all: one rejected file (over the size limit, usually) must not throw away
-  // the ones that uploaded beside it.
+  // Settled, not all: one rejected file must not throw away the ones beside it.
   const results = await Promise.allSettled(
     selected.map((file) => new FileUploadHandler().upload(file, UPLOAD_ARGS))
   );

@@ -61,8 +61,7 @@
         </span>
 
         <div class="flex justify-end">
-          <!-- `canRemove` is the wider of the two guards, so a row that has any
-               action at all has this one. -->
+          <!-- `canRemove` is the wider guard, so any row with an action at all has it. -->
           <Dropdown
             v-if="canRemove(member)"
             :options="rowOptions(member)"
@@ -84,8 +83,7 @@
 
 <script setup lang="ts">
 import { t } from "@app/stores/translations";
-// The organization's people, one row each. Was a tree keyed on role, which implied
-// a reporting line helpdesk does not record — any manager can act on any member.
+// Flat, not keyed on role: a tree implied a reporting line helpdesk does not record.
 import {
   Avatar,
   Badge,
@@ -102,8 +100,7 @@ import LucideUser from "~icons/lucide/user";
 import LucideUsers from "~icons/lucide/users";
 import { computed, ref } from "vue";
 
-// No container, no fills: rows are separated by a hairline and nothing else — and
-// under the last row the hairline would be a line under nothing, hence last:border-b-0.
+// Under the last row the hairline would be a line under nothing.
 const ROW =
   "grid grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
@@ -123,7 +120,7 @@ type Member = {
 const props = withDefaults(
   defineProps<{
     members?: Member[];
-    /** Only a manager of this organization may change anyone. */
+    // Only a manager of this organization may change anyone.
     canManage?: boolean;
     onSetRole?: (member: Member, role: string) => void;
     onRemove?: (member: Member) => void;
@@ -136,8 +133,7 @@ const ROLE_ICONS = {
   Manager: LucideBriefcase,
   Member: LucideUser,
 };
-// Owner is left out: there is exactly one per organization and the list already puts
-// them first, so filtering to them narrows a list of four to a list of one.
+// Owner is left out: there is one per organization, already first in the list.
 const FILTERABLE_ROLES = ["Manager", "Member"];
 const ROLE_FILTERS = [
   { label: "All", value: "All", icon: LucideUsers },
@@ -176,15 +172,12 @@ function roleIcon(member: Member) {
   return ROLE_ICONS[roleLabel(member)];
 }
 
-/** `User.last_active`, worded as the agent portal's contact page words it. Someone who
- *  has never signed in — anyone still holding an invitation — is said so in words: a dash
- *  reads as missing data where the absence is the fact. */
+// Said in words: a dash would read as missing data where the absence is the fact.
 function lastSeen(member: Member) {
   return member.last_seen ? dayjs(member.last_seen).fromNow() : t("Never");
 }
 
-/** The owner's role is fixed, and demoting yourself revokes the rights the call
- *  needs. A pending invite carries its role until it is accepted. */
+// The owner's role is fixed, and demoting yourself revokes the rights the call needs.
 function canSwitchRole(member: Member) {
   return Boolean(
     props.canManage && !member.is_owner && !member.is_you && !member.pending
@@ -195,8 +188,7 @@ function canRemove(member: Member) {
   return Boolean(props.canManage && !member.is_owner && !member.is_you);
 }
 
-/** Only what changes something: the role the member does not hold, and — for a
- *  pending invite, which holds none yet — the cancellation on its own. */
+// Only what changes something: a pending invite holds no role, so only cancellation.
 function rowOptions(member: Member) {
   if (member.pending) {
     return [

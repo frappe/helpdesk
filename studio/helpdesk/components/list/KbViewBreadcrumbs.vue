@@ -61,17 +61,11 @@
 </template>
 
 <script setup lang="ts">
-// The portal's list-view breadcrumb: `Tickets / <view> v`. Mirrors the agent desk's
-// `desk/src/components/ViewBreadcrumbs.vue` markup so both list views read as one
-// design. View icons come from the lucide sprite (see ViewIcon); the fixed chevron and
-// check stay on FeatherIcon, whose glyphs are bundled regardless.
+// View icons come from the lucide sprite; the fixed chevron and check stay on FeatherIcon.
 import { h } from "vue";
 import { Button, Dropdown, FeatherIcon } from "frappe-ui";
 
-// A view's stored icon is usually an emoji (that is what the desk's IconPicker writes),
-// occasionally an icon name, often nothing. Mirrors `getIcon` in desk/src/utils.ts:
-// emoji render as text, a name resolves against the sprite, and an empty one falls back
-// to the list glyph rather than an empty slot.
+// A stored icon is usually an emoji, occasionally a name, often nothing.
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 // lucide names this glyph `text-align-justify`; `align-justify` is not in the sprite.
 const DEFAULT_ICON = "text-align-justify";
@@ -85,11 +79,8 @@ const ViewIcon = (props: { icon?: string }) => {
       { class: `${ICON_CLASS} flex items-center justify-center leading-none` },
       icon
     );
-  // Referenced straight out of the lucide sprite the renderer injects, rather than
-  // FeatherIcon: IconPicker writes lucide names, and the two sets don't overlap
-  // cleanly — a picked icon rendered as feather would come back empty.
-  // Sprite symbols carry only paths, so the consuming svg supplies lucide's own
-  // stroke defaults — without them the glyph renders as nothing.
+  // The sprite, not FeatherIcon: IconPicker writes lucide names and the sets barely overlap.
+  // Sprite symbols carry only paths, so the svg has to supply lucide's stroke defaults.
   const name = (icon || DEFAULT_ICON).replace(/^lucide-/, "");
   return h(
     "svg",

@@ -1,10 +1,7 @@
 import { watch } from 'vue'
 
-// Opening, closing and the URL hash that drives both. The dialog lives in the hash
-// (#settings/<tab>[/<organization>[/invite]]) so it layers over the page underneath
-// and survives a refresh; the topbar menu opens it by pushing that hash. Every screen
-// the dialog can show gets its own segment, which is what makes the device back
-// button step back through them one at a time instead of dismissing the whole dialog.
+// The dialog lives in the hash (#settings/<tab>[/<organization>[/invite]]), a segment per
+// screen, so the device back button steps through them instead of dismissing the dialog.
 
 const HASH_ROOT = 'settings'
 
@@ -21,12 +18,9 @@ export function createSettingsDialog(core, organization) {
     core.settingsOpen.value = false
   }
 
-  // Bound once per app, through `afterEach` rather than a watcher on the route,
-  // because a page script's `route` is a snapshot taken when the script ran.
+  // `afterEach`, not a route watcher: a page script's `route` is a snapshot.
   let routerBound = false
-  // Held here rather than captured in the watch: every page hands over its own router
-  // proxy, and the one the first page gave is tied to a component that has since gone —
-  // writing the hash through it did nothing, so the URL stopped following the dialog.
+  // Held, not captured: each page hands over its own proxy and the first page's is dead.
   let router = null
 
   function bindRouter(value) {
@@ -42,8 +36,7 @@ export function createSettingsDialog(core, organization) {
     )
   }
 
-  // The router reaches a page script through a reactive proxy, which unwraps refs — so
-  // `currentRoute` is the route itself there, and the ref only outside that proxy.
+  // A page script's router proxy unwraps refs, so `currentRoute` is the route itself there.
   function currentRoute() {
     return router?.currentRoute?.value || router?.currentRoute || {}
   }
@@ -73,9 +66,7 @@ export function createSettingsDialog(core, organization) {
     return `#${parts.join('/')}`
   }
 
-  // Organization names carry spaces, which the router escapes on the way into the URL
-  // and hands back escaped after a popstate — so every hash is read decoded, and the
-  // ones we build stay unescaped and let the router do that job once.
+  // Names carry spaces, which the router escapes, so every hash is read decoded.
   function readHash(hash) {
     try {
       return decodeURIComponent(String(hash || ''))
@@ -89,18 +80,14 @@ export function createSettingsDialog(core, organization) {
     const hash = settingsHash()
     const current = currentRoute()
     if (readHash(current.hash) === hash) return
-    // Leaving a screen the way we came in unwinds history rather than growing it —
-    // pushing the parent again would leave the device back button pointing forward,
-    // into the very screen just closed.
+    // Unwind history rather than grow it, or back points forward into the closed screen.
     const previous = previousHash()
     if (previous !== null && readHash(previous) === hash) return router.back()
-    // The path travels with it: a bare `{ hash }` resolves against whatever the router
-    // thinks is current, which is not always the page the dialog is layered over.
+    // The path travels with it: a bare `{ hash }` resolves against whatever is current.
     router.push({ path: current.path, query: current.query, hash })
   }
 
-  // vue-router keeps the entry behind this one in history state, as a full path —
-  // query and all — so only the part before the query names the page.
+  // History state holds a full path, so only the part before the query names the page.
   function previousHash() {
     const previous = router?.options?.history?.state?.back
     if (typeof previous !== 'string') return null

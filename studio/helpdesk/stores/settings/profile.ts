@@ -1,8 +1,6 @@
 import { ref } from 'vue'
 import { call, toast } from 'frappe-ui'
 
-// The signed-in person's own corner of the settings dialog: name, photo, password.
-
 export function createProfileSettings(core) {
   // Form state, seeded from the server payload on every load.
   const profileFirstName = ref('')
@@ -26,8 +24,7 @@ export function createProfileSettings(core) {
     )
   }
 
-  // The portal stores first and last name separately; the dialog edits one field, so it
-  // splits on the first space and everything after it is the last name.
+  // One field, two stored names: everything after the first space is the last name.
   function renameProfile(value) {
     const [first, ...rest] = value.split(/\s+/)
     profileFirstName.value = first

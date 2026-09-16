@@ -12,8 +12,7 @@
         <template #default="{ editor, isEmpty }">
           <EditorBubbleMenu :items="commentToolbar" />
 
-          <!-- Utilities, not a scoped rule: the class lands on the ProseMirror node
-           but the scope attribute does not, so scoped CSS never matches it. -->
+          <!-- Utilities, not scoped CSS: the scope attribute never reaches the ProseMirror node. -->
           <EditorContent
             class="prose prose-sm my-2 max-h-64 min-h-[5rem] max-w-none overflow-y-auto"
           />
@@ -32,8 +31,7 @@
 
           <div class="flex items-center justify-between gap-2">
             <div class="flex min-w-0 items-center gap-1 overflow-x-auto">
-              <!-- Own input rather than frappe-ui's FileUploader: that one holds a single
-               `<input>` with no `multiple`, so three screenshots meant three trips. -->
+              <!-- frappe-ui's FileUploader has no `multiple`, so three files meant three trips. -->
               <input
                 ref="fileInput"
                 type="file"
@@ -73,14 +71,8 @@
 </template>
 
 <script setup lang="ts">
-// The reply composer, built from the same editor the agent portal gives its own users:
-// `desk/src/components/TextEditor.vue` and the toolbar in `desk/src/components/editor/
-// config.ts`. Same `frappe-ui/editor` Editor, same RichTextKit, same toolbar order and
-// the same bubble menu on a selection — so a reply written here serialises to the markup
-// the desk writes, and renders back the same way in the thread.
-//
-// It is a component rather than Studio blocks because a toolbar has to reach the editor
-// instance, and only the Editor's own slot hands that over.
+// The desk's own editor, so a reply serialises to the same markup. A component rather
+// than Studio blocks because only the Editor's slot hands over the instance a toolbar needs.
 import { computed, onMounted, ref } from "vue";
 import { Button, FileUploadHandler, toast, useFileUpload } from "frappe-ui";
 import {
@@ -112,7 +104,7 @@ const props = withDefaults(
     attachments?: any[];
     sending?: boolean;
     placeholder?: string;
-    /** Where an inline upload is filed, so a pasted image belongs to the ticket. */
+    // Where an inline upload is filed, so a pasted image belongs to the ticket.
     doctype?: string;
     docname?: string;
     uploadArgs?: Record<string, unknown>;
@@ -135,14 +127,9 @@ const emit = defineEmits<{
   discard: [];
 }>();
 
-/** How long the composer takes to grow into place. Long enough to read as a movement,
- *  short enough that the cursor is there before anyone starts typing. */
 const OPEN_MS = 180;
 
-// The composer replaces a one-line prompt, so it arrives some 160px taller than what it
-// replaced and everything above it jumped. It grows into that height instead — and only
-// while it is growing, because the clipping that makes a height animation possible would
-// otherwise cut off the toolbar's own menus.
+// Clipped only while growing: the clipping a height animation needs would cut off the menus.
 const opening = ref(true);
 onMounted(() => setTimeout(() => (opening.value = false), OPEN_MS));
 
@@ -156,21 +143,19 @@ const content = computed({
   set: (value) => emit("update:modelValue", value),
 });
 
-// The desk's `buildEditorExtensions()` without its mention list — a customer has no
-// agents to mention — and without the desk-local paste helpers, which live in that app.
+// The desk's `buildEditorExtensions()`, less the mention list and its local paste helpers.
 const extensions = [
   RichTextKit.configure({ heading: { levels: [2, 3, 4, 5, 6] } }),
 ];
 
-/** `ClearFormatting` from the desk's config, less the `cleanStyles` command that comes
- *  from its own extension. */
+// The desk's, less the `cleanStyles` command that comes from its own extension.
 const ClearFormatting: CommandMenuItem = {
   label: "Clear formatting",
   icon: "lucide-brush-cleaning",
   action: (editor) => editor.chain().focus().unsetAllMarks().clearNodes().run(),
 };
 
-/** The desk's `ticketToolbar`, item for item. */
+// The desk's `ticketToolbar`, item for item.
 const replyToolbar: MenuItem[] = [
   Paragraph,
   HeadingGroup,
@@ -189,8 +174,7 @@ const replyToolbar: MenuItem[] = [
   ClearFormatting,
 ];
 
-/** Pasted and dropped media, filed against the ticket the way `uploadFunction` files it
- *  in the desk — private, so the same permissions guard it as the ticket. */
+// Private, so the same permissions guard an upload as guard the ticket.
 function uploadFile(file: File) {
   return useFileUpload().upload(file, {
     private: true,
@@ -199,8 +183,7 @@ function uploadFile(file: File) {
   });
 }
 
-/** Everything the reader picked, uploaded together — `allSettled` so one file over the
- *  size limit does not throw away the ones beside it. */
+// `allSettled`, so one file over the size limit does not throw away the ones beside it.
 async function pickFiles(event: Event) {
   const input = event.target as HTMLInputElement;
   const picked = Array.from(input.files || []);
@@ -235,9 +218,7 @@ defineExpose({ editor: computed(() => editorRef.value?.editor) });
 </script>
 
 <style scoped>
-/* Plain CSS on purpose: a height animation without knowing the height — a grid row
-   grows from nothing to its content's size, which is interpolable where an `auto`
-   height is not. Keyframes over grid-template-rows have no utility equivalent. */
+/* A grid row grows from nothing to its content's size, where an `auto` height cannot. */
 .kb-reply--opening {
   display: grid;
   grid-template-rows: 0fr;

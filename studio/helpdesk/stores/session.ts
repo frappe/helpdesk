@@ -2,10 +2,8 @@ import { computed, ref } from 'vue'
 import { ROUTES } from '@app/routes'
 import { call } from 'frappe-ui'
 
-// Who is looking at the portal, and what it may offer them. The published Studio app
-// is rendered from a bare template with no boot payload, so login state has to be
-// asked for — `helpdesk.api.config.get_config` is the one endpoint the helpdesk
-// already exposes to guests, and it carries the ticket setting too.
+// A published Studio app renders from a bare template with no boot payload, so login
+// state has to be asked for; `get_config` is the one endpoint guests may call.
 
 const store = createSessionStore()
 
@@ -20,11 +18,9 @@ function createSessionStore() {
   let router = null
   let loading = null
 
-  // Guest until told otherwise: the topbar renders before the call returns, and
-  // showing "Log in" to a signed-in user for a moment beats the reverse.
+  // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
 
-  /** Raising a ticket needs an account to put it on. */
   const canCreateTicket = computed(() => !isGuest.value)
 
   const isPublicKnowledgeBase = computed(
@@ -39,8 +35,7 @@ function createSessionStore() {
       )}`
   )
 
-  // A guest has no tickets, account or session to offer, so the menu keeps only what
-  // works signed out.
+  // A guest has no tickets, account or session to offer.
   const accountMenuOptions = computed(() =>
     isGuest.value
       ? [{ icon: 'lucide-log-in', label: 'Log in', onClick: signIn }]
@@ -60,8 +55,7 @@ function createSessionStore() {
     return loading
   }
 
-  // A private knowledge base answers a signed-out reader with a permission error on
-  // every call, so send them to sign in rather than render a shell that cannot fill.
+  // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value) return
     signIn()
@@ -83,9 +77,7 @@ function createSessionStore() {
     window.location.href = loginUrl.value
   }
 
-  // Posted rather than navigated to: frappe only accepts POST on logout, so following
-  // the link landed on a 403 page without ending the session. Back to the portal
-  // home afterwards — signing out should leave you at its door, as a visitor.
+  // Posted, not navigated: frappe only accepts POST on logout.
   async function signOut() {
     try {
       await call('logout')
@@ -95,7 +87,7 @@ function createSessionStore() {
     window.location.href = ROUTES.appRoot
   }
 
-  /** `isFeedbackMandatory` is read straight off it, so the payload itself is exported. */
+  // `isFeedbackMandatory` is read straight off it, so the payload itself is exported.
   return {
     config,
     isGuest,

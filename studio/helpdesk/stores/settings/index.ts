@@ -8,23 +8,16 @@ import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
 import { createSettingsDialog } from './dialog'
 
-// Shared state + actions for the portal settings dialog, used by every page script
-// via `useSettingsModal(context)`. The dialog itself is the `kb_settings` studio
-// component, which binds to whatever the host page's script returns — so every page
-// carrying it returns this store. Backed by helpdesk.api.organization.
-//
-// One instance for the whole app: per-call state would give each page a private copy,
-// so a load on one would leave the others showing stale settings.
+// One instance for the whole app: a private copy per page would go stale on the others.
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
 const dialog = createSettingsDialog(core, organization)
 
-// Every page script imports this module, so calling it here applies the saved theme on
-// load rather than only once the settings dialog renders the picker.
+// Here, not in the dialog, so the saved theme applies on load rather than on open.
 const { currentTheme, setTheme } = useTheme()
 
-// Writable so the theme Select can bind to it two-way; frappe-ui persists the choice.
+// Writable so the theme Select can bind two-way; frappe-ui persists the choice.
 const theme = computed({
   get: () => currentTheme.value,
   set: setTheme,
@@ -36,8 +29,7 @@ const themeOptions = computed(() => [
   { label: t('System'), value: 'system' },
 ])
 
-// The portal's own furniture, in the reader's language. Here rather than on a page
-// because every page spreads this store, and the header is shared between them.
+// Here rather than on a page, because the header these words fill is shared.
 const words = computed(() => ({
   raiseTicket: t('Raise a ticket'),
   status: t('Status'),
@@ -52,8 +44,7 @@ const store = {
   words,
   themeOptions,
   theme,
-  // The settings dialog's own wording is bound through this rather than written into
-  // the blocks, so the panel a reader opens to change their language is itself in it.
+  // Bound, not written into the blocks, so the language panel is itself translated.
   t,
   settingsOpen: core.settingsOpen,
   settingsTab: core.settingsTab,
@@ -73,8 +64,7 @@ const store = {
   ...dialog,
 }
 
-// Every page script goes through here, so the session store rides along rather than
-// being wired into each one: the topbar it feeds is on every page too.
+// Every page script goes through here, so the session store rides along.
 export function useSettingsModal(context) {
   if (context) store.bindRouter(context.router)
   return { ...store, ...usePreferences(), ...useSession(context), theme }
