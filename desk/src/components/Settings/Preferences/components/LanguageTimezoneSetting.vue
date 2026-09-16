@@ -13,6 +13,8 @@
         :model-value="user.doc?.language"
         doctype="Language"
         class="w-40"
+        align="end"
+        :placeholder="__('Select language')"
         hide-clear-button
         @update:model-value="updateLanguage"
       />
