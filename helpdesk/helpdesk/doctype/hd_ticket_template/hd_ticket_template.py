@@ -84,6 +84,8 @@ class HDTicketTemplate(Document):
         """Hiding covers helpdesk pages only; say so when the API still serves it."""
         if frappe.flags.in_migrate or frappe.flags.in_patch:
             return
+        if not self.rows_changed():
+            return
         meta = frappe.get_meta("HD Ticket")
         exposed = [
             meta.get_translated_label(f.fieldname)
@@ -113,7 +115,18 @@ class HDTicketTemplate(Document):
                 " Raise their permission levels in {1} to hide them everywhere."
                 " Read more about permission levels {2}."
             ).format(comma_and(exposed, add_quotes=False), link, docs)
-        frappe.msgprint(text, title=_("Information"), indicator="blue")
+        frappe.msgprint(text, title=_("Perm Levels in Helpdesk"), indicator="blue")
+
+    # show toast only when child table in ticket template is changed
+    def rows_changed(self) -> bool:
+        previous = self.get_doc_before_save()
+        return not previous or self.row_values() != previous.row_values()
+
+    def row_values(self) -> list[tuple]:
+        return [
+            (f.fieldname, f.visible_to, f.required, f.url_method, f.placeholder)
+            for f in self.fields
+        ]
 
     def current_permlevel(self, fieldname: str) -> int:
         """Live meta, so a level changed in Customize Form counts."""
