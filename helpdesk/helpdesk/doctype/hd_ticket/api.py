@@ -132,7 +132,6 @@ def get_template_fields_meta(template: str) -> list[dict]:
             "fieldname": field.fieldname,
             "label": field.label,
             "fieldtype": field.fieldtype,
-            "visible_to": field.visible_to,
         }
         for field in get_fields_meta(template)
     ]

@@ -52,7 +52,6 @@ def template_rows(template: str) -> list:
         filters={"parent": template, "parenttype": DOCTYPE_TEMPLATE},
         fields=[
             "fieldname",
-            "visible_to",
             "required",
             "url_method",
             "placeholder",
@@ -70,7 +69,6 @@ def form_field(row, field) -> frappe._dict:
     """
     return frappe._dict(
         fieldname=row.fieldname,
-        visible_to=row.visible_to,
         required=row.required,
         url_method=row.url_method,
         placeholder=row.placeholder,
@@ -105,7 +103,6 @@ def set_customer_field(fields: list) -> None:
         customer_field.link_filters = link_filters
         if len(customers) > 1:
             customer_field.required = 1
-            customer_field.visible_to = "Everyone"
     elif len(customers) > 1:
         fields.append(
             frappe._dict(

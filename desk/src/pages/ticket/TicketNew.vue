@@ -233,9 +233,7 @@ function applyFilters(fieldname: string, filters: any = null) {
 const customOnChange = computed(() => template.data?._customOnChange);
 
 const visibleFields = computed(() => {
-  let _fields = template.data?.fields?.filter(
-    (f) => !isCustomerPortal.value || f.visible_to !== "Agents"
-  );
+  let _fields = template.data?.fields;
   if (!_fields) return [];
   return _fields.map((field) => parseField(field, templateFields));
 });

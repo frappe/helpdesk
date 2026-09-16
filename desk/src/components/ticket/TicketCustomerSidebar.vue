@@ -185,7 +185,6 @@ const ticketAdditionalInfo = computed(() => {
   const custom_fields = ticket.data.template.fields
     .filter(
       (field: Field) =>
-        field.visible_to !== "Agents" &&
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
         ticket.data[field.fieldname]
     )

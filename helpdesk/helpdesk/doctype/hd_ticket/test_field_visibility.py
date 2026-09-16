@@ -4,7 +4,7 @@ from frappe.permissions import update_permission_property
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import get_filterable_fields, get_list_data
-from helpdesk.consts import TICKET_INTERNAL_FIELD_PERMLEVEL
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE, TICKET_INTERNAL_FIELD_PERMLEVEL
 from helpdesk.field_visibility import fields_visible_to
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
@@ -12,9 +12,11 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
     merge_ticket,
 )
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
+from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
+    create_customer,
     make_template,
     make_ticket,
     set_default_template_visibility,
@@ -31,7 +33,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         frappe.set_user("Administrator")
         self.addCleanup(frappe.set_user, "Administrator")
         create_agent(AGENT_EMAIL)
-        create_contact("FV Customer", CUSTOMER_EMAIL)
+        self.contact = create_contact("FV Customer", CUSTOMER_EMAIL)["contact"]
 
     def delete_as_administrator(self, doctype: str, name: str):
         # cleanups run before the set_user reset, whatever user the test ended as
@@ -274,3 +276,54 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertIn(
             "Internal Tag", client_get("HD Ticket", ticket.name).get("_user_tags")
         )
+
+    def test_agents_only_row_is_absent_from_the_ticket_template_rows(self):
+        """The portal draws every row it is handed, so the label leaks even once
+        get_one has stripped the value off the ticket itself."""
+        self.show_to("priority", "Everyone")
+        self.show_to("response_by", "Agents")
+        ticket = self.make_customer_ticket()
+
+        frappe.set_user(CUSTOMER_EMAIL)
+        rows = get_one(ticket.name, is_customer_portal=True)["template"]["fields"]
+        self.assertEqual(["priority"], [row["fieldname"] for row in rows])
+        # nothing ships the tier to the client, so no page can re-filter on it
+        self.assertNotIn("visible_to", rows[0])
+
+        frappe.set_user(AGENT_EMAIL)
+        rows = get_one(ticket.name)["template"]["fields"]
+        self.assertIn("response_by", [row["fieldname"] for row in rows])
+
+    def test_agents_only_row_is_absent_from_the_new_ticket_form(self):
+        """The portal and the agent desk render the same form off this payload."""
+        self.show_to("priority", "Everyone")
+        self.show_to("response_by", "Agents")
+
+        frappe.set_user(CUSTOMER_EMAIL)
+        fields = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["fields"]
+        self.assertEqual(["priority"], [field.fieldname for field in fields])
+
+        frappe.set_user(AGENT_EMAIL)
+        fields = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["fields"]
+        self.assertIn("response_by", [field.fieldname for field in fields])
+
+    def link_to_two_customers(self):
+        """A portal contact who has to pick which customer a ticket is for."""
+        for name in ("FV Customer One", "FV Customer Two"):
+            customer = create_customer(name, [{"contact_name": self.contact}])
+            self.addCleanup(self.delete_as_administrator, "HD Customer", customer.name)
+
+    def test_a_multi_customer_contact_still_gets_a_required_customer_field(self):
+        """set_customer_field only narrows a row get_fields_meta already allowed,
+        so it has no visibility of its own to restore."""
+        self.show_to("customer", "Everyone")
+        self.link_to_two_customers()
+        setting = "auto_set_customer_from_contact"
+        original = frappe.db.get_single_value("HD Settings", setting)
+        frappe.db.set_single_value("HD Settings", setting, 1)  # nosemgrep
+        self.addCleanup(frappe.db.set_single_value, "HD Settings", setting, original)
+
+        frappe.set_user(CUSTOMER_EMAIL)
+        fields = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["fields"]
+        customer_field = next(f for f in fields if f.fieldname == "customer")
+        self.assertTrue(customer_field.required)

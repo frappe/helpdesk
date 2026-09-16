@@ -88,11 +88,9 @@ const slaData = computed(() =>
 );
 
 const customFields = computed(() => {
-  const _custom_fields = ticket.data.template.fields
-    .filter((field: Field) => field.visible_to !== "Agents")
-    .filter(
-      (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
-    );
+  const _custom_fields = ticket.data.template.fields.filter(
+    (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
+  );
   return _custom_fields;
 });
 </script>

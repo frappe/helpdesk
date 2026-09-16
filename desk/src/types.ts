@@ -247,7 +247,6 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  visible_to?: "Everyone" | "Customers" | "Agents";
   label: string;
   options: string;
   required: 0 | 1;
