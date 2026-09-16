@@ -215,12 +215,15 @@ const fields = computed(() => {
 });
 
 function addColumn(c) {
-  let align = ["Float", "Int", "Percent", "Currency"].includes(c.type)
+  // Combobox normalisation overwrites the option's `type` with "option", so
+  // read the real fieldtype back from the source list.
+  const type = list.data?.fields?.find((f) => f.value === c.value)?.type;
+  let align = ["Float", "Int", "Percent", "Currency"].includes(type)
     ? "right"
     : "left";
   let _column = {
     label: c.label,
-    type: c.type,
+    type,
     key: c.value,
     width: "10rem",
     align,
