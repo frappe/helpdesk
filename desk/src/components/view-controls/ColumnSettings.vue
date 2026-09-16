@@ -46,7 +46,7 @@
                     @click="removeColumn(element)"
                   >
                     <template #icon>
-                      <LucideX class="h-3.5" />
+                      <LucideX class="size-3.5" />
                     </template>
                   </Button>
                 </div>
@@ -68,7 +68,7 @@
                   :label="__('Add Column')"
                 >
                   <template #prefix>
-                    <LucidePlus class="h-4" />
+                    <LucidePlus class="size-4" />
                   </template>
                 </Button>
               </template>

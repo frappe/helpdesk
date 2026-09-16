@@ -10,7 +10,7 @@
     class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-5"
     @click="props.conditions.push(['', '', ''])"
   >
-    <LucidePlus class="h-4" />
+    <LucidePlus class="size-4" />
     {{ __("Add a custom condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">

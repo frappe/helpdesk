@@ -16,7 +16,7 @@
         <UserAvatar :name="value" size="xs" />
       </template>
       <template #suffix>
-        <LucideX class="h-3.5" @click.stop="removeValue(value)" />
+        <LucideX class="size-3.5" @click.stop="removeValue(value)" />
       </template>
     </Button>
     <div class="flex-1">

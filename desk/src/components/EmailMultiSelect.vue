@@ -21,7 +21,7 @@
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
-          <LucideX class="h-3.5" @click.stop="removeValue(value)" />
+          <LucideX class="size-3.5" @click.stop="removeValue(value)" />
         </template>
       </Button>
       <div class="flex-1 min-w-32">
@@ -67,7 +67,7 @@
                 <ComboboxEmpty
                   class="flex gap-2 rounded-4 px-2 py-1 text-base text-ink-gray-5"
                 >
-                  <LucideSearch class="h-4" />
+                  <LucideSearch class="size-4" />
                   {{ __(emptyPlaceholder) }}
                 </ComboboxEmpty>
                 <ComboboxItem

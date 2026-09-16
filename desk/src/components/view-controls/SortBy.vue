@@ -114,7 +114,7 @@
                       >
                         {{ __(displayValue) }}
                         <template #suffix>
-                          <LucideChevronDown class="h-4 text-ink-gray-5" />
+                          <LucideChevronDown class="size-4 text-ink-gray-5" />
                         </template>
                       </Button>
                     </template>
@@ -143,7 +143,7 @@
                   :label="__('Add Sort')"
                 >
                   <template #prefix>
-                    <LucidePlus class="h-4" />
+                    <LucidePlus class="size-4" />
                   </template>
                 </Button>
               </template>

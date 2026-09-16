@@ -13,7 +13,7 @@
       validateAssignmentRule(props.name);
     "
   >
-    <LucidePlus class="h-4" />
+    <LucidePlus class="size-4" />
     {{ __("Add a condition") }}
   </div>
   <div class="flex items-center justify-between mt-2">

@@ -40,7 +40,7 @@
         @click="onCreate(query, () => setOpen(false))"
       >
         <template #prefix>
-          <LucidePlus class="h-4" />
+          <LucidePlus class="size-4" />
         </template>
       </Button>
       <Button
@@ -51,7 +51,7 @@
         @click="clearValue(() => setOpen(false))"
       >
         <template #prefix>
-          <LucideX class="h-4" />
+          <LucideX class="size-4" />
         </template>
       </Button>
     </template>
