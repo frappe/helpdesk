@@ -59,6 +59,7 @@
             <Combobox
               :model-value="null"
               :options="fields"
+              align="end"
               @update:selected-option="(option) => option && addColumn(option)"
             >
               <template #trigger>
