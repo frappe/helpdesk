@@ -14,9 +14,9 @@
       </template>
     </LayoutHeader>
 
-    <div class="p-5 w-full overflow-y-scroll">
+    <div class="px-4 py-4 w-full overflow-y-scroll">
       <!-- Filters -->
-      <div class="mb-4 flex items-center gap-4 overflow-x-auto">
+      <div class="mb-4 flex items-center gap-4 overflow-x-auto px-1 py-1">
         <Dropdown v-if="!showDatePicker" :options="options">
           <template #default>
             <div
@@ -41,34 +41,51 @@
           @update:open="onPickerToggle"
         >
           <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
+            <!-- ms-px: TextInput anchors the prefix to the wrapper, which sits
+                 outside the input's 1px border, so it lands 1px left of the
+                 preset trigger's icon. -->
+            <LucideCalendar class="size-4 text-ink-gray-5 ms-px me-2" />
           </template>
         </DateRangePicker>
         <Link
           v-if="isManager && !viewMyStats"
-          class="form-control w-48"
+          class="w-48"
           doctype="HD Team"
+          variant="outline"
           :placeholder="__('Team')"
           v-model="filters.team"
-          :page-length="5"
-          :hide-me="true"
         >
           <template #prefix>
-            <LucideUsers class="size-4 text-ink-gray-5 me-2" />
+            <LucideUsers class="size-4 text-ink-gray-5 me-1" />
+          </template>
+          <!-- One line per row: the filter only needs the name. -->
+          <template #item-label="{ item }">
+            <div class="truncate">{{ item.label }}</div>
           </template>
         </Link>
         <Link
           v-if="isManager && !viewMyStats"
-          class="form-control w-48"
+          class="w-48"
           doctype="HD Agent"
+          variant="outline"
           :placeholder="__('Agent')"
           v-model="filters.agent"
-          :page-length="5"
           :filters="agentFilter"
-          :hide-me="true"
         >
           <template #prefix>
-            <LucideUser class="size-4 text-ink-gray-5 me-2" />
+            <LucideUser class="size-4 text-ink-gray-5 me-1" />
+          </template>
+          <!-- One line per row: the filter only needs the name. -->
+          <template #item-label="{ item }">
+            <div class="truncate">{{ item.label }}</div>
+          </template>
+          <!-- An empty list means an empty team, not a failed search. -->
+          <template #empty>
+            {{
+              filters.team && !teamMembers.data?.length
+                ? __("No agents in this team")
+                : __("No results")
+            }}
           </template>
         </Link>
       </div>
@@ -76,7 +93,7 @@
 
       <!-- Number Cards -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4 px-1"
         v-if="!numberCards.loading"
       >
         <Tooltip
@@ -96,7 +113,7 @@
       >
         <!-- Trend Charts -->
         <div
-          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 px-1"
           v-if="!trendData.loading"
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
@@ -117,7 +134,7 @@
         </div>
         <!-- Master Data Charts -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4 px-1"
           v-if="!masterData.loading"
         >
           <template v-for="(chart, index) in masterData.data" :key="index">
@@ -139,7 +156,7 @@
 
         <!-- Tag Charts: org level insight, an agent cannot act on their own tag mix -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4 px-1"
           v-if="isManager && !tagData.loading"
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
@@ -195,25 +212,25 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from "@/components";
+import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { Link } from "@framework/ui";
+import { useStorage } from "@vueuse/core";
 import {
   DateRangePicker,
   Dropdown,
   TabButtons,
+  Tooltip,
   createResource,
   dayjs,
   usePageMeta,
-  Tooltip,
 } from "frappe-ui";
 import { AxisChart, DonutChart, NumberChart } from "frappe-ui/experimental";
-const { isMobileView } = useScreenSize();
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
-import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
-import { useScreenSize } from "@/composables/screen";
-import { useStorage } from "@vueuse/core";
+const { isMobileView } = useScreenSize();
 
 interface NumberCardData {
   title: string;
