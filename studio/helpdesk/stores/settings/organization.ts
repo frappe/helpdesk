@@ -3,16 +3,13 @@ import { ROUTES } from '@app/routes'
 import { call, toast } from 'frappe-ui'
 import { t } from '@app/stores/translations'
 
-// The organization side of the settings dialog: the list → detail drill-in, the
-// member table's actions, the invite screen and the organization's own settings.
 // Backed by helpdesk.api.organization.
 
 const MANAGER_ROLE = 'HD Customer Manager'
 const MEMBER_ROLE = 'HD Customer'
 
 export function createOrganizationSettings(core) {
-  // A contact can belong to several organizations, so the modal lists them and
-  // drills into one at a time. `selectedOrg` null means the list is showing.
+  // Null means the list is showing rather than one organization's detail.
   const selectedOrg = ref(null)
   const orgDetail = ref(null)
 
@@ -20,8 +17,7 @@ export function createOrganizationSettings(core) {
   const isOrgManager = computed(() => Boolean(orgDetail.value?.is_manager))
   const orgMembers = computed(() => orgDetail.value?.members || [])
 
-  // A plain member of every organization they belong to can open one and read it, but
-  // change nothing in it — so the screen says what it will actually let them do.
+  // A plain member can read an organization but change nothing in it.
   const managesAnyOrg = computed(() =>
     core.organizations.value.some((org) => org.role !== 'Member'),
   )
@@ -35,6 +31,13 @@ export function createOrganizationSettings(core) {
         : 'Pick an organization to see its people and settings.',
     ),
   )
+  const organizationDetailDescription = computed(() =>
+    t(
+      isOrgManager.value
+        ? "Manage your organization's members and tickets."
+        : "View your organization's members and tickets.",
+    ),
+  )
 
   const canManageMembers = computed(() =>
     Boolean(isOrgManager.value && core.portalConfig.value.allow_customer_managers_to_invite),
@@ -46,9 +49,6 @@ export function createOrganizationSettings(core) {
     ),
   )
 
-  // The organization panel has two things to say about a customer: who belongs to it,
-  // and what they have raised lately. Tabs rather than one long scroll, since the
-  // second is a list that grows.
   const orgTab = ref('members')
   const orgTabOptions = computed(() => [
     { label: t('Members'), value: 'members' },
@@ -88,9 +88,7 @@ export function createOrganizationSettings(core) {
     return loadOrganization(name)
   }
 
-  // A list of one is not a choice. Whoever belongs to a single organization lands straight
-  // in it, however they reached the screen — the nav item, a restored hash, or the list
-  // arriving after the tab was already open.
+  // A list of one is not a choice, however the reader reached the screen.
   watch(
     [core.settingsTab, core.organizations],
     () => {
@@ -101,6 +99,9 @@ export function createOrganizationSettings(core) {
     { immediate: true },
   )
 
+  // With one organization there is no list to go back to: the watch above drills straight in.
+  const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
+
   function closeOrganization() {
     selectedOrg.value = null
     orgDetail.value = null
@@ -109,20 +110,16 @@ export function createOrganizationSettings(core) {
 
   // --- invites ---
 
-  // Inviting is its own screen inside the organization panel, the same way the
-  // organization list drills into a detail — not a dialog on top of it.
   function openInvite() {
     inviteEmails.value = []
     inviteRole.value = 'Member'
     inviteOpen.value = true
   }
 
-  // Watched rather than fetched in `openInvite`: the screen is also reachable
-  // straight from the URL hash, which sets the flag without going through it.
+  // Watched, not fetched in `openInvite`: the URL hash sets the flag without going through it.
   watch(inviteOpen, (open) => open && loadInvitableContacts())
 
-  // Fetched once per visit rather than per keystroke: the list is only this
-  // organization's own domain, so the input filters it in place.
+  // Once per visit, not per keystroke: the input filters this list in place.
   async function loadInvitableContacts() {
     inviteContacts.value = []
     try {
@@ -180,9 +177,7 @@ export function createOrganizationSettings(core) {
 
   // --- members ---
 
-  // A manager reads every ticket the organization has raised, not just their own,
-  // so the change is spelled out before it is made — the same confirmation the agent
-  // desk shows in ContactCard.updateManagerRole, worded the same way.
+  // A manager reads every ticket the organization has raised, so the change is spelled out.
   function setMemberRole(member, role) {
     if (member.is_owner || member.pending) return
     const isManager = role === 'Manager'
@@ -270,8 +265,7 @@ export function createOrganizationSettings(core) {
     return saveOrganization()
   }
 
-  // A Run Script handler calls functions rather than assigning to a binding, so the
-  // fields the dialog toggles get one of these.
+  // A Run Script handler calls functions rather than assigning to a binding.
   function uploadOrgImage() {
     core.pickImage((fileUrl) =>
       core.run(() => call('helpdesk.api.organization.update_organization', {
@@ -290,6 +284,7 @@ export function createOrganizationSettings(core) {
 
   return {
     selectedOrg,
+    canLeaveOrganization,
     settingsOrg,
     isOrgManager,
     canManageMembers,
@@ -297,6 +292,7 @@ export function createOrganizationSettings(core) {
     orgMembers,
     organizationScreenTitle,
     organizationScreenDescription,
+    organizationDetailDescription,
     orgTab,
     orgTabOptions,
     orgName,

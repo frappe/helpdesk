@@ -1,11 +1,8 @@
 <template>
-  <!-- The agent portal's Profile identity block (desk/.../Settings/Profile/Profile.vue):
-       the avatar itself opens the native file picker — no intermediate dialog — and a
-       hover-revealed × clears it. The name is edited inline rather than in a form. -->
-  <div class="flex items-center gap-4 pt-1.5">
+  <!-- The avatar itself opens the file picker; the name is edited inline. -->
+  <div class="flex items-start gap-4 pt-1.5">
     <div class="group relative shrink-0" :class="avatarBox">
-      <!-- Avatar's size enum stops at 46px, so both scales size it themselves:
-           52px beside a page title, 64px (size-16) in settings. -->
+      <!-- Avatar's size enum stops at 46px, so both scales size it themselves. -->
       <Avatar :class="avatarBox" :image="image" :label="name" :shape="shape" />
       <Tooltip
         v-if="editable"
@@ -68,7 +65,7 @@
 <script setup lang="ts">
 import { Avatar, Button, FeatherIcon, TextInput, Tooltip } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
-// The agent portal draws its icons from lucide; feather's pencil is a different glyph.
+// Lucide: feather's pencil is a different glyph.
 import LucideSquarePen from "~icons/lucide/square-pen";
 
 const props = withDefaults(
@@ -79,9 +76,8 @@ const props = withDefaults(
     shape?: "circle" | "square";
     maxLength?: number;
     busy?: boolean;
-    /** A read-only viewer sees the block without upload/remove/rename affordances. */
     editable?: boolean;
-    /** "page" matches the agent portal's PageInfo header; "settings" is the compact one. */
+    // "page" matches the agent portal's PageInfo header; "settings" is the compact one.
     scale?: "settings" | "page";
   }>(),
   { shape: "circle", editable: true, scale: "settings" }
@@ -95,7 +91,6 @@ const titleClass = computed(() =>
   props.scale === "page" ? "text-2xl font-medium" : "text-md font-semibold"
 );
 
-/** Same wording the agent portal's profile shows on the avatar. */
 const uploadLabel = computed(() =>
   props.image ? "Change Photo" : "Upload Photo"
 );
