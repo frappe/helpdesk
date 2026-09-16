@@ -2,6 +2,7 @@
   <Combobox
     v-model="modelValue"
     trigger="button"
+    side="top"
     align="end"
     :label="label ? __(label) : undefined"
     :options="options"

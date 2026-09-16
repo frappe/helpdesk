@@ -13,6 +13,7 @@
         :model-value="user.doc?.language"
         doctype="Language"
         class="w-40"
+        side="top"
         align="end"
         :placeholder="__('Select language')"
         hide-clear-button
