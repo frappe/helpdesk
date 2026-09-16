@@ -38,7 +38,7 @@ PORTAL_INSERT_EXEMPT_FIELDS = [
 ]
 
 # Fillable fields between 0 to 7 perm level
-CREATION_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
+CUSTOMER_FILLABLE_PERMLEVELS = (0, TICKET_VISIBLE_FIELD_PERMLEVEL)
 
 # fields customer can edit, status_category => closed is only allowed
 CUSTOMER_EDIT_EXEMPT_FIELDS = (

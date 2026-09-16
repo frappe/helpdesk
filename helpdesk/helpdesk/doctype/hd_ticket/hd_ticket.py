@@ -19,8 +19,8 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import (
-    CREATION_FILLABLE_PERMLEVELS,
     CUSTOMER_EDIT_EXEMPT_FIELDS,
+    CUSTOMER_FILLABLE_PERMLEVELS,
     DEFAULT_TICKET_TEMPLATE,
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
@@ -90,11 +90,11 @@ class HDTicket(Document):
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
         self.flags.ignore_permlevel_for_fields = (
-            list(PORTAL_INSERT_EXEMPT_FIELDS) + self.creation_fillable_template_fields()
+            list(PORTAL_INSERT_EXEMPT_FIELDS) + self.customer_fillable_template_fields()
         )
 
-    def creation_fillable_template_fields(self) -> list[str]:
-        """Default-template fields shown to customers, at a level a customer may write."""
+    def customer_fillable_template_fields(self) -> list[str]:
+        """fields that a customer should be able to fill at creation as per template + permlevel access check."""
         rows = frappe.get_all(
             "HD Ticket Template Field",
             filters={
@@ -107,10 +107,10 @@ class HDTicket(Document):
             row.fieldname
             for row in rows
             if row.visible_to != "Agents"
-            and self.customer_may_fill_at_creation(row.fieldname)
+            and self.can_customer_fill_at_creation(row.fieldname)
         ]
 
-    def customer_may_fill_at_creation(self, fieldname: str) -> bool:
+    def can_customer_fill_at_creation(self, fieldname: str) -> bool:
         """check if the specific field can be filled by customer"""
 
         # return false for any server computed fields as they are more of logic based & calculated outputs
@@ -118,7 +118,7 @@ class HDTicket(Document):
             return False
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         # check if inside fillable perm level and return
-        return bool(field) and field.permlevel in CREATION_FILLABLE_PERMLEVELS
+        return bool(field) and field.permlevel in CUSTOMER_FILLABLE_PERMLEVELS
 
     def before_validate(self):
         self.check_update_perms()

@@ -2960,7 +2960,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         """A template saved before the guard existed can still list a system-set field."""
         ticket = frappe.new_doc("HD Ticket")
         for fieldname in ("sla", "response_by", "first_responded_on"):
-            self.assertFalse(ticket.customer_may_fill_at_creation(fieldname))
+            self.assertFalse(ticket.can_customer_fill_at_creation(fieldname))
 
     def test_customer_spoof_rejected_without_auto_set_customer(self):
         """The contact-customer link check must not depend on the auto-set toggle."""
