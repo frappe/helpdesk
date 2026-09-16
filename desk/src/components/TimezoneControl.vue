@@ -2,6 +2,7 @@
   <Combobox
     v-model="modelValue"
     trigger="button"
+    align="end"
     :label="label ? __(label) : undefined"
     :options="options"
     :placeholder="__('Select timezone')"
