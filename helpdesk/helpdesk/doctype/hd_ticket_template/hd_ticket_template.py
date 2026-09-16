@@ -15,6 +15,12 @@ from helpdesk.consts import (
 from helpdesk.field_visibility import fields_visible_to
 from helpdesk.utils import capture_event
 
+# the Permission Level section of the framework docs, for the hide warning below
+PERMISSION_LEVEL_DOCS = (
+    "https://docs.frappe.io/framework/user/en/basics/users-and-permissions"
+    "#permission-level"
+)
+
 
 class HDTicketTemplate(Document):
     def validate(self):
@@ -91,16 +97,22 @@ class HDTicketTemplate(Document):
         link = '<a href="/desk/customize-form?doc_type=HD%20Ticket">{0}</a>'.format(
             _("Customize Form")
         )
+        # opens in a new tab so an unsaved template is not lost
+        docs = '<a href="{0}" target="_blank">{1}</a>'.format(
+            PERMISSION_LEVEL_DOCS, _("here")
+        )
         if len(exposed) == 1:
             text = _(
                 "{0} is hidden from customers here, but the API still returns it."
                 " Raise its permission level in {1} to hide it everywhere."
-            ).format(exposed[0], link)
+                " Read more about permission levels {2}."
+            ).format(exposed[0], link, docs)
         else:
             text = _(
                 "{0} are hidden from customers here, but the API still returns them."
                 " Raise their permission levels in {1} to hide them everywhere."
-            ).format(comma_and(exposed, add_quotes=False), link)
+                " Read more about permission levels {2}."
+            ).format(comma_and(exposed, add_quotes=False), link, docs)
         frappe.msgprint(text, title=_("Information"), indicator="blue")
 
     def current_permlevel(self, fieldname: str) -> int:
