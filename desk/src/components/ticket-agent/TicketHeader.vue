@@ -307,9 +307,9 @@ const groupedActions = computed(() => {
     actions.value.filter((action) => action.group && !__(action.buttonLabel))
   );
   _actions = _actions.concat(deleteAction.value);
-  // an empty group would still render its separator, and the kebab itself is
-  // hidden only when every group is empty
-  return _actions.filter((group) => group.options?.length);
+  // Drop empty groups so the kebab hides when there is nothing to show. Form
+  // script actions are flat rows with no `options`, so they must survive.
+  return _actions.filter((action) => !action.options || action.options.length);
 });
 
 const customizationCtx = computed(() => ({
