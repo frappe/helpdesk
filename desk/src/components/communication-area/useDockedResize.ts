@@ -1,4 +1,4 @@
-import { useEventListener, useStorage } from "@vueuse/core";
+import { useEventListener, useStorage, useWindowSize } from "@vueuse/core";
 import type { WindowMode } from "frappe-ui/experimental";
 import { computed, ref, type Ref } from "vue";
 
@@ -16,17 +16,20 @@ export function useDockedResize(options: {
 }) {
   const { windowMode, column, isMobileView, onCollapse } = options;
   const dockedHeight = useStorage("helpdesk-composer-height", 0);
+  const { height: viewportHeight } = useWindowSize();
 
+  // Clamped on the way out, not just on the way in: the height is stored for
+  // the whole browser, so it outlives the window it was dragged in.
   const dockedColumnStyle = computed(() =>
     windowMode.value === "docked" && dockedHeight.value > 0
-      ? { height: `${dockedHeight.value}px` }
+      ? { height: `${clampBodyHeight(dockedHeight.value)}px` }
       : undefined
   );
 
   function clampBodyHeight(value: number) {
     return Math.min(
       Math.max(value, MIN_BODY_HEIGHT),
-      Math.round(window.innerHeight * 0.8)
+      Math.round(viewportHeight.value * 0.8)
     );
   }
 
