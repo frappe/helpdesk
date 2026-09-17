@@ -54,7 +54,7 @@
               @click="openFileSelector()"
               size="xs"
               icon="lucide-paperclip"
-              class="mr-2"
+              class="me-2"
             />
           </template>
         </FileUploader>

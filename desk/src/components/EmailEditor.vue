@@ -184,7 +184,7 @@
                   <ZapIcon class="h-4 w-4" />
                 </button>
               </Tooltip>
-              <div class="h-4 w-[2px] border-s ml-1" />
+              <div class="h-4 w-[2px] border-s ms-1" />
             </div>
             <EditorFixedMenu :items="fullToolbar" />
           </div>

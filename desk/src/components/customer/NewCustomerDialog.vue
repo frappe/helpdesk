@@ -38,7 +38,7 @@
               v-model="state.country"
             >
               <template #prefix>
-                <LucideMapPin class="size-4 mr-1.5" />
+                <LucideMapPin class="size-4 me-1.5" />
               </template>
             </Link>
           </div>

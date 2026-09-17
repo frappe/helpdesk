@@ -26,7 +26,7 @@
         :text="avatar.name"
       >
         <Avatar
-          class="user-avatar -mr-1.5 ring-2 ring-[var(--surface-base)] transition hover:z-20 hover:scale-110"
+          class="user-avatar -me-1.5 ring-2 ring-[var(--surface-base)] transition hover:z-20 hover:scale-110"
           shape="circle"
           :image="avatar.image"
           :label="avatar.label"
@@ -36,7 +36,7 @@
       </Tooltip>
       <Tooltip v-if="overflowCount" :text="overflowNames">
         <div
-          class="user-avatar relative z-10 -mr-1.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-gray-3 text-xs text-ink-gray-7 ring-2 ring-[var(--surface-base)]"
+          class="user-avatar relative z-10 -me-1.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-gray-3 text-xs text-ink-gray-7 ring-2 ring-[var(--surface-base)]"
         >
           +{{ overflowCount }}
         </div>
