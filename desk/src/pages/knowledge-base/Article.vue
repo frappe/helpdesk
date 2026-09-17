@@ -7,7 +7,7 @@
           <Badge
             v-if="!article.loading"
             variant="subtle"
-            :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
+            :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
             size="md"
             >{{ article.data?.status }}</Badge
           >
@@ -34,7 +34,7 @@
       <!-- article Info -->
       <div
         class="flex flex-col gap-3 p-4 w-full"
-        :class="editable && 'border rounded-lg overflow-hidden'"
+        :class="editable && 'border rounded-6 overflow-hidden'"
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
@@ -43,7 +43,7 @@
             <div class="w-full">
               <textarea
                 ref="titleRef"
-                class="w-full resize-none border-0 text-4xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                class="w-full resize-none border-0 text-3xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
                 v-model="title"
                 :placeholder="__('Title')"
                 rows="1"
@@ -131,7 +131,9 @@
                 <Dropdown
                   :options="articleActions"
                   v-if="!editable && !isCustomerPortal"
-                  @click="isConfirmingDeleteArticle = false"
+                  @update:open="
+                    (open) => open && (isConfirmingDeleteArticle = false)
+                  "
                 >
                   <Button size="md" variant="ghost">
                     <template #icon>
@@ -165,7 +167,10 @@
           :model-value="textEditorContentWithIDs"
           :extensions="extensions"
           :editable="editable"
-          :upload-function="(file:any) => uploadFunction(file, 'HD Article', articleId, false)"
+          :upload-function="
+            (file: any, options: any) =>
+              uploadFunction(file, 'HD Article', articleId, false, options)
+          "
           @change="(event:string) => { content = event; }"
           :placeholder="__('Write your article here...')"
         >
@@ -176,6 +181,7 @@
               class="-ms-1 overflow-x-auto w-full"
               :items="fullToolbar"
             />
+            <EditorTableMenu v-if="editable" />
           </template>
         </Editor>
         <div
@@ -227,7 +233,7 @@
       v-if="article.loading"
       class="w-full h-screen flex items-center justify-center"
     >
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
     <MoveToCategoryModal
       v-model="moveToModal"
@@ -287,7 +293,12 @@ import {
   toast,
   usePageMeta,
 } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
 import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
@@ -594,12 +605,15 @@ function scrollToHeading() {
   }, 500);
 }
 
-watch(articleStats.data, () => {
-  if (articleStats.data) {
-    likes.value = articleStats.data.likes;
-    dislikes.value = articleStats.data.dislikes;
+watch(
+  () => articleStats.data,
+  (stats) => {
+    if (stats) {
+      likes.value = stats.likes;
+      dislikes.value = stats.dislikes;
+    }
   }
-});
+);
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =
@@ -608,7 +622,7 @@ watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
 
 const editorClass = computed(() => {
   return [
-    "rounded-b-lg max-w-[unset] prose-sm",
+    "rounded-b-6 max-w-[unset] prose-sm",
     editable.value &&
       "overflow-auto h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]",
   ];
@@ -652,7 +666,7 @@ const articleActions = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       ...ConfirmDelete({
         onConfirmDelete: handleDelete,
         isConfirmingDelete: isConfirmingDeleteArticle,

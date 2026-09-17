@@ -5,7 +5,7 @@
         class="palette-overlay fixed inset-0 z-[100] bg-black/30 dark:bg-black/60"
       />
       <DialogContent
-        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-md bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
+        class="palette-content fixed left-1/2 top-[10%] z-[100] w-full max-w-[640px] -translate-x-1/2 overflow-hidden rounded-5 bg-surface-base shadow-2xl ring-1 ring-black/[0.06] focus-visible:outline-none dark:ring-white/[0.08]"
         @open-auto-focus.prevent
         @close-auto-focus.prevent="restoreFocus"
         @escape-key-down.prevent="onEscape"
@@ -171,7 +171,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Badge, FormControl, useShortcut } from "frappe-ui";
+import { Badge, FormControl, useKeyboardShortcut } from "frappe-ui";
 import {
   DialogContent,
   DialogOverlay,
@@ -409,17 +409,16 @@ watch(isOpen, (open) => {
 // Drilling into a sub-list swaps the whole list out; refocus for the next query.
 watch(depth, () => nextTick(() => inputRef.value?.focus()));
 
-// frappe-ui's useShortcut: the local one suppresses bindings in inputs and
-// dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its own
-// Mod-k (insert link), so bow out there.
-useShortcut({
-  key: "k",
-  ctrl: true,
+// frappe-ui's useKeyboardShortcut: the local one suppresses bindings in inputs
+// and dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its
+// own Mod-k (insert link), so bow out there.
+useKeyboardShortcut({
+  combo: "Mod+K",
   description: __("Open command palette"),
   group: __("General"),
   allowInInput: true,
   allowInDialog: true,
-  condition: () =>
+  enabled: () =>
     isPaletteAvailable.value &&
     !document.activeElement?.closest?.(".ProseMirror"),
   handler: () => (isOpen.value ? closePalette() : openPalette()),

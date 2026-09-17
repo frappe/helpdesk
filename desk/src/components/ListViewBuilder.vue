@@ -40,7 +40,7 @@
     v-if="list.loading && !list.data?.data?.length"
     class="flex items-center justify-center h-full w-full absolute top-0 z-100"
   >
-    <LoadingIndicator :scale="8" />
+    <LoadingIndicator class="size-8" />
   </div>
   <!-- List View -->
   <ListView
@@ -121,7 +121,17 @@
           handlePageLength(count);
         }
       "
-    />
+    >
+      <!-- frappe-ui's ListFooter still feeds TabButtons the removed `buttons`
+           prop, so its own page-length picker renders nothing. -->
+      <template #left>
+        <TabButtons
+          :model-value="defaultParams.page_length_count"
+          :options="[20, 50, 100].map((o) => ({ label: String(o), value: o }))"
+          @update:model-value="(count) => handlePageLength(count)"
+        />
+      </template>
+    </ListFooter>
   </div>
   <!-- Empty State -->
   <EmptyState
@@ -157,19 +167,22 @@ import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   createResource,
+  dayjs,
   Dropdown,
-  FeatherIcon,
   frappeRequest,
+  LoadingIndicator,
+  TabButtons,
+  toast,
+} from "frappe-ui";
+import {
+  Icon as SpriteIcon,
   ListFooter,
   ListHeader,
   ListHeaderItem,
   ListRowItem,
   ListSelectBanner,
   ListView,
-  LoadingIndicator,
-  dayjs,
-  toast,
-} from "frappe-ui";
+} from "frappe-ui/experimental";
 import {
   computed,
   h,
@@ -255,7 +268,7 @@ const defaultOptions = reactive({
               label: __("Delete"),
               variant: "solid",
               theme: "red",
-              iconLeft: "trash-2",
+              iconLeft: "lucide-trash-2",
               onClick({ close }) {
                 handleBulkDelete(close, selections);
               },
@@ -465,7 +478,7 @@ function getGroupedByRows(listRows, groupByField) {
       group: option || " ",
       collapsed: false,
       rows: filteredRows,
-      icon: h(FeatherIcon, {
+      icon: h(SpriteIcon, {
         name: "folder",
         class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
       }),
@@ -588,12 +601,12 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
 
   if (column.type === "MultipleAvatar") {
+    if (!item?.length) return;
     if (item.length > 1) {
-      let target = e.target as HTMLElement;
-      target = target.closest(".user-avatar");
-      if (target) {
-        item = target.getAttribute("data-name");
-      }
+      const avatar = (e.target as HTMLElement).closest(".user-avatar");
+      // the gap between the faces names nobody to filter by
+      if (!avatar) return;
+      item = avatar.getAttribute("data-name");
     } else {
       item = item[0].name;
     }

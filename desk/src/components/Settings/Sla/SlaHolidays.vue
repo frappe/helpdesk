@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center justify-between">
     <div class="flex flex-col gap-1">
-      <div class="text-lg-semibold text-ink-gray-8">
+      <div class="text-md-semibold text-ink-gray-8">
         {{ __("Work Schedule and Holidays") }}
       </div>
       <div class="text-p-sm text-ink-gray-6 max-w-lg">
@@ -12,23 +12,23 @@
         }}
       </div>
     </div>
-    <NestedPopover>
-      <template #target="{ open }">
+    <Popover bare align="end" :offset="8">
+      <template #trigger="{ open }">
         <Button
           class="text-sm"
           :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
           :label="slaData.holiday_list"
         />
       </template>
-      <template #body>
+      <template #default>
         <div
-          class="my-2 min-w-40 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+          class="min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
         >
           <div class="max-h-52 overflow-y-auto p-1">
             <div
               v-for="holiday in holidayListData.data"
               :key="holiday.name"
-              class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-3"
+              class="flex items-center justify-between gap-4 rounded-4 px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-3"
               @click="slaData.holiday_list = holiday.name"
             >
               <div class="flex items-center gap-2 w-full">
@@ -61,7 +61,7 @@
           </div>
         </div>
       </template>
-    </NestedPopover>
+    </Popover>
   </div>
   <div class="mt-5">
     <SlaWorkDaysList />
@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { NestedPopover, Button, createListResource } from "frappe-ui";
+import { Button, createListResource, Popover } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { setActiveSettingsTab } from "../settingsModal";
 import {

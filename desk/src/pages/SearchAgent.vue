@@ -28,7 +28,7 @@
                 <button
                   v-if="query"
                   @click="clearSearch"
-                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded"
+                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded-4"
                 >
                   <LucideX class="w-4 text-ink-gray-7" />
                 </button>
@@ -148,7 +148,7 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex gap-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex gap-x-2 overflow-hidden rounded-4 px-2.5 py-3 hover:bg-surface-gray-2"
             >
               <div class="flex items-start gap-x-2">
                 <div class="flex-shrink-0">
@@ -539,7 +539,7 @@ onMounted(() => {
   }
   // add a shortcut when presses "/" focus on this element
   useShortcut("/", () => {
-    searchInput.value.el.focus();
+    searchInput.value?.focus();
   });
 });
 </script>

@@ -10,23 +10,23 @@
           v-if="orientation === 'vertical'"
           v-for="i in numberCardsCount"
           :key="`card-${i}`"
-          class="border rounded-md p-4 space-y-3 max-h-[140px] min-h-[114px]"
+          class="border rounded-5 p-4 space-y-3 max-h-[140px] min-h-[114px]"
         >
-          <div class="h-3 w-1/2 bg-surface-gray-3 rounded" />
-          <div class="h-7 w-2/3 bg-surface-gray-1 rounded" />
-          <div class="h-3 w-1/2 bg-surface-gray-1 rounded" />
+          <div class="h-3 w-1/2 bg-surface-gray-3 rounded-4" />
+          <div class="h-7 w-2/3 bg-surface-gray-1 rounded-4" />
+          <div class="h-3 w-1/2 bg-surface-gray-1 rounded-4" />
         </div>
         <!-- Horizontal: title on top, value + mini chart side-by-side, percentage row -->
         <div
           v-else
           v-for="i in numberCardsCount"
           :key="`card-h-${i}`"
-          class="border rounded-md flex flex-col p-4 pt-3 gap-2"
+          class="border rounded-5 flex flex-col p-4 pt-3 gap-2"
           :style="{ minHeight: height }"
         >
-          <div class="h-4 w-1/2 bg-surface-gray-3 rounded" />
+          <div class="h-4 w-1/2 bg-surface-gray-3 rounded-4" />
           <div class="flex items-end w-full gap-2 justify-between flex-1">
-            <div class="h-7 w-10 bg-surface-gray-2 rounded" />
+            <div class="h-7 w-10 bg-surface-gray-2 rounded-4" />
             <div
               class="h-full max-w-[50%] w-[50%] flex items-end justify-end gap-1"
             >
@@ -34,11 +34,11 @@
                 v-for="(h, idx) in barHeights"
                 :key="idx"
                 :style="{ height: `${h}%` }"
-                class="w-2 bg-surface-gray-3 rounded-t-sm"
+                class="w-2 bg-surface-gray-3 rounded-t-1"
               />
             </div>
           </div>
-          <div class="h-3 w-1/3 bg-surface-gray-2 rounded" />
+          <div class="h-3 w-1/3 bg-surface-gray-2 rounded-4" />
         </div>
       </div>
     </slot>
@@ -52,7 +52,7 @@
         <div
           v-for="i in barChartCount"
           :key="`chart-${i}`"
-          class="border rounded-md min-h-[300px] p-4 space-y-3"
+          class="border rounded-5 min-h-[300px] p-4 space-y-3"
         >
           <template v-if="getEmptyState(i).chartTitle">
             <div class="text-ink-gray-8 text-p-base-medium">
@@ -66,12 +66,12 @@
             </div>
           </template>
           <template v-else>
-            <div class="h-4 w-1/3 bg-surface-gray-3 rounded" />
-            <div class="h-4 w-1/4 bg-surface-gray-1 rounded" />
+            <div class="h-4 w-1/3 bg-surface-gray-3 rounded-4" />
+            <div class="h-4 w-1/4 bg-surface-gray-1 rounded-4" />
           </template>
 
           <div
-            class="h-64 w-full rounded flex items-center justify-center relative overflow-hidden"
+            class="h-64 w-full rounded-4 flex items-center justify-center relative overflow-hidden"
           >
             <div
               class="absolute inset-0 flex items-end justify-center px-[33px] py-[23px] gap-10"
@@ -89,7 +89,7 @@
                 v-for="(height, idx) in barHeights"
                 :key="idx"
                 :style="{ height: `${height}%` }"
-                class="w-[30px] rounded-sm bg-[var(--surface-gray-3)] shrink-0 z-10"
+                class="w-[30px] rounded-1 bg-[var(--surface-gray-3)] shrink-0 z-10"
               />
               <!-- x-y labels -->
 
@@ -99,14 +99,14 @@
                 <div
                   v-for="j in 5"
                   :key="j"
-                  class="h-[10px] w-[28px] rounded-sm bg-[var(--surface-gray-3)]"
+                  class="h-[10px] w-[28px] rounded-1 bg-[var(--surface-gray-3)]"
                 />
               </div>
               <div class="absolute flex justify-center bottom-0 gap-10">
                 <div
                   v-for="j in barHeights.length"
                   :key="j"
-                  class="h-[10px] w-[30px] rounded-sm bg-[var(--surface-gray-3)]"
+                  class="h-[10px] w-[30px] rounded-1 bg-[var(--surface-gray-3)]"
                 />
               </div>
             </div>
@@ -118,7 +118,7 @@
                 backgroundImage:
                   'radial-gradient(ellipse at center, var(--surface-base) 10%, color-mix(in srgb, var(--surface-base) 90%, transparent) 25%, transparent 70%)',
               }"
-              class="rounded-xl p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
+              class="rounded-7 p-6 w-2/3 text-center pointer-events-auto space-y-0.5 relative z-10 bottom-4.5"
             >
               <div
                 class="relative z-10 text-ink-gray-7 text-center text-p-base-medium leading-[1.15]"

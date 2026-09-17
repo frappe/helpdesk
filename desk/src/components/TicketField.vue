@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete } from "@/components";
 import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
@@ -34,8 +33,8 @@ import {
   DatePicker,
   DateTimePicker,
   dayjs,
-  FormControl,
   Select,
+  TextInput,
 } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -109,6 +108,15 @@ function select(options: Option[]) {
   return h(Select, { ...ghostControl, options });
 }
 
+// ghost opts out of the focus outline, and `class` lands on TextInput's
+// wrapper, so the ring has to be re-applied to the input itself
+function textInput() {
+  return h(TextInput, {
+    variant: "ghost" as const,
+    class: "[&_input:focus]:focus-ring",
+  });
+}
+
 // trigger: "button" keeps the search inside the popover, so the row still
 // reads as a value and not a text input
 function combobox(options: Option[]) {
@@ -128,9 +136,7 @@ function combobox(options: Option[]) {
 
 const component = computed(() => {
   if (props.field.url_method) {
-    return h(Autocomplete, {
-      options: apiOptions.data,
-    });
+    return combobox(apiOptions.data || []);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     const linkProps = {
       doctype: props.field.options,
@@ -166,9 +172,7 @@ const component = computed(() => {
       { label: "No", value: 0 },
     ]);
   } else if (textFields.includes(props.field.fieldtype)) {
-    return h(FormControl, {
-      type: "text",
-    });
+    return textInput();
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
       format: `${window.date_format.toUpperCase()} ${window.time_format}`,
@@ -184,7 +188,7 @@ const component = computed(() => {
   //   return h(DurationField, { showSeconds: false });
   // }
   else {
-    return h(FormControl);
+    return textInput();
   }
 });
 
@@ -268,7 +272,21 @@ function handleRedirect(value: string) {
 }
 </script>
 <style scoped>
-:deep(.form-control input:not([type="checkbox"])),
+/* a read-only row still reads as plain text: TextInput swaps ghost for its
+   filled disabled variant, and the pickers stay flat, so match them */
+:deep(.form-control input[data-slot="control"]:disabled) {
+  border-color: transparent;
+  background: var(--surface-base);
+}
+
+/* PickerShell keeps its chevron on a disabled picker, and the chevron opens
+   the popover on its own mousedown, so hide the whole suffix */
+:deep(.form-control input[data-slot="control"]:disabled ~ div) {
+  display: none;
+}
+
+/* TextInput brings its own variant; only the picker inputs get flattened */
+:deep(.form-control input:not([type="checkbox"]):not([data-slot="control"])),
 :deep(.form-control select),
 :deep(.form-control textarea),
 :deep(.form-control button) {

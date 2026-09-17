@@ -2,7 +2,7 @@
   <div class="flex flex-col focus-visible:border-none" tabindex="0">
     <!-- Filter bar: sticks below the tablist while the page scrolls -->
     <div
-      class="sticky top-[46px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
+      class="sticky top-[45px] z-[5] -mt-5 flex items-center justify-between gap-3 bg-surface-base pt-5 pb-3"
     >
       <FormControl
         v-model="search"
@@ -36,7 +36,7 @@
         <div
           class="py-16 text-center text-sm text-ink-gray-4 flex items-center justify-center"
         >
-          <LoadingIndicator :scale="10" />
+          <LoadingIndicator class="size-10" />
         </div>
       </template>
       <!-- Empty -->
@@ -47,7 +47,7 @@
         <LucideTicket class="h-10 w-10 text-ink-gray-4" />
         <div>
           <!-- make font larger -->
-          <p class="text-lg-medium text-ink-gray-7">
+          <p class="text-md-medium text-ink-gray-7">
             {{ __("No tickets found") }}
           </p>
         </div>
@@ -55,10 +55,10 @@
       <!-- Main Content -->
       <template v-else>
         <!-- Headers -->
-        <!-- top-[106px] = tablist (46) + filter bar (60); remeasure
+        <!-- top-[105px] = tablist (45) + filter bar (60); remeasure
              if either changes -->
         <div
-          class="sticky top-[106px] z-[5] grid items-center border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
+          class="sticky top-[105px] z-[5] grid items-center gap-x-3 border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
           <div
@@ -87,7 +87,7 @@
             :key="ticket.name"
           >
             <div
-              class="grid items-center py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
+              class="grid items-center gap-x-3 py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded-4 transition-colors"
               :style="gridTemplateStyle"
               @click="goToTicket(ticket.name)"
             >
@@ -108,7 +108,10 @@
               </div>
 
               <!-- Priority -->
-              <div v-if="!isMobileView" class="flex items-center gap-1.5">
+              <div
+                v-if="!isMobileView"
+                class="flex min-w-0 items-center gap-1.5"
+              >
                 <TicketPriority :priority="ticket.priority" />
               </div>
 
@@ -140,7 +143,7 @@
             <Button
               :loading="ticketsListResource.loading"
               :label="__('Load More')"
-              icon-left="refresh-cw"
+              icon-left="lucide-refresh-cw"
               @click="
                 () => {
                   ticketsListResource.next();

@@ -35,10 +35,10 @@
             </Button>
             <Dropdown
               :options="dropdownActions"
-              placement="right"
+              align="end"
               v-if="hasPermission()"
             >
-              <Button icon="more-horizontal" variant="subtle" />
+              <Button icon="lucide-more-horizontal" variant="subtle" />
             </Dropdown>
           </div>
         </template>
@@ -48,14 +48,11 @@
         <Tabs
           v-model="activeTab"
           :tabs="tabs"
-          class="tabs-sticky-header [&_[role='tablist']]:!bg-surface-base max-sm:[&_[role='tablist']]:px-3"
+          size="md"
+          class="tabs-sticky-header flex-1 overflow-hidden [&_[role='tablist']]:!bg-surface-base [&_[role='tablist']]:px-5 [&_[role='tablist']]:py-1.5 max-sm:[&_[role='tablist']]:px-3 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
-          <template #tab-item="{ tab, selected }: any">
-            <button
-              class="group flex items-center gap-2 border-b border-transparent py-2 text-base text-ink-gray-5 duration-300 ease-in-out hover:text-ink-gray-9"
-              :class="{ 'text-ink-gray-9': selected }"
-            >
-              <component :is="tab.icon" v-if="tab.icon" class="h-5" />
+          <template #tab-label="{ tab }: any">
+            <span class="group flex items-center gap-2">
               {{ __(tab.label) }}
               <Badge
                 class="group-hover:bg-surface-gray-10 !bg-surface-gray-2 !text-ink-gray-7"
@@ -65,7 +62,7 @@
               >
                 {{ tab.count }}
               </Badge>
-            </button>
+            </span>
           </template>
           <template #tab-panel="{ tab }">
             <div class="p-5 flex flex-col flex-1 min-h-0">
@@ -173,25 +170,26 @@ const { ticketsListResource, ticketsCountResource } = getTicketListResource();
 const tabs = computed(() => [
   {
     label: __("Tickets"),
-    hash: "tickets",
+    value: "tickets",
     count: ticketsCountResource.data ?? 0,
-    icon: h(TicketHashIcon, { class: "size-4" }),
+    iconLeft: h(TicketHashIcon, { class: "size-4" }),
   },
   {
     label: __("Feedback"),
-    hash: "feedback",
+    value: "feedback",
     count: feedbackCount.data ?? 0,
-    icon: h(TicketFeedbackIcon, { class: "size-4" }),
+    iconLeft: h(TicketFeedbackIcon, { class: "size-4" }),
   },
 ]);
 
-const activeTab = computed<number>({
+const activeTab = computed<string>({
   get() {
-    const index = tabs.value.findIndex((t) => t.hash === route.hash.slice(1));
-    return index === -1 ? 0 : index;
+    const hash = route.hash.slice(1);
+    const tab = tabs.value.find((t) => t.value === hash);
+    return tab?.value ?? tabs.value[0].value;
   },
-  set(i) {
-    router.replace({ hash: i === 0 ? "" : `#${tabs.value[i].hash}` });
+  set(value) {
+    router.replace({ hash: value === tabs.value[0].value ? "" : `#${value}` });
   },
 });
 
@@ -257,7 +255,7 @@ const invitationBadge = computed(() => {
   }
   return {
     label: __("Invited"),
-    theme: "orange" as const,
+    theme: "amber" as const,
     tooltip: __("Invite sent. Waiting for the user to accept."),
   };
 });
@@ -269,7 +267,7 @@ const dropdownActions = computed(() => {
   if (!contact.doc?.user && !invitation.value?.name) {
     baseActions.push({
       label: __("Invite as User"),
-      icon: "user-plus",
+      icon: "lucide-user-plus",
       onClick: async () => {
         await inviteAsUser(props.id, contact.doc?.email_id);
         contactInfoResource.reload();
@@ -279,7 +277,7 @@ const dropdownActions = computed(() => {
   if (invitation.value?.name) {
     baseActions.push({
       label: __("Resend Invite"),
-      icon: "mail",
+      icon: "lucide-mail",
       onClick: async () => {
         await resendInvite(
           invitation.value!.name,
@@ -294,7 +292,7 @@ const dropdownActions = computed(() => {
   if (contact.doc?.user) {
     baseActions.push({
       label: __("Send reset password email"),
-      icon: "mail",
+      icon: "lucide-mail",
       onClick: () => {
         resetPassword();
       },
@@ -304,12 +302,12 @@ const dropdownActions = computed(() => {
     {
       group: __("Actions"),
       hideLabel: true,
-      items: baseActions,
+      options: baseActions,
     },
     {
       group: __("Danger"),
       hideLabel: true,
-      items: [
+      options: [
         {
           label: __("Delete"),
           icon: LucideTrash2,

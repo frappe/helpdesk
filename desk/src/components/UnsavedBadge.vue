@@ -3,7 +3,7 @@
     <Badge
       v-if="show"
       variant="subtle"
-      theme="orange"
+      theme="amber"
       size="sm"
       :label="__('Unsaved')"
     />

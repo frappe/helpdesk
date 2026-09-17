@@ -25,7 +25,7 @@
     class="flex h-full items-center justify-center absolute inset-x-0 top-0 pointer-events-none"
   >
     <div
-      class="flex flex-col items-center gap-2 text-2xl-medium text-ink-gray-4 w-9/12 md:w-4/12"
+      class="flex flex-col items-center gap-2 text-xl-medium text-ink-gray-4 w-9/12 md:w-4/12"
     >
       <!-- overlay variant (for charts) -->
       <div
@@ -44,7 +44,7 @@
           :class="{
             'text-sm font-medium text-ink-gray-8': text === 'sm',
             'text-base font-medium text-ink-gray-8': text === 'md' || !text,
-            'text-lg font-medium text-ink-gray-8': text === 'lg',
+            'text-md font-medium text-ink-gray-8': text === 'lg',
           }"
         >
           {{ __(title) }}
