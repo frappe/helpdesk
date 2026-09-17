@@ -34,9 +34,7 @@ export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
       doctype: "Contact",
       fields: ["email_id", "full_name", "name", "image"],
       filters: { email_id: ["in", unknownContacts] },
-      // Unlimited: an address can carry several Contacts, so a page sized by
-      // address count would drop rows other addresses still need.
-      limit_page_length: 0,
+      limit_page_length: unknownContacts.length * 5,
     }).catch(() => null);
     // dont cache a failed lookup, those chips would stay unnamed for the whole session
     if (contacts) {
