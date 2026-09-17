@@ -104,6 +104,9 @@ const expanded = userStorage(
 const showAllChips = ref(false);
 // Not reactive: it only gates the next failure's retry
 let isRetry = false;
+// What the in-flight request carries. The host can clear the staged list while
+// it is out (sending empties the reply box), so a retry has to re-send this.
+let submittedActions: SavedReplyAction[] = [];
 const container = ref<HTMLElement>();
 const { width } = useElementSize(container);
 
@@ -222,7 +225,7 @@ const applyActions = createResource({
     reloadFeed();
   },
   onError: (error: { status?: number }) => {
-    const failed = [...pendingActions.value];
+    const failed = submittedActions;
     // Only a response proves it rolled back, and one retry is enough
     const canRetry = Boolean(error?.status) && !isRetry;
     // Unstaged always: a kept batch would ride the next, unrelated send
@@ -240,6 +243,7 @@ const applyActions = createResource({
 /** Re-send a batch the agent kept from the failure toast. */
 function retry(actions: SavedReplyAction[]) {
   isRetry = true;
+  submittedActions = actions;
   applyActions.submit({ ticket_id: props.ticketId, actions });
 }
 
@@ -249,9 +253,10 @@ function submit() {
   // Actions stay staged during the request, so guard the second call
   if (applyActions.loading) return;
   isRetry = false;
+  submittedActions = [...pendingActions.value];
   applyActions.submit({
     ticket_id: props.ticketId,
-    actions: [...pendingActions.value],
+    actions: submittedActions,
   });
 }
 
