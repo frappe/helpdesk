@@ -299,8 +299,7 @@ function isSelf(email: string): boolean {
   );
 }
 
-// The feed already resolved the sender's name; hand it over so the composer
-// needs no lookup to label the chip.
+// pass the sender name along, the composer then needs no lookup to label the chip
 function senderAddress(activity: EmailActivity) {
   const { sender } = activity.data;
   const name = activity.author?.fullname;

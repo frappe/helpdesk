@@ -1,6 +1,6 @@
 <template>
   <div ref="rootRef" class="max-sm:w-screen">
-    <!-- Minimized pill — the default state; opens the composer window. -->
+    <!-- minimized pill, the default state, opens the composer window -->
     <div v-show="!windowOpen" class="flex items-center gap-2 px-4 py-3">
       <div
         ref="pillRef"
@@ -256,9 +256,6 @@ import {
   removeAttachmentFromServer,
   uploadFunction,
 } from "@/utils";
-// Deep import: the @framework/ui root barrel would pull the whole library
-// (FormLayout, ListView, …) into the bundle — same pattern as TicketField's
-// Link import.
 import type {
   CommentPayload,
   EmailPayload,
@@ -321,7 +318,7 @@ const commentComposerRef = ref<InstanceType<typeof CommentComposer> | null>(
 const savedReplyActionsRef = ref<InstanceType<typeof SavedReplyActions>>();
 
 // ─── Drafts & signature ──────────────────────────────────────
-// Declared first: the channel table and the pill read these.
+// declared first, the channel table and the pill read these
 const cachedEmail = useStorage<string | null>(
   "emailBoxContent" + props.ticketId,
   null
@@ -368,9 +365,7 @@ watch(
 );
 
 watch(emailBody, (value, oldValue) => {
-  // The signature drops into an empty editor on load and on every reply. That
-  // is not the agent typing, and broadcasting it would show a typing indicator
-  // to everyone else on the ticket.
+  // the signature fills an empty editor on load and on every reply, dont treat that as typing
   if (value !== oldValue && hasTypedEmail.value) {
     onUserType();
   }
@@ -403,8 +398,7 @@ function closeComposer() {
   showCommentBox.value = false;
 }
 
-// Esc and Close hand focus to the pill. An open recipient list is rendered
-// outside the hidden window and only dismisses once focus lands elsewhere.
+// hand focus to the pill, an open recipient list only closes once focus moves away
 function collapseToPill() {
   closeComposer();
   nextTick(() => pillRef.value?.focus());
@@ -775,8 +769,7 @@ function isIgnored(event: Event): boolean {
 onClickOutside(
   rootRef,
   (event) => {
-    // A floating window lives outside the page flow — only the docked
-    // composer closes on outside clicks.
+    // only the docked composer closes on outside clicks, a floating one sits outside the page flow
     if (windowMode.value !== "docked") return;
     if (justResized.value) return;
     if (isIgnored(event)) return;

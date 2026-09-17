@@ -38,8 +38,7 @@ export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
       // address count would drop rows other addresses still need.
       limit_page_length: 0,
     }).catch(() => null);
-    // A failed lookup is not an answer. Caching it as "no contact" would keep
-    // these addresses bare for the rest of the session.
+    // dont cache a failed lookup, those chips would stay unnamed for the whole session
     if (contacts) {
       for (const email of unknownContacts) contactByEmail.set(email, null);
       for (const c of contacts) {
@@ -58,9 +57,7 @@ export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
   }
 }
 
-// Plain request, not createResource: RecipientSelect evaluates this inside a
-// computedAsync, and touching a reactive resource there re-triggers evaluation
-// forever.
+// plain request instead of createResource as it would re-trigger the computedAsync calling it forever
 export async function searchRecipients(query: string): Promise<Recipient[]> {
   const contacts = await frappeRequest<
     { full_name?: string; name: string; email_id: string }[]

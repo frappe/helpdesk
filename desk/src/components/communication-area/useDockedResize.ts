@@ -6,8 +6,7 @@ const MIN_BODY_HEIGHT = 240;
 // Dragging this far below the minimum collapses the window back to the pill.
 const MINIMIZE_OVERDRAG = 60;
 
-// Dragging the docked title bar sets the body column's height; 0 means
-// natural. The window's own resize only exists while floating.
+// dragging the docked title bar sets the body height, 0 means natural
 export function useDockedResize(options: {
   windowMode: Readonly<Ref<WindowMode>>;
   column: Ref<HTMLElement | null>;
@@ -18,8 +17,7 @@ export function useDockedResize(options: {
   const dockedHeight = useStorage("helpdesk-composer-height", 0);
   const { height: viewportHeight } = useWindowSize();
 
-  // Clamped on the way out, not just on the way in: the height is stored for
-  // the whole browser, so it outlives the window it was dragged in.
+  // clamp while reading too, saved height can be from a bigger window
   const dockedColumnStyle = computed(() =>
     windowMode.value === "docked" && dockedHeight.value > 0
       ? { height: `${clampBodyHeight(dockedHeight.value)}px` }
@@ -33,8 +31,7 @@ export function useDockedResize(options: {
     );
   }
 
-  // The live drag; move/up listeners are registered once below and no-op while
-  // this is null, so nothing can stack or leak.
+  // the live drag, null when there is none so the listeners below just no-op
   const resizing = ref<{ startY: number; startHeight: number } | null>(null);
   const isResizing = computed(() => resizing.value !== null);
   // A pointer released outside the window must not count as an outside click.

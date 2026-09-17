@@ -104,8 +104,7 @@ const expanded = userStorage(
 const showAllChips = ref(false);
 // Not reactive: it only gates the next failure's retry
 let isRetry = false;
-// What the in-flight request carries. The host can clear the staged list while
-// it is out (sending empties the reply box), so a retry has to re-send this.
+// keep a copy of what we sent, sending clears the staged list so retry uses this
 let submittedActions: SavedReplyAction[] = [];
 const container = ref<HTMLElement>();
 const { width } = useElementSize(container);
