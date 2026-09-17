@@ -47,7 +47,6 @@
                 :model-value="row.value"
                 :options="valueOptions(row.action_type)"
                 @update:model-value="row.value = $event"
-                @search="search(row.action_type, $event)"
               />
             </div>
             <div class="flex min-h-8 items-center justify-end">
@@ -122,11 +121,8 @@ defineProps<{
 
 const actions = defineModel<SavedReplyAction[]>({ required: true });
 
-const {
-  valueOptions: sharedValueOptions,
-  tagOptions,
-  search,
-} = useSavedReplyActionOptions();
+const { valueOptions: sharedValueOptions, tagOptions } =
+  useSavedReplyActionOptions();
 
 const columns = [
   { key: "action_type", label: __("Action"), width: "190px" },

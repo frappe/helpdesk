@@ -1,13 +1,11 @@
 <template>
-  <Combobox
-    trigger="button"
+  <component
+    :is="config.doctype ? Link : Combobox"
+    v-bind="controlProps"
     :disabled="!isEditable"
     :model-value="action.value"
-    :options="pickerOptions"
     :placeholder="__('Select {0}', label.toLowerCase())"
-    @update:model-value="pick($event as string)"
-    v-model:query="queryText"
-    @update:query="search(action.action_type, $event)"
+    @update:model-value="pick(($event ?? '') as string)"
   >
     <template #trigger="{ setOpen }">
       <!-- The anchor forwards its click to this element, so it has to be a plain
@@ -56,19 +54,18 @@
         </Tooltip>
       </div>
     </template>
-  </Combobox>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { ACTION_TYPES } from "@/components/Settings/SavedReplies/components/actionTypes";
 import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
+import { Link } from "@framework/ui";
 import { __ } from "@/translation";
 import { SavedReplyAction } from "@/types";
 import { Badge, Combobox, Tooltip } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import LucideX from "~icons/lucide/x";
-
-const queryText = ref("");
 
 const props = defineProps<{
   action: SavedReplyAction;
@@ -81,7 +78,7 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const { valueOptions, search } = useSavedReplyActionOptions();
+const { valueOptions, linkFilters } = useSavedReplyActionOptions();
 
 const config = computed(() => ACTION_TYPES[props.action.action_type]);
 const label = computed(() => config.value.chipLabel);
@@ -104,8 +101,26 @@ const pickerOptions = computed(() =>
     }))
 );
 
+// A #trigger slot puts Combobox in button mode, and Link forwards that slot,
+// so the badge below serves both controls.
+const controlProps = computed(() =>
+  config.value.doctype
+    ? {
+        doctype: config.value.doctype,
+        filters: linkFilters(props.action.action_type),
+        title: value.value,
+      }
+    : { options: pickerOptions.value }
+);
+
 /** `label` carries the display name (an agent's, not their id), so both move. */
 function pick(picked: string) {
+  // A link picker offers no option list to read a label from; for these
+  // doctypes the record name is the label.
+  if (config.value.doctype) {
+    emit("update", { ...props.action, value: picked, label: picked });
+    return;
+  }
   const option = pickerOptions.value.find(
     (candidate) => candidate.value === picked
   );

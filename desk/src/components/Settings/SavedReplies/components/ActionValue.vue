@@ -8,6 +8,17 @@
     :placeholder="placeholder"
     @update:model-value="emit('update:modelValue', $event as string)"
   />
+  <Link
+    v-else-if="config.control === 'link'"
+    class="w-full"
+    variant="ghost"
+    :doctype="config.doctype!"
+    :filters="linkFilters(type)"
+    :model-value="(modelValue as string)"
+    :placeholder="placeholder"
+    :title="(modelValue as string)"
+    @update:model-value="emit('update:modelValue', ($event ?? '') as string)"
+  />
   <Combobox
     v-else-if="config.control === 'combobox'"
     class="w-full"
@@ -17,9 +28,6 @@
     :options="options"
     :placeholder="placeholder"
     @update:model-value="emit('update:modelValue', $event as string)"
-    v-model:query="queryText"
-    @update:query="emit('search', $event)"
-    @update:open="(open) => !open && (queryText = '')"
   >
     <template v-if="type === 'Assign Agent'" #item-prefix="{ item }">
       <Avatar size="xs" :image="item.image" :label="item.label" />
@@ -87,15 +95,15 @@
 <script setup lang="ts">
 import { buildEditorExtensions } from "@/components/editor/config";
 import TagChip from "@/components/tag/TagChip.vue";
+import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
 import { colorToken } from "@/composables/useTags";
 import { __ } from "@/translation";
 import { SavedReplyActionType } from "@/types";
+import { Link } from "@framework/ui";
 import { Avatar, Combobox, MultiSelect, Select } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
-import { computed, ref } from "vue";
-import { ACTION_TYPES, type ActionOption } from "./actionTypes";
-
-const queryText = ref("");
+import { computed } from "vue";
+import { ACTION_TYPES } from "./actionTypes";
 
 const props = defineProps<{
   type: SavedReplyActionType;
@@ -105,8 +113,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | string[]];
-  search: [query: string];
 }>();
+
+const { linkFilters } = useSavedReplyActionOptions();
 
 const config = computed(() => ACTION_TYPES[props.type]);
 const placeholder = computed(() =>
