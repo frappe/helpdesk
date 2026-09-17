@@ -93,7 +93,7 @@
 // picker and TagColorPicker are closed. `localTags` is the source of truth
 // while it runs, `appliedAtOpen` is the snapshot to diff against, and the close
 // sends one add/remove batch.
-import ShortcutKey from "@/components/ShortcutKey.vue";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { colorToken, useTags, type Tag } from "@/composables/useTags";
 import { __ } from "@/translation";

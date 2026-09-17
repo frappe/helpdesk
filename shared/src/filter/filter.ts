@@ -1,6 +1,6 @@
 import { useDebounceFn } from "@vueuse/core";
 import { createResource } from "frappe-ui";
-import { computed, inject, Component, ComputedRef } from "vue";
+import { computed, inject, Component, ComputedRef, Ref } from "vue";
 import LucideCalendar from "~icons/lucide/calendar";
 import LucideClock from "~icons/lucide/clock";
 import LucideHash from "~icons/lucide/hash";
@@ -63,20 +63,46 @@ const typeRating = ["Rating"];
 // works. It matches substrings too: "VIP" also finds tickets tagged "VIP Customer"
 export const multiValueFields = ["_assign", "_user_tags"];
 
-export function useFilter(): Filter {
+/** Where the control reads and writes its conditions.
+ *
+ *  The desk's list views hand this over through `inject()`, which stays the default.
+ *  A Studio page cannot: a page script returns bindings, it has no component of its
+ *  own to `provide` from, so there the same three things arrive as plain refs. */
+export interface FilterSource {
+  /** The filterable fields, as `helpdesk.api.doc.get_filterable_fields` returns them. */
+  fields: Ref<FilterField[]> | ComputedRef<FilterField[]>;
+  /** The current conditions, in Frappe's wire form or the object form. */
+  conditions: Ref<any> | ComputedRef<any>;
+  /** Called with the next full condition list on every change. */
+  apply: (next: FilterCondition[]) => void;
+}
+
+function injectedSource(): FilterSource {
   const listViewData = inject<any>("listViewData");
   const listViewActions = inject<any>("listViewActions");
   const { list, filterableFields } = listViewData;
+  return {
+    fields: computed(() => filterableFields.data || []),
+    conditions: computed(
+      () => list?.params?.filters || list?.data?.params?.filters
+    ),
+    apply: (next) => listViewActions.applyFilters(next),
+  };
+}
+
+export function useFilter(source?: FilterSource): Filter {
+  const src = source ?? injectedSource();
 
   const conditions = computed<FilterCondition[]>(() =>
-    normalizeFilters(list?.params?.filters || list?.data?.params?.filters)
+    normalizeFilters(src.conditions.value)
   );
 
   const activeFilters = computed<ActiveFilter[]>(() => {
-    if (!filterableFields.data) return [];
+    const available = src.fields.value || [];
+    if (!available.length) return [];
     const filters: ActiveFilter[] = [];
     conditions.value.forEach((condition, index) => {
-      const field = filterableFields.data.find(
+      const field = available.find(
         (f: FilterField) => f.fieldname === condition[0]
       );
       if (!field) return;
@@ -119,11 +145,11 @@ export function useFilter(): Filter {
   }
 
   function apply(next: FilterCondition[]) {
-    listViewActions.applyFilters(next);
+    src.apply(next);
   }
 
   return {
-    fields: computed<FilterField[]>(() => filterableFields.data || []),
+    fields: computed<FilterField[]>(() => src.fields.value || []),
     activeFilters,
     addFilter,
     updateFilter,

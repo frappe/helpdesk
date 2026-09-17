@@ -54,8 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import ShortcutKey from "@/components/ShortcutKey.vue";
-import { __ } from "@/translation";
+import ShortcutKey from "../ShortcutKey.vue";
+import { __ } from "../translation";
 import { TextInput } from "frappe-ui";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { fieldIcon, FilterField } from "./filter";

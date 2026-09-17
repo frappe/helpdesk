@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import FilterIcon from "@/components/icons/FilterIcon.vue";
-import { __ } from "@/translation";
+import FilterIcon from "../icons/FilterIcon.vue";
+import { __ } from "../translation";
 import { Button, Tooltip } from "frappe-ui";
 
 interface P {

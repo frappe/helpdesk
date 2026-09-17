@@ -138,7 +138,7 @@
 <script setup lang="ts">
 import { recordSavedReplyUse } from "@/components/command-palette/savedReplyCommands";
 import { buildEditorExtensions } from "@/components/editor/config";
-import FilterIcon from "@/components/icons/FilterIcon.vue";
+import FilterIcon from "@helpdesk/shared/icons/FilterIcon.vue";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";

@@ -1,0 +1,22 @@
+{
+	"name": "@helpdesk/shared",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./filter": "./src/filter/index.ts",
+		"./translation": "./src/translation.ts",
+		"./utils": "./src/utils.ts",
+		"./shortcuts": "./src/shortcuts.ts",
+		"./device": "./src/device.ts",
+		"./ShortcutKey.vue": "./src/ShortcutKey.vue",
+		"./icons/FilterIcon.vue": "./src/icons/FilterIcon.vue"
+	},
+	"dependencies": {
+		"@vueuse/core": "^13.8.0"
+	},
+	"peerDependencies": {
+		"frappe-ui": "*",
+		"vue": "*"
+	}
+}

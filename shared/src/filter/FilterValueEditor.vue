@@ -119,9 +119,9 @@
 </template>
 
 <script setup lang="ts">
-import BackButton from "@/components/BackButton.vue";
-import { useDevice } from "@/composables";
-import { __ } from "@/translation";
+import BackButton from "../BackButton.vue";
+import { useDevice } from "../device";
+import { __ } from "../translation";
 import { useDebounceFn, useEventListener } from "@vueuse/core";
 import {
   DatePicker,

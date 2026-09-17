@@ -8,7 +8,13 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"@framework/ui": ["../../frappe/ui/src/index.ts"],
-			"@framework/ui/*": ["../../frappe/ui/src/*"]
+			"@framework/ui/*": ["../../frappe/ui/src/*"],
+			"@helpdesk/shared/*": ["../shared/src/*"],
+			// @helpdesk/shared ships source and takes vue/frappe-ui as peers. Its files sit
+			// outside desk/, where node resolution finds neither, so point tsc at desk's copies
+			// (what the bundlers already dedupe to).
+			"vue": ["./node_modules/vue"],
+			"frappe-ui": ["./node_modules/frappe-ui/src/index.ts"]
 		},
 		"types": [
 			"unplugin-icons/types/vue",
