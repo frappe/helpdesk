@@ -7,7 +7,7 @@
     :placeholder="placeholder"
     :upload-function="
       (file: any, options: any) =>
-        uploadFunction(file, doctype, ticketId, true, options)
+        track(uploadFunction(file, doctype, ticketId, true, options))
     "
   >
     <template #default="{ isEmpty }">
@@ -69,13 +69,21 @@
                   }
                 "
               />
-              <Button
-                variant="solid"
-                :label="label"
-                :disabled="isDisabled"
-                :loading="loading"
-                @click="submitComment()"
-              />
+              <!-- A disabled button fires no pointer events, so the span
+                   carries the hover for the tooltip -->
+              <Tooltip
+                :text="isUploading ? __('Please wait, media is uploading') : ''"
+              >
+                <span class="inline-flex">
+                  <Button
+                    variant="solid"
+                    :label="label"
+                    :disabled="isDisabled"
+                    :loading="loading"
+                    @click="submitComment()"
+                  />
+                </span>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -84,7 +92,12 @@
   </Editor>
 </template>
 <script setup lang="ts">
-import { FileUploader, LoadingIndicator, createResource } from "frappe-ui";
+import {
+  FileUploader,
+  LoadingIndicator,
+  Tooltip,
+  createResource,
+} from "frappe-ui";
 import {
   Editor,
   EditorContent,
@@ -98,6 +111,7 @@ import { AttachmentList } from "@/components/";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
@@ -154,8 +168,9 @@ const extensions = buildEditorExtensions({
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
+const { isUploading, track } = useUploadTracker();
 const isDisabled = computed(() => {
-  return isContentEmpty(newComment.value) || loading.value;
+  return isContentEmpty(newComment.value) || loading.value || isUploading.value;
 });
 const loading = ref(false);
 
@@ -168,6 +183,8 @@ async function submitComment() {
   if (isContentEmpty(newComment.value)) {
     return false;
   }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (isUploading.value) return false;
   // the editor keeps the text until the request lands: clearing it up front
   // loses the comment, and its stored draft, whenever the call fails
   loading.value = true;

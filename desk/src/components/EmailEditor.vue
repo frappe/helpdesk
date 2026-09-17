@@ -7,7 +7,7 @@
     :extensions="extensions"
     :upload-function="
       (file: any, options: any) =>
-        uploadFunction(file, doctype, ticketId, true, options)
+        track(uploadFunction(file, doctype, ticketId, true, options))
     "
   >
     <template #default>
@@ -160,7 +160,7 @@
                 "
               >
                 <template #default="{ openFileSelector, uploading }">
-                  {{ void (isUploading = uploading) }}
+                  {{ void (attachmentUploading = uploading) }}
                   <Tooltip :text="__('Attach file')">
                     <button
                       class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
@@ -192,17 +192,25 @@
           </div>
           <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
             <Button label="Discard" @click="handleDiscard" />
-            <Button
-              variant="solid"
-              :disabled="isDisabled"
-              :loading="sendMail.loading"
-              :label="label"
-              @click="
-                () => {
-                  submitMail();
-                }
-              "
-            />
+            <!-- A disabled button fires no pointer events, so the span
+                 carries the hover for the tooltip -->
+            <Tooltip
+              :text="isUploading ? __('Please wait, media is uploading') : ''"
+            >
+              <span class="inline-flex">
+                <Button
+                  variant="solid"
+                  :disabled="isDisabled"
+                  :loading="sendMail.loading"
+                  :label="label"
+                  @click="
+                    () => {
+                      submitMail();
+                    }
+                  "
+                />
+              </span>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -225,6 +233,7 @@ import { AttachmentIcon } from "@/components/icons";
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
@@ -397,7 +406,13 @@ const from = computed(() => {
 const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 
 const attachments = ref([]);
-const isUploading = ref(false);
+const attachmentUploading = ref(false);
+const { isUploading: editorUploading, track } = useUploadTracker();
+
+// The paperclip and the editor's own media buttons upload by different routes
+const isUploading = computed(
+  () => attachmentUploading.value || editorUploading.value
+);
 
 async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
@@ -493,6 +508,8 @@ function submitMail() {
   if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
     return false;
   }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (isUploading.value) return false;
   if (
     !toEmailsClone.value.length &&
     !ccEmailsClone.value.length &&
@@ -702,6 +719,7 @@ onBeforeUnmount(() => {
 defineExpose({
   addToReply,
   editor,
+  isUploading,
   submitMail,
 });
 </script>

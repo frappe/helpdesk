@@ -73,18 +73,28 @@
             @clear="() => (isExpanded = false)"
             :uploadFunction="
               (file: any, options: any) =>
-                uploadFunction(file, 'HD Ticket', props.ticketId, true, options)
+                track(
+                  uploadFunction(file, 'HD Ticket', props.ticketId, true, options)
+                )
             "
           >
             <template #bottom-right>
-              <Button
-                :label="__('Send')"
-                theme="gray"
-                variant="solid"
-                :disabled="$refs.editor?.editor?.isEmpty || send.loading"
-                :loading="send.loading"
-                @click="sendEmail"
-              />
+              <!-- A disabled button fires no pointer events, so the span carries
+                   the hover for the tooltip -->
+              <Tooltip
+                :text="isUploading ? __('Please wait, media is uploading') : ''"
+              >
+                <span class="inline-flex">
+                  <Button
+                    :label="__('Send')"
+                    theme="gray"
+                    variant="solid"
+                    :disabled="!canSend"
+                    :loading="send.loading"
+                    @click="sendEmail"
+                  />
+                </span>
+              </Tooltip>
             </template>
           </TicketTextEditor>
         </div>
@@ -110,6 +120,7 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
@@ -120,6 +131,7 @@ import {
   createResource,
   Tabs,
   toast,
+  Tooltip,
 } from "frappe-ui";
 import {
   computed,
@@ -173,6 +185,14 @@ const ticket = createResource({
 });
 
 provide(ITicket, ticket);
+const { isUploading, track } = useUploadTracker();
+
+// Read off the content model, not the editor ref: the ref is empty on the first
+// render, which let the button paint enabled before flipping to disabled
+const canSend = computed(
+  () =>
+    !isContentEmpty(editorContent.value) && !send.loading && !isUploading.value
+);
 const editor = ref(null);
 const editorContent = ref("");
 const attachments = ref([]);
@@ -283,9 +303,8 @@ function updateField(name, value, callback = () => {}) {
 }
 
 function sendEmail() {
-  if (isContentEmpty(editorContent.value) || send.loading) {
-    return;
-  }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (!canSend.value) return;
   send.submit();
 }
 
