@@ -139,7 +139,7 @@
                 :extensions="helpdeskExtensions"
                 :placeholder="__('Hi John, we are looking into this issue.')"
                 :submit-label="emailSubmitLabel"
-                :submitting="sendMail.loading"
+                :submitting="sendMail.loading || mediaUploading"
                 @submit="onEmailSubmit"
                 @remove-attachment="
                   (file) => removeAttachmentFromServer(file.name)
@@ -188,7 +188,7 @@
                 :extensions="helpdeskExtensions"
                 :placeholder="__('@John could you please look into this?')"
                 :submit-label="commentSubmitLabel"
-                :submitting="sendComment.loading"
+                :submitting="sendComment.loading || mediaUploading"
                 @submit="onCommentSubmit"
                 @remove-attachment="
                   (file) => removeAttachmentFromServer(file.name)
@@ -233,6 +233,7 @@ import { useTyping } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@/composables/shortcuts";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import {
   replyComposer,
   showCommentBox,
@@ -550,8 +551,17 @@ function clearFormatting(
 }
 
 // ─── Attachments ──────────────────────────────────────────────
-function uploadFile(file: File) {
-  return uploadFunction(file, props.doctype, props.ticketId);
+const { isUploading: mediaUploading, track } = useUploadTracker();
+
+// `options` carries the editor's signal and progress callback, which drive the
+// upload's progress ring and its cancel button.
+function uploadFile(
+  file: File,
+  options?: { signal?: AbortSignal; onProgress?: (p: unknown) => void }
+) {
+  return track(
+    uploadFunction(file, props.doctype, props.ticketId, true, options)
+  );
 }
 
 // ─── Saved replies ────────────────────────────────────────────
