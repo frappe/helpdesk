@@ -5,17 +5,18 @@
     :style="{ '--composer-reserve': `${composerHeight}px` }"
   >
     <Tabs
-      :modelValue="tabIndex"
+      :modelValue="activeTab"
       :tabs="tabs"
       @update:modelValue="changeTabTo"
-      class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1"
+      size="md"
+      class="flex-1 overflow-hidden [&_[role='tablist']]:px-5 [&_[role='tablist']]:py-1.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
     >
       <template #tab-panel="{ tab }">
-        <TicketAnalyticsTab v-if="tab.name === 'analytics'" />
+        <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
         <TicketTimeline
           v-else
           :ticket-id="String(ticket.doc?.name)"
-          :tab="tab.name"
+          :tab="tab.value"
           :tab-label="tab.label"
           @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
         />
@@ -81,36 +82,36 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
     {
-      name: "activity",
+      value: "activity",
       label: "Activity",
-      icon: ActivityIcon,
+      iconLeft: ActivityIcon,
     },
     {
-      name: "email",
+      value: "email",
       label: "Emails",
-      icon: EmailIcon,
+      iconLeft: EmailIcon,
     },
     {
-      name: "comment",
+      value: "comment",
       label: "Comments",
-      icon: CommentIcon,
+      iconLeft: CommentIcon,
     },
   ];
 
   if (isCallingEnabled.value) {
     _tabs.push({
-      name: "call",
+      value: "call",
       label: "Calls",
-      icon: PhoneIcon,
+      iconLeft: PhoneIcon,
     });
   }
   _tabs.push({
-    name: "analytics",
+    value: "analytics",
     label: "Analytics",
-    icon: LucideChartNoAxesColumn,
+    iconLeft: LucideChartNoAxesColumn,
   });
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+const { activeTab, changeTabTo } = useActiveTabManager(tabs);
 </script>

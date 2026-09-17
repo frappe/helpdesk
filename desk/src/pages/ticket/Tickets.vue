@@ -178,7 +178,7 @@ const options = computed(() => ({
         return h(
           "span",
           {
-            class: ["truncate flex-1", !isSeen && "font-semibold"],
+            class: ["truncate flex-1", !isSeen && "font-medium"],
           },
           item
         );
@@ -264,7 +264,7 @@ function handleResponseByField(row: any, item: string) {
     h(Badge, {
       label: shortDuration(item),
       variant: "subtle",
-      theme: "orange",
+      theme: "amber",
     })
   );
 }
@@ -354,8 +354,8 @@ function reset(reload = false) {
 const slaStatusColorMap = {
   Fulfilled: "gray",
   Failed: "red",
-  "Resolution Due": "orange",
-  "First Response Due": "orange",
+  "Resolution Due": "amber",
+  "First Response Due": "amber",
   Paused: "blue",
 };
 
@@ -373,7 +373,7 @@ const dropdownOptions = computed(() => {
   const items = [
     {
       group: __("Default Views"),
-      items: [
+      options: [
         {
           label: __("List View"),
           icon: "lucide-align-justify",
@@ -390,13 +390,13 @@ const dropdownOptions = computed(() => {
   if (getCurrentUserViews.value?.length !== 0) {
     items.push({
       group: __("Saved Views"),
-      items: parseViews(getCurrentUserViews.value),
+      options: parseViews(getCurrentUserViews.value),
     });
   }
   if (pinnedViews.value?.length !== 0) {
     items.push({
       group: __("Private Views"),
-      items: parseViews(pinnedViews.value),
+      options: parseViews(pinnedViews.value),
     });
   }
 
@@ -411,13 +411,13 @@ const dropdownOptions = computed(() => {
 
   items.push({
     group: __("Public Views"),
-    items: parseViews(uniquePublicViews),
+    options: parseViews(uniquePublicViews),
   });
 
   items.push({
     group: __("Create View"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Create View"),
         icon: "lucide-plus",

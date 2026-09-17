@@ -19,7 +19,7 @@
           <template #suffix>
             <LucideX
               class="size-4"
-              @click.stop="
+              @click.stop.prevent="
                 () => {
                   $emit(
                     'update:attachments',
@@ -38,10 +38,8 @@
         <slot name="bottom-left" />
         <FileUploader
           class="flex items-center"
-          :upload-args="{
-            folder: 'Home/Helpdesk',
-            private: true,
-          }"
+          folder="Home/Helpdesk"
+          private
           @success="
             (f: File) => $emit('update:attachments', [...attachments, f])
           "
@@ -72,7 +70,7 @@
   </HTextEditor>
   <div
     v-else
-    class="flex w-full cursor-pointer items-center gap-2 rounded bg-surface-gray-2 px-3.5 py-2 hover:bg-surface-gray-3"
+    class="flex w-full cursor-pointer items-center gap-2 rounded-4 bg-surface-gray-2 px-3.5 py-2 hover:bg-surface-gray-3"
     @click="() => $emit('update:expand', !expand)"
   >
     <UserAvatar
@@ -102,7 +100,7 @@ interface P {
   placeholder: string;
   attachments: File[];
   expand?: boolean;
-  uploadFunction?: (file: any) => Promise<any>;
+  uploadFunction?: (file: any, options?: any) => Promise<any>;
 }
 
 interface E {

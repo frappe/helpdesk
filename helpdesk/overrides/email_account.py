@@ -152,12 +152,9 @@ class CustomEmailAccount(EmailAccount):
                 )
             )
 
-        comment = frappe.new_doc("HD Ticket Comment")
+        ticket = frappe.get_doc("HD Ticket", communication.reference_name)
         # a system note, not the pulling user's
-        comment.commented_by = "Administrator"
-        comment.reference_ticket = communication.reference_name
-        comment.content = content
-        comment.save(ignore_permissions=True)
+        ticket.add_comment("Comment", content, comment_email="Administrator")
 
     def get_inbound_mails(self) -> list[InboundMail]:
         """retrive and return inbound mails."""

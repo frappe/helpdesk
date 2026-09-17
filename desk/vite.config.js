@@ -103,6 +103,13 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+        // @framework/ui still imports the `frappe-ui/editor-style.css` subpath,
+        // dropped in frappe-ui 1.0.0-beta.63 (the editor entrypoint pulls its
+        // own stylesheet now). Point it at the real file until frappe drops it.
+        "frappe-ui/editor-style.css": path.resolve(
+          __dirname,
+          "node_modules/frappe-ui/src/molecules/editor/style.css"
+        ),
         // ...localFrappeUIAliases,
       },
       // frappe-ui is served from source (excluded from optimizeDeps) and the
@@ -134,7 +141,6 @@ export default defineConfig(async ({ mode }) => {
     },
     optimizeDeps: {
       include: [
-        "feather-icons",
         "tailwind.config.js",
         "prosemirror-state",
         "prosemirror-view",

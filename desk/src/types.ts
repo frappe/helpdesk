@@ -288,17 +288,6 @@ export type File = {
   attached_to_name?: string;
 };
 
-export type Notification = {
-  creation: string;
-  name: string;
-  notification_type: string;
-  read: boolean;
-  reference_comment: string;
-  reference_ticket: string;
-  user_from: UserInfo;
-  user_to: UserInfo;
-};
-
 export type UserInfo = {
   email: string;
   image: string;
@@ -346,7 +335,7 @@ export type TicketTab =
   | "analytics";
 
 export interface TabObject {
-  name: TicketTab;
+  value: TicketTab;
   label: string;
   icon: Component;
   condition?: () => boolean;

@@ -2,10 +2,9 @@
   <Dialog v-model:open="showSubjectDialog" title="Rename Subject">
     <template #default>
       <div class="flex flex-col flex-1 gap-3">
-        <FormControl
+        <Textarea
           ref="subjectInput"
           v-model="renameSubject"
-          type="textarea"
           size="sm"
           variant="subtle"
           :disabled="false"
@@ -32,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { Textarea } from "frappe-ui";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { TicketSymbol } from "@/types";
@@ -54,7 +54,7 @@ watch(
     if (val) {
       renameSubject.value = ticket?.value?.doc?.subject || "";
       await nextTick();
-      subjectInput.value?.$el?.querySelector("textarea").focus();
+      subjectInput.value?.focus();
     }
   }
 );

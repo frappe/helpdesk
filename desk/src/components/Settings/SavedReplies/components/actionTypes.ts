@@ -13,6 +13,7 @@ import LucideUsers from "~icons/lucide/users";
 
 export type ActionControl =
   | "select"
+  | "link"
   | "combobox"
   | "multiselect"
   | "editor"
@@ -31,6 +32,8 @@ export interface ActionTypeConfig {
   fieldname?: string;
   icon: Component;
   control: ActionControl;
+  /** The doctype a `link` control searches. */
+  doctype?: string;
   /** Muted clarifier shown in the row's value area for no-value actions */
   hint?: string;
 }
@@ -56,14 +59,16 @@ export const ACTION_TYPES: Record<SavedReplyActionType, ActionTypeConfig> = {
     chipLabel: __("Team"),
     fieldname: __("Team"),
     icon: LucideUsers,
-    control: "combobox",
+    control: "link",
+    doctype: "HD Team",
   },
   "Set Ticket Type": {
     label: __("Set ticket type"),
     chipLabel: __("Type"),
     fieldname: __("Ticket Type"),
     icon: LucideTicket,
-    control: "combobox",
+    control: "link",
+    doctype: "HD Ticket Type",
   },
   "Assign Agent": {
     label: __("Assign agent"),
@@ -122,6 +127,10 @@ export const ASSIGNMENT_ACTIONS: SavedReplyActionType[] = [
 
 export function actionNeedsValue(type: SavedReplyActionType): boolean {
   return ACTION_TYPES[type].control !== "none";
+}
+
+export function isLinkAction(type: SavedReplyActionType): boolean {
+  return ACTION_TYPES[type].control === "link";
 }
 
 /** Empty check that understands rich-text values like `<p></p>`. */

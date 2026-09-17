@@ -29,7 +29,7 @@
       <div class="flex justify-center items-center mx-auto">
         <TicketIcon class="size-10 text-ink-gray-4" />
       </div>
-      <div class="text-lg-medium text-ink-gray-8">
+      <div class="text-md-medium text-ink-gray-8">
         {{ __("Ticket not found") }}
       </div>
       <div class="text-center text-p-base text-ink-gray-6 mt-1">
@@ -38,9 +38,7 @@
         }}
       </div>
       <Button :route="{ name: 'TicketsAgent' }" variant="subtle">
-        <template #prefix
-          ><FeatherIcon name="arrow-left" class="size-4"
-        /></template>
+        <template #prefix><LucideArrowLeft class="size-4" /></template>
         {{ __("Back to Tickets") }}
       </Button>
     </div>
@@ -48,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowLeft from "~icons/lucide/arrow-left";
 import { recordTicketVisit } from "@/components/command-palette/recentTickets";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";

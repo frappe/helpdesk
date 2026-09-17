@@ -72,10 +72,10 @@ function clearDraft() {
   editorRef.value?.reset();
 }
 
-async function handleFileUpload(file: File) {
+async function handleFileUpload(file: File, options?: any) {
   const uploads = await Promise.all(
     Array.from(props.selections).map((ticketId) =>
-      uploadFunction(file, "HD Ticket", ticketId)
+      uploadFunction(file, "HD Ticket", ticketId, true, options)
     )
   );
 

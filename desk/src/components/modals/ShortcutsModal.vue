@@ -8,7 +8,7 @@
           class="pb-4"
           :class="!group.hideBorder && 'border-b border-outline-gray-2'"
         >
-          <h2 class="text-lg-semibold text-ink-gray-9 mb-4">
+          <h2 class="text-md-semibold text-ink-gray-9 mb-4">
             {{ group.title }}
           </h2>
           <ul class="space-y-2">
@@ -24,7 +24,7 @@
                 <span
                   v-for="(key, kIndex) in shortcut.keys"
                   :key="kIndex"
-                  class="bg-surface-gray-2 border border-outline-gray-2 text-xs rounded-sm text-ink-gray-8 shadow-sm min-w-5 h-5 flex items-center justify-center"
+                  class="bg-surface-gray-2 border border-outline-gray-2 text-xs rounded-1 text-ink-gray-8 shadow-sm min-w-5 h-5 flex items-center justify-center"
                   :class="[
                     ![metaIcon, shiftKey].includes(key) && 'w-5 ',
                     key === shiftKey && '!px-2',

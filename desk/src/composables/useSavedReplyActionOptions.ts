@@ -6,12 +6,8 @@ import { useConfigStore } from "@/stores/config";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { SavedReplyActionType } from "@/types";
-import { useDebounceFn } from "@vueuse/core";
-import { createListResource } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
-
-const SEARCH_PAGE_LENGTH = 10;
 
 let shared: ReturnType<typeof buildActionOptions> | undefined;
 
@@ -33,49 +29,15 @@ function buildActionOptions() {
   const { teamRestrictionApplied } = storeToRefs(useConfigStore());
   const { userTeams, isAdmin } = storeToRefs(useAuthStore());
 
-  const ticketTypesResource = createListResource({
-    doctype: "HD Ticket Type",
-    cache: ["HD Ticket Type", "search"],
-    fields: ["name"],
-    filters: { disabled: 0 },
-    pageLength: SEARCH_PAGE_LENGTH,
-    auto: true,
-  });
-
-  const teamsResource = createListResource({
-    doctype: "HD Team",
-    cache: ["HD Team", "search"],
-    fields: ["name"],
-    filters: { disabled: 0 },
-    pageLength: SEARCH_PAGE_LENGTH,
-    auto: true,
-  });
-
-  /** Link fields: these lists are fetched by query instead of held whole. */
-  const searchResources: Partial<
-    Record<SavedReplyActionType, ReturnType<typeof createListResource>>
-  > = {
-    "Set Ticket Type": ticketTypesResource,
-    "Set Team": teamsResource,
-  };
-
-  const search = useDebounceFn((type: SavedReplyActionType, query: string) => {
-    const resource = searchResources[type];
-    if (!resource) return;
-    resource.update({
-      filters: { ...resource.filters, name: ["like", `%${query}%`] },
-    });
-    resource.reload();
-  }, 300);
-
-  // A restricted agent can only route to their own teams
-  const teamOptions = computed<ActionOption[]>(() => {
-    const names =
-      !isAdmin.value && teamRestrictionApplied.value
-        ? userTeams.value || []
-        : (teamsResource.data || []).map((team: { name: string }) => team.name);
-    return names.map((name: string) => ({ label: name, value: name }));
-  });
+  /** Server-side filters for the link pickers, which search as you type. */
+  function linkFilters(type: SavedReplyActionType): Record<string, unknown> {
+    const filters: Record<string, unknown> = { disabled: 0 };
+    // A restricted agent can only route to their own teams
+    if (type === "Set Team" && !isAdmin.value && teamRestrictionApplied.value) {
+      filters.name = ["in", userTeams.value || []];
+    }
+    return filters;
+  }
 
   /** Tags as a plain list; callers filter it further if they need to. */
   function tagOptions(): ActionOption[] {
@@ -99,15 +61,6 @@ function buildActionOptions() {
         return (priorityStore.priorities.data || [])
           .filter((priority) => !priority.disabled)
           .map((priority) => ({ label: priority.name, value: priority.name }));
-      case "Set Team":
-        return teamOptions.value;
-      case "Set Ticket Type":
-        return (ticketTypesResource.data || []).map(
-          (ticketType: { name: string }) => ({
-            label: ticketType.name,
-            value: ticketType.name,
-          })
-        );
       case "Assign Agent":
         return agentStore.dropdown || [];
       case "Add Tag":
@@ -120,5 +73,5 @@ function buildActionOptions() {
 
   agentStore.loadOnce();
 
-  return { valueOptions, tagOptions, search };
+  return { valueOptions, tagOptions, linkFilters };
 }

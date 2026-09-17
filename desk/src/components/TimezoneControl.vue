@@ -1,20 +1,22 @@
 <template>
-  <Autocomplete
+  <Combobox
+    v-model="modelValue"
+    trigger="button"
+    side="top"
+    align="end"
     :label="label ? __(label) : undefined"
     :options="options"
     :placeholder="__('Select timezone')"
     :loading="timezoneResource.loading"
-    :model-value="modelValue"
-    @update:model-value="(v: { label: string; value: string } | string) => (modelValue = typeof v === 'string' ? v : v.value)"
   />
 </template>
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Autocomplete, createResource } from "frappe-ui";
+import { Combobox, createResource } from "frappe-ui";
 import { computed } from "vue";
 
-const props = defineProps<{
+defineProps<{
   label?: string;
 }>();
 

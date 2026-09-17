@@ -3,7 +3,6 @@ import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import {
-  FeatherIcon,
   call,
   dayjs,
   dayjsLocal,
@@ -13,7 +12,7 @@ import {
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
-import { Icon } from "frappe-ui/icons";
+import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 
@@ -393,6 +392,9 @@ export function getIcon(icon) {
       icon
     );
   }
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: icon });
+  }
   if (typeof icon === "string") {
     return h(Icon, { name: icon });
   }
@@ -479,8 +481,8 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
     {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
-        variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
+        "group flex w-full gap-2 items-center rounded-5 px-2 py-2 text-base hover:bg-surface-gray-3",
+        variant == "danger" ? "text-ink-red-6 hover:bg-surface-red-1" : "",
       ],
       onClick: onClick,
     },
@@ -489,19 +491,21 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
 }
 
 /**
- * Renders an option icon: `lucide-*` strings as CSS-mask spans (frappe-ui v1),
- * other strings as legacy FeatherIcon, and components as-is.
+ * Renders an option icon: icon-name strings through the lucide sprite,
+ * components as-is.
  */
 export function renderOptionIcon(
   icon: string | object | null,
   classes: string[] = ["h-4 w-4 shrink-0"]
 ) {
   if (!icon) return null;
+  // `lucide-*` renders as a Tailwind mask class; the sprite only carries
+  // canonical names, so aliases like `trash-2` exist there but not in it.
   if (typeof icon === "string" && icon.startsWith("lucide-")) {
     return h("span", { class: [icon, ...classes], "aria-hidden": true });
   }
   if (typeof icon === "string") {
-    return h(FeatherIcon, { name: icon, class: classes, "aria-hidden": true });
+    return h(Icon, { name: icon, class: classes, "aria-hidden": true });
   }
   return h(icon, { class: classes, "aria-hidden": true });
 }
@@ -519,17 +523,23 @@ export function getGridTemplateColumnsForTable(columns) {
   return columnsWidth + " 22px";
 }
 
+/**
+ * `options` carries the editor's `{ signal, onProgress }`, which is what drives
+ * the upload's progress ring and its cancel button.
+ */
 export function uploadFunction(
   file: File,
   doctype: string | null = null,
   docname: string | null = null,
-  isPrivate: boolean = true
+  isPrivate: boolean = true,
+  options: { signal?: AbortSignal; onProgress?: (p: unknown) => void } = {}
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
     private: isPrivate,
     doctype: doctype,
     docname: docname,
+    ...options,
   });
 }
 
@@ -729,34 +739,22 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
       label: "Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Delete",
-          icon: "lucide-trash-2",
-          active: props.active,
-          variant: "grey",
-          onClick: (event) => {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            isConfirmingDelete.value = true;
-          },
-        }),
+      icon: "lucide-trash-2",
+      // preventDefault keeps the menu open so the confirm row can replace this one
+      onClick: (event) => {
+        event.preventDefault();
+        isConfirmingDelete.value = true;
+      },
       condition: () => !isConfirmingDelete.value,
     },
     {
       label: "Confirm Delete",
-      component: (props) =>
-        TemplateOption({
-          option: "Confirm Delete",
-          icon: "lucide-trash-2",
-          active: props.active,
-          variant: "danger",
-          onClick: () => {
-            onConfirmDelete();
-            // Reset state after confirming
-            isConfirmingDelete.value = false;
-          },
-        }),
+      icon: "lucide-trash-2",
+      theme: "red",
+      onClick: () => {
+        onConfirmDelete();
+        isConfirmingDelete.value = false;
+      },
       condition: () => isConfirmingDelete.value,
     },
   ];
@@ -965,4 +963,13 @@ export function handleInviteUserSuccess(
   if (emailsStr.trim() !== "") {
     toast.info(`${emailsStr} already present`);
   }
+}
+
+/**
+ * Splits a legacy `placement` string ("bottom-start") into frappe-ui v1's
+ * `side` + `align` pair. A bare side means centred alignment.
+ */
+export function splitPlacement(placement?: string) {
+  const [side = "bottom", align = "center"] = (placement || "").split("-");
+  return { side, align } as { side: any; align: any };
 }
