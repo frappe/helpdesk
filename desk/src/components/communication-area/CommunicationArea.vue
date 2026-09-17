@@ -48,7 +48,7 @@
       </div>
     </div>
     <Transition
-      enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
+      enter-active-class="transition-[opacity,transform] duration-100 ease-out motion-reduce:transition-none"
       enter-from-class="translate-y-1 opacity-0"
       @leave="(_, done) => done()"
     >
@@ -79,7 +79,11 @@
               >
                 <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
               </div>
-              <TabButtons v-model="channel" :options="channelOptions" />
+              <TabButtons
+                v-model="channel"
+                :options="channelOptions"
+                class="[&_[data-slot=tab-buttons]]:ring-1 [&_[data-slot=tab-buttons]]:ring-inset [&_[data-slot=tab-buttons]]:ring-outline-gray-2"
+              />
               <div class="min-w-0 flex-1">
                 <TypingIndicator :ticketId="ticketId" />
               </div>
@@ -494,6 +498,7 @@ const minimizedLabel = computed(() => {
 const {
   dockedHeight,
   dockedColumnStyle,
+  isResizing,
   justResized,
   onPanelPointerDown,
   startDockedResize,
@@ -636,6 +641,7 @@ function resetRecipients() {
 resetRecipients();
 
 function replyToEmail(data: ReplyPayload) {
+  const wasComposing = showEmailBox.value;
   showCommentBox.value = false;
   showEmailBox.value = true;
 
@@ -652,6 +658,7 @@ function replyToEmail(data: ReplyPayload) {
     body = `<div style="white-space: pre-wrap; line-height: 1.5">${parsed.body.innerHTML}</div>`;
   }
   quotedContent.value = body;
+  if (wasComposing) return;
 
   nextTick(() => {
     emailBody.value = emailSignature.value ?? "";
@@ -744,8 +751,9 @@ useShortcut("e", () => {
   openFloatingComposer();
 });
 
-// Overlays that open outside the composer but belong to it.
+// Overlays and controls that live outside the composer but belong to it.
 const IGNORED_SELECTORS = [
+  ".activity-timeline",
   ".tippy-content",
   ".PopoverContent",
   '[role="dialog"]',
@@ -795,6 +803,7 @@ onBeforeUnmount(() => {
 });
 
 defineExpose({
+  isResizing,
   replyToEmail,
   toggleEmailBox,
   toggleCommentBox,

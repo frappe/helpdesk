@@ -35,7 +35,8 @@ export function useDockedResize(options: {
 
   // The live drag; move/up listeners are registered once below and no-op while
   // this is null, so nothing can stack or leak.
-  let resizing: { startY: number; startHeight: number } | null = null;
+  const resizing = ref<{ startY: number; startHeight: number } | null>(null);
+  const isResizing = computed(() => resizing.value !== null);
   // A pointer released outside the window must not count as an outside click.
   const justResized = ref(false);
 
@@ -50,7 +51,10 @@ export function useDockedResize(options: {
   }
 
   function startDockedResize(event: PointerEvent) {
-    resizing = { startY: event.clientY, startHeight: currentBodyHeight() };
+    resizing.value = {
+      startY: event.clientY,
+      startHeight: currentBodyHeight(),
+    };
     try {
       (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     } catch {}
@@ -65,14 +69,14 @@ export function useDockedResize(options: {
   }
 
   useEventListener(window, "pointermove", (event: PointerEvent) => {
-    if (!resizing) return;
-    const next = resizing.startHeight + (resizing.startY - event.clientY);
+    if (!resizing.value) return;
+    const { startY, startHeight } = resizing.value;
+    const next = startHeight + (startY - event.clientY);
     if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
       // Dragged well past the floor: collapse to the pill, keeping the pre-drag
       // height so reopening restores it.
-      const previous = resizing.startHeight;
       stopDockedResize();
-      dockedHeight.value = clampBodyHeight(previous);
+      dockedHeight.value = clampBodyHeight(startHeight);
       onCollapse();
       return;
     }
@@ -82,8 +86,8 @@ export function useDockedResize(options: {
   useEventListener(window, "pointercancel", stopDockedResize);
 
   function stopDockedResize() {
-    if (!resizing) return;
-    resizing = null;
+    if (!resizing.value) return;
+    resizing.value = null;
     justResized.value = true;
     // The click event fires after pointerup; lift the guard a task later.
     setTimeout(() => (justResized.value = false), 0);
@@ -92,6 +96,7 @@ export function useDockedResize(options: {
   return {
     dockedHeight,
     dockedColumnStyle,
+    isResizing,
     justResized,
     onPanelPointerDown,
     startDockedResize,
