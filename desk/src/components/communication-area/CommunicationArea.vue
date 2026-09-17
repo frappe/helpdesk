@@ -6,7 +6,7 @@
         ref="pillRef"
         role="button"
         tabindex="0"
-        class="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-lg bg-surface-elevation-2 py-1 pl-2 pr-1 text-base text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
+        class="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-6 bg-surface-elevation-2 py-1 pl-2 pr-1 text-base text-ink-gray-5 shadow-md hover:bg-surface-elevation-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
         @click="openComposer()"
         @keydown.enter.prevent="openComposer()"
         @keydown.space.prevent="openComposer()"
@@ -30,9 +30,7 @@
           </template>
         </Button>
       </div>
-      <div
-        class="flex shrink-0 rounded-lg bg-surface-elevation-2 p-1 shadow-md"
-      >
+      <div class="flex shrink-0 rounded-6 bg-surface-elevation-2 p-1 shadow-md">
         <Button
           variant="ghost"
           class="group hover:bg-transparent active:bg-transparent"
@@ -269,7 +267,7 @@ import {
 import { onClickOutside, useStorage } from "@vueuse/core";
 import { Avatar, TabButtons, createResource, toast } from "frappe-ui";
 import { FloatingWindow, type WindowMode } from "frappe-ui/experimental";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { storeToRefs } from "pinia";
 import {
   computed,
@@ -304,7 +302,7 @@ const emit = defineEmits(["update"]);
 
 const { isMac } = useDevice();
 const { isMobileView } = useScreenSize();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager, userImage, userName } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
@@ -614,7 +612,7 @@ const sendMail = createResource({
     showEmailBox.value = false;
     emit("update");
     if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
+      updateOnboardingStep?.("reply_on_ticket");
     }
   },
 });
@@ -664,7 +662,7 @@ const sendComment = createResource({
     showCommentBox.value = false;
     emit("update");
     if (isManager) {
-      updateOnboardingStep("comment_on_ticket");
+      updateOnboardingStep?.("comment_on_ticket");
     }
   },
 });
