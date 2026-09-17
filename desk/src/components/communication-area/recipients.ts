@@ -18,9 +18,7 @@ export function toRecipientList(
   return addresses.filter((a): a is string => !!a).map(toRecipient);
 }
 
-
 const contactByEmail = new Map<string, Recipient | null>();
-
 
 // get contact list for and fill names from Contacts for chips that have none
 export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
@@ -36,15 +34,21 @@ export async function nameRecipients(...lists: Ref<Recipient[]>[]) {
       doctype: "Contact",
       fields: ["email_id", "full_name", "name", "image"],
       filters: { email_id: ["in", unknownContacts] },
-      limit_page_length: unknownContacts.length,
-    }).catch(() => []);
-    for (const email of unknownContacts) contactByEmail.set(email, null);
-    for (const c of contacts) {
-      contactByEmail.set(c.email_id, {
-        email: c.email_id,
-        label: c.full_name || c.name,
-        image: c.image,
-      });
+      // Unlimited: an address can carry several Contacts, so a page sized by
+      // address count would drop rows other addresses still need.
+      limit_page_length: 0,
+    }).catch(() => null);
+    // A failed lookup is not an answer. Caching it as "no contact" would keep
+    // these addresses bare for the rest of the session.
+    if (contacts) {
+      for (const email of unknownContacts) contactByEmail.set(email, null);
+      for (const c of contacts) {
+        contactByEmail.set(c.email_id, {
+          email: c.email_id,
+          label: c.full_name || c.name,
+          image: c.image,
+        });
+      }
     }
   }
   for (const list of lists) {
