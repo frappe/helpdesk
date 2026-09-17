@@ -23,15 +23,16 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from "@/components";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
+import { Link } from "@framework/ui";
 import {
   Combobox,
   createResource,
   DatePicker,
   DateTimePicker,
-  FormControl,
+  Select,
+  TextInput,
 } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -54,29 +55,42 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 
+const SEARCHABLE_FROM = 10;
+
 // trigger: "button" keeps the search inside the popover, so the control still
 // reads as a value rather than a text input
 function picker(options: { label: string; value: string | number }[]) {
   return h(Combobox, { trigger: "button", options, size: "sm" });
 }
 
+// Combobox feeds one placeholder to both its trigger and its search box, so a
+// short list uses Select instead: no search box, no repeated placeholder.
+function select(options: { label: string; value: string | number }[]) {
+  return h(Select, { options, size: "sm" });
+}
+
+function optionControl(options: { label: string; value: string | number }[]) {
+  return options.length > SEARCHABLE_FROM ? picker(options) : select(options);
+}
+
 const component = computed(() => {
   if (props.field.url_method) {
     return picker(apiOptions.data || []);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
+    // title keeps the saved value readable until search_link returns it
     return h(Link, {
       doctype: props.field.options,
       filters: props.field.filters,
-      pageLength: 999,
+      title: props.value ? String(props.value) : undefined,
     });
   } else if (props.field.fieldtype === "Select") {
-    return picker(
+    return optionControl(
       props.field.options
         ? props.field.options.split("\n").map((o) => ({ label: o, value: o }))
         : []
     );
   } else if (props.field.fieldtype === "Check") {
-    return picker([
+    return select([
       { label: "Yes", value: 1 },
       { label: "No", value: 0 },
     ]);
@@ -90,8 +104,8 @@ const component = computed(() => {
       format: window.date_format.toUpperCase(),
     });
   } else {
-    return h(FormControl, {
-      debounce: 500,
+    return h(TextInput, {
+      debounce: 100,
     });
   }
 });
@@ -120,7 +134,8 @@ const placeholder = computed(() => {
     return "Type something";
   } else if (
     props.field.fieldtype === "Select" ||
-    props.field.fieldtype === "Link"
+    props.field.fieldtype === "Link" ||
+    props.field.fieldtype === "Check"
   ) {
     return "Select an option";
   }

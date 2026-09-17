@@ -18,11 +18,12 @@
   />
   <Link
     v-else-if="filter.type === 'Link'"
-    :value="props.value"
+    :model-value="props.value"
     :doctype="filter.options"
     :placeholder="filter.label"
-    @change="(data) => updateFilter(filter, data)"
+    :title="props.value ? String(props.value) : undefined"
     class="!min-w-36 max-w-36"
+    @update:model-value="(value) => updateFilter(filter, value ?? '')"
   />
   <component
     v-else-if="['Date', 'Datetime'].includes(filter.type)"
@@ -42,7 +43,7 @@
   />
 </template>
 <script setup>
-import { Link } from "@/components";
+import { Link } from "@framework/ui";
 import { useDebounceFn } from "@vueuse/core";
 import { DatePicker, DateTimePicker, FormControl, TextInput } from "frappe-ui";
 

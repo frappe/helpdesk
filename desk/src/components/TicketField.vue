@@ -33,8 +33,8 @@ import {
   DatePicker,
   DateTimePicker,
   dayjs,
-  FormControl,
   Select,
+  TextInput,
 } from "frappe-ui";
 import { computed, h } from "vue";
 
@@ -108,6 +108,12 @@ function select(options: Option[]) {
   return h(Select, { ...ghostControl, options });
 }
 
+// the variant alone styles the row: no class overrides, and the scoped rule
+// below skips data-slot="control" so it does not fight this
+function textInput() {
+  return h(TextInput, { variant: "ghost" as const });
+}
+
 // trigger: "button" keeps the search inside the popover, so the row still
 // reads as a value and not a text input
 function combobox(options: Option[]) {
@@ -163,9 +169,7 @@ const component = computed(() => {
       { label: "No", value: 0 },
     ]);
   } else if (textFields.includes(props.field.fieldtype)) {
-    return h(FormControl, {
-      type: "text",
-    });
+    return textInput();
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
       format: `${window.date_format.toUpperCase()} ${window.time_format}`,
@@ -181,7 +185,7 @@ const component = computed(() => {
   //   return h(DurationField, { showSeconds: false });
   // }
   else {
-    return h(FormControl);
+    return textInput();
   }
 });
 
@@ -265,7 +269,8 @@ function handleRedirect(value: string) {
 }
 </script>
 <style scoped>
-:deep(.form-control input:not([type="checkbox"])),
+/* TextInput brings its own variant; only the picker inputs get flattened */
+:deep(.form-control input:not([type="checkbox"]):not([data-slot="control"])),
 :deep(.form-control select),
 :deep(.form-control textarea),
 :deep(.form-control button) {
