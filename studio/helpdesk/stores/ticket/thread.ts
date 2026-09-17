@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { timeAgo } from '@app/utils'
+import { timeAgo } from '@helpdesk/shared/utils'
 import { createResource, dayjs } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 import { layoutOf, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/components/ticket/bubbleLayout'

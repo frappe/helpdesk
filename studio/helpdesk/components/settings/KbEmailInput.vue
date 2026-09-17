@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 // `experimental/` is not in Studio's palette, so it reaches the block tree through this.
+import { validateEmail } from "@helpdesk/shared/utils";
 import { MultiEmailInput } from "frappe-ui/experimental";
 import { computed, ref } from "vue";
 
@@ -59,7 +60,7 @@ function onKeydown(event: KeyboardEvent) {
   if (!(input instanceof HTMLInputElement)) return;
 
   const email = input.value.trim().replace(/[,;]+$/, "");
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+  if (!email || !validateEmail(email)) return;
   event.preventDefault();
 
   if (

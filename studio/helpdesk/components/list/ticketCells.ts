@@ -1,7 +1,8 @@
 // Ported from the agent list: the desk components it mirrors live under `@/`, which
 // the Studio build cannot resolve.
 import { Avatar, Badge, Tooltip, call, createListResource, dayjs } from 'frappe-ui'
-import { parseJsonArray, shortDuration } from '@app/utils'
+import { parseJsonArray } from '@app/utils'
+import { shortDuration } from '@helpdesk/shared/utils'
 import { h, reactive } from 'vue'
 
 const statuses = createListResource({

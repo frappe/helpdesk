@@ -1,7 +1,3 @@
-import { dayjs } from 'frappe-ui'
-
-// Three duration formats coexist on purpose, as they do in the agent portal.
-
 export function parseJson(value: unknown, fallback: any = undefined) {
   if (!value) return fallback
   if (typeof value !== 'string') return value
@@ -25,25 +21,9 @@ const MINUTE = 60
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
-// Compact and direction-agnostic: "2 days 3h".
-export function shortDuration(target: string) {
-  const seconds = Math.abs(dayjs(target).diff(dayjs(), 'second'))
-  if (seconds >= DAY) {
-    const days = Math.floor(seconds / DAY)
-    const hours = Math.floor((seconds % DAY) / HOUR)
-    const label = `${days} ${days === 1 ? 'day' : 'days'}`
-    return hours ? `${label} ${hours}h` : label
-  }
-  if (seconds >= HOUR) {
-    const hours = Math.floor(seconds / HOUR)
-    const minutes = Math.floor((seconds % HOUR) / MINUTE)
-    return minutes ? `${hours}h ${minutes}m` : `${hours}h`
-  }
-  return `${Math.floor(seconds / MINUTE)}m`
-}
-
 // Two units at most, and no trailing seconds: a countdown that re-renders only on load
-// reads as a frozen timer when it shows them.
+// reads as a frozen timer when it shows them. The desk has no equivalent — its
+// `shortDuration` counts to a date, this one formats an elapsed span.
 export function compactDuration(seconds: number) {
   return (
     compactUnits(seconds)
@@ -63,31 +43,4 @@ function compactUnits(seconds: number) {
   const largest = all.findIndex(([value]) => value)
   if (largest < 0) return []
   return all.slice(largest, largest + 2).filter(([value]) => value)
-}
-
-// Not dayjs's `fromNow`: that words a week as days.
-export function timeAgo(value: string) {
-  const seconds = dayjs().diff(dayjs(value), 'second')
-  const days = Math.floor(seconds / DAY)
-  if (days < 1) return withinDay(seconds)
-  if (days < 2) return 'Yesterday'
-  return olderThanDay(days)
-}
-
-function withinDay(seconds: number) {
-  if (seconds < 60) return 'Just now'
-  if (seconds < 120) return '1 minute ago'
-  if (seconds < HOUR) return `${Math.floor(seconds / MINUTE)} minutes ago`
-  if (seconds < 2 * HOUR) return '1 hour ago'
-  return `${Math.floor(seconds / HOUR)} hours ago`
-}
-
-function olderThanDay(days: number) {
-  if (days < 7) return `${days} days ago`
-  if (days < 14) return '1 week ago'
-  if (days < 31) return `${Math.floor(days / 7)} weeks ago`
-  if (days < 62) return '1 month ago'
-  if (days < 365) return `${Math.floor(days / 30)} months ago`
-  if (days < 730) return '1 year ago'
-  return `${Math.floor(days / 365)} years ago`
 }
