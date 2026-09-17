@@ -1,0 +1,70 @@
+diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
+index 91c8dc4..2883b93 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
+@@ -5,6 +5,7 @@ import type {
+ } from '@tiptap/suggestion'
+ import type { Component } from 'vue'
+ import {
++  autoUpdate,
+   computePosition,
+   flip,
+   offset,
+@@ -40,6 +41,9 @@ export function createSuggestionRenderer(
+   let isActive = false
+   // Monotonic token; a stale onUpdate from a superseded query bails.
+   let renderToken = 0
++  // Monotonic token; a stale computePosition settling later bails.
++  let positionToken = 0
++  let cleanupAutoUpdate: (() => void) | null = null
+ 
+   function getListExpose(): SuggestionListExpose | null {
+     const ref = renderer?.ref as SuggestionListExpose | null | undefined
+@@ -52,6 +56,7 @@ export function createSuggestionRenderer(
+     const rect = getReferenceClientRect()
+     if (!rect) return
+     const reference = { getBoundingClientRect: () => rect }
++    const token = ++positionToken
+     void computePosition(reference, floatingEl, {
+       placement: floatingOptions?.placement ?? 'bottom-start',
+       middleware: [
+@@ -60,7 +65,7 @@ export function createSuggestionRenderer(
+         shift({ padding: 8 }),
+       ],
+     }).then(({ x, y }) => {
+-      if (!floatingEl) return
++      if (!floatingEl || token !== positionToken) return
+       Object.assign(floatingEl.style, {
+         position: 'absolute',
+         left: `${x}px`,
+@@ -93,7 +98,19 @@ export function createSuggestionRenderer(
+     floatingEl.style.position = 'absolute'
+     document.body.appendChild(floatingEl)
+     getReferenceClientRect = props.clientRect as () => DOMRect | null
+-    updatePosition()
++
++    // Positions once, then keeps the popup on the caret through scroll, window
++    // resize and its own height changes (`flip()` measures a height that async
++    // rows and late fonts change after the fact).
++    cleanupAutoUpdate = autoUpdate(
++      {
++        getBoundingClientRect: () =>
++          getReferenceClientRect?.() ?? new DOMRect(),
++        contextElement: props.editor?.view?.dom as HTMLElement | undefined,
++      },
++      floatingEl,
++      updatePosition,
++    )
+   }
+ 
+   return {
+@@ -139,6 +156,9 @@ export function createSuggestionRenderer(
+     onExit() {
+       isActive = false
+       renderToken++
++      positionToken++
++      cleanupAutoUpdate?.()
++      cleanupAutoUpdate = null
+       floatingEl?.remove()
+       renderer?.destroy()
+       floatingEl = null
