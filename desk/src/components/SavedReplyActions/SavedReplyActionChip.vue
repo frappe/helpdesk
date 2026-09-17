@@ -85,10 +85,12 @@ const label = computed(() => config.value.chipLabel);
 // Empty for no-value actions like "Assign to Me"; the noun then stands alone
 const value = computed(() => props.action.label || props.action.value);
 
-// A tag chip holds one tag, so it picks like the rest; no-value actions have
-// nothing to pick
-const isEditable = computed(() =>
-  ["select", "combobox", "multiselect"].includes(config.value.control)
+// A tag chip holds one tag, so it picks like the rest. Excluded rather than
+// listed, so a new control type is editable by default instead of silently
+// read-only: no-value actions have nothing to pick, and a comment is too long
+// for a chip.
+const isEditable = computed(
+  () => !["none", "editor"].includes(config.value.control)
 );
 
 // Combobox takes string values; the shared options allow numbers too
