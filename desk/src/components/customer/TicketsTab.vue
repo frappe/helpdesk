@@ -58,7 +58,7 @@
         <!-- top-[105px] = tablist (45) + filter bar (60); remeasure
              if either changes -->
         <div
-          class="sticky top-[105px] z-[5] grid items-center border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
+          class="sticky top-[105px] z-[5] grid items-center gap-x-3 border-b bg-surface-base px-1 py-2 text-xs-medium text-ink-gray-5"
           :style="gridTemplateStyle"
         >
           <div
@@ -87,7 +87,7 @@
             :key="ticket.name"
           >
             <div
-              class="grid items-center py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded-4 transition-colors"
+              class="grid items-center gap-x-3 py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded-4 transition-colors"
               :style="gridTemplateStyle"
               @click="goToTicket(ticket.name)"
             >
@@ -108,7 +108,10 @@
               </div>
 
               <!-- Priority -->
-              <div v-if="!isMobileView" class="flex items-center gap-1.5">
+              <div
+                v-if="!isMobileView"
+                class="flex min-w-0 items-center gap-1.5"
+              >
                 <TicketPriority :priority="ticket.priority" />
               </div>
 

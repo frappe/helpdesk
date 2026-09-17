@@ -16,6 +16,7 @@
         :disabled="field.disabled"
         :model-value="transValue"
         @update:model-value="emitUpdate(field.fieldname, $event)"
+        variant="outline"
       />
       <slot name="label-extra" />
     </div>

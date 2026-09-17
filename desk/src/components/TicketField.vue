@@ -108,10 +108,13 @@ function select(options: Option[]) {
   return h(Select, { ...ghostControl, options });
 }
 
-// the variant alone styles the row: no class overrides, and the scoped rule
-// below skips data-slot="control" so it does not fight this
+// ghost opts out of the focus outline, and `class` lands on TextInput's
+// wrapper, so the ring has to be re-applied to the input itself
 function textInput() {
-  return h(TextInput, { variant: "ghost" as const });
+  return h(TextInput, {
+    variant: "ghost" as const,
+    class: "[&_input:focus]:focus-ring",
+  });
 }
 
 // trigger: "button" keeps the search inside the popover, so the row still
@@ -269,6 +272,19 @@ function handleRedirect(value: string) {
 }
 </script>
 <style scoped>
+/* a read-only row still reads as plain text: TextInput swaps ghost for its
+   filled disabled variant, and the pickers stay flat, so match them */
+:deep(.form-control input[data-slot="control"]:disabled) {
+  border-color: transparent;
+  background: var(--surface-base);
+}
+
+/* PickerShell keeps its chevron on a disabled picker, and the chevron opens
+   the popover on its own mousedown, so hide the whole suffix */
+:deep(.form-control input[data-slot="control"]:disabled ~ div) {
+  display: none;
+}
+
 /* TextInput brings its own variant; only the picker inputs get flattened */
 :deep(.form-control input:not([type="checkbox"]):not([data-slot="control"])),
 :deep(.form-control select),
