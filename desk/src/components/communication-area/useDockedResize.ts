@@ -4,8 +4,10 @@ import { computed, ref, type Ref } from "vue";
 
 // The message area alone; the header rows and toolbar sit outside it.
 const MIN_BODY_HEIGHT = 160;
-// Dragging this far below the minimum collapses the window back to the pill.
+//dragging this far below the minimum collapses the window back to the pill.
 const MINIMIZE_OVERDRAG = 60;
+// max height from top upto which it panel can be dragged
+const THREAD_PEEK = 64;
 
 // dragging the docked title bar sets the message area height, 0 means natural
 export function useDockedResize(options: {
@@ -33,7 +35,11 @@ export function useDockedResize(options: {
   }
 
   // the live drag, null when there is none so the listeners below just no-op
-  const resizing = ref<{ startY: number; startHeight: number } | null>(null);
+  const resizing = ref<{
+    startY: number;
+    startHeight: number;
+    minY: number;
+  } | null>(null);
   const isResizing = computed(() => resizing.value !== null);
   // A pointer released outside the window must not count as an outside click.
   const justResized = ref(false);
@@ -49,13 +55,23 @@ export function useDockedResize(options: {
   }
 
   function startDockedResize(event: PointerEvent) {
+    const grabbed = event.currentTarget as HTMLElement;
     resizing.value = {
       startY: event.clientY,
       startHeight: currentBodyHeight(),
+      //max height upto which panel can be dragged
+      minY: threadTop() + (event.clientY - grabbed.getBoundingClientRect().top),
     };
     try {
       (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     } catch {}
+  }
+
+  function threadTop() {
+    const thread = document.querySelector(
+      "[role='tabpanel'][data-state='active']"
+    );
+    return thread ? thread.getBoundingClientRect().top + THREAD_PEEK : 0;
   }
 
   function currentBodyHeight() {
@@ -64,7 +80,7 @@ export function useDockedResize(options: {
     const bodies =
       column.value?.querySelectorAll<HTMLElement>(".composer-body");
     return Math.max(
-      MIN_BODY_HEIGHT,
+      0,
       ...Array.from(bodies ?? [], (body) => body.offsetHeight)
     );
   }
@@ -75,8 +91,8 @@ export function useDockedResize(options: {
 
   useEventListener(window, "pointermove", (event: PointerEvent) => {
     if (!resizing.value) return;
-    const { startY, startHeight } = resizing.value;
-    const next = startHeight + (startY - event.clientY);
+    const { startY, startHeight, minY } = resizing.value;
+    const next = startHeight + (startY - Math.max(event.clientY, minY));
     if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
       // Dragged well past the floor: collapse to the pill, keeping the pre-drag
       // height so reopening restores it.
