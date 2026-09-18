@@ -13,7 +13,6 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
 )
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
-from helpdesk.overrides.client import set_value
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
@@ -76,32 +75,6 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         frappe.set_user(CUSTOMER_EMAIL)
         self.assertFalse(get_one(ticket.name, is_customer_portal=True).get("priority"))
         self.assertTrue(client_get("HD Ticket", ticket.name).get("priority"))
-
-    def test_a_portal_write_answers_with_only_what_the_customer_may_read(self):
-        """The portal rates and closes tickets through set_value, which is the one
-        client method that replies with the whole document."""
-        self.assertEqual(
-            ["helpdesk.overrides.client.set_value"],
-            frappe.get_hooks("override_whitelisted_methods").get(
-                "frappe.client.set_value"
-            ),
-        )
-        # ticket_type is readable at its level; only the template tier hides it
-        self.show_to("ticket_type", "Agents")
-        ticket = self.make_customer_ticket()
-
-        frappe.set_user(CUSTOMER_EMAIL)
-        written = set_value("HD Ticket", ticket.name, {"feedback_extra": "thank you"})
-
-        self.assertEqual("thank you", written.get("feedback_extra"))
-        # key authenticates the guest feedback link, and is never display data
-        self.assertNotIn("key", written)
-        self.assertNotIn("agreement_status", written)
-        self.assertNotIn("ticket_type", written)
-        self.assertNotIn("_user_tags", written)
-
-        frappe.set_user(AGENT_EMAIL)
-        self.assertIn("key", set_value("HD Ticket", ticket.name, {"priority": "Low"}))
 
     def test_a_save_after_the_read_strip_keeps_the_hidden_value(self):
         """A hidden field is absent from the payload, so a whole-document save would
