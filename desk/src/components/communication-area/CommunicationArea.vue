@@ -121,7 +121,7 @@
             class="flex min-h-0 flex-col"
             :class="windowMode === 'floating' ? 'h-full' : ''"
             :style="dockedBodyStyle"
-            @keydown.esc.capture.stop="collapseToPill"
+            @keydown.esc.capture="onEscape"
           >
             <div
               v-show="showEmailBox"
@@ -407,6 +407,16 @@ watch([isMobileView, windowMode], ([mobile, mode]) => {
 function closeComposer() {
   showEmailBox.value = false;
   showCommentBox.value = false;
+}
+
+//handles unexpected closing in case a popover is open
+function onEscape(event: KeyboardEvent) {
+  event.stopPropagation();
+  if (!document.querySelector("[data-slot='content'][data-state='open']")) {
+    collapseToPill();
+    return;
+  }
+  window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
 }
 
 // hand focus to the pill, an open recipient list only closes once focus moves away
