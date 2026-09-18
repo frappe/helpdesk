@@ -1,35 +1,42 @@
 <template>
-  <Tabs
-    :modelValue="activeTab"
-    :tabs="tabs"
-    @update:modelValue="changeTabTo"
-    size="md"
-    class="flex-1 overflow-hidden [&_[role='tablist']]:px-5 [&_[role='tablist']]:py-1.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
+  <div
+    ref="panelRef"
+    class="relative flex min-h-0 flex-1 flex-col"
+    :style="{ '--composer-reserve': `${composerReserve}px` }"
   >
-    <template #tab-panel="{ tab }">
-      <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
-      <TicketTimeline
-        v-else
-        :ticket-id="String(ticket.doc?.name)"
-        :tab="tab.value"
-        :tab-label="tab.label"
-        @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
+    <Tabs
+      :modelValue="activeTab"
+      :tabs="tabs"
+      @update:modelValue="changeTabTo"
+      size="md"
+      class="flex-1 overflow-hidden [&_[role='tablist']]:px-5 [&_[role='tablist']]:py-1.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:min-h-0"
+    >
+      <template #tab-panel="{ tab }">
+        <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
+        <TicketTimeline
+          v-else
+          :ticket-id="String(ticket.doc?.name)"
+          :tab="tab.value"
+          :tab-label="tab.label"
+          @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
+        />
+      </template>
+    </Tabs>
+    <!-- The composer floats over the thread instead of taking a row in it, so
+         opening or resizing it never reflows the timeline. -->
+    <div ref="composerRef" class="absolute inset-x-0 bottom-0 z-10">
+      <CommunicationArea
+        ref="communicationAreaRef"
+        :ticketId="String(ticket.doc?.name)"
+        :to-emails="[ticket.doc?.raised_by]"
+        :key="ticket.doc?.name"
       />
-    </template>
-  </Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-  />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import CommunicationArea from "@/components/CommunicationArea.vue";
+import CommunicationArea from "@/components/communication-area/CommunicationArea.vue";
 import {
   ActivityIcon,
   CommentIcon,
@@ -40,9 +47,10 @@ import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyt
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { useTelephonyStore } from "@/stores/telephony";
 import { TabObject, TicketSymbol } from "@/types";
+import { useElementSize } from "@vueuse/core";
 import { Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, inject, ref } from "vue";
+import { computed, ComputedRef, inject, ref, useTemplateRef, watch } from "vue";
 import LucideChartNoAxesColumn from "~icons/lucide/chart-no-axes-column";
 import TicketTimeline from "./timeline/TicketTimeline.vue";
 
@@ -51,6 +59,30 @@ const ticket = inject(TicketSymbol)!;
 const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
   null
 );
+const panelRef = useTemplateRef<HTMLElement>("panelRef");
+const composerRef = useTemplateRef<HTMLElement>("composerRef");
+const { height: composerHeight } = useElementSize(composerRef);
+
+// carry the reserved height of the composer on drag start and release
+const composerReserve = ref(0);
+watch([composerHeight, () => communicationAreaRef.value?.isResizing], () => {
+  if (!communicationAreaRef.value?.isResizing)
+    composerReserve.value = composerHeight.value;
+});
+
+// The timeline is bottom-anchored so avoid it to push upwards when composer is dragged
+watch(
+  composerReserve,
+  (height, previous) => {
+    if (!previous) return;
+    const scroller = panelRef.value?.querySelector<HTMLElement>(
+      "[role='tabpanel'][data-state='active'] .activity-timeline"
+    );
+    if (scroller) scroller.scrollTop -= height - previous;
+  },
+  { flush: "post" }
+);
+
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 

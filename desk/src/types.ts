@@ -413,7 +413,6 @@ export interface Breadcrumb {
   };
 }
 
-
 export interface FieldCriteriaState {
   selectedParentField: string;
   selectedChildField: string;
@@ -628,6 +627,14 @@ export interface RenderedSavedReply {
   title: string;
   message: string;
   actions: SavedReplyAction[];
+}
+
+/** What the timeline hands the composer when an agent replies from the feed. */
+export interface ReplyPayload {
+  content: string;
+  to: string[];
+  cc?: string[];
+  bcc?: string[];
 }
 
 export type APIOptions = DropdownOption[] | string[] | [];

@@ -1,9 +1,7 @@
 export { default as BackButton } from "./BackButton.vue";
 export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as AttachmentList } from "./AttachmentList.vue";
-export { default as CommentTextEditor } from "./CommentTextEditor.vue";
-export { default as CommunicationArea } from "./CommunicationArea.vue";
-export { default as EmailEditor } from "./EmailEditor.vue";
+export { default as CommunicationArea } from "./communication-area/CommunicationArea.vue";
 export { default as FadedScrollableDiv } from "./FadedScrollableDiv.vue";
 export { default as Link } from "./frappe-ui/Link.vue";
 export { default as Icon } from "./Icon.vue";

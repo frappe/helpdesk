@@ -2,9 +2,9 @@
   <div
     v-if="pendingActions.length"
     ref="container"
-    class="overflow-hidden rounded-6 border border-outline-gray-1 bg-surface-gray-1"
+    class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1"
   >
-    <div class="flex h-8 items-center gap-1.5 ps-3.5 pe-1.5">
+    <div class="flex h-8 items-center gap-1.5 ps-2.5 pe-0.5">
       <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />
       <template v-if="sourceLabel">
         <Tooltip :text="sourceLabel">
@@ -20,7 +20,7 @@
       <div class="ms-auto flex shrink-0 items-center gap-0.5">
         <Button
           variant="ghost"
-          size="xs"
+          size="sm"
           :aria-expanded="expanded"
           :icon="expanded ? 'lucide-chevron-down' : 'lucide-chevron-right'"
           :label="expanded ? __('Hide actions') : __('Show actions')"
@@ -28,7 +28,7 @@
         />
         <Button
           variant="ghost"
-          size="xs"
+          size="sm"
           icon="lucide-x"
           :label="__('Clear all actions')"
           @click="clear"
@@ -104,6 +104,8 @@ const expanded = userStorage(
 const showAllChips = ref(false);
 // Not reactive: it only gates the next failure's retry
 let isRetry = false;
+// keep a copy of what we sent, sending clears the staged list so retry uses this
+let submittedActions: SavedReplyAction[] = [];
 const container = ref<HTMLElement>();
 const { width } = useElementSize(container);
 
@@ -222,7 +224,7 @@ const applyActions = createResource({
     reloadFeed();
   },
   onError: (error: { status?: number }) => {
-    const failed = [...pendingActions.value];
+    const failed = submittedActions;
     // Only a response proves it rolled back, and one retry is enough
     const canRetry = Boolean(error?.status) && !isRetry;
     // Unstaged always: a kept batch would ride the next, unrelated send
@@ -240,6 +242,7 @@ const applyActions = createResource({
 /** Re-send a batch the agent kept from the failure toast. */
 function retry(actions: SavedReplyAction[]) {
   isRetry = true;
+  submittedActions = actions;
   applyActions.submit({ ticket_id: props.ticketId, actions });
 }
 
@@ -249,9 +252,10 @@ function submit() {
   // Actions stay staged during the request, so guard the second call
   if (applyActions.loading) return;
   isRetry = false;
+  submittedActions = [...pendingActions.value];
   applyActions.submit({
     ticket_id: props.ticketId,
-    actions: [...pendingActions.value],
+    actions: submittedActions,
   });
 }
 
