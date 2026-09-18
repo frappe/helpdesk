@@ -13,6 +13,7 @@ from helpdesk.helpdesk.doctype.hd_ticket.api import (
 )
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
+from helpdesk.overrides.client import set_value
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
@@ -31,22 +32,15 @@ class TestTicketFieldVisibility(IntegrationTestCase):
 
     def setUp(self):
         frappe.set_user("Administrator")
-        self.addCleanup(frappe.set_user, "Administrator")
         create_agent(AGENT_EMAIL)
         self.contact = create_contact("FV Customer", CUSTOMER_EMAIL)["contact"]
 
-    def delete_as_administrator(self, doctype: str, name: str):
-        # cleanups run before the set_user reset, whatever user the test ended as
+    def tearDown(self):
         frappe.set_user("Administrator")
-        frappe.delete_doc(doctype, name, force=True)
 
     def make_customer_ticket(self, **values):
-        ticket = make_ticket(
-            subject="Field visibility ticket",
-            raised_by=CUSTOMER_EMAIL,
-            **values,
-        )
-        self.addCleanup(self.delete_as_administrator, "HD Ticket", ticket.name)
+        ticket = make_ticket(raised_by=CUSTOMER_EMAIL, **values)
+        self.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
         return ticket
 
     def show_to(self, fieldname: str, visible_to: str):
@@ -82,6 +76,32 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         frappe.set_user(CUSTOMER_EMAIL)
         self.assertFalse(get_one(ticket.name, is_customer_portal=True).get("priority"))
         self.assertTrue(client_get("HD Ticket", ticket.name).get("priority"))
+
+    def test_a_portal_write_answers_with_only_what_the_customer_may_read(self):
+        """The portal rates and closes tickets through set_value, which is the one
+        client method that replies with the whole document."""
+        self.assertEqual(
+            ["helpdesk.overrides.client.set_value"],
+            frappe.get_hooks("override_whitelisted_methods").get(
+                "frappe.client.set_value"
+            ),
+        )
+        # ticket_type is readable at its level; only the template tier hides it
+        self.show_to("ticket_type", "Agents")
+        ticket = self.make_customer_ticket()
+
+        frappe.set_user(CUSTOMER_EMAIL)
+        written = set_value("HD Ticket", ticket.name, {"feedback_extra": "thank you"})
+
+        self.assertEqual("thank you", written.get("feedback_extra"))
+        # key authenticates the guest feedback link, and is never display data
+        self.assertNotIn("key", written)
+        self.assertNotIn("agreement_status", written)
+        self.assertNotIn("ticket_type", written)
+        self.assertNotIn("_user_tags", written)
+
+        frappe.set_user(AGENT_EMAIL)
+        self.assertIn("key", set_value("HD Ticket", ticket.name, {"priority": "Low"}))
 
     def test_a_save_after_the_read_strip_keeps_the_hidden_value(self):
         """A hidden field is absent from the payload, so a whole-document save would
@@ -216,7 +236,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
             "FV Other", [{"fieldname": "priority", "visible_to": "Everyone"}]
         )
         self.addCleanup(
-            self.delete_as_administrator, "HD Ticket Template", template.name
+            frappe.delete_doc, "HD Ticket Template", template.name, force=True
         )
 
         frappe.set_user(CUSTOMER_EMAIL)
@@ -311,7 +331,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         """A portal contact who has to pick which customer a ticket is for."""
         for name in ("FV Customer One", "FV Customer Two"):
             customer = create_customer(name, [{"contact_name": self.contact}])
-            self.addCleanup(self.delete_as_administrator, "HD Customer", customer.name)
+            self.addCleanup(frappe.delete_doc, "HD Customer", customer.name, force=True)
 
     def test_a_multi_customer_contact_still_gets_a_required_customer_field(self):
         """set_customer_field only narrows a row get_fields_meta already allowed,
