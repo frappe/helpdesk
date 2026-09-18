@@ -471,7 +471,12 @@ function replaceSavedReply(reply: RenderedSavedReply) {
 
 /** Set by submitMail, so the composer can be cleared before the request goes out. */
 let pendingRow: ReturnType<typeof addPendingActivity> | null = null;
-let sentDraft: { content: string | null; attachments: any[] } | null = null;
+let sentDraft: {
+  content: string | null;
+  attachments: any[];
+  quoted: string | null;
+  quoteExpanded: boolean;
+} | null = null;
 
 const sendMail = createResource({
   url: "run_doc_method",
@@ -498,6 +503,8 @@ const sendMail = createResource({
     if (sentDraft) {
       newEmail.value = sentDraft.content;
       attachments.value = sentDraft.attachments;
+      quotedContent.value = sentDraft.quoted;
+      isQuoteExpanded.value = sentDraft.quoteExpanded;
       sentDraft = null;
     }
     emit("restore");
@@ -562,7 +569,12 @@ function submitMail() {
       })),
     },
   });
-  sentDraft = { content: newEmail.value, attachments: attachments.value };
+  sentDraft = {
+    content: newEmail.value,
+    attachments: attachments.value,
+    quoted: quotedContent.value,
+    quoteExpanded: isQuoteExpanded.value,
+  };
 
   const params = {
     dt: props.doctype,
