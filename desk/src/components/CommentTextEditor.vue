@@ -65,6 +65,7 @@
                   () => {
                     newComment = '';
                     attachments = [];
+                    dropUnused(null);
                     emit('discard');
                   }
                 "
@@ -175,7 +176,7 @@ const extensions = buildEditorExtensions({
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const { isUploading, track } = useUploadTracker();
+const { isUploading, track, dropUnused } = useUploadTracker();
 const isDisabled = computed(() => {
   return isContentEmpty(newComment.value) || loading.value || isUploading.value;
 });
@@ -207,8 +208,8 @@ async function submitComment() {
     data: { name: "", content, attachments: sentAttachments },
   });
 
-  // the feed row is now the only copy on screen; the draft comes back if the
-  // call fails, so nothing is lost
+  // drop before clearing, or an unmount mid-send deletes what the comment carries
+  dropUnused(content);
   newComment.value = null;
   attachments.value = [];
   loading.value = true;
@@ -271,6 +272,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanup();
+  // the saved draft still references what it shows, so only what it dropped goes
+  dropUnused(newComment.value);
   if (isContentEmpty(newComment.value)) {
     localStorage.removeItem("commentBoxContent" + props.ticketId);
   }

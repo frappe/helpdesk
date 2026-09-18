@@ -412,7 +412,7 @@ const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 
 const attachments = ref([]);
 const attachmentUploading = ref(false);
-const { isUploading: editorUploading, track } = useUploadTracker();
+const { isUploading: editorUploading, track, dropUnused } = useUploadTracker();
 
 // The paperclip and the editor's own media buttons upload by different routes
 const isUploading = computed(
@@ -590,7 +590,8 @@ function submitMail() {
     },
   };
 
-  // the feed row is now the only copy on screen; the draft comes back on failure
+  // drop before resetState clears, or an unmount mid-send deletes what it carries
+  dropUnused(message);
   resetState();
   emit("sending");
   sendMail.submit(params);
@@ -652,6 +653,7 @@ function handleDiscard() {
   showBCC.value = false;
   isQuoteExpanded.value = false;
 
+  dropUnused(null);
   focusEditorAtStart();
   emit("discard");
 }
@@ -786,6 +788,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   replyComposer.value = null;
   cleanup();
+  // the saved draft still references what it shows, so only what it dropped goes
+  dropUnused(`${newEmail.value ?? ""}${quotedContent.value ?? ""}`);
 });
 
 defineExpose({
