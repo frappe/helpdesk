@@ -50,7 +50,7 @@ async function submit() {
       assign_to: JSON.stringify(assignees.value),
     });
     open.value = false;
-    toast.success(__("Assigned {0} tickets", ticketIds.length));
+    toast.success(__("Assigned {0} ticket(s)", ticketIds.length));
     emit("success");
   } finally {
     loading.value = false;

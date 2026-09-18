@@ -128,7 +128,7 @@ import {
   ErrorMessage,
   createResource,
 } from "frappe-ui";
-import { nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { isDocDirty, validateExotel, validateTwilio } from "./utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -192,13 +192,6 @@ const telephonyAgent = createDocumentResource({
   auto: false,
   onError(er) {
     toast.error(er?.messages?.[0] || __("Failed to load telephony agent"));
-  },
-});
-
-const twilioAppsResource = createResource({
-  url: "telephony.twilio.api.fetch_applications",
-  onSuccess() {
-    twilio.reload();
   },
 });
 
@@ -284,16 +277,6 @@ async function save() {
   // Reload twilio to prevent "doc has been modified" error, as an application is created and doc is updated on save
   await twilio.reload();
   telephonyStore.fetchCallIntegrationStatus();
-}
-
-function refreshApps(togglePopover) {
-  twilioAppsResource.submit().then(() => {
-    // Close and reopen popover to fix bug where search does not work after refreshing list
-    togglePopover();
-    nextTick(() => {
-      togglePopover();
-    });
-  });
 }
 
 createResource({

@@ -5,6 +5,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
+from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
@@ -24,6 +25,7 @@ def after_install():
     add_default_agent_groups()
     update_agent_role_permissions()
     add_agent_manager_permissions()
+    setup_comments_and_notifications()
     setup_customer_role()
     add_default_assignment_rule()
     create_default_template()
@@ -224,10 +226,27 @@ def setup_customer_role(fresh_install=True):
         role_doc.save()
 
     if fresh_install:
-        portal_settings = frappe.get_single("Portal Settings")
-        portal_settings.default_role = "HD Customer"
-        portal_settings.default_portal_home = "/helpdesk"
-        portal_settings.save()
+        set_portal_defaults(overwrite=True)
+
+
+def set_portal_defaults(overwrite=False):
+    """Point the portal at helpdesk. Installing claims the settings outright;
+    the upgrade patch only fills what a site left empty.
+
+    Writes straight into the Single rather than saving the document. A save
+    also validates the portal menu rows, and a row left behind by a deleted
+    doctype fails that validation and takes the whole migration down.
+    """
+    defaults = {"default_role": "HD Customer", "default_portal_home": "/helpdesk"}
+    if overwrite:
+        to_set = defaults
+    else:
+        current = frappe.db.get_singles_dict("Portal Settings")
+        to_set = {
+            field: value for field, value in defaults.items() if not current.get(field)
+        }
+    if to_set:
+        frappe.db.set_single_value("Portal Settings", to_set)
 
 
 def add_website_settings_permission():
@@ -431,8 +450,10 @@ def add_default_agent_status():
     for status in statuses:
         if not frappe.db.exists("HD Agent Status", status["agent_status"]):
             frappe.get_doc(
-                {"doctype": "HD Agent Status", "enable": 1, **status}
+                {"doctype": "HD Agent Status", "enabled": 1, **status}
             ).insert()
+
+    frappe.db.set_single_value("HD Settings", "default_agent_status", "Active")
 
 
 def add_fts_index():

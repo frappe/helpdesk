@@ -1,14 +1,14 @@
 <template>
-  <div class="flex flex-col rounded-md p-4 grow w-full h-full overflow-hidden">
+  <div class="flex flex-col rounded-5 p-4 grow w-full h-full overflow-hidden">
     <div class="flex gap-4 items-center justify-between">
-      <div class="flex items-center gap-2 text-lg-semibold text-ink-gray-8">
+      <div class="flex items-center gap-2 text-md-semibold text-ink-gray-8">
         {{ currentTitle }}
-        <Tooltip :text="tooltipText" placement="top">
-          <FeatherIcon name="info" class="size-3" />
+        <Tooltip :text="tooltipText" side="top">
+          <LucideInfo class="size-3" />
         </Tooltip>
       </div>
       <div class="w-max">
-        <TabButtons :buttons="chartTabs" v-model="currentTab" />
+        <TabButtons :options="chartTabs" v-model="currentTab" />
       </div>
     </div>
     <div class="flex flex-col mt-5 grow overflow-auto hide-scrollbar">
@@ -26,13 +26,13 @@
             <th class="p-2 text-start font-normal w-full">
               {{ __("Subject") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-20 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-16 whitespace-nowrap">
               {{ __("Status") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-20 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-28 whitespace-nowrap">
               {{ __("Priority") }}
             </th>
-            <th class="p-2 text-start font-normal min-w-32 whitespace-nowrap">
+            <th class="p-2 text-start font-normal min-w-44 whitespace-nowrap">
               {{ __("Team") }}
             </th>
             <th class="p-2 text-start font-normal min-w-40 whitespace-nowrap">
@@ -54,13 +54,13 @@
             <td class="p-2 py-3 w-full max-w-0 truncate">
               {{ ticket.subject }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate">
+            <td class="p-2 py-3 min-w-16 truncate">
               {{ ticket.status }}
             </td>
-            <td class="p-2 py-3 min-w-20 truncate">
+            <td class="p-2 py-3 min-w-28 truncate">
               <TicketPriority :priority="ticket.priority" />
             </td>
-            <td class="p-2 py-3 min-w-36 truncate">
+            <td class="p-2 py-3 min-w-44 truncate">
               {{ ticket.agent_group || __("Not Assigned") }}
             </td>
             <td class="p-2 py-3 min-w-40">
@@ -98,22 +98,22 @@
             :class="i > 1 ? 'border-t border-outline-elevation-2' : ''"
           >
             <td class="p-2 py-3 min-w-8">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 w-full max-w-0">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1 max-w-full" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1 max-w-full" />
             </td>
             <td class="p-2 py-3 min-w-14">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-21">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-28">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
             <td class="p-2 py-3 min-w-40">
-              <div class="h-4 w-full rounded-sm bg-surface-gray-1" />
+              <div class="h-4 w-full rounded-1 bg-surface-gray-1" />
             </td>
           </tr>
           <EmptyState
@@ -141,7 +141,7 @@
             {{
               __("See all {0} tickets", chartConfig?.totalPendingTickets + "")
             }}
-            <FeatherIcon name="arrow-right" class="size-4 rtl:rotate-180" />
+            <LucideArrowRight class="size-4 rtl:rotate-180" />
           </div>
         </div>
         <div v-if="chartConfig?.tickets?.length > 0" class="mt-3 mb-0.5">
@@ -160,17 +160,19 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowRight from "~icons/lucide/arrow-right";
+import LucideInfo from "~icons/lucide/info";
+import EmptyState from "@/components/EmptyState.vue";
+import TicketPriority from "@/components/TicketPriority.vue";
 import { useView } from "@/composables/useView";
 import { __ } from "@/translation";
-import { createResource, FeatherIcon, TabButtons } from "frappe-ui";
-import TicketPriority from "@/components/TicketPriority.vue";
+import { View } from "@/types";
+import { createResource, TabButtons } from "frappe-ui";
 import { computed, onMounted, ref, watch, type PropType } from "vue";
 import { useRouter } from "vue-router";
-import TimerIcon from "~icons/lucide/timer";
-import TicketPlusIcon from "~icons/lucide/ticket-plus";
 import CalendarIcon from "~icons/lucide/calendar";
-import { View } from "@/types";
-import EmptyState from "@/components/EmptyState.vue";
+import TicketPlusIcon from "~icons/lucide/ticket-plus";
+import TimerIcon from "~icons/lucide/timer";
 
 interface TicketReason {
   type: string;

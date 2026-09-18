@@ -1,5 +1,5 @@
 import { useTags, type Tag } from "@/composables/useTags";
-import { useTicket } from "@/composables/useTicket";
+import { reloadTicketFeed, useTicket } from "@/composables/useTicket";
 import { __ } from "@/translation";
 import { call, toast } from "frappe-ui";
 import type { Command } from "./paletteTypes";
@@ -44,10 +44,10 @@ async function toggleTag(ticketId: string, tag: Tag): Promise<void> {
       added: applied ? [] : [{ name: tag.name, color: tag.color || "Gray" }],
       removed: applied ? [tag.name] : [],
     });
-    const { ticket, activities } = useTicket(ticketId);
+    const { ticket } = useTicket(ticketId);
     // The response carries the new _user_tags: one round trip, no doc reload.
     if (ticket.doc) ticket.doc._user_tags = userTags;
-    activities.reload();
+    reloadTicketFeed(ticketId);
   } catch (error: any) {
     toast.error(error?.messages?.join(", ") || __("Failed to update tags"));
     throw error; // the palette flips the optimistic tick back

@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded-md border border-outline-gray-1 bg-surface-base">
+  <div class="rounded-5 border border-outline-gray-1 bg-surface-base">
     <div class="flex items-center gap-1.5 px-4 pt-4">
-      <h3 class="text-lg font-semibold text-ink-gray-8">
+      <h3 class="text-md font-semibold text-ink-gray-8">
         {{ __("Conversation Summary") }}
       </h3>
     </div>

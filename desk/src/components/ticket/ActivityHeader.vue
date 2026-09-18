@@ -1,25 +1,25 @@
 <template>
   <div
-    class="md:mx-5 md:my-4 flex items-center justify-between text-lg-medium mx-6 !mb-0 !my-3"
+    class="md:mx-5 md:my-4 flex items-center justify-between text-md-medium mx-6 !mb-0 !my-3"
   >
-    <div class="flex h-8 items-center text-2xl-semibold text-ink-gray-8">
+    <div class="flex h-8 items-center text-xl-semibold text-ink-gray-8">
       {{ title }}
     </div>
     <Dropdown
       v-if="title == 'Calls'"
       :options="callActions"
       @click.stop
-      placement="right"
+      align="end"
     >
       <template v-slot="{ open }">
         <Button variant="subtle" class="flex items-center gap-1">
           <template #prefix>
-            <FeatherIcon name="plus" class="h-4 w-4" />
+            <LucidePlus class="h-4 w-4" />
           </template>
           <span>{{ __("New") }}</span>
           <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
+            <component
+              :is="open ? LucideChevronUp : LucideChevronDown"
               class="h-4 w-4"
             />
           </template>
@@ -35,6 +35,9 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucidePlus from "~icons/lucide/plus";
 import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";

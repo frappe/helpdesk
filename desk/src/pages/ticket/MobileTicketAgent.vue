@@ -20,8 +20,8 @@
                   />
                 </template>
                 <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
+                  <component
+                    :is="open ? LucideChevronUp : LucideChevronDown"
                     class="h-4"
                   />
                 </template>
@@ -37,39 +37,43 @@
     >
       <!-- left side -->
       <div class="flex items-center gap-2 max-w-[65%]">
-        <Link
-          class="min-w-0 flex-1"
-          doctype="HD Team"
-          :hide-clear-button="true"
-          :model-value="ticket.doc.agent_group"
-          @update:model-value="(val) => updateField('agent_group', val)"
-        >
-          <!-- Same trigger styling as AssignTo so the header controls match -->
-          <template #target="{ togglePopover }">
-            <Button
-              variant="outline"
-              class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
-              @click="togglePopover()"
-            >
-              <div class="flex items-center min-h-5 gap-2 w-full">
-                <span
-                  class="truncate"
-                  :class="
-                    ticket.doc.agent_group
-                      ? 'text-ink-gray-7'
-                      : 'text-ink-gray-5'
-                  "
-                >
-                  {{ ticket.doc.agent_group || __("Team") }}
-                </span>
-              </div>
-              <template #suffix>
-                <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
-              </template>
-            </Button>
-          </template>
-        </Link>
-        <AssignTo class="min-w-0 flex-1" :hide-label="true" />
+        <!-- the width lives on the wrapper: a Combobox with its own #trigger
+             slot drops the class it is handed -->
+        <div class="min-w-0 flex-1">
+          <Link
+            doctype="HD Team"
+            :hide-clear-button="true"
+            :model-value="ticket.doc.agent_group"
+            @update:model-value="(val) => updateField('agent_group', val)"
+          >
+            <!-- Same trigger styling as AssignTo so the header controls match -->
+            <template #trigger>
+              <Button
+                variant="outline"
+                class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+              >
+                <div class="flex items-center min-h-5 gap-2 w-full">
+                  <span
+                    class="truncate"
+                    :class="
+                      ticket.doc.agent_group
+                        ? 'text-ink-gray-7'
+                        : 'text-ink-gray-5'
+                    "
+                  >
+                    {{ ticket.doc.agent_group || __("Team") }}
+                  </span>
+                </div>
+                <template #suffix>
+                  <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
+                </template>
+              </Button>
+            </template>
+          </Link>
+        </div>
+        <div class="min-w-0 flex-1">
+          <AssignTo :hide-label="true" />
+        </div>
       </div>
       <!-- right side -->
       <div class="flex items-center gap-2">
@@ -79,17 +83,22 @@
         />
       </div>
     </header>
-    <div v-if="ticket.doc?.name" class="flex flex-1 overflow-x-hidden">
-      <div class="flex flex-1 flex-col overflow-x-hidden">
-        <div class="flex-1 flex flex-col">
+    <div
+      v-if="ticket.doc?.name"
+      :key="ticketId"
+      class="flex min-h-0 flex-1 overflow-x-hidden"
+    >
+      <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden">
+        <div class="flex min-h-0 flex-1 flex-col">
           <Tabs
-            :modelValue="tabIndex"
+            :modelValue="activeTab"
             :tabs="tabs"
             @update:modelValue="changeTabTo"
-            class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-3 [&_[role='tablist']]:gap-7.5"
+            size="md"
+            class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:py-1.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
           >
             <template #tab-panel="{ tab }">
-              <div v-if="tab.name === 'details'">
+              <div v-if="tab.value === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
@@ -141,23 +150,18 @@
               </div>
 
               <!-- Rest Activities -->
-              <TicketAgentActivities
+              <TicketTimeline
                 v-else
-                ref="ticketAgentActivitiesRef"
-                :activities="filterActivities(tab.name)"
-                :title="tab.label"
-                :ticket-status="ticket.doc?.status"
-                @update="() => reloadTicket(props.ticketId)"
-                @email:reply="
-                  (e) => {
-                    communicationAreaRef.replyToEmail(e);
-                  }
-                "
+                ref="timelineRef"
+                :ticket-id="String(ticket.doc?.name)"
+                :tab="tab.value"
+                :tab-label="tab.label"
+                @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
               />
             </template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-surface-base"
+            class="bg-surface-base"
             ref="communicationAreaRef"
             v-model="ticket.doc"
             :ticketId="ticket.doc?.name"
@@ -168,8 +172,7 @@
             @update="
               () => {
                 reloadTicket(props.ticketId);
-                tabIndex !== 0 &&
-                  ticketAgentActivitiesRef?.scrollToLatestActivity();
+                timelineRef?.reload();
               }
             "
           />
@@ -219,6 +222,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import { __ } from "@/translation";
 import {
   Breadcrumbs,
@@ -251,7 +256,7 @@ import {
   IndicatorIcon,
   PhoneIcon,
 } from "@/components/icons";
-import { TicketAgentActivities } from "@/components/ticket";
+import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
 import CustomActions from "@/components/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";
@@ -259,6 +264,7 @@ import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import {
+  createToast,
   parseField,
   setupCustomizations,
 } from "@/composables/formCustomisation";
@@ -273,19 +279,15 @@ import { globalStore } from "@/stores/globalStore";
 import { getMeta } from "@/stores/meta";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useUserStore } from "@/stores/user";
 import {
-  ActivitiesSymbol,
   AssigneeSymbol,
   Customizations,
   CustomizationSymbol,
-  FeedbackActivity,
   RecentSimilarTicketsSymbol,
   Resource,
   TabObject,
   TicketContactSymbol,
   TicketSymbol,
-  TicketTab,
 } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { storeToRefs } from "pinia";
@@ -295,13 +297,10 @@ const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
 const ticketStatusStore = useTicketStatusStore();
-const { getUser } = useUserStore();
 const router = useRouter();
 const { $dialog } = globalStore();
 
-const ticketAgentActivitiesRef = ref<InstanceType<
-  typeof TicketAgentActivities
-> | null>(null);
+const timelineRef = ref<InstanceType<typeof TicketTimeline> | null>(null);
 const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
   null
 );
@@ -323,7 +322,6 @@ const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const assignees = computed(() => ticketComposable.value.assignees);
 const contact = computed(() => ticketComposable.value.contact);
-const activities = computed(() => ticketComposable.value.activities);
 
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
@@ -345,7 +343,7 @@ const customizationCtx = computed(() => ({
   toast,
   $dialog,
   updateField,
-  createToast: toast.create,
+  createToast,
 }));
 
 watchEffect(async () => {
@@ -375,7 +373,7 @@ const mobileCustomActions = computed(() => {
 
   if (!items.length) return [];
 
-  return [{ group: "Actions", hideLabel: true, items }];
+  return [{ group: "Actions", hideLabel: true, options: items }];
 });
 
 const ticketFields = computed(() => {
@@ -444,10 +442,6 @@ provide(
   RecentSimilarTicketsSymbol,
   computed(() => ticketComposable.value.recentSimilarTickets)
 );
-provide(
-  ActivitiesSymbol,
-  computed(() => ticketComposable.value.activities)
-);
 provide("communicationArea", communicationAreaRef);
 provide("makeCall", () => {
   if (!contact.value.data?.mobile_no && !contact.value.data?.phone) {
@@ -478,192 +472,55 @@ const breadcrumbs = computed(() => {
 });
 
 const dropdownOptions = computed(() =>
-  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
-    label: o.label_agent,
-    value: o.label_agent,
-    onClick: () => ticket.value.setValue.submit({ status: o.label_agent }),
-    icon: () =>
-      h(IndicatorIcon, {
-        class: o.parsed_color,
-      }),
-  }))
+  ticketStatusStore.statuses.data
+    ?.filter((o: HDTicketStatus) => o.enabled)
+    .map((o: HDTicketStatus) => ({
+      label: o.label_agent,
+      value: o.label_agent,
+      onClick: () => ticket.value.setValue.submit({ status: o.label_agent }),
+      icon: () =>
+        h(IndicatorIcon, {
+          class: o.parsed_color,
+        }),
+    }))
 );
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs = [
     {
-      name: "details",
+      value: "details",
       label: __("Details"),
-      icon: DetailsIcon,
+      iconLeft: DetailsIcon,
       condition: () => isMobileView.value,
     },
     {
-      name: "activity",
+      value: "activity",
       label: __("Activity"),
-      icon: ActivityIcon,
+      iconLeft: ActivityIcon,
     },
     {
-      name: "email",
+      value: "email",
       label: __("Emails"),
-      icon: EmailIcon,
+      iconLeft: EmailIcon,
     },
     {
-      name: "comment",
+      value: "comment",
       label: __("Comments"),
-      icon: CommentIcon,
+      iconLeft: CommentIcon,
     },
   ];
 
   if (isCallingEnabled.value) {
     _tabs.push({
-      name: "call",
+      value: "call",
       label: __("Calls"),
-      icon: PhoneIcon,
+      iconLeft: PhoneIcon,
     });
   }
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
-
-const _activities = computed(() => {
-  if (!activities.value?.data) {
-    return [];
-  }
-
-  const emailProps = activities.value.data.communications.map(
-    (email, idx: number) => {
-      return {
-        subject: email.subject,
-        content: email.content,
-        sender: { name: email.user.email, full_name: email.user.name },
-        to: email.recipients,
-        type: "email",
-        key: email.creation,
-        cc: email.cc,
-        bcc: email.bcc,
-        creation: email.communication_date || email.creation,
-        attachments: email.attachments,
-        name: email.name,
-        deliveryStatus: email.delivery_status,
-        isFirstEmail: idx === 0,
-      };
-    }
-  );
-
-  const commentProps = activities.value.data.comments.map((comment) => {
-    return {
-      name: comment.name,
-      type: "comment",
-      key: comment.creation,
-      commentedBy: comment.commented_by,
-      commenter: comment.user.name,
-      creation: comment.creation,
-      content: comment.content,
-      attachments: comment.attachments,
-    };
-  });
-
-  activities.value.data.history.map((h) => {
-    if (h.action && h.owner && h.action.includes(h.owner)) {
-      h.action = h.action.replace(h.owner, "themselves");
-    }
-    return h;
-  });
-
-  const historyProps = [
-    ...activities.value.data.history,
-    ...activities.value.data.views,
-  ].map((h) => {
-    return {
-      type: "history",
-      key: h.creation,
-      content: h.action ? h.action : __("viewed this"),
-      creation: h.creation,
-      user: h.user.name + " ",
-    };
-  });
-
-  const callProps = activities.value.data.calls.map((call) => {
-    return {
-      ...call,
-      type: "call",
-      name: call.name,
-      key: call.creation,
-      call_type: call.type,
-      content: `${call.caller || "Unknown"} made a call to ${
-        call.receiver || "Unknown"
-      }`,
-      duration: call.duration ? call.duration + "s" : "0s",
-    };
-  });
-
-  const sorted = [
-    ...emailProps,
-    ...commentProps,
-    ...historyProps,
-    ...callProps,
-  ].sort(
-    (a, b) => new Date(a.creation).getTime() - new Date(b.creation).getTime()
-  );
-
-  const data = [];
-  let i = 0;
-
-  while (i < sorted.length) {
-    const currentActivity = sorted[i];
-    if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [currentActivity];
-      for (let j = i + 1; j < sorted.length + 1; j++) {
-        const nextActivity = sorted[j];
-
-        if (
-          nextActivity &&
-          nextActivity.user === currentActivity.user &&
-          nextActivity.content !== "viewed this" &&
-          !nextActivity.content.includes("assigned") &&
-          !nextActivity.content.includes("unassigned")
-        ) {
-          currentActivity.relatedActivities.push(nextActivity);
-        } else {
-          data.push(currentActivity);
-          i = j - 1;
-          break;
-        }
-      }
-    } else {
-      data.push(currentActivity);
-    }
-    i++;
-  }
-
-  if (ticket.value.doc?.feedback_rating === 0) {
-    return data;
-  }
-  const feedbackActivity: FeedbackActivity[] = [
-    {
-      type: "feedback",
-      key: "feedback-activity",
-      feedback_rating: ticket.value?.doc?.feedback_rating,
-      feedback_extra: ticket.value?.doc?.feedback_extra,
-      feedback: ticket.value?.doc?.feedback,
-      sender: {
-        name: ticket.value?.doc?.raised_by,
-        full_name: ticket.value?.doc?.contact,
-      },
-    },
-  ];
-  data.push(...feedbackActivity);
-
-  return data;
-});
-
-function filterActivities(eventType: TicketTab) {
-  if (eventType === "activity") {
-    return _activities.value;
-  }
-  return _activities.value.filter((activity) => activity.type === eventType);
-}
+const { activeTab, changeTabTo } = useActiveTabManager(tabs);
 
 onMounted(() => {
   document.title = props.ticketId;

@@ -27,7 +27,8 @@ const props = defineProps({
   },
 });
 
-const currentDuration = ref(__("Last month"));
+// the untranslated key: it is lowercased straight into the API period
+const currentDuration = ref("Last month");
 
 const chartColor = {
   lineColor: "#5597F3",

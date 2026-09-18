@@ -1,9 +1,9 @@
 <template>
   <div
-    class="rounded-md border border-outline-gray-1 bg-surface-base flex flex-col gap-10"
+    class="rounded-5 border border-outline-gray-1 bg-surface-base flex flex-col gap-10"
   >
     <div class="flex items-center px-4 pt-4">
-      <h3 class="text-lg font-semibold text-ink-gray-8">
+      <h3 class="text-md font-semibold text-ink-gray-8">
         {{ __("Ticket Timeline") }}
       </h3>
     </div>
@@ -26,11 +26,7 @@
           class="flex w-max min-w-full items-start pl-12 pr-16 pb-16 pt-8"
         >
           <template v-for="(segment, index) in segments" :key="index">
-            <Tooltip
-              v-if="segment.kind === 'node'"
-              :hover-delay="0.2"
-              arrow-class="!hidden"
-            >
+            <Tooltip bare v-if="segment.kind === 'node'" :hover-delay="0.2">
               <span
                 class="group relative flex-none rounded-full before:absolute before:-inset-2 before:content-['']"
                 :class="[
@@ -60,9 +56,9 @@
                   </span>
                 </span>
               </span>
-              <template v-if="segment.tooltip.length" #body>
+              <template v-if="segment.tooltip.length" #content>
                 <div
-                  class="space-y-1.5 rounded-md border border-outline-gray-1 bg-surface-elevation-2 px-3 py-2 shadow-sm"
+                  class="space-y-1.5 rounded-5 border border-outline-gray-1 bg-surface-elevation-2 px-3 py-2 shadow-sm"
                 >
                   <span
                     v-for="line in segment.tooltip"
@@ -108,7 +104,7 @@
       class="flex flex-wrap gap-x-4 gap-y-1 px-4 pb-4 text-xs text-ink-gray-5"
     >
       <span
-        v-for="item in LEGEND"
+        v-for="item in legend"
         :key="item.label"
         class="flex items-center gap-1.5"
       >
@@ -149,13 +145,6 @@ const OVERDUE =
   "bg-[repeating-linear-gradient(90deg,var(--ink-red-6)_0_5px,transparent_5px_11px)]";
 const TODAY =
   "bg-[var(--surface-base)] border-[1.5px] border-[var(--outline-gray-4)]";
-
-const LEGEND = [
-  { colorClass: GREEN, label: __("SLA met") },
-  { colorClass: RED, label: __("SLA missed / longest wait") },
-  { colorClass: CUSTOMER, label: __("Customer message") },
-  { colorClass: BLUE, label: __("Agent reply") },
-];
 
 const props = defineProps<{
   timeline: TimelineNode[];
@@ -262,6 +251,28 @@ const segments = computed<RailSegment[]>(() => {
   hideRepeatedDates(result);
   preventLabelOverlap(result);
   return result;
+});
+
+// only the colors actually drawn on the rail get a legend entry
+const legend = computed(() => {
+  const labels: Record<string, string> = {
+    [GREEN]: __("SLA met"),
+    [RED]: redLabel.value,
+    [CUSTOMER]: __("Customer message"),
+    [BLUE]: __("Agent reply"),
+    [PENDING]: __("Pending"),
+  };
+  const drawn = new Set(segments.value.map((segment) => segment.colorClass));
+  return Object.entries(labels)
+    .filter(([colorClass]) => drawn.has(colorClass))
+    .map(([colorClass, label]) => ({ colorClass, label }));
+});
+
+// red marks a breach and the longest wait, so it is named after whichever is on the rail
+const redLabel = computed(() => {
+  const isMissed = props.timeline.some((node) => node.state === "breach");
+  if (isMissed && longestWait.value) return __("SLA missed / longest wait");
+  return isMissed ? __("SLA missed") : __("Longest wait");
 });
 
 function getFirstResponseSegments(node: TimelineNode): RailSegment[] {

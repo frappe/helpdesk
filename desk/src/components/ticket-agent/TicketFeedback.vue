@@ -6,11 +6,11 @@
       <div v-if="comment">
         <p
           ref="commentRef"
-          class="whitespace-pre-line text-p-base text-ink-gray-7"
+          class="relative whitespace-pre-line pl-[0.4em] text-p-base text-ink-gray-7"
           :class="!showFullComment && 'line-clamp-3'"
         >
-          <span class="text-ink-gray-4">&ldquo;</span>{{ comment
-          }}<span class="text-ink-gray-4">&rdquo;</span>
+          <span class="absolute left-0 text-ink-gray-4">&ldquo;</span
+          >{{ comment }}<span class="text-ink-gray-4">&rdquo;</span>
         </p>
         <button
           v-if="isCommentClamped || showFullComment"

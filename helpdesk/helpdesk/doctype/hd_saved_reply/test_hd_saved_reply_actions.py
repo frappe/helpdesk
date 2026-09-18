@@ -168,8 +168,13 @@ class TestHDSavedReplyActions(IntegrationTestCase):
         self.assertIn(AGENT, frappe.parse_json(ticket._assign or "[]"))
         self.assertTrue(
             frappe.db.exists(
-                "HD Ticket Comment",
-                {"reference_ticket": ticket.name, "content": note},
+                "Comment",
+                {
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": ticket.name,
+                    "comment_type": "Comment",
+                    "content": note,
+                },
             )
         )
 

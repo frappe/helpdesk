@@ -49,7 +49,7 @@
           <Dropdown
             v-if="chartsDropdown.length > 0"
             :options="chartsDropdown"
-            placement="right"
+            align="end"
           >
             <Button
               :label="__('New')"
@@ -66,15 +66,15 @@
         v-if="agentDashboard.loading"
         class="flex items-center justify-center absolute inset-0 z-10"
       >
-        <LoadingIndicator :scale="8" />
+        <LoadingIndicator class="size-8" />
       </div>
       <div
-        class="flex flex-col p-1 pt-4 md:p-4 md:ps-3 mx-auto max-w-[1500px] w-full grow relative h-full"
+        class="flex flex-col p-1 pt-4 md:p-4 md:ps-3 mx-auto max-w-screen-xl w-full grow relative h-full"
       >
         <div class="grow pb-12">
           <div
             v-if="!agentDashboard.loading && layout.length > 0"
-            class="text-2xl-semibold text-ink-gray-8 ps-2"
+            class="text-xl-semibold text-ink-gray-8 ps-2"
           >
             {{ __("Hey") }}, {{ userName }}
           </div>
@@ -83,8 +83,8 @@
             class="absolute top-1/2 start-1/2 transform -translate-x-1/2 rtl:translate-x-1/2 -translate-y-1/2"
           >
             <div class="flex flex-col items-center justify-center gap-1">
-              <FeatherIcon name="layout" class="size-12 text-ink-gray-4" />
-              <div class="text-lg-medium text-ink-gray-8">
+              <LucideLayout class="size-12 text-ink-gray-4" />
+              <div class="text-md-medium text-ink-gray-8">
                 {{ __("No charts added") }}
               </div>
               <div class="text-p-base text-ink-gray-6">
@@ -111,7 +111,7 @@
                     class="flex h-full w-full items-center justify-center"
                     :class="
                       editing
-                        ? 'pointer-events-none  [&>div:first-child]:rounded [&>div:first-child]:group-hover:ring-2 [&>div:first-child]:group-hover:ring-outline-gray-2'
+                        ? 'pointer-events-none  [&>div:first-child]:rounded-4 [&>div:first-child]:group-hover:ring-2 [&>div:first-child]:group-hover:ring-outline-gray-2'
                         : ''
                     "
                   >
@@ -119,16 +119,13 @@
                   </div>
                   <div
                     v-if="editing"
-                    class="flex absolute end-0 top-0 bg-surface-gray-9 rounded cursor-pointer opacity-0 group-hover:opacity-100"
+                    class="flex absolute end-0 top-0 bg-surface-gray-9 rounded-4 cursor-pointer opacity-0 group-hover:opacity-100"
                   >
                     <div
-                      class="rounded p-1 hover:bg-surface-gray-8"
+                      class="rounded-4 p-1 hover:bg-surface-gray-8"
                       @click="layout.splice(index, 1)"
                     >
-                      <FeatherIcon
-                        name="trash-2"
-                        class="size-3 text-ink-base"
-                      />
+                      <LucideTrash2 class="size-3 text-ink-base" />
                     </div>
                   </div>
                 </div>
@@ -142,6 +139,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideLayout from "~icons/lucide/layout";
+import LucideTrash2 from "~icons/lucide/trash-2";
 import { LayoutHeader } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
@@ -150,10 +149,10 @@ import {
   Button,
   createResource,
   Dropdown,
-  GridLayout,
   LoadingIndicator,
   toast,
 } from "frappe-ui";
+import { GridLayout } from "@/components/frappe-ui/GridLayout";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChartItem from "./components/ChartItem.vue";
@@ -436,6 +435,8 @@ const onReset = () => {
   agentDashboard.submit({
     reset_layout: true,
   });
+  // the flag sticks to the resource, so every later reload would reset again
+  agentDashboard.update({ params: {} });
 };
 
 const onLayoutUpdate = (newLayout: Layout[]) => {

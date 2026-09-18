@@ -38,12 +38,12 @@
             class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="dropdownOptions" placement="right">
+        <Dropdown :options="dropdownOptions" align="end">
           <template #default="{ open }">
             <Button :label="activeFilter">
               <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
+                <component
+                  :is="open ? LucideChevronUp : LucideChevronDown"
                   class="h-4"
                 />
               </template>
@@ -51,16 +51,15 @@
           </template>
           <template #item-label="{ item }">
             <button
-              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded text-base"
+              class="group flex text-ink-gray-6 gap-4 w-full justify-between items-center rounded-4 text-base"
               @click="item.onClick"
             >
               <div class="flex items-center justify-between flex-1">
                 <span class="whitespace-nowrap">
                   {{ item.label }}
                 </span>
-                <FeatherIcon
+                <LucideCheck
                   v-if="activeFilter === item.label"
-                  name="check"
                   class="size-4 text-ink-gray-7"
                 />
               </div>
@@ -80,7 +79,7 @@
             :loading="agents.loading"
             variant="ghost"
             class="w-full"
-            size="2xl"
+            size="lg"
           />
         </div>
         <!-- Empty State -->
@@ -107,7 +106,7 @@
           </div>
           <hr class="mt-2" />
           <div v-for="(agent, index) in agents.data" :key="agent.agent_name">
-            <div class="flex items-center justify-between h-14 group rounded">
+            <div class="flex items-center justify-between h-14 group rounded-4">
               <div class="flex items-center gap-x-3 grow">
                 <Avatar
                   :image="agent.user_image"
@@ -139,22 +138,17 @@
                   :label="getUserRole(agent.name)"
                   :button="{
                     label: getUserRole(agent.name),
-                    iconRight: 'chevron-down',
+                    iconRight: 'lucide-chevron-down',
                     iconLeft:
                       getUserRole(agent.name) === 'Agent'
-                        ? 'user'
+                        ? 'lucide-user'
                         : getUserRole(agent.name) === 'Manager'
-                        ? 'briefcase'
+                        ? 'lucide-briefcase'
                         : null,
                   }"
-                  placement="right"
+                  align="end"
                 />
-                <Dropdown
-                  :options="getOptions(agent)"
-                  :key="agent"
-                  class="ms-2"
-                  placement="right"
-                >
+                <Dropdown :options="getOptions(agent)" :key="agent" align="end">
                   <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>
@@ -179,15 +173,16 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideCheck from "~icons/lucide/check";
 import EmptyState from "@/components/EmptyState.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
-import { renderOptionIcon } from "@/utils";
-import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
+import { Avatar, Button, call, Dropdown, toast } from "frappe-ui";
 import { h, onUnmounted } from "vue";
-import LucideCheck from "~icons/lucide/check";
 import AgentIcon from "../icons/AgentIcon.vue";
 import { activeFilter, useAgents } from "./agents";
 import { setActiveSettingsTab } from "./settingsModal";
@@ -201,65 +196,20 @@ const agents = agentStore.agents;
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
-  const roles = [
-    {
-      label: "Agent",
-      component: (props) =>
-        RoleOption({
-          role: "Agent",
-          active: props.active,
-          selected: agentRole === "Agent",
-          icon: "lucide-user",
-          onClick: () => {
-            updateRole(agent, "Agent");
-          },
-        }),
-    },
-  ];
+  const role = (label: string, icon: string) => ({
+    label,
+    icon,
+    selected: agentRole === label,
+    onClick: () => updateRole(agent, label),
+  });
+  const roles = [role("Agent", "lucide-user")];
   if (isManager) {
-    roles.unshift({
-      label: "Manager",
-      component: (props) =>
-        RoleOption({
-          role: "Manager",
-          active: props.active,
-          selected: agentRole === "Manager",
-          icon: "lucide-briefcase",
-          onClick: () => {
-            updateRole(agent, "Manager");
-          },
-        }),
-    });
+    roles.unshift(role("Manager", "lucide-briefcase"));
   }
 
   return roles;
 }
 
-function RoleOption({ active, role, onClick, selected, icon = null }) {
-  return h(
-    "button",
-    {
-      class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-7",
-
-        "group flex w-full text-ink-gray-8 justify-between items-center rounded-md px-2 py-2 text-sm hover:bg-surface-gray-3",
-      ],
-      onClick: !selected ? onClick : null,
-    },
-    [
-      h("div", { class: "flex gap-2" }, [
-        renderOptionIcon(icon),
-        h("span", { class: "whitespace-nowrap" }, role),
-      ]),
-      selected
-        ? h(LucideCheck, {
-            class: ["h-4 w-4 shrink-0 text-ink-gray-7"],
-            "aria-hidden": true,
-          })
-        : null,
-    ]
-  );
-}
 function updateRole(agent: string, newRole: string) {
   const currentRole = getUserRole(agent);
   if (currentRole === newRole) {

@@ -32,7 +32,8 @@
           <Alert
             v-if="outsideHourSettings.data?.show"
             :title="outsideHourSettings.data?.msg"
-            theme="yellow"
+            theme="amber"
+            dismissible
             class="text-p-sm [&_.size-4]:relative [&>.size-4]:top-[3.5px] [&_button>:first-child]:top-[2.25px] border border-outline-amber-2"
             @dismiss="dismissBanner"
           >
@@ -43,10 +44,11 @@
           v-if="isMobileView"
           v-model="activeTab"
           :tabs="tabs"
-          class="[&_[role='tablist']]:px-3"
+          size="md"
+          class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:py-1.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
         >
           <template #tab-panel="{ tab }">
-            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <TicketCustomerTemplateFields v-if="tab.value === 'details'" />
             <TicketConversation v-else :show-header="false" class="grow" />
           </template>
         </Tabs>
@@ -55,7 +57,7 @@
         <TicketConversation v-else class="grow" />
 
         <div
-          v-if="!isMobileView || activeTab === 0"
+          v-if="!isMobileView || activeTab === 'activity'"
           class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
@@ -70,18 +72,29 @@
             autofocus
             @clear="() => (isExpanded = false)"
             :uploadFunction="
-              (file: any) => uploadFunction(file, 'HD Ticket', props.ticketId)
+              (file: any, options: any) =>
+                track(
+                  uploadFunction(file, 'HD Ticket', props.ticketId, true, options)
+                )
             "
           >
             <template #bottom-right>
-              <Button
-                :label="__('Send')"
-                theme="gray"
-                variant="solid"
-                :disabled="$refs.editor?.editor?.isEmpty || send.loading"
-                :loading="send.loading"
-                @click="sendEmail"
-              />
+              <!-- A disabled button fires no pointer events, so the span carries
+                   the hover for the tooltip -->
+              <Tooltip
+                :text="isUploading ? __('Please wait, media is uploading') : ''"
+              >
+                <span class="inline-flex">
+                  <Button
+                    :label="__('Send')"
+                    theme="gray"
+                    variant="solid"
+                    :disabled="!canSend"
+                    :loading="send.loading"
+                    @click="sendEmail"
+                  />
+                </span>
+              </Tooltip>
             </template>
           </TicketTextEditor>
         </div>
@@ -96,7 +109,10 @@
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import {
+  createToast,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
 import { useActiveViewers } from "@/composables/realtime";
 import { useScreenSize } from "@/composables/screen";
 
@@ -104,6 +120,7 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
@@ -114,6 +131,7 @@ import {
   createResource,
   Tabs,
   toast,
+  Tooltip,
 } from "frappe-ui";
 import {
   computed,
@@ -157,7 +175,7 @@ const ticket = createResource({
       toast,
       $dialog,
       updateField,
-      createToast: toast.create,
+      createToast,
     });
   },
   onError: () => {
@@ -167,6 +185,14 @@ const ticket = createResource({
 });
 
 provide(ITicket, ticket);
+const { isUploading, track } = useUploadTracker();
+
+// Read off the content model, not the editor ref: the ref is empty on the first
+// render, which let the button paint enabled before flipping to disabled
+const canSend = computed(
+  () =>
+    !isContentEmpty(editorContent.value) && !send.loading && !isUploading.value
+);
 const editor = ref(null);
 const editorContent = ref("");
 const attachments = ref([]);
@@ -177,10 +203,10 @@ const { isMobileView } = useScreenSize();
 const { $dialog, $socket } = globalStore();
 const isDismissed = ref(false);
 
-const activeTab = ref(0);
+const activeTab = ref("activity");
 const tabs = computed(() => [
-  { name: "activity", label: __("Activity"), icon: ActivityIcon },
-  { name: "details", label: __("Details"), icon: DetailsIcon },
+  { value: "activity", label: __("Activity"), iconLeft: ActivityIcon },
+  { value: "details", label: __("Details"), iconLeft: DetailsIcon },
 ]);
 
 function getTodayKey() {
@@ -277,9 +303,8 @@ function updateField(name, value, callback = () => {}) {
 }
 
 function sendEmail() {
-  if (isContentEmpty(editorContent.value) || send.loading) {
-    return;
-  }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (!canSend.value) return;
   send.submit();
 }
 
@@ -316,7 +341,7 @@ function showConfirmationDialog() {
       {
         label: __("Confirm"),
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }: { close: () => void }) {
           ticket.data.status = "Closed";
           setValue.submit(
             { fieldname: "status", value: "Closed" },
