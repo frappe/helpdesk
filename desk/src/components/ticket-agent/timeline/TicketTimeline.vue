@@ -351,29 +351,43 @@ function splitRecipients(
 
 // deep links arrive as ?highlight=comment-<name> / communication-<name>;
 // framework row ids are comment:<name> / email:<name>
-function scrollToHighlight() {
+let highlightTimer: ReturnType<typeof setTimeout> | undefined;
+
+// The row can reach the DOM a few renders after the feed resolves, so a single
+// attempt lands only if it happens to be the last one. Keep trying instead; the
+// link stays in the URL until it does, which is also what stops the retries.
+// ponytail: 2s of polling, enough for any feed we render; a MutationObserver on
+// the timeline would be the exact version if that ever stops being true.
+function scrollToHighlight(attemptsLeft = 20) {
+  clearTimeout(highlightTimer);
   const raw = route.query.highlight;
   if (typeof raw !== "string") return;
   const rowId = raw
     .replace(/^comment-/, "comment:")
     .replace(/^communication-/, "email:");
-  nextTick(() => {
-    // false means the row is not rendered yet; keep ?highlight for the next tick
-    if (!timelineRef.value?.scrollToRow(rowId)) return;
+  if (timelineRef.value?.scrollToRow(rowId)) {
     const query = { ...route.query };
     delete query.highlight;
     router.replace({ query, hash: route.hash });
-  });
+    return;
+  }
+  if (attemptsLeft)
+    highlightTimer = setTimeout(() => scrollToHighlight(attemptsLeft - 1), 100);
 }
 
-// opening at the newest row is the timeline's own job (useTimelineScroll)
+// opening at the newest row is the timeline's own job (useTimelineScroll).
+// immediate + post: a deep link that is already settled on arrival still fires,
+// and a fire that follows a render sees the rows it produced.
 watch(
   () => [route.query.highlight, _loading.value, filtered.value.length],
   () => {
     if (_loading.value || !route.query.highlight) return;
     scrollToHighlight();
-  }
+  },
+  { flush: "post", immediate: true }
 );
+
+onBeforeUnmount(() => clearTimeout(highlightTimer));
 
 // the socket payload can't carry attachments (they live on File, joined
 // server-side), so a live comment renders bare; fetch its files and patch
