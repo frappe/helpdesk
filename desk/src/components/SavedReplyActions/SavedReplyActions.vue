@@ -4,7 +4,7 @@
     ref="container"
     class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1"
   >
-    <div class="flex h-8 items-center gap-1.5 ps-3.5 pe-1.5">
+    <div class="flex h-8 items-center gap-1.5 ps-2.5 pe-0.5">
       <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />
       <template v-if="sourceLabel">
         <Tooltip :text="sourceLabel">
@@ -20,7 +20,7 @@
       <div class="ms-auto flex shrink-0 items-center gap-0.5">
         <Button
           variant="ghost"
-          size="xs"
+          size="sm"
           :aria-expanded="expanded"
           :icon="expanded ? 'lucide-chevron-down' : 'lucide-chevron-right'"
           :label="expanded ? __('Hide actions') : __('Show actions')"
@@ -28,7 +28,7 @@
         />
         <Button
           variant="ghost"
-          size="xs"
+          size="sm"
           icon="lucide-x"
           :label="__('Clear all actions')"
           @click="clear"

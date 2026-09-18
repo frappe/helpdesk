@@ -172,7 +172,7 @@
                 <template #footer>
                   <SavedReplyActions
                     ref="savedReplyActionsRef"
-                    class="mx-2.5 mb-2"
+                    class="mb-2 mr-2"
                     :ticket-id="ticketId"
                     :doctype="doctype"
                   />
@@ -385,10 +385,21 @@ watch(commentBody, (value, oldValue) => {
 // ─── Window state ─────────────────────────────────────────────
 const windowOpen = computed(() => showEmailBox.value || showCommentBox.value);
 const windowMode = ref<WindowMode>("docked");
+const lastWindowMode = ref<WindowMode>("docked");
+
+// preserve last state while reopening
+watch(windowOpen, (open) => {
+  if (!open) {
+    lastWindowMode.value = windowMode.value;
+    windowMode.value = "docked";
+    return;
+  }
+  windowMode.value = isMobileView.value ? "docked" : lastWindowMode.value;
+});
 
 // if mobile view switch to docked
-watch([windowOpen, isMobileView, windowMode], ([open, mobile, mode]) => {
-  if (mode !== "docked" && (!open || mobile)) {
+watch([isMobileView, windowMode], ([mobile, mode]) => {
+  if (mobile && mode !== "docked") {
     windowMode.value = "docked";
   }
 });
@@ -472,6 +483,7 @@ function openComposer() {
 
 // Pops straight out; an already open window keeps its channel.
 function openFloatingComposer() {
+  lastWindowMode.value = "floating";
   if (!windowOpen.value) openComposer();
   windowMode.value = "floating";
 }
