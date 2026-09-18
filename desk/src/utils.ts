@@ -2,13 +2,7 @@ import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
-import {
-  call,
-  dayjs,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-} from "frappe-ui";
+import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
@@ -876,8 +870,8 @@ const YEAR = 365 * DAY;
  * Compact relative duration between `target` and now, ignoring direction.
  * Examples: `1y`, `4 days 4h`, `2h 20m`, `5m`.
  */
-export function shortDuration(target: string | Date): string {
-  const seconds = Math.abs(dayjs(target).diff(dayjs(), "second"));
+export function shortDuration(target: string): string {
+  const seconds = Math.abs(dayjsLocal(target).diff(dayjsLocal(), "second"));
   if (seconds >= YEAR) {
     const years = Math.floor(seconds / YEAR);
     return `${years} ${years === 1 ? "year" : "years"}`;

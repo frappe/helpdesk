@@ -206,8 +206,8 @@ class HDServiceLevelAgreement(Document):
         if not doc.is_valid_status_transition():
             return
         self.set_first_response_time(doc)
-        self.set_resolution_time(doc)
         self.set_hold_time(doc)
+        self.set_resolution_time(doc)
 
     def set_first_response_time(self, doc: Document):
         start_at = doc.service_level_agreement_creation
