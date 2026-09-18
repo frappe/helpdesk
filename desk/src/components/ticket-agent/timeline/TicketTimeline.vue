@@ -399,10 +399,15 @@ async function enrichLiveComment(payload: unknown) {
     filters: { attached_to_doctype: "Comment", attached_to_name: name },
     fields: ["file_name", "file_url", "is_private"],
   });
-  if (!files?.length || !extras.data) return;
+  // an inline image is attached so readers can load it, but it is not a chip
+  const content = String(doc.content ?? "");
+  const attachments = files?.filter(
+    (f: { file_url: string }) => !content.includes(f.file_url)
+  );
+  if (!attachments?.length || !extras.data) return;
   extras.data[name] = {
     ...(extras.data[name] ?? { reactions: [] }),
-    attachments: files,
+    attachments,
   };
 }
 
