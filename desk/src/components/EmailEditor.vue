@@ -236,6 +236,7 @@ import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { RenderedSavedReply } from "@/types";
 import {
@@ -252,6 +253,7 @@ import {
   LoadingIndicator,
   Tooltip,
   createResource,
+  dayjs,
   toast,
 } from "frappe-ui";
 import {
@@ -260,6 +262,7 @@ import {
   EditorFixedMenu,
   EditorTableMenu,
 } from "frappe-ui/editor";
+import { addPendingActivity } from "@framework/ui/ActivityTimeline";
 import { useOnboarding } from "@framework/ui";
 import {
   computed,
@@ -307,10 +310,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "discard"]);
+const emit = defineEmits(["submit", "discard", "sending", "restore"]);
 
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
-const { isManager } = useAuthStore();
+const authStore = useAuthStore();
+const { isManager } = authStore;
+const { getUser } = useUserStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const extensions = buildEditorExtensions();
@@ -464,33 +469,38 @@ function replaceSavedReply(reply: RenderedSavedReply) {
   focusEditorAtStart();
 }
 
+/** Set by submitMail, so the composer can be cleared before the request goes out. */
+let pendingRow: ReturnType<typeof addPendingActivity> | null = null;
+let sentDraft: { content: string | null; attachments: any[] } | null = null;
+
 const sendMail = createResource({
   url: "run_doc_method",
-  makeParams: () => ({
-    dt: props.doctype,
-    dn: props.ticketId,
-    method: "reply_via_agent",
-    args: {
-      attachments: attachments.value.map((x) => x.name),
-      from_email: selectedFromEmail.value,
-      to: toEmailsClone.value.join(","),
-      cc: ccEmailsClone.value?.join(","),
-      bcc: bccEmailsClone.value?.join(","),
-      message:
-        newEmail.value +
-        (quotedContentRef.value
-          ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
-          : ""),
-    },
-  }),
-  onSuccess: () => {
+  makeParams: (params) => params,
+  onSuccess: (res: { message?: string } | string) => {
+    // run_doc_method answers with the whole body, since it always carries `docs`
+    const name = typeof res === "string" ? res : res?.message;
+    // the real row replaces the pending one the moment it arrives; unkeyed,
+    // it would outlive it
+    name ? pendingRow?.resolve(`email:${name}`) : pendingRow?.drop();
+    pendingRow = null;
+    sentDraft = null;
     savedReplyActionsRef.value?.submit();
-    resetState();
     emit("submit");
 
     if (isManager) {
       updateOnboardingStep?.("reply_on_ticket");
     }
+  },
+  onError: () => {
+    toast.error(__("Could not send the reply"));
+    pendingRow?.drop();
+    pendingRow = null;
+    if (sentDraft) {
+      newEmail.value = sentDraft.content;
+      attachments.value = sentDraft.attachments;
+      sentDraft = null;
+    }
+    emit("restore");
   },
   debounce: 300,
 });
@@ -509,7 +519,7 @@ function submitMail() {
     return false;
   }
   // The keyboard shortcut reaches here without passing the disabled button
-  if (isUploading.value) return false;
+  if (isUploading.value || sendMail.loading) return false;
   if (
     !toEmailsClone.value.length &&
     !ccEmailsClone.value.length &&
@@ -521,7 +531,57 @@ function submitMail() {
     return false;
   }
 
-  sendMail.submit();
+  const message =
+    newEmail.value +
+    (quotedContentRef.value
+      ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
+      : "");
+  const sender = selectedFromEmail.value?.email_id ?? authStore.userId;
+  const user = getUser(authStore.userId);
+
+  pendingRow?.drop();
+  pendingRow = addPendingActivity(props.doctype, props.ticketId, {
+    type: "email",
+    timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    author: {
+      email: user?.email,
+      fullname: user?.full_name,
+      image: user?.user_image,
+    },
+    data: {
+      name: "",
+      sender,
+      to: toEmailsClone.value.join(", "),
+      cc: ccEmailsClone.value?.join(", "),
+      bcc: bccEmailsClone.value?.join(", "),
+      content: message,
+      attachments: attachments.value.map((a) => ({
+        file_url: a.file_url,
+        file_name: a.file_name,
+        is_private: a.is_private,
+      })),
+    },
+  });
+  sentDraft = { content: newEmail.value, attachments: attachments.value };
+
+  const params = {
+    dt: props.doctype,
+    dn: props.ticketId,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      from_email: selectedFromEmail.value,
+      to: toEmailsClone.value.join(","),
+      cc: ccEmailsClone.value?.join(","),
+      bcc: bccEmailsClone.value?.join(","),
+      message,
+    },
+  };
+
+  // the feed row is now the only copy on screen; the draft comes back on failure
+  resetState();
+  emit("sending");
+  sendMail.submit(params);
 }
 
 function getInitialContent() {

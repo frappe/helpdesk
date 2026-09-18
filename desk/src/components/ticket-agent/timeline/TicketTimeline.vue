@@ -27,7 +27,7 @@
       <template #item-comment="{ activity }">
         <TimelineCommentRow
           :activity="activity"
-          :extras="extrasFor(activity.data.name)"
+          :extras="extrasFor(activity)"
           @update="refresh"
         />
       </template>
@@ -135,6 +135,7 @@ import {
   TimelineContainer,
   useActivityTimeline,
   type Activity,
+  type CommentActivity,
   type CustomActivity,
   type EmailActivity,
   type LogActivity,
@@ -233,8 +234,13 @@ function emailOptions(activity: EmailActivity) {
   ];
 }
 
-function extrasFor(comment: string): CommentExtras {
-  return extras.data?.[comment] ?? { reactions: [], attachments: [] };
+function extrasFor(activity: CommentActivity): CommentExtras {
+  // a pending comment has no name yet, so its attachments ride on the row
+  if (activity.pending)
+    return { reactions: [], attachments: activity.data.attachments ?? [] };
+  return (
+    extras.data?.[activity.data.name] ?? { reactions: [], attachments: [] }
+  );
 }
 
 function refresh() {

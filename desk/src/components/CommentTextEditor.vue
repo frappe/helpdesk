@@ -97,6 +97,8 @@ import {
   LoadingIndicator,
   Tooltip,
   createResource,
+  dayjs,
+  toast,
 } from "frappe-ui";
 import {
   Editor,
@@ -104,6 +106,7 @@ import {
   EditorFixedMenu,
   EditorTableMenu,
 } from "frappe-ui/editor";
+import { addPendingActivity } from "@framework/ui/ActivityTimeline";
 import { useOnboarding } from "@framework/ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
@@ -114,6 +117,8 @@ import { useTyping } from "@/composables/realtime";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
 import { capture } from "@/telemetry";
 import {
   getFontFamily,
@@ -126,7 +131,9 @@ import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
-const { isManager } = useAuthStore();
+const authStore = useAuthStore();
+const { isManager } = authStore;
+const { getUser } = useUserStore();
 
 const props = defineProps({
   ticketId: {
@@ -151,7 +158,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "discard"]);
+const emit = defineEmits(["submit", "discard", "sending", "restore"]);
 
 const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
@@ -184,33 +191,57 @@ async function submitComment() {
     return false;
   }
   // The keyboard shortcut reaches here without passing the disabled button
-  if (isUploading.value) return false;
-  // the editor keeps the text until the request lands: clearing it up front
-  // loses the comment, and its stored draft, whenever the call fails
+  if (isUploading.value || loading.value) return false;
+
+  const content = newComment.value;
+  const sentAttachments = attachments.value;
+  const user = getUser(authStore.userId);
+  const row = addPendingActivity(props.doctype, props.ticketId, {
+    type: "comment",
+    timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    author: {
+      email: user?.email,
+      fullname: user?.full_name,
+      image: user?.user_image,
+    },
+    data: { name: "", content, attachments: sentAttachments },
+  });
+
+  // the feed row is now the only copy on screen; the draft comes back if the
+  // call fails, so nothing is lost
+  newComment.value = null;
+  attachments.value = [];
   loading.value = true;
+  emit("sending");
+
   const comment = createResource({
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
       dn: props.ticketId,
       method: "new_comment",
-      args: {
-        content: newComment.value,
-        attachments: attachments.value,
-      },
+      args: { content, attachments: sentAttachments },
     }),
-    onSuccess: () => {
+    onSuccess: (res: { message?: string } | string) => {
+      // run_doc_method answers with the whole body, since it always carries `docs`
+      const name = typeof res === "string" ? res : res?.message;
+      // the real row replaces the pending one the moment it arrives; unkeyed,
+      // it would outlive it
+      name ? row.resolve(`comment:${name}`) : row.drop();
       capture("comment_added");
       if (isManager) {
         updateOnboardingStep?.("comment_on_ticket");
       }
       emit("submit");
       loading.value = false;
-      attachments.value = [];
-      newComment.value = null;
     },
     onError: () => {
+      toast.error(__("Could not add the comment"));
+      row.drop();
+      newComment.value = content;
+      attachments.value = sentAttachments;
       loading.value = false;
+      emit("restore");
     },
   });
 
