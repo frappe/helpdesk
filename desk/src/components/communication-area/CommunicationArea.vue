@@ -120,7 +120,7 @@
             ref="columnRef"
             class="flex min-h-0 flex-col"
             :class="windowMode === 'floating' ? 'h-full' : ''"
-            :style="dockedColumnStyle"
+            :style="dockedBodyStyle"
             @keydown.esc.capture.stop="collapseToPill"
           >
             <div
@@ -491,7 +491,7 @@ const minimizedLabel = computed(() => {
 // ─── Docked-height resize ─────────────────────────────────────
 const {
   dockedHeight,
-  dockedColumnStyle,
+  dockedBodyStyle,
   isResizing,
   justResized,
   onPanelPointerDown,
@@ -818,8 +818,15 @@ defineExpose({
 
 /* The composer body caps itself at 50vh; release it when the window height is
    fixed so the body fills and the toolbar pins to the bottom. */
-.ticket-composer-window[data-state="floating"] .max-h-\[50vh\],
-.ticket-composer-window.composer-resized[data-state="docked"] .max-h-\[50vh\] {
+.ticket-composer-window[data-state="floating"] .composer-body {
   max-height: none;
+}
+
+/* Docked, the drag sizes the body itself and the window sizes to it, so the
+   CC and BCC rows grow the window upwards instead of shrinking the editor. */
+.ticket-composer-window.composer-resized[data-state="docked"] .composer-body {
+  max-height: none;
+  flex: none;
+  height: var(--composer-body-height);
 }
 </style>

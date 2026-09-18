@@ -2,11 +2,12 @@ import { useEventListener, useStorage, useWindowSize } from "@vueuse/core";
 import type { WindowMode } from "frappe-ui/experimental";
 import { computed, ref, type Ref } from "vue";
 
-const MIN_BODY_HEIGHT = 240;
+// The message area alone; the header rows and toolbar sit outside it.
+const MIN_BODY_HEIGHT = 160;
 // Dragging this far below the minimum collapses the window back to the pill.
 const MINIMIZE_OVERDRAG = 60;
 
-// dragging the docked title bar sets the body height, 0 means natural
+// dragging the docked title bar sets the message area height, 0 means natural
 export function useDockedResize(options: {
   windowMode: Readonly<Ref<WindowMode>>;
   column: Ref<HTMLElement | null>;
@@ -17,17 +18,17 @@ export function useDockedResize(options: {
   const dockedHeight = useStorage("helpdesk-composer-height", 0);
   const { height: viewportHeight } = useWindowSize();
 
-  // clamp while reading too, saved height can be from a bigger window
-  const dockedColumnStyle = computed(() =>
+  // on toggle of cc and bcc increase the body height upwards
+  const dockedBodyStyle = computed(() =>
     windowMode.value === "docked" && dockedHeight.value > 0
-      ? { height: `${clampBodyHeight(dockedHeight.value)}px` }
+      ? { "--composer-body-height": `${clampBodyHeight(dockedHeight.value)}px` }
       : undefined
   );
 
   function clampBodyHeight(value: number) {
     return Math.min(
       Math.max(value, MIN_BODY_HEIGHT),
-      Math.round(viewportHeight.value * 0.8)
+      Math.round(viewportHeight.value * 0.7)
     );
   }
 
@@ -58,7 +59,14 @@ export function useDockedResize(options: {
   }
 
   function currentBodyHeight() {
-    return dockedHeight.value || column.value?.offsetHeight || MIN_BODY_HEIGHT;
+    if (dockedHeight.value) return dockedHeight.value;
+    // The hidden composer measures 0, so the taller of the two is the live one.
+    const bodies =
+      column.value?.querySelectorAll<HTMLElement>(".composer-body");
+    return Math.max(
+      MIN_BODY_HEIGHT,
+      ...Array.from(bodies ?? [], (body) => body.offsetHeight)
+    );
   }
 
   function resizeDockedBy(delta: number) {
@@ -92,7 +100,7 @@ export function useDockedResize(options: {
 
   return {
     dockedHeight,
-    dockedColumnStyle,
+    dockedBodyStyle,
     isResizing,
     justResized,
     onPanelPointerDown,
