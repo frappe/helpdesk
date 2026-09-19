@@ -347,9 +347,7 @@ onMounted(() => {
   });
 });
 const hasAgentCommunication = computed(() => {
-  return ticket.value.doc.communications?.some(
-    (communication) => communication.sent_or_received === "Sent"
-  );
+  return !!ticket.value.doc.last_agent_response;
 });
 
 function updateTicketStatus(status: string) {
