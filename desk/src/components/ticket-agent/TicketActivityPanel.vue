@@ -2,7 +2,7 @@
   <div
     ref="panelRef"
     class="relative flex min-h-0 flex-1 flex-col"
-    :style="{ '--composer-reserve': `${composerReserve}px` }"
+    :style="{ '--composer-reserve': `${composerHeight}px` }"
   >
     <Tabs
       :modelValue="activeTab"
@@ -63,16 +63,8 @@ const panelRef = useTemplateRef<HTMLElement>("panelRef");
 const composerRef = useTemplateRef<HTMLElement>("composerRef");
 const { height: composerHeight } = useElementSize(composerRef);
 
-// carry the reserved height of the composer on drag start and release
-const composerReserve = ref(0);
-watch([composerHeight, () => communicationAreaRef.value?.isResizing], () => {
-  if (!communicationAreaRef.value?.isResizing)
-    composerReserve.value = composerHeight.value;
-});
-
-// The timeline is bottom-anchored so avoid it to push upwards when composer is dragged
 watch(
-  composerReserve,
+  composerHeight,
   (height, previous) => {
     if (!previous) return;
     const scroller = panelRef.value?.querySelector<HTMLElement>(

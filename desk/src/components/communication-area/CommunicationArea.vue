@@ -48,22 +48,24 @@
       </div>
     </div>
     <Transition
-      enter-active-class="transition-[opacity,transform] duration-100 ease-out motion-reduce:transition-none"
-      enter-from-class="translate-y-1 opacity-0"
+      :enter-active-class="
+        isResizing
+          ? ''
+          : 'transition-[opacity,transform] duration-100 ease-out motion-reduce:transition-none'
+      "
+      :enter-from-class="isResizing ? '' : 'translate-y-1 opacity-0'"
       @leave="(_, done) => done()"
     >
       <div v-show="windowOpen" class="px-4 pb-3">
         <FloatingWindow
           v-model:mode="windowMode"
-          class="ticket-composer-window"
+          class="ticket-composer-window group/composer"
           :class="{ 'composer-resized': dockedHeight > 0 }"
-          @pointerdown="onPanelPointerDown"
         >
           <!-- header area having switcher and actions left and right respectively -->
           <template #header="{ mode, dock, float }">
             <div
               class="flex w-full items-center justify-between gap-2 px-2.5 py-2"
-              :class="mode === 'docked' ? 'sm:cursor-ns-resize' : ''"
             >
               <!-- handle to resize in docked state -->
               <div
@@ -71,7 +73,7 @@
                 role="separator"
                 aria-orientation="horizontal"
                 tabindex="0"
-                class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 sm:flex"
+                class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 group-hover/composer:opacity-100 sm:flex"
                 :aria-label="__('Resize composer')"
                 @pointerdown.stop.prevent="startDockedResize($event)"
                 @keydown.up.prevent="resizeDockedBy(16)"
@@ -516,14 +518,13 @@ const {
   dockedBodyStyle,
   isResizing,
   justResized,
-  onPanelPointerDown,
   startDockedResize,
   resizeDockedBy,
 } = useDockedResize({
   windowMode,
   column: columnRef,
-  isMobileView,
   onCollapse: closeComposer,
+  onReopen: openComposer,
 });
 
 // ─── Sender identities ────────────────────────────────────────
@@ -818,7 +819,6 @@ onBeforeUnmount(() => {
 });
 
 defineExpose({
-  isResizing,
   replyToEmail,
   toggleEmailBox,
   toggleCommentBox,
@@ -826,6 +826,12 @@ defineExpose({
 </script>
 
 <style>
+/* resizing cursor should always appear when composer is resized */
+body.composer-resizing,
+body.composer-resizing * {
+  cursor: ns-resize !important;
+}
+
 /* glass transperancy effect*/
 .ticket-composer-window[data-state] {
   background-color: color-mix(

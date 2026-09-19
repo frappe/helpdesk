@@ -2,10 +2,9 @@ import { useEventListener, useStorage, useWindowSize } from "@vueuse/core";
 import type { WindowMode } from "frappe-ui/experimental";
 import { computed, ref, type Ref } from "vue";
 
-// The message area alone; the header rows and toolbar sit outside it.
-const MIN_BODY_HEIGHT = 160;
-//dragging this far below the minimum collapses the window back to the pill.
-const MINIMIZE_OVERDRAG = 60;
+//mininum size of the composer upto which no collapse into docked state
+const MIN_BODY_HEIGHT = 80;
+const COLLAPSE_HEIGHT = 0;
 // max height from top upto which it panel can be dragged
 const THREAD_PEEK = 64;
 
@@ -13,10 +12,10 @@ const THREAD_PEEK = 64;
 export function useDockedResize(options: {
   windowMode: Readonly<Ref<WindowMode>>;
   column: Ref<HTMLElement | null>;
-  isMobileView: Readonly<Ref<boolean>>;
   onCollapse: () => void;
+  onReopen: () => void;
 }) {
-  const { windowMode, column, isMobileView, onCollapse } = options;
+  const { windowMode, column, onCollapse, onReopen } = options;
   const dockedHeight = useStorage("helpdesk-composer-height", 0);
   const { height: viewportHeight } = useWindowSize();
 
@@ -28,8 +27,9 @@ export function useDockedResize(options: {
   );
 
   function clampBodyHeight(value: number) {
+    const floor = resizing.value ? COLLAPSE_HEIGHT : MIN_BODY_HEIGHT;
     return Math.min(
-      Math.max(value, MIN_BODY_HEIGHT),
+      Math.max(value, floor),
       Math.round(viewportHeight.value * 0.7)
     );
   }
@@ -39,20 +39,11 @@ export function useDockedResize(options: {
     startY: number;
     startHeight: number;
     minY: number;
+    collapsed: boolean;
   } | null>(null);
   const isResizing = computed(() => resizing.value !== null);
   // A pointer released outside the window must not count as an outside click.
   const justResized = ref(false);
-
-  function onPanelPointerDown(event: PointerEvent) {
-    if (windowMode.value !== "docked" || isMobileView.value) return;
-    const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, select, textarea, [role='button']"))
-      return;
-    if (column.value?.contains(target)) return;
-    event.preventDefault();
-    startDockedResize(event);
-  }
 
   function startDockedResize(event: PointerEvent) {
     const grabbed = event.currentTarget as HTMLElement;
@@ -61,7 +52,9 @@ export function useDockedResize(options: {
       startHeight: currentBodyHeight(),
       //max height upto which panel can be dragged
       minY: threadTop() + (event.clientY - grabbed.getBoundingClientRect().top),
+      collapsed: false,
     };
+    document.body.classList.add("composer-resizing");
     try {
       (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     } catch {}
@@ -91,15 +84,19 @@ export function useDockedResize(options: {
 
   useEventListener(window, "pointermove", (event: PointerEvent) => {
     if (!resizing.value) return;
-    const { startY, startHeight, minY } = resizing.value;
+    const { startY, startHeight, minY, collapsed } = resizing.value;
     const next = startHeight + (startY - Math.max(event.clientY, minY));
-    if (next < MIN_BODY_HEIGHT - MINIMIZE_OVERDRAG) {
-      // Dragged well past the floor: collapse to the pill, keeping the pre-drag
-      // height so reopening restores it.
-      stopDockedResize();
-      dockedHeight.value = clampBodyHeight(startHeight);
-      onCollapse();
+    if (next <= COLLAPSE_HEIGHT) {
+      if (!collapsed) {
+        resizing.value.collapsed = true;
+        dockedHeight.value = clampBodyHeight(startHeight);
+        onCollapse();
+      }
       return;
+    }
+    if (collapsed) {
+      resizing.value.collapsed = false;
+      onReopen();
     }
     dockedHeight.value = clampBodyHeight(next);
   });
@@ -108,7 +105,14 @@ export function useDockedResize(options: {
 
   function stopDockedResize() {
     if (!resizing.value) return;
+    const { startHeight, collapsed } = resizing.value;
+    const squeezed = !collapsed && dockedHeight.value < MIN_BODY_HEIGHT;
     resizing.value = null;
+    document.body.classList.remove("composer-resizing");
+    if (squeezed) {
+      dockedHeight.value = clampBodyHeight(startHeight);
+      onCollapse();
+    }
     justResized.value = true;
     // The click event fires after pointerup; lift the guard a task later.
     setTimeout(() => (justResized.value = false), 0);
@@ -119,7 +123,6 @@ export function useDockedResize(options: {
     dockedBodyStyle,
     isResizing,
     justResized,
-    onPanelPointerDown,
     startDockedResize,
     resizeDockedBy,
   };
