@@ -247,7 +247,6 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer?: 0 | 1;
   label: string;
   options: string;
   required: 0 | 1;

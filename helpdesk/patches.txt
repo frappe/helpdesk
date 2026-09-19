@@ -60,3 +60,5 @@ helpdesk.patches.repoint_comment_reactions_and_files
 helpdesk.patches.migrate_hd_notifications_to_notification_log
 helpdesk.patches.relabel_comment_search_index
 helpdesk.patches.mark_old_assignment_notifications_read
+helpdesk.patches.harden_hd_ticket_field_permissions
+helpdesk.patches.backfill_template_field_visible_to

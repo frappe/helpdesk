@@ -172,6 +172,52 @@ def make_ticket(
     return ticket
 
 
+def make_template(name: str, fields: list[dict]):
+    """Create an HD Ticket Template, replacing any leftover with the name."""
+    if frappe.db.exists("HD Ticket Template", name):
+        frappe.db.delete("HD Ticket", {"template": name})
+        frappe.delete_doc("HD Ticket Template", name, force=True)
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Template", "template_name": name, "fields": fields}
+    ).insert()
+
+
+def other_priority(current: str) -> str:
+    """A priority different from `current`."""
+    return "Urgent" if current != "Urgent" else "Low"
+
+
+def set_default_template_visibility(fieldname: str, visible_to: str):
+    """Set who sees a field on the Default template; returns an undo for addCleanup."""
+    template = frappe.get_doc("HD Ticket Template", "Default")
+    row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
+    original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
+
+    row = next((r for r in template.fields if r.fieldname == fieldname), None)
+    if row:
+        row.visible_to = visible_to
+    else:
+        template.append("fields", {"fieldname": fieldname, "visible_to": visible_to})
+    template.save(ignore_permissions=True)
+
+    def undo():
+        doc = frappe.get_doc("HD Ticket Template", "Default")
+        doc.fields = []
+        for original in original_rows:
+            doc.append("fields", original)
+        # the save clears the resolver cache along with restoring the rows
+        doc.save(ignore_permissions=True)
+
+    return undo
+
+
+def get_customer_ticket(email: str):
+    """Make a ticket and return it as the customer `email` sees it."""
+    ticket = make_ticket(raised_by=email)
+    frappe.set_user(email)
+    return frappe.get_doc("HD Ticket", ticket.name)
+
+
 def create_agent(
     email: str, first_name: str | None = None, last_name: str | None = None
 ):
