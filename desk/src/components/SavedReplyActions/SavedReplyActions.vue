@@ -39,7 +39,7 @@
     <div v-if="expanded">
       <div
         v-if="chipActions.length"
-        class="flex flex-wrap items-center gap-1.5 px-1.5 pb-2"
+        class="flex flex-wrap items-center gap-1.5 px-2 pb-2"
       >
         <SavedReplyActionChip
           v-for="action in visibleChips"
@@ -50,7 +50,7 @@
           @remove="removeAction(action)"
         />
         <button v-if="overflowCount" type="button" @click="showAllChips = true">
-          <Badge theme="gray" variant="outline" size="lg">
+          <Badge class="!rounded-4" theme="gray" variant="outline" size="lg">
             {{ __("+{0} more", overflowCount) }}
           </Badge>
         </button>

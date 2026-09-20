@@ -18,7 +18,7 @@
       >
         <Tooltip :text="value ? `${label}: ${value}` : label">
           <Badge
-            class="bg-surface-base transition-colors"
+            class="!rounded-4 bg-surface-base transition-colors"
             :class="isEditable ? 'cursor-pointer hover:bg-surface-gray-2' : ''"
             theme="gray"
             variant="outline"

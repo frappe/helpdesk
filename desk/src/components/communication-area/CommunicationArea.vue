@@ -179,7 +179,7 @@
                 <template #footer>
                   <SavedReplyActions
                     ref="savedReplyActionsRef"
-                    class="mb-2 mr-2"
+                    class="mb-2"
                     :ticket-id="ticketId"
                     :doctype="doctype"
                   />
