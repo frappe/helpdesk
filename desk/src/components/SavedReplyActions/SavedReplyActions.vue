@@ -4,7 +4,7 @@
     ref="container"
     class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1 ms-[0.5px] me-[1px]"
   >
-    <div class="flex h-8 items-center gap-1.5 ps-[10.5px] pe-0.5">
+    <div class="flex h-8 items-center gap-1.5 ps-[9.5px] pe-0.5">
       <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />
       <template v-if="sourceLabel">
         <Tooltip :text="sourceLabel">
