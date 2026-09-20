@@ -114,16 +114,16 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
+    hidden_fields = set()
     if doctype == "HD Ticket":
+        hidden_fields = get_hidden_ticket_fields()
         rows.append("_seen") if "_seen" not in rows else rows
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-        hidden = get_hidden_ticket_fields()
-        # pass only rows and columns which user should be able to see
-        rows = [r for r in rows if r not in hidden]
-        columns = [c for c in columns if c.get("key") not in hidden]
-        if group_by_field in hidden:
+        rows = [r for r in rows if r not in hidden_fields]
+        columns = [c for c in columns if c.get("key") not in hidden_fields]
+        if group_by_field in hidden_fields:
             # every ticket would land outside every group, so show a plain list
             group_by_field = view_type = None
     data = (
@@ -150,7 +150,7 @@ def get_list_data(
             "options": field.options,
         }
         for field in fields
-        if field.label and field.fieldname
+        if field.label and field.fieldname and field.fieldname not in hidden_fields
     ]
 
     std_fields = [
@@ -168,6 +168,8 @@ def get_list_data(
     ]
 
     for field in std_fields:
+        if field["value"] in hidden_fields:
+            continue
         if field.get("value") not in rows:
             rows.append(field.get("value"))
         if field not in fields:
@@ -175,12 +177,6 @@ def get_list_data(
 
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
-
-    if doctype == "HD Ticket":
-        hidden = get_hidden_ticket_fields()
-        # pass only rows and columns which user should be able to see
-        fields = [f for f in fields if f["value"] not in hidden]
-        rows = [r for r in rows if r not in hidden]
 
     if group_by_field and view_type == "group_by":
 
@@ -404,8 +400,8 @@ def get_filterable_fields(
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
     if doctype == "HD Ticket":
-        hidden = get_hidden_ticket_fields()
-        res = [f for f in res if f["fieldname"] not in hidden]
+        hidden_fields = get_hidden_ticket_fields()
+        res = [f for f in res if f["fieldname"] not in hidden_fields]
     return res
 
 
@@ -426,8 +422,8 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        hidden = get_hidden_ticket_fields()
-        fields = [f for f in fields if f["value"] not in hidden]
+        hidden_fields = get_hidden_ticket_fields()
+        fields = [f for f in fields if f["value"] not in hidden_fields]
 
     standard_fields = [
         {"label": "Name", "value": "name"},
@@ -481,8 +477,8 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
         return quick_filters
 
     # a hidden field must not offer its label and options here either
-    hidden = get_hidden_ticket_fields()
-    quick_filters = [f for f in quick_filters if f["name"] not in hidden]
+    hidden_fields = get_hidden_ticket_fields()
+    quick_filters = [f for f in quick_filters if f["name"] not in hidden_fields]
 
     _list = get_controller(doctype)
     if hasattr(_list, "filter_standard_fields") and show_customer_portal_fields:

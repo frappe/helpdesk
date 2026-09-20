@@ -497,14 +497,13 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    hidden = get_hidden_ticket_fields()
-    # filter out hidden fields
-    custom_fields = [f for f in custom_fields if f.fieldname not in hidden]
+    hidden_fields = get_hidden_ticket_fields()
+    custom_fields = [f for f in custom_fields if f.fieldname not in hidden_fields]
     form_scripts = get_form_script("HD Ticket")
     return {
         "custom_fields": custom_fields,
         "_form_script": form_scripts,
-        "hidden_fields": sorted(hidden),
+        "hidden_fields": sorted(hidden_fields),
     }
 
 

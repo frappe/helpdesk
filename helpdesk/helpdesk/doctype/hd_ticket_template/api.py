@@ -35,12 +35,12 @@ def get_one(name: str):
 
 def get_fields_meta(template: str):
     """The template's fields, as this user may see them."""
-    hidden = get_hidden_ticket_fields()
+    hidden_fields = get_hidden_ticket_fields()
     meta = frappe.get_meta(DOCTYPE_TICKET)
     fields = []
     for row in template_rows(template):
         field = meta.get_field(row.fieldname)
-        if row.fieldname in hidden or not field:
+        if row.fieldname in hidden_fields or not field:
             continue
         fields.append(form_field(row, field))
     return fields
