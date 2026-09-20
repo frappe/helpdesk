@@ -3,7 +3,6 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
-from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
@@ -254,7 +253,6 @@ def get_list_data(
 
 
 @frappe.whitelist()
-@redis_cache(user=True)
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
