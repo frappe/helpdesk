@@ -18,7 +18,7 @@
         >
           <template #suffix>
             <LucideX
-              class="size-4"
+              class="size-4 shrink-0"
               @click.stop.prevent="
                 () => {
                   $emit(

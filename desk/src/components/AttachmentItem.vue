@@ -3,12 +3,14 @@
     <a :href="preview ? undefined : url" target="_blank">
       <Button
         :label="label"
+        :title="label"
         theme="gray"
         variant="outline"
+        class="min-w-0 max-w-36"
         @click="toggleDialog()"
       >
         <template #prefix>
-          <component :is="icon" class="h-4 w-4" />
+          <component :is="icon" class="h-4 w-4 shrink-0" />
         </template>
         <template #suffix>
           <slot name="suffix" />

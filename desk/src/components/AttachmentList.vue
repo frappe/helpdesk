@@ -8,7 +8,7 @@
     >
       <template #suffix>
         <LucideX
-          class="size-3.5 cursor-pointer text-ink-gray-6 transition-colors hover:text-ink-gray-9"
+          class="size-3.5 shrink-0 cursor-pointer text-ink-gray-6 transition-colors hover:text-ink-gray-9"
           @click.stop.prevent="emit('remove', attachment)"
         />
       </template>
