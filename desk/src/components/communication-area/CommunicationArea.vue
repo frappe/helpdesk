@@ -73,7 +73,7 @@
                 role="separator"
                 aria-orientation="horizontal"
                 tabindex="0"
-                class="absolute left-1/2 top-0 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 group-hover/composer:opacity-100 sm:flex"
+                class="absolute left-1/2 -top-0.5 z-10 hidden h-6 w-24 -translate-x-1/2 cursor-ns-resize touch-none items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 group-hover/composer:opacity-100 sm:flex"
                 :aria-label="__('Resize composer')"
                 @pointerdown.stop.prevent="startDockedResize($event)"
                 @keydown.up.prevent="resizeDockedBy(16)"
@@ -120,14 +120,14 @@
           <!-- Esc button and close button minmize and put composer in dockd state-->
           <div
             ref="columnRef"
-            class="flex min-h-0 flex-col"
+            class="grid min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)]"
             :class="windowMode === 'floating' ? 'h-full' : ''"
             :style="dockedBodyStyle"
             @keydown.esc.capture="onEscape"
           >
             <div
-              v-show="showEmailBox"
-              class="flex min-h-0 flex-1 flex-col ps-2.5 py-2"
+              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-2.5 py-2"
+              :class="showEmailBox ? '' : 'invisible'"
             >
               <EmailComposer
                 ref="emailComposerRef"
@@ -182,8 +182,8 @@
               </EmailComposer>
             </div>
             <div
-              v-show="showCommentBox"
-              class="flex min-h-0 flex-1 flex-col ps-2.5 py-2"
+              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-2.5 py-2"
+              :class="showCommentBox ? '' : 'invisible'"
             >
               <CommentComposer
                 ref="commentComposerRef"
@@ -854,7 +854,7 @@ body.composer-resizing * {
    CC and BCC rows grow the window upwards instead of shrinking the editor. */
 .ticket-composer-window.composer-resized[data-state="docked"] .composer-body {
   max-height: none;
-  flex: none;
+  flex: 1 1 auto;
   height: var(--composer-body-height);
 }
 </style>

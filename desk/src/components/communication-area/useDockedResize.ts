@@ -69,13 +69,11 @@ export function useDockedResize(options: {
 
   function currentBodyHeight() {
     if (dockedHeight.value) return dockedHeight.value;
-    // The hidden composer measures 0, so the taller of the two is the live one.
+    //get exisiting height from the composer and set the other composer to same height
     const bodies =
       column.value?.querySelectorAll<HTMLElement>(".composer-body");
-    return Math.max(
-      0,
-      ...Array.from(bodies ?? [], (body) => body.offsetHeight)
-    );
+    const heights = Array.from(bodies ?? [], (body) => body.offsetHeight);
+    return heights.length ? Math.min(...heights) : 0;
   }
 
   function resizeDockedBy(delta: number) {
