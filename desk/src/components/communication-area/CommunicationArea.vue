@@ -131,7 +131,7 @@
             @keydown.esc.capture="onEscape"
           >
             <div
-              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-2.5 py-2"
+              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-[9px] py-2"
               :class="showEmailBox ? '' : 'invisible'"
             >
               <EmailComposer
@@ -190,7 +190,7 @@
               </EmailComposer>
             </div>
             <div
-              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-2.5 py-2"
+              class="col-start-1 row-start-1 flex min-h-0 min-w-0 flex-col px-[9px] py-2"
               :class="showCommentBox ? '' : 'invisible'"
             >
               <CommentComposer

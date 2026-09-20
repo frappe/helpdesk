@@ -2,9 +2,9 @@
   <div
     v-if="pendingActions.length"
     ref="container"
-    class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1"
+    class="overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1 ms-[0.5px] me-[1px]"
   >
-    <div class="flex h-8 items-center gap-1.5 ps-2.5 pe-0.5">
+    <div class="flex h-8 items-center gap-1.5 ps-[10.5px] pe-0.5">
       <LucideInfo class="size-3 shrink-0 text-ink-gray-6" />
       <template v-if="sourceLabel">
         <Tooltip :text="sourceLabel">
@@ -17,7 +17,7 @@
       <span class="shrink-0 whitespace-nowrap text-sm text-ink-gray-5">
         {{ countSentence }}
       </span>
-      <div class="ms-auto flex shrink-0 items-center gap-0.5">
+      <div class="-mr-[1.5px] ms-auto flex shrink-0 items-center gap-0.5">
         <Button
           variant="ghost"
           size="sm"
@@ -39,7 +39,7 @@
     <div v-if="expanded">
       <div
         v-if="chipActions.length"
-        class="flex flex-wrap items-center gap-1.5 px-2 pb-2"
+        class="flex flex-wrap items-center gap-1.5 px-[9px] pb-2"
       >
         <SavedReplyActionChip
           v-for="action in visibleChips"
