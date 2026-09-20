@@ -156,6 +156,9 @@
                   (file) => removeAttachmentFromServer(file.name)
                 "
               >
+                <template #attachments="{ attachments, remove }">
+                  <AttachmentList :attachments="attachments" @remove="remove" />
+                </template>
                 <template #actions>
                   <Button
                     variant="ghost"
@@ -205,6 +208,9 @@
                   (file) => removeAttachmentFromServer(file.name)
                 "
               >
+                <template #attachments="{ attachments, remove }">
+                  <AttachmentList :attachments="attachments" @remove="remove" />
+                </template>
                 <template #actions>
                   <Button
                     variant="ghost"
@@ -231,7 +237,11 @@
 </template>
 
 <script setup lang="ts">
-import { SavedRepliesSelectorModal, TypingIndicator } from "@/components";
+import {
+  AttachmentList,
+  SavedRepliesSelectorModal,
+  TypingIndicator,
+} from "@/components";
 import { createDialog } from "@/components/dialogs";
 import { CommentIcon } from "@/components/icons";
 import {
