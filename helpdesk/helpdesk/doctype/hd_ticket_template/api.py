@@ -2,7 +2,7 @@ import json
 
 import frappe
 
-from helpdesk.field_visibility import hidden_ticket_fields
+from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.utils import check_permissions, get_customers, is_agent
 
@@ -35,7 +35,7 @@ def get_one(name: str):
 
 def get_fields_meta(template: str):
     """The template's fields, as this user may see them."""
-    hidden = hidden_ticket_fields()
+    hidden = get_hidden_ticket_fields()
     meta = frappe.get_meta(DOCTYPE_TICKET)
     fields = []
     for row in template_rows(template):

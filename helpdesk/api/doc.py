@@ -7,7 +7,7 @@ from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.field_visibility import hidden_ticket_fields
+from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -119,7 +119,7 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-        hidden = hidden_ticket_fields()
+        hidden = get_hidden_ticket_fields()
         # pass only rows and columns which user should be able to see
         rows = [r for r in rows if r not in hidden]
         columns = [c for c in columns if c.get("key") not in hidden]
@@ -177,7 +177,7 @@ def get_list_data(
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        hidden = hidden_ticket_fields()
+        hidden = get_hidden_ticket_fields()
         # pass only rows and columns which user should be able to see
         fields = [f for f in fields if f["value"] not in hidden]
         rows = [r for r in rows if r not in hidden]
@@ -404,7 +404,7 @@ def get_filterable_fields(
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
     if doctype == "HD Ticket":
-        hidden = hidden_ticket_fields()
+        hidden = get_hidden_ticket_fields()
         res = [f for f in res if f["fieldname"] not in hidden]
     return res
 
@@ -426,7 +426,7 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        hidden = hidden_ticket_fields()
+        hidden = get_hidden_ticket_fields()
         fields = [f for f in fields if f["value"] not in hidden]
 
     standard_fields = [
@@ -481,7 +481,7 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
         return quick_filters
 
     # a hidden field must not offer its label and options here either
-    hidden = hidden_ticket_fields()
+    hidden = get_hidden_ticket_fields()
     quick_filters = [f for f in quick_filters if f["name"] not in hidden]
 
     _list = get_controller(doctype)

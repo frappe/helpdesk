@@ -11,7 +11,7 @@ from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
-from helpdesk.field_visibility import hidden_ticket_fields
+from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
@@ -120,7 +120,7 @@ def strip_unreadable_field_names(ticket: dict) -> dict:
     """Drop the names of fields the caller cannot read.
     app based helper to strip fields based on visible_to meta in ticket template
     """
-    for fieldname in hidden_ticket_fields():
+    for fieldname in get_hidden_ticket_fields():
         ticket.pop(fieldname, None)
     return ticket
 
@@ -497,7 +497,7 @@ def get_ticket_customizations():
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    hidden = hidden_ticket_fields()
+    hidden = get_hidden_ticket_fields()
     # filter out hidden fields
     custom_fields = [f for f in custom_fields if f.fieldname not in hidden]
     form_scripts = get_form_script("HD Ticket")

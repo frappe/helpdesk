@@ -16,17 +16,21 @@ from helpdesk.utils import is_agent
 AGENT_WORKFLOW_FIELDS = {"_assign", "_comments", "_liked_by", "_user_tags"}
 
 
-def hidden_ticket_fields() -> set[str]:
-    """get fields which are to be hidden as per the user role category"""
+def get_hidden_ticket_fields() -> set[str]:
+    """Fields the session user must not see.
+
+    Permlevel-unreadable fields, plus the Default template rows reserved for
+    the other audience: agents lose the Customers rows, customers lose the
+    Agents rows and the agent workflow columns.
+    """
     if is_agent():
-        # if agent is requesting the hidden fields will be that for customers
-        tier = fields_visible_to("Customers")
+        tier = get_fields_visible_to("Customers")
     else:
-        tier = fields_visible_to("Agents") | AGENT_WORKFLOW_FIELDS
-    return unreadable_fields("HD Ticket") | tier
+        tier = get_fields_visible_to("Agents") | AGENT_WORKFLOW_FIELDS
+    return get_unreadable_fields("HD Ticket") | tier
 
 
-def unreadable_fields(doctype: str) -> set[str]:
+def get_unreadable_fields(doctype: str) -> set[str]:
     """Fields the user is unable to read because of perm levels."""
     permitted = set(get_permitted_fields(doctype))
     # fields that hold a value, so section and column breaks stay out of the set
@@ -40,7 +44,7 @@ def unreadable_fields(doctype: str) -> set[str]:
 
 
 @redis_cache()
-def fields_visible_to(audience: str) -> set[str]:
+def get_fields_visible_to(audience: str) -> set[str]:
     """helper which returns the set of fields according to the role passed
 
     audience is a Visible to value on the template row: Customers or Agents.
