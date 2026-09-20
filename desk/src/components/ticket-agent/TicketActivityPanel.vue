@@ -2,7 +2,7 @@
   <div
     ref="panelRef"
     class="relative flex min-h-0 flex-1 flex-col"
-    :style="{ '--composer-reserve': `${composerHeight}px` }"
+    :style="{ '--composer-reserve': `${composerReserve}px` }"
   >
     <Tabs
       :modelValue="activeTab"
@@ -63,8 +63,17 @@ const panelRef = useTemplateRef<HTMLElement>("panelRef");
 const composerRef = useTemplateRef<HTMLElement>("composerRef");
 const { height: composerHeight } = useElementSize(composerRef);
 
+const composerReserve = ref(0);
 watch(
-  composerHeight,
+  [composerHeight, () => communicationAreaRef.value?.isResizing],
+  ([height, resizing]) => {
+    if (!resizing) composerReserve.value = height as number;
+  },
+  { immediate: true }
+);
+
+watch(
+  composerReserve,
   (height, previous) => {
     if (!previous) return;
     const scroller = panelRef.value?.querySelector<HTMLElement>(

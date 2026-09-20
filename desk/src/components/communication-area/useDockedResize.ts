@@ -12,10 +12,11 @@ const THREAD_PEEK = 64;
 export function useDockedResize(options: {
   windowMode: Readonly<Ref<WindowMode>>;
   column: Ref<HTMLElement | null>;
+  root: Ref<HTMLElement | null>;
   onCollapse: () => void;
   onReopen: () => void;
 }) {
-  const { windowMode, column, onCollapse, onReopen } = options;
+  const { windowMode, column, root, onCollapse, onReopen } = options;
   const dockedHeight = useStorage("helpdesk-composer-height", 0);
   const { height: viewportHeight } = useWindowSize();
 
@@ -54,9 +55,9 @@ export function useDockedResize(options: {
       minY: threadTop() + (event.clientY - grabbed.getBoundingClientRect().top),
       collapsed: false,
     };
-    document.body.classList.add("composer-resizing");
+
     try {
-      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      (root.value ?? grabbed).setPointerCapture(event.pointerId);
     } catch {}
   }
 
@@ -106,7 +107,6 @@ export function useDockedResize(options: {
     const { startHeight, collapsed } = resizing.value;
     const squeezed = !collapsed && dockedHeight.value < MIN_BODY_HEIGHT;
     resizing.value = null;
-    document.body.classList.remove("composer-resizing");
     if (squeezed) {
       dockedHeight.value = clampBodyHeight(startHeight);
       onCollapse();

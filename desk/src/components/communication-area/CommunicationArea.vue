@@ -1,5 +1,9 @@
 <template>
-  <div ref="rootRef" class="max-sm:w-screen">
+  <div
+    ref="rootRef"
+    class="max-sm:w-screen"
+    :class="{ 'cursor-ns-resize': isResizing }"
+  >
     <!-- minimized pill, the default state, opens the composer window -->
     <div v-show="!windowOpen" class="flex items-center gap-2 px-4 py-3">
       <div
@@ -89,7 +93,8 @@
               <div class="min-w-0 flex-1">
                 <TypingIndicator :ticketId="ticketId" />
               </div>
-              <div class="flex shrink-0 items-center gap-1">
+
+              <div class="mr-px flex shrink-0 items-center gap-1">
                 <Button
                   v-if="!isMobileView"
                   variant="ghost"
@@ -310,7 +315,7 @@ const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager, userImage, userName } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
-const rootRef = ref(null);
+const rootRef = ref<HTMLElement | null>(null);
 const pillRef = ref<HTMLElement | null>(null);
 const columnRef = ref<HTMLElement | null>(null);
 const emailComposerRef = ref<InstanceType<typeof EmailComposer> | null>(null);
@@ -523,6 +528,7 @@ const {
 } = useDockedResize({
   windowMode,
   column: columnRef,
+  root: rootRef,
   onCollapse: closeComposer,
   onReopen: openComposer,
 });
@@ -822,18 +828,13 @@ defineExpose({
   replyToEmail,
   toggleEmailBox,
   toggleCommentBox,
+  // the panel behind holds the thread still while this is true
+  isResizing,
 });
 </script>
 
 <style>
-/* resizing cursor should always appear when composer is resized */
-body.composer-resizing,
-body.composer-resizing * {
-  cursor: ns-resize !important;
-}
-
-/* glass transperancy effect*/
-.ticket-composer-window[data-state] {
+.ticket-composer-window[data-state="docked"] {
   background-color: color-mix(
     in srgb,
     var(--surface-elevation-2) 75%,
@@ -844,14 +845,11 @@ body.composer-resizing * {
   border: 1px solid color-mix(in srgb, var(--outline-gray-3) 70%, transparent);
 }
 
-/* The composer body caps itself at 50vh; release it when the window height is
-   fixed so the body fills and the toolbar pins to the bottom. */
 .ticket-composer-window[data-state="floating"] .composer-body {
   max-height: none;
 }
 
-/* Docked, the drag sizes the body itself and the window sizes to it, so the
-   CC and BCC rows grow the window upwards instead of shrinking the editor. */
+/* Docked state the composer CC and BCC rows grow the window upwards. */
 .ticket-composer-window.composer-resized[data-state="docked"] .composer-body {
   max-height: none;
   flex: 1 1 auto;
