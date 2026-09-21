@@ -17,6 +17,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.extends.communication import sync_ticket_participants
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -238,6 +239,14 @@ class HDTicket(Document):
         self.remove_assignment_if_not_in_team()
         self.publish_update()
         self.capture_update_telemetry_events()
+
+    def on_trash(self):
+        self.clear_participants()
+
+    def clear_participants(self):
+        """Participant rows hold a Link to this ticket, so core refuses the
+        delete while they exist. on_trash runs ahead of that link check."""
+        frappe.db.delete("HD Ticket Participant", {"ticket": self.name})
 
     def capture_update_telemetry_events(self):
         capture_event("ticket_updated")
@@ -1044,6 +1053,11 @@ class HDTicket(Document):
         communication.db_set("reference_name", merge_target_name)
         merge_target = frappe.get_doc("HD Ticket", merge_target_name)
         merge_target.on_communication_update(communication)
+        # db_set fires no document hooks, so the participant projection has
+        # to be recomputed for the ticket the email left and the one it
+        # landed on.
+        sync_ticket_participants(self.name)
+        sync_ticket_participants(merge_target_name)
         return True
 
     # `on_communication_update` is a special method exposed from `Communication` doctype.

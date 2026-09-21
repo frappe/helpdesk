@@ -108,9 +108,6 @@ doc_events = {
     "Communication": {
         "after_insert": "helpdesk.extends.communication.after_insert",
     },
-    "HD Ticket": {
-        "on_trash": "helpdesk.helpdesk.doctype.hd_ticket_participant.hd_ticket_participant.on_ticket_trash",
-    },
 }
 
 # For List View

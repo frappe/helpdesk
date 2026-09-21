@@ -6,6 +6,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.helpdesk.doctype.hd_ticket.api import split_ticket
 from helpdesk.patches import backfill_ticket_participants
 from helpdesk.test_utils import make_communication, make_ticket
 
@@ -173,6 +174,58 @@ class TestParticipantLifecycle(ParticipantTestCase):
         self.assertFalse(
             frappe.db.exists("HD Ticket Participant", {"ticket": ticket.name})
         )
+
+
+class TestParticipantsFollowMovedEmails(ParticipantTestCase):
+    """Splitting and merging move communications with raw database writes,
+    which fire no document hooks, so the projection has to be resynced."""
+
+    def test_splitting_a_ticket_moves_the_participants(self) -> None:
+        ticket = make_ticket(subject="Ticket to split")
+        make_communication(
+            ticket.name, sender="bob@client.com", recipients="support@work.com"
+        )
+        moved = make_communication(
+            ticket.name, sender="later@client.com", recipients="kelly@work.com"
+        )
+
+        new_ticket = split_ticket("Split off", moved.name)
+
+        self.assertRecorded(
+            new_ticket, {("later@client.com", "From"), ("kelly@work.com", "To")}
+        )
+        self.assertNotIn(("kelly@work.com", "To"), self.participants(ticket.name))
+
+    def test_merging_a_ticket_moves_the_participants(self) -> None:
+        target = make_ticket(subject="Merge target")
+        source = make_ticket(subject="Merge source")
+        communication = make_communication(
+            source.name, sender="bob@client.com", recipients="kelly@work.com"
+        )
+        source.db_set("is_merged", 1)
+        source.db_set("merged_with", target.name)
+
+        source.reload().redirect_communication_to_merge_target(communication)
+
+        self.assertRecorded(
+            target.name, {("bob@client.com", "From"), ("kelly@work.com", "To")}
+        )
+        self.assertNotIn(("kelly@work.com", "To"), self.participants(source.name))
+
+    def test_a_resync_keeps_a_participant_still_on_another_email(self) -> None:
+        """Recomputing rather than moving rows one by one is what stops a
+        participant who is also on a remaining email from being dropped."""
+        ticket = make_ticket(subject="Shared participant")
+        make_communication(
+            ticket.name, sender="bob@client.com", recipients="kelly@work.com"
+        )
+        moved = make_communication(
+            ticket.name, sender="bob@client.com", recipients="kelly@work.com"
+        )
+
+        split_ticket("Split off shared", moved.name)
+
+        self.assertRecorded(ticket.name, {("kelly@work.com", "To")})
 
 
 class TestParticipantBackfill(ParticipantTestCase):

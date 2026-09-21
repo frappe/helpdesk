@@ -42,14 +42,41 @@ def after_insert(doc, method: str | None = None):
 
 def record_participants(doc) -> None:
     for email, role in participants_of(doc):
-        frappe.get_doc(
-            {
-                "doctype": "HD Ticket Participant",
-                "ticket": doc.reference_name,
-                "email": email,
-                "role": role,
-            }
-        ).insert(ignore_permissions=True, ignore_if_duplicate=True)
+        add_participant(doc.reference_name, email, role)
+
+
+def sync_ticket_participants(ticket: str) -> None:
+    """Rebuild a ticket's participants from the emails now sitting on it.
+
+    Splitting and merging move communications between tickets with raw
+    database writes, which fire no document hooks, so the projection has
+    to be recomputed for both sides of the move. Recomputing rather than
+    moving rows individually is what keeps a participant who is still on
+    another email in the thread from being dropped.
+    """
+    frappe.db.delete("HD Ticket Participant", {"ticket": ticket})
+    communications = frappe.get_all(
+        "Communication",
+        filters={"reference_doctype": "HD Ticket", "reference_name": ticket},
+        fields=["recipients", "cc", "sender"],
+    )
+    found: set[tuple[str, str]] = set()
+    for communication in communications:
+        found |= participants_of(communication)
+
+    for email, role in found:
+        add_participant(ticket, email, role)
+
+
+def add_participant(ticket: str, email: str, role: str) -> None:
+    frappe.get_doc(
+        {
+            "doctype": "HD Ticket Participant",
+            "ticket": ticket,
+            "email": email,
+            "role": role,
+        }
+    ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
 
 def participants_of(doc) -> set[tuple[str, str]]:

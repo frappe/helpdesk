@@ -11,6 +11,7 @@ from pypika import Criterion, Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.extends.communication import sync_ticket_participants
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
@@ -428,6 +429,12 @@ def split_ticket(subject: str, communication_id: str):
         new_ticket,
         update_modified=False,
     )
+
+    # These bulk writes fire no document hooks, so the participant
+    # projection has to be recomputed for the ticket the emails left and
+    # the one they moved to.
+    sync_ticket_participants(ticket_id)
+    sync_ticket_participants(new_ticket)
 
     # update comments
     frappe.db.set_value(
