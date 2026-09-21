@@ -147,3 +147,89 @@ class TestSearchIndexRelabel(FrappeTestCase):
         ticket = self.row("10")
         self.assertEqual(ticket["ticket_type"], "text")
         self.assertEqual(ticket["reference_ticket"], "10")
+
+
+class TestSearchIndexesRecipientsAndCc(FrappeTestCase):
+    """A ticket should be findable by searching for anyone who was on the
+    To/Cc line of a reply, not just the sender."""
+
+    TEST_INDEX = "test_recipients_cc_search.db"
+
+    def setUp(self):
+        self.search = HelpdeskSearch(db_name=self.TEST_INDEX)
+        self.search.drop_index()
+        self.addCleanup(self.search.drop_index)
+
+    def make_communication(self, ticket_name: str, **fields) -> None:
+        frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket_name,
+                "sent_or_received": "Received",
+                "content": "See attached invoice",
+                **fields,
+            }
+        ).insert(ignore_permissions=True)
+
+    def test_search_matches_a_ticket_by_cced_display_name(self):
+        ticket = make_ticket(subject="Payroll question")
+        self.make_communication(
+            ticket.name,
+            sender="bob@client.com",
+            recipients="support@work.com",
+            cc="Kelly Doe <kelly@work.com>, jane@client.com",
+        )
+
+        self.search.build_index()
+        result = self.search.search("kelly")
+
+        matched = {r.get("reference_name") for r in result["results"]}
+        self.assertIn(ticket.name, matched)
+
+    def test_search_matches_a_ticket_by_recipient_email(self):
+        ticket = make_ticket(subject="Benefits enrollment")
+        self.make_communication(
+            ticket.name,
+            sender="bob@client.com",
+            recipients="jane@client.com, kelly@work.com",
+        )
+
+        self.search.build_index()
+        result = self.search.search("jane@client.com")
+
+        matched = {r.get("reference_name") for r in result["results"]}
+        self.assertIn(ticket.name, matched)
+
+    def test_search_matches_a_ticket_by_bracketed_cced_email(self):
+        """The base content processor treats '<addr>' as an HTML tag and
+        strips it; the email must survive that for a "Name <email>" cc."""
+        ticket = make_ticket(subject="Onboarding question")
+        self.make_communication(
+            ticket.name,
+            sender="bob@client.com",
+            recipients="support@work.com",
+            cc="Kelly Doe <kelly@work.com>",
+        )
+
+        self.search.build_index()
+        result = self.search.search("kelly@work.com")
+
+        matched = {r.get("reference_name") for r in result["results"]}
+        self.assertIn(ticket.name, matched)
+
+    def test_search_matches_a_ticket_by_bracketed_recipient_email(self):
+        """Same bracket-stripping, but on the To line rather than Cc."""
+        ticket = make_ticket(subject="Direct deposit question")
+        self.make_communication(
+            ticket.name,
+            sender="bob@client.com",
+            recipients="Jane Doe <jane@client.com>",
+        )
+
+        self.search.build_index()
+        result = self.search.search("jane@client.com")
+
+        matched = {r.get("reference_name") for r in result["results"]}
+        self.assertIn(ticket.name, matched)

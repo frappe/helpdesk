@@ -19,6 +19,10 @@ class HelpdeskSearch(SQLiteSearch):
     is_post_filter_required = False
 
     INDEX_SCHEMA = {
+        # title/content are implied defaults, but must be listed explicitly
+        # once we add more text fields: only fields named here become part of
+        # the FTS-searchable columns, everything else is stored UNINDEXED.
+        "text_fields": ["title", "content", "recipients", "cc"],
         "metadata_fields": [
             "agent_group",
             "customer",
@@ -66,6 +70,8 @@ class HelpdeskSearch(SQLiteSearch):
                 "reference_doctype",
                 "reference_name",
                 "sender",
+                "recipients",
+                "cc",
                 "owner",
             ],
             "filters": {"reference_doctype": "HD Ticket"},
@@ -119,7 +125,9 @@ class HelpdeskSearch(SQLiteSearch):
 
     @staticmethod
     def _ticket_of(result: dict) -> str | None:
-        """Communication rows carry their ticket in reference_name, not reference_ticket."""
+        """Rows indexed before reference_ticket was set for Communication
+        carry their ticket in reference_name only, so keep the fallback
+        until every site has rebuilt its index."""
         return result.get("reference_ticket") or result.get("reference_name")
 
     def _get_accessible_tickets(self):
@@ -128,6 +136,10 @@ class HelpdeskSearch(SQLiteSearch):
 
     def prepare_document(self, doc):
         """Prepare a document for indexing with helpdesk-specific handling."""
+        if doc.doctype == "Communication":
+            self._strip_angle_brackets(doc, "recipients")
+            self._strip_angle_brackets(doc, "cc")
+
         document = super().prepare_document(doc)
         if not document:
             return None
@@ -165,6 +177,15 @@ class HelpdeskSearch(SQLiteSearch):
             document["owner"] = doc.sender
 
         return document
+
+    @staticmethod
+    def _strip_angle_brackets(doc, field: str) -> None:
+        """Drop the '<' '>' around an address in a "Name <email>" header so
+        the email survives indexing: the base content processor treats
+        bracketed text as an HTML tag and strips it entirely."""
+        value = getattr(doc, field, None)
+        if value:
+            doc[field] = value.replace("<", " ").replace(">", " ")
 
     def get_filter_options(self):
         """Get available filter options for search interface."""
