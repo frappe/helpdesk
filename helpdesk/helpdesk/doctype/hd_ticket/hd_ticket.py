@@ -21,10 +21,10 @@ from pypika.terms import Criterion
 from helpdesk.consts import (
     CUSTOMER_EDIT_EXEMPT_FIELDS,
     CUSTOMER_FILLABLE_PERMLEVELS,
-    DEFAULT_TICKET_TEMPLATE,
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
+from helpdesk.field_visibility import get_customer_visible_template_fields
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -95,19 +95,10 @@ class HDTicket(Document):
 
     def customer_fillable_template_fields(self) -> list[str]:
         """fields that a customer should be able to fill at creation as per template + permlevel access check."""
-        rows = frappe.get_all(
-            "HD Ticket Template Field",
-            filters={
-                "parent": DEFAULT_TICKET_TEMPLATE,
-                "parenttype": "HD Ticket Template",
-            },
-            fields=["fieldname", "visible_to"],
-        )
         return [
-            row.fieldname
-            for row in rows
-            if row.visible_to != "Agents"
-            and self.can_customer_fill_at_creation(row.fieldname)
+            fieldname
+            for fieldname in get_customer_visible_template_fields()
+            if self.can_customer_fill_at_creation(fieldname)
         ]
 
     def can_customer_fill_at_creation(self, fieldname: str) -> bool:

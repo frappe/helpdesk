@@ -61,3 +61,16 @@ def get_fields_visible_to(audience: str) -> set[str]:
             },
         )
     )
+
+
+def get_customer_visible_template_fields() -> list[str]:
+    """Default template fieldnames not reserved for agents."""
+    rows = frappe.get_all(
+        "HD Ticket Template Field",
+        filters={
+            "parent": DEFAULT_TICKET_TEMPLATE,
+            "parenttype": "HD Ticket Template",
+        },
+        fields=["fieldname", "visible_to"],
+    )
+    return [row.fieldname for row in rows if row.visible_to != "Agents"]

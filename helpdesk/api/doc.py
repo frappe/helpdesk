@@ -6,7 +6,10 @@ from frappe.model.document import get_controller
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.field_visibility import get_hidden_ticket_fields
+from helpdesk.field_visibility import (
+    get_customer_visible_template_fields,
+    get_hidden_ticket_fields,
+)
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -278,7 +281,7 @@ def get_filterable_fields(
         "Datetime",
     ]
 
-    visible_custom_fields = get_visible_custom_fields()
+    visible_custom_fields = get_customer_visible_template_fields()
     customer_portal_fields = [
         "name",
         "subject",
@@ -487,7 +490,7 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
 
 
 def get_customer_portal_fields(doctype, fields):
-    visible_custom_fields = get_visible_custom_fields()
+    visible_custom_fields = get_customer_visible_template_fields()
     customer_portal_fields = [
         "name",
         "subject",
@@ -500,16 +503,6 @@ def get_customer_portal_fields(doctype, fields):
     ]
     fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields
-
-
-def get_visible_custom_fields():
-    rows = frappe.db.get_all(
-        "HD Ticket Template Field",
-        {"parent": "Default"},
-        ["fieldname", "visible_to"],
-    )
-    # NULL visible_to would fail an SQL != 'Agents', so filter in Python
-    return [row.fieldname for row in rows if row.visible_to != "Agents"]
 
 
 def default_view_exists(doctype):
