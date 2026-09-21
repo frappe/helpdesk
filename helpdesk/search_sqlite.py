@@ -148,6 +148,10 @@ class HelpdeskSearch(SQLiteSearch):
                 and type(doc.reference_name) is str
             ):
                 document["reference_name"] = str(doc.reference_name)
+                # The small-site prefilter binds on reference_ticket (see
+                # get_search_filters); without this, every Communication hit
+                # was silently dropped for any site under PREFILTER_LIMIT.
+                document["reference_ticket"] = str(doc.reference_name)
 
         if doc.doctype == "HD Ticket":
             document["reference_ticket"] = str(doc.name)
