@@ -7,7 +7,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.patches import backfill_ticket_participants
-from helpdesk.test_utils import make_ticket
+from helpdesk.test_utils import make_communication, make_ticket
 
 
 class ParticipantTestCase(IntegrationTestCase):
@@ -16,19 +16,6 @@ class ParticipantTestCase(IntegrationTestCase):
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
-
-    def make_communication(self, ticket_name: str, **fields):
-        return frappe.get_doc(
-            {
-                "doctype": "Communication",
-                "communication_type": "Communication",
-                "reference_doctype": "HD Ticket",
-                "reference_name": ticket_name,
-                "sent_or_received": "Received",
-                "content": "See attached invoice",
-                **fields,
-            }
-        ).insert(ignore_permissions=True)
 
     def participants(self, ticket: str) -> set[tuple[str, str]]:
         return {
@@ -52,7 +39,7 @@ class TestParticipantCapture(ParticipantTestCase):
     def test_records_the_to_cc_and_from_addresses(self) -> None:
         ticket = make_ticket(subject="Participant capture")
 
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="support@work.com",
@@ -72,10 +59,10 @@ class TestParticipantCapture(ParticipantTestCase):
     def test_the_same_person_on_two_replies_is_recorded_once(self) -> None:
         ticket = make_ticket(subject="Repeat participant")
 
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients="support@work.com"
         )
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients="support@work.com"
         )
 
@@ -91,7 +78,7 @@ class TestParticipantCapture(ParticipantTestCase):
         on the way in rather than at every read."""
         ticket = make_ticket(subject="Mixed case participant")
 
-        self.make_communication(
+        make_communication(
             ticket.name, sender="Bob@Client.COM", recipients="Support@Work.Com"
         )
 
@@ -103,7 +90,7 @@ class TestParticipantCapture(ParticipantTestCase):
     def test_quoted_display_name_containing_a_comma_is_parsed(self) -> None:
         ticket = make_ticket(subject="Quoted participant")
 
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients='"Doe, Kelly" <kelly@work.com>, jane@client.com',
@@ -116,7 +103,7 @@ class TestParticipantCapture(ParticipantTestCase):
     def test_group_syntax_does_not_become_a_participant(self) -> None:
         ticket = make_ticket(subject="Group syntax participant")
 
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="undisclosed-recipients:;",
@@ -160,7 +147,7 @@ class TestParticipantCapture(ParticipantTestCase):
             "helpdesk.extends.communication.record_participants",
             side_effect=ValueError("boom"),
         ):
-            communication = self.make_communication(
+            communication = make_communication(
                 ticket.name, sender="bob@client.com", recipients="support@work.com"
             )
 
@@ -175,7 +162,7 @@ class TestParticipantLifecycle(ParticipantTestCase):
         """Participants hold a Link to the ticket, so without a cascade core
         refuses the delete as still linked."""
         ticket = make_ticket(subject="Deletable ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients="support@work.com"
         )
         self.assertTrue(frappe.db.exists("HD Ticket Participant", {"ticket": ticket.name}))
@@ -198,7 +185,7 @@ class TestParticipantBackfill(ParticipantTestCase):
     def existing_thread(self) -> str:
         """A thread whose participant rows predate the capture hook."""
         ticket = make_ticket(subject="Backfill thread")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="Jane Doe <jane@client.com>",
