@@ -1,4 +1,3 @@
-from email.utils import getaddresses
 from typing import Literal
 
 import frappe
@@ -196,29 +195,16 @@ def get_related_tickets(contact: str) -> list[dict]:
     if not emails:
         return []
 
-    or_filters = []
-    for email in emails:
-        or_filters.append(["recipients", "like", f"%{email}%"])
-        or_filters.append(["cc", "like", f"%{email}%"])
-        or_filters.append(["sender", "=", email])
-
-    # Communication rows aren't independently permission-checked here; the
-    # HD Ticket lookup below is, so a name leaking through here can't expose
-    # a ticket the caller isn't allowed to see.
-    candidates = frappe.get_list(
-        "Communication",
-        filters={"reference_doctype": "HD Ticket"},
-        or_filters=or_filters,
-        fields=["reference_name", "recipients", "cc", "sender"],
+    # Participant rows aren't independently permission-checked here; the
+    # HD Ticket lookup below is, so a ticket name leaking through here can't
+    # expose a ticket the caller isn't allowed to see.
+    ticket_names = frappe.get_list(
+        "HD Ticket Participant",
+        filters={"email": ["in", list(emails)]},
+        pluck="ticket",
+        distinct=True,
         ignore_permissions=True,
     )
-    # The LIKE clauses above only ever over-match ('_' is a single-character
-    # wildcard, and a short address sits inside a longer one: 'an@x.com' is a
-    # substring of 'dan@x.com'), so they act as a coarse prefilter and the
-    # parsed comparison below decides.
-    ticket_names = {
-        c.reference_name for c in candidates if _is_addressed_to(c, emails)
-    }
     if not ticket_names:
         return []
 
@@ -238,17 +224,6 @@ def get_related_tickets(contact: str) -> list[dict]:
         order_by="modified desc",
     )
     return [t for t in tickets if t.contact != contact]
-
-
-def _is_addressed_to(communication, emails: set[str]) -> bool:
-    """Whether any of the communication's To/Cc/From addresses is one of
-    `emails`, comparing parsed addresses rather than raw header substrings."""
-    headers = [
-        header
-        for header in (communication.recipients, communication.cc, communication.sender)
-        if header
-    ]
-    return any(address.lower() in emails for _, address in getaddresses(headers))
 
 
 def get_customers_with_image(name: str) -> list[dict]:
