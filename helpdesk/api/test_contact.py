@@ -5,7 +5,12 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.contact import delete_contact, get_related_tickets
-from helpdesk.test_utils import create_contact, create_customer, make_ticket
+from helpdesk.test_utils import (
+    create_contact,
+    create_customer,
+    make_communication,
+    make_ticket,
+)
 
 
 class TestDeleteContact(IntegrationTestCase):
@@ -91,24 +96,11 @@ class TestGetRelatedTickets(IntegrationTestCase):
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
 
-    def make_communication(self, ticket_name: str, **fields) -> None:
-        frappe.get_doc(
-            {
-                "doctype": "Communication",
-                "communication_type": "Communication",
-                "reference_doctype": "HD Ticket",
-                "reference_name": ticket_name,
-                "sent_or_received": "Received",
-                "content": "See attached invoice",
-                **fields,
-            }
-        ).insert(ignore_permissions=True)
-
     def test_returns_a_ticket_the_contact_was_cced_on(self) -> None:
         email = "cced-contact@example.com"
         contact = create_contact("CcedContact", email, user=False)
         ticket = make_ticket(subject="Cced ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients="support@work.com",
             cc=f"Other <{email}>",
         )
@@ -121,7 +113,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         email = "sent-to-contact@example.com"
         contact = create_contact("SentToContact", email, user=False)
         ticket = make_ticket(subject="Sent to ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients=email,
         )
 
@@ -133,7 +125,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         email = "replier-contact@example.com"
         contact = create_contact("ReplierContact", email, user=False)
         ticket = make_ticket(subject="Replied on ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender=email, recipients="support@work.com",
         )
 
@@ -146,7 +138,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         LIKE '%email%' would wrongly claim the contact was involved."""
         contact = create_contact("ShortContact", "an@example.com", user=False)
         ticket = make_ticket(subject="Someone else's ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender="bob@client.com", recipients="dan@example.com",
         )
 
@@ -159,7 +151,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         filter would match 'bobyx@example.com' for 'bob_x@example.com'."""
         contact = create_contact("UnderscoreContact", "bob_x@example.com", user=False)
         ticket = make_ticket(subject="Wildcard collision ticket")
-        self.make_communication(
+        make_communication(
             ticket.name, sender="someone@client.com", recipients="bobyx@example.com",
         )
 
@@ -171,7 +163,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         """A naive split(',') would break this header into bad addresses."""
         contact = create_contact("QuotedContact", "kelly@work.com", user=False)
         ticket = make_ticket(subject="Quoted display name ticket")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients='"Doe, Kelly" <kelly@work.com>, jane@client.com',
@@ -185,7 +177,7 @@ class TestGetRelatedTickets(IntegrationTestCase):
         email = "owner-contact@example.com"
         contact = create_contact("OwnerContact", email, user=False)
         ticket = make_ticket(subject="Owned ticket", contact=contact["contact"])
-        self.make_communication(
+        make_communication(
             ticket.name, sender=email, recipients="support@work.com",
         )
 

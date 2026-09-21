@@ -5,7 +5,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskSearch
-from helpdesk.test_utils import create_user, make_ticket
+from helpdesk.test_utils import create_user, make_communication, make_ticket
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
 
@@ -160,22 +160,9 @@ class TestSearchIndexesRecipientsAndCc(FrappeTestCase):
         self.search.drop_index()
         self.addCleanup(self.search.drop_index)
 
-    def make_communication(self, ticket_name: str, **fields) -> None:
-        frappe.get_doc(
-            {
-                "doctype": "Communication",
-                "communication_type": "Communication",
-                "reference_doctype": "HD Ticket",
-                "reference_name": ticket_name,
-                "sent_or_received": "Received",
-                "content": "See attached invoice",
-                **fields,
-            }
-        ).insert(ignore_permissions=True)
-
     def test_search_matches_a_ticket_by_cced_display_name(self):
         ticket = make_ticket(subject="Payroll question")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="support@work.com",
@@ -190,7 +177,7 @@ class TestSearchIndexesRecipientsAndCc(FrappeTestCase):
 
     def test_search_matches_a_ticket_by_recipient_email(self):
         ticket = make_ticket(subject="Benefits enrollment")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="jane@client.com, kelly@work.com",
@@ -206,7 +193,7 @@ class TestSearchIndexesRecipientsAndCc(FrappeTestCase):
         """The base content processor treats '<addr>' as an HTML tag and
         strips it; the email must survive that for a "Name <email>" cc."""
         ticket = make_ticket(subject="Onboarding question")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="support@work.com",
@@ -222,7 +209,7 @@ class TestSearchIndexesRecipientsAndCc(FrappeTestCase):
     def test_search_matches_a_ticket_by_bracketed_recipient_email(self):
         """Same bracket-stripping, but on the To line rather than Cc."""
         ticket = make_ticket(subject="Direct deposit question")
-        self.make_communication(
+        make_communication(
             ticket.name,
             sender="bob@client.com",
             recipients="Jane Doe <jane@client.com>",

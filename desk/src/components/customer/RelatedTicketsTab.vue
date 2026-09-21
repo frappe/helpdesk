@@ -18,10 +18,14 @@
     </div>
     <div v-else class="pb-6">
       <template v-for="(ticket, i) in tickets" :key="ticket.name">
-        <div
-          class="grid items-center py-3 px-1 text-sm text-ink-gray-8 cursor-pointer hover:bg-surface-gray-1 rounded transition-colors"
+        <!-- A real link rather than a click handler: keyboard users get it
+             for free, as do open-in-new-tab and middle click. -->
+        <a
+          class="grid items-center py-3 px-1 text-sm text-ink-gray-8 hover:bg-surface-gray-1 rounded transition-colors focus-visible:ring-2 focus-visible:ring-outline-gray-3"
           :style="gridTemplateStyle"
-          @click="goToTicket(ticket.name)"
+          :href="ticketHref(ticket.name)"
+          target="_blank"
+          rel="noopener"
         >
           <div class="text-ink-gray-6 font-base">{{ ticket.name }}</div>
           <div class="truncate font-medium max-w-[90%]">
@@ -34,7 +38,7 @@
           <div v-if="!isMobileView" class="flex items-center gap-1.5">
             <TicketPriority :priority="ticket.priority" />
           </div>
-        </div>
+        </a>
         <hr class="mx-1" v-if="i !== tickets.length - 1" />
       </template>
     </div>
@@ -72,11 +76,10 @@ const gridTemplateStyle = computed(() =>
     : "grid-template-columns: 6rem 1fr 8rem 7rem"
 );
 
-function goToTicket(ticket: string) {
-  const route = router.resolve({
+function ticketHref(ticket: string) {
+  return router.resolve({
     name: "TicketAgent",
     params: { ticketId: String(ticket) },
-  });
-  window.open(route.href, "_blank");
+  }).href;
 }
 </script>
