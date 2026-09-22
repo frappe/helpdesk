@@ -361,8 +361,8 @@ const mobileCustomActions = computed(() => {
 
   for (const action of customActions.value) {
     if (action.group) {
-      // Grouped action (with or without buttonLabel) — flatten its items
-      for (const item of action.items || []) {
+      // Grouped action (with or without buttonLabel) — flatten its options
+      for (const item of action.options || []) {
         items.push({ label: item.label, onClick: item.onClick });
       }
     } else {
