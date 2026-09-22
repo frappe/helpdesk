@@ -41,7 +41,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import { useTheme } from "frappe-ui";
+import { useColorScheme } from "frappe-ui";
 import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
 
@@ -51,7 +51,7 @@ import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
 
-const { currentTheme, toggleTheme } = useTheme();
+const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
 const route = useRoute();
 const router = useRouter();
@@ -89,8 +89,8 @@ const availabilityMenuOption = computed(() => ({
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
-  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleTheme(),
+  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleColorScheme(),
 }));
 
 const customerPortalDropdown = computed(() => [

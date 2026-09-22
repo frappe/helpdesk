@@ -23,7 +23,7 @@
       <Button :label="__('Retry')" @click="analytics.reload()" />
     </div>
     <div v-else class="flex h-full flex-col items-center justify-center">
-      <LoadingIndicator :scale="8" />
+      <LoadingIndicator class="size-8" />
     </div>
   </div>
 </template>

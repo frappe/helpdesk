@@ -20,7 +20,7 @@ def get_comment_extras(ticket: str) -> dict[str, dict]:
             "reference_name": ticket,
             "comment_type": "Comment",
         },
-        fields=["name", "owner"],
+        fields=["name", "owner", "content"],
         limit_page_length=0,
     )
     # the ticket gate above is the whole read rule for agent comments
@@ -28,7 +28,7 @@ def get_comment_extras(ticket: str) -> dict[str, dict]:
     extras = {name: {"reactions": [], "attachments": []} for name in names}
     if not names:
         return extras
-    add_attachments(extras, names)
+    add_attachments(extras, {row.name: row.content or "" for row in rows})
     if frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
         add_reactions(extras, names)
     return extras
@@ -47,14 +47,21 @@ def ensure_agent_can_read(ticket: str) -> None:
         frappe.throw(_("Not permitted"), frappe.PermissionError)
 
 
-def add_attachments(extras: dict[str, dict], names: list[str]) -> None:
+def add_attachments(extras: dict[str, dict], contents: dict[str, str]) -> None:
     files = frappe.get_all(
         "File",
-        filters={"attached_to_doctype": "Comment", "attached_to_name": ["in", names]},
+        filters={
+            "attached_to_doctype": "Comment",
+            "attached_to_name": ["in", list(contents)],
+        },
         fields=["name", "file_url", "file_name", "attached_to_name"],
     )
     for file in files:
-        extras[file.pop("attached_to_name")]["attachments"].append(file)
+        comment = file.pop("attached_to_name")
+        # an inline image is attached so readers can load it, but it is not a chip
+        if file["file_url"] in contents[comment]:
+            continue
+        extras[comment]["attachments"].append(file)
 
 
 def add_reactions(extras: dict[str, dict], names: list[str]) -> None:

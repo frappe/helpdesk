@@ -1,25 +1,24 @@
 <template>
   <div class="flex flex-wrap items-center gap-1.5 pt-1.5">
-    <Popover placement="top-start">
-      <template #target="{ togglePopover }">
-        <Button
-          variant="ghost"
-          class="text-ink-gray- 5 -ml-1.5"
-          @click="togglePopover"
-        >
+    <Popover side="top" align="start">
+      <template #trigger>
+        <Button variant="ghost" class="text-ink-gray-5 -ml-1.5">
           <template #icon>
             <ReactionIcon class="size-4" />
           </template>
         </Button>
       </template>
-      <template #body-main>
+      <template #default="{ close }">
         <div class="p-2">
           <div class="grid grid-cols-6 gap-2">
             <button
               v-for="emoji in PRESET_EMOJIS"
               :key="emoji"
-              class="size-6 flex items-center justify-center rounded hover:bg-surface-gray-2 text-lg transition-colors"
-              @click="emit('toggle', emoji)"
+              class="size-6 flex items-center justify-center rounded-4 hover:bg-surface-gray-2 text-md transition-colors"
+              @click="
+                emit('toggle', emoji);
+                close();
+              "
             >
               {{ emoji }}
             </button>
@@ -28,10 +27,10 @@
       </template>
     </Popover>
 
-    <Tooltip v-for="reaction in reactions" :key="reaction.emoji">
-      <template #body>
+    <Tooltip bare v-for="reaction in reactions" :key="reaction.emoji">
+      <template #content>
         <div
-          class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded"
+          class="bg-surface-gray-10 px-2 py-1 text-center text-p-xs text-ink-base shadow-xl rounded-4"
         >
           {{ reaction.users.map((u) => u.full_name).join(", ") }}
         </div>

@@ -20,15 +20,14 @@
             />
           </div>
         </div>
-        <MultiSelectCombobox
-          :disabled="!fieldCriteriaState.display.enabled"
+        <MultiSelect
           class="min-w-[120px] max-w-[120px]"
+          side="top"
+          :disabled="!fieldCriteriaState.display.enabled"
           :options="fieldCriteriaOptions"
-          :model-value="fieldCriteriaState.display.value"
+          :model-value="selectedValues('display')"
+          :placeholder="__('Select Child Field values')"
           @update:model-value="handleCriteriaSelection($event, 'display')"
-          :multiple="true"
-          placeholder="Select Child Field values"
-          placement="top"
         />
       </div>
       <!-- Mandatory Criteria -->
@@ -46,15 +45,14 @@
             />
           </div>
         </div>
-        <MultiSelectCombobox
-          :disabled="!fieldCriteriaState.mandatory.enabled"
+        <MultiSelect
           class="min-w-[120px] max-w-[120px]"
+          side="top"
+          :disabled="!fieldCriteriaState.mandatory.enabled"
           :options="fieldCriteriaOptions"
-          :model-value="fieldCriteriaState.mandatory.value"
+          :model-value="selectedValues('mandatory')"
+          :placeholder="__('Select Child Field values')"
           @update:model-value="handleCriteriaSelection($event, 'mandatory')"
-          :multiple="true"
-          placeholder="Select Child Field values"
-          placement="top"
         />
       </div>
     </div>
@@ -63,9 +61,9 @@
 
 <script setup lang="ts">
 import DocumentationButton from "@/components/DocumentationButton.vue";
-import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 import { getMeta } from "@/stores/meta";
-import { Switch } from "frappe-ui";
+import { __ } from "@/translation";
+import { MultiSelect, Switch } from "frappe-ui";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -98,21 +96,25 @@ const fieldCriteriaOptions = computed(() => {
   return _options;
 });
 
+function selectedValues(stateKey: "display" | "mandatory") {
+  return fieldCriteriaState.value[stateKey].value.map((v) => v.value);
+}
+
 function handleCriteriaSelection(
-  values: { label: string; value: string }[],
+  values: string[],
   stateKey: "display" | "mandatory"
 ) {
-  const _values = values.map((v) => v.value);
-  fieldCriteriaState.value[stateKey].value = values;
-  if (_values.length === 0) {
-    fieldCriteriaState.value[stateKey].value = [{ label: "Any", value: "Any" }];
-  } else if (_values[0] === "Any" && _values.length > 1) {
-    fieldCriteriaState.value[stateKey].value = _values
-      .filter((value) => value !== "Any")
-      .map((value) => ({ label: value, value }));
-  } else if (_values.at(-1) === "Any" && _values.length > 1) {
-    fieldCriteriaState.value[stateKey].value = [{ label: "Any", value: "Any" }];
-  }
+  // "Any" is exclusive: picking it drops the rest, picking anything else drops it
+  const wasAnySelected = selectedValues(stateKey).includes("Any");
+  let selected =
+    values.includes("Any") && !wasAnySelected
+      ? ["Any"]
+      : values.filter((value) => value !== "Any");
+  if (!selected.length) selected = ["Any"];
+  fieldCriteriaState.value[stateKey].value = selected.map((value) => ({
+    label: value,
+    value,
+  }));
 }
 </script>
 

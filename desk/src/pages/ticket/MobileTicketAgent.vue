@@ -20,8 +20,8 @@
                   />
                 </template>
                 <template #suffix>
-                  <FeatherIcon
-                    :name="open ? 'chevron-up' : 'chevron-down'"
+                  <component
+                    :is="open ? LucideChevronUp : LucideChevronDown"
                     class="h-4"
                   />
                 </template>
@@ -37,39 +37,43 @@
     >
       <!-- left side -->
       <div class="flex items-center gap-2 max-w-[65%]">
-        <Link
-          class="min-w-0 flex-1"
-          doctype="HD Team"
-          :hide-clear-button="true"
-          :model-value="ticket.doc.agent_group"
-          @update:model-value="(val) => updateField('agent_group', val)"
-        >
-          <!-- Same trigger styling as AssignTo so the header controls match -->
-          <template #target="{ togglePopover }">
-            <Button
-              variant="outline"
-              class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
-              @click="togglePopover()"
-            >
-              <div class="flex items-center min-h-5 gap-2 w-full">
-                <span
-                  class="truncate"
-                  :class="
-                    ticket.doc.agent_group
-                      ? 'text-ink-gray-7'
-                      : 'text-ink-gray-5'
-                  "
-                >
-                  {{ ticket.doc.agent_group || __("Team") }}
-                </span>
-              </div>
-              <template #suffix>
-                <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
-              </template>
-            </Button>
-          </template>
-        </Link>
-        <AssignTo class="min-w-0 flex-1" :hide-label="true" />
+        <!-- the width lives on the wrapper: a Combobox with its own #trigger
+             slot drops the class it is handed -->
+        <div class="min-w-0 flex-1">
+          <Link
+            doctype="HD Team"
+            :hide-clear-button="true"
+            :model-value="ticket.doc.agent_group"
+            @update:model-value="(val) => updateField('agent_group', val)"
+          >
+            <!-- Same trigger styling as AssignTo so the header controls match -->
+            <template #trigger>
+              <Button
+                variant="outline"
+                class="!flex !justify-start w-full active:!bg-inherit hover:shadow-sm [&>span]:w-full"
+              >
+                <div class="flex items-center min-h-5 gap-2 w-full">
+                  <span
+                    class="truncate"
+                    :class="
+                      ticket.doc.agent_group
+                        ? 'text-ink-gray-7'
+                        : 'text-ink-gray-5'
+                    "
+                  >
+                    {{ ticket.doc.agent_group || __("Team") }}
+                  </span>
+                </div>
+                <template #suffix>
+                  <LucideChevronDown class="h-4 w-4 ms-auto text-ink-gray-5" />
+                </template>
+              </Button>
+            </template>
+          </Link>
+        </div>
+        <div class="min-w-0 flex-1">
+          <AssignTo :hide-label="true" />
+        </div>
       </div>
       <!-- right side -->
       <div class="flex items-center gap-2">
@@ -87,13 +91,14 @@
       <div class="flex min-h-0 flex-1 flex-col overflow-x-hidden">
         <div class="flex min-h-0 flex-1 flex-col">
           <Tabs
-            :modelValue="tabIndex"
+            :modelValue="activeTab"
             :tabs="tabs"
             @update:modelValue="changeTabTo"
-            class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-3 [&_[role='tablist']]:gap-7.5 [&_[role='tabpanel'][data-state='active']]:flex-1"
+            size="md"
+            class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:py-1.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
           >
             <template #tab-panel="{ tab }">
-              <div v-if="tab.name === 'details'">
+              <div v-if="tab.value === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
                   v-if="contact.data"
@@ -149,7 +154,7 @@
                 v-else
                 ref="timelineRef"
                 :ticket-id="String(ticket.doc?.name)"
-                :tab="tab.name"
+                :tab="tab.value"
                 :tab-label="tab.label"
                 @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
               />
@@ -217,6 +222,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import { __ } from "@/translation";
 import {
   Breadcrumbs,
@@ -257,6 +264,7 @@ import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 import {
+  createToast,
   parseField,
   setupCustomizations,
 } from "@/composables/formCustomisation";
@@ -335,7 +343,7 @@ const customizationCtx = computed(() => ({
   toast,
   $dialog,
   updateField,
-  createToast: toast.create,
+  createToast,
 }));
 
 watchEffect(async () => {
@@ -365,7 +373,7 @@ const mobileCustomActions = computed(() => {
 
   if (!items.length) return [];
 
-  return [{ group: "Actions", hideLabel: true, items }];
+  return [{ group: "Actions", hideLabel: true, options: items }];
 });
 
 const ticketFields = computed(() => {
@@ -464,53 +472,55 @@ const breadcrumbs = computed(() => {
 });
 
 const dropdownOptions = computed(() =>
-  ticketStatusStore.statuses.data?.map((o: HDTicketStatus) => ({
-    label: o.label_agent,
-    value: o.label_agent,
-    onClick: () => ticket.value.setValue.submit({ status: o.label_agent }),
-    icon: () =>
-      h(IndicatorIcon, {
-        class: o.parsed_color,
-      }),
-  }))
+  ticketStatusStore.statuses.data
+    ?.filter((o: HDTicketStatus) => o.enabled)
+    .map((o: HDTicketStatus) => ({
+      label: o.label_agent,
+      value: o.label_agent,
+      onClick: () => ticket.value.setValue.submit({ status: o.label_agent }),
+      icon: () =>
+        h(IndicatorIcon, {
+          class: o.parsed_color,
+        }),
+    }))
 );
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs = [
     {
-      name: "details",
+      value: "details",
       label: __("Details"),
-      icon: DetailsIcon,
+      iconLeft: DetailsIcon,
       condition: () => isMobileView.value,
     },
     {
-      name: "activity",
+      value: "activity",
       label: __("Activity"),
-      icon: ActivityIcon,
+      iconLeft: ActivityIcon,
     },
     {
-      name: "email",
+      value: "email",
       label: __("Emails"),
-      icon: EmailIcon,
+      iconLeft: EmailIcon,
     },
     {
-      name: "comment",
+      value: "comment",
       label: __("Comments"),
-      icon: CommentIcon,
+      iconLeft: CommentIcon,
     },
   ];
 
   if (isCallingEnabled.value) {
     _tabs.push({
-      name: "call",
+      value: "call",
       label: __("Calls"),
-      icon: PhoneIcon,
+      iconLeft: PhoneIcon,
     });
   }
   return _tabs;
 });
 
-const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+const { activeTab, changeTabTo } = useActiveTabManager(tabs);
 
 onMounted(() => {
   document.title = props.ticketId;

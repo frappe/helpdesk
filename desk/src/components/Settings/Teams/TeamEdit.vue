@@ -11,7 +11,11 @@
             {{ __("Enabled") }}
           </span>
         </div>
-        <Dropdown placement="right" :options="options">
+        <Dropdown
+          align="end"
+          :options="options"
+          @update:open="(open) => open && (isConfirmingTeamDelete = false)"
+        >
           <Button variant="ghost">
             <template #icon>
               <LucideMoreHorizontal class="h-4 w-4" />
@@ -65,13 +69,12 @@
                   <Dropdown
                     v-if="teamMembers.length > 1"
                     :options="memberDropdownOptions(member)"
-                    placement="right"
+                    align="end"
+                    @update:open="
+                      (open) => open && (isConfirmingDelete = false)
+                    "
                   >
-                    <Button
-                      icon="lucide-more-horizontal"
-                      variant="ghost"
-                      @click="isConfirmingDelete = false"
-                    />
+                    <Button icon="lucide-more-horizontal" variant="ghost" />
                   </Dropdown>
                 </template>
               </AgentCard>

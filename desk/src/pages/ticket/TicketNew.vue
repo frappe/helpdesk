@@ -63,9 +63,11 @@
             {{ __("Subject") }}
             <span class="place-self-center text-ink-red-5"> * </span>
           </span>
-          <FormControl
+          <!-- TextInput rings only on :focus-visible, so a click leaves the
+               field with no outline; class lands on its wrapper, not the input -->
+          <TextInput
             v-model="subject"
-            type="text"
+            variant="outline"
             :placeholder="__('A short description')"
             maxlength="140"
           />
@@ -73,7 +75,7 @@
         <SearchArticles
           v-if="isCustomerPortal"
           :query="subject"
-          class="shadow"
+          class="shadow-sm"
         />
         <div v-if="isCustomerPortal">
           <h4
@@ -89,18 +91,27 @@
             v-model:content="description"
             :placeholder="__('Detailed explanation')"
             expand
-            :uploadFunction="(file:any)=>uploadFunction(file)"
+            :uploadFunction="
+              (file: any, options: any) =>
+                track(uploadFunction(file, null, null, true, options))
+            "
           >
             <template #bottom-right>
-              <Button
-                :label="__('Submit')"
-                theme="gray"
-                variant="solid"
-                :disabled="
-                  $refs.editor?.editor?.isEmpty || ticket.loading || !subject
-                "
-                @click="() => ticket.submit()"
-              />
+              <!-- A disabled button fires no pointer events, so the span
+                   carries the hover for the tooltip -->
+              <Tooltip
+                :text="isUploading ? __('Please wait, media is uploading') : ''"
+              >
+                <span class="inline-flex">
+                  <Button
+                    :label="__('Submit')"
+                    theme="gray"
+                    variant="solid"
+                    :disabled="!canSubmit"
+                    @click="() => ticket.submit()"
+                  />
+                </span>
+              </Tooltip>
             </template>
           </TicketTextEditor>
         </div>
@@ -114,18 +125,25 @@
           v-model:content="description"
           :placeholder="__('Detailed explanation')"
           expand
-          :uploadFunction="(file:any)=>uploadFunction(file)"
+          :uploadFunction="
+            (file: any, options: any) =>
+              track(uploadFunction(file, null, null, true, options))
+          "
         >
           <template #bottom-right>
-            <Button
-              :label="__('Submit')"
-              theme="gray"
-              variant="solid"
-              :disabled="
-                $refs.editor?.editor?.isEmpty || ticket.loading || !subject
-              "
-              @click="() => ticket.submit()"
-            />
+            <Tooltip
+              :text="isUploading ? __('Please wait, media is uploading') : ''"
+            >
+              <span class="inline-flex">
+                <Button
+                  :label="__('Submit')"
+                  theme="gray"
+                  variant="solid"
+                  :disabled="!canSubmit"
+                  @click="() => ticket.submit()"
+                />
+              </span>
+            </Tooltip>
           </template>
         </TicketTextEditor>
       </div>
@@ -146,17 +164,18 @@ import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Field } from "@/types";
-import { isCustomerPortal, uploadFunction } from "@/utils";
+import { useUploadTracker } from "@/composables/useUploadTracker";
+import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { useOnboarding } from "@framework/ui";
 import {
   Breadcrumbs,
   Button,
   call,
   createListResource,
   createResource,
-  FormControl,
+  TextInput,
   usePageMeta,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -177,9 +196,20 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager, userId: userID } = useAuthStore();
 // Pre-filled by the command palette's "Create ticket …" fallback.
+const { isUploading, track } = useUploadTracker();
+// Read off the content model, not the editor ref: the ref is empty on the first
+// render, which let the button paint enabled before flipping to disabled
+const canSubmit = computed(
+  () =>
+    Boolean(subject.value) &&
+    !isContentEmpty(description.value) &&
+    !ticket.loading &&
+    !isUploading.value
+);
+
 const subject = ref(String(route.query.subject ?? ""));
 const description = ref("");
 const attachments = ref([]);
@@ -277,7 +307,7 @@ const ticket = createResource({
       },
     });
     if (isManager) {
-      updateOnboardingStep("create_first_ticket", true, false, () =>
+      updateOnboardingStep?.("create_first_ticket", true, false, () =>
         localStorage.setItem("firstTicket", data.name)
       );
     }

@@ -9,7 +9,7 @@
       <Tooltip :text="contact.data?.name || contact.data?.email_id">
         <div class="flex min-w-0 items-center gap-1.5 w-fit max-w-[65%]">
           <p
-            class="min-h-[1lh] cursor-pointer truncate text-lg font-medium text-ink-gray-7 hover:text-ink-gray-9"
+            class="min-h-[1lh] cursor-pointer truncate text-md font-medium text-ink-gray-7 hover:text-ink-gray-9"
             @click="openContact(contact.data?.name)"
           >
             {{ contact.data?.name || contact.data?.email_id }}

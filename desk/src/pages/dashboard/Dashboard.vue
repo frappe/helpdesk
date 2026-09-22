@@ -9,25 +9,18 @@
       <template #right-header>
         <!-- Segmented pill toggle: only visible to managers -->
         <div v-if="isManager">
-          <TabButtons v-model="activeTab" :buttons="tabButtons" />
+          <TabButtons v-model="activeTab" :options="tabButtons" />
         </div>
       </template>
     </LayoutHeader>
 
-    <div class="p-5 w-full overflow-y-scroll">
+    <div class="px-4 py-4 w-full overflow-y-scroll">
       <!-- Filters -->
-      <div class="mb-4 flex items-center gap-4 overflow-x-auto">
-        <Dropdown
-          v-if="!showDatePicker"
-          :options="options"
-          class="!form-control !w-48"
-          v-model="preset"
-          :placeholder="__('Select Range')"
-          @change="filters.period = preset"
-        >
+      <div class="mb-4 flex items-center gap-4 overflow-x-auto px-1 py-1">
+        <Dropdown v-if="!showDatePicker" :options="options">
           <template #default>
             <div
-              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
+              class="flex justify-between !min-w-48 items-center border border-outline-gray-2 rounded-4 text-ink-gray-8 px-2 py-1.5 hover:border-outline-gray-3 hover:shadow-sm focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 transition-colors h-7 cursor-pointer"
             >
               <div class="flex items-center">
                 <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
@@ -45,36 +38,54 @@
           variant="outline"
           :placeholder="__('Period')"
           :format="'MMM D'"
+          @update:open="onPickerToggle"
         >
           <template #prefix>
-            <LucideCalendar class="size-4 text-ink-gray-5 me-2" />
+            <!-- ms-px: TextInput anchors the prefix to the wrapper, which sits
+                 outside the input's 1px border, so it lands 1px left of the
+                 preset trigger's icon. -->
+            <LucideCalendar class="size-4 text-ink-gray-5 ms-px me-2" />
           </template>
         </DateRangePicker>
         <Link
           v-if="isManager && !viewMyStats"
-          class="form-control w-48"
+          class="w-48"
           doctype="HD Team"
+          variant="outline"
           :placeholder="__('Team')"
           v-model="filters.team"
-          :page-length="5"
-          :hide-me="true"
         >
           <template #prefix>
-            <LucideUsers class="size-4 text-ink-gray-5 me-2" />
+            <LucideUsers class="size-4 text-ink-gray-5 me-1" />
+          </template>
+          <!-- One line per row: the filter only needs the name. -->
+          <template #item-label="{ item }">
+            <div class="truncate">{{ item.label }}</div>
           </template>
         </Link>
         <Link
           v-if="isManager && !viewMyStats"
-          class="form-control w-48"
+          class="w-48"
           doctype="HD Agent"
+          variant="outline"
           :placeholder="__('Agent')"
           v-model="filters.agent"
-          :page-length="5"
           :filters="agentFilter"
-          :hide-me="true"
         >
           <template #prefix>
-            <LucideUser class="size-4 text-ink-gray-5 me-2" />
+            <LucideUser class="size-4 text-ink-gray-5 me-1" />
+          </template>
+          <!-- One line per row: the filter only needs the name. -->
+          <template #item-label="{ item }">
+            <div class="truncate">{{ item.label }}</div>
+          </template>
+          <!-- An empty list means an empty team, not a failed search. -->
+          <template #empty>
+            {{
+              filters.team && !teamMembers.data?.length
+                ? __("No agents in this team")
+                : __("No results")
+            }}
           </template>
         </Link>
       </div>
@@ -82,7 +93,7 @@
 
       <!-- Number Cards -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4 px-1"
         v-if="!numberCards.loading"
       >
         <Tooltip
@@ -91,7 +102,7 @@
         >
           <NumberChart
             :key="index"
-            class="border rounded-md min-h-[114px]"
+            class="border rounded-5 min-h-[114px]"
             :config="config"
           />
         </Tooltip>
@@ -102,12 +113,12 @@
       >
         <!-- Trend Charts -->
         <div
-          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 px-1"
           v-if="!trendData.loading"
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -123,12 +134,12 @@
         </div>
         <!-- Master Data Charts -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4 px-1"
           v-if="!masterData.loading"
         >
           <template v-for="(chart, index) in masterData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -145,12 +156,12 @@
 
         <!-- Tag Charts: org level insight, an agent cannot act on their own tag mix -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4 px-1"
           v-if="isManager && !tagData.loading"
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-md min-h-80">
+            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
               <component :is="getChartType(chart)" />
             </div>
 
@@ -201,27 +212,25 @@
 </template>
 
 <script setup lang="ts">
-import { Link } from "@/components";
+import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
+import { __ } from "@/translation";
+import { Link } from "@framework/ui";
+import { useStorage } from "@vueuse/core";
 import {
-  AxisChart,
   DateRangePicker,
-  DonutChart,
   Dropdown,
   TabButtons,
-  NumberChart,
+  Tooltip,
   createResource,
   dayjs,
   usePageMeta,
-  Tooltip,
 } from "frappe-ui";
-const { isMobileView } = useScreenSize();
+import { AxisChart, DonutChart, NumberChart } from "frappe-ui/experimental";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
-import { __ } from "@/translation";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
-import { useScreenSize } from "@/composables/screen";
-import { useStorage } from "@vueuse/core";
+const { isMobileView } = useScreenSize();
 
 interface NumberCardData {
   title: string;
@@ -366,13 +375,13 @@ const tabButtons = computed(() => {
   ];
 });
 
-const hasAppliedFilter = computed(() => {
-  return (
+const hasAppliedFilter = computed(() =>
+  Boolean(
     filters.agent ||
-    filters.team ||
-    (filters.period && filters.period !== getLastXDays(30))
-  );
-});
+      filters.team ||
+      (filters.period && filters.period !== getLastXDays(30))
+  )
+);
 
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
@@ -528,11 +537,20 @@ const periodRange = computed({
   },
 });
 
+// dismissing the calendar without a range would otherwise leave an empty
+// field where the preset menu used to be, with no way back to it
+function onPickerToggle(open: boolean) {
+  if (!open && !filters.period) {
+    showDatePicker.value = false;
+    preset.value = formatter("");
+  }
+}
+
 const options = computed(() => [
   {
     group: __("Presets"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Today"),
         onClick: () => {
@@ -638,7 +656,7 @@ usePageMeta(() => {
 
 <style scoped>
 :deep(.form-control button) {
-  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+  @apply text-base rounded-4 h-7 py-1.5 border border-outline-gray-2 bg-surface-base placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-base focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
 }
 :deep(.form-control button > div) {
   overflow: hidden;
