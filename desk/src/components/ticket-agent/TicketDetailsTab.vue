@@ -189,10 +189,10 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  // list which contains the hidden fields marked in ticket template
-  const hiddenFields = customizations.value.data?.hidden_fields || [];
-  // filter alongside with core_fields for example ticket_type maybe hidden so remove from UI
-  return CORE_FIELDS.filter((f) => !hiddenFields.includes(f))
+  const shown = new Set(
+    (customizations.value.data?.fields || []).map((f) => f.fieldname)
+  );
+  return CORE_FIELDS.filter((f) => shown.has(f))
     .map((fieldname) => {
       let field = getField(fieldname);
       if (!field) return null;
@@ -213,7 +213,7 @@ const customFields = computed(() => {
   }
 
   if (!customizations.value.data || customizations.value.loading) return [];
-  let customFields = customizations.value.data?.custom_fields || [];
+  let customFields = customizations.value.data?.fields || [];
   const excludedFields = [...CORE_FIELDS, "subject", "status"];
   customFields = customFields.filter(
     (f) => !excludedFields.includes(f.fieldname)

@@ -46,3 +46,6 @@ CUSTOMER_EDIT_EXEMPT_FIELDS = (
     "feedback",
     "feedback_extra",
 )
+
+# shown on the agent details tab from meta, whether or not the template lists them
+CORE_TICKET_FIELDS = ("priority", "ticket_type", "customer", "agent_group")

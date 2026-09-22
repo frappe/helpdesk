@@ -10,7 +10,7 @@ from frappe.utils.caching import redis_cache
 from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
+from helpdesk.consts import CORE_TICKET_FIELDS, DEFAULT_TICKET_TEMPLATE
 from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
@@ -489,22 +489,23 @@ def duplicate_ticket(ticket_doc, subject):
 @frappe.whitelist()
 @agent_only
 def get_ticket_customizations():
-    # get form script
-    # get default ticket template
-    custom_fields = frappe.get_all(
+    """Every field the agent details tab may show, as this user may see it."""
+    hidden_fields = get_hidden_ticket_fields()
+    rows = frappe.get_all(
         "HD Ticket Template Field",
         filters={"parent": "Default"},
         fields=["fieldname", "required", "placeholder", "url_method"],
         order_by="idx",
     )
-    hidden_fields = get_hidden_ticket_fields()
-    custom_fields = [f for f in custom_fields if f.fieldname not in hidden_fields]
-    form_scripts = get_form_script("HD Ticket")
-    return {
-        "custom_fields": custom_fields,
-        "_form_script": form_scripts,
-        "hidden_fields": sorted(hidden_fields),
-    }
+    fields = [row for row in rows if row.fieldname not in hidden_fields]
+    # core fields draw on meta and need no template row to show
+    listed = {row.fieldname for row in fields}
+    fields += [
+        frappe._dict(fieldname=fieldname)
+        for fieldname in CORE_TICKET_FIELDS
+        if fieldname not in hidden_fields and fieldname not in listed
+    ]
+    return {"fields": fields, "_form_script": get_form_script("HD Ticket")}
 
 
 @frappe.whitelist()

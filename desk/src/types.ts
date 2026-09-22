@@ -500,11 +500,11 @@ export interface DocumentResource<T = unknown> {
 }
 
 export interface Customizations {
-  custom_fields: {
+  fields: {
     fieldname: string;
-    required: number;
-    placeholder: string;
-    url_method: string;
+    required?: number;
+    placeholder?: string;
+    url_method?: string;
   }[];
   _form_script: string[];
   _customActions?: any;

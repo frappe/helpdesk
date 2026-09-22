@@ -197,11 +197,10 @@ class TestTicketFieldVisibility(IntegrationTestCase):
     def test_agent_form_customizations_omit_customers_only_rows(self):
         self.show_to("priority", "Customers")
         frappe.set_user(AGENT_EMAIL)
-        customizations = get_ticket_customizations()
-        self.assertNotIn(
-            "priority", [r.fieldname for r in customizations["custom_fields"]]
-        )
-        self.assertIn("priority", customizations["hidden_fields"])
+        shown = [f.fieldname for f in get_ticket_customizations()["fields"]]
+        self.assertNotIn("priority", shown)
+        # a core field needs no template row to be shown
+        self.assertIn("agent_group", shown)
 
     def test_non_default_template_choices_have_no_effect(self):
         self.show_to("priority", "Agents")

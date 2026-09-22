@@ -381,7 +381,7 @@ const ticketFields = computed(() => {
     "subject",
     "status",
   ];
-  let custom_fields = customizations.data?.custom_fields || [];
+  let custom_fields = customizations.data?.fields || [];
   custom_fields = custom_fields.filter(
     (f) => !coreFieldNames.includes(f.fieldname)
   );
