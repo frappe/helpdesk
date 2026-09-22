@@ -5,7 +5,6 @@ narrows them, and only here: raw framework queries ignore it.
 """
 
 import frappe
-from frappe.model import get_permitted_fields
 from frappe.utils.caching import redis_cache
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
@@ -23,24 +22,18 @@ def get_hidden_ticket_fields() -> set[str]:
     the other audience: agents lose the Customers rows, customers lose the
     Agents rows and the agent workflow columns.
     """
+    meta = frappe.get_meta("HD Ticket")
+    readable = meta.get_permlevel_access("read")
+    unreadable = {
+        df.fieldname
+        for df in meta.get_high_permlevel_fields()
+        if df.permlevel not in readable
+    }
     if is_agent():
         tier = get_fields_visible_to("Customers")
     else:
         tier = get_fields_visible_to("Agents") | AGENT_WORKFLOW_FIELDS
-    return get_unreadable_fields("HD Ticket") | tier
-
-
-def get_unreadable_fields(doctype: str) -> set[str]:
-    """Fields the user is unable to read because of perm levels."""
-    permitted = set(get_permitted_fields(doctype))
-    # fields that hold a value, so section and column breaks stay out of the set
-    return {
-        field.fieldname
-        for field in frappe.get_meta(doctype).get_fieldnames_with_value(
-            with_field_meta=True
-        )
-        if field.fieldname not in permitted
-    }
+    return unreadable | tier
 
 
 @redis_cache()
