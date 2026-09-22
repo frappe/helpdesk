@@ -86,7 +86,10 @@ const slaData = computed(() =>
 
 const customFields = computed(() =>
   ticket.data.template.fields.filter(
-    (f: Field) => f.fieldname !== "priority" && ticket.data[f.fieldname]
+    (f: Field) =>
+      f.fieldname !== "priority" &&
+      ticket.data[f.fieldname] != null &&
+      ticket.data[f.fieldname] !== ""
   )
 );
 </script>

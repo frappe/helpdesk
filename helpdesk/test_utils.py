@@ -172,6 +172,57 @@ def make_ticket(
     return ticket
 
 
+def close_emailed_ticket(raised_by: str) -> str:
+    """Only a ticket that arrived by email is ever sent a feedback link."""
+    ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "via_customer_portal", 0)
+
+    doc = frappe.get_doc("HD Ticket", ticket.name)
+    doc.status = "Closed"
+    doc.save()
+    return doc.name
+
+
+def make_customer_ticket(case, raised_by: str, **values):
+    """A ticket raised by a customer, removed when the test ends."""
+    ticket = make_ticket(raised_by=raised_by, **values)
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket
+
+
+def reply_from_the_portal(case, raised_by: str, status: str) -> str:
+    """The customer answers a ticket left at `status`; returns where it lands."""
+    ticket = make_customer_ticket(case, raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "status", status)
+    frappe.set_user(raised_by)
+    frappe.get_doc("HD Ticket", ticket.name).create_communication_via_contact(
+        "it is happening again"
+    )
+    frappe.set_user("Administrator")
+    return frappe.db.get_value("HD Ticket", ticket.name, "status")
+
+
+def raise_field_permlevel(case, fieldname: str, permlevel: int):
+    """Move a ticket field beyond the levels a customer holds, for this test."""
+    frappe.make_property_setter(
+        {
+            "doctype": "HD Ticket",
+            "fieldname": fieldname,
+            "property": "permlevel",
+            "value": permlevel,
+            "property_type": "Int",
+        },
+        is_system_generated=False,
+    )
+    case.addCleanup(frappe.clear_cache)
+    case.addCleanup(
+        frappe.db.delete,
+        "Property Setter",
+        {"doc_type": "HD Ticket", "field_name": fieldname},
+    )
+    frappe.clear_cache()
+
+
 def make_template(name: str, fields: list[dict]):
     """Create an HD Ticket Template, replacing any leftover with the name."""
     if frappe.db.exists("HD Ticket Template", name):

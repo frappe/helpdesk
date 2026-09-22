@@ -4,7 +4,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.test_utils import create_contact, make_ticket
+from helpdesk.test_utils import close_emailed_ticket, create_contact
 
 CUSTOMER = "email-feedback-customer@example.com"
 
@@ -20,19 +20,9 @@ class IntegrationTestHDEmailFeedback(IntegrationTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    def close_emailed_ticket(self) -> str:
-        """Only a ticket that arrived by email is ever sent a feedback link."""
-        ticket = make_ticket(subject="Feedback flow", raised_by=CUSTOMER)
-        self.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
-        frappe.db.set_value("HD Ticket", ticket.name, "via_customer_portal", 0)
-
-        doc = frappe.get_doc("HD Ticket", ticket.name)
-        doc.status = "Closed"
-        doc.save()
-        return doc.name
-
     def test_a_guest_can_rate_a_closed_ticket_from_the_email(self):
-        name = self.close_emailed_ticket()
+        name = close_emailed_ticket(CUSTOMER)
+        self.addCleanup(frappe.delete_doc, "HD Ticket", name, force=True)
         key = frappe.db.get_value("HD Ticket", name, "key")
 
         frappe.set_user("Guest")
@@ -52,7 +42,8 @@ class IntegrationTestHDEmailFeedback(IntegrationTestCase):
 
     def test_rating_does_not_let_a_customer_edit_the_closed_ticket(self):
         """The exemption covers the rating, not the ticket it is attached to."""
-        name = self.close_emailed_ticket()
+        name = close_emailed_ticket(CUSTOMER)
+        self.addCleanup(frappe.delete_doc, "HD Ticket", name, force=True)
 
         frappe.set_user(CUSTOMER)
         doc = frappe.get_doc("HD Ticket", name)

@@ -16,8 +16,10 @@ from helpdesk.test_utils import (
     create_agent,
     create_contact,
     create_customer,
+    make_customer_ticket,
     make_template,
-    make_ticket,
+    raise_field_permlevel,
+    reply_from_the_portal,
     set_default_template_visibility,
 )
 
@@ -36,38 +38,10 @@ class TestTicketFieldVisibility(IntegrationTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    def make_customer_ticket(self, **values):
-        ticket = make_ticket(raised_by=CUSTOMER_EMAIL, **values)
-        self.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
-        return ticket
-
-    def show_to(self, fieldname: str, visible_to: str):
-        self.addCleanup(set_default_template_visibility(fieldname, visible_to))
-
-    def raise_priority_beyond_customers(self):
-        """What the template warning tells an admin to do: hide from every path."""
-        frappe.make_property_setter(
-            {
-                "doctype": "HD Ticket",
-                "fieldname": "priority",
-                "property": "permlevel",
-                "value": TICKET_INTERNAL_FIELD_PERMLEVEL,
-                "property_type": "Int",
-            },
-            is_system_generated=False,
-        )
-        self.addCleanup(frappe.clear_cache)
-        self.addCleanup(
-            frappe.db.delete,
-            "Property Setter",
-            {"doc_type": "HD Ticket", "field_name": "priority"},
-        )
-        frappe.clear_cache()
-
     def test_agents_only_field_is_stripped_on_helpdesk_pages_not_framework_reads(self):
         """The tier is layout, not a permission; only the permlevel withholds a value."""
-        self.show_to("response_by", "Agents")
-        ticket = self.make_customer_ticket()
+        self.addCleanup(set_default_template_visibility("response_by", "Agents"))
+        ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
 
         frappe.set_user(CUSTOMER_EMAIL)
         self.assertFalse(
@@ -78,8 +52,8 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertTrue(get_one(ticket.name).get("response_by"))
 
     def test_customers_only_field_is_stripped_for_agents(self):
-        self.show_to("priority", "Customers")
-        ticket = self.make_customer_ticket()
+        self.addCleanup(set_default_template_visibility("priority", "Customers"))
+        ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
 
         frappe.set_user(AGENT_EMAIL)
         self.assertFalse(get_one(ticket.name).get("priority"))
@@ -88,9 +62,9 @@ class TestTicketFieldVisibility(IntegrationTestCase):
 
     def test_hiding_the_contact_fields_still_returns_a_ticket(self):
         """get_one used to build the contact card out of raised_by, which hiding removes."""
-        self.show_to("contact", "Agents")
-        self.show_to("raised_by", "Agents")
-        ticket = self.make_customer_ticket()
+        self.addCleanup(set_default_template_visibility("contact", "Agents"))
+        self.addCleanup(set_default_template_visibility("raised_by", "Agents"))
+        ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
 
         frappe.set_user(CUSTOMER_EMAIL)
         result = get_one(ticket.name, is_customer_portal=True)
@@ -111,8 +85,8 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.addCleanup(frappe.clear_cache)
         self.addCleanup(frappe.db.delete, "Custom DocPerm", {"parent": "HD Ticket"})
         frappe.clear_cache()
-        source = self.make_customer_ticket()
-        target = self.make_customer_ticket()
+        source = make_customer_ticket(self, CUSTOMER_EMAIL)
+        target = make_customer_ticket(self, CUSTOMER_EMAIL)
 
         frappe.set_user(AGENT_EMAIL)
         merge_ticket(source=source.name, target=target.name)
@@ -121,30 +95,22 @@ class TestTicketFieldVisibility(IntegrationTestCase):
             frappe.db.get_value("HD Ticket", source.name, "merged_with"), target.name
         )
 
-    def reply_from_the_portal(self, status: str):
-        ticket = self.make_customer_ticket()
-        frappe.db.set_value("HD Ticket", ticket.name, "status", status)
-        frappe.set_user(CUSTOMER_EMAIL)
-        frappe.get_doc("HD Ticket", ticket.name).create_communication_via_contact(
-            "it is happening again"
-        )
-        frappe.set_user("Administrator")
-        return frappe.db.get_value("HD Ticket", ticket.name, "status")
-
     def test_a_portal_reply_reopens_a_ticket_the_agent_answered(self):
         """The edit guard must not treat the reopen as a customer edit."""
         for status in ("Replied", "Resolved"):
             with self.subTest(status=status):
-                self.assertEqual(self.reply_from_the_portal(status), "Open")
+                self.assertEqual(
+                    reply_from_the_portal(self, CUSTOMER_EMAIL, status), "Open"
+                )
 
     def test_a_portal_reply_cannot_reopen_a_closed_ticket(self):
         with self.assertRaises(frappe.PermissionError):
-            self.reply_from_the_portal("Closed")
+            reply_from_the_portal(self, CUSTOMER_EMAIL, "Closed")
 
     def test_permlevel_hidden_field_is_absent_from_list_columns_and_filters(self):
         """A column the query cannot return would be a header with no data under it."""
-        self.make_customer_ticket(priority="High")
-        self.raise_priority_beyond_customers()
+        make_customer_ticket(self, CUSTOMER_EMAIL, priority="High")
+        raise_field_permlevel(self, "priority", TICKET_INTERNAL_FIELD_PERMLEVEL)
 
         frappe.set_user(CUSTOMER_EMAIL)
         result = get_list_data(
@@ -158,7 +124,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertNotIn("priority", offered)
 
     def test_agent_form_customizations_omit_customers_only_rows(self):
-        self.show_to("priority", "Customers")
+        self.addCleanup(set_default_template_visibility("priority", "Customers"))
         frappe.set_user(AGENT_EMAIL)
         shown = [f.fieldname for f in get_ticket_customizations()["fields"]]
         self.assertNotIn("priority", shown)
@@ -166,7 +132,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertIn("agent_group", shown)
 
     def test_non_default_template_choices_have_no_effect(self):
-        self.show_to("priority", "Agents")
+        self.addCleanup(set_default_template_visibility("priority", "Agents"))
         template = make_template(
             "FV Other", [{"fieldname": "priority", "visible_to": "Everyone"}]
         )
@@ -193,7 +159,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
     def test_hiding_warns_once_and_only_for_fields_the_api_still_serves(self):
         """The warning names the rows this save hides, not every hidden row, forever."""
         frappe.clear_messages()
-        self.show_to("priority", "Agents")
+        self.addCleanup(set_default_template_visibility("priority", "Agents"))
         self.assertTrue(any("Priority" in str(m) for m in frappe.message_log))
 
         # a save that hides nothing new is not nagged about
@@ -202,7 +168,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertFalse(frappe.message_log)
 
         # an internal-level field is already hidden everywhere
-        self.show_to("resolution_details", "Agents")
+        self.addCleanup(set_default_template_visibility("resolution_details", "Agents"))
         self.assertFalse(frappe.message_log)
 
     def test_subject_cannot_be_added_to_a_template(self):
@@ -219,7 +185,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""
-        ticket = self.make_customer_ticket()
+        ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
         frappe.db.set_value(
             "HD Ticket",
             ticket.name,
@@ -240,9 +206,9 @@ class TestTicketFieldVisibility(IntegrationTestCase):
     def test_agents_only_row_is_absent_from_the_customer_form_payloads(self):
         """The portal draws every row it is handed, so the label would leak
         even once the value is stripped off the ticket."""
-        self.show_to("priority", "Everyone")
-        self.show_to("response_by", "Agents")
-        ticket = self.make_customer_ticket()
+        self.addCleanup(set_default_template_visibility("priority", "Everyone"))
+        self.addCleanup(set_default_template_visibility("response_by", "Agents"))
+        ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
 
         frappe.set_user(CUSTOMER_EMAIL)
         rows = get_one(ticket.name, is_customer_portal=True)["template"]["fields"]
@@ -260,7 +226,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
 
     def test_a_multi_customer_contact_still_gets_a_required_customer_field(self):
         """set_customer_field only narrows a row get_fields_meta already allowed."""
-        self.show_to("customer", "Everyone")
+        self.addCleanup(set_default_template_visibility("customer", "Everyone"))
         for name in ("FV Customer One", "FV Customer Two"):
             customer = create_customer(name, [{"contact_name": self.contact}])
             self.addCleanup(frappe.delete_doc, "HD Customer", customer.name, force=True)

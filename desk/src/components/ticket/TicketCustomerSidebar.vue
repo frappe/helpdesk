@@ -97,15 +97,11 @@
         :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <Tooltip
-          v-if="field.fieldtype === 'Date' || field.fieldtype === 'Datetime'"
-          :text="dateFormat(field.raw, dateTooltipFormat)"
-        >
-          <span class="text-base text-ink-gray-8">{{ field.value }}</span>
+        <Tooltip :disabled="!storedStamp(field)" :text="storedStamp(field)">
+          <span class="text-base text-ink-gray-8 flex-1">{{
+            field.value
+          }}</span>
         </Tooltip>
-        <span v-else class="text-base text-ink-gray-8 flex-1">{{
-          field.value
-        }}</span>
       </div>
     </div>
   </div>
@@ -172,6 +168,14 @@ const ticketBasicInfo = computed(() => [
   },
 ]);
 
+function storedStamp(field) {
+  if (field.fieldtype === "Date")
+    return dayjs(field.raw).format("ddd, MMM D, YYYY");
+  if (field.fieldtype === "Datetime")
+    return dayjs(field.raw).format(dateTooltipFormat);
+  return "";
+}
+
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
@@ -194,7 +198,8 @@ const ticketAdditionalInfo = computed(() => {
     .filter(
       (field: Field) =>
         ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
-        ticket.data[field.fieldname]
+        ticket.data[field.fieldname] != null &&
+        ticket.data[field.fieldname] !== ""
     )
     .map((field: Field) => {
       const option = {
@@ -220,7 +225,9 @@ const ticketAdditionalInfo = computed(() => {
     });
 
   // return only fields with values for customers
-  return [...fields, ...custom_fields].filter((field) => field.value);
+  return [...fields, ...custom_fields].filter(
+    (field) => field.value != null && field.value !== ""
+  );
 });
 </script>
 
