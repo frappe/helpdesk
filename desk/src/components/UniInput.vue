@@ -58,19 +58,34 @@ const emit = defineEmits<E>();
 
 const SEARCHABLE_FROM = 10;
 
+type Option = { label: string; value: string | number };
+
+// the trigger renders a matched option's label, so an unlisted value needs one
+function withSavedValue(options: Option[]): Option[] {
+  const value = props.value;
+  if (!value || options.some((option) => option.value === value)) {
+    return options;
+  }
+  return [{ label: String(value), value: value as string }, ...options];
+}
+
 // trigger: "button" keeps the search inside the popover, so the control still
 // reads as a value rather than a text input
-function picker(options: { label: string; value: string | number }[]) {
-  return h(Combobox, { trigger: "button", options, size: "sm" });
+function picker(options: Option[]) {
+  return h(Combobox, {
+    trigger: "button",
+    options: withSavedValue(options),
+    size: "sm",
+  });
 }
 
 // Combobox feeds one placeholder to both its trigger and its search box, so a
 // short list uses Select instead: no search box, no repeated placeholder.
-function select(options: { label: string; value: string | number }[]) {
+function select(options: Option[]) {
   return h(Select, { options, size: "sm" });
 }
 
-function optionControl(options: { label: string; value: string | number }[]) {
+function optionControl(options: Option[]) {
   return options.length > SEARCHABLE_FROM ? picker(options) : select(options);
 }
 
