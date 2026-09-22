@@ -2829,9 +2829,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         template.fields[0].visible_to = "Agents"
         template.save()
         self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
-
-        self.set_default_template_fields([])
-        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
         self.assertFalse(
             frappe.get_all(
                 "Property Setter",

@@ -5,13 +5,11 @@ narrows them, and only here: raw framework queries ignore it.
 """
 
 import frappe
-from frappe.utils.caching import redis_cache
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.utils import is_agent
 
-# TODO: _comments to be removed
-AGENT_WORKFLOW_FIELDS = {"_assign", "_comments", "_liked_by", "_user_tags"}
+AGENT_WORKFLOW_FIELDS = {"_assign", "_liked_by", "_user_tags"}
 
 
 def get_hidden_ticket_fields() -> set[str]:
@@ -31,33 +29,9 @@ def get_hidden_ticket_fields() -> set[str]:
     return unreadable | get_template_hidden_fields(audience)
 
 
-@redis_cache()
-def get_template_hidden_fields(audience: str) -> set[str]:
-    """What the Default template hides from `audience`: Agents or Customers.
-
-    Rows reserved for the other audience, plus the agent workflow columns for
-    customers. Rows left at Everyone are hidden from no one.
-    """
-    other = "Customers" if audience == "Agents" else "Agents"
-    hidden = set(
-        frappe.get_all(
-            "HD Ticket Template Field",
-            pluck="fieldname",
-            filters={
-                "parent": DEFAULT_TICKET_TEMPLATE,
-                "parenttype": "HD Ticket Template",
-                "visible_to": other,
-            },
-        )
-    )
-    if audience == "Customers":
-        hidden |= AGENT_WORKFLOW_FIELDS
-    return hidden
-
-
-def get_customer_visible_template_fields() -> list[str]:
-    """Default template fieldnames not reserved for agents."""
-    rows = frappe.get_all(
+def get_template_fields() -> list[dict]:
+    """Default template rows: fieldname and visible_to."""
+    return frappe.get_all(
         "HD Ticket Template Field",
         filters={
             "parent": DEFAULT_TICKET_TEMPLATE,
@@ -65,4 +39,23 @@ def get_customer_visible_template_fields() -> list[str]:
         },
         fields=["fieldname", "visible_to"],
     )
-    return [row.fieldname for row in rows if row.visible_to != "Agents"]
+
+
+def get_template_hidden_fields(audience: str) -> set[str]:
+    """What the Default template hides from `audience`: Agents or Customers.
+
+    Rows reserved for the other audience, plus the agent workflow columns for
+    customers. Rows left at Everyone are hidden from no one.
+    """
+    other = "Customers" if audience == "Agents" else "Agents"
+    hidden = {row.fieldname for row in get_template_fields() if row.visible_to == other}
+    if audience == "Customers":
+        hidden |= AGENT_WORKFLOW_FIELDS
+    return hidden
+
+
+def get_customer_visible_template_fields() -> list[str]:
+    """Default template fieldnames not reserved for agents."""
+    return [
+        row.fieldname for row in get_template_fields() if row.visible_to != "Agents"
+    ]
