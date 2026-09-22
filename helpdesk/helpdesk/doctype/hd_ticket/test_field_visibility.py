@@ -5,7 +5,7 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import get_filterable_fields, get_list_data
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE, TICKET_INTERNAL_FIELD_PERMLEVEL
-from helpdesk.field_visibility import get_fields_visible_to
+from helpdesk.field_visibility import get_template_hidden_fields
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
     get_ticket_customizations,
@@ -246,9 +246,9 @@ class TestTicketFieldVisibility(IntegrationTestCase):
             frappe.rename_doc("HD Ticket Template", "Default", "Renamed Default")
 
     def test_template_save_refreshes_the_hidden_fields(self):
-        self.assertNotIn("priority", get_fields_visible_to("Agents"))
+        self.assertNotIn("priority", get_template_hidden_fields("Customers"))
         self.show_to("priority", "Agents")
-        self.assertIn("priority", get_fields_visible_to("Agents"))
+        self.assertIn("priority", get_template_hidden_fields("Customers"))
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""

@@ -18,9 +18,8 @@ AGENT_WORKFLOW_FIELDS = {"_assign", "_comments", "_liked_by", "_user_tags"}
 def get_hidden_ticket_fields() -> set[str]:
     """Fields the session user must not see.
 
-    Permlevel-unreadable fields, plus the Default template rows reserved for
-    the other audience: agents lose the Customers rows, customers lose the
-    Agents rows and the agent workflow columns.
+    Permlevel-unreadable fields, plus what the Default template hides from
+    the user's audience.
     """
     meta = frappe.get_meta("HD Ticket")
     readable = meta.get_permlevel_access("read")
@@ -29,31 +28,32 @@ def get_hidden_ticket_fields() -> set[str]:
         for df in meta.get_high_permlevel_fields()
         if df.permlevel not in readable
     }
-    if is_agent():
-        tier = get_fields_visible_to("Customers")
-    else:
-        tier = get_fields_visible_to("Agents") | AGENT_WORKFLOW_FIELDS
-    return unreadable | tier
+    audience = "Agents" if is_agent() else "Customers"
+    return unreadable | get_template_hidden_fields(audience)
 
 
 @redis_cache()
-def get_fields_visible_to(audience: str) -> set[str]:
-    """helper which returns the set of fields according to the role passed
+def get_template_hidden_fields(audience: str) -> set[str]:
+    """What the Default template hides from `audience`: Agents or Customers.
 
-    audience is a Visible to value on the template row: Customers or Agents.
-    Fields left at Everyone belong to neither set.
+    Rows reserved for the other audience, plus the agent workflow columns for
+    customers. Rows left at Everyone are hidden from no one.
     """
-    return set(
+    other = "Customers" if audience == "Agents" else "Agents"
+    hidden = set(
         frappe.get_all(
             "HD Ticket Template Field",
             pluck="fieldname",
             filters={
                 "parent": DEFAULT_TICKET_TEMPLATE,
                 "parenttype": "HD Ticket Template",
-                "visible_to": audience,
+                "visible_to": other,
             },
         )
     )
+    if audience == "Customers":
+        hidden |= AGENT_WORKFLOW_FIELDS
+    return hidden
 
 
 def get_customer_visible_template_fields() -> list[str]:
