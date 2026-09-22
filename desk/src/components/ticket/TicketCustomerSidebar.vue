@@ -97,7 +97,15 @@
         :key="field.fieldname"
       >
         <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <span class="text-base text-ink-gray-8 flex-1">{{ field.value }}</span>
+        <Tooltip
+          v-if="field.fieldtype === 'Date' || field.fieldtype === 'Datetime'"
+          :text="dateFormat(field.raw, dateTooltipFormat)"
+        >
+          <span class="text-base text-ink-gray-8">{{ field.value }}</span>
+        </Tooltip>
+        <span v-else class="text-base text-ink-gray-8 flex-1">{{
+          field.value
+        }}</span>
       </div>
     </div>
   </div>
@@ -190,8 +198,12 @@ const ticketAdditionalInfo = computed(() => {
     )
     .map((field: Field) => {
       const option = {
+        fieldname: field.fieldname,
+        fieldtype: field.fieldtype,
         label: field.label,
         value: ticket.data[field.fieldname],
+        // the stored stamp, for the full date on hover
+        raw: ticket.data[field.fieldname],
       };
       if (field.fieldtype === "Date") {
         option.value = dayjs(option.value).format(
