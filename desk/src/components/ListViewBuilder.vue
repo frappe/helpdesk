@@ -601,16 +601,11 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
   }
 
   if (column.type === "MultipleAvatar") {
-    if (!item?.length) return;
-    if (item.length > 1) {
-      const avatar = (e.target as HTMLElement).closest(".user-avatar");
-      // the gap between the faces names nobody to filter by
-      if (!avatar) return;
-      item = avatar.getAttribute("data-name");
-    } else {
-      item = item[0].name;
-    }
-    applyColumnFilter(column.key, "LIKE", `%${item}%`);
+    const avatar = (e.target as HTMLElement).closest(".user-avatar");
+    // the gap between the faces, and the "+n" chip, name nobody to filter by
+    const name = avatar?.getAttribute("data-name");
+    if (!name) return;
+    applyColumnFilter(column.key, "LIKE", `%${name}%`);
     return;
   }
   applyColumnFilter(column.key, "=", item);
