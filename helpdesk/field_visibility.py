@@ -10,8 +10,7 @@ from frappe.utils.caching import redis_cache
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.utils import is_agent
 
-# framework columns permission levels cannot cover; agent workflow data, so never
-# shown to customers. _seen stays out: the portal list reads it for unread dots
+# TODO: _comments to be removed
 AGENT_WORKFLOW_FIELDS = {"_assign", "_comments", "_liked_by", "_user_tags"}
 
 

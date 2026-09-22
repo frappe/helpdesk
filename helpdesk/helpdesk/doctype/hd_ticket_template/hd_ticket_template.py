@@ -84,15 +84,11 @@ class HDTicketTemplate(Document):
         """Hiding covers helpdesk pages only; say so when the API still serves it."""
         if frappe.flags.in_migrate or frappe.flags.in_patch:
             return
-        if not self.rows_changed():
-            return
         meta = frappe.get_meta("HD Ticket")
         exposed = [
             meta.get_translated_label(f.fieldname)
-            for f in self.fields
-            if f.fieldname
-            and f.visible_to == "Agents"
-            and self.current_permlevel(f.fieldname) < TICKET_INTERNAL_FIELD_PERMLEVEL
+            for f in self.newly_hidden_rows()
+            if self.current_permlevel(f.fieldname) < TICKET_INTERNAL_FIELD_PERMLEVEL
         ]
         if not exposed:
             return
@@ -117,15 +113,20 @@ class HDTicketTemplate(Document):
             ).format(comma_and(exposed, add_quotes=False), link, docs)
         frappe.msgprint(text, title=_("Perm Levels in Helpdesk"), indicator="blue")
 
-    # show toast only when child table in ticket template is changed
-    def rows_changed(self) -> bool:
+    def newly_hidden_rows(self) -> list:
+        """Rows this save marks Agents that were not Agents before."""
         previous = self.get_doc_before_save()
-        return not previous or self.row_values() != previous.row_values()
-
-    def row_values(self) -> list[tuple]:
+        hidden_before = (
+            {f.fieldname for f in previous.fields if f.visible_to == "Agents"}
+            if previous
+            else set()
+        )
         return [
-            (f.fieldname, f.visible_to, f.required, f.url_method, f.placeholder)
+            f
             for f in self.fields
+            if f.fieldname
+            and f.visible_to == "Agents"
+            and f.fieldname not in hidden_before
         ]
 
     def current_permlevel(self, fieldname: str) -> int:

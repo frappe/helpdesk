@@ -894,8 +894,7 @@ class HDTicket(Document):
         # if self.status_category == "Paused" and not new_ticket:
         if not new_ticket:
             self.status = self.ticket_reopen_status
-            # the reopen is the server's doing, but the rest of this document
-            # came from the caller, so only the status is let through
+            # flag for allowing status change when reply came in outside support portal
             self.flags.customer_reply_reopen = True
             self.save(ignore_permissions=True)
 
@@ -1179,8 +1178,6 @@ class HDTicket(Document):
         self.description = self.description or c.content
         # portal replies save as the customer; the reset must keep server-set fields
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
-        # this save reopens the ticket and stamps response times. The doc comes
-        # freshly loaded, never from a caller's payload, so this cannot be abused
         self.flags.ignore_customer_edit_guard = True
         # Save the ticket, allowing for hooks to run.
         self.save()
