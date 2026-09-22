@@ -29,18 +29,6 @@ def get_hidden_ticket_fields() -> set[str]:
     return unreadable | get_template_hidden_fields(audience)
 
 
-def get_template_fields() -> list[dict]:
-    """Default template rows: fieldname and visible_to."""
-    return frappe.get_all(
-        "HD Ticket Template Field",
-        filters={
-            "parent": DEFAULT_TICKET_TEMPLATE,
-            "parenttype": "HD Ticket Template",
-        },
-        fields=["fieldname", "visible_to"],
-    )
-
-
 def get_template_hidden_fields(audience: str) -> set[str]:
     """What the Default template hides from `audience`: Agents or Customers.
 
@@ -59,3 +47,15 @@ def get_customer_visible_template_fields() -> list[str]:
     return [
         row.fieldname for row in get_template_fields() if row.visible_to != "Agents"
     ]
+
+
+def get_template_fields() -> list[dict]:
+    """Default template rows: fieldname and visible_to."""
+    return frappe.get_all(
+        "HD Ticket Template Field",
+        filters={
+            "parent": DEFAULT_TICKET_TEMPLATE,
+            "parenttype": "HD Ticket Template",
+        },
+        fields=["fieldname", "visible_to"],
+    )
