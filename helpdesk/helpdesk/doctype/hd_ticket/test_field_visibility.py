@@ -205,6 +205,13 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.show_to("resolution_details", "Agents")
         self.assertFalse(frappe.message_log)
 
+    def test_subject_cannot_be_added_to_a_template(self):
+        """Every form draws the title on its own; a row for it only fights them."""
+        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+        template.append("fields", {"fieldname": "subject"})
+        with self.assertRaises(frappe.ValidationError):
+            template.save()
+
     def test_the_default_template_cannot_be_renamed(self):
         """Renaming it would leave every visible_to lookup finding nothing."""
         with self.assertRaises(frappe.PermissionError):

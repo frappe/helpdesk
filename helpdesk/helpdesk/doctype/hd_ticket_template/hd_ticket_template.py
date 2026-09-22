@@ -49,7 +49,7 @@ class HDTicketTemplate(Document):
         )
 
     def validate_unallowed_fields(self):
-        unallowed_fields = ["status", "agreement_status"]
+        unallowed_fields = ["status", "agreement_status", "subject"]
         for f in self.fields:
             if f.fieldname in unallowed_fields:
                 text = _("Field `{0}` is not allowed in Ticket Template").format(
