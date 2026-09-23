@@ -1,7 +1,7 @@
 <template>
   <Sidebar
     v-model:collapsed="collapsed"
-    :disable-collapse="mobile"
+    :collapsible="!mobile"
     class="border-e border-outline-gray-1"
     :class="{ '!bg-surface-base': mobile }"
   >
@@ -170,7 +170,7 @@ const collapsed = computed({
   set: (value) => sidebarStore.toggleExpanded(!value),
 });
 
-// The mobile drawer pins the sidebar open (disable-collapse), so it is never
+// The mobile drawer pins the sidebar open (collapsible off), so it is never
 // visually collapsed even when the store says so.
 const isCollapsed = computed(() => collapsed.value && !props.mobile);
 
