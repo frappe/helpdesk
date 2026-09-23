@@ -143,7 +143,7 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         frappe.set_user(AGENT_EMAIL)
         fields = TicketFields()
         form = [f.fieldname for f in fields.form]
-        details = [f.fieldname for f in fields.details]
+        details = [f.fieldname for f in fields.layout]
         unlisted = [f for f in CORE_TICKET_FIELDS if f not in form]
         self.assertIn("priority", form)
         self.assertEqual(details, form + unlisted)

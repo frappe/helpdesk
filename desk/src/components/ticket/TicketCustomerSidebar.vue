@@ -207,7 +207,6 @@ const ticketAdditionalInfo = computed(() => {
         fieldtype: field.fieldtype,
         label: field.label,
         value: ticket.data[field.fieldname],
-        // the stored stamp, for the full date on hover
         raw: ticket.data[field.fieldname],
       };
       if (field.fieldtype === "Date") {

@@ -12,19 +12,19 @@ DOCTYPE_TEMPLATE = "HD Ticket Template"
 @frappe.whitelist()
 def get_one(name: str):
     check_permissions(DOCTYPE_TEMPLATE, None)
-    found, about, description_template = frappe.get_value(
-        DOCTYPE_TEMPLATE, name, ["name", "about", "description_template"]
-    ) or [None, None, None]
-    if not found:
+    template = frappe.db.get_value(
+        DOCTYPE_TEMPLATE, name, ["about", "description_template"], as_dict=True
+    )
+    if not template:
         return {"about": None, "fields": []}
     fields = TicketFields().form
     if frappe.db.get_single_value("HD Settings", "auto_set_customer_from_contact"):
         set_customer_field(fields)
 
     return {
-        "about": about,
+        "about": template.about,
         "fields": fields,
-        "description_template": description_template,
+        "description_template": template.description_template,
         "_form_script": get_form_script(
             "HD Ticket", apply_on_new_page=True, is_customer_portal=not is_agent()
         ),

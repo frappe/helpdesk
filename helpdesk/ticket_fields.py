@@ -4,6 +4,7 @@ Permission levels are the real boundary. The Default template's Visible to only
 narrows them, and only here: raw framework queries ignore it.
 """
 
+from collections.abc import Iterable
 from functools import cached_property
 
 import frappe
@@ -70,17 +71,25 @@ class TicketFields:
             ticket.pop(fieldname, None)
         return ticket
 
+    def visible(self, items: Iterable, key: str | None = None) -> list:
+        """Drop the hidden fields off a list of fieldnames, or of dicts named by `key`."""
+        name = (lambda item: item) if key is None else (lambda item: item.get(key))
+        return [item for item in items if name(item) not in self.hidden]
+
     @property
-    def details(self) -> list[frappe._dict]:
+    def layout(self) -> list[frappe._dict]:
         """The agent details tab: visible template rows as stored, then the core
         fields it does not list. The tab holds the doctype meta itself."""
-        rows = [self.row(r) for r in self.rows if r.fieldname not in self.hidden]
-        listed = {r.fieldname for r in rows}
-        return rows + [
+        # TODO: a flat list for now; grow it into tabs, sections and columns that a
+        # layout editor writes back to the template rows, the way CRM Fields Layout does
+        template_fields = [self.row(r) for r in self.visible(self.rows, "fieldname")]
+        listed = {field.fieldname for field in template_fields}
+        core_fields = [
             frappe._dict(fieldname=fieldname)
-            for fieldname in CORE_TICKET_FIELDS
-            if fieldname not in listed and fieldname not in self.hidden
+            for fieldname in self.visible(CORE_TICKET_FIELDS)
+            if fieldname not in listed
         ]
+        return template_fields + core_fields
 
     @property
     def form(self) -> list[frappe._dict]:
@@ -88,8 +97,8 @@ class TicketFields:
         The new-ticket form and the customer sidebar, which hold no meta."""
         return [
             self.form_field(row)
-            for row in self.rows
-            if row.fieldname not in self.hidden and self.meta.has_field(row.fieldname)
+            for row in self.visible(self.rows, "fieldname")
+            if self.meta.has_field(row.fieldname)
         ]
 
     @property

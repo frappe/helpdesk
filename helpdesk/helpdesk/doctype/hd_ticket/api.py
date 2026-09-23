@@ -87,10 +87,16 @@ def get_communications(ticket: str):
     communications = (
         frappe.qb.from_(QBCommunication)
         .select(
+            QBCommunication.bcc,
+            QBCommunication.cc,
             QBCommunication.content,
             QBCommunication.creation,
+            QBCommunication.communication_date,
             QBCommunication.name,
             QBCommunication.sender,
+            QBCommunication.recipients,
+            QBCommunication.subject,
+            QBCommunication.delivery_status,
             QBCommunication.sent_or_received,
             QBCommunication.user,
         )
@@ -380,7 +386,7 @@ def duplicate_ticket(ticket_doc, subject):
 def get_ticket_customizations():
     """Every field the agent details tab may show, as this user may see it."""
     return {
-        "fields": TicketFields().details,
+        "fields": TicketFields().layout,
         "_form_script": get_form_script("HD Ticket"),
     }
 
