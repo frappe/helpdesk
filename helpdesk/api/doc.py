@@ -15,7 +15,7 @@ from helpdesk.utils import (
     parse_call_logs,
 )
 
-# what the portal list may filter, sort and show, before the template adds its rows
+# core workflows of portal must show inside ticket view
 CUSTOMER_PORTAL_LIST_FIELDS = (
     "name",
     "subject",

@@ -64,18 +64,19 @@ class HDTicketTemplate(Document):
                 continue
             if f.fieldname in NEVER_CUSTOMER_VISIBLE_FIELDS:
                 text = _(
-                    "Field `{0}` is a secret and can never be shown to customers"
+                    "Field `{0}` is a secret and can never be shown to customers."
                 ).format(f.fieldname)
                 frappe.throw(text)
             if f.fieldname in SERVER_COMPUTED_FIELDS:
                 text = _(
-                    "Field `{0}` is set by the system and cannot be shown to customers"
+                    "Field `{0}` is set by the system and cannot be shown to customers."
                 ).format(f.fieldname)
                 frappe.throw(text)
             if self.current_permlevel(f.fieldname) >= TICKET_INTERNAL_FIELD_PERMLEVEL:
                 text = _(
                     "Field `{0}` is internal and cannot be shown to customers."
-                    " Lower its permission level in Customize Form to show it."
+                    " Lower its permission level in Customize Form to show it"
+                    " in the ticket form."
                 ).format(f.fieldname)
                 frappe.throw(text)
 
@@ -100,17 +101,19 @@ class HDTicketTemplate(Document):
         )
         if len(exposed) == 1:
             text = _(
-                "{0} is hidden from customers here, but the API still returns it."
-                " Raise its permission level in {1} to hide it everywhere."
+                "{0} is successfully hidden from customers in the ticket form."
+                " Raise its permission level in {1} to hide it from the API layer."
                 " Read more about permission levels {2}."
             ).format(exposed[0], link, docs)
         else:
             text = _(
-                "{0} are hidden from customers here, but the API still returns them."
-                " Raise their permission levels in {1} to hide them everywhere."
+                "{0} are successfully hidden from customers in the ticket form."
+                " Raise their permission levels in {1} to hide them from the API layer."
                 " Read more about permission levels {2}."
             ).format(comma_and(exposed, add_quotes=False), link, docs)
-        frappe.msgprint(text, title=_("Perm Levels in Helpdesk"), indicator="blue")
+        frappe.msgprint(
+            text, title=_("Ticket form successfully updated"), indicator="blue"
+        )
 
     def newly_hidden_rows(self) -> list:
         """Rows this save marks Agents that were not Agents before."""
@@ -129,7 +132,7 @@ class HDTicketTemplate(Document):
         ]
 
     def current_permlevel(self, fieldname: str) -> int:
-        """Live meta, so a level changed in Customize Form counts."""
+        """Live meta check, so a level changed in Customize Form counts."""
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return field.permlevel if field else 0
 

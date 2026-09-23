@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Permission levels, set in Customize Form, are the base: they decide what the API returns and who may write each ticket field. Visible to is a layer on top that only narrows what helpdesk pages show: Everyone, Customers (portal only) or Agents (agent pages only). A customer can fill a field while raising a ticket only when it is visible to them here and its level allows it. Read about permission levels <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\">here</a>.",
+   "description": "Visible To controls the visibility of the field. Setting it to Customers will allow only customers to be able to see that field, Agents only agents, whereas if set to Everyone both agents and customers can see and fill it while raising a ticket. To know more read more about the documentation <a href=\"https://docs.frappe.io/framework/user/en/basics/users-and-permissions\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",
@@ -43,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-23 12:00:00.000000",
+ "modified": "2026-09-23 15:12:46.015935",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",
