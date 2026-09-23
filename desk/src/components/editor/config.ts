@@ -46,6 +46,8 @@ export function buildEditorExtensions(
 ) {
   const kit = RichTextKit.configure({
     heading: { levels: [2, 3, 4, 5, 6] },
+    // rc.1 ships the table-of-contents node off; helpdesk editors had it.
+    toc: {},
     ...(options.mentions ? { mention: { items: options.mentions } } : {}),
   });
   return [

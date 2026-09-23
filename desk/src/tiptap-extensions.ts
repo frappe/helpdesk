@@ -77,7 +77,7 @@ export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
       .insertContent(`{{ ${item.value} }} `)
       .run();
   },
-  component: FieldAutocompleteList,
+  listComponent: FieldAutocompleteList,
 });
 
 export const ComponentUtils: Extension = Extension.create({
