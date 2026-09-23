@@ -5,6 +5,9 @@ import { call } from 'frappe-ui'
 // A published Studio app renders from a bare template with no boot payload, so login
 // state has to be asked for; `get_config` is the one endpoint guests may call.
 
+// The desk SPA's root, the mirror of its own CUSTOMER_PORTAL_ROOT.
+const AGENT_PORTAL_ROOT = '/helpdesk'
+
 const store = createSessionStore()
 
 export function useSession(context) {
@@ -35,6 +38,10 @@ function createSessionStore() {
       )}`
   )
 
+  // The way back from the agent desk's "Customer portal" (Sidebar.vue). Only agents
+  // have the desk to return to; for anyone else the link is a 403.
+  const isAgent = computed(() => Boolean(config.value?.is_agent))
+
   // A guest has no tickets, account or session to offer.
   const accountMenuOptions = computed(() =>
     isGuest.value
@@ -42,6 +49,16 @@ function createSessionStore() {
       : [
           { icon: 'lucide-inbox', label: 'My tickets', onClick: () => go(ROUTES.ticketList) },
           { icon: 'lucide-user', label: 'My account', onClick: openSettings },
+          ...(isAgent.value
+            ? [
+                {
+                  icon: 'lucide-headphones',
+                  label: 'Agent portal',
+                  // A hard navigation: the desk is a separate SPA, not a route here.
+                  onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
+                },
+              ]
+            : []),
           { icon: 'lucide-log-out', label: 'Log out', onClick: signOut },
         ]
   )

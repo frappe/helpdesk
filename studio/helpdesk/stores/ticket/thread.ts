@@ -101,7 +101,8 @@ export function useTicketThread(ticket) {
       // HD Ticket stores the rating as a fraction; the Rating component counts stars.
       rating: data.feedback_rating * 5,
       tags: feedbackTags(data.feedback),
-      comment: data.feedback_extra || '',
+      // Quoted: it is the customer's words, not the portal's.
+      comment: data.feedback_extra ? `“${data.feedback_extra}”` : '',
       timeAgo: timeAgo(when),
       fullDate: dayjs(when).format(DATE_FORMAT),
     }

@@ -68,7 +68,7 @@ const DOT: Record<TimelineStep["state"], string> = {
     "mt-1.5 size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--outline-gray-4)]",
 };
 
-const LINE_BASE = "absolute bottom-0 top-[18px] w-0.5 rounded-full";
+const LINE_BASE = "absolute bottom-0 top-[18px] w-[0.05rem] rounded-full";
 
 // A repeating gradient, not a dashed border: the analytics rail's trick, rotated.
 const DASHED_OWED =

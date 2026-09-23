@@ -1,6 +1,6 @@
 <template>
   <!-- The avatar itself opens the file picker; the name is edited inline. -->
-  <div class="flex items-start gap-4 pt-1.5">
+  <div class="flex items-center gap-4 pt-1.5">
     <div class="group relative shrink-0" :class="avatarBox">
       <!-- Avatar's size enum stops at 46px, so both scales size it themselves. -->
       <Avatar :class="avatarBox" :image="image" :label="name" :shape="shape" />
@@ -87,8 +87,11 @@ const avatarBox = computed(() =>
   props.scale === "page" ? "size-[52px]" : "size-16"
 );
 
+// frappe-ui's text-* classes set weight as well as size, so a separate font-* class
+// loses to them on order — the desk pays for this with `!font-semibold`. The composite
+// classes render the same: 18px/600, matching Settings/Profile/Profile.vue.
 const titleClass = computed(() =>
-  props.scale === "page" ? "text-2xl font-medium" : "text-md font-semibold"
+  props.scale === "page" ? "text-2xl-medium" : "text-2xl-semibold"
 );
 
 const uploadLabel = computed(() =>

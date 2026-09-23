@@ -1,5 +1,7 @@
 import frappe
 
+from helpdesk.utils import is_agent
+
 
 @frappe.whitelist(allow_guest=True)
 def get_config():
@@ -33,6 +35,8 @@ def get_config():
     # The only guest-readable endpoint the portals share, so it also answers "who am
     # I?" — the Studio-rendered portal gets no boot payload to read that from.
     res.session_user = frappe.session.user
+    # Whether to offer the way back to the agent desk; the desk enforces access itself.
+    res.is_agent = is_agent()
 
     res.favicon = (
         res.favicon

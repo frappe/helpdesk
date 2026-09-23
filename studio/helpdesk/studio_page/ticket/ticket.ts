@@ -1,5 +1,6 @@
 import { computed, watch } from 'vue'
-import { call, createResource, dayjs, toast } from 'frappe-ui'
+import { call, createListResource, createResource, dayjs, toast } from 'frappe-ui'
+import { ROUTES } from '@app/routes'
 import { useSettingsModal } from '@app/stores/settings'
 import { useTicketThread } from '@app/stores/ticket/thread'
 import { useTicketDetails } from '@app/stores/ticket/details'
@@ -31,6 +32,26 @@ export default function setup(context) {
 
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
+
+  // Most-read published articles. Not the ticket's own subject: `article.search` is
+  // built on RediSearch, which a stock Redis has no FT.SEARCH for.
+  const helpArticles = createListResource({
+    doctype: 'HD Article',
+    filters: { status: 'Published' },
+    fields: ['name', 'title'],
+    orderBy: 'views desc',
+    pageLength: 3,
+    auto: true,
+  })
+
+  // The portal has no article page of its own yet, so these leave for the desk's public
+  // KB. The `/helpdesk` prefix is that SPA's router base — without it the server 404s.
+  const popularHelp = computed(() =>
+    (helpArticles.data || []).map((article) => ({
+      ...article,
+      url: `/helpdesk/kb-public/articles/${article.name}`,
+    })),
+  )
 
   // Empty hides the button. Resolved keeps its Close: support is done, the customer may not be.
   const pageActionLabel = computed(() =>
@@ -134,5 +155,9 @@ export default function setup(context) {
     solvePromptAt,
     confirmSolved,
     reopenTicket,
+    popularHelp,
+    // A hard navigation: the article pages are the desk's, not routes in this app.
+    openHelpArticle: (article) => (window.location.href = article.url),
+    raiseNewTicket: () => context.router?.push(ROUTES.newTicket),
   }
 }

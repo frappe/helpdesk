@@ -38,6 +38,9 @@ const words = computed(() => ({
   solveYes: t("Yes, it's fixed"),
   solveNo: t('No, still an issue'),
   feedbackTitle: t('Feedback Rating'),
+  popularHelp: t('Popular help'),
+  stillStuck: t('Still stuck?'),
+  raiseNewTicket: t('Raise a new ticket'),
 }))
 
 const store = {

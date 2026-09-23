@@ -289,7 +289,7 @@ export interface HDServiceLevelAgreement extends DocType {
   default_ticket_status?: string;
 }
 
-// Last updated: 2026-07-27 16:57:56.129699
+// Last updated: 2026-09-02 19:00:00.000000
 export interface HDAgent extends DocType {
   /** User: Link (User) */
   user: string;
@@ -303,6 +303,8 @@ export interface HDAgent extends DocType {
   availability?: string;
   /** Availability Changed On: Datetime */
   availability_changed_on?: string;
+  /** Availability Changed By: Link (User) */
+  availability_changed_by?: string;
 }
 
 // Last updated: 2026-06-02 01:18:56.023594
@@ -399,7 +401,7 @@ export interface ContactPhone extends ChildDocType {
   is_primary_mobile_no: 0 | 1;
 }
 
-// Last updated: 2024-03-23 16:01:30.937045
+// Last updated: 2026-07-31 16:01:30.937045
 export interface Contact extends DocType {
   /** First Name: Data */
   first_name?: string;
@@ -410,7 +412,7 @@ export interface Contact extends DocType {
   /** User Id: Link (User) */
   user?: string;
   /** Status: Select */
-  status?: "Passive" | "Open" | "Replied";
+  status?: 'Passive' | 'Open' | 'Replied';
   /** Salutation: Link (Salutation) */
   salutation?: string;
   /** Gender: Link (Gender) */
@@ -451,6 +453,4 @@ export interface Contact extends DocType {
   company_name?: string;
   /** Full Name: Data */
   full_name?: string;
-  /** Timezone: Data (from linked User) */
-  timezone?: string;
 }
