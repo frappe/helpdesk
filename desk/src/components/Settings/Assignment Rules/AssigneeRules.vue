@@ -93,7 +93,7 @@
           <Tooltip
             v-if="user.email == assignmentRuleData.lastUser"
             :text="__('Last user assigned by this rule')"
-            :hover-delay="0.35"
+            :hover-delay="350"
             side="top"
           >
             <Badge theme="blue" variant="solid" :label="__('Last')" />

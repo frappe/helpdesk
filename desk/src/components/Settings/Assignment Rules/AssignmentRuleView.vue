@@ -136,7 +136,7 @@
               <div
                 v-if="isAssignConditionOld && assignmentRulesActiveScreen.data"
               >
-                <HoverCard :hoverDelay="0.25" side="top" align="end">
+                <HoverCard :hoverDelay="250" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
@@ -217,7 +217,7 @@
                   assignmentRuleData.unassignCondition
                 "
               >
-                <HoverCard :hoverDelay="0.25" side="top" align="end">
+                <HoverCard :hoverDelay="250" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap flex items-center"
