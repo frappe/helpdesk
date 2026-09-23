@@ -27,15 +27,10 @@ import {
   Strike,
   commentToolbar,
   type CommandMenuItem,
+  type MentionSuggestionItem,
   type MenuItem,
 } from "frappe-ui/editor";
 import type { MaybeRefOrGetter } from "vue";
-
-/** A mentionable agent as the new editor expects it: `{ id, label }`. */
-export interface MentionItem {
-  id: string;
-  label: string;
-}
 
 /**
  * Build the extension list for a Helpdesk rich-text editor.
@@ -45,7 +40,7 @@ export interface MentionItem {
  */
 export function buildEditorExtensions(
   options: {
-    mentions?: MaybeRefOrGetter<MentionItem[]>;
+    mentions?: MaybeRefOrGetter<MentionSuggestionItem[]>;
     extra?: unknown[];
   } = {}
 ) {

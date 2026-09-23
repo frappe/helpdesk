@@ -165,11 +165,7 @@ const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
 // Mentions as a reactive getter so the `@` list stays in sync as agents load.
 const extensions = buildEditorExtensions({
-  mentions: () =>
-    (dropdown.value ?? []).map((a: { label: string; value: string }) => ({
-      id: a.value,
-      label: a.label,
-    })),
+  mentions: () => dropdown.value ?? [],
 });
 
 // Initialize typing composable
