@@ -1,6 +1,5 @@
 import { computed, watch } from 'vue'
 import { call, createListResource, createResource, dayjs, toast } from 'frappe-ui'
-import { ROUTES } from '@app/routes'
 import { useSettingsModal } from '@app/stores/settings'
 import { useTicketThread } from '@app/stores/ticket/thread'
 import { useTicketDetails } from '@app/stores/ticket/details'
@@ -177,6 +176,5 @@ export default function setup(context) {
     suggestedHeading,
     // A hard navigation: the article pages are the desk's, not routes in this app.
     openHelpArticle: (article) => (window.location.href = article.url),
-    raiseNewTicket: () => context.router?.push(ROUTES.newTicket),
   }
 }

@@ -934,57 +934,6 @@
               "data": "{{ suggestedArticles }}",
               "dataKey": "name"
              }
-            },
-            {
-             "children": [
-              {
-               "children": [],
-               "classes": [
-                "text-ink-gray-8",
-                "font-medium"
-               ],
-               "componentId": "TextBlock-ticket-help-stuck",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "div",
-                "text": "{{ words.stillStuck }}"
-               }
-              },
-              {
-               "children": [],
-               "classes": [
-                "w-full"
-               ],
-               "componentEvents": {
-                "click": {
-                 "action": "Run Script",
-                 "event": "click",
-                 "script": "raiseNewTicket()"
-                }
-               },
-               "componentId": "Button-ticket-help-new",
-               "componentName": "Button",
-               "componentProps": {
-                "label": "{{ words.raiseNewTicket }}",
-                "variant": "solid"
-               },
-               "visibilityCondition": "{{ canCreateTicket }}"
-              }
-             ],
-             "classes": [
-              "border",
-              "border-outline-gray-2",
-              "rounded-6",
-              "flex",
-              "flex-col",
-              "gap-2",
-              "p-3",
-              "mt-1"
-             ],
-             "componentId": "container-ticket-help-card",
-             "componentName": "container",
-             "originalElement": "div"
             }
            ],
            "classes": [
@@ -2363,57 +2312,6 @@
               "data": "{{ suggestedArticles }}",
               "dataKey": "name"
              }
-            },
-            {
-             "children": [
-              {
-               "children": [],
-               "classes": [
-                "text-ink-gray-8",
-                "font-medium"
-               ],
-               "componentId": "TextBlock-ticket-help-stuck",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "div",
-                "text": "{{ words.stillStuck }}"
-               }
-              },
-              {
-               "children": [],
-               "classes": [
-                "w-full"
-               ],
-               "componentEvents": {
-                "click": {
-                 "action": "Run Script",
-                 "event": "click",
-                 "script": "raiseNewTicket()"
-                }
-               },
-               "componentId": "Button-ticket-help-new",
-               "componentName": "Button",
-               "componentProps": {
-                "label": "{{ words.raiseNewTicket }}",
-                "variant": "solid"
-               },
-               "visibilityCondition": "{{ canCreateTicket }}"
-              }
-             ],
-             "classes": [
-              "border",
-              "border-outline-gray-2",
-              "rounded-6",
-              "flex",
-              "flex-col",
-              "gap-2",
-              "p-3",
-              "mt-1"
-             ],
-             "componentId": "container-ticket-help-card",
-             "componentName": "container",
-             "originalElement": "div"
             }
            ],
            "classes": [
@@ -2857,7 +2755,7 @@
  ],
  "frappe_app": "helpdesk",
  "is_standard": 1,
- "modified": "2026-09-24 01:36:07.881691",
+ "modified": "2026-09-24 01:37:36.506345",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
