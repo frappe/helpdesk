@@ -89,7 +89,7 @@
               <FormControl
                 type="checkbox"
                 :model-value="toggleAllChildValues"
-                class="me-2"
+                class="me-4"
               />
               <span class="text-base-medium text-ink-gray-8">
                 {{ toggleCheckboxLabel }}
@@ -105,7 +105,7 @@
                 <FormControl
                   type="checkbox"
                   :model-value="isChildValueSelected(value)"
-                  class="me-2"
+                  class="me-4"
                 />
                 <span class="text-base text-ink-gray-6">{{ value }}</span>
               </li>
