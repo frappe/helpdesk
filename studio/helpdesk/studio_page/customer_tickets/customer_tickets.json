@@ -144,7 +144,7 @@
          "componentId": "Button-tickets-reload",
          "componentName": "Button",
          "componentProps": {
-          "iconLeft": "refresh-cw",
+          "iconLeft": "lucide-refresh-cw",
           "label": "Refresh",
           "variant": "subtle"
          }
@@ -457,7 +457,7 @@
          "componentId": "Button-tickets-reload",
          "componentName": "Button",
          "componentProps": {
-          "iconLeft": "refresh-cw",
+          "iconLeft": "lucide-refresh-cw",
           "label": "Refresh",
           "variant": "subtle"
          }

@@ -130,9 +130,9 @@
               ],
               "componentEvents": {},
               "componentId": "kb_settings-nav-members-icon",
-              "componentName": "FeatherIcon",
+              "componentName": "Icon",
               "componentProps": {
-               "name": "users"
+               "icon": "lucide-users"
               },
               "componentSlots": {},
               "mobileStyles": {},
@@ -823,9 +823,9 @@
                   ],
                   "componentEvents": {},
                   "componentId": "kb_settings-organization-back-icon",
-                  "componentName": "FeatherIcon",
+                  "componentName": "Icon",
                   "componentProps": {
-                   "name": "chevron-left"
+                   "icon": "lucide-chevron-left"
                   },
                   "componentSlots": {},
                   "mobileStyles": {},
@@ -950,7 +950,7 @@
               "componentId": "kb_settings-organization-invite",
               "componentName": "Button",
               "componentProps": {
-               "iconLeft": "plus",
+               "iconLeft": "lucide-plus",
                "label": "{{ t('Invite people') }}",
                "variant": "solid"
               },
@@ -1023,9 +1023,9 @@
                     ],
                     "componentEvents": {},
                     "componentId": "kb_settings-organization-fact-email-icon",
-                    "componentName": "FeatherIcon",
+                    "componentName": "Icon",
                     "componentProps": {
-                     "name": "mail"
+                     "icon": "lucide-mail"
                     },
                     "componentSlots": {},
                     "mobileStyles": {},
@@ -1099,9 +1099,9 @@
                     ],
                     "componentEvents": {},
                     "componentId": "kb_settings-organization-fact-domain-icon",
-                    "componentName": "FeatherIcon",
+                    "componentName": "Icon",
                     "componentProps": {
-                     "name": "globe"
+                     "icon": "lucide-globe"
                     },
                     "componentSlots": {},
                     "mobileStyles": {},
@@ -1175,9 +1175,9 @@
                     ],
                     "componentEvents": {},
                     "componentId": "kb_settings-organization-fact-country-icon",
-                    "componentName": "FeatherIcon",
+                    "componentName": "Icon",
                     "componentProps": {
-                     "name": "map-pin"
+                     "icon": "lucide-map-pin"
                     },
                     "componentSlots": {},
                     "mobileStyles": {},
@@ -1395,9 +1395,9 @@
                 ],
                 "componentEvents": {},
                 "componentId": "kb_settings-invite-back-icon",
-                "componentName": "FeatherIcon",
+                "componentName": "Icon",
                 "componentProps": {
-                 "name": "chevron-left"
+                 "icon": "lucide-chevron-left"
                 },
                 "componentSlots": {},
                 "mobileStyles": {},
@@ -1644,7 +1644,7 @@
     "componentId": "kb_settings-dialog",
     "componentName": "SettingsDialog",
     "componentProps": {
-     "modelValue": {
+     "open": {
       "$type": "variable",
       "name": "settingsOpen"
      },
@@ -1694,7 +1694,7 @@
     "componentProps": {
      "modelValue": "{{ confirmOpen }}",
      "onUpdate:modelValue": "(value) => { if (!value) cancelConfirm() }",
-     "options": "{{ { title: confirmAction ? confirmAction.title : '' } }}"
+     "title": "{{ confirmAction ? confirmAction.title : '' }}"
     },
     "componentSlots": {
      "actions": {
@@ -1767,7 +1767,7 @@
       "slotId": "kb_settings-slot-actions",
       "slotName": "actions"
      },
-     "body-content": {
+     "default": {
       "slotContent": [
        {
         "attributes": {},
@@ -1789,8 +1789,8 @@
         "tabletStyles": {}
        }
       ],
-      "slotId": "kb_settings-slot-body-content",
-      "slotName": "body-content"
+      "slotId": "kb_settings-slot-body-content:default",
+      "slotName": "default"
      }
     },
     "mobileStyles": {},
@@ -1812,7 +1812,7 @@
      }
     },
     "componentSlots": {
-     "body-content": {
+     "default": {
       "slotContent": [
        {
         "attributes": {},
@@ -1951,8 +1951,8 @@
         "tabletStyles": {}
        }
       ],
-      "slotId": "kb_settings-slot-password-body",
-      "slotName": "body-content"
+      "slotId": "kb_settings-slot-password-body:default",
+      "slotName": "default"
      }
     },
     "mobileStyles": {},
@@ -1977,7 +1977,7 @@
  "idx": 0,
  "inputs": [],
  "is_disabled": 0,
- "modified": "2026-09-17 16:00:01.620641",
+ "modified": "2026-09-23 16:06:12.480799",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

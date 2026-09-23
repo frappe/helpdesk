@@ -61,9 +61,8 @@
              "componentId": "Alert-ticket-banner",
              "componentName": "Alert",
              "componentProps": {
-              "theme": "yellow",
-              "title": "{{ bannerMessage }}",
-              "variant": "subtle"
+              "theme": "amber",
+              "title": "{{ bannerMessage }}"
              }
             }
            ],
@@ -474,7 +473,7 @@
               "bg-surface-elevation-1",
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
               "flex",
               "gap-2",
@@ -532,7 +531,7 @@
               "bg-surface-elevation-1",
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
               "py-2.5",
               "px-3"
@@ -977,7 +976,7 @@
              "classes": [
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "flex",
               "flex-col",
               "gap-2",
@@ -1090,7 +1089,7 @@
        "slotId": "Dialog-ticket-feedback:actions",
        "slotName": "actions"
       },
-      "body-content": {
+      "default": {
        "parentBlockId": "Dialog-ticket-feedback",
        "slotContent": [
         {
@@ -1401,8 +1400,8 @@
          "tabletStyles": {}
         }
        ],
-       "slotId": "Dialog-ticket-feedback:body-content",
-       "slotName": "body-content"
+       "slotId": "Dialog-ticket-feedback:default",
+       "slotName": "default"
       }
      }
     },
@@ -1492,9 +1491,8 @@
              "componentId": "Alert-ticket-banner",
              "componentName": "Alert",
              "componentProps": {
-              "theme": "yellow",
-              "title": "{{ bannerMessage }}",
-              "variant": "subtle"
+              "theme": "amber",
+              "title": "{{ bannerMessage }}"
              }
             }
            ],
@@ -1905,7 +1903,7 @@
               "bg-surface-elevation-1",
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
               "flex",
               "gap-2",
@@ -1963,7 +1961,7 @@
               "bg-surface-elevation-1",
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
               "py-2.5",
               "px-3"
@@ -2408,7 +2406,7 @@
              "classes": [
               "border",
               "border-outline-gray-2",
-              "rounded-lg",
+              "rounded-6",
               "flex",
               "flex-col",
               "gap-2",
@@ -2521,7 +2519,7 @@
        "slotId": "Dialog-ticket-feedback:actions",
        "slotName": "actions"
       },
-      "body-content": {
+      "default": {
        "parentBlockId": "Dialog-ticket-feedback",
        "slotContent": [
         {
@@ -2832,8 +2830,8 @@
          "tabletStyles": {}
         }
        ],
-       "slotId": "Dialog-ticket-feedback:body-content",
-       "slotName": "body-content"
+       "slotId": "Dialog-ticket-feedback:default",
+       "slotName": "default"
       }
      }
     },
