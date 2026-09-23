@@ -39,6 +39,7 @@ const words = computed(() => ({
   solveNo: t('No, still an issue'),
   feedbackTitle: t('Feedback Rating'),
   popularHelp: t('Popular help'),
+  relatedHelp: t('Related help'),
   stillStuck: t('Still stuck?'),
   raiseNewTicket: t('Raise a new ticket'),
 }))

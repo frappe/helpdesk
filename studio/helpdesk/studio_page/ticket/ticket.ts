@@ -33,24 +33,42 @@ export default function setup(context) {
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
 
-  // Most-read published articles. Not the ticket's own subject: `article.search` is
-  // built on RediSearch, which a stock Redis has no FT.SEARCH for.
-  const helpArticles = createListResource({
+  // Articles matching the ticket's subject; the most-read ones stand in when none match.
+  const relatedArticles = createResource({
+    url: 'helpdesk.api.article.get_related',
+    makeParams: () => ({ query: ticket.data?.subject }),
+    onSuccess: (data) => !data.length && popularArticles.fetch(),
+    onError: () => popularArticles.fetch(),
+  })
+  watch(
+    () => ticket.data?.subject,
+    (subject) => subject && relatedArticles.fetch(),
+    { immediate: true },
+  )
+
+  const popularArticles = createListResource({
     doctype: 'HD Article',
     filters: { status: 'Published' },
     fields: ['name', 'title'],
     orderBy: 'views desc',
     pageLength: 3,
-    auto: true,
   })
+
+  const isRelated = computed(() => Boolean(relatedArticles.data?.length))
 
   // The portal has no article page of its own yet, so these leave for the desk's public
   // KB. The `/helpdesk` prefix is that SPA's router base — without it the server 404s.
-  const popularHelp = computed(() =>
-    (helpArticles.data || []).map((article) => ({
-      ...article,
-      url: `/helpdesk/kb-public/articles/${article.name}`,
-    })),
+  const suggestedArticles = computed(() =>
+    ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map(
+      (article) => ({
+        ...article,
+        url: `/helpdesk/kb-public/articles/${article.name}`,
+      }),
+    ),
+  )
+
+  const suggestedHeading = computed(() =>
+    isRelated.value ? settings.words.value.relatedHelp : settings.words.value.popularHelp,
   )
 
   // Empty hides the button. Resolved keeps its Close: support is done, the customer may not be.
@@ -155,7 +173,8 @@ export default function setup(context) {
     solvePromptAt,
     confirmSolved,
     reopenTicket,
-    popularHelp,
+    suggestedArticles,
+    suggestedHeading,
     // A hard navigation: the article pages are the desk's, not routes in this app.
     openHelpArticle: (article) => (window.location.href = article.url),
     raiseNewTicket: () => context.router?.push(ROUTES.newTicket),

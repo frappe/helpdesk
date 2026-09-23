@@ -896,7 +896,7 @@
              "componentProps": {
               "fontSize": "text-p-xs",
               "tag": "div",
-              "text": "{{ words.popularHelp }}"
+              "text": "{{ suggestedHeading }}"
              }
             },
             {
@@ -932,7 +932,7 @@
              "componentId": "Repeater-ticket-help-links",
              "componentName": "Repeater",
              "componentProps": {
-              "data": "{{ popularHelp }}",
+              "data": "{{ suggestedArticles }}",
               "dataKey": "name"
              }
             },
@@ -1000,7 +1000,7 @@
            "componentId": "container-ticket-panel-help",
            "componentName": "container",
            "originalElement": "div",
-           "visibilityCondition": "{{ popularHelp.length }}"
+           "visibilityCondition": "{{ suggestedArticles.length }}"
           }
          ],
          "classes": [
@@ -2326,7 +2326,7 @@
              "componentProps": {
               "fontSize": "text-p-xs",
               "tag": "div",
-              "text": "{{ words.popularHelp }}"
+              "text": "{{ suggestedHeading }}"
              }
             },
             {
@@ -2362,7 +2362,7 @@
              "componentId": "Repeater-ticket-help-links",
              "componentName": "Repeater",
              "componentProps": {
-              "data": "{{ popularHelp }}",
+              "data": "{{ suggestedArticles }}",
               "dataKey": "name"
              }
             },
@@ -2430,7 +2430,7 @@
            "componentId": "container-ticket-panel-help",
            "componentName": "container",
            "originalElement": "div",
-           "visibilityCondition": "{{ popularHelp.length }}"
+           "visibilityCondition": "{{ suggestedArticles.length }}"
           }
          ],
          "classes": [
@@ -2859,7 +2859,7 @@
  ],
  "frappe_app": "helpdesk",
  "is_standard": 1,
- "modified": "2026-09-17 16:38:10.767330",
+ "modified": "2026-09-23 21:53:59.621339",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
