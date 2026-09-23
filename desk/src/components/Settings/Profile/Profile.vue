@@ -46,7 +46,7 @@
                   :text="__('Remove Photo')"
                 >
                   <div
-                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
+                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
                     @click.stop="updateImage()"
                   >
                     <LucideX class="size-3.5 cursor-pointer text-ink-gray-4" />
