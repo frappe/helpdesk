@@ -39,7 +39,7 @@
               <LucideChevronDown class="size-4" />
             </div>
           </template>
-          <template #default="{ toggle: togglePopover }">
+          <template #default="{ close: closePopover }">
             <div
               class="p-1 text-ink-gray-7 mt-1 bg-surface-base shadow-xl rounded-4 w-[--reka-popper-anchor-width]"
             >
@@ -50,7 +50,7 @@
                 @click="
                   () => {
                     assignmentRuleData.rule = option.value;
-                    togglePopover();
+                    closePopover();
                   }
                 "
               >

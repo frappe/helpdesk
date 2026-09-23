@@ -72,7 +72,7 @@
                   <LucideChevronDown class="size-4" />
                 </div>
               </template>
-              <template #default="{ toggle: togglePopover }">
+              <template #default="{ close: closePopover }">
                 <div
                   class="p-1 text-ink-gray-6 top-1 absolute bg-surface-base shadow-2xl rounded-4 w-[--reka-popper-anchor-width]"
                 >
@@ -82,7 +82,7 @@
                     class="p-2 cursor-pointer hover:bg-surface-sidebar text-base flex items-center justify-between rounded-4"
                     @click="
                       assignmentRuleData.priority = option.value;
-                      togglePopover();
+                      closePopover();
                     "
                   >
                     {{ option.label }}
