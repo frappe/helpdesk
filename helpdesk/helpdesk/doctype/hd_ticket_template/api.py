@@ -2,13 +2,11 @@ import json
 
 import frappe
 
-from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import check_permissions, get_customers, is_agent
 
 DOCTYPE_TEMPLATE = "HD Ticket Template"
-DOCTYPE_TEMPLATE_FIELD = "HD Ticket Template Field"
-DOCTYPE_TICKET = "HD Ticket"
 
 
 @frappe.whitelist()
@@ -19,7 +17,7 @@ def get_one(name: str):
     ) or [None, None, None]
     if not found:
         return {"about": None, "fields": []}
-    fields = get_fields_meta(name)
+    fields = TicketFields().form
     if frappe.db.get_single_value("HD Settings", "auto_set_customer_from_contact"):
         set_customer_field(fields)
 
@@ -28,59 +26,9 @@ def get_one(name: str):
         "fields": fields,
         "description_template": description_template,
         "_form_script": get_form_script(
-            "HD Ticket", apply_on_new_page=True, is_customer_portal=False
+            "HD Ticket", apply_on_new_page=True, is_customer_portal=not is_agent()
         ),
     }
-
-
-def get_fields_meta(template: str):
-    """The template's fields, as this user may see them."""
-    hidden_fields = get_hidden_ticket_fields()
-    meta = frappe.get_meta(DOCTYPE_TICKET)
-    fields = []
-    for row in template_rows(template):
-        field = meta.get_field(row.fieldname)
-        if row.fieldname in hidden_fields or not field:
-            continue
-        fields.append(form_field(row, field))
-    return fields
-
-
-def template_rows(template: str) -> list:
-    return frappe.get_all(
-        DOCTYPE_TEMPLATE_FIELD,
-        filters={"parent": template, "parenttype": DOCTYPE_TEMPLATE},
-        fields=[
-            "fieldname",
-            "required",
-            "url_method",
-            "placeholder",
-            "idx",
-        ],
-        order_by="idx",
-    )
-
-
-def form_field(row, field) -> frappe._dict:
-    """One field for the form: the template's own columns, plus live doctype meta.
-
-    Meta is cached and already carries Customize Form overrides, so nothing here
-    reads DocField or Property Setter directly.
-    """
-    return frappe._dict(
-        fieldname=row.fieldname,
-        required=row.required,
-        url_method=row.url_method,
-        placeholder=row.placeholder,
-        idx=row.idx,
-        label=field.label,
-        fieldtype=field.fieldtype,
-        options=field.options,
-        link_filters=field.link_filters,
-        depends_on=field.depends_on,
-        mandatory_depends_on=field.mandatory_depends_on,
-        read_only_depends_on=field.read_only_depends_on,
-    )
 
 
 def set_customer_field(fields: list) -> None:
@@ -112,6 +60,5 @@ def set_customer_field(fields: list) -> None:
                 options="HD Customer",
                 link_filters=link_filters,
                 required=1,
-                idx=len(fields) + 1,
             )
         )

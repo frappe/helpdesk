@@ -6,10 +6,7 @@ from frappe.model.document import get_controller
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.field_visibility import (
-    get_customer_visible_template_fields,
-    get_hidden_ticket_fields,
-)
+from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -18,6 +15,17 @@ from helpdesk.utils import (
     parse_call_logs,
 )
 
+# what the portal list may filter, sort and show, before the template adds its rows
+CUSTOMER_PORTAL_LIST_FIELDS = (
+    "name",
+    "subject",
+    "status",
+    "priority",
+    "response_by",
+    "resolution_by",
+    "creation",
+    "customer",
+)
 SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
 
 
@@ -116,9 +124,8 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
-    hidden_fields = set()
+    hidden_fields = TicketFields().hidden if doctype == "HD Ticket" else set()
     if doctype == "HD Ticket":
-        hidden_fields = get_hidden_ticket_fields()
         rows.append("_seen") if "_seen" not in rows else rows
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
@@ -281,17 +288,9 @@ def get_filterable_fields(
         "Datetime",
     ]
 
-    visible_custom_fields = get_customer_visible_template_fields()
-    customer_portal_fields = [
-        "name",
-        "subject",
-        "status",
-        "priority",
-        "response_by",
-        "resolution_by",
-        "creation",
-        "customer",
-    ]
+    ticket_fields = TicketFields()
+    visible_custom_fields = ticket_fields.customer_template_fields
+    customer_portal_fields = list(CUSTOMER_PORTAL_LIST_FIELDS)
 
     from_doc_fields = (
         frappe.qb.from_(QBDocField)
@@ -299,7 +298,6 @@ def get_filterable_fields(
             QBDocField.fieldname,
             QBDocField.fieldtype,
             QBDocField.label,
-            QBDocField.name,
             QBDocField.options,
         )
         .where(QBDocField.parent == doctype)
@@ -313,7 +311,6 @@ def get_filterable_fields(
             QBCustomField.fieldname,
             QBCustomField.fieldtype,
             QBCustomField.label,
-            QBCustomField.name,
             QBCustomField.options,
         )
         .where(QBCustomField.dt == doctype)
@@ -353,7 +350,6 @@ def get_filterable_fields(
                 "fieldname": "_assign",
                 "fieldtype": "Link",
                 "label": "Assigned to",
-                "name": "_assign",
                 "options": "HD Agent",
             }
         )
@@ -362,7 +358,6 @@ def get_filterable_fields(
                 "fieldname": "_user_tags",
                 "fieldtype": "Link",
                 "label": "Tags",
-                "name": "_user_tags",
                 "options": "Tag",
             }
         )
@@ -394,15 +389,13 @@ def get_filterable_fields(
             "fieldname": "__assigned_on",
             "fieldtype": "Date",
             "label": "Assigned on",
-            "name": "__assigned_on",
         },
     ]
     for field in standard_fields:
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
     if doctype == "HD Ticket":
-        hidden_fields = get_hidden_ticket_fields()
-        res = [f for f in res if f["fieldname"] not in hidden_fields]
+        res = [f for f in res if f["fieldname"] not in ticket_fields.hidden]
     return res
 
 
@@ -423,7 +416,7 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
         fields = get_customer_portal_fields(doctype, fields)
 
     if doctype == "HD Ticket":
-        hidden_fields = get_hidden_ticket_fields()
+        hidden_fields = TicketFields().hidden
         fields = [f for f in fields if f["value"] not in hidden_fields]
 
     standard_fields = [
@@ -478,7 +471,7 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
         return quick_filters
 
     # a hidden field must not offer its label and options here either
-    hidden_fields = get_hidden_ticket_fields()
+    hidden_fields = TicketFields().hidden
     quick_filters = [f for f in quick_filters if f["name"] not in hidden_fields]
 
     _list = get_controller(doctype)
@@ -490,16 +483,9 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
 
 
 def get_customer_portal_fields(doctype, fields):
-    visible_custom_fields = get_customer_visible_template_fields()
     customer_portal_fields = [
-        "name",
-        "subject",
-        "status",
-        "priority",
-        "response_by",
-        "resolution_by",
-        "creation",
-        *visible_custom_fields,
+        *CUSTOMER_PORTAL_LIST_FIELDS,
+        *TicketFields().customer_template_fields,
     ]
     fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields

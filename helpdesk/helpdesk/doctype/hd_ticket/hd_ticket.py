@@ -20,11 +20,9 @@ from pypika.terms import Criterion
 
 from helpdesk.consts import (
     CUSTOMER_EDIT_EXEMPT_FIELDS,
-    CUSTOMER_FILLABLE_PERMLEVELS,
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
-from helpdesk.field_visibility import get_customer_visible_template_fields
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -35,6 +33,7 @@ from helpdesk.helpdesk.utils.email import (
 )
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
+from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import (
     agent_only,
     capture_event,
@@ -90,26 +89,8 @@ class HDTicket(Document):
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
         self.flags.ignore_permlevel_for_fields = (
-            list(PORTAL_INSERT_EXEMPT_FIELDS) + self.customer_fillable_template_fields()
+            list(PORTAL_INSERT_EXEMPT_FIELDS) + TicketFields().customer_fillable
         )
-
-    def customer_fillable_template_fields(self) -> list[str]:
-        """fields that a customer should be able to fill at creation as per template + permlevel access check."""
-        return [
-            fieldname
-            for fieldname in get_customer_visible_template_fields()
-            if self.can_customer_fill_at_creation(fieldname)
-        ]
-
-    def can_customer_fill_at_creation(self, fieldname: str) -> bool:
-        """check if the specific field can be filled by customer"""
-
-        # return false for any server computed fields as they are more of logic based & calculated outputs
-        if fieldname in SERVER_COMPUTED_FIELDS:
-            return False
-        field = frappe.get_meta("HD Ticket").get_field(fieldname)
-        # check if inside fillable perm level and return
-        return bool(field) and field.permlevel in CUSTOMER_FILLABLE_PERMLEVELS
 
     def before_validate(self):
         self.check_update_perms()

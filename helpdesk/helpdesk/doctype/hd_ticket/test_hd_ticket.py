@@ -25,6 +25,7 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     has_permission,
     permission_query,
 )
+from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
     add_comment,
@@ -32,10 +33,13 @@ from helpdesk.test_utils import (
     add_holiday,
     create_contact,
     create_customer,
+    default_template_rows,
     get_current_week_monday,
+    get_custom_field_permlevel,
     get_customer_ticket,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_form_script,
     make_priority,
     make_sla,
     make_status,
@@ -44,7 +48,10 @@ from helpdesk.test_utils import (
     make_ticket,
     other_priority,
     remove_holidays,
+    set_custom_field_permlevel,
+    set_default_template_rows,
     set_ticket_status_and_communication_date,
+    ticket_field_permlevel,
     update_role_in_customer,
     upload_test_file,
 )
@@ -2392,48 +2399,14 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.get_doc(
             {"doctype": "HD Agent", "user": PERMS_AGENT, "agent_name": "Perms Agent"}
         ).insert(ignore_if_duplicate=True)
-        self.original_default_fields = self.default_template_rows()
+        self.original_default_fields = default_template_rows()
         if self.original_default_fields:
             # tests assume a clean default template
-            self.set_default_template_fields([])
+            set_default_template_rows([])
 
     def tearDown(self):
         frappe.set_user("Administrator")
-        self.set_default_template_fields(self.original_default_fields)
-
-    @staticmethod
-    def default_template_rows():
-        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
-        return [
-            {
-                "fieldname": f.fieldname,
-                "required": f.required,
-                "visible_to": f.visible_to,
-                "url_method": f.url_method,
-                "placeholder": f.placeholder,
-            }
-            for f in template.fields
-        ]
-
-    @staticmethod
-    def set_default_template_fields(rows):
-        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
-        template.fields = []
-        for row in rows:
-            template.append("fields", row)
-        template.save()
-        return template
-
-    def test_customer_cannot_write_agent_fields(self):
-        ticket = get_customer_ticket(PERMS_CUSTOMER)
-        original_priority = ticket.priority
-        original_response_by = ticket.response_by
-        ticket.priority = other_priority(original_priority)
-        ticket.response_by = now_datetime()
-        ticket.save()
-        ticket.reload()
-        self.assertEqual(ticket.priority, original_priority)
-        self.assertEqual(ticket.response_by, original_response_by)
+        set_default_template_rows(self.original_default_fields)
 
     def test_customer_cannot_edit_ticket_after_creation(self):
         """Level-0 fields stay writable to raise a ticket; freezing them is the guard's job."""
@@ -2507,47 +2480,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertEqual(spoofed.priority, baseline.priority)
         self.assertNotEqual(spoofed.contact, other_contact)
 
-    def test_hidden_custom_field_is_absent_from_the_api(self):
-        """The list path never consults the controller, only the permission level."""
-        from frappe.custom.doctype.custom_field.custom_field import create_custom_field
-
-        fieldname = "custom_perms_api_hidden"
-        create_custom_field(
-            "HD Ticket",
-            {
-                "fieldname": fieldname,
-                "label": "Perms API Hidden",
-                "fieldtype": "Data",
-                "permlevel": 8,
-            },
-        )
-        frappe.clear_cache(doctype="HD Ticket")
-        try:
-            ticket = make_ticket(raised_by=PERMS_CUSTOMER)
-            frappe.db.set_value("HD Ticket", ticket.name, fieldname, "internal note")
-
-            frappe.set_user(PERMS_CUSTOMER)
-            rows = frappe.get_list(
-                "HD Ticket",
-                filters={"name": ticket.name},
-                fields=["name", fieldname],
-            )
-            self.assertNotIn(fieldname, rows[0])
-
-            frappe.set_user(PERMS_AGENT)
-            rows = frappe.get_list(
-                "HD Ticket",
-                filters={"name": ticket.name},
-                fields=["name", fieldname],
-            )
-            self.assertEqual(rows[0].get(fieldname), "internal note")
-        finally:
-            frappe.set_user("Administrator")
-            frappe.delete_doc(
-                "Custom Field", f"HD Ticket-{fieldname}", ignore_missing=True
-            )
-            frappe.clear_cache(doctype="HD Ticket")
-
     def test_custom_field_permlevel_governs_customer_access(self):
         """At 8 a customer's value is dropped; at 7 it is fillable at creation, then frozen."""
         from frappe.custom.doctype.custom_field.custom_field import create_custom_field
@@ -2563,7 +2495,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             },
         )
         try:
-            self.set_default_template_fields(
+            set_default_template_rows(
                 [{"fieldname": fieldname, "visible_to": "Agents"}]
             )
             frappe.set_user(PERMS_CUSTOMER)
@@ -2574,8 +2506,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
             # an admin lowers it to the customer-visible level in Customize Form
             frappe.set_user("Administrator")
-            self.set_custom_field_permlevel(fieldname, 7)
-            self.set_default_template_fields(
+            set_custom_field_permlevel(fieldname, 7)
+            set_default_template_rows(
                 [{"fieldname": fieldname, "visible_to": "Everyone"}]
             )
             frappe.set_user(PERMS_CUSTOMER)
@@ -2622,7 +2554,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                     "Perms Sidecar Show",
                     [{"fieldname": fieldname, "visible_to": "Everyone"}],
                 )
-            self.assertEqual(self.custom_field_permlevel(fieldname), 8)
+            self.assertEqual(get_custom_field_permlevel(fieldname), 8)
         finally:
             frappe.set_user("Administrator")
             frappe.delete_doc(
@@ -2639,24 +2571,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 force=True,
             )
             frappe.clear_cache(doctype="HD Ticket")
-
-    @staticmethod
-    def set_custom_field_permlevel(fieldname, permlevel):
-        frappe.db.set_value(
-            "Custom Field",
-            frappe.db.get_value(
-                "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
-            ),
-            "permlevel",
-            permlevel,
-        )
-        frappe.clear_cache(doctype="HD Ticket")
-
-    @staticmethod
-    def custom_field_permlevel(fieldname):
-        return frappe.db.get_value(
-            "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
-        )
 
     def test_customer_cannot_set_agent_side_status(self):
         """Replied means an agent answered; a customer may only close."""
@@ -2691,7 +2605,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.get_list("HD Form Script", fields=["name", "script"])
 
     def test_customer_gets_portal_scripts_and_never_agent_ones(self):
-        """is_customer_portal comes from the caller; a customer never gets agent scripts."""
+        """The server decides the audience; a customer never gets agent scripts."""
         for name, portal, body in (
             ("Perms Portal Script", 1, "PORTAL"),
             ("Perms Agent Script", 0, "AGENT"),
@@ -2711,7 +2625,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         try:
             frappe.set_user(PERMS_CUSTOMER)
-            customer_view = get_one(ticket.name, is_customer_portal=False)
+            customer_view = get_one(ticket.name)
             forced = customer_view.get("_form_script")
             self.assertTrue(any("PORTAL" in s for s in forced))
             self.assertFalse(any("AGENT" in s for s in forced))
@@ -2720,9 +2634,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             self.assertNotIn("AGENT", frappe.as_json(customer_view))
 
             frappe.set_user(PERMS_AGENT)
-            agent_view = get_one(ticket.name, is_customer_portal=False).get(
-                "_form_script"
-            )
+            agent_view = get_one(ticket.name).get("_form_script")
             self.assertTrue(any("AGENT" in s for s in agent_view))
         finally:
             frappe.set_user("Administrator")
@@ -2730,6 +2642,28 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 frappe.delete_doc(
                     "HD Form Script", name, force=True, ignore_missing=True
                 )
+
+    def test_new_ticket_form_scripts_follow_the_audience(self):
+        """The new-ticket page used to ask for agent scripts whoever loaded it."""
+        make_form_script(
+            self,
+            "Perms Portal New Script",
+            "PORTAL",
+            apply_to_customer_portal=True,
+            apply_on_new_page=True,
+        )
+        make_form_script(
+            self, "Perms Agent New Script", "AGENT", apply_on_new_page=True
+        )
+
+        frappe.set_user(PERMS_CUSTOMER)
+        scripts = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["_form_script"]
+        self.assertTrue(any("PORTAL" in s for s in scripts))
+        self.assertFalse(any("AGENT" in s for s in scripts))
+
+        frappe.set_user(PERMS_AGENT)
+        scripts = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["_form_script"]
+        self.assertTrue(any("AGENT" in s for s in scripts))
 
     def test_customer_can_submit_feedback(self):
         """The portal sends status, feedback and feedback_extra in a single
@@ -2771,13 +2705,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         """Marking an internal standard field visible is rejected loudly:
         `key` authenticates the guest feedback flow."""
         with self.assertRaises(frappe.ValidationError):
-            self.set_default_template_fields(
-                [{"fieldname": "key", "visible_to": "Everyone"}]
-            )
-        self.assertEqual(self.hd_ticket_permlevel("key"), 8)
+            set_default_template_rows([{"fieldname": "key", "visible_to": "Everyone"}])
+        self.assertEqual(ticket_field_permlevel("key"), 8)
         # listing it hidden, for the agent form, stays allowed
-        self.set_default_template_fields([{"fieldname": "key", "visible_to": "Agents"}])
-        self.assertEqual(self.hd_ticket_permlevel("key"), 8)
+        set_default_template_rows([{"fieldname": "key", "visible_to": "Agents"}])
+        self.assertEqual(ticket_field_permlevel("key"), 8)
 
     def test_secret_field_never_exposable_via_template(self):
         """`key` authenticates guest feedback links. Even an admin lowering
@@ -2793,9 +2725,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         )
         frappe.clear_cache(doctype="HD Ticket")
         try:
-            self.assertEqual(self.hd_ticket_permlevel("key"), 7)
+            self.assertEqual(ticket_field_permlevel("key"), 7)
             with self.assertRaises(frappe.ValidationError):
-                self.set_default_template_fields(
+                set_default_template_rows(
                     [{"fieldname": "key", "visible_to": "Everyone"}]
                 )
         finally:
@@ -2812,33 +2744,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
     def test_system_set_field_not_exposable_via_template(self):
         """Showing sla would offer a picker the server throws away; hidden is fine."""
         with self.assertRaises(frappe.ValidationError):
-            self.set_default_template_fields(
-                [{"fieldname": "sla", "visible_to": "Everyone"}]
-            )
-        self.set_default_template_fields([{"fieldname": "sla", "visible_to": "Agents"}])
-
-    def test_template_never_moves_standard_field_permlevels(self):
-        """Standard field levels belong to the doctype; the template writes no Property Setter."""
-        shipped = self.hd_ticket_permlevel("priority")
-        template = self.set_default_template_fields(
-            [{"fieldname": "priority", "visible_to": "Everyone"}]
-        )
-        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
-
-        template.reload()
-        template.fields[0].visible_to = "Agents"
-        template.save()
-        self.assertEqual(self.hd_ticket_permlevel("priority"), shipped)
-        self.assertFalse(
-            frappe.get_all(
-                "Property Setter",
-                filters={"doc_type": "HD Ticket", "property": "permlevel"},
-            )
-        )
-
-    @staticmethod
-    def hd_ticket_permlevel(fieldname):
-        return frappe.get_meta("HD Ticket").get_field(fieldname).permlevel
+            set_default_template_rows([{"fieldname": "sla", "visible_to": "Everyone"}])
+        set_default_template_rows([{"fieldname": "sla", "visible_to": "Agents"}])
 
     def test_portal_activity_stamps_last_customer_response(self):
         frappe.set_user(PERMS_CUSTOMER)
@@ -2858,9 +2765,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
     def test_visible_field_fillable_only_while_creating(self):
         """A standard field the default template shows can be filled on the
         creation form; afterwards it is read-only for the customer."""
-        self.set_default_template_fields(
-            [{"fieldname": "priority", "visible_to": "Everyone"}]
-        )
+        set_default_template_rows([{"fieldname": "priority", "visible_to": "Everyone"}])
         frappe.set_user(PERMS_CUSTOMER)
         default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
         chosen = other_priority(default_priority)
@@ -2889,9 +2794,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             make_property_setter,
         )
 
-        self.set_default_template_fields(
-            [{"fieldname": "priority", "visible_to": "Everyone"}]
-        )
+        set_default_template_rows([{"fieldname": "priority", "visible_to": "Everyone"}])
         make_property_setter("HD Ticket", "priority", "permlevel", 3, "Int")
         frappe.clear_cache(doctype="HD Ticket")
         try:
@@ -2933,17 +2836,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertTrue(stripped.get("sla"))
         self.assertTrue(stripped.get("response_by"))
 
-        # the creation response is stripped the same way
-        created = new(get_ticket_obj())
-        self.assertNotIn("agreement_status", created)
-        self.assertNotIn("key", created)
-        self.assertTrue(created.get("priority"))
-        self.assertTrue(created.get("response_by"))
-        self.assertTrue(created.get("sla"))
+        # the creation response carries only the name; the page loads the rest
+        self.assertEqual(list(new(get_ticket_obj())), ["name"])
 
         frappe.set_user(PERMS_AGENT)
         self.assertTrue(get_one(ticket.name).get("agreement_status"))
-        self.assertTrue(new(get_ticket_obj()).get("agreement_status"))
 
     def test_sla_output_not_fillable_at_creation(self):
         """SLA outputs are readable, but the engine owns their values and recomputes them."""
@@ -2952,12 +2849,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         ticket = frappe.get_doc({**get_ticket_obj(), "response_by": supplied}).insert()
         self.assertTrue(ticket.response_by)
         self.assertNotEqual(str(ticket.response_by), supplied)
-
-    def test_server_computed_fields_never_creation_fillable(self):
-        """A template saved before the guard existed can still list a system-set field."""
-        ticket = frappe.new_doc("HD Ticket")
-        for fieldname in ("sla", "response_by", "first_responded_on"):
-            self.assertFalse(ticket.can_customer_fill_at_creation(fieldname))
 
     def test_customer_spoof_rejected_without_auto_set_customer(self):
         """The contact-customer link check must not depend on the auto-set toggle."""

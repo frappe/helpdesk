@@ -10,11 +10,9 @@ from frappe.utils.caching import redis_cache
 from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
-from helpdesk.consts import CORE_TICKET_FIELDS, DEFAULT_TICKET_TEMPLATE
-from helpdesk.field_visibility import get_hidden_ticket_fields
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
-from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
+from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
 
@@ -26,81 +24,40 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    # strips permlevel fields the caller cannot read; no-op for agents
-    d.apply_fieldlevel_read_permissions()
-    return strip_unreadable_field_names(d.as_dict())
+    return {"name": d.name}
 
 
 @frappe.whitelist()
-def get_one(name: str, is_customer_portal: bool = False):
+def get_one(name: str):
+    """The customer portal's ticket page: the ticket as this user may read it,
+    its conversation, the contact card, the template rows and the form script."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
-    QBContact = frappe.qb.DocType("Contact")
+    fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
-    ticket = strip_unreadable_field_names(doc.as_dict())
+    ticket = fields.strip(doc.as_dict())
     # core caches comment and email snippets here; nothing in the SPA reads it
     ticket.pop("_comments", None)
 
+    QBContact = frappe.qb.DocType("Contact")
     contact = (
         frappe.qb.from_(QBContact)
-        .select(
-            QBContact.company_name,
-            QBContact.email_id,
-            QBContact.image,
-            QBContact.mobile_no,
-            QBContact.name,
-            QBContact.phone,
-        )
+        .select(QBContact.name, QBContact.email_id, QBContact.image)
         .where(QBContact.name == ticket.contact)
         .run(as_dict=True)
     )
     contact = contact[0] if contact else contact_from_email(ticket.raised_by)
-    template = ticket.template or DEFAULT_TICKET_TEMPLATE
-
-    linked_calls = frappe.db.get_all(
-        "Dynamic Link",
-        filters={"link_name": ticket["name"], "parenttype": "TP Call Log"},
-        pluck="parent",
-    )
-
-    calls = []
-
-    for call in linked_calls:
-        call = frappe.get_cached_doc(
-            "TP Call Log",
-            call,
-            fields=[
-                "name",
-                "caller",
-                "receiver",
-                "duration",
-                "type",
-                "status",
-                "from",
-                "to",
-                "recording_url",
-                "creation",
-            ],
-        ).as_dict()
-
-        calls.append(call)
-
-    call_logs = parse_call_logs(calls)
 
     return {
         **ticket,
-        "comments": get_comments(name),
         "communications": get_communications(name),
         "contact": contact,
-        # tags are agent workflow data, same as _user_tags
-        "tags": get_tags(name) if is_agent() else [],
-        "template": {"fields": get_template_fields_meta(template)},
+        "template": {"fields": fields.form},
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=is_customer_portal or not is_agent()
+            "HD Ticket", is_customer_portal=not fields.for_agent
         ),
-        "calls": call_logs,
     }
 
 
@@ -114,27 +71,6 @@ def contact_from_email(email: str | None) -> dict:
         "mobile_no": "",
         "image": "",
     }
-
-
-def strip_unreadable_field_names(ticket: dict) -> dict:
-    """Drop the names of fields the caller cannot read.
-    app based helper to strip fields based on visible_to meta in ticket template
-    """
-    for fieldname in get_hidden_ticket_fields():
-        ticket.pop(fieldname, None)
-    return ticket
-
-
-def get_template_fields_meta(template: str) -> list[dict]:
-    """returns the template fields meta in dict"""
-    return [
-        {
-            "fieldname": field.fieldname,
-            "label": field.label,
-            "fieldtype": field.fieldtype,
-        }
-        for field in get_fields_meta(template)
-    ]
 
 
 def get_assignee(_assign: str):
@@ -151,16 +87,10 @@ def get_communications(ticket: str):
     communications = (
         frappe.qb.from_(QBCommunication)
         .select(
-            QBCommunication.bcc,
-            QBCommunication.cc,
             QBCommunication.content,
             QBCommunication.creation,
-            QBCommunication.communication_date,
             QBCommunication.name,
             QBCommunication.sender,
-            QBCommunication.recipients,
-            QBCommunication.subject,
-            QBCommunication.delivery_status,
             QBCommunication.sent_or_received,
             QBCommunication.user,
         )
@@ -174,47 +104,6 @@ def get_communications(ticket: str):
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
     return communications
-
-
-def get_comments(ticket: str):
-    if not frappe.has_permission("Comment", "read"):
-        return []
-    QBComment = frappe.qb.DocType("Comment")
-    comments = (
-        frappe.qb.from_(QBComment)
-        .select(
-            QBComment.comment_email.as_("commented_by"),
-            QBComment.content,
-            QBComment.creation,
-            QBComment.is_pinned,
-            QBComment.name,
-        )
-        .where(QBComment.reference_doctype == "HD Ticket")
-        .where(QBComment.reference_name == ticket)
-        .where(QBComment.comment_type == "Comment")
-        .orderby(QBComment.creation, order=Order.asc)
-        .run(as_dict=True)
-    )
-    for c in comments:
-        c.user = get_user_info_for_avatar(c.commented_by)
-        c.attachments = get_attachments("Comment", c.name)
-    return comments
-
-
-def get_tags(ticket: str):
-    QBTag = frappe.qb.DocType("Tag Link")
-    rows = (
-        frappe.qb.from_(QBTag)
-        .select(QBTag.tag)
-        .where(QBTag.document_type == "HD Ticket")
-        .where(QBTag.document_name == ticket)
-        .orderby(QBTag.creation, order=Order.asc)
-        .run(as_dict=True)
-    )
-    res = []
-    for tag in rows:
-        res.append(tag.tag)
-    return res
 
 
 def get_call_logs(ticket: str):
@@ -490,22 +379,10 @@ def duplicate_ticket(ticket_doc, subject):
 @agent_only
 def get_ticket_customizations():
     """Every field the agent details tab may show, as this user may see it."""
-    hidden_fields = get_hidden_ticket_fields()
-    rows = frappe.get_all(
-        "HD Ticket Template Field",
-        filters={"parent": "Default"},
-        fields=["fieldname", "required", "placeholder", "url_method"],
-        order_by="idx",
-    )
-    fields = [row for row in rows if row.fieldname not in hidden_fields]
-    # core fields draw on meta and need no template row to show
-    listed = {row.fieldname for row in fields}
-    fields += [
-        frappe._dict(fieldname=fieldname)
-        for fieldname in CORE_TICKET_FIELDS
-        if fieldname not in hidden_fields and fieldname not in listed
-    ]
-    return {"fields": fields, "_form_script": get_form_script("HD Ticket")}
+    return {
+        "fields": TicketFields().details,
+        "_form_script": get_form_script("HD Ticket"),
+    }
 
 
 @frappe.whitelist()
