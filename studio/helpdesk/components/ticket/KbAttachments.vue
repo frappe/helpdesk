@@ -9,7 +9,7 @@
       @click="open(index)"
     />
 
-    <Dialog v-model="showDialog" size="4xl">
+    <Dialog v-model:open="showDialog" size="4xl">
       <template #title>
         <div class="flex min-w-0 items-center justify-between gap-3">
           <div class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9">
@@ -45,25 +45,23 @@
         </div>
       </template>
 
-      <template #body-content>
-        <div class="flex justify-center">
-          <img
-            v-if="kindOf(current) === 'image'"
-            :src="current?.file_url"
-            :alt="current?.file_name"
-            class="m-auto max-h-[70vh] max-w-full rounded-md border border-outline-gray-2"
-          />
-          <video
-            v-else-if="kindOf(current) === 'video'"
-            :src="current?.file_url"
-            controls
-            class="m-auto max-h-[70vh] max-w-full rounded-md border border-outline-gray-2"
-          />
-          <div v-else class="prose prose-sm max-h-[70vh] w-full max-w-none overflow-auto whitespace-pre-wrap font-mono text-p-sm text-ink-gray-8">
-            {{ text }}
-          </div>
+      <div class="flex justify-center">
+        <img
+          v-if="kindOf(current) === 'image'"
+          :src="current?.file_url"
+          :alt="current?.file_name"
+          class="m-auto max-h-[70vh] max-w-full rounded-5 border border-outline-gray-2"
+        />
+        <video
+          v-else-if="kindOf(current) === 'video'"
+          :src="current?.file_url"
+          controls
+          class="m-auto max-h-[70vh] max-w-full rounded-5 border border-outline-gray-2"
+        />
+        <div v-else class="prose prose-sm max-h-[70vh] w-full max-w-none overflow-auto whitespace-pre-wrap font-mono text-p-sm text-ink-gray-8">
+          {{ text }}
         </div>
-      </template>
+      </div>
     </Dialog>
   </div>
 </template>

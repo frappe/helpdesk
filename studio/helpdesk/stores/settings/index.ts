@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { useTheme } from 'frappe-ui'
+import { useColorScheme } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 import { useSession } from '@app/stores/session'
 import { t } from '@app/stores/translations'
@@ -15,12 +15,12 @@ const profile = createProfileSettings(core)
 const dialog = createSettingsDialog(core, organization)
 
 // Here, not in the dialog, so the saved theme applies on load rather than on open.
-const { currentTheme, setTheme } = useTheme()
+const { colorScheme, setColorScheme } = useColorScheme()
 
 // Writable so the theme Select can bind two-way; frappe-ui persists the choice.
 const theme = computed({
-  get: () => currentTheme.value,
-  set: setTheme,
+  get: () => colorScheme.value,
+  set: setColorScheme,
 })
 
 const themeOptions = computed(() => [

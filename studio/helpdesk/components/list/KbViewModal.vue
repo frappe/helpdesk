@@ -1,52 +1,48 @@
 <template>
   <Dialog
-    v-model="show"
-    :options="{
-      title: isRename ? 'Rename view' : 'Save as new view',
-      actions: [
-        {
-          label: isRename ? 'Save' : 'Create',
-          variant: 'solid',
-          disabled: !label.trim(),
-          onClick: () => emit('submit'),
-        },
-      ],
-    }"
+    v-model:open="show"
+    :title="isRename ? 'Rename view' : 'Save as new view'"
+    :actions="[
+      {
+        label: isRename ? 'Save' : 'Create',
+        variant: 'solid',
+        disabled: !label.trim(),
+        onClick: () => emit('submit'),
+      },
+    ]"
   >
-    <template #body-content>
-      <FormControl
-        v-model="label"
-        type="text"
-        label="Name"
-        placeholder="My open tickets"
-        autocomplete="off"
-        @keyup.enter="label.trim() && emit('submit')"
-      />
-      <div class="mt-4">
-        <div class="mb-1.5 text-base text-ink-gray-5">Icon</div>
-        <div class="flex items-center gap-2">
-          <!-- The icon list cannot show an emoji, which is what the desk's picker wrote. -->
-          <div
-            v-if="isEmojiIcon"
-            class="grid size-7 shrink-0 place-items-center rounded bg-surface-gray-3 text-base leading-none"
-            title="Current icon"
-          >
-            {{ icon }}
-          </div>
-          <IconPicker
-            v-model="icon"
-            :max-icons="1000"
-            class="flex-1"
-            :placeholder="
-              isEmojiIcon ? 'Replace with an icon...' : 'Select an icon...'
-            "
-          />
+    <FormControl
+      v-model="label"
+      type="text"
+      label="Name"
+      placeholder="My open tickets"
+      autocomplete="off"
+      @keyup.enter="label.trim() && emit('submit')"
+    />
+    <div class="mt-4">
+      <div class="mb-1.5 text-base text-ink-gray-5">Icon</div>
+      <div class="flex items-center gap-2">
+        <!-- The icon list cannot show an emoji, which is what the desk's picker wrote. -->
+        <div
+          v-if="isEmojiIcon"
+          class="grid size-7 shrink-0 place-items-center rounded-4 bg-surface-gray-3 text-base leading-none"
+          title="Current icon"
+        >
+          {{ icon }}
         </div>
+        <IconPicker
+          v-model="icon"
+          :max-icons="1000"
+          class="flex-1"
+          :placeholder="
+            isEmojiIcon ? 'Replace with an icon...' : 'Select an icon...'
+          "
+        />
       </div>
-      <p v-if="!isRename" class="mt-4 text-p-sm text-ink-gray-6">
-        Saves the filters, sort order and columns currently on screen.
-      </p>
-    </template>
+    </div>
+    <p v-if="!isRename" class="mt-4 text-p-sm text-ink-gray-6">
+      Saves the filters, sort order and columns currently on screen.
+    </p>
   </Dialog>
 </template>
 
@@ -55,7 +51,7 @@
 // hides public outside the agent view. A customer's view is a name over the layout.
 import { Dialog, FormControl } from "frappe-ui";
 // Reads the full lucide sprite the studio renderer injects, not just what the bundle uses.
-import { IconPicker } from "frappe-ui/icons";
+import { IconPicker } from "frappe-ui/experimental";
 import { computed } from "vue";
 
 const props = defineProps<{ modelValue: any }>();

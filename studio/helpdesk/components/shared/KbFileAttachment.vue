@@ -3,7 +3,7 @@
     <!-- A drop target has to look like one, where a single-file row reads as an input. -->
     <button
       type="button"
-      class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
+      class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-6 border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
       :class="{ '!border-outline-gray-4 !bg-surface-gray-2': isOver }"
       @click="openFileSelector"
       @dragenter.prevent="isOver = true"
@@ -11,7 +11,7 @@
       @dragleave.prevent="isOver = false"
       @drop.prevent="onDrop"
     >
-      <FeatherIcon name="upload" class="size-4 shrink-0 text-ink-gray-5" />
+      <Icon icon="lucide-upload" class="size-4 shrink-0 text-ink-gray-5" />
       <span class="text-p-base text-ink-gray-5">
         {{
           uploading
@@ -31,19 +31,16 @@
     </button>
 
     <ul v-if="files.length" class="m-0 flex list-none flex-col gap-1 p-0">
-      <li v-for="file in files" :key="file.name" class="flex min-w-0 items-center gap-1.5 rounded-md bg-surface-gray-2 px-2 py-1 text-p-sm text-ink-gray-7">
-        <FeatherIcon
-          name="paperclip"
-          class="size-3.5 shrink-0 text-ink-gray-5"
-        />
+      <li v-for="file in files" :key="file.name" class="flex min-w-0 items-center gap-1.5 rounded-5 bg-surface-gray-2 px-2 py-1 text-p-sm text-ink-gray-7">
+        <Icon icon="lucide-paperclip" class="size-3.5 shrink-0 text-ink-gray-5" />
         <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ file.file_name || file.name }}</span>
         <button
           type="button"
-          class="grid place-items-center rounded text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
+          class="grid place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
           :aria-label="`Remove ${file.file_name || file.name}`"
           @click.stop="remove(file)"
         >
-          <FeatherIcon name="x" class="size-3.5" />
+          <Icon icon="lucide-x" class="size-3.5" />
         </button>
       </li>
     </ul>
@@ -57,7 +54,7 @@
 // drives the same `FileUploadHandler`, once per file.
 
 import { computed, ref } from "vue";
-import { FeatherIcon, FileUploadHandler } from "frappe-ui";
+import { FileUploadHandler, Icon } from "frappe-ui";
 
 // Private: an attachment on a support ticket is not public content.
 const UPLOAD_ARGS = { folder: "Home/Helpdesk", private: true };

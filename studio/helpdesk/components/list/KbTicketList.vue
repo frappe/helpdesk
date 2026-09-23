@@ -70,6 +70,7 @@
 // Draws nothing itself: every cell comes from its column's `cell()`.
 import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
 import { loadTicketMeta } from "./ticketCells";
+import { LoadingIndicator } from "frappe-ui";
 import {
   ListFooter,
   ListHeader,
@@ -79,8 +80,7 @@ import {
   ListRows,
   ListSelectBanner,
   ListView,
-  LoadingIndicator,
-} from "frappe-ui";
+} from "frappe-ui/experimental";
 
 // Here, not at module load: this file ships in the public page bundles too.
 loadTicketMeta();

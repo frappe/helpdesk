@@ -68,7 +68,7 @@
             align="end"
           >
             <template #trigger="{ open }">
-              <Button variant="ghost" icon="more-horizontal" :active="open" />
+              <Button variant="ghost" icon="lucide-more-horizontal" :active="open" />
             </template>
           </Dropdown>
         </div>
@@ -194,7 +194,7 @@ function rowOptions(member: Member) {
     return [
       {
         label: "Cancel invitation",
-        icon: "x-circle",
+        icon: "lucide-x-circle",
         onClick: () => props.onRemove?.(member),
       },
     ];
@@ -209,7 +209,7 @@ function rowOptions(member: Member) {
     },
     {
       label: "Remove from organization",
-      icon: "user-minus",
+      icon: "lucide-user-minus",
       onClick: () => props.onRemove?.(member),
     },
   ];

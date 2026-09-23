@@ -21,9 +21,9 @@
             <ViewIcon :icon="currentView.icon" />
           </template>
           <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
-              class="h-4 text-ink-gray-8"
+            <Icon
+              :icon="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
+              class="size-4 text-ink-gray-8"
             />
           </template>
         </Button>
@@ -38,16 +38,16 @@
           v-if="item.name"
           class="flex items-center justify-end gap-2 min-w-11"
         >
-          <FeatherIcon
+          <Icon
             v-if="item.name === currentView.name"
-            name="check"
+            icon="lucide-check"
             class="size-4 text-ink-gray-7"
           />
           <Dropdown side="right" align="start" :options="viewActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="ms-0 !size-4 rounded-sm [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
+                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop
@@ -61,9 +61,9 @@
 </template>
 
 <script setup lang="ts">
-// View icons come from the lucide sprite; the fixed chevron and check stay on FeatherIcon.
+// View icons come from the lucide sprite; the fixed chevron and check use Icon.
 import { h } from "vue";
-import { Button, Dropdown, FeatherIcon } from "frappe-ui";
+import { Button, Dropdown, Icon } from "frappe-ui";
 
 // A stored icon is usually an emoji, occasionally a name, often nothing.
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
@@ -79,7 +79,7 @@ const ViewIcon = (props: { icon?: string }) => {
       { class: `${ICON_CLASS} flex items-center justify-center leading-none` },
       icon
     );
-  // The sprite, not FeatherIcon: IconPicker writes lucide names and the sets barely overlap.
+  // The sprite, not Icon: a stored name may be one the mask plugin never saw at build time.
   // Sprite symbols carry only paths, so the svg has to supply lucide's stroke defaults.
   const name = (icon || DEFAULT_ICON).replace(/^lucide-/, "");
   return h(

@@ -1,10 +1,15 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { clone, parseJson } from '@app/utils'
 import { call, createListResource, toast } from 'frappe-ui'
+import { spritePlugin } from 'frappe-ui/experimental'
 import { parseOrderBy, serializeOrderBy } from '@framework/ui/SortBy'
 import { useSession } from '@app/stores/session'
 
 // Conditions are stored whole as `snapshot` hands them over: lossless, no doctype lookup.
+
+// ponytail: Studio dropped the lucide sprite, but view icons are any lucide name stored per
+// view, which build-time classes cannot cover. Move off it before frappe-ui removes it.
+if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 const DOCTYPE = 'HD Ticket'
 
@@ -208,7 +213,7 @@ function createViewsStore() {
     {
       group: 'Views',
       hideLabel: true,
-      items: [
+      options: [
         { label: DEFAULT_VIEW.label, icon: DEFAULT_VIEW.icon, onClick: () => open('') },
         // Legacy rows with a null label would render as a blank, unidentifiable row.
         ...views.value.map((v) => ({
@@ -222,10 +227,10 @@ function createViewsStore() {
     {
       group: 'Actions',
       hideLabel: true,
-      items: [
+      options: [
         {
           label: 'Save as new view',
-          icon: 'plus',
+          icon: 'lucide-plus',
           onClick: () =>
             (modal.value = { show: true, mode: 'create', label: '', icon: '' }),
         },
@@ -239,12 +244,12 @@ function createViewsStore() {
     return [
       {
         label: 'Save current layout',
-        icon: 'save',
+        icon: 'lucide-save',
         onClick: () => saveCurrentView(),
       },
       {
         label: 'Rename',
-        icon: 'edit-2',
+        icon: 'lucide-edit-2',
         onClick: () =>
           (modal.value = {
             show: true,
@@ -254,7 +259,7 @@ function createViewsStore() {
             name: item.name,
           }),
       },
-      { label: 'Delete', icon: 'trash-2', onClick: () => deleteView(item.name) },
+      { label: 'Delete', icon: 'lucide-trash-2', onClick: () => deleteView(item.name) },
     ]
   }
 

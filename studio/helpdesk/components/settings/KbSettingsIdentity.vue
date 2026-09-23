@@ -7,12 +7,12 @@
       <Tooltip
         v-if="editable"
         :hover-delay="0"
-        placement="bottom"
+        side="bottom"
         :text="uploadLabel"
       >
         <div
           class="absolute inset-0 cursor-pointer"
-          :class="shape === 'square' ? 'rounded-md' : 'rounded-full'"
+          :class="shape === 'square' ? 'rounded-5' : 'rounded-full'"
           @click="$emit('upload')"
         />
       </Tooltip>
@@ -21,7 +21,7 @@
         class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline outline-black/5 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2"
         @click.stop="$emit('remove')"
       >
-        <FeatherIcon name="x" class="size-3.5 text-ink-gray-4" />
+        <Icon icon="lucide-x" class="size-3.5 text-ink-gray-4" />
       </div>
     </div>
 
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Button, FeatherIcon, TextInput, Tooltip } from "frappe-ui";
+import { Avatar, Button, Icon, TextInput, Tooltip } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 // Lucide: feather's pencil is a different glyph.
 import LucideSquarePen from "~icons/lucide/square-pen";

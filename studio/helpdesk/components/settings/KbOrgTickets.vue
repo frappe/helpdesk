@@ -66,7 +66,7 @@ const ROW =
 
 // A ::before, so the fill reaches past the text without widening the row.
 const BODY_ROW =
-  "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-md before:content-[''] hover:before:bg-surface-gray-2";
+  "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-5 before:content-[''] hover:before:bg-surface-gray-2";
 
 const props = defineProps<{ customer?: string }>();
 const RECENT = 10;

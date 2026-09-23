@@ -10,8 +10,8 @@
         <Tooltip
           :text="step.fullDate"
           :disabled="!step.fullDate"
-          :hover-delay="0.2"
-          placement="left"
+          :hover-delay="200"
+          side="left"
         >
           <span :class="[DOT_BASE, DOT[step.state]]" />
         </Tooltip>
