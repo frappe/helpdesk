@@ -2428,6 +2428,20 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.db.get_value("HD Ticket", ticket.name, "status"), "Closed"
         )
 
+    def test_write_endpoints_echo_nothing_the_customer_cannot_read(self):
+        """The framework strips its reads, not its writes; the ticket strips
+        itself whenever it is serialised outside a save."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        echoed = client_set_value("HD Ticket", ticket.name, "status", "Closed")
+        self.assertEqual(echoed["status"], "Closed")
+        for fieldname in ("key", "agreement_status", "last_agent_response"):
+            self.assertNotIn(fieldname, echoed)
+
+        frappe.set_user(PERMS_AGENT)
+        echoed = client_set_value("HD Ticket", ticket.name, "status", "Open")
+        self.assertIn("agreement_status", echoed)
+
     def test_customer_cannot_tamper_via_run_doc_method(self):
         """run_doc_method builds the doc from the caller's payload and the save skips
         permissions, so only a check inside validate stops the tampered value."""

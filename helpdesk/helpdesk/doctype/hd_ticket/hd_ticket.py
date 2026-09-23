@@ -76,6 +76,17 @@ class HDTicket(Document):
     def autoname(self):
         return self.name
 
+    def as_dict(self, *args, **kwargs):
+        """Never echo a value the caller cannot read: the framework strips its
+        reads, not its writes. Rules, hooks, webhooks and mail templates that
+        run inside a save still get the whole document."""
+        data = super().as_dict(*args, **kwargs)
+        if (self.doctype, self.name) in frappe.flags.currently_saving:
+            return data
+        for fieldname in TicketFields().unreadable:
+            data.pop(fieldname, None)
+        return data
+
     def before_insert(self):
         self.generate_key()
         self.apply_portal_insert_rules()

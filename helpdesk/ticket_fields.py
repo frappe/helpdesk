@@ -30,7 +30,11 @@ class TicketFields:
 
     def __init__(self):
         self.meta = frappe.get_meta("HD Ticket")
-        self.rows = frappe.get_all(
+
+    @cached_property
+    def rows(self) -> list[frappe._dict]:
+        """The Default template's rows, read once and only when asked for."""
+        return frappe.get_all(
             "HD Ticket Template Field",
             filters={
                 "parent": DEFAULT_TICKET_TEMPLATE,
@@ -45,13 +49,19 @@ class TicketFields:
         return is_agent()
 
     @cached_property
-    def hidden(self) -> set[str]:
-        """Unreadable at the user's levels, or reserved for the other audience."""
-        unreadable = set(self.meta.get_valid_columns()) - set(
+    def unreadable(self) -> set[str]:
+        """Columns the user's permission levels withhold: the framework's own answer."""
+        return set(self.meta.get_valid_columns()) - set(
             get_permitted_fields("HD Ticket")
         )
+
+    @cached_property
+    def hidden(self) -> set[str]:
+        """Unreadable at the user's levels, or reserved for the other audience."""
         other = "Customers" if self.for_agent else "Agents"
-        hidden = unreadable | {r.fieldname for r in self.rows if r.visible_to == other}
+        hidden = self.unreadable | {
+            r.fieldname for r in self.rows if r.visible_to == other
+        }
         return hidden if self.for_agent else hidden | AGENT_WORKFLOW_FIELDS
 
     def strip(self, ticket: dict) -> dict:
