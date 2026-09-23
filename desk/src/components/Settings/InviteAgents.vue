@@ -45,7 +45,7 @@
           <li
             v-for="invite in pendingInvitesResource.data"
             :key="invite.name"
-            class="flex items-center justify-between px-3 py-1 rounded-lg bg-surface-gray-2"
+            class="flex items-center justify-between px-3 py-1 rounded-6 bg-surface-gray-2"
           >
             <div class="text-base">
               <span class="text-ink-gray-8">
@@ -116,7 +116,7 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, ref } from "vue";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 
@@ -124,7 +124,7 @@ const authStore = useAuthStore();
 const { isAdmin, isManager } = authStore;
 
 // @ts-expect-error
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const emails = ref("");
 
@@ -215,7 +215,7 @@ const inviteByEmailResource = createResource({
     resetInputValues();
     handleInviteUserSuccess(data);
     pendingInvitesResource.reload();
-    updateOnboardingStep("invite_your_team");
+    updateOnboardingStep?.("invite_your_team");
     capture("agents_invited", {
       data: {
         role: role.value,

@@ -35,7 +35,7 @@ function routeForSearchItem(item: SearchItem) {
     return { name: "TicketAgent", params: { ticketId } };
   }
   const prefix =
-    item.doctype === "HD Ticket Comment" ? "comment" : "communication";
+    item.doctype === "Comment" ? "comment" : "communication";
   return {
     name: "TicketAgent",
     params: { ticketId },

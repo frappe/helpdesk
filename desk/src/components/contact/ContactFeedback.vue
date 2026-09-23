@@ -2,7 +2,7 @@
   <div>
     <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-16">
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
 
     <!-- Empty -->

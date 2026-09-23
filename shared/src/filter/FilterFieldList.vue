@@ -31,7 +31,7 @@
         role="option"
         :aria-selected="index === activeIndex"
         :class="[
-          'flex h-8 w-full items-center gap-2 rounded px-2 text-base text-ink-gray-8',
+          'flex h-8 w-full items-center gap-2 rounded-4 px-2 text-base text-ink-gray-8',
           index === activeIndex ? 'bg-surface-gray-2' : '',
         ]"
         @mousemove="activeIndex = index"
@@ -122,6 +122,6 @@ watch(activeIndex, (index) => {
 onMounted(() => {
   // preventScroll: the panel mounts mid-swipe, still translated; a default
   // focus would scroll it into view and visually cancel the slide
-  nextTick(() => searchInput.value?.el?.focus({ preventScroll: true }));
+  nextTick(() => searchInput.value?.focus({ preventScroll: true }));
 });
 </script>

@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Manage general settings of your app.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("General") }}
         </h1>
         <UnsavedBadge :show="isDirty" />

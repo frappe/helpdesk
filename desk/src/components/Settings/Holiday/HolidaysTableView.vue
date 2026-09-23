@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border px-2 border-outline-gray-2 text-sm">
+  <div class="rounded-5 border px-2 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 px-4 items-center gap-2"
       :style="{
@@ -37,12 +37,12 @@
           </div>
         </div>
         <div class="flex justify-end">
-          <Dropdown placement="right" :options="dropdownOptions(holiday)">
-            <Button
-              icon="lucide-more-horizontal"
-              variant="ghost"
-              @click="isConfirmingDelete = false"
-            />
+          <Dropdown
+            align="end"
+            :options="dropdownOptions(holiday)"
+            @update:open="(open) => open && (isConfirmingDelete = false)"
+          >
+            <Button icon="lucide-more-horizontal" variant="ghost" />
           </Dropdown>
         </div>
       </div>

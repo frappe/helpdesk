@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import frappe
+from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.utils import add_to_date, getdate
 
@@ -391,18 +392,20 @@ def add_comment(
     save: bool = True,
 ):
     """
-    Creates a test HD Ticket Comment for a given ticket.
+    Creates a test agent comment (core Comment) for a given ticket.
     """
     comment = frappe.get_doc(
         {
-            "doctype": "HD Ticket Comment",
-            "reference_ticket": ticket,
+            "doctype": "Comment",
+            "comment_type": "Comment",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
             "content": content,
-            "comment_by": comment_by,
+            "comment_email": comment_by,
         }
     )
     if save:
-        return comment.insert()
+        return comment.insert(ignore_permissions=True)
     return comment
 
 
@@ -573,6 +576,12 @@ def make_team(team_name, members=[], disabled=False):
     if not members:
         members = [make_agent("default_team_agent@example.com")]
 
+    # The team's auto-created Assignment Rule lands in the cached doctype map,
+    # which a test rollback cannot undo; re-sync the cache when that happens.
+    frappe.db.after_rollback.add(
+        lambda: clear_doctype_map("Assignment Rule", "HD Ticket")
+    )
+
     if frappe.db.exists("HD Team", team_name):
         team = frappe.get_doc("HD Team", team_name)
         team.disabled = disabled
@@ -612,3 +621,26 @@ def upload_test_file(file_name: str) -> str:
         }
     ).insert(ignore_permissions=True)
     return file_doc.name
+
+
+def make_notification_log(name: str, ticket: str, user: str, **values) -> None:
+    """Write a Notification Log row straight to the table under a fixed name.
+
+    Inserted rather than raised through the real producers so a test can state
+    the exact type, app and read flag it needs.
+    """
+    frappe.db.delete("Notification Log", {"name": name})
+    doc = frappe.new_doc("Notification Log")
+    doc.name = name
+    doc.update(
+        {
+            "for_user": user,
+            "from_user": user,
+            "document_type": "HD Ticket",
+            "document_name": ticket,
+            "subject": "seeded notification",
+            "read": 0,
+            **values,
+        }
+    )
+    doc.db_insert()

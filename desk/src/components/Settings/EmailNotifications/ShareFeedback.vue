@@ -15,16 +15,17 @@
   >
     <template #formFields>
       <FormControl
-        type="autocomplete"
+        type="combobox"
         size="sm"
         :label="__('On ticket status')"
         :options="statusOptions"
         :required="true"
-        :model-value="ticketStatus"
+        :model-value="ticketStatus?.value ?? null"
         @update:model-value="
-          (val) => {
-            ticketStatus = val;
-            compRef.setUnsavedChanges();
+          (value) => {
+            ticketStatus =
+              statusOptions.find((option) => option.value === value) ?? null;
+            compRef.markUnsavedChanges();
           }
         "
       />

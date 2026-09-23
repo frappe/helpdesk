@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-md bg-surface-base border border-outline-gray-1 px-3 py-2.5 flex flex-col gap-2.5 hover:border-outline-gray-3 hover:cursor-pointer"
+    class="rounded-5 bg-surface-base border border-outline-gray-1 px-3 py-2.5 flex flex-col gap-2.5 hover:border-outline-gray-3 hover:cursor-pointer"
     @click="goToContact"
   >
     <div class="flex items-center justify-between">
@@ -20,17 +20,13 @@
         <Tooltip
           v-if="contact.is_manager"
           :text="__('Can view tickets raised by all contacts of the customer.')"
-          placement="top"
+          side="top"
         >
           <Badge :label="__('Manager')" theme="green" variant="outline" />
         </Tooltip>
       </div>
       <div class="flex gap-1">
-        <Tooltip
-          v-if="contact.is_primary"
-          :text="__('Primary')"
-          placement="top"
-        >
+        <Tooltip v-if="contact.is_primary" :text="__('Primary')" side="top">
           <span
             class="flex h-6 w-6 items-center justify-center text-ink-amber-5"
             :aria-label="__('Primary')"
@@ -38,11 +34,7 @@
             <LucideStar class="size-4 fill-ink-amber-5" />
           </span>
         </Tooltip>
-        <Dropdown
-          v-if="hasPermission()"
-          placement="right"
-          :options="dropdownOptions"
-        >
+        <Dropdown v-if="hasPermission()" align="end" :options="dropdownOptions">
           <Button
             class="h-6 w-6 p-0 min-w-fit shrink-0"
             variant="ghost"
@@ -154,7 +146,7 @@ const dropdownOptions = computed(() => {
   if (!props.contact.is_primary) {
     primaryActions.push({
       label: __("Set as Primary"),
-      icon: "star",
+      icon: "lucide-star",
       onClick: () => {
         updatePrimaryContact();
       },
@@ -163,11 +155,11 @@ const dropdownOptions = computed(() => {
   const roleActions = [
     {
       label: __("Role"),
-      icon: "briefcase",
+      icon: "lucide-briefcase",
       submenu: [
         {
           label: __("Customer"),
-          icon: props.contact.is_manager ? undefined : "check",
+          icon: props.contact.is_manager ? undefined : "lucide-check",
           onClick: () => {
             if (!props.contact.is_manager) return;
             updateManagerRole(0);
@@ -175,7 +167,7 @@ const dropdownOptions = computed(() => {
         },
         {
           label: __("Customer Manager"),
-          icon: props.contact.is_manager ? "check" : undefined,
+          icon: props.contact.is_manager ? "lucide-check" : undefined,
           onClick: () => {
             if (props.contact.is_manager) return;
             updateManagerRole(1);
@@ -188,7 +180,7 @@ const dropdownOptions = computed(() => {
   const destructiveActions = [
     {
       label: __("Remove Contact"),
-      icon: "x",
+      icon: "lucide-x",
       theme: "red" as const,
       onClick: () => {
         removeContact();
@@ -198,7 +190,7 @@ const dropdownOptions = computed(() => {
   const deleteActionGroup = {
     group: "",
     hideLabel: true,
-    items: destructiveActions,
+    options: destructiveActions,
   };
 
   if (props.contact.is_primary) {
@@ -209,7 +201,7 @@ const dropdownOptions = computed(() => {
     {
       group: "",
       hideLabel: true,
-      items: [...primaryActions, ...roleActions],
+      options: [...primaryActions, ...roleActions],
     },
     deleteActionGroup,
   ];

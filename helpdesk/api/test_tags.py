@@ -102,8 +102,13 @@ class TestTicketTags(FrappeTestCase):
         # a claim is bookkeeping, not a change: no activity logged
         self.assertFalse(
             frappe.db.exists(
-                "HD Ticket Activity",
-                {"ticket": self.ticket.name, "action": ["like", "%desk-minted%"]},
+                "Comment",
+                {
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": self.ticket.name,
+                    "comment_type": "Info",
+                    "content": ["like", "%desk-minted%"],
+                },
             )
         )
 
@@ -125,13 +130,15 @@ class TestTicketTags(FrappeTestCase):
         self.assertEqual(frappe.db.get_value("Tag", "batch-new", "color"), "Blue")
         self.assertEqual(frappe.db.get_value("Tag", "batch-plain", "color"), "Gray")
 
-        # one activity for the whole batch
+        # one Info comment for the whole batch (content is HTML-sanitized on save)
         self.assertTrue(
             frappe.db.exists(
-                "HD Ticket Activity",
+                "Comment",
                 {
-                    "ticket": self.ticket.name,
-                    "action": "added tags batch-new, batch-plain & removed tag batch-old",
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": self.ticket.name,
+                    "comment_type": "Info",
+                    "content": "added tags batch-new, batch-plain &amp; removed tag batch-old",
                 },
             )
         )

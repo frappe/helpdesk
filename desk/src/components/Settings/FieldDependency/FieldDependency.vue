@@ -8,7 +8,11 @@
       <div class="flex gap-4">
         <!-- Switch -->
         <div class="flex gap-2 items-center">
-          <Switch v-model="state.enabled" class="!w-fit" />
+          <Switch
+            class="!w-fit"
+            :model-value="Boolean(state.enabled)"
+            @update:model-value="(value) => (state.enabled = value)"
+          />
           <span class="text-p-base text-ink-gray-6">
             {{ __("Enabled") }}
           </span>

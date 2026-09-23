@@ -74,10 +74,8 @@ watch(holidaySearchRef, (newValue) => {
   holidayList.filters = {
     name: ["like", `%${newValue}%`],
   };
-  if (!newValue) {
-    holidayList.start = 0;
-    holidayList.pageLength = 10;
-  }
+  // no pager on this list, so a shrunken pageLength would hide the rest for good
+  if (!newValue) holidayList.start = 0;
   holidayList.reload();
 });
 </script>

@@ -1,6 +1,6 @@
 <template>
-  <NestedPopover>
-    <template #target>
+  <Popover bare :offset="8">
+    <template #trigger>
       <Button :label="__('Columns')">
         <template v-if="hideLabel" #icon>
           <ColumnsIcon class="h-4" />
@@ -10,9 +10,9 @@
         </template>
       </Button>
     </template>
-    <template #body="{ close }">
+    <template #default="{ close }">
       <div
-        class="my-2 p-1.5 min-w-40 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="p-1.5 min-w-40 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       >
         <div v-if="!edit">
           <Draggable
@@ -24,7 +24,7 @@
           >
             <template #item="{ element }">
               <div
-                class="flex cursor-grab items-center justify-between gap-6 rounded px-2 py-1.5 text-base text-ink-gray-8 hover:bg-surface-gray-2"
+                class="flex cursor-grab items-center justify-between gap-6 rounded-4 px-2 py-1.5 text-base text-ink-gray-8 hover:bg-surface-gray-2"
               >
                 <div class="flex items-center gap-2">
                   <DragIcon class="h-3.5" />
@@ -46,7 +46,7 @@
                     @click="removeColumn(element)"
                   >
                     <template #icon>
-                      <LucideX class="h-3.5" />
+                      <LucideX class="size-3.5" />
                     </template>
                   </Button>
                 </div>
@@ -56,24 +56,24 @@
           <div
             class="mt-1.5 flex flex-col gap-1 border-t border-outline-elevation-2 pt-1.5"
           >
-            <Autocomplete
-              value=""
+            <Combobox
+              :model-value="null"
               :options="fields"
-              @change="(e) => addColumn(e)"
+              align="end"
+              @update:selected-option="(option) => option && addColumn(option)"
             >
-              <template #target="{ togglePopover }">
+              <template #trigger>
                 <Button
                   class="w-full !justify-start !text-ink-gray-5"
                   variant="ghost"
-                  @click="togglePopover()"
                   :label="__('Add Column')"
                 >
                   <template #prefix>
-                    <FeatherIcon name="plus" class="h-4" />
+                    <LucidePlus class="size-4" />
                   </template>
                 </Button>
               </template>
-            </Autocomplete>
+            </Combobox>
             <!-- <Button
               v-if="columnsUpdated"
               class="w-full !justify-start !text-ink-gray-5"
@@ -100,7 +100,7 @@
         </div>
         <div v-else>
           <div
-            class="flex flex-col items-center justify-between gap-2 rounded px-2 py-1.5 text-base text-ink-gray-8"
+            class="flex flex-col items-center justify-between gap-2 rounded-4 px-2 py-1.5 text-base text-ink-gray-8"
           >
             <div class="flex flex-col items-center gap-3">
               <FormControl
@@ -140,21 +140,20 @@
         </div>
       </div>
     </template>
-  </NestedPopover>
+  </Popover>
 </template>
 
 <script setup>
-import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
+import LucidePlus from "~icons/lucide/plus";
 import {
   ColumnsIcon,
   DragIcon,
   EditIcon,
   ReloadIcon,
 } from "@/components/icons";
-import NestedPopover from "@/components/NestedPopover.vue";
 import { isTouchScreenDevice } from "@/utils";
 import { watchOnce } from "@vueuse/core";
-import { Button, FormControl } from "frappe-ui";
+import { Button, Combobox, FormControl, Popover } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import Draggable from "vuedraggable";
 
@@ -217,12 +216,15 @@ const fields = computed(() => {
 });
 
 function addColumn(c) {
-  let align = ["Float", "Int", "Percent", "Currency"].includes(c.type)
+  // Combobox normalisation overwrites the option's `type` with "option", so
+  // read the real fieldtype back from the source list.
+  const type = list.data?.fields?.find((f) => f.value === c.value)?.type;
+  let align = ["Float", "Int", "Percent", "Currency"].includes(type)
     ? "right"
     : "left";
   let _column = {
     label: c.label,
-    type: c.type,
+    type,
     key: c.value,
     width: "10rem",
     align,

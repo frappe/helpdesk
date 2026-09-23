@@ -6,12 +6,18 @@
   >
     <template #header-actions>
       <div class="flex gap-4 items-center">
-        <div
-          class="flex items-center justify-between gap-2 cursor-pointer"
-          @click="toggleEnabled"
-        >
-          <Switch size="sm" v-model="slaData.enabled" />
-          <span class="text-sm-medium text-ink-gray-7">
+        <div class="flex items-center justify-between gap-2">
+          <Switch
+            size="sm"
+            :model-value="Boolean(slaData.enabled)"
+            @update:model-value="(value) => (slaData.enabled = value)"
+          />
+          <!-- on the label only: on the wrapper it would undo the switch's
+               own toggle -->
+          <span
+            class="cursor-pointer text-sm-medium text-ink-gray-7"
+            @click="toggleEnabled"
+          >
             {{ __("Enabled") }}
           </span>
         </div>
@@ -54,7 +60,7 @@
               />
             </div>
             <div class="space-y-1.5" v-if="!slaData.default_sla">
-              <FormLabel :label="__('Rank')" for="rank" size="md" />
+              <FormLabel :label="__('Rank')" for="rank" />
               <FormControl
                 id="rank"
                 type="number"
@@ -83,7 +89,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">{{
+            <span class="text-md-semibold text-ink-gray-8">{{
               __("Assignment Conditions")
             }}</span>
             <span class="text-p-sm text-ink-gray-6">
@@ -101,28 +107,28 @@
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
               >
-                <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
-                  <template #target>
+                <HoverCard :hoverDelay="0.25" side="top" align="end">
+                  <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default"
                     >
                       {{ __("Old Conditions") }}
-                      <FeatherIcon name="info" class="size-4" />
+                      <LucideInfo class="size-4" />
                     </div>
                   </template>
-                  <template #body-main>
+                  <template #default>
                     <div
-                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                      class="text-sm text-ink-gray-6 p-2 bg-surface-base rounded-5 max-w-96 text-wrap whitespace-pre-wrap leading-5"
                     >
                       <code>{{ slaData.condition }}</code>
                     </div>
                   </template>
-                </Popover>
+                </HoverCard>
               </div>
             </div>
             <div class="mt-5" v-if="!slaData.default_sla">
               <div
-                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-md p-3 py-4"
+                class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-outline-gray-2 rounded-5 p-3 py-4"
                 v-if="!useNewUI"
               >
                 <span class="text-p-sm">
@@ -149,7 +155,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Valid From") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -158,7 +164,7 @@
           </div>
           <div class="mt-3.5 flex gap-5 flex-col md:flex-row">
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('From date')" for="from_date" size="md" />
+              <FormLabel :label="__('From date')" for="from_date" />
               <DatePicker
                 v-model="slaData.start_date"
                 variant="subtle"
@@ -175,7 +181,7 @@
               <ErrorMessage :message="slaDataErrors.start_date" />
             </div>
             <div class="w-full space-y-1.5">
-              <FormLabel :label="__('To date')" for="to_date" size="md" />
+              <FormLabel :label="__('To date')" for="to_date" />
               <DatePicker
                 v-model="slaData.end_date"
                 variant="subtle"
@@ -196,7 +202,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Response and Resolution") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -244,7 +250,7 @@
         <hr class="my-8" />
         <div>
           <div class="flex flex-col gap-1">
-            <span class="text-lg-semibold text-ink-gray-8">
+            <span class="text-md-semibold text-ink-gray-8">
               {{ __("Status Details") }}
             </span>
             <span class="text-p-sm text-ink-gray-6">
@@ -274,6 +280,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideInfo from "~icons/lucide/info";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
   resetSlaDataErrors,
@@ -291,8 +298,8 @@ import {
   DatePicker,
   ErrorMessage,
   FormLabel,
+  HoverCard,
   LoadingIndicator,
-  Popover,
   Switch,
   toast,
 } from "frappe-ui";
@@ -302,13 +309,13 @@ import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { SlaPolicyListResourceSymbol } from "@/types";
 import { HDServiceLevelAgreement } from "@/types/doctypes";
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const showConfirmDialog = ref({
   show: false,
@@ -429,12 +436,8 @@ const saveSla = () => {
 };
 
 const createSla = () => {
-  const defaultTicketStatus = slaData.value.default_ticket_status
-    ? slaData.value.default_ticket_status?.value
-    : null;
-  const ticketReopenStatus = slaData.value.reopen_ticket_status
-    ? slaData.value.reopen_ticket_status?.value
-    : null;
+  const defaultTicketStatus = slaData.value.default_ticket_status || null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status || null;
   slaPolicyList?.insert.submit(
     {
       ...slaData.value,
@@ -455,19 +458,15 @@ const createSla = () => {
           doctype: "HD Service Level Agreement",
           name: data.name,
         });
-        updateOnboardingStep("setup_sla", true);
+        updateOnboardingStep?.("setup_sla", true);
       },
     }
   );
 };
 
 const updateSla = () => {
-  const defaultTicketStatus = slaData.value.default_ticket_status
-    ? slaData.value.default_ticket_status?.value
-    : null;
-  const ticketReopenStatus = slaData.value.reopen_ticket_status
-    ? slaData.value.reopen_ticket_status?.value
-    : null;
+  const defaultTicketStatus = slaData.value.default_ticket_status || null;
+  const ticketReopenStatus = slaData.value.reopen_ticket_status || null;
   slaPolicyList?.setValue.submit(
     {
       ...slaData.value,

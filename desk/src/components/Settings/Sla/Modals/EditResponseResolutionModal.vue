@@ -13,12 +13,11 @@
           required
         />
         <div>
-          <FormLabel label="Response time" required size="md" />
-          <Popover class="mt-2">
-            <template #target="{ togglePopover }" class="w-max">
+          <FormLabel label="Response time" required />
+          <Popover bare>
+            <template #trigger>
               <div
-                @click="togglePopover()"
-                class="w-full bg-surface-gray-2 rounded p-1.5 px-2 text-base text-ink-gray-8"
+                class="mt-2 w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.response_time">
                   {{ formatTimeHMS(priorityData.response_time) }}
@@ -26,7 +25,7 @@
                 <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
-            <template #body>
+            <template #default>
               <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.response_time"
@@ -37,12 +36,11 @@
           </Popover>
         </div>
         <div>
-          <FormLabel label="Resolution time" required size="md" />
-          <Popover class="mt-2">
-            <template #target="{ togglePopover }" class="w-max">
+          <FormLabel label="Resolution time" required />
+          <Popover bare>
+            <template #trigger>
               <div
-                @click="togglePopover()"
-                class="w-full bg-surface-gray-2 rounded p-1.5 px-2 text-base text-ink-gray-8"
+                class="mt-2 w-full bg-surface-gray-2 rounded-4 p-1.5 px-2 text-base text-ink-gray-8"
               >
                 <div v-if="priorityData.resolution_time">
                   {{ formatTimeHMS(priorityData.resolution_time) }}
@@ -50,7 +48,7 @@
                 <div v-else class="text-ink-gray-4">Select time</div>
               </div>
             </template>
-            <template #body>
+            <template #default>
               <div class="absolute bg-surface-base top-2">
                 <DurationPicker
                   v-model="priorityData.resolution_time"

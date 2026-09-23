@@ -1,7 +1,7 @@
 <template>
   <span
     v-if="priority"
-    class="flex items-center gap-2"
+    class="flex min-w-0 items-center gap-2"
     :class="{ 'me-1': iconOnly }"
   >
     <span class="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
@@ -56,7 +56,9 @@
         />
       </svg>
     </span>
-    <span v-if="!iconOnly" class="truncate">{{ priority }}</span>
+    <span v-if="!iconOnly" :title="priority" class="truncate">{{
+      priority
+    }}</span>
   </span>
 </template>
 

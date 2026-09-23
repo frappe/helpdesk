@@ -9,7 +9,6 @@
             v-model:attachments="attachments"
             :show-signature="true"
             :show-attachments="true"
-            :type="'Email'"
             :placeholder="__('Write your reply...')"
             :min-height="'min-h-[200px]'"
             :max-height="'max-h-[300px]'"
@@ -73,10 +72,10 @@ function clearDraft() {
   editorRef.value?.reset();
 }
 
-async function handleFileUpload(file: File) {
+async function handleFileUpload(file: File, options?: any) {
   const uploads = await Promise.all(
     Array.from(props.selections).map((ticketId) =>
-      uploadFunction(file, "HD Ticket", ticketId)
+      uploadFunction(file, "HD Ticket", ticketId, true, options)
     )
   );
 

@@ -75,7 +75,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
-import { call, SidebarItem, toast, useTheme } from "frappe-ui";
+import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   HelpModal,
@@ -84,7 +84,7 @@ import {
   showHelpModal,
   TrialBanner,
   useOnboarding,
-} from "frappe-ui/frappe";
+} from "@framework/ui";
 
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
@@ -119,12 +119,12 @@ const authStore = useAuthStore();
 const configStore = useConfigStore();
 
 const { appsMenuOption } = useApps();
-const { currentTheme, toggleTheme } = useTheme();
+const { colorScheme, toggleColorScheme } = useColorScheme();
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
-  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
-  onClick: () => toggleTheme(),
+  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
+  onClick: () => toggleColorScheme(),
 }));
 
 const isFCSite = ref(window.is_fc_site);
@@ -134,7 +134,7 @@ const customerPortalDropdown = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Log out"),
         icon: "lucide-log-out",
@@ -180,7 +180,7 @@ const agentPortalDropdown = computed(() => [
   {
     group: __("Danger"),
     hideLabel: true,
-    items: [
+    options: [
       {
         label: __("Log out"),
         icon: "lucide-log-out",
@@ -215,7 +215,7 @@ const showPermissionNoticeBanner = computed(() => {
 const showOnboardingBanner = computed(() => {
   return (
     !isCustomerPortal.value &&
-    !isOnboardingStepsCompleted.value &&
+    !isOnboardingStepsCompleted?.value &&
     authStore.isManager
   );
 });
@@ -346,7 +346,7 @@ const steps = [
     icon: markRaw(Globe),
     onClick: () => {
       window.open(CUSTOMER_PORTAL_ROOT, "_blank");
-      updateOnboardingStep("explore_customer_portal");
+      updateOnboardingStep?.("explore_customer_portal");
       minimize.value = true;
     },
   },
@@ -433,14 +433,14 @@ const showIntermediateModal = ref(false);
 const currentStep = ref({});
 
 const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
-  useOnboarding("helpdesk");
+  useOnboarding("helpdesk") ?? {};
 
 async function handleFirstTicketNavigation() {
   const ticket = await getFirstTicket();
 
   if (!ticket) {
     router.push({ name: "TicketAgentNew" });
-    updateOnboardingStep("create_first_ticket", false); // reset the step as first ticket is not created
+    updateOnboardingStep?.("create_first_ticket", false); // reset the step as first ticket is not created
     toast.error(
       __("Please create a new ticket to proceed with the next step.")
     );
@@ -480,7 +480,7 @@ async function getGeneralCategory() {
 
 function setUpOnboarding() {
   if (!authStore.isManager) return;
-  setUp(steps);
+  setUp?.(steps);
   useShortcut({ key: "h", meta: true }, () => {
     showHelpModal.value = !showHelpModal.value;
   });

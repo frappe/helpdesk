@@ -6,10 +6,10 @@
     variant="subtle"
     @update:model-value="agentStatusStore.setMyStatus"
   >
-    <template #item-prefix="{ option }">
+    <template #item-prefix="{ item }">
       <div
         class="size-2 rounded-full flex-shrink-0"
-        :class="agentStatusStore.statusColor(option.value)"
+        :class="agentStatusStore.statusColor(item.value)"
       />
     </template>
   </Select>

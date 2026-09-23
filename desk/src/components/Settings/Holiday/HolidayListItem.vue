@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded"
+    class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded-4"
   >
     <div
       class="w-full ps-2 flex flex-col justify-center h-14"
@@ -16,12 +16,12 @@
     </div>
     <div class="flex justify-between items-center pe-2">
       <div>
-        <Dropdown placement="right" :options="dropdownOptions">
-          <Button
-            icon="lucide-more-horizontal"
-            variant="ghost"
-            @click="isConfirmingDelete = false"
-          />
+        <Dropdown
+          align="end"
+          :options="dropdownOptions"
+          @update:open="(open) => open && (isConfirmingDelete = false)"
+        >
+          <Button icon="lucide-more-horizontal" variant="ghost" />
         </Dropdown>
       </div>
     </div>

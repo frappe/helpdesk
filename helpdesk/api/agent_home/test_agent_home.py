@@ -600,8 +600,9 @@ class TestAgentHome(FrappeTestCase):
             self.assertIn("Pending for", t["reason"]["text"])
 
     def test_get_recent_activity_latest_per_ticket(self):
-        """One row per ticket showing its most recent action; SLA changes are
-        filtered out, and updated rows carry the capitalized action text."""
+        """One row per ticket showing its most recent action; other users'
+        changes are excluded, and updated rows carry the capitalized text
+        derived from the Version row."""
         ticket = self._create_ticket(subject="Recent Activity Ticket")
 
         frappe.get_doc(
@@ -615,29 +616,27 @@ class TestAgentHome(FrappeTestCase):
 
         frappe.get_doc(
             {
-                "doctype": "HD Ticket Comment",
-                "reference_ticket": ticket.name,
-                "commented_by": agent_email,
+                "doctype": "Comment",
+                "comment_type": "Comment",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "comment_email": agent_email,
                 "content": "Looking into this",
             }
         ).insert(ignore_permissions=True)
 
-        frappe.get_doc(
-            {
-                "doctype": "HD Ticket Activity",
-                "ticket": ticket.name,
-                "action": "set status to Resolved",
-            }
-        ).insert(ignore_permissions=True)
+        frappe.set_user(agent_email)
+        ticket.reload()
+        ticket.status = "Resolved"
+        # test-mode saves skip Version creation unless asked
+        ticket.save(ignore_version=False)
 
-        # Inserted last (newest) but must be excluded, so it cannot win the row.
-        frappe.get_doc(
-            {
-                "doctype": "HD Ticket Activity",
-                "ticket": ticket.name,
-                "action": "set SLA to Default",
-            }
-        ).insert(ignore_permissions=True)
+        # Newest change, but by another user, so it cannot win the row.
+        frappe.set_user("Administrator")
+        ticket.reload()
+        ticket.priority = "High"
+        ticket.save(ignore_version=False)
+        frappe.set_user(agent_email)
 
         rows = [r for r in get_recent_activity() if r["name"] == ticket.name]
 
@@ -651,9 +650,11 @@ class TestAgentHome(FrappeTestCase):
         other = self._create_ticket(subject="Quietly commented ticket")
         frappe.get_doc(
             {
-                "doctype": "HD Ticket Comment",
-                "reference_ticket": other.name,
-                "commented_by": agent_email,
+                "doctype": "Comment",
+                "comment_type": "Comment",
+                "reference_doctype": "HD Ticket",
+                "reference_name": other.name,
+                "comment_email": agent_email,
                 "content": "single note",
             }
         ).insert(ignore_permissions=True)
@@ -662,9 +663,11 @@ class TestAgentHome(FrappeTestCase):
         for i in range(RECENT_ACTIVITY_LIMIT + 5):
             frappe.get_doc(
                 {
-                    "doctype": "HD Ticket Comment",
-                    "reference_ticket": busy.name,
-                    "commented_by": agent_email,
+                    "doctype": "Comment",
+                    "comment_type": "Comment",
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": busy.name,
+                    "comment_email": agent_email,
                     "content": f"note {i}",
                 }
             ).insert(ignore_permissions=True)

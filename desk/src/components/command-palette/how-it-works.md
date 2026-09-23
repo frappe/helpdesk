@@ -98,9 +98,9 @@ Defined in `commands.ts:130`:
   id: "toggle-theme",
   title: __("Toggle theme"),
   group: GROUP.account,
-  icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
+  icon: colorScheme.value === "dark" ? LucideSun : LucideMoon,
   keywords: "dark light appearance",
-  perform: () => toggleTheme(),
+  perform: () => toggleColorScheme(),
 }
 ```
 

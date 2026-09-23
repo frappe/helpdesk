@@ -1,5 +1,5 @@
 <template>
-  <div v-if="ticket.doc?.name" class="flex-1">
+  <div v-if="ticket.doc?.name && feedReady" :key="ticketId" class="flex-1">
     <TicketHeader :viewers="viewers" />
     <div class="h-full flex overflow-hidden">
       <div class="flex-1 flex flex-col overflow-hidden">
@@ -18,10 +18,10 @@
     />
   </div>
   <div
-    v-else-if="!ticket.doc && !ticket.get?.error"
+    v-else-if="ticket.doc?.name || (!ticket.doc && !ticket.get?.error)"
     class="grid h-full place-items-center"
   >
-    <LoadingIndicator class="w-6 text-ink-gray-4" />
+    <LoadingIndicator class="size-6 text-ink-gray-4" />
   </div>
 
   <div v-else class="grid h-full place-items-center px-4 py-20 text-center">
@@ -29,7 +29,7 @@
       <div class="flex justify-center items-center mx-auto">
         <TicketIcon class="size-10 text-ink-gray-4" />
       </div>
-      <div class="text-lg-medium text-ink-gray-8">
+      <div class="text-md-medium text-ink-gray-8">
         {{ __("Ticket not found") }}
       </div>
       <div class="text-center text-p-base text-ink-gray-6 mt-1">
@@ -38,9 +38,7 @@
         }}
       </div>
       <Button :route="{ name: 'TicketsAgent' }" variant="subtle">
-        <template #prefix
-          ><FeatherIcon name="arrow-left" class="size-4"
-        /></template>
+        <template #prefix><LucideArrowLeft class="size-4" /></template>
         {{ __("Back to Tickets") }}
       </Button>
     </div>
@@ -48,9 +46,12 @@
 </template>
 
 <script setup lang="ts">
+import LucideArrowLeft from "~icons/lucide/arrow-left";
 import { recordTicketVisit } from "@/components/command-palette/recentTickets";
 import TicketIcon from "@/components/icons/TicketIcon.vue";
 import TicketActivityPanel from "@/components/ticket-agent/TicketActivityPanel.vue";
+import { SHARED_VISIBLE_TYPES } from "@/components/ticket-agent/timeline/TicketTimeline.vue";
+import { useActivityTimeline } from "@framework/ui/ActivityTimeline";
 import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
@@ -67,7 +68,6 @@ import {
 import { globalStore } from "@/stores/globalStore";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
-  ActivitiesSymbol,
   AssigneeSymbol,
   Customizations,
   CustomizationSymbol,
@@ -98,6 +98,16 @@ const props = defineProps({
 const route = useRoute();
 const showPhoneModal = ref(false);
 
+// Started here, not in the timeline, so it runs alongside the doc fetch and both
+// sit behind one spinner. Every tab shares this one store.
+const { loading: feedLoading } = useActivityTimeline(
+  "HD Ticket",
+  props.ticketId,
+  SHARED_VISIBLE_TYPES
+);
+// latched: a doc_update reloads the feed, and that must not blank the page
+const feedReady = ref(false);
+
 useTicketNavigation();
 
 const ticketComposable = computed(() => useTicket(props.ticketId));
@@ -125,10 +135,6 @@ provide(
 provide(
   RecentSimilarTicketsSymbol,
   computed(() => ticketComposable.value.recentSimilarTickets)
-);
-provide(
-  ActivitiesSymbol,
-  computed(() => ticketComposable.value.activities)
 );
 provide("makeCall", () => {
   if (
@@ -171,6 +177,15 @@ watch(
   { immediate: true }
 );
 
+// immediate so a store fetched earlier in the session opens the gate right away
+watch(
+  feedLoading,
+  (loading) => {
+    if (!loading) feedReady.value = true;
+  },
+  { immediate: true }
+);
+
 // Feeds the command palette's "Recent" list, which is what an empty Cmd+K shows.
 watch(
   () => ticket.value?.doc?.subject,
@@ -206,12 +221,6 @@ onMounted(() => {
     }
   });
 
-  $socket.on("helpdesk:ticket-comment", (data: { ticket_id: string }) => {
-    if (data.ticket_id == props.ticketId) {
-      ticketComposable.value.activities.reload();
-    }
-  });
-
   $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
     if (data.ticket_id == props.ticketId) {
       reloadTicket(props.ticketId);
@@ -225,7 +234,6 @@ onBeforeUnmount(() => {
   showCommentBox.value = false;
 
   $socket.off("ticket_update");
-  $socket.off("helpdesk:ticket-comment");
   $socket.off("helpdesk:ticket-update");
 });
 usePageMeta(() => {

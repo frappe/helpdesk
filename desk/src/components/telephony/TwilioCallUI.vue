@@ -2,7 +2,7 @@
   <div v-show="showCallPopup" v-bind="$attrs">
     <div
       ref="callPopup"
-      class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-lg bg-surface-gray-10 p-4 !text-ink-gray-2 shadow-2xl"
+      class="fixed z-20 flex w-60 cursor-move select-none flex-col rounded-6 bg-surface-gray-10 p-4 !text-ink-gray-2 shadow-2xl"
       :style="style"
     >
       <div class="flex flex-row-reverse items-center gap-1">
@@ -19,7 +19,7 @@
           :class="onCall || calling ? '' : 'pulse'"
         />
         <div class="flex flex-col items-center justify-center gap-1">
-          <div class="text-2xl-medium">
+          <div class="text-xl-medium">
             {{ contact?.full_name ?? "Unknown" }}
           </div>
           <div class="text-sm text-ink-gray-5">
@@ -64,7 +64,7 @@
             theme="red"
             :label="'Cancel'"
             @click="cancelCall"
-            class="rounded-lg"
+            class="rounded-6"
           >
             <template #prefix>
               <LucidePhone class="h-4 w-4 rotate-[135deg]" />
@@ -77,7 +77,7 @@
             variant="solid"
             theme="green"
             :label="'Accept'"
-            class="rounded-lg"
+            class="rounded-6"
             @click="acceptIncomingCall"
           >
             <template #prefix>
@@ -89,7 +89,7 @@
             variant="solid"
             theme="red"
             :label="'Reject'"
-            class="rounded-lg"
+            class="rounded-6"
             @click="rejectIncomingCall"
           >
             <template #prefix>
@@ -102,7 +102,7 @@
   </div>
   <div
     v-show="showSmallCallWindow"
-    class="ms-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-lg bg-surface-gray-10 px-2 py-1 text-base !text-ink-gray-2"
+    class="ms-2 mt-1 flex cursor-pointer select-none items-center justify-between gap-3 rounded-6 bg-surface-gray-10 px-2 py-1 text-base !text-ink-gray-2"
     @click="toggleCallWindow"
     v-bind="$attrs"
   >

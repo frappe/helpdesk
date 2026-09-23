@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="props.items.length > 0"
-    class="max-h-[300px] min-w-40 overflow-y-auto rounded-lg bg-surface-base p-1 text-base shadow-lg pointer-events-auto hide-scrollbar"
+    class="max-h-[300px] min-w-40 overflow-y-auto rounded-6 bg-surface-base p-1 text-base shadow-lg pointer-events-auto hide-scrollbar"
   >
     <button
       v-for="(item, index) in props.items"
@@ -12,7 +12,7 @@
         }
       "
       :class="[
-        'flex w-full items-center whitespace-nowrap rounded-md px-2 py-1.5 text-sm text-ink-gray-9',
+        'flex w-full items-center whitespace-nowrap rounded-5 px-2 py-1.5 text-sm text-ink-gray-9',
         index === selectedIndex ? 'bg-surface-gray-2' : '',
       ]"
       @click.stop.prevent="selectItem(index)"

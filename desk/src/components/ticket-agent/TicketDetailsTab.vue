@@ -68,7 +68,6 @@
                   doctype="HD Ticket"
                   :name="ticket.doc?.name"
                   :tags="ticket.doc?._user_tags"
-                  @change="onTagsChange"
                 />
               </div>
             </div>
@@ -114,7 +113,7 @@
                   @click="openTicket(t.name)"
                 >
                   <div
-                    class="-mx-2 cursor-pointer rounded px-2 py-3 transition-colors hover:bg-surface-gray-2"
+                    class="-mx-2 cursor-pointer rounded-4 px-2 py-3 transition-colors hover:bg-surface-gray-2"
                   >
                     <p
                       class="font-base mb-2 truncate text-sm text-ink-gray-9 max-w-[70%]"
@@ -127,7 +126,7 @@
                         <span class="">{{ "#" + t.name }}</span>
                       </p>
                       <span
-                        class="font-base shrink-0 rounded-sm px-2 py-0.5 text-xs"
+                        class="font-base shrink-0 rounded-1 px-2 py-0.5 text-xs"
                         :class="getStatusColor(t.status as string)"
                       >
                         {{ t.status }}
@@ -155,7 +154,6 @@ import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation.ts";
 import {
-  ActivitiesSymbol,
   AssigneeSymbol,
   CustomizationSymbol,
   FieldValue,
@@ -177,7 +175,6 @@ import TicketSLA from "./TicketSLA.vue";
 const ticket = inject(TicketSymbol)!;
 const assignees = inject(AssigneeSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
-const activities = inject(ActivitiesSymbol)!;
 const recentSimilarTickets = inject(RecentSimilarTicketsSymbol)!;
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -352,20 +349,12 @@ function handleFieldUpdate(
     { [fieldname]: value },
     {
       onSuccess: () => {
-        // TODO: emit the event for notification to listeners
         if (fieldname === "agent_group") {
           assignees.value.reload();
         }
-        activities.value.reload();
       },
     }
-
-    //show error toast
   );
-}
-
-function onTagsChange() {
-  activities.value.reload();
 }
 
 const fieldRefs = ref<Record<string, any>>({});

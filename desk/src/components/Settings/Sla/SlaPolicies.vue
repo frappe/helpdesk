@@ -1,7 +1,7 @@
 <template>
   <SettingsLayoutBase>
     <template #title>
-      <h1 class="text-lg-semibold text-ink-gray-8">
+      <h1 class="text-md-semibold text-ink-gray-8">
         {{ __("Service Level Agreements (SLAs)") }}
       </h1>
     </template>
@@ -86,10 +86,8 @@ watch(slaSearchQuery, (newValue) => {
   slaPolicyList.filters = {
     name: ["like", `%${newValue}%`],
   };
-  if (!newValue) {
-    slaPolicyList.start = 0;
-    slaPolicyList.pageLength = 10;
-  }
+  // no pager on this list, so a shrunken pageLength would hide the rest for good
+  if (!newValue) slaPolicyList.start = 0;
   slaPolicyList.reload();
 });
 </script>

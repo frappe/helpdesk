@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
+    class="grid grid-cols-6 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded-4"
   >
     <div
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
@@ -21,17 +21,17 @@
       <div>
         <Switch
           size="sm"
-          :modelValue="data.enabled"
+          :modelValue="Boolean(data.enabled)"
           @update:modelValue="onToggle"
         />
       </div>
       <div>
-        <Dropdown placement="right" :options="dropdownOptions">
-          <Button
-            icon="lucide-more-horizontal"
-            variant="ghost"
-            @click="isConfirmingDelete = false"
-          />
+        <Dropdown
+          align="end"
+          :options="dropdownOptions"
+          @update:open="(open) => open && (isConfirmingDelete = false)"
+        >
+          <Button icon="lucide-more-horizontal" variant="ghost" />
         </Dropdown>
       </div>
     </div>

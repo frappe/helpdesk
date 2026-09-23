@@ -10,17 +10,17 @@
       <div class="bg-surface-elevation-2 px-4 pb-6 py-5 sm:px-6">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-2xl-semibold leading-6 text-ink-gray-9">
               {{ __("Edit Customer") }}
             </h3>
             <Badge
               v-if="isDirty"
               :label="__('Unsaved')"
               variant="subtle"
-              theme="orange"
+              theme="amber"
             />
           </div>
-          <Button icon="x" @click="model = false" variant="ghost" />
+          <Button icon="lucide-x" @click="model = false" variant="ghost" />
         </div>
         <div class="space-y-4">
           <!-- Image section -->

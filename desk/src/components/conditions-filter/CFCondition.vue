@@ -31,21 +31,23 @@
         </div>
       </div>
       <div v-if="!props.isGroup" class="flex items-center gap-2 w-full">
-        <div id="fieldname" class="w-full">
-          <Autocomplete
-            :options="filterableFields.data"
-            v-model="props.condition[0]"
-            :placeholder="'Field'"
-            @update:modelValue="updateField"
+        <div id="fieldname" class="flex-1 min-w-0">
+          <Combobox
+            class="w-full"
+            trigger="button"
+            :options="filterableFields.data || []"
+            :model-value="props.condition[0]"
+            :placeholder="__('Field')"
+            @update:selected-option="updateField"
           />
         </div>
-        <div id="operator">
+        <div id="operator" class="flex-1 min-w-0">
           <FormControl
             v-if="!props.condition[0]"
             disabled
             type="text"
             :placeholder="'operator'"
-            class="w-[100px]"
+            class="w-full"
           />
           <FormControl
             v-else
@@ -54,10 +56,10 @@
             v-model="props.condition[1]"
             @change="updateOperator"
             :options="getOperators()"
-            class="w-max min-w-[100px]"
+            class="w-full"
           />
         </div>
-        <div id="value" class="w-full">
+        <div id="value" class="flex-1 min-w-0">
           <FormControl
             v-if="!props.condition[0]"
             disabled
@@ -89,7 +91,7 @@
       />
     </div>
     <div :class="'w-max'">
-      <Dropdown placement="right" :options="dropdownOptions">
+      <Dropdown align="end" :options="dropdownOptions">
         <Button variant="ghost" icon="lucide-more-horizontal" />
       </Dropdown>
     </div>
@@ -107,11 +109,11 @@
 </template>
 
 <script setup lang="ts">
-import { Link, StarRating } from "@/components";
-import { TemplateOption } from "@/utils";
+import { StarRating } from "@/components";
+import { Link } from "@framework/ui";
 import {
-  Autocomplete,
   Button,
+  Combobox,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
@@ -187,31 +189,21 @@ const dropdownOptions = computed(() => {
 
   options.push({
     label: "Remove",
-    component: (props) =>
-      TemplateOption({
-        option: "Remove",
-        icon: "lucide-trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: () => {
-          emit("remove");
-        },
-      }),
+    icon: "lucide-trash-2",
+    theme: "red",
+    onClick: () => {
+      emit("remove");
+    },
     condition: () => !props.isGroup,
   });
 
   options.push({
     label: "Remove group",
-    component: (props) =>
-      TemplateOption({
-        option: "Remove group",
-        icon: "lucide-trash-2",
-        active: props.active,
-        variant: "danger",
-        onClick: () => {
-          emit("remove");
-        },
-      }),
+    icon: "lucide-trash-2",
+    theme: "red",
+    onClick: () => {
+      emit("remove");
+    },
     condition: () => props.isGroup,
   });
 
@@ -276,19 +268,16 @@ function getValueControl() {
       return h(FormControl, { type: "text" });
     }
     return h(Link, {
-      class: "form-control",
+      class: "w-full",
       doctype: options,
-      value: props.condition[2],
+      title: props.condition[2],
     });
   } else if (typeNumber.includes(fieldtype)) {
     return h(FormControl, { type: "number" });
   } else if (typeDate.includes(fieldtype) && operator == "between") {
-    return h(DateRangePicker, { value: props.condition[2], iconLeft: "" });
+    return h(DateRangePicker);
   } else if (typeDate.includes(fieldtype)) {
-    return h(fieldtype == "Date" ? DatePicker : DateTimePicker, {
-      value: props.condition[2],
-      iconLeft: "",
-    });
+    return h(fieldtype == "Date" ? DatePicker : DateTimePicker);
   } else if (typeRating.includes(fieldtype)) {
     return h(StarRating, {
       rating: props.condition[2] || 0,
@@ -304,7 +293,9 @@ function getValueControl() {
 function updateValue(value) {
   value = value.target ? value.target.value : value;
   if (props.condition[1] === "between") {
-    props.condition[2] = [value.split(",")[0], value.split(",")[1]];
+    // DateRangePicker emits [from, to]; the text controls still emit "from,to"
+    const range = Array.isArray(value) ? value : String(value).split(",");
+    props.condition[2] = [range[0], range[1]];
   } else {
     props.condition[2] = value + "";
   }

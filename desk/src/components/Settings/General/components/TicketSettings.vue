@@ -133,7 +133,7 @@
           }}</span>
         </div>
         <SelectDropdown
-          :options="ticketTypeList.data"
+          :options="ticketTypeList.data || []"
           v-model="settingsData.defaultTicketType"
           target-class="max-w-40"
           placement="bottom-start"
@@ -152,7 +152,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-3">
           <div class="flex flex-col gap-1.5">
-            <FormLabel :label="__('Ticket status')" size="md" />
+            <FormLabel :label="__('Ticket status')" />
             <SelectDropdown
               :options="autoCloseTicketStatusList"
               :model-value="settingsData.autoCloseStatus"
@@ -294,7 +294,8 @@ function resetBannerContent() {
 }
 
 function handleShowBannerToggle(value: boolean) {
-  if (!bannerMsg.data.current) {
+  // the switch is live before the message resource lands
+  if (!bannerMsg.data?.current) {
     if (value) {
       settingsData.value.outsideWorkingHoursBannerMessage =
         bannerMsg.data?.default;

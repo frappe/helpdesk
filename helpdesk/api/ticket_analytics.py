@@ -227,7 +227,12 @@ def summary(
         "customer_messages": customer,
         "agent_messages": len(messages) - customer,
         "internal_comments": frappe.db.count(
-            "HD Ticket Comment", {"reference_ticket": ticket}
+            "Comment",
+            {
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket,
+                "comment_type": "Comment",
+            },
         ),
         "agents_involved": [
             get_user_info_for_avatar(user)

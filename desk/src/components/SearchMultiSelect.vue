@@ -50,7 +50,7 @@
 
     <div
       v-if="isOpen"
-      class="absolute z-50 mt-2 w-64 divide-y divide-outline-elevation-2 rounded-lg bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none start-0 origin-top-left"
+      class="absolute z-50 mt-2 w-64 divide-y divide-outline-elevation-2 rounded-6 bg-surface-elevation-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none start-0 origin-top-left"
     >
       <!-- Header -->
       <div class="py-1.5 px-1.5">
@@ -85,7 +85,7 @@
           <button
             v-for="option in filteredIndividualOptions"
             :key="`individual-${option.value}`"
-            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
+            class="group flex h-7 w-full items-center rounded-4 px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
             :class="{ 'bg-surface-gray-2': isHighlighted(option) }"
             @click="toggleOption(option)"
           >
@@ -130,7 +130,7 @@
           <button
             v-for="option in group.items"
             :key="`grouped-${option.value}`"
-            class="group flex h-7 w-full items-center rounded px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
+            class="group flex h-7 w-full items-center rounded-4 px-2 text-base hover:bg-surface-gray-3 text-ink-gray-6"
             :class="{ 'bg-surface-gray-2': isHighlighted(option) }"
             @click="toggleOption(option)"
           >

@@ -3,47 +3,49 @@ import { storeToRefs } from "pinia";
 import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+/**
+ * Keeps the selected tab in sync with the URL hash. frappe-ui v1 Tabs are
+ * keyed by `tab.value`, so this tracks the value rather than an index; the
+ * first tab is the default and carries no hash.
+ */
 export function useActiveTabManager(tabs) {
   const route = useRoute();
   const router = useRouter();
   const telephonyStore = useTelephonyStore();
   const { isLoading: isTelephonyLoading } = storeToRefs(telephonyStore);
 
+  const activeTab = ref("");
+
+  const firstTab = () => tabs.value?.[0]?.value;
+
   const changeTabTo = (tab) => {
-    tabIndex.value = tab;
-    if (tab == 0) {
+    activeTab.value = tab;
+    if (tab === firstTab()) {
       router.replace({ path: route.path, query: route.query });
     } else {
-      setActiveTabInUrl(tabs.value?.[tab]?.name || tabs.value[0].name);
+      setActiveTabInUrl(tab);
     }
   };
 
-  function setActiveTabInUrl(tabName) {
-    let hash = "#" + tabName?.toLowerCase();
+  function setActiveTabInUrl(tab) {
+    const hash = "#" + tab?.toLowerCase();
     if (route.hash === hash) return;
     router.push({ hash, query: route.query });
   }
 
-  function findTabIndex(tabName) {
-    return tabs.value?.findIndex(
-      (tabOptions) => tabOptions.name.toLowerCase() === tabName
-    );
+  function findTab(hash) {
+    return tabs.value?.find((tab) => tab.value.toLowerCase() === hash)?.value;
   }
 
-  const tabIndex = ref(0);
-
   const setActiveTab = () => {
-    let _activeTab = route.hash.replace("#", "");
-    if (_activeTab) {
-      let index = findTabIndex(_activeTab);
-      if (index !== -1 || index === 0) {
-        tabIndex.value = index;
-        setActiveTabInUrl(tabs.value[index].name);
-        return;
-      }
+    const fromHash = findTab(route.hash.replace("#", ""));
+    if (fromHash) {
+      activeTab.value = fromHash;
+      setActiveTabInUrl(fromHash);
+      return;
     }
 
-    tabIndex.value = 0;
+    activeTab.value = firstTab();
     router.replace({ path: route.path, query: route.query });
   };
 
@@ -51,14 +53,13 @@ export function useActiveTabManager(tabs) {
   watch(
     () => route.hash,
     (newHash) => {
-      let index = findTabIndex(newHash.replace("#", ""));
-      if (index === -1) index = 0;
+      const tab = findTab(newHash.replace("#", "")) ?? firstTab();
 
-      if (index == 0) {
+      if (tab === firstTab()) {
         router.replace({ path: route.path, query: route.query });
       }
 
-      tabIndex.value = index;
+      activeTab.value = tab;
     }
   );
 
@@ -75,5 +76,5 @@ export function useActiveTabManager(tabs) {
     { deep: true, flush: "post", immediate: true }
   );
 
-  return { tabIndex, changeTabTo };
+  return { activeTab, changeTabTo };
 }

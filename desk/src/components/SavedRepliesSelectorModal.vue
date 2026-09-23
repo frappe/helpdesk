@@ -3,7 +3,7 @@
     <template #default>
       <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex items-center justify-between w-full p-4 pb-2">
-          <div class="text-3xl-semibold">{{ __("Saved Replies") }}</div>
+          <div class="text-2xl-semibold">{{ __("Saved Replies") }}</div>
           <Button
             icon-left="lucide-plus"
             :label="__('New')"
@@ -35,7 +35,7 @@
                 class="absolute end-1 top-1/2 -translate-y-1/2"
               />
             </div>
-            <Dropdown :options="filters" placement="right">
+            <Dropdown :options="filters" align="end">
               <Button :label="activeFilterLabel">
                 <template #prefix><FilterIcon class="h-4" /></template>
               </Button>
@@ -59,7 +59,7 @@
             <div
               v-for="template in savedReplyListResource?.data"
               :key="template.name"
-              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border border-outline-gray-1 bg-surface-base p-3 hover:border-outline-gray-3 relative"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-6 border border-outline-gray-1 bg-surface-base p-3 hover:border-outline-gray-3 relative"
               @click="onTemplateSelect(template)"
             >
               <div class="flex items-center gap-2 border-b pb-2">
@@ -99,7 +99,7 @@
                   selectedTemplate.name === template.name &&
                   selectedTemplate.isLoading
                 "
-                class="flex items-center justify-center absolute top-0 start-0 w-full h-full rounded-lg"
+                class="flex items-center justify-center absolute top-0 start-0 w-full h-full rounded-6"
               >
                 <LoadingIndicator class="size-4" />
               </div>
@@ -366,10 +366,7 @@ watch(
     }
     // Counts don't move with the selected scope, so this is the only refetch
     scopeCounts.reload();
-    nextTick(() => {
-      const inputEl = searchInput.value?.$el?.querySelector("input");
-      inputEl?.focus();
-    });
+    nextTick(() => searchInput.value?.focus());
   },
   { immediate: true }
 );

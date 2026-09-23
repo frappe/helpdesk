@@ -2,7 +2,7 @@
   <Dropdown :options="options">
     <template #default="{ open }">
       <button
-        class="flex h-12 items-center rounded-md py-2 duration-300 ease-in-out"
+        class="flex h-12 items-center rounded-5 py-2 duration-300 ease-in-out"
         :class="
           collapsed
             ? 'w-auto px-0'
@@ -35,8 +35,7 @@
               : 'ms-2 relative start-[-2.5px] w-auto opacity-100'
           "
         >
-          <FeatherIcon
-            name="chevron-down"
+          <LucideChevronDown
             class="h-4 w-4 text-ink-gray-5"
             aria-hidden="true"
           />
@@ -47,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import BrandLogo from "@/components/BrandLogo.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";

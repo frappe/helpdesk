@@ -17,7 +17,7 @@
       </Tooltip>
       <div
         v-if="remainingCustomers.length"
-        class="relative -mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-gray-2 text-2xs font-medium text-ink-gray-6 ring-2 ring-[var(--surface-white)]"
+        class="relative -mr-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-surface-gray-2 text-2xs font-medium text-ink-gray-6 ring-2 ring-[var(--surface-base)]"
       >
         +{{ remainingCustomers.length }}
       </div>

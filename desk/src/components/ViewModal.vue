@@ -18,7 +18,7 @@
           <div class="flex items-center gap-2">
             <div
               v-if="currentIsEmoji"
-              class="grid size-7 shrink-0 place-items-center rounded bg-surface-gray-3 text-base leading-none"
+              class="grid size-7 shrink-0 place-items-center rounded-4 bg-surface-gray-3 text-base leading-none"
               :title="__('Current icon')"
             >
               {{ view.icon }}
@@ -71,7 +71,7 @@ import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { isCustomerPortal, isEmoji } from "@/utils";
 import { Dialog } from "frappe-ui";
-import { IconPicker } from "frappe-ui/icons";
+import { IconPicker } from "frappe-ui/experimental";
 import { computed, ref } from "vue";
 
 let viewDialogConfig = defineModel();

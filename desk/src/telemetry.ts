@@ -1,4 +1,4 @@
-import { useTelemetry } from "frappe-ui/frappe";
+import { useTelemetry } from "@framework/ui";
 const APP = "helpdesk";
 
 interface CaptureOptions {

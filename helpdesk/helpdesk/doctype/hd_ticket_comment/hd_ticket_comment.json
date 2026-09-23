@@ -2,6 +2,7 @@
  "actions": [],
  "autoname": "hash",
  "creation": "2022-08-25 23:50:58.598316",
+ "deprecated": 1,
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",

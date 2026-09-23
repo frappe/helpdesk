@@ -28,7 +28,7 @@
                 <button
                   v-if="query"
                   @click="clearSearch"
-                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded"
+                  class="p-1 size-6 grid place-content-center focus:outline-none focus:ring focus:ring-outline-gray-3 rounded-4"
                 >
                   <LucideX class="w-4 text-ink-gray-7" />
                 </button>
@@ -148,7 +148,7 @@
           <template v-for="item in searchResponse?.results" :key="item.id">
             <router-link
               :to="getItemRoute(item)"
-              class="flex gap-x-2 overflow-hidden rounded px-2.5 py-3 hover:bg-surface-gray-2"
+              class="flex gap-x-2 overflow-hidden rounded-4 px-2.5 py-3 hover:bg-surface-gray-2"
             >
               <div class="flex items-start gap-x-2">
                 <div class="flex-shrink-0">
@@ -157,7 +157,7 @@
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMessageSquare
-                    v-else-if="item.doctype === 'HD Ticket Comment'"
+                    v-else-if="item.doctype === 'Comment'"
                     class="h-4 w-4 text-ink-gray-6"
                   />
                   <LucideMail
@@ -350,7 +350,7 @@ const doctypesFilterOptions = computed(() => {
   return [
     { value: "HD Ticket", label: __("Tickets"), count: 0 },
     { value: "Communication", label: __("Emails"), count: 0 },
-    { value: "HD Ticket Comment", label: __("Comments"), count: 0 },
+    { value: "Comment", label: __("Comments"), count: 0 },
   ];
 });
 
@@ -419,9 +419,7 @@ function getItemRoute(item: SearchResultItem) {
       name: "TicketAgent",
       params: { ticketId: item.name },
     };
-  } else if (item.doctype === "HD Ticket Comment" && item.reference_ticket) {
-    // ?highlight is the activity deep-link target (element id, see
-    // TicketAgentActivities); the hash only selects the tab.
+  } else if (item.doctype === "Comment" && item.reference_ticket) {
     return {
       name: "TicketAgent",
       params: { ticketId: item.reference_ticket },
@@ -446,7 +444,7 @@ function getTicketNumber(item: SearchResultItem) {
 
   if (item.doctype === "HD Ticket") {
     return item.name || "";
-  } else if (item.doctype === "HD Ticket Comment") {
+  } else if (item.doctype === "Comment") {
     return item.reference_ticket || "";
   } else if (item.doctype === "Communication") {
     return item.reference_name || "";
@@ -541,7 +539,7 @@ onMounted(() => {
   }
   // add a shortcut when presses "/" focus on this element
   useShortcut("/", () => {
-    searchInput.value.el.focus();
+    searchInput.value?.focus();
   });
 });
 </script>
