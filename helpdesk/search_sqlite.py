@@ -11,6 +11,9 @@ from helpdesk.utils import is_agent
 # unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
 
+# Shortest word a related-article query keeps; shorter ones are mostly filler.
+MIN_TERM_LENGTH = 4
+
 
 class HelpdeskSearch(SQLiteSearch):
     INDEX_NAME = "helpdesk_search.db"
@@ -239,6 +242,30 @@ class HelpdeskSearch(SQLiteSearch):
             "customers": customers,
             "doctypes": doctypes,
         }
+
+
+class HelpdeskArticleSearch(SQLiteSearch):
+    """Articles to suggest beside a ticket; its own index, since no article has a ticket to permit."""
+
+    INDEX_NAME = "helpdesk_article_search.db"
+    INDEX_SCHEMA = {"metadata_fields": ["status", "category"]}
+    # Every status, filtered at search time: the index queue re-adds a changed article without
+    # re-checking a doctype filter, so an unpublished one would linger.
+    INDEXABLE_DOCTYPES = {
+        "HD Article": {
+            "fields": ["name", "title", "content", "status", "category", "modified"]
+        },
+    }
+
+    def get_search_filters(self) -> dict:
+        return {"status": "Published"}
+
+    def _prepare_fts_query(self, query: str) -> str:
+        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms."""
+        # ponytail: word length stands in for a stopword list; add one if short terms matter
+        quote = super()._prepare_fts_query
+        terms = [term for term in query.split() if len(term) >= MIN_TERM_LENGTH]
+        return " OR ".join(quote(term) for term in terms)
 
 
 def build_index():

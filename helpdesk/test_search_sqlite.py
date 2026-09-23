@@ -4,7 +4,8 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.patches import relabel_comment_search_index
-from helpdesk.search_sqlite import HelpdeskSearch
+from helpdesk.api import article as article_api
+from helpdesk.search_sqlite import HelpdeskArticleSearch, HelpdeskSearch
 from helpdesk.test_utils import create_user, make_ticket
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
@@ -147,3 +148,61 @@ class TestSearchIndexRelabel(FrappeTestCase):
         ticket = self.row("10")
         self.assertEqual(ticket["ticket_type"], "text")
         self.assertEqual(ticket["reference_ticket"], "10")
+
+
+class TestRelatedArticles(FrappeTestCase):
+    """Runs against a throwaway index so the site's real one is never touched."""
+
+    TEST_INDEX = "test_related_articles.db"
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.published = cls.make_article("Rotating the zephyrine webhook secret", "Published")
+        cls.draft = cls.make_article("Zephyrine webhook draft notes", "Draft")
+
+    @staticmethod
+    def make_article(title: str, status: str):
+        return frappe.get_doc(
+            {
+                "doctype": "HD Article",
+                "title": title,
+                "status": status,
+                "content": f"<p>{title}</p>",
+            }
+        ).insert()
+
+    def setUp(self):
+        self.search = HelpdeskArticleSearch(db_name=self.TEST_INDEX)
+        self.search.drop_index()
+        self.addCleanup(self.search.drop_index)
+
+    def related(self, query: str) -> list[dict]:
+        with patch.object(
+            article_api,
+            "HelpdeskArticleSearch",
+            lambda: HelpdeskArticleSearch(db_name=self.TEST_INDEX),
+        ):
+            return article_api.get_related(query)
+
+    def test_a_ticket_subject_finds_published_articles_only(self):
+        self.search.build_index()
+
+        # A sentence: ANDing every word would match nothing.
+        found = self.related("Our zephyrine webhook stopped firing after the update")
+
+        self.assertEqual([row["name"] for row in found], [self.published.name])
+        self.assertNotIn("<mark>", found[0]["title"])
+
+    def test_an_article_unpublished_after_indexing_stops_matching(self):
+        self.search.build_index()
+        frappe.db.set_value("HD Article", self.published.name, "status", "Draft")
+        # What the index queue does for a changed article: re-add it, filter or not.
+        self.search._index_documents(
+            [self.search.prepare_document(frappe.get_doc("HD Article", self.published.name))]
+        )
+
+        self.assertEqual(self.related("zephyrine webhook"), [])
+
+    def test_no_index_yet_returns_nothing(self):
+        self.assertEqual(self.related("zephyrine webhook"), [])

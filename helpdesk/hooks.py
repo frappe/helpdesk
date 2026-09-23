@@ -31,7 +31,10 @@ after_migrate = [
 # Full Text Search
 # ------------------
 
-sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+sqlite_search = [
+    "helpdesk.search_sqlite.HelpdeskSearch",
+    "helpdesk.search_sqlite.HelpdeskArticleSearch",
+]
 
 scheduler_events = {
     "all": [
