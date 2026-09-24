@@ -32,11 +32,11 @@
       </template>
     </LayoutHeader>
     <header
-      class="flex h-12 items-center justify-between py-[7px] px-3 border-b"
+      class="flex h-12 items-center justify-between gap-2 py-[7px] px-3 border-b"
       v-if="ticket.doc?.name"
     >
       <!-- left side -->
-      <div class="flex items-center gap-2 max-w-[65%]">
+      <div class="flex min-w-0 flex-1 items-center gap-2">
         <!-- the width lives on the wrapper: a Combobox with its own #trigger
              slot drops the class it is handed -->
         <div class="min-w-0 flex-1">
@@ -92,12 +92,27 @@
         <div class="flex min-h-0 flex-1 flex-col">
           <Tabs
             :modelValue="activeTab"
-            :tabs="tabs"
             @update:modelValue="changeTabTo"
-            size="md"
-            class="flex-1 overflow-hidden [&_[role='tablist']]:px-3 [&_[role='tablist']]:py-1.5 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
+            class="flex flex-col flex-1 overflow-hidden [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
           >
-            <template #tab-panel="{ tab }">
+            <!-- The wrapper scrolls, not the list: the active underline sits
+                 on the list's border, which the list's own overflow would clip. -->
+            <div class="shrink-0 overflow-x-auto hide-scrollbar">
+              <TabList size="md" class="w-max min-w-full px-3 py-1.5">
+                <TabTrigger
+                  v-for="tab in visibleTabs"
+                  :key="tab.value"
+                  :value="tab.value"
+                  :label="tab.label"
+                  :icon-left="tab.iconLeft"
+                />
+              </TabList>
+            </div>
+            <TabPanel
+              v-for="tab in visibleTabs"
+              :key="tab.value"
+              :value="tab.value"
+            >
               <div v-if="tab.value === 'details'">
                 <!-- ticket contact info -->
                 <TicketAgentContact
@@ -158,7 +173,7 @@
                 :tab-label="tab.label"
                 @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
               />
-            </template>
+            </TabPanel>
           </Tabs>
           <CommunicationArea
             class="bg-surface-base"
@@ -232,7 +247,10 @@ import {
   Dialog,
   Dropdown,
   FormControl,
+  TabList,
+  TabPanel,
   Tabs,
+  TabTrigger,
   toast,
 } from "frappe-ui";
 import {
@@ -519,6 +537,10 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
   }
   return _tabs;
 });
+
+const visibleTabs = computed(() =>
+  tabs.value.filter((tab) => !tab.condition || tab.condition())
+);
 
 const { activeTab, changeTabTo } = useActiveTabManager(tabs);
 
