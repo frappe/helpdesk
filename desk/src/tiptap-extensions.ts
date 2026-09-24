@@ -854,3 +854,38 @@ export const CleanStyles = Extension.create<CleanStylesOptions>({
     } as any;
   },
 });
+
+// frappe-ui's suggestion popups (`/`, `@`, `{{`) don't close on an outside click.
+export const DismissSuggestionsOnOutsideClick = Extension.create({
+  name: "dismissSuggestionsOnOutsideClick",
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("dismissSuggestionsOnOutsideClick"),
+        view(view) {
+          const onPointerDown = (event: PointerEvent) => {
+            const target = event.target as Element;
+            if (
+              view.dom.contains(target) ||
+              target.closest?.(".editor-popover")
+            )
+              return;
+            for (const plugin of view.state.plugins) {
+              const state = plugin.getState(view.state);
+              if (state?.active && "decorationId" in state)
+                view.dispatch(
+                  view.state.tr.setMeta(plugin.spec.key!, { exit: true })
+                );
+            }
+          };
+          document.addEventListener("pointerdown", onPointerDown, true);
+          return {
+            destroy: () =>
+              document.removeEventListener("pointerdown", onPointerDown, true),
+          };
+        },
+      }),
+    ];
+  },
+});

@@ -1,6 +1,7 @@
 import {
   CleanStyles,
   ComponentUtils,
+  DismissSuggestionsOnOutsideClick,
   HandleExcelPaste,
 } from "@/tiptap-extensions";
 import {
@@ -55,6 +56,7 @@ export function buildEditorExtensions(
     ComponentUtils,
     HandleExcelPaste,
     CleanStyles,
+    DismissSuggestionsOnOutsideClick,
     ...(options.extra ?? []),
   ];
 }
