@@ -93,7 +93,7 @@
           <Tabs
             :modelValue="activeTab"
             @update:modelValue="changeTabTo"
-            class="flex flex-col flex-1 overflow-hidden [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
+            class="flex flex-col flex-1 overflow-hidden"
           >
             <!-- Scroll here so the active underline isn't clipped. -->
             <div class="shrink-0 overflow-x-auto hide-scrollbar">
@@ -111,6 +111,7 @@
               v-for="tab in visibleTabs"
               :key="tab.value"
               :value="tab.value"
+              class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
             >
               <div v-if="tab.value === 'details'">
                 <!-- ticket contact info -->
