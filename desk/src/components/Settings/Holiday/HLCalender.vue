@@ -16,7 +16,7 @@
       <div class="flex items-center" v-for="(week, i) in datesAsWeeks" :key="i">
         <div v-for="date in week" :key="getFormattedDate(date)">
           <Popover v-if="isHoliday(date)">
-            <template #trigger="{ close, toggle }">
+            <template #trigger="{ close, setOpen }">
               <!--
                 Hover opens this one. reka turns the whole trigger subtree into
                 the toggle, so the cell stops its click before it gets there.
@@ -28,7 +28,9 @@
                     '!text-ink-gray-4 !bg-surface-gray-2': isWeekOff(date),
                   }"
                   @mouseover="
-                    handleMouseEnter(getFormattedDate(date), () => toggle(true))
+                    handleMouseEnter(getFormattedDate(date), () =>
+                      setOpen(true)
+                    )
                   "
                   @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
                   @click.stop="
@@ -43,12 +45,14 @@
                 </div>
               </div>
             </template>
-            <template #default="{ close: closePopover, toggle: togglePopover }">
+            <template
+              #default="{ close: closePopover, setOpen: setPopoverOpen }"
+            >
               <div
                 class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-outline-gray-1 rounded-5"
                 @mouseover="
                   handleMouseEnter(getFormattedDate(date), () =>
-                    togglePopover(true)
+                    setPopoverOpen(true)
                   )
                 "
                 @mouseleave="
@@ -83,17 +87,20 @@
                     />
                   </template>
                   <template
-                    #default="{ close: closeDropdown, toggle: toggleDropdown }"
+                    #default="{
+                      close: closeDropdown,
+                      setOpen: setDropdownOpen,
+                    }"
                   >
                     <div
                       class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-outline-gray-1 rounded-5"
                       @mouseover="
                         handleMouseEnter(getFormattedDate(date), () =>
-                          togglePopover(true)
+                          setPopoverOpen(true)
                         );
                         handleMouseEnter(
                           getFormattedDate(date) + 'dropdown',
-                          () => toggleDropdown(true)
+                          () => setDropdownOpen(true)
                         );
                       "
                       @mouseleave="

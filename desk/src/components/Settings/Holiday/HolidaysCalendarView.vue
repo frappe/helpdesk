@@ -11,7 +11,7 @@
               icon-right="lucide-chevron-down"
             />
           </template>
-          <template #default="{ toggle: togglePopover }">
+          <template #default="{ close: closePopover }">
             <div class="w-24">
               <div ref="yearsContainer" class="max-h-60 overflow-y-auto py-1">
                 <div
@@ -19,7 +19,7 @@
                   :key="year"
                   ref="yearItems"
                   class="cursor-pointer px-3 py-1.5 text-sm hover:bg-surface-gray-2 flex items-center justify-between"
-                  @click="onYearChange(togglePopover, year)"
+                  @click="onYearChange(closePopover, year)"
                 >
                   {{ year }}
                   <LucideCheck class="size-4" v-if="year === currentYear" />
@@ -121,7 +121,7 @@ const yearsList = computed(() => {
   return yearList;
 });
 
-const onYearChange = (togglePopover: () => void, year: number) => {
+const onYearChange = (closePopover: () => void, year: number) => {
   currentYear.value = year;
   if (year === dayjs(holidayData.value.from_date).year()) {
     if (dayjs(holidayData.value.from_date).month() >= 6) {
@@ -134,7 +134,7 @@ const onYearChange = (togglePopover: () => void, year: number) => {
   } else {
     visibleMonths.value = "first-half";
   }
-  togglePopover();
+  closePopover();
 };
 
 const goToToday = () => {

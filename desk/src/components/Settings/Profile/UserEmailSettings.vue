@@ -70,7 +70,9 @@
                 {{ e.email_account }}
               </span>
               <span class="text-ink-gray-6 truncate">{{ e.email_id }}</span>
-              <div class="group-hover:opacity-100 opacity-0 transition-opacity">
+              <div
+                class="group-hover:opacity-100 opacity-0 transition-opacity [@media(hover:none)]:opacity-100"
+              >
                 <Button
                   class="w-10"
                   variant="ghost"

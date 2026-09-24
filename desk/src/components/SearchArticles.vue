@@ -99,7 +99,9 @@ watch(
       },
     });
     articles.reload();
-  }
+  },
+  // Mounted after the third character is typed.
+  { immediate: true }
 );
 
 function handleSearchArticleClick(article) {

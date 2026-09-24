@@ -10,7 +10,7 @@
           }}
           <span class="whitespace-nowrap font-semibold">
             #{{ ticket.name
-            }}<HoverCard :hoverDelay="0.25" :side="isRtl ? 'left' : 'right'">
+            }}<HoverCard :hoverDelay="250" :side="isRtl ? 'left' : 'right'">
               <template #trigger>
                 <LucideInfo
                   class="size-4 cursor-pointer !inline-flex align-middle ms-1 -mt-1"

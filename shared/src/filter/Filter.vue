@@ -1,10 +1,7 @@
 <template>
   <Popover bare side="bottom" align="end">
-    <template #trigger="{ toggle: togglePopover }">
-      <div
-        :ref="() => (openPopoverFn = () => togglePopover(true))"
-        class="w-fit"
-      >
+    <template #trigger="{ setOpen }">
+      <div :ref="() => (openPopoverFn = () => setOpen(true))" class="w-fit">
         <FilterTrigger
           :count="activeFilters.length"
           @toggle="resetSteps()"
