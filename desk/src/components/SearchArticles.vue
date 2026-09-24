@@ -99,7 +99,9 @@ watch(
       },
     });
     articles.reload();
-  }
+  },
+  // The search popover mounts this on the third character, already typed.
+  { immediate: true }
 );
 
 function handleSearchArticleClick(article) {
