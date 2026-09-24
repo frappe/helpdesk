@@ -11,14 +11,17 @@
     "
   >
     <template #default="{ isEmpty }">
-      <EditorContent
-        :class="[
-          'prose-sm max-w-none',
-          editable &&
-            'min-h-[7rem] mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
-          getFontFamily(newComment),
-        ]"
-      />
+      <!-- The wrapper scrolls, not EditorContent, so a selected node's outline
+           has room inside the scroll box instead of being clipped at its edge. -->
+      <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
+        <EditorContent
+          :class="[
+            'prose-sm max-w-none',
+            editable && 'min-h-[7rem] mx-5 border-t py-3',
+            getFontFamily(newComment),
+          ]"
+        />
+      </div>
       <!-- Attachments -->
       <AttachmentList
         class="my-2 ms-5"

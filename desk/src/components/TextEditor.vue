@@ -22,12 +22,13 @@
         </span>
 
         <EditorBubbleMenu :items="commentToolbar" />
-        <EditorContent
-          :class="[
-            'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]',
-            getFontFamily(content),
-          ]"
-        />
+        <!-- Scroll on a wrapper spanning the card's padding, so a selected
+             node's outline has room instead of being clipped. -->
+        <div class="-mx-3 px-3 max-h-64 overflow-auto my-4">
+          <EditorContent
+            :class="['prose-f max-w-none min-h-[5rem]', getFontFamily(content)]"
+          />
+        </div>
 
         <div class="flex flex-col gap-2">
           <slot name="bottom-top" />

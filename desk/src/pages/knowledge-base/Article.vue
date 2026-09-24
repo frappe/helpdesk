@@ -175,7 +175,11 @@
           :placeholder="__('Write your article here...')"
         >
           <template #default>
-            <EditorContent :class="editorClass" />
+            <!-- Scroll on a wrapper spanning the card's padding, so a selected
+                 node's outline has room instead of being clipped. -->
+            <div :class="editorScrollClass">
+              <EditorContent class="rounded-b-6 max-w-[unset] prose-sm" />
+            </div>
             <EditorFixedMenu
               v-if="editable"
               class="-ms-1 overflow-x-auto w-full"
@@ -620,13 +624,11 @@ watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
     newContent !== article.data.content || newTitle !== article.data.title;
 });
 
-const editorClass = computed(() => {
-  return [
-    "rounded-b-6 max-w-[unset] prose-sm",
+const editorScrollClass = computed(
+  () =>
     editable.value &&
-      "overflow-auto h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]",
-  ];
-});
+    "-mx-4 px-4 overflow-auto h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]"
+);
 
 const isConfirmingDeleteArticle = ref(false);
 
