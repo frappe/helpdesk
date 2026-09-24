@@ -11,9 +11,7 @@ type ToastType = "success" | "error" | "warning" | "info";
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
   if (typeof icon === "string") {
-    // A script's icon name is runtime data, so Tailwind only emits a
-    // `lucide-*` class for it by accident. The sprite has every current lucide
-    // name; legacy aliases (trash-2, check-circle, …) exist only as classes.
+    // Use the sprite icon if present, else the lucide-* class (legacy aliases).
     const name = icon.replace(/^lucide-/, "");
     const inSprite = document.getElementById(name)?.closest("#lucide-sprite");
     if (!inSprite && !isEmoji(icon))

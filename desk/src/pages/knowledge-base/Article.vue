@@ -175,8 +175,7 @@
           :placeholder="__('Write your article here...')"
         >
           <template #default>
-            <!-- Scroll on a wrapper spanning the card's padding, so a selected
-                 node's outline has room instead of being clipped. -->
+            <!-- Scroll here so selected nodes aren't clipped. -->
             <div :class="editorScrollClass">
               <EditorContent class="rounded-b-6 max-w-[unset] prose-sm" />
             </div>

@@ -95,8 +95,7 @@
             @update:modelValue="changeTabTo"
             class="flex flex-col flex-1 overflow-hidden [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
           >
-            <!-- The wrapper scrolls, not the list: the active underline sits
-                 on the list's border, which the list's own overflow would clip. -->
+            <!-- Scroll here so the active underline isn't clipped. -->
             <div class="shrink-0 overflow-x-auto hide-scrollbar">
               <TabList size="md" class="w-max min-w-full px-3 py-1.5">
                 <TabTrigger

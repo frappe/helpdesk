@@ -11,8 +11,7 @@
     "
   >
     <template #default="{ isEmpty }">
-      <!-- The wrapper scrolls, not EditorContent, so a selected node's outline
-           has room inside the scroll box instead of being clipped at its edge. -->
+      <!-- Scroll here so selected nodes aren't clipped. -->
       <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
         <EditorContent
           :class="[
