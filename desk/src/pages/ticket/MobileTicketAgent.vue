@@ -187,7 +187,7 @@
             @update="
               () => {
                 reloadTicket(props.ticketId);
-                timelineRef?.reload();
+                timelineRef[0]?.reload();
               }
             "
           />
@@ -318,7 +318,7 @@ const ticketStatusStore = useTicketStatusStore();
 const router = useRouter();
 const { $dialog } = globalStore();
 
-const timelineRef = ref<InstanceType<typeof TicketTimeline> | null>(null);
+const timelineRef = ref<InstanceType<typeof TicketTimeline>[]>([]);
 const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
   null
 );
