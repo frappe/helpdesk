@@ -31,8 +31,8 @@
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
-          <div class="flex justify-between overflow-hidden py-2.5">
-            <div class="flex items-center overflow-x-auto w-[60%]">
+          <div class="flex justify-between gap-2 overflow-hidden py-2.5">
+            <div class="flex min-w-0 flex-1 items-center overflow-x-auto">
               <div class="inline-flex items-center gap-1.5 p-1">
                 <FileUploader
                   :doctype="doctype"
@@ -61,7 +61,7 @@
               <EditorFixedMenu :items="fullToolbar" />
               <EditorTableMenu />
             </div>
-            <div class="flex items-center justify-end gap-x-2 w-[40%]">
+            <div class="flex shrink-0 items-center justify-end gap-x-2">
               <Button
                 label="Discard"
                 @click="
