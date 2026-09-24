@@ -1,6 +1,5 @@
 import Icon from "@/components/Icon.vue";
 import { Field } from "@/types";
-import { isEmoji } from "@/utils";
 import { toast } from "frappe-ui";
 import { h, isVNode, type Component } from "vue";
 
@@ -10,14 +9,7 @@ type ToastType = "success" | "error" | "warning" | "info";
 // beta.24's toast.create took have to arrive as components.
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
-  if (typeof icon === "string") {
-    // Use the sprite icon if present, else the lucide-* class (legacy aliases).
-    const name = icon.replace(/^lucide-/, "");
-    const inSprite = document.getElementById(name)?.closest("#lucide-sprite");
-    if (!inSprite && !isEmoji(icon))
-      return () => h("span", { class: `lucide-${name} size-4` });
-    return () => h(Icon, { icon, class: "size-4" });
-  }
+  if (typeof icon === "string") return () => h(Icon, { icon, class: "size-4" });
   if (isVNode(icon)) return () => icon;
   return icon as Component;
 }
