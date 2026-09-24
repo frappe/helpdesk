@@ -103,7 +103,12 @@ const kebabOptions = computed(() => [
     : []),
   ...(isOwner.value
     ? ConfirmDelete({
-        onConfirmDelete: () => deleteComment.submit(),
+        onConfirmDelete: () =>
+          toast.promise(deleteComment.submit(), {
+            loading: __("Deleting comment"),
+            success: __("Comment deleted"),
+            error: __("Could not delete the comment"),
+          }),
         isConfirmingDelete,
       })
     : []),
@@ -113,10 +118,9 @@ const saveComment = createResource({ url: "frappe.client.set_value" });
 const deleteComment = createResource({
   url: "frappe.client.delete",
   makeParams: () => ({ doctype: "Comment", name: props.activity.data.name }),
-  onSuccess() {
-    emit("update");
-    toast.success(__("Comment deleted successfully."));
-  },
+  onSuccess: () => emit("update"),
+  // the toast below reports the failure; this keeps the global handler off it
+  onError: () => {},
 });
 const reaction = createResource({
   url: "helpdesk.api.comment.toggle_reaction",
