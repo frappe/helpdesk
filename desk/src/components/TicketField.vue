@@ -36,7 +36,7 @@ import {
   Select,
   TextInput,
 } from "frappe-ui";
-import { computed, h } from "vue";
+import { computed, h, nextTick } from "vue";
 
 interface P {
   field: Field;
@@ -100,8 +100,12 @@ const emptyLabel = computed(
   () => props.field.placeholder || `Add ${props.field.label}`
 );
 
+const usesCombobox = computed(
+  () => !!props.field.url_method || isSearchableSelect.value
+);
+
 const placeholder = computed(() =>
-  isSearchableSelect.value ? "" : emptyLabel.value
+  usesCombobox.value ? "" : emptyLabel.value
 );
 
 function select(options: Option[]) {
@@ -117,6 +121,15 @@ function textInput() {
   });
 }
 
+// the trigger renders a matched option's label, so an unlisted value needs one
+function withSavedValue(options: Option[]): Option[] {
+  const value = props.value;
+  if (!value || options.some((option) => option.value === value)) {
+    return options;
+  }
+  return [{ label: String(value), value: value as string }, ...options];
+}
+
 // trigger: "button" keeps the search inside the popover, so the row still
 // reads as a value and not a text input
 function combobox(options: Option[]) {
@@ -125,7 +138,7 @@ function combobox(options: Option[]) {
     {
       ...ghostControl,
       trigger: "button",
-      options,
+      options: withSavedValue(options),
     },
     {
       prefix: () =>
@@ -192,8 +205,8 @@ const component = computed(() => {
   }
 });
 
-// the Link streams half-typed queries through update:modelValue, so commits
-// wait for a real selection or for the picker to close still empty
+// the Link nulls its model when the input is emptied, so an empty commit
+// waits for the picker to close still empty
 let linkPickerOpen = false;
 let linkModel: FieldValue = null;
 
@@ -211,20 +224,26 @@ const listeners = computed(() => {
   if (fieldtype === "Link") {
     return {
       "update:modelValue": (value: FieldValue) => {
-        if (linkPickerOpen) linkModel = value;
+        linkModel = value;
         // only the clear (x) button nulls the model while the picker is closed
-        else if (!value) emitUpdate(props.field.fieldname, "");
+        if (!linkPickerOpen && !value) emitUpdate(props.field.fieldname, "");
       },
       "update:selectedOption": (option: { value: string } | null) => {
         if (!option) return;
+        linkModel = option.value;
         emitUpdate(props.field.fieldname, option.value);
         // a mouse commit blurs the input already, a keyboard one doesn't
         (document.activeElement as HTMLElement | null)?.blur();
       },
       "update:open": (open: boolean) => {
         linkPickerOpen = open;
-        if (open) linkModel = props.value ?? null;
-        else if (!linkModel) emitUpdate(props.field.fieldname, "");
+        if (open) {
+          linkModel = props.value ?? null;
+          return;
+        }
+        // picking closes the picker before it commits, so the clear waits a
+        // tick for the pick to land
+        nextTick(() => !linkModel && emitUpdate(props.field.fieldname, ""));
       },
       // Escape keeps focus on the input; blur so it deselects like a commit
       keydown: (event: KeyboardEvent) => {

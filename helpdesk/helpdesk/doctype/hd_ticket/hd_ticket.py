@@ -622,6 +622,7 @@ class HDTicket(Document):
             tag["src"] for tag in soup.find_all(["img", "video"]) if tag.has_attr("src")
         ]
         self.claim_comment_files(comment.name, urls)
+        return comment.name
 
     def claim_comment_files(self, comment: str, urls: list[str]):
         """Move a comment's files off the ticket and onto the comment.
@@ -741,7 +742,7 @@ class HDTicket(Document):
             _attachments.append({"file_url": file_url})
 
         if not should_send_email:
-            return
+            return communication.name
 
         message = self.parse_content(message)
 
@@ -796,6 +797,8 @@ class HDTicket(Document):
         # off keeps no id, so it can never become the next reply's parent.
         if queued_email:
             communication.db_set("message_id", message_id)
+
+        return communication.name
 
     @frappe.whitelist()
     # flake8: noqa

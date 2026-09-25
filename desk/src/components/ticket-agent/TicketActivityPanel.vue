@@ -25,6 +25,7 @@
     :cc-emails="[]"
     :bcc-emails="[]"
     :key="ticket.doc?.name"
+    @update="reloadTicketFeed(String(ticket.doc?.name))"
   />
 </template>
 
@@ -38,6 +39,7 @@ import {
 } from "@/components/icons";
 import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
+import { reloadTicketFeed } from "@/composables/useTicket";
 import { useTelephonyStore } from "@/stores/telephony";
 import { TabObject, TicketSymbol } from "@/types";
 import { Tabs } from "frappe-ui";

@@ -1,3 +1,4 @@
+import Icon from "@/components/Icon.vue";
 import { Field } from "@/types";
 import { toast } from "frappe-ui";
 import { h, isVNode, type Component } from "vue";
@@ -8,8 +9,7 @@ type ToastType = "success" | "error" | "warning" | "info";
 // beta.24's toast.create took have to arrive as components.
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
-  if (typeof icon === "string")
-    return () => h("span", { class: `lucide-${icon} size-4` });
+  if (typeof icon === "string") return () => h(Icon, { icon, class: "size-4" });
   if (isVNode(icon)) return () => icon;
   return icon as Component;
 }
@@ -55,10 +55,20 @@ export async function setupCustomizations(doc, obj) {
       parseOnChangeFn(onChangeFieldMap, parsed.onChange);
     }
   }
-  data._customActions = actions;
+  data._customActions = withLegacyGroupOptions(actions);
   if (Object.keys(onChangeFieldMap).length) {
     data._customOnChange = onChangeFieldMap;
   }
+}
+
+// Form scripts written before frappe-ui v1 name a group's children `items`,
+// which the menu no longer reads, so the whole group goes missing.
+function withLegacyGroupOptions(actions: any[]) {
+  return actions.map((action) =>
+    action.items && !action.options
+      ? { ...action, options: action.items }
+      : action
+  );
 }
 
 function parseOnChangeFn(fieldMap: object, currentField: object) {

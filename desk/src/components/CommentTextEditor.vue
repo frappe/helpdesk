@@ -11,14 +11,16 @@
     "
   >
     <template #default="{ isEmpty }">
-      <EditorContent
-        :class="[
-          'prose-sm max-w-none',
-          editable &&
-            'min-h-[7rem] mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
-          getFontFamily(newComment),
-        ]"
-      />
+      <!-- Scroll here so selected nodes aren't clipped. -->
+      <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
+        <EditorContent
+          :class="[
+            'prose-sm max-w-none',
+            editable && 'min-h-[7rem] mx-5 border-t py-3',
+            getFontFamily(newComment),
+          ]"
+        />
+      </div>
       <!-- Attachments -->
       <AttachmentList
         class="my-2 ms-5"
@@ -28,8 +30,8 @@
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
-          <div class="flex justify-between overflow-hidden py-2.5">
-            <div class="flex items-center overflow-x-auto w-[60%]">
+          <div class="flex justify-between gap-2 overflow-hidden py-2.5">
+            <div class="flex min-w-0 flex-1 items-center overflow-x-auto">
               <div class="inline-flex items-center gap-1.5 p-1">
                 <FileUploader
                   :doctype="doctype"
@@ -58,13 +60,14 @@
               <EditorFixedMenu :items="fullToolbar" />
               <EditorTableMenu />
             </div>
-            <div class="flex items-center justify-end gap-x-2 w-[40%]">
+            <div class="flex shrink-0 items-center justify-end gap-x-2">
               <Button
                 label="Discard"
                 @click="
                   () => {
                     newComment = '';
                     attachments = [];
+                    dropUnused(null);
                     emit('discard');
                   }
                 "
@@ -97,6 +100,8 @@ import {
   LoadingIndicator,
   Tooltip,
   createResource,
+  dayjs,
+  toast,
 } from "frappe-ui";
 import {
   Editor,
@@ -104,6 +109,7 @@ import {
   EditorFixedMenu,
   EditorTableMenu,
 } from "frappe-ui/editor";
+import { addPendingActivity } from "@framework/ui/ActivityTimeline";
 import { useOnboarding } from "@framework/ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
@@ -114,6 +120,8 @@ import { useTyping } from "@/composables/realtime";
 import { useUploadTracker } from "@/composables/useUploadTracker";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
 import { capture } from "@/telemetry";
 import {
   getFontFamily,
@@ -126,7 +134,9 @@ import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
-const { isManager } = useAuthStore();
+const authStore = useAuthStore();
+const { isManager } = authStore;
+const { getUser } = useUserStore();
 
 const props = defineProps({
   ticketId: {
@@ -151,24 +161,20 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "discard"]);
+const emit = defineEmits(["submit", "discard", "sending", "restore"]);
 
 const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
 // Mentions as a reactive getter so the `@` list stays in sync as agents load.
 const extensions = buildEditorExtensions({
-  mentions: () =>
-    (dropdown.value ?? []).map((a: { label: string; value: string }) => ({
-      id: a.value,
-      label: a.label,
-    })),
+  mentions: () => dropdown.value ?? [],
 });
 
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const { isUploading, track } = useUploadTracker();
+const { isUploading, track, dropUnused } = useUploadTracker();
 const isDisabled = computed(() => {
   return isContentEmpty(newComment.value) || loading.value || isUploading.value;
 });
@@ -184,33 +190,57 @@ async function submitComment() {
     return false;
   }
   // The keyboard shortcut reaches here without passing the disabled button
-  if (isUploading.value) return false;
-  // the editor keeps the text until the request lands: clearing it up front
-  // loses the comment, and its stored draft, whenever the call fails
+  if (isUploading.value || loading.value) return false;
+
+  const content = newComment.value;
+  const sentAttachments = attachments.value;
+  const user = getUser(authStore.userId);
+  const row = addPendingActivity(props.doctype, props.ticketId, {
+    type: "comment",
+    timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    author: {
+      email: user?.email,
+      fullname: user?.full_name,
+      image: user?.user_image,
+    },
+    data: { name: "", content, attachments: sentAttachments },
+  });
+
+  // drop before clearing, or an unmount mid-send deletes what the comment carries
+  dropUnused(content);
+  newComment.value = null;
+  attachments.value = [];
   loading.value = true;
+  emit("sending");
+
   const comment = createResource({
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
       dn: props.ticketId,
       method: "new_comment",
-      args: {
-        content: newComment.value,
-        attachments: attachments.value,
-      },
+      args: { content, attachments: sentAttachments },
     }),
-    onSuccess: () => {
+    onSuccess: (res: { message?: string } | string) => {
+      // run_doc_method answers with the whole body, since it always carries `docs`
+      const name = typeof res === "string" ? res : res?.message;
+      // the real row replaces the pending one the moment it arrives; unkeyed,
+      // it would outlive it
+      name ? row.resolve(`comment:${name}`) : row.drop();
       capture("comment_added");
       if (isManager) {
         updateOnboardingStep?.("comment_on_ticket");
       }
       emit("submit");
       loading.value = false;
-      attachments.value = [];
-      newComment.value = null;
     },
     onError: () => {
+      toast.error(__("Could not add the comment"));
+      row.drop();
+      newComment.value = content;
+      attachments.value = sentAttachments;
       loading.value = false;
+      emit("restore");
     },
   });
 
@@ -240,6 +270,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanup();
+  // the saved draft still references what it shows, so only what it dropped goes
+  dropUnused(newComment.value);
   if (isContentEmpty(newComment.value)) {
     localStorage.removeItem("commentBoxContent" + props.ticketId);
   }
