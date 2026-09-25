@@ -10,7 +10,7 @@
   "fieldname",
   "url_method",
   "required",
-  "hide_from_customer",
+  "visible_to",
   "placeholder"
  ],
  "fields": [
@@ -28,11 +28,13 @@
    "label": "Required"
   },
   {
-   "default": "0",
-   "fieldname": "hide_from_customer",
-   "fieldtype": "Check",
+   "default": "Everyone",
+   "description": "Everyone lets both agents and customers see this field. Customers shows it only in the customer portal, Agents only in the agent view. This controls the ticket form only. Raise the field's permission level in Customize Form to hide it from the API layer as well.",
+   "fieldname": "visible_to",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Hide from customer"
+   "label": "Visible to",
+   "options": "Everyone\nCustomers\nAgents"
   },
   {
    "fieldname": "url_method",
@@ -49,7 +51,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-04-03 22:47:57.042918",
+ "modified": "2026-09-23 15:30:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

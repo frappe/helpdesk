@@ -3,10 +3,10 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
-from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
+from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import (
     call_log_default_columns,
     check_permissions,
@@ -15,6 +15,17 @@ from helpdesk.utils import (
     parse_call_logs,
 )
 
+# core workflows of portal must show inside ticket view
+CUSTOMER_PORTAL_LIST_FIELDS = (
+    "name",
+    "subject",
+    "status",
+    "priority",
+    "response_by",
+    "resolution_by",
+    "creation",
+    "customer",
+)
 SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
 
 
@@ -113,11 +124,17 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
-    if doctype == "HD Ticket":
+    ticket_fields = TicketFields() if doctype == "HD Ticket" else None
+    if ticket_fields:
         rows.append("_seen") if "_seen" not in rows else rows
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
+        rows = ticket_fields.visible(rows)
+        columns = ticket_fields.visible(columns, "key")
+        if group_by_field in ticket_fields.hidden:
+            # every ticket would land outside every group, so show a plain list
+            group_by_field = view_type = None
     data = (
         frappe.get_list(
             doctype,
@@ -158,6 +175,9 @@ def get_list_data(
         {"label": "Assigned To", "type": "Text", "value": "_assign"},
         {"label": "Owner", "type": "Link", "value": "owner", "options": "User"},
     ]
+    if ticket_fields:
+        fields = ticket_fields.visible(fields, "value")
+        std_fields = ticket_fields.visible(std_fields, "value")
 
     for field in std_fields:
         if field.get("value") not in rows:
@@ -244,7 +264,6 @@ def get_list_data(
 
 
 @frappe.whitelist()
-@redis_cache()
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
@@ -270,17 +289,9 @@ def get_filterable_fields(
         "Datetime",
     ]
 
-    visible_custom_fields = get_visible_custom_fields()
-    customer_portal_fields = [
-        "name",
-        "subject",
-        "status",
-        "priority",
-        "response_by",
-        "resolution_by",
-        "creation",
-        "customer",
-    ]
+    ticket_fields = TicketFields()
+    visible_custom_fields = ticket_fields.customer_template_fields
+    customer_portal_fields = list(CUSTOMER_PORTAL_LIST_FIELDS)
 
     from_doc_fields = (
         frappe.qb.from_(QBDocField)
@@ -288,7 +299,6 @@ def get_filterable_fields(
             QBDocField.fieldname,
             QBDocField.fieldtype,
             QBDocField.label,
-            QBDocField.name,
             QBDocField.options,
         )
         .where(QBDocField.parent == doctype)
@@ -302,7 +312,6 @@ def get_filterable_fields(
             QBCustomField.fieldname,
             QBCustomField.fieldtype,
             QBCustomField.label,
-            QBCustomField.name,
             QBCustomField.options,
         )
         .where(QBCustomField.dt == doctype)
@@ -342,7 +351,6 @@ def get_filterable_fields(
                 "fieldname": "_assign",
                 "fieldtype": "Link",
                 "label": "Assigned to",
-                "name": "_assign",
                 "options": "HD Agent",
             }
         )
@@ -351,7 +359,6 @@ def get_filterable_fields(
                 "fieldname": "_user_tags",
                 "fieldtype": "Link",
                 "label": "Tags",
-                "name": "_user_tags",
                 "options": "Tag",
             }
         )
@@ -383,12 +390,13 @@ def get_filterable_fields(
             "fieldname": "__assigned_on",
             "fieldtype": "Date",
             "label": "Assigned on",
-            "name": "__assigned_on",
         },
     ]
     for field in standard_fields:
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
+    if doctype == "HD Ticket":
+        res = ticket_fields.visible(res, "fieldname")
     return res
 
 
@@ -407,6 +415,9 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
+
+    if doctype == "HD Ticket":
+        fields = TicketFields().visible(fields, "value")
 
     standard_fields = [
         {"label": "Name", "value": "name"},
@@ -459,6 +470,8 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     if doctype != "HD Ticket":
         return quick_filters
 
+    quick_filters = TicketFields().visible(quick_filters, "name")
+
     _list = get_controller(doctype)
     if hasattr(_list, "filter_standard_fields") and show_customer_portal_fields:
         # to filter out more fields from customer remember to update customer_not_allowed_fields in hd_ticket.py
@@ -468,27 +481,12 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
 
 
 def get_customer_portal_fields(doctype, fields):
-    visible_custom_fields = get_visible_custom_fields()
     customer_portal_fields = [
-        "name",
-        "subject",
-        "status",
-        "priority",
-        "response_by",
-        "resolution_by",
-        "creation",
-        *visible_custom_fields,
+        *CUSTOMER_PORTAL_LIST_FIELDS,
+        *TicketFields().customer_template_fields,
     ]
     fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields
-
-
-def get_visible_custom_fields():
-    return frappe.db.get_all(
-        "HD Ticket Template Field",
-        {"parent": "Default", "hide_from_customer": 0},
-        pluck="fieldname",
-    )
 
 
 def default_view_exists(doctype):

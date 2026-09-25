@@ -6,7 +6,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
-from helpdesk.consts import DEFAULT_SLA
+from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
 
@@ -170,6 +170,176 @@ def make_ticket(
     if save:
         ticket.insert(ignore_if_duplicate=True, ignore_permissions=True)
     return ticket
+
+
+def close_emailed_ticket(raised_by: str) -> str:
+    """Only a ticket that arrived by email is ever sent a feedback link."""
+    ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "via_customer_portal", 0)
+
+    doc = frappe.get_doc("HD Ticket", ticket.name)
+    doc.status = "Closed"
+    doc.save()
+    return doc.name
+
+
+def make_customer_ticket(case, raised_by: str, **values):
+    """A ticket raised by a customer, removed when the test ends."""
+    ticket = make_ticket(raised_by=raised_by, **values)
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket
+
+
+def make_form_script(
+    case,
+    name: str,
+    body: str,
+    apply_to_customer_portal: bool = False,
+    apply_on_new_page: bool = False,
+):
+    """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
+    frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
+    frappe.get_doc(
+        {
+            "doctype": "HD Form Script",
+            "name": name,
+            "dt": "HD Ticket",
+            "apply_to": "Form",
+            "enabled": 1,
+            "apply_to_customer_portal": int(apply_to_customer_portal),
+            "apply_on_new_page": int(apply_on_new_page),
+            "script": f"function setupForm() {{ return {{}} }} // {body}",
+        }
+    ).insert()
+    case.addCleanup(
+        frappe.delete_doc, "HD Form Script", name, force=True, ignore_missing=True
+    )
+
+
+def reply_from_the_portal(case, raised_by: str, status: str) -> str:
+    """The customer answers a ticket left at `status`; returns where it lands."""
+    ticket = make_customer_ticket(case, raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "status", status)
+    frappe.set_user(raised_by)
+    frappe.get_doc("HD Ticket", ticket.name).create_communication_via_contact(
+        "it is happening again"
+    )
+    frappe.set_user("Administrator")
+    return frappe.db.get_value("HD Ticket", ticket.name, "status")
+
+
+def raise_field_permlevel(case, fieldname: str, permlevel: int):
+    """Move a ticket field beyond the levels a customer holds, for this test."""
+    frappe.make_property_setter(
+        {
+            "doctype": "HD Ticket",
+            "fieldname": fieldname,
+            "property": "permlevel",
+            "value": permlevel,
+            "property_type": "Int",
+        },
+        is_system_generated=False,
+    )
+    case.addCleanup(frappe.clear_cache)
+    case.addCleanup(
+        frappe.db.delete,
+        "Property Setter",
+        {"doc_type": "HD Ticket", "field_name": fieldname},
+    )
+    frappe.clear_cache()
+
+
+def make_template(name: str, fields: list[dict]):
+    """Create an HD Ticket Template, replacing any leftover with the name."""
+    if frappe.db.exists("HD Ticket Template", name):
+        frappe.db.delete("HD Ticket", {"template": name})
+        frappe.delete_doc("HD Ticket Template", name, force=True)
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Template", "template_name": name, "fields": fields}
+    ).insert()
+
+
+def other_priority(current: str) -> str:
+    """A priority different from `current`."""
+    return "Urgent" if current != "Urgent" else "Low"
+
+
+def default_template_rows() -> list[dict]:
+    """The Default template's rows as plain dicts, for restoring later."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    return [
+        {
+            "fieldname": f.fieldname,
+            "required": f.required,
+            "visible_to": f.visible_to,
+            "url_method": f.url_method,
+            "placeholder": f.placeholder,
+        }
+        for f in template.fields
+    ]
+
+
+def set_default_template_rows(rows: list[dict]):
+    """Replace every row of the Default template; returns the saved template."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    template.fields = []
+    for row in rows:
+        template.append("fields", row)
+    template.save()
+    return template
+
+
+def set_custom_field_permlevel(fieldname: str, permlevel: int):
+    frappe.db.set_value(
+        "Custom Field",
+        frappe.db.get_value(
+            "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+        ),
+        "permlevel",
+        permlevel,
+    )
+    frappe.clear_cache(doctype="HD Ticket")
+
+
+def get_custom_field_permlevel(fieldname: str) -> int:
+    return frappe.db.get_value(
+        "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
+    )
+
+
+def ticket_field_permlevel(fieldname: str) -> int:
+    """The live level, Customize Form overrides included."""
+    return frappe.get_meta("HD Ticket").get_field(fieldname).permlevel
+
+
+def set_default_template_visibility(fieldname: str, visible_to: str):
+    """Set who sees a field on the Default template; returns an undo for addCleanup."""
+    template = frappe.get_doc("HD Ticket Template", "Default")
+    row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
+    original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
+
+    row = next((r for r in template.fields if r.fieldname == fieldname), None)
+    if row:
+        row.visible_to = visible_to
+    else:
+        template.append("fields", {"fieldname": fieldname, "visible_to": visible_to})
+    template.save(ignore_permissions=True)
+
+    def undo():
+        doc = frappe.get_doc("HD Ticket Template", "Default")
+        doc.fields = []
+        for original in original_rows:
+            doc.append("fields", original)
+        doc.save(ignore_permissions=True)
+
+    return undo
+
+
+def get_customer_ticket(email: str):
+    """Make a ticket and return it as the customer `email` sees it."""
+    ticket = make_ticket(raised_by=email)
+    frappe.set_user(email)
+    return frappe.get_doc("HD Ticket", ticket.name)
 
 
 def create_agent(

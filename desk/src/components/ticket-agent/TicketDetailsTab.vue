@@ -189,16 +189,21 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  return CORE_FIELDS.map((fieldname) => {
-    let field = getField(fieldname);
-    if (!field) return null;
-    field = parseField(field, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB on change
-    field["required"] = field.reqd;
-    const formatted = getFieldInFormat(field, field);
-    formatted["visible"] = true;
-    return formatted;
-  }).filter(Boolean);
+  const shown = new Set(
+    (customizations.value.data?.fields || []).map((f) => f.fieldname)
+  );
+  return CORE_FIELDS.filter((f) => shown.has(f))
+    .map((fieldname) => {
+      let field = getField(fieldname);
+      if (!field) return null;
+      field = parseField(field, ticket.value.doc);
+      // cant handle required depends on as we directly set the value in DB on change
+      field["required"] = field.reqd;
+      const formatted = getFieldInFormat(field, field);
+      formatted["visible"] = true;
+      return formatted;
+    })
+    .filter(Boolean);
 });
 
 const customFields = computed(() => {
@@ -208,7 +213,7 @@ const customFields = computed(() => {
   }
 
   if (!customizations.value.data || customizations.value.loading) return [];
-  let customFields = customizations.value.data?.custom_fields || [];
+  let customFields = customizations.value.data?.fields || [];
   const excludedFields = [...CORE_FIELDS, "subject", "status"];
   customFields = customFields.filter(
     (f) => !excludedFields.includes(f.fieldname)

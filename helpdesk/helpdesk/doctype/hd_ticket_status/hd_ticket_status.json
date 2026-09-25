@@ -124,6 +124,11 @@
    "select": 1
   },
   {
+   "read": 1,
+   "role": "HD Customer Manager",
+   "select": 1
+  },
+  {
    "email": 1,
    "export": 1,
    "print": 1,

@@ -39,7 +39,7 @@
       <div class="flex min-w-0 flex-1 items-center gap-2">
         <!-- the width lives on the wrapper: a Combobox with its own #trigger
              slot drops the class it is handed -->
-        <div class="min-w-0 flex-1">
+        <div v-if="showTeamPicker" class="min-w-0 flex-1">
           <Link
             doctype="HD Team"
             :hide-clear-button="true"
@@ -394,6 +394,10 @@ const mobileCustomActions = computed(() => {
   return [{ group: "Actions", hideLabel: true, options: items }];
 });
 
+const showTeamPicker = computed(() =>
+  (customizations.data?.fields || []).some((f) => f.fieldname === "agent_group")
+);
+
 const ticketFields = computed(() => {
   if (!customizations.data || !ticket.value.doc) return [];
   const fieldsMeta = getFields();
@@ -407,7 +411,7 @@ const ticketFields = computed(() => {
     "subject",
     "status",
   ];
-  let custom_fields = customizations.data?.custom_fields || [];
+  let custom_fields = customizations.data?.fields || [];
   custom_fields = custom_fields.filter(
     (f) => !coreFieldNames.includes(f.fieldname)
   );

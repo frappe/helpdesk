@@ -247,7 +247,6 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer?: 0 | 1;
   label: string;
   options: string;
   required: 0 | 1;
@@ -501,11 +500,11 @@ export interface DocumentResource<T = unknown> {
 }
 
 export interface Customizations {
-  custom_fields: {
+  fields: {
     fieldname: string;
-    required: number;
-    placeholder: string;
-    url_method: string;
+    required?: number;
+    placeholder?: string;
+    url_method?: string;
   }[];
   _form_script: string[];
   _customActions?: any;

@@ -7,21 +7,13 @@ from frappe import _
 from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
-from pypika import Criterion, Order
+from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
-from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
-from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
-from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import (
-    agent_only,
-    check_permissions,
-    get_customers,
-    is_agent,
-    parse_call_logs,
-)
+from helpdesk.ticket_fields import TicketFields
+from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
 
 @frappe.whitelist()
@@ -32,131 +24,53 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    return d
+    return {"name": d.name}
 
 
 @frappe.whitelist()
-def get_one(name: str, is_customer_portal: bool = False):
+def get_one(name: str):
+    """The customer portal's ticket page: the ticket as this user may read it,
+    its conversation, the contact card, the template rows and the form script."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
-    QBContact = frappe.qb.DocType("Contact")
-    QBTicket = frappe.qb.DocType("HD Ticket")
+    fields = TicketFields()
 
-    _is_agent = is_agent()
-
-    query = (
-        frappe.qb.from_(QBTicket)
-        .select(QBTicket.star)
-        .where(QBTicket.name == name)
-        .limit(1)
-    )
-
-    if not _is_agent:
-        query = query.where(get_customer_criteria())
-
-    ticket = query.run(as_dict=True)
-    if not len(ticket):
-        frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
-    ticket = ticket.pop()
+    doc = frappe.get_doc("HD Ticket", name)
+    # strips permlevel fields the caller cannot read; no-op for agents
+    doc.apply_fieldlevel_read_permissions()
+    ticket = fields.strip(doc.as_dict())
     # core caches comment and email snippets here; nothing in the SPA reads it
     ticket.pop("_comments", None)
 
+    QBContact = frappe.qb.DocType("Contact")
     contact = (
         frappe.qb.from_(QBContact)
-        .select(
-            QBContact.company_name,
-            QBContact.email_id,
-            QBContact.image,
-            QBContact.mobile_no,
-            QBContact.name,
-            QBContact.phone,
-        )
+        .select(QBContact.name, QBContact.email_id, QBContact.image)
         .where(QBContact.name == ticket.contact)
         .run(as_dict=True)
     )
-    if contact:
-        contact = contact[0]
-    else:
-        contact = {
-            "email_id": ticket.raised_by,
-            "name": ticket.raised_by.split("@")[0],
-        }
-    template = ticket.template or DEFAULT_TICKET_TEMPLATE
-
-    linked_calls = frappe.db.get_all(
-        "Dynamic Link",
-        filters={"link_name": ticket["name"], "parenttype": "TP Call Log"},
-        pluck="parent",
-    )
-
-    calls = []
-
-    for call in linked_calls:
-        call = frappe.get_cached_doc(
-            "TP Call Log",
-            call,
-            fields=[
-                "name",
-                "caller",
-                "receiver",
-                "duration",
-                "type",
-                "status",
-                "from",
-                "to",
-                "recording_url",
-                "creation",
-            ],
-        ).as_dict()
-
-        calls.append(call)
-
-    call_logs = parse_call_logs(calls)
+    contact = contact[0] if contact else contact_from_email(ticket.raised_by)
 
     return {
         **ticket,
-        "comments": get_comments(name),
         "communications": get_communications(name),
         "contact": contact,
-        "tags": get_tags(name),
-        "template": get_template(template),
+        "template": {"fields": fields.form},
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=is_customer_portal
+            "HD Ticket", is_customer_portal=not fields.for_agent
         ),
-        "fields": get_meta(template),
-        "calls": call_logs,
     }
 
 
-def get_meta(template: str):
-    default_fields = ["ticket_type", "agent_group", "priority", "customer"]
-    DocField = frappe.qb.DocType("DocField")
-
-    fields = (
-        frappe.qb.from_(DocField)
-        .select(DocField.star)
-        .where(DocField.parent == "HD Ticket")
-        .where(DocField.fieldname.isin(default_fields))
-        .run(as_dict=True)
-    )
-    meta_fields = get_fields_meta(template)
-    meta_fields = [f for f in meta_fields if f["fieldname"] not in default_fields]
-
-    fields.extend(meta_fields)
-    return fields
-
-
-def get_customer_criteria():
-    QBTicket = frappe.qb.DocType("HD Ticket")
-    user = frappe.session.user
-    conditions = [
-        QBTicket.contact == user,
-        QBTicket.raised_by == user,
-        QBTicket.owner == user,
-    ]
-    customer = get_customers(user)
-    for c in customer:
-        conditions.append(QBTicket.customer == c)
-    return Criterion.any(conditions)
+def contact_from_email(email: str | None) -> dict:
+    """Stand-in card for a ticket with no contact. The email is all there is,
+    and it is missing entirely when the reader cannot see `raised_by`."""
+    return {
+        "email_id": email,
+        "name": (email or "").split("@")[0],
+        "phone": "",
+        "mobile_no": "",
+        "image": "",
+    }
 
 
 def get_assignee(_assign: str):
@@ -196,47 +110,6 @@ def get_communications(ticket: str):
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
     return communications
-
-
-def get_comments(ticket: str):
-    if not frappe.has_permission("Comment", "read"):
-        return []
-    QBComment = frappe.qb.DocType("Comment")
-    comments = (
-        frappe.qb.from_(QBComment)
-        .select(
-            QBComment.comment_email.as_("commented_by"),
-            QBComment.content,
-            QBComment.creation,
-            QBComment.is_pinned,
-            QBComment.name,
-        )
-        .where(QBComment.reference_doctype == "HD Ticket")
-        .where(QBComment.reference_name == ticket)
-        .where(QBComment.comment_type == "Comment")
-        .orderby(QBComment.creation, order=Order.asc)
-        .run(as_dict=True)
-    )
-    for c in comments:
-        c.user = get_user_info_for_avatar(c.commented_by)
-        c.attachments = get_attachments("Comment", c.name)
-    return comments
-
-
-def get_tags(ticket: str):
-    QBTag = frappe.qb.DocType("Tag Link")
-    rows = (
-        frappe.qb.from_(QBTag)
-        .select(QBTag.tag)
-        .where(QBTag.document_type == "HD Ticket")
-        .where(QBTag.document_name == ticket)
-        .orderby(QBTag.creation, order=Order.asc)
-        .run(as_dict=True)
-    )
-    res = []
-    for tag in rows:
-        res.append(tag.tag)
-    return res
 
 
 def get_call_logs(ticket: str):
@@ -326,6 +199,9 @@ def merge_ticket(source: str, target: str):
     doc.status = "Closed"
     doc.is_merged = 1
     doc.merged_with = target
+    # the server owns the merge link; without this the permlevel reset drops it
+    # and closes the source anyway, leaving nothing to say where it went
+    doc.flags.ignore_permlevel_for_fields = ["is_merged", "merged_with"]
     doc.save()
 
     message = _(
@@ -508,16 +384,11 @@ def duplicate_ticket(ticket_doc, subject):
 @frappe.whitelist()
 @agent_only
 def get_ticket_customizations():
-    # get form script
-    # get default ticket template
-    custom_fields = frappe.get_all(
-        "HD Ticket Template Field",
-        filters={"parent": "Default"},
-        fields=["fieldname", "required", "placeholder", "url_method"],
-        order_by="idx",
-    )
-    form_scripts = get_form_script("HD Ticket")
-    return {"custom_fields": custom_fields, "_form_script": form_scripts}
+    """Every field the agent details tab may show, as this user may see it."""
+    return {
+        "fields": TicketFields().layout,
+        "_form_script": get_form_script("HD Ticket"),
+    }
 
 
 @frappe.whitelist()
@@ -623,13 +494,7 @@ def get_ticket_contact(ticket: str):
             as_dict=1,
         )
     else:
-        data = {
-            "email_id": raised_by,
-            "name": raised_by.split("@")[0],
-            "phone": "",
-            "mobile_no": "",
-            "image": "",
-        }
+        data = contact_from_email(raised_by)
     return data
 
 
