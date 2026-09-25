@@ -4,116 +4,117 @@
       {{ label }}
       <span v-if="required" class="text-ink-red-6">*</span>
     </label>
-    <div :class="containerClasses">
-      <!--
-        The popover wraps the flag button alone: reka makes the whole #trigger
-        subtree toggle the panel, so a container-level trigger would open the
-        country list on every click in the number field.
-      -->
-      <Popover bare v-model:open="isOpen">
-        <template #trigger>
+    <Popover v-model:open="isOpen" matchTargetWidth>
+      <template #target="{ togglePopover }">
+        <div :class="containerClasses">
           <button
             type="button"
-            class="flex h-full items-center gap-1 rounded-l-4 px-2 min-w-[50px] focus:outline-none"
+            class="flex h-full items-center gap-1 rounded-l px-2 min-w-[50px] focus:outline-none"
             :class="[
               { 'pointer-events-none': disabled },
               flagCode ? '' : 'justify-center',
             ]"
             :aria-label="__('Select country')"
+            @click.stop="togglePopover()"
           >
             <img
               v-if="flagCode"
               :src="`https://flagcdn.com/${flagCode}.svg`"
               :alt="selectedCountry ?? ''"
-              class="h-3 w-4 rounded-1 object-cover"
+              class="h-3 w-4 rounded-sm object-cover"
             />
-            <LucideChevronDown class="size-3.5 text-ink-gray-5" />
+            <FeatherIcon name="chevron-down" class="size-3.5 text-ink-gray-5" />
           </button>
-        </template>
-
-        <template #default="{ close }">
           <div
-            class="mt-1 flex max-h-72 w-72 flex-col overflow-hidden rounded-6 border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
+            class="self-stretch border-l border-outline-gray-2"
+            aria-hidden="true"
+          />
+          <span
+            v-if="isd"
+            class="select-none ps-2.5 text-base"
+            :class="textColorClass"
           >
-            <div class="border-b border-outline-gray-1 p-2">
-              <FormControl
-                v-model="searchQuery"
-                size="sm"
-                autocomplete="one-time-code"
-                :name="`country-search-${id}`"
-                :placeholder="__('Search country')"
-                :autofocus="true"
-                @keydown.down.prevent="moveHighlight(1)"
-                @keydown.up.prevent="moveHighlight(-1)"
-                @keydown.enter.prevent="commitHighlighted(close)"
-                @keydown.escape.prevent="close()"
+            {{ isd }}
+          </span>
+          <TextInput
+            :id="id"
+            ref="numberInputRef"
+            v-model="localNumber"
+            type="tel"
+            variant="ghost"
+            :size="size"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            :autofocus="autofocus"
+            inputmode="tel"
+            maxlength="10"
+            autocomplete="off"
+            class="min-w-0 flex-1 [&_input]:!bg-transparent [&_input]:!ps-1"
+            @keydown.backspace="onBackspace"
+            @blur="$emit('blur', $event)"
+          />
+          <div
+            v-if="$slots.suffix"
+            class="flex items-center gap-2 ps-3.5 pe-2.5"
+          >
+            <slot name="suffix" />
+          </div>
+        </div>
+      </template>
+
+      <template #body="{ close }">
+        <div
+          class="mt-1 flex max-h-72 flex-col overflow-hidden rounded-lg border border-outline-gray-2 bg-surface-elevation-2 shadow-lg"
+        >
+          <div class="border-b border-outline-gray-1 p-2">
+            <FormControl
+              v-model="searchQuery"
+              size="sm"
+              autocomplete="one-time-code"
+              :name="`country-search-${id}`"
+              :placeholder="__('Search country')"
+              :autofocus="true"
+              @keydown.down.prevent="moveHighlight(1)"
+              @keydown.up.prevent="moveHighlight(-1)"
+              @keydown.enter.prevent="commitHighlighted(close)"
+              @keydown.escape.prevent="close()"
+            />
+          </div>
+          <div class="flex-1 overflow-y-auto p-1">
+            <button
+              v-for="(country, idx) in filteredCountries"
+              :key="country.name"
+              :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
+              type="button"
+              class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
+              :class="
+                idx === highlightedIndex
+                  ? 'bg-surface-gray-3'
+                  : 'hover:bg-surface-gray-2'
+              "
+              @mouseenter="highlightedIndex = idx"
+              @click="onSelectCountry(country.name, close)"
+            >
+              <img
+                :src="`https://flagcdn.com/${country.code}.svg`"
+                :alt="country.name"
+                class="h-3 w-4 rounded-sm object-cover"
               />
-            </div>
-            <div class="flex-1 overflow-y-auto p-1">
-              <button
-                v-for="(country, idx) in filteredCountries"
-                :key="country.name"
-                :ref="(el) => setItemRef(el as HTMLElement | null, idx)"
-                type="button"
-                class="flex w-full items-center gap-2 rounded-5 px-2 py-1.5 text-left text-base text-ink-gray-7 outline-none"
-                :class="
-                  idx === highlightedIndex
-                    ? 'bg-surface-gray-3'
-                    : 'hover:bg-surface-gray-2'
-                "
-                @mouseenter="highlightedIndex = idx"
-                @click="onSelectCountry(country.name, close)"
-              >
-                <img
-                  :src="`https://flagcdn.com/${country.code}.svg`"
-                  :alt="country.name"
-                  class="h-3 w-4 rounded-1 object-cover"
-                />
-                <span class="flex-1 truncate">
-                  {{ country.name }}
-                </span>
-                <span class="text-ink-gray-5">{{ country.isd }}</span>
-              </button>
-              <div
-                v-if="filteredCountries.length === 0"
-                class="p-3 text-center text-base text-ink-gray-5"
-              >
-                {{ __("No country found") }}
-              </div>
+              <span class="flex-1 truncate">
+                {{ country.name }}
+              </span>
+              <span class="text-ink-gray-5">{{ country.isd }}</span>
+            </button>
+            <div
+              v-if="filteredCountries.length === 0"
+              class="p-3 text-center text-base text-ink-gray-5"
+            >
+              {{ __("No country found") }}
             </div>
           </div>
-        </template>
-      </Popover>
-      <div
-        class="self-stretch border-l border-outline-gray-2"
-        aria-hidden="true"
-      />
-      <span
-        v-if="isd"
-        class="select-none ps-2.5 text-base"
-        :class="textColorClass"
-      >
-        {{ isd }}
-      </span>
-      <TextInput
-        :id="id"
-        ref="numberInputRef"
-        v-model="localNumber"
-        type="tel"
-        variant="ghost"
-        :size="size"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :autofocus="autofocus"
-        inputmode="tel"
-        autocomplete="off"
-        class="min-w-0 flex-1 [&_input]:!bg-transparent [&_input]:!ps-1"
-        @keydown.backspace="onBackspace"
-      />
-      <div v-if="$slots.suffix" class="flex items-center gap-2 ps-3.5 pe-2.5">
-        <slot name="suffix" />
-      </div>
-    </div>
+        </div>
+      </template>
+    </Popover>
     <p v-if="description" :class="descriptionClasses">
       {{ description }}
     </p>
@@ -121,10 +122,9 @@
 </template>
 
 <script setup lang="ts">
-import LucideChevronDown from "~icons/lucide/chevron-down";
 // TODO: replace with reka-ui in future
 import { __ } from "@/translation";
-import { FormControl, Popover, TextInput } from "frappe-ui";
+import { FeatherIcon, FormControl, Popover, TextInput } from "frappe-ui";
 import { computed, ref, useId, watch } from "vue";
 import countries from "./countries.json";
 
@@ -174,7 +174,7 @@ const flagCode = computed(
 const localNumber = ref<string>("");
 const isOpen = ref(false);
 const searchQuery = ref("");
-const numberInputRef = ref<{ focus: () => void } | null>(null);
+const numberInputRef = ref<{ el?: HTMLInputElement | null } | null>(null);
 const highlightedIndex = ref(0);
 const itemRefs: HTMLElement[] = [];
 
@@ -209,8 +209,8 @@ const filteredCountries = computed(() => {
 const sizeClasses = computed(
   () =>
     ({
-      sm: "h-7 rounded-4",
-      md: "h-8 rounded-4",
+      sm: "h-7 rounded",
+      md: "h-8 rounded",
     }[props.size])
 );
 
@@ -247,7 +247,7 @@ const descriptionClasses = computed(() => [
 ]);
 
 function parseValue(value: unknown) {
-  const phoneNumber =
+  let phoneNumber =
     typeof value === "string"
       ? value
       : typeof value === "number"
@@ -258,11 +258,24 @@ function parseValue(value: unknown) {
     return;
   }
 
+  phoneNumber = phoneNumber.trim();
+
+  // Handle bracketed country codes like "(91) 9876543210" or "(+91) 9876543210"
+  if (phoneNumber.startsWith("(") && phoneNumber.includes(")")) {
+    const closeParen = phoneNumber.indexOf(")");
+    const insideParen = phoneNumber.substring(1, closeParen).trim();
+    const rest = phoneNumber.substring(closeParen + 1).trim();
+    phoneNumber =
+      (insideParen.startsWith("+") ? insideParen : "+" + insideParen) +
+      "-" +
+      rest;
+  }
+
   // Form 1: "+ISD-NUMBER" (canonical, with dash separator)
   const dashIdx = phoneNumber.indexOf("-");
   if (dashIdx > 0) {
-    const isdPart = phoneNumber.substring(0, dashIdx);
-    const numberPart = phoneNumber.substring(dashIdx + 1);
+    const isdPart = phoneNumber.substring(0, dashIdx).trim();
+    const numberPart = phoneNumber.substring(dashIdx + 1).trim();
     const match = Object.entries(countryCodes).find(
       ([, info]) => info.isd === isdPart
     );
@@ -273,16 +286,24 @@ function parseValue(value: unknown) {
     }
   }
 
-  // Form 2: "+ISDNUMBER"
-  // Pick the longest matching ISD prefix so +1 → US doesn't shadow +1242 → Bahamas.
-  if (phoneNumber.startsWith("+")) {
+  // Form 2: "+ISDNUMBER" or "ISDNUMBER"
+  let searchNumber = phoneNumber;
+  if (
+    !searchNumber.startsWith("+") &&
+    /^\d+$/.test(searchNumber) &&
+    searchNumber.length > 10
+  ) {
+    searchNumber = "+" + searchNumber;
+  }
+
+  if (searchNumber.startsWith("+")) {
     let bestName: string | null = null;
     let bestIsd = "";
 
     for (const [countryName, info] of Object.entries(countryCodes)) {
       if (
         info.isd &&
-        phoneNumber.startsWith(info.isd) &&
+        searchNumber.startsWith(info.isd) &&
         info.isd.length > bestIsd.length
       ) {
         bestName = countryName;
@@ -291,7 +312,7 @@ function parseValue(value: unknown) {
     }
     if (bestName) {
       selectedCountry.value = bestName;
-      localNumber.value = phoneNumber.substring(bestIsd.length);
+      localNumber.value = searchNumber.substring(bestIsd.length);
       return;
     }
   }
@@ -319,7 +340,7 @@ function onSelectCountry(name: string, close: () => void) {
   selectedCountry.value = name;
   searchQuery.value = "";
   close();
-  numberInputRef.value?.focus();
+  numberInputRef.value?.el?.focus();
 }
 
 function onBackspace() {
@@ -336,7 +357,14 @@ function emitValue() {
 }
 
 parseValue(model.value);
-if (!model.value) applyDefaultCountry();
+watch(localNumber, (val) => {
+  if (val) {
+    const cleanDigits = val.replace(/\D/g, "");
+    if (cleanDigits.length > 10) {
+      localNumber.value = cleanDigits.slice(0, 10);
+    }
+  }
+});
 
 watch([localNumber, isd], emitValue);
 
