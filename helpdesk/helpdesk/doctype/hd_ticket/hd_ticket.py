@@ -1381,10 +1381,14 @@ def _customer_query(user: str) -> str:
 
 
 def _agent_query(user: str) -> str | None:
-    query = _get_base_visibility(user)
-
     if not frappe.db.get_single_value("HD Settings", "restrict_tickets_by_agent_group"):
         return  # Restrictions disabled, return all tickets
+
+    query = _get_base_visibility(user)
+
+    managed_customers = _get_managed_customers(user)
+    if managed_customers:
+        query += " OR " + _build_in_clause("customer", managed_customers)
 
     show_tickets_without_team = frappe.db.get_single_value(
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
