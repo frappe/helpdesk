@@ -143,10 +143,12 @@
               :options="[
                 {
                   value: 'calendar',
+                  label: __('Calendar'),
                   icon: 'lucide-calendar',
                 },
                 {
                   value: 'list',
+                  label: __('List'),
                   icon: 'lucide-list',
                 },
               ]"

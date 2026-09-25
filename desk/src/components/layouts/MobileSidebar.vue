@@ -10,7 +10,7 @@
         leave-from="translate-x-0"
         leave-to="-translate-x-full rtl:translate-x-full"
       >
-        <div class="relative z-10 h-full">
+        <div class="relative z-10 h-full w-fit">
           <AppSidebar mobile :profile-settings="profileSettings" />
         </div>
       </TransitionChild>
