@@ -182,6 +182,50 @@ def get_contact_info(name: str) -> dict:
     return result
 
 
+@frappe.whitelist(methods=["GET"])
+def get_related_tickets(contact: str) -> list[dict]:
+    """Tickets the contact was cc'd, sent to, or replied on, but doesn't
+    own — those already show up in the contact's own Tickets tab."""
+    frappe.has_permission("Contact", "read", doc=contact, throw=True)
+    emails = {
+        row.email_id.lower()
+        for row in frappe.get_doc("Contact", contact).email_ids
+        if row.email_id
+    }
+    if not emails:
+        return []
+
+    # Participant rows aren't independently permission-checked here; the
+    # HD Ticket lookup below is, so a ticket name leaking through here can't
+    # expose a ticket the caller isn't allowed to see.
+    ticket_names = frappe.get_list(
+        "HD Ticket Participant",
+        filters={"email": ["in", list(emails)]},
+        pluck="ticket",
+        distinct=True,
+        ignore_permissions=True,
+    )
+    if not ticket_names:
+        return []
+
+    tickets = frappe.get_list(
+        "HD Ticket",
+        filters={"name": ["in", list(ticket_names)]},
+        fields=[
+            "name",
+            "subject",
+            "status",
+            "priority",
+            "response_by",
+            "resolution_by",
+            "_assign",
+            "contact",
+        ],
+        order_by="modified desc",
+    )
+    return [t for t in tickets if t.contact != contact]
+
+
 def get_customers_with_image(name: str) -> list[dict]:
     customers = get_customers(contact=name)
     return [

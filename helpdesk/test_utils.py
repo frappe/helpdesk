@@ -172,6 +172,24 @@ def make_ticket(
     return ticket
 
 
+def make_communication(ticket: str, content: str = "This is a test email.", **args):
+    """
+    Creates a test email received on an HD Ticket. Pass sender, recipients or
+    cc to set who was on the thread.
+    """
+    return frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+            "sent_or_received": "Received",
+            "content": content,
+            **args,
+        }
+    ).insert(ignore_permissions=True)
+
+
 def create_agent(
     email: str, first_name: str | None = None, last_name: str | None = None
 ):
