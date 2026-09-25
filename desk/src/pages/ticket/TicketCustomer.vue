@@ -336,7 +336,9 @@ function handleClose() {
 function showConfirmationDialog() {
   $dialog({
     title: __("Close Ticket"),
-    message: __("Are you sure you want to close this ticket?"),
+    message: hasAgentCommunication.value
+      ? __("Are you sure you want to close this ticket?")
+      : __("Are you sure you want to close this ticket without resolution?"),
     actions: [
       {
         label: __("Confirm"),
@@ -388,11 +390,15 @@ const showEditor = computed(() => ticket.data.status !== "Closed");
 
 // this handles whether the ticket was raised and then was closed without any reply from the agent.
 const { isFeedbackMandatory } = useConfigStore();
-const showFeedback = computed(() => {
-  const hasAgentCommunication = ticket.data?.communications?.some(
+
+const hasAgentCommunication = computed(() => {
+  return ticket.data?.communications?.some(
     (c) => c.sender !== ticket.data.raised_by
   );
-  return hasAgentCommunication && isFeedbackMandatory;
+});
+
+const showFeedback = computed(() => {
+  return hasAgentCommunication.value && isFeedbackMandatory;
 });
 const { startViewing, stopViewing } = useActiveViewers(props.ticketId);
 

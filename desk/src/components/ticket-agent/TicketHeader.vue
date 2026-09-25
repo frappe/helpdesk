@@ -148,9 +148,14 @@ const statusDropdown = computed(() => {
     label: __(o.label_agent),
     value: o.label_agent,
     onClick: () => {
-      notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit({ status: o.label_agent });
+
+      if (o.label_agent === "Closed") {
+        confirmCloseTicket();
+        return;
+      }
+
+      updateTicketStatus(o.label_agent);
     },
     icon: () =>
       h(IndicatorIcon, {
@@ -341,6 +346,43 @@ onMounted(() => {
     statusRef.value?.$el?.click();
   });
 });
+const hasAgentCommunication = computed(() => {
+  return !!ticket.value.doc.last_agent_response;
+});
+
+function updateTicketStatus(status: string) {
+  notifyTicketUpdate("Status", status);
+
+  if (ticket.value.doc.status === status) return;
+
+  ticket.value.setValue.submit(
+    { status },
+    {
+      onSuccess() {
+        ticket.value.reload();
+      },
+    }
+  );
+}
+
+function confirmCloseTicket() {
+  $dialog({
+    title: __("Close Ticket"),
+    message: hasAgentCommunication.value
+      ? __("Are you sure you want to close this ticket?")
+      : __("Are you sure you want to close this ticket without resolution?"),
+    actions: [
+      {
+        label: __("Confirm"),
+        variant: "solid",
+        onClick({ close }) {
+          updateTicketStatus("Closed");
+          close();
+        },
+      },
+    ],
+  });
+}
 </script>
 
 <style>
