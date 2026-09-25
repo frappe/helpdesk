@@ -68,7 +68,7 @@
           <!-- SLA explanation icon -->
           <Tooltip
             v-if="
-              dayjs(data.value).diff(dayjs(), 'day', true) > 4 &&
+              dayjsLocal(data.value).diff(dayjsLocal(), 'day', true) > 4 &&
               data.title === 'Resolution'
             "
             :text="
@@ -129,7 +129,7 @@ import {
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat } from "@/utils";
-import { Avatar, dayjs, Tooltip } from "frappe-ui";
+import { Avatar, dayjs, dayjsLocal, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);

@@ -505,6 +505,48 @@ class TestHDTicket(IntegrationTestCase):
             # Resolution time should be 1 hour more than the original resolution time
             self.assertEqual(ticket.resolution_time, 60 * 60)
 
+    def test_hold_time_deducted_when_resolved_straight_from_paused(self):
+        # Resolving out of a paused status closes the hold window in the same
+        # save, so that window still has to come off the resolution time.
+        ticket = None
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=30)):
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+        # straight to Resolved, with no intermediate un-pause to bank the hold
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=2, minutes=30)):
+            ticket.status = "Resolved"
+            ticket.save()
+            ticket.reload()
+
+            self.assertEqual(ticket.total_hold_time, 2 * 60 * 60)
+            # 2h30m elapsed, 2h of it on hold, leaving the 30m before the pause
+            self.assertEqual(ticket.resolution_time, 30 * 60)
+
+    def test_resolution_time_kept_when_closed_ticket_set_back_to_resolved(self):
+        # Moving between resolved statuses is not a reopen, so the time spent
+        # resolved must not be counted as hold.
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="High")
+
+        for minutes, status in ((60, "Resolved"), (90, "Closed"), (180, "Resolved")):
+            ticket.reload()
+            with self.freeze_time(add_to_date(date, minutes=minutes)):
+                ticket.status = status
+                ticket.save()
+
+        ticket.reload()
+        self.assertEqual(ticket.resolution_time, 60 * 60)
+        self.assertFalse(ticket.total_hold_time)
+
     def test_hold_time_resolution_time_with_holiday(self):
         # create friday as holiday
         # create ticket on thursday 5:30 PM with high priority
