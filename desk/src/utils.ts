@@ -12,7 +12,7 @@ import {
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
-import { Icon } from "frappe-ui/experimental";
+import { FeatherIcon as Icon } from "frappe-ui";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 
