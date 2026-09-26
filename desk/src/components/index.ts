@@ -19,3 +19,5 @@ export { default as TextEditor } from "./TextEditor.vue";
 export { default as TypingIndicator } from "./TypingIndicator.vue";
 export { default as UniInput } from "./UniInput.vue";
 export { default as UserAvatar } from "./UserAvatar.vue";
+export { Autocomplete } from "frappe-ui";
+export { default as PhoneControl } from "./frappe-ui/PhoneControl/PhoneControl.vue";
