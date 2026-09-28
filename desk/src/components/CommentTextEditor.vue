@@ -11,14 +11,16 @@
     "
   >
     <template #default="{ isEmpty }">
-      <EditorContent
-        :class="[
-          'prose-sm max-w-none',
-          editable &&
-            'min-h-[7rem] mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
-          getFontFamily(newComment),
-        ]"
-      />
+      <!-- Scroll here so selected nodes aren't clipped. -->
+      <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
+        <EditorContent
+          :class="[
+            'prose-sm max-w-none',
+            editable && 'min-h-[7rem] mx-5 border-t py-3',
+            getFontFamily(newComment),
+          ]"
+        />
+      </div>
       <!-- Attachments -->
       <AttachmentList
         class="my-2 ms-5"
@@ -28,8 +30,8 @@
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
-          <div class="flex justify-between overflow-hidden py-2.5">
-            <div class="flex items-center overflow-x-auto w-[60%]">
+          <div class="flex justify-between gap-2 overflow-hidden py-2.5">
+            <div class="flex min-w-0 flex-1 items-center overflow-x-auto">
               <div class="inline-flex items-center gap-1.5 p-1">
                 <FileUploader
                   :doctype="doctype"
@@ -58,7 +60,7 @@
               <EditorFixedMenu :items="fullToolbar" />
               <EditorTableMenu />
             </div>
-            <div class="flex items-center justify-end gap-x-2 w-[40%]">
+            <div class="flex shrink-0 items-center justify-end gap-x-2">
               <Button
                 label="Discard"
                 @click="
@@ -165,11 +167,7 @@ const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
 // Mentions as a reactive getter so the `@` list stays in sync as agents load.
 const extensions = buildEditorExtensions({
-  mentions: () =>
-    (dropdown.value ?? []).map((a: { label: string; value: string }) => ({
-      id: a.value,
-      label: a.label,
-    })),
+  mentions: () => dropdown.value ?? [],
 });
 
 // Initialize typing composable
@@ -196,14 +194,14 @@ async function submitComment() {
 
   const content = newComment.value;
   const sentAttachments = attachments.value;
-  const user = getUser(authStore.userId);
-  const row = addPendingActivity(props.doctype, props.ticketId, {
+  const pendingRow = addPendingActivity(props.doctype, props.ticketId, {
     type: "comment",
     timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     author: {
-      email: user?.email,
-      fullname: user?.full_name,
-      image: user?.user_image,
+      email: getUser(authStore.userId).email,
+      // the users list may still be a stub with a guessed name and no avatar
+      fullname: authStore.userName,
+      image: authStore.userImage,
     },
     data: { name: "", content, attachments: sentAttachments },
   });
@@ -228,7 +226,7 @@ async function submitComment() {
       const name = typeof res === "string" ? res : res?.message;
       // the real row replaces the pending one the moment it arrives; unkeyed,
       // it would outlive it
-      name ? row.resolve(`comment:${name}`) : row.drop();
+      name ? pendingRow.resolve(`comment:${name}`) : pendingRow.drop();
       capture("comment_added");
       if (isManager) {
         updateOnboardingStep?.("comment_on_ticket");
@@ -238,7 +236,7 @@ async function submitComment() {
     },
     onError: () => {
       toast.error(__("Could not add the comment"));
-      row.drop();
+      pendingRow.drop();
       newComment.value = content;
       attachments.value = sentAttachments;
       loading.value = false;

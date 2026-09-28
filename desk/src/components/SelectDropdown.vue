@@ -17,7 +17,7 @@
         </div>
       </Button>
     </template>
-    <template #default="{ toggle: togglePopover }">
+    <template #default="{ close: closePopover }">
       <div
         class="mt-1 p-1 text-ink-gray-6 w-[--reka-popper-anchor-width] bg-surface-base shadow-2xl rounded-4"
         :class="bodyClass"
@@ -30,7 +30,7 @@
             @click="
               () => {
                 onChange(option.value);
-                togglePopover();
+                closePopover();
               }
             "
           >
@@ -46,7 +46,7 @@
           :label="__('Reset')"
           icon-left="lucide-refresh-ccw"
           class="w-full focus-visible:ring-0"
-          @click="onReset(togglePopover)"
+          @click="onReset(closePopover)"
         />
       </div>
     </template>
@@ -73,9 +73,9 @@ const props = withDefaults(defineProps<Props>(), {
   defaultValue: undefined,
 });
 
-const onReset = (togglePopover: () => void) => {
+const onReset = (closePopover: () => void) => {
   model.value = props.defaultValue !== undefined ? props.defaultValue : null;
-  togglePopover();
+  closePopover();
 };
 
 const onChange = (value: string) => {

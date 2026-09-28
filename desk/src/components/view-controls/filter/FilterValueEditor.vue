@@ -90,7 +90,7 @@
     </template>
     <div v-else class="flex flex-col gap-2 p-2">
       <div v-if="isRatingPicker" class="px-2 py-1">
-        <Rating v-model="ratingStars" />
+        <Rating v-model="ratingStars" size="md" />
       </div>
       <DateRangePicker
         v-else-if="isDate && operator === 'between'"

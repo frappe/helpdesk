@@ -119,7 +119,7 @@
                   </div>
                   <div
                     v-if="editing"
-                    class="flex absolute end-0 top-0 bg-surface-gray-9 rounded-4 cursor-pointer opacity-0 group-hover:opacity-100"
+                    class="flex absolute end-0 top-0 bg-surface-gray-9 rounded-4 cursor-pointer opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
                   >
                     <div
                       class="rounded-4 p-1 hover:bg-surface-gray-8"

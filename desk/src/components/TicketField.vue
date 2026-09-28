@@ -100,8 +100,12 @@ const emptyLabel = computed(
   () => props.field.placeholder || `Add ${props.field.label}`
 );
 
+const usesCombobox = computed(
+  () => !!props.field.url_method || isSearchableSelect.value
+);
+
 const placeholder = computed(() =>
-  isSearchableSelect.value ? "" : emptyLabel.value
+  usesCombobox.value ? "" : emptyLabel.value
 );
 
 function select(options: Option[]) {
@@ -117,6 +121,15 @@ function textInput() {
   });
 }
 
+// the trigger renders a matched option's label, so an unlisted value needs one
+function withSavedValue(options: Option[]): Option[] {
+  const value = props.value;
+  if (!value || options.some((option) => option.value === value)) {
+    return options;
+  }
+  return [{ label: String(value), value: value as string }, ...options];
+}
+
 // trigger: "button" keeps the search inside the popover, so the row still
 // reads as a value and not a text input
 function combobox(options: Option[]) {
@@ -125,7 +138,7 @@ function combobox(options: Option[]) {
     {
       ...ghostControl,
       trigger: "button",
-      options,
+      options: withSavedValue(options),
     },
     {
       prefix: () =>

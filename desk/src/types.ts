@@ -336,7 +336,7 @@ export type TicketTab =
 export interface TabObject {
   value: TicketTab;
   label: string;
-  icon: Component;
+  iconLeft: Component;
   condition?: () => boolean;
 }
 
