@@ -90,8 +90,8 @@ export default function setup(context) {
     __(isRelated.value ? 'Related help' : 'Popular help'),
   )
 
-  // Empty hides the button. Resolved keeps its Close: support is done, the customer may not be.
-  const pageActionLabel = computed(() => (ticket.data && !isClosed.value ? __('Close') : ''))
+  // Empty hides the button: a customer may close only what support has resolved.
+  const pageActionLabel = computed(() => (isResolved.value ? __('Close') : ''))
 
   // A ticket still in flight already has a place to say more, and it is this thread.
   const canCreateTicket = computed(() => settings.canCreateTicket.value && isClosed.value)

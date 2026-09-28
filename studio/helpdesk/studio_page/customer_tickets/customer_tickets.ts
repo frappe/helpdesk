@@ -4,8 +4,7 @@ import { useListData, useListView } from '@framework/ui/ListView'
 import { parseFilters, serializeFilters } from '@framework/ui/Filter'
 import { __, translations } from '@helpdesk/shared/translation'
 import {
-  loadAssignees,
-  avatarCell, datetimeCell, idCell, priorityCell, ratingCell,
+  datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
 import { ROUTES } from '@app/routes'
@@ -26,7 +25,6 @@ const COLUMN_LABELS = {
   status: 'Status',
   response_by: 'First Response',
   resolution_by: 'Resolution',
-  _assign: 'Assigned To',
   customer: 'Customer',
   priority: 'Priority',
   ticket_type: 'Type',
@@ -42,7 +40,6 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'status', width: '8rem' },
   { fieldname: 'response_by', width: '8rem' },
   { fieldname: 'resolution_by', width: '8rem' },
-  { fieldname: '_assign', width: '8rem' },
   { fieldname: 'customer', width: '8rem' },
   { fieldname: 'priority', width: '10rem' },
   { fieldname: 'ticket_type', width: '11rem' },
@@ -51,9 +48,6 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'feedback_rating', width: '10rem' },
   { fieldname: 'creation', width: '8rem' },
 ].map((column) => ({ ...column, label: __(COLUMN_LABELS[column.fieldname]) }))
-
-// The column layer drops `_`-prefixed keys it has no declaration for.
-const SYNTHETIC_COLUMNS = [{ key: '_assign', label: __('Assigned To'), width: '8rem' }]
 
 // Fetch-only: the SLA badges and the subject's unread weight need these, no column shows them.
 const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen']
@@ -67,7 +61,6 @@ const CELLS = {
   resolution_by: resolutionCell,
   creation: datetimeCell,
   modified: datetimeCell,
-  _assign: avatarCell,
   feedback_rating: ratingCell,
 }
 const CELLS_BY_TYPE = { Datetime: datetimeCell, Date: datetimeCell, Rating: ratingCell }
@@ -77,7 +70,7 @@ export default function setup(context) {
   const settings = useSettingsModal(context)
   settings.loadSettings()
 
-  const view = useListView(DOCTYPE, { synthetic: SYNTHETIC_COLUMNS })
+  const view = useListView(DOCTYPE)
   // Before the data layer: `useListData` fetches on creation, so seeding after costs a request.
   view.columns.shown.value = DEFAULT_COLUMNS
   watch(translations, () => {
@@ -89,12 +82,10 @@ export default function setup(context) {
   // Unset, the server orders by `modified`, which never settles for a requester.
   view.sort.by.value = [{ fieldname: 'creation', direction: 'desc' }]
 
-  // The fetch skips synthetic keys, but `_assign` is a real column to `get_list`.
   const fetchView = {
     ...view,
     columns: {
       ...view.columns,
-      synthetic: computed(() => []),
       wire: computed(() => [
         ...view.columns.wire.value,
         ...SUPPORT_FIELDS.map((key) => ({ key })),
@@ -102,9 +93,6 @@ export default function setup(context) {
     },
   }
   const data = useListData(DOCTYPE, fetchView)
-
-  // `_assign` is only user ids; the column draws a face and a name from them.
-  watch(data.rows, (rows) => loadAssignees(rows), { immediate: true })
 
   const views = useViews(view)
 
@@ -193,8 +181,6 @@ export default function setup(context) {
     filters: view.filters.conditions,
     sort: view.sort.by,
     columns: view.columns.shown,
-    // ColumnSettings reads its picker options from this prop, not the composable.
-    syntheticColumns: SYNTHETIC_COLUMNS,
     quickFilterFields,
     quickFilterCustomizing: view.quickFilter.customizing,
     filterFields: computed(() => filterFields.data || []),

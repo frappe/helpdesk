@@ -3,12 +3,11 @@ import { dayjs } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { twoUnitDuration } from '@helpdesk/shared/utils'
 import { isClosedStatus, statusMeta } from '@app/stores/ticketMeta'
-import { DATE_FORMATS, parseJsonArray } from '@app/utils'
+import { DATE_FORMATS } from '@app/utils'
 
 // Everything the summary sidebar shows, worded as progress: "Failed" is no use to the
 // person still waiting.
 
-const EMPTY = '—'
 // The page heading already carries the subject.
 const HIDDEN_FIELDS = ['subject']
 const MINUTE = 60
@@ -27,26 +26,26 @@ export function useTicketDetails(ticket, thread) {
       data.value.raised_by ||
       '',
     image: data.value.contact?.image || '',
-    reference: data.value.name
-      ? `#${data.value.name} via ${data.value.via_customer_portal ? 'Portal' : 'Email'}`
-      : '',
+    reference: data.value.name ? `#${data.value.name}` : '',
   }))
 
   const statusPill = computed(() => statusMeta(data.value.status))
 
-  const basics = computed(() => [
-    { label: __('Team'), value: data.value.agent_group || EMPTY },
-    { label: __('Priority'), value: data.value.priority || EMPTY },
-    ...templateFields(),
-  ])
+  // Only fields with a value, as the desk's customer sidebar shows them.
+  const basics = computed(() =>
+    [
+      { label: __('Team'), value: data.value.agent_group },
+      { label: __('Priority'), value: data.value.priority },
+      ...templateFields(),
+    ].filter((row) => row.value),
+  )
 
-  // An empty field keeps its row; a missing row would just look complete.
   function templateFields() {
     return (data.value.template?.fields || [])
       .filter((field) => !field.hide_from_customer && !HIDDEN_FIELDS.includes(field.fieldname))
       .map((field) => ({
         label: __(field.label),
-        value: formatValue(field, data.value[field.fieldname]) || EMPTY,
+        value: formatValue(field, data.value[field.fieldname]),
       }))
   }
 
@@ -75,13 +74,11 @@ export function useTicketDetails(ticket, thread) {
     return makeStep(__('Request received'), formatStepDate(on), 'done', on)
   }
 
-  // No assignment timestamp is customer-readable, so the first agent reply stands in.
+  // Assignment is agent-only data, so the first agent reply stands in for it.
   function assigned() {
     const reply = firstReply.value
     if (reply)
       return makeStep(__('Assigned to {0}', [reply.sender]), elapsedPhrase(reply.creation), 'done', reply.creation)
-    if (parseJsonArray(data.value._assign).length)
-      return makeStep(__('Assigned to agent'), __('An agent is on it'), 'done')
     return makeStep(__('Assigned to agent'), __('Waiting to be assigned'), 'pending')
   }
 

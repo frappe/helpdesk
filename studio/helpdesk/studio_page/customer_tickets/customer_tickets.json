@@ -171,8 +171,7 @@
           "modelValue": {
            "$type": "variable",
            "name": "columns"
-          },
-          "synthetic": "{{ syntheticColumns }}"
+          }
          }
         }
        ],
@@ -296,7 +295,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:35:28.027984",
+ "modified": "2026-09-28 21:48:53.021392",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

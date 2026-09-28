@@ -1,10 +1,10 @@
 // Ported from the agent list: the desk components it mirrors live under `@/`, which
 // the Studio build cannot resolve.
-import { Avatar, Badge, Tooltip, call, dayjs } from 'frappe-ui'
+import { Badge, Tooltip, dayjs } from 'frappe-ui'
 import { parseJsonArray } from '@app/utils'
 import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
 import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
-import { h, reactive } from 'vue'
+import { h } from 'vue'
 
 export function statusCell({ item }: any) {
   const status = statusMeta(item)
@@ -12,24 +12,6 @@ export function statusCell({ item }: any) {
     h('span', { class: ['size-[7px] shrink-0 rounded-full', STATUS_DOT_CLASSES[status.color]] }),
     h('span', { class: 'flex-1 truncate text-base' }, status.label),
   ])
-}
-
-// `_assign` carries bare ids, so without this the list guesses a name from the email.
-const agents = reactive<Record<string, { name: string; image?: string }>>({})
-
-export function loadAssignees(rows: any[]) {
-  const wanted = new Set<string>()
-  for (const row of rows || []) {
-    for (const email of parseJsonArray(row?._assign)) {
-      if (email && !(email in agents)) wanted.add(email)
-    }
-  }
-  if (!wanted.size) return
-  // Claimed before the answer lands, so a second page does not ask again.
-  wanted.forEach((email) => (agents[email] = { name: guessName(email) }))
-  call('helpdesk.api.agent.get_agent_avatars', { agents: [...wanted] })
-    .then((found) => Object.assign(agents, found || {}))
-    .catch(() => {})
 }
 
 // Bars faded per level: High is fully solid, None is empty.
@@ -106,41 +88,6 @@ export function datetimeCell({ item }: any) {
   return item ? h('span', { class: 'text-base' }, timeAgo(item)) : null
 }
 
-// Names come from the email: `session.get_users`, which the agent list uses, is agent-only.
-export function avatarCell({ item }: any) {
-  const assignees = parseAssignees(item)
-  if (!assignees.length) return null
-  if (assignees.length === 1) {
-    return h(Tooltip, { text: assignees[0].email }, () =>
-      h('div', { class: 'flex min-w-0 items-center gap-2 text-base line-clamp-1' }, [
-        h(Avatar, {
-          shape: 'circle',
-          size: 'sm',
-          label: assignees[0].name,
-          image: assignees[0].image,
-        }),
-        h('div', { class: 'min-w-0 truncate' }, assignees[0].name),
-      ]),
-    )
-  }
-  return h(
-    'div',
-    { class: 'me-1.5 flex min-w-0 items-center' },
-    assignees.map((assignee) =>
-      h(Tooltip, { text: assignee.email }, () =>
-        h(Avatar, {
-          // my-1: the ring paints outside the border box, which the cell would clip.
-          class: 'user-avatar -mr-1.5 my-1 ring-2 ring-[var(--surface-base)] transition hover:z-20 hover:scale-110',
-          shape: 'circle',
-          size: 'sm',
-          label: assignee.name,
-          image: assignee.image,
-        }),
-      ),
-    ),
-  )
-}
-
 // Bold until the reader has opened the ticket.
 export function subjectCell({ row, item }: any, reader: string) {
   const seen = parseJsonArray(row._seen).includes(reader)
@@ -168,20 +115,6 @@ export function textCell({ item }: any) {
 
 export function idCell({ row }: any) {
   return h('span', { class: 'truncate text-base text-ink-gray-6' }, row.name)
-}
-
-function parseAssignees(raw: string) {
-  return parseJsonArray(raw).map((email: string) => ({
-    email,
-    name: agents[email]?.name || guessName(email),
-    image: agents[email]?.image,
-  }))
-}
-
-// Until the lookup answers.
-function guessName(email: string) {
-  const local = String(email).split('@')[0]
-  return local.charAt(0).toUpperCase() + local.slice(1)
 }
 
 const STAR_PATH = `<path d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
