@@ -254,14 +254,36 @@ const saveSettings = async () => {
   });
 };
 
-const toggleFields = [
-  "isFeedbackMandatory",
-  "enableCommentReactions",
-  "disableSavedRepliesGlobalScope",
-  "allowAnyoneToCreateTickets",
-  "preferKnowledgeBase",
-  "skipEmailWorkflow",
-] as const;
+const toggleFieldnames = {
+  isFeedbackMandatory: "is_feedback_mandatory",
+  enableCommentReactions: "enable_comment_reactions",
+  disableSavedRepliesGlobalScope: "disable_saved_replies_global_scope",
+  allowAnyoneToCreateTickets: "allow_anyone_to_create_tickets",
+  preferKnowledgeBase: "prefer_knowledge_base",
+  skipEmailWorkflow: "skip_email_workflow",
+} as const;
+const toggleFields = Object.keys(toggleFieldnames) as Array<
+  keyof typeof toggleFieldnames
+>;
+
+// Toggles save on their own, so they never carry unsaved text fields along.
+const saveTogglesResource = createResource({
+  url: "frappe.client.set_value",
+  makeParams: () => ({
+    doctype: "HD Settings",
+    name: "HD Settings",
+    fieldname: Object.fromEntries(
+      toggleFields.map((f) => [toggleFieldnames[f], settingsData.value[f]])
+    ),
+  }),
+  onSuccess() {
+    const initial = JSON.parse(initialData.value!);
+    toggleFields.forEach((f) => (initial[f] = settingsData.value[f]));
+    initialData.value = JSON.stringify(initial);
+    configStore.configResource.reload();
+  },
+});
+let pendingToggleSave = Promise.resolve();
 
 // Track dirty state for non-toggle fields only
 watch(
@@ -271,7 +293,7 @@ watch(
     const initial = JSON.parse(initialData.value);
     isDirty.value = Object.keys(data).some(
       (key) =>
-        !(toggleFields as readonly string[]).includes(key) &&
+        !(toggleFields as string[]).includes(key) &&
         JSON.stringify(data[key as keyof typeof data]) !==
           JSON.stringify(initial[key])
     );
@@ -280,16 +302,19 @@ watch(
   { deep: true }
 );
 
-// auto save when any toggle field changes
+// Queue toggle saves: parallel writes to the single doc fail with a 417.
 watch(
   () => toggleFields.map((f) => settingsData.value[f]),
-  async (newVals) => {
+  (newVals) => {
     if (!initialData.value) return;
     const initial = JSON.parse(initialData.value);
-    if (newVals.some((v, i) => v !== initial[toggleFields[i]])) {
-      await saveSettingsResource.submit();
-      toast.success(__("Settings updated"));
-    }
+    if (!newVals.some((v, i) => v !== initial[toggleFields[i]])) return;
+    pendingToggleSave = pendingToggleSave
+      .then(async () => {
+        await saveTogglesResource.submit();
+        toast.success(__("Settings updated"));
+      })
+      .catch(() => settingsDataResource.reload());
   }
 );
 
