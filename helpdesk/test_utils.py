@@ -517,6 +517,16 @@ def get_invitation(email: str):
     )
 
 
+def delete_invitations(email: str) -> None:
+    """Remove every helpdesk invitation raised for an email, whoever the session user is."""
+    frappe.set_user("Administrator")
+    names = frappe.get_all(
+        "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
+    )
+    for name in names:
+        frappe.delete_doc("User Invitation", name, force=True)
+
+
 def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
     frappe.set_user("Administrator")
     is_manager = True if role == "HD Customer Manager" else False

@@ -10,7 +10,8 @@ from frappe import _
 from frappe.query_builder.functions import Count
 from frappe.utils import sbool
 
-from helpdesk.utils import get_customers, is_agent
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_agent
 
 # The organizations you can act on come first; alphabetical within a role.
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
@@ -280,34 +281,47 @@ def get_pending_members(customer_name: str) -> list[dict]:
 
 @frappe.whitelist()
 def get_invitable_contacts(customer: str) -> list[dict]:
-    """Who this organization can still be asked to add, as the agent desk offers them.
-
-    The same set `InviteContactDialog.vue` builds: contacts that already have a user,
-    minus the agents (an agent is not somebody's customer contact), minus whoever is a
-    member or holds a pending invite here. It was scoped to the organization's own email
-    domain, which suggested nobody unless a customer's `domain` happened to match the
-    addresses its people actually use.
-    """
+    """Contacts on the organization's email domain with a login, minus agents, members
+    and pending invites."""
     doc = get_managed_customer(customer)
-    members = {row.contact_name for row in doc.contacts}
-    invited = {member["email"] for member in get_pending_members(doc.name)}
-    invited.update(frappe.get_all("HD Agent", pluck="name"))
-    rows = frappe.get_all(
+    if not doc.domain:
+        return []
+    invited = [member["email"] for member in get_pending_members(doc.name)]
+    invited += frappe.get_all("HD Agent", pluck="name")
+    return frappe.get_all(
         "Contact",
-        filters={"user": ["is", "set"]},
-        fields=["name", "full_name", "email_id", "image"],
+        filters=[
+            ["user", "is", "set"],
+            ["email_id", "like", f"%@{doc.domain}"],
+            ["email_id", "not in", invited],
+            ["name", "not in", [row.contact_name for row in doc.contacts]],
+        ],
+        fields=["full_name", "email_id as email", "image"],
         order_by="full_name asc",
     )
-    return [
-        {
-            "contact": row.name,
-            "full_name": row.full_name or row.email_id,
-            "email": row.email_id,
-            "image": row.image,
-        }
-        for row in rows
-        if row.name not in members and row.email_id not in invited
-    ]
+
+
+@frappe.whitelist()
+def invite_members(customer: str, emails: list[str], role: str) -> None:
+    """Invite people into an organization you manage.
+
+    Inserted with permissions ignored because customer managers hold none on User
+    Invitation; `HelpdeskUserInvitation` still checks they manage this customer.
+    """
+    assert_portal_allows("allow_customer_managers_to_invite")
+    doc = get_managed_customer(customer)
+    if role not in CUSTOMER_ROLES:
+        frappe.throw(_("Invalid role {0}").format(role))
+    for email in emails:
+        frappe.get_doc(
+            doctype="User Invitation",
+            email=email,
+            roles=[{"role": role}],
+            app_name="helpdesk",
+            redirect_to_path=CUSTOMER_PORTAL_ROOT,
+            customer=doc.name,
+            contact=frappe.db.get_value("Contact", {"email_id": email}),
+        ).insert(ignore_permissions=True)
 
 
 @frappe.whitelist()

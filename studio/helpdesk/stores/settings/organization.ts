@@ -1,5 +1,4 @@
 import { ref, computed, watch } from 'vue'
-import { ROUTES } from '@app/routes'
 import { call, toast } from 'frappe-ui'
 import { t } from '@app/stores/translations'
 
@@ -142,33 +141,28 @@ export function createOrganizationSettings(core) {
       toast.error('Please enter an email address')
       return
     }
-    return core.run(async () => {
-      const result = await call('frappe.core.api.user_invitation.invite_by_email', {
-        emails: emails.join(','),
-        roles: [inviteRole.value === 'Manager' ? MANAGER_ROLE : MEMBER_ROLE],
-        redirect_to_path: ROUTES.appRoot,
-        app_name: 'helpdesk',
-        customer: selectedOrg.value,
-      })
-      if (result.invited_emails?.length) {
-        toast.success(result.invited_emails.length > 1 ? 'Invitations sent' : 'Invitation sent')
-        inviteEmails.value = []
-        inviteOpen.value = false
-      } else if (result.pending_invite_emails?.length) {
-        toast.error('An invitation for this email is already pending')
-      } else if (result.accepted_invite_emails?.length) {
-        toast.error('This person has already joined')
-      } else if (result.disabled_user_emails?.length) {
-        toast.error('This user account is disabled')
-      }
-    }, null, () => {
-      if (!emails.every(isPendingMember)) return null
+    const closeInviteForm = () => {
       inviteEmails.value = []
       inviteOpen.value = false
-      return emails.length > 1
-        ? 'Invitations created, but the emails could not be sent'
-        : 'Invitation created, but the email could not be sent'
-    })
+    }
+    return core.run(
+      async () => {
+        await call('helpdesk.api.organization.invite_members', {
+          customer: selectedOrg.value,
+          emails,
+          role: inviteRole.value === 'Manager' ? MANAGER_ROLE : MEMBER_ROLE,
+        })
+        closeInviteForm()
+      },
+      emails.length > 1 ? 'Invitations sent' : 'Invitation sent',
+      () => {
+        if (!emails.every(isPendingMember)) return null
+        closeInviteForm()
+        return emails.length > 1
+          ? 'Invitations created, but the emails could not be sent'
+          : 'Invitation created, but the email could not be sent'
+      },
+    )
   }
 
   function isPendingMember(email) {

@@ -112,21 +112,12 @@ user_invitation = {
             "HD Customer",
             "HD Customer Manager",
         ],
-        # Customer managers can invite members into their own organization only;
-        # scoping is enforced by the User Invitation before_insert hook below.
-        "HD Customer Manager": [
-            "HD Customer",
-            "HD Customer Manager",
-        ],
     },
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
 
 doc_events = {
-    "User Invitation": {
-        "before_insert": "helpdesk.helpdesk.hooks.user_invitation.validate_customer_scope",
-    },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",

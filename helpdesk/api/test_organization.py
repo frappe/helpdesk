@@ -2,20 +2,26 @@
 # See license.txt
 
 import frappe
+from frappe.core.api.user_invitation import get_pending_invitations
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.organization import (
     get_invitable_contacts,
     get_organization,
     get_organizations,
+    invite_members,
     update_member_role,
 )
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
     create_customer,
+    delete_invitations,
     make_ticket,
 )
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT
+
+NEWCOMER = "newcomer@invitations.test"
 
 
 class TestOrganizationMembers(IntegrationTestCase):
@@ -99,6 +105,76 @@ class TestOrganizationMembers(IntegrationTestCase):
             update_member_role(self.customer.name, self.manager["contact"], False)
 
 
+class TestInvitations(IntegrationTestCase):
+    """A customer manager invites into the organization they manage and sees no other."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        frappe.set_user("Administrator")
+        cls.manager = create_contact("Invite Sender", "sender@invitations.test")
+        cls.customer = create_customer(
+            "Test Invitations",
+            [{"contact_name": cls.manager["contact"], "is_manager": 1}],
+        )
+        cls.other_customer = create_customer("Test Other Invitations")
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 1
+        )
+
+    def setUp(self) -> None:
+        frappe.set_user(self.manager["user"])
+        self.addCleanup(frappe.set_user, "Administrator")
+        self.addCleanup(delete_invitations, NEWCOMER)
+
+    def test_an_invitation_lands_in_the_managed_organization(self) -> None:
+        invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+
+        invitation = frappe.db.get_value(
+            "User Invitation",
+            {"email": NEWCOMER},
+            ["name", "status", "customer", "redirect_to_path"],
+            as_dict=True,
+        )
+        self.assertEqual(invitation.status, "Pending")
+        self.assertEqual(invitation.customer, self.customer.name)
+        self.assertEqual(invitation.redirect_to_path, CUSTOMER_PORTAL_ROOT)
+        roles = frappe.get_all("User Role", {"parent": invitation.name}, pluck="role")
+        self.assertEqual(roles, ["HD Customer"])
+
+    def test_a_manager_cannot_invite_into_another_organization(self) -> None:
+        with self.assertRaises(frappe.PermissionError):
+            invite_members(self.other_customer.name, [NEWCOMER], "HD Customer")
+
+    def test_the_invitation_itself_refuses_another_organization(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            frappe.get_doc(
+                doctype="User Invitation",
+                email=NEWCOMER,
+                roles=[{"role": "HD Customer"}],
+                app_name="helpdesk",
+                redirect_to_path=CUSTOMER_PORTAL_ROOT,
+                customer=self.other_customer.name,
+            ).insert(ignore_permissions=True)
+
+    def test_a_manager_cannot_list_the_helpdesk_invitations(self) -> None:
+        with self.assertRaises(frappe.PermissionError):
+            get_pending_invitations("helpdesk")
+
+    def test_invites_need_the_portal_setting(self) -> None:
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 0
+        )
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_invite",
+            1,
+        )
+        with self.assertRaises(frappe.PermissionError):
+            invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+
+
 class TestInvitableContacts(IntegrationTestCase):
     """Suggestions for the invite screen, and the line they must not cross."""
 
@@ -115,12 +191,14 @@ class TestInvitableContacts(IntegrationTestCase):
             "Test Invitable",
             [{"contact_name": cls.manager["contact"], "is_manager": 1}],
         )
+        cls.customer.db_set("domain", "invitable.test")
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 1
+        )
 
     def setUp(self) -> None:
         frappe.set_user(self.manager["user"])
-
-    def tearDown(self) -> None:
-        frappe.set_user("Administrator")
+        self.addCleanup(frappe.set_user, "Administrator")
 
     def emails(self) -> list[str]:
         return [row["email"] for row in get_invitable_contacts(self.customer.name)]
@@ -128,11 +206,21 @@ class TestInvitableContacts(IntegrationTestCase):
     def test_a_contact_with_a_user_is_suggested(self) -> None:
         self.assertIn("colleague@invitable.test", self.emails())
 
-    def test_the_email_domain_does_not_narrow_the_list(self) -> None:
-        self.assertIn("outsider@elsewhere.test", self.emails())
+    def test_contacts_off_the_email_domain_are_not_suggested(self) -> None:
+        self.assertNotIn("outsider@elsewhere.test", self.emails())
+
+    def test_an_organization_without_a_domain_suggests_nobody(self) -> None:
+        self.customer.db_set("domain", None)
+        self.addCleanup(self.customer.db_set, "domain", "invitable.test")
+        self.assertEqual(self.emails(), [])
 
     def test_existing_members_are_not_suggested(self) -> None:
         self.assertNotIn("manager@invitable.test", self.emails())
+
+    def test_a_pending_invitee_is_not_suggested(self) -> None:
+        invite_members(self.customer.name, ["colleague@invitable.test"], "HD Customer")
+        self.addCleanup(delete_invitations, "colleague@invitable.test")
+        self.assertNotIn("colleague@invitable.test", self.emails())
 
     def test_agents_are_not_suggested(self) -> None:
         self.assertNotIn("agent@invitable.test", self.emails())
