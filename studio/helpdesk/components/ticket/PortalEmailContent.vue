@@ -2,6 +2,8 @@
   <iframe
     ref="frame"
     :srcdoc="srcdoc"
+    sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+    referrerpolicy="no-referrer"
     class="block h-10 max-h-[500px] w-full max-w-full border-0"
   />
 </template>
@@ -9,6 +11,10 @@
 <script setup lang="ts">
 // An iframe keeps the mail's markup and styles out of the portal, as the desk's does.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  applyCssToIframe,
+  stripEmailColors,
+} from "@framework/ui/components/ActivityTimeline/utils";
 
 const QUOTE_SELECTORS = [
   "div.gmail_quote",
@@ -23,7 +29,9 @@ const props = withDefaults(
 
 const frame = ref<HTMLIFrameElement | null>(null);
 
-const body = computed(() => collapseQuotes(asHtml(props.content || "")));
+const body = computed(() =>
+  collapseQuotes(asHtml(stripEmailColors(props.content || "")))
+);
 
 // Plain-text mail has no markup, so its newlines would collapse into one paragraph.
 function asHtml(content: string) {
@@ -32,24 +40,11 @@ function asHtml(content: string) {
   return `<div style="white-space: pre-wrap">${doc.body.innerHTML}</div>`;
 }
 
-// The portal's own stylesheets, so prose renders inside the frame as it does outside.
-let capturedStyles = "";
-function mirroredStyles() {
-  if (capturedStyles) return capturedStyles;
-  const links = Array.from(
-    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')
-  ).map((link) => `<link rel="stylesheet" href="${link.href}" />`);
-  const styles = Array.from(document.querySelectorAll("style")).map(
-    (style) => `<style>${style.textContent}</style>`
-  );
-  capturedStyles = links.join("") + styles.join("");
-  return capturedStyles;
-}
-
 function collapseQuotes(html: string) {
   const doc = new DOMParser().parseFromString(html, "text/html");
+  stripActiveContent(doc);
   const selector = QUOTE_SELECTORS.find((s) => doc.querySelector(s));
-  if (!selector) return html;
+  if (!selector) return doc.body.innerHTML;
 
   let quote = nextQuote(doc, selector);
   while (quote) {
@@ -57,6 +52,17 @@ function collapseQuotes(html: string) {
     quote = nextQuote(doc, selector);
   }
   return doc.body.innerHTML;
+}
+
+// Scripts and handlers go at parse time; the sandbox and CSP stay as the runtime backstop.
+function stripActiveContent(doc: Document) {
+  doc.querySelectorAll("script").forEach((element) => element.remove());
+  doc.querySelectorAll("*").forEach((element) => {
+    for (const attribute of [...element.attributes]) {
+      if (attribute.name.toLowerCase().startsWith("on"))
+        element.removeAttribute(attribute.name);
+    }
+  });
 }
 
 // Folding leaves the matched marker in the document, so skip what is already folded.
@@ -115,12 +121,11 @@ onMounted(() => {
 });
 
 const srcdoc = computed(
-  () => `<!DOCTYPE html><html><head><base target="_blank" />
-  ${mirroredStyles()}
+  () => `<!DOCTYPE html><html><head>
+  <meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none';" />
+  <base target="_blank" />
   <style>
-    body { margin: 0; font-family: ${contextFont.value.family}; font-size: ${
-    contextFont.value.size
-  }; }
+    body { margin: 0; font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}; }
     /* Tailwind's prose caps itself at 65ch; a message uses the width it is given. */
     .email-content { max-width: none; word-break: break-word; }
     .email-content img { margin: 0; border-width: 0; }
@@ -142,9 +147,7 @@ const srcdoc = computed(
     .replied-content .collapse + input { display: none; }
     .replied-content .collapse + input + div { display: none; }
     .replied-content .collapse + input:checked + div { display: block; }
-  </style></head><body><div class="email-content prose prose-sm">${
-    body.value
-  }</div></body></html>`
+  </style></head><body><div class="email-content prose prose-sm">${body.value}</div></body></html>`
 );
 
 let observer: ResizeObserver | null = null;
@@ -154,7 +157,11 @@ watch(
   frame,
   (element) => {
     if (!element) return;
-    element.onload = () => resize(element);
+    element.onload = () => {
+      // The portal's own sheets, so prose renders inside the frame as it does outside.
+      applyCssToIframe(element, () => resize(element));
+      resize(element);
+    };
     // Text re-wraps on a width change, and a height measured at the old width clips it.
     observer?.disconnect();
     observer = new ResizeObserver(([entry]) => {
