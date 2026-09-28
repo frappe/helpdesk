@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="props.items.length > 0"
+    data-suggestion-popup
     class="max-h-[300px] min-w-40 overflow-y-auto rounded-6 bg-surface-base p-1 text-base shadow-lg pointer-events-auto hide-scrollbar"
   >
     <button

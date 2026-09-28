@@ -77,6 +77,7 @@
                   class="w-10"
                   variant="ghost"
                   :tooltip="__('Remove')"
+                  :aria-label="__('Remove')"
                   icon="lucide-x"
                   @click.prevent="removeEmail(e)"
                 />

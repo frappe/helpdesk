@@ -868,7 +868,7 @@ export const DismissSuggestionsOnOutsideClick = Extension.create({
             const target = event.target as Element;
             if (
               view.dom.contains(target) ||
-              target.closest?.(".editor-popover")
+              target.closest?.(".editor-popover, [data-suggestion-popup]")
             )
               return;
             for (const plugin of view.state.plugins) {
