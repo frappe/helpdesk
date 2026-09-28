@@ -1,4 +1,3 @@
-import type { Page } from "@playwright/test";
 import type { Api } from "../support/api";
 import { raiseTicket } from "../support/factories";
 import { expect, test, uid, usePersona } from "../support/fixtures";
@@ -273,42 +272,6 @@ test("bulk edit, assign and reply act on every selected ticket", async ({
   }
 });
 
-test("a saved view can be pinned, made public and deleted", async ({
-  page,
-  api,
-}) => {
-  const label = `E2E view ${uid()}`;
-  const list = new TicketList(page);
-  await list.goto();
-  await list.searchSubject(label);
-
-  await page.getByRole("button", { name: "List", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Create View" }).click();
-  const createDialog = page.getByRole("dialog", { name: "Create View" });
-  await createDialog.getByRole("textbox").first().fill(label);
-  await createDialog.getByRole("button", { name: "Create" }).click();
-  await expect(page).toHaveURL(/\?view=/);
-  const view = await expect
-    .poll(() => api.exists("HD View", { label }))
-    .toBeTruthy()
-    .then(() => api.exists("HD View", { label }));
-  const saved = await api.get("HD View", view!);
-  expect(saved.filters).toContain(label);
-
-  const sidebar = page.getByRole("navigation", { name: "Main" });
-  await viewAction(page, label, "Pin View");
-  await expect(sidebar.getByRole("button", { name: label })).toBeVisible();
-  await expect.poll(async () => (await api.get("HD View", view!)).pinned).toBe(1);
-
-  await viewAction(page, label, "Make Public");
-  await expect.poll(async () => (await api.get("HD View", view!)).public).toBe(1);
-
-  await viewAction(page, label, "Delete");
-  await page.getByRole("dialog").getByRole("button", { name: "Confirm" }).click();
-  await expect.poll(() => api.exists("HD View", { label })).toBeUndefined();
-  await expect(sidebar.getByRole("button", { name: label })).toHaveCount(0);
-});
-
 test("selected tickets export as CSV", async ({ page, apiAs }) => {
   const subject = `${uid()} export`;
   await raiseTicket(await apiAs("customer"), subject);
@@ -328,14 +291,6 @@ test("selected tickets export as CSV", async ({ page, apiAs }) => {
   const content = await (await file.createReadStream()).toArray();
   expect(Buffer.concat(content).toString()).toContain(subject);
 });
-
-async function viewAction(page: Page, label: string, action: string) {
-  await page.getByRole("banner").getByRole("button", { name: label }).click();
-  const item = page.getByRole("menuitem", { name: label });
-  await item.hover();
-  await item.getByRole("button").click();
-  await page.getByRole("menuitem", { name: action }).click();
-}
 
 async function assign(api: Api, name: string, users: string[]) {
   await api.call("frappe.desk.form.assign_to.add", {

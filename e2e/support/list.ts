@@ -43,6 +43,30 @@ export class TicketList {
     await this.page.getByRole("menuitem", { name: item }).click();
   }
 
+  /** Save the current filters as a new view and return its HD View name. */
+  async createView(api: Api, label: string) {
+    await this.page.getByRole("button", { name: "List", exact: true }).click();
+    await this.page.getByRole("menuitem", { name: "Create View" }).click();
+    const dialog = this.page.getByRole("dialog", { name: "Create View" });
+    await dialog.getByRole("textbox").first().fill(label);
+    await dialog.getByRole("button", { name: "Create" }).click();
+    await expect(this.page).toHaveURL(/\?view=/);
+    await expect.poll(() => api.exists("HD View", { label })).toBeTruthy();
+    return (await api.exists("HD View", { label }))!;
+  }
+
+  /** Run an action from a view's kebab menu in the breadcrumb dropdown. */
+  async viewAction(label: string, action: string) {
+    await this.page.getByRole("banner").locator("button[aria-haspopup=menu]").first().click();
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // standard views carry a "Standard" badge in their name
+    const name = new RegExp(`^${escaped}( Standard)?$`);
+    const item = this.page.getByRole("menuitem", { name });
+    await item.hover();
+    await item.getByRole("button").click();
+    await this.page.getByRole("menuitem", { name: action }).click();
+  }
+
   async addFilter(field: string, value: string) {
     await this.page.getByRole("button", { name: "Filter" }).click();
     const popover = this.page.getByRole("dialog", { name: "Filter" });
