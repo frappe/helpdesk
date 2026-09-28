@@ -41,14 +41,6 @@ export function slaTextColor(metric: SLAMetric): string {
   return metric.state === "due" ? "text-ink-gray-7" : inkClasses[metric.color];
 }
 
-/** Display text, e.g. "Fulfilled in 3h 20m", "Due in 2d 4h", "On Hold" */
-export function slaLabel(metric: SLAMetric): string {
-  if (metric.state !== "fulfilled") return metric.value;
-  return metric.fulfilledIn
-    ? `Fulfilled in ${metric.fulfilledIn}`
-    : "Fulfilled";
-}
-
 export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
   firstResponse: ComputedRef<SLAMetric | null>;
   resolution: ComputedRef<SLAMetric | null>;

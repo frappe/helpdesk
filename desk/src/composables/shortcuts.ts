@@ -1,1 +1,1 @@
-export { shortcutsList, useShortcut } from "@helpdesk/shared/shortcuts";
+export { useShortcut } from "@helpdesk/shared/shortcuts";

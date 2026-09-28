@@ -70,8 +70,6 @@ const DASHED_OWED =
 const LINE: Record<MilestoneState, string> = {
   done: "bg-[var(--outline-gray-2)]",
   closed: "bg-[var(--outline-gray-2)]",
-  breach:
-    "bg-[repeating-linear-gradient(180deg,var(--ink-red-6)_0_5px,transparent_5px_11px)]",
   next: DASHED_OWED,
   pending: DASHED_OWED,
 };

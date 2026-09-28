@@ -23,7 +23,6 @@ export {
   prettyDate,
   shortDuration,
   timeAgo,
-  validateEmail,
 } from "@helpdesk/shared/utils";
 
 /**
@@ -645,17 +644,6 @@ export function getRandom(len = 4) {
   });
 
   return text;
-}
-
-export function isElementInViewport(el: HTMLElement) {
-  if (!el) return false;
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= window.innerHeight &&
-    rect.right <= window.innerWidth
-  );
 }
 
 export function parseApiOptions(

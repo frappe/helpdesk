@@ -83,11 +83,9 @@ function createPreferencesStore() {
       LAYOUT_OPTIONS.map((option) => ({ ...option, label: __(option.label) })),
     ),
     preferences,
-    isPreferencesSaving,
     languageOptions,
     timezoneOptions,
     loadPreferences,
     setPreference,
-    savePreferences,
   }
 }

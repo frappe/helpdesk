@@ -92,7 +92,6 @@ export function createSettingsCore() {
   return {
     isSettingsOpen,
     settingsTab,
-    settingsData,
     isSettingsBusy,
     settingsUser,
     organizations,

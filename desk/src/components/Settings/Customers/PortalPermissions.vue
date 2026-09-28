@@ -59,11 +59,9 @@
 // Off by default: the first one lets a customer create logins. These only draw the
 // controls; the server enforces them independently.
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
 
-const configStore = useConfigStore();
 const hdSettings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
@@ -71,12 +69,9 @@ const hdSettings = createDocumentResource({
 
 // Each switch saves itself, so the tab never carries a dirty state.
 function onToggle(fieldname: string, value: boolean) {
-  hdSettings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
-}
-
-function onSaved() {
-  // The portal reads both through `get_config`, so refresh what it will be handed.
-  configStore.configResource.reload();
-  toast.success(__("Settings updated"));
+  hdSettings.setValue.submit(
+    { [fieldname]: value },
+    { onSuccess: () => toast.success(__("Settings updated")) }
+  );
 }
 </script>

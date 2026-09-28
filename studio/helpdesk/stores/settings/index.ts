@@ -69,7 +69,6 @@ const store = {
   accountMenuOptions,
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
-  settingsData: core.settingsData,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
@@ -82,7 +81,6 @@ const store = {
   acceptConfirm: core.acceptConfirm,
   ...organization,
   ...profile,
-  ...dialog,
 }
 
 // Every page script goes through here, so the session store rides along.

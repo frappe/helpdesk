@@ -1,7 +1,7 @@
 // Style values the message blocks bind, so a row carries its own geometry rather than
 // the page forking into two templates.
 
-export const TIMELINE = {
+const TIMELINE = {
   showRail: true,
   // Lined up with the first line of the card, which is the byline.
   avatarOffset: '6px',
@@ -20,7 +20,7 @@ export const TIMELINE = {
 
 // A flex row, so the reader's own messages can turn around and sit against the other edge.
 // The card shrinks to the width PortalEmailContent measures, capped at three quarters.
-export const THEIR_BUBBLE = {
+const THEIR_BUBBLE = {
   ...TIMELINE,
   // The byline sits above the bubble, so the face shifts in towards the name.
   avatarOffset: '-4px',
@@ -34,7 +34,7 @@ export const THEIR_BUBBLE = {
   cardPadding: '12px 16px 14px',
 }
 
-export const OWN_BUBBLE = {
+const OWN_BUBBLE = {
   ...THEIR_BUBBLE,
   // The side of the thread already says whose it is, so no face is shown back at you.
   showRail: false,

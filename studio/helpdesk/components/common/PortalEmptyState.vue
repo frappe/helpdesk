@@ -15,7 +15,6 @@
         {{ description }}
       </div>
     </div>
-    <slot />
   </div>
 </template>
 
@@ -25,15 +24,11 @@ import { computed } from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideInbox from "~icons/lucide/inbox";
-import LucideSearch from "~icons/lucide/search";
-import LucideUsers from "~icons/lucide/users";
 
 const GLYPHS = {
   organization: LucideBuilding2,
   article: LucideBookOpen,
   ticket: LucideInbox,
-  search: LucideSearch,
-  people: LucideUsers,
 };
 
 const props = withDefaults(

@@ -37,7 +37,7 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { computed, h, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
 import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
@@ -54,7 +54,6 @@ import { useAgentStatusStore } from "@/stores/agentStatus";
 const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 
 const agentStatusStore = useAgentStatusStore();

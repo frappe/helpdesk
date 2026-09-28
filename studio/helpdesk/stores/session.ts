@@ -63,7 +63,6 @@ function createSessionStore() {
     config,
     isGuest,
     canCreateTicket,
-    isPublicKnowledgeBase,
     isAgent,
     brandLogo,
     loginUrl,

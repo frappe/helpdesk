@@ -63,14 +63,11 @@ export function createProfileSettings(core) {
   }
 
   return {
-    profileFirstName,
-    profileLastName,
     passwordOpen,
     currentPassword,
     newPassword,
     openPasswordChange,
     changePassword,
-    saveProfile,
     renameProfile,
     uploadProfileImage,
     removeProfileImage,

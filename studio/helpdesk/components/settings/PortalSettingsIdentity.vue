@@ -1,9 +1,9 @@
 <template>
   <!-- The avatar itself opens the file picker; the name is edited inline. -->
   <div class="flex items-center gap-4 pt-1.5">
-    <div class="group relative shrink-0" :class="avatarBox">
-      <!-- Avatar's size enum stops at 46px, so both scales size it themselves. -->
-      <Avatar :class="avatarBox" :image="image" :label="name" :shape="shape" />
+    <div class="group relative size-16 shrink-0">
+      <!-- Avatar's size enum stops at 46px, so the block sizes it itself. -->
+      <Avatar class="size-16" :image="image" :label="name" :shape="shape" />
       <Tooltip
         v-if="editable"
         :hover-delay="0"
@@ -29,7 +29,7 @@
       <!-- Both states share the input's height so switching doesn't move the block. -->
       <div class="flex min-h-7 items-center gap-1">
         <template v-if="!isEditing">
-          <span class="text-ink-gray-8" :class="titleClass">{{ name }}</span>
+          <span class="text-2xl-semibold text-ink-gray-8">{{ name }}</span>
           <Button
             v-if="editable"
             class="!h-5 !px-1"
@@ -78,10 +78,8 @@ const props = withDefaults(
     maxLength?: number;
     busy?: boolean;
     editable?: boolean;
-    // "page" matches the agent portal's PageInfo header; "settings" is the compact one.
-    scale?: "settings" | "page";
   }>(),
-  { shape: "circle", editable: true, scale: "settings" }
+  { shape: "circle", editable: true }
 );
 
 const emit = defineEmits<{
@@ -89,17 +87,6 @@ const emit = defineEmits<{
   (e: "remove"): void;
   (e: "rename", value: string): void;
 }>();
-
-const avatarBox = computed(() =>
-  props.scale === "page" ? "size-[52px]" : "size-16"
-);
-
-// frappe-ui's text-* classes set weight as well as size, so a separate font-* class
-// loses to them on order — the desk pays for this with `!font-semibold`. The composite
-// classes render the same: 18px/600, matching Settings/Profile/Profile.vue.
-const titleClass = computed(() =>
-  props.scale === "page" ? "text-2xl-medium" : "text-2xl-semibold"
-);
 
 const uploadLabel = computed(() =>
   props.image ? __("Change Photo") : __("Upload Photo")

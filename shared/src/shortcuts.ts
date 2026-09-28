@@ -10,7 +10,7 @@ interface ShortcutBinding {
   meta?: boolean; // Cmd on Mac
 }
 
-export const shortcutsList = ref<ShortcutBinding[]>([]);
+const shortcutsList = ref<ShortcutBinding[]>([]);
 
 // Registers a keyboard shortcut and its callback
 // binding: can take either a string (key) or a ShortcutBinding object, e.g., 'k' or { key: 'k', cmnd: true }

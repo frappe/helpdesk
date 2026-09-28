@@ -1,11 +1,6 @@
 <template>
   <div class="flex items-center">
-    <button
-      class="ps-0 pe-0.5 py-1 text-lg-medium text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3"
-      @click="emit('parentClick')"
-    >
-      {{ label }}
-    </button>
+    <span class="pe-0.5 py-1 text-lg-medium text-ink-gray-5">{{ label }}</span>
     <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown :options="options">
       <template #default="{ open }">
@@ -112,6 +107,4 @@ withDefaults(
     viewActions: () => () => [],
   }
 );
-
-const emit = defineEmits<{ (e: "parentClick"): void }>();
 </script>

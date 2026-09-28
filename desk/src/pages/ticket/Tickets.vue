@@ -11,10 +11,7 @@
         />
       </template>
       <template #right-header>
-        <RouterLink
-          class="inline-flex"
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
-        >
+        <RouterLink class="inline-flex" :to="{ name: 'TicketAgentNew' }">
           <Button
             class="rtl:flex-row-reverse"
             :label="__('Create')"
