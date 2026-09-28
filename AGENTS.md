@@ -373,6 +373,7 @@ const ticket = createDocumentResource({
 - Write meaningful commit messages and maintain clean git history
 - Document complex logic with JSDoc/TSDoc comments
 - Only add comments that explain why something is done, not what is done
+- Keep a comment to 2 lines at most. If it needs more to explain, simplify the code instead
 - Keep dependencies updated and audit for security vulnerabilities
 
 ## References
