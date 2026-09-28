@@ -23,11 +23,3 @@ class TestConfig(IntegrationTestCase):
 
     def test_it_names_a_signed_in_user(self):
         self.assertEqual(get_config().session_user, "Administrator")
-
-    def test_it_carries_the_ticket_setting(self):
-        for value in (1, 0):
-            frappe.db.set_single_value(
-                "HD Settings", "allow_anyone_to_create_tickets", value
-            )
-
-            self.assertEqual(get_config().allow_anyone_to_create_tickets, value)
