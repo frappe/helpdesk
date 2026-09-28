@@ -38,12 +38,16 @@ function appliedTags(ticketId: string): Set<string> {
 async function toggleTag(ticketId: string, tag: Tag): Promise<void> {
   const applied = appliedTags(ticketId).has(tag.name);
   try {
-    const userTags = await call("helpdesk.api.tags.update_tags", {
-      doctype: "HD Ticket",
-      name: ticketId,
-      added: applied ? [] : [{ name: tag.name, color: tag.color || "Gray" }],
-      removed: applied ? [tag.name] : [],
-    });
+    const userTags = await call(
+      "frappe.desk.doctype.tag.tag.update_document_tags",
+      {
+        doctype: "HD Ticket",
+        docname: ticketId,
+        app: "helpdesk",
+        added: applied ? [] : [{ name: tag.name, color: tag.color }],
+        removed: applied ? [tag.name] : [],
+      }
+    );
     const { ticket } = useTicket(ticketId);
     // The response carries the new _user_tags: one round trip, no doc reload.
     if (ticket.doc) ticket.doc._user_tags = userTags;

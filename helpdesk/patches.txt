@@ -49,6 +49,7 @@ helpdesk.patches.show_customer_portal_permission_notice
 helpdesk.patches.set_persona_captured_for_existing_sites
 helpdesk.patches.backfill_priority_level
 helpdesk.patches.add_tag_custom_fields
+helpdesk.patches.migrate_tags_to_framework
 helpdesk.patches.rename_purple_status_color
 helpdesk.patches.set_default_portal_settings
 helpdesk.patches.rename_agent_status_enable_field

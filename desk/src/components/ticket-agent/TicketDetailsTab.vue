@@ -64,10 +64,12 @@
               <!-- 9px = the Link triggers' 8px padding + 1px border, so chips
                  and the add button start on the same column as the values -->
               <div class="min-w-0 flex-1 py-0.5 ps-[9px]">
-                <Tags
+                <TagPicker
                   doctype="HD Ticket"
-                  :name="ticket.doc?.name"
+                  :docname="ticket.doc?.name"
+                  app="helpdesk"
                   :tags="ticket.doc?._user_tags"
+                  @update:tags="ticket.doc && (ticket.doc._user_tags = $event)"
                 />
               </div>
             </div>
@@ -165,7 +167,7 @@ import { dayjs } from "frappe-ui";
 import { computed, inject, ref } from "vue";
 import FieldLabel from "../FieldLabel.vue";
 import Section from "../Section.vue";
-import Tags from "../tag/Tags.vue";
+import { TagPicker } from "@framework/ui";
 import TicketField from "../TicketField.vue";
 import AssignTo from "./AssignTo.vue";
 import TicketContact from "./TicketContact.vue";
