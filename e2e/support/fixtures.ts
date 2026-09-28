@@ -50,6 +50,12 @@ export const test = base.extend<Fixtures>({
 
 export { expect };
 
+/** Hide the getting started panel that covers the sidebar for admins and managers. */
+export function skipGettingStarted(page: Page, user: string) {
+  const key = `isOnboardingStepsCompletedhelpdesk${user}`;
+  return page.addInitScript((key) => localStorage.setItem(key, "true"), key);
+}
+
 /** Short unique suffix so specs never collide with each other or old runs. */
 export function uid() {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;

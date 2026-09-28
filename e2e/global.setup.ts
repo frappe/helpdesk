@@ -1,5 +1,6 @@
 import { expect, test as setup } from "@playwright/test";
 import { Api } from "./support/api";
+import { skipGettingStarted } from "./support/fixtures";
 import { seedSite } from "./support/seed";
 import { siteHeader } from "./support/site";
 import {
@@ -33,7 +34,11 @@ setup("seed site and log every persona in", async ({ browser, baseURL }) => {
       form: { usr: emailOf(key), pwd: password },
     });
     expect(response.ok(), `login as ${key}`).toBeTruthy();
+    const page = await context.newPage();
+    await skipGettingStarted(page, emailOf(key));
+    await page.goto("/api/method/ping");
     await context.storageState({ path: storageStateOf(key) });
     await context.close();
   }
 });
+

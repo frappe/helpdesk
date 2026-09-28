@@ -1,5 +1,5 @@
 import type { Api } from "./api";
-import { seedPersonas } from "./personas";
+import { emailOf, personas, seedPersonas, type PersonaKey } from "./personas";
 
 export const OUTGOING_EMAIL = "e2e-support@example.com";
 
@@ -7,14 +7,14 @@ export const OUTGOING_EMAIL = "e2e-support@example.com";
 export async function seedSite(api: Api) {
   await seedPersonas(api);
   await ensureOutgoingEmailAccount(api);
+  await resetDefaultTicketViews(api);
   await api.update("HD Settings", "HD Settings", {
     persona_captured: 1,
     setup_complete: 1,
   });
 }
 
-// SMTP is never reached: without a password Frappe skips the connection check
-// and queued mails just sit in the Email Queue.
+// Without a password Frappe skips the SMTP check, so mails just stay queued.
 async function ensureOutgoingEmailAccount(api: Api) {
   if (await api.exists("Email Account", { email_id: OUTGOING_EMAIL })) return;
   await api.insert("Email Account", {
@@ -26,4 +26,13 @@ async function ensureOutgoingEmailAccount(api: Api) {
     default_outgoing: 1,
     enable_incoming: 0,
   });
+}
+
+// Filters typed on the ticket list auto save into the user's default view.
+async function resetDefaultTicketViews(api: Api) {
+  const keys = ["admin", ...Object.keys(personas)] as PersonaKey[];
+  const views = await api.list("HD View", {
+    filters: { dt: "HD Ticket", is_default: 1, user: ["in", keys.map(emailOf)] },
+  });
+  for (const view of views) await api.delete("HD View", view.name);
 }

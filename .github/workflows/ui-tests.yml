@@ -29,7 +29,7 @@ jobs:
 
     services:
       redis-cache:
-        image: redis:alpine
+        image: redis/redis-stack-server:latest
         ports:
           - 13000:6379
       redis-queue:
