@@ -2,12 +2,7 @@ import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
-import {
-  call,
-  dayjsLocal,
-  toast,
-  useFileUpload,
-} from "frappe-ui";
+import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
