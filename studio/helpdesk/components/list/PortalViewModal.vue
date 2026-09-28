@@ -51,10 +51,10 @@
 <script setup lang="ts">
 // No "Pin to sidebar" or "Make it public": this portal has no sidebar, and the desk
 // hides public outside the agent view. A customer's view is a name over the layout.
+import { computed } from "vue";
 import { Dialog, FormControl } from "frappe-ui";
 // Reads the full lucide sprite the studio renderer injects, not just what the bundle uses.
 import { IconPicker } from "frappe-ui/experimental";
-import { computed } from "vue";
 import { __ } from "@helpdesk/shared/translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 

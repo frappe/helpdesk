@@ -14,12 +14,12 @@
         </div>
         <div
           class="rounded border border-outline-gray-2"
-          @keydown.ctrl.enter.capture.stop="submit"
-          @keydown.meta.enter.capture.stop="submit"
+          @keydown.ctrl.enter.capture.stop="saveResolution"
+          @keydown.meta.enter.capture.stop="saveResolution"
         >
           <Editor
             ref="editorRef"
-            v-model="details"
+            v-model="resolutionDetails"
             :extensions="extensions"
             :placeholder="
               __('Re-synced the auth server; codes are accepted again.')
@@ -29,7 +29,7 @@
               <EditorContent
                 :class="[
                   'prose-sm max-w-none min-h-[7rem] max-h-[40vh] overflow-y-auto px-3 py-2',
-                  getFontFamily(details),
+                  getFontFamily(resolutionDetails),
                 ]"
               />
               <div
@@ -46,7 +46,7 @@
             variant="solid"
             :loading="isSaving"
             :label="__('Mark as {0}', [status])"
-            @click="submit"
+            @click="saveResolution"
           />
         </div>
       </div>
@@ -73,9 +73,9 @@ const props = withDefaults(defineProps<{ status?: string }>(), {
 });
 const ticket = inject(TicketSymbol)!;
 const show = defineModel<boolean>({ default: false });
-const emit = defineEmits(["saved"]);
+const emit = defineEmits<{ saved: [] }>();
 
-const details = ref("");
+const resolutionDetails = ref("");
 const isSaving = ref(false);
 const editorRef = ref<any>(null);
 
@@ -85,20 +85,22 @@ const extensions = buildEditorExtensions();
 watch(show, async (open) => {
   if (!open) return;
   // Whatever is already recorded, so reopening edits rather than discards it.
-  details.value = ticket.value?.doc?.resolution_details || "";
+  resolutionDetails.value = ticket.value?.doc?.resolution_details || "";
   await nextTick();
   editorRef.value?.editor?.commands.focus();
 });
 
 // Asked of the editor, not the markup: an untouched one still reports `<p></p>`, and a
 // note that is only a screenshot is not empty.
-function submit() {
+function saveResolution() {
   if (isSaving.value) return;
   isSaving.value = true;
   ticket.value.setValue.submit(
     {
       status: props.status,
-      resolution_details: editorRef.value?.editor?.isEmpty ? "" : details.value,
+      resolution_details: editorRef.value?.editor?.isEmpty
+        ? ""
+        : resolutionDetails.value,
     },
     {
       onSuccess() {

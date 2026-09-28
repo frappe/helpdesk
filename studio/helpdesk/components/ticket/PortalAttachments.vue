@@ -85,10 +85,6 @@ interface Attachment {
   file_name: string;
 }
 
-const props = withDefaults(defineProps<{ attachments?: Attachment[] }>(), {
-  attachments: () => [],
-});
-
 type Kind = "image" | "video" | "text" | "pdf" | "spreadsheet" | "file";
 
 // By extension: the payload carries a name and a URL, not a mime type.
@@ -129,6 +125,10 @@ const ICONS: Record<Kind, string> = {
 
 // What the dialog can show; the rest belong in a tab.
 const VIEWABLE: Kind[] = ["image", "video", "text"];
+
+const props = withDefaults(defineProps<{ attachments?: Attachment[] }>(), {
+  attachments: () => [],
+});
 
 const showDialog = ref(false);
 const position = ref(0);

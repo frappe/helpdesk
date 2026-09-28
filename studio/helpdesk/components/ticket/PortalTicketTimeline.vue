@@ -58,10 +58,6 @@ export interface TimelineStep {
   fullDate?: string;
 }
 
-withDefaults(defineProps<{ steps?: TimelineStep[] }>(), {
-  steps: () => [],
-});
-
 // The ::after pads an 8px target out to 24px without moving or resizing the mark.
 const DOT_BASE =
   "relative shrink-0 rounded-full after:absolute after:-inset-2 after:rounded-full after:content-['']";
@@ -79,4 +75,8 @@ const LINE: Record<MilestoneState, string> = {
   next: DASHED_OWED,
   pending: DASHED_OWED,
 };
+
+withDefaults(defineProps<{ steps?: TimelineStep[] }>(), {
+  steps: () => [],
+});
 </script>

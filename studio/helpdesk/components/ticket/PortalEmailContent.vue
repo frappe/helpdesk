@@ -10,18 +10,18 @@
 // An iframe keeps the mail's markup and styles out of the portal, as the desk's does.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+const QUOTE_SELECTORS = [
+  "div.gmail_quote",
+  "div#appendonsend",
+  "p.reply-to-content",
+];
+
 const props = withDefaults(
   defineProps<{ content?: string; isChat?: boolean }>(),
   { content: "", isChat: false }
 );
 
 const frame = ref<HTMLIFrameElement | null>(null);
-
-const QUOTE_SELECTORS = [
-  "div.gmail_quote",
-  "div#appendonsend",
-  "p.reply-to-content",
-];
 
 const body = computed(() => collapseQuotes(asHtml(props.content || "")));
 

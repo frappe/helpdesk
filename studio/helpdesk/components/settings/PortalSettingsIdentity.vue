@@ -84,6 +84,12 @@ const props = withDefaults(
   { shape: "circle", editable: true, scale: "settings" }
 );
 
+const emit = defineEmits<{
+  (e: "upload"): void;
+  (e: "remove"): void;
+  (e: "rename", value: string): void;
+}>();
+
 const avatarBox = computed(() =>
   props.scale === "page" ? "size-[52px]" : "size-16"
 );
@@ -98,12 +104,6 @@ const titleClass = computed(() =>
 const uploadLabel = computed(() =>
   props.image ? __("Change Photo") : __("Upload Photo")
 );
-
-const emit = defineEmits<{
-  (e: "upload"): void;
-  (e: "remove"): void;
-  (e: "rename", value: string): void;
-}>();
 
 const isEditing = ref(false);
 const draft = ref("");

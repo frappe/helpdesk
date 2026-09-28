@@ -20,10 +20,10 @@
           </div>
           <Switch
             :model-value="
-              Boolean(settings.doc?.allow_customer_managers_to_invite)
+              Boolean(hdSettings.doc?.allow_customer_managers_to_invite)
             "
             @update:model-value="
-              (value) => update('allow_customer_managers_to_invite', value)
+              (value) => onToggle('allow_customer_managers_to_invite', value)
             "
           />
         </div>
@@ -41,12 +41,12 @@
           <Switch
             :model-value="
               Boolean(
-                settings.doc?.allow_customer_managers_to_edit_organization
+                hdSettings.doc?.allow_customer_managers_to_edit_organization
               )
             "
             @update:model-value="
               (value) =>
-                update('allow_customer_managers_to_edit_organization', value)
+                onToggle('allow_customer_managers_to_edit_organization', value)
             "
           />
         </div>
@@ -64,14 +64,14 @@ import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
 
 const configStore = useConfigStore();
-const settings = createDocumentResource({
+const hdSettings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
 });
 
 // Each switch saves itself, so the tab never carries a dirty state.
-function update(fieldname: string, value: boolean) {
-  settings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
+function onToggle(fieldname: string, value: boolean) {
+  hdSettings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
 }
 
 function onSaved() {
