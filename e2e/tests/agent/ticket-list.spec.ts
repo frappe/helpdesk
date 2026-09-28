@@ -1,11 +1,11 @@
-import type { Api } from "../support/api";
-import { raiseTicket } from "../support/factories";
-import { expect, test, uid, usePersona } from "../support/fixtures";
+import type { Api } from "../../helpers/api";
+import { raiseTicket } from "../../helpers/factories";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import {
   TicketList,
   resetDefaultTicketView,
-} from "../support/list";
-import { personas } from "../support/personas";
+} from "../../helpers/list";
+import { personas } from "../../helpers/personas";
 
 usePersona("manager");
 

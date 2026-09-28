@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
-import { Api } from "../support/api";
-import { expect, skipGettingStarted, test, uid, usePersona } from "../support/fixtures";
-import { PASSWORD, personas } from "../support/personas";
-import { createThrowawayAgent, openSettings, snapshotSettings } from "../support/settings";
+import { Api } from "../../helpers/api";
+import { expect, skipGettingStarted, test, uid, usePersona } from "../../helpers/fixtures";
+import { PASSWORD, personas } from "../../helpers/personas";
+import { createThrowawayAgent, openSettings, snapshotSettings } from "../../helpers/settings";
 
 const PIXEL = "e2e/fixtures/pixel.png";
 

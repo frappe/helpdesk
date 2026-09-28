@@ -1,6 +1,6 @@
-import { expect, test, usePersona } from "../support/fixtures";
-import { raiseTicket } from "../support/factories";
-import { PASSWORD, personas } from "../support/personas";
+import { expect, test, usePersona } from "../../helpers/fixtures";
+import { raiseTicket } from "../../helpers/factories";
+import { PASSWORD, personas } from "../../helpers/personas";
 
 test.describe("logged out", () => {
   test.use({ storageState: { cookies: [], origins: [] } });

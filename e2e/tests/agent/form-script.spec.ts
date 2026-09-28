@@ -1,13 +1,13 @@
 import type { Page } from "@playwright/test";
-import { raiseTicket } from "../support/factories";
-import { expect, test } from "../support/fixtures";
+import { raiseTicket } from "../../helpers/factories";
+import { expect, test } from "../../helpers/fixtures";
 import {
   FormScripts,
   TEMPLATE,
   clicksOn,
   countingAction,
   ensureTemplate,
-} from "../support/form-script";
+} from "../../helpers/form-script";
 
 const NEW_WITH_TEMPLATE = `/helpdesk/tickets/new/${encodeURIComponent(TEMPLATE)}`;
 

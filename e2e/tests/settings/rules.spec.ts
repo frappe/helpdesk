@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../support/api";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { personas } from "../support/personas";
-import { openSettings } from "../support/settings";
+import type { Api } from "../../helpers/api";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { personas } from "../../helpers/personas";
+import { openSettings } from "../../helpers/settings";
 
 const RULE = "Assignment Rule";
 const DEPENDENCY = "Field Dependency-ticket_type-priority";

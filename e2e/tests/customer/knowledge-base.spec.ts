@@ -1,10 +1,10 @@
 import type { Page } from "@playwright/test";
-import { expect, test, uid, usePersona } from "../support/fixtures";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import {
   createArticle,
   createCategory,
   pickOption,
-} from "../support/portal";
+} from "../../helpers/portal";
 
 usePersona("manager");
 

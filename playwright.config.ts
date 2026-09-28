@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { siteHeader } from "./e2e/support/site";
+import { siteHeader } from "./e2e/helpers/site";
 
 /**
  * E2E suite for the Helpdesk SPA, run against a real bench site.

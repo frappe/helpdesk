@@ -1,14 +1,14 @@
 import { expect, test as setup } from "@playwright/test";
-import { Api } from "./support/api";
-import { skipGettingStarted } from "./support/fixtures";
-import { seedSite } from "./support/seed";
-import { siteHeader } from "./support/site";
+import { Api } from "./helpers/api";
+import { skipGettingStarted } from "./helpers/fixtures";
+import { seedSite } from "./helpers/seed";
+import { siteHeader } from "./helpers/site";
 import {
   PASSWORD,
   emailOf,
   storageStateOf,
   type PersonaKey,
-} from "./support/personas";
+} from "./helpers/personas";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
 const PERSONAS: PersonaKey[] = [

@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
-import { raiseTicket } from "../support/factories";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { personas } from "../support/personas";
-import { openSettings } from "../support/settings";
+import { raiseTicket } from "../../helpers/factories";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { personas } from "../../helpers/personas";
+import { openSettings } from "../../helpers/settings";
 
 const REPLY = "HD Saved Reply";
 

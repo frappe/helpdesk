@@ -4,15 +4,15 @@ import {
   test,
   uid,
   usePersona,
-} from "../support/fixtures";
+} from "../../helpers/fixtures";
 import {
   createThrowawayAgent,
   openSettings,
   snapshotSettings,
-} from "../support/settings";
-import { PASSWORD, personas } from "../support/personas";
+} from "../../helpers/settings";
+import { PASSWORD, personas } from "../../helpers/personas";
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../support/api";
+import type { Api } from "../../helpers/api";
 
 const SLA = "HD Service Level Agreement";
 const HOLIDAYS = "HD Service Holiday List";

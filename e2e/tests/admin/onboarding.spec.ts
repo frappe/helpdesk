@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
-import type { Api } from "../support/api";
-import { expect, test, uid } from "../support/fixtures";
+import type { Api } from "../../helpers/api";
+import { expect, test, uid } from "../../helpers/fixtures";
 
 const ANSWERS = [
   "Spreadsheets",

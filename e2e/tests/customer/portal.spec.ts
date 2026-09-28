@@ -1,8 +1,8 @@
 import type { Page, Route } from "@playwright/test";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { raiseTicket } from "../support/factories";
-import { personas } from "../support/personas";
-import { createArticle, createCategory } from "../support/portal";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { raiseTicket } from "../../helpers/factories";
+import { personas } from "../../helpers/personas";
+import { createArticle, createCategory } from "../../helpers/portal";
 
 const PIXEL = "e2e/fixtures/pixel.png";
 

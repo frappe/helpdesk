@@ -1,6 +1,6 @@
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { raiseTicket } from "../support/factories";
-import { personas } from "../support/personas";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { raiseTicket } from "../../helpers/factories";
+import { personas } from "../../helpers/personas";
 import {
   addComment,
   comments,
@@ -8,7 +8,7 @@ import {
   openTicket,
   postComment,
   setHelpdeskSetting,
-} from "../support/ticket";
+} from "../../helpers/ticket";
 
 // 1x1 transparent PNG
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";

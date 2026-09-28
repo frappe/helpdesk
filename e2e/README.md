@@ -18,5 +18,7 @@ Set `ADMIN_PASSWORD` if the site's Administrator password is not `admin`.
 ## Layout
 
 - `global.setup.ts` seeds the personas and saves a logged-in session for each.
-- `support/` holds the REST client, personas, fixtures and data factories.
-- `specs/` has one file per area. Each spec creates its own data with unique names.
+- `helpers/` holds the REST client, personas, fixtures and data factories.
+- `tests/` groups the specs by who uses the screen: `agent/`, `settings/`, `customer/` and `admin/`.
+  Each spec creates its own data with unique names.
+- `fixtures/` holds files the specs upload.

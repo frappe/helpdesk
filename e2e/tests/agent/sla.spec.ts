@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
-import type { Api } from "../support/api";
-import { raiseTicket } from "../support/factories";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { personas, type PersonaKey } from "../support/personas";
+import type { Api } from "../../helpers/api";
+import { raiseTicket } from "../../helpers/factories";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { personas, type PersonaKey } from "../../helpers/personas";
 
 type PageAs = (key: PersonaKey) => Promise<Page>;
 

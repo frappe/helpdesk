@@ -1,9 +1,9 @@
 import type { APIResponse, Page } from "@playwright/test";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { raiseTicket } from "../support/factories";
-import { PASSWORD, personas } from "../support/personas";
-import type { Api } from "../support/api";
-import { loginContext, openTicketInList } from "../support/portal";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { raiseTicket } from "../../helpers/factories";
+import { PASSWORD, personas } from "../../helpers/personas";
+import type { Api } from "../../helpers/api";
+import { loginContext, openTicketInList } from "../../helpers/portal";
 
 test.describe("plain agent", () => {
   usePersona("agent");

@@ -1,4 +1,4 @@
-import { expect, test, uid, usePersona } from "../support/fixtures";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 
 usePersona("manager");
 

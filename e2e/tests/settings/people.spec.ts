@@ -1,11 +1,11 @@
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { personas } from "../support/personas";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { personas } from "../../helpers/personas";
 import {
   createThrowawayAgent,
   openSettings,
-} from "../support/settings";
+} from "../../helpers/settings";
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../support/api";
+import type { Api } from "../../helpers/api";
 
 usePersona("admin");
 

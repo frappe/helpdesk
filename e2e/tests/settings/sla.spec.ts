@@ -1,7 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../support/api";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { openSettings } from "../support/settings";
+import type { Api } from "../../helpers/api";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { openSettings } from "../../helpers/settings";
 
 const SLA = "HD Service Level Agreement";
 const HOLIDAYS = "HD Service Holiday List";

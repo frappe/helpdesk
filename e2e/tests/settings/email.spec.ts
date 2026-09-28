@@ -1,8 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../support/api";
-import { expect, test, uid, usePersona } from "../support/fixtures";
-import { PASSWORD } from "../support/personas";
-import { createThrowawayAgent, openSettings, snapshotSettings } from "../support/settings";
+import type { Api } from "../../helpers/api";
+import { expect, test, uid, usePersona } from "../../helpers/fixtures";
+import { PASSWORD } from "../../helpers/personas";
+import { createThrowawayAgent, openSettings, snapshotSettings } from "../../helpers/settings";
 
 const ACCOUNT = "Email Account";
 
