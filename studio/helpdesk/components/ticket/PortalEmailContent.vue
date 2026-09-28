@@ -37,7 +37,7 @@ const body = computed(() =>
 function asHtml(content: string) {
   const doc = new DOMParser().parseFromString(content, "text/html");
   if (doc.body.children.length) return content;
-  return `<div style="white-space: pre-wrap">${doc.body.innerHTML}</div>`;
+  return `<div class="whitespace-pre-wrap">${doc.body.innerHTML}</div>`;
 }
 
 function collapseQuotes(html: string) {
@@ -75,16 +75,20 @@ function fold(doc: Document, quote: Element) {
   const wrapper = doc.createElement("div");
   wrapper.className = "replied-content";
 
+  // Literal classes: the frame mirrors the page's sheets, and Tailwind scans this file.
   const label = doc.createElement("label");
-  label.className = "collapse";
+  label.className =
+    "my-2.5 flex h-3 w-[23px] cursor-pointer items-center justify-center rounded-5 bg-surface-gray-2 text-lg font-bold leading-none text-ink-gray-8 hover:bg-surface-gray-3";
   label.setAttribute("for", id);
   label.innerHTML = "...";
 
   const toggle = doc.createElement("input");
   toggle.id = id;
   toggle.type = "checkbox";
+  toggle.className = "peer hidden";
 
   const hidden = doc.createElement("div");
+  hidden.className = "hidden peer-checked:block";
   hidden.appendChild(quote.cloneNode(true));
 
   // Whatever follows the quote is part of it.
@@ -109,7 +113,7 @@ function hash(value: string) {
   return result;
 }
 
-// An iframe inherits no CSS, so the face has to survive until the mirrored sheets load.
+// Inline, not a class: the face is a runtime value read off the page.
 const pageStyle = getComputedStyle(document.body);
 const contextFont = ref({
   family: pageStyle.fontFamily,
@@ -124,30 +128,9 @@ const srcdoc = computed(
   () => `<!DOCTYPE html><html><head>
   <meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none';" />
   <base target="_blank" />
-  <style>
-    body { margin: 0; font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}; }
-    /* Tailwind's prose caps itself at 65ch; a message uses the width it is given. */
-    .email-content { max-width: none; word-break: break-word; }
-    .email-content img { margin: 0; border-width: 0; }
-    .replied-content .collapse {
-      margin: 10px 0;
-      cursor: pointer;
-      display: flex;
-      font-size: larger;
-      font-weight: 700;
-      height: 12px;
-      line-height: 0.1;
-      color: var(--ink-gray-8);
-      background: var(--surface-gray-2);
-      width: 23px;
-      justify-content: center;
-      border-radius: 5px;
-    }
-    .replied-content .collapse:hover { background: var(--surface-gray-3); }
-    .replied-content .collapse + input { display: none; }
-    .replied-content .collapse + input + div { display: none; }
-    .replied-content .collapse + input:checked + div { display: block; }
-  </style></head><body><div class="email-content prose prose-sm">${body.value}</div></body></html>`
+  </head><body class="m-0" style="font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}">
+  <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
+  </body></html>`
 );
 
 let observer: ResizeObserver | null = null;

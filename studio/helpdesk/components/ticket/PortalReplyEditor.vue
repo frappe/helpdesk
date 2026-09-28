@@ -1,6 +1,14 @@
 <template>
-  <div class="kb-reply" :class="{ 'kb-reply--opening': isOpening }">
-    <div class="kb-reply__frame">
+  <!-- A grid row grows from nothing to its content's size, where an `auto` height cannot. -->
+  <div
+    :class="[
+      isOpening &&
+        'grid transition-[grid-template-rows,opacity] duration-[180ms] ease-out motion-reduce:transition-none',
+      isOpening && !hasStartedOpening && 'grid-rows-[0fr] opacity-50',
+      isOpening && hasStartedOpening && 'grid-rows-[1fr]',
+    ]"
+  >
+    <div :class="isOpening && 'min-h-0 overflow-hidden'">
       <Editor
         v-model="content"
         :extensions="extensions"
@@ -128,7 +136,12 @@ const content = defineModel<string>({ default: "" });
 
 // Clipped only while growing: the clipping a height animation needs would cut off the menus.
 const isOpening = ref(true);
-onMounted(() => setTimeout(() => (isOpening.value = false), OPEN_MS));
+// Flipped a frame after mount, so the transition has a start state to leave.
+const hasStartedOpening = ref(false);
+onMounted(() => {
+  requestAnimationFrame(() => (hasStartedOpening.value = true));
+  setTimeout(() => (isOpening.value = false), OPEN_MS);
+});
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const pendingUploadCount = ref(0);
@@ -191,28 +204,3 @@ function discard(editor: any) {
   emit("discard");
 }
 </script>
-
-<style scoped>
-/* A grid row grows from nothing to its content's size, where an `auto` height cannot. */
-.kb-reply--opening {
-  display: grid;
-  grid-template-rows: 0fr;
-  animation: kb-reply-open 180ms ease-out forwards;
-}
-
-.kb-reply--opening .kb-reply__frame {
-  overflow: hidden;
-  min-height: 0;
-}
-
-@keyframes kb-reply-open {
-  from {
-    grid-template-rows: 0fr;
-    opacity: 0.5;
-  }
-  to {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-}
-</style>
