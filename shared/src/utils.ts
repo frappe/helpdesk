@@ -11,8 +11,6 @@ const YEAR = 365 * DAY;
 // The studio-built customer portal, served outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/kb";
 
-export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
-
 export function validateEmail(email) {
   const regExp =
     /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;

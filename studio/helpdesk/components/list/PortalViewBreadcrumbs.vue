@@ -58,36 +58,26 @@
 <script setup lang="ts">
 import { h } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
+import { Icon as SpriteIcon } from "frappe-ui/experimental";
 import { isEmoji } from "@helpdesk/shared/utils";
 
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 // lucide names this glyph `text-align-justify`; `align-justify` is not in the sprite.
 const DEFAULT_ICON = "text-align-justify";
 
+// The sprite, not the mask class: a stored name may be one the build never saw.
 function ViewIcon(props: { icon?: string }) {
-  const icon = props.icon;
-  if (icon && isEmoji(icon))
+  const icon = props.icon || DEFAULT_ICON;
+  if (isEmoji(icon))
     return h(
       "div",
       { class: [ICON_CLASS, "flex items-center justify-center leading-none"] },
       icon
     );
-  // The sprite, not Icon: a stored name may be one the build never saw, and symbols carry no stroke.
-  const name = (icon || DEFAULT_ICON).replace(/^lucide-/, "");
-  return h(
-    "svg",
-    {
-      class: ICON_CLASS,
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      "stroke-width": 2,
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      "aria-hidden": "true",
-    },
-    [h("use", { href: `#${name}` })]
-  );
+  return h(SpriteIcon, {
+    name: icon.replace(/^lucide-/, ""),
+    class: ICON_CLASS,
+  });
 }
 
 withDefaults(

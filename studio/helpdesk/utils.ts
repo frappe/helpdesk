@@ -1,10 +1,10 @@
 import type { Ref } from 'vue'
 import { FileUploadHandler, call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { dateTooltipFormat } from '@helpdesk/shared/utils'
+import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
 
 // Private: an attachment on a support ticket is not public content.
-export const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
+const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
 
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,

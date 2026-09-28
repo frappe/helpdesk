@@ -24,7 +24,7 @@ const store = createViewsStore()
 
 export function useViews(listView) {
   store.attachListView(listView)
-  return store
+  return store.bindings
 }
 
 function sessionUser() {
@@ -239,8 +239,7 @@ function createViewsStore() {
     return done.then(() => (isViewModalOpen.value = false))
   }
 
-  return {
-    attachListView,
+  const bindings = {
     currentView,
     viewOptions,
     viewActions,
@@ -250,6 +249,8 @@ function createViewsStore() {
     viewModalIcon,
     submitViewModal,
   }
+
+  return { attachListView, bindings }
 }
 
 // Copied, so a restore cannot alias the stored default into live refs.

@@ -1,7 +1,7 @@
 import { createListResource } from 'frappe-ui'
 
 // The category that both "Resolved" and "Closed" belong to; the name tells them apart.
-export const RESOLVED_CATEGORY = 'Resolved'
+const RESOLVED_CATEGORY = 'Resolved'
 export const CLOSED_STATUS = 'Closed'
 
 // Full literal classes: one built from data is invisible to Tailwind's scanner.

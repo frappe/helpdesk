@@ -46,7 +46,7 @@
 import { Tooltip } from "frappe-ui";
 import { MILESTONE_DOT_CLASSES, type MilestoneState } from "./milestoneDots";
 
-export interface TimelineStep {
+interface TimelineStep {
   title: string;
   subtitle: string;
   // `next` is the nearest unmet milestone; `pending` is anything behind it.

@@ -77,10 +77,8 @@ export function useTicketFeedback(ticket) {
   return {
     isFeedbackOpen,
     openFeedback,
-    closeFeedback,
     feedbackStars,
     feedbackOptions,
-    feedbackOption,
     selectFeedbackOption,
     feedbackText,
     isFeedbackSaving,
