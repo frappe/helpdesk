@@ -2,7 +2,7 @@ import { expect, type Page } from "@playwright/test";
 import type { Api } from "./api";
 
 /** Open the settings modal from the user menu and switch to a tab. */
-export async function openSettings(page: Page, tab: string) {
+export async function openSettings(page: Page, tab: string | RegExp) {
   await page.getByRole("button", { name: /^Helpdesk / }).click();
   await page.getByRole("menuitem", { name: "Settings" }).click();
   const dialog = page.getByRole("dialog");
@@ -14,7 +14,8 @@ export async function openSettings(page: Page, tab: string) {
 /** Snapshot HD Settings fields so a test can put them back afterwards. */
 export async function snapshotSettings(api: Api, fields: string[]) {
   const settings = await api.get("HD Settings", "HD Settings");
-  const saved = Object.fromEntries(fields.map((field) => [field, settings[field]]));
+  // REST updates skip nulls, so an empty field is restored as "".
+  const saved = Object.fromEntries(fields.map((field) => [field, settings[field] ?? ""]));
   return () => api.update("HD Settings", "HD Settings", saved);
 }
 
