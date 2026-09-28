@@ -40,11 +40,9 @@ jobs:
         run: |
           echo "IMAGE_TAG=stable" >> $GITHUB_ENV
 
-      # pinned: an unpinned checkout let upstream Containerfile changes silently break our image
       - uses: actions/checkout@v4
         with:
           repository: frappe/frappe_docker
-          ref: v3.2.2
           path: builds
 
       - name: Build
