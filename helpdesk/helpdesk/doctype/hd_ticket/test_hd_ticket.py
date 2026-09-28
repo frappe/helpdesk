@@ -552,10 +552,17 @@ class TestHDTicket(IntegrationTestCase):
             ticket = make_ticket(priority="Urgent")
 
         ticket.reload()
-        with self.freeze_time(add_to_date(date, hours=6)):
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.first_responded_on = get_datetime()
+            ticket.save()
+
+        # Urgent resolves in 2h, so the hold at 3h starts after the breach.
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=3)):
             ticket.status = "Replied"
             ticket.save()
             self.assertEqual(ticket.agreement_status, "Failed")
+            self.assertLess(ticket.first_responded_on, ticket.response_by)
 
     def test_resolution_time_kept_when_closed_ticket_set_back_to_resolved(self):
         # Moving between resolved statuses is not a reopen, so the time spent
