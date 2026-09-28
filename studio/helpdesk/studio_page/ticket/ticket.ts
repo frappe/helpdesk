@@ -1,9 +1,11 @@
 import { computed, watch } from 'vue'
 import { call, createListResource, createResource, dayjs, toast } from 'frappe-ui'
 import { useSettingsModal } from '@app/stores/settings'
-import { useTicketThread } from '@app/stores/ticket/thread'
-import { useTicketDetails } from '@app/stores/ticket/details'
-import { useTicketFeedback } from '@app/stores/ticket/feedback'
+import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
+import { useReplyComposer } from '@app/composables/useReplyComposer'
+import { useTicketDetails } from '@app/composables/useTicketDetails'
+import { useTicketFeedback } from '@app/composables/useTicketFeedback'
+import { useTicketThread } from '@app/composables/useTicketThread'
 import { loadTicketMeta } from '@app/components/list/ticketCells'
 
 // The page is drawn from Studio blocks, so this returns display-ready state and actions.
@@ -162,6 +164,8 @@ export default function setup(context) {
     ...settings,
     ...thread,
     ...useTicketDetails(ticket, thread),
+    ...useReplyComposer(ticket),
+    ...useOutsideHoursBanner(ticket),
     ...feedback,
     ticketId,
     ticket,

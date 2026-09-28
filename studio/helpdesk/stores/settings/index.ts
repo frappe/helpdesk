@@ -3,10 +3,9 @@ import { useColorScheme } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 import { useSession } from '@app/stores/session'
 import { t } from '@app/stores/translations'
-import { createSettingsCore } from './core'
+import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
-import { createSettingsDialog } from './dialog'
 
 // One instance for the whole app: a private copy per page would go stale on the others.
 const core = createSettingsCore()

@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 // Draws nothing itself: every cell comes from its column's `cell()`.
-import PortalEmptyState from "@app/components/shared/PortalEmptyState.vue";
+import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
 import { loadTicketMeta } from "./ticketCells";
 import { LoadingIndicator } from "frappe-ui";
 import {

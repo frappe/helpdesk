@@ -85,7 +85,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideSquareUser from "~icons/lucide/square-user";
 import LucideTicket from "~icons/lucide/ticket";
 import { computed, ref } from "vue";
-import PortalEmptyState from "@app/components/shared/PortalEmptyState.vue";
+import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
 
 type Organization = {
   name: string;

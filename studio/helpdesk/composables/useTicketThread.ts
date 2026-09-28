@@ -1,9 +1,8 @@
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { timeAgo } from '@helpdesk/shared/utils'
-import { createResource, dayjs } from 'frappe-ui'
+import { dayjs } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
-import { layoutOf, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/components/ticket/bubbleLayout'
-import { useReplyComposer } from './composer'
+import { layoutOf, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/composables/messageLayout'
 
 // Drawn from Studio blocks, so every value a block binds is finished here.
 
@@ -130,41 +129,5 @@ export function useTicketThread(ticket) {
     lastAgentReply,
     firstAgentReply,
     conversation,
-    ...useOutsideHoursBanner(ticket),
-    ...useReplyComposer(ticket),
-  }
-}
-
-// Dismissal is remembered per ticket per day, so it returns tomorrow.
-function useOutsideHoursBanner(ticket) {
-  const banner = createResource({
-    url: 'helpdesk.helpdesk.doctype.hd_ticket.api.show_outside_hours_banner',
-    makeParams: () => ({ ticket_name: ticket.data?.name }),
-  })
-  const dismissed = ref(false)
-
-  watch(
-    () => ticket.data?.name,
-    (name) => {
-      if (!name) return
-      dismissed.value = localStorage.getItem(dismissKey(name)) === 'true'
-      banner.fetch()
-    },
-    { immediate: true },
-  )
-
-  function dismissKey(name: string) {
-    return `kb:banner-dismissed:${name}:${new Date().toISOString().split('T')[0]}`
-  }
-
-  function dismissBanner() {
-    localStorage.setItem(dismissKey(ticket.data.name), 'true')
-    dismissed.value = true
-  }
-
-  return {
-    showBanner: computed(() => Boolean(banner.data?.show) && !dismissed.value),
-    bannerMessage: computed(() => banner.data?.msg || ''),
-    dismissBanner,
   }
 }
