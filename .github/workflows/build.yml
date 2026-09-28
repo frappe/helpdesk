@@ -7,15 +7,14 @@ on:
     tags:
       - "*"
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   build:
     name: Build
 
     runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
 
     steps:
       - name: Checkout Entire Repository
