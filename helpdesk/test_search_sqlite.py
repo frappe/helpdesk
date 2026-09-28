@@ -6,7 +6,7 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.api import article as article_api
 from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskArticleSearch, HelpdeskSearch
-from helpdesk.test_utils import create_user, make_ticket
+from helpdesk.test_utils import create_user, make_article, make_ticket
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
 
@@ -158,21 +158,8 @@ class TestRelatedArticles(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.published = cls.make_article(
-            "Rotating the zephyrine webhook secret", "Published"
-        )
-        cls.draft = cls.make_article("Zephyrine webhook draft notes", "Draft")
-
-    @staticmethod
-    def make_article(title: str, status: str):
-        return frappe.get_doc(
-            {
-                "doctype": "HD Article",
-                "title": title,
-                "status": status,
-                "content": f"<p>{title}</p>",
-            }
-        ).insert()
+        cls.published = make_article("Rotating the zephyrine webhook secret")
+        cls.draft = make_article("Zephyrine webhook draft notes", "Draft")
 
     def setUp(self):
         self.search = HelpdeskArticleSearch(db_name=self.TEST_INDEX)

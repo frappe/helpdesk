@@ -172,6 +172,18 @@ def make_ticket(
     return ticket
 
 
+def make_article(title: str, status: str = "Published"):
+    """Creates an HD Article whose content repeats its title."""
+    return frappe.get_doc(
+        {
+            "doctype": "HD Article",
+            "title": title,
+            "status": status,
+            "content": f"<p>{title}</p>",
+        }
+    ).insert()
+
+
 def create_agent(
     email: str, first_name: str | None = None, last_name: str | None = None
 ):
