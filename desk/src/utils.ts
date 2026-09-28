@@ -154,10 +154,6 @@ export function getTimeInSeconds(time: string) {
 
 export const isCustomerPortal = ref(false);
 
-export function customerPortalTicketUrl(ticketId: string) {
-  return `${CUSTOMER_PORTAL_ROOT}/tickets/${ticketId}`;
-}
-
 export async function copyToClipboard(
   msg: string = "",
   toastMessage: string = __("Copied to clipboard.")

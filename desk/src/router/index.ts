@@ -4,7 +4,6 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import {
   CUSTOMER_PORTAL_ROOT,
-  customerPortalTicketUrl,
   isCustomerPortal,
 } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
@@ -200,14 +199,6 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
-  // Old ticket URLs belong to the server's redirects now; a hard load that got here falls through.
-  if (to.path === "/my-tickets" || to.path.startsWith("/my-tickets/")) {
-    if (window.location.pathname !== "/helpdesk" + to.path) {
-      window.location.replace("/helpdesk" + to.fullPath);
-      return;
-    }
-  }
-
   const authStore = useAuthStore();
   isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
@@ -226,9 +217,7 @@ router.beforeEach(async (to, _, next) => {
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
-    window.location.replace(
-      customerPortalTicketUrl(to.params.ticketId as string)
-    );
+    window.location.replace(`${CUSTOMER_PORTAL_ROOT}/tickets/${to.params.ticketId}`);
   } else {
     next();
   }
