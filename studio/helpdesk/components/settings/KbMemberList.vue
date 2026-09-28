@@ -39,9 +39,15 @@
             :label="member.full_name"
           />
           <div class="min-w-0">
-            <div class="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-base-medium text-ink-gray-8">
+            <div
+              class="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-base-medium text-ink-gray-8"
+            >
               {{ member.full_name }}
-              <span v-if="member.is_you" class="text-p-xs font-normal text-ink-gray-5">You</span>
+              <span
+                v-if="member.is_you"
+                class="text-p-xs font-normal text-ink-gray-5"
+                >You</span
+              >
               <Badge
                 v-if="member.pending"
                 label="Pending"
@@ -49,13 +55,19 @@
                 variant="subtle"
               />
             </div>
-            <div class="overflow-hidden text-ellipsis whitespace-nowrap text-p-sm text-ink-gray-5">{{ member.email }}</div>
+            <div
+              class="overflow-hidden text-ellipsis whitespace-nowrap text-p-sm text-ink-gray-5"
+            >
+              {{ member.email }}
+            </div>
           </div>
         </div>
 
         <div class="text-p-sm text-ink-gray-5">{{ lastSeen(member) }}</div>
 
-        <span class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7">
+        <span
+          class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
+        >
           <component :is="roleIcon(member)" class="size-4" />
           {{ roleLabel(member) }}
         </span>
@@ -68,13 +80,20 @@
             align="end"
           >
             <template #trigger="{ open }">
-              <Button variant="ghost" icon="lucide-more-horizontal" :active="open" />
+              <Button
+                variant="ghost"
+                icon="lucide-more-horizontal"
+                :active="open"
+              />
             </template>
           </Dropdown>
         </div>
       </div>
 
-      <div v-if="!matches.length" class="py-6 text-center text-p-sm text-ink-gray-5">
+      <div
+        v-if="!matches.length"
+        class="py-6 text-center text-p-sm text-ink-gray-5"
+      >
         {{ t("No members match this filter.") }}
       </div>
     </div>

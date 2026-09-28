@@ -1,6 +1,8 @@
 <template>
   <TabsRoot v-model="active">
-    <TabsList class="relative flex items-center gap-6 border-b border-outline-gray-1">
+    <TabsList
+      class="relative flex items-center gap-6 border-b border-outline-gray-1"
+    >
       <!-- translate-y-px drops the bar onto the rail rather than above it. -->
       <TabsIndicator
         class="absolute bottom-0 left-0 h-px w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] translate-y-px transition-[width,transform] duration-300 ease-out motion-reduce:transition-none"

@@ -26,6 +26,8 @@ def sent_invites(emails: list[str], send_welcome_mail_to_user: bool = True):
                 "user_image": user.user_image,
             }
         ).insert()
+
+
 @frappe.whitelist()
 def get_agent_avatars(agents: list[str] | str) -> dict:
     """Name and picture for the agents named, keyed by user id.
@@ -55,4 +57,3 @@ def get_agent_avatars(agents: list[str] | str) -> dict:
             fields=["name", "full_name", "user_image"],
         )
     }
-

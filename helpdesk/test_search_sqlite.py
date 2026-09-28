@@ -3,8 +3,8 @@ from unittest.mock import patch
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.patches import relabel_comment_search_index
 from helpdesk.api import article as article_api
+from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskArticleSearch, HelpdeskSearch
 from helpdesk.test_utils import create_user, make_ticket
 
@@ -158,7 +158,9 @@ class TestRelatedArticles(FrappeTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.published = cls.make_article("Rotating the zephyrine webhook secret", "Published")
+        cls.published = cls.make_article(
+            "Rotating the zephyrine webhook secret", "Published"
+        )
         cls.draft = cls.make_article("Zephyrine webhook draft notes", "Draft")
 
     @staticmethod
@@ -199,7 +201,11 @@ class TestRelatedArticles(FrappeTestCase):
         frappe.db.set_value("HD Article", self.published.name, "status", "Draft")
         # What the index queue does for a changed article: re-add it, filter or not.
         self.search._index_documents(
-            [self.search.prepare_document(frappe.get_doc("HD Article", self.published.name))]
+            [
+                self.search.prepare_document(
+                    frappe.get_doc("HD Article", self.published.name)
+                )
+            ]
         )
 
         self.assertEqual(self.related("zephyrine webhook"), [])

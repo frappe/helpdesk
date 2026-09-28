@@ -31,9 +31,19 @@
     </button>
 
     <ul v-if="files.length" class="m-0 flex list-none flex-col gap-1 p-0">
-      <li v-for="file in files" :key="file.name" class="flex min-w-0 items-center gap-1.5 rounded-5 bg-surface-gray-2 px-2 py-1 text-p-sm text-ink-gray-7">
-        <Icon icon="lucide-paperclip" class="size-3.5 shrink-0 text-ink-gray-5" />
-        <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ file.file_name || file.name }}</span>
+      <li
+        v-for="file in files"
+        :key="file.name"
+        class="flex min-w-0 items-center gap-1.5 rounded-5 bg-surface-gray-2 px-2 py-1 text-p-sm text-ink-gray-7"
+      >
+        <Icon
+          icon="lucide-paperclip"
+          class="size-3.5 shrink-0 text-ink-gray-5"
+        />
+        <span
+          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          >{{ file.file_name || file.name }}</span
+        >
         <button
           type="button"
           class="grid place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"

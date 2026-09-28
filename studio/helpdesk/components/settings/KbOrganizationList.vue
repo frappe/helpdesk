@@ -21,7 +21,10 @@
     />
 
     <!-- Cards wide enough that "n tickets · n members" stays on one line. -->
-    <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3">
+    <div
+      v-else
+      class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3"
+    >
       <!-- The elevation token draws its own hairline, so the resting border gives way. -->
       <div
         v-for="organization in matches"
@@ -46,11 +49,19 @@
             variant="outline"
           />
         </div>
-        <div class="overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-semibold leading-5 text-ink-gray-9">
+        <div
+          class="overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-semibold leading-5 text-ink-gray-9"
+        >
           {{ organization.customer_name }}
         </div>
-        <div class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-p-base text-ink-gray-5">{{ organization.domain }}</div>
-        <div class="mt-3 flex items-center gap-1.5 border-t border-outline-gray-1 pt-3 text-p-sm text-ink-gray-5">
+        <div
+          class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-p-base text-ink-gray-5"
+        >
+          {{ organization.domain }}
+        </div>
+        <div
+          class="mt-3 flex items-center gap-1.5 border-t border-outline-gray-1 pt-3 text-p-sm text-ink-gray-5"
+        >
           <span class="flex items-center gap-1 whitespace-nowrap">
             <LucideTicket class="size-3.5 shrink-0" />
             {{ count(organization.ticket_count, "ticket") }}

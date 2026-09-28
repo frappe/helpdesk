@@ -16,10 +16,20 @@
 
     <div v-if="tickets.length" class="isolate">
       <div :class="[ROW, 'min-h-8 text-p-xs text-ink-gray-5']">
-        <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{ t("ID") }}</span>
-        <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ t("Subject") }}</span>
-        <span class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7">{{ t("Status") }}</span>
-        <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{ t("Created") }}</span>
+        <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{
+          t("ID")
+        }}</span>
+        <span
+          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          >{{ t("Subject") }}</span
+        >
+        <span
+          class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7"
+          >{{ t("Status") }}</span
+        >
+        <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
+          t("Created")
+        }}</span>
       </div>
 
       <a
@@ -28,9 +38,16 @@
         :class="[ROW, BODY_ROW]"
         :href="`/kb/tickets/${ticket.name}`"
       >
-        <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">#{{ ticket.name }}</span>
-        <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ ticket.subject }}</span>
-        <span class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7">
+        <span class="w-14 shrink-0 text-p-sm text-ink-gray-5"
+          >#{{ ticket.name }}</span
+        >
+        <span
+          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          >{{ ticket.subject }}</span
+        >
+        <span
+          class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7"
+        >
           <span
             class="size-2 rounded-full"
             :style="{ background: statusMeta(ticket.status).color }"
@@ -43,7 +60,10 @@
       </a>
     </div>
 
-    <p v-if="!loading && !tickets.length" class="py-4 text-p-base text-ink-gray-5">
+    <p
+      v-if="!loading && !tickets.length"
+      class="py-4 text-p-base text-ink-gray-5"
+    >
       {{
         search
           ? t("No tickets match your search.")

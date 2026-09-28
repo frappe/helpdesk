@@ -12,9 +12,14 @@
     <Dialog v-model:open="showDialog" size="4xl">
       <template #title>
         <div class="flex min-w-0 items-center justify-between gap-3">
-          <div class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9">
+          <div
+            class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9"
+          >
             {{ current?.file_name }}
-            <span v-if="viewable.length > 1" class="shrink-0 text-p-xs font-normal text-ink-gray-5">
+            <span
+              v-if="viewable.length > 1"
+              class="shrink-0 text-p-xs font-normal text-ink-gray-5"
+            >
               {{ position + 1 }} of {{ viewable.length }}
             </span>
           </div>
@@ -58,7 +63,10 @@
           controls
           class="m-auto max-h-[70vh] max-w-full rounded-5 border border-outline-gray-2"
         />
-        <div v-else class="prose prose-sm max-h-[70vh] w-full max-w-none overflow-auto whitespace-pre-wrap font-mono text-p-sm text-ink-gray-8">
+        <div
+          v-else
+          class="prose prose-sm max-h-[70vh] w-full max-w-none overflow-auto whitespace-pre-wrap font-mono text-p-sm text-ink-gray-8"
+        >
           {{ text }}
         </div>
       </div>

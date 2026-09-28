@@ -23,7 +23,9 @@
       <div class="min-w-0 pb-5 group-last:pb-0">
         <div
           class="text-base-medium"
-          :class="step.state === 'pending' ? 'text-ink-gray-4' : 'text-ink-gray-8'"
+          :class="
+            step.state === 'pending' ? 'text-ink-gray-4' : 'text-ink-gray-8'
+          "
         >
           {{ step.title }}
         </div>
