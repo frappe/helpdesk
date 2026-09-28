@@ -49,7 +49,7 @@
        "height": "28px"
       },
       "componentId": "KbViewBreadcrumbs-header",
-      "componentName": "KbViewBreadcrumbs",
+      "componentName": "PortalViewBreadcrumbs",
       "componentProps": {
        "currentView": "{{ inputs.currentView }}",
        "label": "{{ inputs.viewLabel || 'Tickets' }}",
@@ -191,7 +191,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-08-19 13:04:36.826122",
+ "modified": "2026-09-28 21:15:56.174984",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

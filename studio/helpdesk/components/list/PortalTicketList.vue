@@ -48,7 +48,7 @@
       <ListSelectBanner />
     </ListView>
 
-    <KbEmptyState
+    <PortalEmptyState
       v-else
       class="pointer-events-none flex-1"
       icon="ticket"
@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 // Draws nothing itself: every cell comes from its column's `cell()`.
-import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
+import PortalEmptyState from "@app/components/shared/PortalEmptyState.vue";
 import { loadTicketMeta } from "./ticketCells";
 import { LoadingIndicator } from "frappe-ui";
 import {

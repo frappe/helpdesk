@@ -59,7 +59,7 @@
                 variant="solid"
                 label="Send"
                 :disabled="isEmpty"
-                :loading="sending"
+                :loading="isSending"
                 @click="emit('send')"
               />
             </div>
@@ -102,7 +102,7 @@ const props = withDefaults(
   defineProps<{
     modelValue?: string;
     attachments?: any[];
-    sending?: boolean;
+    isSending?: boolean;
     placeholder?: string;
     // Where an inline upload is filed, so a pasted image belongs to the ticket.
     doctype?: string;
@@ -114,7 +114,7 @@ const props = withDefaults(
   {
     modelValue: "",
     attachments: () => [],
-    sending: false,
+    isSending: false,
     placeholder: "Type a message",
     doctype: "HD Ticket",
     uploadArgs: () => ({ folder: "Home/Helpdesk", private: true }),

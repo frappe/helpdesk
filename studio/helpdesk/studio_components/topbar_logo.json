@@ -7,7 +7,7 @@
   },
   "blockName": "topbar-left",
   "componentId": "KbNavMenu-topbar",
-  "componentName": "KbNavMenu",
+  "componentName": "PortalNavMenu",
   "componentProps": {
    "options": "{{ accountMenuOptions }}"
   },

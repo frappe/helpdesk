@@ -19,7 +19,7 @@ export const TIMELINE = {
 }
 
 // A flex row, so the reader's own messages can turn around and sit against the other edge.
-// The card shrinks to the width `hug` in KbEmailContent reports, capped at three quarters.
+// The card shrinks to the width `hug` in PortalEmailContent reports, capped at three quarters.
 export const THEIR_BUBBLE = {
   ...TIMELINE,
   // The byline sits above the bubble, so the face shifts in towards the name.

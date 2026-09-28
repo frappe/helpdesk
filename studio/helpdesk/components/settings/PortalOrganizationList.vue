@@ -9,7 +9,7 @@
       </TextInput>
     </div>
 
-    <KbEmptyState
+    <PortalEmptyState
       v-if="!matches.length"
       icon="organization"
       :title="search ? 'No organizations found' : 'No organizations'"
@@ -85,7 +85,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideSquareUser from "~icons/lucide/square-user";
 import LucideTicket from "~icons/lucide/ticket";
 import { computed, ref } from "vue";
-import KbEmptyState from "@app/components/shared/KbEmptyState.vue";
+import PortalEmptyState from "@app/components/shared/PortalEmptyState.vue";
 
 type Organization = {
   name: string;

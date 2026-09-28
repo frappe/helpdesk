@@ -8,14 +8,14 @@ const HASH_ROOT = 'settings'
 export function createSettingsDialog(core, organization) {
   function openSettings(tab) {
     core.settingsTab.value = tab || 'profile'
-    core.settingsOpen.value = true
+    core.isSettingsOpen.value = true
     organization.inviteOpen.value = false
     organization.closeOrganization()
     core.loadSettings()
   }
 
   function closeSettings() {
-    core.settingsOpen.value = false
+    core.isSettingsOpen.value = false
   }
 
   // `afterEach`, not a route watcher: a page script's `route` is a snapshot.
@@ -31,7 +31,7 @@ export function createSettingsDialog(core, organization) {
     applyHash(currentRoute().hash)
     router.afterEach((to) => applyHash(to.hash))
     watch(
-      [core.settingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
+      [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
       () => pushHash(),
     )
   }
@@ -44,7 +44,7 @@ export function createSettingsDialog(core, organization) {
   function applyHash(hash) {
     const [root, tab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
     if (root !== HASH_ROOT) return closeSettings()
-    if (core.settingsOpen.value) core.settingsTab.value = tab || 'profile'
+    if (core.isSettingsOpen.value) core.settingsTab.value = tab || 'profile'
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
@@ -59,7 +59,7 @@ export function createSettingsDialog(core, organization) {
   }
 
   function settingsHash() {
-    if (!core.settingsOpen.value) return ''
+    if (!core.isSettingsOpen.value) return ''
     const parts = [HASH_ROOT, core.settingsTab.value]
     if (organization.selectedOrg.value) parts.push(organization.selectedOrg.value)
     if (organization.selectedOrg.value && organization.inviteOpen.value) parts.push('invite')

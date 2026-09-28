@@ -4,14 +4,14 @@ import { call, createListResource, toast } from 'frappe-ui'
 // A port of `desk/src/pages/ticket/TicketFeedback.vue`; the dialog is Studio blocks.
 
 export function useTicketFeedback(ticket) {
-  const feedbackOpen = ref(false)
+  const isFeedbackOpen = ref(false)
   // What the rating is saved alongside: the status the caller is heading for.
   const transition = ref<Record<string, string>>({})
   // In stars, the way the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
   const feedbackText = ref('')
-  const feedbackSaving = ref(false)
+  const isFeedbackSaving = ref(false)
 
   const options = createListResource({
     doctype: 'HD Ticket Feedback Option',
@@ -34,7 +34,7 @@ export function useTicketFeedback(ticket) {
     options.reload()
   })
 
-  watch(feedbackOpen, (open) => {
+  watch(isFeedbackOpen, (open) => {
     if (open) return
     feedbackStars.value = 0
     feedbackOption.value = null
@@ -44,11 +44,11 @@ export function useTicketFeedback(ticket) {
   // `validate_feedback` blocks a non-agent from the Resolved category without a rating.
   function openFeedback(status = 'Closed') {
     transition.value = { status }
-    feedbackOpen.value = true
+    isFeedbackOpen.value = true
   }
 
   function closeFeedback() {
-    feedbackOpen.value = false
+    isFeedbackOpen.value = false
   }
 
   function selectFeedbackOption(name: string) {
@@ -58,8 +58,8 @@ export function useTicketFeedback(ticket) {
   // One write, so the rating and the transition can never disagree. The status written is
   // the one the opener asked for, never the one the ticket is already in.
   async function submitFeedback() {
-    if (!feedbackOption.value || feedbackSaving.value) return
-    feedbackSaving.value = true
+    if (!feedbackOption.value || isFeedbackSaving.value) return
+    isFeedbackSaving.value = true
     try {
       await call('frappe.client.set_value', {
         doctype: 'HD Ticket',
@@ -79,12 +79,12 @@ export function useTicketFeedback(ticket) {
     } catch (error) {
       toast.error(error?.messages?.[0] || 'Could not save the feedback')
     } finally {
-      feedbackSaving.value = false
+      isFeedbackSaving.value = false
     }
   }
 
   return {
-    feedbackOpen,
+    isFeedbackOpen,
     openFeedback,
     closeFeedback,
     feedbackStars,
@@ -92,7 +92,7 @@ export function useTicketFeedback(ticket) {
     feedbackOption,
     selectFeedbackOption,
     feedbackText,
-    feedbackSaving,
+    isFeedbackSaving,
     canSubmitFeedback: computed(() => Boolean(feedbackOption.value)),
     submitFeedback,
   }

@@ -49,7 +49,7 @@
           "shrink-0"
          ],
          "componentId": "KbOrgSwitcher-tickets",
-         "componentName": "KbOrgSwitcher",
+         "componentName": "PortalOrgSwitcher",
          "componentProps": {
           "onSelect": "(customers) => selectOrganization(customers)",
           "organizations": "{{ organizations }}",
@@ -142,7 +142,7 @@
           }
          },
          "componentId": "KbFilter-tickets-filter",
-         "componentName": "KbFilter",
+         "componentName": "PortalFilter",
          "componentProps": {
           "conditions": "{{ filterConditions }}",
           "fields": "{{ filterFields }}"
@@ -213,7 +213,7 @@
         "w-full"
        ],
        "componentId": "KbTicketList-tickets",
-       "componentName": "KbTicketList",
+       "componentName": "PortalTicketList",
        "componentProps": {
         "columns": "{{ listColumns }}",
         "emptyState": "{{ emptyState }}",
@@ -262,7 +262,7 @@
       }
      },
      "componentId": "KbViewModal-ref",
-     "componentName": "KbViewModal",
+     "componentName": "PortalViewModal",
      "componentProps": {
       "modelValue": "{{ viewModal }}"
      },
@@ -288,7 +288,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:13:35.813259",
+ "modified": "2026-09-28 21:15:56.188511",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

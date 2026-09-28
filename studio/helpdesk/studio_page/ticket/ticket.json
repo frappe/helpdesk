@@ -283,7 +283,7 @@
                     },
                     {
                      "componentId": "KbEmailContent-ticket-body",
-                     "componentName": "KbEmailContent",
+                     "componentName": "PortalEmailContent",
                      "componentProps": {
                       "content": "{{ dataItem.content }}"
                      },
@@ -291,7 +291,7 @@
                     },
                     {
                      "componentId": "KbAttachments-ticket",
-                     "componentName": "KbAttachments",
+                     "componentName": "PortalAttachments",
                      "componentProps": {
                       "attachments": "{{ dataItem.attachments }}"
                      },
@@ -329,7 +329,7 @@
                       }
                      },
                      "componentId": "KbDotAction-ticket-solve-yes",
-                     "componentName": "KbDotAction",
+                     "componentName": "PortalDotAction",
                      "componentProps": {
                       "label": "{{ words.solveYes }}",
                       "state": "done"
@@ -344,7 +344,7 @@
                       }
                      },
                      "componentId": "KbDotAction-ticket-solve-no",
-                     "componentName": "KbDotAction",
+                     "componentName": "PortalDotAction",
                      "componentProps": {
                       "label": "{{ words.solveNo }}",
                       "state": "next"
@@ -465,7 +465,7 @@
              "componentId": "container-ticket-prompt",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ canReply && !composerOpen }}"
+             "visibilityCondition": "{{ canReply && !isComposerOpen }}"
             },
             {
              "children": [
@@ -483,10 +483,11 @@
                 }
                },
                "componentId": "KbReplyEditor-ticket",
-               "componentName": "KbReplyEditor",
+               "componentName": "PortalReplyEditor",
                "componentProps": {
                 "attachments": "{{ attachments }}",
                 "docname": "{{ ticketId }}",
+                "isSending": "{{ isSending }}",
                 "modelValue": {
                  "$type": "variable",
                  "name": "reply"
@@ -494,7 +495,6 @@
                 "onAttach": "{{ addAttachment }}",
                 "onRemoveAttachment": "{{ removeAttachment }}",
                 "placeholder": "{{ t('Type a message') }}",
-                "sending": "{{ sending }}",
                 "uploadArgs": "{{ uploadArgs }}"
                },
                "isCustomVueComponent": true
@@ -512,7 +512,7 @@
              "componentId": "container-ticket-editor",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ canReply && composerOpen }}"
+             "visibilityCondition": "{{ canReply && isComposerOpen }}"
             }
            ],
            "classes": [
@@ -624,7 +624,7 @@
               },
               {
                "componentId": "KbStatusPill-ticket",
-               "componentName": "KbStatusPill",
+               "componentName": "PortalStatusPill",
                "componentProps": {
                 "color": "{{ statusPill.color }}",
                 "label": "{{ statusPill.label }}"
@@ -720,7 +720,7 @@
            "children": [
             {
              "componentId": "KbTicketTimeline-ticket",
-             "componentName": "KbTicketTimeline",
+             "componentName": "PortalTicketTimeline",
              "componentProps": {
               "steps": "{{ timeline }}"
              },
@@ -952,7 +952,7 @@
      "componentProps": {
       "modelValue": {
        "$type": "variable",
-       "name": "feedbackOpen"
+       "name": "isFeedbackOpen"
       },
       "title": "Rate this ticket"
      },
@@ -976,7 +976,7 @@
          "componentProps": {
           "disabled": "{{ !canSubmitFeedback }}",
           "label": "Submit",
-          "loading": "{{ feedbackSaving }}",
+          "loading": "{{ isFeedbackSaving }}",
           "variant": "solid"
          },
          "componentSlots": {}
@@ -1236,7 +1236,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:13:36.212361",
+ "modified": "2026-09-28 21:15:56.223995",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

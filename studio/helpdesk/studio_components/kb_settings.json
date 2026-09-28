@@ -194,9 +194,9 @@
                }
               },
               "componentId": "kb_settings-profile-identity",
-              "componentName": "KbSettingsIdentity",
+              "componentName": "PortalSettingsIdentity",
               "componentProps": {
-               "busy": "{{ settingsBusy }}",
+               "busy": "{{ isSettingsBusy }}",
                "editable": true,
                "image": "{{ settingsUser.image }}",
                "name": "{{ settingsUser.full_name }}",
@@ -533,7 +533,7 @@
           "children": [
            {
             "componentId": "kb_settings-organization-list",
-            "componentName": "KbOrganizationList",
+            "componentName": "PortalOrganizationList",
             "componentProps": {
              "onSelect": "{{ openOrganization }}",
              "organizations": "{{ organizations }}"
@@ -888,9 +888,9 @@
                }
               },
               "componentId": "kb_settings-organization-identity",
-              "componentName": "KbSettingsIdentity",
+              "componentName": "PortalSettingsIdentity",
               "componentProps": {
-               "busy": "{{ settingsBusy }}",
+               "busy": "{{ isSettingsBusy }}",
                "editable": "{{ canEdit }}",
                "image": "{{ settingsOrg.image }}",
                "maxLength": 34,
@@ -907,7 +907,7 @@
                "w-full"
               ],
               "componentId": "kb_settings-organization-tabs",
-              "componentName": "KbTabs",
+              "componentName": "PortalTabs",
               "componentProps": {
                "modelValue": {
                 "$type": "variable",
@@ -928,7 +928,7 @@
                  "mt-3"
                 ],
                 "componentId": "kb_settings-members-list",
-                "componentName": "KbMemberList",
+                "componentName": "PortalMemberList",
                 "componentProps": {
                  "canManage": "{{ canInvite }}",
                  "members": "{{ orgMembers }}",
@@ -954,7 +954,7 @@
                "mt-4"
               ],
               "componentId": "kb_settings-organization-tickets",
-              "componentName": "KbOrgTickets",
+              "componentName": "PortalOrgTickets",
               "componentProps": {
                "customer": "{{ selectedOrg }}"
               },
@@ -1053,7 +1053,7 @@
               "componentName": "Button",
               "componentProps": {
                "label": "{{ t('Send Invite') }}",
-               "loading": "{{ settingsBusy }}",
+               "loading": "{{ isSettingsBusy }}",
                "variant": "subtle"
               },
               "componentSlots": {}
@@ -1126,7 +1126,7 @@
              },
              {
               "componentId": "kb_settings-invite-emails",
-              "componentName": "KbEmailInput",
+              "componentName": "PortalEmailInput",
               "componentProps": {
                "contacts": "{{ inviteContacts }}",
                "modelValue": {
@@ -1186,7 +1186,7 @@
     "componentProps": {
      "open": {
       "$type": "variable",
-      "name": "settingsOpen"
+      "name": "isSettingsOpen"
      },
      "size": "5xl",
      "tab": {
@@ -1218,7 +1218,7 @@
     "componentId": "kb_settings-confirm-dialog",
     "componentName": "Dialog",
     "componentProps": {
-     "modelValue": "{{ confirmOpen }}",
+     "modelValue": "{{ isConfirmOpen }}",
      "onUpdate:modelValue": "(value) => { if (!value) cancelConfirm() }",
      "title": "{{ confirmAction ? confirmAction.title : '' }}"
     },
@@ -1254,7 +1254,7 @@
           "componentName": "Button",
           "componentProps": {
            "label": "{{ confirmAction.label || 'Confirm' }}",
-           "loading": "{{ settingsBusy }}",
+           "loading": "{{ isSettingsBusy }}",
            "theme": "{{ confirmAction.theme || 'red' }}",
            "variant": "solid"
           },
@@ -1369,7 +1369,7 @@
               "componentName": "Button",
               "componentProps": {
                "label": "Change password",
-               "loading": "{{ settingsBusy }}",
+               "loading": "{{ isSettingsBusy }}",
                "variant": "solid"
               },
               "componentSlots": {}
@@ -1424,7 +1424,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-09-23 16:06:12.480799",
+ "modified": "2026-09-28 21:15:56.024756",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

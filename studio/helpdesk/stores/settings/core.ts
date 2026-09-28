@@ -6,29 +6,29 @@ import { usePreferences } from '@app/stores/preferences'
 // the dialog module that drives it.
 
 export function createSettingsCore() {
-  const settingsOpen = ref(false)
+  const isSettingsOpen = ref(false)
   const settingsTab = ref('profile') // 'profile' | 'members' | 'organization'
   const settingsData = ref(null)
-  const settingsBusy = ref(false)
+  const isSettingsBusy = ref(false)
 
   const settingsUser = computed(() => settingsData.value?.user || {})
   const organizations = computed(() => settingsData.value?.organizations || [])
 
   const confirmAction = ref(null)
   // Apart from the options, so what is on the dialog survives its own closing animation.
-  const confirmOpen = ref(false)
+  const isConfirmOpen = ref(false)
 
   function askConfirm(options) {
     confirmAction.value = options
-    confirmOpen.value = true
+    isConfirmOpen.value = true
   }
 
   function cancelConfirm() {
-    confirmOpen.value = false
+    isConfirmOpen.value = false
   }
 
   function acceptConfirm() {
-    confirmOpen.value = false
+    isConfirmOpen.value = false
     return confirmAction.value?.action?.()
   }
 
@@ -53,8 +53,8 @@ export function createSettingsCore() {
   // `landed` covers actions that mail synchronously, where a mail failure fails a
   // request whose change is already saved.
   async function run(action, successMessage, landed) {
-    if (settingsBusy.value) return
-    settingsBusy.value = true
+    if (isSettingsBusy.value) return
+    isSettingsBusy.value = true
     try {
       await action()
       if (successMessage) toast.success(successMessage)
@@ -66,7 +66,7 @@ export function createSettingsCore() {
       if (partial) toast.warning(partial)
       else toast.error(serverMessage(error) || 'Something went wrong')
     } finally {
-      settingsBusy.value = false
+      isSettingsBusy.value = false
     }
   }
 
@@ -93,14 +93,14 @@ export function createSettingsCore() {
   }
 
   return {
-    settingsOpen,
+    isSettingsOpen,
     settingsTab,
     settingsData,
-    settingsBusy,
+    isSettingsBusy,
     settingsUser,
     organizations,
     confirmAction,
-    confirmOpen,
+    isConfirmOpen,
     askConfirm,
     cancelConfirm,
     acceptConfirm,

@@ -48,15 +48,15 @@ const store = {
   theme,
   // Bound, not written into the blocks, so the language panel is itself translated.
   t,
-  settingsOpen: core.settingsOpen,
+  isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
-  settingsBusy: core.settingsBusy,
+  isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
   // Pages that show organizations outside the dialog have to ask for them.
   loadSettings: core.loadSettings,
   confirmAction: core.confirmAction,
-  confirmOpen: core.confirmOpen,
+  isConfirmOpen: core.isConfirmOpen,
   askConfirm: core.askConfirm,
   cancelConfirm: core.cancelConfirm,
   acceptConfirm: core.acceptConfirm,

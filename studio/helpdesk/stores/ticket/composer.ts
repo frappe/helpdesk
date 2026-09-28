@@ -12,10 +12,10 @@ const SETTLE_MS = 300
 const SCROLL_MS = 220
 
 export function useReplyComposer(ticket) {
-  const composerOpen = ref(false)
+  const isComposerOpen = ref(false)
   const reply = ref('')
   const attachments = ref<any[]>([])
-  const sending = ref(false)
+  const isSending = ref(false)
 
   // Resolved is not closed: replying to it reopens the ticket.
   const canReply = computed(() => ticket.data?.status !== 'Closed')
@@ -26,11 +26,11 @@ export function useReplyComposer(ticket) {
   )
 
   const threadTailSpace = computed(() =>
-    composerOpen.value ? EDITOR_TAIL : PROMPT_TAIL,
+    isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL,
   )
 
   function openComposer() {
-    composerOpen.value = true
+    isComposerOpen.value = true
     // The editor opens over the thread, so ride down or the message replied to is behind it.
     nextTick(scrollThreadToEnd)
     // Message iframes settle their height a beat after paint; this pass catches that.
@@ -72,13 +72,13 @@ export function useReplyComposer(ticket) {
   function discard() {
     reply.value = ''
     attachments.value = []
-    composerOpen.value = false
+    isComposerOpen.value = false
   }
 
   // The requester's reply path: it attributes the message to them, not to an agent.
   async function send() {
-    if (!canSend.value || sending.value) return
-    sending.value = true
+    if (!canSend.value || isSending.value) return
+    isSending.value = true
     try {
       await call('run_doc_method', {
         dt: 'HD Ticket',
@@ -93,13 +93,13 @@ export function useReplyComposer(ticket) {
     } catch (error) {
       toast.error(error?.messages?.[0] || 'Could not send the message')
     } finally {
-      sending.value = false
+      isSending.value = false
     }
   }
 
   return {
     canReply,
-    composerOpen,
+    isComposerOpen,
     threadTailSpace,
     openComposer,
     reply,
@@ -109,7 +109,7 @@ export function useReplyComposer(ticket) {
     removeAttachment,
     uploadArgs: UPLOAD_ARGS,
     canSend,
-    sending,
+    isSending,
     send,
     discard,
   }
