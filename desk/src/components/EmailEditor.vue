@@ -544,17 +544,16 @@ function submitMail() {
       ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
       : "");
   const sender = selectedFromEmail.value?.email_id ?? authStore.userId;
-  const currentUser = getUser(authStore.userId);
 
   pendingRow?.drop();
   pendingRow = addPendingActivity(props.doctype, props.ticketId, {
     type: "email",
     timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     author: {
-      email: currentUser?.email || authStore.userId,
-      // the users list may not have landed yet, and its stub carries no avatar
-      fullname: currentUser?.full_name || authStore.userName,
-      image: currentUser?.user_image || authStore.userImage,
+      email: getUser(authStore.userId).email,
+      // the users list may still be a stub with a guessed name and no avatar
+      fullname: authStore.userName,
+      image: authStore.userImage,
     },
     data: {
       name: "",
