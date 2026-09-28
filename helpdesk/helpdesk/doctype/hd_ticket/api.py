@@ -295,17 +295,19 @@ def merge_ticket(source: str, target: str):
         frappe.throw(_("Target ticket does not exist"))
     if source == target:
         frappe.throw(_("Source and target ticket cannot be same"))
+    for name in (source, target):
+        frappe.has_permission("HD Ticket", "write", doc=name, throw=True)
 
     controller = get_controller("HD Ticket")
 
-    source_comments = frappe.db.get_list(
+    source_comments = frappe.get_all(
         "Comment",
         filters={"reference_doctype": "HD Ticket", "reference_name": source},
         pluck="name",
     )
     duplicate_list_retain_timestamp("Comment", source_comments, target, controller)
 
-    source_communications = frappe.db.get_list(
+    source_communications = frappe.get_all(
         "Communication",
         filters={"reference_doctype": "HD Ticket", "reference_name": source},
         pluck="name",
@@ -314,7 +316,7 @@ def merge_ticket(source: str, target: str):
         "Communication", source_communications, target, controller
     )
 
-    source_attachments = frappe.db.get_list(
+    source_attachments = frappe.get_all(
         "File",
         filters={"attached_to_doctype": "HD Ticket", "attached_to_name": source},
         pluck="name",
@@ -381,7 +383,7 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
         duplicate_doc.insert(ignore_permissions=True)
 
         if doctype == "File":
-            return
+            continue
 
         attachments = get_attachments(
             doctype,

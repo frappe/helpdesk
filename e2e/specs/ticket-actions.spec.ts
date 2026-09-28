@@ -41,8 +41,7 @@ test("a ticket merges into another from the same customer", async ({ page, api, 
   });
 });
 
-test.fixme("merging carries the source emails over to the target", async ({ page, api, apiAs }) => {
-  // merge_ticket reads Communication with frappe.db.get_list, which an Agent can't list, so none move
+test("merging carries the source emails over to the target", async ({ page, api, apiAs }) => {
   const customer = await apiAs("customer");
   const target = await raiseTicket(customer);
   const source = await raiseTicket(customer);
