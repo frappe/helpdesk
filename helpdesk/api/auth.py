@@ -79,6 +79,40 @@ def get_user():
 
 
 @frappe.whitelist()
+def update_profile(
+    first_name: str | None = None,
+    last_name: str | None = None,
+    image: str | None = None,
+) -> None:
+    """Change the session user's own name or picture."""
+    user = frappe.get_doc("User", frappe.session.user)
+    if first_name is not None:
+        user.first_name = first_name
+    if last_name is not None:
+        user.last_name = last_name
+    if image is not None:
+        user.user_image = image or None
+    user.save(ignore_permissions=True)
+    _sync_contact(user)
+
+
+def _sync_contact(user) -> None:
+    # Frappe mirrors the User onto its Contact after commit, too late for the reload that follows.
+    contact_name = frappe.db.get_value("Contact", {"user": user.name})
+    if not contact_name:
+        return
+    contact = frappe.get_doc("Contact", contact_name)
+    contact.update(
+        {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "image": user.user_image,
+        }
+    )
+    contact.save(ignore_permissions=True)
+
+
+@frappe.whitelist()
 @agent_only
 def get_current_user_email_info():
     user = frappe.session.user

@@ -31,7 +31,10 @@ after_migrate = [
 # Full Text Search
 # ------------------
 
-sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+sqlite_search = [
+    "helpdesk.search_sqlite.HelpdeskSearch",
+    "helpdesk.search_sqlite.HelpdeskArticleSearch",
+]
 
 scheduler_events = {
     "all": [
@@ -51,6 +54,39 @@ website_route_rules = [
     {
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
+    },
+    # Frappe's legacy `/kb/<category>` rule would shadow the Studio app's single-segment pages;
+    # only a static rule outranks it, so each of those pages needs an entry.
+    {
+        "from_route": "/kb/customer-tickets",
+        "to_route": "kb",
+    },
+    {
+        "from_route": "/kb/new-ticket",
+        "to_route": "kb",
+    },
+]
+
+# The old customer portal's ticket URLs keep working through these.
+website_redirects = [
+    # The app root will be the knowledge base once its pages land.
+    {
+        "source": "/kb",
+        "target": "/kb/customer-tickets",
+    },
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/kb/new-ticket",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/kb/customer-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/kb/tickets/\1",
     },
 ]
 

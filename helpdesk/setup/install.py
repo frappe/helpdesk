@@ -7,6 +7,7 @@ from frappe.permissions import add_permission, update_permission_property
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
@@ -221,7 +222,7 @@ def setup_customer_role(fresh_install=True):
         else:
             role_doc = frappe.new_doc("Role")
             role_doc.role_name = role_name
-        role_doc.home_page = "/helpdesk"
+        role_doc.home_page = CUSTOMER_PORTAL_ROOT
         role_doc.desk_access = 0
         role_doc.save()
 
@@ -230,14 +231,17 @@ def setup_customer_role(fresh_install=True):
 
 
 def set_portal_defaults(overwrite=False):
-    """Point the portal at helpdesk. Installing claims the settings outright;
-    the upgrade patch only fills what a site left empty.
+    """Point the portal at the studio customer portal. Installing claims the
+    settings outright; the upgrade patch only fills what a site left empty.
 
     Writes straight into the Single rather than saving the document. A save
     also validates the portal menu rows, and a row left behind by a deleted
     doctype fails that validation and takes the whole migration down.
     """
-    defaults = {"default_role": "HD Customer", "default_portal_home": "/helpdesk"}
+    defaults = {
+        "default_role": "HD Customer",
+        "default_portal_home": CUSTOMER_PORTAL_ROOT,
+    }
     if overwrite:
         to_set = defaults
     else:

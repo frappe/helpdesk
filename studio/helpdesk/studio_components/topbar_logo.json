@@ -1,0 +1,29 @@
+{
+ "block": {
+  "baseStyles": {
+   "display": "flex",
+   "height": "fit-content",
+   "width": "fit-content"
+  },
+  "blockName": "topbar-left",
+  "componentId": "KbNavMenu-topbar",
+  "componentName": "PortalNavMenu",
+  "componentProps": {
+   "logo": "{{ brandLogo }}",
+   "options": "{{ accountMenuOptions }}"
+  },
+  "componentSlots": {},
+  "isCustomVueComponent": true
+ },
+ "component_id": "topbar_logo",
+ "component_name": "Topbar Logo",
+ "creation": "2026-07-06 11:54:37.022115",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "is_disabled": 0,
+ "modified": "2026-07-27 22:07:26.003646",
+ "modified_by": "Administrator",
+ "name": "topbar_logo",
+ "owner": "Administrator"
+}

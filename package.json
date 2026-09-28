@@ -1,7 +1,10 @@
 {
 	"private": true,
+	"dependencies": {
+		"@helpdesk/shared": "link:./shared"
+	},
 	"scripts": {
-		"postinstall": "cd desk && yarn install",
+		"postinstall": "cd shared && yarn install && cd ../desk && yarn install",
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
 	},

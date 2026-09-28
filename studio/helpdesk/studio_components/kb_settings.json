@@ -1,0 +1,1431 @@
+{
+ "block": {
+  "blockName": "KB Settings",
+  "children": [
+   {
+    "blockName": "Settings Dialog",
+    "children": [
+     {
+      "children": [
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-profile-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Profile') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-profile",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "profile"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "componentId": "kb_settings-nav-profile-avatar",
+              "componentName": "Avatar",
+              "componentProps": {
+               "image": "{{ settingsUser.image }}",
+               "label": "{{ settingsUser.full_name }}",
+               "size": "xs"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-prefix",
+            "slotName": "prefix"
+           }
+          }
+         }
+        ],
+        "componentId": "kb_settings-nav-personal",
+        "componentName": "SettingsNavGroup",
+        "componentProps": {
+         "label": "{{ t('Personal') }}"
+        },
+        "componentSlots": {}
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-members-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ organizationScreenTitle }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-members",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "members"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-members-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-users"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-prefix",
+            "slotName": "prefix"
+           }
+          }
+         }
+        ],
+        "componentId": "kb_settings-nav-organization",
+        "componentName": "SettingsNavGroup",
+        "componentProps": {
+         "label": "{{ t('Organization') }}"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ organizations.length }}"
+       }
+      ],
+      "componentId": "kb_settings-sidebar",
+      "componentName": "SettingsSidebar",
+      "componentProps": {},
+      "componentSlots": {}
+     },
+     {
+      "children": [
+       {
+        "blockName": "Profile",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "classes": [
+               "text-ink-gray-8",
+               "font-semibold"
+              ],
+              "componentId": "kb_settings-profile-header-title",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-lg",
+               "tag": "h2",
+               "text": "{{ t('Profile') }}"
+              },
+              "componentSlots": {}
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-profile-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ t('Manage your profile information.') }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-profile-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "py-8",
+           "px-10"
+          ],
+          "componentId": "kb_settings-profile-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "blockName": "Profile identity",
+              "componentEvents": {
+               "remove": {
+                "action": "Run Script",
+                "event": "remove",
+                "script": "removeProfileImage()"
+               },
+               "rename": {
+                "action": "Run Script",
+                "event": "rename",
+                "script": "function handleEvent(value) { renameProfile(value) }"
+               },
+               "upload": {
+                "action": "Run Script",
+                "event": "upload",
+                "script": "uploadProfileImage()"
+               }
+              },
+              "componentId": "kb_settings-profile-identity",
+              "componentName": "PortalSettingsIdentity",
+              "componentProps": {
+               "busy": "{{ isSettingsBusy }}",
+               "editable": true,
+               "image": "{{ settingsUser.image }}",
+               "name": "{{ settingsUser.full_name }}",
+               "subtitle": "{{ settingsUser.email }}"
+              },
+              "componentSlots": {},
+              "isCustomVueComponent": true
+             },
+             {
+              "blockName": "Preferences",
+              "children": [
+               {
+                "children": [
+                 {
+                  "classes": [
+                   "text-base",
+                   "font-semibold",
+                   "text-ink-gray-9"
+                  ],
+                  "componentId": "kb_settings-preferences-title",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "tag": "span",
+                   "text": "{{ t('Preferences') }}"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
+                "classes": [
+                 "flex",
+                 "h-7",
+                 "items-center",
+                 "justify-between"
+                ],
+                "componentId": "kb_settings-preferences-head",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               },
+               {
+                "children": [
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-40"
+                    ],
+                    "componentId": "kb_settings-select-language",
+                    "componentName": "Combobox",
+                    "componentProps": {
+                     "modelValue": "{{ preferences.language }}",
+                     "onUpdate:modelValue": "(value) => setPreference('language', value)",
+                     "options": "{{ languageOptions }}",
+                     "placeholder": "{{ t('Select language') }}",
+                     "trigger": "button"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-row-language",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Change language of the application.') }}",
+                   "title": "{{ t('Language') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-40"
+                    ],
+                    "componentId": "kb_settings-select-time_zone",
+                    "componentName": "Combobox",
+                    "componentProps": {
+                     "modelValue": "{{ preferences.time_zone }}",
+                     "onUpdate:modelValue": "(value) => setPreference('time_zone', value)",
+                     "options": "{{ timezoneOptions }}",
+                     "placeholder": "{{ t('Select timezone') }}",
+                     "trigger": "button"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-row-time_zone",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Change timezone of the application.') }}",
+                   "title": "{{ t('Timezone') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-32"
+                    ],
+                    "componentId": "kb_settings-select-theme",
+                    "componentName": "Select",
+                    "componentProps": {
+                     "modelValue": {
+                      "$type": "variable",
+                      "name": "theme"
+                     },
+                     "options": {
+                      "$type": "variable",
+                      "name": "themeOptions"
+                     }
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-row-theme",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Switch between light, dark, or system theme.') }}",
+                   "title": "{{ t('Theme') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-32"
+                    ],
+                    "componentId": "kb_settings-select-layout",
+                    "componentName": "Select",
+                    "componentProps": {
+                     "modelValue": {
+                      "$type": "variable",
+                      "name": "conversationLayout"
+                     },
+                     "options": {
+                      "$type": "variable",
+                      "name": "conversationLayoutOptions"
+                     }
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-row-layout",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Read replies as a timeline, or as a chat with your own messages on the right.') }}",
+                   "title": "{{ t('Conversation layout') }}"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
+                "classes": [
+                 "mt-2"
+                ],
+                "componentId": "kb_settings-preferences-rows",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               }
+              ],
+              "classes": [
+               "mt-8"
+              ],
+              "componentId": "kb_settings-preferences",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div",
+              "visibilityCondition": "{{ settingsUser.email }}"
+             },
+             {
+              "blockName": "Security",
+              "children": [
+               {
+                "classes": [
+                 "text-base",
+                 "font-semibold",
+                 "text-ink-gray-9"
+                ],
+                "componentId": "kb_settings-security-title",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "tag": "span",
+                 "text": "{{ t('Security') }}"
+                },
+                "componentSlots": {}
+               },
+               {
+                "children": [
+                 {
+                  "blockName": "Password row",
+                  "children": [
+                   {
+                    "componentEvents": {
+                     "click": {
+                      "action": "Run Script",
+                      "event": "click",
+                      "script": "openPasswordChange()"
+                     }
+                    },
+                    "componentId": "kb_settings-password-change",
+                    "componentName": "Button",
+                    "componentProps": {
+                     "label": "{{ t('Change password') }}",
+                     "variant": "subtle"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-password-row",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Change your account password for security.') }}",
+                   "title": "{{ t('Password') }}"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
+                "classes": [
+                 "mt-2"
+                ],
+                "componentId": "kb_settings-security-rows",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               }
+              ],
+              "classes": [
+               "mt-4"
+              ],
+              "componentId": "kb_settings-security",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div",
+              "visibilityCondition": "{{ settingsUser.email }}"
+             }
+            ],
+            "componentId": "kb_settings-profile-content",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-10",
+           "pb-8"
+          ],
+          "componentId": "kb_settings-profile-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-profile-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "profile"
+        },
+        "componentSlots": {}
+       },
+       {
+        "blockName": "Manage organization",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "classes": [
+               "text-ink-gray-8",
+               "font-semibold"
+              ],
+              "componentId": "kb_settings-organization-list-header-title",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-lg",
+               "tag": "h2",
+               "text": "{{ organizationScreenTitle }}"
+              },
+              "componentSlots": {}
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-organization-list-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ organizationScreenDescription }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-organization-list-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "py-8",
+           "px-10"
+          ],
+          "componentId": "kb_settings-organization-list-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ !selectedOrg }}"
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-organization-list",
+            "componentName": "PortalOrganizationList",
+            "componentProps": {
+             "onSelect": "{{ openOrganization }}",
+             "organizations": "{{ organizations }}"
+            },
+            "componentSlots": {},
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-10",
+           "pb-8"
+          ],
+          "componentId": "kb_settings-organization-list-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ !selectedOrg }}"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "children": [
+                 {
+                  "classes": [
+                   "size-4.5"
+                  ],
+                  "componentId": "kb_settings-organization-back-icon",
+                  "componentName": "Icon",
+                  "componentProps": {
+                   "icon": "lucide-chevron-left"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "classes": [
+                   "font-semibold"
+                  ],
+                  "componentId": "kb_settings-organization-back-label",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-lg",
+                   "tag": "h2",
+                   "text": "{{ organizationScreenTitle }}"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
+                "classes": [
+                 "cursor-pointer",
+                 "select-none",
+                 "hover:opacity-80",
+                 "items-center",
+                 "text-ink-gray-8",
+                 "flex",
+                 "gap-2",
+                 "-ml-1.5",
+                 "pr-2"
+                ],
+                "componentEvents": {
+                 "click": {
+                  "action": "Run Script",
+                  "event": "click",
+                  "script": "closeOrganization()"
+                 }
+                },
+                "componentId": "kb_settings-organization-back",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div",
+                "visibilityCondition": "{{ canLeaveOrganization }}"
+               },
+               {
+                "classes": [
+                 "text-ink-gray-8",
+                 "font-semibold"
+                ],
+                "componentId": "kb_settings-organization-title",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-lg",
+                 "tag": "h2",
+                 "text": "{{ organizationScreenTitle }}"
+                },
+                "componentSlots": {},
+                "visibilityCondition": "{{ !canLeaveOrganization }}"
+               },
+               {
+                "classes": [
+                 "text-ink-gray-6",
+                 "max-w-[28rem]"
+                ],
+                "componentId": "kb_settings-organization-detail-description",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-base",
+                 "tag": "p",
+                 "text": "{{ organizationDetailDescription }}"
+                },
+                "componentSlots": {}
+               }
+              ],
+              "classes": [
+               "flex",
+               "flex-col",
+               "gap-1",
+               "min-w-0"
+              ],
+              "componentId": "kb_settings-organization-detail-heading-stack",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
+             },
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "openInvite()"
+               }
+              },
+              "componentId": "kb_settings-organization-invite",
+              "componentName": "Button",
+              "componentProps": {
+               "iconLeft": "lucide-plus",
+               "label": "{{ t('Invite people') }}",
+               "variant": "solid"
+              },
+              "componentSlots": {},
+              "visibilityCondition": "{{ canInvite }}"
+             }
+            ],
+            "classes": [
+             "flex",
+             "items-start",
+             "justify-between",
+             "gap-4"
+            ],
+            "componentId": "kb_settings-organization-detail-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "py-8",
+           "px-10"
+          ],
+          "componentId": "kb_settings-organization-detail-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+         },
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "blockName": "Organization identity",
+              "children": [
+               {
+                "blockName": "Organization details",
+                "children": [
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "size-4",
+                     "text-ink-gray-6"
+                    ],
+                    "componentId": "kb_settings-organization-fact-email-icon",
+                    "componentName": "Icon",
+                    "componentProps": {
+                     "icon": "lucide-mail"
+                    },
+                    "componentSlots": {}
+                   },
+                   {
+                    "classes": [
+                     "text-sm",
+                     "text-ink-gray-8"
+                    ],
+                    "componentId": "kb_settings-organization-fact-email-value",
+                    "componentName": "TextBlock",
+                    "componentProps": {
+                     "tag": "span",
+                     "text": "{{ settingsOrg.email }}"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "classes": [
+                   "flex",
+                   "items-center",
+                   "gap-x-1"
+                  ],
+                  "componentId": "kb_settings-organization-fact-email",
+                  "componentName": "container",
+                  "componentProps": {},
+                  "componentSlots": {},
+                  "originalElement": "div",
+                  "visibilityCondition": "{{ settingsOrg.email }}"
+                 },
+                 {
+                  "classes": [
+                   "text-ink-gray-4"
+                  ],
+                  "componentId": "kb_settings-organization-meta-dot",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "tag": "span",
+                   "text": "\u2022"
+                  },
+                  "componentSlots": {},
+                  "visibilityCondition": "{{ settingsOrg.email && settingsOrg.domain }}"
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "size-4",
+                     "text-ink-gray-6"
+                    ],
+                    "componentId": "kb_settings-organization-fact-domain-icon",
+                    "componentName": "Icon",
+                    "componentProps": {
+                     "icon": "lucide-globe"
+                    },
+                    "componentSlots": {}
+                   },
+                   {
+                    "classes": [
+                     "text-sm",
+                     "text-ink-gray-8"
+                    ],
+                    "componentId": "kb_settings-organization-fact-domain-value",
+                    "componentName": "TextBlock",
+                    "componentProps": {
+                     "tag": "span",
+                     "text": "{{ settingsOrg.domain }}"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "classes": [
+                   "flex",
+                   "items-center",
+                   "gap-x-1"
+                  ],
+                  "componentId": "kb_settings-organization-fact-domain",
+                  "componentName": "container",
+                  "componentProps": {},
+                  "componentSlots": {},
+                  "originalElement": "div",
+                  "visibilityCondition": "{{ settingsOrg.domain }}"
+                 },
+                 {
+                  "classes": [
+                   "text-ink-gray-4"
+                  ],
+                  "componentId": "kb_settings-organization-meta-dot-country",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "tag": "span",
+                   "text": "\u2022"
+                  },
+                  "componentSlots": {},
+                  "visibilityCondition": "{{ (settingsOrg.email || settingsOrg.domain) && settingsOrg.country }}"
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "size-4",
+                     "text-ink-gray-6"
+                    ],
+                    "componentId": "kb_settings-organization-fact-country-icon",
+                    "componentName": "Icon",
+                    "componentProps": {
+                     "icon": "lucide-map-pin"
+                    },
+                    "componentSlots": {}
+                   },
+                   {
+                    "classes": [
+                     "text-sm",
+                     "text-ink-gray-8"
+                    ],
+                    "componentId": "kb_settings-organization-fact-country-value",
+                    "componentName": "TextBlock",
+                    "componentProps": {
+                     "tag": "span",
+                     "text": "{{ settingsOrg.country }}"
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "classes": [
+                   "flex",
+                   "items-center",
+                   "gap-x-1"
+                  ],
+                  "componentId": "kb_settings-organization-fact-country",
+                  "componentName": "container",
+                  "componentProps": {},
+                  "componentSlots": {},
+                  "originalElement": "div",
+                  "visibilityCondition": "{{ settingsOrg.country }}"
+                 }
+                ],
+                "classes": [
+                 "flex",
+                 "items-center",
+                 "gap-x-1.5"
+                ],
+                "componentId": "kb_settings-organization-meta",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               }
+              ],
+              "componentEvents": {
+               "remove": {
+                "action": "Run Script",
+                "event": "remove",
+                "script": "removeOrgImage()"
+               },
+               "rename": {
+                "action": "Run Script",
+                "event": "rename",
+                "script": "function handleEvent(value) { renameOrganization(value) }"
+               },
+               "upload": {
+                "action": "Run Script",
+                "event": "upload",
+                "script": "uploadOrgImage()"
+               }
+              },
+              "componentId": "kb_settings-organization-identity",
+              "componentName": "PortalSettingsIdentity",
+              "componentProps": {
+               "busy": "{{ isSettingsBusy }}",
+               "editable": "{{ canEdit }}",
+               "image": "{{ settingsOrg.image }}",
+               "maxLength": 34,
+               "name": "{{ settingsOrg.customer_name }}",
+               "shape": "square",
+               "subtitle": ""
+              },
+              "componentSlots": {},
+              "isCustomVueComponent": true
+             },
+             {
+              "classes": [
+               "mt-5",
+               "w-full"
+              ],
+              "componentId": "kb_settings-organization-tabs",
+              "componentName": "PortalTabs",
+              "componentProps": {
+               "modelValue": {
+                "$type": "variable",
+                "name": "orgTab"
+               },
+               "options": {
+                "$type": "variable",
+                "name": "orgTabOptions"
+               }
+              },
+              "isCustomVueComponent": true
+             },
+             {
+              "blockName": "Members",
+              "children": [
+               {
+                "classes": [
+                 "mt-3"
+                ],
+                "componentId": "kb_settings-members-list",
+                "componentName": "PortalMemberList",
+                "componentProps": {
+                 "canManage": "{{ canInvite }}",
+                 "members": "{{ orgMembers }}",
+                 "onRemove": "{{ removeMember }}",
+                 "onSetRole": "{{ setMemberRole }}"
+                },
+                "componentSlots": {},
+                "isCustomVueComponent": true
+               }
+              ],
+              "classes": [
+               "mt-4"
+              ],
+              "componentId": "kb_settings-members",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div",
+              "visibilityCondition": "{{ orgTab === 'members' && orgMembers.length }}"
+             },
+             {
+              "classes": [
+               "mt-4"
+              ],
+              "componentId": "kb_settings-organization-tickets",
+              "componentName": "PortalOrgTickets",
+              "componentProps": {
+               "customer": "{{ selectedOrg }}"
+              },
+              "isCustomVueComponent": true,
+              "visibilityCondition": "{{ orgTab === 'tickets' }}"
+             }
+            ],
+            "componentId": "kb_settings-organization-detail",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-10",
+           "pb-8"
+          ],
+          "componentId": "kb_settings-organization-detail-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+         },
+         {
+          "blockName": "Invite header",
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "classes": [
+                 "size-4.5"
+                ],
+                "componentId": "kb_settings-invite-back-icon",
+                "componentName": "Icon",
+                "componentProps": {
+                 "icon": "lucide-chevron-left"
+                },
+                "componentSlots": {}
+               },
+               {
+                "classes": [
+                 "font-semibold"
+                ],
+                "componentId": "kb_settings-invite-back-label",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-lg",
+                 "tag": "h1",
+                 "text": "{{ t('Invite people') }}"
+                },
+                "componentSlots": {}
+               }
+              ],
+              "classes": [
+               "cursor-pointer",
+               "select-none",
+               "hover:opacity-80",
+               "items-center",
+               "text-ink-gray-8",
+               "flex",
+               "gap-2",
+               "-ml-1.5",
+               "min-h-8",
+               "pr-2"
+              ],
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "closeInvite()"
+               }
+              },
+              "componentId": "kb_settings-invite-back",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
+             },
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "sendInvite()"
+               }
+              },
+              "componentId": "kb_settings-invite-send",
+              "componentName": "Button",
+              "componentProps": {
+               "label": "{{ t('Send Invite') }}",
+               "loading": "{{ isSettingsBusy }}",
+               "variant": "subtle"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "items-start",
+             "justify-between",
+             "gap-4"
+            ],
+            "componentId": "kb_settings-invite-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "py-8",
+           "px-10"
+          ],
+          "componentId": "kb_settings-invite-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ inviteOpen }}"
+         },
+         {
+          "blockName": "Invite body",
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "classes": [
+                 "w-32"
+                ],
+                "componentId": "kb_settings-invite-role",
+                "componentName": "Select",
+                "componentProps": {
+                 "modelValue": {
+                  "$type": "variable",
+                  "name": "inviteRole"
+                 },
+                 "options": [
+                  {
+                   "label": "Member",
+                   "value": "Member"
+                  },
+                  {
+                   "label": "Manager",
+                   "value": "Manager"
+                  }
+                 ]
+                },
+                "componentSlots": {}
+               }
+              ],
+              "componentId": "kb_settings-invite-row",
+              "componentName": "SettingsRow",
+              "componentProps": {
+               "description": "{{ t('New people will be added to the team as') }}",
+               "title": "{{ t('Invite by email') }}"
+              },
+              "componentSlots": {}
+             },
+             {
+              "componentId": "kb_settings-invite-emails",
+              "componentName": "PortalEmailInput",
+              "componentProps": {
+               "contacts": "{{ inviteContacts }}",
+               "modelValue": {
+                "$type": "variable",
+                "name": "inviteEmails"
+               },
+               "placeholder": "{{ t('Separate multiple emails with commas') }}"
+              },
+              "componentSlots": {},
+              "isCustomVueComponent": true
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-3"
+            ],
+            "componentId": "kb_settings-invite-content",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-10",
+           "pb-8"
+          ],
+          "componentId": "kb_settings-invite-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div",
+          "visibilityCondition": "{{ inviteOpen }}"
+         }
+        ],
+        "componentId": "kb_settings-organization-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "members"
+        },
+        "componentSlots": {}
+       }
+      ],
+      "componentId": "kb_settings-content",
+      "componentName": "SettingsContent",
+      "componentProps": {},
+      "componentSlots": {}
+     }
+    ],
+    "componentId": "kb_settings-dialog",
+    "componentName": "SettingsDialog",
+    "componentProps": {
+     "open": {
+      "$type": "variable",
+      "name": "isSettingsOpen"
+     },
+     "size": "5xl",
+     "tab": {
+      "$type": "variable",
+      "name": "settingsTab"
+     },
+     "unmountOnHide": false
+    },
+    "componentSlots": {
+     "title": {
+      "slotContent": [
+       {
+        "componentId": "kb_settings-title",
+        "componentName": "TextBlock",
+        "componentProps": {
+         "tag": "span",
+         "text": "Settings"
+        },
+        "componentSlots": {}
+       }
+      ],
+      "slotId": "kb_settings-slot-title",
+      "slotName": "title"
+     }
+    }
+   },
+   {
+    "blockName": "Confirm dialog",
+    "componentId": "kb_settings-confirm-dialog",
+    "componentName": "Dialog",
+    "componentProps": {
+     "modelValue": "{{ isConfirmOpen }}",
+     "onUpdate:modelValue": "(value) => { if (!value) cancelConfirm() }",
+     "title": "{{ confirmAction ? confirmAction.title : '' }}"
+    },
+    "componentSlots": {
+     "actions": {
+      "slotContent": [
+       {
+        "children": [
+         {
+          "componentEvents": {
+           "click": {
+            "action": "Run Script",
+            "event": "click",
+            "script": "cancelConfirm()"
+           }
+          },
+          "componentId": "kb_settings-confirm-cancel",
+          "componentName": "Button",
+          "componentProps": {
+           "label": "Cancel"
+          },
+          "componentSlots": {}
+         },
+         {
+          "componentEvents": {
+           "click": {
+            "action": "Run Script",
+            "event": "click",
+            "script": "acceptConfirm()"
+           }
+          },
+          "componentId": "kb_settings-confirm-accept",
+          "componentName": "Button",
+          "componentProps": {
+           "label": "{{ confirmAction.label || 'Confirm' }}",
+           "loading": "{{ isSettingsBusy }}",
+           "theme": "{{ confirmAction.theme || 'red' }}",
+           "variant": "solid"
+          },
+          "componentSlots": {}
+         }
+        ],
+        "classes": [
+         "flex",
+         "justify-end",
+         "gap-2"
+        ],
+        "componentId": "kb_settings-confirm-actions",
+        "componentName": "container",
+        "componentProps": {},
+        "componentSlots": {},
+        "originalElement": "div"
+       }
+      ],
+      "slotId": "kb_settings-slot-actions",
+      "slotName": "actions"
+     },
+     "default": {
+      "slotContent": [
+       {
+        "classes": [
+         "text-p-base",
+         "text-ink-gray-8"
+        ],
+        "componentId": "kb_settings-confirm-message",
+        "componentName": "TextBlock",
+        "componentProps": {
+         "tag": "span",
+         "text": "{{ confirmAction.message }}"
+        },
+        "componentSlots": {}
+       }
+      ],
+      "slotId": "kb_settings-slot-body-content:default",
+      "slotName": "default"
+     }
+    }
+   },
+   {
+    "blockName": "Password dialog",
+    "componentId": "kb_settings-password-dialog",
+    "componentName": "Dialog",
+    "componentProps": {
+     "modelValue": {
+      "$type": "variable",
+      "name": "passwordOpen"
+     }
+    },
+    "componentSlots": {
+     "default": {
+      "slotContent": [
+       {
+        "children": [
+         {
+          "classes": [
+           "mb-4",
+           "text-lg",
+           "font-semibold",
+           "text-ink-gray-9"
+          ],
+          "componentId": "kb_settings-password-title",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "tag": "span",
+           "text": "Change password"
+          },
+          "componentSlots": {}
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-password-current",
+            "componentName": "FormControl",
+            "componentProps": {
+             "label": "Current password",
+             "modelValue": {
+              "$type": "variable",
+              "name": "currentPassword"
+             },
+             "type": "password"
+            },
+            "componentSlots": {}
+           },
+           {
+            "componentId": "kb_settings-password-new",
+            "componentName": "FormControl",
+            "componentProps": {
+             "label": "New password",
+             "modelValue": {
+              "$type": "variable",
+              "name": "newPassword"
+             },
+             "type": "password"
+            },
+            "componentSlots": {}
+           },
+           {
+            "children": [
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "changePassword()"
+               }
+              },
+              "componentId": "kb_settings-password-submit",
+              "componentName": "Button",
+              "componentProps": {
+               "label": "Change password",
+               "loading": "{{ isSettingsBusy }}",
+               "variant": "solid"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "justify-end"
+            ],
+            "componentId": "kb_settings-password-actions",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "flex",
+           "flex-col",
+           "gap-4"
+          ],
+          "componentId": "kb_settings-password-fields",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-password-body",
+        "componentName": "container",
+        "componentProps": {},
+        "componentSlots": {},
+        "originalElement": "div"
+       }
+      ],
+      "slotId": "kb_settings-slot-password-body:default",
+      "slotName": "default"
+     }
+    }
+   }
+  ],
+  "componentId": "kb_settings-root",
+  "componentName": "container",
+  "componentProps": {},
+  "componentSlots": {},
+  "originalElement": "div"
+ },
+ "component_id": "kb_settings",
+ "component_name": "KB Settings",
+ "creation": "2026-08-14 22:49:13.595749",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "is_disabled": 0,
+ "modified": "2026-09-28 21:48:52.849664",
+ "modified_by": "Administrator",
+ "name": "kb_settings",
+ "owner": "Administrator"
+}

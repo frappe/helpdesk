@@ -28,6 +28,7 @@ from helpdesk.helpdesk.utils.email import (
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
 from helpdesk.utils import (
+    CUSTOMER_PORTAL_ROOT,
     agent_only,
     capture_event,
     get_agents_team,
@@ -411,11 +412,12 @@ class HDTicket(Document):
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent() or not self.via_customer_portal:
             return
-        is_closed = old_doc.status == "Closed"
-        is_rated = bool(old_doc.feedback)
-        if is_closed or is_rated:
-            text = _("Closed or rated tickets cannot be updated by non-agents")
-            frappe.throw(text, frappe.PermissionError)
+        # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
+        if old_doc.status == "Closed":
+            frappe.throw(
+                _("Closed tickets cannot be updated by non-agents"),
+                frappe.PermissionError,
+            )
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -607,7 +609,7 @@ class HDTicket(Document):
     @property
     def portal_uri(self):
         root_uri = frappe.utils.get_url()
-        return f"{root_uri}/helpdesk/my-tickets/{self.name}"
+        return f"{root_uri}{CUSTOMER_PORTAL_ROOT}/tickets/{self.name}"
 
     @frappe.whitelist()
     def new_comment(self, content: str, attachments: list[str] = []):
@@ -898,10 +900,10 @@ class HDTicket(Document):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                # Queued, not sent inline: an unreachable mail server must not fail the reply already saved.
             )
-        except Exception as e:
-            frappe.throw(_(e))
+        except Exception:
+            self.log_error("Could not queue the reply notification to agents")
 
     def send_acknowledgement_email(self):
         acknowledgement_email_content = frappe.db.get_single_value(
@@ -921,14 +923,11 @@ class HDTicket(Document):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
             )
-        except Exception as e:
-            frappe.throw(
-                _("Could not send an acknowledgement email due to: {0}").format(e)
-            )
+        except Exception:
+            self.log_error("Could not queue the acknowledgement email")
 
     @frappe.whitelist()
     def mark_seen(self):

@@ -1,0 +1,198 @@
+{
+ "block": {
+  "baseStyles": {
+   "alignItems": "center",
+   "display": "flex",
+   "height": "fit-content",
+   "justifyContent": "space-between",
+   "width": "100%"
+  },
+  "children": [
+   {
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "flexShrink": 1,
+     "gap": "8px",
+     "height": "fit-content",
+     "justifyContent": "center",
+     "width": "fit-content"
+    },
+    "blockName": "container",
+    "children": [
+     {
+      "componentId": "topbar_logo-1k0b8u75h",
+      "componentName": "topbar_logo",
+      "componentProps": {},
+      "componentSlots": {},
+      "isStudioComponent": true
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "componentId": "Breadcrumbs-header",
+      "componentName": "Breadcrumbs",
+      "componentProps": {
+       "items": "{{ (inputs.hideRoot ? [] : [{ label: 'Knowledge base', route: '/' }]).concat(inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(route.path === '/' ? [] : [{ label: inputs.crumb || route.name }]) }}"
+      },
+      "componentSlots": {},
+      "visibilityCondition": "{{ !inputs.currentView }}"
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "height": "28px"
+      },
+      "componentId": "KbViewBreadcrumbs-header",
+      "componentName": "PortalViewBreadcrumbs",
+      "componentProps": {
+       "currentView": "{{ inputs.currentView }}",
+       "label": "{{ inputs.viewLabel || 'Tickets' }}",
+       "options": "{{ inputs.viewOptions }}",
+       "viewActions": "{{ inputs.viewActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ inputs.currentView }}"
+     }
+    ],
+    "componentId": "container-xy0t2y8tg",
+    "componentName": "container",
+    "componentProps": {},
+    "componentSlots": {},
+    "originalElement": "div"
+   },
+   {
+    "baseStyles": {
+     "alignItems": "center",
+     "display": "flex",
+     "flexDirection": "row",
+     "gap": "12px"
+    },
+    "blockName": "header-right",
+    "children": [
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "router.push('/new-ticket')"
+       }
+      },
+      "componentId": "Button-raise-ticket",
+      "componentName": "Button",
+      "componentProps": {
+       "label": "{{ words.raiseTicket }}",
+       "variant": "subtle"
+      },
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/new-ticket'].includes(route.path) }}"
+     },
+     {
+      "baseStyles": {
+       "cursor": "pointer"
+      },
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "window.location.href = loginUrl"
+       }
+      },
+      "componentId": "TextBlock-login",
+      "componentName": "TextBlock",
+      "componentProps": {
+       "fontSize": "text-base",
+       "tag": "span",
+       "text": "{{ t('Login') }}"
+      },
+      "visibilityCondition": "{{ isGuest }}"
+     },
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "onPageAction()"
+       }
+      },
+      "componentId": "Button-page-action",
+      "componentName": "Button",
+      "componentProps": {
+       "iconLeft": "{{ pageActionIcon }}",
+       "label": "{{ pageActionLabel }}",
+       "variant": "solid"
+      },
+      "componentSlots": {},
+      "visibilityCondition": "{{ pageActionLabel }}"
+     }
+    ],
+    "componentId": "container-header-right",
+    "componentName": "container",
+    "originalElement": "div"
+   }
+  ],
+  "componentId": "container-v2fhlmh1f",
+  "componentName": "container",
+  "componentProps": {},
+  "componentSlots": {},
+  "originalElement": "div"
+ },
+ "component_id": "header",
+ "component_name": "Header",
+ "creation": "2026-09-01 23:00:19.470034",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [
+  {
+   "input_name": "crumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "parentCrumb",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "parentRoute",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "currentView",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewOptions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewActions",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "viewLabel",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "hideRoot",
+   "required": 0,
+   "type": "Data"
+  }
+ ],
+ "is_disabled": 0,
+ "modified": "2026-09-28 21:48:53.005856",
+ "modified_by": "Administrator",
+ "name": "header",
+ "owner": "Administrator"
+}

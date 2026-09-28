@@ -32,6 +32,7 @@ from helpdesk.test_utils import (
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
     make_agent,
+    make_feedback_option,
     make_priority,
     make_sla,
     make_status,
@@ -129,6 +130,37 @@ class TestHDTicket(IntegrationTestCase):
         ticket.set("__islocal", False)
         ticket.check_update_perms()
         frappe.set_user("Administrator")
+
+    def test_update_perms_allowed_on_a_reopened_rated_ticket(self):
+        # `feedback` is never cleared, so a rating must not freeze a ticket an agent reopened.
+        feedback_option = make_feedback_option("Reopened rating")
+        self.addCleanup(
+            frappe.delete_doc, feedback_option.doctype, feedback_option.name, force=True
+        )
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.insert()
+        ticket.db_set("feedback", feedback_option.name)
+        ticket.db_set("status", "Open")
+
+        frappe.set_user(non_agent)
+        self.addCleanup(frappe.set_user, "Administrator")
+        reopened = frappe.get_doc("HD Ticket", ticket.name)
+        reopened.subject = "Reopened and still rated"
+        reopened.load_doc_before_save()
+        reopened.check_update_perms()
+
+    def test_update_perms_blocked_on_a_closed_ticket(self):
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket.insert()
+        ticket.db_set("status", "Closed")
+
+        frappe.set_user(non_agent)
+        self.addCleanup(frappe.set_user, "Administrator")
+        closed = frappe.get_doc("HD Ticket", ticket.name)
+        closed.subject = "Should not be editable"
+        closed.load_doc_before_save()
+        with self.assertRaises(frappe.PermissionError):
+            closed.check_update_perms()
 
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
