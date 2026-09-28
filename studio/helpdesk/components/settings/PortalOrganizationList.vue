@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Wrapped: scoped rules don't reach a child component's own root. -->
     <div class="mb-6">
       <TextInput v-model="search" type="text" :placeholder="__('Search')">
         <template #prefix>
@@ -22,12 +21,10 @@
       "
     />
 
-    <!-- Cards wide enough that "n tickets · n members" stays on one line. -->
     <div
       v-else
       class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3"
     >
-      <!-- The elevation token draws its own hairline, so the resting border gives way. -->
       <div
         v-for="organization in matches"
         :key="organization.name"
@@ -90,7 +87,6 @@
 </template>
 
 <script setup lang="ts">
-// A role badge per card, rather than sorting the cards into sections.
 import { computed, ref } from "vue";
 import { Avatar, Badge, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";

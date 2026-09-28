@@ -55,8 +55,6 @@
 </template>
 
 <script setup lang="ts">
-// Keyed on the resolved category, not on "Closed" alone, so a custom status catches too.
-// Never blocks the transition: the note is optional and submitting empty is the old path.
 import {
   buildEditorExtensions,
   ticketToolbar,
@@ -84,14 +82,12 @@ const extensions = buildEditorExtensions();
 
 watch(show, async (open) => {
   if (!open) return;
-  // Whatever is already recorded, so reopening edits rather than discards it.
   resolutionDetails.value = ticket.value?.doc?.resolution_details || "";
   await nextTick();
   editorRef.value?.editor?.commands.focus();
 });
 
-// Asked of the editor, not the markup: an untouched one still reports `<p></p>`, and a
-// note that is only a screenshot is not empty.
+// Asked of the editor: untouched markup is still `<p></p>`, and a lone screenshot is not empty.
 function saveResolution() {
   if (isSaving.value) return;
   isSaving.value = true;

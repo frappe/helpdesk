@@ -15,16 +15,13 @@ export function useTicketThread(ticket) {
   const conversation = computed(() => {
     const rows = sortByCreation().map(toMessageRow)
     rows.forEach((row, index) => {
-      // Only the final row stops short, and chat has no rail at all.
       const last = index === rows.length - 1
       row.railHeight = isChat.value ? '0px' : last ? '20px' : '100%'
-      // Chat puts the byline above the bubble, once per turn rather than once per message.
       const opens = !continues(rows[index - 1], row)
       row.insideByline = !isChat.value
       row.outsideByline = isChat.value && opens
       row.showAvatar = !isChat.value || opens
     })
-    // The gap belongs to the message above the join, since that is where it is drawn.
     rows.forEach((row, index) => {
       const next = rows[index + 1]
       row.rowSpacing = next && isChat.value && !next.outsideByline ? GROUPED_GAP : ROW_GAP
@@ -96,14 +93,12 @@ export function useTicketThread(ticket) {
       // HD Ticket stores the rating as a fraction; the Rating component counts stars.
       rating: data.feedback_rating * 5,
       tags: feedbackTags(data.feedback),
-      // Quoted: it is the customer's words, not the portal's.
       comment: data.feedback_extra ? `“${data.feedback_extra}”` : '',
       timeAgo: timeAgo(when),
       fullDate: dayjs(when).format(DATE_FORMATS.tooltip),
     }
   })
 
-  // The preset answer reads as tags: "Adequate help, bit slow" is two of them.
   function feedbackTags(feedback: string) {
     return (feedback || '')
       .split(',')

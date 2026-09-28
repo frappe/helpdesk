@@ -56,12 +56,10 @@
 </template>
 
 <script setup lang="ts">
-// View icons come from the lucide sprite; the fixed chevron and check use Icon.
 import { h } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
 import { isEmoji } from "@helpdesk/shared/utils";
 
-// A stored icon is usually an emoji, occasionally a name, often nothing.
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 // lucide names this glyph `text-align-justify`; `align-justify` is not in the sprite.
 const DEFAULT_ICON = "text-align-justify";
@@ -74,8 +72,7 @@ function ViewIcon(props: { icon?: string }) {
       { class: [ICON_CLASS, "flex items-center justify-center leading-none"] },
       icon
     );
-  // The sprite, not Icon: a stored name may be one the mask plugin never saw at build time.
-  // Sprite symbols carry only paths, so the svg has to supply lucide's stroke defaults.
+  // The sprite, not Icon: a stored name may be one the build never saw, and symbols carry no stroke.
   const name = (icon || DEFAULT_ICON).replace(/^lucide-/, "");
   return h(
     "svg",

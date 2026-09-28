@@ -2,8 +2,7 @@ import { computed, ref } from 'vue'
 import { call } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
 
-// A published Studio app renders from a bare template with no boot payload, so login
-// state has to be asked for; `get_config` is the one endpoint guests may call.
+// A published Studio app has no boot payload; `get_config` is the one call guests may make.
 
 const store = createSessionStore()
 
@@ -20,12 +19,9 @@ function createSessionStore() {
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
   const canCreateTicket = computed(() => !isGuest.value)
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
-  // Only agents have the desk to return to; for anyone else the link is a 403.
   const isAgent = computed(() => Boolean(config.value?.is_agent))
-  // The favicon is the helpdesk's fallback everywhere else, so the topbar falls back with it.
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
 
-  // Back to the page they were reading, not to the agent desk.
   const loginUrl = computed(
     () => `/login?redirect-to=${encodeURIComponent(window.location.pathname + window.location.search)}`,
   )

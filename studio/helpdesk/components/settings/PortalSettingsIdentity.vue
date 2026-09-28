@@ -1,5 +1,4 @@
 <template>
-  <!-- The avatar itself opens the file picker; the name is edited inline. -->
   <div class="flex items-center gap-4 pt-1.5">
     <div class="group relative size-16 shrink-0">
       <!-- Avatar's size enum stops at 46px, so the block sizes it itself. -->
@@ -26,7 +25,6 @@
     </div>
 
     <div class="flex min-w-0 flex-col gap-1">
-      <!-- Both states share the input's height so switching doesn't move the block. -->
       <div class="flex min-h-7 items-center gap-1">
         <template v-if="!isEditing">
           <span class="text-2xl-semibold text-ink-gray-8">{{ name }}</span>
@@ -56,7 +54,6 @@
         </template>
       </div>
       <span class="text-p-sm text-ink-gray-6">{{ subtitle }}</span>
-      <!-- Anything else that belongs to the identity, aligned with the name column. -->
       <slot />
     </div>
   </div>
@@ -65,7 +62,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
 import { Avatar, Button, Icon, TextInput, Tooltip } from "frappe-ui";
-// Lucide: feather's pencil is a different glyph.
 import LucideSquarePen from "~icons/lucide/square-pen";
 import { __ } from "@helpdesk/shared/translation";
 

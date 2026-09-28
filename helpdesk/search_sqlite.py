@@ -247,8 +247,7 @@ class HelpdeskArticleSearch(SQLiteSearch):
 
     INDEX_NAME = "helpdesk_article_search.db"
     INDEX_SCHEMA = {"metadata_fields": ["status", "category"]}
-    # Every status, filtered at search time: the index queue re-adds a changed article without
-    # re-checking a doctype filter, so an unpublished one would linger.
+    # Every status: the index queue re-adds a changed article unfiltered, so a draft would linger.
     INDEXABLE_DOCTYPES = {
         "HD Article": {
             "fields": ["name", "title", "content", "status", "category", "modified"]

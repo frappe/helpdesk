@@ -67,7 +67,6 @@
 </template>
 
 <script setup lang="ts">
-// Draws nothing itself: every cell comes from its column's `cell()`.
 import { LoadingIndicator } from "frappe-ui";
 import {
   ListFooter,

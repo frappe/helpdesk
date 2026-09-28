@@ -4,9 +4,7 @@ import { __ } from '@helpdesk/shared/translation'
 import { countLabel, errorMessage } from '@app/utils'
 import { ROLES } from './roles'
 
-// Backed by helpdesk.api.organization.
 export function createOrganizationSettings(core) {
-  // Null means the list is showing rather than one organization's detail.
   const selectedOrganizationName = ref(null)
   const organization = ref(null)
 
@@ -15,7 +13,6 @@ export function createOrganizationSettings(core) {
   const canEdit = computed(() => Boolean(organization.value?.can_edit))
   const members = computed(() => organization.value?.members || [])
 
-  // A plain member can read an organization but change nothing in it.
   const managesAnyOrganization = computed(() =>
     core.organizations.value.some((row) => row.role !== 'Member'),
   )
@@ -83,7 +80,6 @@ export function createOrganizationSettings(core) {
     { immediate: true },
   )
 
-  // With one organization there is no list to go back to: the watch above drills straight in.
   const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
 
   function closeOrganization() {
@@ -101,7 +97,6 @@ export function createOrganizationSettings(core) {
   // Watched, not fetched in `openInvite`: the URL hash sets the flag without going through it.
   watch(inviteOpen, (open) => open && loadInvitableContacts())
 
-  // Once per visit, not per keystroke: the input filters this list in place.
   async function loadInvitableContacts() {
     inviteContacts.value = []
     try {
@@ -151,7 +146,6 @@ export function createOrganizationSettings(core) {
     return members.value.some((member) => member.email === email && member.pending)
   }
 
-  // A manager reads every ticket the organization has raised, so the change is spelled out.
   function setMemberRole(member, role) {
     if (member.role === 'Owner' || member.pending || role === member.role) return
     const isManager = role === 'Manager'

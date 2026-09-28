@@ -13,5 +13,4 @@ class TestConfig(IntegrationTestCase):
         config = get_config()
         self.assertEqual(config.session_user, "Guest")
         self.assertFalse(config.is_agent)
-        # A Single omits fields never set; the portal reads a missing key as undefined.
         self.assertIn("confirm_resolution_after_days", config)

@@ -19,7 +19,6 @@ import { matchesQuery } from "@app/utils";
 
 const props = withDefaults(
   defineProps<{
-    // People who may be invited, offered as suggestions while typing.
     contacts?: { full_name: string; email: string; image?: string }[];
     placeholder?: string;
   }>(),
@@ -30,7 +29,6 @@ const emails = defineModel<string[]>({ default: () => [] });
 
 const query = ref("");
 
-// MultiEmailInput drops only what is already selected, leaving the matching to its host.
 const options = computed(() =>
   props.contacts
     .filter((contact) =>

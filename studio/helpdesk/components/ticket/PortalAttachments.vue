@@ -75,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-// The desk's AttachmentItem, plus stepping between a message's files inside the dialog.
 import { computed, ref, watch } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
@@ -123,7 +122,6 @@ const ICONS: Record<Kind, string> = {
   file: "lucide-file",
 };
 
-// What the dialog can show; the rest belong in a tab.
 const VIEWABLE: Kind[] = ["image", "video", "text"];
 
 const props = withDefaults(defineProps<{ attachments?: Attachment[] }>(), {
@@ -168,7 +166,6 @@ function openInTab(attachment?: Attachment | null) {
   if (attachment) window.open(attachment.file_url, "_blank");
 }
 
-// Only text needs fetching; the elements fetch images and video themselves.
 watch([current, showDialog], () => {
   text.value = "";
   if (!showDialog.value || !current.value || kindOf(current.value) !== "text")

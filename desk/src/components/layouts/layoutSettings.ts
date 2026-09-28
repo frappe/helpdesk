@@ -61,8 +61,6 @@ export const agentPortalSidebarOptions: SidebarOption[] = [
   },
 ];
 
-// The customer shell only renders the knowledge base now — tickets live in
-// the studio portal, reached by URL rather than route name.
 export const customerPortalSidebarOptions: SidebarOption[] = [
   {
     label: __("Tickets"),

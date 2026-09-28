@@ -1,14 +1,11 @@
-// Style values the message blocks bind, so a row carries its own geometry rather than
-// the page forking into two templates.
+// Geometry the message blocks bind, so one template serves both layouts.
 
 const TIMELINE = {
   showRail: true,
-  // Lined up with the first line of the card, which is the byline.
   avatarOffset: '6px',
   avatarLeft: '0px',
   rowDisplay: 'grid',
   rowDirection: 'row',
-  // How far the row sits from the thread's own left edge.
   rowLeft: '0px',
   contentAlign: 'stretch',
   cardWidth: 'auto',
@@ -18,11 +15,8 @@ const TIMELINE = {
   cardBorder: '1px solid var(--outline-gray-2)',
 }
 
-// A flex row, so the reader's own messages can turn around and sit against the other edge.
-// The card shrinks to the width PortalEmailContent measures, capped at three quarters.
 const THEIR_BUBBLE = {
   ...TIMELINE,
-  // The byline sits above the bubble, so the face shifts in towards the name.
   avatarOffset: '-4px',
   avatarLeft: '23px',
   rowDisplay: 'flex',
@@ -36,7 +30,6 @@ const THEIR_BUBBLE = {
 
 const OWN_BUBBLE = {
   ...THEIR_BUBBLE,
-  // The side of the thread already says whose it is, so no face is shown back at you.
   showRail: false,
   rowDirection: 'row-reverse',
   rowLeft: '0px',
@@ -45,7 +38,6 @@ const OWN_BUBBLE = {
   cardBorder: '1px solid transparent',
 }
 
-// How long a run of messages stays one turn, and how tightly those messages sit.
 export const GROUP_SECONDS = 5 * 60
 export const GROUPED_GAP = '12px'
 export const ROW_GAP = '24px'

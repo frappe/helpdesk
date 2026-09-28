@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-// An iframe keeps the mail's markup and styles out of the portal, as the desk's does.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   applyCssToIframe,
@@ -91,7 +90,6 @@ function fold(doc: Document, quote: Element) {
   hidden.className = "hidden peer-checked:block";
   hidden.appendChild(quote.cloneNode(true));
 
-  // Whatever follows the quote is part of it.
   let sibling = quote.nextSibling;
   while (sibling) {
     const next = sibling.nextSibling;
@@ -141,7 +139,6 @@ watch(
   (element) => {
     if (!element) return;
     element.onload = () => {
-      // The portal's own sheets, so prose renders inside the frame as it does outside.
       applyCssToIframe(element, () => resize(element));
       resize(element);
     };
@@ -187,7 +184,6 @@ function resize(element: HTMLIFrameElement) {
 
 // A bubble is as wide as its sentence; an iframe fills whatever it is given instead.
 function fitFrameToContent(element: HTMLIFrameElement) {
-  // Timeline fills the column instead; the mail centres itself inside it.
   if (!props.isChat) {
     element.style.width = "";
     return;

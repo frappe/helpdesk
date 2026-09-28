@@ -19,7 +19,6 @@ export function useReplyComposer(ticket) {
   const attachments = ref<any[]>([])
   const isSending = ref(false)
 
-  // Resolved is not closed: replying to it reopens the ticket.
   const canReply = computed(() => !isClosedStatus(ticket.data?.status))
   const canSend = computed(() => !isContentEmpty(reply.value))
   const threadTailSpace = computed(() => (isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL))
@@ -29,7 +28,6 @@ export function useReplyComposer(ticket) {
     scrollThreadToEndSoon()
   }
 
-  // Once now, once after the message frames have settled their height.
   function scrollThreadToEndSoon() {
     nextTick(scrollThreadToEnd)
     setTimeout(scrollThreadToEnd, SETTLE_MS)
@@ -67,7 +65,6 @@ export function useReplyComposer(ticket) {
     isComposerOpen.value = false
   }
 
-  // The requester's reply path: it attributes the message to them, not to an agent.
   function send() {
     if (!canSend.value) return
     return runAction(

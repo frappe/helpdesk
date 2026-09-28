@@ -36,7 +36,6 @@ export function errorMessage(error: any, fallback: string) {
 
 type ActionOptions = { busy?: Ref<boolean>; success?: string; fallback: string }
 
-// Runs a request once at a time and reports how it went as a toast.
 export async function runAction(action: () => Promise<unknown>, options: ActionOptions) {
   const { busy, success, fallback } = options
   if (busy?.value) return

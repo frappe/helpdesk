@@ -8,7 +8,6 @@ import { runAction } from '@app/utils'
 
 const DEFAULT_TEMPLATE = 'Default'
 
-// How a template field renders and where its choices come from; anything else is text.
 const FIELD_CONTROLS = {
   Select: {
     control: 'select',
@@ -20,13 +19,11 @@ const FIELD_CONTROLS = {
   },
 }
 
-// The middle fields render through a Repeater over the template's field list, reading
-// with `getField` and writing back through an `update:modelValue` Run Script.
+// The template fields render through a Repeater: `getField` reads, `setField` writes via Run Script.
 export default function setup(context) {
   const { subject, description, template, ticketTypes, newTicket, route } = context
   const session = useSettingsModal(context)
 
-  // Arriving from a search: what was searched for becomes the subject.
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
 
@@ -41,10 +38,8 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  // Values for the template-driven fields, keyed by fieldname.
   const model = reactive({})
 
-  // Already uploaded; they ride along with the insert as `attachments`.
   const attachments = ref([])
 
   const fields = computed(() =>

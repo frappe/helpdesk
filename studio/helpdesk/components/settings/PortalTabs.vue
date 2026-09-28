@@ -3,13 +3,11 @@
     <TabsList
       class="relative flex items-center gap-6 border-b border-outline-gray-1"
     >
-      <!-- translate-y-px drops the bar onto the rail rather than above it. -->
       <TabsIndicator
         class="absolute bottom-0 left-0 h-px w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] translate-y-px transition-[width,transform] duration-300 ease-out motion-reduce:transition-none"
       >
         <div class="size-full bg-[var(--ink-gray-8)]" />
       </TabsIndicator>
-      <!-- One weight for every tab: the indicator is sized from the tab's width. -->
       <TabsTrigger
         v-for="option in options"
         :key="option.value"
@@ -23,8 +21,7 @@
 </template>
 
 <script setup lang="ts">
-// `TabsIndicator` is one element reka positions from the active tab, so the bar travels
-// instead of cutting. Not frappe-ui's `Tabs`: that owns the panels and keys them by index.
+// reka's TabsIndicator travels between tabs; frappe-ui's Tabs owns the panels.
 import { TabsIndicator, TabsList, TabsRoot, TabsTrigger } from "reka-ui";
 
 defineProps<{ options?: { label: string; value: string }[] }>();

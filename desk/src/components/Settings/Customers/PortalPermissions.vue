@@ -56,8 +56,6 @@
 </template>
 
 <script setup lang="ts">
-// Off by default: the first one lets a customer create logins. These only draw the
-// controls; the server enforces them independently.
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
@@ -67,7 +65,6 @@ const hdSettings = createDocumentResource({
   name: "HD Settings",
 });
 
-// Each switch saves itself, so the tab never carries a dirty state.
 function onToggle(fieldname: string, value: boolean) {
   hdSettings.setValue.submit(
     { [fieldname]: value },

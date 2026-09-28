@@ -1,5 +1,4 @@
 <template>
-  <!-- One width for both: a hugging trigger resized on every change. -->
   <MultiSelect
     class="w-[220px]"
     size="sm"
@@ -10,7 +9,6 @@
     :model-value="selectedOrganizations"
     @update:model-value="(value) => emit('select', value)"
   >
-    <!-- Owns the whole prefix area, so one template covers none / one / many. -->
     <template #prefix="{ selectedOptions }">
       <Avatar
         v-if="selectedOptions.length === 1"
@@ -22,10 +20,7 @@
       <LucideBuilding2 v-else class="size-4 text-ink-gray-5" />
     </template>
 
-    <!-- Full-row takeover, so the tick sits after the name instead of before it.
-         MultiSelect hard-codes its checkbox into the row's prefix, but it also
-         documents `#item` for exactly this — so the row is still built from
-         frappe-ui's own ItemListRow and Checkbox rather than moved with CSS. -->
+    <!-- `#item`, so the tick sits after the name; MultiSelect hard-codes it before. -->
     <template #item="{ item, selected }">
       <ItemListRow size="sm" :selected="selected" :disabled="item.disabled">
         <template #prefix>
@@ -40,7 +35,6 @@
           <div class="truncate">{{ item.label }}</div>
         </template>
         <template #suffix>
-          <!-- Presentational: the row itself owns the click and the focus ring. -->
           <Checkbox
             :model-value="selected"
             :disabled="item.disabled"
@@ -56,7 +50,6 @@
 </template>
 
 <script setup lang="ts">
-// Its value lives in the list's filter conditions, so the controls cannot disagree.
 import { computed } from "vue";
 import { Avatar, Checkbox, ItemListRow, MultiSelect } from "frappe-ui";
 import LucideBuilding2 from "~icons/lucide/building-2";
@@ -67,7 +60,6 @@ type Organization = { name: string; customer_name?: string; image?: string };
 const props = withDefaults(
   defineProps<{
     organizations?: Organization[];
-    // Docnames in play; empty means every organization.
     selectedOrganizations?: string[];
   }>(),
   { organizations: () => [], selectedOrganizations: () => [] }

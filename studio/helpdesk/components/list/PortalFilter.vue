@@ -7,9 +7,7 @@
 </template>
 
 <script setup lang="ts">
-// The desk's filter popover, driven by props: a Studio page script returns bindings and
-// has no component of its own to `provide` from. Named `PortalFilter` because Studio
-// registers a custom component by its filename.
+// Prop-driven: a Studio page script has no component to `provide` from.
 import { Filter } from "@helpdesk/shared/filter";
 import type { FilterCondition, FilterField } from "@helpdesk/shared/filter";
 

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col gap-2">
-    <!-- A drop target has to look like one, where a single-file row reads as an input. -->
     <button
       type="button"
       class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-6 border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
@@ -23,7 +22,6 @@
             : __("Drop files here, or click to choose")
         }}
       </span>
-      <!-- Covers the target, so a file released anywhere on it lands on the input. -->
       <input
         ref="input"
         type="file"

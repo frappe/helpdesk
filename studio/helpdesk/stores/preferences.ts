@@ -3,7 +3,6 @@ import { useStorage } from '@vueuse/core'
 import { createDocumentResource, createResource, toast } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 
-// Language and timezone live on the User doc, which a signed-in user may edit themselves.
 
 // In the browser, not on the User doc: it describes this screen on this device.
 const LAYOUT_KEY = 'kb:conversation-layout'
@@ -21,7 +20,6 @@ export function usePreferences() {
 function createPreferencesStore() {
   const conversationLayout = useStorage(LAYOUT_KEY, 'timeline')
 
-  // Created once the settings payload names the signed-in user.
   const user = ref(null)
   const languageOptions = ref([])
   const timezoneOptions = ref([])
@@ -37,7 +35,6 @@ function createPreferencesStore() {
     if (!timezoneOptions.value.length) timezones.fetch()
   }
 
-  // An empty pick falls back to the saved value, so a stray clear cannot blank the field.
   function setPreference(field, picked) {
     if (!user.value?.doc || isPreferencesSaving.value) return
     const value = picked || user.value.originalDoc?.[field]

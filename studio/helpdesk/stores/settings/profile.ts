@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { call, toast } from 'frappe-ui'
 
 export function createProfileSettings(core) {
-  // Form state, seeded from the server payload on every load.
   const profileFirstName = ref('')
   const profileLastName = ref('')
   const passwordOpen = ref(false)

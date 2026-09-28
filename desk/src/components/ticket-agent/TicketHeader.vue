@@ -159,10 +159,8 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      // Finishing a ticket is the transition worth pausing on: it is the agent's last
-      // chance to say what they did, and the customer portal shows that note on its
-      // resolution card. Keyed on the category so Resolved, Closed and any custom status
-      // filed under it all ask. The dialog writes the status itself, so it is not set twice.
+      // Keyed on the category so every resolving status asks for the note the portal shows;
+      // the dialog writes the status itself.
       if (o.category === "Resolved") {
         pendingStatus.value = o.label_agent;
         showResolutionDialog.value = true;

@@ -4,6 +4,5 @@ import { CUSTOMER_PORTAL_ROOT } from '@helpdesk/shared/utils'
 export const ROUTES = {
   ticketList: '/customer-tickets',
   ticket: (name: string) => `/tickets/${name}`,
-  // Absolute, for navigations that leave the SPA (login redirects, logout).
   appRoot: CUSTOMER_PORTAL_ROOT,
 }

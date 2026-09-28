@@ -11,10 +11,6 @@
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
       </TextInput>
-      <!-- Each option carries its icon, so the trigger shows the role you filtered
-           to rather than one generic glyph. Subtle, not outline: it sits beside the
-           search and the pair reads as one strip — the outline variant's white fill and
-           border made the filter the louder of the two. Both lighten on focus. -->
       <Select v-model="role" :options="ROLE_FILTERS" size="sm" />
     </div>
 
@@ -71,7 +67,6 @@
         </span>
 
         <div class="flex justify-end">
-          <!-- `canRemove` is the wider guard, so any row with an action at all has it. -->
           <Dropdown
             v-if="canRemove(member)"
             :options="rowOptions(member)"
@@ -99,7 +94,6 @@
 </template>
 
 <script setup lang="ts">
-// Flat, not keyed on role: a tree implied a reporting line helpdesk does not record.
 import { computed, ref } from "vue";
 import { Avatar, Badge, Button, Dropdown, Select, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
@@ -109,7 +103,6 @@ import { timeAgo } from "@helpdesk/shared/utils";
 import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
-// Under the last row the hairline would be a line under nothing.
 const ROW =
   "grid grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
@@ -139,7 +132,6 @@ const ROLE_FILTERS = [
 const props = withDefaults(
   defineProps<{
     members?: Member[];
-    // Only a manager of this organization may change anyone.
     canManage?: boolean;
   }>(),
   { members: () => [], canManage: false }
@@ -165,7 +157,6 @@ function matchesSearch(member: Member) {
   return matchesQuery(search.value, member.full_name, member.email);
 }
 
-// Said in words: a dash would read as missing data where the absence is the fact.
 function lastSeen(member: Member) {
   return member.last_seen ? timeAgo(member.last_seen) : __("Never");
 }
@@ -184,7 +175,6 @@ function canRemove(member: Member) {
   return Boolean(props.canManage && member.role !== "Owner" && !member.is_you);
 }
 
-// Only what changes something: a pending invite holds no role, so only cancellation.
 function rowOptions(member: Member) {
   if (member.pending) {
     return [

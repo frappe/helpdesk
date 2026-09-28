@@ -1,5 +1,4 @@
-// Ported from the agent list: the desk components it mirrors live under `@/`, which
-// the Studio build cannot resolve.
+// Ported from the desk's list cells, which Studio cannot import (they live under `@/`).
 import { Badge, Tooltip, dayjs } from 'frappe-ui'
 import { parseJsonArray } from '@app/utils'
 import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
@@ -14,7 +13,6 @@ export function statusCell({ item }: any) {
   ])
 }
 
-// Bars faded per level: High is fully solid, None is empty.
 const FADED_BARS: Record<string, number> = { High: 0, Medium: 1, Low: 2, None: 3 }
 const BARS = [
   { x: 0, y: 8, height: 4 },
@@ -88,7 +86,6 @@ export function datetimeCell({ item }: any) {
   return item ? h('span', { class: 'text-base' }, timeAgo(item)) : null
 }
 
-// Bold until the reader has opened the ticket.
 export function subjectCell({ row, item }: any, reader: string) {
   const seen = parseJsonArray(row._seen).includes(reader)
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)

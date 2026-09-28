@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col">
     <div class="mb-3 flex items-center gap-2">
-      <!-- Same search the members list carries. -->
       <TextInput
         v-model="search"
         type="text"
@@ -62,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-// Ten rows, newest first: anything longer belongs in the ticket list, a click away.
 import { ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import { TextInput, call, debounce } from "frappe-ui";
@@ -79,7 +77,6 @@ const SEARCH_DEBOUNCE_MS = 300;
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
 
-// A ::before, so the fill reaches past the text without widening the row.
 const BODY_ROW =
   "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-5 before:content-[''] hover:before:bg-surface-gray-2";
 
@@ -89,7 +86,6 @@ const tickets = ref<any[]>([]);
 const isLoading = ref(false);
 const search = ref("");
 
-// Searched at the source: what the reader wants is usually older than the newest ten.
 async function load() {
   const customer = props.customer;
   if (!customer) {

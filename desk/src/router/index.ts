@@ -136,8 +136,7 @@ const portalRoutes = [
     component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
-  // Customer Portal Routes — the ticket pages moved to the studio portal at
-  // /kb; only the knowledge base still renders here.
+  // Customer Portal Routes
   {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",
@@ -201,11 +200,7 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
-  // The studio app at /kb has replaced the customer ticket portal. Hand these
-  // navigations to the server, whose redirects (hooks: website_redirects) map
-  // the old ticket URLs onto the new pages. A hard load that still got this far
-  // means the server redirect didn't fire — fall through to the catch-all
-  // rather than loop.
+  // Old ticket URLs belong to the server's redirects now; a hard load that got here falls through.
   if (to.path === "/my-tickets" || to.path.startsWith("/my-tickets/")) {
     if (window.location.pathname !== "/helpdesk" + to.path) {
       window.location.replace("/helpdesk" + to.fullPath);

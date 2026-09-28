@@ -25,8 +25,6 @@
 </template>
 
 <script setup lang="ts">
-// Menu and trigger together: a trigger has to read its menu's state, and only the slot
-// knows it. The chevron alone answers the pointer, with no fill behind the brand mark.
 import { Dropdown, Icon } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 

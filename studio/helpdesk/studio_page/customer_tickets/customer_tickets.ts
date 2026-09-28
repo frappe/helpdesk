@@ -12,8 +12,7 @@ import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
 
-// No client-side scoping: HD Ticket's permission_query already limits a non-agent to
-// their own tickets plus those of customers they manage.
+// No client-side scoping: HD Ticket's permission_query already limits what a requester sees.
 
 const DOCTYPE = 'HD Ticket'
 const PAGE_LENGTH_OPTIONS = [20, 50, 100]
@@ -66,7 +65,6 @@ const CELLS = {
 const CELLS_BY_TYPE = { Datetime: datetimeCell, Date: datetimeCell, Rating: ratingCell }
 
 export default function setup(context) {
-  // The switcher lists them and the subject cell needs the reader's email for unread.
   const settings = useSettingsModal(context)
   settings.loadSettings()
 
@@ -118,7 +116,6 @@ export default function setup(context) {
     navigateTo(ROUTES.ticket(row.name))
   }
 
-  // A view of the `customer` condition, not state beside it.
   const selectedOrganizations = computed(() => {
     const condition = view.filters.conditions.value.find(isCustomerCondition)
     if (!condition) return []
@@ -142,7 +139,6 @@ export default function setup(context) {
     )
   }
 
-  // The customer-portal flag limits this to what a requester may filter on.
   const filterFields = createResource({
     url: 'helpdesk.api.doc.get_filterable_fields',
     cache: ['HD Ticket', 'customer-portal-filter-fields'],

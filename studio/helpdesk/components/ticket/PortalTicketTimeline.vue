@@ -6,7 +6,6 @@
       class="group grid grid-cols-[16px_minmax(0,1fr)] gap-3"
     >
       <div class="relative flex justify-center">
-        <!-- The dot is the milestone; the line beside it is only how long it took. -->
         <Tooltip
           :text="step.fullDate"
           :disabled="!step.fullDate"
@@ -44,8 +43,6 @@
 </template>
 
 <script setup lang="ts">
-// The analytics status line turned on its side, since this sidebar is only 382px wide.
-// A segment leads to the next milestone, so it takes that step's state.
 import { Tooltip } from "frappe-ui";
 import { MILESTONE_DOT_CLASSES, type MilestoneState } from "./milestoneDots";
 
@@ -54,7 +51,6 @@ export interface TimelineStep {
   subtitle: string;
   // `next` is the nearest unmet milestone; `pending` is anything behind it.
   state: MilestoneState;
-  // The exact moment, shown on hover; the line itself reads as elapsed time.
   fullDate?: string;
 }
 
@@ -64,7 +60,7 @@ const DOT_BASE =
 
 const LINE_BASE = "absolute bottom-0 top-[18px] w-[0.05rem] rounded-full";
 
-// A repeating gradient, not a dashed border: the analytics rail's trick, rotated.
+// A gradient, not a dashed border, so the dash length is ours.
 const DASHED_OWED =
   "bg-[repeating-linear-gradient(180deg,var(--outline-gray-2)_0_5px,transparent_5px_11px)]";
 const LINE: Record<MilestoneState, string> = {

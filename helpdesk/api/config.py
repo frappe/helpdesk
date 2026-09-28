@@ -22,18 +22,14 @@ def get_config():
         "enable_comment_reactions",
         "show_customer_portal_permission_notice",
     ]
-    # A Single stores only the fields that have been set, so one never touched comes
-    # back missing rather than empty — and the portal reads a missing key as undefined
-    # instead of as "no value". Every requested field is answered for.
+    # A Single omits fields never set; every requested key is answered so the portal reads null.
     values = (
         frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True) or {}
     )
     res = frappe._dict({field: values.get(field) for field in fields})
 
-    # The only guest-readable endpoint the portals share, so it also answers "who am
-    # I?" — the Studio-rendered portal gets no boot payload to read that from.
+    # The Studio portal has no boot payload, so this also names the session user.
     res.session_user = frappe.session.user
-    # Whether to offer the way back to the agent desk; the desk enforces access itself.
     res.is_agent = is_agent()
 
     res.favicon = (

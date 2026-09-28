@@ -4,10 +4,8 @@ import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
 import { runAction, updateTicket } from '@app/utils'
 
-// A port of the desk's TicketFeedback; the dialog itself is Studio blocks.
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
-  // The status the rating is saved alongside: where the caller is heading.
   const transition = ref<Record<string, string>>({})
   // In stars, the way the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
@@ -28,7 +26,6 @@ export function useTicketFeedback(ticket) {
     })),
   )
 
-  // A different rating means a different option set, so the previous answer goes.
   watch(feedbackStars, (stars) => {
     resetFeedbackAnswer()
     options.update({ filters: { rating: stars / 5, disabled: 0 } })
@@ -60,7 +57,6 @@ export function useTicketFeedback(ticket) {
     feedbackOption.value = name
   }
 
-  // One write, so the rating and the transition can never disagree.
   function submitFeedback() {
     if (!feedbackOption.value) return
     return runAction(

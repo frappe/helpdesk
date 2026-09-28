@@ -7,8 +7,6 @@
 </template>
 
 <script setup lang="ts">
-// Neither answer is solid: the dots carry the meaning, and a filled button would imply
-// a recommended answer.
 import { Button } from "frappe-ui";
 import { MILESTONE_DOT_CLASSES, type MilestoneState } from "./milestoneDots";
 

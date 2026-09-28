@@ -45,8 +45,7 @@ class TestOrganizationMembers(IntegrationTestCase):
         )
         cls.customer.primary_contact = cls.owner["contact"]
         cls.customer.save()
-        # `update_member_role` is gated on this being on. Set here rather than left to
-        # whatever the site happens to carry, so these pass on a fresh site too.
+        # `update_member_role` needs this on; set here so a fresh site passes too.
         frappe.db.set_single_value(
             "HD Settings", "allow_customer_managers_to_invite", 1
         )

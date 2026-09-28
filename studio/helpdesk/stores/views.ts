@@ -8,7 +8,6 @@ import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { parseJson } from '@app/utils'
 
-// Conditions are stored whole as `snapshot` hands them over: lossless, no doctype lookup.
 
 // ponytail: Studio dropped the lucide sprite, but view icons are any lucide name stored per
 // view, which build-time classes cannot cover. Move off it before frappe-ui removes it.
@@ -69,7 +68,6 @@ function createViewsStore() {
       : DEFAULT_VIEW,
   )
 
-  // Filters and sort are remembered per view; columns belong to the view itself.
   const rememberedLayout = useStorage(
     () => `${MEMORY_PREFIX}:${DOCTYPE}:${activeName.value}`,
     null,
@@ -114,7 +112,6 @@ function createViewsStore() {
     if (!listView) return
     isRestoring = true
     const row = activeView.value
-    // No `?view=`: the unnamed "List" view, i.e. the page's own default layout.
     if (!row) {
       if (defaultSnapshot) listView.restore(structuredClone(defaultSnapshot))
     } else {
@@ -206,7 +203,6 @@ function createViewsStore() {
       hideLabel: true,
       options: [
         { label: DEFAULT_VIEW.label, icon: DEFAULT_VIEW.icon, onClick: () => openView('') },
-        // Legacy rows with a null label would render as a blank, unidentifiable row.
         ...views.value.map((view) => ({
           name: view.name,
           label: view.label || __('Untitled view'),
@@ -224,7 +220,6 @@ function createViewsStore() {
     },
   ])
 
-  // The default "List" row has no `name`.
   function viewActions(item) {
     if (!item?.name) return []
     return [

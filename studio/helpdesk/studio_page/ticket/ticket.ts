@@ -30,7 +30,6 @@ export default function setup(context) {
 
   const ticketId = computed(() => String(route?.params?.name || ''))
 
-  // Answers with the communications too, so the thread costs no second request.
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
@@ -54,7 +53,6 @@ export default function setup(context) {
     feedbackTitle: __('Feedback Rating'),
   }))
 
-  // Articles matching the ticket's subject; the most-read ones stand in when none match.
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
     makeParams: () => ({ query: ticket.data?.subject }),
@@ -77,8 +75,7 @@ export default function setup(context) {
 
   const isRelated = computed(() => Boolean(relatedArticles.data?.length))
 
-  // The portal has no article page of its own yet, so these leave for the desk's public
-  // KB. The `/helpdesk` prefix is that SPA's router base.
+  // The article pages are the desk's, under its `/helpdesk` router base.
   const suggestedArticles = computed(() =>
     ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map((article) => ({
       ...article,
@@ -93,10 +90,8 @@ export default function setup(context) {
   // Empty hides the button: a customer may close only what support has resolved.
   const pageActionLabel = computed(() => (isResolved.value ? __('Close') : ''))
 
-  // A ticket still in flight already has a place to say more, and it is this thread.
   const canCreateTicket = computed(() => settings.canCreateTicket.value && isClosed.value)
 
-  // Nothing to rate until someone answers, and a rating already given is never asked again.
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
 
   // Where a rating is required the status cannot be written without it.
@@ -180,7 +175,6 @@ export default function setup(context) {
     reopenTicket,
     suggestedArticles,
     suggestedHeading,
-    // A hard navigation: the article pages are the desk's, not routes in this app.
     openHelpArticle: (article) => (window.location.href = article.url),
   }
 }

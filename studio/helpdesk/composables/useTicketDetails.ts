@@ -5,8 +5,7 @@ import { twoUnitDuration } from '@helpdesk/shared/utils'
 import { isClosedStatus, statusMeta } from '@app/stores/ticketMeta'
 import { DATE_FORMATS } from '@app/utils'
 
-// Everything the summary sidebar shows, worded as progress: "Failed" is no use to the
-// person still waiting.
+// The summary sidebar, worded as progress rather than as a report card.
 
 // The page heading already carries the subject.
 const HIDDEN_FIELDS = ['subject']
@@ -31,7 +30,6 @@ export function useTicketDetails(ticket, thread) {
 
   const statusPill = computed(() => statusMeta(data.value.status))
 
-  // Only fields with a value, as the desk's customer sidebar shows them.
   const basics = computed(() =>
     [
       { label: __('Team'), value: data.value.agent_group },
@@ -56,7 +54,6 @@ export function useTicketDetails(ticket, thread) {
     return value
   }
 
-  // Milestones only: the thread on the left already is the messages.
   const timeline = computed(() => {
     const steps = [received(), assigned(), answered(), ...resolution(), ...closing()]
     // Ring the first unmet step past everything reached; later steps overtake earlier ones.
@@ -144,7 +141,6 @@ export function useTicketDetails(ticket, thread) {
     return [makeStep(__('Closed'), elapsedPhrase(on), 'closed', on)]
   }
 
-  // Always `pending`, so the frontier logic above gives it the ring.
   function awaiting(title: string, due: string) {
     if (!due) return makeStep(title, __('Pending'), 'pending')
     if (dayjs().isAfter(dayjs(due)))
@@ -152,7 +148,6 @@ export function useTicketDetails(ticket, thread) {
     return makeStep(title, __('Due {0}', [dueWording(due)]), 'pending')
   }
 
-  // The stamp waits under the pointer; the visible line is elapsed wording.
   function makeStep(title: string, subtitle: string, state: string, on?: string) {
     return { title, subtitle, state, fullDate: on ? dayjs(on).format(DATE_FORMATS.tooltip) : '' }
   }

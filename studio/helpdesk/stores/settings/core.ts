@@ -38,7 +38,6 @@ export function createSettingsCore() {
     return confirmAction.value?.action?.()
   }
 
-  // Modules that keep state derived from the payload re-seed themselves here.
   const reloadHooks = []
   function afterLoad(hook) {
     reloadHooks.push(hook)
@@ -56,8 +55,7 @@ export function createSettingsCore() {
     }
   }
 
-  // `landed` covers actions that mail synchronously, where a mail failure fails a
-  // request whose change is already saved.
+  // `landed` reports a change that saved but whose mail failed.
   async function run(action, successMessage, landed) {
     if (isSettingsBusy.value) return
     isSettingsBusy.value = true
@@ -107,8 +105,7 @@ export function createSettingsCore() {
   }
 }
 
-// The dialog lives in the hash (#settings/<tab>[/<organization>[/invite]]), a segment per
-// screen, so the device back button steps through them instead of dismissing the dialog.
+// The dialog lives in the hash, a segment per screen, so the device back button steps through it.
 
 const HASH_ROOT = 'settings'
 
@@ -146,7 +143,6 @@ export function createSettingsDialog(core, organization) {
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
-    // An organization is named by whatever is left, slashes and all.
     applyOrganizationHash(rest.join('/'), invite)
   }
 

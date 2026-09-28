@@ -9,7 +9,6 @@ import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
 
-// The desk SPA's root, the mirror of its own CUSTOMER_PORTAL_ROOT.
 const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
@@ -24,7 +23,6 @@ const session = useSession()
 // Here, not in the dialog, so the saved theme applies on load rather than on open.
 const { colorScheme, setColorScheme } = useColorScheme()
 
-// Writable so the theme Select can bind two-way; frappe-ui persists the choice.
 const theme = computed({
   get: () => colorScheme.value,
   set: setColorScheme,
@@ -36,10 +34,8 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-// The header these words fill is shared by every page.
 const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
 
-// A guest has no tickets, account or session to offer.
 const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? [{ icon: 'lucide-log-in', label: __('Log in'), onClick: session.signIn }]
@@ -51,7 +47,6 @@ const accountMenuOptions = computed(() =>
               {
                 icon: 'lucide-headphones',
                 label: __('Agent portal'),
-                // A hard navigation: the desk is a separate SPA, not a route here.
                 onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
               },
             ]
@@ -72,7 +67,6 @@ const store = {
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
-  // Pages that show organizations outside the dialog have to ask for them.
   loadSettings: core.loadSettings,
   confirmAction: core.confirmAction,
   isConfirmOpen: core.isConfirmOpen,
@@ -83,7 +77,6 @@ const store = {
   ...profile,
 }
 
-// Every page script goes through here, so the session store rides along.
 export function useSettingsModal(context) {
   bindRouter(context?.router)
   dialog.watchRoute()

@@ -38,7 +38,6 @@
 
           <div class="flex items-center justify-between gap-2">
             <div class="flex min-w-0 items-center gap-1 overflow-x-auto">
-              <!-- frappe-ui's FileUploader has no `multiple`, so three files meant three trips. -->
               <input
                 ref="fileInput"
                 type="file"
@@ -78,8 +77,7 @@
 </template>
 
 <script setup lang="ts">
-// The desk's own editor, so a reply serialises to the same markup. A component rather
-// than Studio blocks because only the Editor's slot hands over the instance a toolbar needs.
+// The desk's editor, so a reply serialises to the same markup.
 import { onMounted, ref } from "vue";
 import { Button, useFileUpload } from "frappe-ui";
 import {
@@ -115,7 +113,6 @@ const props = withDefaults(
     attachments?: any[];
     isSending?: boolean;
     placeholder?: string;
-    // The ticket an inline upload is filed against.
     docname?: string;
   }>(),
   {
@@ -146,19 +143,17 @@ onMounted(() => {
 const fileInput = ref<HTMLInputElement | null>(null);
 const pendingUploadCount = ref(0);
 
-// The desk's `buildEditorExtensions()`, less the mention list and its local paste helpers.
 const extensions = [
   RichTextKit.configure({ heading: { levels: [2, 3, 4, 5, 6] } }),
 ];
 
-// The desk's, less the `cleanStyles` command that comes from its own extension.
+// The desk's, minus `cleanStyles`, which needs its extension.
 const ClearFormatting: CommandMenuItem = {
   label: "Clear formatting",
   icon: "lucide-brush-cleaning",
   action: (editor) => editor.chain().focus().unsetAllMarks().clearNodes().run(),
 };
 
-// The desk's `ticketToolbar`, item for item.
 const replyToolbar: MenuItem[] = [
   Paragraph,
   HeadingGroup,
@@ -177,7 +172,6 @@ const replyToolbar: MenuItem[] = [
   ClearFormatting,
 ];
 
-// Private, so the same permissions guard an upload as guard the ticket.
 function uploadInlineFile(file: File) {
   return useFileUpload().upload(file, {
     private: true,
@@ -189,7 +183,6 @@ function uploadInlineFile(file: File) {
 async function onFilesPicked(event: Event) {
   const input = event.target as HTMLInputElement;
   const picked = Array.from(input.files || []);
-  // Cleared so picking the same file twice in a row still fires `change`.
   input.value = "";
   if (!picked.length) return;
 

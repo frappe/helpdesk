@@ -6,8 +6,7 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 def execute():
     """The studio app replaces the old customer portal as the landing page."""
-    # Plain db writes: saving Portal Settings validates its menu rows, and a stale row
-    # would fail the migration.
+    # db writes, not save: a stale Portal Settings menu row would fail the migration.
     portal_home = frappe.db.get_single_value("Portal Settings", "default_portal_home")
     if portal_home == "/helpdesk":
         frappe.db.set_single_value(

@@ -55,11 +55,8 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Frappe ships a legacy "/kb/<category>" rule (Help Article portal) that would
-    # otherwise shadow single-segment pages of the Studio-built KB app at /kb.
-    # Only a fully static rule outranks that dynamic one in werkzeug's route map, so
-    # every single-segment KB page needs its own entry here (multi-segment routes
-    # like /kb/articles/<name> don't collide and resolve via the app renderer).
+    # Frappe's legacy `/kb/<category>` rule would shadow the Studio app's single-segment pages;
+    # only a static rule outranks it, so each of those pages needs an entry.
     {
         "from_route": "/kb/customer-tickets",
         "to_route": "kb",
@@ -70,13 +67,9 @@ website_route_rules = [
     },
 ]
 
-# The studio portal at /kb replaces the old customer portal. Its ticket URLs keep
-# working through these redirects until the old pages are deleted; the desk router
-# hard-navigates its legacy customer routes so they resolve here too.
+# The old customer portal's ticket URLs keep working through these.
 website_redirects = [
-    # The studio renderer serves the app root from the page whose route is "/",
-    # which the knowledge base pages will claim when they land — until then the
-    # portal root is the ticket list.
+    # The app root will be the knowledge base once its pages land.
     {
         "source": "/kb",
         "target": "/kb/customer-tickets",

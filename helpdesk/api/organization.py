@@ -11,7 +11,6 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
 MANAGER_ROLE = "HD Customer Manager"
 PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
 PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
-# Organizations the caller can act on come first; alphabetical within a role.
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 
 

@@ -412,8 +412,7 @@ class HDTicket(Document):
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent() or not self.via_customer_portal:
             return
-        # A rating no longer locks the ticket: `feedback` is never cleared, so it froze
-        # tickets an agent had reopened.
+        # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
         if old_doc.status == "Closed":
             frappe.throw(
                 _("Closed tickets cannot be updated by non-agents"),
@@ -901,13 +900,9 @@ class HDTicket(Document):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                # Queued, not flushed inline. `now=True` sends during the request's own
-                # `db.commit()`, so an unreachable outgoing server turned a customer's
-                # reply into a 500 — after the reply had already been written, and past
-                # the point any `except` here could catch it.
+                # Queued, not sent inline: an unreachable mail server must not fail the reply already saved.
             )
         except Exception:
-            # Telling the agents is not worth failing the reply the customer just sent.
             self.log_error("Could not queue the reply notification to agents")
 
     def send_acknowledgement_email(self):
@@ -930,8 +925,6 @@ class HDTicket(Document):
                 reference_name=self.name,
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
-                # Queued for the same reason as the reply notification above: raising a
-                # ticket must not fail on the acknowledgement it triggers.
             )
         except Exception:
             self.log_error("Could not queue the acknowledgement email")

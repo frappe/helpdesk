@@ -1,4 +1,3 @@
-// The summary rail's dots, shared with the buttons that answer in its language.
 // Full literal strings: Tailwind's scanner cannot see interpolation.
 export const MILESTONE_DOT_CLASSES = {
   done: "size-2 bg-[var(--ink-green-6)]",
