@@ -295,6 +295,8 @@ def merge_ticket(source: str, target: str):
         frappe.throw(_("Target ticket does not exist"))
     if source == target:
         frappe.throw(_("Source and target ticket cannot be same"))
+    if frappe.db.get_value("HD Ticket", source, "is_merged"):
+        frappe.throw(_("Ticket #{0} is already merged").format(source))
     for name in (source, target):
         frappe.has_permission("HD Ticket", "write", doc=name, throw=True)
 

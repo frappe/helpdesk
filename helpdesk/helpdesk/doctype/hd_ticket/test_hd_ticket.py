@@ -750,6 +750,8 @@ class TestHDTicket(IntegrationTestCase):
         add_comment(ticket2.name, "First comment on ticket 2")
 
         merge_ticket(source=ticket1.name, target=ticket2.name)
+        with self.assertRaises(frappe.ValidationError):
+            merge_ticket(source=ticket1.name, target=ticket2.name)
         ticket1.reload()
         self.assertEqual(ticket1.status, "Closed")
         self.assertTrue(ticket1.is_merged)
