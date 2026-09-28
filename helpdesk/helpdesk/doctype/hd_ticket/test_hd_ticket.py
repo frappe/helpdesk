@@ -1880,11 +1880,11 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(communication_attachments, 4)
         self.assertEqual(ticket_attachments, 4)
 
-        # delete all files
         files = frappe.get_all(
             "File",
             filters={
                 "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+                "attached_to_name": ["in", communications + ticket_ids],
             },
             pluck="name",
         )
