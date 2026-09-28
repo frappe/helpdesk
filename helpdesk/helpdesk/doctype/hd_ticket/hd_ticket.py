@@ -28,6 +28,7 @@ from helpdesk.helpdesk.utils.email import (
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
 from helpdesk.utils import (
+    CUSTOMER_PORTAL_ROOT,
     agent_only,
     capture_event,
     get_agents_team,
@@ -411,13 +412,13 @@ class HDTicket(Document):
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent() or not self.via_customer_portal:
             return
-        # Only a closed ticket is out of the requester's hands. A rating used to freeze it
-        # too, but `feedback` is never cleared — so one rating made every later version of
-        # the ticket read-only to them, including after an agent reopened it: they could
-        # neither reply (a reply reopens through this same save) nor close it.
+        # A rating no longer locks the ticket: `feedback` is never cleared, so it froze
+        # tickets an agent had reopened.
         if old_doc.status == "Closed":
-            text = _("Closed tickets cannot be updated by non-agents")
-            frappe.throw(text, frappe.PermissionError)
+            frappe.throw(
+                _("Closed tickets cannot be updated by non-agents"),
+                frappe.PermissionError,
+            )
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -609,7 +610,7 @@ class HDTicket(Document):
     @property
     def portal_uri(self):
         root_uri = frappe.utils.get_url()
-        return f"{root_uri}/kb/tickets/{self.name}"
+        return f"{root_uri}{CUSTOMER_PORTAL_ROOT}/tickets/{self.name}"
 
     @frappe.whitelist()
     def new_comment(self, content: str, attachments: list[str] = []):

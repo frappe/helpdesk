@@ -4,15 +4,13 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
+from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
 # Most tickets to bind as an exact IN (...) prefilter; past this the prefilter is
 # skipped and results are permission-checked after the search instead, since an
 # unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
-
-# Shortest word a related-article query keeps; shorter ones are mostly filler.
-MIN_TERM_LENGTH = 4
 
 
 class HelpdeskSearch(SQLiteSearch):
@@ -262,9 +260,9 @@ class HelpdeskArticleSearch(SQLiteSearch):
 
     def _prepare_fts_query(self, query: str) -> str:
         """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms."""
-        # ponytail: word length stands in for a stopword list; add one if short terms matter
         quote = super()._prepare_fts_query
-        terms = [term for term in query.split() if len(term) >= MIN_TERM_LENGTH]
+        stopwords = set(get_stopwords())
+        terms = [term for term in query.split() if term.lower() not in stopwords]
         return " OR ".join(quote(term) for term in terms)
 
 
