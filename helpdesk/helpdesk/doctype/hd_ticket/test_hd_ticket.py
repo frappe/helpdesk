@@ -31,6 +31,7 @@ from helpdesk.test_utils import (
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_agent,
     make_priority,
     make_sla,
     make_status,
@@ -2378,6 +2379,20 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(has_permission(ticket, user=agent2))
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
+
+    def test_only_managers_can_delete_a_ticket(self):
+        manager = make_agent("ticket_manager@test.com", first_name="Ticket Manager")
+        frappe.get_doc("User", manager).add_roles("Agent Manager")
+        ticket = make_ticket(raised_by=non_agent)
+
+        frappe.set_user(agent)
+        with self.assertRaises(frappe.PermissionError):
+            frappe.delete_doc("HD Ticket", ticket.name)
+
+        frappe.set_user(manager)
+        frappe.delete_doc("HD Ticket", ticket.name)
+        self.assertFalse(frappe.db.exists("HD Ticket", ticket.name))
+        frappe.set_user("Administrator")
 
     def test_only_agents_can_comment_on_a_ticket(self):
         contact = create_contact("Commenter", "commenter@test.com")
