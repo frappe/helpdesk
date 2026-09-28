@@ -242,14 +242,14 @@ router.beforeEach(async (to, _, next) => {
     window.location.href =
       LOGIN_PAGE +
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
-  } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    next({ name: "TicketsCustomer" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
     const ticketId = to.params.ticketId;
     next({
       name: "TicketCustomer",
       params: { ticketId },
     });
+  } else if (!to.meta.public && !authStore.hasDeskAccess) {
+    next({ name: "TicketsCustomer" });
   } else {
     next();
   }
