@@ -225,9 +225,7 @@ async function runScheduledJob(api: Api, method: string) {
   });
 }
 
+// The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.
 function daysAgo(days: number) {
-  const date = new Date();
-  date.setDate(date.getDate() - days);
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 }

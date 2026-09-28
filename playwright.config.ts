@@ -17,7 +17,7 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
   use: {
-    baseURL: process.env.BASE_URL || "http://helpdesk.test:8000",
+    baseURL: process.env.BASE_URL || "http://localhost:8000",
     extraHTTPHeaders: siteHeader(),
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
@@ -25,6 +25,8 @@ export default defineConfig({
     navigationTimeout: 30_000,
     ...devices["Desktop Chrome"],
     viewport: { width: 1440, height: 900 },
+    // Differs from a fresh site's Asia/Kolkata, so timezone bugs show up locally too.
+    timezoneId: "UTC",
   },
   projects: [
     { name: "setup", testMatch: /global\.setup\.ts/ },
