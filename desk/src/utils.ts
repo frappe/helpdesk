@@ -347,10 +347,10 @@ export function isContentEmpty(content: string) {
   }
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, "text/html");
-  if (doc.body.textContent === null) {
-    return true;
+  if (doc.body.querySelector("img, video, iframe")) {
+    return false;
   }
-  return doc.body.textContent.trim() === "";
+  return !doc.body.textContent?.trim();
 }
 
 export function normalize(value: any) {
