@@ -144,8 +144,7 @@ test("next and previous ticket show that ticket's own timeline", async ({ api, a
   await expect(feed.getByText(notes.get(next)!)).toHaveCount(0);
 });
 
-test("activity, emails, comments and analytics tabs render", async ({ page, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("activity, emails, comments and analytics tabs render", async ({ page, apiAs, ticket }) => {
   const note = `Tab note ${uid()}`;
   await addComment(await apiAs("agent"), ticket.name, note);
   await openTicket(page, ticket.name);
@@ -170,16 +169,14 @@ test("activity, emails, comments and analytics tabs render", async ({ page, apiA
 });
 
 test.describe("deleting", () => {
-  test("agents are not offered delete", async ({ page, apiAs }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
+  test("agents are not offered delete", async ({ page, ticket }) => {
     await openTicket(page, ticket.name);
     await page.getByRole("banner").getByRole("button").last().click();
     await expect(page.getByRole("menuitem", { name: "Merge Ticket" })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "Delete" })).toHaveCount(0);
   });
 
-  test("an admin deletes a ticket", async ({ api, apiAs, pageAs }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
+  test("an admin deletes a ticket", async ({ api, pageAs, ticket }) => {
     const admin = await pageAs("admin");
     await openTicket(admin, ticket.name);
     await admin.getByRole("banner").getByRole("button").last().click();

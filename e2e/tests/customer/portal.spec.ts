@@ -100,8 +100,8 @@ test("conversation: customer and agent replies both show, internal comments neve
   page,
   apiAs,
   pageAs,
+  ticket,
 }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
   const agent = await apiAs("agent");
   const agentReply = `Agent answer ${uid()}`;
   const note = `Internal note ${uid()}`;
@@ -136,8 +136,8 @@ test("closing after an agent reply asks for a rating when feedback is mandatory"
   page,
   api,
   apiAs,
+  ticket,
 }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
   await (await apiAs("agent")).call("run_doc_method", {
     dt: "HD Ticket",
     dn: ticket.name,

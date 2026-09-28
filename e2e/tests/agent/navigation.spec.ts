@@ -104,10 +104,9 @@ test("the command palette finds a ticket and opens it", async ({ page, api, apiA
 test("search finds a ticket by text that is only in a comment", async ({
   page,
   api,
-  apiAs,
+  ticket,
 }) => {
   const token = `comment${uid()}`;
-  const ticket = await raiseTicket(await apiAs("customer"));
   await api.insert("Comment", {
     comment_type: "Comment",
     reference_doctype: "HD Ticket",

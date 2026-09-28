@@ -1,5 +1,6 @@
 import { test as base, expect, type Browser, type Page } from "@playwright/test";
 import { Api } from "./api";
+import { raiseTicket } from "./factories";
 import {
   PASSWORD,
   emailOf,
@@ -17,6 +18,8 @@ interface Fixtures {
   apiAs: (key: PersonaKey) => Promise<Api>;
   /** A second browser page logged in as another persona. */
   pageAs: (key: PersonaKey) => Promise<Page>;
+  /** A fresh ticket the customer raised, for tests that need any one ticket. */
+  ticket: Record<string, any>;
 }
 
 /** Log a spec file's `page` in as one persona. */
@@ -46,17 +49,16 @@ export const test = base.extend<Fixtures>({
     });
     await Promise.all(contexts.map((context) => context.close()));
   },
+  ticket: async ({ apiAs }, use) => {
+    await use(await raiseTicket(await apiAs("customer")));
+  },
 });
 
 export { expect };
+export { uid } from "./factories";
 
 /** Hide the getting started panel that covers the sidebar for admins and managers. */
 export function skipGettingStarted(page: Page, user: string) {
   const key = `isOnboardingStepsCompletedhelpdesk${user}`;
   return page.addInitScript((key) => localStorage.setItem(key, "true"), key);
-}
-
-/** Short unique suffix so specs never collide with each other or old runs. */
-export function uid() {
-  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }

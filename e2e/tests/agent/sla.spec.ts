@@ -58,8 +58,7 @@ test("a ticket on hold stays Paused after its deadlines pass", async ({
   await expect(await listRow(api, pageAs, ticket.name)).toContainText("Paused");
 });
 
-test("analytics tab counts the opening message once", async ({ page, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("analytics tab counts the opening message once", async ({ page, apiAs, ticket }) => {
   await replyAsAgent(await apiAs("agent"), ticket.name);
 
   await page.goto(`/helpdesk/tickets/${ticket.name}`);

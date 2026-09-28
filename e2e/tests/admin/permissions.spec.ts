@@ -12,8 +12,8 @@ test.describe("plain agent", () => {
     page,
     api,
     apiAs,
+    ticket,
   }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
     const agent = await apiAs("agent");
 
     await expectDenied(agent.raw("frappe.client.delete", { doctype: "HD Ticket", name: ticket.name }));
@@ -47,9 +47,7 @@ test.describe("plain agent", () => {
 test.describe("agent manager", () => {
   usePersona("manager");
 
-  test("bulk deletes tickets from the list", async ({ page, api, apiAs }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
-
+  test("bulk deletes tickets from the list", async ({ page, api, ticket }) => {
     await selectRow(page, api, personas.manager.email, ticket.name);
     await openSelectionMenu(page);
     await page.getByRole("menuitem", { name: "Delete" }).click();
@@ -113,8 +111,8 @@ test.describe("customer", () => {
   test("cannot open a private file attached to an internal comment", async ({
     baseURL,
     apiAs,
+    ticket,
   }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
     const agentContext = await loginContext(baseURL!, personas.agent.email, PASSWORD);
     // unique bytes: Frappe dedupes files by content, sharing one URL across owners
     const upload = await agentContext.post("/api/method/upload_file", {

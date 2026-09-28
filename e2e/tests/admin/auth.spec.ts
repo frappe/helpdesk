@@ -1,5 +1,4 @@
 import { expect, test, usePersona } from "../../helpers/fixtures";
-import { raiseTicket } from "../../helpers/factories";
 import { PASSWORD, personas } from "../../helpers/personas";
 
 test.describe("logged out", () => {
@@ -34,12 +33,11 @@ test.describe("agent", () => {
 test.describe("customer", () => {
   usePersona("customer");
 
-  test("lands on the portal and is kept out of agent routes", async ({ page, apiAs }) => {
+  test("lands on the portal and is kept out of agent routes", async ({ page, ticket }) => {
     await page.goto("/helpdesk");
     await expect(page).toHaveURL(/\/helpdesk\/my-tickets$/);
     await expect(page.getByRole("button", { name: "Customers" })).toHaveCount(0);
 
-    const ticket = await raiseTicket(await apiAs("customer"));
     await page.goto(`/helpdesk/tickets/${ticket.name}`);
     await expect(page).toHaveURL(new RegExp(`/helpdesk/my-tickets/${ticket.name}$`));
   });

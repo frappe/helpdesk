@@ -1,5 +1,4 @@
 import type { Locator, Page } from "@playwright/test";
-import { raiseTicket } from "../../helpers/factories";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import { personas } from "../../helpers/personas";
 import { openSettings } from "../../helpers/settings";
@@ -73,10 +72,9 @@ test("clicking a field suggestion inserts its placeholder", async ({ page }) => 
   await expect(dialog.locator("[contenteditable=true]")).toHaveText("About {{ subject }} ");
 });
 
-test("the preview renders a reply's placeholders against a chosen ticket", async ({ page, api, apiAs }) => {
+test("the preview renders a reply's placeholders against a chosen ticket", async ({ page, api, ticket }) => {
   const title = track(`E2E Preview ${uid()}`);
   await api.insert(REPLY, { title, message: "<p>Re: {{ subject }}</p>", scope: "Personal" });
-  const ticket = await raiseTicket(await apiAs("customer"));
 
   await page.goto("/helpdesk/tickets");
   const dialog = await openSettings(page, "Saved Replies");

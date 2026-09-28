@@ -1,6 +1,6 @@
 import { request, type Page } from "@playwright/test";
 import type { Api } from "./api";
-import { uid } from "./fixtures";
+import { uid } from "./factories";
 import { siteHeader } from "./site";
 
 export async function createCategory(api: Api, name = `E2E Category ${uid()}`) {

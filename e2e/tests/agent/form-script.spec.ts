@@ -1,5 +1,4 @@
 import type { Page } from "@playwright/test";
-import { raiseTicket } from "../../helpers/factories";
 import { expect, test } from "../../helpers/fixtures";
 import {
   FormScripts,
@@ -21,11 +20,10 @@ test.afterEach(async () => {
   await scripts.removeAll();
 });
 
-test("a flat action fires exactly once on each page", async ({ apiAs, pageAs }) => {
+test("a flat action fires exactly once on each page", async ({ pageAs, ticket }) => {
   await scripts.create(countingAction("E2E Agent Ticket"));
   await scripts.create(countingAction("E2E Portal Ticket"), { portal: true });
   await scripts.create(countingAction("E2E Agent New"), { newPage: true });
-  const ticket = await raiseTicket(await apiAs("customer"));
 
   const surfaces = [
     { persona: "agent", url: `/helpdesk/tickets/${ticket.name}`, label: "E2E Agent Ticket" },
@@ -40,7 +38,7 @@ test("a flat action fires exactly once on each page", async ({ apiAs, pageAs }) 
   }
 });
 
-test("grouped actions render, including the legacy items shape", async ({ apiAs, pageAs }) => {
+test("grouped actions render, including the legacy items shape", async ({ pageAs, ticket }) => {
   await scripts.create(
     countingAction(
       "E2E Flat",
@@ -51,7 +49,6 @@ test("grouped actions render, including the legacy items shape", async ({ apiAs,
       { group: "E2E Labelled", buttonLabel: "E2E Menu", label: "E2E Menu Item", onClick: () => {} }`
     )
   );
-  const ticket = await raiseTicket(await apiAs("customer"));
   const page = await pageAs("agent");
   await page.goto(`/helpdesk/tickets/${ticket.name}`);
 
@@ -67,8 +64,8 @@ test("grouped actions render, including the legacy items shape", async ({ apiAs,
 
 test("actions can update fields, call the server, open dialogs and route", async ({
   api,
-  apiAs,
   pageAs,
+  ticket,
 }) => {
   await scripts.create(`return { actions: [
     { label: "E2E Set Priority", onClick: () => ctx.updateField("priority", "High") },
@@ -77,7 +74,6 @@ test("actions can update fields, call the server, open dialogs and route", async
     { label: "E2E Dialog", onClick: () => ctx.$dialog({ title: "E2E Dialog Title", message: "From a form script" }) },
     { label: "E2E Route", onClick: () => ctx.router.push({ name: "TicketsAgent" }) },
   ] };`);
-  const ticket = await raiseTicket(await apiAs("customer"));
   const page = await pageAs("agent");
   await page.goto(`/helpdesk/tickets/${ticket.name}`);
 
@@ -95,11 +91,10 @@ test("actions can update fields, call the server, open dialogs and route", async
   await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
 });
 
-test("toast shows a message", async ({ apiAs, pageAs }) => {
+test("toast shows a message", async ({ pageAs, ticket }) => {
   await scripts.create(`return { actions: [
     { label: "E2E Toast", onClick: () => ctx.toast.success("E2E plain toast") },
   ] };`);
-  const ticket = await raiseTicket(await apiAs("customer"));
   const page = await pageAs("agent");
   await page.goto(`/helpdesk/tickets/${ticket.name}`);
 
@@ -107,12 +102,11 @@ test("toast shows a message", async ({ apiAs, pageAs }) => {
   await expect(page.getByText("E2E plain toast", { exact: true })).toBeVisible();
 });
 
-test("createToast reads duration as seconds", async ({ apiAs, pageAs }) => {
+test("createToast reads duration as seconds", async ({ pageAs, ticket }) => {
   // Form scripts pass seconds; vue-sonner reads milliseconds.
   await scripts.create(`return { actions: [
     { label: "E2E Timed Toast", onClick: () => ctx.createToast({ message: "E2E timed toast", type: "success", duration: 5 }) },
   ] };`);
-  const ticket = await raiseTicket(await apiAs("customer"));
   const page = await pageAs("agent");
   await page.goto(`/helpdesk/tickets/${ticket.name}`);
 
@@ -167,10 +161,9 @@ test.describe("new ticket form", () => {
 });
 
 test.describe("scoping", () => {
-  test("portal flag keeps agent and portal scripts apart", async ({ apiAs, pageAs }) => {
+  test("portal flag keeps agent and portal scripts apart", async ({ pageAs, ticket }) => {
     await scripts.create(countingAction("E2E Agent Only"));
     await scripts.create(countingAction("E2E Portal Only"), { portal: true });
-    const ticket = await raiseTicket(await apiAs("customer"));
 
     const agent = await pageAs("agent");
     await agent.goto(`/helpdesk/tickets/${ticket.name}`);
@@ -184,13 +177,12 @@ test.describe("scoping", () => {
   });
 
   test("a disabled script never runs and two enabled scripts combine", async ({
-    apiAs,
     pageAs,
+    ticket,
   }) => {
     await scripts.create(countingAction("E2E First"));
     await scripts.create(countingAction("E2E Second"));
     await scripts.create(countingAction("E2E Disabled"), { enabled: false });
-    const ticket = await raiseTicket(await apiAs("customer"));
 
     const page = await pageAs("agent");
     await page.goto(`/helpdesk/tickets/${ticket.name}`);

@@ -1,5 +1,4 @@
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { raiseTicket } from "../../helpers/factories";
 import { personas } from "../../helpers/personas";
 import {
   addComment,
@@ -30,8 +29,7 @@ test("agent raises a ticket from the new ticket form", async ({ page, api }) => 
   expect(ticket.description).toContain("Printer is on fire");
 });
 
-test("email reply with cc and an attachment is sent and stored", async ({ page, api, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("email reply with cc and an attachment is sent and stored", async ({ page, api, ticket }) => {
   const fileName = `note-${uid()}.txt`;
   await openTicket(page, ticket.name);
 
@@ -79,9 +77,8 @@ test("email reply with cc and an attachment is sent and stored", async ({ page, 
 test("reply editor inserts a table from the slash menu and uploads a pasted image", async ({
   page,
   api,
-  apiAs,
+  ticket,
 }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
   await openTicket(page, ticket.name);
   await page.getByRole("button", { name: "Reply", exact: true }).click();
   const editor = composer(page);
@@ -120,8 +117,7 @@ test("reply editor inserts a table from the slash menu and uploads a pasted imag
     .toMatch(/<table[\s\S]*cell value[\s\S]*<img[^>]+src="\/private\/files\/[\s\S]*<\/table>/);
 });
 
-test("comments post once, edit, delete and survive leaving the ticket", async ({ page, api, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("comments post once, edit, delete and survive leaving the ticket", async ({ page, api, ticket }) => {
   const rowWith = (text: string) => page.locator(".activity", { hasText: text });
   const first = `First note ${uid()}`;
   await openTicket(page, ticket.name);
@@ -163,10 +159,9 @@ test("comments post once, edit, delete and survive leaving the ticket", async ({
 test("an @mention notifies the agent and the notification opens the comment", async ({
   page,
   api,
-  apiAs,
   pageAs,
+  ticket,
 }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
   const note = `Need eyes ${uid()}`;
   await openTicket(page, ticket.name);
   await page.getByRole("button", { name: "Comment", exact: true }).click();
@@ -201,9 +196,8 @@ test.describe("reactions", () => {
   });
   test.afterAll(async () => restore?.());
 
-  test("reactions roll up into one notification for the author", async ({ api, apiAs, pageAs }) => {
+  test("reactions roll up into one notification for the author", async ({ api, apiAs, pageAs, ticket }) => {
     const agentApi = await apiAs("agent");
-    const ticket = await raiseTicket(await apiAs("customer"));
     const name = await addComment(agentApi, ticket.name, `React to me ${uid()}`);
     const reactionLogs = () =>
       api.list("Notification Log", {

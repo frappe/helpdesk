@@ -1,7 +1,6 @@
 import type { Page } from "@playwright/test";
 import type { Api } from "../../helpers/api";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { raiseTicket } from "../../helpers/factories";
 import { personas } from "../../helpers/personas";
 import {
   composer,
@@ -13,10 +12,9 @@ import {
 
 usePersona("agent");
 
-test("sidebar fields save once per change and persist", async ({ page, api, apiAs }) => {
+test("sidebar fields save once per change and persist", async ({ page, api, ticket }) => {
   const team = `E2E Team ${uid()}`;
   await createTeam(api, team, [personas.agent.email]);
-  const ticket = await raiseTicket(await apiAs("customer"));
   const setValue = recordCalls(page, "frappe.client.set_value");
   await openTicket(page, ticket.name);
 
@@ -50,9 +48,8 @@ test("sidebar fields save once per change and persist", async ({ page, api, apiA
   expect(saved).toMatchObject({ priority: "Low", ticket_type: "Bug", agent_group: team });
 });
 
-test.fixme("setting a team that has no members does not error", async ({ page, apiAs }) => {
+test.fixme("setting a team that has no members does not error", async ({ page, ticket }) => {
   // fresh sites ship Billing with an enabled, empty round robin rule: IndexError in get_user_round_robin
-  const ticket = await raiseTicket(await apiAs("customer"));
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await openTicket(page, ticket.name);
@@ -64,8 +61,7 @@ test.fixme("setting a team that has no members does not error", async ({ page, a
   expect(errors).toEqual([]);
 });
 
-test("tags can be created with a colour, added and removed", async ({ page, api, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("tags can be created with a colour, added and removed", async ({ page, api, ticket }) => {
   const tag = `e2e-${uid()}`;
   const tagsOnTicket = async () =>
     ((await api.get("HD Ticket", ticket.name))._user_tags || "")
@@ -94,9 +90,8 @@ test("tags can be created with a colour, added and removed", async ({ page, api,
   await expect(page.getByTitle(tag)).toHaveCount(0);
 });
 
-test.fixme("tag activity reads '&', not '&amp;'", async ({ page, api, apiAs }) => {
+test.fixme("tag activity reads '&', not '&amp;'", async ({ page, api, ticket }) => {
   // log_tag_activity joins with " & ", saving sanitises it to &amp; and the log row renders text
-  const ticket = await raiseTicket(await apiAs("customer"));
   await api.call("helpdesk.api.tags.update_tags", {
     doctype: "HD Ticket",
     name: ticket.name,
@@ -107,8 +102,7 @@ test.fixme("tag activity reads '&', not '&amp;'", async ({ page, api, apiAs }) =
   await expect(page.getByText(/added tag .* & removed tag/)).toBeVisible();
 });
 
-test("agents are assigned and unassigned from the sidebar", async ({ page, api, apiAs }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
+test("agents are assigned and unassigned from the sidebar", async ({ page, api, ticket }) => {
   const assignees = async () =>
     (
       await api.list("ToDo", {
@@ -144,10 +138,9 @@ test.describe("assign within team", () => {
     for (const undo of restore.reverse()) await undo();
   });
 
-  test("only the ticket team's agents are offered", async ({ page, api, apiAs }) => {
+  test("only the ticket team's agents are offered", async ({ page, api, ticket }) => {
     const team = `E2E Team ${uid()}`;
     await createTeam(api, team, [personas.agent.email, personas.manager.email]);
-    const ticket = await raiseTicket(await apiAs("customer"));
     await api.update("HD Ticket", ticket.name, { agent_group: team });
     await openTicket(page, ticket.name);
 
@@ -162,9 +155,8 @@ test.describe("assign within team", () => {
 test("status changes from the menu and the s shortcut, and the subject is renamed", async ({
   page,
   api,
-  apiAs,
+  ticket,
 }) => {
-  const ticket = await raiseTicket(await apiAs("customer"));
   const status = async () => (await api.get("HD Ticket", ticket.name)).status;
   await openTicket(page, ticket.name);
   const header = page.getByRole("banner");
@@ -211,12 +203,11 @@ async function applySavedReply(page: Page, title: string) {
   await page.getByRole("button", { name: "Show actions" }).click();
 }
 
-test("saved reply chips can be repointed and apply after sending", async ({ page, api, apiAs }) => {
+test("saved reply chips can be repointed and apply after sending", async ({ page, api, apiAs, ticket }) => {
   const team = `E2E Team ${uid()}`;
   const tag = `e2e-${uid()}`;
   await createTeam(api, team, [personas.agent.email]);
   const reply = await stagingReply(apiAs, tag);
-  const ticket = await raiseTicket(await apiAs("customer"));
   await openTicket(page, ticket.name);
   await applySavedReply(page, reply.title);
 
@@ -241,10 +232,9 @@ test("saved reply chips can be repointed and apply after sending", async ({ page
     .toEqual(["High", "Bug", team, true]);
 });
 
-test.fixme("a repointed chip reopens with the full list", async ({ page, apiAs }) => {
+test.fixme("a repointed chip reopens with the full list", async ({ page, apiAs, ticket }) => {
   // the picker keeps the picked label as its search text, so only that option shows
   const reply = await stagingReply(apiAs, `e2e-${uid()}`);
-  const ticket = await raiseTicket(await apiAs("customer"));
   await openTicket(page, ticket.name);
   await applySavedReply(page, reply.title);
 

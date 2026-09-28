@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import type { Api } from "./api";
-import { uid } from "./fixtures";
+import { uid } from "./factories";
 
 export const TEMPLATE = "E2E Form Script";
 
