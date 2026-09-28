@@ -269,26 +269,45 @@ const toggleFields = Object.keys(toggleFieldnames) as Array<
 // Toggles save on their own, so they never carry unsaved text fields along.
 const saveTogglesResource = createResource({
   url: "frappe.client.set_value",
-  makeParams: () => ({
+  makeParams: (values: Record<string, unknown>) => ({
     doctype: "HD Settings",
     name: "HD Settings",
     fieldname: Object.fromEntries(
-      toggleFields.map((f) => [toggleFieldnames[f], settingsData.value[f]])
+      toggleFields.map((f) => [toggleFieldnames[f], values[f]])
     ),
   }),
-  onSuccess() {
-    const initial = JSON.parse(initialData.value!);
-    toggleFields.forEach((f) => (initial[f] = settingsData.value[f]));
-    initialData.value = JSON.stringify(initial);
-    configStore.configResource.reload();
-  },
 });
 let pendingToggleSave = Promise.resolve();
 
-// Undo only the toggles, so unsaved text edits survive a failed toggle save.
-function revertToggles() {
+function currentToggles() {
+  return Object.fromEntries(
+    toggleFields.map((f) => [f, settingsData.value[f]])
+  );
+}
+
+async function saveToggles(sent: Record<string, unknown>) {
+  try {
+    await saveTogglesResource.submit(sent);
+    markTogglesSaved(sent);
+    toast.success(__("Settings updated"));
+  } catch {
+    revertToggles(sent);
+  }
+}
+
+function markTogglesSaved(sent: Record<string, unknown>) {
   const initial = JSON.parse(initialData.value!);
-  toggleFields.forEach((f) => (settingsData.value[f] = initial[f]));
+  toggleFields.forEach((f) => (initial[f] = sent[f]));
+  initialData.value = JSON.stringify(initial);
+  configStore.configResource.reload();
+}
+
+// Undo only what the failed request sent; a toggle changed since keeps its queued save.
+function revertToggles(sent: Record<string, unknown>) {
+  const initial = JSON.parse(initialData.value!);
+  toggleFields
+    .filter((f) => settingsData.value[f] === sent[f])
+    .forEach((f) => (settingsData.value[f] = initial[f]));
 }
 
 // Track dirty state for non-toggle fields only
@@ -315,12 +334,9 @@ watch(
     if (!initialData.value) return;
     const initial = JSON.parse(initialData.value);
     if (!newVals.some((v, i) => v !== initial[toggleFields[i]])) return;
-    pendingToggleSave = pendingToggleSave
-      .then(async () => {
-        await saveTogglesResource.submit();
-        toast.success(__("Settings updated"));
-      })
-      .catch(revertToggles);
+    pendingToggleSave = pendingToggleSave.then(() =>
+      saveToggles(currentToggles())
+    );
   }
 );
 

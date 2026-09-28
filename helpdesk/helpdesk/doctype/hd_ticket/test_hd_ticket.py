@@ -791,13 +791,13 @@ class TestHDTicket(IntegrationTestCase):
         finally:
             frappe.set_user("Administrator")
 
-        contents = frappe.get_all(
+        contents = frappe.get_list(
             "Communication",
             filters={"reference_doctype": "HD Ticket", "reference_name": target.name},
             pluck="content",
         )
         self.assertTrue(any("Agent merge source" in c for c in contents))
-        files = frappe.get_all(
+        files = frappe.get_list(
             "File",
             filters={
                 "attached_to_doctype": "HD Ticket",
