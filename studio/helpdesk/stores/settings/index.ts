@@ -53,7 +53,6 @@ const store = {
   settingsBusy: core.settingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
-  isAgentUser: core.isAgentUser,
   // Pages that show organizations outside the dialog have to ask for them.
   loadSettings: core.loadSettings,
   confirmAction: core.confirmAction,

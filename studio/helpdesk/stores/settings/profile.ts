@@ -16,7 +16,7 @@ export function createProfileSettings(core) {
 
   function saveProfile() {
     return core.run(
-      () => call('helpdesk.api.organization.update_profile', {
+      () => call('helpdesk.api.auth.update_profile', {
         first_name: profileFirstName.value,
         last_name: profileLastName.value,
       }),
@@ -34,12 +34,12 @@ export function createProfileSettings(core) {
 
   function uploadProfileImage() {
     core.pickImage((fileUrl) =>
-      core.run(() => call('helpdesk.api.organization.update_profile', { image: fileUrl }), 'Photo updated')
+      core.run(() => call('helpdesk.api.auth.update_profile', { image: fileUrl }), 'Photo updated')
     )
   }
 
   function removeProfileImage() {
-    return core.run(() => call('helpdesk.api.organization.update_profile', { image: '' }), 'Photo removed')
+    return core.run(() => call('helpdesk.api.auth.update_profile', { image: '' }), 'Photo removed')
   }
 
   function openPasswordChange() {

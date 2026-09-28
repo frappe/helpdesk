@@ -68,8 +68,8 @@
         <span
           class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
         >
-          <component :is="roleIcon(member)" class="size-4" />
-          {{ roleLabel(member) }}
+          <component :is="ROLE_ICONS[member.role]" class="size-4" />
+          {{ member.role }}
         </span>
 
         <div class="flex justify-end">
@@ -130,8 +130,7 @@ type Member = {
   email?: string;
   image?: string;
   last_seen?: string;
-  is_manager?: boolean;
-  is_owner?: boolean;
+  role: "Owner" | "Manager" | "Member";
   is_you?: boolean;
   pending?: boolean;
 };
@@ -171,7 +170,7 @@ const matches = computed(() =>
 );
 
 function matchesRole(member: Member) {
-  return role.value === "All" || roleLabel(member) === role.value;
+  return role.value === "All" || member.role === role.value;
 }
 
 function matchesSearch(member: Member) {
@@ -182,15 +181,6 @@ function matchesSearch(member: Member) {
     .includes(query);
 }
 
-function roleLabel(member: Member) {
-  if (member.is_owner) return "Owner";
-  return member.is_manager ? "Manager" : "Member";
-}
-
-function roleIcon(member: Member) {
-  return ROLE_ICONS[roleLabel(member)];
-}
-
 // Said in words: a dash would read as missing data where the absence is the fact.
 function lastSeen(member: Member) {
   return member.last_seen ? dayjs(member.last_seen).fromNow() : t("Never");
@@ -199,12 +189,15 @@ function lastSeen(member: Member) {
 // The owner's role is fixed, and demoting yourself revokes the rights the call needs.
 function canSwitchRole(member: Member) {
   return Boolean(
-    props.canManage && !member.is_owner && !member.is_you && !member.pending
+    props.canManage &&
+      member.role !== "Owner" &&
+      !member.is_you &&
+      !member.pending
   );
 }
 
 function canRemove(member: Member) {
-  return Boolean(props.canManage && !member.is_owner && !member.is_you);
+  return Boolean(props.canManage && member.role !== "Owner" && !member.is_you);
 }
 
 // Only what changes something: a pending invite holds no role, so only cancellation.
@@ -218,7 +211,7 @@ function rowOptions(member: Member) {
       },
     ];
   }
-  const next = member.is_manager ? "Member" : "Manager";
+  const next = member.role === "Manager" ? "Member" : "Manager";
   return [
     {
       label: next === "Manager" ? "Make manager" : "Make member",

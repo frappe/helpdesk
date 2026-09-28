@@ -34,7 +34,7 @@
             }}</span>
             <span class="text-p-sm text-ink-gray-6">{{
               __(
-                "Customer managers can change their own organization's logo. Renaming stays with agents."
+                "Customer managers can change their own organization's name and logo."
               )
             }}</span>
           </div>

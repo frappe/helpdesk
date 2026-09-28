@@ -172,6 +172,12 @@ def make_ticket(
     return ticket
 
 
+def make_feedback_option(label: str, rating: float = 1.0):
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Feedback Option", "label": label, "rating": rating}
+    ).insert()
+
+
 def make_article(title: str, status: str = "Published"):
     """Creates an HD Article whose content repeats its title."""
     return frappe.get_doc(
@@ -515,6 +521,32 @@ def get_invitation(email: str):
         ["name", "customer", "contact"],
         as_dict=True,
     )
+
+
+def get_organization_members(customer: str) -> dict:
+    """The portal's member rows for a customer, keyed by contact name."""
+    from helpdesk.api.organization import get_organization
+
+    return {
+        member["contact"]: member
+        for member in get_organization(customer)["members"]
+        if member.get("contact")
+    }
+
+
+def get_organization_card(customer: str) -> dict:
+    """The portal's card for one of the session user's organizations."""
+    from helpdesk.api.organization import get_settings
+
+    return next(
+        org for org in get_settings()["organizations"] if org["name"] == customer
+    )
+
+
+def get_invitable_emails(customer: str) -> list[str]:
+    from helpdesk.api.organization import get_invitable_contacts
+
+    return [row["email"] for row in get_invitable_contacts(customer)]
 
 
 def delete_invitations(email: str) -> None:

@@ -7,8 +7,6 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.organization import (
     get_invitable_contacts,
-    get_organization,
-    get_organizations,
     invite_members,
     update_member_role,
 )
@@ -17,6 +15,9 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     delete_invitations,
+    get_invitable_emails,
+    get_organization_card,
+    get_organization_members,
     make_ticket,
 )
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT
@@ -52,15 +53,10 @@ class TestOrganizationMembers(IntegrationTestCase):
 
     def setUp(self) -> None:
         frappe.set_user(self.manager["user"])
-
-    def tearDown(self) -> None:
-        frappe.set_user("Administrator")
+        self.addCleanup(frappe.set_user, "Administrator")
 
     def members(self) -> dict:
-        return {
-            member["contact"]: member
-            for member in get_organization(self.customer.name)["members"]
-        }
+        return get_organization_members(self.customer.name)
 
     def test_last_seen_comes_from_the_linked_user(self) -> None:
         stamp = "2026-08-01 09:30:00"
@@ -74,9 +70,9 @@ class TestOrganizationMembers(IntegrationTestCase):
 
     def test_roles_describe_the_membership(self) -> None:
         members = self.members()
-        self.assertTrue(members[self.owner["contact"]]["is_owner"])
-        self.assertTrue(members[self.manager["contact"]]["is_manager"])
-        self.assertFalse(members[self.member["contact"]]["is_manager"])
+        self.assertEqual(members[self.owner["contact"]]["role"], "Owner")
+        self.assertEqual(members[self.manager["contact"]]["role"], "Manager")
+        self.assertEqual(members[self.member["contact"]]["role"], "Member")
 
     def test_the_caller_is_marked_as_you(self) -> None:
         you = [m for m in self.members().values() if m["is_you"]]
@@ -86,10 +82,18 @@ class TestOrganizationMembers(IntegrationTestCase):
 
     def test_a_manager_can_switch_a_member_to_manager(self) -> None:
         update_member_role(self.customer.name, self.member["contact"], True)
-        self.assertTrue(self.members()[self.member["contact"]]["is_manager"])
+        self.assertEqual(self.is_manager(self.member["contact"]), 1)
+        self.assertEqual(self.members()[self.member["contact"]]["role"], "Manager")
 
         update_member_role(self.customer.name, self.member["contact"], False)
-        self.assertFalse(self.members()[self.member["contact"]]["is_manager"])
+        self.assertEqual(self.is_manager(self.member["contact"]), 0)
+
+    def is_manager(self, contact: str) -> int:
+        return frappe.db.get_value(
+            "HD Customer Member",
+            {"parent": self.customer.name, "contact_name": contact},
+            "is_manager",
+        )
 
     def test_the_owner_role_cannot_be_switched(self) -> None:
         with self.assertRaises(frappe.ValidationError):
@@ -201,7 +205,7 @@ class TestInvitableContacts(IntegrationTestCase):
         self.addCleanup(frappe.set_user, "Administrator")
 
     def emails(self) -> list[str]:
-        return [row["email"] for row in get_invitable_contacts(self.customer.name)]
+        return get_invitable_emails(self.customer.name)
 
     def test_a_contact_with_a_user_is_suggested(self) -> None:
         self.assertIn("colleague@invitable.test", self.emails())
@@ -253,18 +257,12 @@ class TestOrganizationCards(IntegrationTestCase):
 
     def setUp(self) -> None:
         frappe.set_user(self.member["user"])
-
-    def tearDown(self) -> None:
-        frappe.set_user("Administrator")
+        self.addCleanup(frappe.set_user, "Administrator")
 
     def card(self) -> dict:
-        return next(
-            org for org in get_organizations() if org["name"] == self.customer.name
-        )
+        return get_organization_card(self.customer.name)
 
     def test_the_ticket_count_includes_settled_tickets(self) -> None:
-        # Was open-only, which read as "nothing on file" for an organization whose
-        # tickets had all been answered.
         self.assertEqual(self.card()["ticket_count"], 2)
 
     def test_members_are_counted(self) -> None:

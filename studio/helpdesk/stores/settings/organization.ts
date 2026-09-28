@@ -38,15 +38,8 @@ export function createOrganizationSettings(core) {
     ),
   )
 
-  const canManageMembers = computed(() =>
-    Boolean(isOrgManager.value && core.portalConfig.value.allow_customer_managers_to_invite),
-  )
-  const canEditOrganization = computed(() =>
-    Boolean(
-      isOrgManager.value &&
-        core.portalConfig.value.allow_customer_managers_to_edit_organization,
-    ),
-  )
+  const canInvite = computed(() => Boolean(orgDetail.value?.can_invite))
+  const canEdit = computed(() => Boolean(orgDetail.value?.can_edit))
 
   const orgTab = ref('members')
   const orgTabOptions = computed(() => [
@@ -173,9 +166,9 @@ export function createOrganizationSettings(core) {
 
   // A manager reads every ticket the organization has raised, so the change is spelled out.
   function setMemberRole(member, role) {
-    if (member.is_owner || member.pending) return
+    if (member.role === 'Owner' || member.pending) return
     const isManager = role === 'Manager'
-    if (isManager === Boolean(member.is_manager)) return
+    if (role === member.role) return
     core.askConfirm({
       title: isManager ? 'Grant manager access' : 'Revoke manager access',
       message: isManager
@@ -197,7 +190,7 @@ export function createOrganizationSettings(core) {
   }
 
   function removeMember(member) {
-    if (member.is_owner) return
+    if (member.role === 'Owner') return
     if (member.pending) return cancelInvitation(member)
     core.askConfirm({
       title: 'Remove member',
@@ -221,7 +214,7 @@ export function createOrganizationSettings(core) {
       label: 'Cancel invitation',
       action: () =>
         core.run(
-          () => call('helpdesk.api.organization.cancel_invitation', {
+          () => call('helpdesk.api.organization.remove_member', {
             customer: selectedOrg.value,
             invitation: member.invitation,
           }),
@@ -281,8 +274,8 @@ export function createOrganizationSettings(core) {
     canLeaveOrganization,
     settingsOrg,
     isOrgManager,
-    canManageMembers,
-    canEditOrganization,
+    canInvite,
+    canEdit,
     orgMembers,
     organizationScreenTitle,
     organizationScreenDescription,

@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { call, toast, FileUploadHandler } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
-import { useSession } from '@app/stores/session'
 
 // Tab state lives here so the organization module can watch it without depending on
 // the dialog module that drives it.
@@ -14,10 +13,6 @@ export function createSettingsCore() {
 
   const settingsUser = computed(() => settingsData.value?.user || {})
   const organizations = computed(() => settingsData.value?.organizations || [])
-  const isAgentUser = computed(() => Boolean(settingsData.value?.is_agent))
-
-  // The server enforces this; here it only decides whether the controls are worth drawing.
-  const portalConfig = computed(() => useSession().config.value || {})
 
   const confirmAction = ref(null)
   // Apart from the options, so what is on the dialog survives its own closing animation.
@@ -104,8 +99,6 @@ export function createSettingsCore() {
     settingsBusy,
     settingsUser,
     organizations,
-    isAgentUser,
-    portalConfig,
     confirmAction,
     confirmOpen,
     askConfirm,

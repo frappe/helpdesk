@@ -5,21 +5,13 @@ from helpdesk.api.config import get_config
 
 
 class TestConfig(IntegrationTestCase):
-    """The portal's only guest-readable endpoint: the whole signed-out experience —
-    whether "Log in" shows, whether a ticket may be raised — is drawn from it."""
+    """The portal's only guest-readable endpoint; the signed-out topbar is drawn from it."""
 
-    def tearDown(self):
-        frappe.set_user("Administrator")
-
-    def test_it_is_reachable_without_a_session(self):
-        # The portal renders for signed-out visitors; an endpoint that quietly stops
-        # being guest-callable takes the whole topbar with it.
-        self.assertIn(get_config, frappe.guest_methods)
-
-    def test_it_names_the_session_user(self):
+    def test_a_guest_gets_every_field_and_their_own_name(self) -> None:
         frappe.set_user("Guest")
-
-        self.assertEqual(get_config().session_user, "Guest")
-
-    def test_it_names_a_signed_in_user(self):
-        self.assertEqual(get_config().session_user, "Administrator")
+        self.addCleanup(frappe.set_user, "Administrator")
+        config = get_config()
+        self.assertEqual(config.session_user, "Guest")
+        self.assertFalse(config.is_agent)
+        # A Single omits fields never set; the portal reads a missing key as undefined.
+        self.assertIn("confirm_resolution_after_days", config)

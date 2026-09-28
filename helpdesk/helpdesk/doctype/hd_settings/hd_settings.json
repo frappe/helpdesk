@@ -575,7 +575,7 @@
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to edit organization details",
-   "description": "Lets a customer manager change their organization's logo from the portal."
+   "description": "Lets a customer manager change their organization's name and logo from the portal."
   }
  ],
  "grid_page_length": 50,

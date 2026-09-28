@@ -673,7 +673,7 @@
                "variant": "solid"
               },
               "componentSlots": {},
-              "visibilityCondition": "{{ canManageMembers }}"
+              "visibilityCondition": "{{ canInvite }}"
              }
             ],
             "classes": [
@@ -891,7 +891,7 @@
               "componentName": "KbSettingsIdentity",
               "componentProps": {
                "busy": "{{ settingsBusy }}",
-               "editable": "{{ isOrgManager }}",
+               "editable": "{{ canEdit }}",
                "image": "{{ settingsOrg.image }}",
                "maxLength": 34,
                "name": "{{ settingsOrg.customer_name }}",
@@ -930,7 +930,7 @@
                 "componentId": "kb_settings-members-list",
                 "componentName": "KbMemberList",
                 "componentProps": {
-                 "canManage": "{{ canManageMembers }}",
+                 "canManage": "{{ canInvite }}",
                  "members": "{{ orgMembers }}",
                  "onRemove": "{{ removeMember }}",
                  "onSetRole": "{{ setMemberRole }}"

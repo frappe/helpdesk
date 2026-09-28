@@ -21,10 +21,6 @@ def get_config():
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
         "show_customer_portal_permission_notice",
-        # Drive whether the portal offers the org-management controls at all; the
-        # server still enforces them independently.
-        "allow_customer_managers_to_invite",
-        "allow_customer_managers_to_edit_organization",
     ]
     # A Single stores only the fields that have been set, so one never touched comes
     # back missing rather than empty — and the portal reads a missing key as undefined
