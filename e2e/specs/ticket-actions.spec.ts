@@ -12,8 +12,18 @@ const communications = (api: Api, ticket: string) =>
     filters: { reference_doctype: "HD Ticket", reference_name: ticket },
   });
 
+type Ticket = { name: string; subject: string };
+
 /** Merge `source` into `target` through the ticket's More menu. */
-async function mergeFromUi(page: Page, source: { name: string }, target: { name: string; subject: string }) {
+async function mergeFromUi(page: Page, source: Ticket, target: Ticket) {
+  const opened = page.context().waitForEvent("page");
+  await openMergeDialog(page, source, target);
+  await page.getByRole("button", { name: `Merge with ticket #${target.name}` }).click();
+  await expect(page.getByText("Ticket merged successfully.")).toBeVisible();
+  return opened;
+}
+
+async function openMergeDialog(page: Page, source: Ticket, target: Ticket) {
   await openTicket(page, source.name);
   await page.getByRole("banner").getByRole("button").last().click();
   await page.getByRole("menuitem", { name: "Merge Ticket" }).click();
@@ -21,10 +31,7 @@ async function mergeFromUi(page: Page, source: { name: string }, target: { name:
   await dialog.getByRole("button", { name: "Ticket", exact: true }).click();
   await page.getByRole("combobox", { name: "Select Ticket" }).fill(target.subject);
   await page.getByRole("option", { name: `${target.subject} ${target.name},` }).click();
-  const opened = page.context().waitForEvent("page");
-  await dialog.getByRole("button", { name: `Merge with ticket #${target.name}` }).click();
-  await expect(page.getByText("Ticket merged successfully.")).toBeVisible();
-  return opened;
+  return dialog;
 }
 
 test("a ticket merges into another from the same customer", async ({ page, api, apiAs }) => {
@@ -39,6 +46,27 @@ test("a ticket merges into another from the same customer", async ({ page, api, 
     merged_with: target.name,
     status: "Closed",
   });
+});
+
+test("a merge whose response is lost closes the dialog once the ticket shows merged", async ({
+  page,
+  api,
+  apiAs,
+}) => {
+  const customer = await apiAs("customer");
+  const target = await raiseTicket(customer);
+  const source = await raiseTicket(customer);
+  // The server merges, but the browser gets a gateway timeout instead of the reply.
+  await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket", async (route) => {
+    await route.fetch();
+    await route.fulfill({ status: 504, body: "Gateway Timeout" });
+  });
+
+  const dialog = await openMergeDialog(page, source, target);
+  await dialog.getByRole("button", { name: `Merge with ticket #${target.name}` }).click();
+  await expect(page.getByText("Could not confirm the merge. Reloading the ticket.")).toBeVisible();
+  await expect(dialog).toBeHidden();
+  expect((await api.get("HD Ticket", source.name)).is_merged).toBe(1);
 });
 
 test("merging carries the source emails over to the target", async ({ page, api, apiAs }) => {
