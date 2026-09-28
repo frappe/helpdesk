@@ -1,17 +1,13 @@
 {
  "blocks": [
   {
-   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {},
      "blockName": "navbar",
      "children": [
       {
        "blockName": "Header",
-       "children": [],
-       "classes": [],
        "componentId": "header-topbar",
        "componentName": "header",
        "componentProps": {
@@ -41,17 +37,13 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "toolbar",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "toolbar-left",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "tickets-org-switcher",
-         "children": [],
          "classes": [
           "shrink-0"
          ],
@@ -65,12 +57,9 @@
          "isCustomVueComponent": true
         },
         {
-         "baseStyles": {},
          "children": [
           {
            "blockName": "tickets-quickfilter",
-           "children": [],
-           "classes": [],
            "componentId": "QuickFilter-tickets-quickfilter",
            "componentName": "QuickFilter",
            "componentProps": {
@@ -112,9 +101,7 @@
        "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "toolbar-divider",
-       "children": [],
        "classes": [
         "border-l",
         "border-outline-gray-2",
@@ -127,13 +114,10 @@
        "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "toolbar-right",
        "children": [
         {
          "blockName": "tickets-reload",
-         "children": [],
-         "classes": [],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -150,8 +134,6 @@
          }
         },
         {
-         "children": [],
-         "classes": [],
          "componentEvents": {
           "update:conditions": {
            "action": "Run Script",
@@ -168,8 +150,6 @@
         },
         {
          "blockName": "tickets-sort",
-         "children": [],
-         "classes": [],
          "componentId": "SortBy-tickets-sort",
          "componentName": "SortBy",
          "componentProps": {
@@ -182,8 +162,6 @@
         },
         {
          "blockName": "tickets-columns",
-         "children": [],
-         "classes": [],
          "componentId": "ColumnSettings-tickets-columns",
          "componentName": "ColumnSettings",
          "componentProps": {
@@ -223,13 +201,10 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "table-wrap",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "tickets-listview",
-       "children": [],
        "classes": [
         "flex",
         "flex-1",
@@ -270,15 +245,11 @@
     },
     {
      "blockName": "KB Settings",
-     "children": [],
-     "classes": [],
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
     },
     {
-     "children": [],
-     "classes": [],
      "componentEvents": {
       "submit": {
        "action": "Run Script",
@@ -314,17 +285,13 @@
  "doctype": "Studio Page",
  "draft_blocks": [
   {
-   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {},
      "blockName": "navbar",
      "children": [
       {
        "blockName": "Header",
-       "children": [],
-       "classes": [],
        "componentId": "header-topbar",
        "componentName": "header",
        "componentProps": {
@@ -354,17 +321,13 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "toolbar",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "toolbar-left",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "tickets-org-switcher",
-         "children": [],
          "classes": [
           "shrink-0"
          ],
@@ -378,12 +341,9 @@
          "isCustomVueComponent": true
         },
         {
-         "baseStyles": {},
          "children": [
           {
            "blockName": "tickets-quickfilter",
-           "children": [],
-           "classes": [],
            "componentId": "QuickFilter-tickets-quickfilter",
            "componentName": "QuickFilter",
            "componentProps": {
@@ -425,9 +385,7 @@
        "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "toolbar-divider",
-       "children": [],
        "classes": [
         "border-l",
         "border-outline-gray-2",
@@ -440,13 +398,10 @@
        "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "toolbar-right",
        "children": [
         {
          "blockName": "tickets-reload",
-         "children": [],
-         "classes": [],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -463,8 +418,6 @@
          }
         },
         {
-         "children": [],
-         "classes": [],
          "componentEvents": {
           "update:conditions": {
            "action": "Run Script",
@@ -481,8 +434,6 @@
         },
         {
          "blockName": "tickets-sort",
-         "children": [],
-         "classes": [],
          "componentId": "SortBy-tickets-sort",
          "componentName": "SortBy",
          "componentProps": {
@@ -495,8 +446,6 @@
         },
         {
          "blockName": "tickets-columns",
-         "children": [],
-         "classes": [],
          "componentId": "ColumnSettings-tickets-columns",
          "componentName": "ColumnSettings",
          "componentProps": {
@@ -536,13 +485,10 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "table-wrap",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "tickets-listview",
-       "children": [],
        "classes": [
         "flex",
         "flex-1",
@@ -583,15 +529,11 @@
     },
     {
      "blockName": "KB Settings",
-     "children": [],
-     "classes": [],
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
     },
     {
-     "children": [],
-     "classes": [],
      "componentEvents": {
       "submit": {
        "action": "Run Script",
@@ -632,8 +574,6 @@
  "page_name": "page-e0f4b5bc",
  "page_title": "Customer tickets",
  "published": 1,
- "resources": [],
  "route": "/customer-tickets",
- "studio_app": "helpdesk",
- "variables": []
+ "studio_app": "helpdesk"
 }

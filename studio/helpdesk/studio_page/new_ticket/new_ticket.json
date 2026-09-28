@@ -1,17 +1,13 @@
 {
  "blocks": [
   {
-   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {},
      "blockName": "topbar",
      "children": [
       {
        "blockName": "Header",
-       "children": [],
-       "classes": [],
        "componentId": "header-topbar",
        "componentName": "header",
        "componentProps": {
@@ -41,17 +37,13 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "content",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "stack",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "title",
-         "children": [],
          "classes": [
           "font-semibold",
           "mb-1",
@@ -69,13 +61,10 @@
          }
         },
         {
-         "baseStyles": {},
          "blockName": "f-subject",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "c-subject",
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -106,13 +95,10 @@
          "originalElement": "div"
         },
         {
-         "baseStyles": {},
          "blockName": "f-desc",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "l-desc",
-           "children": [],
            "classes": [
             "text-ink-gray-5",
             "block",
@@ -127,9 +113,7 @@
            }
           },
           {
-           "baseStyles": {},
            "blockName": "c-desc",
-           "children": [],
            "classes": [
             "border-none",
             "border",
@@ -169,13 +153,10 @@
          "originalElement": "div"
         },
         {
-         "baseStyles": {},
          "blockName": "fields",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "field-control",
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -216,13 +197,10 @@
          "visibilityCondition": "{{ fields && fields.length }}"
         },
         {
-         "baseStyles": {},
          "blockName": "f-attach",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "l-attach",
-           "children": [],
            "classes": [
             "text-ink-gray-5",
             "block",
@@ -237,8 +215,6 @@
            }
           },
           {
-           "baseStyles": {},
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -260,8 +236,7 @@
          ],
          "componentId": "f-attach",
          "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": null
+         "originalElement": "div"
         }
        ],
        "classes": [
@@ -278,17 +253,13 @@
        ],
        "componentId": "stack",
        "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": null
+       "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "container",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "submit",
-         "children": [],
          "classes": [
           "w-full"
          ],
@@ -326,8 +297,7 @@
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": null
+       "originalElement": "div"
       }
      ],
      "classes": [
@@ -346,8 +316,6 @@
     },
     {
      "blockName": "KB Settings",
-     "children": [],
-     "classes": [],
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
@@ -371,17 +339,13 @@
  "doctype": "Studio Page",
  "draft_blocks": [
   {
-   "baseStyles": {},
    "blockName": "body",
    "children": [
     {
-     "baseStyles": {},
      "blockName": "topbar",
      "children": [
       {
        "blockName": "Header",
-       "children": [],
-       "classes": [],
        "componentId": "header-topbar",
        "componentName": "header",
        "componentProps": {
@@ -411,17 +375,13 @@
      "originalElement": "div"
     },
     {
-     "baseStyles": {},
      "blockName": "content",
      "children": [
       {
-       "baseStyles": {},
        "blockName": "stack",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "title",
-         "children": [],
          "classes": [
           "font-semibold",
           "mb-1",
@@ -439,13 +399,10 @@
          }
         },
         {
-         "baseStyles": {},
          "blockName": "f-subject",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "c-subject",
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -476,13 +433,10 @@
          "originalElement": "div"
         },
         {
-         "baseStyles": {},
          "blockName": "f-desc",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "l-desc",
-           "children": [],
            "classes": [
             "text-ink-gray-5",
             "block",
@@ -497,9 +451,7 @@
            }
           },
           {
-           "baseStyles": {},
            "blockName": "c-desc",
-           "children": [],
            "classes": [
             "border-none",
             "border",
@@ -539,13 +491,10 @@
          "originalElement": "div"
         },
         {
-         "baseStyles": {},
          "blockName": "fields",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "field-control",
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -586,13 +535,10 @@
          "visibilityCondition": "{{ fields && fields.length }}"
         },
         {
-         "baseStyles": {},
          "blockName": "f-attach",
          "children": [
           {
-           "baseStyles": {},
            "blockName": "l-attach",
-           "children": [],
            "classes": [
             "text-ink-gray-5",
             "block",
@@ -607,8 +553,6 @@
            }
           },
           {
-           "baseStyles": {},
-           "children": [],
            "classes": [
             "w-full"
            ],
@@ -630,8 +574,7 @@
          ],
          "componentId": "f-attach",
          "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": null
+         "originalElement": "div"
         }
        ],
        "classes": [
@@ -648,17 +591,13 @@
        ],
        "componentId": "stack",
        "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": null
+       "originalElement": "div"
       },
       {
-       "baseStyles": {},
        "blockName": "container",
        "children": [
         {
-         "baseStyles": {},
          "blockName": "submit",
-         "children": [],
          "classes": [
           "w-full"
          ],
@@ -696,8 +635,7 @@
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": null
+       "originalElement": "div"
       }
      ],
      "classes": [
@@ -716,8 +654,6 @@
     },
     {
      "blockName": "KB Settings",
-     "children": [],
-     "classes": [],
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
