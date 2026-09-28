@@ -4,7 +4,7 @@
       <TextInput
         v-model="search"
         type="text"
-        :placeholder="t('Search')"
+        :placeholder="__('Search')"
         class="min-w-0 flex-1"
       >
         <template #prefix>
@@ -20,9 +20,9 @@
 
     <div>
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
-        <span>{{ t("Members") }}</span>
-        <span>{{ t("Last seen") }}</span>
-        <span>{{ t("Role") }}</span>
+        <span>{{ __("Members") }}</span>
+        <span>{{ __("Last seen") }}</span>
+        <span>{{ __("Role") }}</span>
         <span />
       </div>
 
@@ -94,14 +94,14 @@
         v-if="!matches.length"
         class="py-6 text-center text-p-sm text-ink-gray-5"
       >
-        {{ t("No members match this filter.") }}
+        {{ __("No members match this filter.") }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { t } from "@app/stores/translations";
+import { __ } from "@helpdesk/shared/translation";
 // Flat, not keyed on role: a tree implied a reporting line helpdesk does not record.
 import {
   Avatar,
@@ -183,7 +183,7 @@ function matchesSearch(member: Member) {
 
 // Said in words: a dash would read as missing data where the absence is the fact.
 function lastSeen(member: Member) {
-  return member.last_seen ? dayjs(member.last_seen).fromNow() : t("Never");
+  return member.last_seen ? dayjs(member.last_seen).fromNow() : __("Never");
 }
 
 // The owner's role is fixed, and demoting yourself revokes the rights the call needs.

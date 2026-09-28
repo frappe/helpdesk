@@ -2,7 +2,7 @@
   <div>
     <!-- Wrapped: scoped rules don't reach a child component's own root. -->
     <div class="mb-6">
-      <TextInput v-model="search" type="text" :placeholder="t('Search')">
+      <TextInput v-model="search" type="text" :placeholder="__('Search')">
         <template #prefix>
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { t } from "@app/stores/translations";
+import { __ } from "@helpdesk/shared/translation";
 // A role badge per card, rather than sorting the cards into sections.
 import { Avatar, Badge, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";

@@ -5,7 +5,7 @@
       <TextInput
         v-model="search"
         type="text"
-        :placeholder="t('Search')"
+        :placeholder="__('Search')"
         class="min-w-0 flex-1"
       >
         <template #prefix>
@@ -17,18 +17,18 @@
     <div v-if="tickets.length" class="isolate">
       <div :class="[ROW, 'min-h-8 text-p-xs text-ink-gray-5']">
         <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{
-          t("ID")
+          __("ID")
         }}</span>
         <span
           class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-          >{{ t("Subject") }}</span
+          >{{ __("Subject") }}</span
         >
         <span
           class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7"
-          >{{ t("Status") }}</span
+          >{{ __("Status") }}</span
         >
         <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
-          t("Created")
+          __("Created")
         }}</span>
       </div>
 
@@ -66,8 +66,8 @@
     >
       {{
         search
-          ? t("No tickets match your search.")
-          : t("No tickets from this organization yet.")
+          ? __("No tickets match your search.")
+          : __("No tickets from this organization yet.")
       }}
     </p>
   </div>
@@ -79,7 +79,7 @@ import { ref, watch } from "vue";
 import { TextInput, call, dayjs, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import { statusMeta } from "@app/components/list/ticketCells";
-import { t } from "@app/stores/translations";
+import { __ } from "@helpdesk/shared/translation";
 
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";

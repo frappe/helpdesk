@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { compactDuration, parseJsonArray } from '@app/utils'
 import { dayjs } from 'frappe-ui'
 import { statusMeta } from '@app/components/list/ticketCells'
-import { t, tFormat } from '@app/stores/translations'
+import { __ } from '@helpdesk/shared/translation'
 
 // Everything the summary sidebar shows, finished for display — the Studio blocks only bind.
 // Read as progress, not as a report card: "Failed" is no use to the person still waiting.
@@ -38,8 +38,8 @@ export function useTicketDetails(ticket, thread) {
   const statusPill = computed(() => statusMeta(data.value.status))
 
   const basics = computed(() => [
-    { label: t('Team'), value: data.value.agent_group || EMPTY },
-    { label: t('Priority'), value: data.value.priority || EMPTY },
+    { label: __('Team'), value: data.value.agent_group || EMPTY },
+    { label: __('Priority'), value: data.value.priority || EMPTY },
     ...templateFields(),
   ])
 
@@ -52,7 +52,7 @@ export function useTicketDetails(ticket, thread) {
           !HIDDEN_FIELDS.includes(templateField.fieldname),
       )
       .map((templateField) => ({
-        label: t(templateField.label),
+        label: __(templateField.label),
         value: formatValue(templateField, data.value[templateField.fieldname]) || EMPTY,
       }))
   }
@@ -78,17 +78,17 @@ export function useTicketDetails(ticket, thread) {
   })
 
   function received() {
-    return step(t('Request received'), at(data.value.creation), 'done', data.value.creation)
+    return step(__('Request received'), at(data.value.creation), 'done', data.value.creation)
   }
 
   // No assignment timestamp is customer-readable, so the first agent reply stands in.
   function assigned() {
     const reply = firstReply.value
     if (reply)
-      return step(tFormat('Assigned to', reply.sender), since(reply.creation), 'done', reply.creation)
+      return step(__('Assigned to {0}', [reply.sender]), since(reply.creation), 'done', reply.creation)
     if (assignees().length)
-      return step(t('Assigned to agent'), t('An agent is on it'), 'done')
-    return step(t('Assigned to agent'), t('Waiting to be assigned'), 'pending')
+      return step(__('Assigned to agent'), __('An agent is on it'), 'done')
+    return step(__('Assigned to agent'), __('Waiting to be assigned'), 'pending')
   }
 
   function assignees() {
@@ -97,8 +97,8 @@ export function useTicketDetails(ticket, thread) {
 
   function answered() {
     const reply = firstReply.value
-    if (!reply) return awaiting(t('Awaiting first response'), data.value.response_by)
-    return step(t('First response'), speedOf(reply), 'done', reply.creation)
+    if (!reply) return awaiting(__('Awaiting first response'), data.value.response_by)
+    return step(__('First response'), speedOf(reply), 'done', reply.creation)
   }
 
   function speedOf(reply) {
@@ -114,9 +114,9 @@ export function useTicketDetails(ticket, thread) {
   // A ticket that ended without being resolved gets no resolved step; the close covers it.
   function resolution() {
     const on = data.value.resolution_date
-    if (on) return wasResolved() ? [step(t('Resolved'), resolvedAt(on), 'done', on)] : []
-    if (!firstReply.value) return [step(t('Resolved'), '', 'pending')]
-    return [awaiting(t('Awaiting resolution'), data.value.resolution_by)]
+    if (on) return wasResolved() ? [step(__('Resolved'), resolvedAt(on), 'done', on)] : []
+    if (!firstReply.value) return [step(__('Resolved'), '', 'pending')]
+    return [awaiting(__('Awaiting resolution'), data.value.resolution_by)]
   }
 
   // A ticket closed outright is stamped `resolution_date` too, so the date alone can't tell.
@@ -148,12 +148,12 @@ export function useTicketDetails(ticket, thread) {
     if (data.value.status !== 'Closed') return []
     const on = data.value.resolution_date
     // Resolved first: that stamp belongs to the step above, and nothing records the close.
-    return [step(t('Closed'), wasResolved() ? '' : since(on), 'closed', wasResolved() ? '' : on)]
+    return [step(__('Closed'), wasResolved() ? '' : since(on), 'closed', wasResolved() ? '' : on)]
   }
 
   // Always `pending`, so the frontier logic above gives it the ring.
   function awaiting(title: string, due: string) {
-    if (!due) return step(title, t('Pending'), 'pending')
+    if (!due) return step(title, __('Pending'), 'pending')
     if (dayjs().isAfter(dayjs(due))) return step(title, `Overdue by ${countdown(due)}`, 'pending')
     return step(title, `Due ${dueWording(due)}`, 'pending')
   }

@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { setLanguage, t } from '@app/stores/translations'
+import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { createDocumentResource, createResource, toast } from 'frappe-ui'
 
 // Language and timezone live on the User doc, which a signed-in user may edit themselves.
@@ -58,9 +58,8 @@ function createPreferencesStore() {
   function savePreferences() {
     user.value?.save.submit(null, {
       onSuccess: () => {
-        // Every string goes through `t()`, so telling the translator is enough — no reload.
-        setLanguage(user.value.doc.language)
-        toast.success(t('Preferences updated successfully.'))
+        fetchTranslations()
+        toast.success(__('Preferences updated successfully.'))
       },
       onError: (error) => toast.error(error.message),
     })
@@ -90,7 +89,7 @@ function createPreferencesStore() {
   return {
     conversationLayout,
     conversationLayoutOptions: computed(() =>
-      LAYOUT_OPTIONS.map((option) => ({ ...option, label: t(option.label) })),
+      LAYOUT_OPTIONS.map((option) => ({ ...option, label: __(option.label) })),
     ),
     preferences,
     preferencesSaving,

@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
-import { t } from '@app/stores/translations'
+import { __ } from '@helpdesk/shared/translation'
 
 // Backed by helpdesk.api.organization.
 
@@ -21,17 +21,17 @@ export function createOrganizationSettings(core) {
     core.organizations.value.some((org) => org.role !== 'Member'),
   )
   const organizationScreenTitle = computed(() =>
-    t(managesAnyOrg.value ? 'Manage organization' : 'View organization'),
+    __(managesAnyOrg.value ? 'Manage organization' : 'View organization'),
   )
   const organizationScreenDescription = computed(() =>
-    t(
+    __(
       managesAnyOrg.value
         ? 'Pick an organization to manage its people and settings.'
         : 'Pick an organization to see its people and settings.',
     ),
   )
   const organizationDetailDescription = computed(() =>
-    t(
+    __(
       isOrgManager.value
         ? "Manage your organization's members and tickets."
         : "View your organization's members and tickets.",
@@ -43,8 +43,8 @@ export function createOrganizationSettings(core) {
 
   const orgTab = ref('members')
   const orgTabOptions = computed(() => [
-    { label: t('Members'), value: 'members' },
-    { label: t('Tickets'), value: 'tickets' },
+    { label: __('Members'), value: 'members' },
+    { label: __('Tickets'), value: 'tickets' },
   ])
 
   const orgName = ref('')

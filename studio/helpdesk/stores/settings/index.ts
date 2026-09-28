@@ -2,10 +2,12 @@ import { computed } from 'vue'
 import { useColorScheme } from 'frappe-ui'
 import { usePreferences } from '@app/stores/preferences'
 import { useSession } from '@app/stores/session'
-import { t } from '@app/stores/translations'
+import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
+
+fetchTranslations()
 
 // One instance for the whole app: a private copy per page would go stale on the others.
 const core = createSettingsCore()
@@ -23,30 +25,30 @@ const theme = computed({
 })
 
 const themeOptions = computed(() => [
-  { label: t('Light'), value: 'light' },
-  { label: t('Dark'), value: 'dark' },
-  { label: t('System'), value: 'system' },
+  { label: __('Light'), value: 'light' },
+  { label: __('Dark'), value: 'dark' },
+  { label: __('System'), value: 'system' },
 ])
 
 // Here rather than on a page, because the header these words fill is shared.
 const words = computed(() => ({
-  raiseTicket: t('Raise a ticket'),
-  status: t('Status'),
-  composerPrompt: t('Type a message'),
-  solveAsk: t('Did this solve your issue?'),
-  solveYes: t("Yes, it's fixed"),
-  solveNo: t('No, still an issue'),
-  feedbackTitle: t('Feedback Rating'),
-  popularHelp: t('Popular help'),
-  relatedHelp: t('Related help'),
+  raiseTicket: __('Raise a ticket'),
+  status: __('Status'),
+  composerPrompt: __('Type a message'),
+  solveAsk: __('Did this solve your issue?'),
+  solveYes: __("Yes, it's fixed"),
+  solveNo: __('No, still an issue'),
+  feedbackTitle: __('Feedback Rating'),
+  popularHelp: __('Popular help'),
+  relatedHelp: __('Related help'),
 }))
 
 const store = {
   words,
   themeOptions,
   theme,
-  // Bound, not written into the blocks, so the language panel is itself translated.
-  t,
+  // The blocks bind `t`; the alias keeps them off the module's own name.
+  t: __,
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
   isSettingsBusy: core.isSettingsBusy,

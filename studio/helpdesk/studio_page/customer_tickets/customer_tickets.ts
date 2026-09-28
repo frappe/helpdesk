@@ -9,7 +9,7 @@ import {
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
 import { useSettingsModal } from '@app/stores/settings'
-import { language, t } from '@app/stores/translations'
+import { __, translations } from '@helpdesk/shared/translation'
 import { useViews } from '@app/stores/views'
 
 // No client-side scoping: HD Ticket's permission_query already limits a non-agent to
@@ -49,10 +49,10 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'contact', width: '8rem' },
   { fieldname: 'feedback_rating', width: '10rem' },
   { fieldname: 'creation', width: '8rem' },
-].map((column) => ({ ...column, label: t(COLUMN_LABELS[column.fieldname]) }))
+].map((column) => ({ ...column, label: __(COLUMN_LABELS[column.fieldname]) }))
 
 // The column layer drops `_`-prefixed keys it has no declaration for.
-const SYNTHETIC_COLUMNS = [{ key: '_assign', label: t('Assigned To'), width: '8rem' }]
+const SYNTHETIC_COLUMNS = [{ key: '_assign', label: __('Assigned To'), width: '8rem' }]
 
 // Fetch-only: the SLA badges and the subject's unread weight need these, no column shows them.
 const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen']
@@ -79,10 +79,10 @@ export default function setup(context) {
   const view = useListView(DOCTYPE, { synthetic: SYNTHETIC_COLUMNS })
   // Before the data layer: `useListData` fetches on creation, so seeding after costs a request.
   view.columns.shown.value = DEFAULT_COLUMNS
-  watch(language, () => {
+  watch(translations, () => {
     view.columns.shown.value = view.columns.shown.value.map((column) => {
       const english = COLUMN_LABELS[column.fieldname || column.key]
-      return english ? { ...column, label: t(english) } : column
+      return english ? { ...column, label: __(english) } : column
     })
   })
   // Unset, the server orders by `modified`, which never settles for a requester.
