@@ -31,6 +31,7 @@ from helpdesk.test_utils import (
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_agent,
     make_feedback_option,
     make_priority,
     make_sla,
@@ -561,6 +562,40 @@ class TestHDTicket(IntegrationTestCase):
             self.assertEqual(ticket.total_hold_time, 2 * 60 * 60)
             # 2h30m elapsed, 2h of it on hold, leaving the 30m before the pause
             self.assertEqual(ticket.resolution_time, 30 * 60)
+
+    def test_agreement_status_stays_paused_past_the_deadlines(self):
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.status = "Replied"
+            ticket.save()
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, days=7)):
+            ticket.subject = "Edited while on hold"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+    def test_agreement_status_keeps_a_breach_from_before_the_hold(self):
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.first_responded_on = get_datetime()
+            ticket.save()
+
+        # Urgent resolves in 2h, so the hold at 3h starts after the breach.
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=3)):
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Failed")
+            self.assertLess(ticket.first_responded_on, ticket.response_by)
 
     def test_resolution_time_kept_when_closed_ticket_set_back_to_resolved(self):
         # Moving between resolved statuses is not a reopen, so the time spent
@@ -2410,6 +2445,20 @@ class TestHDTicket(IntegrationTestCase):
         self.assertTrue(has_permission(ticket, user=agent2))
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
+
+    def test_only_managers_can_delete_a_ticket(self):
+        manager = make_agent("ticket_manager@test.com", first_name="Ticket Manager")
+        frappe.get_doc("User", manager).add_roles("Agent Manager")
+        ticket = make_ticket(raised_by=non_agent)
+
+        frappe.set_user(agent)
+        with self.assertRaises(frappe.PermissionError):
+            frappe.delete_doc("HD Ticket", ticket.name)
+
+        frappe.set_user(manager)
+        frappe.delete_doc("HD Ticket", ticket.name)
+        self.assertFalse(frappe.db.exists("HD Ticket", ticket.name))
+        frappe.set_user("Administrator")
 
     def test_only_agents_can_comment_on_a_ticket(self):
         contact = create_contact("Commenter", "commenter@test.com")

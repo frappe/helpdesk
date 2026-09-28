@@ -308,15 +308,20 @@ class HDServiceLevelAgreement(Document):
 
     def is_first_response_failed(self, doc: Document):
         if not doc.first_responded_on:
-            return get_datetime(doc.response_by) < now_datetime()
+            return get_datetime(doc.response_by) < self.get_active_ticket_time(doc)
         return get_datetime(doc.response_by) < get_datetime(doc.first_responded_on)
 
     def is_resolution_failed(self, doc: Document):
         if not self.apply_sla_for_resolution or not doc.resolution_by:
             return
         if not doc.resolution_date:
-            return get_datetime(doc.resolution_by) < now_datetime()
+            return get_datetime(doc.resolution_by) < self.get_active_ticket_time(doc)
         return get_datetime(doc.resolution_by) < get_datetime(doc.resolution_date)
+
+    def get_active_ticket_time(self, doc: Document):
+        """Hold time is credited only on resume, so an on-hold ticket is measured
+        against when it went on hold."""
+        return get_datetime(doc.on_hold_since) if doc.on_hold_since else now_datetime()
 
     def calc_time(
         self,

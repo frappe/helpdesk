@@ -194,14 +194,14 @@ async function submitComment() {
 
   const content = newComment.value;
   const sentAttachments = attachments.value;
-  const user = getUser(authStore.userId);
-  const row = addPendingActivity(props.doctype, props.ticketId, {
+  const pendingRow = addPendingActivity(props.doctype, props.ticketId, {
     type: "comment",
     timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     author: {
-      email: user?.email,
-      fullname: user?.full_name,
-      image: user?.user_image,
+      email: getUser(authStore.userId).email,
+      // the users list may still be a stub with a guessed name and no avatar
+      fullname: authStore.userName,
+      image: authStore.userImage,
     },
     data: { name: "", content, attachments: sentAttachments },
   });
@@ -226,7 +226,7 @@ async function submitComment() {
       const name = typeof res === "string" ? res : res?.message;
       // the real row replaces the pending one the moment it arrives; unkeyed,
       // it would outlive it
-      name ? row.resolve(`comment:${name}`) : row.drop();
+      name ? pendingRow.resolve(`comment:${name}`) : pendingRow.drop();
       capture("comment_added");
       if (isManager) {
         updateOnboardingStep?.("comment_on_ticket");
@@ -236,7 +236,7 @@ async function submitComment() {
     },
     onError: () => {
       toast.error(__("Could not add the comment"));
-      row.drop();
+      pendingRow.drop();
       newComment.value = content;
       attachments.value = sentAttachments;
       loading.value = false;
