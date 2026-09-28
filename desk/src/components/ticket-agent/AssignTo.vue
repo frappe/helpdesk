@@ -168,6 +168,7 @@
 import ShortcutKey from "@/components/ShortcutKey.vue";
 import { useShortcut } from "@/composables/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
+import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -287,6 +288,20 @@ watch(popoverIsOpen, (isOpen) => {
   }
 });
 
+const configStore = useConfigStore();
+const ticketTeam = computed(() => ticket?.value?.doc?.agent_group);
+const restrictToTeam = computed(
+  () =>
+    configStore.teamRestrictionApplied &&
+    configStore.assignWithinTeam &&
+    Boolean(ticketTeam.value)
+);
+const teamMembers = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+  makeParams: () => ({ team: ticketTeam.value }),
+  onSuccess: () => reloadAgents(),
+});
+
 const agentResource = createListResource({
   doctype: "HD Agent",
   fields: [
@@ -298,21 +313,35 @@ const agentResource = createListResource({
   ],
   filters: { is_active: true },
   pageLength: 20,
-  auto: true,
 });
 
-const debouncedSearch = useDebounceFn((text: string) => {
+function reloadAgents(text = "") {
   const filters: Record<string, any> = { is_active: true };
   if (text) {
     filters.agent_name = ["like", `%${text}%`];
   }
+  if (restrictToTeam.value) {
+    filters.name = ["in", teamMembers.data || []];
+  }
   agentResource.filters = filters;
   agentResource.reload();
-}, 300);
+}
+
+const debouncedSearch = useDebounceFn(reloadAgents, 300);
+
+function isOfferable(agentName: string) {
+  return !restrictToTeam.value || teamMembers.data?.includes(agentName);
+}
 
 watch(searchText, (text) => {
   debouncedSearch(text);
 });
+
+watch(
+  [restrictToTeam, ticketTeam],
+  ([restricted]) => (restricted ? teamMembers.fetch() : reloadAgents()),
+  { immediate: true }
+);
 
 // Prefer the live status pushed over the socket (agentStatusStore.liveStatuses)
 // so the dot/tooltip reflect any agent's change made elsewhere this session,
@@ -335,7 +364,7 @@ const agentOptions = computed<AgentOption[]>(() => {
 
   // Include current agent only when not searching. Built from the session user
   // and the store's live status (seeded from auth.get_user) — no extra fetch.
-  if (!searchText.value && currentAgentName) {
+  if (!searchText.value && currentAgentName && isOfferable(currentAgentName)) {
     agents.push({
       value: currentAgentName,
       label: currentUser.value.full_name || currentAgentName,
