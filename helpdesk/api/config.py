@@ -3,6 +3,8 @@ import frappe
 from helpdesk.utils import is_agent
 
 
+# Guest-callable by design: it returns only public branding and portal flags, and is_agent is False for guests.
+# nosemgrep: frappe-semgrep-rules.rules.security.guest-whitelisted-method
 @frappe.whitelist(allow_guest=True)
 def get_config():
     fields = [
