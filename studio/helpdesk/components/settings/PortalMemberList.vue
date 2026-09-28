@@ -40,24 +40,22 @@
           />
           <div class="min-w-0">
             <div
-              class="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap text-base-medium text-ink-gray-8"
+              class="flex items-center gap-1.5 truncate text-base-medium text-ink-gray-8"
             >
               {{ member.full_name }}
               <span
                 v-if="member.is_you"
                 class="text-p-xs font-normal text-ink-gray-5"
-                >You</span
+                >{{ __("You") }}</span
               >
               <Badge
                 v-if="member.pending"
-                label="Pending"
+                :label="__('Pending')"
                 theme="orange"
                 variant="subtle"
               />
             </div>
-            <div
-              class="overflow-hidden text-ellipsis whitespace-nowrap text-p-sm text-ink-gray-5"
-            >
+            <div class="truncate text-p-sm text-ink-gray-5">
               {{ member.email }}
             </div>
           </div>
@@ -68,7 +66,7 @@
         <span
           class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
         >
-          <component :is="ROLE_ICONS[member.role]" class="size-4" />
+          <component :is="ROLES[member.role].icon" class="size-4" />
           {{ member.role }}
         </span>
 
@@ -101,23 +99,15 @@
 </template>
 
 <script setup lang="ts">
-import { __ } from "@helpdesk/shared/translation";
 // Flat, not keyed on role: a tree implied a reporting line helpdesk does not record.
-import {
-  Avatar,
-  Badge,
-  Button,
-  Dropdown,
-  Select,
-  TextInput,
-  dayjs,
-} from "frappe-ui";
-import LucideBriefcase from "~icons/lucide/briefcase";
-import LucideCrown from "~icons/lucide/crown";
-import LucideSearch from "~icons/lucide/search";
-import LucideUser from "~icons/lucide/user";
-import LucideUsers from "~icons/lucide/users";
 import { computed, ref } from "vue";
+import { Avatar, Badge, Button, Dropdown, Select, TextInput } from "frappe-ui";
+import LucideSearch from "~icons/lucide/search";
+import LucideUsers from "~icons/lucide/users";
+import { __ } from "@helpdesk/shared/translation";
+import { timeAgo } from "@helpdesk/shared/utils";
+import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { matchesQuery } from "@app/utils";
 
 // Under the last row the hairline would be a line under nothing.
 const ROW =
@@ -130,37 +120,35 @@ type Member = {
   email?: string;
   image?: string;
   last_seen?: string;
-  role: "Owner" | "Manager" | "Member";
+  role: RoleLabel;
   is_you?: boolean;
   pending?: boolean;
 };
+
+// Owner is left out: there is one per organization, already first in the list.
+const FILTERABLE_ROLES: RoleLabel[] = ["Manager", "Member"];
+const ROLE_FILTERS = [
+  { label: "All", value: "All", icon: LucideUsers },
+  ...FILTERABLE_ROLES.map((label) => ({
+    label,
+    value: label,
+    icon: ROLES[label].icon,
+  })),
+];
 
 const props = withDefaults(
   defineProps<{
     members?: Member[];
     // Only a manager of this organization may change anyone.
     canManage?: boolean;
-    onSetRole?: (member: Member, role: string) => void;
-    onRemove?: (member: Member) => void;
   }>(),
   { members: () => [], canManage: false }
 );
 
-const ROLE_ICONS = {
-  Owner: LucideCrown,
-  Manager: LucideBriefcase,
-  Member: LucideUser,
-};
-// Owner is left out: there is one per organization, already first in the list.
-const FILTERABLE_ROLES = ["Manager", "Member"];
-const ROLE_FILTERS = [
-  { label: "All", value: "All", icon: LucideUsers },
-  ...FILTERABLE_ROLES.map((label) => ({
-    label,
-    value: label,
-    icon: ROLE_ICONS[label],
-  })),
-];
+const emit = defineEmits<{
+  setRole: [member: Member, role: RoleLabel];
+  remove: [member: Member];
+}>();
 
 const role = ref("All");
 const search = ref("");
@@ -174,16 +162,12 @@ function matchesRole(member: Member) {
 }
 
 function matchesSearch(member: Member) {
-  const query = search.value.trim().toLowerCase();
-  if (!query) return true;
-  return `${member.full_name} ${member.email || ""}`
-    .toLowerCase()
-    .includes(query);
+  return matchesQuery(search.value, member.full_name, member.email);
 }
 
 // Said in words: a dash would read as missing data where the absence is the fact.
 function lastSeen(member: Member) {
-  return member.last_seen ? dayjs(member.last_seen).fromNow() : __("Never");
+  return member.last_seen ? timeAgo(member.last_seen) : __("Never");
 }
 
 // The owner's role is fixed, and demoting yourself revokes the rights the call needs.
@@ -205,24 +189,24 @@ function rowOptions(member: Member) {
   if (member.pending) {
     return [
       {
-        label: "Cancel invitation",
+        label: __("Cancel invitation"),
         icon: "lucide-x-circle",
-        onClick: () => props.onRemove?.(member),
+        onClick: () => emit("remove", member),
       },
     ];
   }
-  const next = member.role === "Manager" ? "Member" : "Manager";
+  const next: RoleLabel = member.role === "Manager" ? "Member" : "Manager";
   return [
     {
-      label: next === "Manager" ? "Make manager" : "Make member",
-      icon: ROLE_ICONS[next],
-      onClick: () => props.onSetRole?.(member, next),
+      label: next === "Manager" ? __("Make manager") : __("Make member"),
+      icon: ROLES[next].icon,
+      onClick: () => emit("setRole", member, next),
       condition: () => canSwitchRole(member),
     },
     {
-      label: "Remove from organization",
+      label: __("Remove from organization"),
       icon: "lucide-user-minus",
-      onClick: () => props.onRemove?.(member),
+      onClick: () => emit("remove", member),
     },
   ];
 }

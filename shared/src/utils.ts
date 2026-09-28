@@ -1,4 +1,4 @@
-import { dayjsLocal } from "frappe-ui";
+import { dayjs, dayjsLocal } from "frappe-ui";
 
 import { __ } from "./translation";
 
@@ -7,6 +7,11 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
+
+// The studio-built customer portal, served outside the desk SPA.
+export const CUSTOMER_PORTAL_ROOT = "/kb";
+
+export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
 
 export function validateEmail(email) {
   const regExp =
@@ -124,6 +129,49 @@ export function prettyDate(date, mini = false) {
 
 export function timeAgo(date) {
   return prettyDate(date);
+}
+
+/** Format a duration using its two most significant units, e.g. "1d 9h" */
+export function twoUnitDuration(milliseconds: number): string {
+  const duration = dayjs.duration(milliseconds);
+
+  const years = duration.years();
+  const months = duration.months();
+  const days = duration.days();
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+
+  if (years > 0) {
+    return `${years}y ${months}mo`;
+  } else if (months > 0) {
+    return `${months}mo ${days}d`;
+  } else if (days > 0) {
+    return `${days}d ${hours}h`;
+  } else if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else if (minutes > 0) {
+    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+  }
+  return `${seconds}s`;
+}
+
+export function isContentEmpty(content: string) {
+  if (!content || content === null || content === undefined) {
+    return true;
+  }
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  if (doc.body.textContent === null) {
+    return true;
+  }
+  return doc.body.textContent.trim() === "";
+}
+
+// Lucide names are plain ASCII, so any emoji-presentation or pictographic
+// character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
+export function isEmoji(str: string): boolean {
+  return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
 
 /**

@@ -1,12 +1,11 @@
 <template>
-  <div class="kb-reply" :class="{ 'kb-reply--opening': opening }">
+  <div class="kb-reply" :class="{ 'kb-reply--opening': isOpening }">
     <div class="kb-reply__frame">
       <Editor
-        ref="editorRef"
         v-model="content"
         :extensions="extensions"
         :placeholder="placeholder"
-        :upload-function="uploadFile"
+        :upload-function="uploadInlineFile"
         autofocus
       >
         <template #default="{ editor, isEmpty }">
@@ -25,7 +24,7 @@
               icon-left="lucide-file"
               icon-right="lucide-x"
               :label="file.file_name"
-              @click="onRemoveAttachment?.(file)"
+              @click="emit('removeAttachment', file)"
             />
           </div>
 
@@ -37,13 +36,13 @@
                 type="file"
                 multiple
                 class="hidden"
-                @change="pickFiles"
+                @change="onFilesPicked"
               />
               <Button
                 variant="ghost"
                 icon="lucide-paperclip"
-                :loading="uploading"
-                aria-label="Attach files"
+                :loading="pendingUploadCount > 0"
+                :aria-label="__('Attach files')"
                 @click="fileInput?.click()"
               />
               <EditorFixedMenu :items="replyToolbar" />
@@ -52,12 +51,12 @@
             <div class="flex shrink-0 items-center gap-2">
               <Button
                 variant="ghost"
-                label="Discard"
+                :label="__('Discard')"
                 @click="discard(editor)"
               />
               <Button
                 variant="solid"
-                label="Send"
+                :label="__('Send')"
                 :disabled="isEmpty"
                 :loading="isSending"
                 @click="emit('send')"
@@ -73,8 +72,8 @@
 <script setup lang="ts">
 // The desk's own editor, so a reply serialises to the same markup. A component rather
 // than Studio blocks because only the Editor's slot hands over the instance a toolbar needs.
-import { computed, onMounted, ref } from "vue";
-import { Button, FileUploadHandler, toast, useFileUpload } from "frappe-ui";
+import { onMounted, ref } from "vue";
+import { Button, useFileUpload } from "frappe-ui";
 import {
   Blockquote,
   Bold,
@@ -97,51 +96,42 @@ import {
   type CommandMenuItem,
   type MenuItem,
 } from "frappe-ui/editor";
+import { __ } from "@helpdesk/shared/translation";
+import { uploadFiles } from "@app/utils";
+
+const DOCTYPE = "HD Ticket";
+const OPEN_MS = 180;
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string;
     attachments?: any[];
     isSending?: boolean;
     placeholder?: string;
-    // Where an inline upload is filed, so a pasted image belongs to the ticket.
-    doctype?: string;
+    // The ticket an inline upload is filed against.
     docname?: string;
-    uploadArgs?: Record<string, unknown>;
-    onAttach?: (file: any) => void;
-    onRemoveAttachment?: (file: any) => void;
   }>(),
   {
-    modelValue: "",
     attachments: () => [],
     isSending: false,
     placeholder: "Type a message",
-    doctype: "HD Ticket",
-    uploadArgs: () => ({ folder: "Home/Helpdesk", private: true }),
   }
 );
 
 const emit = defineEmits<{
-  "update:modelValue": [value: string];
   send: [];
   discard: [];
+  attach: [file: any];
+  removeAttachment: [file: any];
 }>();
 
-const OPEN_MS = 180;
+const content = defineModel<string>({ default: "" });
 
 // Clipped only while growing: the clipping a height animation needs would cut off the menus.
-const opening = ref(true);
-onMounted(() => setTimeout(() => (opening.value = false), OPEN_MS));
+const isOpening = ref(true);
+onMounted(() => setTimeout(() => (isOpening.value = false), OPEN_MS));
 
-const editorRef = ref<InstanceType<typeof Editor> | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const pending = ref(0);
-const uploading = computed(() => pending.value > 0);
-
-const content = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
+const pendingUploadCount = ref(0);
 
 // The desk's `buildEditorExtensions()`, less the mention list and its local paste helpers.
 const extensions = [
@@ -175,46 +165,31 @@ const replyToolbar: MenuItem[] = [
 ];
 
 // Private, so the same permissions guard an upload as guard the ticket.
-function uploadFile(file: File) {
+function uploadInlineFile(file: File) {
   return useFileUpload().upload(file, {
     private: true,
-    doctype: props.doctype,
+    doctype: DOCTYPE,
     docname: props.docname,
   });
 }
 
-// `allSettled`, so one file over the size limit does not throw away the ones beside it.
-async function pickFiles(event: Event) {
+async function onFilesPicked(event: Event) {
   const input = event.target as HTMLInputElement;
   const picked = Array.from(input.files || []);
   // Cleared so picking the same file twice in a row still fires `change`.
   input.value = "";
   if (!picked.length) return;
 
-  pending.value += picked.length;
-  const results = await Promise.allSettled(
-    picked.map((file) => new FileUploadHandler().upload(file, props.uploadArgs))
-  );
-  pending.value -= picked.length;
-
-  results.forEach((result) => {
-    if (result.status === "fulfilled") props.onAttach?.(result.value);
-  });
-  if (results.some((result) => result.status === "rejected")) {
-    toast.error(
-      picked.length > 1
-        ? "Some files could not be uploaded"
-        : "Error uploading file"
-    );
-  }
+  pendingUploadCount.value += picked.length;
+  const uploaded = await uploadFiles(picked);
+  pendingUploadCount.value -= picked.length;
+  uploaded.forEach((file) => emit("attach", file));
 }
 
 function discard(editor: any) {
   editor?.commands.clearContent(true);
   emit("discard");
 }
-
-defineExpose({ editor: computed(() => editorRef.value?.editor) });
 </script>
 
 <style scoped>

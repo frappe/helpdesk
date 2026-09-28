@@ -4,19 +4,23 @@
     <button
       type="button"
       class="relative flex w-full cursor-pointer items-center justify-center gap-2 rounded-6 border border-dashed border-outline-gray-3 bg-surface-gray-1 px-3 py-4 hover:border-outline-gray-4 hover:bg-surface-gray-2"
-      :class="{ '!border-outline-gray-4 !bg-surface-gray-2': isOver }"
+      :class="{ '!border-outline-gray-4 !bg-surface-gray-2': isDragOver }"
       @click="openFileSelector"
-      @dragenter.prevent="isOver = true"
-      @dragover.prevent="isOver = true"
-      @dragleave.prevent="isOver = false"
+      @dragenter.prevent="isDragOver = true"
+      @dragover.prevent="isDragOver = true"
+      @dragleave.prevent="isDragOver = false"
       @drop.prevent="onDrop"
     >
       <Icon icon="lucide-upload" class="size-4 shrink-0 text-ink-gray-5" />
       <span class="text-p-base text-ink-gray-5">
         {{
-          uploading
-            ? `Uploading ${pending} file${pending === 1 ? "" : "s"}…`
-            : "Drop files here, or click to choose"
+          pendingUploadCount
+            ? countLabel(
+                pendingUploadCount,
+                "Uploading 1 file…",
+                "Uploading {0} files…"
+              )
+            : __("Drop files here, or click to choose")
         }}
       </span>
       <!-- Covers the target, so a file released anywhere on it lands on the input. -->
@@ -40,46 +44,34 @@
           icon="lucide-paperclip"
           class="size-3.5 shrink-0 text-ink-gray-5"
         />
-        <span
-          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-          >{{ file.file_name || file.name }}</span
-        >
+        <span class="min-w-0 flex-1 truncate">{{
+          file.file_name || file.name
+        }}</span>
         <button
           type="button"
           class="grid place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
-          :aria-label="`Remove ${file.file_name || file.name}`"
+          :aria-label="__('Remove {0}', [file.file_name || file.name])"
           @click.stop="remove(file)"
         >
           <Icon icon="lucide-x" class="size-3.5" />
         </button>
       </li>
     </ul>
-
-    <p v-if="error" class="text-p-sm text-ink-red-6">{{ error }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-// Not frappe-ui's `FileUploader`: that has no `multiple` and uploads one at a time. This
-// drives the same `FileUploadHandler`, once per file.
+// Not frappe-ui's `FileUploader`: that has no `multiple` and uploads one at a time.
+import { ref } from "vue";
+import { Icon } from "frappe-ui";
+import { __ } from "@helpdesk/shared/translation";
+import { countLabel, uploadFiles } from "@app/utils";
 
-import { computed, ref } from "vue";
-import { FileUploadHandler, Icon } from "frappe-ui";
-
-// Private: an attachment on a support ticket is not public content.
-const UPLOAD_ARGS = { folder: "Home/Helpdesk", private: true };
-
-const props = withDefaults(defineProps<{ files?: any[] }>(), {
-  files: () => [],
-});
-const emit = defineEmits<{ "update:files": [files: any[]] }>();
+const files = defineModel<any[]>("files", { default: () => [] });
 
 const input = ref<HTMLInputElement | null>(null);
-const isOver = ref(false);
-const pending = ref(0);
-const error = ref("");
-
-const uploading = computed(() => pending.value > 0);
+const isDragOver = ref(false);
+const pendingUploadCount = ref(0);
 
 function openFileSelector() {
   input.value?.click();
@@ -93,34 +85,19 @@ function onPick(event: Event) {
 }
 
 function onDrop(event: DragEvent) {
-  isOver.value = false;
+  isDragOver.value = false;
   const dropped = event.dataTransfer?.files;
   if (dropped?.length) upload(Array.from(dropped));
 }
 
 async function upload(selected: File[]) {
-  error.value = "";
-  pending.value += selected.length;
-  // Settled, not all: one rejected file must not throw away the ones beside it.
-  const results = await Promise.allSettled(
-    selected.map((file) => new FileUploadHandler().upload(file, UPLOAD_ARGS))
-  );
-  pending.value -= selected.length;
-
-  const uploaded = results
-    .filter((result) => result.status === "fulfilled")
-    .map((result: any) => result.value);
-  if (uploaded.length) emit("update:files", [...props.files, ...uploaded]);
-
-  const failed = results.find((result) => result.status === "rejected") as any;
-  if (failed)
-    error.value = failed.reason?.message || "Some files could not be uploaded";
+  pendingUploadCount.value += selected.length;
+  const uploaded = await uploadFiles(selected);
+  pendingUploadCount.value -= selected.length;
+  if (uploaded.length) files.value = [...files.value, ...uploaded];
 }
 
 function remove(file: any) {
-  emit(
-    "update:files",
-    props.files.filter((attached) => attached.name !== file.name)
-  );
+  files.value = files.value.filter((attached) => attached.name !== file.name);
 }
 </script>

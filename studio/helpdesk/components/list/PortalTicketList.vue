@@ -69,7 +69,7 @@
 <script setup lang="ts">
 // Draws nothing itself: every cell comes from its column's `cell()`.
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
-import { loadTicketMeta } from "./ticketCells";
+import { loadTicketMeta } from "@app/stores/ticketMeta";
 import { LoadingIndicator } from "frappe-ui";
 import {
   ListFooter,
@@ -102,8 +102,8 @@ withDefaults(
     loading: false,
     rowCount: 0,
     totalCount: 0,
-    pageLengthOptions: () => [20, 50, 100],
-    emptyState: () => ({ title: "No tickets found" }),
+    pageLengthOptions: () => [],
+    emptyState: () => ({ title: "" }),
   }
 );
 

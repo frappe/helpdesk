@@ -6,21 +6,21 @@
       variant="outline"
       :label="attachment.file_name"
       :icon-left="iconOf(attachment)"
-      @click="open(index)"
+      @click="openAttachment(index)"
     />
 
     <Dialog v-model:open="showDialog" size="4xl">
       <template #title>
         <div class="flex min-w-0 items-center justify-between gap-3">
           <div
-            class="flex min-w-0 items-baseline gap-2 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-ink-gray-9"
+            class="flex min-w-0 items-baseline gap-2 truncate font-medium text-ink-gray-9"
           >
             {{ current?.file_name }}
             <span
               v-if="viewable.length > 1"
               class="shrink-0 text-p-xs font-normal text-ink-gray-5"
             >
-              {{ position + 1 }} of {{ viewable.length }}
+              {{ __("{0} of {1}", [position + 1, viewable.length]) }}
             </span>
           </div>
           <div class="flex shrink-0 items-center gap-1">
@@ -29,21 +29,21 @@
               variant="ghost"
               icon="lucide-chevron-left"
               :disabled="position === 0"
-              aria-label="Previous attachment"
-              @click="step(-1)"
+              :aria-label="__('Previous attachment')"
+              @click="showAdjacent(-1)"
             />
             <Button
               v-if="viewable.length > 1"
               variant="ghost"
               icon="lucide-chevron-right"
               :disabled="position === viewable.length - 1"
-              aria-label="Next attachment"
-              @click="step(1)"
+              :aria-label="__('Next attachment')"
+              @click="showAdjacent(1)"
             />
             <Button
               variant="ghost"
               icon="lucide-external-link"
-              aria-label="Open in a new tab"
+              :aria-label="__('Open in a new tab')"
               @click="openInTab(current)"
             />
           </div>
@@ -78,6 +78,7 @@
 // The desk's AttachmentItem, plus stepping between a message's files inside the dialog.
 import { computed, ref, watch } from "vue";
 import { Button, Dialog } from "frappe-ui";
+import { __ } from "@helpdesk/shared/translation";
 
 interface Attachment {
   file_url: string;
@@ -150,14 +151,14 @@ function isViewable(attachment: Attachment) {
   return VIEWABLE.includes(kindOf(attachment));
 }
 
-function open(index: number) {
+function openAttachment(index: number) {
   const attachment = props.attachments[index];
   if (!isViewable(attachment)) return openInTab(attachment);
   position.value = viewable.value.indexOf(attachment);
   showDialog.value = true;
 }
 
-function step(by: number) {
+function showAdjacent(by: number) {
   const next = position.value + by;
   if (next < 0 || next >= viewable.value.length) return;
   position.value = next;
@@ -179,6 +180,6 @@ watch([current, showDialog], () => {
       // The reader may have stepped on while this was in flight.
       if (current.value?.file_url === url) text.value = body;
     })
-    .catch(() => (text.value = "This file could not be read."));
+    .catch(() => (text.value = __("This file could not be read.")));
 });
 </script>

@@ -1,12 +1,29 @@
-import { reactive, computed, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+import { __ } from '@helpdesk/shared/translation'
+import { isContentEmpty } from '@helpdesk/shared/utils'
 import { ROUTES } from '@app/routes'
-import { toast } from 'frappe-ui'
+import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
+import { runAction } from '@app/utils'
+
+const DEFAULT_TEMPLATE = 'Default'
+
+// How a template field renders and where its choices come from; anything else is text.
+const FIELD_CONTROLS = {
+  Select: {
+    control: 'select',
+    options: (field) => field.options.split('\n').map((option) => option.trim()).filter(Boolean),
+  },
+  Link: {
+    control: 'autocomplete',
+    options: (field, ticketTypes) => ticketTypes.map((ticketType) => ticketType.name),
+  },
+}
 
 // The middle fields render through a Repeater over the template's field list, reading
 // with `getField` and writing back through an `update:modelValue` Run Script.
 export default function setup(context) {
-  const { subject, description, template, ticketTypes, newTicket, router, route } = context
+  const { subject, description, template, ticketTypes, newTicket, route } = context
   const session = useSettingsModal(context)
 
   // Arriving from a search: what was searched for becomes the subject.
@@ -16,12 +33,12 @@ export default function setup(context) {
   // Permission-gated, so fetched once the session is known: a guest would only 403.
   watch(
     session.isGuest,
-    (guest) => {
-      if (guest) return
+    (isGuest) => {
+      if (isGuest) return
       template.fetch()
       ticketTypes.fetch()
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   // Values for the template-driven fields, keyed by fieldname.
@@ -29,15 +46,15 @@ export default function setup(context) {
 
   // Already uploaded; they ride along with the insert as `attachments`.
   const attachments = ref([])
-  const setAttachments = (files) => (attachments.value = files || [])
 
   const fields = computed(() =>
-    (template.data?.fields || []).filter((f) => !f.hide_from_customer)
+    (template.data?.fields || []).filter((field) => !field.hide_from_customer),
   )
 
   function getField(name) {
     return model[name] ?? ''
   }
+
   function setField(name, value) {
     model[name] = value
   }
@@ -48,46 +65,48 @@ export default function setup(context) {
   }
 
   function controlType(fieldtype) {
-    if (fieldtype === 'Select') return 'select'
-    if (fieldtype === 'Link') return 'autocomplete'
-    return 'text'
+    return FIELD_CONTROLS[fieldtype]?.control || 'text'
   }
 
   function optionsFor(field) {
-    if (field.fieldtype === 'Link') {
-      return (ticketTypes.data || []).map((t) => ({ label: t.name, value: t.name }))
-    }
-    if (field.fieldtype === 'Select') {
-      return (field.options || '')
-        .split('\n')
-        .map((o) => o.trim())
-        .filter(Boolean)
-        .map((o) => ({ label: o, value: o }))
-    }
-    return []
+    const choices = FIELD_CONTROLS[field.fieldtype]?.options(field, ticketTypes.data || []) || []
+    return choices.map((choice) => ({ label: choice, value: choice }))
   }
 
   const canSubmit = computed(() => {
-    const descEmpty = (description.value || '').replace(/<[^>]*>/g, '').trim().length === 0
-    if (!subject.value || descEmpty) return false
-    return fields.value.filter((f) => f.required).every((f) => model[f.fieldname])
+    if (!subject.value || isContentEmpty(description.value)) return false
+    return fields.value.filter((field) => field.required).every((field) => model[field.fieldname])
   })
 
   function createTicket() {
     if (!canSubmit.value) return
-    newTicket
-      .submit({
-        doc: { subject: subject.value, description: description.value, template: 'Default', ...model },
-        attachments: attachments.value,
-      })
-      .then(() => router.push(ROUTES.ticketList))
-      .catch((error) => toast.error(error?.messages?.[0] || 'Could not create the ticket'))
+    return runAction(
+      async () => {
+        await newTicket.submit({
+          doc: {
+            subject: subject.value,
+            description: description.value,
+            template: DEFAULT_TEMPLATE,
+            ...model,
+          },
+          attachments: attachments.value,
+        })
+        navigateTo(ROUTES.ticketList)
+      },
+      { fallback: __('Could not create the ticket') },
+    )
   }
 
   return {
     ...session,
-    fields, getField, setField, setDescription, controlType, optionsFor, canSubmit,
-    attachments, setAttachments,
+    fields,
+    getField,
+    setField,
+    setDescription,
+    controlType,
+    optionsFor,
+    canSubmit,
+    attachments,
     createTicket,
   }
 }

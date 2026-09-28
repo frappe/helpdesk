@@ -1,11 +1,10 @@
 <template>
-  <div ref="root" @keydown.capture="onKeydown">
+  <div @keydown.capture="onKeydown">
     <MultiEmailInput
-      :modelValue="modelValue"
+      v-model="emails"
       :options="options"
       :placeholder="placeholder"
       size="md"
-      @update:modelValue="$emit('update:modelValue', $event)"
       @update:query="query = $event"
     />
   </div>
@@ -13,45 +12,36 @@
 
 <script setup lang="ts">
 // `experimental/` is not in Studio's palette, so it reaches the block tree through this.
-import { validateEmail } from "@helpdesk/shared/utils";
-import { MultiEmailInput } from "frappe-ui/experimental";
 import { computed, ref } from "vue";
+import { MultiEmailInput } from "frappe-ui/experimental";
+import { validateEmail } from "@helpdesk/shared/utils";
+import { matchesQuery } from "@app/utils";
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string[];
     // People who may be invited, offered as suggestions while typing.
-    contacts?: {
-      contact: string;
-      full_name: string;
-      email: string;
-      image?: string;
-    }[];
+    contacts?: { full_name: string; email: string; image?: string }[];
     placeholder?: string;
   }>(),
-  { modelValue: () => [], contacts: () => [], placeholder: "Add email…" }
+  { contacts: () => [], placeholder: "Add email…" }
 );
 
-const emit = defineEmits<{ "update:modelValue": [value: string[]] }>();
+const emails = defineModel<string[]>({ default: () => [] });
 
-const root = ref<HTMLElement | null>(null);
 const query = ref("");
 
 // MultiEmailInput drops only what is already selected, leaving the matching to its host.
-const options = computed(() => {
-  const needle = query.value.trim().toLowerCase();
-  return props.contacts
-    .filter(
-      (contact) =>
-        !needle ||
-        `${contact.full_name} ${contact.email}`.toLowerCase().includes(needle)
+const options = computed(() =>
+  props.contacts
+    .filter((contact) =>
+      matchesQuery(query.value, contact.full_name, contact.email)
     )
     .map((contact) => ({
       label: contact.full_name,
       value: contact.email,
       avatar: contact.image,
-    }));
-});
+    }))
+);
 
 // It only splits on paste, but the placeholder promises commas.
 function onKeydown(event: KeyboardEvent) {
@@ -64,11 +54,9 @@ function onKeydown(event: KeyboardEvent) {
   event.preventDefault();
 
   if (
-    !props.modelValue.some(
-      (entry) => entry.toLowerCase() === email.toLowerCase()
-    )
+    !emails.value.some((entry) => entry.toLowerCase() === email.toLowerCase())
   ) {
-    emit("update:modelValue", [...props.modelValue, email]);
+    emails.value = [...emails.value, email];
   }
   clear(input);
 }

@@ -1,74 +1,17 @@
 // Ported from the agent list: the desk components it mirrors live under `@/`, which
 // the Studio build cannot resolve.
-import { Avatar, Badge, Tooltip, call, createListResource, dayjs } from 'frappe-ui'
+import { Avatar, Badge, Tooltip, call, dayjs } from 'frappe-ui'
 import { parseJsonArray } from '@app/utils'
-import { shortDuration } from '@helpdesk/shared/utils'
+import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
+import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
 import { h, reactive } from 'vue'
 
-const statuses = createListResource({
-  doctype: 'HD Ticket Status',
-  cache: ['HD Ticket Status', 'list'],
-  fields: ['label_agent', 'label_customer', 'different_view', 'category', 'color'],
-  orderBy: '`tabHD Ticket Status`.order',
-  pageLength: 1000,
-})
-
-function getStatus(label: string) {
-  return (statuses.data || []).find(
-    (status: any) => status.label_agent === label || status.label_customer === label,
-  )
-}
-
-// Tokens, not classes: a class built from data is invisible to Tailwind's scanner.
-const INK_COLORS = [
-  'amber', 'blue', 'cyan', 'gray', 'green', 'orange',
-  'pink', 'purple', 'red', 'teal', 'violet', 'yellow',
-]
-
-function statusColor(color: string) {
-  const name = (color || 'gray').toLowerCase()
-  // Espresso has no black ink.
-  if (name === 'black') return 'var(--ink-gray-9)'
-  return `var(--ink-${INK_COLORS.includes(name) ? name : 'gray'}-6)`
-}
-
-function indicator(color: string) {
-  return h(
-    'svg',
-    {
-      style: { color: statusColor(color) },
-      width: 16, height: 16, viewBox: '0 0 16 16', fill: 'none',
-    },
-    [h('circle', { cx: 8, cy: 8, r: 3.5, fill: 'currentColor', stroke: 'currentColor', 'stroke-width': 1 })],
-  )
-}
-
 export function statusCell({ item }: any) {
-  const status = getStatus(item)
+  const status = statusMeta(item)
   return h('div', { class: 'flex w-full items-center justify-start gap-1.5' }, [
-    indicator(status?.color),
-    h('span', { class: 'flex-1 truncate text-base' }, status?.label_customer || item),
+    h('span', { class: ['size-[7px] shrink-0 rounded-full', STATUS_DOT_CLASSES[status.color]] }),
+    h('span', { class: 'flex-1 truncate text-base' }, status.label),
   ])
-}
-
-export function statusMeta(label: string) {
-  const status = getStatus(label)
-  return { label: status?.label_customer || label || '', color: statusColor(status?.color) }
-}
-
-// --- priority
-const priorities = createListResource({
-  doctype: 'HD Ticket Priority',
-  cache: ['HD Ticket Priority', 'list'],
-  fields: ['name', 'level'],
-  pageLength: 1000,
-})
-
-// On mount, not at import: this module is bundled into public pages too, and a
-// signed-out visitor cannot call `frappe.client.get_list`.
-export function loadTicketMeta() {
-  statuses.fetch()
-  priorities.fetch()
 }
 
 // `_assign` carries bare ids, so without this the list guesses a name from the email.
@@ -87,10 +30,6 @@ export function loadAssignees(rows: any[]) {
   call('helpdesk.api.agent.get_agent_avatars', { agents: [...wanted] })
     .then((found) => Object.assign(agents, found || {}))
     .catch(() => {})
-}
-
-function getLevel(name: string) {
-  return (priorities.data || []).find((priority: any) => priority.name === name)?.level ?? 'Medium'
 }
 
 // Bars faded per level: High is fully solid, None is empty.
@@ -123,7 +62,7 @@ function urgentIcon() {
 
 export function priorityCell({ item }: any) {
   if (!item) return null
-  const level = getLevel(item)
+  const level = getPriorityLevel(item)
   const icon =
     level === 'Urgent'
       ? urgentIcon()
@@ -134,17 +73,20 @@ export function priorityCell({ item }: any) {
   ])
 }
 
-// --- SLA
-const badge = (label: string, theme: string) => h(Badge, { label, theme, variant: 'subtle' })
-const countdown = (deadline: string) =>
-  h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
+function badge(label: string, theme: string) {
+  return h(Badge, { label, theme, variant: 'subtle' })
+}
+
+function countdownBadge(deadline: string) {
+  return h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
     h(Badge, { label: shortDuration(deadline), theme: 'orange', variant: 'subtle' }),
   )
+}
 
 export function responseCell({ row, item }: any) {
   if (!item) return null
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) return badge('Failed', 'red')
-  if (!row.first_responded_on) return countdown(item)
+  if (!row.first_responded_on) return countdownBadge(item)
   return dayjs(row.first_responded_on).isBefore(item)
     ? badge('Fulfilled', 'gray')
     : badge('Failed', 'red')
@@ -157,12 +99,11 @@ export function resolutionCell({ row, item }: any) {
     return badge(fulfilled ? 'Fulfilled' : 'Failed', fulfilled ? 'gray' : 'red')
   }
   if (!item) return null
-  return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdown(item)
+  return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdownBadge(item)
 }
 
-// --- fallback cell types
 export function datetimeCell({ item }: any) {
-  return item ? h('span', { class: 'text-base' }, dayjs(item).fromNow()) : null
+  return item ? h('span', { class: 'text-base' }, timeAgo(item)) : null
 }
 
 // Names come from the email: `session.get_users`, which the agent list uses, is agent-only.
@@ -213,7 +154,7 @@ export function ratingCell({ item }: any) {
     { class: 'flex w-max flex-row-reverse gap-1' },
     [1, 0.8, 0.6, 0.4, 0.2].map((step) =>
       h('svg', {
-        style: { fill: step <= rating ? 'var(--ink-yellow-5)' : 'var(--ink-gray-3)' },
+        class: step <= rating ? 'fill-[var(--ink-yellow-5)]' : 'fill-[var(--ink-gray-3)]',
         height: '16px', width: '16px', viewBox: '0 0 47.94 47.94',
         innerHTML: STAR_PATH,
       }),
@@ -239,11 +180,8 @@ function parseAssignees(raw: string) {
 
 // Until the lookup answers.
 function guessName(email: string) {
-  return capitalize(String(email).split('@')[0])
-}
-
-function capitalize(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1)
+  const local = String(email).split('@')[0]
+  return local.charAt(0).toUpperCase() + local.slice(1)
 }
 
 const STAR_PATH = `<path d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757

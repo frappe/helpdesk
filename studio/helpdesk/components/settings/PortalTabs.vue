@@ -25,17 +25,9 @@
 <script setup lang="ts">
 // `TabsIndicator` is one element reka positions from the active tab, so the bar travels
 // instead of cutting. Not frappe-ui's `Tabs`: that owns the panels and keys them by index.
-import { computed } from "vue";
 import { TabsIndicator, TabsList, TabsRoot, TabsTrigger } from "reka-ui";
 
-const props = defineProps<{
-  modelValue?: string;
-  options?: { label: string; value: string }[];
-}>();
-const emit = defineEmits<{ "update:modelValue": [value: string] }>();
+defineProps<{ options?: { label: string; value: string }[] }>();
 
-const active = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
+const active = defineModel<string>();
 </script>

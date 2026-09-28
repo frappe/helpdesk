@@ -1,6 +1,15 @@
 import { ref, computed, watch } from 'vue'
-import { call, toast, FileUploadHandler } from 'frappe-ui'
+import { call, toast } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
 import { usePreferences } from '@app/stores/preferences'
+import {
+  afterEachRoute,
+  currentRoute,
+  navigateBack,
+  navigateTo,
+  previousLocation,
+} from '@app/stores/router'
+import { errorMessage, uploadFiles } from '@app/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
@@ -43,7 +52,7 @@ export function createSettingsCore() {
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)
-      toast.error('Could not load settings')
+      toast.error(__('Could not load settings'))
     }
   }
 
@@ -61,14 +70,10 @@ export function createSettingsCore() {
       await loadSettings()
       const partial = landed?.()
       if (partial) toast.warning(partial)
-      else toast.error(serverMessage(error) || 'Something went wrong')
+      else toast.error(errorMessage(error, __('Something went wrong')))
     } finally {
       isSettingsBusy.value = false
     }
-  }
-
-  function serverMessage(error) {
-    return error?.messages?.[0] || error?.message
   }
 
   function pickImage(onUploaded) {
@@ -78,13 +83,8 @@ export function createSettingsCore() {
     input.onchange = async () => {
       const file = input.files && input.files[0]
       if (!file) return
-      try {
-        const uploaded = await new FileUploadHandler().upload(file, { private: false, optimize: true })
-        await onUploaded(uploaded.file_url)
-      } catch (error) {
-        console.error(error)
-        toast.error('Could not upload image')
-      }
+      const [uploaded] = await uploadFiles([file], { private: false, optimize: true })
+      if (uploaded) await onUploaded(uploaded.file_url)
     }
     input.click()
   }
@@ -104,7 +104,6 @@ export function createSettingsCore() {
     afterLoad,
     loadSettings,
     run,
-    serverMessage,
     pickImage,
   }
 }
@@ -128,26 +127,17 @@ export function createSettingsDialog(core, organization) {
   }
 
   // `afterEach`, not a route watcher: a page script's `route` is a snapshot.
-  let routerBound = false
-  // Held, not captured: each page hands over its own proxy and the first page's is dead.
-  let router = null
+  let isWatchingRoute = false
 
-  function bindRouter(value) {
-    if (!value) return
-    router = value
-    if (routerBound) return
-    routerBound = true
+  function watchRoute() {
+    if (isWatchingRoute) return
+    isWatchingRoute = true
     applyHash(currentRoute().hash)
-    router.afterEach((to) => applyHash(to.hash))
+    afterEachRoute((to) => applyHash(to.hash))
     watch(
       [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
       () => pushHash(),
     )
-  }
-
-  // A page script's router proxy unwraps refs, so `currentRoute` is the route itself there.
-  function currentRoute() {
-    return router?.currentRoute?.value || router?.currentRoute || {}
   }
 
   function applyHash(hash) {
@@ -185,21 +175,20 @@ export function createSettingsDialog(core, organization) {
   }
 
   function pushHash() {
-    if (!router) return
     const hash = settingsHash()
     const current = currentRoute()
     if (readHash(current.hash) === hash) return
     // Unwind history rather than grow it, or back points forward into the closed screen.
     const previous = previousHash()
-    if (previous !== null && readHash(previous) === hash) return router.back()
+    if (previous !== null && readHash(previous) === hash) return navigateBack()
     // The path travels with it: a bare `{ hash }` resolves against whatever is current.
-    router.push({ path: current.path, query: current.query, hash })
+    navigateTo({ path: current.path, query: current.query, hash })
   }
 
   // History state holds a full path, so only the part before the query names the page.
   function previousHash() {
-    const previous = router?.options?.history?.state?.back
-    if (typeof previous !== 'string') return null
+    const previous = previousLocation()
+    if (previous === null) return null
     const index = previous.indexOf('#')
     const [location, hash] = index === -1 ? [previous, ''] : [previous.slice(0, index), previous.slice(index)]
     return location.split('?')[0] === currentRoute().path ? hash : null
@@ -208,6 +197,6 @@ export function createSettingsDialog(core, organization) {
   return {
     openSettings,
     closeSettings,
-    bindRouter,
+    watchRoute,
   }
 }

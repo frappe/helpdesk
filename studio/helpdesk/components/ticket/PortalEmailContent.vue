@@ -9,16 +9,13 @@
 <script setup lang="ts">
 // An iframe keeps the mail's markup and styles out of the portal, as the desk's does.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { usePreferences } from "@app/stores/preferences";
 
-const props = withDefaults(defineProps<{ content?: string }>(), {
-  content: "",
-});
+const props = withDefaults(
+  defineProps<{ content?: string; isChat?: boolean }>(),
+  { content: "", isChat: false }
+);
 
 const frame = ref<HTMLIFrameElement | null>(null);
-
-const { conversationLayout } = usePreferences();
-const isChat = computed(() => conversationLayout.value === "chat");
 
 const QUOTE_SELECTORS = [
   "div.gmail_quote",
@@ -174,7 +171,7 @@ watch(
 onBeforeUnmount(() => observer?.disconnect());
 
 watch(
-  [srcdoc, isChat],
+  [srcdoc, () => props.isChat],
   () => frame.value && requestAnimationFrame(() => resize(frame.value!))
 );
 
@@ -182,7 +179,7 @@ function resize(element: HTMLIFrameElement) {
   const root = element.contentDocument?.documentElement;
   if (!root) return;
   const fit = () => {
-    hug(element);
+    fitFrameToContent(element);
     element.style.height = `${root.offsetHeight + 1}px`;
   };
   fit();
@@ -199,9 +196,9 @@ function resize(element: HTMLIFrameElement) {
 }
 
 // A bubble is as wide as its sentence; an iframe fills whatever it is given instead.
-function hug(element: HTMLIFrameElement) {
+function fitFrameToContent(element: HTMLIFrameElement) {
   // Timeline fills the column instead; the mail centres itself inside it.
-  if (!isChat.value) {
+  if (!props.isChat) {
     element.style.width = "";
     return;
   }

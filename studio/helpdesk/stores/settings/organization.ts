@@ -1,45 +1,41 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
+import { countLabel, errorMessage } from '@app/utils'
+import { ROLES } from './roles'
 
 // Backed by helpdesk.api.organization.
-
-const MANAGER_ROLE = 'HD Customer Manager'
-const MEMBER_ROLE = 'HD Customer'
-
 export function createOrganizationSettings(core) {
   // Null means the list is showing rather than one organization's detail.
-  const selectedOrg = ref(null)
-  const orgDetail = ref(null)
+  const selectedOrganizationName = ref(null)
+  const organization = ref(null)
 
-  const settingsOrg = computed(() => orgDetail.value)
-  const isOrgManager = computed(() => Boolean(orgDetail.value?.is_manager))
-  const orgMembers = computed(() => orgDetail.value?.members || [])
+  const isManager = computed(() => Boolean(organization.value?.is_manager))
+  const canInvite = computed(() => Boolean(organization.value?.can_invite))
+  const canEdit = computed(() => Boolean(organization.value?.can_edit))
+  const members = computed(() => organization.value?.members || [])
 
   // A plain member can read an organization but change nothing in it.
-  const managesAnyOrg = computed(() =>
-    core.organizations.value.some((org) => org.role !== 'Member'),
+  const managesAnyOrganization = computed(() =>
+    core.organizations.value.some((row) => row.role !== 'Member'),
   )
   const organizationScreenTitle = computed(() =>
-    __(managesAnyOrg.value ? 'Manage organization' : 'View organization'),
+    __(managesAnyOrganization.value ? 'Manage organization' : 'View organization'),
   )
   const organizationScreenDescription = computed(() =>
     __(
-      managesAnyOrg.value
+      managesAnyOrganization.value
         ? 'Pick an organization to manage its people and settings.'
         : 'Pick an organization to see its people and settings.',
     ),
   )
   const organizationDetailDescription = computed(() =>
     __(
-      isOrgManager.value
+      isManager.value
         ? "Manage your organization's members and tickets."
         : "View your organization's members and tickets.",
     ),
   )
-
-  const canInvite = computed(() => Boolean(orgDetail.value?.can_invite))
-  const canEdit = computed(() => Boolean(orgDetail.value?.can_edit))
 
   const orgTab = ref('members')
   const orgTabOptions = computed(() => [
@@ -47,35 +43,31 @@ export function createOrganizationSettings(core) {
     { label: __('Tickets'), value: 'tickets' },
   ])
 
-  const orgName = ref('')
   const inviteOpen = ref(false)
   const inviteEmails = ref([])
   const inviteRole = ref('Member') // 'Member' | 'Manager'
   const inviteContacts = ref([])
 
   core.afterLoad(() => {
-    if (selectedOrg.value) return loadOrganization(selectedOrg.value)
+    if (selectedOrganizationName.value) return loadOrganization(selectedOrganizationName.value)
   })
-
-  // --- list -> detail ---
 
   async function loadOrganization(name) {
     orgTab.value = 'members'
     try {
-      orgDetail.value = await call('helpdesk.api.organization.get_organization', {
+      organization.value = await call('helpdesk.api.organization.get_organization', {
         customer: name,
       })
-      orgName.value = orgDetail.value.customer_name || ''
     } catch (error) {
       console.error(error)
-      toast.error(core.serverMessage(error) || 'Could not open organization')
+      toast.error(errorMessage(error, __('Could not open organization')))
       closeOrganization()
     }
   }
 
   function openOrganization(name) {
-    selectedOrg.value = name
-    orgDetail.value = null
+    selectedOrganizationName.value = name
+    organization.value = null
     inviteOpen.value = false
     return loadOrganization(name)
   }
@@ -84,7 +76,7 @@ export function createOrganizationSettings(core) {
   watch(
     [core.settingsTab, core.organizations],
     () => {
-      if (core.settingsTab.value !== 'members' || selectedOrg.value) return
+      if (core.settingsTab.value !== 'members' || selectedOrganizationName.value) return
       if (core.organizations.value.length === 1)
         openOrganization(core.organizations.value[0].name)
     },
@@ -95,12 +87,10 @@ export function createOrganizationSettings(core) {
   const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
 
   function closeOrganization() {
-    selectedOrg.value = null
-    orgDetail.value = null
+    selectedOrganizationName.value = null
+    organization.value = null
     inviteOpen.value = false
   }
-
-  // --- invites ---
 
   function openInvite() {
     inviteEmails.value = []
@@ -115,10 +105,9 @@ export function createOrganizationSettings(core) {
   async function loadInvitableContacts() {
     inviteContacts.value = []
     try {
-      inviteContacts.value = await call(
-        'helpdesk.api.organization.get_invitable_contacts',
-        { customer: selectedOrg.value }
-      )
+      inviteContacts.value = await call('helpdesk.api.organization.get_invitable_contacts', {
+        customer: selectedOrganizationName.value,
+      })
     } catch (error) {
       console.error(error)
     }
@@ -130,61 +119,59 @@ export function createOrganizationSettings(core) {
 
   function sendInvite() {
     const emails = inviteEmails.value.map((email) => email.trim()).filter(Boolean)
-    if (!emails.length) {
-      toast.error('Please enter an email address')
-      return
-    }
-    const closeInviteForm = () => {
-      inviteEmails.value = []
-      inviteOpen.value = false
-    }
+    if (!emails.length) return toast.error(__('Please enter an email address'))
     return core.run(
       async () => {
         await call('helpdesk.api.organization.invite_members', {
-          customer: selectedOrg.value,
+          customer: selectedOrganizationName.value,
           emails,
-          role: inviteRole.value === 'Manager' ? MANAGER_ROLE : MEMBER_ROLE,
+          role: ROLES[inviteRole.value].role,
         })
         closeInviteForm()
       },
-      emails.length > 1 ? 'Invitations sent' : 'Invitation sent',
+      countLabel(emails.length, 'Invitation sent', 'Invitations sent'),
       () => {
         if (!emails.every(isPendingMember)) return null
         closeInviteForm()
-        return emails.length > 1
-          ? 'Invitations created, but the emails could not be sent'
-          : 'Invitation created, but the email could not be sent'
+        return countLabel(
+          emails.length,
+          'Invitation created, but the email could not be sent',
+          'Invitations created, but the emails could not be sent',
+        )
       },
     )
   }
 
-  function isPendingMember(email) {
-    return orgMembers.value.some((member) => member.email === email && member.pending)
+  function closeInviteForm() {
+    inviteEmails.value = []
+    inviteOpen.value = false
   }
 
-  // --- members ---
+  function isPendingMember(email) {
+    return members.value.some((member) => member.email === email && member.pending)
+  }
 
   // A manager reads every ticket the organization has raised, so the change is spelled out.
   function setMemberRole(member, role) {
-    if (member.role === 'Owner' || member.pending) return
+    if (member.role === 'Owner' || member.pending || role === member.role) return
     const isManager = role === 'Manager'
-    if (role === member.role) return
     core.askConfirm({
-      title: isManager ? 'Grant manager access' : 'Revoke manager access',
+      title: isManager ? __('Grant manager access') : __('Revoke manager access'),
       message: isManager
-        ? `${member.full_name} will get access to tickets raised by everyone in the organization.`
-        : `${member.full_name} will only see their own tickets going forward.`,
-      label: 'Confirm',
+        ? __('{0} will get access to tickets raised by everyone in the organization.', [member.full_name])
+        : __('{0} will only see their own tickets going forward.', [member.full_name]),
+      label: __('Confirm'),
       // Not destructive either way, so it does not take the dialog's red default.
       theme: 'gray',
       action: () =>
         core.run(
-          () => call('helpdesk.api.organization.update_member_role', {
-            customer: selectedOrg.value,
-            contact: member.contact,
-            is_manager: isManager,
-          }),
-          'Role updated'
+          () =>
+            call('helpdesk.api.organization.update_member_role', {
+              customer: selectedOrganizationName.value,
+              contact: member.contact,
+              is_manager: isManager,
+            }),
+          __('Role updated'),
         ),
     })
   }
@@ -193,96 +180,79 @@ export function createOrganizationSettings(core) {
     if (member.role === 'Owner') return
     if (member.pending) return cancelInvitation(member)
     core.askConfirm({
-      title: 'Remove member',
-      message: `${member.full_name} will lose access to this organization's tickets.`,
-      label: 'Remove',
+      title: __('Remove member'),
+      message: __("{0} will lose access to this organization's tickets.", [member.full_name]),
+      label: __('Remove'),
       action: () =>
         core.run(
-          () => call('helpdesk.api.organization.remove_member', {
-            customer: selectedOrg.value,
-            contact: member.contact,
-          }),
-          'Member removed'
+          () =>
+            call('helpdesk.api.organization.remove_member', {
+              customer: selectedOrganizationName.value,
+              contact: member.contact,
+            }),
+          __('Member removed'),
         ),
     })
   }
 
   function cancelInvitation(member) {
     core.askConfirm({
-      title: 'Cancel invitation',
-      message: `The invitation sent to ${member.email} will no longer be usable.`,
-      label: 'Cancel invitation',
+      title: __('Cancel invitation'),
+      message: __('The invitation sent to {0} will no longer be usable.', [member.email]),
+      label: __('Cancel invitation'),
       action: () =>
         core.run(
-          () => call('helpdesk.api.organization.remove_member', {
-            customer: selectedOrg.value,
-            invitation: member.invitation,
-          }),
-          'Invitation cancelled',
           () =>
-            orgMembers.value.every((row) => row.invitation !== member.invitation) &&
-            'Invitation cancelled, but the notice could not be emailed'
+            call('helpdesk.api.organization.remove_member', {
+              customer: selectedOrganizationName.value,
+              invitation: member.invitation,
+            }),
+          __('Invitation cancelled'),
+          () =>
+            members.value.every((row) => row.invitation !== member.invitation) &&
+            __('Invitation cancelled, but the notice could not be emailed'),
         ),
     })
   }
 
-  // --- the organization's own settings ---
-
-  function saveOrganization() {
-    const name = orgName.value.trim()
-    if (!name) {
-      toast.error('Please enter an organization name')
-      return
-    }
-    return core.run(
-      async () => {
-        // Renaming returns the new docname, which is also the drill-in key.
-        const renamed = await call('helpdesk.api.organization.update_organization', {
-          customer: selectedOrg.value,
-          customer_name: name,
-        })
-        selectedOrg.value = renamed
-      },
-      'Organization updated'
-    )
+  function updateOrganization(values, successMessage) {
+    return core.run(async () => {
+      // Renaming returns the new docname, which is also the drill-in key.
+      selectedOrganizationName.value = await call('helpdesk.api.organization.update_organization', {
+        customer: selectedOrganizationName.value,
+        ...values,
+      })
+    }, successMessage)
   }
 
   function renameOrganization(value) {
-    orgName.value = value
-    return saveOrganization()
+    const name = value.trim()
+    if (!name) return toast.error(__('Please enter an organization name'))
+    return updateOrganization({ customer_name: name }, __('Organization updated'))
   }
 
   // A Run Script handler calls functions rather than assigning to a binding.
   function uploadOrgImage() {
-    core.pickImage((fileUrl) =>
-      core.run(() => call('helpdesk.api.organization.update_organization', {
-        customer: selectedOrg.value,
-        image: fileUrl,
-      }), 'Logo updated')
-    )
+    core.pickImage((fileUrl) => updateOrganization({ image: fileUrl }, __('Logo updated')))
   }
 
   function removeOrgImage() {
-    return core.run(() => call('helpdesk.api.organization.update_organization', {
-      customer: selectedOrg.value,
-      image: '',
-    }), 'Logo removed')
+    return updateOrganization({ image: '' }, __('Logo removed'))
   }
 
   return {
-    selectedOrg,
+    // The blocks bind these two under their shorter names.
+    selectedOrg: selectedOrganizationName,
+    settingsOrg: organization,
     canLeaveOrganization,
-    settingsOrg,
-    isOrgManager,
     canInvite,
     canEdit,
-    orgMembers,
+    orgMembers: members,
     organizationScreenTitle,
     organizationScreenDescription,
     organizationDetailDescription,
     orgTab,
     orgTabOptions,
-    orgName,
     inviteOpen,
     inviteEmails,
     inviteRole,
@@ -294,8 +264,6 @@ export function createOrganizationSettings(core) {
     sendInvite,
     setMemberRole,
     removeMember,
-    cancelInvitation,
-    saveOrganization,
     renameOrganization,
     uploadOrgImage,
     removeOrgImage,

@@ -1,11 +1,16 @@
 import { computed } from 'vue'
 import { useColorScheme } from 'frappe-ui'
-import { usePreferences } from '@app/stores/preferences'
-import { useSession } from '@app/stores/session'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
+import { ROUTES } from '@app/routes'
+import { usePreferences } from '@app/stores/preferences'
+import { bindRouter, navigateTo } from '@app/stores/router'
+import { useSession } from '@app/stores/session'
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
+
+// The desk SPA's root, the mirror of its own CUSTOMER_PORTAL_ROOT.
+const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 
@@ -14,6 +19,7 @@ const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
 const dialog = createSettingsDialog(core, organization)
+const session = useSession()
 
 // Here, not in the dialog, so the saved theme applies on load rather than on open.
 const { colorScheme, setColorScheme } = useColorScheme()
@@ -30,18 +36,29 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-// Here rather than on a page, because the header these words fill is shared.
-const words = computed(() => ({
-  raiseTicket: __('Raise a ticket'),
-  status: __('Status'),
-  composerPrompt: __('Type a message'),
-  solveAsk: __('Did this solve your issue?'),
-  solveYes: __("Yes, it's fixed"),
-  solveNo: __('No, still an issue'),
-  feedbackTitle: __('Feedback Rating'),
-  popularHelp: __('Popular help'),
-  relatedHelp: __('Related help'),
-}))
+// The header these words fill is shared by every page.
+const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
+
+// A guest has no tickets, account or session to offer.
+const accountMenuOptions = computed(() =>
+  session.isGuest.value
+    ? [{ icon: 'lucide-log-in', label: __('Log in'), onClick: session.signIn }]
+    : [
+        { icon: 'lucide-inbox', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
+        { icon: 'lucide-user', label: __('My account'), onClick: () => dialog.openSettings('profile') },
+        ...(session.isAgent.value
+          ? [
+              {
+                icon: 'lucide-headphones',
+                label: __('Agent portal'),
+                // A hard navigation: the desk is a separate SPA, not a route here.
+                onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
+              },
+            ]
+          : []),
+        { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
+      ],
+)
 
 const store = {
   words,
@@ -49,8 +66,10 @@ const store = {
   theme,
   // The blocks bind `t`; the alias keeps them off the module's own name.
   t: __,
+  accountMenuOptions,
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
+  settingsData: core.settingsData,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
@@ -68,6 +87,7 @@ const store = {
 
 // Every page script goes through here, so the session store rides along.
 export function useSettingsModal(context) {
-  if (context) store.bindRouter(context.router)
-  return { ...store, ...usePreferences(), ...useSession(context), theme }
+  bindRouter(context?.router)
+  dialog.watchRoute()
+  return { ...store, ...usePreferences(), ...session }
 }

@@ -12,11 +12,13 @@
     <PortalEmptyState
       v-if="!matches.length"
       icon="organization"
-      :title="search ? 'No organizations found' : 'No organizations'"
+      :title="search ? __('No organizations found') : __('No organizations')"
       :description="
         search
-          ? 'Change your search terms.'
-          : `You'll see your organization here once someone adds you to one.`
+          ? __('Change your search terms.')
+          : __(
+              `You'll see your organization here once someone adds you to one.`
+            )
       "
     />
 
@@ -32,8 +34,8 @@
         class="cursor-pointer rounded-[10px] border border-outline-gray-1 p-4 transition-[box-shadow,border-color] duration-150 hover:border-transparent hover:bg-surface-elevation-1 hover:shadow-[var(--elevation-sm)]"
         role="button"
         tabindex="0"
-        @click="onSelect?.(organization.name)"
-        @keydown.enter="onSelect?.(organization.name)"
+        @click="emit('select', organization.name)"
+        @keydown.enter="emit('select', organization.name)"
       >
         <div class="mb-3 flex items-start justify-between gap-2">
           <Avatar
@@ -45,18 +47,16 @@
           <Badge
             v-if="organization.role"
             :label="organization.role"
-            :theme="roleTheme(organization.role)"
+            :theme="ROLES[organization.role]?.theme || 'gray'"
             variant="outline"
           />
         </div>
         <div
-          class="overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-semibold leading-5 text-ink-gray-9"
+          class="truncate text-[15px] font-semibold leading-5 text-ink-gray-9"
         >
           {{ organization.customer_name }}
         </div>
-        <div
-          class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-p-base text-ink-gray-5"
-        >
+        <div class="mt-0.5 truncate text-p-base text-ink-gray-5">
           {{ organization.domain }}
         </div>
         <div
@@ -64,12 +64,24 @@
         >
           <span class="flex items-center gap-1 whitespace-nowrap">
             <LucideTicket class="size-3.5 shrink-0" />
-            {{ count(organization.ticket_count, "ticket") }}
+            {{
+              countLabel(
+                organization.ticket_count || 0,
+                "1 ticket",
+                "{0} tickets"
+              )
+            }}
           </span>
           <span class="text-ink-gray-4">·</span>
           <span class="flex items-center gap-1 whitespace-nowrap">
             <LucideSquareUser class="size-3.5 shrink-0" />
-            {{ count(organization.member_count, "member") }}
+            {{
+              countLabel(
+                organization.member_count || 0,
+                "1 member",
+                "{0} members"
+              )
+            }}
           </span>
         </div>
       </div>
@@ -78,53 +90,37 @@
 </template>
 
 <script setup lang="ts">
-import { __ } from "@helpdesk/shared/translation";
 // A role badge per card, rather than sorting the cards into sections.
+import { computed, ref } from "vue";
 import { Avatar, Badge, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import LucideSquareUser from "~icons/lucide/square-user";
 import LucideTicket from "~icons/lucide/ticket";
-import { computed, ref } from "vue";
+import { __ } from "@helpdesk/shared/translation";
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
+import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { countLabel, matchesQuery } from "@app/utils";
 
 type Organization = {
   name: string;
   customer_name: string;
   domain?: string;
   image?: string;
-  role?: string;
+  role?: RoleLabel;
   member_count?: number;
   ticket_count?: number;
 };
 
-const props = withDefaults(
-  defineProps<{
-    organizations?: Organization[];
-    onSelect?: (name: string) => void;
-  }>(),
-  { organizations: () => [] }
-);
+const props = withDefaults(defineProps<{ organizations?: Organization[] }>(), {
+  organizations: () => [],
+});
+const emit = defineEmits<{ select: [name: string] }>();
 
 const search = ref("");
 
-const matches = computed(() => {
-  const query = search.value.trim().toLowerCase();
-  if (!query) return props.organizations;
-  return props.organizations.filter((organization) =>
-    `${organization.customer_name} ${organization.domain || ""}`
-      .toLowerCase()
-      .includes(query)
-  );
-});
-
-// Owner and Manager act on the organization, so they get colour.
-const ROLE_THEMES = { Owner: "blue", Manager: "green" };
-
-function roleTheme(role: string) {
-  return ROLE_THEMES[role] || "gray";
-}
-
-function count(total: number | undefined, noun: string) {
-  return `${total || 0} ${total === 1 ? noun : noun + "s"}`;
-}
+const matches = computed(() =>
+  props.organizations.filter((organization) =>
+    matchesQuery(search.value, organization.customer_name, organization.domain)
+  )
+);
 </script>

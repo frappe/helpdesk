@@ -1,22 +1,23 @@
-import { computed, ref, watch } from 'vue'
-import { ROUTES } from '@app/routes'
+import { computed, watch } from 'vue'
 import { createResource } from 'frappe-ui'
 import { useListData, useListView } from '@framework/ui/ListView'
 import { parseFilters, serializeFilters } from '@framework/ui/Filter'
+import { __, translations } from '@helpdesk/shared/translation'
 import {
   loadAssignees,
   avatarCell, datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
+import { ROUTES } from '@app/routes'
+import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import { __, translations } from '@helpdesk/shared/translation'
 import { useViews } from '@app/stores/views'
 
 // No client-side scoping: HD Ticket's permission_query already limits a non-agent to
 // their own tickets plus those of customers they manage.
 
 const DOCTYPE = 'HD Ticket'
-const PAGE_LENGTHS = [20, 50, 100]
+const PAGE_LENGTH_OPTIONS = [20, 50, 100]
 
 // Kept in English and translated on the way out, so a heading survives a language change.
 const COLUMN_LABELS = {
@@ -105,7 +106,7 @@ export default function setup(context) {
   // `_assign` is only user ids; the column draws a face and a name from them.
   watch(data.rows, (rows) => loadAssignees(rows), { immediate: true })
 
-  const views = useViews(context, view)
+  const views = useViews(view)
 
   const listColumns = computed(() =>
     view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
@@ -119,17 +120,15 @@ export default function setup(context) {
   }
 
   const emptyState = computed(() => ({
-    title: 'No tickets found',
+    title: __('No tickets found'),
     description: view.filters.conditions.value.length
-      ? 'No tickets match the applied filters. Try adjusting or clearing them.'
-      : 'Tickets you raise will show up here.',
+      ? __('No tickets match the applied filters. Try adjusting or clearing them.')
+      : __('Tickets you raise will show up here.'),
   }))
 
   function openTicket(row) {
-    context.router.push(ROUTES.ticket(row.name))
+    navigateTo(ROUTES.ticket(row.name))
   }
-
-  // --- Organization switcher ---
 
   // A view of the `customer` condition, not state beside it.
   const selectedOrganizations = computed(() => {
@@ -139,7 +138,9 @@ export default function setup(context) {
   })
 
   function selectOrganization(customers) {
-    const others = view.filters.conditions.value.filter((c) => !isCustomerCondition(c))
+    const others = view.filters.conditions.value.filter(
+      (condition) => !isCustomerCondition(condition),
+    )
     view.filters.conditions.value = customers?.length
       ? [...others, { fieldname: 'customer', operator: 'in', value: customers }]
       : others
@@ -152,8 +153,6 @@ export default function setup(context) {
       (condition.operator === 'in' || condition.operator === 'equals')
     )
   }
-
-  // --- Filter ---
 
   // The customer-portal flag limits this to what a requester may filter on.
   const filterFields = createResource({
@@ -173,23 +172,22 @@ export default function setup(context) {
   // One organization is not a choice, but never override a condition already there.
   watch(
     settings.organizations,
-    (orgs) => {
-      if (orgs.length !== 1 || selectedOrganizations.value.length) return
-      selectOrganization([orgs[0].name])
+    (organizations) => {
+      if (organizations.length !== 1 || selectedOrganizations.value.length) return
+      selectOrganization([organizations[0].name])
     },
     { immediate: true },
   )
 
   // Customer arrives as a quick filter, but the switcher is that filter here.
   const quickFilterFields = computed({
-    get: () => view.quickFilter.fields.value.filter((f) => f.fieldname !== 'customer'),
+    get: () => view.quickFilter.fields.value.filter((field) => field.fieldname !== 'customer'),
     set: (fields) => (view.quickFilter.fields.value = fields),
   })
 
   return {
     ...settings,
     ...views,
-    navMenuOpen: ref(false),
     selectedOrganizations,
     selectOrganization,
     filters: view.filters.conditions,
@@ -210,7 +208,7 @@ export default function setup(context) {
     rowCount: data.rowCount,
     totalCount: data.totalCount,
     pageLength: data.pageLength,
-    pageLengthOptions: PAGE_LENGTHS,
+    pageLengthOptions: PAGE_LENGTH_OPTIONS,
     loadMore: data.loadMore,
     reload: data.reload,
     resizeColumn: ({ key, width }) => view.columns.setWidth(key, width),

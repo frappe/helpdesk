@@ -1,16 +1,24 @@
-import { computed, watch } from 'vue'
-import { call, createListResource, createResource, dayjs, toast } from 'frappe-ui'
-import { useSettingsModal } from '@app/stores/settings'
+import { computed, ref, watch } from 'vue'
+import { createListResource, createResource, dayjs } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
 import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
-import { loadTicketMeta } from '@app/components/list/ticketCells'
+import { useSettingsModal } from '@app/stores/settings'
+import {
+  CLOSED_STATUS,
+  isClosedStatus,
+  isResolvedStatus,
+  loadTicketMeta,
+} from '@app/stores/ticketMeta'
+import { runAction, updateTicket } from '@app/utils'
 
-// The page is drawn from Studio blocks, so this returns display-ready state and actions.
 // Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
 const RESOLVED_PROMPT_DAYS = 5
+const POPULAR_ARTICLE_LIMIT = 3
+const REOPENED_STATUS = 'Open'
 
 export default function setup(context) {
   const { route } = context
@@ -18,7 +26,6 @@ export default function setup(context) {
   const { config } = settings
   // The composer shows the reader's own avatar, which rides on the settings payload.
   settings.loadSettings()
-  // On mount, not at import: a signed-out visitor cannot call it.
   loadTicketMeta()
 
   const ticketId = computed(() => String(route?.params?.name || ''))
@@ -33,6 +40,19 @@ export default function setup(context) {
 
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
+  const isClosed = computed(() => isClosedStatus(ticket.data?.status))
+  const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
+  const isUpdatingStatus = ref(false)
+
+  const words = computed(() => ({
+    ...settings.words.value,
+    status: __('Status'),
+    composerPrompt: __('Type a message'),
+    solveAsk: __('Did this solve your issue?'),
+    solveYes: __("Yes, it's fixed"),
+    solveNo: __('No, still an issue'),
+    feedbackTitle: __('Feedback Rating'),
+  }))
 
   // Articles matching the ticket's subject; the most-read ones stand in when none match.
   const relatedArticles = createResource({
@@ -52,50 +72,40 @@ export default function setup(context) {
     filters: { status: 'Published' },
     fields: ['name', 'title'],
     orderBy: 'views desc',
-    pageLength: 3,
+    pageLength: POPULAR_ARTICLE_LIMIT,
   })
 
   const isRelated = computed(() => Boolean(relatedArticles.data?.length))
 
   // The portal has no article page of its own yet, so these leave for the desk's public
-  // KB. The `/helpdesk` prefix is that SPA's router base — without it the server 404s.
+  // KB. The `/helpdesk` prefix is that SPA's router base.
   const suggestedArticles = computed(() =>
-    ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map(
-      (article) => ({
-        ...article,
-        url: `/helpdesk/kb-public/articles/${article.name}`,
-      }),
-    ),
+    ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map((article) => ({
+      ...article,
+      url: `/helpdesk/kb-public/articles/${article.name}`,
+    })),
   )
 
   const suggestedHeading = computed(() =>
-    isRelated.value ? settings.words.value.relatedHelp : settings.words.value.popularHelp,
+    __(isRelated.value ? 'Related help' : 'Popular help'),
   )
 
   // Empty hides the button. Resolved keeps its Close: support is done, the customer may not be.
-  const pageActionLabel = computed(() =>
-    ticket.data && ticket.data.status !== 'Closed' ? 'Close' : '',
-  )
+  const pageActionLabel = computed(() => (ticket.data && !isClosed.value ? __('Close') : ''))
 
   // A ticket still in flight already has a place to say more, and it is this thread.
-  const canCreateTicket = computed(
-    () => settings.canCreateTicket.value && ticket.data?.status === 'Closed',
-  )
+  const canCreateTicket = computed(() => settings.canCreateTicket.value && isClosed.value)
 
   // Nothing to rate until someone answers, and a rating already given is never asked again.
-  const canRate = computed(
-    () => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback,
-  )
+  const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
 
   // Where a rating is required the status cannot be written without it.
-  const wantsFeedback = computed(
-    () => canRate.value && Boolean(config.value?.is_feedback_mandatory),
-  )
+  const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
 
   // Asked once, under the latest agent reply, and only after the resolution has stood a while.
   const solvePromptAt = computed(() => {
     const data = ticket.data
-    if (!data || data.status !== 'Resolved') return null
+    if (!data || !isResolved.value) return null
     if (!settledFor(promptAfterDays.value)) return null
     const viewer = config.value?.session_user
     if (viewer && data.raised_by && viewer !== data.raised_by) return null
@@ -109,64 +119,56 @@ export default function setup(context) {
   })
 
   function settledFor(days: number) {
-    const on = ticket.data?.resolution_date
-    return Boolean(on) && dayjs().diff(dayjs(on), 'day') >= days
+    const resolvedOn = ticket.data?.resolution_date
+    return Boolean(resolvedOn) && dayjs().diff(dayjs(resolvedOn), 'day') >= days
   }
 
   // Where a rating is still owed, the dialog's save is the only way past `validate_feedback`.
-  async function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback('Closed')
+  function confirmSolved() {
+    if (canRate.value) return feedback.openFeedback(CLOSED_STATUS)
     return closeTicket()
   }
 
   // An agent reply leaves the ticket "Replied", so No puts it back in the queue.
-  async function reopenTicket() {
-    try {
-      await call('frappe.client.set_value', {
-        doctype: 'HD Ticket',
-        name: ticketId.value,
-        fieldname: 'status',
-        value: 'Open',
-      })
-      ticket.fetch()
-      toast.success('Reopened — we will take another look')
-    } catch (error) {
-      toast.error(error?.messages?.[0] || 'Could not reopen this ticket')
-    }
+  function reopenTicket() {
+    return setStatus(REOPENED_STATUS, {
+      success: __('Reopened, we will take another look'),
+      fallback: __('Could not reopen this ticket'),
+    })
   }
 
   function onPageAction() {
     if (wantsFeedback.value) return feedback.openFeedback()
     settings.askConfirm({
-      title: 'Close ticket',
-      message: 'Are you sure you want to close this ticket?',
-      label: 'Close',
+      title: __('Close ticket'),
+      message: __('Are you sure you want to close this ticket?'),
+      label: __('Close'),
       action: closeTicket,
     })
   }
 
-  async function closeTicket() {
-    try {
-      await call('frappe.client.set_value', {
-        doctype: 'HD Ticket',
-        name: ticketId.value,
-        fieldname: 'status',
-        value: 'Closed',
-      })
-      ticket.fetch()
-    } catch (error) {
-      toast.error(error?.messages?.[0] || 'Could not close this ticket')
-    }
+  function closeTicket() {
+    return setStatus(CLOSED_STATUS, { fallback: __('Could not close this ticket') })
+  }
+
+  function setStatus(status: string, messages: { success?: string; fallback: string }) {
+    return runAction(
+      async () => {
+        await updateTicket(ticketId.value, { status })
+        ticket.fetch()
+      },
+      { busy: isUpdatingStatus, ...messages },
+    )
   }
 
   return {
-
     ...settings,
     ...thread,
     ...useTicketDetails(ticket, thread),
     ...useReplyComposer(ticket),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
+    words,
     ticketId,
     ticket,
     canCreateTicket,

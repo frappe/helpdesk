@@ -10,7 +10,16 @@ import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 
+import {
+  CUSTOMER_PORTAL_ROOT,
+  isContentEmpty,
+  isEmoji,
+} from "@helpdesk/shared/utils";
+
 export {
+  CUSTOMER_PORTAL_ROOT,
+  isContentEmpty,
+  isEmoji,
   prettyDate,
   shortDuration,
   timeAgo,
@@ -71,8 +80,6 @@ export function dateFormat(date, format?: string) {
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
 }
-
-export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
 
 export function errorMessage(title, message) {
   toast.error(message);
@@ -147,10 +154,6 @@ export function getTimeInSeconds(time: string) {
 }
 
 export const isCustomerPortal = ref(false);
-
-// The studio-built customer portal, served outside the desk SPA. Customer
-// ticket pages live there; the desk only hard-navigates to it.
-export const CUSTOMER_PORTAL_ROOT = "/kb";
 
 export function customerPortalTicketUrl(ticketId: string) {
   return `${CUSTOMER_PORTAL_ROOT}/tickets/${ticketId}`;
@@ -238,18 +241,6 @@ export const textEditorMenuButtons = [
   ClearFormattingUtility,
 ];
 
-export function isContentEmpty(content: string) {
-  if (!content || content === null || content === undefined) {
-    return true;
-  }
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  if (doc.body.textContent === null) {
-    return true;
-  }
-  return doc.body.textContent.trim() === "";
-}
-
 export function normalize(value: any) {
   if (value === null || value === undefined) {
     return "";
@@ -259,12 +250,6 @@ export function normalize(value: any) {
 
 export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
-}
-
-// Lucide names are plain ASCII, so any emoji-presentation or pictographic
-// character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
-export function isEmoji(str: string): boolean {
-  return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
 
 /**

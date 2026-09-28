@@ -1,7 +1,9 @@
 import { computed, nextTick, ref } from 'vue'
-import { call, toast } from 'frappe-ui'
-
-const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
+import { call } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { isContentEmpty } from '@helpdesk/shared/utils'
+import { isClosedStatus } from '@app/stores/ticketMeta'
+import { runAction } from '@app/utils'
 
 // The composer floats over the thread, so the thread reserves this much room for it.
 const PROMPT_TAIL = '96px'
@@ -18,22 +20,18 @@ export function useReplyComposer(ticket) {
   const isSending = ref(false)
 
   // Resolved is not closed: replying to it reopens the ticket.
-  const canReply = computed(() => ticket.data?.status !== 'Closed')
-
-  // An empty editor still reports `<p></p>`.
-  const canSend = computed(
-    () => reply.value.replace(/<[^>]*>/g, '').trim().length > 0,
-  )
-
-  const threadTailSpace = computed(() =>
-    isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL,
-  )
+  const canReply = computed(() => !isClosedStatus(ticket.data?.status))
+  const canSend = computed(() => !isContentEmpty(reply.value))
+  const threadTailSpace = computed(() => (isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL))
 
   function openComposer() {
     isComposerOpen.value = true
-    // The editor opens over the thread, so ride down or the message replied to is behind it.
+    scrollThreadToEndSoon()
+  }
+
+  // Once now, once after the message frames have settled their height.
+  function scrollThreadToEndSoon() {
     nextTick(scrollThreadToEnd)
-    // Message iframes settle their height a beat after paint; this pass catches that.
     setTimeout(scrollThreadToEnd, SETTLE_MS)
   }
 
@@ -55,18 +53,12 @@ export function useReplyComposer(ticket) {
     requestAnimationFrame(step)
   }
 
-  function setReply(content: string) {
-    reply.value = content
-  }
-
   function addAttachment(file) {
     attachments.value = [...attachments.value, file]
   }
 
   function removeAttachment(file) {
-    attachments.value = attachments.value.filter(
-      (attached) => attached.file_url !== file.file_url,
-    )
+    attachments.value = attachments.value.filter((attached) => attached.file_url !== file.file_url)
   }
 
   function discard() {
@@ -76,25 +68,22 @@ export function useReplyComposer(ticket) {
   }
 
   // The requester's reply path: it attributes the message to them, not to an agent.
-  async function send() {
-    if (!canSend.value || isSending.value) return
-    isSending.value = true
-    try {
-      await call('run_doc_method', {
-        dt: 'HD Ticket',
-        dn: ticket.data.name,
-        method: 'create_communication_via_contact',
-        args: { message: reply.value, attachments: attachments.value },
-      })
-      discard()
-      await ticket.fetch()
-      nextTick(scrollThreadToEnd)
-      setTimeout(scrollThreadToEnd, SETTLE_MS)
-    } catch (error) {
-      toast.error(error?.messages?.[0] || 'Could not send the message')
-    } finally {
-      isSending.value = false
-    }
+  function send() {
+    if (!canSend.value) return
+    return runAction(
+      async () => {
+        await call('run_doc_method', {
+          dt: 'HD Ticket',
+          dn: ticket.data.name,
+          method: 'create_communication_via_contact',
+          args: { message: reply.value, attachments: attachments.value },
+        })
+        discard()
+        await ticket.fetch()
+        scrollThreadToEndSoon()
+      },
+      { busy: isSending, fallback: __('Could not send the message') },
+    )
   }
 
   return {
@@ -103,12 +92,9 @@ export function useReplyComposer(ticket) {
     threadTailSpace,
     openComposer,
     reply,
-    setReply,
     attachments,
     addAttachment,
     removeAttachment,
-    uploadArgs: UPLOAD_ARGS,
-    canSend,
     isSending,
     send,
     discard,

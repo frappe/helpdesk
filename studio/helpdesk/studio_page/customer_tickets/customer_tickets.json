@@ -255,16 +255,24 @@
       "submit": {
        "action": "Run Script",
        "script": "submitViewModal()"
-      },
-      "update:modelValue": {
-       "action": "Run Script",
-       "script": "setViewModal(eventArgs[0])"
       }
      },
      "componentId": "KbViewModal-ref",
      "componentName": "PortalViewModal",
      "componentProps": {
-      "modelValue": "{{ viewModal }}"
+      "icon": {
+       "$type": "variable",
+       "name": "viewModalIcon"
+      },
+      "label": {
+       "$type": "variable",
+       "name": "viewModalLabel"
+      },
+      "mode": "{{ viewModalMode }}",
+      "open": {
+       "$type": "variable",
+       "name": "isViewModalOpen"
+      }
      },
      "isCustomVueComponent": true
     }
@@ -288,7 +296,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:15:56.188511",
+ "modified": "2026-09-28 21:35:28.027984",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

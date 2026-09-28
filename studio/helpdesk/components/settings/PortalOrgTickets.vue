@@ -19,49 +19,37 @@
         <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{
           __("ID")
         }}</span>
-        <span
-          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-          >{{ __("Subject") }}</span
-        >
-        <span
-          class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7"
-          >{{ __("Status") }}</span
-        >
+        <span class="min-w-0 flex-1 truncate">{{ __("Subject") }}</span>
+        <span class="w-36 shrink-0 text-p-sm text-ink-gray-7">{{
+          __("Status")
+        }}</span>
         <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
           __("Created")
         }}</span>
       </div>
 
-      <a
+      <RouterLink
         v-for="ticket in tickets"
         :key="ticket.name"
         :class="[ROW, BODY_ROW]"
-        :href="`/kb/tickets/${ticket.name}`"
+        :to="ROUTES.ticket(ticket.name)"
       >
         <span class="w-14 shrink-0 text-p-sm text-ink-gray-5"
           >#{{ ticket.name }}</span
         >
-        <span
-          class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-          >{{ ticket.subject }}</span
-        >
-        <span
-          class="flex w-36 shrink-0 items-center gap-1.5 text-p-sm text-ink-gray-7"
-        >
-          <span
-            class="size-2 rounded-full"
-            :style="{ background: statusMeta(ticket.status).color }"
-          />
-          {{ statusMeta(ticket.status).label }}
-        </span>
+        <span class="min-w-0 flex-1 truncate">{{ ticket.subject }}</span>
+        <PortalStatusPill
+          class="w-36 shrink-0"
+          v-bind="statusMeta(ticket.status)"
+        />
         <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
-          dayjs(ticket.creation).fromNow()
+          timeAgo(ticket.creation)
         }}</span>
-      </a>
+      </RouterLink>
     </div>
 
     <p
-      v-if="!loading && !tickets.length"
+      v-if="!isLoading && !tickets.length"
       class="py-4 text-p-base text-ink-gray-5"
     >
       {{
@@ -76,10 +64,17 @@
 <script setup lang="ts">
 // Ten rows, newest first: anything longer belongs in the ticket list, a click away.
 import { ref, watch } from "vue";
-import { TextInput, call, dayjs, debounce } from "frappe-ui";
+import { RouterLink } from "vue-router";
+import { TextInput, call, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
-import { statusMeta } from "@app/components/list/ticketCells";
 import { __ } from "@helpdesk/shared/translation";
+import { timeAgo } from "@helpdesk/shared/utils";
+import PortalStatusPill from "@app/components/ticket/PortalStatusPill.vue";
+import { ROUTES } from "@app/routes";
+import { statusMeta } from "@app/stores/ticketMeta";
+
+const RECENT_TICKET_LIMIT = 10;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
@@ -89,10 +84,9 @@ const BODY_ROW =
   "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-5 before:content-[''] hover:before:bg-surface-gray-2";
 
 const props = defineProps<{ customer?: string }>();
-const RECENT = 10;
 
 const tickets = ref<any[]>([]);
-const loading = ref(false);
+const isLoading = ref(false);
 const search = ref("");
 
 // Searched at the source: what the reader wants is usually older than the newest ten.
@@ -106,23 +100,23 @@ async function load() {
   const query = search.value.trim();
   if (query) filters.subject = ["like", `%${query}%`];
 
-  loading.value = true;
+  isLoading.value = true;
   try {
     tickets.value = await call("frappe.client.get_list", {
       doctype: "HD Ticket",
       filters,
       fields: ["name", "subject", "status", "creation"],
       order_by: "creation desc",
-      limit_page_length: RECENT,
+      limit_page_length: RECENT_TICKET_LIMIT,
     });
   } catch {
     tickets.value = [];
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 }
 
-const searchLater = debounce(load, 300);
+const searchLater = debounce(load, SEARCH_DEBOUNCE_MS);
 
 watch(
   () => props.customer,

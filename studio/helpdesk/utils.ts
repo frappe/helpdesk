@@ -1,3 +1,20 @@
+import type { Ref } from 'vue'
+import { FileUploadHandler, call, toast } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { dateTooltipFormat } from '@helpdesk/shared/utils'
+
+// Private: an attachment on a support ticket is not public content.
+export const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
+
+export const DATE_FORMATS = {
+  tooltip: dateTooltipFormat,
+  clock: 'h:mm A',
+  day: 'D MMMM',
+  dayWithYear: 'D MMMM YYYY',
+  step: 'ddd D MMM, h:mm A',
+  date: 'DD-MM-YYYY',
+}
+
 export function parseJson(value: unknown, fallback: any = undefined) {
   if (!value) return fallback
   if (typeof value !== 'string') return value
@@ -13,34 +30,51 @@ export function parseJsonArray(value: unknown): any[] {
   return Array.isArray(parsed) ? parsed : []
 }
 
-export function clone<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value))
+export function errorMessage(error: any, fallback: string) {
+  return error?.messages?.join(', ') || error?.message || fallback
 }
 
-const MINUTE = 60
-const HOUR = 60 * MINUTE
-const DAY = 24 * HOUR
+type ActionOptions = { busy?: Ref<boolean>; success?: string; fallback: string }
 
-// Two units at most, and no trailing seconds: a countdown that re-renders only on load
-// reads as a frozen timer when it shows them. The desk has no equivalent — its
-// `shortDuration` counts to a date, this one formats an elapsed span.
-export function compactDuration(seconds: number) {
-  return (
-    compactUnits(seconds)
-      .map(([value, unit]) => `${value}${unit}`)
-      .join(' ') || '0s'
+// Runs a request once at a time and reports how it went as a toast.
+export async function runAction(action: () => Promise<unknown>, options: ActionOptions) {
+  const { busy, success, fallback } = options
+  if (busy?.value) return
+  if (busy) busy.value = true
+  try {
+    await action()
+    if (success) toast.success(success)
+  } catch (error) {
+    console.error(error)
+    toast.error(errorMessage(error, fallback))
+  } finally {
+    if (busy) busy.value = false
+  }
+}
+
+export function updateTicket(name: string, values: Record<string, unknown>) {
+  return call('frappe.client.set_value', { doctype: 'HD Ticket', name, fieldname: values })
+}
+
+// Keeps the files that made it; one file over the size limit must not sink the rest.
+// ponytail: @framework/ui useUploader is the upgrade if restrictions or progress are needed
+export async function uploadFiles(files: File[], args: Record<string, unknown> = UPLOAD_ARGS) {
+  const results = await Promise.allSettled(
+    files.map((file) => new FileUploadHandler().upload(file, args)),
   )
+  const uploaded = results
+    .filter((result) => result.status === 'fulfilled')
+    .map((result: any) => result.value)
+  const failedCount = files.length - uploaded.length
+  if (failedCount) toast.error(countLabel(failedCount, '1 file could not be uploaded', '{0} files could not be uploaded'))
+  return uploaded
 }
 
-// The largest unit and the one below it, so 83 days and 59 minutes reads as "83 days".
-function compactUnits(seconds: number) {
-  const all: [number, string][] = [
-    [Math.floor(seconds / DAY), 'd'],
-    [Math.floor((seconds % DAY) / HOUR), 'h'],
-    [Math.floor((seconds % HOUR) / MINUTE), 'm'],
-    [Math.floor(seconds % MINUTE), 's'],
-  ]
-  const largest = all.findIndex(([value]) => value)
-  if (largest < 0) return []
-  return all.slice(largest, largest + 2).filter(([value]) => value)
+export function countLabel(count: number, singular: string, plural: string) {
+  return count === 1 ? __(singular) : __(plural, [count])
+}
+
+export function matchesQuery(query: string, ...fields: (string | undefined)[]) {
+  const needle = query.trim().toLowerCase()
+  return !needle || fields.join(' ').toLowerCase().includes(needle)
 }

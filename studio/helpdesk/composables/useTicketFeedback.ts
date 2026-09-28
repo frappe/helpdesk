@@ -1,11 +1,13 @@
 import { computed, ref, watch } from 'vue'
-import { call, createListResource, toast } from 'frappe-ui'
+import { createListResource } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { CLOSED_STATUS } from '@app/stores/ticketMeta'
+import { runAction, updateTicket } from '@app/utils'
 
-// A port of `desk/src/pages/ticket/TicketFeedback.vue`; the dialog is Studio blocks.
-
+// A port of the desk's TicketFeedback; the dialog itself is Studio blocks.
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
-  // What the rating is saved alongside: the status the caller is heading for.
+  // The status the rating is saved alongside: where the caller is heading.
   const transition = ref<Record<string, string>>({})
   // In stars, the way the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
@@ -28,8 +30,7 @@ export function useTicketFeedback(ticket) {
 
   // A different rating means a different option set, so the previous answer goes.
   watch(feedbackStars, (stars) => {
-    feedbackOption.value = null
-    feedbackText.value = ''
+    resetFeedbackAnswer()
     options.update({ filters: { rating: stars / 5, disabled: 0 } })
     options.reload()
   })
@@ -37,12 +38,16 @@ export function useTicketFeedback(ticket) {
   watch(isFeedbackOpen, (open) => {
     if (open) return
     feedbackStars.value = 0
-    feedbackOption.value = null
-    feedbackText.value = ''
+    resetFeedbackAnswer()
   })
 
+  function resetFeedbackAnswer() {
+    feedbackOption.value = null
+    feedbackText.value = ''
+  }
+
   // `validate_feedback` blocks a non-agent from the Resolved category without a rating.
-  function openFeedback(status = 'Closed') {
+  function openFeedback(status = CLOSED_STATUS) {
     transition.value = { status }
     isFeedbackOpen.value = true
   }
@@ -55,32 +60,22 @@ export function useTicketFeedback(ticket) {
     feedbackOption.value = name
   }
 
-  // One write, so the rating and the transition can never disagree. The status written is
-  // the one the opener asked for, never the one the ticket is already in.
-  async function submitFeedback() {
-    if (!feedbackOption.value || isFeedbackSaving.value) return
-    isFeedbackSaving.value = true
-    try {
-      await call('frappe.client.set_value', {
-        doctype: 'HD Ticket',
-        name: ticket.data.name,
-        fieldname: {
+  // One write, so the rating and the transition can never disagree.
+  function submitFeedback() {
+    if (!feedbackOption.value) return
+    return runAction(
+      async () => {
+        await updateTicket(ticket.data.name, {
           ...transition.value,
           ...(ticket.data.feedback
             ? {}
-            : {
-                feedback: feedbackOption.value,
-                feedback_extra: feedbackText.value,
-              }),
-        },
-      })
-      closeFeedback()
-      ticket.fetch()
-    } catch (error) {
-      toast.error(error?.messages?.[0] || 'Could not save the feedback')
-    } finally {
-      isFeedbackSaving.value = false
-    }
+            : { feedback: feedbackOption.value, feedback_extra: feedbackText.value }),
+        })
+        closeFeedback()
+        ticket.fetch()
+      },
+      { busy: isFeedbackSaving, fallback: __('Could not save the feedback') },
+    )
   }
 
   return {

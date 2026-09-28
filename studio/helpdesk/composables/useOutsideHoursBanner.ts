@@ -1,4 +1,5 @@
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
+import { useStorage } from '@vueuse/core'
 import { createResource } from 'frappe-ui'
 
 // Dismissal is remembered per ticket per day, so it returns tomorrow.
@@ -7,15 +8,13 @@ export function useOutsideHoursBanner(ticket) {
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.show_outside_hours_banner',
     makeParams: () => ({ ticket_name: ticket.data?.name }),
   })
-  const dismissed = ref(false)
+  const isDismissed = useStorage(() => dismissKey(ticket.data?.name), false, localStorage, {
+    writeDefaults: false,
+  })
 
   watch(
     () => ticket.data?.name,
-    (name) => {
-      if (!name) return
-      dismissed.value = localStorage.getItem(dismissKey(name)) === 'true'
-      banner.fetch()
-    },
+    (name) => name && banner.fetch(),
     { immediate: true },
   )
 
@@ -24,12 +23,11 @@ export function useOutsideHoursBanner(ticket) {
   }
 
   function dismissBanner() {
-    localStorage.setItem(dismissKey(ticket.data.name), 'true')
-    dismissed.value = true
+    isDismissed.value = true
   }
 
   return {
-    showBanner: computed(() => Boolean(banner.data?.show) && !dismissed.value),
+    showBanner: computed(() => Boolean(banner.data?.show) && !isDismissed.value),
     bannerMessage: computed(() => banner.data?.msg || ''),
     dismissBanner,
   }

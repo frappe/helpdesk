@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
-import { __, fetchTranslations } from '@helpdesk/shared/translation'
+import { useStorage } from '@vueuse/core'
 import { createDocumentResource, createResource, toast } from 'frappe-ui'
+import { __, fetchTranslations } from '@helpdesk/shared/translation'
 
 // Language and timezone live on the User doc, which a signed-in user may edit themselves.
 
@@ -18,15 +19,7 @@ export function usePreferences() {
 }
 
 function createPreferencesStore() {
-  const layout = ref(readLayout())
-
-  const conversationLayout = computed({
-    get: () => layout.value,
-    set: (value) => {
-      layout.value = value
-      writeLayout(value)
-    },
-  })
+  const conversationLayout = useStorage(LAYOUT_KEY, 'timeline')
 
   // Created once the settings payload names the signed-in user.
   const user = ref(null)
@@ -34,10 +27,9 @@ function createPreferencesStore() {
   const timezoneOptions = ref([])
 
   const preferences = computed(() => user.value?.doc || {})
+  const isPreferencesSaving = computed(() => Boolean(user.value?.save.loading))
 
-  const preferencesSaving = computed(() => Boolean(user.value?.save.loading))
-
-  // Takes the User's docname — for Administrator that is not the email.
+  // Takes the User's docname: for Administrator that is not the email.
   function loadPreferences(userName) {
     if (!userName || user.value?.name === userName) return
     user.value = createDocumentResource({ doctype: 'User', name: userName })
@@ -47,8 +39,7 @@ function createPreferencesStore() {
 
   // An empty pick falls back to the saved value, so a stray clear cannot blank the field.
   function setPreference(field, picked) {
-    if (!user.value?.doc) return
-    if (preferencesSaving.value) return
+    if (!user.value?.doc || isPreferencesSaving.value) return
     const value = picked || user.value.originalDoc?.[field]
     if (value === user.value.originalDoc?.[field]) return
     user.value.doc[field] = value
@@ -92,27 +83,11 @@ function createPreferencesStore() {
       LAYOUT_OPTIONS.map((option) => ({ ...option, label: __(option.label) })),
     ),
     preferences,
-    preferencesSaving,
+    isPreferencesSaving,
     languageOptions,
     timezoneOptions,
     loadPreferences,
     setPreference,
     savePreferences,
-  }
-}
-
-function readLayout() {
-  try {
-    return window.localStorage.getItem(LAYOUT_KEY) || 'timeline'
-  } catch {
-    return 'timeline'
-  }
-}
-
-function writeLayout(value: string) {
-  try {
-    window.localStorage.setItem(LAYOUT_KEY, value)
-  } catch {
-    // A browser that refuses storage still gets the layout it just picked, for this visit.
   }
 }

@@ -1,15 +1,13 @@
 import { computed, watch } from 'vue'
-import { timeAgo } from '@helpdesk/shared/utils'
 import { dayjs } from 'frappe-ui'
+import { timeAgo } from '@helpdesk/shared/utils'
 import { usePreferences } from '@app/stores/preferences'
 import { layoutOf, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/composables/messageLayout'
+import { DATE_FORMATS } from '@app/utils'
 
-// Drawn from Studio blocks, so every value a block binds is finished here.
+// Waits for the email frames to size themselves, which happens after paint.
+const SCROLL_TO_MESSAGE_MS = 1000
 
-const DATE_FORMAT = 'ddd, MMM D, YYYY h:mm A'
-const CLOCK_FORMAT = 'h:mm A'
-const DAY_FORMAT = 'D MMMM'
-const YEAR_FORMAT = 'D MMMM YYYY'
 export function useTicketThread(ticket) {
   const { conversationLayout } = usePreferences()
   const isChat = computed(() => conversationLayout.value === 'chat')
@@ -24,7 +22,6 @@ export function useTicketThread(ticket) {
       const opens = !continues(rows[index - 1], row)
       row.insideByline = !isChat.value
       row.outsideByline = isChat.value && opens
-      // One face per turn; the rail keeps its width either way, so rows stay lined up.
       row.showAvatar = !isChat.value || opens
     })
     // The gap belongs to the message above the join, since that is where it is drawn.
@@ -44,19 +41,20 @@ export function useTicketThread(ticket) {
     )
   }
 
-  // The wait is because the email frames only size themselves after paint.
-  let landed = false
+  let hasScrolledToMessage = false
   watch(conversation, (messages) => {
-    if (landed || !messages.length) return
-    landed = true
+    if (hasScrolledToMessage || !messages.length) return
+    hasScrolledToMessage = true
     const id = location.hash.slice(1) || messages[messages.length - 1].name
-    setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: 'nearest' }), 1000)
+    setTimeout(
+      () => document.getElementById(id)?.scrollIntoView({ block: 'nearest' }),
+      SCROLL_TO_MESSAGE_MS,
+    )
   })
 
   function sortByCreation() {
     return [...(ticket.data?.communications || [])].sort(
-      (first, second) =>
-        new Date(first.creation).getTime() - new Date(second.creation).getTime(),
+      (first, second) => new Date(first.creation).getTime() - new Date(second.creation).getTime(),
     )
   }
 
@@ -66,14 +64,14 @@ export function useTicketThread(ticket) {
       content: message.content,
       sender: message.user?.name || message.sender,
       image: message.user?.image,
-      // Kept raw as well as worded: the sidebar dates and measures it.
       creation: message.creation,
       timeAgo: timeAgo(message.creation),
       clock: clockTime(message.creation),
-      fullDate: dayjs(message.creation).format(DATE_FORMAT),
+      fullDate: dayjs(message.creation).format(DATE_FORMATS.tooltip),
       attachments: message.attachments || [],
-      // Ask Frappe's direction, not identities: `sender` is an email, `raised_by` may not be.
+      // Frappe's direction, not identities: `sender` is an email, `raised_by` may not be.
       isAgentReply: message.sent_or_received === 'Sent',
+      isChat: isChat.value,
       railHeight: '100%',
       ...layoutOf(isChat.value, message.sent_or_received !== 'Sent'),
     }
@@ -89,9 +87,7 @@ export function useTicketThread(ticket) {
   )
 
   // Dated from `resolution_date`: HD Ticket stamps no time of its own for feedback.
-  const rating = computed(() => toRating())
-
-  function toRating() {
+  const rating = computed(() => {
     const data = ticket.data
     if (!data?.feedback_rating) return null
     const when = data.resolution_date || data.modified
@@ -103,9 +99,9 @@ export function useTicketThread(ticket) {
       // Quoted: it is the customer's words, not the portal's.
       comment: data.feedback_extra ? `“${data.feedback_extra}”` : '',
       timeAgo: timeAgo(when),
-      fullDate: dayjs(when).format(DATE_FORMAT),
+      fullDate: dayjs(when).format(DATE_FORMATS.tooltip),
     }
-  }
+  })
 
   // The preset answer reads as tags: "Adequate help, bit slow" is two of them.
   function feedbackTags(feedback: string) {
@@ -118,9 +114,9 @@ export function useTicketThread(ticket) {
 
   function clockTime(value: string) {
     const at = dayjs(value)
-    const time = at.format(CLOCK_FORMAT)
+    const time = at.format(DATE_FORMATS.clock)
     if (at.isSame(dayjs(), 'day')) return time
-    const day = at.isSame(dayjs(), 'year') ? DAY_FORMAT : YEAR_FORMAT
+    const day = at.isSame(dayjs(), 'year') ? DATE_FORMATS.day : DATE_FORMATS.dayWithYear
     return `${at.format(day)} at ${time}`
   }
 

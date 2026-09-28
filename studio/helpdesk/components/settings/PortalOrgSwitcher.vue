@@ -5,10 +5,10 @@
     size="sm"
     variant="subtle"
     align="start"
-    :placeholder="PLACEHOLDER"
+    :placeholder="__('Select organizations')"
     :options="options"
     :model-value="selectedOrganizations"
-    @update:model-value="(value) => onSelect?.(value)"
+    @update:model-value="(value) => emit('select', value)"
   >
     <!-- Owns the whole prefix area, so one template covers none / one / many. -->
     <template #prefix="{ selectedOptions }">
@@ -57,24 +57,22 @@
 
 <script setup lang="ts">
 // Its value lives in the list's filter conditions, so the controls cannot disagree.
+import { computed } from "vue";
 import { Avatar, Checkbox, ItemListRow, MultiSelect } from "frappe-ui";
 import LucideBuilding2 from "~icons/lucide/building-2";
-import { computed } from "vue";
+import { __ } from "@helpdesk/shared/translation";
 
 type Organization = { name: string; customer_name?: string; image?: string };
-
-// Drives both the empty trigger and the menu's search field, so it invites a pick.
-const PLACEHOLDER = "Select organizations";
 
 const props = withDefaults(
   defineProps<{
     organizations?: Organization[];
     // Docnames in play; empty means every organization.
     selectedOrganizations?: string[];
-    onSelect?: (names: string[]) => void;
   }>(),
   { organizations: () => [], selectedOrganizations: () => [] }
 );
+const emit = defineEmits<{ select: [names: string[]] }>();
 
 const options = computed(() =>
   props.organizations.map((organization) => ({

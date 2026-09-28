@@ -4,7 +4,7 @@
       <button
         type="button"
         class="group flex cursor-pointer items-center gap-1 rounded-5 bg-transparent p-0.5"
-        aria-label="Menu"
+        :aria-label="__('Menu')"
       >
         <img
           v-if="logo"
@@ -26,16 +26,9 @@
 
 <script setup lang="ts">
 // Menu and trigger together: a trigger has to read its menu's state, and only the slot
-// knows it. The chevron alone answers the pointer — no fill behind the brand mark.
-import { computed } from "vue";
+// knows it. The chevron alone answers the pointer, with no fill behind the brand mark.
 import { Dropdown, Icon } from "frappe-ui";
-import { useSession } from "@app/stores/session";
+import { __ } from "@helpdesk/shared/translation";
 
-defineProps<{ options?: unknown[] }>();
-
-// The favicon is the helpdesk's fallback everywhere else, so the topbar falls back with it.
-const { config } = useSession();
-const logo = computed(
-  () => config.value?.brand_logo || config.value?.favicon || ""
-);
+defineProps<{ options?: unknown[]; logo?: string }>();
 </script>

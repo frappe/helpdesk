@@ -1,93 +1,48 @@
 import { computed, ref } from 'vue'
-import { ROUTES } from '@app/routes'
 import { call } from 'frappe-ui'
+import { ROUTES } from '@app/routes'
 
 // A published Studio app renders from a bare template with no boot payload, so login
 // state has to be asked for; `get_config` is the one endpoint guests may call.
 
-// The desk SPA's root, the mirror of its own CUSTOMER_PORTAL_ROOT.
-const AGENT_PORTAL_ROOT = '/helpdesk'
-
 const store = createSessionStore()
 
-export function useSession(context) {
-  if (context?.router) store.bindRouter(context.router)
+export function useSession() {
   store.loadSession()
   return store
 }
 
 function createSessionStore() {
   const config = ref(null)
-  let router = null
-  let loading = null
+  let sessionRequest = null
 
   // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
-
   const canCreateTicket = computed(() => !isGuest.value)
-
-  const isPublicKnowledgeBase = computed(
-    () => Boolean(config.value?.public_knowledge_base)
-  )
+  const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
+  // Only agents have the desk to return to; for anyone else the link is a 403.
+  const isAgent = computed(() => Boolean(config.value?.is_agent))
+  // The favicon is the helpdesk's fallback everywhere else, so the topbar falls back with it.
+  const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
 
   // Back to the page they were reading, not to the agent desk.
   const loginUrl = computed(
-    () =>
-      `/login?redirect-to=${encodeURIComponent(
-        window.location.pathname + window.location.search
-      )}`
-  )
-
-  // The way back from the agent desk's "Customer portal" (Sidebar.vue). Only agents
-  // have the desk to return to; for anyone else the link is a 403.
-  const isAgent = computed(() => Boolean(config.value?.is_agent))
-
-  // A guest has no tickets, account or session to offer.
-  const accountMenuOptions = computed(() =>
-    isGuest.value
-      ? [{ icon: 'lucide-log-in', label: 'Log in', onClick: signIn }]
-      : [
-          { icon: 'lucide-inbox', label: 'My tickets', onClick: () => go(ROUTES.ticketList) },
-          { icon: 'lucide-user', label: 'My account', onClick: openSettings },
-          ...(isAgent.value
-            ? [
-                {
-                  icon: 'lucide-headphones',
-                  label: 'Agent portal',
-                  // A hard navigation: the desk is a separate SPA, not a route here.
-                  onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
-                },
-              ]
-            : []),
-          { icon: 'lucide-log-out', label: 'Log out', onClick: signOut },
-        ]
+    () => `/login?redirect-to=${encodeURIComponent(window.location.pathname + window.location.search)}`,
   )
 
   function loadSession() {
-    if (loading) return loading
-    loading = call('helpdesk.api.config.get_config')
+    if (sessionRequest) return sessionRequest
+    sessionRequest = call('helpdesk.api.config.get_config')
       .then((data) => (config.value = data))
       .then(sendGuestToLogin)
       .catch((error) => console.error(error))
-    return loading
+    return sessionRequest
   }
 
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value) return
     signIn()
-  }
-
-  function bindRouter(value) {
-    router = router || value
-  }
-
-  function go(path) {
-    router?.push(path)
-  }
-
-  function openSettings() {
-    router?.push({ hash: '#settings/profile' })
   }
 
   function signIn() {
@@ -104,15 +59,16 @@ function createSessionStore() {
     window.location.href = ROUTES.appRoot
   }
 
-  // `isFeedbackMandatory` is read straight off it, so the payload itself is exported.
   return {
     config,
     isGuest,
     canCreateTicket,
     isPublicKnowledgeBase,
+    isAgent,
+    brandLogo,
     loginUrl,
-    accountMenuOptions,
     loadSession,
-    bindRouter,
+    signIn,
+    signOut,
   }
 }

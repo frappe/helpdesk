@@ -28,7 +28,7 @@
     <div class="flex min-w-0 flex-col gap-1">
       <!-- Both states share the input's height so switching doesn't move the block. -->
       <div class="flex min-h-7 items-center gap-1">
-        <template v-if="!editing">
+        <template v-if="!isEditing">
           <span class="text-ink-gray-8" :class="titleClass">{{ name }}</span>
           <Button
             v-if="editable"
@@ -44,14 +44,14 @@
             ref="nameInput"
             v-model="draft"
             :maxlength="maxLength"
-            @keydown.enter="commit"
-            @keydown.esc.stop="editing = false"
+            @keydown.enter="saveName"
+            @keydown.esc.stop="isEditing = false"
           />
           <Button
             variant="outline"
             icon="lucide-check"
             :loading="busy"
-            @click="commit"
+            @click="saveName"
           />
         </template>
       </div>
@@ -63,10 +63,11 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Button, Icon, TextInput, Tooltip } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
+import { Avatar, Button, Icon, TextInput, Tooltip } from "frappe-ui";
 // Lucide: feather's pencil is a different glyph.
 import LucideSquarePen from "~icons/lucide/square-pen";
+import { __ } from "@helpdesk/shared/translation";
 
 const props = withDefaults(
   defineProps<{
@@ -95,7 +96,7 @@ const titleClass = computed(() =>
 );
 
 const uploadLabel = computed(() =>
-  props.image ? "Change Photo" : "Upload Photo"
+  props.image ? __("Change Photo") : __("Upload Photo")
 );
 
 const emit = defineEmits<{
@@ -104,19 +105,19 @@ const emit = defineEmits<{
   (e: "rename", value: string): void;
 }>();
 
-const editing = ref(false);
+const isEditing = ref(false);
 const draft = ref("");
 const nameInput = ref<{ el?: HTMLInputElement } | null>(null);
 
 function startEditing() {
   draft.value = props.name || "";
-  editing.value = true;
+  isEditing.value = true;
   nextTick(() => nameInput.value?.el?.focus());
 }
 
-function commit() {
+function saveName() {
   const value = draft.value.trim();
-  editing.value = false;
+  isEditing.value = false;
   if (value && value !== props.name) emit("rename", value);
 }
 </script>

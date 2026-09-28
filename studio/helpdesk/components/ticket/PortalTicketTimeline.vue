@@ -13,7 +13,13 @@
           :hover-delay="200"
           side="left"
         >
-          <span :class="[DOT_BASE, DOT[step.state]]" />
+          <span
+            :class="[
+              DOT_BASE,
+              MILESTONE_DOT_CLASSES[step.state],
+              step.state === 'next' ? 'mt-[5px]' : 'mt-1.5',
+            ]"
+          />
         </Tooltip>
         <span
           v-if="index < steps.length - 1"
@@ -40,15 +46,15 @@
 <script setup lang="ts">
 // The analytics status line turned on its side, since this sidebar is only 382px wide.
 // A segment leads to the next milestone, so it takes that step's state.
-
 import { Tooltip } from "frappe-ui";
+import { MILESTONE_DOT_CLASSES, type MilestoneState } from "./milestoneDots";
 
 export interface TimelineStep {
   title: string;
   subtitle: string;
   // `next` is the nearest unmet milestone; `pending` is anything behind it.
-  state: "done" | "closed" | "next" | "pending" | "breach";
-  // The exact moment, shown on hover — the line itself reads as elapsed time.
+  state: MilestoneState;
+  // The exact moment, shown on hover; the line itself reads as elapsed time.
   fullDate?: string;
 }
 
@@ -60,22 +66,12 @@ withDefaults(defineProps<{ steps?: TimelineStep[] }>(), {
 const DOT_BASE =
   "relative shrink-0 rounded-full after:absolute after:-inset-2 after:rounded-full after:content-['']";
 
-// Full literal strings — Tailwind's scanner cannot see interpolation.
-const DOT: Record<TimelineStep["state"], string> = {
-  done: "mt-1.5 size-2 bg-[var(--ink-green-6)]",
-  closed: "mt-1.5 size-2 bg-[var(--outline-gray-4)]",
-  breach: "mt-1.5 size-2 bg-[var(--ink-red-6)]",
-  next: "mt-[5px] size-2.5 bg-surface-base shadow-[inset_0_0_0_2px_var(--ink-amber-7)]",
-  pending:
-    "mt-1.5 size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--outline-gray-4)]",
-};
-
 const LINE_BASE = "absolute bottom-0 top-[18px] w-[0.05rem] rounded-full";
 
 // A repeating gradient, not a dashed border: the analytics rail's trick, rotated.
 const DASHED_OWED =
   "bg-[repeating-linear-gradient(180deg,var(--outline-gray-2)_0_5px,transparent_5px_11px)]";
-const LINE: Record<TimelineStep["state"], string> = {
+const LINE: Record<MilestoneState, string> = {
   done: "bg-[var(--outline-gray-2)]",
   closed: "bg-[var(--outline-gray-2)]",
   breach:
