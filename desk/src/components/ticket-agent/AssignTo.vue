@@ -339,7 +339,12 @@ watch(searchText, (text) => {
 
 watch(
   [restrictToTeam, ticketTeam],
-  ([restricted]) => (restricted ? teamMembers.fetch() : reloadAgents()),
+  ([restricted]) => {
+    if (!restricted) return reloadAgents();
+    // Drop the previous team's members so none stay offerable while fetching.
+    teamMembers.reset();
+    teamMembers.fetch();
+  },
   { immediate: true }
 );
 
@@ -376,7 +381,7 @@ const agentOptions = computed<AgentOption[]>(() => {
 
   if (agentResource.data) {
     for (const agent of agentResource.data) {
-      if (!seen.has(agent.name)) {
+      if (!seen.has(agent.name) && isOfferable(agent.name)) {
         agents.push({
           value: agent.name,
           label: agent.agent_name || getUser(agent.name).full_name,

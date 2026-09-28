@@ -285,6 +285,12 @@ const saveTogglesResource = createResource({
 });
 let pendingToggleSave = Promise.resolve();
 
+// Undo only the toggles, so unsaved text edits survive a failed toggle save.
+function revertToggles() {
+  const initial = JSON.parse(initialData.value!);
+  toggleFields.forEach((f) => (settingsData.value[f] = initial[f]));
+}
+
 // Track dirty state for non-toggle fields only
 watch(
   settingsData,
@@ -314,7 +320,7 @@ watch(
         await saveTogglesResource.submit();
         toast.success(__("Settings updated"));
       })
-      .catch(() => settingsDataResource.reload());
+      .catch(revertToggles);
   }
 );
 
