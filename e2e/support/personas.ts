@@ -57,9 +57,8 @@ function customer(slug: string, firstName: string, roles: string[]): Persona {
 
 async function ensureUser(api: Api, persona: Persona) {
   const roles = persona.roles.map((role) => ({ role }));
-  const fields = { roles, new_password: PASSWORD, enabled: 1 };
   if (await api.exists("User", { name: persona.email })) {
-    await api.update("User", persona.email, fields);
+    await api.update("User", persona.email, { roles, enabled: 1 });
     return;
   }
   await api.insert("User", {
@@ -68,7 +67,8 @@ async function ensureUser(api: Api, persona: Persona) {
     last_name: "E2E",
     send_welcome_email: 0,
     user_type: persona.kind === "agent" ? "System User" : "Website User",
-    ...fields,
+    new_password: PASSWORD,
+    roles,
   });
 }
 
