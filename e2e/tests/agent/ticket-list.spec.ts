@@ -212,7 +212,8 @@ test("clicking an assignee avatar filters the list by that agent", async ({
   await expect(list.rows()).toHaveCount(2);
   await expect(list.row(`${id} other`)).toHaveCount(0);
 
-  await list.goto();
+  // the avatar filter is auto saved to the default view, so a reload would keep it
+  await list.clearFilters();
   await list.searchSubject(id);
   await expect(list.rows()).toHaveCount(3);
   await list.row(`${id} both`).locator(`.user-avatar[data-name="${agent2.email}"]`).click();
