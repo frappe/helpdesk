@@ -44,7 +44,7 @@ class TicketFields:
             fields=[
                 "fieldname",
                 "visible_to",
-                "customer_can_edit",
+                "editable_after_creation",
                 "required",
                 "placeholder",
                 "url_method",
@@ -128,7 +128,7 @@ class TicketFields:
     @property
     def customer_editable(self) -> list[str]:
         """Of those, what the template lets a customer change after raising."""
-        opened = {r.fieldname for r in self.rows if r.customer_can_edit}
+        opened = {r.fieldname for r in self.rows if r.editable_after_creation}
         return [
             fieldname for fieldname in self.customer_fillable if fieldname in opened
         ]

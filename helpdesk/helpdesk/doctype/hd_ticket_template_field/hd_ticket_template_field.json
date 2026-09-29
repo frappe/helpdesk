@@ -11,7 +11,7 @@
   "url_method",
   "required",
   "visible_to",
-  "customer_can_edit",
+  "editable_after_creation",
   "placeholder"
  ],
  "fields": [
@@ -38,13 +38,13 @@
    "options": "Everyone\nCustomers\nAgents"
   },
   {
-   "columns": 2,
+   "columns": 3,
    "default": "0",
    "depends_on": "eval:doc.visible_to != 'Agents'",
-   "fieldname": "customer_can_edit",
+   "fieldname": "editable_after_creation",
    "fieldtype": "Check",
    "in_list_view": 1,
-   "label": "Customer can edit"
+   "label": "Editable after creation"
   },
   {
    "fieldname": "url_method",
@@ -61,7 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-09-29 19:00:00.000000",
+ "modified": "2026-09-29 20:05:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

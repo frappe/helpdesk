@@ -2535,7 +2535,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 {
                     "fieldname": "priority",
                     "visible_to": "Everyone",
-                    "customer_can_edit": 1,
+                    "editable_after_creation": 1,
                 }
             ]
         )
@@ -2547,9 +2547,15 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.db.get_value("HD Ticket", ticket.name, "priority"), new_priority
         )
 
-    def test_customer_can_edit_is_ignored_on_an_agent_only_row(self):
+    def test_editable_after_creation_is_ignored_on_an_agent_only_row(self):
         set_default_template_rows(
-            [{"fieldname": "priority", "visible_to": "Agents", "customer_can_edit": 1}]
+            [
+                {
+                    "fieldname": "priority",
+                    "visible_to": "Agents",
+                    "editable_after_creation": 1,
+                }
+            ]
         )
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         frappe.set_user(PERMS_CUSTOMER)
