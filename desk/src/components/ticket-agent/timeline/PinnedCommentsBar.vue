@@ -67,10 +67,8 @@ import type { PinnedComment } from "@/composables/useTicket";
 import { htmlToText } from "@/utils";
 import { computed, ref, watch } from "vue";
 
-/**
- * Telegram-style pinned bar: shows one pin at a time, newest first. A click
- * waits for `jump` to reach the shown pin, then steps to the next older one.
- */
+/** Telegram-style pinned bar, one pin at a time, newest first. A click waits
+ * for `jump` to reach the shown pin, then steps to the next older one. */
 const props = defineProps<{
   comments: PinnedComment[];
   jump: (name: string) => Promise<void>;
