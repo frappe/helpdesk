@@ -1,6 +1,7 @@
 <template>
   <div
     class="md:mx-5 md:my-4 flex items-center justify-between text-md-medium mx-6 !mb-0 !my-3"
+    v-bind:class="$attrs.class"
   >
     <div class="flex h-8 items-center text-xl-semibold text-ink-gray-8">
       {{ title }}
@@ -35,15 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import LucideChevronUp from "~icons/lucide/chevron-up";
-import LucideChevronDown from "~icons/lucide/chevron-down";
-import LucidePlus from "~icons/lucide/plus";
 import { PhoneIcon } from "@/components/icons";
 import CallLogModal from "@/pages/call-logs/CallLogModal.vue";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { Dropdown } from "frappe-ui";
 import { computed, h, inject, ref } from "vue";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucidePlus from "~icons/lucide/plus";
 defineProps({
   title: {
     type: String,
