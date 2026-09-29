@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_bulk_edit": 1,
- "allow_rename": 1,
+ "allow_rename": 0,
  "autoname": "field:template_name",
  "creation": "2022-02-25 12:54:38.382222",
  "description": "This doctype will be deprecated in the future",
@@ -43,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-29 22:00:00.000000",
+ "modified": "2026-09-30 04:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",

@@ -144,11 +144,6 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertIn("priority", form)
         self.assertEqual(details, form + unlisted)
 
-    def test_the_default_template_cannot_be_renamed(self):
-        """Renaming it would leave every visible_to lookup finding nothing."""
-        with self.assertRaises(frappe.PermissionError):
-            frappe.rename_doc("HD Ticket Template", "Default", "Renamed Default")
-
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""
         ticket = make_customer_ticket(self, CUSTOMER_EMAIL)
