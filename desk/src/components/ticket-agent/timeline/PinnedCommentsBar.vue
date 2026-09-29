@@ -6,8 +6,12 @@
     :aria-label="__('Go to pinned comment {0}', [current + 1])"
     @click="select"
   >
-    <!-- one full-height line split evenly per pin; -my-0.5 reaches into the padding -->
-    <span class="relative -my-0.5 flex flex-col gap-0.5 self-stretch">
+    <!-- one full-height line split evenly per pin; past two pins -my-0.5
+    reaches into the padding so the segments stay tall enough to read -->
+    <span
+      class="relative flex flex-col gap-0.5 self-stretch"
+      :class="{ '-my-0.5': comments.length > 2 }"
+    >
       <span
         v-for="comment in comments"
         :key="comment.name"
