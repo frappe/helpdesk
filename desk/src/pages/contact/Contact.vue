@@ -84,6 +84,11 @@
                   : undefined
               "
               />
+              <RelatedTicketsTab
+                v-if="tab.label === __('Related Tickets')"
+                :tickets="relatedTicketsResource.data ?? []"
+                :loading="relatedTicketsResource.loading"
+              />
               <div v-if="tab.label === __('Feedback')">
                 <!-- Feedback tab content -->
                 <ContactFeedback :name="props.id" />
@@ -115,6 +120,7 @@
 <script setup lang="ts">
 import ContactCustomers from "@/components/contact/ContactCustomers.vue";
 import ContactFeedback from "@/components/contact/ContactFeedback.vue";
+import RelatedTicketsTab from "@/components/customer/RelatedTicketsTab.vue";
 import TicketsTab from "@/components/customer/TicketsTab.vue";
 import DeleteWithTicketsDialog from "@/components/DeleteWithTicketsDialog.vue";
 import ModifiedIcon from "@/components/icons/ModifiedIcon.vue";
@@ -138,6 +144,7 @@ import {
   Button,
   Dropdown,
   Tabs,
+  createResource,
   dayjs,
   usePageMeta,
 } from "frappe-ui";
@@ -167,12 +174,24 @@ const { feedbackCount } = useContactFeedback(props.id);
 
 const { ticketsListResource, ticketsCountResource } = getTicketListResource();
 
+const relatedTicketsResource = createResource({
+  url: "helpdesk.api.contact.get_related_tickets",
+  params: { contact: props.id },
+  auto: true,
+});
+
 const tabs = computed(() => [
   {
     label: __("Tickets"),
     value: "tickets",
     count: ticketsCountResource.data ?? 0,
     iconLeft: h(TicketHashIcon, { class: "size-4" }),
+  },
+  {
+    label: __("Related Tickets"),
+    hash: "related-tickets",
+    count: relatedTicketsResource.data?.length ?? 0,
+    icon: h(TicketHashIcon, { class: "size-4" }),
   },
   {
     label: __("Feedback"),
