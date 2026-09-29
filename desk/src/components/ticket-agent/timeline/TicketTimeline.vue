@@ -30,6 +30,7 @@
           :activity="activity"
           :extras="extrasFor(activity)"
           :pinned="pinnedNames.has(activity.data.name)"
+          :pin-count="pinnedNames.size"
           @update="refresh"
         />
       </template>

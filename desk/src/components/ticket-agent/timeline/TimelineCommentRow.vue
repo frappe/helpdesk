@@ -53,7 +53,7 @@ import {
   CommentItem,
   type CommentActivity,
 } from "@framework/ui/ActivityTimeline";
-import { Button, Dropdown, createResource, toast } from "frappe-ui";
+import { Button, Dropdown, Tooltip, createResource, toast } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, h, ref } from "vue";
 import TimelineReactions from "./TimelineReactions.vue";
@@ -63,10 +63,14 @@ export interface CommentExtras {
   attachments: Array<{ file_name: string; file_url: string }>;
 }
 
+// mirrors MAX_PINNED_COMMENTS in helpdesk/extends/comment.py, which enforces it
+const MAX_PINNED_COMMENTS = 5;
+
 const props = defineProps<{
   activity: CommentActivity;
   extras: CommentExtras;
   pinned: boolean;
+  pinCount: number;
 }>();
 const emit = defineEmits<{ update: [] }>();
 
@@ -91,6 +95,9 @@ const isOwner = computed(() => {
 const isMergeMarker = computed(() =>
   /has been merged with ticket #\d+/.test(props.activity.data.content)
 );
+const pinLimitReached = computed(
+  () => !props.pinned && props.pinCount >= MAX_PINNED_COMMENTS
+);
 
 const kebabOptions = computed(() => [
   {
@@ -102,6 +109,10 @@ const kebabOptions = computed(() => [
     label: props.pinned ? __("Unpin") : __("Pin"),
     icon: h(props.pinned ? UnpinIcon : PinIcon, { class: "size-4" }),
     onClick: togglePin,
+    ...(pinLimitReached.value && {
+      disabled: true,
+      slots: { label: pinLimitLabel },
+    }),
   },
   // only the author edits or deletes; anyone may share the link
   ...(isOwner.value && !isMergeMarker.value
@@ -158,6 +169,16 @@ function saveContent(content: string) {
         toast.success(__("Comment updated successfully."));
       },
     }
+  );
+}
+
+// disabled menu items drop pointer events, so the label opts back in for the tooltip
+function pinLimitLabel() {
+  const reason = __("{0} pinned already. Unpin one to pin this.", [
+    MAX_PINNED_COMMENTS,
+  ]);
+  return h(Tooltip, { text: reason, side: "right" }, () =>
+    h("div", { class: "pointer-events-auto truncate" }, __("Pin"))
   );
 }
 
