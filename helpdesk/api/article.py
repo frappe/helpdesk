@@ -40,7 +40,7 @@ def only_published(items: list) -> list:
     names = {item["name"].split("#")[0] for item in items}
     if not names:
         return []
-    published = frappe.get_all(
+    published = frappe.get_list(
         "HD Article",
         filters={"name": ("in", list(names)), "status": "Published"},
         pluck="name",
