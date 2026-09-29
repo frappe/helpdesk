@@ -230,27 +230,6 @@ def reply_from_the_portal(case, raised_by: str, status: str) -> str:
     return frappe.db.get_value("HD Ticket", ticket.name, "status")
 
 
-def raise_field_permlevel(case, fieldname: str, permlevel: int):
-    """Move a ticket field beyond the levels a customer holds, for this test."""
-    frappe.make_property_setter(
-        {
-            "doctype": "HD Ticket",
-            "fieldname": fieldname,
-            "property": "permlevel",
-            "value": permlevel,
-            "property_type": "Int",
-        },
-        is_system_generated=False,
-    )
-    case.addCleanup(frappe.clear_cache)
-    case.addCleanup(
-        frappe.db.delete,
-        "Property Setter",
-        {"doc_type": "HD Ticket", "field_name": fieldname},
-    )
-    frappe.clear_cache()
-
-
 def make_template(name: str, fields: list[dict]):
     """Create an HD Ticket Template, replacing any leftover with the name."""
     if frappe.db.exists("HD Ticket Template", name):

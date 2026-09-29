@@ -7,7 +7,6 @@ from frappe.query_builder.functions import Date
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import (
     agent_only,
     call_log_default_columns,
@@ -17,16 +16,6 @@ from helpdesk.utils import (
     parse_call_logs,
 )
 
-# core workflows of portal must show inside ticket view
-CUSTOMER_PORTAL_LIST_FIELDS = (
-    "name",
-    "subject",
-    "status",
-    "priority",
-    "response_by",
-    "resolution_by",
-    "creation",
-)
 SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
 
 
@@ -125,17 +114,11 @@ def get_list_data(
         rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
-    ticket_fields = TicketFields() if doctype == "HD Ticket" else None
-    if ticket_fields:
+    if doctype == "HD Ticket":
         rows.append("_seen") if "_seen" not in rows else rows
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-        rows = ticket_fields.visible(rows)
-        columns = ticket_fields.visible(columns, "key")
-        if group_by_field in ticket_fields.hidden:
-            # every ticket would land outside every group, so show a plain list
-            group_by_field = view_type = None
     data = (
         frappe.get_list(
             doctype,
@@ -176,9 +159,6 @@ def get_list_data(
         {"label": "Assigned To", "type": "Text", "value": "_assign"},
         {"label": "Owner", "type": "Link", "value": "owner", "options": "User"},
     ]
-    if ticket_fields:
-        fields = ticket_fields.visible(fields, "value")
-        std_fields = ticket_fields.visible(std_fields, "value")
 
     for field in std_fields:
         if field.get("value") not in rows:
@@ -290,9 +270,17 @@ def get_filterable_fields(
         "Datetime",
     ]
 
-    ticket_fields = TicketFields()
-    visible_custom_fields = ticket_fields.customer_template_fields
-    customer_portal_fields = [*CUSTOMER_PORTAL_LIST_FIELDS, "customer"]
+    visible_custom_fields = get_visible_custom_fields()
+    customer_portal_fields = [
+        "name",
+        "subject",
+        "status",
+        "priority",
+        "response_by",
+        "resolution_by",
+        "creation",
+        "customer",
+    ]
 
     from_doc_fields = (
         frappe.qb.from_(QBDocField)
@@ -396,8 +384,6 @@ def get_filterable_fields(
     for field in standard_fields:
         if field.get("fieldname") not in [r.get("fieldname") for r in res]:
             res.append(field)
-    if doctype == "HD Ticket":
-        res = ticket_fields.visible(res, "fieldname")
     return res
 
 
@@ -416,9 +402,6 @@ def sort_options(doctype: str, show_customer_portal_fields: bool = False):
 
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
-
-    if doctype == "HD Ticket":
-        fields = TicketFields().visible(fields, "value")
 
     standard_fields = [
         {"label": "Name", "value": "name"},
@@ -471,8 +454,6 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
     if doctype != "HD Ticket":
         return quick_filters
 
-    quick_filters = TicketFields().visible(quick_filters, "name")
-
     _list = get_controller(doctype)
     if hasattr(_list, "filter_standard_fields") and show_customer_portal_fields:
         # to filter out more fields from customer remember to update customer_not_allowed_fields in hd_ticket.py
@@ -482,12 +463,27 @@ def get_quick_filters(doctype: str, show_customer_portal_fields: bool = False):
 
 
 def get_customer_portal_fields(doctype, fields):
+    visible_custom_fields = get_visible_custom_fields()
     customer_portal_fields = [
-        *CUSTOMER_PORTAL_LIST_FIELDS,
-        *TicketFields().customer_template_fields,
+        "name",
+        "subject",
+        "status",
+        "priority",
+        "response_by",
+        "resolution_by",
+        "creation",
+        *visible_custom_fields,
     ]
     fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields
+
+
+def get_visible_custom_fields() -> list[str]:
+    return frappe.db.get_all(
+        "HD Ticket Template Field",
+        {"parent": "Default", "visible_to": "Everyone"},
+        pluck="fieldname",
+    )
 
 
 def default_view_exists(doctype):

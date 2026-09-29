@@ -20,7 +20,7 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import (
-    CUSTOMER_EDIT_EXEMPT_FIELDS,
+    CUSTOMER_ALWAYS_WRITABLE_FIELDS,
     PORTAL_INSERT_EXEMPT_FIELDS,
     SERVER_COMPUTED_FIELDS,
 )
@@ -90,9 +90,10 @@ class HDTicket(Document):
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
-        self.flags.ignore_permlevel_for_fields = (
-            list(PORTAL_INSERT_EXEMPT_FIELDS) + TicketFields().customer_fillable
-        )
+        self.flags.ignore_permlevel_for_fields = [
+            *PORTAL_INSERT_EXEMPT_FIELDS,
+            *(row.fieldname for row in self.customer_writable_rows()),
+        ]
 
     def validate_higher_perm_levels(self):
         # ahead of the framework's silent reset of fields the user cannot write,
@@ -456,12 +457,12 @@ class HDTicket(Document):
         # custom flag created to allow insertion in special cases
         if self.flags.get("ignore_customer_edit_guard"):
             return
-        editable = self.customer_editable_fields()
+        editable = self.customer_writable_after_create()
         # the framework's reset runs next and would revert what the template opens
         self.flags.ignore_permlevel_for_fields = list(editable)
         # a customer is never sent what it cannot read, so a whole-document save
         # carries those blank; the framework's reset puts them back
-        unreadable = TicketFields().unreadable
+        unreadable = TicketFields().unreadable_fields
         changed = [
             df
             for df in self.meta.fields
@@ -485,16 +486,29 @@ class HDTicket(Document):
         )
         frappe.throw(message.format(labels), frappe.PermissionError)
 
-    def customer_editable_fields(self) -> set[str]:
-        """Customers may only close and whatever the template opens to them;
-        replies reopen the ticket server-side."""
-        editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS) | set(
-            TicketFields().customer_editable
-        )
+    def customer_writable_after_create(self) -> set[str]:
+        """Close, rate, and what the template opens; replies reopen server-side."""
+        writable = set(CUSTOMER_ALWAYS_WRITABLE_FIELDS) | {
+            row.fieldname
+            for row in self.customer_writable_rows()
+            if row.editable_after_creation
+        }
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved" or self.flags.get("customer_reply_reopen"):
-            editable.add("status")
-        return editable
+            writable.add("status")
+        return writable
+
+    def customer_writable_rows(self) -> list[frappe._dict]:
+        """Template rows a customer may fill: shown, readable, not server-set."""
+        levels = self.get_permlevel_access("read")
+        readable = {df.fieldname for df in self.meta.fields if df.permlevel in levels}
+        return [
+            row
+            for row in TicketFields().template_rows
+            if row.visible_to != "Agents"
+            and row.fieldname in readable
+            and row.fieldname not in SERVER_COMPUTED_FIELDS
+        ]
 
     def generate_key(self):
         self.key = uuid.uuid4()

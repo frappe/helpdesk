@@ -37,8 +37,8 @@ PORTAL_INSERT_EXEMPT_FIELDS = [
     "customer",
 ]
 
-# fields customer can edit, status_category => closed is only allowed
-CUSTOMER_EDIT_EXEMPT_FIELDS = (
+# a customer may always change these: closing sets status_category, rating the feedback
+CUSTOMER_ALWAYS_WRITABLE_FIELDS = (
     "status_category",
     "feedback",
     "feedback_extra",

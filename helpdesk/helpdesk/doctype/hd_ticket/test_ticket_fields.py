@@ -3,7 +3,7 @@ from frappe.client import get as client_get
 from frappe.permissions import update_permission_property
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.api.doc import get_filterable_fields, get_list_data
+from helpdesk.api.doc import get_visible_custom_fields
 from helpdesk.consts import (
     CORE_TICKET_FIELDS,
     DEFAULT_TICKET_TEMPLATE,
@@ -20,7 +20,6 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     make_customer_ticket,
-    raise_field_permlevel,
     reply_from_the_portal,
     set_default_template_visibility,
 )
@@ -99,21 +98,11 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         with self.assertRaises(frappe.PermissionError):
             reply_from_the_portal(self, CUSTOMER_EMAIL, "Closed")
 
-    def test_permlevel_hidden_field_is_absent_from_list_columns_and_filters(self):
-        """A column the query cannot return would be a header with no data under it."""
-        make_customer_ticket(self, CUSTOMER_EMAIL, priority="High")
-        raise_field_permlevel(self, "priority", TICKET_INTERNAL_FIELD_PERMLEVEL)
-
-        frappe.set_user(CUSTOMER_EMAIL)
-        result = get_list_data(
-            "HD Ticket",
-            rows=["subject", "priority"],
-            columns=[{"key": "subject"}, {"key": "priority"}],
-        )
-        self.assertNotIn("priority", [c.get("key") for c in result["columns"]])
-        self.assertNotIn("priority", result["rows"])
-        offered = [f.get("fieldname") for f in get_filterable_fields("HD Ticket")]
-        self.assertNotIn("priority", offered)
+    def test_visible_custom_fields_are_the_everyone_rows(self):
+        self.addCleanup(set_default_template_visibility("priority", "Agents"))
+        self.assertNotIn("priority", get_visible_custom_fields())
+        set_default_template_visibility("priority", "Everyone")
+        self.assertIn("priority", get_visible_custom_fields())
 
     def test_hiding_warns_once_and_only_for_fields_the_api_still_serves(self):
         """The warning names the rows this save hides, not every hidden row, forever."""
@@ -149,8 +138,8 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.addCleanup(set_default_template_visibility("priority", "Everyone"))
         frappe.set_user(AGENT_EMAIL)
         fields = TicketFields()
-        form = [f.fieldname for f in fields.form]
-        details = [f.fieldname for f in fields.layout]
+        form = [f.fieldname for f in fields.get_form()]
+        details = [f.fieldname for f in fields.get_layout()]
         unlisted = [f for f in CORE_TICKET_FIELDS if f not in form]
         self.assertIn("priority", form)
         self.assertEqual(details, form + unlisted)

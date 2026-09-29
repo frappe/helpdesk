@@ -24,7 +24,7 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    return TicketFields().strip(d.as_dict())
+    return TicketFields().strip_hidden_fields(d.as_dict())
 
 
 @frappe.whitelist()
@@ -37,7 +37,7 @@ def get_one(name: str):
     doc = frappe.get_doc("HD Ticket", name)
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
-    ticket = fields.strip(doc.as_dict())
+    ticket = fields.strip_hidden_fields(doc.as_dict())
     # core caches comment and email snippets here; nothing in the SPA reads it
     ticket.pop("_comments", None)
 
@@ -54,9 +54,9 @@ def get_one(name: str):
         **ticket,
         "communications": get_communications(name),
         "contact": contact,
-        "template": {"fields": fields.form},
+        "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=not fields.for_agent
+            "HD Ticket", is_customer_portal=not fields.is_agent
         ),
     }
 
@@ -390,7 +390,7 @@ def duplicate_ticket(ticket_doc, subject):
 def get_ticket_customizations():
     """Every field the agent details tab may show, as this user may see it."""
     return {
-        "fields": TicketFields().layout,
+        "fields": TicketFields().get_layout(),
         "_form_script": get_form_script("HD Ticket"),
     }
 
