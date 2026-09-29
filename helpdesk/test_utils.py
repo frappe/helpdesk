@@ -267,14 +267,9 @@ def other_priority(current: str) -> str:
 def default_template_rows() -> list[dict]:
     """The Default template's rows as plain dicts, for restoring later."""
     template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    # every column, so a column added later is restored too
     return [
-        {
-            "fieldname": f.fieldname,
-            "required": f.required,
-            "visible_to": f.visible_to,
-            "url_method": f.url_method,
-            "placeholder": f.placeholder,
-        }
+        f.as_dict(no_default_fields=True, no_child_table_fields=True)
         for f in template.fields
     ]
 
