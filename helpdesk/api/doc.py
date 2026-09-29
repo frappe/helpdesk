@@ -46,9 +46,6 @@ def get_list_data(
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
 
-    handle_at_me_support(filters)
-    handle_assigned_on_filter(filters, doctype)
-
     _list = get_controller(doctype)
     default_rows = []
     if hasattr(_list, "default_list_data"):
@@ -101,6 +98,9 @@ def get_list_data(
                         filters.append([key, value[0], value[1]])
                     else:
                         filters.append([key, "=", value])
+
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
 
     if rows is None:
         rows = []
