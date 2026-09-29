@@ -550,12 +550,8 @@ def handle_at_me_support(filters):
 def _replace_at_me(container, key):
     value = container[key]
     if isinstance(value, list):
-        if "@me" in value:
-            value[value.index("@me")] = frappe.session.user
-        elif "%@me%" in value:
-            index = [i for i, v in enumerate(value) if v == "%@me%"]
-            for i in index:
-                value[i] = "%" + frappe.session.user + "%"
+        for index in range(len(value)):
+            _replace_at_me(value, index)
     elif value == "@me":
         container[key] = frappe.session.user
     elif value == "%@me%":
