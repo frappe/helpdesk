@@ -103,9 +103,14 @@ class HDTicket(Document):
             list(PORTAL_INSERT_EXEMPT_FIELDS) + TicketFields().customer_fillable
         )
 
+    def validate_higher_perm_levels(self):
+        # ahead of the framework's silent reset of fields the user cannot write,
+        # so a customer's change is refused out loud instead of vanishing
+        self.prevent_customer_edits()
+        super().validate_higher_perm_levels()
+
     def before_validate(self):
         self.check_update_perms()
-        self.prevent_customer_edits()
         self.set_ticket_type()
         self.set_raised_by()
         self.set_priority()
@@ -463,6 +468,7 @@ class HDTicket(Document):
         # custom flag created to allow insertion in special cases
         if self.flags.get("ignore_customer_edit_guard"):
             return
+        self.restore_unreadable_blanks()
         editable = self.customer_editable_fields()
         changed = [
             df
@@ -480,6 +486,14 @@ class HDTicket(Document):
             _("You cannot change {0} after the ticket is raised").format(labels),
             frappe.PermissionError,
         )
+
+    def restore_unreadable_blanks(self):
+        """A customer is never sent the fields it cannot read, so a whole-document
+        save carries them blank; that is absence, not an edit."""
+        before = self.get_doc_before_save()
+        for fieldname in TicketFields().unreadable:
+            if not self.get(fieldname):
+                self.set(fieldname, before.get(fieldname))
 
     def customer_editable_fields(self) -> set[str]:
         """Customers may only close; replies reopen the ticket server-side."""

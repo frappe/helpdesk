@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import frappe
 from frappe.client import get as client_get
+from frappe.client import save as client_save
 from frappe.client import set_value as client_set_value
 from frappe.desk.form.utils import add_comment as desk_add_comment
 from frappe.tests import IntegrationTestCase
@@ -2478,7 +2479,7 @@ PERMS_AGENT = "perms.agent@example.com"
 
 class TestHDTicketFieldPermissions(IntegrationTestCase):
     """Customers may only fill customer-facing fields, and only while creating.
-    Permlevel-protected fields revert silently; level-0 fields raise PermissionError."""
+    A later edit to any field raises PermissionError, whatever its permlevel."""
 
     def setUp(self):
         frappe.set_user("Administrator")
@@ -2509,6 +2510,38 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             ticket.save()
         ticket.reload()
         self.assertEqual(ticket.subject, original_subject)
+
+    def test_customer_edit_to_a_protected_field_raises(self):
+        """Frappe resets fields a user cannot write before any hook runs, so
+        without the guard a faulty portal script would fail silently."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        for fieldname, value in (
+            ("priority", other_priority(ticket.priority)),
+            ("resolution_details", "set by a portal script"),
+        ):
+            with self.assertRaises(frappe.PermissionError):
+                client_set_value("HD Ticket", ticket.name, fieldname, value)
+            self.assertEqual(
+                frappe.db.get_value("HD Ticket", ticket.name, fieldname),
+                ticket.get(fieldname),
+            )
+
+    def test_customer_resaving_an_unchanged_ticket_passes(self):
+        """A customer is never sent the fields it cannot read, so a whole-document
+        save carries them blank; that is not an edit."""
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.db.set_value(
+            "HD Ticket", ticket.name, "resolution_details", "agent notes"
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        seen = client_get("HD Ticket", ticket.name)
+        self.assertFalse(seen.get("resolution_details"))
+        client_save(seen)
+        self.assertEqual(
+            frappe.db.get_value("HD Ticket", ticket.name, "resolution_details"),
+            "agent notes",
+        )
 
     def test_customer_can_close_own_ticket(self):
         """Closing also flips status_category via fetch_from; the guard must allow both."""
@@ -2621,10 +2654,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             ).insert()
             self.assertEqual(visible.get(fieldname), "customer value")
 
-            # fillable only while creating: this later edit gets undone
+            # fillable only while creating: a later edit is refused
             visible.reload()
             visible.set(fieldname, "changed later")
-            visible.save()
+            with self.assertRaises(frappe.PermissionError):
+                visible.save()
             visible.reload()
             self.assertEqual(visible.get(fieldname), "customer value")
         finally:
@@ -2869,7 +2903,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     def test_visible_field_fillable_only_while_creating(self):
         """A standard field the default template shows can be filled on the
-        creation form; afterwards it is read-only for the customer."""
+        creation form; afterwards an edit is refused."""
         set_default_template_rows([{"fieldname": "priority", "visible_to": "Everyone"}])
         frappe.set_user(PERMS_CUSTOMER)
         default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
@@ -2879,7 +2913,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
         ticket.reload()
         ticket.priority = other_priority(chosen)
-        ticket.save()
+        with self.assertRaises(frappe.PermissionError):
+            ticket.save()
         ticket.reload()
         self.assertEqual(ticket.priority, chosen)
 
