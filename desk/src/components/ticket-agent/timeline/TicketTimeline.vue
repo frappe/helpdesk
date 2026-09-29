@@ -1,81 +1,89 @@
 <template>
-  <PinnedCommentsBar :comments="pinnedComments" :jump="goToPinned" />
-  <TimelineContainer ref="timelineContainer">
-    <ActivityTimeline
-      ref="timelineRef"
-      class="mt-4 px-5 pt-1 pb-6"
-      :activities="filtered"
-      :loading="_loading"
-      :paginate="paginate"
-    >
-      <template #empty>
-        <div
-          class="flex h-full flex-col items-center justify-center gap-2 text-ink-gray-4"
-        >
-          <component :is="emptyIcon" class="size-6" />
-          <p class="text-p-base text-ink-gray-5">
-            {{ __("No {0} yet", [tabLabel]) }}
-          </p>
-        </div>
-      </template>
+  <div class="relative flex min-h-0 flex-1 flex-col">
+    <!-- floats over the feed, so pins coming and going never move the rows -->
+    <PinnedCommentsBar
+      class="absolute inset-x-0 top-0 z-10"
+      :comments="pinnedComments"
+      :jump="goToPinned"
+    />
+    <TimelineContainer ref="timelineContainer">
+      <ActivityTimeline
+        ref="timelineRef"
+        class="px-5 pb-6"
+        :class="pinnedComments.length ? 'scroll-pt-14 pt-14' : 'mt-4 pt-1'"
+        :activities="filtered"
+        :loading="_loading"
+        :paginate="paginate"
+      >
+        <template #empty>
+          <div
+            class="flex h-full flex-col items-center justify-center gap-2 text-ink-gray-4"
+          >
+            <component :is="emptyIcon" class="size-6" />
+            <p class="text-p-base text-ink-gray-5">
+              {{ __("No {0} yet", [tabLabel]) }}
+            </p>
+          </div>
+        </template>
 
-      <!-- reuse the framework row, bolding tag names alongside the actor -->
-      <template #item-log="{ activity }">
-        <LogItem :activity="withTagNamesBold(activity)" />
-      </template>
+        <!-- reuse the framework row, bolding tag names alongside the actor -->
+        <template #item-log="{ activity }">
+          <LogItem :activity="withTagNamesBold(activity)" />
+        </template>
 
-      <template #item-comment="{ activity }">
-        <TimelineCommentRow
-          :activity="activity"
-          :extras="extrasFor(activity)"
-          :pinned="pinnedNames.has(activity.data.name)"
-          :pin-count="pinnedNames.size"
-          @update="refresh"
-        />
-      </template>
+        <template #item-comment="{ activity }">
+          <TimelineCommentRow
+            :activity="activity"
+            :extras="extrasFor(activity)"
+            :pinned="pinnedNames.has(activity.data.name)"
+            :pin-count="pinnedNames.size"
+            @update="refresh"
+          />
+        </template>
 
-      <template #item-email="{ activity }">
-        <EmailItem :email="withEmailFixups(activity)">
-          <template #actions>
-            <Button
-              variant="ghost"
-              :tooltip="__('Reply')"
-              @click="reply(activity)"
-            >
-              <template #icon><ReplyIcon class="text-ink-gray-7" /></template>
-            </Button>
-            <Button
-              variant="ghost"
-              :tooltip="__('Reply All')"
-              @click="replyAll(activity)"
-            >
-              <template #icon
-                ><ReplyAllIcon class="text-ink-gray-7"
-              /></template>
-            </Button>
-            <Dropdown align="end" :options="emailOptions(activity)">
+        <template #item-email="{ activity }">
+          <EmailItem :email="withEmailFixups(activity)">
+            <template #actions>
               <Button
-                icon="lucide-more-horizontal"
-                class="!text-ink-gray-7"
                 variant="ghost"
-              />
-            </Dropdown>
-          </template>
-        </EmailItem>
-      </template>
+                :tooltip="__('Reply')"
+                @click="reply(activity)"
+              >
+                <template #icon><ReplyIcon class="text-ink-gray-7" /></template>
+              </Button>
+              <Button
+                variant="ghost"
+                :tooltip="__('Reply All')"
+                @click="replyAll(activity)"
+              >
+                <template #icon
+                  ><ReplyAllIcon class="text-ink-gray-7"
+                /></template>
+              </Button>
+              <Dropdown align="end" :options="emailOptions(activity)">
+                <Button
+                  icon="lucide-more-horizontal"
+                  class="!text-ink-gray-7"
+                  variant="ghost"
+                />
+              </Dropdown>
+            </template>
+          </EmailItem>
+        </template>
 
-      <template #item-call="{ activity }">
-        <CallArea :activity="activity.data" />
-      </template>
-      <template #icon-call="{ activity }">
-        <LucidePhoneIncoming
-          v-if="activity.data.call_type === 'Incoming'"
-          class="size-4 text-ink-gray-5"
-        />
-        <LucidePhoneOutgoing v-else class="size-4 text-ink-gray-5" />
-      </template>
-    </ActivityTimeline>
-  </TimelineContainer>
+        <template #item-call="{ activity }">
+          <CallArea :activity="activity.data" />
+        </template>
+        <template #icon-call="{ activity }">
+          <LucidePhoneIncoming
+            v-if="activity.data.call_type === 'Incoming'"
+            class="size-4 text-ink-gray-5"
+          />
+          <LucidePhoneOutgoing v-else class="size-4 text-ink-gray-5" />
+        </template>
+      </ActivityTimeline>
+    </TimelineContainer>
+  </div>
   <TicketSplitModal
     :modelValue="Boolean(splitCommunication)"
     @update:modelValue="splitCommunication = ''"
@@ -438,27 +446,6 @@ watch(
 );
 
 onBeforeUnmount(() => clearTimeout(highlightTimer));
-
-// scroll anchoring pins rows to the feed's top edge, so the bar would push them down;
-// off for the toggle the feed stays bottom-anchored, back on so live rows keep place
-watch(
-  () => Boolean(pinnedComments.value.length),
-  () => {
-    const scroller = feedScroller();
-    if (!scroller) return;
-    scroller.style.overflowAnchor = "none";
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        scroller.style.overflowAnchor = "";
-        // a scroll drops the anchor saved before the bar, else it snaps back to it
-        const top = scroller.scrollTop;
-        scroller.scrollTop = top < 0 ? top + 1 : top - 1;
-        scroller.scrollTop = top;
-      })
-    );
-  },
-  { flush: "pre" }
-);
 
 // the socket payload can't carry attachments (they live on File, joined
 // server-side), so a live comment renders bare; fetch its files and patch

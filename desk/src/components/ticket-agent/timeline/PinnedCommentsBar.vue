@@ -1,53 +1,65 @@
 <template>
-  <button
-    v-if="comments.length"
-    type="button"
-    class="flex shrink-0 items-center gap-2.5 bg-surface-gray-1 px-5 py-2 text-left"
-    :aria-label="__('Go to pinned comment {0}', [current + 1])"
-    @click="select"
+  <!-- fades in a touch from above; leaving is a plain, quicker fade -->
+  <Transition
+    :css="animated"
+    enter-active-class="motion-safe:transition-[opacity,transform] motion-safe:duration-200 motion-safe:ease-out"
+    enter-from-class="opacity-0 -translate-y-1"
+    leave-active-class="motion-safe:transition-opacity motion-safe:duration-150 motion-safe:ease-in"
+    leave-to-class="opacity-0"
   >
-    <!-- one full-height line split evenly per pin; past two pins -my-0.5
-    reaches into the padding so the segments stay tall enough to read -->
-    <span
-      class="relative flex flex-col gap-0.5 self-stretch"
-      :class="{ '-my-0.5': comments.length > 2 }"
+    <!-- the after: fade stands in for the feed's own top fade, which the bar covers -->
+    <button
+      v-if="comments.length"
+      type="button"
+      class="flex items-center gap-2.5 bg-surface-gray-1 px-5 py-2.5 text-left after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-gradient-to-b after:from-surface-base"
+      :aria-label="__('Go to pinned comment {0}', [current + 1])"
+      @click="select"
     >
+      <!-- one full-height line split evenly per pin; past two pins -my-0.5
+      reaches into the padding so the segments stay tall enough to read -->
       <span
-        v-for="comment in comments"
-        :key="comment.name"
-        class="w-[3px] flex-1 rounded-full bg-surface-gray-4"
-      />
-      <span
-        class="absolute inset-x-0 rounded-full bg-surface-violet-6 motion-safe:transition-[top] motion-safe:duration-150 motion-safe:ease-out"
-        :style="indicatorStyle"
-      />
-    </span>
-    <!-- -top-px optically centres Inter, whose glyphs sit low -->
-    <span class="relative -top-px flex min-w-0 flex-1 items-center gap-2">
-      <PinIcon class="size-4 shrink-0 text-ink-gray-8" />
-      <!-- one grid cell, so the leaving and entering previews overlap while they slide -->
-      <span class="grid min-w-0 flex-1 overflow-hidden">
-        <Transition
-          enter-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
-          leave-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
-          :enter-from-class="`opacity-0 ${
-            toOlder ? '-translate-y-full' : 'translate-y-full'
-          }`"
-          :leave-to-class="`opacity-0 ${
-            toOlder ? 'translate-y-full' : '-translate-y-full'
-          }`"
-        >
-          <p
-            :key="current"
-            class="truncate text-p-base text-ink-gray-5 [grid-area:1/1]"
-          >
-            <span class="font-medium text-ink-gray-7">{{ current + 1 }}:</span>
-            {{ preview }}
-          </p>
-        </Transition>
+        class="relative flex flex-col gap-0.5 self-stretch"
+        :class="{ '-my-0.5': comments.length > 2 }"
+      >
+        <span
+          v-for="comment in comments"
+          :key="comment.name"
+          class="w-[3px] flex-1 rounded-full bg-surface-gray-4"
+        />
+        <span
+          class="absolute inset-x-0 top-0 rounded-full bg-surface-violet-6 motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out"
+          :style="indicatorStyle"
+        />
       </span>
-    </span>
-  </button>
+      <!-- -top-px optically centres Inter, whose glyphs sit low -->
+      <span class="relative -top-px flex min-w-0 flex-1 items-center gap-2">
+        <PinIcon class="size-4 shrink-0 text-ink-gray-8" />
+        <!-- one grid cell, so the leaving and entering previews overlap while they slide -->
+        <span class="grid min-w-0 flex-1 overflow-hidden">
+          <Transition
+            enter-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
+            leave-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
+            :enter-from-class="`opacity-0 ${
+              toOlder ? '-translate-y-full' : 'translate-y-full'
+            }`"
+            :leave-to-class="`opacity-0 ${
+              toOlder ? 'translate-y-full' : '-translate-y-full'
+            }`"
+          >
+            <p
+              :key="current"
+              class="truncate text-p-base text-ink-gray-5 [grid-area:1/1]"
+            >
+              <span class="font-medium tabular-nums text-ink-gray-7"
+                >{{ current + 1 }}:</span
+              >
+              {{ preview }}
+            </p>
+          </Transition>
+        </span>
+      </span>
+    </button>
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -71,6 +83,8 @@ const ADVANCE_DELAY_MS = 300;
 
 const current = ref(props.comments.length - 1);
 let jumping = false;
+// the first pins arrive with the page, and that should not animate in
+const animated = ref(props.comments.length > 0);
 // older pins sit higher in the feed, so their preview slides in from above
 const toOlder = ref(true);
 
@@ -84,8 +98,9 @@ const preview = computed(() =>
 const indicatorStyle = computed(() => {
   const count = props.comments.length;
   return {
-    top: `calc(${current.value} * (100% + ${SEGMENT_GAP}) / ${count})`,
     height: `calc((100% - ${count - 1} * ${SEGMENT_GAP}) / ${count})`,
+    // a translate percentage is the piece's own height, one segment
+    transform: `translateY(calc(${current.value} * (100% + ${SEGMENT_GAP})))`,
   };
 });
 
@@ -107,5 +122,10 @@ async function select() {
 watch(
   () => props.comments.length,
   (count) => (current.value = count - 1)
+);
+watch(
+  () => props.comments.length,
+  () => (animated.value = true),
+  { once: true, flush: "post" }
 );
 </script>
