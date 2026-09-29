@@ -62,7 +62,8 @@ def create_email_account(data: dict[str, Any]):
             )
             email_doc.password = data.get("password")
             # validate whether the credentials are correct
-            email_doc.get_incoming_server()
+            if email_doc.enable_incoming:
+                email_doc.get_incoming_server()
 
         # if correct credentials, save the email account
         email_doc.save()
