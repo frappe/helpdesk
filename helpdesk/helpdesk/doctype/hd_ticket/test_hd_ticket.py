@@ -2611,10 +2611,12 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             "agent notes",
         )
 
-    def test_customer_can_close_own_ticket(self):
+    def test_customer_can_close_own_ticket_but_not_resolve_it(self):
         """Closing also flips status_category via fetch_from; the guard must allow both."""
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "status", "Resolved")
         client_set_value("HD Ticket", ticket.name, "status", "Closed")
         self.assertEqual(
             frappe.db.get_value("HD Ticket", ticket.name, "status"), "Closed"

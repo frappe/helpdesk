@@ -86,8 +86,8 @@ class CustomerEditController:
             for row in self.customer_writable_rows()
             if row.editable_after_creation
         }
-        category = frappe.db.get_value("HD Ticket Status", self.status, "category")
-        if category == "Resolved" or self.flags.get("customer_reply_reopen"):
+        # the portal only closes; Resolved is the agent's call and stops the SLA
+        if self.status == "Closed" or self.flags.get("customer_reply_reopen"):
             writable.add("status")
         return writable
 
