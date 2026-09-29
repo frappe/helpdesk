@@ -216,6 +216,8 @@ apiCall.submit({ ticket_id: "<id>", agent_id: "<agent>" });
 **Data Query Patterns**:
 
 - Always prefer `frappe.get_list()` over `frappe.get_all()` for new code. It handles perms out of the box and is more flexible.
+- `frappe.get_all()` is fine for child tables (e.g. `Has Role`, `HD Customer Member`), which have no permissions of their own.
+- When `frappe.get_all()` is used on a parent DocType, make sure the caller may see the result some other way, for example a `frappe.has_permission(...)` check first, or `@agent_only` / `@agent_manager_only` (`helpdesk/utils.py`) on the endpoint.
 - Use `frappe.qb.get_query(..., ignore_permissions=False)` when permission checks are needed
 - Example query patterns from helpdesk context
 

@@ -765,6 +765,8 @@ class TestHDTicket(IntegrationTestCase):
         add_comment(ticket2.name, "First comment on ticket 2")
 
         merge_ticket(source=ticket1.name, target=ticket2.name)
+        with self.assertRaises(frappe.ValidationError):
+            merge_ticket(source=ticket1.name, target=ticket2.name)
         ticket1.reload()
         self.assertEqual(ticket1.status, "Closed")
         self.assertTrue(ticket1.is_merged)
@@ -783,6 +785,42 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(
             len(comments), 3
         )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
+
+    def test_agent_merge_moves_emails_and_every_attachment(self):
+        source = make_ticket(description="Agent merge source")
+        target = make_ticket(description="Agent merge target")
+        for index in range(2):
+            frappe.get_doc(
+                {
+                    "doctype": "File",
+                    "file_name": f"merge-{index}.txt",
+                    "content": f"attachment {index}",
+                    "attached_to_doctype": "HD Ticket",
+                    "attached_to_name": source.name,
+                }
+            ).insert(ignore_permissions=True)
+
+        frappe.set_user(make_agent("merge-agent@example.com"))
+        try:
+            merge_ticket(source=source.name, target=target.name)
+        finally:
+            frappe.set_user("Administrator")
+
+        contents = frappe.get_list(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": target.name},
+            pluck="content",
+        )
+        self.assertTrue(any("Agent merge source" in c for c in contents))
+        files = frappe.get_list(
+            "File",
+            filters={
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": target.name,
+            },
+            pluck="file_name",
+        )
+        self.assertTrue({"merge-0.txt", "merge-1.txt"} <= set(files))
 
     def test_reply_to_merged_ticket_redirects_to_target(self):
         source = make_ticket(description="Merged source")
@@ -1859,11 +1897,11 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(communication_attachments, 4)
         self.assertEqual(ticket_attachments, 4)
 
-        # delete all files
         files = frappe.get_all(
             "File",
             filters={
                 "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+                "attached_to_name": ["in", communications + ticket_ids],
             },
             pluck="name",
         )
