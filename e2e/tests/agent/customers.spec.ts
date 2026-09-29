@@ -80,6 +80,9 @@ test("inviting adds an existing user at once and keeps a new email pending until
     await input.fill(email);
     await input.press("Enter");
   }
+  // the suggestions stay open after each email and can cover the Invite button
+  await dialog.getByRole("heading", { name: "Invite Contact" }).click();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
   await dialog.getByRole("button", { name: "Invite", exact: true }).click();
 
   await expect(card(page, existing.name)).toBeVisible();
