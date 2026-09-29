@@ -1,8 +1,8 @@
-import type { APIResponse, Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect, test, uid, usePersona } from "../../helpers/fixtures";
 import { raiseTicket } from "../../helpers/factories";
 import { PASSWORD, personas } from "../../helpers/personas";
-import type { Api } from "../../helpers/api";
+import { expectDenied, type Api } from "../../helpers/api";
 import { loginContext, openTicketInList } from "../../helpers/portal";
 
 test.describe("plain agent", () => {
@@ -152,13 +152,6 @@ test.describe("customer", () => {
 function addComment(api: Api, ticket: string, content: string, raw = false) {
   const args = { dt: "HD Ticket", dn: ticket, method: "new_comment", args: { content } };
   return raw ? api.raw("run_doc_method", args) : api.call("run_doc_method", args);
-}
-
-async function expectDenied(pending: Promise<APIResponse>) {
-  const response = await pending;
-  const body = await response.text();
-  expect(response.ok(), body).toBeFalsy();
-  expect(body).toMatch(/PermissionError|not permitted|Insufficient Permission/i);
 }
 
 async function selectRow(page: Page, api: Api, user: string, ticket: string) {
