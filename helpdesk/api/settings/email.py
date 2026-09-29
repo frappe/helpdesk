@@ -61,8 +61,8 @@ def create_email_account(data: dict[str, Any]):
                 "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
             )
             email_doc.password = data.get("password")
-            # validate whether the credentials are correct
-            if email_doc.enable_incoming:
+            # validate the credentials, except for outgoing-only services
+            if service == "Custom" or email_doc.email_server:
                 email_doc.get_incoming_server()
 
         # if correct credentials, save the email account
