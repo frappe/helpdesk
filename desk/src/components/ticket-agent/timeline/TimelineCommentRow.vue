@@ -6,11 +6,24 @@
     @discard="editing = false"
   >
     <template v-if="!editing" #actions>
-      <PinIcon
+      <!-- shows the slashed pin on hover so the click's effect is visible first -->
+      <Button
         v-if="pinned"
-        class="size-4 text-ink-violet-5"
-        :aria-label="__('Pinned')"
-      />
+        variant="ghost"
+        class="group text-ink-violet-5"
+        :tooltip="__('Unpin')"
+        :aria-label="__('Unpin')"
+        @click="togglePin"
+      >
+        <template #icon>
+          <PinIcon
+            class="size-4 group-hover:hidden group-focus-visible:hidden"
+          />
+          <UnpinIcon
+            class="hidden size-4 group-hover:block group-focus-visible:block"
+          />
+        </template>
+      </Button>
       <Dropdown
         align="end"
         :options="kebabOptions"
