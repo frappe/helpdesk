@@ -12,7 +12,7 @@
           <span class="truncate text-base font-medium text-ink-gray-6">
             {{ activity.author.fullname }}
           </span>
-          <Badge v-if="pinned" theme="violet" :label="__('Pinned')">
+          <Badge v-if="pinned" theme="gray" :label="__('Pinned')">
             <template #prefix><PinIcon class="size-3" /></template>
           </Badge>
         </div>
