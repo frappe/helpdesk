@@ -1812,6 +1812,7 @@ class TestHDTicket(IntegrationTestCase):
         )
         self.assertEqual(comm.sender, email_account.email_id)
         self.assertEqual(comm.email_account, email_account.name)
+        self.assertEqual(comm.sender_full_name, frappe.utils.get_fullname(agent))
 
     def test_reply_via_agent_with_invalid_from_email_account(self):
         """If `from_email.email_account` does not exist, reply_via_agent should throw."""

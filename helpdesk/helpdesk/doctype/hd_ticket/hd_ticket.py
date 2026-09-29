@@ -706,6 +706,7 @@ class HDTicket(Document):
                 "reference_doctype": "HD Ticket",
                 "reference_name": self.name,
                 "sender": sender,
+                "sender_full_name": frappe.utils.get_fullname(),
                 "sent_or_received": "Sent",
                 "status": "Linked",
                 "subject": subject,
