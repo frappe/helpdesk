@@ -60,8 +60,6 @@
   "email_account",
   "column_break_16",
   "via_customer_portal",
-  "attachment",
-  "content_type",
   "split_and_merge_section",
   "is_merged",
   "merged_with",
@@ -379,18 +377,6 @@
    "permlevel": 8
   },
   {
-   "fieldname": "attachment",
-   "fieldtype": "Attach",
-   "hidden": 1,
-   "label": "Attachment"
-  },
-  {
-   "fieldname": "content_type",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Content Type"
-  },
-  {
    "fieldname": "customer_feedback_section",
    "fieldtype": "Section Break"
   },
@@ -526,7 +512,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-09-29 23:00:00.000000",
+ "modified": "2026-09-30 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
