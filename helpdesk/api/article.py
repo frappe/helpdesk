@@ -30,14 +30,14 @@ def search_with_enough_results(
     out = hd_search(query, qtype=qtype)
     if not out:
         return prev_res, len(prev_res) == NUM_RESULTS
-    items = prev_res + only_published(out[0].get("items", []))
+    items = prev_res + filter_public_articles(out[0].get("items", []))
     items = list({v["id"]: v for v in items}.values())[:NUM_RESULTS]  # unique results
     return items, len(items) == NUM_RESULTS
 
 
-def only_published(items: list) -> list:
+def filter_public_articles(articles: list) -> list:
     """Drop hits whose article is no longer published, the index can be stale."""
-    names = {item["name"].split("#")[0] for item in items}
+    names = {article["name"].split("#")[0] for article in articles}
     if not names:
         return []
     published = frappe.get_list(
@@ -45,7 +45,9 @@ def only_published(items: list) -> list:
         filters={"name": ("in", list(names)), "status": "Published"},
         pluck="name",
     )
-    return [item for item in items if item["name"].split("#")[0] in published]
+    return [
+        article for article in articles if article["name"].split("#")[0] in published
+    ]
 
 
 def sanitize_query(query: str) -> str:
