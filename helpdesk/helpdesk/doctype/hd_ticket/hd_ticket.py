@@ -10,7 +10,6 @@ from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
-from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
@@ -19,11 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import (
-    CUSTOMER_ALWAYS_WRITABLE_FIELDS,
-    PORTAL_INSERT_EXEMPT_FIELDS,
-    SERVER_COMPUTED_FIELDS,
-)
+from helpdesk.consts import SERVER_COMPUTED_FIELDS
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -34,7 +29,6 @@ from helpdesk.helpdesk.utils.email import (
 )
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
-from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import (
     agent_only,
     capture_event,
@@ -47,11 +41,12 @@ from helpdesk.utils import (
 )
 
 from ..hd_service_level_agreement.utils import get_sla
+from .customer_edit_controller import CustomerEditController
 
 customer_not_allowed_fields = ["customer"]
 
 
-class HDTicket(Document):
+class HDTicket(Document, CustomerEditController):
     @property
     def default_open_status(self):
         return frappe.db.get_value(
@@ -80,20 +75,6 @@ class HDTicket(Document):
     def before_insert(self):
         self.generate_key()
         self.apply_portal_insert_rules()
-
-    def apply_portal_insert_rules(self):
-        """The permlevel reset after this hook wipes fields the user cannot write;
-        exempt server-set fields and the ones the template lets a customer fill."""
-        # a System Manager pulling emails is not the sender of the pulled tickets
-        if is_agent() or "System Manager" in frappe.get_roles():
-            return
-        if frappe.session.user != "Guest":
-            self.raised_by = frappe.session.user
-        self.via_customer_portal = 1
-        self.flags.ignore_permlevel_for_fields = [
-            *PORTAL_INSERT_EXEMPT_FIELDS,
-            *(row.fieldname for row in self.customer_writable_rows()),
-        ]
 
     def validate_higher_perm_levels(self):
         # ahead of the framework's silent reset of fields the user cannot write,
@@ -434,81 +415,6 @@ class HDTicket(Document):
         frappe.throw(
             _("Ticket must be resolved with a feedback"), frappe.ValidationError
         )
-
-    def check_update_perms(self):
-        # not gated on via_customer_portal: agent-raised tickets are still the customer's
-        old_doc = self.get_doc_before_save()
-        if not old_doc or is_agent():
-            return
-        # rating the ticket is the one thing a closing email asks the customer to do
-        if self.flags.get("ignore_closed_ticket_guard"):
-            return
-        is_closed = old_doc.status == "Closed"
-        is_rated = bool(old_doc.feedback)
-        if is_closed or is_rated:
-            text = _("Closed or rated tickets cannot be updated by non-agents")
-            frappe.throw(text, frappe.PermissionError)
-
-    def prevent_customer_edits(self):
-        """restrict customer from changing ticket values post submission of ticket."""
-        if self.is_new() or is_agent():
-            return
-
-        # custom flag created to allow insertion in special cases
-        if self.flags.get("ignore_customer_edit_guard"):
-            return
-        editable = self.customer_writable_after_create()
-        # the framework's reset runs next and would revert what the template opens
-        self.flags.ignore_permlevel_for_fields = list(editable)
-        # a customer is never sent what it cannot read, so a whole-document save
-        # carries those blank; the framework's reset puts them back
-        unreadable = TicketFields().unreadable_fields
-        changed = [
-            df
-            for df in self.meta.fields
-            if df.fieldtype not in no_value_fields
-            and df.fieldname not in editable
-            and not (df.fieldname in unreadable and not self.get(df.fieldname))
-            and self.has_value_changed(df.fieldname)
-        ]
-        if not changed:
-            return
-        writable_levels = self.get_permlevel_access("write")
-        not_permitted = [df for df in changed if df.permlevel not in writable_levels]
-        message = (
-            _("You do not have permission to change {0}")
-            if not_permitted
-            else _("You cannot change {0} after the ticket is raised")
-        )
-        labels = ", ".join(
-            self.meta.get_translated_label(df.fieldname)
-            for df in not_permitted or changed
-        )
-        frappe.throw(message.format(labels), frappe.PermissionError)
-
-    def customer_writable_after_create(self) -> set[str]:
-        """Close, rate, and what the template opens; replies reopen server-side."""
-        writable = set(CUSTOMER_ALWAYS_WRITABLE_FIELDS) | {
-            row.fieldname
-            for row in self.customer_writable_rows()
-            if row.editable_after_creation
-        }
-        category = frappe.db.get_value("HD Ticket Status", self.status, "category")
-        if category == "Resolved" or self.flags.get("customer_reply_reopen"):
-            writable.add("status")
-        return writable
-
-    def customer_writable_rows(self) -> list[frappe._dict]:
-        """Template rows a customer may fill: shown, readable, not server-set."""
-        levels = self.get_permlevel_access("read")
-        readable = {df.fieldname for df in self.meta.fields if df.permlevel in levels}
-        return [
-            row
-            for row in TicketFields().template_rows
-            if row.visible_to != "Agents"
-            and row.fieldname in readable
-            and row.fieldname not in SERVER_COMPUTED_FIELDS
-        ]
 
     def generate_key(self):
         self.key = uuid.uuid4()
