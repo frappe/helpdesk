@@ -8,13 +8,9 @@ from helpdesk.api.doc import (
     get_quick_filters,
     sort_options,
 )
-from helpdesk.test_utils import create_agent, create_contact, create_user
+from helpdesk.test_utils import create_agent, create_contact, create_user, unique_email
 
 AGENT_ONLY_FIELDS = {"_assign", "_user_tags", "agent_group", "ticket_type", "contact"}
-
-
-def unique_email(prefix: str) -> str:
-    return f"{prefix}-{frappe.generate_hash(length=8)}@example.com"
 
 
 class FieldPersonas(IntegrationTestCase):

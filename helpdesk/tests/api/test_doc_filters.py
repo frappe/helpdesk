@@ -8,7 +8,14 @@ from helpdesk.api.doc import (
     handle_at_me_support,
     remove_assignments,
 )
-from helpdesk.test_utils import create_agent, create_contact, make_team, make_ticket
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    make_team,
+    make_ticket,
+    make_todo,
+    unique_email,
+)
 
 ASSIGNED_AT = {
     "day_before": "2026-01-04 23:59:59",
@@ -16,26 +23,6 @@ ASSIGNED_AT = {
     "evening": "2026-01-05 18:30:00",
     "day_after": "2026-01-06 09:00:00",
 }
-
-
-def assign(ticket: str, user: str, at: str | None = None) -> str:
-    """Open a ToDo for `user` on `ticket`, optionally backdated to `at`."""
-    todo = frappe.get_doc(
-        {
-            "doctype": "ToDo",
-            "allocated_to": user,
-            "reference_type": "HD Ticket",
-            "reference_name": ticket,
-            "description": "Assigned in test",
-        }
-    ).insert(ignore_permissions=True)
-    if at:
-        frappe.db.set_value("ToDo", todo.name, "creation", at, update_modified=False)
-    return todo.name
-
-
-def unique_email(prefix: str) -> str:
-    return f"{prefix}-{frappe.generate_hash(length=8)}@example.com"
 
 
 class TestAtMeSupport(IntegrationTestCase):
@@ -98,7 +85,7 @@ class TestAssignedOnFilter(IntegrationTestCase):
         cls.tickets = {}
         for label, at in ASSIGNED_AT.items():
             cls.tickets[label] = make_ticket(subject=f"Assigned on {label}").name
-            assign(cls.tickets[label], cls.agent, at)
+            make_todo(cls.tickets[label], cls.agent, at)
 
     def test_each_operator_treats_the_value_as_a_whole_day(self) -> None:
         cases = [
@@ -133,8 +120,8 @@ class TestAssignedOnFilter(IntegrationTestCase):
     def test_only_own_open_assignments_count(self) -> None:
         other_agent = create_agent(unique_email("assigned-on-other")).name
         ticket = make_ticket(subject="Assigned to someone else").name
-        assign(ticket, other_agent, ASSIGNED_AT["evening"])
-        cancelled = assign(ticket, self.agent, ASSIGNED_AT["evening"])
+        make_todo(ticket, other_agent, ASSIGNED_AT["evening"])
+        cancelled = make_todo(ticket, self.agent, ASSIGNED_AT["evening"])
         frappe.db.set_value("ToDo", cancelled, "status", "Cancelled")
 
         self.assertNotIn(ticket, self.matching_names("=", "2026-01-05"))
@@ -192,7 +179,7 @@ class TestRemoveAssignments(IntegrationTestCase):
 
     def setUp(self) -> None:
         self.ticket = make_ticket(raised_by=self.customer["user"]).name
-        self.todo = assign(self.ticket, self.assignee)
+        self.todo = make_todo(self.ticket, self.assignee)
 
     def test_agent_removes_assignment(self) -> None:
         with self.set_user(self.agent):

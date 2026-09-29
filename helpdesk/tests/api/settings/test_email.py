@@ -1,5 +1,4 @@
 import imaplib
-import unittest
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -7,7 +6,12 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.settings.email import create_email_account
-from helpdesk.test_utils import create_agent
+from helpdesk.test_utils import (
+    create_agent,
+    make_agent_manager,
+    make_email_account_data,
+    unique_email,
+)
 
 EMAIL_ACCOUNT_MODULE = "frappe.email.doctype.email_account.email_account"
 
@@ -23,7 +27,7 @@ class TestCreateEmailAccount(IntegrationTestCase):
         frappe.set_user("Administrator")
 
     def test_gmail_account_saves_provider_servers_and_ticket_folder(self) -> None:
-        name = create_email_account(self.account_data("GMail"))
+        name = create_email_account(make_email_account_data("GMail"))
 
         account = frappe.get_doc("Email Account", name)
         self.assertEqual(account.service, "GMail")
@@ -36,7 +40,7 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.email_server.return_value.connect.assert_called_once()
 
     def test_invalid_credentials_are_rejected_and_nothing_saved(self) -> None:
-        data = self.account_data("GMail")
+        data = make_email_account_data("GMail")
         self.email_server.return_value.connect.side_effect = imaplib.IMAP4.error(
             "AUTHENTICATIONFAILED"
         )
@@ -48,13 +52,13 @@ class TestCreateEmailAccount(IntegrationTestCase):
 
     def test_unsupported_or_missing_service_is_rejected(self) -> None:
         for service in ("Hotmail", "", None):
-            data = self.account_data(service)
+            data = make_email_account_data(service)
             with self.assertRaises(frappe.ValidationError):
                 create_email_account(data)
             self.assertFalse(self.account_exists(data))
 
     def test_invalid_email_address_is_rejected(self) -> None:
-        data = self.account_data("GMail", email_id="not-an-email")
+        data = make_email_account_data("GMail", email_id="not-an-email")
 
         with self.assertRaises(frappe.ValidationError):
             create_email_account(data)
@@ -62,7 +66,7 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.assertFalse(self.account_exists(data))
 
     def test_custom_service_saves_given_servers_and_defaults(self) -> None:
-        data = self.account_data(
+        data = make_email_account_data(
             "Custom",
             email_server="imap.example.com",
             incoming_port="993",
@@ -82,7 +86,7 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.assert_ticket_inbox_folder(account)
 
     def test_frappe_mail_saves_api_credentials_without_imap(self) -> None:
-        data = self.account_data(
+        data = make_email_account_data(
             "Frappe Mail",
             api_key="mail-key",
             api_secret="mail-secret",
@@ -104,7 +108,7 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.email_server.assert_not_called()
 
     def test_outgoing_only_sendgrid_account_is_created(self) -> None:
-        data = self.account_data("Sendgrid", enable_incoming=0)
+        data = make_email_account_data("Sendgrid", enable_incoming=0)
 
         account = frappe.get_doc("Email Account", create_email_account(data))
 
@@ -114,13 +118,13 @@ class TestCreateEmailAccount(IntegrationTestCase):
 
     def test_outlook_yahoo_and_yandex_accounts_are_created(self) -> None:
         for service in ("Outlook", "Yahoo", "Yandex"):
-            data = self.account_data(service)
+            data = make_email_account_data(service)
             create_email_account(data)
             self.assertTrue(self.account_exists(data))
 
     def test_agent_cannot_create_email_account(self) -> None:
-        agent = create_agent(self.unique_email("email-agent"))
-        data = self.account_data("GMail")
+        agent = create_agent(unique_email("email-agent"))
+        data = make_email_account_data("GMail")
 
         with self.set_user(agent.name), self.assertRaises(frappe.PermissionError):
             create_email_account(data)
@@ -128,32 +132,12 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.assertFalse(self.account_exists(data))
 
     def test_agent_manager_can_create_outgoing_email_account(self) -> None:
-        data = self.account_data("GMail", enable_incoming=0)
+        data = make_email_account_data("GMail", enable_incoming=0)
 
-        with self.set_user(self.make_agent_manager()):
+        with self.set_user(make_agent_manager("email-manager")):
             create_email_account(data)
 
         self.assertTrue(self.account_exists(data))
-
-    def make_agent_manager(self) -> str:
-        manager = create_agent(self.unique_email("email-manager"))
-        frappe.get_doc("User", manager.name).add_roles("Agent Manager")
-        return manager.name
-
-    def account_data(self, service: str | None, **overrides: Any) -> dict[str, Any]:
-        """The payload EmailAdd.vue sends, with a unique name and address."""
-        suffix = frappe.generate_hash(length=6)
-        return {
-            "email_account_name": f"Support {suffix}",
-            "email_id": f"support-{suffix}@example.com",
-            "service": service,
-            "password": "app-password",
-            "enable_incoming": 1,
-            "enable_outgoing": 1,
-            "default_incoming": 0,
-            "default_outgoing": 0,
-            **overrides,
-        }
 
     def account_exists(self, data: dict[str, Any]) -> bool:
         return bool(
@@ -164,6 +148,3 @@ class TestCreateEmailAccount(IntegrationTestCase):
     def assert_ticket_inbox_folder(self, account) -> None:
         folders = [(row.folder_name, row.append_to) for row in account.imap_folder]
         self.assertEqual(folders, [("INBOX", "HD Ticket")])
-
-    def unique_email(self, prefix: str) -> str:
-        return f"{prefix}-{frappe.generate_hash(length=6)}@example.com"

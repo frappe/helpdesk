@@ -5,67 +5,29 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.article import get_article_stats, search
 from helpdesk.search import NUM_RESULTS
-from helpdesk.test_utils import create_agent, create_contact
-
-
-def make_article(status: str = "Published") -> str:
-    """Insert an HD Article with a unique title and return its name."""
-    return (
-        frappe.get_doc(
-            {
-                "doctype": "HD Article",
-                "title": f"Reset password {frappe.generate_hash(length=6)}",
-                "content": "<p>Open settings and click reset.</p>",
-                "status": status,
-            }
-        )
-        .insert(ignore_permissions=True)
-        .name
-    )
-
-
-def add_feedback(article: str, feedback: int) -> None:
-    frappe.get_doc(
-        {
-            "doctype": "HD Article Feedback",
-            "user": "Administrator",
-            "article": article,
-            "feedback": feedback,
-        }
-    ).insert(ignore_permissions=True)
-
-
-def make_customer_user() -> str:
-    email = f"article-customer-{frappe.generate_hash(length=6)}@example.com"
-    return create_contact("Article Customer", email)["user"]
-
-
-def make_agent_user() -> str:
-    email = f"article-agent-{frappe.generate_hash(length=6)}@example.com"
-    return create_agent(email).name
-
-
-def search_hit(article: str, section: str = "intro") -> frappe._dict:
-    """A search index hit shaped like helpdesk.search.search items."""
-    name = f"{article}#{section}"
-    return frappe._dict(id=f"HD Article:{name}", name=name, subject=article)
-
-
-def search_page(*hits: frappe._dict) -> list[dict]:
-    return [{"title": "Articles", "items": list(hits)}]
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    make_agent_manager,
+    make_article,
+    make_article_feedback,
+    make_search_hit,
+    make_search_page,
+    unique_email,
+)
 
 
 class TestGetArticleStats(IntegrationTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
         self.published = make_article()
-        self.draft = make_article("Draft")
+        self.draft = make_article(status="Draft")
 
     def test_counts_views_likes_and_dislikes_of_one_article(self) -> None:
         frappe.db.set_value("HD Article", self.published, "views", 7)
         for feedback in (1, 1, 2, 0):
-            add_feedback(self.published, feedback)
-        add_feedback(self.draft, 1)
+            make_article_feedback(self.published, feedback)
+        make_article_feedback(self.draft, 1)
 
         stats = get_article_stats(self.published)
 
@@ -75,33 +37,34 @@ class TestGetArticleStats(IntegrationTestCase):
         self.assertEqual(get_article_stats(self.draft)["likes"], 0)
 
     def test_agent_reads_stats_of_draft(self) -> None:
-        with self.set_user(make_agent_user()):
+        with self.set_user(create_agent(unique_email("article-agent")).name):
             self.assertEqual(get_article_stats(self.draft)["dislikes"], 0)
 
     def test_agent_manager_reads_stats_of_draft(self) -> None:
-        user = make_agent_user()
-        frappe.get_doc("User", user).add_roles("Agent Manager")
+        user = make_agent_manager("article-manager")
 
         with self.set_user(user):
             self.assertEqual(get_article_stats(self.draft)["likes"], 0)
 
     def test_customer_reads_stats_of_published_article(self) -> None:
-        add_feedback(self.published, 1)
+        make_article_feedback(self.published, 1)
 
-        with self.set_user(make_customer_user()):
+        customer = create_contact("Article Customer", unique_email("article-customer"))
+
+        with self.set_user(customer["user"]):
             self.assertEqual(get_article_stats(self.published)["likes"], 1)
 
     def test_customer_cannot_read_stats_of_unpublished_article(self) -> None:
-        archived = make_article("Archived")
-        customer = make_customer_user()
+        archived = make_article(status="Archived")
+        customer = create_contact("Article Customer", unique_email("article-customer"))
 
         for article in (self.draft, archived, "missing-article"):
-            with self.subTest(article=article), self.set_user(customer):
+            with self.subTest(article=article), self.set_user(customer["user"]):
                 with self.assertRaises(frappe.PermissionError):
                     get_article_stats(article)
 
     def test_inactive_agent_cannot_read_stats_of_draft(self) -> None:
-        agent = make_agent_user()
+        agent = create_agent(unique_email("article-agent")).name
         frappe.db.set_value("HD Agent", agent, "is_active", 0)
 
         with self.set_user(agent), self.assertRaises(frappe.PermissionError):
@@ -117,8 +80,8 @@ class TestSearchArticles(IntegrationTestCase):
         self.articles = [make_article() for _ in range(NUM_RESULTS + 1)]
 
     def test_full_first_page_is_returned_without_fallback(self, hd_search, *_) -> None:
-        hits = [search_hit(article) for article in self.articles[:NUM_RESULTS]]
-        hd_search.return_value = search_page(*hits)
+        hits = [make_search_hit(article) for article in self.articles[:NUM_RESULTS]]
+        hd_search.return_value = make_search_page(*hits)
 
         result = search("  How do I RESET my password?! ")
 
@@ -126,8 +89,11 @@ class TestSearchArticles(IntegrationTestCase):
         hd_search.assert_called_once_with("how do i reset my password", qtype="and")
 
     def test_fallback_merges_unique_hits_up_to_the_limit(self, hd_search, *_) -> None:
-        first, second, *rest = [search_hit(article) for article in self.articles]
-        hd_search.side_effect = [search_page(first, second), search_page(second, *rest)]
+        first, second, *rest = [make_search_hit(article) for article in self.articles]
+        hd_search.side_effect = [
+            make_search_page(first, second),
+            make_search_page(second, *rest),
+        ]
 
         result = search("reset my password")
 
@@ -143,15 +109,16 @@ class TestSearchArticles(IntegrationTestCase):
     def test_customer_never_sees_unpublished_article_from_stale_index(
         self, hd_search, *_
     ) -> None:
-        published = search_hit(self.articles[0])
+        published = make_search_hit(self.articles[0])
         stale = [
-            search_hit(make_article("Draft")),
-            search_hit(make_article("Archived")),
-            search_hit("deleted-article"),
+            make_search_hit(make_article(status="Draft")),
+            make_search_hit(make_article(status="Archived")),
+            make_search_hit("deleted-article"),
         ]
-        hd_search.return_value = search_page(published, *stale)
+        hd_search.return_value = make_search_page(published, *stale)
+        customer = create_contact("Article Customer", unique_email("article-customer"))
 
-        with self.set_user(make_customer_user()):
+        with self.set_user(customer["user"]):
             result = search("reset password")
 
         self.assertEqual(result, [published])

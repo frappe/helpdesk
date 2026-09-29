@@ -3,7 +3,15 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.doc import get_list_data
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import HDTicket
-from helpdesk.test_utils import create_agent, create_contact, make_ticket
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    delete_default_views,
+    make_article,
+    make_default_view,
+    make_ticket,
+    unique_email,
+)
 
 PORTAL_FIELDS = {
     "name",
@@ -23,9 +31,9 @@ class TestGetListData(IntegrationTestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.token = frappe.generate_hash(length=8)
-        cls.agent = create_agent(f"doc-list-agent-{cls.token}@example.com").name
-        cls.customer = create_contact("DocList", f"doc-list-{cls.token}@example.com")
-        other = create_contact("DocListOther", f"doc-other-{cls.token}@example.com")
+        cls.agent = create_agent(unique_email("doc-list-agent")).name
+        cls.customer = create_contact("DocList", unique_email("doc-list"))
+        other = create_contact("DocListOther", unique_email("doc-other"))
         cls.tickets = {
             suffix: make_ticket(subject=f"{cls.token} {suffix}").name
             for suffix in ("a", "b", "c")
@@ -84,7 +92,7 @@ class TestGetListData(IntegrationTestCase):
             self.assertIn(field, row)
 
     def test_agent_default_columns_without_saved_view(self) -> None:
-        self.delete_default_views(self.agent)
+        delete_default_views(self.agent)
 
         with self.set_user(self.agent):
             result = get_list_data(
@@ -96,7 +104,7 @@ class TestGetListData(IntegrationTestCase):
         self.assertIn("agent_group", {f["value"] for f in result["fields"]})
 
     def test_customer_gets_portal_columns_and_fields(self) -> None:
-        self.delete_default_views(self.customer["user"])
+        delete_default_views(self.customer["user"])
 
         with self.set_user(self.customer["user"]):
             result = get_list_data(
@@ -120,7 +128,7 @@ class TestGetListData(IntegrationTestCase):
 
     def test_default_view_supplies_columns_and_rows(self) -> None:
         columns = [{"label": "Subject", "type": "Data", "key": "subject"}]
-        self.make_default_view(self.agent, columns=columns, rows=["ticket_type"])
+        make_default_view(self.agent, columns=columns, rows=["ticket_type"])
 
         with self.set_user(self.agent):
             result = get_list_data(
@@ -131,7 +139,7 @@ class TestGetListData(IntegrationTestCase):
         self.assertIn("ticket_type", result["data"][0])
 
     def test_default_view_without_columns_falls_back_to_defaults(self) -> None:
-        self.make_default_view(self.agent, columns=[], rows=[])
+        make_default_view(self.agent, columns=[], rows=[])
 
         with self.set_user(self.agent):
             result = get_list_data(
@@ -142,7 +150,7 @@ class TestGetListData(IntegrationTestCase):
         self.assertIn("resolution_date", result["rows"])
 
     def test_default_filters_apply_only_without_filters(self) -> None:
-        self.make_default_view(self.agent)
+        make_default_view(self.agent)
         default_filters = {"subject": ["like", f"{self.token} a"]}
 
         with self.set_user(self.agent):
@@ -155,7 +163,7 @@ class TestGetListData(IntegrationTestCase):
         self.assertEqual([row.name for row in filtered["data"]], [self.tickets["b"]])
 
     def test_default_filters_resolve_at_me(self) -> None:
-        self.make_default_view(self.customer["user"])
+        make_default_view(self.customer["user"])
 
         with self.set_user(self.customer["user"]):
             result = self.list_default({"raised_by": "@me"}, filters=[])
@@ -173,24 +181,6 @@ class TestGetListData(IntegrationTestCase):
     def subject_filter(self, text: str) -> list:
         return [["subject", "like", f"%{text}%"]]
 
-    def make_default_view(
-        self, user: str, columns: list | None = None, rows: list | None = None
-    ) -> None:
-        self.delete_default_views(user)
-        frappe.get_doc(
-            {
-                "doctype": "HD View",
-                "dt": "HD Ticket",
-                "user": user,
-                "is_default": 1,
-                "columns": frappe.as_json(columns or []),
-                "rows": frappe.as_json(rows or []),
-            }
-        ).insert(ignore_permissions=True)
-
-    def delete_default_views(self, user: str) -> None:
-        frappe.db.delete("HD View", {"user": user, "dt": "HD Ticket", "is_default": 1})
-
 
 class TestGroupByView(IntegrationTestCase):
     """The knowledge base groups articles by category through a group_by view."""
@@ -206,14 +196,16 @@ class TestGroupByView(IntegrationTestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.token = frappe.generate_hash(length=8)
-        for label in ("Zeta", "Alpha"):
-            category = frappe.get_doc(
-                {"doctype": "HD Article Category", "category_name": label}
-            ).insert(ignore_permissions=True)
-            cls.make_article(category.name)
+        categories = [
+            frappe.get_doc({"doctype": "HD Article Category", "category_name": label})
+            .insert(ignore_permissions=True)
+            .name
+            for label in ("Zeta", "Alpha")
+        ]
         general = {"category_name": "General"}
-        cls.make_article(frappe.db.get_value("HD Article Category", general))
-        cls.make_article(None)
+        categories += [frappe.db.get_value("HD Article Category", general), None]
+        for category in categories:
+            make_article(f"{cls.token} {category}", "Draft", category)
 
     def test_categories_sorted_by_label_with_general_first(self) -> None:
         options = self.group_options(order_by="modified desc")
@@ -247,15 +239,3 @@ class TestGroupByView(IntegrationTestCase):
 
     def title_filter(self) -> list:
         return [["title", "like", f"{self.token}%"]]
-
-    @classmethod
-    def make_article(cls, category: str | None) -> None:
-        frappe.get_doc(
-            {
-                "doctype": "HD Article",
-                "title": f"{cls.token} {category}",
-                "category": category,
-                "status": "Draft",
-                "content": "Body",
-            }
-        ).insert(ignore_permissions=True)

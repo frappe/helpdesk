@@ -8,9 +8,12 @@ from helpdesk.api.dashboard import HelpdeskDashboard, get_dashboard_data
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
+    make_agent_manager,
     make_sla,
+    make_tagged_ticket,
     make_team,
     make_ticket,
+    unique_email,
 )
 
 AGENT = "dashboard-sla-agent@example.com"
@@ -60,12 +63,10 @@ class TestTagDashboard(IntegrationTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
-        suffix = frappe.generate_hash(length=6)
-        cls.manager = create_agent(f"tag-dash-manager-{suffix}@example.com").name
-        frappe.get_doc("User", cls.manager).add_roles("Agent Manager")
-        cls.agent = create_agent(f"tag-dash-agent-{suffix}@example.com").name
-        cls.member = create_agent(f"tag-dash-member-{suffix}@example.com").name
-        cls.customer = create_contact("Tag Customer", f"tag-dash-{suffix}@example.com")
+        cls.manager = make_agent_manager("tag-dash-manager")
+        cls.agent = create_agent(unique_email("tag-dash-agent")).name
+        cls.member = create_agent(unique_email("tag-dash-member")).name
+        cls.customer = create_contact("Tag Customer", unique_email("tag-dash"))
         # so no ticket below is Administrator's first, which would get a tag
         make_ticket()
 
@@ -75,9 +76,9 @@ class TestTagDashboard(IntegrationTestCase):
 
     def test_top_tags_count_each_tag_of_a_ticket(self) -> None:
         billing, refund = self.tag("billing"), self.tag("refund")
-        self.make_tagged_ticket("2031-03-10 10:00:00", billing, refund)
-        self.make_tagged_ticket("2031-03-11 10:00:00", billing)
-        self.make_tagged_ticket("2031-03-11 11:00:00")
+        make_tagged_ticket(self.team, "2031-03-10 10:00:00", billing, refund)
+        make_tagged_ticket(self.team, "2031-03-11 10:00:00", billing)
+        make_tagged_ticket(self.team, "2031-03-11 11:00:00")
 
         top_tags = self.get_charts("2031-03-10", "2031-03-11")["top_tags"]["data"]
         # ascending, so the chart draws the biggest bar on top
@@ -87,19 +88,19 @@ class TestTagDashboard(IntegrationTestCase):
 
     def test_date_range_includes_whole_first_and_last_day(self) -> None:
         billing = self.tag("billing")
-        self.make_tagged_ticket("2031-04-09 23:59:59", billing)
-        self.make_tagged_ticket("2031-04-10 00:00:00", billing)
-        self.make_tagged_ticket("2031-04-12 23:59:59", billing)
-        self.make_tagged_ticket("2031-04-13 00:00:00", billing)
+        make_tagged_ticket(self.team, "2031-04-09 23:59:59", billing)
+        make_tagged_ticket(self.team, "2031-04-10 00:00:00", billing)
+        make_tagged_ticket(self.team, "2031-04-12 23:59:59", billing)
+        make_tagged_ticket(self.team, "2031-04-13 00:00:00", billing)
 
         charts = self.get_charts("2031-04-10", "2031-04-12")
         self.assertEqual(self.top_tag_counts(charts), {billing: 2})
 
     def test_tag_trend_zero_fills_each_day(self) -> None:
         billing, refund = self.tag("billing"), self.tag("refund")
-        self.make_tagged_ticket("2031-05-01 09:00:00", billing)
-        self.make_tagged_ticket("2031-05-01 17:00:00", billing)
-        self.make_tagged_ticket("2031-05-03 09:00:00", refund)
+        make_tagged_ticket(self.team, "2031-05-01 09:00:00", billing)
+        make_tagged_ticket(self.team, "2031-05-01 17:00:00", billing)
+        make_tagged_ticket(self.team, "2031-05-03 09:00:00", refund)
 
         trend = self.get_charts("2031-05-01", "2031-05-03")["tag_trend"]
         self.assertEqual(
@@ -117,7 +118,7 @@ class TestTagDashboard(IntegrationTestCase):
         # tag i sits on i + 1 tickets, so the ranking has no ties
         tags = [self.tag(f"t{index}") for index in range(11)]
         for index in range(11):
-            self.make_tagged_ticket("2031-06-01 10:00:00", *tags[index:])
+            make_tagged_ticket(self.team, "2031-06-01 10:00:00", *tags[index:])
 
         charts = self.get_charts("2031-06-01", "2031-06-01")
         top_tags = [row["tag"] for row in charts["top_tags"]["data"]]
@@ -126,7 +127,7 @@ class TestTagDashboard(IntegrationTestCase):
         self.assertEqual(trend_tags, tags[:5:-1])
 
     def test_untagged_tickets_give_empty_charts(self) -> None:
-        self.make_tagged_ticket("2031-07-01 10:00:00")
+        make_tagged_ticket(self.team, "2031-07-01 10:00:00")
 
         charts = self.get_charts("2031-07-01", "2031-07-01")
         self.assertEqual(charts["top_tags"]["data"], [])
@@ -136,17 +137,17 @@ class TestTagDashboard(IntegrationTestCase):
     def test_other_teams_tickets_are_not_counted(self) -> None:
         billing = self.tag("billing")
         other_team = make_team(f"Other Tag Team {self.suffix}", [self.member]).name
-        self.make_tagged_ticket("2031-08-01 10:00:00", billing)
-        self.make_tagged_ticket("2031-08-01 10:00:00", billing, team=other_team)
+        make_tagged_ticket(self.team, "2031-08-01 10:00:00", billing)
+        make_tagged_ticket(other_team, "2031-08-01 10:00:00", billing)
 
         charts = self.get_charts("2031-08-01", "2031-08-01")
         self.assertEqual(self.top_tag_counts(charts), {billing: 1})
 
     def test_deleted_ticket_and_removed_tag_are_not_counted(self) -> None:
         billing = self.tag("billing")
-        self.make_tagged_ticket("2031-09-01 10:00:00", billing)
-        deleted = self.make_tagged_ticket("2031-09-01 10:00:00", billing)
-        untagged = self.make_tagged_ticket("2031-09-01 10:00:00", billing)
+        make_tagged_ticket(self.team, "2031-09-01 10:00:00", billing)
+        deleted = make_tagged_ticket(self.team, "2031-09-01 10:00:00", billing)
+        untagged = make_tagged_ticket(self.team, "2031-09-01 10:00:00", billing)
         frappe.delete_doc("HD Ticket", deleted.name, force=True)
         untagged.remove_tag(billing)
 
@@ -155,8 +156,8 @@ class TestTagDashboard(IntegrationTestCase):
 
     def test_agent_sees_tags_of_own_tickets_only(self) -> None:
         billing = self.tag("billing")
-        mine = self.make_tagged_ticket("2031-10-01 10:00:00", billing)
-        self.make_tagged_ticket("2031-10-01 10:00:00", billing)
+        mine = make_tagged_ticket(self.team, "2031-10-01 10:00:00", billing)
+        make_tagged_ticket(self.team, "2031-10-01 10:00:00", billing)
         frappe.db.set_value("HD Ticket", mine.name, "_assign", json.dumps([self.agent]))
 
         filters = {
@@ -182,13 +183,6 @@ class TestTagDashboard(IntegrationTestCase):
 
     def tag(self, label: str) -> str:
         return f"{label}-{self.suffix}"
-
-    def make_tagged_ticket(self, created_on: str, *tags: str, team: str | None = None):
-        with self.freeze_time(created_on):
-            ticket = make_ticket(subject="Tag chart", agent_group=team or self.team)
-        for tag in tags:
-            ticket.add_tag(tag)
-        return ticket
 
     def get_charts(self, from_date: str, to_date: str) -> dict[str, dict]:
         """Tag charts for this test's team, as the manager sees them."""

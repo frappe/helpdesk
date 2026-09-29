@@ -12,7 +12,13 @@ from helpdesk.api.settings.email_notifications import (
     update_share_feedback,
 )
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_default_email_content
-from helpdesk.test_utils import create_agent, make_status
+from helpdesk.test_utils import (
+    create_agent,
+    make_agent_manager,
+    make_status,
+    unique_email,
+    unique_name,
+)
 
 # notification name: (update function, enabled field, content field)
 SIMPLE_NOTIFICATIONS: dict[str, tuple[Callable, str, str]] = {
@@ -49,7 +55,7 @@ class TestEmailNotifications(IntegrationTestCase):
         self.enterContext(
             change_settings("HD Settings", self.current_notification_settings())
         )
-        self.resolved_status = make_status(self.unique("Done"), "Resolved").name
+        self.resolved_status = make_status(unique_name("Done"), "Resolved").name
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
@@ -131,7 +137,7 @@ class TestEmailNotifications(IntegrationTestCase):
         self.assertEqual(data["ticket_status"], {"label": "Closed", "value": "Closed"})
 
     def test_share_feedback_rejects_status_outside_resolved_category(self) -> None:
-        open_status = make_status(self.unique("Waiting"), "Open").name
+        open_status = make_status(unique_name("Waiting"), "Open").name
         update_share_feedback(
             {"label": self.resolved_status, "value": self.resolved_status},
             False,
@@ -149,7 +155,7 @@ class TestEmailNotifications(IntegrationTestCase):
         )
 
     def test_agent_cannot_read_notification_settings(self) -> None:
-        with self.set_user(self.make_agent()):
+        with self.set_user(create_agent(unique_email("notify-agent")).name):
             for name in [*SIMPLE_NOTIFICATIONS, "share_feedback"]:
                 with self.assertRaises(frappe.PermissionError):
                     get_data(name)
@@ -157,7 +163,7 @@ class TestEmailNotifications(IntegrationTestCase):
     def test_agent_cannot_update_notification_settings(self) -> None:
         before = self.current_notification_settings()
 
-        with self.set_user(self.make_agent()):
+        with self.set_user(create_agent(unique_email("notify-agent")).name):
             for update, _, _ in SIMPLE_NOTIFICATIONS.values():
                 with self.assertRaises(frappe.PermissionError):
                     update(enabled=True, content=CUSTOM_CONTENT)
@@ -169,8 +175,7 @@ class TestEmailNotifications(IntegrationTestCase):
         self.assertEqual(self.current_notification_settings(), before)
 
     def test_agent_manager_can_read_and_update_notification_settings(self) -> None:
-        manager = self.make_agent()
-        frappe.get_doc("User", manager).add_roles("Agent Manager")
+        manager = make_agent_manager("notify-manager")
 
         with self.set_user(manager):
             update_acknowledgement(enabled=True, content=CUSTOM_CONTENT)
@@ -185,9 +190,3 @@ class TestEmailNotifications(IntegrationTestCase):
 
     def saved(self, field: str):
         return frappe.db.get_single_value("HD Settings", field, cache=False)
-
-    def make_agent(self) -> str:
-        return create_agent(f"{self.unique('notify-agent')}@example.com").name
-
-    def unique(self, prefix: str) -> str:
-        return f"{prefix}-{frappe.generate_hash(length=6)}"

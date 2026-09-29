@@ -9,27 +9,15 @@ from helpdesk.api.customer_portal_notice import (
     promote_all_contacts_to_managers,
     restore_ticket_access,
 )
-from helpdesk.test_utils import create_agent, create_contact, create_customer
-
-
-def unique_email(prefix: str) -> str:
-    return f"{prefix}-{frappe.generate_hash(length=6)}@example.com"
-
-
-def make_agent_manager() -> str:
-    email = create_agent(unique_email("notice-manager")).name
-    frappe.get_doc("User", email).add_roles("Agent Manager")
-    return email
-
-
-def notice_is_shown() -> bool:
-    return bool(frappe.db.get_single_value("HD Settings", NOTICE_FLAG))
-
-
-def roles_of(user: str) -> list[str]:
-    return frappe.get_all(
-        "Has Role", filters={"parent": user, "parenttype": "User"}, pluck="role"
-    )
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    create_customer,
+    get_user_roles,
+    is_portal_notice_shown,
+    make_agent_manager,
+    unique_email,
+)
 
 
 class TestDismissNotice(IntegrationTestCase):
@@ -39,31 +27,31 @@ class TestDismissNotice(IntegrationTestCase):
     def test_administrator_dismisses_notice_and_notifies_clients(self) -> None:
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             publish_realtime = self.dismiss_as("Administrator")
-            self.assertFalse(notice_is_shown())
+            self.assertFalse(is_portal_notice_shown())
 
         publish_realtime.assert_called_once()
         event = publish_realtime.call_args.args[0]
         self.assertEqual(event, "helpdesk:settings-updated")
 
     def test_agent_manager_dismisses_notice(self) -> None:
-        manager = make_agent_manager()
+        manager = make_agent_manager("notice-manager")
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             self.dismiss_as(manager)
-            self.assertFalse(notice_is_shown())
+            self.assertFalse(is_portal_notice_shown())
 
     def test_agent_cannot_dismiss_notice(self) -> None:
         agent = create_agent(unique_email("notice-agent")).name
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             with self.assertRaises(frappe.PermissionError):
                 self.dismiss_as(agent)
-            self.assertTrue(notice_is_shown())
+            self.assertTrue(is_portal_notice_shown())
 
     def test_customer_cannot_dismiss_notice(self) -> None:
         customer = create_contact("Notice Customer", unique_email("notice-customer"))
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             with self.assertRaises(frappe.PermissionError):
                 self.dismiss_as(customer["user"])
-            self.assertTrue(notice_is_shown())
+            self.assertTrue(is_portal_notice_shown())
 
     def dismiss_as(self, user: str) -> MagicMock:
         """Dismiss the notice as `user`, returning the realtime publisher mock."""
@@ -79,21 +67,21 @@ class TestRestoreTicketAccess(IntegrationTestCase):
     def test_administrator_queues_promotion_and_dismisses_notice(self) -> None:
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             enqueue = self.restore_as("Administrator")
-            self.assertFalse(notice_is_shown())
+            self.assertFalse(is_portal_notice_shown())
 
         enqueue.assert_called_once()
         self.assertIs(enqueue.call_args.args[0], promote_all_contacts_to_managers)
         self.assertTrue(enqueue.call_args.kwargs["deduplicate"])
 
     def test_agent_manager_queues_promotion(self) -> None:
-        self.restore_as(make_agent_manager()).assert_called_once()
+        self.restore_as(make_agent_manager("notice-manager")).assert_called_once()
 
     def test_agent_cannot_restore_access(self) -> None:
         agent = create_agent(unique_email("restore-agent")).name
         with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
             with self.assertRaises(frappe.PermissionError):
                 self.restore_as(agent)
-            self.assertTrue(notice_is_shown())
+            self.assertTrue(is_portal_notice_shown())
 
     def test_customer_cannot_restore_access(self) -> None:
         customer = create_contact("Restore Customer", unique_email("restore-customer"))
@@ -129,13 +117,13 @@ class TestPromoteAllContactsToManagers(IntegrationTestCase):
         self.assertTrue(all(row.is_manager for row in self.customer.contacts))
         for user in (self.member["user"], self.manager["user"]):
             with self.subTest(user=user):
-                self.assertIn("HD Customer Manager", roles_of(user))
-                self.assertIn("HD Customer", roles_of(user))
+                self.assertIn("HD Customer Manager", get_user_roles(user))
+                self.assertIn("HD Customer", get_user_roles(user))
 
     def test_running_twice_does_not_duplicate_roles(self) -> None:
         promote_all_contacts_to_managers()
         promote_all_contacts_to_managers()
 
-        roles = roles_of(self.member["user"])
+        roles = get_user_roles(self.member["user"])
         self.assertEqual(roles.count("HD Customer Manager"), 1)
         self.assertEqual(roles.count("HD Customer"), 1)
