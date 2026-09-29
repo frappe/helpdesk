@@ -105,6 +105,9 @@ doc_events = {
         "before_insert": "helpdesk.extends.comment.before_insert",
         "on_trash": "helpdesk.extends.comment.on_trash",
     },
+    "Communication": {
+        "after_insert": "helpdesk.extends.communication.after_insert",
+    },
 }
 
 # For List View
