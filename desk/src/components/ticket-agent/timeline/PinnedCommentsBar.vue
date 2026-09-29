@@ -1,5 +1,4 @@
 <template>
-  <!-- fades in a touch from above; leaving is a plain, quicker fade -->
   <Transition
     :css="animated"
     enter-active-class="motion-safe:transition-[opacity,transform] motion-safe:duration-200 motion-safe:ease-out"
