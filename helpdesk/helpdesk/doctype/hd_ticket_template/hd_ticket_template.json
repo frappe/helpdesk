@@ -28,7 +28,7 @@
    "options": "HTML"
   },
   {
-   "description": "Everyone, Customers or Agents: who sees this field. It also needs the field's permission level to permit them, or it stays hidden regardless. Editable after creation lets customers change the field after they create the ticket. Agents can always change it. Read more about permission levels <a href=\"https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
+   "description": "Everyone or Agents: who sees this field. It also needs the field's permission level to permit them, or it stays hidden regardless. Editable after creation lets customers change the field after they create the ticket. Agents can always change it. Read more about permission levels <a href=\"https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk\" target=\"_blank\" rel=\"noopener noreferrer\">here</a>.",
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Fields",
@@ -43,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-29 20:00:00.000000",
+ "modified": "2026-09-29 22:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",

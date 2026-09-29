@@ -1,4 +1,5 @@
 import frappe
+from frappe.query_builder.functions import Coalesce
 
 from helpdesk.consts import (
     NEVER_CUSTOMER_VISIBLE_FIELDS,
@@ -10,31 +11,35 @@ from helpdesk.consts import (
 def execute():
     """Move the deleted hide_from_customer flag onto the Visible to column.
 
-    Raw SQL because the flag is gone from the doctype, so the ORM cannot see it.
-    Frappe never drops a removed field's column, so it is still readable here.
+    Query builder because the flag is gone from the doctype, so the ORM cannot
+    see it. Frappe never drops a removed field's column, so it is still readable.
     """
     if not frappe.db.has_column("HD Ticket Template Field", "hide_from_customer"):
         return
+    TemplateField = frappe.qb.DocType("HD Ticket Template Field")
     # migrate hide_from_customers to visible_to
-    frappe.db.sql(
-        "update `tabHD Ticket Template Field`"
-        " set visible_to = 'Agents' where hide_from_customer = 1"
-    )
+    (
+        frappe.qb.update(TemplateField)
+        .set(TemplateField.visible_to, "Agents")
+        .where(TemplateField.hide_from_customer == 1)
+    ).run()
     # everything rest is visible to everyone by default
-    frappe.db.sql(
-        "update `tabHD Ticket Template Field`"
-        " set visible_to = 'Everyone' where coalesce(visible_to, '') = ''"
-    )
+    (
+        frappe.qb.update(TemplateField)
+        .set(TemplateField.visible_to, "Everyone")
+        .where(Coalesce(TemplateField.visible_to, "") == "")
+    ).run()
     hide_rows_the_template_may_not_show()
 
 
 def hide_rows_the_template_may_not_show():
     """fields that maybe in hd ticket template which should be internal"""
-    frappe.db.sql(
-        "update `tabHD Ticket Template Field`"
-        " set visible_to = 'Agents' where fieldname in %(fields)s",
-        {"fields": tuple(never_customer_visible_fieldnames())},
-    )
+    TemplateField = frappe.qb.DocType("HD Ticket Template Field")
+    (
+        frappe.qb.update(TemplateField)
+        .set(TemplateField.visible_to, "Agents")
+        .where(TemplateField.fieldname.isin(list(never_customer_visible_fieldnames())))
+    ).run()
 
 
 def never_customer_visible_fieldnames() -> set[str]:

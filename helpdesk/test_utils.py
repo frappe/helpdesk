@@ -310,7 +310,14 @@ def ticket_field_permlevel(fieldname: str) -> int:
 def set_default_template_visibility(fieldname: str, visible_to: str):
     """Set who sees a field on the Default template; returns an undo for addCleanup."""
     template = frappe.get_doc("HD Ticket Template", "Default")
-    row_keys = ("fieldname", "visible_to", "required", "placeholder", "url_method")
+    row_keys = (
+        "fieldname",
+        "visible_to",
+        "editable_after_creation",
+        "required",
+        "placeholder",
+        "url_method",
+    )
     original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
 
     row = next((r for r in template.fields if r.fieldname == fieldname), None)

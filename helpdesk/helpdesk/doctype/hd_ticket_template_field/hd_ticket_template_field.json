@@ -30,16 +30,16 @@
   },
   {
    "default": "Everyone",
-   "description": "Everyone lets both agents and customers see this field. Customers shows it only in the customer portal, Agents only in the agent view. This controls the ticket form only. Raise the field's permission level in Customize Form to hide it from the API layer as well.",
+   "description": "Everyone lets both agents and customers see this field. Agents shows it only in the agent view. This controls the ticket form only. Raise the field's permission level in Customize Form to hide it from the API layer as well.",
    "fieldname": "visible_to",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Visible to",
-   "options": "Everyone\nCustomers\nAgents"
+   "options": "Everyone\nAgents"
   },
   {
    "columns": 3,
-   "default": "0",
+   "default": "1",
    "depends_on": "eval:doc.visible_to != 'Agents'",
    "fieldname": "editable_after_creation",
    "fieldtype": "Check",
@@ -61,7 +61,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-09-29 20:05:00.000000",
+ "modified": "2026-09-29 22:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

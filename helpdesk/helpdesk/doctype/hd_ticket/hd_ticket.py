@@ -14,6 +14,7 @@ from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
+from frappe.utils.html_utils import sanitize_html
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -75,17 +76,6 @@ class HDTicket(Document):
 
     def autoname(self):
         return self.name
-
-    def as_dict(self, *args, **kwargs):
-        """Never echo a value the caller cannot read: the framework strips its
-        reads, not its writes. Rules, hooks, webhooks and mail templates that
-        run inside a save still get the whole document."""
-        data = super().as_dict(*args, **kwargs)
-        if (self.doctype, self.name) in frappe.flags.currently_saving:
-            return data
-        for fieldname in TicketFields().unreadable:
-            data.pop(fieldname, None)
-        return data
 
     def before_insert(self):
         self.generate_key()
@@ -204,9 +194,6 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
-        # the creation-form exemption must not survive into a later save
-        self.flags.pop("ignore_permlevel_for_fields", None)
-
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
         publish_event("helpdesk:new-ticket")
@@ -1189,9 +1176,14 @@ class HDTicket(Document):
                     "HD Settings", "update_status_to"
                 )
 
-        # Fetch description from communication if not set already. This might not be needed
-        # anymore as a communication is created when a ticket is created.
-        self.description = self.description or c.content
+        # email tickets are inserted blank; set_only_once refuses the save that
+        # would fill it, so write it already sanitized the way that save would
+        if not self.description:
+            self.db_set(
+                "description",
+                sanitize_html(c.content, linkify=True),
+                update_modified=False,
+            )
         # portal replies save as the customer; the reset must keep server-set fields
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
         self.flags.ignore_customer_edit_guard = True

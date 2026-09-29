@@ -2530,15 +2530,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             )
 
     def test_customer_can_edit_a_field_the_template_opens(self):
-        set_default_template_rows(
-            [
-                {
-                    "fieldname": "priority",
-                    "visible_to": "Everyone",
-                    "editable_after_creation": 1,
-                }
-            ]
-        )
+        """Editable after creation is ticked unless the admin unticks it."""
+        set_default_template_rows([{"fieldname": "priority", "visible_to": "Everyone"}])
         ticket = make_ticket(raised_by=PERMS_CUSTOMER)
         new_priority = other_priority(ticket.priority)
         frappe.set_user(PERMS_CUSTOMER)
@@ -2589,19 +2582,37 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.db.get_value("HD Ticket", ticket.name, "status"), "Closed"
         )
 
-    def test_write_endpoints_echo_nothing_the_customer_cannot_read(self):
-        """The framework strips its reads, not its writes; the ticket strips
-        itself whenever it is serialised outside a save."""
-        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+    def test_rules_and_templates_read_the_whole_ticket(self):
+        """Assignment rules and mail templates evaluate as_dict as the customer."""
         frappe.set_user(PERMS_CUSTOMER)
-        echoed = client_set_value("HD Ticket", ticket.name, "status", "Closed")
-        self.assertEqual(echoed["status"], "Closed")
-        for fieldname in ("key", "agreement_status", "last_agent_response"):
-            self.assertNotIn(fieldname, echoed)
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        self.assertEqual(ticket.as_dict().get("via_customer_portal"), 1)
 
-        frappe.set_user(PERMS_AGENT)
-        echoed = client_set_value("HD Ticket", ticket.name, "status", "Open")
-        self.assertIn("agreement_status", echoed)
+    def test_first_communication_fills_a_blank_description(self):
+        """Tickets raised by email or by a split start without one."""
+        ticket = make_ticket(description=None)
+        frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "communication_medium": "Email",
+                "sent_or_received": "Received",
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket.name,
+                "subject": ticket.subject,
+                "content": "my printer is broken, see https://example.com<script>x</script>",
+            }
+        ).insert(ignore_permissions=True)
+        description = frappe.db.get_value("HD Ticket", ticket.name, "description")
+        self.assertIn("my printer is broken", description)
+        self.assertNotIn("<script>", description)
+
+    def test_description_is_set_only_once(self):
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        ticket.reload()
+        ticket.description = "Rewritten by an agent"
+        with self.assertRaises(frappe.CannotChangeConstantError):
+            ticket.save()
 
     def test_customer_cannot_tamper_via_run_doc_method(self):
         """run_doc_method builds the doc from the caller's payload and the save skips
@@ -2683,7 +2694,13 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.set_user("Administrator")
             set_custom_field_permlevel(fieldname, 7)
             set_default_template_rows(
-                [{"fieldname": fieldname, "visible_to": "Everyone"}]
+                [
+                    {
+                        "fieldname": fieldname,
+                        "visible_to": "Everyone",
+                        "editable_after_creation": 0,
+                    }
+                ]
             )
             frappe.set_user(PERMS_CUSTOMER)
             visible = frappe.get_doc(
@@ -2819,27 +2836,16 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                     "HD Form Script", name, force=True, ignore_missing=True
                 )
 
-    def test_new_ticket_form_scripts_follow_the_audience(self):
-        """The new-ticket page used to ask for agent scripts whoever loaded it."""
+    def test_new_ticket_form_runs_new_page_scripts_for_customers(self):
+        """The form cannot set new page and customer portal together, and Field
+        Dependency sets new page only, so the portal must load these too."""
         make_form_script(
-            self,
-            "Perms Portal New Script",
-            "PORTAL",
-            apply_to_customer_portal=True,
-            apply_on_new_page=True,
+            self, "Perms New Page Script", "NEW_PAGE", apply_on_new_page=True
         )
-        make_form_script(
-            self, "Perms Agent New Script", "AGENT", apply_on_new_page=True
-        )
-
-        frappe.set_user(PERMS_CUSTOMER)
-        scripts = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["_form_script"]
-        self.assertTrue(any("PORTAL" in s for s in scripts))
-        self.assertFalse(any("AGENT" in s for s in scripts))
-
-        frappe.set_user(PERMS_AGENT)
-        scripts = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["_form_script"]
-        self.assertTrue(any("AGENT" in s for s in scripts))
+        for user in (PERMS_CUSTOMER, PERMS_AGENT):
+            frappe.set_user(user)
+            scripts = get_ticket_form(DEFAULT_TICKET_TEMPLATE)["_form_script"]
+            self.assertTrue(any("NEW_PAGE" in s for s in scripts))
 
     def test_customer_can_submit_feedback(self):
         """The portal sends status, feedback and feedback_extra in a single
@@ -2940,8 +2946,16 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
 
     def test_visible_field_fillable_only_while_creating(self):
         """A standard field the default template shows can be filled on the
-        creation form; afterwards an edit is refused."""
-        set_default_template_rows([{"fieldname": "priority", "visible_to": "Everyone"}])
+        creation form; unticked, an edit afterwards is refused."""
+        set_default_template_rows(
+            [
+                {
+                    "fieldname": "priority",
+                    "visible_to": "Everyone",
+                    "editable_after_creation": 0,
+                }
+            ]
+        )
         frappe.set_user(PERMS_CUSTOMER)
         default_priority = frappe.get_doc(get_ticket_obj()).insert().priority
         chosen = other_priority(default_priority)

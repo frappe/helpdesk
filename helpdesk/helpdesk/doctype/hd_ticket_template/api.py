@@ -26,7 +26,7 @@ def get_one(name: str):
         "fields": fields,
         "description_template": template.description_template,
         "_form_script": get_form_script(
-            "HD Ticket", apply_on_new_page=True, is_customer_portal=not is_agent()
+            "HD Ticket", apply_on_new_page=True, is_customer_portal=False
         ),
     }
 

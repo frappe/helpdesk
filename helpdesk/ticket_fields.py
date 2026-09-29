@@ -65,12 +65,11 @@ class TicketFields:
 
     @cached_property
     def hidden(self) -> set[str]:
-        """Unreadable at the user's levels, or reserved for the other audience."""
-        other = "Customers" if self.for_agent else "Agents"
-        hidden = self.unreadable | {
-            r.fieldname for r in self.rows if r.visible_to == other
-        }
-        return hidden if self.for_agent else hidden | AGENT_WORKFLOW_FIELDS
+        """Unreadable at the user's levels, or, for a customer, reserved for agents."""
+        if self.for_agent:
+            return self.unreadable
+        agent_rows = {r.fieldname for r in self.rows if r.visible_to == "Agents"}
+        return self.unreadable | agent_rows | AGENT_WORKFLOW_FIELDS
 
     def strip(self, ticket: dict) -> dict:
         """Drop the hidden fields off a ticket dict."""
