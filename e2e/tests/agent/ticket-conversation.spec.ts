@@ -245,7 +245,7 @@ test("pinned comments cycle in a bar that never shifts the feed", async ({ page,
   await expect(bar).toContainText(older);
   await toggle(newer, "Pin");
   await expect(bar).toContainText(newer);
-  await expect(panel.getByLabel("Pinned", { exact: true })).toHaveCount(2);
+  await expect(panel.getByText("Pinned", { exact: true })).toHaveCount(2);
   expect(await topOf(newer)).toBe(restingTop);
 
   // newest first; each click jumps to the shown pin, then steps to the older one
@@ -273,7 +273,7 @@ test("a sixth pin is blocked until one of the five is unpinned", async ({ page, 
 
   const panel = page.locator("[role=tabpanel][data-state=active]");
   const rowWith = (text: string) => panel.locator(".activity", { hasText: text });
-  const markers = panel.getByLabel("Pinned", { exact: true });
+  const markers = panel.getByText("Pinned", { exact: true });
   const pinItem = page.getByRole("menuitem", { name: "Pin", exact: true });
   const openMenu = (text: string) => rowWith(text).getByRole("button").first().click();
   await expect(markers).toHaveCount(5);
@@ -295,6 +295,6 @@ test("a sixth pin is blocked until one of the five is unpinned", async ({ page, 
   await openMenu(notes[5]);
   await expect(pinItem).not.toHaveAttribute("aria-disabled", "true");
   await pinItem.click();
-  await expect(rowWith(notes[5]).getByLabel("Pinned", { exact: true })).toBeVisible();
+  await expect(rowWith(notes[5]).getByText("Pinned", { exact: true })).toBeVisible();
   await expect(markers).toHaveCount(5);
 });
