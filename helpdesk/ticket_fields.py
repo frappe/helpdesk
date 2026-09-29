@@ -41,7 +41,14 @@ class TicketFields:
                 "parent": DEFAULT_TICKET_TEMPLATE,
                 "parenttype": "HD Ticket Template",
             },
-            fields=["fieldname", "visible_to", "required", "placeholder", "url_method"],
+            fields=[
+                "fieldname",
+                "visible_to",
+                "customer_can_edit",
+                "required",
+                "placeholder",
+                "url_method",
+            ],
             order_by="idx",
         )
 
@@ -116,6 +123,14 @@ class TicketFields:
             for fieldname in self.customer_template_fields
             if fieldname not in SERVER_COMPUTED_FIELDS
             and self.permlevel(fieldname) in levels
+        ]
+
+    @property
+    def customer_editable(self) -> list[str]:
+        """Of those, what the template lets a customer change after raising."""
+        opened = {r.fieldname for r in self.rows if r.customer_can_edit}
+        return [
+            fieldname for fieldname in self.customer_fillable if fieldname in opened
         ]
 
     def permlevel(self, fieldname: str) -> int | None:

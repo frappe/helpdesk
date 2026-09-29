@@ -470,6 +470,8 @@ class HDTicket(Document):
             return
         self.restore_unreadable_blanks()
         editable = self.customer_editable_fields()
+        # the framework's reset runs next and would revert what the template opens
+        self.flags.ignore_permlevel_for_fields = list(editable)
         changed = [
             df
             for df in self.meta.fields
@@ -501,8 +503,11 @@ class HDTicket(Document):
                 self.set(fieldname, before.get(fieldname))
 
     def customer_editable_fields(self) -> set[str]:
-        """Customers may only close; replies reopen the ticket server-side."""
-        editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS)
+        """Customers may only close and whatever the template opens to them;
+        replies reopen the ticket server-side."""
+        editable = set(CUSTOMER_EDIT_EXEMPT_FIELDS) | set(
+            TicketFields().customer_editable
+        )
         category = frappe.db.get_value("HD Ticket Status", self.status, "category")
         if category == "Resolved" or self.flags.get("customer_reply_reopen"):
             editable.add("status")

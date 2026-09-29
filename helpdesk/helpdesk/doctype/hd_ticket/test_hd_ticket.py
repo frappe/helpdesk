@@ -2529,6 +2529,35 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 ticket.get(fieldname),
             )
 
+    def test_customer_can_edit_a_field_the_template_opens(self):
+        set_default_template_rows(
+            [
+                {
+                    "fieldname": "priority",
+                    "visible_to": "Everyone",
+                    "customer_can_edit": 1,
+                }
+            ]
+        )
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        new_priority = other_priority(ticket.priority)
+        frappe.set_user(PERMS_CUSTOMER)
+        client_set_value("HD Ticket", ticket.name, "priority", new_priority)
+        self.assertEqual(
+            frappe.db.get_value("HD Ticket", ticket.name, "priority"), new_priority
+        )
+
+    def test_customer_can_edit_is_ignored_on_an_agent_only_row(self):
+        set_default_template_rows(
+            [{"fieldname": "priority", "visible_to": "Agents", "customer_can_edit": 1}]
+        )
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value(
+                "HD Ticket", ticket.name, "priority", other_priority(ticket.priority)
+            )
+
     def test_customer_resaving_an_unchanged_ticket_passes(self):
         """A customer is never sent the fields it cannot read, so a whole-document
         save carries them blank; that is not an edit."""
