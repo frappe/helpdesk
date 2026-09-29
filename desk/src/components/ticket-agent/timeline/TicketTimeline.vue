@@ -1,5 +1,5 @@
 <template>
-  <PinnedCommentsBar :comments="pinnedComments.data ?? []" :jump="goToPinned" />
+  <PinnedCommentsBar :comments="pinnedComments" :jump="goToPinned" />
   <ActivityHeader :title="tabLabel" />
   <TimelineContainer ref="timelineContainer">
     <ActivityTimeline
@@ -127,7 +127,11 @@ import {
 } from "@/components/icons";
 import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import TicketSplitModal from "@/components/ticket/TicketSplitModal.vue";
-import { registerTicketFeed, useTicket } from "@/composables/useTicket";
+import {
+  registerTicketFeed,
+  useTicket,
+  type PinnedComment,
+} from "@/composables/useTicket";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
@@ -189,14 +193,21 @@ const { activities, loading, paginate, reload } = useActivityTimeline(
   SHARED_VISIBLE_TYPES
 );
 
-const {
-  calls,
-  commentExtras: extras,
-  pinnedComments,
-} = useTicket(props.ticketId);
-const pinnedNames = computed(
-  () => new Set((pinnedComments.data ?? []).map((pin) => pin.name))
-);
+const { calls, commentExtras: extras } = useTicket(props.ticketId);
+const pinnedNames = computed(() => new Set(extras.data?.pinned_comments ?? []));
+// the feed already holds every comment, so the bar reads their text from it
+const pinnedComments = computed<PinnedComment[]>(() => {
+  const contents = new Map(
+    activities.value
+      .filter(
+        (activity): activity is CommentActivity => activity.type === "comment"
+      )
+      .map((activity) => [activity.data.name, activity.data.content])
+  );
+  return (extras.data?.pinned_comments ?? [])
+    .filter((name) => contents.has(name))
+    .map((name) => ({ name, content: contents.get(name) as string }));
+});
 
 const _loading = computed(() => loading.value || calls.loading);
 
@@ -256,14 +267,16 @@ function extrasFor(activity: CommentActivity): CommentExtras {
   if (activity.pending)
     return { reactions: [], attachments: activity.data.attachments ?? [] };
   return (
-    extras.data?.[activity.data.name] ?? { reactions: [], attachments: [] }
+    extras.data?.comments[activity.data.name] ?? {
+      reactions: [],
+      attachments: [],
+    }
   );
 }
 
 function refresh() {
   reload();
   extras.reload();
-  pinnedComments.reload();
 }
 
 // Emails and Calls feeds hold no comments, so the jump lands on Comments
@@ -431,7 +444,7 @@ onBeforeUnmount(() => clearTimeout(highlightTimer));
 // scroll anchoring pins rows to the feed's top edge, so the bar would push them down;
 // off for the toggle the feed stays bottom-anchored, back on so live rows keep place
 watch(
-  () => Boolean(pinnedComments.data?.length),
+  () => Boolean(pinnedComments.value.length),
   () => {
     const scroller = feedScroller();
     if (!scroller) return;
@@ -479,8 +492,8 @@ async function enrichLiveComment(payload: unknown) {
     (f: { file_url: string }) => !content.includes(f.file_url)
   );
   if (!attachments?.length || !extras.data) return;
-  extras.data[name] = {
-    ...(extras.data[name] ?? { reactions: [] }),
+  extras.data.comments[name] = {
+    ...(extras.data.comments[name] ?? { reactions: [] }),
     attachments,
   };
 }
@@ -495,7 +508,7 @@ function reloadPinsOnChange(payload: unknown) {
   if (key !== "comments" || action === "add") return;
   if (doc?.reference_name !== props.ticketId) return;
   if (doc.is_pinned || pinnedNames.value.has(doc.name as string))
-    pinnedComments.reload();
+    extras.reload();
 }
 
 let unregisterFeed: () => void;

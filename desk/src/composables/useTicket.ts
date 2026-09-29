@@ -9,12 +9,7 @@ import type {
   TicketContact,
 } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
-import {
-  createDocumentResource,
-  createListResource,
-  createResource,
-  toast,
-} from "frappe-ui";
+import { createDocumentResource, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
 
 interface MapValue {
@@ -25,11 +20,15 @@ interface MapValue {
   analytics: Resource<TicketAnalytics>;
   // shared by every timeline tab instance, fetched once per ticket
   calls: Resource<Record<string, any>[]>;
-  commentExtras: Resource<Record<string, CommentExtras>>;
-  // oldest first, so a pin's position is its "N:" in the pinned bar
-  pinnedComments: ReturnType<typeof createListResource<PinnedComment>>;
+  commentExtras: Resource<TicketCommentExtras>;
   // lent by the mounted timeline; see registerTicketFeed
   reloadFeed?: () => void;
+}
+
+export interface TicketCommentExtras {
+  comments: Record<string, CommentExtras>;
+  // oldest first, so a pin's position is its "N:" in the pinned bar
+  pinned_comments: string[];
 }
 
 export interface PinnedComment {
@@ -89,18 +88,6 @@ export const useTicket = (ticketId: string): MapValue => {
       commentExtras: createResource({
         url: "helpdesk.api.timeline.get_comment_extras",
         params: { ticket: ticketId },
-        auto: true,
-      }),
-      pinnedComments: createListResource<PinnedComment>({
-        doctype: "Comment",
-        filters: {
-          reference_doctype: "HD Ticket",
-          reference_name: ticketId,
-          comment_type: "Comment",
-          is_pinned: 1,
-        },
-        fields: ["name", "content"],
-        orderBy: "creation asc",
         auto: true,
       }),
     };

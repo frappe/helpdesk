@@ -1,6 +1,7 @@
 import frappe
 from frappe.client import set_value
 
+from helpdesk.api.timeline import get_comment_extras
 from helpdesk.extends.comment import MAX_PINNED_COMMENTS
 from helpdesk.test_utils import make_ticket
 from helpdesk.tests.test_core_comments import AGENT_TWO, CoreCommentsTestCase
@@ -25,13 +26,9 @@ class TestPinnedComments(CoreCommentsTestCase):
         set_value("Comment", comments[0].name, "content", "edited while pinned")
         set_value("Comment", comments[0].name, "is_pinned", 0)
         set_value("Comment", comments[-1].name, "is_pinned", 1)
-        pinned = frappe.get_list(
-            "Comment",
-            filters={"reference_name": ticket.name, "is_pinned": 1},
-            pluck="name",
-        )
-        self.assertEqual(len(pinned), MAX_PINNED_COMMENTS)
-        self.assertNotIn(comments[0].name, pinned)
+        # the pinned bar numbers pins by this order, oldest first
+        pinned = get_comment_extras(ticket.name)["pinned_comments"]
+        self.assertEqual(pinned, [comment.name for comment in comments[1:]])
 
     def test_pins_are_counted_per_ticket(self):
         full, other = make_ticket(), make_ticket()
