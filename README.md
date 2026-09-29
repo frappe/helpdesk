@@ -132,6 +132,15 @@ Replace the following parameters with your values:
 
 The script will set up a production-ready instance of Frappe Helpdesk with all the necessary configurations in about 5 minutes.
 
+### Easypanel
+
+If you'd rather not manage the containers yourself, [Easypanel](https://easypanel.io) is a self-hosted deployment platform with a one-click Frappe Helpdesk template:
+
+[![Deploy on Easypanel][easypanel-btn]][easypanel-deploy]
+
+[easypanel-btn]: https://easypanel.io/img/deploy-on-easypanel-40.svg
+[easypanel-deploy]: https://easypanel.io/templates/frappe-helpdesk
+
 ## Development Setup
 
 ### Docker
