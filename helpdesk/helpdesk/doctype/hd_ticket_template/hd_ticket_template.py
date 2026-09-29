@@ -14,10 +14,9 @@ from helpdesk.consts import (
 )
 from helpdesk.utils import capture_event
 
-# the Permission Level section of the framework docs, for the hide warning below
+# linked from the hide warning below
 PERMISSION_LEVEL_DOCS = (
-    "https://docs.frappe.io/framework/user/en/basics/users-and-permissions"
-    "#permission-level"
+    "https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk"
 )
 
 
