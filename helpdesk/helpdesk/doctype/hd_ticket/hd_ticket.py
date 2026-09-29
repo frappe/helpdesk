@@ -84,7 +84,8 @@ class HDTicket(Document):
     def apply_portal_insert_rules(self):
         """The permlevel reset after this hook wipes fields the user cannot write;
         exempt server-set fields and the ones the template lets a customer fill."""
-        if is_agent():
+        # a System Manager pulling emails is not the sender of the pulled tickets
+        if is_agent() or "System Manager" in frappe.get_roles():
             return
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
