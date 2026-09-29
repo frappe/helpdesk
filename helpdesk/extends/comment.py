@@ -28,8 +28,6 @@ def validate(doc, method: str | None = None):
         return
     if not doc.has_value_changed("is_pinned"):
         return
-    # serialise concurrent pins on this ticket so two requests can't both pass the count
-    frappe.db.get_value("HD Ticket", doc.reference_name, "name", for_update=True)
     pinned = frappe.db.count(
         "Comment",
         {
