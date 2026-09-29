@@ -151,8 +151,8 @@ def edit_contact(name: str, doc: dict):
 
     if user := contact_doc.get("user"):
         user_doc = frappe.get_doc("User", user)
-        user_doc.user_image = doc.get("image", "")
-        user_doc.time_zone = doc.get("timezone", "")
+        user_doc.user_image = doc.get("image", user_doc.user_image)
+        user_doc.time_zone = doc.get("timezone", user_doc.time_zone)
         # the caller passed the Contact write check, and only the photo and timezone change
         user_doc.save(ignore_permissions=True)
 
