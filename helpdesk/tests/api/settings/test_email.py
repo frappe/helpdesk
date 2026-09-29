@@ -40,15 +40,15 @@ class TestCreateEmailAccount(IntegrationTestCase):
         self.email_server.return_value.connect.assert_called_once()
 
     def test_invalid_credentials_are_rejected_and_nothing_saved(self) -> None:
-        data = make_email_account_data("GMail")
         self.email_server.return_value.connect.side_effect = imaplib.IMAP4.error(
             "AUTHENTICATIONFAILED"
         )
-
-        with self.assertRaises(frappe.ValidationError):
-            create_email_account(data)
-
-        self.assertFalse(self.account_exists(data))
+        # the add form sends incoming off by default, credentials are still checked
+        for enable_incoming in (1, 0):
+            data = make_email_account_data("GMail", enable_incoming=enable_incoming)
+            with self.assertRaises(frappe.ValidationError):
+                create_email_account(data)
+            self.assertFalse(self.account_exists(data))
 
     def test_unsupported_or_missing_service_is_rejected(self) -> None:
         for service in ("Hotmail", "", None):
