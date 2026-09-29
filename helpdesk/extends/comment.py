@@ -9,6 +9,8 @@ from frappe import _
 
 from helpdesk.utils import is_admin, is_agent
 
+MAX_PINNED_COMMENTS = 5
+
 
 def before_insert(doc, method: str | None = None):
     """The insert path ignores permissions, so the write gate has to live here."""
@@ -17,6 +19,31 @@ def before_insert(doc, method: str | None = None):
     if not is_agent():
         frappe.throw(
             _("You are not permitted to add a comment"), frappe.PermissionError
+        )
+
+
+def validate(doc, method: str | None = None):
+    """Caps pinned comments per ticket so the pinned bar stays readable."""
+    if doc.reference_doctype != "HD Ticket" or not doc.is_pinned:
+        return
+    if not doc.has_value_changed("is_pinned"):
+        return
+    # serialise concurrent pins on this ticket so two requests can't both pass the count
+    frappe.db.get_value("HD Ticket", doc.reference_name, "name", for_update=True)
+    pinned = frappe.db.count(
+        "Comment",
+        {
+            "reference_doctype": "HD Ticket",
+            "reference_name": doc.reference_name,
+            "is_pinned": 1,
+            "name": ["!=", doc.name],
+        },
+    )
+    if pinned >= MAX_PINNED_COMMENTS:
+        frappe.throw(
+            _("A ticket can have at most {0} pinned comments").format(
+                MAX_PINNED_COMMENTS
+            )
         )
 
 
