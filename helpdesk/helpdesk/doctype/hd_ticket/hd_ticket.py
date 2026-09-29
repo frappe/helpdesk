@@ -479,13 +479,18 @@ class HDTicket(Document):
         ]
         if not changed:
             return
+        writable_levels = self.get_permlevel_access("write")
+        not_permitted = [df for df in changed if df.permlevel not in writable_levels]
+        message = (
+            _("You do not have permission to change {0}")
+            if not_permitted
+            else _("You cannot change {0} after the ticket is raised")
+        )
         labels = ", ".join(
-            self.meta.get_translated_label(df.fieldname) for df in changed
+            self.meta.get_translated_label(df.fieldname)
+            for df in not_permitted or changed
         )
-        frappe.throw(
-            _("You cannot change {0} after the ticket is raised").format(labels),
-            frappe.PermissionError,
-        )
+        frappe.throw(message.format(labels), frappe.PermissionError)
 
     def restore_unreadable_blanks(self):
         """A customer is never sent the fields it cannot read, so a whole-document

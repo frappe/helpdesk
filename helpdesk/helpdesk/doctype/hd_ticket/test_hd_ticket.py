@@ -2520,7 +2520,9 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             ("priority", other_priority(ticket.priority)),
             ("resolution_details", "set by a portal script"),
         ):
-            with self.assertRaises(frappe.PermissionError):
+            with self.assertRaisesRegex(
+                frappe.PermissionError, "You do not have permission to change"
+            ):
                 client_set_value("HD Ticket", ticket.name, fieldname, value)
             self.assertEqual(
                 frappe.db.get_value("HD Ticket", ticket.name, fieldname),
