@@ -246,13 +246,23 @@ def get_list_data(
 
 
 @frappe.whitelist()
-@redis_cache()
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
     ignore_team_restrictions: bool = False,
 ):
     check_permissions(doctype, None)
+    return _get_filterable_fields(
+        doctype, show_customer_portal_fields, ignore_team_restrictions
+    )
+
+
+@redis_cache()
+def _get_filterable_fields(
+    doctype: str,
+    show_customer_portal_fields: bool = False,
+    ignore_team_restrictions: bool = False,
+):
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
     allowed_fieldtypes = [
