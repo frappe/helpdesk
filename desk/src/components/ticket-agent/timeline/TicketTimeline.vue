@@ -1,10 +1,9 @@
 <template>
   <PinnedCommentsBar :comments="pinnedComments" :jump="goToPinned" />
-  <ActivityHeader :title="tabLabel" />
   <TimelineContainer ref="timelineContainer">
     <ActivityTimeline
       ref="timelineRef"
-      class="px-5 pt-1 pb-6"
+      class="mt-4 px-5 pt-1 pb-6"
       :activities="filtered"
       :loading="_loading"
       :paginate="paginate"
@@ -125,7 +124,6 @@ import {
   ReplyAllIcon,
   ReplyIcon,
 } from "@/components/icons";
-import ActivityHeader from "@/components/ticket/ActivityHeader.vue";
 import TicketSplitModal from "@/components/ticket/TicketSplitModal.vue";
 import {
   registerTicketFeed,
