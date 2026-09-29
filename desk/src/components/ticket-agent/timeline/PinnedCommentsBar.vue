@@ -18,28 +18,30 @@
         :style="indicatorStyle"
       />
     </span>
-    <PinIcon class="size-4 shrink-0 text-ink-gray-8" />
-    <!-- one grid cell, so the leaving and entering previews overlap while they slide;
-    -top-px optically centres Inter, whose line box leaves the glyphs sitting low -->
-    <span class="relative -top-px grid min-w-0 flex-1 overflow-hidden">
-      <Transition
-        enter-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
-        leave-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
-        :enter-from-class="`opacity-0 ${
-          toOlder ? '-translate-y-full' : 'translate-y-full'
-        }`"
-        :leave-to-class="`opacity-0 ${
-          toOlder ? 'translate-y-full' : '-translate-y-full'
-        }`"
-      >
-        <p
-          :key="current"
-          class="truncate text-p-base text-ink-gray-5 [grid-area:1/1]"
+    <!-- -top-px optically centres Inter, whose glyphs sit low -->
+    <span class="relative -top-px flex min-w-0 flex-1 items-center gap-2">
+      <PinIcon class="size-4 shrink-0 text-ink-gray-8" />
+      <!-- one grid cell, so the leaving and entering previews overlap while they slide -->
+      <span class="grid min-w-0 flex-1 overflow-hidden">
+        <Transition
+          enter-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
+          leave-active-class="motion-safe:transition motion-safe:duration-150 motion-safe:ease-out"
+          :enter-from-class="`opacity-0 ${
+            toOlder ? '-translate-y-full' : 'translate-y-full'
+          }`"
+          :leave-to-class="`opacity-0 ${
+            toOlder ? 'translate-y-full' : '-translate-y-full'
+          }`"
         >
-          <span class="font-medium text-ink-gray-7">{{ current + 1 }}:</span>
-          {{ preview }}
-        </p>
-      </Transition>
+          <p
+            :key="current"
+            class="truncate text-p-base text-ink-gray-5 [grid-area:1/1]"
+          >
+            <span class="font-medium text-ink-gray-7">{{ current + 1 }}:</span>
+            {{ preview }}
+          </p>
+        </Transition>
+      </span>
     </span>
   </button>
 </template>
@@ -84,10 +86,11 @@ const indicatorStyle = computed(() => {
 });
 
 async function select() {
-  if (jumping) return;
+  const pin = props.comments[current.value];
+  if (jumping || !pin) return;
   jumping = true;
   try {
-    await props.jump(props.comments[current.value].name);
+    await props.jump(pin.name);
     await new Promise((resolve) => setTimeout(resolve, ADVANCE_DELAY_MS));
     toOlder.value = current.value > 0;
     const count = props.comments.length;
