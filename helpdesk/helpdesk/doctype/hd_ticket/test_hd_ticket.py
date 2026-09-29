@@ -3065,8 +3065,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         self.assertTrue(stripped.get("sla"))
         self.assertTrue(stripped.get("response_by"))
 
-        # the creation response carries only the name; the page loads the rest
-        self.assertEqual(list(new(get_ticket_obj())), ["name"])
+        # the creation response carries what the customer may read, nothing internal
+        created = new(get_ticket_obj())
+        self.assertEqual(created["raised_by"], PERMS_CUSTOMER)
+        for field in internal:
+            self.assertNotIn(field, created)
 
         frappe.set_user(PERMS_AGENT)
         self.assertTrue(get_one(ticket.name).get("agreement_status"))

@@ -456,15 +456,18 @@ class HDTicket(Document):
         # custom flag created to allow insertion in special cases
         if self.flags.get("ignore_customer_edit_guard"):
             return
-        self.restore_unreadable_blanks()
         editable = self.customer_editable_fields()
         # the framework's reset runs next and would revert what the template opens
         self.flags.ignore_permlevel_for_fields = list(editable)
+        # a customer is never sent what it cannot read, so a whole-document save
+        # carries those blank; the framework's reset puts them back
+        unreadable = TicketFields().unreadable
         changed = [
             df
             for df in self.meta.fields
             if df.fieldtype not in no_value_fields
             and df.fieldname not in editable
+            and not (df.fieldname in unreadable and not self.get(df.fieldname))
             and self.has_value_changed(df.fieldname)
         ]
         if not changed:
@@ -481,14 +484,6 @@ class HDTicket(Document):
             for df in not_permitted or changed
         )
         frappe.throw(message.format(labels), frappe.PermissionError)
-
-    def restore_unreadable_blanks(self):
-        """A customer is never sent the fields it cannot read, so a whole-document
-        save carries them blank; that is absence, not an edit."""
-        before = self.get_doc_before_save()
-        for fieldname in TicketFields().unreadable:
-            if not self.get(fieldname):
-                self.set(fieldname, before.get(fieldname))
 
     def customer_editable_fields(self) -> set[str]:
         """Customers may only close and whatever the template opens to them;

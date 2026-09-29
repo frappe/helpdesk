@@ -17,7 +17,7 @@ def get_one(name: str):
     )
     if not template:
         return {"about": None, "fields": []}
-    fields = TicketFields().form
+    fields = TicketFields(name).form
     if frappe.db.get_single_value("HD Settings", "auto_set_customer_from_contact"):
         set_customer_field(fields)
 

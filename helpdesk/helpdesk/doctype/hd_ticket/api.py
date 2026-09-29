@@ -24,7 +24,7 @@ def new(doc: dict, attachments: list[dict] = []):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
-    return {"name": d.name}
+    return TicketFields().strip(d.as_dict())
 
 
 @frappe.whitelist()

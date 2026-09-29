@@ -29,16 +29,17 @@ class TicketFields:
     and ask it; nothing else derives the rule.
     """
 
-    def __init__(self):
+    def __init__(self, template: str = DEFAULT_TICKET_TEMPLATE):
+        self.template = template
         self.meta = frappe.get_meta("HD Ticket")
 
     @cached_property
     def rows(self) -> list[frappe._dict]:
-        """The Default template's rows, read once and only when asked for."""
+        """The template's rows, read once and only when asked for."""
         return frappe.get_all(
             "HD Ticket Template Field",
             filters={
-                "parent": DEFAULT_TICKET_TEMPLATE,
+                "parent": self.template,
                 "parenttype": "HD Ticket Template",
             },
             fields=[
