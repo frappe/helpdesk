@@ -3,6 +3,7 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
+from frappe.query_builder.functions import Date
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
@@ -581,8 +582,8 @@ def handle_assigned_on_filter(filters, doctype):
         .where(ToDo.status == "Open")
     )
 
-    # Apply date filter based on operator
-    query = apply_datetime_filter(query, ToDo.creation, assigned_on_filter)
+    # "Assigned on" is a Date filter, so compare whole days
+    query = apply_datetime_filter(query, Date(ToDo.creation), assigned_on_filter)
 
     ticket_names = [row[0] for row in query.run()]
     # No matching tickets results in an impossible filter
