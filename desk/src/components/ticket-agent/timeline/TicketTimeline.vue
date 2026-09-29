@@ -1,6 +1,7 @@
 <template>
+  <PinnedCommentsBar :comments="pinnedComments.data ?? []" :jump="goToPinned" />
   <ActivityHeader :title="tabLabel" />
-  <TimelineContainer>
+  <TimelineContainer ref="timelineContainer">
     <ActivityTimeline
       ref="timelineRef"
       class="px-5 pt-1 pb-6"
@@ -28,6 +29,7 @@
         <TimelineCommentRow
           :activity="activity"
           :extras="extrasFor(activity)"
+          :pinned="pinnedNames.has(activity.data.name)"
           @update="refresh"
         />
       </template>
@@ -101,6 +103,9 @@ const VERSION_FIELDS = [
 // tab instances don't refetch the same row
 const enrichedRows = new Set<string>();
 
+// clicking the pinned bar scrolls the feed to that comment over this long
+const PIN_JUMP_MS = 300;
+
 export const SHARED_VISIBLE_TYPES: VisibleTypes = [
   "email",
   "comment",
@@ -153,6 +158,8 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideSplit from "~icons/lucide/split";
+import { glideToRow } from "./glideToRow";
+import PinnedCommentsBar from "./PinnedCommentsBar.vue";
 import TimelineCommentRow, { CommentExtras } from "./TimelineCommentRow.vue";
 
 const props = defineProps<{
@@ -172,6 +179,8 @@ const ticket = inject(TicketSymbol)!;
 const splitCommunication = ref("");
 const timelineRef =
   useTemplateRef<InstanceType<typeof ActivityTimeline>>("timelineRef");
+const timelineContainer =
+  useTemplateRef<InstanceType<typeof TimelineContainer>>("timelineContainer");
 
 const { activities, loading, paginate, reload } = useActivityTimeline(
   "HD Ticket",
@@ -179,7 +188,14 @@ const { activities, loading, paginate, reload } = useActivityTimeline(
   SHARED_VISIBLE_TYPES
 );
 
-const { calls, commentExtras: extras } = useTicket(props.ticketId);
+const {
+  calls,
+  commentExtras: extras,
+  pinnedComments,
+} = useTicket(props.ticketId);
+const pinnedNames = computed(
+  () => new Set((pinnedComments.data ?? []).map((pin) => pin.name))
+);
 
 const _loading = computed(() => loading.value || calls.loading);
 
@@ -246,6 +262,28 @@ function extrasFor(activity: CommentActivity): CommentExtras {
 function refresh() {
   reload();
   extras.reload();
+  pinnedComments.reload();
+}
+
+// Emails and Calls feeds hold no comments, so the jump lands on Comments
+// resolves once the row is on screen, so the pinned bar advances after the jump
+async function goToPinned(name: string) {
+  const scroller = feedScroller();
+  // Emails and Calls feeds hold no comments; the Comments tab takes the deep link
+  if (!["activity", "comment"].includes(props.tab) || !scroller) {
+    router.replace({
+      query: { ...route.query, highlight: `comment-${name}` },
+      hash: "#comment",
+    });
+    return;
+  }
+  await glideToRow(scroller, `comment:${name}`, PIN_JUMP_MS);
+  timelineRef.value?.scrollToRow(`comment:${name}`);
+}
+
+function feedScroller() {
+  const container = timelineContainer.value?.$el as HTMLElement | undefined;
+  return container?.querySelector<HTMLElement>(".activity-timeline");
 }
 
 // after send/comment the newest row belongs on screen (old feed parity)
@@ -389,6 +427,27 @@ watch(
 
 onBeforeUnmount(() => clearTimeout(highlightTimer));
 
+// scroll anchoring pins rows to the feed's top edge, so the bar would push them down;
+// off for the toggle the feed stays bottom-anchored, back on so live rows keep place
+watch(
+  () => Boolean(pinnedComments.data?.length),
+  () => {
+    const scroller = feedScroller();
+    if (!scroller) return;
+    scroller.style.overflowAnchor = "none";
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        scroller.style.overflowAnchor = "";
+        // a scroll drops the anchor saved before the bar, else it snaps back to it
+        const top = scroller.scrollTop;
+        scroller.scrollTop = top < 0 ? top + 1 : top - 1;
+        scroller.scrollTop = top;
+      })
+    );
+  },
+  { flush: "pre" }
+);
+
 // the socket payload can't carry attachments (they live on File, joined
 // server-side), so a live comment renders bare; fetch its files and patch
 // extras, where our footer renders from. One keyed lookup, deduped across
@@ -425,6 +484,19 @@ async function enrichLiveComment(payload: unknown) {
   };
 }
 
+// another agent pinned, unpinned, edited or deleted a pinned comment
+function reloadPinsOnChange(payload: unknown) {
+  const { doc, key, action } = (payload ?? {}) as {
+    doc?: Record<string, unknown>;
+    key?: string;
+    action?: string;
+  };
+  if (key !== "comments" || action === "add") return;
+  if (doc?.reference_name !== props.ticketId) return;
+  if (doc.is_pinned || pinnedNames.value.has(doc.name as string))
+    pinnedComments.reload();
+}
+
 let unregisterFeed: () => void;
 
 onMounted(() => {
@@ -436,12 +508,14 @@ onMounted(() => {
     }
   );
   $socket.on("docinfo_update", enrichLiveComment);
+  $socket.on("docinfo_update", reloadPinsOnChange);
 });
 
 onBeforeUnmount(() => {
   unregisterFeed?.();
   $socket.off("helpdesk:comment-reaction-update");
   $socket.off("docinfo_update", enrichLiveComment);
+  $socket.off("docinfo_update", reloadPinsOnChange);
 });
 
 defineExpose({ reload: refreshAndScroll });

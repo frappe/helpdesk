@@ -6,6 +6,11 @@
     @discard="editing = false"
   >
     <template v-if="!editing" #actions>
+      <PinIcon
+        v-if="pinned"
+        class="size-4 text-ink-violet-5"
+        :aria-label="__('Pinned')"
+      />
       <Dropdown
         align="end"
         :options="kebabOptions"
@@ -37,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { PinIcon, UnpinIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
@@ -49,7 +55,7 @@ import {
 } from "@framework/ui/ActivityTimeline";
 import { Button, Dropdown, createResource, toast } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, h, ref } from "vue";
 import TimelineReactions from "./TimelineReactions.vue";
 
 export interface CommentExtras {
@@ -60,6 +66,7 @@ export interface CommentExtras {
 const props = defineProps<{
   activity: CommentActivity;
   extras: CommentExtras;
+  pinned: boolean;
 }>();
 const emit = defineEmits<{ update: [] }>();
 
@@ -90,6 +97,11 @@ const kebabOptions = computed(() => [
     label: __("Copy link"),
     icon: "lucide-link",
     onClick: () => copyActivityLink("comment", props.activity.data.name),
+  },
+  {
+    label: props.pinned ? __("Unpin") : __("Pin"),
+    icon: h(props.pinned ? UnpinIcon : PinIcon, { class: "size-4" }),
+    onClick: togglePin,
   },
   // only the author edits or deletes; anyone may share the link
   ...(isOwner.value && !isMergeMarker.value
@@ -145,6 +157,23 @@ function saveContent(content: string) {
         emit("update");
         toast.success(__("Comment updated successfully."));
       },
+    }
+  );
+}
+
+// any agent may pin; the server caps pins per ticket and says so on failure
+function togglePin() {
+  saveComment.submit(
+    {
+      doctype: "Comment",
+      name: props.activity.data.name,
+      fieldname: "is_pinned",
+      value: props.pinned ? 0 : 1,
+    },
+    {
+      onSuccess: () => emit("update"),
+      onError: (error: { messages?: string[] }) =>
+        toast.error(error.messages?.[0] ?? __("Could not pin the comment")),
     }
   );
 }
