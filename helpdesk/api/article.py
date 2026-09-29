@@ -1,11 +1,13 @@
 import re
 
 import frappe
+from frappe import _
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
+from helpdesk.utils import is_agent
 
 
 def get_nouns(blob: TextBlob):
@@ -56,7 +58,11 @@ def sanitize_query(query: str) -> str:
 
 @frappe.whitelist()
 def get_article_stats(article_name: str):
-    views = frappe.db.get_value("HD Article", article_name, "views")
+    views, status = frappe.db.get_value(
+        "HD Article", article_name, ["views", "status"]
+    ) or (None, None)
+    if not is_agent() and status != "Published":
+        frappe.throw(_("Access denied"), frappe.PermissionError)
 
     likes = frappe.db.count(
         "HD Article Feedback",
