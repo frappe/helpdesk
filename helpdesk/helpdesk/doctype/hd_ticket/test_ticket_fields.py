@@ -137,6 +137,13 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             template.save()
 
+    def test_a_miscased_fieldname_cannot_be_added_to_a_template(self):
+        """The DB matches case-insensitively; the forms and checks do not."""
+        template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+        template.append("fields", {"fieldname": "status_Category"})
+        with self.assertRaisesRegex(frappe.ValidationError, "does not exist"):
+            template.save()
+
     def test_details_tab_lists_the_template_then_the_core_fields(self):
         """The order a layout editor will build on: template rows, then core."""
         self.addCleanup(set_default_template_visibility("priority", "Everyone"))

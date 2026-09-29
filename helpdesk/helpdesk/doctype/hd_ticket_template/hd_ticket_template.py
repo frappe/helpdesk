@@ -28,24 +28,13 @@ class HDTicketTemplate(Document):
         self.warn_customer_hidden_fields()
 
     def verify_field_exists(self):
+        # meta, not a DB lookup: the DB matches case-insensitively and would
+        # let `status_Category` past every check below
+        meta = frappe.get_meta("HD Ticket")
         for f in self.fields:
-            if not f.fieldname:
-                continue
-            exists = self.docfield_exists(f.fieldname) or self.custom_field_exists(
-                f.fieldname
-            )
-            if not exists:
+            if f.fieldname and not meta.has_field(f.fieldname):
                 text = _("Field `{0}` does not exist in Ticket").format(f.fieldname)
                 frappe.throw(text)
-
-    def docfield_exists(self, fieldname: str):
-        return frappe.db.exists(
-            {
-                "doctype": "DocField",
-                "fieldname": fieldname,
-                "parent": "HD Ticket",
-            }
-        )
 
     def validate_unallowed_fields(self):
         unallowed_fields = ["status", "agreement_status", "subject"]
@@ -134,15 +123,6 @@ class HDTicketTemplate(Document):
         """Live meta check, so a level changed in Customize Form counts."""
         field = frappe.get_meta("HD Ticket").get_field(fieldname)
         return field.permlevel if field else 0
-
-    def custom_field_exists(self, fieldname: str):
-        return frappe.db.exists(
-            {
-                "doctype": "Custom Field",
-                "fieldname": fieldname,
-                "dt": "HD Ticket",
-            }
-        )
 
     def on_update(self):
         capture_event("ticket_template_updated")
