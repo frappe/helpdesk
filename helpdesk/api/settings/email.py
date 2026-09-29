@@ -3,6 +3,13 @@ from typing import Any
 import frappe
 from frappe import _
 
+# the UI names these providers differently from the Email Account service options
+FRAPPE_SERVICE_NAMES = {
+    "Outlook": "Outlook.com",
+    "Yahoo": "Yahoo Mail",
+    "Yandex": "Yandex.Mail",
+}
+
 
 @frappe.whitelist()
 def create_email_account(data: dict[str, Any]):
@@ -71,13 +78,6 @@ def create_email_account(data: dict[str, Any]):
     except Exception as e:
         frappe.throw(str(e))
 
-
-# the UI names these providers differently from the Email Account service options
-FRAPPE_SERVICE_NAMES = {
-    "Outlook": "Outlook.com",
-    "Yahoo": "Yahoo Mail",
-    "Yandex": "Yandex.Mail",
-}
 
 email_service_config = {
     "Frappe Mail": {
