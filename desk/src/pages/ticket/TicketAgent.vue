@@ -169,6 +169,7 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
+    useTicket(newTicketId as string).ticket.markSeen.reload();
 
     // Switching to an already-visited ticket: show its cached conversation and
     // refresh it in the background in case it changed while we were elsewhere.
@@ -212,7 +213,6 @@ onMounted(() => {
     },
   });
   ticketsToNavigate.reload();
-  ticket.value.markSeen.reload();
 
   $socket.on("ticket_update", (data: TicketUpdateData) => {
     if (data.ticket_id === ticket.value?.name) {

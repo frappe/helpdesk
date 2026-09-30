@@ -1,5 +1,6 @@
 import type { TicketAnalytics } from "@/components/ticket-agent/analytics/types";
 import type { CommentExtras } from "@/components/ticket-agent/timeline/TimelineCommentRow.vue";
+import { useNotificationStore } from "@/stores/notification";
 import { __ } from "@/translation";
 import type {
   DocumentResource,
@@ -45,7 +46,10 @@ export const useTicket = (ticketId: string): MapValue => {
         doctype: "HD Ticket",
         name: ticketId,
         whitelistedMethods: {
-          markSeen: "mark_seen",
+          markSeen: {
+            method: "mark_seen",
+            onSuccess: () => useNotificationStore().controller.reload(),
+          },
         },
         setValue: {
           onSuccess: () => {

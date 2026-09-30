@@ -563,6 +563,7 @@ onMounted(() => {
   // Revisiting a ticket: show the cached conversation immediately and refresh it
   // in place (mobile has no live socket refresh to keep the cache current).
   revalidateTicket(props.ticketId);
+  ticket.value.markSeen.reload();
 });
 
 onUnmounted(() => {
