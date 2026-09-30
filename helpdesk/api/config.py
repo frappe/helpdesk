@@ -16,7 +16,6 @@ def get_config():
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
         "show_customer_portal_permission_notice",
-        "show_ticket_field_permission_notice",
     ]
     res = frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True)
 

@@ -39,9 +39,6 @@ export const useConfigStore = defineStore("config", () => {
   const showCustomerPortalPermissionNotice = computed(
     () => !!parseInt(config.value.show_customer_portal_permission_notice)
   );
-  const showTicketFieldPermissionNotice = computed(
-    () => !!parseInt(config.value.show_ticket_field_permission_notice)
-  );
 
   $socket.on("helpdesk:settings-updated", () => configResource.reload());
 
@@ -59,6 +56,5 @@ export const useConfigStore = defineStore("config", () => {
     disableGlobalScopeForSavedReplies,
     enableCommentReactions,
     showCustomerPortalPermissionNotice,
-    showTicketFieldPermissionNotice,
   };
 });

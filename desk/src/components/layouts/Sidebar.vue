@@ -221,11 +221,7 @@ const showPermissionNoticeBanner = computed(() => {
 });
 
 const showFieldPermissionNoticeBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    (authStore.isManager || authStore.isAdmin) &&
-    configStore.showTicketFieldPermissionNotice
-  );
+  return !isCustomerPortal.value && (authStore.isManager || authStore.isAdmin);
 });
 
 const showOnboardingBanner = computed(() => {
