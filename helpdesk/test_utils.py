@@ -947,13 +947,6 @@ def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, 
     }
 
 
-def is_portal_notice_shown() -> bool:
-    """Whether HD Settings still flags the customer portal notice as shown."""
-    from helpdesk.api.customer_portal_notice import NOTICE_FLAG
-
-    return bool(frappe.db.get_single_value("HD Settings", NOTICE_FLAG))
-
-
 def get_user_roles(user: str) -> list[str]:
     """A user's Has Role rows, duplicates included (unlike frappe.get_roles)."""
     return frappe.get_all(
