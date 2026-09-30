@@ -20,6 +20,10 @@
           v-if="showPermissionNoticeBanner"
           :isSidebarCollapsed="isCollapsed"
         />
+        <TicketFieldPermissionBanner
+          v-if="showFieldPermissionNoticeBanner"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
@@ -60,6 +64,7 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
+import TicketFieldPermissionBanner from "@/components/layouts/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
@@ -212,6 +217,14 @@ const showPermissionNoticeBanner = computed(() => {
     !isCustomerPortal.value &&
     (authStore.isManager || authStore.isAdmin) &&
     configStore.showCustomerPortalPermissionNotice
+  );
+});
+
+const showFieldPermissionNoticeBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    (authStore.isManager || authStore.isAdmin) &&
+    configStore.showTicketFieldPermissionNotice
   );
 });
 
