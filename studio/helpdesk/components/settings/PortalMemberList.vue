@@ -47,7 +47,7 @@
               <Badge
                 v-if="member.pending"
                 :label="__('Pending')"
-                theme="orange"
+                theme="amber"
                 variant="subtle"
               />
             </div>

@@ -59,7 +59,7 @@ function badge(label: string, theme: string) {
 
 function countdownBadge(deadline: string) {
   return h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
-    h(Badge, { label: shortDuration(deadline), theme: 'orange', variant: 'subtle' }),
+    h(Badge, { label: shortDuration(deadline), theme: 'amber', variant: 'subtle' }),
   )
 }
 
