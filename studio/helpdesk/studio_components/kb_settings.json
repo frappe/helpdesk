@@ -907,18 +907,17 @@
                "w-full"
               ],
               "componentId": "kb_settings-organization-tabs",
-              "componentName": "PortalTabs",
+              "componentName": "Tabs",
               "componentProps": {
                "modelValue": {
                 "$type": "variable",
                 "name": "orgTab"
                },
-               "options": {
+               "tabs": {
                 "$type": "variable",
                 "name": "orgTabOptions"
                }
-              },
-              "isCustomVueComponent": true
+              }
              },
              {
               "blockName": "Members",
@@ -1424,7 +1423,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-09-28 21:48:52.849664",
+ "modified": "2026-09-30 18:20:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
