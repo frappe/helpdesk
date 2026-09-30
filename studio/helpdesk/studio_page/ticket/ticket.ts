@@ -118,6 +118,15 @@ export default function setup(context) {
     return Boolean(resolvedOn) && dayjs().diff(dayjs(resolvedOn), 'day') >= days
   }
 
+  // The prompt is a row of its own, drawn by the timeline's `item-solve_prompt` slot.
+  const activities = computed(() =>
+    thread.activities.value.flatMap((activity) =>
+      activity.key === solvePromptAt.value
+        ? [activity, { type: 'solve_prompt', key: 'solve-prompt', timestamp: activity.timestamp, data: {} }]
+        : [activity],
+    ),
+  )
+
   // Where a rating is still owed, the dialog's save is the only way past `validate_feedback`.
   function confirmSolved() {
     if (canRate.value) return feedback.openFeedback(CLOSED_STATUS)
@@ -166,11 +175,11 @@ export default function setup(context) {
     words,
     ticketId,
     ticket,
+    activities,
     canCreateTicket,
     pageActionLabel,
     pageActionIcon: 'check',
     onPageAction,
-    solvePromptAt,
     confirmSolved,
     reopenTicket,
     suggestedArticles,

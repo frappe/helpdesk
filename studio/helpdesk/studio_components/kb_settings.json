@@ -319,35 +319,6 @@
                    "title": "{{ t('Theme') }}"
                   },
                   "componentSlots": {}
-                 },
-                 {
-                  "children": [
-                   {
-                    "classes": [
-                     "w-32"
-                    ],
-                    "componentId": "kb_settings-select-layout",
-                    "componentName": "Select",
-                    "componentProps": {
-                     "modelValue": {
-                      "$type": "variable",
-                      "name": "conversationLayout"
-                     },
-                     "options": {
-                      "$type": "variable",
-                      "name": "conversationLayoutOptions"
-                     }
-                    },
-                    "componentSlots": {}
-                   }
-                  ],
-                  "componentId": "kb_settings-row-layout",
-                  "componentName": "SettingsRow",
-                  "componentProps": {
-                   "description": "{{ t('Read replies as a timeline, or as a chat with your own messages on the right.') }}",
-                   "title": "{{ t('Conversation layout') }}"
-                  },
-                  "componentSlots": {}
                  }
                 ],
                 "classes": [

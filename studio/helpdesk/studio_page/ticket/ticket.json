@@ -74,338 +74,94 @@
            "visibilityCondition": "{{ showBanner }}"
           },
           {
-           "baseStyles": {
-            "paddingBottom": "{{ threadTailSpace }}"
-           },
            "children": [
             {
              "baseStyles": {
-              "gap": "0px"
+              "paddingBottom": "{{ threadTailSpace }}"
              },
-             "children": [
-              {
-               "attributes": {
-                "id": "{{ dataItem.name }}"
-               },
-               "baseStyles": {
-                "display": "{{ dataItem.rowDisplay }}",
-                "flexDirection": "{{ dataItem.rowDirection }}",
-                "left": "{{ dataItem.rowLeft }}"
-               },
-               "blockName": "message",
-               "children": [
+             "classes": [
+              "flex-1",
+              "min-h-0",
+              "pt-4"
+             ],
+             "componentId": "ActivityTimeline-ticket-thread",
+             "componentName": "ActivityTimeline",
+             "componentProps": {
+              "activities": "{{ activities }}",
+              "loading": "{{ ticket.loading }}"
+             },
+             "componentSlots": {
+              "item-solve_prompt": {
+               "parentBlockId": "ActivityTimeline-ticket-thread",
+               "slotContent": [
                 {
                  "children": [
                   {
-                   "baseStyles": {
-                    "height": "{{ dataItem.railHeight }}"
-                   },
                    "classes": [
-                    "left-[50%]",
-                    "absolute",
-                    "top-3",
-                    "w-px",
-                    "bg-[var(--outline-gray-1)]"
+                    "text-ink-gray-5"
                    ],
-                   "componentId": "container-ticket-rail-line",
-                   "componentName": "container",
-                   "originalElement": "div"
-                  },
-                  {
-                   "baseStyles": {
-                    "left": "{{ dataItem.avatarLeft }}",
-                    "marginTop": "{{ dataItem.avatarOffset }}"
-                   },
-                   "classes": [
-                    "relative"
-                   ],
-                   "componentId": "Avatar-ticket-sender",
-                   "componentName": "Avatar",
+                   "componentId": "TextBlock-ticket-solve-ask",
+                   "componentName": "TextBlock",
                    "componentProps": {
-                    "image": "{{ dataItem.image }}",
-                    "label": "{{ dataItem.sender }}",
-                    "size": "lg"
+                    "fontSize": "text-p-base",
+                    "tag": "span",
+                    "text": "{{ words.solveAsk }}"
+                   }
+                  },
+                  {
+                   "componentEvents": {
+                    "click": {
+                     "action": "Run Script",
+                     "script": "confirmSolved()"
+                    }
                    },
-                   "visibilityCondition": "{{ dataItem.showAvatar }}"
+                   "componentId": "KbDotAction-ticket-solve-yes",
+                   "componentName": "PortalDotAction",
+                   "componentProps": {
+                    "label": "{{ words.solveYes }}",
+                    "state": "done"
+                   },
+                   "isCustomVueComponent": true
+                  },
+                  {
+                   "componentEvents": {
+                    "click": {
+                     "action": "Run Script",
+                     "script": "reopenTicket()"
+                    }
+                   },
+                   "componentId": "KbDotAction-ticket-solve-no",
+                   "componentName": "PortalDotAction",
+                   "componentProps": {
+                    "label": "{{ words.solveNo }}",
+                    "state": "next"
+                   },
+                   "isCustomVueComponent": true
                   }
                  ],
                  "classes": [
+                  "items-center",
                   "flex",
-                  "shrink-0",
-                  "justify-center",
-                  "relative",
-                  "w-[30px]"
+                  "flex-wrap",
+                  "gap-2"
                  ],
-                 "componentId": "container-ticket-rail",
-                 "componentName": "container",
-                 "originalElement": "div",
-                 "visibilityCondition": "{{ dataItem.showRail }}"
-                },
-                {
-                 "baseStyles": {
-                  "alignItems": "{{ dataItem.contentAlign }}",
-                  "marginBottom": "{{ dataItem.rowSpacing }}"
-                 },
-                 "children": [
-                  {
-                   "children": [
-                    {
-                     "classes": [
-                      "text-ink-gray-8",
-                      "font-medium"
-                     ],
-                     "componentId": "TextBlock-ticket-sender-outside",
-                     "componentName": "TextBlock",
-                     "componentProps": {
-                      "fontSize": "text-p-sm",
-                      "tag": "span",
-                      "text": "{{ dataItem.sender }}"
-                     }
-                    },
-                    {
-                     "classes": [
-                      "text-ink-gray-4",
-                      "text-center",
-                      "w-4"
-                     ],
-                     "componentId": "TextBlock-ticket-dot-outside",
-                     "componentName": "TextBlock",
-                     "componentProps": {
-                      "fontSize": "text-p-sm",
-                      "tag": "span",
-                      "text": "\u00b7"
-                     }
-                    },
-                    {
-                     "children": [
-                      {
-                       "classes": [
-                        "text-ink-gray-5"
-                       ],
-                       "componentId": "TextBlock-ticket-time-outside",
-                       "componentName": "TextBlock",
-                       "componentProps": {
-                        "fontSize": "text-p-sm",
-                        "tag": "span",
-                        "text": "{{ dataItem.clock }}"
-                       }
-                      }
-                     ],
-                     "componentId": "Tooltip-ticket-time-outside",
-                     "componentName": "Tooltip",
-                     "componentProps": {
-                      "text": "{{ dataItem.fullDate }}"
-                     }
-                    }
-                   ],
-                   "classes": [
-                    "items-center",
-                    "flex",
-                    "gap-0.5",
-                    "pb-1",
-                    "pl-4"
-                   ],
-                   "componentId": "container-ticket-byline-outside",
-                   "componentName": "container",
-                   "originalElement": "div",
-                   "visibilityCondition": "{{ dataItem.outsideByline }}"
-                  },
-                  {
-                   "baseStyles": {
-                    "backgroundColor": "{{ dataItem.cardBackground }}",
-                    "border": "{{ dataItem.cardBorder }}",
-                    "maxWidth": "{{ dataItem.cardMaxWidth }}",
-                    "padding": "{{ dataItem.cardPadding }}",
-                    "width": "{{ dataItem.cardWidth }}"
-                   },
-                   "children": [
-                    {
-                     "children": [
-                      {
-                       "classes": [
-                        "text-ink-gray-9",
-                        "font-medium"
-                       ],
-                       "componentId": "TextBlock-ticket-sender",
-                       "componentName": "TextBlock",
-                       "componentProps": {
-                        "fontSize": "text-base",
-                        "tag": "span",
-                        "text": "{{ dataItem.sender }}"
-                       }
-                      },
-                      {
-                       "classes": [
-                        "text-ink-gray-4",
-                        "text-center",
-                        "w-4"
-                       ],
-                       "componentId": "TextBlock-ticket-dot",
-                       "componentName": "TextBlock",
-                       "componentProps": {
-                        "fontSize": "text-base",
-                        "tag": "span",
-                        "text": "\u00b7"
-                       }
-                      },
-                      {
-                       "children": [
-                        {
-                         "classes": [
-                          "text-ink-gray-5"
-                         ],
-                         "componentId": "TextBlock-ticket-time",
-                         "componentName": "TextBlock",
-                         "componentProps": {
-                          "fontSize": "text-base",
-                          "tag": "span",
-                          "text": "{{ dataItem.timeAgo }}"
-                         }
-                        }
-                       ],
-                       "componentId": "Tooltip-ticket-time",
-                       "componentName": "Tooltip",
-                       "componentProps": {
-                        "text": "{{ dataItem.fullDate }}"
-                       }
-                      }
-                     ],
-                     "classes": [
-                      "items-center",
-                      "flex",
-                      "gap-0.5",
-                      "mb-4"
-                     ],
-                     "componentId": "container-ticket-byline",
-                     "componentName": "container",
-                     "originalElement": "div",
-                     "visibilityCondition": "{{ dataItem.insideByline }}"
-                    },
-                    {
-                     "componentId": "KbEmailContent-ticket-body",
-                     "componentName": "PortalEmailContent",
-                     "componentProps": {
-                      "content": "{{ dataItem.content }}",
-                      "isChat": "{{ dataItem.isChat }}"
-                     },
-                     "isCustomVueComponent": true
-                    },
-                    {
-                     "componentId": "KbAttachments-ticket",
-                     "componentName": "PortalAttachments",
-                     "componentProps": {
-                      "attachments": "{{ dataItem.attachments }}"
-                     },
-                     "isCustomVueComponent": true,
-                     "visibilityCondition": "{{ dataItem.attachments.length }}"
-                    }
-                   ],
-                   "classes": [
-                    "rounded-[10px]",
-                    "min-w-0"
-                   ],
-                   "componentId": "container-ticket-card",
-                   "componentName": "container",
-                   "originalElement": "div"
-                  },
-                  {
-                   "children": [
-                    {
-                     "classes": [
-                      "text-ink-gray-5"
-                     ],
-                     "componentId": "TextBlock-ticket-solve-ask",
-                     "componentName": "TextBlock",
-                     "componentProps": {
-                      "fontSize": "text-p-base",
-                      "tag": "span",
-                      "text": "{{ words.solveAsk }}"
-                     }
-                    },
-                    {
-                     "componentEvents": {
-                      "click": {
-                       "action": "Run Script",
-                       "script": "confirmSolved()"
-                      }
-                     },
-                     "componentId": "KbDotAction-ticket-solve-yes",
-                     "componentName": "PortalDotAction",
-                     "componentProps": {
-                      "label": "{{ words.solveYes }}",
-                      "state": "done"
-                     },
-                     "isCustomVueComponent": true
-                    },
-                    {
-                     "componentEvents": {
-                      "click": {
-                       "action": "Run Script",
-                       "script": "reopenTicket()"
-                      }
-                     },
-                     "componentId": "KbDotAction-ticket-solve-no",
-                     "componentName": "PortalDotAction",
-                     "componentProps": {
-                      "label": "{{ words.solveNo }}",
-                      "state": "next"
-                     },
-                     "isCustomVueComponent": true
-                    }
-                   ],
-                   "classes": [
-                    "items-center",
-                    "flex",
-                    "flex-wrap",
-                    "gap-2"
-                   ],
-                   "componentId": "container-ticket-solve-prompt",
-                   "componentName": "container",
-                   "visibilityCondition": "{{ dataItem.name === solvePromptAt }}"
-                  }
-                 ],
-                 "classes": [
-                  "flex",
-                  "flex-1",
-                  "flex-col",
-                  "gap-2.5",
-                  "min-w-0"
-                 ],
-                 "componentId": "container-ticket-content",
+                 "componentId": "container-ticket-solve-prompt",
                  "componentName": "container",
                  "originalElement": "div"
                 }
                ],
-               "classes": [
-                "gap-4",
-                "grid-cols-[30px_minmax(0,_1fr)]",
-                "relative"
-               ],
-               "componentId": "container-ticket-row",
-               "componentName": "container",
-               "originalElement": "div"
+               "slotId": "ActivityTimeline-ticket-thread:item-solve_prompt",
+               "slotName": "item-solve_prompt"
               }
-             ],
-             "classes": [
-              "flex",
-              "flex-col",
-              "pt-4"
-             ],
-             "componentId": "Repeater-ticket-thread",
-             "componentName": "Repeater",
-             "componentProps": {
-              "data": "{{ conversation }}",
-              "dataKey": "name"
-             },
-             "visibilityCondition": "{{ conversation.length }}"
+             }
             }
            ],
            "classes": [
+            "flex",
+            "flex-col",
             "flex-1",
-            "overflow-y-auto",
-            "py-0",
-            "px-10",
-            "js-ticket-thread"
+            "min-h-0",
+            "px-10"
            ],
            "componentId": "container-ticket-thread",
            "componentName": "container",
@@ -860,13 +616,12 @@
            "children": [
             {
              "classes": [
-              "text-ink-gray-9",
-              "font-medium"
+              "text-ink-gray-5"
              ],
              "componentId": "TextBlock-ticket-help-title",
              "componentName": "TextBlock",
              "componentProps": {
-              "fontSize": "text-base",
+              "fontSize": "text-p-sm",
               "tag": "div",
               "text": "{{ suggestedHeading }}"
              }
@@ -875,7 +630,7 @@
              "children": [
               {
                "classes": [
-                "text-ink-blue-5",
+                "text-ink-gray-8",
                 "cursor-pointer",
                 "hover:underline"
                ],
@@ -889,7 +644,7 @@
                "componentId": "TextBlock-ticket-help-link",
                "componentName": "TextBlock",
                "componentProps": {
-                "fontSize": "text-p-base",
+                "fontSize": "text-p-sm",
                 "tag": "div",
                 "text": "{{ dataItem.title }}"
                }
