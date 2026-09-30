@@ -64,6 +64,16 @@ const CELLS = {
 }
 const CELLS_BY_TYPE = { Datetime: datetimeCell, Date: datetimeCell, Rating: ratingCell }
 
+// `useListData` refetches on a new identity, which meta, translations and a restored view
+// all produce without changing what is asked for.
+function settled(source) {
+  let last
+  return computed(() => {
+    const next = source()
+    return JSON.stringify(next) === JSON.stringify(last) ? last : (last = next)
+  })
+}
+
 export default function setup(context) {
   const settings = useSettingsModal(context)
   settings.loadSettings()
@@ -80,19 +90,22 @@ export default function setup(context) {
   // Unset, the server orders by `modified`, which never settles for a requester.
   view.sort.by.value = [{ fieldname: 'creation', direction: 'desc' }]
 
+  // Before the data layer too: the remembered filters belong in the first fetch.
+  const views = useViews(view)
+
   const fetchView = {
     ...view,
+    filters: { ...view.filters, wire: settled(() => view.filters.wire.value) },
     columns: {
       ...view.columns,
-      wire: computed(() => [
-        ...view.columns.wire.value,
-        ...SUPPORT_FIELDS.map((key) => ({ key })),
-      ]),
+      wire: settled(() =>
+        [...view.columns.wire.value.map((column) => column.key), ...SUPPORT_FIELDS].map(
+          (key) => ({ key }),
+        ),
+      ),
     },
   }
   const data = useListData(DOCTYPE, fetchView)
-
-  const views = useViews(view)
 
   const listColumns = computed(() =>
     view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
