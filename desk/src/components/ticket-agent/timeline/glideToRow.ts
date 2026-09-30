@@ -1,8 +1,5 @@
-/**
- * Scrolls `scroller` so the row with id `rowId` sits mid-view, eased over
- * `durationMs`, and resolves once it lands. The browser's smooth scroll picks
- * its own duration and has no reliable "done", which the pinned bar waits on.
- */
+/** Eases the row to mid-view and resolves on arrival; the browser's smooth
+ * scroll has no reliable "done", and the pinned bar waits on it. */
 export function glideToRow(
   scroller: HTMLElement,
   rowId: string,
