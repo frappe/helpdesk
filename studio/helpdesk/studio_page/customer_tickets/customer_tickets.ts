@@ -1,7 +1,6 @@
 import { computed, watch } from 'vue'
 import { createResource } from 'frappe-ui'
 import { useListData, useListView } from '@framework/ui/ListView'
-import { parseFilters, serializeFilters } from '@framework/ui/Filter'
 import { __, translations } from '@helpdesk/shared/translation'
 import {
   datetimeCell, idCell, priorityCell, ratingCell,
@@ -159,13 +158,6 @@ export default function setup(context) {
     auto: true,
   })
 
-  const filterConditions = computed({
-    get: () => serializeFilters(view.filters.conditions.value),
-    set: (wire) => {
-      view.filters.conditions.value = parseFilters(filterFields.data || [], wire)
-    },
-  })
-
   // One organization is not a choice, but never override a condition already there.
   watch(
     settings.organizations,
@@ -193,8 +185,6 @@ export default function setup(context) {
     quickFilterFields,
     quickFilterCustomizing: view.quickFilter.customizing,
     filterFields: computed(() => filterFields.data || []),
-    filterConditions,
-    setFilterConditions: (wire) => (filterConditions.value = wire),
     listColumns,
     emptyState,
     openTicket,

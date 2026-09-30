@@ -150,7 +150,7 @@ import {
   Reload,
   SortBy,
 } from "@/components/view-controls";
-import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
+import { Filter, normalizeFilters } from "@/components/view-controls/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,

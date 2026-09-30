@@ -135,19 +135,16 @@
          }
         },
         {
-         "componentEvents": {
-          "update:conditions": {
-           "action": "Run Script",
-           "script": "setFilterConditions(eventArgs[0])"
-          }
-         },
          "componentId": "KbFilter-tickets-filter",
-         "componentName": "PortalFilter",
+         "componentName": "Filter",
          "componentProps": {
-          "conditions": "{{ filterConditions }}",
-          "fields": "{{ filterFields }}"
-         },
-         "isCustomVueComponent": true
+          "doctype": "HD Ticket",
+          "fields": "{{ filterFields }}",
+          "modelValue": {
+           "$type": "variable",
+           "name": "filters"
+          }
+         }
         },
         {
          "blockName": "tickets-sort",
@@ -295,7 +292,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:48:53.021392",
+ "modified": "2026-09-30 17:32:38.478901",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

@@ -146,43 +146,22 @@
 </template>
 
 <script setup lang="ts">
-import BackButton from "../BackButton.vue";
-import { useShortcut } from "../shortcuts";
-import { __ } from "../translation";
+import BackButton from "@/components/BackButton.vue";
+import { useShortcut } from "@/composables/shortcuts";
+import { __ } from "@/translation";
 import { useEventListener } from "@vueuse/core";
 import { Button, Popover } from "frappe-ui";
-import { computed, inject, nextTick, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import {
   ActiveFilter,
   fieldIcon,
-  FilterCondition,
   FilterField,
   filterSummary,
-  FilterSource,
   useFilter,
 } from "./filter";
 import FilterFieldList from "./FilterFieldList.vue";
 import FilterTrigger from "./FilterTrigger.vue";
 import FilterValueEditor from "./FilterValueEditor.vue";
-
-const props = defineProps<{
-  filterableFields?: FilterField[];
-  conditions?: FilterCondition[];
-}>();
-const emit = defineEmits<{
-  "update:conditions": [conditions: FilterCondition[]];
-}>();
-
-// A desk list view provides its data; a Studio page has no component to provide
-// from, so there the same three things arrive as props.
-const listViewData = inject<any>("listViewData", null);
-const source: FilterSource | undefined = listViewData
-  ? undefined
-  : {
-      fields: computed(() => props.filterableFields ?? []),
-      conditions: computed(() => props.conditions ?? []),
-      apply: (next) => emit("update:conditions", next),
-    };
 
 const {
   fields,
@@ -191,7 +170,7 @@ const {
   updateFilter,
   removeFilter,
   clearFilters,
-} = useFilter(source);
+} = useFilter();
 
 const step = ref<"overview" | "fields" | "value">("fields");
 const selectedField = ref<FilterField | null>(null);

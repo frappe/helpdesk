@@ -21,7 +21,7 @@
 <script setup>
 import { FadedScrollableDiv } from "@/components";
 import { inject } from "vue";
-import { normalizeFilters } from "@helpdesk/shared/filter";
+import { normalizeFilters } from "./filter";
 import QuickFilterField from "./QuickFilterField.vue";
 
 const listViewData = inject("listViewData");
