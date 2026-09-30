@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import get_user_date_format, get_user_time_format
 
 from helpdesk.utils import is_agent
 
@@ -31,6 +32,8 @@ def get_config():
     # The Studio portal has no boot payload, so this also names the session user.
     res.session_user = frappe.session.user
     res.is_agent = is_agent()
+    res.date_format = get_user_date_format()
+    res.time_format = get_user_time_format()
 
     res.favicon = (
         res.favicon

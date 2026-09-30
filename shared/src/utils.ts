@@ -199,3 +199,48 @@ export function shortDuration(target: string): string {
   }
   return `${Math.floor(seconds / MINUTE)}m`;
 }
+
+/**
+ * Convert `link_filters` from the stored list format to the dict format that
+ * `frappe.desk.search.search_link` expects. Doctypes with a standard query
+ * @example
+ * // in:  '[["User", "name", "in", ["a@x.com", "b@x.com"]]]'
+ * // out: { name: ["in", ["a@x.com", "b@x.com"]] }
+ */
+export function parseLinkFilters(linkFilters: string) {
+  const conditions = JSON.parse(linkFilters);
+  if (!Array.isArray(conditions)) return conditions;
+  return Object.fromEntries(
+    conditions.map((condition) => {
+      const [fieldname, operator, value] =
+        condition.length === 4 ? condition.slice(1) : condition;
+      return [fieldname, operator === "=" ? value : [operator, value]];
+    })
+  );
+}
+
+type DropdownOption = { label: string; value: string | number };
+
+export function parseApiOptions(
+  options: string[] | DropdownOption[]
+): DropdownOption[] | [] {
+  if (!options?.length) return [];
+  return (
+    options
+      .filter((o) => Boolean(o))
+      .map((o) => {
+        if (
+          typeof o === "object" &&
+          o.hasOwnProperty("label") &&
+          o.hasOwnProperty("value")
+        ) {
+          return o;
+        } else {
+          return {
+            label: o?.toString(),
+            value: o as string,
+          };
+        }
+      }) || []
+  );
+}

@@ -62,6 +62,20 @@
          }
         },
         {
+         "blockName": "about",
+         "classes": [
+          "prose-sm",
+          "max-w-none",
+          "text-ink-gray-7"
+         ],
+         "componentId": "about",
+         "componentName": "HTML",
+         "componentProps": {
+          "html": "{{ about }}"
+         },
+         "visibilityCondition": "{{ about }}"
+        },
+        {
          "blockName": "f-subject",
          "children": [
           {
@@ -152,47 +166,16 @@
         },
         {
          "blockName": "fields",
-         "children": [
-          {
-           "blockName": "field-control",
-           "classes": [
-            "w-full"
-           ],
-           "componentEvents": {
-            "update:modelValue": {
-             "action": "Run Script",
-             "event": "update:modelValue",
-             "script": "setField(dataItem.fieldname, eventArgs[0])"
-            }
-           },
-           "componentId": "field-control",
-           "componentName": "FormControl",
-           "componentProps": {
-            "label": "{{ dataItem.label }}",
-            "modelValue": "{{ getField(dataItem.fieldname) }}",
-            "options": "{{ optionsFor(dataItem) }}",
-            "placeholder": "{{ t('Select option') }}",
-            "required": "{{ !!dataItem.required }}",
-            "size": "sm",
-            "type": "{{ controlType(dataItem.fieldtype) }}",
-            "variant": "subtle"
-           }
-          }
-         ],
          "classes": [
-          "grid",
-          "flex-col",
-          "gap-5",
-          "grid-cols-[repeat(2,_minmax(200px,_1fr))]",
           "w-full"
          ],
          "componentId": "fields",
-         "componentName": "Repeater",
+         "componentName": "FormLayout",
          "componentProps": {
-          "data": "{{ fields }}",
-          "dataKey": "fieldname"
+          "doc": "{{ model }}",
+          "layout": "{{ layout }}"
          },
-         "visibilityCondition": "{{ fields && fields.length }}"
+         "visibilityCondition": "{{ fields.length }}"
         },
         {
          "blockName": "f-attach",
@@ -217,14 +200,14 @@
             "w-full"
            ],
            "componentId": "KbFileAttachment-attach",
-           "componentName": "PortalFileAttachment",
+           "componentName": "AttachmentsList",
            "componentProps": {
-            "files": {
+            "modelValue": {
              "$type": "variable",
              "name": "attachments"
-            }
-           },
-           "isCustomVueComponent": true
+            },
+            "transport": "{{ uploadPrivately }}"
+           }
           }
          ],
          "classes": [
@@ -366,17 +349,6 @@
    "resource_name": "template",
    "resource_type": "API Resource",
    "url": "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one"
-  },
-  {
-   "auto": 0,
-   "document_type": "HD Ticket Type",
-   "fetch_document_using_filters": 0,
-   "fields": "[\"name\"]",
-   "filters": "{}",
-   "limit": 0,
-   "method": "GET",
-   "resource_name": "ticketTypes",
-   "resource_type": "Document List"
   }
  ],
  "route": "/tickets/new",

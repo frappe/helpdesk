@@ -1,6 +1,5 @@
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
-import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
@@ -20,6 +19,7 @@ export {
   CUSTOMER_PORTAL_ROOT,
   isContentEmpty,
   isEmoji,
+  parseApiOptions,
   prettyDate,
   shortDuration,
   timeAgo,
@@ -640,30 +640,6 @@ export function getRandom(len = 4) {
   });
 
   return text;
-}
-
-export function parseApiOptions(
-  options: string[] | DropdownOption[]
-): DropdownOption[] | [] {
-  if (!options?.length) return [];
-  return (
-    options
-      .filter((o) => Boolean(o))
-      .map((o) => {
-        if (
-          typeof o === "object" &&
-          o.hasOwnProperty("label") &&
-          o.hasOwnProperty("value")
-        ) {
-          return o;
-        } else {
-          return {
-            label: o?.toString(),
-            value: o as string,
-          };
-        }
-      }) || []
-  );
 }
 
 export function openContact(name: string) {

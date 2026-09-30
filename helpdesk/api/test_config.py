@@ -14,3 +14,4 @@ class TestConfig(IntegrationTestCase):
         self.assertEqual(config.session_user, "Guest")
         self.assertFalse(config.is_agent)
         self.assertIn("confirm_resolution_after_days", config)
+        self.assertTrue(config.date_format)
