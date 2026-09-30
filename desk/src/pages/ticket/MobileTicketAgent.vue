@@ -95,17 +95,26 @@
             @update:modelValue="changeTabTo"
             class="flex flex-col flex-1 overflow-hidden"
           >
-            <!-- Scroll here so the active underline isn't clipped. -->
-            <div class="shrink-0 overflow-x-auto hide-scrollbar">
-              <TabList size="md" class="w-max min-w-full px-3 py-1.5">
-                <TabTrigger
-                  v-for="tab in visibleTabs"
-                  :key="tab.value"
-                  :value="tab.value"
-                  :label="tab.label"
-                  :icon-left="tab.iconLeft"
-                />
-              </TabList>
+            <div class="flex shrink-0">
+              <!-- Scroll here so the active underline isn't clipped. -->
+              <div class="min-w-0 flex-1 overflow-x-auto hide-scrollbar">
+                <TabList size="md" class="w-max min-w-full px-3 py-1.5">
+                  <TabTrigger
+                    v-for="tab in visibleTabs"
+                    :key="tab.value"
+                    :value="tab.value"
+                    :label="tab.label"
+                    :icon-left="tab.iconLeft"
+                  />
+                </TabList>
+              </div>
+              <!-- own border, so the tab underline runs on beneath it -->
+              <div
+                v-if="activeTab === 'call'"
+                class="flex items-center border-b border-outline-gray-1 pe-3"
+              >
+                <TicketCallActions />
+              </div>
             </div>
             <TabPanel
               v-for="tab in visibleTabs"
@@ -274,6 +283,7 @@ import {
   IndicatorIcon,
   PhoneIcon,
 } from "@/components/icons";
+import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
 import CustomActions from "@/components/CustomActions.vue";

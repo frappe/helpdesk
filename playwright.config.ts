@@ -11,9 +11,8 @@ export default defineConfig({
   workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI
-    ? [["github"], ["html", { open: "never" }]]
-    : "list",
+  // CI shards write blob reports that the merge-reports job joins into one HTML report.
+  reporter: process.env.CI ? [["github"], ["blob"]] : "list",
   timeout: 60_000,
   expect: { timeout: 10_000 },
   use: {

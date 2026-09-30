@@ -1,7 +1,7 @@
-import { raiseTicket } from "../../helpers/factories";
-import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { TicketList, resetDefaultTicketView } from "../../helpers/list";
-import { personas } from "../../helpers/personas";
+import { raiseTicket } from "../../../helpers/factories";
+import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
+import { TicketList, resetDefaultTicketView } from "../../../helpers/list";
+import { personas } from "../../../helpers/personas";
 
 usePersona("manager");
 

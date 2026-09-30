@@ -1,12 +1,30 @@
 <template>
   <Tabs
     :modelValue="activeTab"
-    :tabs="tabs"
     @update:modelValue="changeTabTo"
-    size="md"
-    class="flex-1 overflow-hidden [&_[role='tablist']]:px-5 [&_[role='tablist']]:py-1.5 [&_[role='tablist']]:flex-shrink-0 [&_[role='tabpanel'][data-state='active']]:flex-1 [&_[role='tabpanel'][data-state='active']]:flex [&_[role='tabpanel'][data-state='active']]:flex-col [&_[role='tabpanel'][data-state='active']]:overflow-auto [&_[role='tabpanel'][data-state='active']]:min-h-0"
+    class="flex flex-1 flex-col overflow-hidden"
   >
-    <template #tab-panel="{ tab }">
+    <!-- the row carries the underline so it runs beneath the actions too -->
+    <div
+      class="flex shrink-0 items-center gap-2 border-b border-outline-gray-1 px-5"
+    >
+      <TabList size="md" class="flex-1 !border-b-0 py-1.5">
+        <TabTrigger
+          v-for="tab in tabs"
+          :key="tab.value"
+          :value="tab.value"
+          :label="tab.label"
+          :icon-left="tab.iconLeft"
+        />
+      </TabList>
+      <TicketCallActions v-if="activeTab === 'call'" />
+    </div>
+    <TabPanel
+      v-for="tab in tabs"
+      :key="tab.value"
+      :value="tab.value"
+      class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
+    >
       <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
       <TicketTimeline
         v-else
@@ -15,7 +33,7 @@
         :tab-label="tab.label"
         @email:reply="(e) => communicationAreaRef?.replyToEmail(e)"
       />
-    </template>
+    </TabPanel>
   </Tabs>
   <!-- Comm Area -->
   <CommunicationArea
@@ -38,11 +56,12 @@ import {
   PhoneIcon,
 } from "@/components/icons";
 import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
+import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { reloadTicketFeed } from "@/composables/useTicket";
 import { useTelephonyStore } from "@/stores/telephony";
 import { TabObject, TicketSymbol } from "@/types";
-import { Tabs } from "frappe-ui";
+import { TabList, TabPanel, TabTrigger, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, inject, ref } from "vue";
 import LucideChartNoAxesColumn from "~icons/lucide/chart-no-axes-column";
