@@ -57,7 +57,7 @@ const props = defineProps<{
 }>();
 
 const { dismiss } = useBanners();
-const showDialog = ref(false);
+const showDialog = defineModel<boolean>("open", { default: false });
 const confirming = ref(false);
 
 async function confirm() {

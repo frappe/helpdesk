@@ -7,6 +7,7 @@
     :confirm-label="__('Confirm')"
     :before-dismiss="restoreTicketAccess"
     :is-sidebar-collapsed="isSidebarCollapsed"
+    @update:open="clearChoiceOnClose"
   >
     <p>
       {{
@@ -55,6 +56,10 @@ const restoreResource = createResource({
     );
   },
 });
+
+function clearChoiceOnClose(open: boolean) {
+  if (!open) restoreOldBehaviour.value = false;
+}
 
 async function restoreTicketAccess() {
   if (restoreOldBehaviour.value) await restoreResource.submit();
