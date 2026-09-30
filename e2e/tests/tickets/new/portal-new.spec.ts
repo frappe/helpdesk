@@ -11,7 +11,7 @@ test.describe("raising a ticket", () => {
   test("with a custom field and an inline image", async ({ page, api }) => {
     const template = await api.get("HD Ticket Template", "Default");
     await api.update("HD Ticket Template", "Default", {
-      fields: [{ fieldname: "ticket_type", required: 0, hide_from_customer: 0 }],
+      fields: [{ fieldname: "ticket_type", required: 0, visible_to: "Everyone" }],
     });
     try {
       const subject = `E2E portal ${uid()}`;

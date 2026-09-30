@@ -70,10 +70,7 @@ test.describe("customer", () => {
       customer.raw("frappe.desk.form.load.getdoc", { doctype: "HD Ticket", name: ticket.name }),
       customer.raw("frappe.desk.form.load.get_docinfo", { doctype: "HD Ticket", name: ticket.name }),
       customer.raw("helpdesk.api.timeline.get_comment_extras", { ticket: ticket.name }),
-      customer.raw("helpdesk.helpdesk.doctype.hd_ticket.api.get_one", {
-        name: ticket.name,
-        is_customer_portal: true,
-      }),
+      customer.raw("helpdesk.helpdesk.doctype.hd_ticket.api.get_one", { name: ticket.name }),
       customer.raw("frappe.client.get_list", {
         doctype: "Comment",
         filters: { reference_name: ticket.name },

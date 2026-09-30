@@ -13,10 +13,12 @@ from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
+from frappe.utils.html_utils import sanitize_html
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import SERVER_COMPUTED_FIELDS
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -39,11 +41,12 @@ from helpdesk.utils import (
 )
 
 from ..hd_service_level_agreement.utils import get_sla
+from .customer_edit_controller import CustomerEditController
 
 customer_not_allowed_fields = ["customer"]
 
 
-class HDTicket(Document):
+class HDTicket(Document, CustomerEditController):
     @property
     def default_open_status(self):
         return frappe.db.get_value(
@@ -71,6 +74,13 @@ class HDTicket(Document):
 
     def before_insert(self):
         self.generate_key()
+        self.apply_portal_insert_rules()
+
+    def validate_higher_perm_levels(self):
+        # ahead of the framework's silent reset of fields the user cannot write,
+        # so a customer's change is refused out loud instead of vanishing
+        self.prevent_customer_edits()
+        super().validate_higher_perm_levels()
 
     def before_validate(self):
         self.check_update_perms()
@@ -167,7 +177,6 @@ class HDTicket(Document):
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def after_insert(self):
-
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
         publish_event("helpdesk:new-ticket")
@@ -310,11 +319,6 @@ class HDTicket(Document):
                     self.contact = contact
 
     def set_customer(self):
-        if not frappe.db.get_single_value(
-            "HD Settings", "auto_set_customer_from_contact"
-        ):
-            return
-
         # For existing tickets, only validate if customer value has changed
         if not self.is_new() and not self.has_value_changed("customer"):
             return
@@ -330,6 +334,11 @@ class HDTicket(Document):
                     ).format(self.customer, self.contact),
                     frappe.ValidationError,
                 )
+            return
+
+        if not frappe.db.get_single_value(
+            "HD Settings", "auto_set_customer_from_contact"
+        ):
             return
 
         # Auto-set customer only for new tickets
@@ -406,16 +415,6 @@ class HDTicket(Document):
         frappe.throw(
             _("Ticket must be resolved with a feedback"), frappe.ValidationError
         )
-
-    def check_update_perms(self):
-        old_doc = self.get_doc_before_save()
-        if not old_doc or is_agent() or not self.via_customer_portal:
-            return
-        is_closed = old_doc.status == "Closed"
-        is_rated = bool(old_doc.feedback)
-        if is_closed or is_rated:
-            text = _("Closed or rated tickets cannot be updated by non-agents")
-            frappe.throw(text, frappe.PermissionError)
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -815,6 +814,8 @@ class HDTicket(Document):
         # if self.status_category == "Paused" and not new_ticket:
         if not new_ticket:
             self.status = self.ticket_reopen_status
+            # flag for allowing status change when reply came in outside support portal
+            self.flags.customer_reply_reopen = True
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")
@@ -1092,9 +1093,17 @@ class HDTicket(Document):
                     "HD Settings", "update_status_to"
                 )
 
-        # Fetch description from communication if not set already. This might not be needed
-        # anymore as a communication is created when a ticket is created.
-        self.description = self.description or c.content
+        # email tickets are inserted blank; set_only_once refuses the save that
+        # would fill it, so write it already sanitized the way that save would
+        if not self.description:
+            self.db_set(
+                "description",
+                sanitize_html(c.content, linkify=True),
+                update_modified=False,
+            )
+        # portal replies save as the customer; the reset must keep server-set fields
+        self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
+        self.flags.ignore_customer_edit_guard = True
         # Save the ticket, allowing for hooks to run.
         self.save()
 
