@@ -342,7 +342,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:48:53.052949",
+ "modified": "2026-09-30 17:58:41.316471",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",
@@ -382,7 +382,7 @@
    "resource_type": "Document List"
   }
  ],
- "route": "/new-ticket",
+ "route": "/tickets/new",
  "studio_app": "helpdesk",
  "variables": [
   {

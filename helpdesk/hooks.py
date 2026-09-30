@@ -61,10 +61,6 @@ website_route_rules = [
         "from_route": "/kb/customer-tickets",
         "to_route": "kb",
     },
-    {
-        "from_route": "/kb/new-ticket",
-        "to_route": "kb",
-    },
 ]
 
 # The old customer portal's ticket URLs keep working through these.
@@ -76,7 +72,7 @@ website_redirects = [
     },
     {
         "source": "/helpdesk/my-tickets/new",
-        "target": "/kb/new-ticket",
+        "target": "/kb/tickets/new",
         "forward_query_parameters": True,
     },
     {

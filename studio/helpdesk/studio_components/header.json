@@ -81,7 +81,7 @@
        "click": {
         "action": "Run Script",
         "event": "click",
-        "script": "router.push('/new-ticket')"
+        "script": "router.push('/tickets/new')"
        }
       },
       "componentId": "Button-raise-ticket",
@@ -90,7 +90,7 @@
        "label": "{{ words.raiseTicket }}",
        "variant": "subtle"
       },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/new-ticket'].includes(route.path) }}"
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/tickets/new'].includes(route.path) }}"
      },
      {
       "baseStyles": {
@@ -191,7 +191,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-09-28 21:48:53.005856",
+ "modified": "2026-09-29 01:57:14.025397",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
