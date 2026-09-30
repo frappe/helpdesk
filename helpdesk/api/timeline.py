@@ -9,8 +9,9 @@ from helpdesk.utils import is_agent
 
 
 @frappe.whitelist()
-def get_comment_extras(ticket: str) -> dict[str, dict]:
-    """One batched call per ticket open: {comment_name: {reactions, attachments}}.
+def get_comment_extras(ticket: str) -> dict:
+    """One batched call per ticket open: {comments: {comment_name: {reactions,
+    attachments}}, pinned_comments: [names, oldest first]}.
     Re-fetched by the client on helpdesk:comment-reaction-update."""
     ensure_agent_can_read(ticket)
     rows = frappe.get_list(
@@ -20,18 +21,23 @@ def get_comment_extras(ticket: str) -> dict[str, dict]:
             "reference_name": ticket,
             "comment_type": "Comment",
         },
-        fields=["name", "owner", "content"],
+        fields=["name", "owner", "content", "is_pinned"],
+        order_by="creation asc",
         limit_page_length=0,
     )
     # the ticket gate above is the whole read rule for agent comments
     names = [row.name for row in rows]
     extras = {name: {"reactions": [], "attachments": []} for name in names}
+    result = {
+        "comments": extras,
+        "pinned_comments": [row.name for row in rows if row.is_pinned],
+    }
     if not names:
-        return extras
+        return result
     add_attachments(extras, {row.name: row.content or "" for row in rows})
     if frappe.db.get_single_value("HD Settings", "enable_comment_reactions"):
         add_reactions(extras, names)
-    return extras
+    return result
 
 
 @frappe.whitelist()

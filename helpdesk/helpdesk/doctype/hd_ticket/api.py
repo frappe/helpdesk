@@ -374,6 +374,8 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: str, cont
 
         elif doctype == "Comment":
             duplicate_doc.reference_name = target
+            # the target keeps its own pins; a copied pin could break its cap and abort the merge
+            duplicate_doc.is_pinned = 0
             attachments = get_attachments(
                 "Communication",
                 activity,
