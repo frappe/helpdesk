@@ -74,7 +74,7 @@ class HDTicket(Document, CustomerEditController):
 
     def before_insert(self):
         self.generate_key()
-        self.apply_portal_insert_rules()
+        self.apply_ticket_insert_rules()
 
     def validate_higher_perm_levels(self):
         # ahead of the framework's silent reset of fields the user cannot write,
