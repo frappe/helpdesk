@@ -216,7 +216,6 @@
         "loading": "{{ listLoading }}",
         "onColumnResize": "(payload) => resizeColumn(payload)",
         "onLoadMore": "() => loadMore()",
-        "onRowClick": "(row) => openTicket(row)",
         "pageLength": {
          "$type": "variable",
          "name": "pageLength"
@@ -224,6 +223,10 @@
         "pageLengthOptions": "{{ pageLengthOptions }}",
         "rowCount": "{{ rowCount }}",
         "rows": "{{ rows }}",
+        "sort": {
+         "$type": "variable",
+         "name": "sort"
+        },
         "totalCount": "{{ totalCount }}"
        },
        "isCustomVueComponent": true

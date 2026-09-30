@@ -6,8 +6,6 @@ import {
   datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
-import { ROUTES } from '@app/routes'
-import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
 
@@ -33,7 +31,7 @@ const COLUMN_LABELS = {
 }
 
 const DEFAULT_COLUMNS = [
-  { fieldname: 'name', width: 'auto' },
+  { fieldname: 'name', width: '5rem' },
   { fieldname: 'subject', width: '25rem' },
   { fieldname: 'status', width: '8rem' },
   { fieldname: 'response_by', width: '8rem' },
@@ -106,8 +104,13 @@ export default function setup(context) {
   }
   const data = useListData(DOCTYPE, fetchView)
 
+  // `List` keys its cells by `fieldname`; the wire projection names it `key`.
   const listColumns = computed(() =>
-    view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
+    view.columns.wire.value.map((column) => ({
+      ...column,
+      fieldname: column.key,
+      cell: cellFor(column),
+    })),
   )
 
   function cellFor(column) {
@@ -123,10 +126,6 @@ export default function setup(context) {
       ? __('No tickets match the applied filters. Try adjusting or clearing them.')
       : __('Tickets you raise will show up here.'),
   }))
-
-  function openTicket(row) {
-    navigateTo(ROUTES.ticket(row.name))
-  }
 
   const selectedOrganizations = computed(() => {
     const condition = view.filters.conditions.value.find(isCustomerCondition)
@@ -187,7 +186,6 @@ export default function setup(context) {
     filterFields: computed(() => filterFields.data || []),
     listColumns,
     emptyState,
-    openTicket,
     rows: data.rows,
     listLoading: data.loading,
     rowCount: data.rowCount,
@@ -196,6 +194,6 @@ export default function setup(context) {
     pageLengthOptions: PAGE_LENGTH_OPTIONS,
     loadMore: data.loadMore,
     reload: data.reload,
-    resizeColumn: ({ key, width }) => view.columns.setWidth(key, width),
+    resizeColumn: ({ fieldname, width }) => view.columns.setWidth(fieldname, width),
   }
 }
