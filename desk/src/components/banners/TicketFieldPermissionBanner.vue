@@ -25,7 +25,7 @@
       <span class="font-medium text-ink-gray-8">{{ __("Check this:") }}</span>
       {{
         __(
-          "If you created your own agent roles, those agents cannot see the agent-only fields yet. Give those roles level 8 in Role Permission Manager."
+          "If you created custom agent roles, raise their permission level to 8 in Role Permission Manager so they can see agent-only fields."
         )
       }}
       <a
