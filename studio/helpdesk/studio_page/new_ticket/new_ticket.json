@@ -116,10 +116,7 @@
           {
            "blockName": "c-desc",
            "classes": [
-            "border-none",
-            "border",
-            "border-outline-gray-2",
-            "w-auto"
+            "w-full"
            ],
            "componentEvents": {
             "change": {
@@ -135,7 +132,7 @@
             "bubbleMenuOptions": {},
             "content": "{{ description }}",
             "editable": true,
-            "editorClass": "prose-sm min-h-32 max-h-60 overflow-y-auto p-2",
+            "editorClass": "prose-sm max-w-none min-h-32 max-h-60 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2",
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
