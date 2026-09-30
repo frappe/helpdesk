@@ -14,7 +14,7 @@ from helpdesk.utils import is_agent
 class CustomerEditController:
     """What a customer may fill on insert and change after it; mixed into HDTicket."""
 
-    def apply_portal_insert_rules(self):
+    def apply_ticket_insert_rules(self):
         """The permlevel reset after this hook wipes fields the user cannot write;
         exempt server-set fields and the ones the template lets a customer fill."""
         # a System Manager pulling emails is not the sender of the pulled tickets

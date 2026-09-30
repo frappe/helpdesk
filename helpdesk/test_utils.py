@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Any
+from unittest.mock import MagicMock, patch
 
 import frappe
 from frappe.cache_manager import clear_doctype_map
@@ -7,6 +8,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.tests.classes.context_managers import freeze_time
 from frappe.utils import add_to_date, getdate
 
+from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
@@ -947,15 +949,26 @@ def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, 
     }
 
 
-def is_portal_notice_shown() -> bool:
-    """Whether HD Settings still flags the customer portal notice as shown."""
-    from helpdesk.api.customer_portal_notice import NOTICE_FLAG
-
-    return bool(frappe.db.get_single_value("HD Settings", NOTICE_FLAG))
-
-
 def get_user_roles(user: str) -> list[str]:
     """A user's Has Role rows, duplicates included (unlike frappe.get_roles)."""
     return frappe.get_all(
         "Has Role", filters={"parent": user, "parenttype": "User"}, pluck="role"
     )
+
+
+def show_only_banners(*banners: str):
+    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
+    for banner, flag in BANNERS.items():
+        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def dismiss_banner_as(user: str, banner: str) -> MagicMock:
+    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        with patch("frappe.publish_realtime") as publish_realtime:
+            dismiss_banner(banner)
+    finally:
+        frappe.set_user(previous_user)
+    return publish_realtime
