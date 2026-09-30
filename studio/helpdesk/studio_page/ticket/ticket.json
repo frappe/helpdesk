@@ -472,32 +472,49 @@
              "children": [
               {
                "componentEvents": {
-                "discard": {
+                "submit": {
                  "action": "Run Script",
-                 "event": "discard",
-                 "script": "discard()"
-                },
-                "send": {
-                 "action": "Run Script",
-                 "event": "send",
-                 "script": "send()"
+                 "event": "submit",
+                 "script": "send(eventArgs[0])"
                 }
                },
                "componentId": "KbReplyEditor-ticket",
-               "componentName": "PortalReplyEditor",
+               "componentName": "CommentComposer",
                "componentProps": {
-                "attachments": "{{ attachments }}",
-                "docname": "{{ ticketId }}",
-                "isSending": "{{ isSending }}",
                 "modelValue": {
                  "$type": "variable",
                  "name": "reply"
                 },
-                "onAttach": "{{ addAttachment }}",
-                "onRemoveAttachment": "{{ removeAttachment }}",
-                "placeholder": "{{ t('Type a message') }}"
+                "placeholder": "{{ t('Type a message') }}",
+                "submitLabel": "{{ t('Send') }}",
+                "submitting": "{{ isSending }}",
+                "uploadFunction": "{{ uploadFile }}"
                },
-               "isCustomVueComponent": true
+               "componentSlots": {
+                "actions": {
+                 "parentBlockId": "KbReplyEditor-ticket",
+                 "slotContent": [
+                  {
+                   "componentEvents": {
+                    "click": {
+                     "action": "Run Script",
+                     "event": "click",
+                     "script": "discard()"
+                    }
+                   },
+                   "componentId": "Button-ticket-composer-cancel",
+                   "componentName": "Button",
+                   "componentProps": {
+                    "label": "{{ t('Cancel') }}",
+                    "variant": "ghost"
+                   },
+                   "componentSlots": {}
+                  }
+                 ],
+                 "slotId": "KbReplyEditor-ticket:actions",
+                 "slotName": "actions"
+                }
+               }
               }
              ],
              "classes": [
@@ -1236,7 +1253,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-28 21:48:53.066586",
+ "modified": "2026-09-30 17:58:55.204803",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
