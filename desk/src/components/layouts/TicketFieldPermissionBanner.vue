@@ -77,9 +77,10 @@
 </template>
 
 <script setup lang="ts">
+import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { createResource } from "frappe-ui";
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import LucideShieldAlert from "~icons/lucide/shield-alert";
 
 defineProps({
@@ -99,6 +100,11 @@ const notice = createResource({
   },
   auto: true,
 });
+
+const { $socket } = globalStore();
+const reloadNotice = () => notice.reload();
+$socket.on("helpdesk:settings-updated", reloadNotice);
+onUnmounted(() => $socket.off("helpdesk:settings-updated", reloadNotice));
 
 const dismissResource = createResource({
   url: "helpdesk.api.customer_portal_notice.dismiss_field_permission_notice",
