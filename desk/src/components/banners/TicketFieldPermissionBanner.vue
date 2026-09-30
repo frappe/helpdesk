@@ -1,37 +1,38 @@
 <template>
   <SidebarBanner
     banner="ticket_field_permission"
-    :title="__('Ticket field permissions')"
-    :description="__('Some ticket fields are now visible to agents only')"
-    :dialog-title="__('Ticket field permissions have changed')"
+    :title="__('Ticket fields update')"
+    :description="__('Some fields are now hidden from customers')"
+    :dialog-title="__('Ticket fields have changed')"
     :is-sidebar-collapsed="isSidebarCollapsed"
   >
     <p>
+      <span class="font-medium text-ink-gray-8">{{ __("What changed:") }}</span>
       {{
         __(
-          "Ticket fields now use permission levels. Customers can read fields at level 7, and only agents can read fields at level 8."
+          "Customers now see only the ticket fields meant for them. All other fields are visible to agents only."
         )
       }}
     </p>
     <p>
       {{
         __(
-          "After raising a ticket, customers can only close it, rate it and change the fields marked Editable after creation in the ticket template."
+          "Once a ticket is raised, customers can only close it, rate it, or edit fields marked 'Editable after creation' in HD Ticket Template."
         )
       }}
     </p>
     <p>
+      <span class="font-medium text-ink-gray-8">{{ __("Check this:") }}</span>
       {{
         __(
-          "Roles you created get level 7 only. Add level 8 in Role Permission Manager for your own agent roles."
+          "If you created your own agent roles, those agents cannot see the agent-only fields yet. Give those roles level 8 in Role Permission Manager."
         )
       }}
-      {{ __("Learn more in the") }}
       <a
         href="https://docs.frappe.io/helpdesk/customization/perm-levels-in-helpdesk"
         target="_blank"
         class="underline"
-        >{{ __("documentation") }}</a
+        >{{ __("See how") }}</a
       >.
     </p>
   </SidebarBanner>
