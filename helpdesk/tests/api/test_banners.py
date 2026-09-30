@@ -24,6 +24,15 @@ class TestBanners(IntegrationTestCase):
         with self.banners_on(PORTAL_BANNER), self.set_user(manager):
             self.assertEqual(get_banners(), [PORTAL_BANNER])
 
+    def test_flag_never_saved_counts_as_off(self) -> None:
+        # the patches set only their own flag, so an upgraded site can lack a row
+        with self.banners_on(FIELD_BANNER):
+            frappe.db.delete(
+                "Singles",
+                {"doctype": "HD Settings", "field": BANNERS[PORTAL_BANNER]},
+            )
+            self.assertEqual(get_banners(), [FIELD_BANNER])
+
     def test_agents_and_customers_see_no_banners(self) -> None:
         agent = create_agent(unique_email("banner-agent")).name
         customer = create_contact("Banner Customer", unique_email("banner-customer"))

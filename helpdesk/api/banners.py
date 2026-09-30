@@ -15,10 +15,11 @@ def get_banners() -> list[str]:
     if not is_agent_manager():
         return []
 
-    shown = frappe.get_value(
-        "HD Settings", "HD Settings", list(BANNERS.values()), as_dict=True
-    )
-    return [banner for banner, flag in BANNERS.items() if shown[flag]]
+    return [
+        banner
+        for banner, flag in BANNERS.items()
+        if frappe.db.get_single_value("HD Settings", flag)
+    ]
 
 
 @frappe.whitelist(methods=["POST"])
