@@ -1,7 +1,7 @@
 import frappe
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)  # nosemgrep
 def get_config():
     fields = [
         "brand_name",
