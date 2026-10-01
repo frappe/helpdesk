@@ -190,7 +190,7 @@ class HelpdeskDashboard:
             "delta": current_pct - prev_pct,
             "deltaSuffix": "%",
             "tooltip": _(
-                "% of resolved tickets that met both first response and resolution SLA"
+                "% of resolved tickets that met all their SLA targets, including first response"
             ),
         }
 
