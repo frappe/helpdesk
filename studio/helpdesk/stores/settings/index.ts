@@ -36,11 +36,14 @@ const themeOptions = computed(() => [
 
 const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
 
+const knowledgeBase = { icon: 'lucide-book-open', label: __('Knowledge base'), onClick: () => navigateTo(ROUTES.home) }
+
 const accountMenuOptions = computed(() =>
   session.isGuest.value
-    ? [{ icon: 'lucide-log-in', label: __('Log in'), onClick: session.signIn }]
+    ? [knowledgeBase, { icon: 'lucide-log-in', label: __('Log in'), onClick: session.signIn }]
     : [
         { icon: 'lucide-inbox', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
+        knowledgeBase,
         { icon: 'lucide-user', label: __('My account'), onClick: () => dialog.openSettings('profile') },
         ...(session.isAgent.value
           ? [

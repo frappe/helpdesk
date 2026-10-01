@@ -1,0 +1,341 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "navbar",
+     "children": [
+      {
+       "blockName": "Header",
+       "componentId": "header-help",
+       "componentName": "header",
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [
+      "items-center",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "shrink-0",
+      "h-13",
+      "justify-between",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
+     "componentId": "container-help-navbar",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "help-body",
+     "children": [
+      {
+       "blockName": "help-search",
+       "children": [
+        {
+         "componentId": "TextInput-help",
+         "componentName": "TextInput",
+         "componentProps": {
+          "autofocus": true,
+          "modelValue": {
+           "$type": "variable",
+           "name": "query"
+          },
+          "placeholder": "Search for an answer, e.g. refund not received",
+          "size": "md",
+          "type": "text",
+          "variant": "outline"
+         },
+         "componentSlots": {
+          "prefix": {
+           "parentBlockId": "TextInput-help",
+           "slotContent": [
+            {
+             "classes": [
+              "size-4",
+              "text-ink-gray-4"
+             ],
+             "componentId": "Icon-help-search",
+             "componentName": "Icon",
+             "componentProps": {
+              "icon": "lucide-search"
+             }
+            }
+           ],
+           "slotId": "TextInput-help:prefix",
+           "slotName": "prefix"
+          }
+         }
+        },
+        {
+         "children": [
+          {
+           "baseStyles": {
+            "display": "flex",
+            "flexDirection": "column",
+            "gap": "0px"
+           },
+           "children": [
+            {
+             "componentId": "PortalArticleRow-help",
+             "componentName": "PortalArticleRow",
+             "componentProps": {
+              "article": "{{ dataItem }}"
+             },
+             "isCustomVueComponent": true
+            }
+           ],
+           "componentId": "Repeater-help-results",
+           "componentName": "Repeater",
+           "componentProps": {
+            "data": "{{ results.data }}",
+            "dataKey": "name"
+           }
+          },
+          {
+           "children": [
+            {
+             "children": [
+              {
+               "classes": [
+                "size-4"
+               ],
+               "componentId": "Icon-help-plus",
+               "componentName": "Icon",
+               "componentProps": {
+                "icon": "lucide-plus"
+               }
+              }
+             ],
+             "classes": [
+              "mt-px",
+              "flex",
+              "size-9",
+              "shrink-0",
+              "items-center",
+              "justify-center",
+              "rounded-5",
+              "bg-surface-gray-2",
+              "text-ink-gray-6"
+             ],
+             "componentId": "container-help-create-icon",
+             "componentName": "container",
+             "originalElement": "div"
+            },
+            {
+             "children": [
+              {
+               "classes": [
+                "font-medium",
+                "text-ink-gray-8",
+                "leading-[1.15]"
+               ],
+               "componentId": "TextBlock-help-create-title",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-base",
+                "tag": "span",
+                "text": "Can\u2019t find what you\u2019re looking for?"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-6"
+               ],
+               "componentId": "TextBlock-help-create-hint",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-p-sm",
+                "tag": "span",
+                "text": "Create a ticket and our team will get back to you."
+               }
+              }
+             ],
+             "classes": [
+              "flex",
+              "min-w-0",
+              "flex-col",
+              "gap-0.5"
+             ],
+             "componentId": "container-help-create-text",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "flex",
+            "cursor-pointer",
+            "items-start",
+            "gap-3",
+            "px-2",
+            "py-3",
+            "transition-colors",
+            "hover:bg-surface-gray-2"
+           ],
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "createTicket()"
+            }
+           },
+           "componentId": "container-help-create-ticket",
+           "componentName": "container",
+           "originalElement": "div"
+          }
+         ],
+         "classes": [
+          "mt-4",
+          "flex",
+          "flex-col"
+         ],
+         "componentId": "container-help-results",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ query.trim().length >= 3 && results.data && results.data.length }}"
+        },
+        {
+         "children": [
+          {
+           "classes": [
+            "size-6",
+            "text-ink-gray-4"
+           ],
+           "componentId": "Icon-help-empty",
+           "componentName": "Icon",
+           "componentProps": {
+            "icon": "lucide-search"
+           }
+          },
+          {
+           "classes": [
+            "mt-2",
+            "font-medium",
+            "text-ink-gray-8",
+            "leading-[1.15]"
+           ],
+           "componentId": "TextBlock-help-empty-title",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-base",
+            "tag": "span",
+            "text": "No articles found"
+           }
+          },
+          {
+           "classes": [
+            "max-w-xs",
+            "text-ink-gray-6"
+           ],
+           "componentId": "TextBlock-help-empty-hint",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-p-sm",
+            "tag": "p",
+            "text": "We couldn\u2019t find any matching articles. Create a ticket and our team will get back to you."
+           }
+          },
+          {
+           "classes": [
+            "mt-2"
+           ],
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "createTicket()"
+            }
+           },
+           "componentId": "Button-help-create-ticket",
+           "componentName": "Button",
+           "componentProps": {
+            "iconLeft": "lucide-plus",
+            "label": "Create ticket",
+            "variant": "subtle"
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-1",
+          "flex-col",
+          "items-center",
+          "justify-center",
+          "gap-1",
+          "pb-16",
+          "text-center"
+         ],
+         "componentId": "container-help-empty",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ query.trim().length >= 3 && results.fetched && !results.loading && !(results.data && results.data.length) }}"
+        }
+       ],
+       "classes": [
+        "mx-auto",
+        "flex",
+        "w-full",
+        "max-w-2xl",
+        "flex-col",
+        "px-5",
+        "py-8",
+        "min-h-[70vh]"
+       ],
+       "componentId": "container-help-search",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-col",
+      "min-h-0",
+      "overflow-y-auto",
+      "w-full"
+     ],
+     "componentId": "container-help-content",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "componentProps": {},
+     "componentSlots": {},
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base",
+    "flex",
+    "flex-col",
+    "h-screen",
+    "w-full"
+   ],
+   "componentId": "container-help-body",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-10-01 15:56:40.184057",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-01 15:56:40.947948",
+ "modified_by": "Administrator",
+ "name": "help",
+ "owner": "Administrator",
+ "page_name": "page-ad474ae9",
+ "page_title": "Help",
+ "published": 1,
+ "route": "/help",
+ "studio_app": "helpdesk"
+}

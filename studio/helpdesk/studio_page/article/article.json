@@ -1,0 +1,955 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "baseStyles": {
+    "display": "flex",
+    "flexDirection": "column",
+    "flexShrink": 0,
+    "height": "100%",
+    "overflowX": "hidden",
+    "width": "inherit"
+   },
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "top-bar",
+     "children": [
+      {
+       "blockName": "Header",
+       "componentId": "header-topbar",
+       "componentName": "header",
+       "componentProps": {
+        "crumb": "{{ article?.data?.title }}",
+        "parentCrumb": "{{ currentCategory?.label }}",
+        "parentRoute": "{{ currentCategory?.route }}"
+       },
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "flex-row",
+      "shrink-0",
+      "h-13",
+      "justify-between",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
+     "componentId": "container-1bvj813bs",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "page-wrapper",
+     "children": [
+      {
+       "blockName": "sidebar",
+       "children": [
+        {
+         "baseStyles": {
+          "flexShrink": 0,
+          "width": "100%"
+         },
+         "blockName": "search",
+         "componentId": "PortalSearchField-article",
+         "componentName": "PortalSearchField",
+         "componentProps": {
+          "modelValue": {
+           "$type": "variable",
+           "name": "sidebarQuery"
+          },
+          "placeholder": "Search articles",
+          "shortcutVariant": "keys"
+         },
+         "isCustomVueComponent": true
+        },
+        {
+         "baseStyles": {
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "6px",
+          "width": "100%"
+         },
+         "children": [
+          {
+           "children": [
+            {
+             "children": [
+              {
+               "children": [
+                {
+                 "baseStyles": {
+                  "transform": "{{ isExpanded(dataItem.name) ? 'rotate(90deg)' : 'none' }}"
+                 },
+                 "classes": [
+                  "size-3",
+                  "text-ink-gray-5",
+                  "transition-transform"
+                 ],
+                 "componentId": "tree-cat-chevron",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-chevron-right"
+                 }
+                }
+               ],
+               "classes": [
+                "items-center",
+                "rounded-full",
+                "flex",
+                "shrink-0",
+                "justify-center",
+                "p-1"
+               ],
+               "componentId": "tree-cat-chevron-badge",
+               "componentName": "container",
+               "originalElement": "div"
+              },
+              {
+               "children": [
+                {
+                 "baseStyles": {
+                  "color": "{{ dataItem.isCurrent ? 'var(--ink-gray-8)' : 'var(--ink-gray-7)' }}"
+                 },
+                 "classes": [
+                  "size-4",
+                  "shrink-0"
+                 ],
+                 "componentId": "tree-cat-icon",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-folder"
+                 }
+                },
+                {
+                 "baseStyles": {
+                  "color": "{{ dataItem.isCurrent ? 'var(--ink-gray-8)' : 'var(--ink-gray-7)' }}"
+                 },
+                 "classes": [
+                  "flex-1",
+                  "min-w-0",
+                  "truncate",
+                  "leading-[1.15]"
+                 ],
+                 "componentId": "tree-cat-label",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-base",
+                  "tag": "span",
+                  "text": "{{ dataItem.label }}"
+                 }
+                }
+               ],
+               "classes": [
+                "items-center",
+                "rounded-4",
+                "flex",
+                "flex-1",
+                "gap-2",
+                "min-w-0",
+                "overflow-hidden",
+                "pb-1.5",
+                "pr-2",
+                "pt-1.5"
+               ],
+               "componentId": "tree-cat-button",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "items-center",
+              "bg-transparent",
+              "rounded-4",
+              "shadow-none",
+              "cursor-pointer",
+              "flex",
+              "shrink-0",
+              "gap-0.5",
+              "h-7",
+              "min-w-0",
+              "pl-0.5",
+              "w-full"
+             ],
+             "componentEvents": {
+              "click": {
+               "action": "Run Script",
+               "event": "click",
+               "script": "toggleCategory(dataItem.name)"
+              }
+             },
+             "componentId": "tree-cat-header",
+             "componentName": "container",
+             "originalElement": "div"
+            },
+            {
+             "children": [
+              {
+               "baseStyles": {
+                "display": "flex",
+                "flexDirection": "column",
+                "gap": "0px",
+                "width": "100%"
+               },
+               "children": [
+                {
+                 "baseStyles": {
+                  "backgroundColor": "{{ dataItem.isActive ? 'var(--surface-base)' : '' }}",
+                  "boxShadow": "{{ dataItem.isActive ? 'var(--elevation-sm)' : 'none' }}"
+                 },
+                 "children": [
+                  {
+                   "baseStyles": {
+                    "color": "{{ dataItem.isActive ? 'var(--ink-gray-9)' : 'var(--ink-gray-5)' }}"
+                   },
+                   "classes": [
+                    "flex-1",
+                    "min-w-0",
+                    "truncate",
+                    "leading-[1.15]"
+                   ],
+                   "componentId": "tree-item-label",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base",
+                    "tag": "span",
+                    "text": "{{ dataItem.label }}"
+                   }
+                  }
+                 ],
+                 "classes": [
+                  "hover:bg-surface-gray-2",
+                  "items-center",
+                  "rounded-4",
+                  "cursor-pointer",
+                  "flex",
+                  "shrink-0",
+                  "h-7",
+                  "ml-[39px]",
+                  "min-w-0",
+                  "overflow-hidden",
+                  "pl-[9px]",
+                  "pr-2.5",
+                  "w-[calc(100%_-_39px)]"
+                 ],
+                 "componentEvents": {
+                  "click": {
+                   "action": "Run Script",
+                   "event": "click",
+                   "script": "router.push(`/articles/${dataItem.name}`)"
+                  }
+                 },
+                 "componentId": "tree-item",
+                 "componentName": "container",
+                 "originalElement": "div"
+                }
+               ],
+               "componentId": "tree-items-repeater",
+               "componentName": "Repeater",
+               "componentProps": {
+                "data": "{{ dataItem.children }}",
+                "dataKey": "name"
+               },
+               "visibilityCondition": "{{ dataItem.children && dataItem.children.length }}"
+              }
+             ],
+             "classes": [
+              "flex",
+              "flex-col",
+              "w-full"
+             ],
+             "componentId": "tree-items-wrap",
+             "componentName": "container",
+             "originalElement": "div",
+             "visibilityCondition": "{{ isExpanded(dataItem.name) }}"
+            }
+           ],
+           "classes": [
+            "flex",
+            "flex-col",
+            "gap-0.5",
+            "min-w-0",
+            "w-full"
+           ],
+           "componentId": "tree-cat",
+           "componentName": "container",
+           "originalElement": "div"
+          }
+         ],
+         "componentId": "tree-repeater",
+         "componentName": "Repeater",
+         "componentProps": {
+          "data": "{{ categoryTree }}",
+          "dataKey": "name"
+         },
+         "visibilityCondition": "{{ categoryTree.length }}"
+        },
+        {
+         "blockName": "No search results",
+         "children": [
+          {
+           "blockName": "No search results",
+           "componentId": "article-sidebar-empty",
+           "componentName": "PortalEmptyState",
+           "componentProps": {
+            "description": "Try a different search term.",
+            "icon": "search",
+            "title": "No matching articles"
+           },
+           "isCustomVueComponent": true
+          }
+         ],
+         "classes": [
+          "items-center",
+          "flex",
+          "flex-1",
+          "justify-center",
+          "min-h-0",
+          "w-full"
+         ],
+         "componentId": "article-sidebar-empty-wrap",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ !categoryTree.length }}"
+        }
+       ],
+       "classes": [
+        "bg-surface-base",
+        "flex",
+        "flex-col",
+        "shrink-0",
+        "gap-2.5",
+        "h-full",
+        "overflow-x-hidden",
+        "overflow-y-auto",
+        "p-4",
+        "static",
+        "w-[250px]"
+       ],
+       "componentId": "container-mxaqix40f",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "blockName": "main-layout",
+       "children": [
+        {
+         "blockName": "article-column",
+         "children": [
+          {
+           "blockName": "container",
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-8",
+              "font-bold",
+              "leading-[1.25]"
+             ],
+             "componentId": "TextBlock-2so2pbuuk",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-3xl",
+              "tag": "h1",
+              "text": "{{ article.data.title }}"
+             }
+            },
+            {
+             "blockName": "meta-row",
+             "children": [
+              {
+               "componentId": "Avatar-jsgl5l2bo",
+               "componentName": "Avatar",
+               "componentProps": {
+                "image": "{{ article.data.author.image }}",
+                "label": "{{ article.data.author.name }}",
+                "shape": "circle",
+                "size": "md",
+                "theme": "gray"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-5",
+                "leading-[1.15]"
+               ],
+               "componentId": "TextBlock-bb34uxs9r",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "{{ article.data.author.name }}"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-4",
+                "leading-[1.15]"
+               ],
+               "componentId": "TextBlock-zkf1kslsi",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "\u00b7"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-5",
+                "leading-[1.15]"
+               ],
+               "componentId": "TextBlock-6b11cqpq2",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "{{ publishedOn }}"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-4",
+                "leading-[1.15]"
+               ],
+               "componentId": "article-reading-dot",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "\u00b7"
+               }
+              },
+              {
+               "children": [
+                {
+                 "classes": [
+                  "size-3.5"
+                 ],
+                 "componentId": "article-reading-icon",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-clock"
+                 }
+                },
+                {
+                 "classes": [
+                  "leading-[1.15]"
+                 ],
+                 "componentId": "article-reading-label",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "{{ readingTime }}"
+                 }
+                }
+               ],
+               "classes": [
+                "flex",
+                "items-center",
+                "gap-1",
+                "text-ink-gray-5"
+               ],
+               "componentId": "article-reading-time",
+               "componentName": "container",
+               "originalElement": "div"
+              },
+              {
+               "classes": [
+                "text-ink-gray-4",
+                "leading-[1.15]"
+               ],
+               "componentId": "article-permalink-dot",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "\u00b7"
+               }
+              },
+              {
+               "children": [
+                {
+                 "classes": [
+                  "size-3.5",
+                  "shrink-0"
+                 ],
+                 "componentId": "Icon-copy-link",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-copy"
+                 }
+                },
+                {
+                 "classes": [
+                  "leading-[1.15]"
+                 ],
+                 "componentId": "TextBlock-copy-link",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "Copy link"
+                 }
+                }
+               ],
+               "classes": [
+                "flex",
+                "cursor-pointer",
+                "items-center",
+                "gap-1",
+                "text-ink-gray-5",
+                "transition-colors",
+                "hover:text-ink-gray-7"
+               ],
+               "componentEvents": {
+                "click": {
+                 "action": "Run Script",
+                 "event": "click",
+                 "script": "copyLink()"
+                }
+               },
+               "componentId": "container-copy-link",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "items-center",
+              "flex",
+              "flex-row",
+              "gap-2",
+              "justify-start"
+             ],
+             "componentId": "container-7rc7b7a0k",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "flex",
+            "flex-col",
+            "shrink",
+            "gap-3",
+            "h-fit",
+            "w-fit"
+           ],
+           "componentId": "container-fkgmgcjko",
+           "componentName": "container",
+           "originalElement": "div"
+          },
+          {
+           "baseStyles": {
+            "borderBottom": "1px solid var(--outline-gray-1)",
+            "paddingBottom": "16px"
+           },
+           "componentId": "PortalArticleBody-article",
+           "componentName": "PortalArticleBody",
+           "componentProps": {
+            "content": "{{ articleHtml }}"
+           },
+           "isCustomVueComponent": true
+          },
+          {
+           "blockName": "related-section",
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-8",
+              "font-semibold",
+              "leading-[1.15]"
+             ],
+             "componentId": "TextBlock-kfxofctkr",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-lg",
+              "tag": "h2",
+              "text": "Related articles"
+             }
+            },
+            {
+             "baseStyles": {
+              "display": "flex",
+              "flexDirection": "column",
+              "gap": "0px",
+              "width": "100%"
+             },
+             "blockName": "related-repeater",
+             "children": [
+              {
+               "blockName": "related-row",
+               "children": [
+                {
+                 "baseStyles": {
+                  "flexShrink": 0
+                 },
+                 "classes": [
+                  "size-4",
+                  "text-ink-gray-6"
+                 ],
+                 "componentId": "HTML-related-article-icon",
+                 "componentName": "HTML",
+                 "componentProps": {
+                  "html": "<svg viewBox=\"0 0 16 16\" fill=\"currentColor\" class=\"size-full\"><path d=\"M11 1C12.6569 1 14 2.34315 14 4V12.5C14 13.8807 12.8807 15 11.5 15H4.5C3.11929 15 2 13.8807 2 12.5V3.5C2 2.11929 3.11929 1 4.5 1H11ZM4.5 2C3.67157 2 3 2.67157 3 3.5V12.5C3 13.3284 3.67157 14 4.5 14H11.5C12.3284 14 13 13.3284 13 12.5V4C13 2.89543 12.1046 2 11 2H4.5ZM10.75 10.5C11.0261 10.5 11.25 10.7239 11.25 11C11.25 11.2761 11.0261 11.5 10.75 11.5H5.25C4.97386 11.5 4.75 11.2761 4.75 11C4.75 10.7239 4.97386 10.5 5.25 10.5H10.75ZM10.75 7.5C11.0261 7.5 11.25 7.72386 11.25 8C11.25 8.27614 11.0261 8.5 10.75 8.5H5.25C4.97386 8.5 4.75 8.27614 4.75 8C4.75 7.72386 4.97386 7.5 5.25 7.5H10.75ZM10.75 4.5C11.0261 4.5 11.25 4.72386 11.25 5C11.25 5.27614 11.0261 5.5 10.75 5.5H5.25C4.97386 5.5 4.75 5.27614 4.75 5C4.75 4.72386 4.97386 4.5 5.25 4.5H10.75Z\"/></svg>"
+                 }
+                },
+                {
+                 "classes": [
+                  "truncate",
+                  "text-ink-gray-8",
+                  "flex-1",
+                  "leading-[1.15]"
+                 ],
+                 "componentId": "TextBlock-paoqq6dak",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-sm",
+                  "tag": "span",
+                  "text": "{{ dataItem.title }}"
+                 }
+                },
+                {
+                 "classes": [
+                  "size-4",
+                  "shrink-0",
+                  "text-ink-gray-4"
+                 ],
+                 "componentId": "Icon-related-chevron",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-chevron-right"
+                 }
+                }
+               ],
+               "classes": [
+                "hover:bg-surface-gray-1",
+                "items-center",
+                "border-outline-gray-2",
+                "rounded-none",
+                "border-t",
+                "border-r",
+                "border-l",
+                "cursor-pointer",
+                "flex",
+                "gap-2.5",
+                "py-2.5",
+                "px-3",
+                "w-full"
+               ],
+               "componentEvents": {
+                "click": {
+                 "action": "Run Script",
+                 "event": "click",
+                 "script": "router.push(`/articles/${dataItem.name}`)"
+                }
+               },
+               "componentId": "container-2cad4s6qq",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "[&>*:first-child]:rounded-t-4",
+              "[&>*:last-child]:rounded-b-4",
+              "[&>*:last-child]:border-b"
+             ],
+             "componentId": "Repeater-qufpavvce",
+             "componentName": "Repeater",
+             "componentProps": {
+              "data": "{{ relatedArticles }}",
+              "dataKey": "name"
+             },
+             "visibilityCondition": "{{ relatedArticles && relatedArticles.length }}"
+            }
+           ],
+           "classes": [
+            "flex",
+            "flex-col",
+            "gap-3",
+            "mt-4",
+            "w-full"
+           ],
+           "componentId": "container-oyv4vjmm0",
+           "componentName": "container",
+           "originalElement": "div",
+           "visibilityCondition": "{{ relatedArticles.length > 0 }}"
+          },
+          {
+           "blockName": "feedback-box",
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-7",
+              "leading-[1.15]"
+             ],
+             "componentId": "TextBlock-x7azonved",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-sm",
+              "tag": "span",
+              "text": "Did this answer your question?"
+             }
+            },
+            {
+             "blockName": "fb-actions",
+             "children": [
+              {
+               "blockName": "fb-button",
+               "children": [
+                {
+                 "baseStyles": {
+                  "color": "{{ vote === '1' ? 'var(--ink-gray-9)' : 'var(--ink-gray-6)' }}",
+                  "fill": "{{ vote === '1' ? 'currentColor' : 'none' }}"
+                 },
+                 "classes": [
+                  "size-4"
+                 ],
+                 "componentId": "HTML-vote-1",
+                 "componentName": "HTML",
+                 "componentProps": {
+                  "html": "<svg viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"size-full\"><path d=\"M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3\"/></svg>"
+                 }
+                }
+               ],
+               "classes": [
+                "hover:bg-surface-gray-2",
+                "items-center",
+                "border-0",
+                "rounded-4",
+                "cursor-pointer",
+                "flex",
+                "h-9",
+                "justify-center",
+                "w-9"
+               ],
+               "componentEvents": {
+                "click": {
+                 "action": "Run Script",
+                 "event": "click",
+                 "script": "submitFeedback('1')"
+                }
+               },
+               "componentId": "container-mg93ofc32",
+               "componentName": "container",
+               "originalElement": "div"
+              },
+              {
+               "blockName": "fb-button",
+               "children": [
+                {
+                 "baseStyles": {
+                  "color": "{{ vote === '2' ? 'var(--ink-gray-9)' : 'var(--ink-gray-6)' }}",
+                  "fill": "{{ vote === '2' ? 'currentColor' : 'none' }}"
+                 },
+                 "classes": [
+                  "size-4"
+                 ],
+                 "componentId": "HTML-vote-2",
+                 "componentName": "HTML",
+                 "componentProps": {
+                  "html": "<svg viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"size-full\"><path d=\"M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17\"/></svg>"
+                 }
+                }
+               ],
+               "classes": [
+                "hover:bg-surface-gray-2",
+                "items-center",
+                "border-0",
+                "rounded-4",
+                "cursor-pointer",
+                "flex",
+                "h-9",
+                "justify-center",
+                "w-9"
+               ],
+               "componentEvents": {
+                "click": {
+                 "action": "Run Script",
+                 "event": "click",
+                 "script": "submitFeedback('2')"
+                }
+               },
+               "componentId": "container-kw1gtpath",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "flex",
+              "flex-row",
+              "shrink-0",
+              "gap-0"
+             ],
+             "componentId": "container-fl85fwgrt",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "bg-surface-sidebar",
+            "items-center",
+            "rounded-4",
+            "flex",
+            "gap-4",
+            "justify-between",
+            "mt-6",
+            "p-4",
+            "w-full"
+           ],
+           "componentId": "container-3vdv8rj18",
+           "componentName": "container",
+           "originalElement": "div"
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-1",
+          "flex-col",
+          "gap-6",
+          "ml-[170px]",
+          "mr-[70px]",
+          "mt-0",
+          "max-w-[700px]",
+          "min-w-0",
+          "w-full"
+         ],
+         "componentId": "container-rr220ojgc",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "toc-sidebar",
+         "children": [
+          {
+           "baseStyles": {
+            "width": "100%"
+           },
+           "componentId": "PortalTableOfContents-article",
+           "componentName": "PortalTableOfContents",
+           "componentProps": {
+            "items": "{{ toc }}"
+           },
+           "isCustomVueComponent": true
+          }
+         ],
+         "classes": [
+          "self-start",
+          "flex",
+          "flex-col",
+          "shrink-0",
+          "pb-4",
+          "pl-4",
+          "pr-3",
+          "pt-4",
+          "sticky",
+          "top-0",
+          "w-[250px]"
+         ],
+         "componentId": "container-ku83agf6x",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [
+        "items-start",
+        "border-outline-gray-1",
+        "flex",
+        "flex-1",
+        "flex-row",
+        "h-full",
+        "mx-auto",
+        "ml-0",
+        "max-w-[1200px]",
+        "min-w-0",
+        "overflow-y-auto",
+        "pb-10",
+        "pl-0",
+        "pr-0",
+        "pt-[34px]",
+        "relative",
+        "w-full"
+       ],
+       "componentId": "container-gi1caqqm1",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-row",
+      "min-h-0",
+      "overflow-y-hidden",
+      "static",
+      "w-full"
+     ],
+     "componentId": "container-cdpb9v85p",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    }
+   ],
+   "componentId": "root",
+   "componentName": "div",
+   "originalElement": "body"
+  }
+ ],
+ "creation": "2026-10-01 15:56:40.157642",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-01 15:56:40.937683",
+ "modified_by": "Administrator",
+ "name": "article",
+ "owner": "Administrator",
+ "page_name": "page-d252dcea",
+ "page_title": "Article",
+ "published": 1,
+ "resources": [
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"name\": \"{{ route.params.name }}\"}",
+   "resource_name": "article",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_public_article"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "articles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_public_articles"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "categories",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_public_categories"
+  }
+ ],
+ "route": "/articles/:name",
+ "studio_app": "helpdesk"
+}

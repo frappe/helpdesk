@@ -1,0 +1,80 @@
+<template>
+  <nav v-if="items.length" class="flex flex-col">
+    <button
+      v-for="item in items"
+      :key="item.id"
+      type="button"
+      class="border-l py-[7px] pl-3 text-left text-[14px] leading-normal tracking-[0.28px] transition-colors"
+      :class="
+        item.id === activeId
+          ? 'border-ink-gray-9 text-ink-gray-9'
+          : 'border-outline-gray-1 text-ink-gray-5 hover:border-outline-gray-3 hover:text-ink-gray-7'
+      "
+      @click="scrollTo(item.id)"
+    >
+      {{ item.text }}
+    </button>
+  </nav>
+</template>
+
+<script setup lang="ts">
+// "On this page" rail: the headings live in the article body beside this, so they are
+// measured off the document rather than owned here.
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+const props = withDefaults(
+  defineProps<{ items?: { id: string; text: string }[] }>(),
+  { items: () => [] }
+);
+
+// A heading is current once it crosses this far down the viewport: a fixed offset
+// would leave every heading of a short article "below the line".
+const ACTIVE_RATIO = 0.25;
+
+const activeId = ref<string | null>(null);
+
+function measure(scrolled?: EventTarget | null) {
+  const box = scrolled instanceof HTMLElement ? scrolled : null;
+  // At the end of the scroll the last section is usually too short to reach the line.
+  if (box && box.scrollTop + box.clientHeight >= box.scrollHeight - 4) {
+    activeId.value = props.items.at(-1)?.id ?? null;
+    return;
+  }
+  const line = window.innerHeight * ACTIVE_RATIO;
+  let current = props.items[0]?.id ?? null;
+  for (const item of props.items) {
+    const top = document.getElementById(item.id)?.getBoundingClientRect().top;
+    if (top !== undefined && top <= line) current = item.id;
+  }
+  activeId.value = current;
+}
+
+// Scroll events do not bubble, but they do capture: this hears the nested body scroller.
+const onScroll = (event: Event) => measure(event.target);
+const onResize = () => measure();
+
+function scrollTo(id: string) {
+  // Instant on purpose: Chrome drops smooth scrolls under an overflow-hidden ancestor.
+  document.getElementById(id)?.scrollIntoView({ block: "start" });
+}
+
+watch(
+  () => props.items,
+  () => measure(),
+  { flush: "post" }
+);
+
+onMounted(() => {
+  document.addEventListener("scroll", onScroll, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener("resize", onResize);
+  measure();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("scroll", onScroll, { capture: true });
+  window.removeEventListener("resize", onResize);
+});
+</script>

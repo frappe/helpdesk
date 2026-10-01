@@ -61,15 +61,14 @@ website_route_rules = [
         "from_route": "/kb/customer-tickets",
         "to_route": "kb",
     },
+    {
+        "from_route": "/kb/help",
+        "to_route": "kb",
+    },
 ]
 
 # The old customer portal's URLs keep working through these.
 website_redirects = [
-    # The app root will be the knowledge base once its pages land.
-    {
-        "source": "/kb",
-        "target": "/kb/customer-tickets",
-    },
     {
         "source": "/helpdesk/my-tickets/new",
         "target": "/kb/tickets/new",
