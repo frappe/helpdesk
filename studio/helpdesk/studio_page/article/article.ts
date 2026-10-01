@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue'
 import { call, dayjs, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
+import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { matchesQuery, runAction } from '@app/utils'
 
@@ -33,6 +34,12 @@ export default function setup(context) {
     const date = article?.data?.published_on
     return date ? dayjs(date).format('D MMM YYYY') : ''
   })
+
+  // Only a page anyone can open can be handed to an assistant by URL.
+  const { isPublicKnowledgeBase } = useSession()
+  const isPublicArticle = computed(
+    () => article?.data?.visibility === 'Public' && isPublicKnowledgeBase.value,
+  )
 
   const currentCategory = computed(() =>
     article?.data?.category
@@ -114,5 +121,6 @@ export default function setup(context) {
     vote,
     submitFeedback,
     copyLink,
+    isPublicArticle,
   }
 }

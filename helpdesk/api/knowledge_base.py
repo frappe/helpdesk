@@ -2,7 +2,8 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.rate_limiter import rate_limit
-from frappe.utils import escape_html, get_user_info_for_avatar
+from frappe.utils import escape_html, expand_relative_urls, get_user_info_for_avatar
+from markdownify import markdownify
 
 from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.utils import is_agent
@@ -245,12 +246,7 @@ def first_image(soup: BeautifulSoup) -> str | None:
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_article(name: str) -> dict:
     """One article, published — or any article to an agent previewing a draft."""
-    validate_public_access()
-    article = frappe.db.get_value(
-        "HD Article", name, [*PUBLIC_ARTICLE_FIELDS, "content"], as_dict=True
-    )
-    if not article or not is_readable(article):
-        frappe.throw(_("Article not found"), frappe.DoesNotExistError)
+    article = get_readable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = get_user_info_for_avatar(article.author)
     article.category_name = frappe.db.get_value(
         "HD Article Category", article.category, "category_name"
@@ -258,6 +254,31 @@ def get_public_article(name: str) -> dict:
     # The reader's own vote rides along, so the page can show it filled in without
     # a second call. Named as `get_article` names it.
     article.feedback = get_own_vote(name)
+    return article
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])
+def get_article_markdown(name: str) -> None:
+    """The article as a Markdown page, to paste into an LLM or point one at."""
+    article = get_readable_article(name, ["title", "content", "status", "visibility"])
+    body = markdownify(
+        expand_relative_urls(article.content or ""), heading_style="ATX", bullets="-"
+    )
+    frappe.response.update(
+        type="download",
+        filename=f"{name}.md",
+        filecontent=f"# {article.title}\n\n{body.strip()}\n",
+        content_type="text/markdown",
+        display_content_as="inline",
+    )
+
+
+def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
+    """`fields` must carry `status` and `visibility`: they decide who may read it."""
+    validate_public_access()
+    article = frappe.db.get_value("HD Article", name, fields, as_dict=True)
+    if not article or not is_readable(article):
+        frappe.throw(_("Article not found"), frappe.DoesNotExistError)
     return article
 
 

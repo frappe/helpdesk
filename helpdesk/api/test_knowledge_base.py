@@ -5,6 +5,7 @@ from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
     get_article,
+    get_article_markdown,
     get_popular_categories,
     get_public_article,
     get_public_articles,
@@ -110,6 +111,7 @@ class TestPublicReads(IntegrationTestCase):
         for endpoint in (
             get_public_articles,
             get_public_article,
+            get_article_markdown,
             get_public_categories,
             get_public_category,
             vote_on_article,
@@ -126,6 +128,7 @@ class TestPublicReads(IntegrationTestCase):
             (get_public_categories, ()),
             (get_popular_categories, ()),
             (get_public_article, (self.published,)),
+            (get_article_markdown, (self.published,)),
             (get_public_category, (self.category.name,)),
             (increment_views, (self.published,)),
         ):
@@ -230,6 +233,26 @@ class TestPublicReads(IntegrationTestCase):
         self.assertRaises(
             frappe.DoesNotExistError, get_public_article, "no-such-article"
         )
+
+    def test_an_article_reads_as_markdown(self) -> None:
+        name = self.make_article(
+            "Fixture markdown",
+            content='<h2>Setup</h2><p>Open <b>Settings</b></p><img src="/files/a.png">',
+        )
+        get_article_markdown(name)
+
+        self.assertEqual(frappe.response.content_type, "text/markdown")
+        self.assertEqual(frappe.response.display_content_as, "inline")
+        markdown = frappe.response.filecontent
+        self.assertTrue(markdown.startswith("# Fixture markdown\n\n## Setup\n"))
+        self.assertIn("Open **Settings**", markdown)
+        # Absolute, so an LLM reading the page can still fetch the image.
+        self.assertIn(f"]({frappe.utils.get_url()}/files/a.png)", markdown)
+
+    def test_a_guest_cannot_read_a_draft_as_markdown(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.DoesNotExistError, get_article_markdown, self.draft)
 
     def test_categories_carry_a_fixed_shape(self) -> None:
         [category] = [

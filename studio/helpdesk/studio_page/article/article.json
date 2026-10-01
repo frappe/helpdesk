@@ -346,18 +346,43 @@
            "blockName": "container",
            "children": [
             {
-             "classes": [
-              "text-ink-gray-8",
-              "font-bold",
-              "leading-[1.25]"
+             "blockName": "title-row",
+             "children": [
+              {
+               "classes": [
+                "text-ink-gray-8",
+                "font-bold",
+                "leading-[1.25]",
+                "min-w-0"
+               ],
+               "componentId": "TextBlock-2so2pbuuk",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-3xl",
+                "tag": "h1",
+                "text": "{{ article.data.title }}"
+               }
+              },
+              {
+               "componentId": "PortalCopyForLLM-article",
+               "componentName": "PortalCopyForLLM",
+               "componentProps": {
+                "isPublic": "{{ isPublicArticle }}",
+                "name": "{{ article.data.name }}"
+               },
+               "isCustomVueComponent": true
+              }
              ],
-             "componentId": "TextBlock-2so2pbuuk",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-3xl",
-              "tag": "h1",
-              "text": "{{ article.data.title }}"
-             }
+             "classes": [
+              "flex",
+              "items-start",
+              "justify-between",
+              "gap-4",
+              "w-full"
+             ],
+             "componentId": "container-article-title-row",
+             "componentName": "container",
+             "originalElement": "div"
             },
             {
              "blockName": "meta-row",
@@ -538,7 +563,7 @@
             "shrink",
             "gap-3",
             "h-fit",
-            "w-fit"
+            "w-full"
            ],
            "componentId": "container-fkgmgcjko",
            "componentName": "container",
@@ -914,7 +939,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:43:28.582118",
+ "modified": "2026-10-01 17:10:25.986514",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
