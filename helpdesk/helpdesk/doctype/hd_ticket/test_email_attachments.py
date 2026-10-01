@@ -1,12 +1,21 @@
 import frappe
-from frappe.core.doctype.file.utils import find_file_by_url
 from frappe.tests import IntegrationTestCase
+from frappe.utils import get_datetime
 
 from helpdesk.extends.file import strip_email_file_ids
+from helpdesk.helpdesk.doctype.hd_ticket.api import split_ticket
 from helpdesk.patches.mirror_email_attachments_to_tickets import (
     execute as mirror_existing,
 )
-from helpdesk.test_utils import create_contact, make_agent, make_customer_ticket
+from helpdesk.test_utils import (
+    attach_private_file,
+    can_download,
+    count_ticket_files,
+    create_contact,
+    make_agent,
+    make_customer_ticket,
+    make_ticket_email,
+)
 
 CUSTOMER = "attachments.customer@example.com"
 OTHER_CUSTOMER = "attachments.other@example.com"
@@ -24,88 +33,52 @@ class TestEmailAttachments(IntegrationTestCase):
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    def email(self, sent_or_received="Received"):
-        email = frappe.get_doc(
-            {
-                "doctype": "Communication",
-                "communication_type": "Communication",
-                "communication_medium": "Email",
-                "sent_or_received": sent_or_received,
-                "sender": CUSTOMER,
-                "subject": self.ticket.subject,
-                "content": "<p>See attachment</p>",
-                "reference_doctype": "HD Ticket",
-                "reference_name": self.ticket.name,
-            }
-        ).insert(ignore_permissions=True)
-        self.addCleanup(frappe.delete_doc, "Communication", email.name, force=True)
-        return email
-
-    def attach(self, doctype, name, file_name="invoice.txt"):
-        file = frappe.get_doc(
-            {
-                "doctype": "File",
-                "file_name": file_name,
-                "content": frappe.generate_hash(),
-                "is_private": 1,
-                "attached_to_doctype": doctype,
-                "attached_to_name": name,
-            }
-        ).insert(ignore_permissions=True)
-        self.addCleanup(self.delete_rows, file.file_url)
-        return file
-
-    def delete_rows(self, file_url):
-        frappe.db.delete("File", {"file_url": file_url})
-
-    def readable_by(self, user, file_url, fid=None):
-        frappe.set_user(user)
-        try:
-            return bool(find_file_by_url(file_url, name=fid))
-        finally:
-            frappe.set_user("Administrator")
-
-    def ticket_rows(self, file_url):
-        return frappe.db.count(
-            "File",
-            {
-                "file_url": file_url,
-                "attached_to_doctype": "HD Ticket",
-                "attached_to_name": self.ticket.name,
-            },
-        )
+    def email_file(self, sent_or_received="Received", file_name="invoice.txt"):
+        email = make_ticket_email(self, self.ticket.name, CUSTOMER, sent_or_received)
+        return attach_private_file(self, "Communication", email.name, file_name)
 
     def test_customer_reads_attachment_of_received_email(self):
-        file = self.attach("Communication", self.email().name)
-        self.assertEqual(self.ticket_rows(file.file_url), 1)
-        self.assertTrue(self.readable_by(CUSTOMER, file.file_url))
-        self.assertTrue(self.readable_by(AGENT, file.file_url))
+        file = self.email_file()
+        self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 1)
+        self.assertTrue(can_download(CUSTOMER, file.file_url))
+        self.assertTrue(can_download(AGENT, file.file_url))
 
     def test_customer_reads_attachment_of_sent_email(self):
-        file = self.attach("Communication", self.email("Sent").name)
-        self.assertTrue(self.readable_by(CUSTOMER, file.file_url))
+        file = self.email_file("Sent")
+        self.assertTrue(can_download(CUSTOMER, file.file_url))
 
     def test_other_customer_cannot_read_attachment(self):
-        file = self.attach("Communication", self.email().name)
-        self.assertFalse(self.readable_by(OTHER_CUSTOMER, file.file_url))
+        file = self.email_file()
+        self.assertFalse(can_download(OTHER_CUSTOMER, file.file_url))
 
     def test_comment_attachment_is_not_mirrored(self):
         comment = self.ticket.add_comment("Comment", "internal note")
         self.addCleanup(frappe.delete_doc, "Comment", comment.name, force=True)
-        file = self.attach("Comment", comment.name)
-        self.assertEqual(self.ticket_rows(file.file_url), 0)
-        self.assertFalse(self.readable_by(CUSTOMER, file.file_url))
+        file = attach_private_file(self, "Comment", comment.name)
+        self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 0)
+        self.assertFalse(can_download(CUSTOMER, file.file_url))
 
     def test_mirror_is_not_duplicated(self):
-        file = self.attach("Communication", self.email().name)
+        file = self.email_file()
         frappe.get_doc("File", file.name).run_method("after_insert")
-        self.assertEqual(self.ticket_rows(file.file_url), 1)
+        self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 1)
+
+    def test_mirror_keeps_file_timestamps(self):
+        file = self.email_file()
+        mirror = frappe.db.get_value(
+            "File",
+            {"file_url": file.file_url, "attached_to_doctype": "HD Ticket"},
+            ["creation", "owner"],
+            as_dict=True,
+        )
+        self.assertEqual(mirror.creation, get_datetime(file.creation))
+        self.assertEqual(mirror.owner, file.owner)
 
     def test_strip_email_file_ids_only_for_email_files(self):
-        email_file = self.attach("Communication", self.email().name, "inline.png")
+        email_file = self.email_file(file_name="inline.png")
         comment = self.ticket.add_comment("Comment", "internal note")
         self.addCleanup(frappe.delete_doc, "Comment", comment.name, force=True)
-        comment_file = self.attach("Comment", comment.name, "note.png")
+        comment_file = attach_private_file(self, "Comment", comment.name, "note.png")
         content = (
             f'<img src="{email_file.file_url}?fid={email_file.name}">'
             f'<img src="{comment_file.file_url}?fid={comment_file.name}">'
@@ -115,11 +88,23 @@ class TestEmailAttachments(IntegrationTestCase):
         self.assertIn(f"?fid={comment_file.name}", stripped)
 
     def test_patch_mirrors_existing_attachments(self):
-        file = self.attach("Communication", self.email().name)
+        file = self.email_file()
         frappe.db.delete(
             "File", {"file_url": file.file_url, "attached_to_doctype": "HD Ticket"}
         )
-        self.assertFalse(self.readable_by(CUSTOMER, file.file_url))
+        self.assertFalse(can_download(CUSTOMER, file.file_url))
         mirror_existing()
-        self.assertEqual(self.ticket_rows(file.file_url), 1)
-        self.assertTrue(self.readable_by(CUSTOMER, file.file_url))
+        self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 1)
+        self.assertTrue(can_download(CUSTOMER, file.file_url))
+
+    def test_split_keeps_backfilled_mirror_with_its_email(self):
+        file = self.email_file()
+        frappe.db.delete(
+            "File", {"file_url": file.file_url, "attached_to_doctype": "HD Ticket"}
+        )
+        later = make_ticket_email(self, self.ticket.name, CUSTOMER)
+        mirror_existing()
+        new_ticket = split_ticket("Split", later.name)
+        self.addCleanup(frappe.delete_doc, "HD Ticket", new_ticket, force=True)
+        self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 1)
+        self.assertEqual(count_ticket_files(new_ticket, file.file_url), 0)

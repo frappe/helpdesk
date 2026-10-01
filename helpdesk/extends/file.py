@@ -37,7 +37,9 @@ def email_ticket(doctype: str | None, name: str | None) -> str | None:
 
 def mirror_to_ticket(file, ticket: str):
     """Insert the row directly: saving a File with a url can copy the content
-    to a new url, and would stamp a second Attachment comment on the ticket."""
+    to a new url, and would stamp a second Attachment comment on the ticket.
+    The mirror keeps the file's timestamps, since split_ticket moves ticket
+    files by creation together with the emails they belong to."""
     if frappe.db.exists(
         "File",
         {
@@ -59,6 +61,10 @@ def mirror_to_ticket(file, ticket: str):
             "folder": file.folder,
             "attached_to_doctype": "HD Ticket",
             "attached_to_name": ticket,
+            "creation": file.creation,
+            "modified": file.modified,
+            "owner": file.owner,
+            "modified_by": file.modified_by,
         }
     )
     mirror.set_new_name()
