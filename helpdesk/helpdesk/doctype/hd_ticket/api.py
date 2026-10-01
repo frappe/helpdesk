@@ -105,10 +105,14 @@ def get_communications(ticket: str):
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
+    customer = not is_agent()
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
+        if customer:
+            # the email itself shows To and Cc to its recipients, never Bcc
+            c.pop("bcc", None)
     return communications
 
 
