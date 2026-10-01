@@ -9,6 +9,8 @@ const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
   clock: 'h:mm A',
+  day: 'D MMMM',
+  dayWithYear: 'D MMMM YYYY',
   step: 'ddd D MMM, h:mm A',
   date: 'DD-MM-YYYY',
 }

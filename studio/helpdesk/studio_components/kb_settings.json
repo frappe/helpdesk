@@ -319,6 +319,35 @@
                    "title": "{{ t('Theme') }}"
                   },
                   "componentSlots": {}
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-32"
+                    ],
+                    "componentId": "kb_settings-select-layout",
+                    "componentName": "Select",
+                    "componentProps": {
+                     "modelValue": {
+                      "$type": "variable",
+                      "name": "conversationLayout"
+                     },
+                     "options": {
+                      "$type": "variable",
+                      "name": "conversationLayoutOptions"
+                     }
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "componentId": "kb_settings-row-layout",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Read replies as a timeline, or as a chat with your own messages on the right.') }}",
+                   "title": "{{ t('Conversation layout') }}"
+                  },
+                  "componentSlots": {}
                  }
                 ],
                 "classes": [
@@ -1389,12 +1418,12 @@
  },
  "component_id": "kb_settings",
  "component_name": "KB Settings",
- "creation": "2026-08-14 22:49:13.595749",
+ "creation": "2026-10-01 16:19:30.705430",
  "docstatus": 0,
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-09-30 18:20:00.000000",
+ "modified": "2026-10-01 16:19:07.824662",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
