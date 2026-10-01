@@ -34,11 +34,13 @@ test("email reply with cc and an attachment is sent and stored", async ({ page, 
   await openTicket(page, ticket.name);
 
   await page.getByRole("button", { name: "Reply", exact: true }).click();
+  // type before picking the Cc: the picker refocuses its input 200ms after a
+  // pick, which would swallow the last keystrokes meant for the editor
+  await composer(page).click();
+  await composer(page).pressSequentially("We are on it");
   await page.getByRole("button", { name: "Cc", exact: true }).click();
   await page.getByRole("combobox", { expanded: true }).fill("cc-person@example.com");
   await page.getByRole("option", { name: /cc-person@example.com/ }).click();
-  await composer(page).click();
-  await composer(page).pressSequentially("We are on it");
   await page.locator("input[type=file]").setInputFiles({
     name: fileName,
     mimeType: "text/plain",
