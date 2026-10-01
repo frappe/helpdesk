@@ -107,13 +107,8 @@
    "select": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
    "role": "HD Customer Manager",
-   "share": 1
+   "select": 1
   }
  ],
  "quick_entry": 1,
