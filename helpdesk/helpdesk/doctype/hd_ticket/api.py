@@ -10,6 +10,7 @@ from frappe.utils.caching import redis_cache
 from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
+from helpdesk.extends.file import strip_email_file_ids
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.ticket_fields import TicketFields
@@ -105,10 +106,13 @@ def get_communications(ticket: str):
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
+    customer = not is_agent()
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
+        if customer:
+            c.content = strip_email_file_ids(c.content)
     return communications
 
 

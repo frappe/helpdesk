@@ -106,6 +106,9 @@ doc_events = {
         "validate": "helpdesk.extends.comment.validate",
         "on_trash": "helpdesk.extends.comment.on_trash",
     },
+    "File": {
+        "after_insert": "helpdesk.extends.file.after_insert",
+    },
 }
 
 # For List View
