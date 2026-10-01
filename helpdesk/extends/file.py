@@ -71,16 +71,23 @@ def mirror_to_ticket(file, ticket: str):
     mirror.db_insert()
 
 
-def strip_email_file_ids(content: str | None) -> str | None:
+def strip_email_file_ids(content: str | None, emails: list[str]) -> str | None:
     """Inline images pin the Communication's row via `fid`, which customers
-    cannot read; without it the ticket's mirror row serves the url."""
-    if not content or "?fid=" not in content:
+    cannot read; without it the ticket's mirror row serves the url.
+
+    `emails` are the Communications of a ticket the caller may read; only
+    their files are looked up, so the File query stays within that ticket."""
+    if not content or "?fid=" not in content or not emails:
         return content
     fids = set(m.group(2) for m in FID_PATTERN.finditer(content))
     on_emails = set(
         frappe.get_all(
             "File",
-            filters={"name": ["in", list(fids)], "attached_to_doctype": "Communication"},
+            filters={
+                "name": ["in", list(fids)],
+                "attached_to_doctype": "Communication",
+                "attached_to_name": ["in", emails],
+            },
             pluck="name",
         )
     )

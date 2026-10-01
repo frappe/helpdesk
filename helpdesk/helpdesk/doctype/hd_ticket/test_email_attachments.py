@@ -75,7 +75,10 @@ class TestEmailAttachments(IntegrationTestCase):
         self.assertEqual(mirror.owner, file.owner)
 
     def test_strip_email_file_ids_only_for_email_files(self):
-        email_file = self.email_file(file_name="inline.png")
+        email = make_ticket_email(self, self.ticket.name, CUSTOMER)
+        email_file = attach_private_file(
+            self, "Communication", email.name, "inline.png"
+        )
         comment = self.ticket.add_comment("Comment", "internal note")
         self.addCleanup(frappe.delete_doc, "Comment", comment.name, force=True)
         comment_file = attach_private_file(self, "Comment", comment.name, "note.png")
@@ -83,7 +86,7 @@ class TestEmailAttachments(IntegrationTestCase):
             f'<img src="{email_file.file_url}?fid={email_file.name}">'
             f'<img src="{comment_file.file_url}?fid={comment_file.name}">'
         )
-        stripped = strip_email_file_ids(content)
+        stripped = strip_email_file_ids(content, [email.name])
         self.assertIn(f'src="{email_file.file_url}"', stripped)
         self.assertIn(f"?fid={comment_file.name}", stripped)
 
@@ -108,3 +111,11 @@ class TestEmailAttachments(IntegrationTestCase):
         self.addCleanup(frappe.delete_doc, "HD Ticket", new_ticket, force=True)
         self.assertEqual(count_ticket_files(self.ticket.name, file.file_url), 1)
         self.assertEqual(count_ticket_files(new_ticket, file.file_url), 0)
+
+    def test_strip_email_file_ids_only_for_given_emails(self):
+        other = make_customer_ticket(self, raised_by=OTHER_CUSTOMER)
+        other_email = make_ticket_email(self, other.name, OTHER_CUSTOMER)
+        other_file = attach_private_file(self, "Communication", other_email.name)
+        email = make_ticket_email(self, self.ticket.name, CUSTOMER)
+        content = f'<img src="{other_file.file_url}?fid={other_file.name}">'
+        self.assertEqual(strip_email_file_ids(content, [email.name]), content)
