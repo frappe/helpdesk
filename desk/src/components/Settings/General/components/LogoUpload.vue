@@ -6,9 +6,11 @@
       <div
         class="flex items-center justify-center min-w-16 min-h-16 rounded-6 overflow-hidden border border-outline-gray-1"
       >
+        <!-- Square and full-bleed: these are logos and banners, not people. -->
         <Avatar
           v-if="props.image"
-          size="3xl"
+          shape="square"
+          class="size-16"
           :image="props.image"
           :label="props.title"
         />
@@ -20,8 +22,10 @@
       </div>
     </div>
     <div>
+      <!-- Public: logos and banners are served to signed-out portal visitors. -->
       <FileUploader
         :fileTypes="['image/*']"
+        :private="false"
         @success="
           (file) => {
             emit('onUpload', file.file_url);

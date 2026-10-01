@@ -17,11 +17,9 @@
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable && !article.loading">
           <Button
-            :label="
-              article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
-            "
-            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
-            @click="toggleStatus()"
+            :label="isPublished ? __('Unpublish') : __('Publish')"
+            :iconLeft="isPublished ? undefined : 'lucide-globe'"
+            @click="togglePublished()"
           />
         </div>
       </template>
@@ -249,6 +247,14 @@
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
+    <ArticleSharingModal
+      v-if="article.data"
+      v-model="showSharingModal"
+      :title="article.data.title"
+      :visibility="article.data.visibility"
+      :url="articleUrl"
+      @publish="publishArticle"
+    />
   </div>
 </template>
 
@@ -263,6 +269,7 @@ import {
   ThumbsUpIcon,
 } from "@/components/icons";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -279,7 +286,7 @@ import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   ConfirmDelete,
-  copyToClipboard,
+  CUSTOMER_PORTAL_ROOT,
   isCustomerPortal,
   uploadFunction,
 } from "@/utils";
@@ -444,25 +451,41 @@ function incrementArticleViews(articleId: string) {
   );
 }
 
-const toggleStatus = debounce(() => {
-  const status = article.data?.status === "Published" ? "Draft" : "Published";
+const isPublished = computed(() => article.data?.status === "Published");
+
+const togglePublished = debounce(
+  () =>
+    isPublished.value
+      ? save({ status: "Draft" }, __("Article unpublished."))
+      : save({ status: "Published" }, __("Article published.")),
+  300
+);
+
+const showSharingModal = ref(false);
+const articleUrl = computed(
+  () =>
+    `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/articles/${props.articleId}`
+);
+
+// The sharing dialog settles the audience and publishes in one write.
+function publishArticle(visibility: string) {
+  save(
+    { status: "Published", visibility },
+    isPublished.value ? __("Access updated.") : __("Article published.")
+  );
+}
+
+function save(fieldname: Record<string, string>, message: string) {
   updateArticle.submit(
-    {
-      doctype: "HD Article",
-      name: article.data.name,
-      fieldname: "status",
-      value: status,
-    },
+    { doctype: "HD Article", name: article.data.name, fieldname },
     {
       onSuccess: () => {
-        if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+        toast.success(message);
         article.reload();
       },
     }
   );
-}, 300);
+}
 const isDirty = ref(false);
 
 const moveToModal = ref(false);
@@ -657,12 +680,8 @@ const articleActions = computed(() => [
       ]),
   {
     label: __("Share"),
-    icon: "lucide-link",
-    onClick: () => {
-      const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.toString(), __("Article link copied to clipboard"));
-    },
+    icon: "lucide-share-2",
+    onClick: () => (showSharingModal.value = true),
   },
   {
     group: __("Danger"),
