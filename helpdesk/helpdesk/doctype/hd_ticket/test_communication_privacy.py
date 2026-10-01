@@ -14,6 +14,9 @@ class TestCommunicationPrivacy(IntegrationTestCase):
         create_contact("Privacy Customer", CUSTOMER)
         make_agent(AGENT)
         self.ticket = make_customer_ticket(self, raised_by=CUSTOMER)
+        self.email = self.email_with_bcc(self.ticket)
+
+    def email_with_bcc(self, ticket):
         email = frappe.get_doc(
             {
                 "doctype": "Communication",
@@ -24,21 +27,22 @@ class TestCommunicationPrivacy(IntegrationTestCase):
                 "recipients": CUSTOMER,
                 "cc": "colleague@example.com",
                 "bcc": "hidden@example.com",
-                "subject": self.ticket.subject,
+                "subject": ticket.subject,
                 "content": "<p>Reply</p>",
                 "reference_doctype": "HD Ticket",
-                "reference_name": self.ticket.name,
+                "reference_name": ticket.name,
             }
         ).insert(ignore_permissions=True)
         self.addCleanup(frappe.delete_doc, "Communication", email.name, force=True)
-        self.email = email.name
+        return email.name
 
     def tearDown(self):
         frappe.set_user("Administrator")
 
-    def communication(self, user):
+    def communication(self, user, ticket=None, email=None):
         frappe.set_user(user)
-        return next(c for c in get_communications(self.ticket.name) if c.name == self.email)
+        ticket, email = ticket or self.ticket, email or self.email
+        return next(c for c in get_communications(ticket.name) if c.name == email)
 
     def test_customer_does_not_receive_bcc(self):
         email = self.communication(CUSTOMER)
@@ -48,3 +52,11 @@ class TestCommunicationPrivacy(IntegrationTestCase):
     def test_agent_receives_bcc(self):
         email = self.communication(AGENT)
         self.assertEqual(email.bcc, "hidden@example.com")
+
+    def test_agent_as_requester_does_not_receive_bcc(self):
+        ticket = make_customer_ticket(self, raised_by=AGENT)
+        email = self.email_with_bcc(ticket)
+        self.assertNotIn(
+            "hidden@example.com",
+            str(self.communication(AGENT, ticket, email).get("bcc") or ""),
+        )
