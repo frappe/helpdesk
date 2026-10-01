@@ -11,8 +11,8 @@ const configStore = useConfigStore();
 if (authStore.hasDeskAccess) {
   router.push({ name: "TicketsAgent" });
 } else if (configStore.preferKnowledgeBase) {
-  router.push({ name: "CustomerKnowledgeBase" });
-} else {
   window.location.replace(CUSTOMER_PORTAL_ROOT);
+} else {
+  window.location.replace(`${CUSTOMER_PORTAL_ROOT}/customer-tickets`);
 }
 </script>

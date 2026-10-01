@@ -63,7 +63,7 @@ website_route_rules = [
     },
 ]
 
-# The old customer portal's ticket URLs keep working through these.
+# The old customer portal's URLs keep working through these.
 website_redirects = [
     # The app root will be the knowledge base once its pages land.
     {
@@ -83,6 +83,18 @@ website_redirects = [
     {
         "source": r"/helpdesk/my-tickets/(.*)",
         "target": r"/kb/tickets/\1",
+    },
+    {
+        "source": "/helpdesk/kb-public",
+        "target": "/kb",
+    },
+    {
+        "source": r"/helpdesk/kb-public/articles/(.*)",
+        "target": r"/kb/articles/\1",
+    },
+    {
+        "source": r"/helpdesk/kb-public/(.*)",
+        "target": r"/kb/category/\1",
     },
 ]
 

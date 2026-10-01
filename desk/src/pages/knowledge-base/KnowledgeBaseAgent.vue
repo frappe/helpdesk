@@ -60,7 +60,7 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { copyToClipboard } from "@/utils";
+import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
 import {
   Badge,
   Button,
@@ -169,7 +169,7 @@ const groupByActions = [
     onClick: async ({ group }) => {
       const { label, value } = group;
       const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/${value}`;
+      url.pathname = `${CUSTOMER_PORTAL_ROOT}/category/${value}`;
       await copyToClipboard(
         url.toString(),
         __("Category '{0}' link copied to clipboard", [label])

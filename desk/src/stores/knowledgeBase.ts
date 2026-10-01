@@ -113,12 +113,3 @@ export const setFeedback = createResource({
     },
   }),
 });
-
-// view count
-export const incrementView = createResource({
-  url: "helpdesk.api.knowledge_base.increment_views",
-  makeParams: ({ article }) => ({
-    article,
-  }),
-});
-

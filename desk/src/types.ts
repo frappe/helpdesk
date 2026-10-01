@@ -362,10 +362,8 @@ export interface Article {
   creation: string;
   content: string;
   modified: string;
-  feedback: FeedbackAction;
+  feedback: 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 }
-
-export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface Author {
   name: string;
@@ -567,7 +565,6 @@ export interface HDSettings {
   isFeedbackMandatory: boolean;
   allowAnyoneToCreateTickets: boolean;
   defaultTicketType: string;
-  preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
   enableOutsideHoursBanner: boolean;
