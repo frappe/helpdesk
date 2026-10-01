@@ -1,0 +1,415 @@
+import frappe
+from frappe.tests import IntegrationTestCase
+
+from helpdesk.api.knowledge_base import (
+    PUBLIC_ARTICLE_FIELDS,
+    PUBLIC_CATEGORY_FIELDS,
+    get_article,
+    get_popular_categories,
+    get_public_article,
+    get_public_articles,
+    get_public_categories,
+    get_public_category,
+    increment_views,
+    search_articles,
+    vote_on_article,
+)
+from helpdesk.search_sqlite import HelpdeskArticleSearch
+from helpdesk.test_utils import (
+    disable_public_knowledge_base,
+    enable_anonymous_article_voting,
+    enable_public_knowledge_base,
+    make_article,
+    make_article_category,
+)
+
+# A list row carries what it shows over the stored fields, computed, never asked for.
+LIST_ROW_FIELDS = {*PUBLIC_ARTICLE_FIELDS, "excerpt", "image"}
+# Not an agent and needs no User row: the audience rule reads the session name and roles.
+CUSTOMER = "fixture.customer@example.com"
+# The site's own articles carry real view counts; fixtures outrank them all.
+BASE_VIEWS = 1_000_000
+# Wide enough to cover every category on the site when asserting an absence.
+ALL = 100
+
+
+class TestPopularCategories(IntegrationTestCase):
+    def make_viewed_article(self, category, views, status="Published"):
+        make_article(
+            f"Fixture {status} {views}", status, category=category, views=views
+        )
+
+    def names(self) -> list[str]:
+        return [row["name"] for row in get_popular_categories(limit=ALL)]
+
+    def test_ranks_categories_by_summed_views(self) -> None:
+        quiet = make_article_category("Fixture Quiet").name
+        loud = make_article_category("Fixture Loud").name
+        self.make_viewed_article(quiet, BASE_VIEWS + 1)
+        # Two articles, so views are proven summed rather than maxed.
+        self.make_viewed_article(loud, BASE_VIEWS)
+        self.make_viewed_article(loud, BASE_VIEWS)
+
+        ranked = [
+            row["label"]
+            for row in get_popular_categories(limit=ALL)
+            if row["name"] in {quiet, loud}
+        ]
+        self.assertEqual(ranked, ["Fixture Loud", "Fixture Quiet"])
+
+    def test_caps_at_three_by_default(self) -> None:
+        for index in range(4):
+            category = make_article_category(f"Fixture {index}").name
+            self.make_viewed_article(category, BASE_VIEWS + index)
+
+        self.assertEqual(len(get_popular_categories()), 3)
+        self.assertEqual(len(get_popular_categories(limit=2)), 2)
+
+    def test_excludes_categories_with_no_views(self) -> None:
+        silent = make_article_category("Fixture Silent").name
+        self.make_viewed_article(silent, 0)
+
+        self.assertNotIn(silent, self.names())
+
+    def test_excludes_views_of_unpublished_articles(self) -> None:
+        drafted = make_article_category("Fixture Drafted").name
+        self.make_viewed_article(drafted, BASE_VIEWS, status="Draft")
+
+        self.assertNotIn(drafted, self.names())
+
+    def test_ignores_articles_without_a_category(self) -> None:
+        self.make_viewed_article(None, BASE_VIEWS)
+
+        self.assertTrue(all(self.names()))
+
+
+class TestPublicReads(IntegrationTestCase):
+    """Open to a guest while the knowledge base is public, never wider than published."""
+
+    def setUp(self) -> None:
+        enable_public_knowledge_base()
+        self.category = make_article_category(
+            "Fixture Public", description="Fixture description"
+        )
+        self.published = self.make_article("Fixture published")
+        self.draft = self.make_article("Fixture draft", "Draft")
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def make_article(self, title, status="Published", **values) -> str:
+        return make_article(title, status, category=self.category.name, **values).name
+
+    def titles(self, **kwargs) -> list[str]:
+        return [
+            row["title"]
+            for row in get_public_articles(category=self.category.name, **kwargs)
+        ]
+
+    def test_every_endpoint_is_reachable_without_a_session(self) -> None:
+        for endpoint in (
+            get_public_articles,
+            get_public_article,
+            get_public_categories,
+            get_public_category,
+            vote_on_article,
+            increment_views,
+        ):
+            self.assertIn(endpoint, frappe.guest_methods)
+
+    def test_a_private_knowledge_base_refuses_every_anonymous_read(self) -> None:
+        disable_public_knowledge_base()
+        frappe.set_user("Guest")
+
+        for endpoint, args in (
+            (get_public_articles, ()),
+            (get_public_categories, ()),
+            (get_popular_categories, ()),
+            (get_public_article, (self.published,)),
+            (get_public_category, (self.category.name,)),
+            (increment_views, (self.published,)),
+        ):
+            with self.subTest(endpoint=endpoint.__name__):
+                self.assertRaises(frappe.PermissionError, endpoint, *args)
+
+    def test_a_public_knowledge_base_answers_a_guest(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertEqual(get_public_article(self.published)["name"], self.published)
+
+    def test_a_signed_in_reader_is_unaffected(self) -> None:
+        disable_public_knowledge_base()
+
+        self.assertEqual(get_public_article(self.published)["name"], self.published)
+
+    def test_a_private_knowledge_base_refuses_anonymous_votes(self) -> None:
+        disable_public_knowledge_base()
+        enable_anonymous_article_voting()
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.PermissionError, vote_on_article, self.published, 1)
+
+    def test_an_article_carries_the_reader_s_own_vote(self) -> None:
+        self.assertEqual(get_public_article(self.published)["feedback"], "0")
+
+        frappe.get_doc("HD Article", self.published).set_feedback(1)
+
+        self.assertEqual(get_public_article(self.published)["feedback"], "1")
+
+    def test_a_cookieless_guest_is_shown_no_vote(self) -> None:
+        # An empty visitor id would match every signed-in reader's vote row.
+        frappe.get_doc("HD Article", self.published).set_feedback(1)
+        frappe.set_user("Guest")
+
+        self.assertEqual(get_public_article(self.published)["feedback"], "0")
+
+    def test_lists_only_published_articles(self) -> None:
+        self.assertEqual(self.titles(), ["Fixture published"])
+
+    def test_a_guest_cannot_widen_past_published(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertNotIn("Fixture draft", self.titles())
+
+    def test_narrows_to_one_category(self) -> None:
+        other = make_article_category("Fixture Other")
+        make_article("Fixture elsewhere", category=other.name)
+
+        self.assertEqual(self.titles(), ["Fixture published"])
+
+    def test_limit_caps_the_list(self) -> None:
+        self.make_article("Fixture second")
+
+        self.assertEqual(len(self.titles(limit=1)), 1)
+
+    def test_a_row_carries_what_the_list_shows(self) -> None:
+        [article] = get_public_articles(category=self.category.name)
+
+        self.assertEqual(set(article), LIST_ROW_FIELDS)
+        self.assertEqual(article.excerpt, "Fixture published")
+        self.assertIsNone(article.image)
+        self.assertEqual(article.author["name"], "Administrator")
+
+    def test_a_row_carries_the_body_s_first_image(self) -> None:
+        body = '<p>intro</p><img src="/files/one.png"><img src="/files/two.png">'
+        frappe.db.set_value("HD Article", self.published, "content", body)
+
+        [article] = get_public_articles(category=self.category.name)
+
+        self.assertEqual(article.image, "/files/one.png")
+        self.assertEqual(article.excerpt, "intro")
+
+    def test_popular_sorts_by_views(self) -> None:
+        frappe.db.set_value("HD Article", self.published, "views", BASE_VIEWS)
+        self.make_article("Fixture popular", views=BASE_VIEWS + 1)
+
+        self.assertEqual(
+            self.titles(sort="popular"), ["Fixture popular", "Fixture published"]
+        )
+
+    def test_reads_one_published_article(self) -> None:
+        article = get_public_article(self.published)
+
+        self.assertEqual(article.content, "<p>Fixture published</p>")
+        self.assertEqual(article.category_name, "Fixture Public")
+        self.assertEqual(article.author["name"], "Administrator")
+        self.assertEqual(
+            set(article),
+            {*PUBLIC_ARTICLE_FIELDS, "content", "category_name", "feedback"},
+        )
+
+    def test_a_guest_cannot_read_a_draft(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.DoesNotExistError, get_public_article, self.draft)
+
+    def test_an_agent_can_preview_a_draft(self) -> None:
+        self.assertEqual(get_public_article(self.draft).title, "Fixture draft")
+
+    def test_an_unknown_article_is_not_found(self) -> None:
+        self.assertRaises(
+            frappe.DoesNotExistError, get_public_article, "no-such-article"
+        )
+
+    def test_categories_carry_a_fixed_shape(self) -> None:
+        [category] = [
+            row for row in get_public_categories() if row["name"] == self.category.name
+        ]
+
+        self.assertEqual(set(category), set(PUBLIC_CATEGORY_FIELDS))
+
+    def test_reads_one_category(self) -> None:
+        category = get_public_category(self.category.name)
+
+        self.assertEqual(category.description, "Fixture description")
+
+    def test_an_unknown_category_is_not_found(self) -> None:
+        self.assertRaises(
+            frappe.DoesNotExistError, get_public_category, "no-such-category"
+        )
+
+    def test_a_reader_is_counted_once_an_hour(self) -> None:
+        increment_views(self.published)
+        increment_views(self.published)
+
+        self.assertEqual(frappe.db.get_value("HD Article", self.published, "views"), 1)
+
+    def test_a_draft_s_views_are_not_counted_for_a_guest(self) -> None:
+        frappe.set_user("Guest")
+
+        increment_views(self.draft)
+
+        self.assertEqual(frappe.db.get_value("HD Article", self.draft, "views"), 0)
+
+
+class TestCustomersOnlyArticles(IntegrationTestCase):
+    """Live, but every anonymous read misses it: lists, tallies, links and votes."""
+
+    def setUp(self) -> None:
+        enable_public_knowledge_base()
+        self.category = make_article_category("Fixture Visibility")
+        self.public = self.make_article("Fixture open", "Public")
+        self.members = self.make_article("Fixture members", "Customers only")
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def make_article(self, title, visibility) -> str:
+        return make_article(
+            title, category=self.category.name, visibility=visibility, views=BASE_VIEWS
+        ).name
+
+    def titles(self) -> list[str]:
+        return [
+            row["title"] for row in get_public_articles(category=self.category.name)
+        ]
+
+    def test_defaults_to_public(self) -> None:
+        self.assertEqual(make_article("Fixture default").visibility, "Public")
+
+    def test_a_guest_is_shown_only_public_articles(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertEqual(self.titles(), ["Fixture open"])
+
+    def test_a_signed_in_reader_is_shown_both(self) -> None:
+        self.assertEqual(sorted(self.titles()), ["Fixture members", "Fixture open"])
+
+    def test_an_agents_only_article_is_shown_to_neither(self) -> None:
+        self.make_article("Fixture internal", "Agents only")
+        self.assertIn("Fixture internal", self.titles())
+
+        frappe.session.user = CUSTOMER
+        self.assertNotIn("Fixture internal", self.titles())
+
+        frappe.set_user("Guest")
+        self.assertNotIn("Fixture internal", self.titles())
+
+    def test_a_customer_cannot_open_an_agents_only_article(self) -> None:
+        internal = self.make_article("Fixture internal link", "Agents only")
+        frappe.session.user = CUSTOMER
+
+        self.assertRaises(frappe.DoesNotExistError, get_public_article, internal)
+        self.assertRaises(frappe.PermissionError, get_article, internal)
+
+    def test_a_guest_cannot_open_one_by_name(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.DoesNotExistError, get_public_article, self.members)
+        self.assertRaises(frappe.PermissionError, get_article, self.members)
+
+    def test_a_guest_cannot_vote_on_one(self) -> None:
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.DoesNotExistError, vote_on_article, self.members, 1)
+
+    def test_its_views_do_not_rank_a_category_for_a_guest(self) -> None:
+        # A chip would point the guest at a category that looks empty once opened.
+        members_only = make_article_category("Fixture Members Only").name
+        make_article(
+            "Fixture members elsewhere",
+            category=members_only,
+            visibility="Customers only",
+            views=BASE_VIEWS,
+        )
+        self.assertIn(members_only, self.ranked())
+
+        frappe.set_user("Guest")
+
+        self.assertNotIn(members_only, self.ranked())
+
+    def ranked(self) -> list[str]:
+        return [row["name"] for row in get_popular_categories(limit=ALL)]
+
+
+class TestSearch(IntegrationTestCase):
+    """The index answers; the audience gate filters what it found."""
+
+    def setUp(self) -> None:
+        enable_public_knowledge_base()
+        category = make_article_category("Fixture Search").name
+        # The index is a file outside the transaction, so fixtures go in and out by hand.
+        self.search = HelpdeskArticleSearch()
+        if not self.search.index_exists():
+            self.search.build_index()
+        body = "<p>Where the <b>zebra</b> crosses & how</p>"
+        self.public = make_article(
+            "Fixture zebra crossing", category=category, content=body
+        ).name
+        self.members = make_article(
+            "Fixture zebra members",
+            category=category,
+            content=body,
+            visibility="Customers only",
+        ).name
+        self.draft = make_article(
+            "Fixture zebra draft", "Draft", category=category, content=body
+        ).name
+        self.search.index_documents_by_name(
+            "HD Article", [self.public, self.members, self.draft]
+        )
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+        for name in (self.public, self.members, self.draft):
+            self.search.remove_doc("HD Article", name)
+
+    def names(self) -> list[str]:
+        return [row["name"] for row in search_articles("zebra")]
+
+    def test_is_reachable_without_a_session(self) -> None:
+        self.assertIn(search_articles, frappe.guest_methods)
+
+    def test_finds_published_articles_only(self) -> None:
+        self.assertIn(self.public, self.names())
+        self.assertNotIn(self.draft, self.names())
+
+    def test_marks_the_hit_in_escaped_text(self) -> None:
+        [row] = [row for row in search_articles("zebra") if row["name"] == self.public]
+
+        self.assertIn("<mark>zebra</mark>", row["title"])
+        # Author text is not HTML: the ampersand is escaped and the bold tag is text.
+        self.assertIn("&amp;", row["excerpt"])
+        self.assertNotIn("<b>", row["excerpt"])
+        self.assertEqual(row["category_name"], "Fixture Search")
+        self.assertIsNone(row["image"])
+
+    def test_a_guest_is_shown_only_public_articles(self) -> None:
+        self.assertIn(self.members, self.names())
+
+        frappe.set_user("Guest")
+
+        self.assertIn(self.public, self.names())
+        self.assertNotIn(self.members, self.names())
+
+    def test_a_private_knowledge_base_refuses_a_guest(self) -> None:
+        disable_public_knowledge_base()
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.PermissionError, search_articles, "zebra")
+
+    def test_a_blank_query_matches_nothing(self) -> None:
+        self.assertEqual(search_articles("  "), [])
+
+    def test_limit_caps_the_list(self) -> None:
+        self.assertEqual(len(search_articles("zebra", limit=1)), 1)
