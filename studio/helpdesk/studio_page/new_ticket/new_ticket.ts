@@ -1,5 +1,5 @@
 import { computed, reactive, ref, watch } from 'vue'
-import { createListResource, toast, useFileUpload } from 'frappe-ui'
+import { createListResource, createResource, debounce, toast, useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
@@ -11,6 +11,9 @@ import { runAction } from '@app/utils'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
+const SUGGESTION_DEBOUNCE_MS = 400
+const MIN_SUBJECT_LENGTH = 3
+const SUGGESTION_LIMIT = 3
 
 // The upload queue keeps only `file_url`; the server links attachments by File name.
 const uploadedByUrl = new Map()
@@ -66,6 +69,18 @@ export default function setup(context) {
   )
 
   const about = computed(() => template.data?.about || '')
+
+  // Articles that may already answer the subject, before the form is filled in.
+  const suggestions = createResource({
+    url: 'helpdesk.api.knowledge_base.search_articles',
+    method: 'GET',
+    makeParams: () => ({ query: subject.value, limit: SUGGESTION_LIMIT }),
+  })
+  const suggest = debounce(() => {
+    if (subject.value.trim().length >= MIN_SUBJECT_LENGTH) suggestions.fetch()
+    else suggestions.reset()
+  }, SUGGESTION_DEBOUNCE_MS)
+  watch(subject, suggest)
 
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
@@ -158,6 +173,7 @@ export default function setup(context) {
   return {
     ...session,
     about,
+    suggestions,
     fields,
     layout,
     model,

@@ -110,6 +110,94 @@
          "originalElement": "div"
         },
         {
+         "blockName": "suggestions",
+         "children": [
+          {
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-5",
+              "leading-[1.15]"
+             ],
+             "componentId": "TextBlock-nt-suggestions",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-base",
+              "tag": "span",
+              "text": "{{ t('Suggested articles based on your subject') }}"
+             }
+            },
+            {
+             "classes": [
+              "cursor-pointer",
+              "text-ink-blue-link",
+              "hover:underline",
+              "leading-[1.15]"
+             ],
+             "componentEvents": {
+              "click": {
+               "action": "Run Script",
+               "event": "click",
+               "script": "router.push({ path: '/help', query: { q: subject } })"
+              }
+             },
+             "componentId": "TextBlock-nt-see-all",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-base",
+              "tag": "span",
+              "text": "{{ t('See all') }}"
+             }
+            }
+           ],
+           "classes": [
+            "mb-1",
+            "flex",
+            "items-center",
+            "justify-between",
+            "px-2",
+            "pt-1"
+           ],
+           "componentId": "container-nt-suggestions-head",
+           "componentName": "container",
+           "originalElement": "div"
+          },
+          {
+           "baseStyles": {
+            "display": "flex",
+            "flexDirection": "column",
+            "gap": "0px"
+           },
+           "children": [
+            {
+             "componentId": "PortalArticleRow-nt",
+             "componentName": "PortalArticleRow",
+             "componentProps": {
+              "article": "{{ dataItem }}",
+              "variant": "suggestion"
+             },
+             "isCustomVueComponent": true
+            }
+           ],
+           "componentId": "Repeater-nt-suggestions",
+           "componentName": "Repeater",
+           "componentProps": {
+            "data": "{{ suggestions.data }}",
+            "dataKey": "name"
+           }
+          }
+         ],
+         "classes": [
+          "rounded-7",
+          "bg-surface-gray-2",
+          "p-3"
+         ],
+         "componentId": "container-nt-suggestions",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ suggestions.data && suggestions.data.length }}"
+        },
+        {
          "blockName": "f-desc",
          "children": [
           {
@@ -317,13 +405,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-07-30 15:26:13.484982",
+ "creation": "2026-10-01 15:56:40.168008",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:51:21.324006",
+ "modified": "2026-10-01 16:51:38.034694",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",
