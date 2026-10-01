@@ -32,11 +32,11 @@
    "read_only": 1
   },
   {
-    "fieldname": "users",
-    "fieldtype": "Table MultiSelect",
-    "label": "Users",
-    "options": "HD Team Member",
-    "reqd": 1
+   "fieldname": "users",
+   "fieldtype": "Table MultiSelect",
+   "label": "Users",
+   "options": "HD Team Member",
+   "reqd": 1
   },
   {
    "default": "0",
@@ -105,6 +105,15 @@
   {
    "role": "HD Customer",
    "select": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer Manager",
+   "share": 1
   }
  ],
  "quick_entry": 1,
