@@ -50,7 +50,9 @@ class TestSlaFulfilledCard(IntegrationTestCase):
                     "HD Ticket", ticket.name, "agreement_status", agreement_status
                 )
 
-        filters = frappe._dict(from_date="2031-03-12", to_date="2031-03-12", agent=AGENT)
+        filters = frappe._dict(
+            from_date="2031-03-12", to_date="2031-03-12", agent=AGENT
+        )
         [day] = HelpdeskDashboard(filters).get_ticket_trend_data()["data"]
         self.assertEqual(day["SLA Fulfilled"], 50)
 
