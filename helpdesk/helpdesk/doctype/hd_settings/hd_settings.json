@@ -20,7 +20,10 @@
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
+  "public_knowledge_base",
   "prefer_knowledge_base",
+  "allow_anonymous_article_voting",
+  "banner_image",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -231,9 +234,29 @@
   },
   {
    "default": "0",
+   "description": "Anyone can read articles without signing in.",
+   "fieldname": "public_knowledge_base",
+   "fieldtype": "Check",
+   "label": "Public knowledge base"
+  },
+  {
+   "default": "0",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
    "label": "Prefer knowledge base"
+  },
+  {
+   "default": "0",
+   "description": "Allow anonymous users to vote on articles.",
+   "fieldname": "allow_anonymous_article_voting",
+   "fieldtype": "Check",
+   "label": "Anonymous voting on articles"
+  },
+  {
+   "description": "Banner image shown at the top of the Knowledge Base portal",
+   "fieldname": "banner_image",
+   "fieldtype": "Attach Image",
+   "label": "Banner Image"
   },
   {
    "fieldname": "agent_status_section",

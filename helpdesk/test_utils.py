@@ -178,16 +178,39 @@ def make_feedback_option(label: str, rating: float = 1.0):
     ).insert()
 
 
-def make_article(title: str, status: str = "Published"):
-    """Creates an HD Article whose content repeats its title."""
+def make_article(title: str, status: str = "Published", **values):
+    """Creates an HD Article whose content repeats its title unless `values` says otherwise."""
     return frappe.get_doc(
         {
             "doctype": "HD Article",
             "title": title,
             "status": status,
             "content": f"<p>{title}</p>",
+            **values,
         }
     ).insert()
+
+
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
+
+
+def enable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+
+
+def disable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+
+
+def enable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+
+
+def disable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 0)
 
 
 def create_agent(

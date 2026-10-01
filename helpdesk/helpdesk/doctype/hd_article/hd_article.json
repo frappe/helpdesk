@@ -9,6 +9,7 @@
  "field_order": [
   "title",
   "status",
+  "visibility",
   "published_on",
   "views",
   "column_break_7",
@@ -73,6 +74,13 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Published\nDraft\nArchived"
+  },
+  {
+   "default": "Public",
+   "fieldname": "visibility",
+   "fieldtype": "Select",
+   "label": "Visibility",
+   "options": "Public\nCustomers only\nAgents only"
   },
   {
    "fieldname": "title_slug",

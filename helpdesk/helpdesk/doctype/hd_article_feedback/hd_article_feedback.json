@@ -7,6 +7,7 @@
  "field_order": [
   "article",
   "user",
+  "visitor_id",
   "feedback"
  ],
  "fields": [
@@ -30,6 +31,13 @@
    "fieldtype": "Link",
    "label": "Article",
    "options": "HD Article"
+  },
+  {
+   "description": "Cookie that tells one signed-out reader from another",
+   "fieldname": "visitor_id",
+   "fieldtype": "Data",
+   "label": "Visitor ID",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
