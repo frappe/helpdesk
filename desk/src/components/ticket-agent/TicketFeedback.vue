@@ -14,7 +14,7 @@
         </p>
         <button
           v-if="isCommentClamped || showFullComment"
-          class="mt-0.5 text-base text-ink-gray-5 hover:text-ink-gray-7"
+          class="mt-0.5 pl-[0.4em] text-base text-ink-gray-5 hover:text-ink-gray-7"
           @click="showFullComment = !showFullComment"
         >
           {{ showFullComment ? __("Show less") : __("Show more") }}
