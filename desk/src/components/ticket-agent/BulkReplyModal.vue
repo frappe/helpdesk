@@ -76,6 +76,7 @@ type BulkReplyResult = {
   failed: { ticket_id: string; error: string }[];
 };
 const failures = ref<BulkReplyResult["failed"]>([]);
+let responseGeneration = 0;
 const pendingTicketIds = computed(() =>
   failures.value.length
     ? failures.value.map((failure) => failure.ticket_id)
@@ -84,14 +85,21 @@ const pendingTicketIds = computed(() =>
 watch(
   () => Array.from(props.selections).join(","),
   () => {
+    responseGeneration++;
     failures.value = [];
-  }
+  },
+  { flush: "sync" }
 );
 // Retry state belongs to one modal session. The component stays mounted, so
 // reopening with the same selection must target the whole selection again.
-watch(open, (isOpen) => {
-  if (isOpen) failures.value = [];
-});
+watch(
+  open,
+  (isOpen) => {
+    responseGeneration++;
+    if (isOpen) failures.value = [];
+  },
+  { flush: "sync" }
+);
 
 const bulkReplyResource: Resource = createResource({
   url: "helpdesk.api.ticket.bulk_reply",
@@ -122,6 +130,7 @@ function handleDiscard() {
 
 function handleSubmit() {
   if (editorRef.value?.isEmpty() || bulkReplyResource.loading) return;
+  const requestGeneration = responseGeneration;
   bulkReplyResource.submit(
     {
       ticket_ids: pendingTicketIds.value,
@@ -130,6 +139,17 @@ function handleSubmit() {
     },
     {
       onSuccess(result: BulkReplyResult) {
+        // A response must not change the draft or retry targets of a newer session.
+        if (!open.value || requestGeneration !== responseGeneration) {
+          toast.info(
+            __(
+              "A previous bulk reply finished: sent to {0} tickets, failed for {1} tickets.",
+              String(result.sent.length),
+              String(result.failed.length)
+            )
+          );
+          return;
+        }
         failures.value = result.failed;
         if (result.failed.length) {
           const msg = result.sent.length
