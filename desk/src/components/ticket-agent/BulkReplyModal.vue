@@ -87,6 +87,11 @@ watch(
     failures.value = [];
   }
 );
+// Retry state belongs to one modal session. The component stays mounted, so
+// reopening with the same selection must target the whole selection again.
+watch(open, (isOpen) => {
+  if (isOpen) failures.value = [];
+});
 
 const bulkReplyResource: Resource = createResource({
   url: "helpdesk.api.ticket.bulk_reply",
