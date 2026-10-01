@@ -1,11 +1,13 @@
 import { computed, ref, watch } from 'vue'
-import { createListResource, createResource, dayjs } from 'frappe-ui'
+import { createResource, dayjs } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
 import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
+import { ROUTES } from '@app/routes'
+import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import {
   CLOSED_STATUS,
@@ -65,22 +67,17 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  const popularArticles = createListResource({
-    doctype: 'HD Article',
-    filters: { status: 'Published' },
-    fields: ['name', 'title'],
-    orderBy: 'views desc',
-    pageLength: POPULAR_ARTICLE_LIMIT,
+  // Through the portal's own endpoint: it keeps to the articles this reader may see.
+  const popularArticles = createResource({
+    url: 'helpdesk.api.knowledge_base.get_public_articles',
+    method: 'GET',
+    params: { limit: POPULAR_ARTICLE_LIMIT, sort: 'popular' },
   })
 
   const isRelated = computed(() => Boolean(relatedArticles.data?.length))
 
-  // The article pages are the desk's, under its `/helpdesk` router base.
-  const suggestedArticles = computed(() =>
-    ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map((article) => ({
-      ...article,
-      url: `/helpdesk/kb-public/articles/${article.name}`,
-    })),
+  const suggestedArticles = computed(
+    () => (isRelated.value ? relatedArticles.data : popularArticles.data) || [],
   )
 
   const suggestedHeading = computed(() =>
@@ -187,6 +184,6 @@ export default function setup(context) {
     reopenTicket,
     suggestedArticles,
     suggestedHeading,
-    openHelpArticle: (article) => (window.location.href = article.url),
+    openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
   }
 }
