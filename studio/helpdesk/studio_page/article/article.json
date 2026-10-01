@@ -396,7 +396,7 @@
                "componentProps": {
                 "fontSize": "text-sm",
                 "tag": "span",
-                "text": "\u00b7"
+                "text": "·"
                }
               },
               {
@@ -422,7 +422,7 @@
                "componentProps": {
                 "fontSize": "text-sm",
                 "tag": "span",
-                "text": "\u00b7"
+                "text": "·"
                }
               },
               {
@@ -470,7 +470,7 @@
                "componentProps": {
                 "fontSize": "text-sm",
                 "tag": "span",
-                "text": "\u00b7"
+                "text": "·"
                }
               },
               {
@@ -902,7 +902,10 @@
    ],
    "componentId": "root",
    "componentName": "div",
-   "originalElement": "body"
+   "originalElement": "body",
+   "classes": [
+    "bg-surface-base"
+   ]
   }
  ],
  "creation": "2026-10-01 15:56:40.157642",
@@ -911,7 +914,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 15:56:40.937683",
+ "modified": "2026-10-01 16:43:28.582118",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
