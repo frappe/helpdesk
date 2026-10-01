@@ -373,8 +373,7 @@ def get_custom_fields():
             },
             {
                 "fieldname": "custom_conv_state",
-                "fieldtype": "Select",
-                "options": "open\npaused\nclosed",
+                "fieldtype": "Long Text",
                 "label": "Conversation State",
                 "insert_after": "custom_client_ticket",
             },

@@ -626,3 +626,87 @@ def create_timesheet(title, project=None, task=None, hours=0, notes=""):
         pass
     frappe.db.commit()
     return {"name": ts.name, "title": title, "total_hours": float(hours), "status": ts.status}
+
+
+# === Reports ===
+
+@frappe.whitelist()
+def get_task_status_report(user=None, from_date=None, to_date=None, project=None, status=None):
+    """Per-assignee task counts by status.
+
+    Overdue overlaps Ongoing/Pending (a late task is still being worked on or not started),
+    so it is reported alongside them rather than as a separate bucket.
+    """
+    filters = [["status", "!=", "Cancelled"]]
+    if project:
+        filters.append(["project", "=", _resolve_project(str(project))])
+    if from_date:
+        filters.append(["exp_end_date", ">=", from_date])
+    if to_date:
+        filters.append(["exp_end_date", "<=", to_date])
+
+    # get_list (not get_all) so non-PM users only see their own tasks
+    tasks = frappe.get_list(
+        "Task",
+        filters=filters,
+        fields=["name", "status", "exp_end_date", "_assign"],
+        limit_page_length=0,
+    )
+
+    today = frappe.utils.getdate(frappe.utils.today())
+
+    def bucket(task):
+        if task.status == "Completed":
+            return "completed"
+        if task.status == "Open":
+            return "pending"
+        return "ongoing"  # Working, Pending Review
+
+    def is_overdue(task):
+        return bool(task.exp_end_date) and task.status != "Completed" and frappe.utils.getdate(task.exp_end_date) < today
+
+    def matches_status(task):
+        if not status:
+            return True
+        if status == "Overdue":
+            return is_overdue(task)
+        return bucket(task) == {"Completed": "completed", "Working": "ongoing", "Pending Review": "ongoing", "Open": "pending"}.get(status)
+
+    members = {}
+    summary = {"total": 0, "completed": 0, "ongoing": 0, "pending": 0, "overdue": 0}
+    for task in tasks:
+        if not matches_status(task):
+            continue
+        try:
+            assignees = json.loads(task._assign or "[]")
+        except (json.JSONDecodeError, TypeError):
+            assignees = []
+        if user and user not in assignees:
+            continue
+        # tasks are counted once in the summary even when shared by several assignees
+        summary["total"] += 1
+        summary[bucket(task)] += 1
+        summary["overdue"] += is_overdue(task)
+        for assignee in assignees or [None]:
+            if user and assignee != user:
+                continue
+            row = members.setdefault(
+                assignee or "",
+                {"user": assignee or "", "total": 0, "completed": 0, "ongoing": 0, "pending": 0, "overdue": 0},
+            )
+            row["total"] += 1
+            row[bucket(task)] += 1
+            if is_overdue(task):
+                row["overdue"] += 1
+
+    full_names = {
+        u.name: u.full_name
+        for u in frappe.get_all("User", filters={"name": ("in", [m for m in members if m])}, fields=["name", "full_name"])
+    }
+    rows = []
+    for key, row in members.items():
+        row["full_name"] = full_names.get(key) or key or _("Unassigned")
+        rows.append(row)
+    rows.sort(key=lambda r: (-r["total"], r["full_name"]))
+
+    return {"summary": summary, "members": rows}

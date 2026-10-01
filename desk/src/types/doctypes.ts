@@ -369,7 +369,7 @@ export interface HDCustomer extends DocType {
   country?: string;
 }
 
-// Last updated: 2024-03-23 16:03:23.469424
+// Last updated: 2019-10-10 22:05:54.736093
 export interface DynamicLink extends ChildDocType {
   /** Link Document Type: Link (DocType) */
   link_doctype: string;
@@ -379,7 +379,7 @@ export interface DynamicLink extends ChildDocType {
   link_title?: string;
 }
 
-// Last updated: 2024-03-23 16:01:31.173691
+// Last updated: 2019-09-24 17:47:30.565805
 export interface ContactEmail extends ChildDocType {
   /** Email ID: Data */
   email_id: string;
@@ -387,7 +387,7 @@ export interface ContactEmail extends ChildDocType {
   is_primary: 0 | 1;
 }
 
-// Last updated: 2024-03-23 16:01:31.293047
+// Last updated: 2020-04-06 18:28:10.486220
 export interface ContactPhone extends ChildDocType {
   /** Number: Data */
   phone: string;
@@ -397,7 +397,7 @@ export interface ContactPhone extends ChildDocType {
   is_primary_mobile_no: 0 | 1;
 }
 
-// Last updated: 2024-03-23 16:01:30.937045
+// Last updated: 2023-12-08 15:52:37.525003
 export interface Contact extends DocType {
   /** First Name: Data */
   first_name?: string;
@@ -408,7 +408,7 @@ export interface Contact extends DocType {
   /** User Id: Link (User) */
   user?: string;
   /** Status: Select */
-  status?: "Passive" | "Open" | "Replied";
+  status?: 'Passive' | 'Open' | 'Replied';
   /** Salutation: Link (Salutation) */
   salutation?: string;
   /** Gender: Link (Gender) */
@@ -449,6 +449,4 @@ export interface Contact extends DocType {
   company_name?: string;
   /** Full Name: Data */
   full_name?: string;
-  /** Timezone: Data (from linked User) */
-  timezone?: string;
 }
