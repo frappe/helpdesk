@@ -131,16 +131,23 @@ function handleDiscard() {
 function handleSubmit() {
   if (editorRef.value?.isEmpty() || bulkReplyResource.loading) return;
   const requestGeneration = responseGeneration;
+  const submittedMessage = content.value;
   bulkReplyResource.submit(
     {
       ticket_ids: pendingTicketIds.value,
-      message: content.value,
+      message: submittedMessage,
       attachments: (attachments.value ?? []).map((a) => a.name),
     },
     {
       onSuccess(result: BulkReplyResult) {
         // A response must not change the draft or retry targets of a newer session.
         if (!open.value || requestGeneration !== responseGeneration) {
+          // Fully sent: drop the draft so reopening cannot resend it, unless
+          // the agent has already edited it for a newer reply.
+          if (!result.failed.length && content.value === submittedMessage) {
+            content.value = "";
+            editorRef.value?.reset();
+          }
           toast.info(
             __(
               "A previous bulk reply finished: sent to {0} tickets, failed for {1} tickets.",
