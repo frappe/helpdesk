@@ -61,6 +61,5 @@ export function useReplyComposer(ticket) {
     isSending,
     uploadFile,
     send,
-    discard,
   }
 }

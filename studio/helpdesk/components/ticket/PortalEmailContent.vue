@@ -13,6 +13,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   applyCssToIframe,
   stripEmailColors,
+  useDataTheme,
 } from "@framework/ui/components/ActivityTimeline/utils";
 
 const QUOTE_SELECTORS = [
@@ -122,10 +123,15 @@ onMounted(() => {
   contextFont.value = { family: style.fontFamily, size: style.fontSize };
 });
 
+// Read once: a reactive theme in the srcdoc would reload the frame on every toggle.
+const dataTheme = useDataTheme();
+const initialTheme = dataTheme.value;
+
 const srcdoc = computed(
-  () => `<!DOCTYPE html><html><head>
+  () => `<!DOCTYPE html><html data-theme="${initialTheme}"><head>
   <meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none';" />
   <base target="_blank" />
+  <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }</style>
   </head><body class="m-0" style="font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}">
   <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
   </body></html>`
@@ -189,4 +195,8 @@ function fitFrameToContent(element: HTMLIFrameElement) {
   content.style.width = "";
   if (natural) element.style.width = `${natural}px`;
 }
+
+watch(dataTheme, (theme) =>
+  frame.value?.contentDocument?.documentElement.setAttribute("data-theme", theme)
+);
 </script>

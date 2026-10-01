@@ -150,7 +150,7 @@
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
-            "placeholder": "{{ t('Describe your issue\u2026') }}",
+            "placeholder": "{{ t('Describe your issue…') }}",
             "tags": null
            }
           }
@@ -303,6 +303,7 @@
     }
    ],
    "classes": [
+    "bg-surface-base",
     "items-center",
     "flex",
     "flex-col",
@@ -322,7 +323,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-09-30 17:58:41.316471",
+ "modified": "2026-10-01 16:51:21.324006",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",
