@@ -1,10 +1,11 @@
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
+import { useClipboard } from '@vueuse/core'
 import { call, dayjs, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
 import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
-import { matchesQuery, runAction } from '@app/utils'
+import { runAction } from '@app/utils'
 
 const WORDS_PER_MINUTE = 200
 const RELATED_LIMIT = 6
@@ -47,33 +48,17 @@ export default function setup(context) {
       : null,
   )
 
-  // Sidebar: one node per category, its articles as leaves. A category name match keeps
-  // all of its articles; otherwise only the matching titles survive.
-  const sidebarQuery = ref('')
-  const categoryTree = computed(() =>
-    (categories.data || [])
-      .map((category) => {
-        const label = category.category_name || category.name
-        const wholeCategory = matchesQuery(sidebarQuery.value, label)
-        const children = (articles.data || [])
-          .filter((row) => row.category === category.name)
-          .filter((row) => wholeCategory || matchesQuery(sidebarQuery.value, row.title))
-          .map((row) => ({ name: row.name, label: row.title, isActive: row.name === article?.data?.name }))
-        return { name: category.name, label, children, isCurrent: children.some((child) => child.isActive) }
-      })
-      .filter((category) => !sidebarQuery.value || category.children.length),
+  // Sidebar: each category with its articles, in the shape the sidebar reads.
+  const sidebarCategories = computed(() =>
+    (categories.data || []).map((category) => ({
+      name: category.name,
+      label: category.category_name || category.name,
+      icon: category.icon,
+      articles: (articles.data || [])
+        .filter((row) => row.category === category.name)
+        .map((row) => ({ name: row.name, title: row.title })),
+    })),
   )
-
-  // Open on the category being read until the reader toggles it; a search opens them all.
-  const toggled = ref({})
-  function isExpanded(name) {
-    if (sidebarQuery.value) return true
-    if (name in toggled.value) return toggled.value[name]
-    return categoryTree.value.find((category) => category.name === name)?.isCurrent || false
-  }
-  function toggleCategory(name) {
-    toggled.value = { ...toggled.value, [name]: !isExpanded(name) }
-  }
 
   const relatedArticles = computed(() =>
     (articles.data || [])
@@ -94,8 +79,10 @@ export default function setup(context) {
     )
   }
 
+  // `legacy` falls back to execCommand where the Clipboard API is missing (plain http).
+  const { copy } = useClipboard({ legacy: true })
   async function copyLink() {
-    await navigator.clipboard.writeText(window.location.href)
+    await copy(window.location.href)
     toast.success(__('Link copied'))
   }
 
@@ -113,10 +100,7 @@ export default function setup(context) {
     readingTime,
     publishedOn,
     currentCategory,
-    sidebarQuery,
-    categoryTree,
-    isExpanded,
-    toggleCategory,
+    sidebarCategories,
     relatedArticles,
     vote,
     submitFeedback,

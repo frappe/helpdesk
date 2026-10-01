@@ -52,285 +52,21 @@
        "blockName": "sidebar",
        "children": [
         {
-         "baseStyles": {
-          "flexShrink": 0,
-          "width": "100%"
-         },
-         "blockName": "search",
-         "componentId": "PortalSearchField-article",
-         "componentName": "PortalSearchField",
+         "componentId": "PortalArticleSidebar-article",
+         "componentName": "PortalArticleSidebar",
          "componentProps": {
-          "modelValue": {
-           "$type": "variable",
-           "name": "sidebarQuery"
-          },
-          "placeholder": "Search articles",
-          "shortcutVariant": "keys"
+          "activeName": "{{ article.data.name }}",
+          "categories": "{{ sidebarCategories }}"
          },
          "isCustomVueComponent": true
-        },
-        {
-         "baseStyles": {
-          "display": "flex",
-          "flexDirection": "column",
-          "gap": "6px",
-          "width": "100%"
-         },
-         "children": [
-          {
-           "children": [
-            {
-             "children": [
-              {
-               "children": [
-                {
-                 "baseStyles": {
-                  "transform": "{{ isExpanded(dataItem.name) ? 'rotate(90deg)' : 'none' }}"
-                 },
-                 "classes": [
-                  "size-3",
-                  "text-ink-gray-5",
-                  "transition-transform"
-                 ],
-                 "componentId": "tree-cat-chevron",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "lucide-chevron-right"
-                 }
-                }
-               ],
-               "classes": [
-                "items-center",
-                "rounded-full",
-                "flex",
-                "shrink-0",
-                "justify-center",
-                "p-1"
-               ],
-               "componentId": "tree-cat-chevron-badge",
-               "componentName": "container",
-               "originalElement": "div"
-              },
-              {
-               "children": [
-                {
-                 "baseStyles": {
-                  "color": "{{ dataItem.isCurrent ? 'var(--ink-gray-8)' : 'var(--ink-gray-7)' }}"
-                 },
-                 "classes": [
-                  "size-4",
-                  "shrink-0"
-                 ],
-                 "componentId": "tree-cat-icon",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "lucide-folder"
-                 }
-                },
-                {
-                 "baseStyles": {
-                  "color": "{{ dataItem.isCurrent ? 'var(--ink-gray-8)' : 'var(--ink-gray-7)' }}"
-                 },
-                 "classes": [
-                  "flex-1",
-                  "min-w-0",
-                  "truncate",
-                  "leading-[1.15]"
-                 ],
-                 "componentId": "tree-cat-label",
-                 "componentName": "TextBlock",
-                 "componentProps": {
-                  "fontSize": "text-base",
-                  "tag": "span",
-                  "text": "{{ dataItem.label }}"
-                 }
-                }
-               ],
-               "classes": [
-                "items-center",
-                "rounded-4",
-                "flex",
-                "flex-1",
-                "gap-2",
-                "min-w-0",
-                "overflow-hidden",
-                "pb-1.5",
-                "pr-2",
-                "pt-1.5"
-               ],
-               "componentId": "tree-cat-button",
-               "componentName": "container",
-               "originalElement": "div"
-              }
-             ],
-             "classes": [
-              "items-center",
-              "bg-transparent",
-              "rounded-4",
-              "shadow-none",
-              "cursor-pointer",
-              "flex",
-              "shrink-0",
-              "gap-0.5",
-              "h-7",
-              "min-w-0",
-              "pl-0.5",
-              "w-full"
-             ],
-             "componentEvents": {
-              "click": {
-               "action": "Run Script",
-               "event": "click",
-               "script": "toggleCategory(dataItem.name)"
-              }
-             },
-             "componentId": "tree-cat-header",
-             "componentName": "container",
-             "originalElement": "div"
-            },
-            {
-             "children": [
-              {
-               "baseStyles": {
-                "display": "flex",
-                "flexDirection": "column",
-                "gap": "0px",
-                "width": "100%"
-               },
-               "children": [
-                {
-                 "baseStyles": {
-                  "backgroundColor": "{{ dataItem.isActive ? 'var(--surface-base)' : '' }}",
-                  "boxShadow": "{{ dataItem.isActive ? 'var(--elevation-sm)' : 'none' }}"
-                 },
-                 "children": [
-                  {
-                   "baseStyles": {
-                    "color": "{{ dataItem.isActive ? 'var(--ink-gray-9)' : 'var(--ink-gray-5)' }}"
-                   },
-                   "classes": [
-                    "flex-1",
-                    "min-w-0",
-                    "truncate",
-                    "leading-[1.15]"
-                   ],
-                   "componentId": "tree-item-label",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-base",
-                    "tag": "span",
-                    "text": "{{ dataItem.label }}"
-                   }
-                  }
-                 ],
-                 "classes": [
-                  "hover:bg-surface-gray-2",
-                  "items-center",
-                  "rounded-4",
-                  "cursor-pointer",
-                  "flex",
-                  "shrink-0",
-                  "h-7",
-                  "ml-[39px]",
-                  "min-w-0",
-                  "overflow-hidden",
-                  "pl-[9px]",
-                  "pr-2.5",
-                  "w-[calc(100%_-_39px)]"
-                 ],
-                 "componentEvents": {
-                  "click": {
-                   "action": "Run Script",
-                   "event": "click",
-                   "script": "router.push(`/articles/${dataItem.name}`)"
-                  }
-                 },
-                 "componentId": "tree-item",
-                 "componentName": "container",
-                 "originalElement": "div"
-                }
-               ],
-               "componentId": "tree-items-repeater",
-               "componentName": "Repeater",
-               "componentProps": {
-                "data": "{{ dataItem.children }}",
-                "dataKey": "name"
-               },
-               "visibilityCondition": "{{ dataItem.children && dataItem.children.length }}"
-              }
-             ],
-             "classes": [
-              "flex",
-              "flex-col",
-              "w-full"
-             ],
-             "componentId": "tree-items-wrap",
-             "componentName": "container",
-             "originalElement": "div",
-             "visibilityCondition": "{{ isExpanded(dataItem.name) }}"
-            }
-           ],
-           "classes": [
-            "flex",
-            "flex-col",
-            "gap-0.5",
-            "min-w-0",
-            "w-full"
-           ],
-           "componentId": "tree-cat",
-           "componentName": "container",
-           "originalElement": "div"
-          }
-         ],
-         "componentId": "tree-repeater",
-         "componentName": "Repeater",
-         "componentProps": {
-          "data": "{{ categoryTree }}",
-          "dataKey": "name"
-         },
-         "visibilityCondition": "{{ categoryTree.length }}"
-        },
-        {
-         "blockName": "No search results",
-         "children": [
-          {
-           "blockName": "No search results",
-           "componentId": "article-sidebar-empty",
-           "componentName": "PortalEmptyState",
-           "componentProps": {
-            "description": "Try a different search term.",
-            "icon": "search",
-            "title": "No matching articles"
-           },
-           "isCustomVueComponent": true
-          }
-         ],
-         "classes": [
-          "items-center",
-          "flex",
-          "flex-1",
-          "justify-center",
-          "min-h-0",
-          "w-full"
-         ],
-         "componentId": "article-sidebar-empty-wrap",
-         "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": "{{ !categoryTree.length }}"
         }
        ],
        "classes": [
-        "bg-surface-base",
         "flex",
         "flex-col",
         "shrink-0",
-        "gap-2.5",
         "h-full",
-        "overflow-x-hidden",
-        "overflow-y-auto",
-        "p-4",
-        "static",
-        "w-[250px]"
+        "w-[280px]"
        ],
        "componentId": "container-mxaqix40f",
        "componentName": "container",
@@ -939,7 +675,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 17:10:25.986514",
+ "modified": "2026-10-01 17:27:50.506730",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
