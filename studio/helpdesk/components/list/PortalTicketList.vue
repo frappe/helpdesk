@@ -1,23 +1,52 @@
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <List
-      v-if="rows.length || loading"
+    <div
+      v-if="loading && !rows.length"
+      class="flex h-full w-full items-center justify-center"
+    >
+      <LoadingIndicator :scale="8" />
+    </div>
+
+    <ListView
+      v-else-if="rows.length"
       class="min-h-0 flex-1"
       :columns="columns"
       :rows="rows"
       row-key="name"
-      :loading="loading"
-      :row-link="(row) => ROUTES.ticket(row.name as string)"
-      v-model:sort="sort"
-      @column-resize="(payload) => emit('columnResize', payload)"
+      :options="{
+        selectable: true,
+        showTooltip: false,
+        resizeColumn: true,
+        onRowClick,
+      }"
     >
-      <template #cell="{ row, column }">
-        <component
-          :is="column.cell({ row, item: row[column.fieldname] })"
-          v-if="column.cell"
+      <ListHeader class="mx-3 sm:mx-5">
+        <ListHeaderItem
+          v-for="column in columns"
+          :key="column.key"
+          :item="column"
+          @columnWidthUpdated="(payload) => emit('columnResize', payload)"
         />
-      </template>
-    </List>
+      </ListHeader>
+      <ListRows class="mx-3 sm:mx-5">
+        <ListRow
+          v-for="row in rows"
+          :key="row.name"
+          :row="row"
+          v-slot="{ column, item }"
+          class="truncate text-base row"
+        >
+          <ListRowItem :item="item" :column="column" :row="row">
+            <component
+              :is="column.cell({ row, item })"
+              v-if="column.cell"
+              :key="column.key"
+            />
+          </ListRowItem>
+        </ListRow>
+      </ListRows>
+      <ListSelectBanner />
+    </ListView>
 
     <PortalEmptyState
       v-else
@@ -29,23 +58,27 @@
 
     <div v-if="rows.length" class="border-t px-3 py-2 sm:px-5">
       <ListFooter
-        v-model:page-size="pageLength"
-        :row-count="rowCount"
-        :total-count="totalCount"
-        has-counts
-        :page-size-options="pageLengthOptions"
-        @load-more="emit('loadMore')"
+        v-model="pageLength"
+        :options="{ rowCount, totalCount, pageLengthOptions }"
+        @loadMore="emit('loadMore')"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { List, ListFooter } from "@framework/ui/experimental/List";
-import type { ColumnResize } from "@framework/ui/experimental/List";
-import type { Sort } from "@framework/ui/SortBy";
+import { LoadingIndicator } from "frappe-ui";
+import {
+  ListFooter,
+  ListHeader,
+  ListHeaderItem,
+  ListRow,
+  ListRowItem,
+  ListRows,
+  ListSelectBanner,
+  ListView,
+} from "frappe-ui/experimental";
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
-import { ROUTES } from "@app/routes";
 import { loadTicketMeta } from "@app/stores/ticketMeta";
 
 // Here, not at module load: this file ships in the public page bundles too.
@@ -60,6 +93,7 @@ withDefaults(
     totalCount?: number;
     pageLengthOptions?: number[];
     emptyState?: { title: string; description?: string };
+    onRowClick?: (row: any) => void;
   }>(),
   {
     columns: () => [],
@@ -73,10 +107,12 @@ withDefaults(
 );
 
 const pageLength = defineModel<number>("pageLength", { default: 20 });
-const sort = defineModel<Sort[]>("sort", { default: () => [] });
 
 const emit = defineEmits<{
-  (e: "columnResize", payload: ColumnResize): void;
+  (
+    e: "columnResize",
+    payload: { key: string; width: string; save: boolean }
+  ): void;
   (e: "loadMore"): void;
 }>();
 </script>
