@@ -8,7 +8,6 @@ import {
   FormControl,
   frappeRequest,
   FrappeUI,
-  Input,
   setConfig,
   TextInput,
   toast,
@@ -16,10 +15,11 @@ import {
 } from "frappe-ui";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import { spritePlugin } from "frappe-ui/icons";
 import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
-import { posthogPlugin } from "./telemetry";
+import { telemetryPlugin } from "frappe-ui/frappe";
 import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";
@@ -32,7 +32,6 @@ const globalComponents = {
   ErrorMessage,
   FeatherIcon,
   FormControl,
-  Input,
   Tooltip,
   TextInput,
 };
@@ -44,13 +43,13 @@ setConfig("serverMessagesHandler", (msgs) => {
   }
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
-    if (msg && msg.message == "Feedback email has been sent to the customer") {
+    if (msg && msg.message == "Feedback email has been sent to the customer.") {
       toast.success(msg.message);
       return;
     }
     toast.create({
       message: msg.message,
-      icon: h(CircleAlert, { class: "text-blue-500" }),
+      icon: h(CircleAlert, { class: "text-ink-blue-5" }),
     });
   });
 });
@@ -65,10 +64,11 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(FrappeUI);
+app.use(spritePlugin);
 app.use(pinia);
 app.use(router);
-// app.use(posthogPlugin);
 app.use(translationPlugin);
+app.use(telemetryPlugin, { app_name: "helpdesk" });
 
 for (const c in globalComponents) {
   app.component(c, globalComponents[c]);

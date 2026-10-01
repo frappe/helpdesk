@@ -1,7 +1,6 @@
 import functools
 import json
 import re
-from typing import List
 
 import frappe
 import phonenumbers
@@ -15,9 +14,7 @@ from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
-from pypika import Criterion
 from pypika.functions import Replace
-
 
 def check_permissions(doctype, parent, doc=None):
     user = frappe.session.user
@@ -33,25 +30,11 @@ def check_permissions(doctype, parent, doc=None):
             _("Insufficient Permission for {0}").format(doctype), frappe.PermissionError
         )
 
-
 def is_admin(user: str = None) -> bool:
-    """
-    Check whether `user` is an admin
-
-    :param user: User to check against, defaults to current user
-    :return: Whether `user` is an admin
-    """
     user = user or frappe.session.user
     return user == "Administrator"
 
-
-def is_agent(user: str = None) -> bool:
-    """
-    Check whether `user` is an agent
-
-    :param user: User to check against, defaults to current user
-    :return: Whether `user` is an agent
-    """
+def is_agent(user: str | None = None) -> bool:
     user = user or frappe.session.user
     return (
         is_admin()
@@ -60,57 +43,51 @@ def is_agent(user: str = None) -> bool:
         or bool(frappe.db.exists("HD Agent", {"name": user}))
     )
 
+def get_agent_name(user: str = None) -> str | None:
+    user = user or frappe.session.user
+    return user if frappe.db.exists("HD Agent", user) else None
 
-def publish_event(event: str, data: dict, user: str = None):
-    """
-    Publish `event` to a room with `data`
-
-    :param event: Event name. Example: "refetch_resource"
-    :param data: Data to be sent with the event
-    :param user: User to send the event to, defaults to current user
-    """
-    room = get_website_room()
+def publish_event(
+    event: str,
+    room: str | None = None,
+    data: dict | None = None,
+    user: str | None = None,
+):
+    room = room or get_website_room()
     user = user or frappe.session.user
     frappe.publish_realtime(
         event, message=data, room=room, after_commit=True, user=user
     )
 
-
-def refetch_resource(key: str | List[str], user=None):
-    event = "refetch_resource"
-    data = {"cache_key": key}
-    publish_event(event, data, user=user)
-
+def get_doc_room(doctype: str, name: str) -> str:
+    return f"open_doc:{doctype}/{name}"
 
 def capture_event(event: str):
     return _capture(event, "helpdesk")
 
+def get_customers(user: str = "", contact: str = "", get_roles=False):
+    user = user or frappe.session.user
+    if not contact:
+        contact = frappe.db.get_value("Contact", {"user": user})
 
-def get_customer(contact: str) -> tuple[str]:
-    """
-    Get `Customer` from `Contact`
+    HDCustomer = frappe.qb.DocType("HD Customer")
+    HDCustomerMember = frappe.qb.DocType("HD Customer Member")
 
-    :param contact: Contact which belongs to a customer
-    :return: Customer `name` if available
-    """
-    QBDynamicLink = frappe.qb.DocType("Dynamic Link")
-    QBContact = frappe.qb.DocType("Contact")
-    conditions = [QBDynamicLink.parent == contact, QBContact.email_id == contact]
-    return [
-        i[0]
-        for i in (
-            frappe.qb.from_(QBDynamicLink)
-            .select(QBDynamicLink.link_name)
-            .where(QBDynamicLink.parentfield == "links")
-            .where(QBDynamicLink.parenttype == "Contact")
-            .where(QBDynamicLink.link_doctype == "HD Customer")
-            .join(QBContact)
-            .on(QBDynamicLink.parent == QBContact.name)
-            .where(Criterion.any(conditions))
-            .run()
-        )
-    ]
+    query = (
+        frappe.qb.from_(HDCustomerMember)
+        .where(HDCustomerMember.contact_name == contact)
+        .join(HDCustomer)
+        .on(HDCustomer.name == HDCustomerMember.parent)
+        .select(HDCustomer.name, HDCustomerMember.is_manager)
+        .distinct()
+    ).run(as_dict=True)
+    customers = [d.get("name") for d in query]
+    if get_roles:
+        customers = [
+            {"name": d.get("name"), "is_manager": d.get("is_manager")} for d in query
+        ]
 
+    return tuple(customers)
 
 def extract_mentions(html):
     if not html:
@@ -123,41 +100,20 @@ def extract_mentions(html):
         )
     return mentions
 
-
 def alphanumeric_to_int(s: str) -> int | None:
-    """
-    Get int from alphanumeric string, using regex
-    String example: "foo-123" -> 123
-
-
-    :param s: Alphanumeric string to be searched for
-    :return: Integer if a number is found
-    """
     s = re.search(r"\d+", s)
-
     if not s:
         return
-
     return int(s.group(0))
 
-
 def get_context(d: Document) -> dict:
-    """
-    Get safe context for `safe_eval`
-
-    :param doc: `Document` to add in context
-    :return: Context with `doc` and safe variables
-    """
     utils = get_safe_globals().get("frappe").get("utils")
     return {
         "doc": d.as_dict(),
         "frappe": frappe._dict(utils=utils),
     }
 
-
 def agent_only(fn):
-    """Decorator to validate if user is an agent."""
-
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         if not is_agent():
@@ -166,130 +122,66 @@ def agent_only(fn):
                 title=_("Not Allowed"),
                 exc=frappe.PermissionError,
             )
-
         return fn(*args, **kwargs)
-
     return wrapper
 
+def agent_manager_only(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        roles = set(frappe.get_roles())
+        access_roles = {"Administrator", "System Manager", "Agent Manager"}
+        if not roles.intersection(access_roles):
+            frappe.throw(
+                msg=_("You are not permitted to access this resource."),
+                title=_("Not Allowed"),
+                exc=frappe.PermissionError,
+            )
+        return fn(*args, **kwargs)
+    return wrapper
 
 def get_agents_team():
-    QBTeam = frappe.qb.DocType("HD Team")
-    QBTeamMember = frappe.qb.DocType("HD Team Member")
+    Team = frappe.qb.DocType("HD Team")
+    TeamMember = frappe.qb.DocType("HD Team Member")
 
     teams = (
-        frappe.qb.from_(QBTeamMember)
-        .where(QBTeamMember.user == frappe.session.user)
-        .join(QBTeam)
-        .on(QBTeam.name == QBTeamMember.parent)
-        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
+        frappe.qb.from_(TeamMember)
+        .join(Team)
+        .on(Team.name == TeamMember.parent)
+        .where(TeamMember.user == frappe.session.user)
+        .where(Team.disabled == 0)
+        .select(Team.team_name, Team.ignore_restrictions)
         .run(as_dict=True)
     )
     return teams
 
-
 contact_default_columns = [
-    {
-        "label": "Name",
-        "type": "Data",
-        "key": "full_name",
-        "width": "17rem",
-    },
-    {
-        "label": "Email",
-        "type": "Data",
-        "key": "email_id",
-        "width": "24rem",
-    },
-    {
-        "label": "Created On",
-        "type": "Datetime",
-        "key": "creation",
-        "width": "8rem",
-    },
+    {"label": "Name", "type": "Data", "key": "full_name", "width": "17rem"},
+    {"label": "Email", "type": "Data", "key": "email_id", "width": "17rem"},
+    {"label": "Mobile", "type": "Data", "key": "mobile_no", "width": "12rem"},
+    {"label": "Created On", "type": "Datetime", "key": "creation", "width": "8rem"},
 ]
+
+contact_default_rows = ["name", "email_id", "mobile_no", "image", "creation"]
 
 call_log_default_columns = [
-    {
-        "label": "Name",
-        "type": "Data",
-        "key": "name",
-        "width": "9rem",
-    },
-    {
-        "label": "Caller",
-        "type": "Link",
-        "key": "caller",
-        "options": "User",
-        "width": "12rem",
-    },
-    {
-        "label": "Receiver",
-        "type": "Link",
-        "key": "receiver",
-        "options": "User",
-        "width": "12rem",
-    },
-    {
-        "label": "Type",
-        "type": "Select",
-        "key": "type",
-        "width": "9rem",
-    },
-    {
-        "label": "Medium",
-        "type": "Select",
-        "key": "telephony_medium",
-        "width": "9rem",
-    },
-    {
-        "label": "Status",
-        "type": "Select",
-        "key": "status",
-        "width": "9rem",
-    },
-    {
-        "label": "Duration",
-        "type": "Duration",
-        "key": "duration",
-        "width": "6rem",
-    },
-    {
-        "label": "From (number)",
-        "type": "Data",
-        "key": "from",
-        "width": "9rem",
-    },
-    {
-        "label": "To (number)",
-        "type": "Data",
-        "key": "to",
-        "width": "9rem",
-    },
-    {
-        "label": "Created On",
-        "type": "Datetime",
-        "key": "creation",
-        "width": "8rem",
-    },
+    {"label": "Name", "type": "Data", "key": "name", "width": "9rem"},
+    {"label": "Caller", "type": "Link", "key": "caller", "options": "User", "width": "12rem"},
+    {"label": "Receiver", "type": "Link", "key": "receiver", "options": "User", "width": "12rem"},
+    {"label": "Type", "type": "Select", "key": "type", "width": "9rem"},
+    {"label": "Medium", "type": "Select", "key": "telephony_medium", "width": "9rem"},
+    {"label": "Status", "type": "Select", "key": "status", "width": "9rem"},
+    {"label": "Duration", "type": "Duration", "key": "duration", "width": "6rem"},
+    {"label": "From (number)", "type": "Data", "key": "from", "width": "9rem"},
+    {"label": "To (number)", "type": "Data", "key": "to", "width": "9rem"},
+    {"label": "Created On", "type": "Datetime", "key": "creation", "width": "8rem"},
 ]
-
 
 def seconds_to_duration(seconds):
     if not seconds:
         return "0s"
-
     hours = floor(seconds // 3600)
     minutes = floor((seconds % 3600) // 60)
     seconds = floor((seconds % 3600) % 60)
-
-    # 1h 0m 0s -> 1h
-    # 0h 1m 0s -> 1m
-    # 0h 0m 1s -> 1s
-    # 1h 1m 0s -> 1h 1m
-    # 1h 0m 1s -> 1h 1s
-    # 0h 1m 1s -> 1m 1s
-    # 1h 1m 1s -> 1h 1m 1s
-
     if hours and minutes and seconds:
         return f"{hours}h {minutes}m {seconds}s"
     elif hours and minutes:
@@ -307,13 +199,9 @@ def seconds_to_duration(seconds):
     else:
         return "0s"
 
-
 def parse_phone_number(phone_number, default_country="IN"):
     try:
-        # Parse the number
         number = phonenumbers.parse(phone_number, default_country)
-
-        # Get various information about the number
         result = {
             "is_valid": phonenumbers.is_valid_number(number),
             "country_code": number.country_code,
@@ -328,16 +216,13 @@ def parse_phone_number(phone_number, default_country="IN"):
             "country": phonenumbers.region_code_for_number(number),
             "is_possible": phonenumbers.is_possible_number(number),
         }
-
         return {"success": True, **result}
     except NumberParseException as e:
         return {"success": False, "error": str(e)}
 
-
 def get_contact(phone_number):
     if not phone_number:
         return {"mobile_no": phone_number}
-
     cleaned_number = (
         phone_number.strip()
         .replace(" ", "")
@@ -346,15 +231,10 @@ def get_contact(phone_number):
         .replace(")", "")
         .replace("+", "")
     )
-
-    # Check if the number is associated with a contact
     Contact = frappe.qb.DocType("Contact")
     normalized_phone = Replace(
-        Replace(
-            Replace(Replace(Replace(Contact.phone, " ", ""), "-", ""), "(", ""), ")", ""
-        ),
-        "+",
-        "",
+        Replace(Replace(Replace(Replace(Contact.phone, " ", ""), "-", ""), "(", ""), ")", ""),
+        "+", "",
     )
     query = (
         frappe.qb.from_(Contact)
@@ -365,15 +245,12 @@ def get_contact(phone_number):
     contacts = query.run(as_dict=True)
     return contacts[0] if contacts else {"mobile_no": phone_number}
 
-
 def get_contact_by_phone_number(phone_number):
-    """Get contact by phone number."""
     number = parse_phone_number(phone_number)
     if number.get("is_valid"):
         return get_contact(number.get("national_number"))
     else:
         return get_contact(phone_number)
-
 
 def parse_call_log(call):
     call["show_recording"] = False
@@ -382,11 +259,8 @@ def parse_call_log(call):
         call["activity_type"] = "incoming_call"
         contact = get_contact_by_phone_number(call.get("from"))
         receiver = (
-            frappe.db.get_values(
-                "User", call.get("receiver"), ["full_name", "user_image"]
-            )[0]
-            if call.get("receiver")
-            else [None, None]
+            frappe.db.get_values("User", call.get("receiver"), ["full_name", "user_image"])[0]
+            if call.get("receiver") else [None, None]
         )
         call["_caller"] = {
             "label": contact.get("full_name", "Unknown"),
@@ -400,11 +274,8 @@ def parse_call_log(call):
         call["activity_type"] = "outgoing_call"
         contact = get_contact_by_phone_number(call.get("to"))
         caller = (
-            frappe.db.get_values(
-                "User", call.get("caller"), ["full_name", "user_image"]
-            )[0]
-            if call.get("caller")
-            else [None, None]
+            frappe.db.get_values("User", call.get("caller"), ["full_name", "user_image"])[0]
+            if call.get("caller") else [None, None]
         )
         call["_caller"] = {
             "label": caller[0] or "Unknown",
@@ -414,13 +285,10 @@ def parse_call_log(call):
             "label": contact.get("full_name", "Unknown"),
             "image": contact.get("image"),
         }
-
     return call
-
 
 def parse_call_logs(calls):
     return [parse_call_log(call) for call in calls] if calls else []
-
 
 def is_json_valid(json_string):
     try:
@@ -428,3 +296,57 @@ def is_json_valid(json_string):
         return True
     except json.JSONDecodeError:
         return False
+
+def is_frappe_version(version: str, above: bool = False, below: bool = False):
+    from frappe.pulse.utils import get_frappe_version
+    current_version = get_frappe_version()
+    major_version = int(current_version.split(".")[0])
+    target_version = int(version.split(".")[0])
+    if above:
+        return major_version >= target_version
+    if below:
+        return major_version < target_version
+    return major_version == target_version
+
+def format_time_difference(dt, context="ago"):
+    if not dt:
+        return ""
+    now = frappe.utils.now_datetime()
+    if isinstance(dt, str):
+        dt = frappe.utils.get_datetime(dt)
+    if context == "until":
+        diff = dt - now
+        past_label = "overdue"
+    else:
+        diff = now - dt
+        past_label = "0m"
+    total_seconds = diff.total_seconds()
+    if total_seconds < 0:
+        return past_label
+    if total_seconds < 3600:
+        return f"{int(total_seconds // 60)}m"
+    elif total_seconds < 86400:
+        return f"{int(total_seconds // 3600)}h"
+    else:
+        return f"{int(total_seconds // 86400)}d"
+
+def get_country_from_timezone(time_zone: str):
+    country = frappe.db.get_value(
+        "Country", {"time_zones": ["like", f"%{time_zone}%"]}, "name"
+    )
+    return country or None
+
+
+# === QCS Support Hub helpers ===
+
+def normalize_site_url(raw: str | None) -> str | None:
+    if not raw:
+        return raw
+    value = raw.strip().rstrip("/")
+    if not value:
+        return value
+    if "://" in value:
+        return value
+    host = value.split("/")[0]
+    scheme = "http" if "localhost" in host.lower() else "https"
+    return f"{scheme}://{value}"

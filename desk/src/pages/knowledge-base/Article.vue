@@ -2,16 +2,25 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-1 items-center crumbs truncate">
-          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
+        <div class="flex gap-2 items-center crumbs max-w-[50vw]">
+          <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
+          <Badge
+            v-if="!article.loading"
+            variant="subtle"
+            :theme="article.data?.status === 'Draft' ? 'orange' : 'green'"
+            size="md"
+            >{{ article.data?.status }}</Badge
+          >
         </div>
       </template>
       <template #right-header v-if="!isCustomerPortal">
         <!-- Default Buttons -->
-        <div class="flex gap-2" v-if="!editable">
+        <div class="flex gap-2" v-if="!editable && !article.loading">
           <Button
-            :label="article.data?.status === 'Draft' ? 'Publish' : 'Unpublish'"
-            :iconLeft="article.data?.status !== 'Published' && 'globe'"
+            :label="
+              article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
+            "
+            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
             @click="toggleStatus()"
           />
         </div>
@@ -29,124 +38,262 @@
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
-          <div class="flex gap-1 items-center justify-between">
-            <div class="flex gap-1 items-center">
-              <!-- Avatar -->
-              <div class="flex gap-1 items-center justify-center">
-                <Avatar
-                  :image="article.data.author.image"
-                  :label="article.data.author.name"
-                />
-                <span
-                  class="truncate capitalize text-base text-ink-gray-9 font-medium"
-                >
-                  {{ article.data.author.name }}
-                </span>
+          <!-- Title -->
+          <div class="flex sm:flex-row flex-col justify-between">
+            <div class="w-full">
+              <textarea
+                ref="titleRef"
+                class="w-full resize-none border-0 text-4xl-bold bg-transparent placeholder-ink-gray-3 p-0 focus:ring-0 overflow-hidden"
+                v-model="title"
+                :placeholder="__('Title')"
+                rows="1"
+                wrap="soft"
+                maxlength="140"
+                autofocus
+                :disabled="!editable"
+              />
+              <div
+                v-if="!editable && isCustomerPortal"
+                class="flex gap-1 items-center pt-1.5"
+              >
+                <!-- Avatar -->
+                <div class="flex gap-2 pb-1.5 items-center justify-center">
+                  <Avatar
+                    :image="article.data.author.image"
+                    :label="article.data.author.name"
+                    size="md"
+                  />
+                  <div class="flex gap-1 items-end">
+                    <p class="truncate capitalize text-base text-ink-gray-7">
+                      {{ article.data.author.name }}
+                    </p>
+                    <IconDot class="h-4 w-4 text-ink-gray-5" />
+                    <div class="text-base text-ink-gray-7">
+                      {{
+                        dayjsLocal(article.data.modified).format(
+                          "MMM D, h:mm A"
+                        )
+                      }}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <IconDot class="h-4 w-4 text-gray-600" />
-              <div class="text-xs text-gray-500">
-                {{ dayjs(article.data.modified).short() }}
+              <div
+                v-if="!editable && !isCustomerPortal && !isMobileView"
+                class="text-p-sm text-ink-gray-4 items-center"
+              >
+                <span>{{ views }} views</span>
               </div>
             </div>
-            <Dropdown
-              :options="articleActions"
-              v-if="!editable && !isCustomerPortal"
-            >
-              <Button variant="ghost">
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
-            </Dropdown>
-            <div class="flex gap-2" v-if="editable">
-              <DiscardButton
-                :hide-dialog="!isDirty"
-                title="Discard changes?"
-                message="Are you sure you want to discard changes?"
-                @discard="handleDiscard"
-              />
+            <div class="flex gap-4 justify-between sm:items-start">
+              <div class="flex gap-4 text-p-sm items-center">
+                <div
+                  class="flex items-center gap-2"
+                  v-if="!editable && !isCustomerPortal"
+                >
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    class="flex shrink-0 !w-auto"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ likes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsUpFilledIcon
+                        v-if="feedback === 1 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsUpIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    class="flex shrink-0 !w-auto"
+                    :disabled="!isCustomerPortal"
+                  >
+                    <template #suffix>
+                      {{ dislikes }}
+                    </template>
+                    <template #icon>
+                      <ThumbsDownFilledIcon
+                        v-if="feedback === 2 && isCustomerPortal"
+                        class="size-4"
+                      />
+                      <ThumbsDownIcon v-else class="size-4" />
+                    </template>
+                  </Button>
+                </div>
+              </div>
+              <div class="flex gap-1 items-start justify-between">
+                <Dropdown
+                  :options="articleActions"
+                  v-if="!editable && !isCustomerPortal"
+                  @click="isConfirmingDeleteArticle = false"
+                >
+                  <Button size="md" variant="ghost">
+                    <template #icon>
+                      <IconMoreHorizontal class="h-4 w-4" />
+                    </template>
+                  </Button>
+                </Dropdown>
+                <div class="flex gap-2" v-if="editable">
+                  <DiscardButton
+                    :disabled="!isDirty"
+                    :hide-dialog="!isDirty"
+                    :title="__('Discard changes?')"
+                    :message="__('Are you sure you want to discard changes?')"
+                    @discard="handleDiscard"
+                  />
 
-              <Button label="Save" @click="handleSave" variant="solid" />
+                  <Button
+                    :label="__('Save')"
+                    @click="handleSave"
+                    variant="solid"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <!-- Title -->
-          <textarea
-            ref="titleRef"
-            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200 overflow-hidden"
-            v-model="title"
-            placeholder="Title"
-            rows="1"
-            wrap="soft"
-            maxlength="140"
-            autofocus
-            :disabled="!editable"
-          />
         </div>
+
         <!-- Article Content -->
-        <TextEditor
+        <Editor
           ref="editorRef"
-          :editor-class="editorClass"
-          :content="textEditorContentWithIDs"
-          :extensions="[PreserveIds]"
+          :model-value="textEditorContentWithIDs"
+          :extensions="extensions"
           :editable="editable"
-          @change="(event:string) => {
-			      content = event;
-		      }"
-          placeholder="Write your article here..."
+          :upload-function="(file:any) => uploadFunction(file, 'HD Article', articleId, false)"
+          @change="(event:string) => { content = event; }"
+          :placeholder="__('Write your article here...')"
         >
-          <template #bottom v-if="editable">
-            <TextEditorFixedMenu
+          <template #default>
+            <EditorContent :class="editorClass" />
+            <EditorFixedMenu
+              v-if="editable"
               class="-ml-1 overflow-x-auto w-full"
-              :buttons="textEditorMenuButtons"
+              :items="fullToolbar"
             />
           </template>
-        </TextEditor>
+        </Editor>
+        <div
+          v-if="!editable && !isCustomerPortal"
+          class="flex gap-1 items-center pt-1.5 mt-4"
+        >
+          <!-- Avatar -->
+          <div class="flex gap-2 items-center justify-center">
+            <Avatar
+              :image="article.data.author.image"
+              :label="article.data.author.name"
+              size="lg"
+            />
+            <div class="flex flex-col justify-start gap-1">
+              <p class="truncate capitalize text-p-base-medium text-ink-gray-9">
+                <span class="text-base text-ink-gray-5">published by </span>
+                {{ article.data.author.name }}
+              </p>
+              <div class="flex items-center gap-1">
+                <span class="text-p-xs text-ink-gray-7">
+                  {{
+                    dayjsLocal(article.data.modified).format("MMM D, h:mm A")
+                  }}
+                </span>
+                <IconDot
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="h-4 w-4 text-ink-gray-5"
+                />
+
+                <span
+                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  class="text-p-xs text-ink-gray-4 items-center"
+                  >{{ views }} views</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
       <div class="p-4" v-if="isCustomerPortal">
         <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>
-    <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
+    <!-- Loading State -->
+    <div
+      v-if="article.loading"
+      class="w-full h-screen flex items-center justify-center"
+    >
+      <LoadingIndicator :scale="10" />
+    </div>
+    <MoveToCategoryModal
+      v-model="moveToModal"
+      @move="handleMoveToCategory"
+      :exclude-category="article.data?.category_id"
+    />
+    <CategoryModal
+      :edit="editTitle"
+      v-model:title="category.title"
+      v-model="showCategoryModal"
+      @create="handleCategoryCreate"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import {
+  ThumbsDownFilledIcon,
+  ThumbsDownIcon,
+  ThumbsUpFilledIcon,
+  ThumbsUpIcon,
+} from "@/components/icons";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { dayjs } from "@/dayjs";
+import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
-import { globalStore } from "@/stores/globalStore";
 import {
   deleteRes as deleteArticle,
   incrementView,
   moveToCategory,
+  newCategory,
   updateRes as updateArticle,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
-import { PreserveIds } from "@/tiptap-extensions";
+import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
+  ConfirmDelete,
   copyToClipboard,
   isCustomerPortal,
-  textEditorMenuButtons,
+  uploadFunction,
 } from "@/utils";
 import {
   Avatar,
+  Badge,
   Breadcrumbs,
   Button,
   createResource,
+  dayjsLocal,
   debounce,
   Dropdown,
-  TextEditor,
-  TextEditorFixedMenu,
+  LoadingIndicator,
   toast,
+  usePageMeta,
 } from "frappe-ui";
-import { computed, h, onMounted, ref, watch } from "vue";
+import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
+import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+
+const extensions = buildEditorExtensions();
+const { isMobileView } = useScreenSize();
+
 const props = defineProps({
   articleId: {
     type: String,
@@ -154,7 +301,43 @@ const props = defineProps({
   },
 });
 
-const { $dialog } = globalStore();
+const showCategoryModal = ref(false);
+const editTitle = ref(false);
+
+function handleCategoryCreate() {
+  newCategory.submit(
+    {
+      title: category.title,
+    },
+    {
+      onSuccess: (data: any) => {
+        showCategoryModal.value = false;
+        router.push({
+          name: "Article",
+          params: {
+            articleId: data.article,
+          },
+          query: {
+            category: data.category,
+            title: category.title,
+            isEdit: 1,
+          },
+        });
+        //update category name in breadcrumb
+        article.data.category_name = category.title;
+        toast.success(__("Category created successfully."));
+      },
+      onError: (error: string) => {
+        toast.error(error);
+      },
+    }
+  );
+}
+
+const category = reactive({
+  title: "",
+  id: "",
+});
 
 const router = useRouter();
 const route = useRoute();
@@ -162,7 +345,9 @@ const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
-
+const likes = ref(0);
+const dislikes = ref(0);
+const views = ref(0);
 const content = ref("");
 const title = ref("");
 const feedback = ref<FeedbackAction>();
@@ -178,6 +363,14 @@ watch(
     }
   }
 );
+
+const categories = createResource({
+  url: "frappe.client.get_count",
+  makeParams: () => ({
+    doctype: "HD Article Category",
+  }),
+  auto: true,
+});
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.api.knowledge_base.get_article",
@@ -209,6 +402,17 @@ const article: Resource<Article> = createResource({
   },
 });
 
+const articleStats = createResource({
+  url: "helpdesk.api.article.get_article_stats",
+  params: { article_name: props.articleId },
+  onSuccess(data) {
+    likes.value = data.likes;
+    dislikes.value = data.dislikes;
+    views.value = data.views;
+  },
+  auto: true,
+});
+
 function incrementArticleViews(articleId: string) {
   incrementView.submit(
     {
@@ -235,6 +439,9 @@ const toggleStatus = debounce(() => {
     },
     {
       onSuccess: () => {
+        if (status === "Published")
+          toast.success("Article published successfully.");
+        else toast.success("Article unpublished successfully.");
         article.reload();
       },
     }
@@ -254,7 +461,7 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         article.reload();
         moveToModal.value = false;
-        toast.success("Article moved");
+        toast.success(__(`Article has been successfully moved.`));
       },
       onError: (error: Error) => {
         let msg = error?.messages?.[0] || error.message;
@@ -267,7 +474,7 @@ function handleMoveToCategory(category: string) {
 
 function handleEditMode() {
   editable.value = true;
-  editorRef.value.editor.chain().focus("start");
+  editorRef.value.editor.chain().focus("end").run();
 }
 
 function handleDiscard() {
@@ -275,9 +482,37 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
+  const original = addLinksToHeadings(article.data.content);
+  textEditorContentWithIDs.value = null;
+  nextTick(() => {
+    textEditorContentWithIDs.value = original;
+  });
+}
+
+function hasParagraphContent(html: string) {
+  if (!html) return false;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const paragraphs = doc.querySelectorAll("p");
+  return Array.from(paragraphs).some((p) => {
+    return p.textContent.trim().length > 0;
+  });
 }
 
 function handleSave() {
+  const titleVal = title.value?.trim();
+  const bodyText = hasParagraphContent(content.value);
+
+  if (!titleVal) {
+    toast.error(__("Article title cannot be set as empty"));
+    return;
+  }
+
+  if (!bodyText) {
+    toast.error(__("Article body cannot be set as empty."));
+    return;
+  }
+
   editable.value = false;
   handleArticleUpdate();
 }
@@ -300,7 +535,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        toast.success("Article updated");
+        toast.success(__("Article updated successfully."));
         isDirty.value = false;
         article.reload();
       },
@@ -309,37 +544,25 @@ function handleArticleUpdate() {
 }
 
 function handleDelete() {
-  $dialog({
-    title: "Delete Article",
-    message: "Are you sure you want to delete this article?",
-    actions: [
-      {
-        label: "Confirm",
-        variant: "solid",
-        onClick({ close }) {
-          deleteArticle.submit(
-            {
-              doctype: "HD Article",
-              name: article.data.name,
-            },
-            {
-              onSuccess: () => {
-                toast.success("Article deleted");
-                router.push({
-                  name: "AgentKnowledgeBase",
-                });
-              },
-            }
-          );
-          close();
-        },
+  deleteArticle.submit(
+    { doctype: "HD Article", name: article.data.name },
+    {
+      onSuccess: () => {
+        toast.success(__("Article deleted successfully."));
+        router.push({ name: "AgentKnowledgeBase" });
       },
-    ],
-  });
+    }
+  );
 }
-
-const textEditorContentWithIDs = computed(() =>
-  article.data?.content ? addLinksToHeadings(article.data?.content) : null
+const textEditorContentWithIDs = ref(null);
+watch(
+  () => article.data?.content,
+  (newContent) => {
+    if (newContent) {
+      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+    }
+  },
+  { immediate: true }
 );
 
 function addLinksToHeadings(content: string) {
@@ -369,6 +592,13 @@ function scrollToHeading() {
   }, 500);
 }
 
+watch(articleStats.data, () => {
+  if (articleStats.data) {
+    likes.value = articleStats.data.likes;
+    dislikes.value = articleStats.data.dislikes;
+  }
+});
+
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =
     newContent !== article.data.content || newTitle !== article.data.title;
@@ -382,43 +612,49 @@ const editorClass = computed(() => {
   ];
 });
 
+const isConfirmingDeleteArticle = ref(false);
+
 const articleActions = computed(() => [
   {
-    label: "Edit",
-    icon: "edit",
+    label: __("Edit"),
+    icon: "lucide-edit",
     onClick: () => {
       handleEditMode();
     },
   },
+
+  ...(categories.data && categories.data > 1
+    ? [
+        {
+          label: __("Move To"),
+          icon: "lucide-corner-up-right",
+          onClick: () => (moveToModal.value = true),
+        },
+      ]
+    : [
+        {
+          label: __("Add Category"),
+          icon: "lucide-folder-plus",
+          onClick: () => (showCategoryModal.value = true),
+        },
+      ]),
   {
-    label: "Move To",
-    icon: "corner-up-right",
-    onClick: () => (moveToModal.value = true),
-  },
-  {
-    label: "Share",
-    icon: "link",
+    label: __("Share"),
+    icon: "lucide-link",
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.toString(), "Article link copied to clipboard");
+      copyToClipboard(url.toString(), __("Article link copied to clipboard"));
     },
   },
   {
-    group: "Danger",
+    group: __("Danger"),
     hideLabel: true,
     items: [
-      {
-        label: "Delete",
-        component: h(Button, {
-          label: "Delete",
-          variant: "ghost",
-          iconLeft: "trash-2",
-          theme: "red",
-          style: "width: 100%; justify-content: flex-start;",
-          onClick: handleDelete,
-        }),
-      },
+      ...ConfirmDelete({
+        onConfirmDelete: handleDelete,
+        isConfirmingDelete: isConfirmingDeleteArticle,
+      }),
     ],
   },
 ]);
@@ -426,7 +662,7 @@ const articleActions = computed(() => [
 const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
-      label: "Knowledge Base",
+      label: isMobileView.value ? "" : __("Knowledge Base"),
       route: {
         name: isCustomerPortal.value
           ? "CustomerKnowledgeBase"
@@ -465,5 +701,11 @@ onMounted(() => {
   setTimeout(() => {
     scrollToHeading();
   }, 100);
+});
+
+usePageMeta(() => {
+  return {
+    title: article.data?.title + ` - ${article.data?.category_name} `,
+  };
 });
 </script>

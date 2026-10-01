@@ -1,15 +1,17 @@
 <template>
-  <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center">
+  <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center relative">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
+        <div class="text-lg-medium text-ink-gray-9">Knowledge Base</div>
       </template>
     </LayoutHeader>
     <div
       class="max-w-4xl 2xl:max-w-5xl pt-4 sm:px-5 w-full flex flex-col gap-4"
     >
       <SearchPopover
-        :popoverClass="['max-w-[310px] md:max-w-[842px] !top-1']"
+        :popoverClass="[
+          'max-w-[310px] md:max-w-[856px] !top-1 md:min-w-[856px]',
+        ]"
         v-model="query"
         placeholder="Ask a question..."
         size="md"
@@ -19,7 +21,7 @@
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
         <!-- Heading -->
-        <p class="text-lg text-gray-900">Categories</p>
+        <p class="text-lg text-ink-gray-9">Categories</p>
         <CategoryFolderContainer />
       </section>
     </div>

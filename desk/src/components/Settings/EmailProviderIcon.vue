@@ -1,27 +1,32 @@
 <template>
   <div
-    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200"
-    :class="{ 'ring-2 ring-blue-500': selected }"
+    class="flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-gray-2 hover:bg-surface-gray-3"
+    :class="{ 'ring-2 ring-outline-blue-4': selected }"
   >
-    <img :src="logo" class="h-6 w-6" />
+    <img v-if="logoValue" :src="logoValue" class="size-4.5" />
+    <LucideMail v-else class="size-4.5 text-ink-gray-7" />
   </div>
-  <p v-if="serviceName" class="text-center text-p-xs text-gray-700">
+  <p v-if="serviceName" class="text-center text-p-xs text-ink-gray-7">
     {{ serviceName }}
   </p>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import LucideMail from "~icons/lucide/mail";
 interface P {
   serviceName?: string;
   logo?: string;
   selected?: boolean;
 }
 
-withDefaults(defineProps<P>(), {
+const props = withDefaults(defineProps<P>(), {
   serviceName: "",
   selected: false,
   logo: "",
 });
+
+const logoValue = computed(() => props.logo);
 </script>
 
 <style scoped></style>

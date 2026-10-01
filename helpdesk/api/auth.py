@@ -1,5 +1,6 @@
 import frappe
 
+from helpdesk.utils import agent_only, get_agent_name, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -14,6 +15,7 @@ def get_user():
         "user_image",
         "username",
         "time_zone",
+        "language",
     ]
     user = frappe.get_value(
         doctype="User",
@@ -22,20 +24,44 @@ def get_user():
         as_dict=True,
     )
 
+    roles = frappe.get_roles(current_user)
+    is_admin = "System Manager" in roles or "Administrator" in roles
+
     is_agent = _is_agent()
-    is_admin = ("System Manager" or "Admistrator") in frappe.get_roles(current_user)
+    agent_name = get_agent_name()
+    has_agent_record = bool(agent_name)
     has_desk_access = is_agent or is_admin
+    availability = (
+        frappe.db.get_value(
+            "HD Agent",
+            agent_name,
+            ["availability", "availability_changed_on"],
+            as_dict=True,
+        )
+        if agent_name
+        else None
+    ) or {}
     user_image = user.user_image
     user_first_name = user.first_name
     user_name = user.full_name
     user_id = user.name
     username = user.username
     is_manager = ("Agent Manager") in frappe.get_roles(current_user)
+    language = user.language or frappe.db.get_single_value(
+        "System Settings", "language"
+    )
+    user_team = get_agents_team()
+    user_team_names = [team["team_name"] for team in user_team]
+    # Ride the boot so the onboarding guard decides without an extra round-trip.
+    persona_captured = bool(
+        frappe.db.get_single_value("HD Settings", "persona_captured")
+    )
 
     return {
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,
+        "has_agent_record": has_agent_record,
         "user_id": user_id,
         "is_manager": is_manager,
         "user_image": user_image,
@@ -43,45 +69,46 @@ def get_user():
         "user_name": user_name,
         "username": username,
         "time_zone": user.time_zone,
+        "language": language,
+        "user_teams": user_team_names,
+        "availability": availability.get("availability"),
+        "availability_changed_on": availability.get("availability_changed_on"),
+        "persona_captured": persona_captured,
     }
 
 
-@frappe.whitelist(allow_guest=True)
-def oauth_providers():
-    from frappe.utils.html_utils import get_icon_html
-    from frappe.utils.oauth import get_oauth2_authorize_url, get_oauth_keys
-    from frappe.utils.password import get_decrypted_password
+@frappe.whitelist()
+@agent_only
+def get_current_user_email_info():
+    user = frappe.session.user
 
-    out = []
-    providers = frappe.get_all(
-        "Social Login Key",
-        filters={"enable_social_login": 1},
-        fields=["name", "client_id", "base_url", "provider_name", "icon"],
-        order_by="name",
+    email_signature, email = frappe.db.get_value(
+        "User", user, ["email_signature", "email"]
+    )
+    user_emails = frappe.db.get_all(
+        "User Email",
+        filters={"parent": user},
+        fields=["email_account", "email_id"],
+    )
+    outgoing_account_names = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        pluck="name",
     )
 
-    for provider in providers:
-        client_secret = get_decrypted_password(
-            "Social Login Key", provider.name, "client_secret"
-        )
-        if not client_secret:
-            continue
+    outgoing_emails = [
+        row for row in user_emails if row.email_account in outgoing_account_names
+    ]
 
-        icon = None
-        if provider.icon:
-            if provider.provider_name == "Custom":
-                icon = get_icon_html(provider.icon, small=True)
-            else:
-                icon = f"<img src='{provider.icon}' alt={provider.provider_name}>"
+    available_emails = frappe.db.get_all(
+        "Email Account",
+        filters={"enable_outgoing": 1},
+        fields=["name", "email_id"],
+    )
 
-        if provider.client_id and provider.base_url and get_oauth_keys(provider.name):
-            out.append(
-                {
-                    "name": provider.name,
-                    "provider_name": provider.provider_name,
-                    "auth_url": get_oauth2_authorize_url(provider.name, "/helpdesk"),
-                    "icon": icon,
-                }
-            )
-
-    return out
+    return {
+        "email_signature": email_signature,
+        "email": email,
+        "outgoing_emails": outgoing_emails,
+        "available_emails": available_emails,
+    }

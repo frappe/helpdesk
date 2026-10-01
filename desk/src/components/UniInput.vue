@@ -1,32 +1,42 @@
 <template>
   <div class="space-y-1.5" v-if="field.display_via_depends_on">
-    <span class="block text-sm text-gray-700">
+    <span class="block text-sm text-ink-gray-7">
       {{ field.label }}
-      <span v-if="field.required" class="place-self-center text-red-500">
+      <span v-if="field.required" class="place-self-center text-ink-red-6">
         *
       </span>
     </span>
-    <component
-      :is="component"
-      :placeholder="placeholder"
-      :value="transValue"
-      :disabled="field.disabled"
-      :model-value="transValue"
-      @update:model-value="emitUpdate(field.fieldname, $event)"
-      @change="
-        emitUpdate(
-          field.fieldname,
-          $event.target?.value || $event.value || $event
-        )
-      "
-    />
+    <div class="flex gap-2 items-center [&>div]:flex-1">
+      <component
+        class="w-full"
+        :is="component"
+        :placeholder="placeholder"
+        :value="transValue"
+        :disabled="field.disabled"
+        :model-value="transValue"
+        @update:model-value="emitUpdate(field.fieldname, $event)"
+        @change="
+          emitUpdate(
+            field.fieldname,
+            $event.target?.value || $event.value || $event
+          )
+        "
+      />
+      <slot name="label-extra" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Autocomplete, Link } from "@/components";
-import { Field } from "@/types";
-import { createResource, FormControl } from "frappe-ui";
+import { APIOptions, Field } from "@/types";
+import { parseApiOptions } from "@/utils";
+import {
+  createResource,
+  DatePicker,
+  DateTimePicker,
+  FormControl,
+} from "frappe-ui";
 import { computed, h } from "vue";
 
 type Value = string | number | boolean;
@@ -58,12 +68,13 @@ const component = computed(() => {
     return h(Link, {
       doctype: props.field.options,
       filters: props.field.filters,
+      pageLength: 999,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
       options: props.field.options
-        .split("\n")
-        .map((o) => ({ label: o, value: o })),
+        ? props.field.options.split("\n").map((o) => ({ label: o, value: o }))
+        : [],
       size: "sm",
     });
   } else if (props.field.fieldtype === "Check") {
@@ -80,6 +91,15 @@ const component = computed(() => {
       ],
       size: "sm",
     });
+  } else if (props.field.fieldtype === "Datetime") {
+    return h(DateTimePicker, {
+      format: `${window.date_format.toUpperCase()} ${window.time_format}`,
+    });
+  } else if (props.field.fieldtype === "Date") {
+    return h(DatePicker, {
+      id: props.field.fieldname,
+      format: window.date_format.toUpperCase(),
+    });
   } else {
     return h(FormControl, {
       debounce: 500,
@@ -90,11 +110,9 @@ const component = computed(() => {
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) =>
-    data?.map((o) => ({
-      label: o,
-      value: o,
-    })) || [],
+  transform: (data: APIOptions) => {
+    return parseApiOptions(data);
+  },
 });
 
 const transValue = computed(() => {
@@ -110,8 +128,13 @@ const placeholder = computed(() => {
   }
   if (props.field.fieldtype === "Data" && !props.field.url_method) {
     return "Type something";
+  } else if (
+    props.field.fieldtype === "Select" ||
+    props.field.fieldtype === "Link"
+  ) {
+    return "Select an option";
   }
-  return "Select an option";
+  return "Type something";
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {

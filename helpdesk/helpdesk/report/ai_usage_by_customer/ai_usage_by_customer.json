@@ -1,0 +1,22 @@
+{
+ "add_total_row": 1,
+ "creation": "2026-04-20 12:00:00.000000",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "is_standard": "Yes",
+ "modified": "2026-04-20 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "AI Usage by Customer",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "HDS AI Support Session",
+ "report_name": "AI Usage by Customer",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ]
+}

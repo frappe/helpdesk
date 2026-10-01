@@ -1,0 +1,158 @@
+{
+	"actions": [],
+	"autoname": "QCS-CONN-.YYYY.-.#####",
+	"creation": "2026-03-29 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"customer_section",
+		"customer_name",
+		"site_url",
+		"column_break_cust",
+		"contract_id",
+		"mcp_endpoint",
+		"credentials_section",
+		"api_key",
+		"api_secret",
+		"column_break_cred",
+		"last_token_update",
+		"health_section",
+		"connection_status",
+		"last_health_check",
+		"column_break_health",
+		"mcp_client_installed",
+		"last_error"
+	],
+	"fields": [
+		{
+			"fieldname": "customer_section",
+			"fieldtype": "Section Break",
+			"label": "Customer"
+		},
+		{
+			"fieldname": "customer_name",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Customer",
+			"options": "HD Customer",
+			"reqd": 1
+		},
+		{
+			"description": "Full customer site URL (e.g. https://customer.example.com). Scheme is inferred as http for *.localhost hosts if omitted.",
+			"fieldname": "site_url",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Site URL",
+			"options": "URL",
+			"reqd": 1
+		},
+		{
+			"fieldname": "column_break_cust",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Reference to QCS Support Contract in QCS ERPNext (not a Link field)",
+			"fieldname": "contract_id",
+			"fieldtype": "Data",
+			"label": "Contract ID"
+		},
+		{
+			"fieldname": "mcp_endpoint",
+			"fieldtype": "Data",
+			"label": "MCP Endpoint",
+			"read_only": 1
+		},
+		{
+			"fieldname": "credentials_section",
+			"fieldtype": "Section Break",
+			"label": "Credentials"
+		},
+		{
+			"fieldname": "api_key",
+			"fieldtype": "Data",
+			"label": "API Key"
+		},
+		{
+			"fieldname": "api_secret",
+			"fieldtype": "Password",
+			"label": "API Secret"
+		},
+		{
+			"fieldname": "column_break_cred",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "last_token_update",
+			"fieldtype": "Datetime",
+			"label": "Last Token Update",
+			"read_only": 1
+		},
+		{
+			"fieldname": "health_section",
+			"fieldtype": "Section Break",
+			"label": "Connection Health"
+		},
+		{
+			"default": "Pending",
+			"fieldname": "connection_status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Connection Status",
+			"options": "Pending\nConnected\nDisconnected\nError"
+		},
+		{
+			"fieldname": "last_health_check",
+			"fieldtype": "Datetime",
+			"label": "Last Health Check",
+			"read_only": 1
+		},
+		{
+			"fieldname": "column_break_health",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "mcp_client_installed",
+			"fieldtype": "Check",
+			"label": "MCP Client Installed",
+			"read_only": 1
+		},
+		{
+			"fieldname": "last_error",
+			"fieldtype": "Small Text",
+			"label": "Last Error",
+			"read_only": 1
+		}
+	],
+	"links": [],
+	"modified": "2026-03-29 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS Support Connection",
+	"naming_rule": "Expression (old style)",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		},
+		{
+			"read": 1,
+			"role": "Agent"
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"title_field": "customer_name"
+}

@@ -1,0 +1,63 @@
+{
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"fields": [
+		{
+			"fieldname": "task_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Task Name",
+			"reqd": 1
+		},
+		{
+			"fieldname": "description",
+			"fieldtype": "Text",
+			"label": "Description"
+		},
+		{
+			"fieldname": "phase_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Phase"
+		},
+		{
+			"fieldname": "module_name",
+			"fieldtype": "Data",
+			"label": "Module"
+		},
+		{
+			"fieldname": "category",
+			"fieldtype": "Select",
+			"default": "Functional",
+			"label": "Category",
+			"options": "Functional\nDevelopment\nSupport\nCommon"
+		},
+		{
+			"fieldname": "default_priority",
+			"fieldtype": "Select",
+			"default": "Medium",
+			"label": "Default Priority",
+			"options": "Urgent\nHigh\nMedium\nLow"
+		},
+		{
+			"fieldname": "estimated_hours",
+			"fieldtype": "Float",
+			"label": "Estimated Hours"
+		},
+		{
+			"fieldname": "sort_order",
+			"fieldtype": "Int",
+			"label": "Sort Order"
+		}
+	],
+	"istable": 1,
+	"modified": "2024-01-01 00:00:00",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HD Task Template Task",
+	"owner": "Administrator",
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 0
+}

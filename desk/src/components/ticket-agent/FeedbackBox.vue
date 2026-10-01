@@ -1,15 +1,20 @@
 <template>
-  <div class="w-full p-4 rounded" :class="styles[0]">
+  <div class="w-full p-4 rounded-md" :class="styles[0]">
     <!-- Header -->
-    <div class="flex gap-[9px] mb-1.5 items-center">
-      <p class="text-base text-ink-gray-8 font-medium">
+    <div
+      class="flex mb-1.5 items-center"
+      :class="activity.feedback && 'gap-[9px]'"
+    >
+      <p class="text-base-medium text-ink-gray-8">
         {{ activity.feedback }}
       </p>
       <StarRating :rating="activity.feedback_rating" />
     </div>
     <!-- Optional Text -->
     <div v-if="activity.feedback_extra">
-      <p class="mt-2 text-sm text-gray-700">{{ activity.feedback_extra }}</p>
+      <p class="mt-2 text-p-sm text-ink-gray-7">
+        {{ activity.feedback_extra }}
+      </p>
     </div>
   </div>
 </template>

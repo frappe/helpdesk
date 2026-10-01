@@ -1,0 +1,247 @@
+{
+	"actions": [],
+	"autoname": "QCS-AI-.YYYY.-.#####",
+	"creation": "2026-03-29 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"ticket_section",
+		"ticket",
+		"customer_name",
+		"column_break_ticket",
+		"connection",
+		"contract_id",
+		"tier",
+		"status_section",
+		"status",
+		"started_at",
+		"column_break_status",
+		"ended_at",
+		"total_tool_calls",
+		"ai_section",
+		"conversation_log",
+		"diagnosis",
+		"resolution",
+		"column_break_ai",
+		"agent_notes",
+		"escalated_to_dev",
+		"conversation_state",
+		"mcp_section",
+		"mcp_calls",
+		"token_section",
+		"total_input_tokens",
+		"total_output_tokens",
+		"column_break_tokens",
+		"cache_read_tokens",
+		"cache_write_tokens",
+		"column_break_tokens2",
+		"estimated_cost_usd",
+		"model_used"
+	],
+	"fields": [
+		{
+			"fieldname": "ticket_section",
+			"fieldtype": "Section Break",
+			"label": "Ticket"
+		},
+		{
+			"fieldname": "ticket",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Ticket",
+			"options": "HD Ticket",
+			"reqd": 1
+		},
+		{
+			"fieldname": "customer_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Customer Name"
+		},
+		{
+			"fieldname": "column_break_ticket",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "connection",
+			"fieldtype": "Link",
+			"label": "Connection",
+			"options": "HDS Support Connection"
+		},
+		{
+			"fieldname": "contract_id",
+			"fieldtype": "Data",
+			"label": "Contract ID"
+		},
+		{
+			"fieldname": "tier",
+			"fieldtype": "Data",
+			"label": "Tier"
+		},
+		{
+			"fieldname": "status_section",
+			"fieldtype": "Section Break",
+			"label": "Status"
+		},
+		{
+			"default": "Active",
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Status",
+			"options": "Active\nAwaiting Review\nCompleted\nFailed\nCancelled"
+		},
+		{
+			"default": "Now",
+			"fieldname": "started_at",
+			"fieldtype": "Datetime",
+			"label": "Started At"
+		},
+		{
+			"fieldname": "column_break_status",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "ended_at",
+			"fieldtype": "Datetime",
+			"label": "Ended At"
+		},
+		{
+			"default": "0",
+			"fieldname": "total_tool_calls",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"label": "Tool Calls"
+		},
+		{
+			"fieldname": "ai_section",
+			"fieldtype": "Section Break",
+			"label": "AI Interaction"
+		},
+		{
+			"fieldname": "conversation_log",
+			"fieldtype": "Code",
+			"label": "Conversation Log",
+			"options": "JSON"
+		},
+		{
+			"description": "Serialized Anthropic messages for pause/resume",
+			"fieldname": "conversation_state",
+			"fieldtype": "Long Text",
+			"hidden": 1,
+			"label": "Conversation State (internal)"
+		},
+		{
+			"fieldname": "diagnosis",
+			"fieldtype": "Long Text",
+			"label": "Diagnosis"
+		},
+		{
+			"fieldname": "resolution",
+			"fieldtype": "Long Text",
+			"label": "Resolution"
+		},
+		{
+			"fieldname": "column_break_ai",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "agent_notes",
+			"fieldtype": "Small Text",
+			"label": "Agent Notes"
+		},
+		{
+			"default": "0",
+			"fieldname": "escalated_to_dev",
+			"fieldtype": "Check",
+			"label": "Escalated to Dev"
+		},
+		{
+			"fieldname": "mcp_section",
+			"fieldtype": "Section Break",
+			"label": "MCP Calls"
+		},
+		{
+			"fieldname": "mcp_calls",
+			"fieldtype": "Table",
+			"label": "MCP Calls",
+			"options": "HDS MCP Call Log"
+		},
+		{
+			"fieldname": "token_section",
+			"fieldtype": "Section Break",
+			"label": "Token Usage"
+		},
+		{
+			"default": "0",
+			"fieldname": "total_input_tokens",
+			"fieldtype": "Int",
+			"label": "Input Tokens"
+		},
+		{
+			"default": "0",
+			"fieldname": "total_output_tokens",
+			"fieldtype": "Int",
+			"label": "Output Tokens"
+		},
+		{
+			"fieldname": "column_break_tokens",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "cache_read_tokens",
+			"fieldtype": "Int",
+			"label": "Cache Read Tokens"
+		},
+		{
+			"default": "0",
+			"fieldname": "cache_write_tokens",
+			"fieldtype": "Int",
+			"label": "Cache Write Tokens"
+		},
+		{
+			"fieldname": "column_break_tokens2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "estimated_cost_usd",
+			"fieldtype": "Currency",
+			"in_list_view": 1,
+			"label": "Cost (USD)",
+			"options": "USD",
+			"precision": "4"
+		},
+		{
+			"fieldname": "model_used",
+			"fieldtype": "Data",
+			"label": "Model Used"
+		}
+	],
+	"links": [],
+	"modified": "2026-03-29 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS AI Support Session",
+	"naming_rule": "Expression (old style)",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}

@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "creation": "2017-02-17 13:07:35.686409",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -11,8 +12,9 @@
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
-  "assign_within_team",
   "column_break_dxlq",
+  "assign_within_team",
+  "disable_saved_replies_global_scope",
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
@@ -20,11 +22,12 @@
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
-  "is_ticket_type_mandatory",
   "column_break_zxek",
   "feedback_section",
   "is_feedback_mandatory",
   "column_break_kegb",
+  "comments_section",
+  "enable_comment_reactions",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
   "auto_update_status",
@@ -33,6 +36,12 @@
   "auto_close_tickets",
   "auto_close_status",
   "auto_close_after_days",
+  "section_break_ylvs",
+  "enable_outside_hours_banner",
+  "outside_working_hours_message",
+  "column_break_fzef",
+  "ticket_routing_section",
+  "auto_set_customer_from_contact",
   "status_section",
   "default_ticket_status",
   "column_break_yfbu",
@@ -42,13 +51,17 @@
   "instantly_send_email",
   "column_break_aomm",
   "branding_tab",
-  "images_column",
-  "brand_logo",
   "column_break_fsjn",
+  "brand_name",
+  "brand_logo",
+  "favicon",
+  "images_column",
   "misc_tab",
   "setup_section",
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
+  "show_customer_portal_permission_notice",
+  "persona_captured",
   "column_break_hjfh",
   "search_tab",
   "name_weight",
@@ -136,6 +149,21 @@
    "label": "Is name setup skipped"
   },
   {
+   "default": "0",
+   "fieldname": "show_customer_portal_permission_notice",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Customer Portal Permission Notice"
+  },
+  {
+   "default": "0",
+   "description": "Set once an admin completes the onboarding persona questionnaire",
+   "fieldname": "persona_captured",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Persona Captured"
+  },
+  {
    "fieldname": "column_break_hjfh",
    "fieldtype": "Column Break"
   },
@@ -149,12 +177,6 @@
    "fieldtype": "Link",
    "label": "Default ticket type",
    "options": "HD Ticket Type"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_ticket_type_mandatory",
-   "fieldtype": "Check",
-   "label": "Ticket type is mandatory"
   },
   {
    "fieldname": "column_break_zxek",
@@ -190,8 +212,7 @@
   },
   {
    "fieldname": "images_column",
-   "fieldtype": "Column Break",
-   "label": "Images"
+   "fieldtype": "Column Break"
   },
   {
    "description": "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred",
@@ -313,6 +334,18 @@
   {
    "fieldname": "column_break_kegb",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "comments_section",
+   "fieldtype": "Section Break",
+   "label": "Comments"
+  },
+  {
+   "default": "0",
+   "description": "Allow users to react to comments with emojis",
+   "fieldname": "enable_comment_reactions",
+   "fieldtype": "Check",
+   "label": "Enable comment reactions"
   },
   {
    "depends_on": "eval:doc.enable_email_ticket_feedback",
@@ -449,12 +482,66 @@
    "link_filters": "[[\"HD Ticket Status\",\"category\",\"in\",[\"Paused\",\"Resolved\",null]]]",
    "mandatory_depends_on": "eval: doc.auto_close_tickets",
    "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "description": "Appears next to the title in your browser tab. Recommended size is minimum 32x32 px in PNG or ICO",
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "default": "0",
+   "depends_on": "restrict_tickets_by_agent_group",
+   "fieldname": "disable_saved_replies_global_scope",
+   "fieldtype": "Check",
+   "label": "Disable saved replies with scope 'Global'"
+     },
+  {
+   "fieldname": "section_break_ylvs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_fzef",
+   "fieldtype": "Column Break"
+  },
+{
+   "default": "Thanks for reaching out \ud83d\udc4b. This ticket was created outside our working hours. You can expect the next response by {{ next_working_day }}.",
+   "depends_on": "enable_outside_hours_banner",
+   "fieldname": "outside_working_hours_message",
+   "fieldtype": "Small Text",
+   "label": "Custom Outside Working Hours Message",
+   "mandatory_depends_on": "eval: doc.enable_outside_hours_banner",
+   "placeholder": "Add your Custom Message here"
+  },
+  {
+   "default": "0",
+   "description": "Let customers know they're raising a ticket outside working hours, and when they can expect a reply.",
+   "fieldname": "enable_outside_hours_banner",
+   "fieldtype": "Check",
+   "label": "Apply outside working hours"
+  },
+  {
+   "fieldname": "ticket_routing_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Routing"
+  },
+  {
+   "default": "1",
+   "description": "Automatically set the customer on a ticket based on the contact's linked customer(s)",
+   "fieldname": "auto_set_customer_from_contact",
+   "fieldtype": "Check",
+   "label": "Auto-set customer from contact"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-29 13:34:17.018321",
+ "modified": "2026-07-10 14:58:15.922364",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

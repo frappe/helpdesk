@@ -6,22 +6,40 @@ from helpdesk.utils import agent_only
 @frappe.whitelist()
 @agent_only
 def get_users():
-    users = frappe.qb.get_query(
+    session_user = frappe.session.user
+
+    # Fetch agent-related roles in a single query
+    role_rows = frappe.db.get_all(
+        "Has Role",
+        filters={
+            "parenttype": "User",
+            "role": ["in", ["Agent Manager", "Agent", "Guest"]],
+        },
+        fields=["parent", "role"],
+    )
+
+    # Role priority: Manager > Agent > Guest
+    priority = {"Agent Manager": 3, "Agent": 2, "Guest": 1}
+    label = {"Agent Manager": "Manager", "Agent": "Agent", "Guest": "Guest"}
+    roles_map = {}
+    for row in role_rows:
+        if priority.get(row.role, 0) > priority.get(roles_map.get(row.parent), 0):
+            roles_map[row.parent] = row.role
+
+    # Fetch all active users
+    users = frappe.db.get_all(
         "User",
+        filters={"enabled": 1},
         fields=["name", "email", "enabled", "user_image", "full_name", "user_type"],
         order_by="full_name asc",
-        distinct=True,
-    ).run(as_dict=1)
+    )
 
-    for user in users:
-        roles = frappe.get_roles(user.name)
-        if "Agent Manager" in roles:
-            user.role = "Manager"
-        elif "Agent" in roles:
-            user.role = "Agent"
-        elif "Guest" in roles:
-            user.role = "Guest"
-        if frappe.session.user == user.name:
-            user.session_user = True
+    # Add role and session user information
+    for u in users:
+        r = roles_map.get(u.name)
+        if r:
+            u["role"] = label[r]
+        if u.name == session_user:
+            u["session_user"] = True
 
     return users

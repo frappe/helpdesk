@@ -1,0 +1,125 @@
+{
+	"actions": [],
+	"autoname": "hash",
+	"creation": "2026-03-29 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"session",
+		"ticket",
+		"column_break_usage",
+		"model",
+		"timestamp",
+		"tokens_section",
+		"input_tokens",
+		"output_tokens",
+		"column_break_tokens",
+		"cache_read_tokens",
+		"cache_write_tokens",
+		"column_break_tokens2",
+		"estimated_cost_usd"
+	],
+	"fields": [
+		{
+			"fieldname": "session",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Session",
+			"options": "HDS AI Support Session"
+		},
+		{
+			"fieldname": "ticket",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Ticket",
+			"options": "HD Ticket"
+		},
+		{
+			"fieldname": "column_break_usage",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "model",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Model"
+		},
+		{
+			"default": "Now",
+			"fieldname": "timestamp",
+			"fieldtype": "Datetime",
+			"in_list_view": 1,
+			"label": "Timestamp"
+		},
+		{
+			"fieldname": "tokens_section",
+			"fieldtype": "Section Break",
+			"label": "Tokens"
+		},
+		{
+			"default": "0",
+			"fieldname": "input_tokens",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"label": "Input Tokens"
+		},
+		{
+			"default": "0",
+			"fieldname": "output_tokens",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"label": "Output Tokens"
+		},
+		{
+			"fieldname": "column_break_tokens",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "cache_read_tokens",
+			"fieldtype": "Int",
+			"label": "Cache Read Tokens"
+		},
+		{
+			"default": "0",
+			"fieldname": "cache_write_tokens",
+			"fieldtype": "Int",
+			"label": "Cache Write Tokens"
+		},
+		{
+			"fieldname": "column_break_tokens2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "estimated_cost_usd",
+			"fieldtype": "Currency",
+			"in_list_view": 1,
+			"label": "Cost (USD)",
+			"options": "USD",
+			"precision": "4"
+		}
+	],
+	"in_create": 1,
+	"links": [],
+	"modified": "2026-03-29 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS AI Usage Log",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1
+		}
+	],
+	"sort_field": "timestamp",
+	"sort_order": "DESC",
+	"states": []
+}

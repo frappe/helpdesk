@@ -1,6 +1,6 @@
 <template>
   <div v-if="typingUsers.length > 0" class="pl-2">
-    <div class="flex items-center gap-2 text-sm text-gray-600">
+    <div class="flex items-center gap-2 text-sm text-ink-gray-5">
       <div class="flex items-center gap-1.5">
         <component :is="typingMessage" />
         <div class="typing-dots">

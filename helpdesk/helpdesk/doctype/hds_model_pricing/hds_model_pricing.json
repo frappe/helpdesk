@@ -1,0 +1,149 @@
+{
+	"actions": [],
+	"allow_rename": 1,
+	"autoname": "field:model_id",
+	"creation": "2026-04-23 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"model_id",
+		"display_name",
+		"provider",
+		"column_break_header",
+		"is_active",
+		"deprecated_on",
+		"section_pricing",
+		"input_cost_per_1m",
+		"output_cost_per_1m",
+		"column_break_pricing",
+		"cache_read_cost_per_1m",
+		"cache_write_cost_per_1m",
+		"section_meta",
+		"pricing_source_url",
+		"last_synced_on",
+		"notes"
+	],
+	"fields": [
+		{
+			"description": "Exact model ID as used in Anthropic API (e.g. claude-sonnet-4-6)",
+			"fieldname": "model_id",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Model ID",
+			"reqd": 1,
+			"unique": 1
+		},
+		{
+			"fieldname": "display_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Display Name"
+		},
+		{
+			"default": "Anthropic",
+			"fieldname": "provider",
+			"fieldtype": "Select",
+			"label": "Provider",
+			"options": "Anthropic"
+		},
+		{
+			"fieldname": "column_break_header",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "1",
+			"fieldname": "is_active",
+			"fieldtype": "Check",
+			"in_list_view": 1,
+			"label": "Active"
+		},
+		{
+			"description": "Date the model was deprecated by the provider (if any).",
+			"fieldname": "deprecated_on",
+			"fieldtype": "Date",
+			"label": "Deprecated On"
+		},
+		{
+			"fieldname": "section_pricing",
+			"fieldtype": "Section Break",
+			"label": "Pricing (USD per 1M tokens)"
+		},
+		{
+			"fieldname": "input_cost_per_1m",
+			"fieldtype": "Float",
+			"in_list_view": 1,
+			"label": "Input",
+			"precision": "4"
+		},
+		{
+			"fieldname": "output_cost_per_1m",
+			"fieldtype": "Float",
+			"in_list_view": 1,
+			"label": "Output",
+			"precision": "4"
+		},
+		{
+			"fieldname": "column_break_pricing",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "cache_read_cost_per_1m",
+			"fieldtype": "Float",
+			"label": "Cache Read",
+			"precision": "4"
+		},
+		{
+			"fieldname": "cache_write_cost_per_1m",
+			"fieldtype": "Float",
+			"label": "Cache Write",
+			"precision": "4"
+		},
+		{
+			"fieldname": "section_meta",
+			"fieldtype": "Section Break",
+			"label": "Reference"
+		},
+		{
+			"default": "https://platform.claude.com/docs/en/about-claude/models/overview",
+			"fieldname": "pricing_source_url",
+			"fieldtype": "Data",
+			"label": "Pricing Source URL",
+			"options": "URL"
+		},
+		{
+			"fieldname": "last_synced_on",
+			"fieldtype": "Datetime",
+			"label": "Last Synced On",
+			"read_only": 1
+		},
+		{
+			"fieldname": "notes",
+			"fieldtype": "Small Text",
+			"label": "Notes"
+		}
+	],
+	"index_web_pages_for_search": 0,
+	"links": [],
+	"modified": "2026-04-23 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS Model Pricing",
+	"naming_rule": "By fieldname",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}

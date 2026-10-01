@@ -1,22 +1,29 @@
 import json
+from datetime import timedelta
 
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar, now_datetime
+from frappe.utils import (
+    add_to_date,
+    get_datetime,
+    get_user_info_for_avatar,
+    now_datetime,
+)
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import (
     agent_only,
     check_permissions,
-    get_customer,
+    get_customers,
     is_agent,
     parse_call_logs,
 )
@@ -24,17 +31,18 @@ from helpdesk.utils import (
 
 @frappe.whitelist()
 # flake8: noqa
-def new(doc, attachments=[]):
+def new(doc: dict, attachments: list[dict] = []):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
+    doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc).insert()
     return d
 
 
 @frappe.whitelist()
-def get_one(name, is_customer_portal=False):
-    check_permissions("HD Ticket", None, doc=name)
+def get_one(name: str, is_customer_portal: bool = False):
+    frappe.has_permission("HD Ticket", "read", name, throw=True)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
 
@@ -150,7 +158,7 @@ def get_customer_criteria():
         QBTicket.raised_by == user,
         QBTicket.owner == user,
     ]
-    customer = get_customer(user)
+    customer = get_customers(user)
     for c in customer:
         conditions.append(QBTicket.customer == c)
     return Criterion.any(conditions)
@@ -164,6 +172,8 @@ def get_assignee(_assign: str):
 
 
 def get_communications(ticket: str):
+    if not frappe.has_permission("HD Ticket", "read", ticket):
+        return []
     QBCommunication = frappe.qb.DocType("Communication")
     communications = (
         frappe.qb.from_(QBCommunication)
@@ -178,6 +188,8 @@ def get_communications(ticket: str):
             QBCommunication.recipients,
             QBCommunication.subject,
             QBCommunication.delivery_status,
+            QBCommunication.sent_or_received,
+            QBCommunication.user,
         )
         .where(QBCommunication.reference_doctype == "HD Ticket")
         .where(QBCommunication.reference_name == ticket)
@@ -186,7 +198,8 @@ def get_communications(ticket: str):
     )
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
-        c.user = get_user_info_for_avatar(c.sender)
+        user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+        c.user = get_user_info_for_avatar(user_id)
     return communications
 
 
@@ -232,6 +245,8 @@ def get_history(ticket: str):
 
 
 def get_views(ticket: str):
+    if not frappe.has_permission("HD Ticket", "read", ticket):
+        return []
     QBViewLog = frappe.qb.DocType("View Log")
     views = (
         frappe.qb.from_(QBViewLog)
@@ -314,7 +329,7 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 @agent_only
-def merge_ticket(source: int, target: int):
+def merge_ticket(source: str, target: str):
     # check if source and target exists
     if not frappe.db.exists("HD Ticket", source):
         frappe.throw(_("Source ticket does not exist"))
@@ -375,7 +390,7 @@ def merge_ticket(source: int, target: int):
     c.save()
 
 
-def duplicate_list_retain_timestamp(doctype, activities: list, target: int, controller):
+def duplicate_list_retain_timestamp(doctype, activities: list, target: str, controller):
     for activity in activities:
         attachments = get_attachments(
             "HD Ticket Comment",
@@ -558,7 +573,7 @@ def get_ticket_customizations():
 
 @frappe.whitelist()
 # TODO: make it bette, on mount fetch only once and cache it
-def get_navigation_tickets(ticket: str, current_view: str = None):
+def get_navigation_tickets(ticket: str, current_view: str | None = None):
     """
     Get a list of tickets to navigate
     """
@@ -576,7 +591,7 @@ def get_navigation_tickets(ticket: str, current_view: str = None):
         )
 
         # Extract just the ticket IDs
-        ticket_ids = [int(ticket), *tickets]
+        ticket_ids = [ticket, *tickets]
         # print("\n\n", ticket_ids, "\n\n")
         return ticket_ids
 
@@ -587,48 +602,45 @@ def get_navigation_tickets(ticket: str, current_view: str = None):
 
 
 def get_navigation_filters(ticket: str, current_view: str = None):
-    filters = []
-    if current_view:
-        _filters = frappe.get_value("HD View", current_view, "filters")
-        if _filters:
-            try:
-                # Parse the filters string to list/dict
-                filters = (
-                    json.loads(_filters) if isinstance(_filters, str) else _filters
-                )
-            except (json.JSONDecodeError, TypeError):
-                filters = []
+    conditions = _to_conditions(_get_view_filters(current_view))
+    # Custom filter "__assigned_on" is not available in any doctype
+    conditions = [c for c in conditions if c[0] != "__assigned_on"]
+    conditions.append(["name", "!=", ticket])
+    return handle_at_me_support(conditions)
 
-    if not filters:
-        default_view = frappe.db.get_value(
+
+def _get_view_filters(current_view: str | None) -> dict | list:
+    filters = _parse_view_filters(
+        frappe.get_value("HD View", current_view, "filters") if current_view else None
+    )
+    if filters:
+        return filters
+    return _parse_view_filters(
+        frappe.db.get_value(
             "HD View",
             {"dt": "HD Ticket", "is_default": 1, "user": frappe.session.user},
             "filters",
         )
+    )
 
-        if default_view:
-            try:
-                filters = (
-                    json.loads(default_view)
-                    if isinstance(default_view, str)
-                    else default_view
-                )
-            except (json.JSONDecodeError, TypeError):
-                filters = []
 
-    # Base filters - exclude the current ticket
-    base_filters = {"name": ["!=", ticket]}
+def _parse_view_filters(raw) -> dict | list:
+    if not raw:
+        return []
+    try:
+        return (json.loads(raw) if isinstance(raw, str) else raw) or []
+    except (json.JSONDecodeError, TypeError):
+        return []
 
-    # Combine base filters with view filters
-    # is instance of {}
 
-    if filters and isinstance(filters, object):
-        final_filters = {**filters, **base_filters}
-    else:
-        final_filters = base_filters
-    final_filters = handle_at_me_support(final_filters)
-
-    return final_filters
+def _to_conditions(filters: dict | list) -> list:
+    """Normalize dict filters (legacy saved views) to a list of conditions."""
+    if isinstance(filters, dict):
+        return [
+            [key, *value] if isinstance(value, list) else [key, "=", value]
+            for key, value in filters.items()
+        ]
+    return [c for c in filters if isinstance(c, list) and len(c) >= 3]
 
 
 def get_navigation_order_by(view):
@@ -648,6 +660,7 @@ def get_navigation_order_by(view):
 
 @frappe.whitelist()
 def get_ticket_contact(ticket: str):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return None
     contact = frappe.db.get_value("HD Ticket", ticket, "contact")
@@ -671,11 +684,13 @@ def get_ticket_contact(ticket: str):
 
 @frappe.whitelist()
 def get_recent_similar_tickets(ticket: str):
+    frappe.has_permission("HD Ticket", "read", str(ticket), throw=True)
     if not frappe.db.exists("HD Ticket", ticket):
         return {"recent_tickets": [], "similar_tickets": []}
 
     recent_tickets = get_recent_tickets(ticket)
-    similar_tickets = get_similar_tickets(ticket)
+    # Update this with TextBlob or SQLite Vector Search
+    similar_tickets = []
     # print('\n\n',recent_tickets,'\n\n')
     return {"recent_tickets": recent_tickets, "similar_tickets": similar_tickets}
 
@@ -701,12 +716,16 @@ def get_recent_tickets(ticket: str):
             )
             or []
         )
-    elif raised_by:
+
+    if raised_by:
+        # Exclude the current ticket and any already picked up as org tickets,
+        # otherwise a ticket matching both `customer` and `raised_by` shows twice.
+        excluded = [ticket] + [t.name for t in org_tickets]
         user_tickets = (
             frappe.get_list(
                 "HD Ticket",
                 filters={
-                    "name": ["!=", ticket],
+                    "name": ["not in", excluded],
                     "raised_by": raised_by,
                 },
                 fields=fields,
@@ -718,54 +737,9 @@ def get_recent_tickets(ticket: str):
     return org_tickets + user_tickets
 
 
-def get_similar_tickets(ticket: str):
-    doc = frappe.get_doc("HD Ticket", ticket)
-
-    # Separate search terms
-    subject_search = ""
-    desc_search = ""
-    relevance_threshold = 70  # Minimum relevance percentage to consider
-
-    if doc.subject:
-        subject_search = doc.subject.strip()
-
-    if doc.description:
-        soup = BeautifulSoup(doc.description, "html.parser")
-        text = soup.get_text()
-        if text:
-            desc_search = text.strip()
-
-    tickets = frappe.db.sql(
-        """
-        SELECT `name`, `subject`, `status`, `creation`,
-            (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION)) as `raw_relevance`
-        FROM `tabHD Ticket`
-        WHERE (MATCH(subject) AGAINST(%(subject_search)s WITH QUERY EXPANSION))
-            AND name != %(ticket)s
-            AND creation > DATE_SUB(NOW(), INTERVAL 90 DAY)
-        ORDER BY `raw_relevance` DESC, creation DESC
-        LIMIT 4
-        """,
-        {
-            "subject_search": subject_search,
-            "ticket": ticket,
-        },
-        as_dict=1,
-    )
-
-    max_relevance = max((t["raw_relevance"] for t in tickets), default=0)
-    for t in tickets:
-        t["relevance"] = (
-            round((t["raw_relevance"] / max_relevance) * 100) if max_relevance else 0
-        )
-
-    tickets = [t for t in tickets if t["relevance"] > relevance_threshold]
-
-    return tickets
-
-
 @frappe.whitelist()
 def get_ticket_activities(ticket: str):
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
     activities = {
         "comments": get_comments(ticket),
         "communications": get_communications(ticket),
@@ -777,6 +751,72 @@ def get_ticket_activities(ticket: str):
 
 
 @frappe.whitelist()
-def get_ticket_assignees(ticket: str):
-    assignees = frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
-    return assignees
+def get_ticket_assignees(ticket: str) -> list[dict]:
+    frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+    assignee_names = json.loads(
+        frappe.db.get_value("HD Ticket", ticket, "_assign") or "[]"
+    )
+    if not assignee_names:
+        return []
+    # Presence details are for the agent desk only; customers get plain names.
+    if not is_agent():
+        return [{"name": name} for name in assignee_names]
+    # Enrich each assignee with their agent status so the UI can show presence
+    # without a separate lookup. Non-agent assignees fall back to just the name.
+    agents = {
+        agent.name: agent
+        for agent in frappe.get_all(
+            "HD Agent",
+            filters={"name": ["in", assignee_names]},
+            fields=[
+                "name",
+                "agent_name",
+                "user_image",
+                "availability",
+                "availability_changed_on",
+            ],
+        )
+    }
+    return [agents.get(name, {"name": name}) for name in assignee_names]
+
+
+def show_banner_next_day(ticket):
+    sla = ticket.get_sla()
+    working_hours = sla.get_working_hours()
+    now = now_datetime()
+    creation_date = get_datetime(ticket.creation)
+    next_date = add_to_date(creation_date, days=1)
+    next_date_day_name = next_date.strftime("%A")
+    if next_date_day_name not in working_hours:
+        return True
+
+    start_time = working_hours[next_date_day_name][0]
+
+    next_day_start_datetime = (
+        next_date.replace(hour=0, minute=0, second=0, microsecond=0) + start_time
+    )
+    if now > next_day_start_datetime:
+        return False
+    return True
+
+
+@frappe.whitelist()
+def show_outside_hours_banner(ticket_name: str):
+    show_banner_settings = frappe.db.get_single_value(
+        "HD Settings", "enable_outside_hours_banner"
+    )
+    if not show_banner_settings:
+        return {"show": False}
+
+    ticket = frappe.get_doc("HD Ticket", ticket_name)
+    is_currently_outside = (
+        ticket.is_currently_outside_working_hours()
+        and ticket.raised_outside_working_hours
+        and show_banner_next_day(ticket)
+    )
+    if is_currently_outside and not ticket.has_agent_replied:
+        banner_data = get_rendered_banner_msg(ticket_name)
+
+        return {"msg": banner_data.get("banner_msg"), "show": True}
+
+    return {"show": False}

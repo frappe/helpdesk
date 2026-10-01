@@ -9,6 +9,7 @@ from helpdesk.api.settings.field_dependency import (
     handle_fields_criteria,
     handle_form_customization,
 )
+from helpdesk.utils import capture_event
 
 
 class HDFormScript(Document):
@@ -44,6 +45,9 @@ class HDFormScript(Document):
         if len(parts) < 2:
             return None
         return [parts[1], parts[2]] if len(parts) > 2 else [parts[1], None]
+
+    def after_insert(self):
+        capture_event("form_script_created")
 
     def on_trash(self):
         if not self.is_standard:

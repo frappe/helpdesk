@@ -1,8 +1,10 @@
+import { __ } from "@/translation";
 import type {
   DocumentResource,
   RecentSimilarTicket,
   Resource,
   TicketActivities,
+  TicketAssignee,
   TicketContact,
 } from "@/types";
 import type { HDTicket } from "@/types/doctypes";
@@ -11,7 +13,7 @@ import { reactive } from "vue";
 
 interface MapValue {
   ticket: DocumentResource<HDTicket>;
-  assignees: Resource<Record<"name", string>[]>;
+  assignees: Resource<TicketAssignee[]>;
   contact: Resource<TicketContact>;
   recentSimilarTickets: Resource<RecentSimilarTicket>;
   activities: Resource<TicketActivities>;
@@ -19,8 +21,7 @@ interface MapValue {
 
 const ticketMap: Record<string, MapValue> = reactive({});
 
-export const useTicket = (ticketId: string): MapValue => {
-  let err = false;
+export const useTicket = (ticketId: string | number): MapValue => {
   if (!ticketMap[ticketId]) {
     ticketMap[ticketId] = {
       ticket: createDocumentResource<HDTicket>({
@@ -31,12 +32,9 @@ export const useTicket = (ticketId: string): MapValue => {
         },
         setValue: {
           onSuccess: () => {
-            toast.success(__("Ticket updated"));
-            err = false;
+            toast.success(__("Ticket updated successfully."));
           },
           onError: (error) => {
-            if (err) return;
-            err = true;
             const msg = error.exc_type
               ? (error.messages || error.message || []).join(", ")
               : error.message;
@@ -48,12 +46,6 @@ export const useTicket = (ticketId: string): MapValue => {
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_assignees",
         params: { ticket: ticketId },
         auto: true,
-        transform: (data: string) => {
-          return JSON.parse(data).map((name: string) => ({ name })) as Record<
-            "name",
-            string
-          >[];
-        },
       }),
       contact: createResource({
         url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_contact",
@@ -75,3 +67,19 @@ export const useTicket = (ticketId: string): MapValue => {
 
   return ticketMap[ticketId];
 };
+
+export function reloadTicket(ticketId: string) {
+  const ticketData = ticketMap[ticketId];
+  if (!ticketData) return;
+  ticketData.ticket.reload();
+  ticketData.assignees.reload();
+  ticketData.activities.reload();
+}
+
+// Refresh a ticket that may have gone stale
+export function revalidateTicket(ticketId: string | number) {
+  const ticketData = ticketMap[ticketId];
+  if (ticketData?.ticket.get.fetched && !ticketData.ticket.get.loading) {
+    reloadTicket(ticketId as string);
+  }
+}

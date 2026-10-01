@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="show" :options="{ size: 'xl', position: 'top' }">
-    <template #body>
+  <Dialog v-model:open="show" size="xl" position="top" bare>
+    <template #default>
       <div>
         <Combobox nullable @update:model-value="onSelection">
           <div class="relative">
@@ -8,14 +8,18 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search tickets, emails, comments, or #234 to navigate to ticket"
-              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-500 focus:ring-0"
+              :placeholder="
+                __(
+                  'Search tickets, emails, comments, or #234 to navigate to ticket'
+                )
+              "
+              class="pl-11.5 pr-4.5 w-full border-none bg-transparent py-3 text-base text-ink-gray-8 placeholder:text-ink-gray-4 focus:ring-0"
               autocomplete="off"
               @input="onInput"
             />
           </div>
           <ComboboxOptions
-            class="max-h-96 overflow-auto border-t border-gray-100"
+            class="max-h-96 overflow-auto border-t border-outline-gray-1"
             static
             :hold="true"
           >
@@ -26,7 +30,7 @@
             >
               <div
                 v-if="!group.hideTitle"
-                class="px-4.5 mb-2.5 text-base text-gray-600"
+                class="px-4.5 mb-2.5 text-base text-ink-gray-5"
               >
                 {{ group.title }}
               </div>
@@ -62,19 +66,19 @@ import {
   ComboboxOptions,
 } from "@headlessui/vue";
 
+import { __ } from "@/translation";
 import { Dialog } from "frappe-ui";
 import { computed, h, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import LucideBookOpen from "~icons/lucide/book-open";
-import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import LucideTicket from "~icons/lucide/ticket";
 import CPGroup from "./CPGroup.vue";
 const router = useRouter();
 const { isMac } = useDevice();
 
 // Reactive data
-const show = defineModel();
+const show = defineModel({ default: false });
 const query = ref("");
 
 // Computed properties
@@ -82,7 +86,7 @@ const navigationItems = computed(() => {
   const items = [];
   if (query.value.startsWith("#")) {
     items.push({
-      title: `Go to Ticket #${query.value.slice(1)}`,
+      title: __("Go to Ticket #{0}", [query.value.slice(1)]),
       icon: () => h(LucideTicket),
       route: {
         name: "TicketAgent",
@@ -91,13 +95,13 @@ const navigationItems = computed(() => {
     });
   } else {
     items.push({
-      title: "Tickets",
+      title: __("Tickets"),
       icon: () => h(LucideTicket),
       route: { name: "TicketsAgent" },
     });
   }
   items.push({
-    title: "Knowledge Base",
+    title: __("Knowledge Base"),
     icon: () => h(LucideBookOpen),
     route: {
       name: isCustomerPortal.value
@@ -107,19 +111,19 @@ const navigationItems = computed(() => {
   });
 
   return {
-    title: "Jump to",
+    title: __("Jump to"),
     component: h(CPGroup),
     items,
   };
 });
 
 const fullSearchItem = computed(() => ({
-  title: "Search",
+  title: __("Search"),
   hideTitle: true,
   component: h(CPGroup),
   items: [
     {
-      title: `Search for "${query.value}"`,
+      title: __('Search for "{0}"', [query.value]),
       icon: () => h(LucideFileSearch),
       route: { name: "SearchAgent", query: { q: query.value } },
     },

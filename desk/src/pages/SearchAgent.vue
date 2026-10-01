@@ -4,7 +4,7 @@
       <LayoutHeader>
         <template #left-header>
           <Breadcrumbs
-            :items="[{ label: 'Search', route: { name: 'SearchAgent' } }]"
+            :items="[{ label: __('Search'), route: { name: 'SearchAgent' } }]"
           />
         </template>
       </LayoutHeader>
@@ -13,7 +13,7 @@
           <TextInput
             ref="searchInput"
             class="flex-1"
-            placeholder="Search tickets, comments, and communications..."
+            :placeholder="__('Search tickets, comments, and communications...')"
             autocomplete="off"
             :model-value="query"
             @update:model-value="updateQuery"
@@ -47,8 +47,8 @@
               @update:model-value="
                 (values) => updateFilter('agent_group', values)
               "
-              placeholder="Team"
-              label="Team"
+              :placeholder="__('Team')"
+              :label="__('Team')"
             />
 
             <!-- Status Filter -->
@@ -56,8 +56,8 @@
               :options="statusFilterOptions"
               :model-value="activeFilters.status || []"
               @update:model-value="(values) => updateFilter('status', values)"
-              placeholder="Status"
-              label="Status"
+              :placeholder="__('Status')"
+              :label="__('Status')"
             />
 
             <!-- Priority Filter -->
@@ -65,8 +65,8 @@
               :options="priorityFilterOptions"
               :model-value="activeFilters.priority || []"
               @update:model-value="(values) => updateFilter('priority', values)"
-              placeholder="Priority"
-              label="Priority"
+              :placeholder="__('Priority')"
+              :label="__('Priority')"
             />
 
             <!-- Document Type Filter -->
@@ -74,8 +74,8 @@
               :options="doctypesFilterOptions"
               :model-value="activeFilters.doctype || []"
               @update:model-value="(values) => updateFilter('doctype', values)"
-              placeholder="Type"
-              label="Type"
+              :placeholder="__('Type')"
+              :label="__('Type')"
             />
             <Button
               v-if="hasActiveFilters()"
@@ -83,7 +83,7 @@
               class="ml-auto text-ink-gray-5"
               variant="gray-ghost"
               @click="clearFilters"
-              label="Clear all filters"
+              :label="__('Clear all filters')"
             />
           </div>
         </div>
@@ -97,37 +97,44 @@
               <ErrorMessage
                 :message="
                   search.error.type == 'HelpdeskSearchIndexMissingError'
-                    ? 'Search index does not exist. Please build the index first.'
+                    ? __(
+                        'Search index does not exist. Please build the index first.'
+                      )
                     : search.error
                 "
               />
             </template>
             <template v-else-if="newSearch && query.length > 2">
-              <p class="text-ink-gray-6">Press enter to search</p>
+              <p class="text-ink-gray-6">{{ __("Press enter to search") }}</p>
             </template>
             <template v-else-if="search.loading">
-              <p class="text-ink-gray-6">Searching...</p>
+              <p class="text-ink-gray-6">{{ __("Searching...") }}</p>
             </template>
             <template v-else-if="searchResponse?.summary">
               <div class="space-y-1">
                 <p class="text-ink-gray-6">
-                  {{ searchResponse.summary.filtered_matches }} matches ({{
-                    searchResponse.summary.duration
-                  }}s)
+                  {{
+                    __("{0} matches", [searchResponse.summary.filtered_matches])
+                  }}
+                  <span>
+                    {{ __("({0}s)", [searchResponse.summary.duration]) }}
+                  </span>
                   <span v-if="hasActiveFilters()">
                     •
                     {{
-                      Object.keys(searchResponse.summary.applied_filters || {})
-                        .length
+                      __("{0} filter(s) applied", [
+                        Object.keys(
+                          searchResponse.summary.applied_filters || {}
+                        ).length,
+                      ])
                     }}
-                    filter(s) applied
                   </span>
                 </p>
                 <p
                   v-if="searchResponse.summary.corrected_query"
                   class="text-ink-gray-6"
                 >
-                  <span class="text-ink-gray-5">Searched for:</span>
+                  <span class="text-ink-gray-5">{{ __("Searched for:") }}</span>
                   <span class="ml-1 font-medium text-primary">
                     {{ searchResponse.summary.corrected_query }}
                   </span>
@@ -164,17 +171,17 @@
                 <div class="flex items-center">
                   <div
                     v-if="item.title"
-                    class="text-base font-medium"
+                    class="text-base-medium truncate max-w-[60%]"
                     v-html="item.title"
                   />
-                  <div class="text-base font-medium" v-else>
+                  <div class="text-base-medium" v-else>
                     {{ item.name }}
                   </div>
                   <span class="px-1 leading-none text-sm text-ink-gray-5">
                     &middot;
                     {{
                       item.doctype == "Communication"
-                        ? "Email"
+                        ? __("Email")
                         : item.doctype.replace("HD ", "")
                     }}
                   </span>
@@ -204,10 +211,11 @@
 import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
 import { useShortcut } from "@/composables/shortcuts";
-import dayjs from "dayjs";
+import { __ } from "@/translation";
 import {
   Breadcrumbs,
   createResource,
+  dayjs,
   debounce,
   ErrorMessage,
   TextInput,
@@ -340,9 +348,9 @@ const priorityFilterOptions = computed(() => {
 
 const doctypesFilterOptions = computed(() => {
   return [
-    { value: "HD Ticket", label: "Tickets", count: 0 },
-    { value: "Communication", label: "Emails", count: 0 },
-    { value: "HD Ticket Comment", label: "Comments", count: 0 },
+    { value: "HD Ticket", label: __("Tickets"), count: 0 },
+    { value: "Communication", label: __("Emails"), count: 0 },
+    { value: "HD Ticket Comment", label: __("Comments"), count: 0 },
   ];
 });
 

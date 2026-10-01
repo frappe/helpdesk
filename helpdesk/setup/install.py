@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import frappe
@@ -5,6 +6,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
+from helpdesk.setup.default_views import add_default_views
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
@@ -12,16 +14,20 @@ from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
 
+FORM_SCRIPT_NAME = "Helpdesk AI Support Actions"
+
 
 def after_install():
     create_custom_fields(get_custom_fields())
     add_default_status()
+    add_default_agent_status()
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
     add_default_agent_groups()
     update_agent_role_permissions()
     add_agent_manager_permissions()
+    setup_customer_role()
     add_default_assignment_rule()
     create_default_template()
     create_fallback_ticket_type()
@@ -30,6 +36,9 @@ def after_install():
     create_welcome_ticket()
     create_ticket_feedback_options()
     add_property_setters()
+    add_website_settings_permission()
+    add_default_views()
+    _create_form_script()
     # Always keep this at last, because sql_ddl makes the db commit
     add_fts_index()
 
@@ -169,7 +178,7 @@ def add_default_agent_groups():
         if not frappe.db.exists("HD Team", agent_group):
             agent_group_doc = frappe.new_doc("HD Team")
             agent_group_doc.team_name = agent_group
-            agent_group_doc.insert()
+            agent_group_doc.insert(ignore_mandatory=True)
 
 
 def update_agent_role_permissions():
@@ -198,16 +207,45 @@ def add_agent_manager_permissions():
     doc_to_permissions = {
         "Email Account": ["create", "delete", "write"],
         "File": ["create", "delete", "write"],
-        "Contact": ["create", "delete", "write"],
+        "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],
         "User Invitation": ["create", "write"],
         "Role": [],
+        "Assignment Rule": ["create", "delete", "write"],
     }
     for dt in doc_to_permissions.keys():
         # this adds read permission to the role
         add_permission(dt, "Agent Manager")
         for p in doc_to_permissions[dt]:
             update_permission_property(dt, "Agent Manager", 0, p, 1)
+
+
+def setup_customer_role(fresh_install=True):
+    customer_roles = ["HD Customer", "HD Customer Manager"]
+    for role_name in customer_roles:
+        if frappe.db.exists("Role", role_name):
+            role_doc = frappe.get_doc("Role", role_name)
+        else:
+            role_doc = frappe.new_doc("Role")
+            role_doc.role_name = role_name
+        role_doc.home_page = "/helpdesk"
+        role_doc.desk_access = 0
+        role_doc.save()
+
+    if fresh_install:
+        portal_settings = frappe.get_single("Portal Settings")
+        portal_settings.default_role = "HD Customer"
+        portal_settings.default_portal_home = "/helpdesk"
+        portal_settings.save()
+
+
+def add_website_settings_permission():
+    doctype = "Website Settings"
+    role = "System Manager"
+    permissions = ["create", "write", "delete"]
+    add_permission(doctype, role)
+    for p in permissions:
+        update_permission_property(doctype, role, 0, p, 1)
 
 
 def add_default_assignment_rule():
@@ -229,7 +267,7 @@ def add_property_setters():
 
 
 def get_custom_fields():
-    """Helpdesk specific custom fields that needs to be added to the Assignment Rule DocType."""
+    """Helpdesk specific custom fields."""
     return {
         "Assignment Rule": [
             {
@@ -247,6 +285,156 @@ def get_custom_fields():
                 "label": "Unassign Condition JSON",
                 "insert_after": "unassign_condition",
                 "depends_on": "eval: doc.unassign_condition_json",
+            },
+        ],
+        "User Invitation": [
+            {
+                "fieldname": "contact",
+                "label": "Contact",
+                "fieldtype": "Link",
+                "options": "Contact",
+                "insert_after": "roles",
+                "set_only_once": 1,
+            },
+            {
+                "fieldname": "customer",
+                "label": "Customer",
+                "fieldtype": "Link",
+                "options": "HD Customer",
+                "insert_after": "contact",
+                "set_only_once": 1,
+            },
+        ],
+        "Task": [
+            {
+                "fieldname": "custom_category",
+                "fieldtype": "Select",
+                "label": "Category",
+                "options": "Functional\nDevelopment\nSupport\nCommon",
+                "insert_after": "task_type",
+                "in_list_view": 1,
+                "in_standard_filter": 1,
+            },
+            {
+                "fieldname": "custom_phase",
+                "fieldtype": "Data",
+                "label": "Phase",
+                "insert_after": "custom_category",
+                "in_list_view": 1,
+            },
+            {
+                "fieldname": "custom_module",
+                "fieldtype": "Data",
+                "label": "Module",
+                "insert_after": "custom_phase",
+            },
+            {
+                "fieldname": "custom_estimated_hours",
+                "fieldtype": "Float",
+                "label": "Estimated Hours",
+                "insert_after": "custom_module",
+                "in_list_view": 1,
+            },
+            {
+                "fieldname": "custom_actual_hours",
+                "fieldtype": "Float",
+                "label": "Actual Hours",
+                "insert_after": "custom_estimated_hours",
+            },
+            {
+                "fieldname": "custom_timer_start",
+                "fieldtype": "Datetime",
+                "label": "Timer Started",
+                "insert_after": "custom_actual_hours",
+                "read_only": 1,
+            },
+            {
+                "fieldname": "custom_timer_elapsed",
+                "fieldtype": "Float",
+                "label": "Paused Timer (hrs)",
+                "insert_after": "custom_timer_start",
+                "read_only": 1,
+            },
+        ],
+        "HD Ticket": [
+            {
+                "fieldname": "custom_qcs_connection",
+                "fieldtype": "Link",
+                "options": "HDS Support Connection",
+                "label": "HDS Connection",
+                "insert_after": "description",
+            },
+            {
+                "fieldname": "custom_client_ticket",
+                "fieldtype": "Data",
+                "label": "Client Ticket ID",
+                "insert_after": "custom_qcs_connection",
+                "in_list_view": 1,
+            },
+            {
+                "fieldname": "custom_conv_state",
+                "fieldtype": "Select",
+                "options": "open\npaused\nclosed",
+                "label": "Conversation State",
+                "insert_after": "custom_client_ticket",
+            },
+            {
+                "fieldname": "custom_triage_status",
+                "fieldtype": "Select",
+                "options": "Pending\nCompleted\nFailed",
+                "label": "Triage Status",
+                "insert_after": "custom_conv_state",
+            },
+            {
+                "fieldname": "custom_triage_category",
+                "fieldtype": "Data",
+                "label": "Triage Category",
+                "insert_after": "custom_triage_status",
+            },
+            {
+                "fieldname": "custom_triage_priority",
+                "fieldtype": "Data",
+                "label": "Triage Priority",
+                "insert_after": "custom_triage_category",
+            },
+            {
+                "fieldname": "custom_triage_complexity",
+                "fieldtype": "Data",
+                "label": "Triage Complexity",
+                "insert_after": "custom_triage_priority",
+            },
+            {
+                "fieldname": "custom_triage_summary",
+                "fieldtype": "Text Editor",
+                "label": "Triage Summary",
+                "insert_after": "custom_triage_complexity",
+            },
+            {
+                "fieldname": "custom_triage_recommended_track",
+                "fieldtype": "Data",
+                "label": "Recommended Track",
+                "insert_after": "custom_triage_summary",
+            },
+            {
+                "fieldname": "custom_triage_timestamp",
+                "fieldtype": "Datetime",
+                "label": "Triage Timestamp",
+                "insert_after": "custom_triage_recommended_track",
+            },
+            {
+                "fieldname": "custom_triage_data",
+                "fieldtype": "JSON",
+                "label": "Triage Data",
+                "insert_after": "custom_triage_timestamp",
+            },
+        ],
+        "Project User": [
+            {
+                "fieldname": "custom_role",
+                "fieldtype": "Select",
+                "label": "Role",
+                "options": "Project Manager\nFunctional Consultant\nDeveloper\nSupport Engineer",
+                "insert_after": "user",
             },
         ],
     }
@@ -344,6 +532,34 @@ def add_default_status():
     frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
 
 
+def add_default_agent_status():
+    statuses = [
+        {
+            "agent_status": "Active",
+            "category": "Active",
+            "color": "Green",
+            "status_order": 10,
+        },
+        {
+            "agent_status": "Away",
+            "category": "Away",
+            "color": "Amber",
+            "status_order": 20,
+        },
+        {
+            "agent_status": "Unavailable",
+            "category": "Unavailable",
+            "color": "Red",
+            "status_order": 30,
+        },
+    ]
+    for status in statuses:
+        if not frappe.db.exists("HD Agent Status", status["agent_status"]):
+            frappe.get_doc(
+                {"doctype": "HD Agent Status", "enable": 1, **status}
+            ).insert()
+
+
 def add_fts_index():
     indexes = [
         {"table": "tabHD Ticket", "column": "subject", "index_name": "ft_subject"},
@@ -361,8 +577,8 @@ def add_fts_index():
 def add_index_if_not_exists(table, column, index_name):
     index_exists = frappe.db.sql(
         """
-        SHOW INDEX FROM `{table}` 
-            WHERE Column_name = '{column}' 
+        SHOW INDEX FROM `{table}`
+            WHERE Column_name = '{column}'
             AND Index_type = 'FULLTEXT'
         """.format(
             table=table, column=column
@@ -382,3 +598,38 @@ def add_index_if_not_exists(table, column, index_name):
             table=table, index_name=index_name, column=column
         )
     )
+
+
+def _create_form_script():
+    js_path = os.path.join(
+        os.path.dirname(__file__), "..", "hd_form_scripts", "ai_support_actions.js"
+    )
+
+    if not os.path.exists(js_path):
+        frappe.log_error("HD Form Script JS not found", js_path)
+        return
+
+    with open(js_path) as f:
+        script_content = f.read()
+
+    if frappe.db.exists("HD Form Script", FORM_SCRIPT_NAME):
+        doc = frappe.get_doc("HD Form Script", FORM_SCRIPT_NAME)
+        doc.script = script_content
+        doc.enabled = 1
+        doc.save(ignore_permissions=True)
+        print(f"Updated HD Form Script: {FORM_SCRIPT_NAME}")
+    else:
+        doc = frappe.get_doc(
+            {
+                "doctype": "HD Form Script",
+                "name": FORM_SCRIPT_NAME,
+                "dt": "HD Ticket",
+                "apply_to": "Form",
+                "enabled": 1,
+                "script": script_content,
+            }
+        )
+        doc.insert(ignore_permissions=True)
+        print(f"Created HD Form Script: {FORM_SCRIPT_NAME}")
+
+    frappe.db.commit()

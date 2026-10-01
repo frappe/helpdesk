@@ -2,19 +2,17 @@
   <TwilioCallUI ref="twilio" />
   <ExotelCallUI ref="exotel" />
   <Dialog
-    v-model="show"
-    :options="{
-      title: 'Make call',
-      actions: [
-        {
-          label: `Call using ${callMedium}`,
-          variant: 'solid',
-          onClick: makeCallUsing,
-        },
-      ],
-    }"
+    v-model:open="show"
+    title="Make call"
+    :actions="[
+      {
+        label: `Call using ${callMedium}`,
+        variant: 'solid',
+        onClick: makeCallUsing,
+      },
+    ]"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl type="text" v-model="mobileNumber" label="Mobile Number" />
         <FormControl

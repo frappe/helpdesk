@@ -1,0 +1,318 @@
+<template>
+  <Dialog
+    v-model:open="show"
+    size="4xl"
+    bare
+    @vue:unmounted="resetFilter"
+    @after-leave="onAfterLeave"
+  >
+    <template #default>
+      <div class="max-h-[575px]" :style="{ height: 'calc(100vh - 8rem)' }">
+        <div class="flex items-center justify-between w-full p-4 pb-2">
+          <div class="text-3xl-semibold">{{ __("Saved Replies") }}</div>
+          <Button
+            variant="solid"
+            icon-left="lucide-plus"
+            :label="__('New')"
+            @click="onNewSavedReplyClick"
+          />
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-2">
+            <div class="relative w-full">
+              <TextInput
+                ref="searchInput"
+                :model-value="search"
+                @update:model-value="search = $event"
+                :placeholder="__('Search')"
+                type="text"
+                class="focus:ring-0 border-outline-gray-2"
+                :debounce="300"
+                autofocus
+              >
+                <template #prefix>
+                  <LucideSearch class="size-4" />
+                </template>
+              </TextInput>
+              <Button
+                v-if="search"
+                icon="lucide-x"
+                variant="ghost"
+                @click="search = ''"
+                class="absolute right-1 top-1/2 -translate-y-1/2"
+              />
+            </div>
+            <Dropdown :options="filters" placement="right">
+              <Button
+                :label="activeFilterLabel"
+                icon-left="lucide-filter"
+                class="p-4"
+              >
+                <template #suffix>
+                  <p
+                    class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-base pt-px text-xs-medium text-ink-gray-8 shadow-sm"
+                    v-if="savedReplyListResource?.data?.length"
+                  >
+                    {{ savedReplyListResource?.data?.length }}
+                  </p>
+                </template>
+              </Button>
+            </Dropdown>
+          </div>
+        </div>
+        <div class="px-4 h-full overflow-y-auto">
+          <div
+            v-if="savedReplyListResource?.list?.loading"
+            class="flex items-center justify-center mt-24"
+          >
+            <LoadingIndicator class="size-4" />
+          </div>
+          <div
+            v-if="
+              !savedReplyListResource?.list?.loading &&
+              savedReplyListResource?.data?.length
+            "
+            class="grid grid-cols-1 md:grid-cols-3 gap-2 pb-36"
+          >
+            <div
+              v-for="template in savedReplyListResource?.data"
+              :key="template.name"
+              class="flex h-56 cursor-pointer flex-col gap-2 rounded-lg border p-3 hover:bg-surface-gray-2 relative"
+              @click="onTemplateSelect(template)"
+            >
+              <div class="text-base-semibold truncate border-b pb-2">
+                {{ template.title }}
+              </div>
+              <div
+                v-if="template.message"
+                class="flex-1 overflow-hidden pointer-events-none"
+              >
+                <Editor
+                  :model-value="template.message"
+                  :extensions="extensions"
+                  :editable="false"
+                >
+                  <template #default>
+                    <EditorContent
+                      class="!prose-sm max-w-none !text-sm text-ink-gray-5 focus:outline-none"
+                    />
+                  </template>
+                </Editor>
+              </div>
+              <div
+                v-if="
+                  selectedTemplate.name === template.name &&
+                  selectedTemplate.isLoading
+                "
+                class="flex items-center justify-center absolute top-0 left-0 w-full h-full bg-surface-gray-10/20 rounded-lg"
+              >
+                <LoadingIndicator class="size-4" />
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="
+              !savedReplyListResource?.list?.loading &&
+              !savedReplyListResource?.data?.length
+            "
+            class="mt-2"
+          >
+            <div class="flex h-56 flex-col items-center justify-center">
+              <div class="text-p-sm text-ink-gray-4">
+                {{ __("No saved replies found") }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { useConfigStore } from "@/stores/config";
+import { capture } from "@/telemetry";
+import { __ } from "@/translation";
+import { SavedReply } from "@/types";
+import { useStorage } from "@vueuse/core";
+import {
+  Button,
+  createListResource,
+  createResource,
+  Dialog,
+  Dropdown,
+  LoadingIndicator,
+  TextInput,
+} from "frappe-ui";
+import { Editor, EditorContent } from "frappe-ui/editor";
+import { buildEditorExtensions } from "@/components/editor/config";
+const extensions = buildEditorExtensions();
+import { storeToRefs } from "pinia";
+import { computed, nextTick, ref, watch } from "vue";
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "./Settings/settingsModal";
+
+const props = defineProps({
+  doctype: {
+    type: String,
+    default: "",
+  },
+  ticketId: {
+    type: String,
+    default: "",
+  },
+});
+
+const show = defineModel();
+const activeFilter = useStorage("saved-replies-filter", "Personal");
+const { disableGlobalScopeForSavedReplies, teamRestrictionApplied } =
+  storeToRefs(useConfigStore());
+
+const filters = computed(() => {
+  const scopes = [
+    { label: __("All"), value: "All" },
+    { label: __("Personal"), value: "Personal" },
+    { label: __("My Team(s)"), value: "Team" },
+    { label: __("Global"), value: "Global" },
+  ];
+  if (teamRestrictionApplied.value && disableGlobalScopeForSavedReplies.value) {
+    scopes.pop();
+  }
+  return scopes.map((scope) => ({
+    ...scope,
+    selected: activeFilter.value === scope.value,
+    onClick: () => (activeFilter.value = scope.value),
+  }));
+});
+
+const activeFilterLabel = computed(() => {
+  return (
+    filters.value.find((filter) => filter.value === activeFilter.value)
+      ?.label ?? activeFilter.value
+  );
+});
+
+// Older sessions stored the label instead of the value
+if (activeFilter.value == "My Team") {
+  activeFilter.value = "Team";
+}
+
+// Set default filter to Personal if Global is disabled
+if (
+  teamRestrictionApplied.value &&
+  disableGlobalScopeForSavedReplies.value &&
+  activeFilter.value == "Global"
+) {
+  activeFilter.value = "Personal";
+}
+
+const emit = defineEmits(["apply"]);
+
+const search = ref("");
+const searchInput = ref<InstanceType<typeof TextInput>>();
+const selectedTemplate = ref({
+  name: "",
+  isLoading: false,
+});
+const pendingTemplate = ref<string | null>(null);
+
+function onAfterLeave() {
+  if (pendingTemplate.value !== null) {
+    emit("apply", pendingTemplate.value);
+    pendingTemplate.value = null;
+  }
+}
+
+const scope = computed(() => {
+  return filters.value.find((f) => f.value === activeFilter.value)?.value;
+});
+
+const savedReplyListResource = createListResource({
+  doctype: "HD Saved Reply",
+  fields: ["name", "title", "owner", "scope", "message"],
+  filters: {
+    scope: scope.value == "All" ? undefined : ["=", scope.value],
+  },
+  cache: ["SavedReplyListForModal"],
+  auto: true,
+  orderBy: "modified desc",
+  start: 0,
+  pageLength: 999,
+});
+
+const onTemplateSelect = (template: SavedReply) => {
+  if (selectedTemplate.value.isLoading) return;
+  selectedTemplate.value = {
+    name: template.name,
+    isLoading: true,
+  };
+  const renderResponse = createResource({
+    url: "helpdesk.api.saved_replies.get_rendered_saved_reply",
+    params: {
+      saved_reply_id: template.name,
+      ticket_id: props.ticketId,
+    },
+    onSuccess: (data: string) => {
+      selectedTemplate.value = {
+        name: "",
+        isLoading: false,
+      };
+      // If user cancelled (Escape/outside click) while API was in flight, discard
+      if (!show.value) return;
+      pendingTemplate.value = data;
+      show.value = false;
+      capture("saved_reply_applied");
+    },
+  });
+  renderResponse.submit().catch(() => {
+    selectedTemplate.value = {
+      name: "",
+      isLoading: false,
+    };
+  });
+};
+
+const onNewSavedReplyClick = () => {
+  show.value = false;
+  showSettingsModal.value = true;
+  setActiveSettingsTab("Saved Replies");
+};
+
+const resetFilter = () => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource.filters,
+    title: undefined,
+  };
+};
+
+watch(search, (newValue) => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource.filters,
+    title: ["like", `%${newValue}%`],
+  };
+  savedReplyListResource.list.reload();
+});
+
+watch(activeFilter, () => {
+  savedReplyListResource.filters = {
+    ...savedReplyListResource?.filters,
+    scope: scope.value == "All" ? undefined : ["=", scope.value],
+  };
+  savedReplyListResource.list.reload();
+});
+
+watch(
+  show,
+  (newValue) => {
+    if (newValue) {
+      nextTick(() => {
+        const inputEl = searchInput.value?.$el?.querySelector("input");
+        inputEl?.focus();
+      });
+    }
+  },
+  { immediate: true }
+);
+</script>

@@ -1,0 +1,207 @@
+{
+	"actions": [],
+	"creation": "2026-04-04 12:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"api_section",
+		"ai_provider",
+		"ai_base_url",
+		"investigation_provider",
+		"investigation_base_url",
+		"investigation_api_key",
+		"anthropic_api_key",
+		"column_break_api",
+		"default_triage_model",
+		"default_investigation_model",
+		"limits_section",
+		"max_tool_calls_per_session",
+		"max_session_time_seconds",
+		"column_break_limits",
+		"max_sessions_per_ticket",
+		"initial_tool_calls",
+		"tool_limits_section",
+		"hub_max_list_limit",
+		"hub_max_error_log_limit",
+		"column_break_tool_limits",
+		"hub_max_report_rows",
+		"triage_section",
+		"auto_triage_enabled",
+		"column_break_triage",
+		"triage_job_timeout"
+	],
+	"fields": [
+		{
+			"fieldname": "api_section",
+			"fieldtype": "Section Break",
+			"label": "AI Provider"
+		},
+		{
+			"fieldname": "ai_provider",
+			"fieldtype": "Select",
+			"label": "Provider",
+			"options": "Anthropic\nAnthropic Compatible\nOpenAI Compatible",
+			"default": "Anthropic",
+			"description": "Anthropic Compatible: Kimi/Moonshot, GLM/Zhipu \u2014 same API shape, set Base URL. OpenAI Compatible: Poolside, Qwen \u2014 triage only; investigation sessions need Anthropic or Anthropic Compatible."
+		},
+		{
+			"fieldname": "ai_base_url",
+			"fieldtype": "Data",
+			"label": "Base URL",
+			"depends_on": "eval:doc.ai_provider && doc.ai_provider != 'Anthropic'",
+			"description": "e.g. https://api.moonshot.ai/anthropic or https://inference.poolside.ai/v1"
+		},
+		{
+			"fieldname": "investigation_provider",
+			"fieldtype": "Select",
+			"label": "Investigation Provider",
+			"options": "\nAnthropic\nAnthropic Compatible",
+			"description": "Optional override: run investigation sessions on a different provider than triage (e.g. cheap OpenAI-compatible triage + Anthropic investigation). Blank = same as Provider above. OpenAI-Compatible is not offered here \u2014 sessions need Anthropic tool-use."
+		},
+		{
+			"fieldname": "investigation_base_url",
+			"fieldtype": "Data",
+			"label": "Investigation Base URL",
+			"depends_on": "eval:doc.investigation_provider && doc.investigation_provider != 'Anthropic'"
+		},
+		{
+			"fieldname": "investigation_api_key",
+			"fieldtype": "Password",
+			"label": "Investigation API Key",
+			"depends_on": "investigation_provider",
+			"description": "Blank = reuse the main AI API Key."
+		},
+		{
+			"fieldname": "anthropic_api_key",
+			"fieldtype": "Password",
+			"label": "AI API Key",
+			"reqd": 1,
+			"description": "Key for the selected provider. Stored only on the Hub \u2014 customer sites never hold an AI credential."
+		},
+		{
+			"fieldname": "column_break_api",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "claude-haiku-4-5-20251001",
+			"fieldname": "default_triage_model",
+			"fieldtype": "Data",
+			"label": "Triage Model"
+		},
+		{
+			"default": "claude-sonnet-4-6",
+			"fieldname": "default_investigation_model",
+			"fieldtype": "Data",
+			"label": "Investigation Model"
+		},
+		{
+			"fieldname": "limits_section",
+			"fieldtype": "Section Break",
+			"label": "Investigation Limits"
+		},
+		{
+			"default": "30",
+			"fieldname": "max_tool_calls_per_session",
+			"fieldtype": "Int",
+			"label": "Max Tool Calls per Session"
+		},
+		{
+			"default": "300",
+			"description": "In seconds (300 = 5 minutes)",
+			"fieldname": "max_session_time_seconds",
+			"fieldtype": "Int",
+			"label": "Max Session Time"
+		},
+		{
+			"fieldname": "column_break_limits",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "3",
+			"fieldname": "max_sessions_per_ticket",
+			"fieldtype": "Int",
+			"label": "Max Sessions per Ticket"
+		},
+		{
+			"default": "10",
+			"description": "Pause the session after this many tool calls for agent review. Set to 0 to disable pausing.",
+			"fieldname": "initial_tool_calls",
+			"fieldtype": "Int",
+			"label": "Initial Tool Calls (Deep Dive Pause)"
+		},
+		{
+			"description": "Caps applied to tool-call arguments before the Hub forwards them to customer sites. These protect the Hub's Anthropic token budget regardless of customer-side limits. Claude Desktop / Web sessions bypass these caps.",
+			"fieldname": "tool_limits_section",
+			"fieldtype": "Section Break",
+			"label": "Tool Call Limits (Token Budget)"
+		},
+		{
+			"default": "200",
+			"description": "Max rows returned by get_list. Effective limit = min(Sonnet request, this, customer ceiling).",
+			"fieldname": "hub_max_list_limit",
+			"fieldtype": "Int",
+			"label": "Hub Max List Limit"
+		},
+		{
+			"default": "50",
+			"description": "Max entries returned by get_error_log.",
+			"fieldname": "hub_max_error_log_limit",
+			"fieldtype": "Int",
+			"label": "Hub Max Error Log Limit"
+		},
+		{
+			"fieldname": "column_break_tool_limits",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "500",
+			"description": "Max rows returned by execute_report.",
+			"fieldname": "hub_max_report_rows",
+			"fieldtype": "Int",
+			"label": "Hub Max Report Rows"
+		},
+		{
+			"fieldname": "triage_section",
+			"fieldtype": "Section Break",
+			"label": "Triage"
+		},
+		{
+			"default": "1",
+			"fieldname": "auto_triage_enabled",
+			"fieldtype": "Check",
+			"label": "Auto-Triage on New Tickets"
+		},
+		{
+			"fieldname": "column_break_triage",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "25",
+			"fieldname": "triage_job_timeout",
+			"fieldtype": "Int",
+			"label": "Triage Job Timeout (seconds)"
+		}
+	],
+	"issingle": 1,
+	"links": [],
+	"modified": "2026-04-04 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS Hub Settings",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}

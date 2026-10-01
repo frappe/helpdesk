@@ -28,5 +28,3 @@ function updateStep(
   fieldDependencyName.value = fieldDependency;
 }
 </script>
-
-<style scoped></style>

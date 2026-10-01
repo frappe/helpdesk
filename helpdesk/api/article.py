@@ -1,3 +1,5 @@
+import re
+
 import frappe
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
@@ -23,7 +25,7 @@ def get_noun_phrases(blob: TextBlob):
 def search_with_enough_results(
     prev_res: list, query: str, qtype="and"
 ) -> tuple[list, bool]:
-    out = hd_search(query, only_articles=True, qtype=qtype)
+    out = hd_search(query, qtype=qtype)
     if not out:
         return prev_res, len(prev_res) == NUM_RESULTS
     items = prev_res + out[0].get("items", [])
@@ -31,9 +33,44 @@ def search_with_enough_results(
     return items, len(items) == NUM_RESULTS
 
 
+def sanitize_query(query: str) -> str:
+    q = query.strip().lower()
+    q = re.sub(r"[^a-z0-9\s]", " ", q)
+    # Collapse multiple spaces into one
+    q = re.sub(r"\s+", " ", q)
+    return q.strip()
+
+
+@frappe.whitelist()
+def get_article_stats(article_name: str):
+    views = frappe.db.get_value("HD Article", article_name, "views")
+
+    likes = frappe.db.count(
+        "HD Article Feedback",
+        filters={
+            "article": article_name,
+            "feedback": 1,
+        },
+    )
+
+    dislikes = frappe.db.count(
+        "HD Article Feedback",
+        filters={
+            "article": article_name,
+            "feedback": 2,
+        },
+    )
+
+    return {
+        "views": views,
+        "likes": likes,
+        "dislikes": dislikes,
+    }
+
+
 @frappe.whitelist()
 def search(query: str) -> list:
-    query = query.strip().lower()
+    query = sanitize_query(query)
     ret, enough = search_with_enough_results([], query)
     if enough:
         return ret

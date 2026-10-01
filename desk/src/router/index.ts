@@ -1,4 +1,5 @@
 import { useScreenSize } from "@/composables/screen";
+import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -19,12 +20,18 @@ declare module "vue-router" {
   }
 }
 
-const routes = [
+// Pages that render inside the portal chrome; PortalRoot picks the agent or
+// customer shell from the session.
+const portalRoutes = [
   // Agent Portal Routes
   {
-    path: "/",
+    path: "",
+    redirect: "/home",
+  },
+  {
+    path: "/home",
     name: "Home",
-    redirect: "/tickets",
+    component: () => import("@/pages/home/Home.vue"),
   },
 
   {
@@ -80,12 +87,24 @@ const routes = [
   {
     path: "/customers",
     name: "CustomerList",
-    component: () => import("@/pages/desk/customer/Customers.vue"),
+    component: () => import("@/pages/customer/Customers.vue"),
+  },
+  {
+    path: "/customers/:id",
+    name: "Customer",
+    component: () => import("@/pages/customer/Customer.vue"),
+    props: true,
   },
   {
     path: "/contacts",
     name: "ContactList",
-    component: () => import("@/pages/desk/contact/Contacts.vue"),
+    component: () => import("@/pages/contact/Contacts.vue"),
+  },
+  {
+    path: "/contacts/:id",
+    name: "Contact",
+    component: () => import("@/pages/contact/Contact.vue"),
+    props: true,
   },
   {
     path: "/agents",
@@ -103,14 +122,59 @@ const routes = [
     redirect: "/tickets",
   },
   {
-    path: "/canned-responses",
-    name: "CannedResponses",
-    component: () => import("@/pages/CannedResponses.vue"),
-  },
-  {
     path: "/dashboard",
     name: "Dashboard",
     component: () => import("@/pages/dashboard/Dashboard.vue"),
+  },
+  {
+    path: "/projects",
+    name: "TaskyProjects",
+    component: () => import("@/pages/tasky/Projects.vue"),
+  },
+  {
+    path: "/templates",
+    name: "TaskyTemplates",
+    component: () => import("@/pages/tasky/Templates.vue"),
+  },
+  {
+    path: "/projects/:projectId",
+    name: "TaskyProject",
+    component: () => import("@/pages/tasky/PMDashboard.vue"),
+    props: true,
+  },
+  {
+    path: "/projects/:projectId/checklist",
+    name: "TaskyChecklist",
+    component: () => import("@/pages/tasky/Checklist.vue"),
+    props: true,
+  },
+  {
+    path: "/projects/:projectId/kanban",
+    name: "TaskyKanban",
+    component: () => import("@/pages/tasky/Kanban.vue"),
+    props: true,
+  },
+  {
+    path: "/projects/:projectId/timeline",
+    name: "TaskyTimeline",
+    component: () => import("@/pages/tasky/Timeline.vue"),
+    props: true,
+  },
+  {
+    path: "/projects/:projectId/overdue",
+    name: "TaskyOverdue",
+    component: () => import("@/pages/tasky/Overdue.vue"),
+    props: true,
+  },
+  {
+    path: "/my-tasks",
+    name: "TaskyMyTasks",
+    component: () => import("@/pages/tasky/MyTasks.vue"),
+  },
+  {
+    path: "/timesheets",
+    name: "TaskyTimesheets",
+    component: () => import("@/pages/tasky/Timesheets.vue"),
   },
   {
     path: "/call-logs",
@@ -188,7 +252,22 @@ const routes = [
   },
 ];
 
-const handleMobileView = (componentName) => {
+const routes = [
+  // Renders bare — no portal chrome.
+  {
+    path: "/onboarding",
+    name: "Persona",
+    component: () => import("@/pages/PersonaForm.vue"),
+    beforeEnter: () => canViewPersona(useAuthStore()) || { name: "Home" },
+  },
+  {
+    path: "/",
+    component: () => import("@/roots/PortalRoot.vue"),
+    children: portalRoutes,
+  },
+];
+
+const handleMobileView = (componentName: string) => {
   return isMobileView.value ? `Mobile${componentName}` : componentName;
 };
 
@@ -203,6 +282,9 @@ router.beforeEach(async (to, _, next) => {
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
+
+  const interrupt = personaInterrupt(to, authStore);
+  if (interrupt) return next(interrupt);
 
   if (!authStore.isLoggedIn) {
     const redirectURL = to.fullPath !== "/" ? to.fullPath : "";

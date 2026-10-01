@@ -1,5 +1,4 @@
 import { HDTicketStatus } from "@/types/doctypes";
-import { parseColor } from "@/utils";
 import { createListResource } from "frappe-ui";
 import { defineStore } from "pinia";
 
@@ -37,19 +36,19 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
     );
   }
   const colorMap = {
-    Green: ["text-green-700", "bg-surface-green-2"],
-    Black: ["text-black", "bg-surface-gray-2"],
-    Gray: ["text-gray-700", "bg-surface-gray-2"],
-    Blue: ["text-blue-700", "bg-surface-blue-2"],
-    Red: ["text-red-500", "bg-surface-red-1"],
-    Pink: ["text-pink-500", "bg-surface-pink-1"],
-    Orange: ["text-orange-600", "bg-surface-orange-1"],
-    Amber: ["text-amber-700", "bg-surface-amber-2"],
-    Yellow: ["text-yellow-700", "bg-surface-amber-2"],
-    Cyan: ["text-cyan-700", "bg-surface-cyan-1"],
-    Teal: ["text-teal-700", "bg-teal-100"],
-    Violet: ["text-violet-700", "bg-surface-violet-1"],
-    Purple: ["text-purple-700", "bg-purple-100"],
+    Green: ["text-ink-green-6", "bg-surface-green-2"],
+    Black: ["text-ink-gray-9", "bg-surface-gray-2"],
+    Gray: ["text-ink-gray-7", "bg-surface-gray-2"],
+    Blue: ["text-ink-blue-6", "bg-surface-blue-2"],
+    Red: ["text-ink-red-6", "bg-surface-red-1"],
+    Pink: ["text-ink-pink-1", "bg-surface-pink-1"],
+    Orange: ["text-ink-orange-6", "bg-surface-orange-1"],
+    Amber: ["text-ink-amber-6", "bg-surface-amber-2"],
+    Yellow: ["text-ink-yellow-6", "bg-surface-amber-2"],
+    Cyan: ["text-ink-cyan-6", "bg-surface-cyan-1"],
+    Teal: ["text-ink-teal-6", "bg-surface-teal-1"],
+    Violet: ["text-ink-violet-6", "bg-surface-violet-1"],
+    Purple: ["text-ink-purple-6", "bg-surface-purple-1"],
     Default: ["text-ink-gray-9", "bg-surface-gray-2"],
   };
 
@@ -61,12 +60,11 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
 });
 function parseColor(color: string): string {
   color = color.toLowerCase();
-  let textColor = `!text-${color}-600`;
+  let textColor = `!text-${color}-500`;
   if (color == "black") {
     textColor = "!text-ink-gray-9";
   } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-700`;
+    textColor = `!text-${color}-500`;
   }
-
   return textColor;
 }

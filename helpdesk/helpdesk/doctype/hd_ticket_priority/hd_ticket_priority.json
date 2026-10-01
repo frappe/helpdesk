@@ -6,9 +6,9 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "integer_value",
-  "column_break_fzcl",
-  "description"
+  "disabled",
+  "description",
+  "integer_value"
  ],
  "fields": [
   {
@@ -26,13 +26,15 @@
    "reqd": 1
   },
   {
-   "fieldname": "column_break_fzcl",
-   "fieldtype": "Column Break"
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "grid_page_length": 50,
  "links": [],
- "modified": "2025-03-21 15:26:37.744606",
+ "modified": "2026-06-19 13:04:40.394240",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Priority",
@@ -59,13 +61,12 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Helpdesk Contact",
+   "role": "Agent Manager",
    "share": 1,
    "write": 1
   },
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -81,7 +82,18 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "HD Customer",
+   "select": 1,
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HD Customer Manager",
+   "select": 1,
    "share": 1
   }
  ],

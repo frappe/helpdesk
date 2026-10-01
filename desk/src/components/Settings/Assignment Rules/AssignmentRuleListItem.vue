@@ -1,26 +1,34 @@
 <template>
   <div
-    class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-gray-50 rounded"
+    class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
   >
     <div
       @click="assignmentRulesActiveScreen = { screen: 'view', data: data }"
-      class="w-full py-3 pl-2 col-span-7"
+      class="w-full pl-2 col-span-7 h-14 flex flex-col justify-center"
     >
-      <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
+      <div class="text-base-medium text-ink-gray-7">{{ data.name }}</div>
       <div
         v-if="data.description && data.description.length > 0"
-        class="text-sm w-full text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
+        class="text-sm w-full text-ink-gray-5 mt-1 truncate"
       >
         {{ data.description }}
       </div>
     </div>
-    <div class="col-span-2">
-      <Select
-        class="w-max bg-transparent -ml-2 border-0 text-ink-gray-6 focus-visible:!ring-0 bg-none"
-        :options="priorityOptions"
+    <div class="col-span-3">
+      <select
+        class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-md p-0 pl-2 pr-5 bg-transparent -ml-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
         v-model="data.priority"
         @update:modelValue="onPriorityChange"
-      />
+        @change="onPriorityChange"
+      >
+        <option
+          v-for="option in priorityOptions"
+          :key="option.value"
+          :value="option.value"
+        >
+          {{ option.label }}
+        </option>
+      </select>
     </div>
     <div class="flex justify-between items-center w-full pr-2 col-span-2">
       <div>
@@ -33,7 +41,7 @@
       <div>
         <Dropdown placement="right" :options="dropdownOptions">
           <Button
-            icon="more-horizontal"
+            icon="lucide-more-horizontal"
             variant="ghost"
             @click="isConfirmingDelete = false"
           />
@@ -42,15 +50,15 @@
     </div>
   </div>
   <Dialog
-    :options="{ title: __('Duplicate Assignment Rule') }"
-    v-model="duplicateDialog.show"
+    :title="__('Duplicate Assignment Rule')"
+    v-model:open="duplicateDialog.show"
   >
-    <template #body-content>
+    <template #default>
       <div class="flex flex-col gap-4">
         <FormControl
           :label="__('New Assignment Rule Name')"
           type="text"
-          v-model="duplicateDialog.name"
+          v-model="duplicateDialog.newName"
         />
       </div>
     </template>
@@ -69,19 +77,22 @@
 
 <script setup lang="ts">
 import { assignmentRulesActiveScreen } from "@/stores/assignmentRules";
+import { __ } from "@/translation";
+import { AssignmentRuleListResourceSymbol } from "@/types";
+import { AssignmentRule } from "@/types/doctypes";
 import { ConfirmDelete } from "@/utils";
 import {
   Button,
   createResource,
   Dialog,
+  Dropdown,
   FormControl,
-  Select,
   Switch,
   toast,
 } from "frappe-ui";
 import { inject, ref } from "vue";
 
-const assignmentRulesList = inject<any>("assignmentRulesList");
+const assignmentRulesListData = inject(AssignmentRuleListResourceSymbol);
 
 const props = defineProps({
   data: {
@@ -100,6 +111,7 @@ const priorityOptions = [
 
 const duplicateDialog = ref({
   show: false,
+  newName: "",
   name: "",
 });
 
@@ -113,9 +125,9 @@ const deleteAssignmentRule = () => {
       name: props.data.name,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
+      assignmentRulesListData?.reload();
       isConfirmingDelete.value = false;
-      toast.success("Assignment rule deleted");
+      toast.success(__("Assignment rule deleted successfully."));
     },
     auto: true,
   });
@@ -123,14 +135,15 @@ const deleteAssignmentRule = () => {
 
 const dropdownOptions = [
   {
-    label: "Duplicate",
+    label: __("Duplicate"),
     onClick: () => {
       duplicateDialog.value = {
         show: true,
-        name: props.data.name + " (Copy)",
+        newName: props.data.name + " (Copy)",
+        name: props.data.name,
       };
     },
-    icon: "copy",
+    icon: "lucide-copy",
   },
   ...ConfirmDelete({
     onConfirmDelete: () => deleteAssignmentRule(),
@@ -140,22 +153,37 @@ const dropdownOptions = [
 
 const duplicate = () => {
   createResource({
-    url: "helpdesk.api.assignment_rule.duplicate_assignment_rule",
+    url: "frappe.client.get",
     params: {
-      docname: props.data.name,
-      new_name: duplicateDialog.value.name,
+      doctype: "Assignment Rule",
+      name: duplicateDialog.value.name,
     },
-    onSuccess: (data) => {
-      assignmentRulesList.reload();
-      toast.success("Assignment rule duplicated");
-      duplicateDialog.value.show = false;
-      duplicateDialog.value.name = "";
-      assignmentRulesActiveScreen.value = {
-        screen: "view",
-        data: {
-          name: data.name,
+    onSuccess: (data: AssignmentRule) => {
+      createResource({
+        url: "frappe.client.insert",
+        params: {
+          doc: {
+            ...data,
+            name: duplicateDialog.value.newName,
+          },
         },
-      };
+        auto: true,
+        onSuccess(newAssignmentRuleData: AssignmentRule) {
+          assignmentRulesListData?.reload();
+          toast.success(__("Assignment rule duplicated successfully."));
+          duplicateDialog.value = {
+            show: false,
+            newName: "",
+            name: "",
+          };
+          setTimeout(() => {
+            assignmentRulesActiveScreen.value = {
+              screen: "view",
+              data: newAssignmentRuleData,
+            };
+          }, 250);
+        },
+      });
     },
     auto: true,
   });
@@ -165,15 +193,26 @@ const onPriorityChange = () => {
   setAssignmentRuleValue("priority", props.data.priority);
 };
 
-const onToggle = () => {
+const onToggle = (enabled: boolean) => {
   if (!props.data.users_exists && props.data.disabled) {
-    toast.error("Cannot enable rule without adding users in it");
+    toast.error(__("Cannot enable rule without adding users in it"));
     return;
   }
-  setAssignmentRuleValue("disabled", !props.data.disabled, "status");
+  // Optimistically flip so the switch reflects the new state immediately;
+  // revert if the backend update fails.
+  const previous = props.data.disabled;
+  props.data.disabled = enabled ? 0 : 1;
+  setAssignmentRuleValue("disabled", props.data.disabled, "status", () => {
+    props.data.disabled = previous;
+  });
 };
 
-const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
+const setAssignmentRuleValue = (
+  key: string,
+  value: any,
+  fieldName?: string,
+  onError?: () => void
+) => {
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -183,8 +222,15 @@ const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
       value: value,
     },
     onSuccess: () => {
-      assignmentRulesList.reload();
-      toast.success(`Assignment rule ${fieldName || key} updated`);
+      toast.success(
+        __("Assignment rule {0} updated successfully.", fieldName || key)
+      );
+    },
+    onError: () => {
+      onError?.();
+      toast.error(
+        __("Failed to update assignment rule {0}.", fieldName || key)
+      );
     },
     auto: true,
   });

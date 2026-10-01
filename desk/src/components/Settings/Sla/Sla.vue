@@ -1,8 +1,6 @@
 <template>
-  <div class="pb-8">
-    <SlaPolicies v-if="slaActiveScreen.screen == 'list'" />
-    <SlaPolicyView v-else-if="slaActiveScreen.screen == 'view'" />
-  </div>
+  <SlaPolicies v-if="slaActiveScreen.screen == 'list'" />
+  <SlaPolicyView v-else-if="slaActiveScreen.screen == 'view'" />
 </template>
 
 <script setup lang="ts">
@@ -10,16 +8,25 @@ import { slaActiveScreen } from "@/stores/sla";
 import SlaPolicies from "./SlaPolicies.vue";
 import SlaPolicyView from "./SlaPolicyView.vue";
 import { createListResource } from "frappe-ui";
-import { provide } from "vue";
+import { onUnmounted, provide, ref } from "vue";
+import { SlaPolicyListResourceSymbol } from "@/types";
 
 const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
   fields: ["name", "default_sla", "enabled", "description"],
-  orderBy: "creation desc",
+  cache: ["SLAPolicyList"],
+  orderBy: "modified desc",
   start: 0,
   pageLength: 999,
   auto: true,
 });
+const slaSearchQuery = ref("");
 
-provide("slaPolicyList", slaPolicyListData);
+provide("slaSearchQuery", slaSearchQuery);
+provide(SlaPolicyListResourceSymbol, slaPolicyListData);
+
+onUnmounted(() => {
+  slaSearchQuery.value = "";
+  slaPolicyListData.filters = {};
+});
 </script>

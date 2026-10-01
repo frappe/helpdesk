@@ -1,6 +1,6 @@
 {
 	"charts": [],
-	"content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/helpdesk\\\">Visit Helpdesk</a></span>\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Helpdesk Configuration<br></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Helpdesk Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
+	"content": "[{\"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/helpdesk\\\">Visit Helpdesk</a></span>\", \"col\": 12}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"paragraph\", \"data\": {\"text\": \"<span class=\\\"h4\\\">Helpdesk Configuration<br></span>\", \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Ticket Configuration\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Agent Configuration\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Ticket Reports\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Automation\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Channels\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"AI Support\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"AI Usage & Pricing\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Implementation\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"AI Usage Reports\", \"col\": 4}}]",
 	"creation": "2022-09-17 11:48:26.825712",
 	"docstatus": 0,
 	"doctype": "Workspace",
@@ -125,14 +125,14 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Helpdesk Reports",
+			"label": "Ticket Reports",
 			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
 		},
 		{
 			"hidden": 0,
-			"is_query_report": 0,
+			"is_query_report": 1,
 			"label": "Ticket Analytics",
 			"link_count": 0,
 			"link_to": "Ticket Analytics",
@@ -142,16 +142,168 @@
 		},
 		{
 			"hidden": 0,
-			"is_query_report": 0,
+			"is_query_report": 1,
 			"label": "Ticket Summary",
 			"link_count": 0,
 			"link_to": "Ticket Summary",
 			"link_type": "Report",
 			"onboard": 0,
 			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "AI Support",
+			"link_count": 7,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Support Connections",
+			"link_count": 0,
+			"link_to": "HDS Support Connection",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Hub Settings",
+			"link_count": 0,
+			"link_to": "HDS Hub Settings",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "AI Support Sessions",
+			"link_count": 0,
+			"link_to": "HDS AI Support Session",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Action Requests",
+			"link_count": 0,
+			"link_to": "HDS Support Action Request",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Remote Audit Log",
+			"link_count": 0,
+			"link_to": "HDS Remote Audit Log",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Site Login Log",
+			"link_count": 0,
+			"link_to": "HDS Site Login Log",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "MCP Call Log",
+			"link_count": 0,
+			"link_to": "HDS MCP Call Log",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "AI Usage & Pricing",
+			"link_count": 2,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "AI Usage Log",
+			"link_count": 0,
+			"link_to": "HDS AI Usage Log",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Model Pricing",
+			"link_count": 0,
+			"link_to": "HDS Model Pricing",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Implementation",
+			"link_count": 1,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Implementation Templates",
+			"link_count": 0,
+			"link_to": "HD Task Template",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "AI Usage Reports",
+			"link_count": 2,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 1,
+			"label": "AI Usage By Customer",
+			"link_count": 0,
+			"link_to": "AI Usage By Customer",
+			"link_type": "Report",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 1,
+			"label": "AI Usage Summary",
+			"link_count": 0,
+			"link_to": "AI Usage Summary",
+			"link_type": "Report",
+			"onboard": 0,
+			"type": "Link"
 		}
 	],
-	"modified": "2022-12-02 16:07:39.761267",
+	"modified": "2025-12-30 19:50:39.761267",
 	"modified_by": "Administrator",
 	"module": "Helpdesk",
 	"name": "Helpdesk",

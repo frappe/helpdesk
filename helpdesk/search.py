@@ -25,8 +25,6 @@ except ImportError:
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
-from helpdesk.utils import is_agent
-
 if TYPE_CHECKING:
     from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
@@ -95,7 +93,7 @@ def get_synonym_words() -> list[str]:
 
 
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
+    unsafe_chars = re.compile(r"[^a-zA-Z0-9\s]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -182,6 +180,8 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
+        # Collapse multiple spaces
+        query = re.sub(r"\s+", " ", query)
         return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
@@ -213,14 +213,6 @@ class Search:
 
 class HelpdeskSearch(Search):
     DOCTYPE_FIELDS = {
-        "HD Ticket": [
-            "name",
-            "subject",
-            "description",
-            "agent_group",
-            "modified",
-            "creation",
-        ],
         "HD Article": [
             "name",
             "category",
@@ -239,7 +231,6 @@ class HelpdeskSearch(Search):
             {"name": "subject", "weight": settings.subject_weight or 6},
             {"name": "description", "weight": settings.description_weight or 5},
             {"name": "headings", "weight": settings.headings_weight or 8},
-            {"name": "team", "type": "tag"},
             {"name": "modified", "sortable": True},
             {"name": "creation", "sortable": True},
         ]
@@ -248,7 +239,7 @@ class HelpdeskSearch(Search):
     def build_index(self):
         self.drop_index()
         self.create_index()
-        records = self.get_records("HD Ticket") + self.get_records("HD Article")
+        records = self.get_records("HD Article")
         total = len(records)
         for i, doc in enumerate(records):
             self.index_doc(doc)
@@ -257,15 +248,6 @@ class HelpdeskSearch(Search):
 
     def index_doc(self, doc):
         id = f"{doc.doctype}:{doc.name}"
-        fields = None
-        if doc.doctype == "HD Ticket":
-            fields = {
-                "doctype": doc.doctype,
-                "name": doc.name,
-                "subject": doc.subject,
-                "team": doc.agent_group,
-                "modified": doc.modified,
-            }
         if doc.doctype == "HD Article":
             fields = {
                 "doctype": doc.doctype,
@@ -275,7 +257,6 @@ class HelpdeskSearch(Search):
                 "headings": doc.headings,
                 "modified": doc.modified,
             }
-        if fields:
             self.add_document(id, fields)
 
     def remove_doc(self, doc):
@@ -319,16 +300,15 @@ class HelpdeskSearch(Search):
         return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
 
     def get_count(self, doctype):
-        if doctype == "HD Ticket":
-            return frappe.db.count(doctype)
         if doctype == "HD Article":
             return len(self.get_records(doctype))
 
     def get_records(self, doctype):
         records = []
-        filters = {"status": "Published"} if doctype == "HD Article" else {}
         for d in frappe.db.get_all(
-            doctype, filters=filters, fields=self.DOCTYPE_FIELDS[doctype]
+            doctype,
+            filters={"status": "Published"},
+            fields=self.DOCTYPE_FIELDS[doctype],
         ):
             d.doctype = doctype
             if doctype == "HD Article":
@@ -338,16 +318,10 @@ class HelpdeskSearch(Search):
                     cd.content = section
                     cd.headings = heading
                     records.append(cd)
-            elif doctype == "HD Ticket":
-                d.headings = self.extract_headings(d.description)
-                records.append(d)
         return records
 
 
-@frappe.whitelist()
-def search(
-    query, only_articles=False, qtype: Literal["and", "or"] = "and"
-) -> list[dict[str, list[dict]]]:
+def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts: list[str] = query.split()
@@ -371,10 +345,6 @@ def search(
         doctype, name = r.id.split(":")
         r.doctype = doctype
         r.name = name
-        if doctype == "HD Ticket" and not only_articles:
-            if not is_agent():
-                r = []
-            groups.setdefault("Tickets", []).append(r)
         if doctype == "HD Article":
             groups.setdefault("Articles", []).append(r)
 

@@ -4,9 +4,35 @@
 import frappe
 from frappe.model.document import Document
 
+from helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status import get_active_status
+
 
 class HDAgent(Document):
+    def before_insert(self):
+        if not self.availability:
+            self.availability = get_active_status()
+
     def before_save(self):
+        old_doc = self.get_doc_before_save()
+        if not old_doc or old_doc.availability != self.availability:
+            self.availability_changed_on = frappe.utils.now()
+        if old_doc and old_doc.agent_name != self.agent_name:
+            if self.agent_name:
+                agent_name = self.agent_name.split()
+                frappe.set_value(
+                    "User",
+                    self.user,
+                    {
+                        "first_name": agent_name[0],
+                        "last_name": " ".join(agent_name[1:]),
+                    },
+                )
+            else:
+                self.agent_name = frappe.get_value("User", self.user, "full_name")
+
+        if old_doc and old_doc.user_image != self.user_image:
+            frappe.set_value("User", self.user, "user_image", self.user_image)
+
         if self.name == self.user:
             return
 
@@ -21,10 +47,11 @@ class HDAgent(Document):
 
 
 @frappe.whitelist()
-def update_agent_role(user, new_role):
+def update_agent_role(user: str, new_role: str):
     """
     Update the role of the user to Agent
     """
+    frappe.only_for(("Agent Manager", "System Manager"))
 
     user_doc = frappe.get_doc("User", user)
 

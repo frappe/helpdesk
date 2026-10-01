@@ -1,52 +1,66 @@
-import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import { OrganizationsIcon } from "../icons";
-import PhoneIcon from "../icons/PhoneIcon.vue";
+import LucideHome from "~icons/lucide/home";
+import LucideFolderKanban from "~icons/lucide/folder-kanban";
+import LucideListTodo from "~icons/lucide/list-todo";
+import LucideClipboardList from "~icons/lucide/clipboard-list";
+import LucideClock from "~icons/lucide/clock";
+import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
   {
-    label: "Tickets",
+    label: __("Home"),
+    icon: LucideHome,
+    to: "Home",
+  },
+  {
+    label: __("Dashboard"),
+    icon: LucideLayoutDashboard,
+    to: "Dashboard"
+  },
+  {
+    label: __("Tickets"),
     icon: LucideTicket,
     to: "TicketsAgent",
   },
   {
-    label: "Knowledge Base",
-    icon: LucideBookOpen,
-    to: "AgentKnowledgeBase",
+    label: __("Projects"),
+    icon: LucideFolderKanban,
+    to: "TaskyProjects",
   },
   {
-    label: "Canned responses",
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
+    label: __("Templates"),
+    icon: LucideClipboardList,
+    to: "TaskyTemplates",
   },
   {
-    label: "Customers",
+    label: __("My Tasks"),
+    icon: LucideListTodo,
+    to: "TaskyMyTasks",
+  },
+  {
+    label: __("Timesheets"),
+    icon: LucideClock,
+    to: "TaskyTimesheets",
+  },
+  {
+    label: __("Customers"),
     icon: OrganizationsIcon,
     to: "CustomerList",
   },
   {
-    label: "Contacts",
+    label: __("Contacts"),
     icon: LucideContact2,
     to: "ContactList",
-  },
-  {
-    label: "Call Logs",
-    icon: PhoneIcon,
-    to: "CallLogs",
   },
 ];
 
 export const customerPortalSidebarOptions = [
   {
-    label: "Tickets",
+    label: __("Tickets"),
     icon: LucideTicket,
     to: "TicketsCustomer",
-  },
-  {
-    label: "Knowledge Base",
-    icon: LucideBookOpen,
-    to: "CustomerKnowledgeBase",
   },
 ];

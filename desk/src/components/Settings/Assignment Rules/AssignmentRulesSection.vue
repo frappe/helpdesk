@@ -7,7 +7,7 @@
   />
   <div
     v-if="props.conditions.length == 0"
-    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
+    class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-outline-gray-2 text-ink-gray-5 rounded-md"
     @click="
       props.conditions.push(['', '', '']);
       validateAssignmentRule(props.name);
@@ -25,7 +25,7 @@
     >
       <Button
         :disabled="props.errors !== ''"
-        :icon-right="open ? 'chevron-up' : 'chevron-down'"
+        :icon-right="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
         :label="__('Add condition')"
       />
     </Dropdown>
@@ -42,7 +42,8 @@ import CFConditions from "@/components/conditions-filter/CFConditions.vue";
 import { validateConditions } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
-import { validateAssignmentRule } from "../../../stores/assignmentRules";
+import { validateAssignmentRule } from "@/stores/assignmentRules";
+import { __ } from "@/translation";
 
 const props = defineProps({
   conditions: Array<any>,
@@ -62,13 +63,13 @@ const getConjunction = () => {
 
 const dropdownOptions = [
   {
-    label: "Add condition",
+    label: __("Add condition"),
     onClick: () => {
       addCondition();
     },
   },
   {
-    label: "Add condition group",
+    label: __("Add condition group"),
     onClick: () => {
       const conjunction = getConjunction();
       props.conditions.push(conjunction, [[]]);

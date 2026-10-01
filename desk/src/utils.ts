@@ -1,11 +1,21 @@
-import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
-import dayjs from "dayjs";
-import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
-import { gemoji } from "gemoji";
-import { h, markRaw, ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import type { DropdownOption } from "@/types";
+import { useClipboard } from "@vueuse/core";
+import {
+  FeatherIcon,
+  call,
+  dayjs,
+  dayjsLocal,
+  toast,
+  useFileUpload,
+} from "frappe-ui";
+import { h, ref } from "vue";
 import zod from "zod";
-import TicketIcon from "./components/icons/TicketIcon.vue";
+import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
+import { Icon } from "frappe-ui/icons";
 import { getMeta } from "./stores/meta";
+import { __ } from "./translation";
+
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -18,7 +28,7 @@ import { getMeta } from "./stores/meta";
  */
 export async function copy(s: string) {
   const { copy: c } = useClipboard();
-  c(s).then(() => toast.success("Copied to clipboard"));
+  c(s).then(() => toast.success(__("Copied to clipboard.")));
 }
 
 /**
@@ -35,22 +45,152 @@ export function getAssign(s: string): string | undefined {
 
 export function validateEmail(email) {
   const regExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;
   return regExp.test(email);
 }
 
+export function extractEmail(input: string) {
+  const match = input.match(/<([^>]+)>$/); // grabs the part inside <>
+  return match ? match[1] : input;
+}
+
 export function validateEmailWithZod(email: string) {
-  const success = zod.string().email().safeParse(email).success;
+  const extractedEmail = extractEmail(email);
+  const success = zod.string().email().safeParse(extractedEmail).success;
   return success;
 }
 
+/** Dayjs date format derived from the site's System Settings (boot data). */
+export function getDateFormat(): string {
+  return ((window as any).date_format || "dd-mm-yyyy").toUpperCase();
+}
+
+/** Time format from the site's System Settings (boot data). */
+export function getTimeFormat(): string {
+  return (window as any).time_format || "HH:mm:ss";
+}
+
 export function dateFormat(date, format?: string) {
-  const _format = format || "DD-MM-YYYY HH:mm:ss";
-  return useDateFormat(date, _format).value;
+  const _format = format || `${getDateFormat()} ${getTimeFormat()}`;
+  if (!date) return "";
+  const tzDate = dayjsLocal(date);
+  return tzDate.format(_format);
 }
 
 export function timeAgo(date) {
-  return useTimeAgo(date).value;
+  return prettyDate(date);
+}
+
+export function getBrowserTimezone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+export function prettyDate(date, mini = false) {
+  if (!date) return "";
+
+  if (typeof date == "string") {
+    date = dayjsLocal(date);
+  }
+
+  let nowDatetime = dayjsLocal();
+  let diff = nowDatetime.diff(date, "seconds");
+  let absDiff = Math.abs(diff);
+
+  // Day-level labels ("Yesterday", "N days ago"...) count calendar dates, not
+  // elapsed 24h windows — otherwise they track time-of-day and an event lands
+  // in the wrong day around midnight. Sub-day labels below still use elapsed
+  // seconds, so recent events keep precise "minutes/hours ago".
+  let dayDiff = nowDatetime.startOf("day").diff(date.startOf("day"), "day");
+
+  if (isNaN(dayDiff)) return "";
+
+  if (mini) {
+    // Return short format of time difference
+    if (absDiff < 86400) {
+      // Within a day — show sub-day granularity (past or future).
+      if (absDiff < 60) return __("Now");
+      if (absDiff < 3600) {
+        const minutes = Math.floor(absDiff / 60);
+        return diff >= 0 ? __("{0} m", [minutes]) : __("in {0} m", [minutes]);
+      }
+      const hours = Math.floor(absDiff / 3600);
+      return diff >= 0 ? __("{0} h", [hours]) : __("in {0} h", [hours]);
+    } else if (diff < 0) {
+      const ahead = -dayDiff;
+      if (ahead === 1) {
+        return __("Tomorrow");
+      } else if (ahead < 7) {
+        return __("in {0} d", [ahead]);
+      } else if (ahead < 31) {
+        return __("in {0} w", [Math.floor(ahead / 7)]);
+      } else if (ahead < 365) {
+        return __("in {0} M", [Math.floor(ahead / 30)]);
+      } else {
+        return __("in {0} y", [Math.floor(ahead / 365)]);
+      }
+    } else {
+      if (dayDiff < 7) {
+        return __("{0} d", [dayDiff]);
+      } else if (dayDiff < 31) {
+        return __("{0} w", [Math.floor(dayDiff / 7)]);
+      } else if (dayDiff < 365) {
+        return __("{0} M", [Math.floor(dayDiff / 30)]);
+      } else {
+        return __("{0} y", [Math.floor(dayDiff / 365)]);
+      }
+    }
+  } else {
+    // Return long format of time difference
+    if (absDiff < 86400) {
+      // Within a day — show sub-day granularity (past or future).
+      if (absDiff < 60) return __("Just now");
+      if (diff >= 0) {
+        if (absDiff < 120) return __("1 minute ago");
+        if (absDiff < 3600)
+          return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
+        if (absDiff < 7200) return __("1 hour ago");
+        return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
+      }
+      if (absDiff < 120) return __("In 1 minute");
+      if (absDiff < 3600)
+        return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+      if (absDiff < 7200) return __("In 1 hour");
+      return __("In {0} hours", [Math.floor(absDiff / 3600)]);
+    } else if (diff < 0) {
+      const ahead = -dayDiff;
+      if (ahead === 1) {
+        return __("Tomorrow");
+      } else if (ahead < 7) {
+        return __("In {0} days", [ahead]);
+      } else if (ahead < 31) {
+        return __("In {0} weeks", [Math.floor(ahead / 7)]);
+      } else if (ahead < 365) {
+        return __("In {0} months", [Math.floor(ahead / 30)]);
+      } else if (ahead < 730) {
+        return __("In 1 year");
+      } else {
+        return __("In {0} years", [Math.floor(ahead / 365)]);
+      }
+    } else {
+      if (dayDiff === 1) {
+        return __("Yesterday");
+      } else if (dayDiff < 7) {
+        return __("{0} days ago", [dayDiff]);
+      } else if (dayDiff < 14) {
+        return __("1 week ago");
+      } else if (dayDiff < 31) {
+        return __("{0} weeks ago", [Math.floor(dayDiff / 7)]);
+      } else if (dayDiff < 62) {
+        return __("1 month ago");
+      } else if (dayDiff < 365) {
+        return __("{0} months ago", [Math.floor(dayDiff / 30)]);
+      } else if (dayDiff < 730) {
+        return __("1 year ago");
+      } else {
+        return __("{0} years ago", [Math.floor(dayDiff / 365)]);
+      }
+    }
+  }
 }
 
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
@@ -59,35 +199,54 @@ export function errorMessage(title, message) {
   toast.error(message);
 }
 
-export function formatTime(seconds) {
+export function formatTime(
+  seconds: number,
+  config: {
+    day?: boolean;
+    hour?: boolean;
+    minute?: boolean;
+    second?: boolean;
+    maxUnits?: number;
+  } = {
+    day: true,
+    hour: true,
+    minute: true,
+    second: true,
+  }
+) {
   const days = Math.floor(seconds / (3600 * 24));
   const hours = Math.floor((seconds % (3600 * 24)) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
 
-  let formattedTime = "";
+  const parts: string[] = [];
 
-  if (days > 0) {
-    formattedTime += `${days}d `;
+  if (config.day && days > 0) {
+    parts.push(`${days}d`);
   }
 
-  if (hours > 0 || days > 0) {
-    formattedTime += `${hours}h `;
+  if (config.hour && (hours > 0 || days > 0)) {
+    parts.push(`${hours}h`);
   }
 
-  if (minutes > 0 || hours > 0 || days > 0) {
-    formattedTime += `${minutes}m `;
+  if (config.minute && (minutes > 0 || hours > 0 || days > 0)) {
+    parts.push(`${minutes}m`);
   }
 
-  formattedTime += `${
-    remainingSeconds >= 10
-      ? remainingSeconds
-      : remainingSeconds > 1
-      ? "0" + remainingSeconds
-      : "0"
-  }s`;
+  if (config.second) {
+    parts.push(
+      `${
+        remainingSeconds >= 10
+          ? remainingSeconds
+          : remainingSeconds > 1
+          ? "0" + remainingSeconds
+          : "0"
+      }s`
+    );
+  }
 
-  return formattedTime.trim();
+  const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
+  return limited.join(" ").trim();
 }
 
 export function getTimeInSeconds(time: string) {
@@ -112,7 +271,7 @@ export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
-  toastMessage: string = "Copied to clipboard"
+  toastMessage: string = __("Copied to clipboard.")
 ) {
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(msg);
@@ -129,20 +288,26 @@ export async function copyToClipboard(
   toast.success(toastMessage);
 }
 
+export const ClearFormattingUtility = {
+  label: "Clear formatting",
+  icon: LucideBrushCleaning,
+  action: (editor) => {
+    editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
+  },
+  isActive: () => false,
+};
+
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
   "Separator",
   "Bold",
   "Italic",
+  "FontColor",
   "Separator",
+  ["Align Left", "Align Center", "Align Right"],
   "Bullet List",
   "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
   "Separator",
   "Image",
   "Video",
@@ -165,32 +330,63 @@ export const textEditorMenuButtons = [
     "ToggleHeaderCell",
     "DeleteTable",
   ],
+  "Separator",
+  ClearFormattingUtility,
 ];
 
 export function isContentEmpty(content: string) {
+  if (!content || content === null || content === undefined) {
+    return true;
+  }
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, "text/html");
-  return doc.body.textContent === "";
+  if (doc.body.textContent === null) {
+    return true;
+  }
+  return doc.body.textContent.trim() === "";
+}
+
+export function normalize(value: any) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  return value;
 }
 
 export function isTouchScreenDevice() {
   return "ontouchstart" in document.documentElement;
 }
 
-export function isEmoji(str) {
-  const emojiList = gemoji.map((emoji) => emoji.emoji);
-  return emojiList.includes(str);
+// Lucide names are plain ASCII, so any emoji-presentation or pictographic
+// character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
+export function isEmoji(str: string): boolean {
+  return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
 
+/**
+ * Resolves a stored icon value into a renderable component.
+ * Supports Lucide icon names from the frappe-ui IconPicker, emojis stored by
+ * older views, and pre-resolved icon components, falling back to the ticket icon.
+ */
 export function getIcon(icon) {
-  if (isEmoji(icon)) {
-    return h("div", icon);
+  if (!icon) {
+    return h(Icon, { name: "ticket" });
   }
-  return icon || markRaw(TicketIcon);
+  if (isEmoji(icon)) {
+    return h(
+      "div",
+      { class: "flex items-center justify-center leading-none" },
+      icon
+    );
+  }
+  if (typeof icon === "string") {
+    return h(Icon, { name: icon });
+  }
+  return icon;
 }
 export function formatTimeShort(date: string) {
-  const now = dayjs();
-  const inputDate = dayjs.tz(date);
+  const now = dayjsLocal();
+  const inputDate = dayjsLocal(date);
   const diffSeconds = now.diff(inputDate, "second");
   const diffMinutes = now.diff(inputDate, "minute");
   const diffHours = now.diff(inputDate, "hour");
@@ -215,14 +411,14 @@ function hasArabicContent(content: string) {
 
 export function getFontFamily(content: string) {
   const langMap = {
-    default: "!font-[InterVar]",
+    default: "!font-[Inter]",
     arabic: "!font-[system-ui]",
   };
-  let lang = "default";
+  let lang = "";
   if (hasArabicContent(content)) {
     lang = "arabic";
   }
-  return langMap[lang];
+  return langMap[lang] || "";
 }
 
 /**
@@ -257,11 +453,10 @@ export function htmlToText(html: string): string {
  */
 export function getFormattedDate(date) {
   if (!date) return "";
-
-  const dateObj = dayjs(date);
+  const dateObj = dayjsLocal(date);
   if (!dateObj.isValid()) return "";
 
-  return dateObj.format("DD-MM-YYYY");
+  return dateObj.format(getDateFormat());
 }
 
 export function TemplateOption({ active, option, variant, icon, onClick }) {
@@ -270,22 +465,31 @@ export function TemplateOption({ active, option, variant, icon, onClick }) {
     {
       class: [
         active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
-        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base hover:bg-surface-gray-3",
+        variant == "danger" ? "text-ink-red-6 hover:bg-ink-red-1" : "",
       ],
       onClick: onClick,
     },
-    [
-      icon
-        ? h(FeatherIcon, {
-            name: icon,
-            class: ["h-4 w-4 shrink-0"],
-            "aria-hidden": true,
-          })
-        : null,
-      h("span", { class: "whitespace-nowrap" }, option),
-    ]
+    [renderOptionIcon(icon), h("span", { class: "whitespace-nowrap" }, option)]
   );
+}
+
+/**
+ * Renders an option icon: `lucide-*` strings as CSS-mask spans (frappe-ui v1),
+ * other strings as legacy FeatherIcon, and components as-is.
+ */
+export function renderOptionIcon(
+  icon: string | object | null,
+  classes: string[] = ["h-4 w-4 shrink-0"]
+) {
+  if (!icon) return null;
+  if (typeof icon === "string" && icon.startsWith("lucide-")) {
+    return h("span", { class: [icon, ...classes], "aria-hidden": true });
+  }
+  if (typeof icon === "string") {
+    return h(FeatherIcon, { name: icon, class: classes, "aria-hidden": true });
+  }
+  return h(icon, { class: classes, "aria-hidden": true });
 }
 
 export function getGridTemplateColumnsForTable(columns) {
@@ -303,12 +507,13 @@ export function getGridTemplateColumnsForTable(columns) {
 
 export function uploadFunction(
   file: File,
-  doctype: string = null,
-  docname: string = null
+  doctype: string | null = null,
+  docname: string | null = null,
+  isPrivate: boolean = true
 ) {
   let fileUpload = useFileUpload();
   return fileUpload.upload(file, {
-    private: true,
+    private: isPrivate,
     doctype: doctype,
     docname: docname,
   });
@@ -513,11 +718,12 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "grey",
           onClick: (event) => {
             event.preventDefault();
+            event.stopImmediatePropagation();
             isConfirmingDelete.value = true;
           },
         }),
@@ -528,7 +734,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       component: (props) =>
         TemplateOption({
           option: "Confirm Delete",
-          icon: "trash-2",
+          icon: "lucide-trash-2",
           active: props.active,
           variant: "danger",
           onClick: () => {
@@ -553,18 +759,6 @@ export function getRandom(len = 4) {
   return text;
 }
 
-export function parseColor(color: string): string {
-  color = color.toLowerCase();
-  let textColor = `!text-${color}-600`;
-  if (color == "black") {
-    textColor = "!text-ink-gray-9";
-  } else if (["gray", "green"].includes(color)) {
-    textColor = `!text-${color}-700`;
-  }
-
-  return textColor;
-}
-
 export function isElementInViewport(el: HTMLElement) {
   if (!el) return false;
   const rect = el.getBoundingClientRect();
@@ -574,4 +768,187 @@ export function isElementInViewport(el: HTMLElement) {
     rect.bottom <= window.innerHeight &&
     rect.right <= window.innerWidth
   );
+}
+
+export function parseApiOptions(
+  options: string[] | DropdownOption[]
+): DropdownOption[] | [] {
+  if (!options?.length) return [];
+  return (
+    options
+      .filter((o) => Boolean(o))
+      .map((o) => {
+        if (
+          typeof o === "object" &&
+          o.hasOwnProperty("label") &&
+          o.hasOwnProperty("value")
+        ) {
+          return o;
+        } else {
+          return {
+            label: o?.toString(),
+            value: o as string,
+          };
+        }
+      }) || []
+  );
+}
+
+export function openContact(name: string) {
+  const url = window.location.origin + "/helpdesk/contacts/" + name;
+  window.open(url, "_blank");
+}
+
+const COLOR_PROPS = new Set([
+  "color",
+  "background",
+  "background-color",
+  "border-color",
+]);
+
+// Strip color-related inline styles + bgcolor/color attrs so iframe CSS controls colors.
+export function stripEmailColors(html: string): string {
+  if (!html) return html;
+  const div = document.createElement("div");
+  div.innerHTML = html;
+
+  div.querySelectorAll("[style]").forEach((el) => {
+    const styles = el.getAttribute("style") || "";
+    const filtered = styles
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => {
+        if (!s) return false;
+        const prop = s.split(":")[0].trim().toLowerCase();
+        return !COLOR_PROPS.has(prop);
+      })
+      .join("; ");
+    if (filtered) el.setAttribute("style", filtered);
+    else el.removeAttribute("style");
+  });
+
+  div
+    .querySelectorAll("[bgcolor]")
+    .forEach((el) => el.removeAttribute("bgcolor"));
+  div
+    .querySelectorAll("font[color]")
+    .forEach((el) => el.removeAttribute("color"));
+
+  return div.innerHTML;
+}
+
+// Shared reactive mirror of <html data-theme> for JS-driven theme-aware components
+export const dataTheme = ref<string>(
+  (typeof document !== "undefined" &&
+    document.documentElement.getAttribute("data-theme")) ||
+    "light"
+);
+
+if (typeof window !== "undefined") {
+  new MutationObserver(() => {
+    const next = document.documentElement.getAttribute("data-theme") || "light";
+    if (next !== dataTheme.value) dataTheme.value = next;
+  }).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+}
+
+const MINUTE = 60;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const MONTH = 30 * DAY;
+const YEAR = 365 * DAY;
+
+/**
+ * Compact relative duration between `target` and now, ignoring direction.
+ * Examples: `1y`, `4 days 4h`, `2h 20m`, `5m`.
+ */
+export function shortDuration(target: string | Date): string {
+  const seconds = Math.abs(dayjs(target).diff(dayjs(), "second"));
+  if (seconds >= YEAR) {
+    const years = Math.floor(seconds / YEAR);
+    return `${years} ${years === 1 ? "year" : "years"}`;
+  }
+  if (seconds >= MONTH) {
+    const months = Math.floor(seconds / MONTH);
+    return `${months} ${months === 1 ? "month" : "months"}`;
+  }
+  if (seconds >= DAY) {
+    const days = Math.floor(seconds / DAY);
+    const hours = Math.floor((seconds % DAY) / HOUR);
+    const dayLabel = `${days} ${days === 1 ? "day" : "days"}`;
+    return hours ? `${dayLabel} ${hours}h` : dayLabel;
+  }
+  if (seconds >= HOUR) {
+    const hours = Math.floor(seconds / HOUR);
+    const minutes = Math.floor((seconds % HOUR) / MINUTE);
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+  return `${Math.floor(seconds / MINUTE)}m`;
+}
+
+export function buildPercentageChange(
+  value: number | null,
+  negativeIsBetter: boolean = true
+) {
+  // No change (or no comparison): stay neutral — never green/red, no up/down arrow.
+  if (value === null || value === undefined || value === 0) {
+    return { icon: "", value: "0", color: "text-ink-gray-5" };
+  }
+  const isPositive = value > 0;
+  const isGood = negativeIsBetter ? !isPositive : isPositive;
+  // Cap the magnitude at 100% so large swings (e.g. +3186%) stay readable.
+  const capped = Math.min(Math.abs(value), 100);
+  return {
+    icon: isPositive ? "lucide-arrow-up-right" : "lucide-arrow-down-left",
+    value: isPositive ? `+${capped}` : `-${capped}`,
+    color: isGood ? "text-ink-green-6" : "text-ink-red-6",
+  };
+}
+
+export function hasPermission() {
+  const authStore = useAuthStore();
+  return authStore.isAdmin || authStore.isManager;
+}
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
+}
+const emailsToStr = (emails: readonly string[]) => emails.join(", ");
+
+export function handleInviteUserSuccess(
+  data: Record<
+    | "disabled_user_emails"
+    | "accepted_invite_emails"
+    | "pending_invite_emails"
+    | "invited_emails",
+    string[]
+  >
+) {
+  let emailsStr = emailsToStr(data.invited_emails);
+  if (emailsStr.trim() !== "") {
+    toast.success(`${emailsStr} invited successfully`);
+  }
+  emailsStr = emailsToStr(data.disabled_user_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present and disabled`);
+  }
+  emailsStr = emailsToStr(data.pending_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already invited`);
+  }
+  emailsStr = emailsToStr(data.accepted_invite_emails);
+  if (emailsStr.trim() !== "") {
+    toast.info(`${emailsStr} already present`);
+  }
 }

@@ -3,12 +3,12 @@
     <svg
       v-for="i in [1, 0.8, 0.6, 0.4, 0.2]"
       :key="i"
-      class="-all peer fill-gray-300"
+      class="-all peer fill-ink-gray-3"
       :class="{
-        ['fill-yellow-500']: i <= rating,
+        ['fill-ink-yellow-5']: i <= rating,
         'cursor-pointer': !static,
-        'hover:fill-yellow-200': i > rating && !static,
-        'peer-hover:fill-yellow-200': i > rating && !static,
+        'hover:fill-ink-yellow-2': i > rating && !static,
+        'peer-hover:fill-ink-yellow-2': i > rating && !static,
       }"
       height="16px"
       width="16px"

@@ -1,37 +1,51 @@
 <template>
   <ActivityHeader :title="title" />
   <FadedScrollableDiv
-    class="flex flex-col flex-1 overflow-y-scroll"
+    class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
-    <div v-if="activities.length" class="activities flex-1 h-full mt-1">
+    <div v-if="activities.length" class="activities flex-1 h-full mt-0.5">
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
-        class="activity"
+        class="activity mt-2"
+        tabindex="0"
+        :id="activity.key"
       >
         <!-- single activity -->
         <div
-          class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
+          class="w-full px-6 md:px-5 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-gray-200"
-            :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
+            class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-outline-elevation-2"
+            :class="[
+              i != activities.length - 1 && 'after:h-full',
+              !['email', 'feedback', 'call', 'comment'].includes(
+                activity.type
+              ) && 'after:top-6',
+            ]"
           >
             <div
-              class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[['email', 'feedback'].includes(activity.type) && 'mt-2']"
+              class="z-1 flex items-center justify-center rounded-full bg-surface-base"
+              :class="[
+                ['email', 'feedback'].includes(activity.type)
+                  ? 'my-1 h-9 w-9'
+                  : 'h-6 w-6',
+                !['email', 'feedback', 'call', 'comment'].includes(
+                  activity.type
+                ) && 'mt-[2px]',
+              ]"
             >
               <Avatar
                 v-if="activity.type === 'email' || activity.type === 'feedback'"
                 size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
-                class="bg-white absolute left-[1px]"
+                class="bg-surface-base absolute left-[0.7px]"
               />
               <CommentIcon
                 v-else-if="activity.type === 'comment'"
-                class="text-gray-600 absolute left-[7.5px]"
+                class="text-ink-gray-5 absolute left-[7.5px]"
               />
               <FeatherIcon
                 v-else-if="activity.type === 'call'"
@@ -40,14 +54,22 @@
                     ? 'phone-incoming'
                     : 'phone-outgoing'
                 "
-                class="text-gray-600 absolute left-[7.5px] size-4"
+                class="text-ink-gray-5 left-[7.5px] size-4"
               />
-              <DotIcon v-else class="text-gray-600 absolute left-[7.5px]" />
+              <DotIcon
+                v-else
+                class="text-ink-gray-5 absolute left-[7.5px] top-[6px]"
+              />
             </div>
           </div>
           <div
             class="mb-4 flex flex-1"
-            :class="[i == activities.length - 1 && 'mb-5']"
+            :class="[
+              i == activities.length - 1 && 'mb-5',
+              !['email', 'feedback', 'call', 'comment'].includes(
+                activity.type
+              ) && 'mt-[2px]',
+            ]"
           >
             <EmailArea
               v-if="activity.type === 'email'"
@@ -78,36 +100,16 @@
     </div>
     <div
       v-else
-      class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
+      class="h-screen flex flex-col items-center justify-center gap-3 text-2xl-medium text-ink-gray-4"
     >
-      <component :is="emptyTextIcon" class="h-10 w-10" />
-      <span>{{ emptyText }}</span>
-      <Button
-        v-if="title == 'Emails'"
-        label="New Email"
-        @click="communicationAreaRef?.toggleEmailBox() ?? toggleEmailBox()"
-      />
-      <Button
-        v-else-if="title == 'Comments'"
-        label="New Comment"
-        @click="communicationAreaRef?.toggleCommentBox() ?? toggleCommentBox()"
-      />
-      <Button
-        v-else-if="title == 'Calls'"
-        label="Make a Call"
-        @click="makeCall()"
-      />
+      <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
+      <span class="text-lg-medium text-ink-gray-8">{{ __(emptyText) }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
 
 <script setup lang="ts">
-import {
-  CommentBox,
-  EmailArea,
-  FadedScrollableDiv,
-  HistoryBox,
-} from "@/components";
+import { FadedScrollableDiv } from "@/components";
 import {
   ActivityIcon,
   CommentIcon,
@@ -115,14 +117,16 @@ import {
   EmailIcon,
   PhoneIcon,
 } from "@/components/icons";
-import { toggleCommentBox, toggleEmailBox } from "@/pages/ticket/modalStates";
 import { useUserStore } from "@/stores/user";
 import { TicketActivity } from "@/types";
 import { isElementInViewport } from "@/utils";
 import { Avatar, FeatherIcon } from "frappe-ui";
-import { PropType, Ref, computed, h, inject, nextTick, watch } from "vue";
+import { PropType, computed, h, inject, nextTick, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import FeedbackBox from "../ticket-agent/FeedbackBox.vue";
+import CommentBox from "@/components/CommentBox.vue";
+import EmailArea from "@/components/EmailArea.vue";
+import HistoryBox from "@/components/HistoryBox.vue";
 
 const props = defineProps({
   activities: {
@@ -145,20 +149,14 @@ const route = useRoute();
 const router = useRouter();
 
 const { getUser } = useUserStore();
-const communicationAreaRef: Ref = inject("communicationArea");
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  let text = "No Activities";
-  if (props.title == "Emails") {
-    text = "No Email Communications";
-  } else if (props.title == "Comments") {
-    text = "No Comments";
-    return text;
-  } else if (props.title == "Calls") {
-    text = "No Calls";
-    return text;
-  }
+  if (props.title === "Emails") return "No email communications";
+  if (props.title === "Comments") return "No comments found";
+  if (props.title === "Calls") return "No calls made";
+
+  return "No activity found";
 });
 
 const emptyTextIcon = computed(() => {
@@ -170,7 +168,13 @@ const emptyTextIcon = computed(() => {
   } else if (props.title == "Calls") {
     icon = PhoneIcon;
   }
-  return h(icon, { class: "text-gray-500" });
+  return h(icon, { class: "text-ink-gray-4" });
+});
+
+onMounted(() => {
+  nextTick(() => {
+    document.querySelector(".activity")?.focus();
+  });
 });
 
 function scrollToLatestActivity() {
@@ -202,11 +206,11 @@ function scrollToHash() {
           (element as any).scrollIntoViewIfNeeded();
 
           // Add highlight effect using Tailwind class
-          element.classList.add("bg-yellow-100");
+          element.classList.add("bg-surface-yellow-2");
 
           // Remove highlight after 2 seconds
           setTimeout(() => {
-            element.classList.remove("bg-yellow-100");
+            element.classList.remove("bg-surface-yellow-2");
             router.replace({ hash: "" });
           }, 2000);
         }
@@ -234,3 +238,8 @@ defineExpose({
   scrollToLatestActivity,
 });
 </script>
+<style scoped>
+.activity:focus {
+  outline: none;
+}
+</style>

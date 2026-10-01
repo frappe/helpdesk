@@ -17,7 +17,7 @@
       <FormControl
         type="autocomplete"
         size="sm"
-        :label="__('On Ticket Status')"
+        :label="__('On ticket status')"
         :options="statusOptions"
         :required="true"
         :model-value="ticketStatus"
@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import Notification from "./Notification.vue";
-import { createResource } from "frappe-ui";
+import { createResource, toast } from "frappe-ui";
 import type { BaseSettings, Notification as NotificationType } from "./types";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
@@ -74,6 +74,7 @@ const updateSettings = createResource({
 });
 
 function onSubmit() {
+  toast.success(__("Settings updated successfully."));
   return updateSettings.submit({
     ticket_status: ticketStatus.value,
     enabled: enabled.value,

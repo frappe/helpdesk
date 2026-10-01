@@ -1,141 +1,125 @@
 <template>
-  <TextEditor
-    v-if="agentsList.data"
+  <Editor
     ref="editorRef"
-    :editor-class="[
-      'prose-sm max-w-none',
-      editable &&
-        'min-h-[7rem] mx-6 md:ml-10 md:mr-9 max-h-[50vh] overflow-y-auto border-t py-3',
-      getFontFamily(newComment),
-    ]"
-    :content="newComment"
-    :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
-    :placeholder="placeholder"
+    v-model="newComment"
+    :extensions="extensions"
     :editable="editable"
-    :mentions="agents"
-    @change="editable ? (newComment = $event) : null"
-    :extensions="[PreserveVideoControls]"
-    :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :placeholder="placeholder"
+    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
   >
-    <template #bottom>
-      <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
-        <!-- Attachments -->
-        <div class="flex flex-wrap gap-2">
-          <AttachmentItem
-            v-for="a in attachments"
-            :key="a.file_url"
-            :label="a.file_name"
-            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-          >
-            <template #suffix>
-              <FeatherIcon
-                class="h-3.5"
-                name="x"
-                @click.stop="removeAttachment(a)"
-              />
-            </template>
-          </AttachmentItem>
-        </div>
-        <!-- Fixed Menu -->
-        <div class="flex justify-between overflow-hidden border-t py-2.5">
-          <div class="flex items-center overflow-x-auto w-[60%]">
-            <TextEditorFixedMenu
-              class="-ml-1"
-              :buttons="textEditorMenuButtons"
+    <template #default="{ isEmpty }">
+      <EditorContent
+        :class="[
+          'prose-sm max-w-none',
+          editable &&
+            'min-h-[7rem] mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
+          getFontFamily(newComment),
+        ]"
+      />
+      <!-- Attachments -->
+      <div class="flex flex-wrap gap-2 my-2 ml-5">
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
+        >
+          <template #suffix>
+            <FeatherIcon
+              class="h-3.5"
+              name="x"
+              @click.stop="removeAttachment(a)"
             />
-            <FileUploader
-              :upload-args="{
-                doctype: doctype,
-                docname: ticketId,
-                private: true,
-              }"
-              @success="(f) => attachments.push(f)"
-            >
-              <template #default="{ openFileSelector }">
-                <Button
-                  theme="gray"
-                  variant="ghost"
-                  @click="openFileSelector()"
+          </template>
+        </AttachmentItem>
+      </div>
+      <div v-if="editable" class="flex flex-col gap-2 border-t">
+        <div class="px-4">
+          <!-- Fixed Menu -->
+          <div class="flex justify-between overflow-hidden py-2.5">
+            <div class="flex items-center overflow-x-auto w-[60%]">
+              <div class="inline-flex items-center gap-1.5 p-1">
+                <FileUploader
+                  :upload-args="{
+                    doctype: doctype,
+                    docname: ticketId,
+                    private: true,
+                  }"
+                  @success="(f) => attachments.push(f)"
                 >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
+                  <template #default="{ openFileSelector, uploading }">
+                    {{ void (loading = uploading) }}
+                    <button
+                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-2"
+                      @click="openFileSelector()"
+                      :disabled="uploading"
+                    >
+                      <AttachmentIcon
+                        class="h-4 w-4"
+                        style="stroke-width: 1.5 !important"
+                      />
+                    </button>
                   </template>
-                </Button>
-              </template>
-            </FileUploader>
-          </div>
-          <div class="flex items-center justify-end space-x-2 w-[40%]">
-            <Button
-              label="Discard"
-              @click="
-                () => {
-                  newComment = '';
-                  attachments = [];
-                  emit('discard');
-                }
-              "
-            />
-            <Button
-              variant="solid"
-              :label="label"
-              :disabled="commentEmpty"
-              :loading="loading"
-              @click="
-                () => {
-                  loading = true;
-                  submitComment();
-                  newComment = '';
-                }
-              "
-            />
+                </FileUploader>
+                <div class="h-4 w-[2px] border-l ml-1" />
+              </div>
+              <EditorFixedMenu :items="fullToolbar" />
+            </div>
+            <div class="flex items-center justify-end space-x-2 w-[40%]">
+              <Button
+                label="Discard"
+                @click="
+                  () => {
+                    newComment = '';
+                    attachments = [];
+                    emit('discard');
+                  }
+                "
+              />
+              <Button
+                variant="solid"
+                :label="label"
+                :disabled="isDisabled"
+                :loading="loading"
+                @click="
+                  () => {
+                    loading = true;
+                    submitComment();
+                    newComment = '';
+                  }
+                "
+              />
+            </div>
           </div>
         </div>
       </div>
     </template>
-  </TextEditor>
+  </Editor>
 </template>
 <script setup lang="ts">
-import {
-  FileUploader,
-  TextEditor,
-  TextEditorFixedMenu,
-  createResource,
-} from "frappe-ui";
+import { FileUploader, createResource } from "frappe-ui";
+import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentItem } from "@/components/";
+import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
-import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
   removeAttachmentFromServer,
-  textEditorMenuButtons,
   uploadFunction,
 } from "@/utils";
 import { useStorage } from "@vueuse/core";
+import { storeToRefs } from "pinia";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
-const { agents: agentsList } = useAgentStore();
+const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
 const { isManager } = useAuthStore();
-
-onMounted(() => {
-  if (
-    agentsList.loading ||
-    agentsList.data?.length ||
-    agentsList.list.promise
-  ) {
-    return;
-  }
-  agentsList.fetch();
-});
 
 const props = defineProps({
   ticketId: {
@@ -164,38 +148,23 @@ const emit = defineEmits(["submit", "discard"]);
 
 const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
+// Mentions as a reactive getter so the `@` list stays in sync as agents load.
+const extensions = buildEditorExtensions({
+  mentions: () =>
+    (dropdown.value ?? []).map((a: { label: string; value: string }) => ({
+      id: a.value,
+      label: a.label,
+    })),
+});
+
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const commentEmpty = computed(() => {
-  return isContentEmpty(newComment.value);
+const isDisabled = computed(() => {
+  return isContentEmpty(newComment.value) || loading.value;
 });
 const loading = ref(false);
-
-// Watch for changes in comment content to trigger typing events
-watch(newComment, (newValue, oldValue) => {
-  if (newValue !== oldValue && newValue) {
-    onUserType();
-  }
-});
-
-onBeforeUnmount(() => {
-  cleanup();
-});
-
-const label = computed(() => {
-  return loading.value ? "Sending..." : props.label;
-});
-
-const agents = computed(() => {
-  return (
-    agentsList.data?.map((agent) => ({
-      label: agent.agent_name.trimEnd(),
-      value: agent.name,
-    })) || []
-  );
-});
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
@@ -236,6 +205,31 @@ async function submitComment() {
 
 const editorRef = ref(null);
 const editor = computed(() => editorRef.value?.editor);
+
+// Watch for changes in comment content to trigger typing events
+watch(newComment, (newValue, oldValue) => {
+  if (newValue !== oldValue && newValue) {
+    onUserType();
+  }
+});
+
+onMounted(() => {
+  if (
+    agentsList.value.loading ||
+    agentsList.value.data?.length ||
+    agentsList.value.list.promise
+  ) {
+    return;
+  }
+  agentsList.value.fetch();
+});
+
+onBeforeUnmount(() => {
+  cleanup();
+  if (isContentEmpty(newComment.value)) {
+    localStorage.removeItem("commentBoxContent" + props.ticketId);
+  }
+});
 
 defineExpose({
   submitComment,

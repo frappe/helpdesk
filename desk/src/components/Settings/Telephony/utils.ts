@@ -1,4 +1,5 @@
 export const isDocDirty = (doc: any, originalDoc: any) => {
+  if (!doc || !originalDoc) return false;
   return JSON.stringify(doc) !== JSON.stringify(originalDoc);
 };
 

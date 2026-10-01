@@ -4,6 +4,7 @@
     ref="e"
     :model-value="content"
     :placeholder="placeholder"
+    :upload-function="uploadFunction"
     @update:model-value="$emit('update:content', $event)"
     @clear="() => $emit('update:attachments', [])"
   >
@@ -16,8 +17,8 @@
           :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
-            <Icon
-              icon="lucide:x"
+            <LucideX
+              class="size-4"
               @click.stop="
                 () => {
                   $emit(
@@ -33,22 +34,28 @@
       </div>
     </template>
     <template #bottom-left>
-      <span class="flex">
+      <span class="flex items-center">
         <slot name="bottom-left" />
         <FileUploader
+          class="flex items-center"
           :upload-args="{
             folder: 'Home/Helpdesk',
             private: true,
           }"
-          @success="(f: File) => $emit('update:attachments', [...attachments, f])"
+          @success="
+            (f: File) => $emit('update:attachments', [...attachments, f])
+          "
           @failure="() => toast.error('Error uploading file')"
         >
           <template #default="{ openFileSelector }">
-            <Button theme="gray" variant="ghost" @click="openFileSelector()">
-              <template #icon>
-                <Icon icon="lucide:paperclip" />
-              </template>
-            </Button>
+            <Button
+              theme="gray"
+              variant="ghost"
+              @click="openFileSelector()"
+              size="xs"
+              icon="lucide-paperclip"
+              class="mr-2"
+            />
           </template>
         </FileUploader>
       </span>
@@ -65,7 +72,7 @@
   </HTextEditor>
   <div
     v-else
-    class="flex w-full cursor-pointer items-center gap-2 rounded bg-gray-100 px-3.5 py-2 hover:bg-gray-200"
+    class="flex w-full cursor-pointer items-center gap-2 rounded bg-surface-gray-2 px-3.5 py-2 hover:bg-surface-gray-3"
     @click="() => $emit('update:expand', !expand)"
   >
     <UserAvatar
@@ -73,12 +80,11 @@
       :image="authStore.userImage"
       size="sm"
     />
-    <span class="text-base text-gray-700">
+    <span class="text-base text-ink-gray-7">
       {{ placeholder }}
     </span>
   </div>
 </template>
-
 <script setup lang="ts">
 import {
   AttachmentItem,
@@ -88,7 +94,6 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { File } from "@/types";
 import { removeAttachmentFromServer } from "@/utils";
-import { Icon } from "@iconify/vue";
 import { FileUploader, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 
@@ -97,6 +102,7 @@ interface P {
   placeholder: string;
   attachments: File[];
   expand?: boolean;
+  uploadFunction?: (file: any) => Promise<any>;
 }
 
 interface E {
@@ -110,7 +116,7 @@ withDefaults(defineProps<P>(), {
 });
 defineEmits<E>();
 const e = ref(null);
-const editor = computed(() => e.value.editor);
+const editor = computed(() => e.value?.editor);
 const authStore = useAuthStore();
 defineExpose({
   editor,

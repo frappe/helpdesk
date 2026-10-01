@@ -1,0 +1,76 @@
+{
+	"actions": [],
+	"creation": "2026-03-29 12:00:00.000000",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"tool_name",
+		"description",
+		"arguments",
+		"column_break_pa",
+		"risk_level",
+		"approved",
+		"execution_result"
+	],
+	"fields": [
+		{
+			"columns": 2,
+			"fieldname": "tool_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Tool Name",
+			"reqd": 1
+		},
+		{
+			"columns": 3,
+			"fieldname": "description",
+			"fieldtype": "Small Text",
+			"in_list_view": 1,
+			"label": "Description"
+		},
+		{
+			"fieldname": "arguments",
+			"fieldtype": "Code",
+			"label": "Arguments",
+			"options": "JSON"
+		},
+		{
+			"fieldname": "column_break_pa",
+			"fieldtype": "Column Break"
+		},
+		{
+			"columns": 1,
+			"default": "Low",
+			"fieldname": "risk_level",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"label": "Risk Level",
+			"options": "Low\nMedium\nHigh"
+		},
+		{
+			"columns": 1,
+			"default": "0",
+			"fieldname": "approved",
+			"fieldtype": "Check",
+			"in_list_view": 1,
+			"label": "Approved"
+		},
+		{
+			"fieldname": "execution_result",
+			"fieldtype": "Small Text",
+			"label": "Execution Result"
+		}
+	],
+	"istable": 1,
+	"links": [],
+	"modified": "2026-03-29 12:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HDS Support Proposed Action",
+	"owner": "Administrator",
+	"permissions": [],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}

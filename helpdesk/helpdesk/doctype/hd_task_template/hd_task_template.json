@@ -1,0 +1,55 @@
+{
+	"autoname": "field:template_name",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"fields": [
+		{
+			"fieldname": "template_name",
+			"fieldtype": "Data",
+			"label": "Template Name",
+			"unique": 1,
+			"reqd": 1
+		},
+		{
+			"fieldname": "description",
+			"fieldtype": "Text",
+			"label": "Description"
+		},
+		{
+			"fieldname": "industry",
+			"fieldtype": "Data",
+			"label": "Industry"
+		},
+		{
+			"fieldname": "tasks",
+			"fieldtype": "Table",
+			"label": "Tasks",
+			"options": "HD Task Template Task"
+		}
+	],
+	"istable": 0,
+	"modified": "2024-01-01 00:00:00",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "HD Task Template",
+	"naming_rule": "Set by user",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}

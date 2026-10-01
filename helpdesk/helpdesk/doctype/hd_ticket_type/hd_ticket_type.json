@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "Prompt",
@@ -10,6 +11,7 @@
  "engine": "InnoDB",
  "field_order": [
   "is_system",
+  "disabled",
   "description",
   "priority"
  ],
@@ -32,10 +34,16 @@
    "fieldtype": "Check",
    "label": "System",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
   }
  ],
  "links": [],
- "modified": "2025-02-17 17:19:18.747328",
+ "modified": "2026-06-27 19:24:45.498088",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Type",
@@ -79,13 +87,9 @@
    "write": 1
   },
   {
-   "email": 1,
-   "export": 1,
-   "print": 1,
    "read": 1,
-   "report": 1,
-   "role": "Helpdesk Contact",
-   "share": 1
+   "role": "HD Customer",
+   "select": 1
   },
   {
    "email": 1,
@@ -93,11 +97,13 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "HD Customer Manager",
+   "select": 1,
    "share": 1
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

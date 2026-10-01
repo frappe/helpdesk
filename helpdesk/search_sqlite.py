@@ -79,20 +79,25 @@ class HelpdeskSearch(SQLiteSearch):
         if not document:
             return None
 
-        if doc.doctype == "HD Ticket Comment":
-            # For comments, resolve the ticket for permissions
-            document["reference_ticket"] = int(doc.reference_ticket)
+        if (
+            doc.doctype == "HD Ticket Comment"
+            and doc.reference_ticket
+            and type(doc.reference_ticket) is str
+        ):
+            document["reference_ticket"] = str(doc.reference_ticket)
 
         if doc.doctype == "Communication":
-            # For communications, ensure reference fields are set
+            # For communications, ensure reference fields are set for ticket doctype
             document["reference_doctype"] = doc.reference_doctype
-            if doc.reference_doctype == "HD Ticket":
-                document["reference_ticket"] = int(doc.reference_name)
-            else:
-                document["reference_ticket"] = doc.reference_name
+            if (
+                doc.reference_doctype == "HD Ticket"
+                and doc.reference_name
+                and type(doc.reference_name) is str
+            ):
+                document["reference_name"] = str(doc.reference_name)
 
         if doc.doctype == "HD Ticket":
-            document["reference_ticket"] = int(doc.name)
+            document["reference_ticket"] = str(doc.name)
 
         # Map commented_by to owner for HD Ticket Comment
         if doc.doctype == "HD Ticket Comment":
@@ -182,12 +187,6 @@ class HelpdeskSearch(SQLiteSearch):
 
 
 def build_index():
-    """Build search index - called by background job."""
+    """Build search index - can be called from console."""
     search = HelpdeskSearch()
     search.build_index()
-
-
-def delete_doc():
-    """Delete document from index - called by background job."""
-    search = HelpdeskSearch()
-    search.remove_doc()

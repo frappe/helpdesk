@@ -1,71 +1,120 @@
 <template>
-  <div class="w-full h-full flex flex-col">
-    <!-- Header -->
-    <SettingsLayoutHeader
-      title="Teams"
-      description="Create and manage teams and assign agents to specific teams."
+  <SettingsLayoutBase
+    :title="__('Teams')"
+    :description="
+      __('Create and manage teams and assign agents to specific teams.')
+    "
+  >
+    <template #header-actions>
+      <Button
+        :label="__('New')"
+        theme="gray"
+        variant="solid"
+        @click="emit('update:step', 'new-team', '')"
+        icon-left="lucide-plus"
+      />
+    </template>
+    <template
+      v-if="teams.data?.length > 9 || teamsSearchQuery.length"
+      #header-bottom
     >
-      <template #actions>
-        <Button
-          label="New"
-          theme="gray"
-          variant="solid"
-          @click="() => (showForm = !showForm)"
-          icon-left="plus"
-        />
-      </template>
-      <template #bottom-section>
-        <FormControl
-          v-model="search"
-          :placeholder="'Search'"
+      <div class="relative">
+        <TextInput
+          :model-value="teamsSearchQuery"
+          @update:model-value="teamsSearchQuery = $event"
+          :placeholder="__('Search')"
           type="text"
+          class="focus:ring-0 border-outline-gray-2"
           :debounce="300"
-          class="w-60"
         >
           <template #prefix>
-            <LucideSearch class="h-4 w-4 text-gray-500" />
+            <LucideSearch class="size-4" />
           </template>
-        </FormControl>
-      </template>
-    </SettingsLayoutHeader>
-    <!-- List -->
-    <div
-      v-if="!teams.loading && teams.data?.length > 0"
-      class="divide-y w-full h-full hide-scrollbar overflow-y-scroll mt-4"
-    >
+        </TextInput>
+        <Button
+          v-if="teamsSearchQuery"
+          icon="lucide-x"
+          variant="ghost"
+          @click="teamsSearchQuery = ''"
+          class="absolute right-1 top-1/2 -translate-y-1/2"
+        />
+      </div>
+    </template>
+    <template #content>
+      <!-- List -->
       <div
-        v-for="team in teams.data"
-        :key="team.name"
-        class="flex items-center gap-2 py-2 group justify-between cursor-pointer"
-        @click="() => emit('update:step', 'team-edit', team.name)"
+        v-if="!teams.loading && teams.data?.length > 0"
+        class="w-full h-full -ml-2"
       >
-        <div class="flex items-center gap-2">
-          <Avatar :label="team.name" size="sm" />
-          <p :key="team.name" class="text-p-base text-gray-700">
-            {{ team.name }}
-          </p>
+        <div class="flex text-sm text-ink-gray-5">
+          <div class="ml-2">{{ __("Team name") }}</div>
+        </div>
+        <hr class="mx-2 mt-2" />
+        <div v-for="(team, index) in teams.data" :key="team.name">
+          <div
+            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
+          >
+            <div
+              class="w-full py-3 pl-2 flex gap-1 items-center"
+              @click="() => emit('update:step', 'team-edit', team.name)"
+            >
+              <p class="text-base-medium text-ink-gray-7">
+                {{ team.name }}
+              </p>
+              <Badge :label="__('Disabled')" v-if="team.disabled" />
+            </div>
+            <div class="flex justify-between items-center pr-2">
+              <div>
+                <Dropdown placement="right" :options="dropdownOptions(team)">
+                  <Button
+                    icon="lucide-more-horizontal"
+                    variant="ghost"
+                    @click="isConfirmingDelete = false"
+                  />
+                </Dropdown>
+              </div>
+            </div>
+          </div>
+          <hr v-if="index !== teams.data.length - 1" class="mx-2" />
+        </div>
+        <!-- Load More Button -->
+        <div class="flex justify-center">
+          <Button
+            v-if="!teams.loading && teams.hasNextPage"
+            class="mt-3.5 p-2"
+            @click="() => teams.next()"
+            :loading="teams.loading"
+            :label="__('Load More')"
+            icon-left="lucide-refresh-cw"
+          />
         </div>
       </div>
-    </div>
-    <!-- Loading State -->
-    <div v-if="teams.loading" class="flex mt-28 justify-between w-full h-full">
-      <Button
-        :loading="teams.loading"
-        variant="ghost"
-        class="w-full"
-        size="2xl"
+      <!-- Loading State -->
+      <div
+        v-if="teams.loading"
+        class="flex mt-28 justify-between w-full h-full"
+      >
+        <Button
+          :loading="teams.loading"
+          variant="ghost"
+          class="w-full"
+          size="2xl"
+        />
+      </div>
+      <!-- Empty State -->
+      <EmptyState
+        v-if="!teams.loading && !teams.data?.length"
+        variant="badge"
+        :icon="AgentIcon"
+        title="No team found"
+        :description="
+          teamsSearchQuery.length
+            ? 'Change your search terms to find teams.'
+            : 'Add one to get started.'
+        "
       />
-    </div>
-    <!-- Empty State -->
-    <div
-      v-if="!teams.data?.length"
-      class="flex mt-28 justify-between w-full h-full"
-    >
-      <p class="text-sm text-gray-500 w-full flex justify-center">
-        No teams found
-      </p>
-    </div>
-  </div>
+    </template>
+  </SettingsLayoutBase>
   <NewTeamModal
     v-model="showForm"
     @create="
@@ -74,40 +123,74 @@
       }
     "
   />
+  <RenameTeamModal v-model="showRename" @onRename="() => teams.reload()" />
 </template>
 
 <script setup lang="ts">
-import { Avatar, FormControl, createListResource } from "frappe-ui";
-import { ref, watch } from "vue";
+import AgentIcon from "@/components/icons/AgentIcon.vue";
+import EmptyState from "@/components/EmptyState.vue";
+import EditIcon from "@/components/icons/EditIcon.vue";
+import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
+import { __ } from "@/translation";
+import { TeamListResourceSymbol } from "@/types";
+import { ConfirmDelete } from "@/utils";
+import { Dropdown, TextInput, toast } from "frappe-ui";
+import { inject, markRaw, Ref, ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
+import RenameTeamModal from "./RenameTeamModal.vue";
 
 interface E {
   (event: "update:step", step: string, team: string): void;
 }
 
 const emit = defineEmits<E>();
+const teamsSearchQuery = inject<Ref>("teamsSearchQuery");
 
-const teams = createListResource({
-  doctype: "HD Team",
-  cache: ["Teams"],
-  fields: ["name"],
-  auto: true,
-  orderBy: "creation desc",
-});
-
-const search = ref("");
+const teams = inject(TeamListResourceSymbol)!;
 const showForm = ref(false);
+const showRename = ref({
+  show: false,
+  teamName: "",
+});
+const isConfirmingDelete = ref(false);
 
-watch(search, (newValue) => {
+const dropdownOptions = (team: any) => {
+  return [
+    {
+      label: __("Rename"),
+      icon: markRaw(EditIcon),
+      onClick: () => {
+        showRename.value = {
+          show: true,
+          teamName: team.name,
+        };
+      },
+    },
+    ...ConfirmDelete({
+      onConfirmDelete: () => deleteTeam(team),
+      isConfirmingDelete,
+    }),
+  ];
+};
+
+const deleteTeam = (team: any) => {
+  if (!isConfirmingDelete.value) {
+    isConfirmingDelete.value = true;
+    return;
+  }
+
+  teams.delete.submit(team.name, {
+    onSuccess: () => {
+      toast.success(__("Team deleted successfully."));
+    },
+  });
+};
+
+watch(teamsSearchQuery, (newValue) => {
   teams.filters = {
+    ...teams.filters,
     name: ["like", `%${newValue}%`],
   };
-  if (!newValue) {
-    teams.start = 0;
-    teams.pageLength = 10;
-  }
   teams.reload();
 });
 </script>
-
-<style scoped></style>

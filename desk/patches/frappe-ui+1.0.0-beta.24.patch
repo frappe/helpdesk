@@ -1,0 +1,107 @@
+diff --git a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts b/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
+index 0b7069a..de2a3df 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/SuggestionExtension.ts
+@@ -16,6 +16,7 @@ export type SuggestionExtensionOptions<TItem = any> = {
+   items: TItem[] | ((query: string) => TItem[] | Promise<TItem[]>)
+   component?: Component
+   floatingOptions?: SuggestionFloatingOptions
++  allowSpaces?: boolean
+   command: (props: { editor: Editor; item: TItem; range: SuggestionRange }) => void
+ }
+ 
+@@ -26,6 +27,7 @@ function buildSuggestionExtension<TItem = any>(options: SuggestionExtensionOptio
+       return {
+         suggestion: {
+           char: options.trigger,
++          allowSpaces: options.allowSpaces,
+           pluginKey: new PluginKey(options.name),
+           items: ({ query }: { query: string }) =>
+             typeof options.items === 'function' ? options.items(query) : options.items,
+diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
+index 1447ba9..b6aad68 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/extensions/link/link-extension.ts
+@@ -45,6 +45,14 @@ export const LinkExtension = Link.extend({
+     }
+   },
+ 
++  // tiptap's Link mark is inclusive whenever `autolink` is on, so typing right
++  // after a link extends the mark onto the new text. Keep autolink (URL
++  // detection as you type) but make the mark non-inclusive so the link stops at
++  // its boundary.
++  inclusive() {
++    return false
++  },
++
+   addCommands() {
+     return {
+       ...this.parent?.(),
+diff --git a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
+index 8363502..07f4551 100644
+--- a/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
++++ b/node_modules/frappe-ui/src/molecules/editor/extensions/shared/suggestion-renderer.ts
+@@ -82,6 +82,25 @@ export function createSuggestionRenderer(
+     })
+   }
+ 
++  // Attach the VueRenderer's mount wrapper (`el`), not `renderer.element` —
++  // FocusScope-based popups have no synchronous first element child.
++  function getWrapper(): HTMLElement | null {
++    return (renderer as unknown as { el: HTMLElement | null } | null)?.el ?? null
++  }
++
++  function attach(props: SuggestionProps, token: number): void {
++    if (!isActive || token !== renderToken || !renderer) return
++    if (floatingEl) return
++    const wrapper = getWrapper()
++    if (!props.clientRect || !wrapper) return
++
++    floatingEl = wrapper
++    floatingEl.style.position = 'absolute'
++    document.body.appendChild(floatingEl)
++    getReferenceClientRect = props.clientRect as () => DOMRect | null
++    updatePosition()
++  }
++
+   return {
+     onStart(props: SuggestionProps) {
+       isActive = true
+@@ -92,15 +111,7 @@ export function createSuggestionRenderer(
+         props,
+       })
+ 
+-      if (!props.clientRect || !renderer.element) return
+-      // A newer query already superseded this start before mount completed.
+-      if (token !== renderToken || !isActive) return
+-
+-      floatingEl = renderer.element as HTMLElement
+-      floatingEl.style.position = 'absolute'
+-      document.body.appendChild(floatingEl)
+-      getReferenceClientRect = props.clientRect as () => DOMRect | null
+-      updatePosition()
++      attach(props, token)
+     },
+ 
+     onUpdate(props: SuggestionProps) {
+@@ -108,14 +119,18 @@ export function createSuggestionRenderer(
+       if (!isActive || !renderer) return
+       const token = ++renderToken
+ 
+-      renderer.updateProps(props)
++      // Skip the plugin's transient `loading` dispatch (empty items) so the
++      // popover doesn't unmount/remount on every keystroke.
++      const loading = (props as SuggestionProps & { loading?: boolean }).loading
++      if (!loading) renderer.updateProps(props)
+ 
+       if (!props.clientRect) return
+       // Fix 2: a newer query bumped the token between updateProps and now.
+       if (token !== renderToken) return
+ 
+       getReferenceClientRect = props.clientRect as () => DOMRect | null
+-      updatePosition()
++      if (!floatingEl) attach(props, token)
++      else updatePosition()
+     },
+ 
+     onKeyDown(props: SuggestionKeyDownProps): boolean {

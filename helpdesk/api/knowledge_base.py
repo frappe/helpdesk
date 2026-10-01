@@ -44,13 +44,19 @@ def get_article(name: str):
 
 
 @frappe.whitelist()
-def delete_articles(articles):
+def delete_articles(articles: list[str]):
     for article in articles:
         frappe.delete_doc("HD Article", article)
 
 
 @frappe.whitelist()
 def create_category(title: str):
+    if title.strip().lower() == "general":
+        frappe.throw(
+            _(
+                "General is a reserved category name. Please use a different name to proceed."
+            )
+        )
     category = frappe.new_doc("HD Article Category", category_name=title).insert()
     article = frappe.new_doc(
         "HD Article", title="New Article", category=category.name
@@ -59,7 +65,7 @@ def create_category(title: str):
 
 
 @frappe.whitelist()
-def move_to_category(category, articles):
+def move_to_category(category: str, articles: list[str]):
     frappe.has_permission("HD Article", "write", throw=True)
 
     for article in articles:
@@ -82,7 +88,7 @@ def move_to_category(category, articles):
 
 @frappe.whitelist()
 def get_categories():
-    categories = frappe.get_all(
+    categories = frappe.get_list(
         "HD Article Category",
         fields=["name", "category_name", "modified"],
     )
@@ -97,8 +103,8 @@ def get_categories():
 
 
 @frappe.whitelist()
-def get_category_articles(category):
-    articles = frappe.get_all(
+def get_category_articles(category: str):
+    articles = frappe.get_list(
         "HD Article",
         filters={"category": category, "status": "Published"},
         fields=["name", "title", "published_on", "modified", "author", "content"],
@@ -112,7 +118,7 @@ def get_category_articles(category):
 
 
 @frappe.whitelist()
-def merge_category(source, target):
+def merge_category(source: str, target: str):
     frappe.has_permission("HD Article Category", "delete", throw=True)
 
     if source == target:
@@ -141,13 +147,13 @@ def get_general_category():
 
 
 @frappe.whitelist()
-def get_category_title(category):
+def get_category_title(category: str):
     return frappe.db.get_value("HD Article Category", category, "category_name")
 
 
 @frappe.whitelist()
 @rate_limit(key="article", seconds=60 * 60)
-def increment_views(article):
+def increment_views(article: str):
     views = frappe.db.get_value("HD Article", article, "views") or 0
     views += 1
     frappe.db.set_value("HD Article", article, "views", views, update_modified=False)
