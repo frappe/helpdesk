@@ -6,12 +6,14 @@
 	"type": "module",
 	"exports": {
 		"./translation": "./src/translation.ts",
-		"./utils": "./src/utils.ts"
+		"./utils": "./src/utils.ts",
+		"./tiptap": "./src/tiptap.ts"
 	},
 	"dependencies": {
 		"@vueuse/core": "^14.1.0"
 	},
 	"peerDependencies": {
+		"@tiptap/core": "*",
 		"frappe-ui": "*",
 		"vue": "*"
 	}
