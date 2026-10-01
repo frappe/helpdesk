@@ -16,6 +16,18 @@
             @keydown="handleKeydown"
           />
         </p>
+        <div
+          v-if="failures.length"
+          role="alert"
+          class="text-p-sm text-ink-gray-9"
+        >
+          <p>{{ __("Replies failed for these tickets:") }}</p>
+          <ul class="list-disc pl-5">
+            <li v-for="failure in failures" :key="failure.ticket_id">
+              {{ failure.ticket_id }}: {{ failure.error }}
+            </li>
+          </ul>
+        </div>
       </div>
     </template>
     <template #actions>
@@ -24,12 +36,12 @@
         <Button
           variant="solid"
           :loading="bulkReplyResource.loading"
-          :disabled="editorRef?.isUploading"
+          :disabled="editorRef?.isUploading || bulkReplyResource.loading"
           @click="handleSubmit"
           :label="
-            props.selections.size === 1
+            pendingTicketIds.length === 1
               ? __('Send Reply')
-              : __('Send to {0} tickets', String(props.selections.size))
+              : __('Send to {0} tickets', String(pendingTicketIds.length))
           "
         />
       </div>
@@ -44,7 +56,7 @@ import { Resource } from "@/types";
 import { uploadFunction } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import { createResource, Dialog, toast, UploadedFile } from "frappe-ui";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const open = defineModel<boolean>();
 
@@ -59,22 +71,36 @@ const content = useStorage<string>("bulk-reply", "");
 const attachments = useStorage<UploadedFile[]>("bulk-attachments", []);
 const editorRef = ref<InstanceType<typeof CompactEditor> | null>(null);
 
+type BulkReplyResult = {
+  sent: string[];
+  failed: { ticket_id: string; error: string }[];
+};
+const failures = ref<BulkReplyResult["failed"]>([]);
+const pendingTicketIds = computed(() =>
+  failures.value.length
+    ? failures.value.map((failure) => failure.ticket_id)
+    : Array.from(props.selections)
+);
+watch(
+  () => Array.from(props.selections).join(","),
+  () => {
+    failures.value = [];
+  }
+);
+
 const bulkReplyResource: Resource = createResource({
   url: "helpdesk.api.ticket.bulk_reply",
-  onSuccess() {
-    clearDraft();
-    open.value = false;
-  },
 });
 
 function clearDraft() {
   content.value = "";
   editorRef.value?.reset();
+  failures.value = [];
 }
 
 async function handleFileUpload(file: File, options?: any) {
   const uploads = await Promise.all(
-    Array.from(props.selections).map((ticketId) =>
+    pendingTicketIds.value.map((ticketId) =>
       uploadFunction(file, "HD Ticket", ticketId, true, options)
     )
   );
@@ -90,23 +116,38 @@ function handleDiscard() {
 }
 
 function handleSubmit() {
-  if (editorRef.value?.isEmpty()) return;
+  if (editorRef.value?.isEmpty() || bulkReplyResource.loading) return;
   bulkReplyResource.submit(
     {
-      ticket_ids: Array.from(props.selections),
+      ticket_ids: pendingTicketIds.value,
       message: content.value,
       attachments: (attachments.value ?? []).map((a) => a.name),
     },
     {
-      onSuccess() {
+      onSuccess(result: BulkReplyResult) {
+        failures.value = result.failed;
+        if (result.failed.length) {
+          const msg = result.sent.length
+            ? __(
+                "Sent replies to {0} of {1} tickets. Retry will only include failed tickets.",
+                String(result.sent.length),
+                String(result.sent.length + result.failed.length)
+              )
+            : __("No replies were sent. Check the errors and try again.");
+          if (result.sent.length) toast.warning(msg);
+          else toast.error(msg);
+          return;
+        }
         const msg =
-          props.selections.size === 1
+          result.sent.length === 1
             ? __("Bulk reply sent successfully to 1 ticket.")
             : __(
                 "Bulk reply sent successfully to {0} tickets.",
-                String(props.selections.size)
+                String(result.sent.length)
               );
         toast.success(msg);
+        clearDraft();
+        open.value = false;
         emit("success");
       },
     }
