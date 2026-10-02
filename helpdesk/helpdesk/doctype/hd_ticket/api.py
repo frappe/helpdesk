@@ -106,14 +106,12 @@ def get_communications(ticket: str):
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
-    customer = not is_agent()
-    emails = [c.name for c in communications]
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
-        if customer:
-            c.content = strip_email_file_ids(c.content, emails)
+    if not is_agent():
+        strip_email_file_ids(communications)
     return communications
 
 

@@ -86,9 +86,10 @@ class TestEmailAttachments(IntegrationTestCase):
             f'<img src="{email_file.file_url}?fid={email_file.name}">'
             f'<img src="{comment_file.file_url}?fid={comment_file.name}">'
         )
-        stripped = strip_email_file_ids(content, [email.name])
-        self.assertIn(f'src="{email_file.file_url}"', stripped)
-        self.assertIn(f"?fid={comment_file.name}", stripped)
+        emails = [frappe._dict(name=email.name, content=content)]
+        strip_email_file_ids(emails)
+        self.assertIn(f'src="{email_file.file_url}"', emails[0].content)
+        self.assertIn(f"?fid={comment_file.name}", emails[0].content)
 
     def test_patch_mirrors_existing_attachments(self):
         file = self.email_file()
@@ -118,4 +119,20 @@ class TestEmailAttachments(IntegrationTestCase):
         other_file = attach_private_file(self, "Communication", other_email.name)
         email = make_ticket_email(self, self.ticket.name, CUSTOMER)
         content = f'<img src="{other_file.file_url}?fid={other_file.name}">'
-        self.assertEqual(strip_email_file_ids(content, [email.name]), content)
+        emails = [frappe._dict(name=email.name, content=content)]
+        strip_email_file_ids(emails)
+        self.assertEqual(emails[0].content, content)
+
+    def test_strip_email_file_ids_across_emails(self):
+        emails = []
+        for _ in range(2):
+            email = make_ticket_email(self, self.ticket.name, CUSTOMER)
+            file = attach_private_file(self, "Communication", email.name, "inline.png")
+            emails.append(
+                frappe._dict(
+                    name=email.name,
+                    content=f'<img src="{file.file_url}?fid={file.name}">',
+                )
+            )
+        strip_email_file_ids(emails)
+        self.assertTrue(all("?fid=" not in email.content for email in emails))
