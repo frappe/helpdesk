@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 from helpdesk.utils import agent_only, get_agent_name, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
@@ -90,6 +91,8 @@ def update_profile(
         user.first_name = first_name
     if last_name is not None:
         user.last_name = last_name
+    if image and not image.startswith("/files/"):
+        frappe.throw(_("Please upload the picture rather than linking to it"))
     if image is not None:
         user.user_image = image or None
     user.save(ignore_permissions=True)

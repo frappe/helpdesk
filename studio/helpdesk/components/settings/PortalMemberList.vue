@@ -51,7 +51,10 @@
                 variant="subtle"
               />
             </div>
-            <div class="truncate text-p-sm text-ink-gray-5">
+            <div
+              v-if="!member.pending"
+              class="truncate text-p-sm text-ink-gray-5"
+            >
               {{ member.email }}
             </div>
           </div>

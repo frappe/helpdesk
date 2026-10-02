@@ -6,9 +6,13 @@ from frappe.core.api.user_invitation import get_pending_invitations
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.organization import (
+    MAX_INVITES,
     get_invitable_contacts,
+    get_organization,
     invite_members,
+    remove_member,
     update_member_role,
+    update_organization,
 )
 from helpdesk.test_utils import (
     create_agent,
@@ -176,6 +180,153 @@ class TestInvitations(IntegrationTestCase):
         )
         with self.assertRaises(frappe.PermissionError):
             invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+
+    def test_more_than_the_cap_is_refused(self) -> None:
+        emails = [f"invitee{i}@invitations.test" for i in range(MAX_INVITES + 1)]
+        with self.assertRaises(frappe.ValidationError):
+            invite_members(self.customer.name, emails, "HD Customer")
+
+
+class TestMemberRemoval(IntegrationTestCase):
+    """Who a manager may drop, and whose invitations they may cancel."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        frappe.set_user("Administrator")
+        cls.owner = create_contact("Removal Owner", "owner@removal.test")
+        cls.manager = create_contact("Removal Manager", "manager@removal.test")
+        cls.member = create_contact("Removal Member", "member@removal.test")
+        cls.customer = create_customer(
+            "Test Member Removal",
+            [
+                {"contact_name": cls.owner["contact"]},
+                {"contact_name": cls.manager["contact"], "is_manager": 1},
+                {"contact_name": cls.member["contact"]},
+            ],
+        )
+        cls.customer.primary_contact = cls.owner["contact"]
+        cls.customer.save()
+        cls.other_customer = create_customer("Test Other Removal")
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 1
+        )
+
+    def setUp(self) -> None:
+        frappe.set_user(self.manager["user"])
+        self.addCleanup(frappe.set_user, "Administrator")
+
+    def member_contacts(self) -> list[str]:
+        customer = frappe.get_doc("HD Customer", self.customer.name)
+        return [row.contact_name for row in customer.contacts]
+
+    def readd_member(self) -> None:
+        frappe.set_user("Administrator")
+        customer = frappe.get_doc("HD Customer", self.customer.name)
+        customer.append("contacts", {"contact_name": self.member["contact"]})
+        customer.save()
+
+    def test_a_manager_removes_a_member(self) -> None:
+        remove_member(self.customer.name, self.member["contact"])
+        self.addCleanup(self.readd_member)
+
+        self.assertNotIn(self.member["contact"], self.member_contacts())
+
+    def test_the_owner_cannot_be_removed(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            remove_member(self.customer.name, self.owner["contact"])
+
+    def test_you_cannot_remove_yourself(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            remove_member(self.customer.name, self.manager["contact"])
+
+    def test_a_plain_member_cannot_remove_anyone(self) -> None:
+        frappe.set_user(self.member["user"])
+        with self.assertRaises(frappe.PermissionError):
+            remove_member(self.customer.name, self.owner["contact"])
+
+    def test_a_manager_cancels_an_invitation(self) -> None:
+        invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+        self.addCleanup(delete_invitations, NEWCOMER)
+        invitation = frappe.db.get_value("User Invitation", {"email": NEWCOMER})
+
+        remove_member(self.customer.name, invitation=invitation)
+
+        status = frappe.db.get_value("User Invitation", invitation, "status")
+        self.assertEqual(status, "Cancelled")
+
+    def test_another_organizations_invitation_is_refused(self) -> None:
+        frappe.set_user("Administrator")
+        invitation = frappe.get_doc(
+            doctype="User Invitation",
+            email=NEWCOMER,
+            roles=[{"role": "HD Customer"}],
+            app_name="helpdesk",
+            redirect_to_path=CUSTOMER_PORTAL_ROOT,
+            customer=self.other_customer.name,
+        ).insert()
+        self.addCleanup(delete_invitations, NEWCOMER)
+        frappe.set_user(self.manager["user"])
+
+        with self.assertRaises(frappe.PermissionError):
+            remove_member(self.customer.name, invitation=invitation.name)
+
+
+class TestOrganizationEdits(IntegrationTestCase):
+    """Renaming and re-logoing, behind their own portal setting."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        frappe.set_user("Administrator")
+        cls.manager = create_contact("Edit Manager", "manager@edits.test")
+        cls.member = create_contact("Edit Member", "member@edits.test")
+        cls.customer = create_customer(
+            "Test Org Edits",
+            [
+                {"contact_name": cls.manager["contact"], "is_manager": 1},
+                {"contact_name": cls.member["contact"]},
+            ],
+        )
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_edit_organization", 1
+        )
+
+    def setUp(self) -> None:
+        frappe.set_user(self.manager["user"])
+        self.addCleanup(frappe.set_user, "Administrator")
+
+    def test_edits_need_the_portal_setting(self) -> None:
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_edit_organization", 0
+        )
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_edit_organization",
+            1,
+        )
+        with self.assertRaises(frappe.PermissionError):
+            update_organization(self.customer.name, image="/files/logo.png")
+
+    def test_a_plain_member_cannot_edit(self) -> None:
+        frappe.set_user(self.member["user"])
+        with self.assertRaises(frappe.PermissionError):
+            update_organization(self.customer.name, image="/files/logo.png")
+
+    def test_a_rename_answers_with_the_new_name(self) -> None:
+        renamed = update_organization(self.customer.name, "Test Org Edits Renamed")
+        self.addCleanup(self.rename_back, renamed)
+
+        self.assertEqual(renamed, "Test Org Edits Renamed")
+        self.assertTrue(frappe.db.exists("HD Customer", renamed))
+
+    def rename_back(self, renamed: str) -> None:
+        frappe.set_user("Administrator")
+        frappe.rename_doc("HD Customer", renamed, self.customer.name)
+
+    def test_the_creator_s_email_is_not_shown_as_the_organization_s(self) -> None:
+        self.assertIsNone(get_organization(self.customer.name)["email"])
 
 
 class TestInvitableContacts(IntegrationTestCase):

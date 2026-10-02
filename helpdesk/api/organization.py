@@ -2,6 +2,7 @@
 
 import frappe
 from frappe import _
+from frappe.rate_limiter import rate_limit
 from frappe.utils import sbool
 
 from helpdesk.api.dashboard import COUNT_NAME
@@ -12,6 +13,7 @@ MANAGER_ROLE = "HD Customer Manager"
 PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
 PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
+MAX_INVITES = 20
 
 
 @frappe.whitelist()
@@ -44,7 +46,7 @@ def get_organization(customer: str) -> dict:
         "customer_name": hd_customer.customer_name,
         "image": hd_customer.image,
         "domain": hd_customer.domain,
-        "email": hd_customer.email_id or hd_customer.owner,
+        "email": hd_customer.email_id,
         "country": hd_customer.country,
         "is_manager": is_manager,
         "can_invite": is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING),
@@ -75,13 +77,24 @@ def get_invitable_contacts(customer: str) -> list[dict]:
     )
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
+@rate_limit(limit=10, seconds=60 * 60, ip_based=False, user_based=True)
 def invite_members(customer: str, emails: list[str], role: str) -> None:
     """Inserted with permissions ignored because customer managers hold none on User
     Invitation; `HelpdeskUserInvitation` still checks they manage this customer."""
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
     if role not in CUSTOMER_ROLES:
         frappe.throw(_("Invalid role {0}").format(role))
+    if len(emails) > MAX_INVITES:
+        frappe.throw(_("You can invite up to {0} people at a time").format(MAX_INVITES))
+    contacts = dict(
+        frappe.get_all(
+            "Contact",
+            filters={"email_id": ["in", emails]},
+            fields=["email_id", "name"],
+            as_list=True,
+        )
+    )
     for email in emails:
         frappe.get_doc(
             doctype="User Invitation",
@@ -90,7 +103,7 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
             app_name="helpdesk",
             redirect_to_path=CUSTOMER_PORTAL_ROOT,
             customer=hd_customer.name,
-            contact=frappe.db.get_value("Contact", {"email_id": email}),
+            contact=contacts.get(email),
         ).insert(ignore_permissions=True)
 
 
@@ -197,7 +210,7 @@ def _get_pending_members(hd_customer) -> list[dict]:
     return [
         {
             "invitation": invitation["name"],
-            "full_name": invitation["email"].split("@")[0],
+            "full_name": invitation["email"],
             "email": invitation["email"],
             "role": _get_role_label(False, MANAGER_ROLE in invitation["roles"]),
             "pending": True,
@@ -233,7 +246,16 @@ def _is_portal_setting_on(setting: str) -> bool:
 def _get_managed_customer(customer: str, setting: str):
     """The HD Customer, once the helpdesk allows the action and the caller manages it."""
     if not _is_portal_setting_on(setting):
-        frappe.throw(_("Your helpdesk does not allow this"), frappe.PermissionError)
+        frappe.throw(
+            (
+                _("Your helpdesk does not allow customers to manage members")
+                if setting == PORTAL_INVITE_SETTING
+                else _(
+                    "Your helpdesk does not allow customers to edit their organization"
+                )
+            ),
+            frappe.PermissionError,
+        )
     hd_customer = frappe.get_doc("HD Customer", customer)
     hd_customer.check_permission("write")
     return hd_customer
