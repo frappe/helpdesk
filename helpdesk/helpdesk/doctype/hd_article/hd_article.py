@@ -8,6 +8,8 @@ from frappe.utils import cint
 
 from helpdesk.utils import capture_event
 
+VOTE_VALUES = (0, 1, 2)
+
 
 class HDArticle(Document):
     def validate(self):
@@ -96,18 +98,17 @@ class HDArticle(Document):
 
     @frappe.whitelist()
     def set_feedback(self, value: int, visitor_id: str | None = None):
-        """Record one vote — 0 none, 1 like, 2 dislike.
-
-        Every signed-out reader is the same `Guest` user, so theirs is kept apart by
-        `visitor_id`, the cookie `helpdesk.api.knowledge_base` hands out.
-        """
+        """Record one vote: 0 none, 1 like, 2 dislike; a guest's is kept by `visitor_id`."""
+        value = cint(value)
+        if value not in VOTE_VALUES:
+            frappe.throw(_("Invalid vote"), frappe.ValidationError)
         self.validate_voter(visitor_id)
         owner = (
             {"visitor_id": visitor_id}
             if frappe.session.user == "Guest"
             else {"user": frappe.session.user}
         )
-        self.save_feedback(owner, int(value))
+        self.save_feedback(owner, value)
 
     def validate_voter(self, visitor_id: str | None):
         # Whitelisted, so hiding the buttons is not the gate — this is.
@@ -118,7 +119,7 @@ class HDArticle(Document):
         ):
             frappe.throw(_("Voting requires an account"), frappe.PermissionError)
         if not visitor_id:
-            frappe.throw(_("Could not identify this reader"), frappe.ValidationError)
+            frappe.throw(_("Please enable cookies to vote"), frappe.ValidationError)
 
     def save_feedback(self, owner: dict, value: int):
         feedback = frappe.db.exists(

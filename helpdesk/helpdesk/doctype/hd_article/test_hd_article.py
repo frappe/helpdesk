@@ -67,6 +67,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
 
         self.assertRaises(frappe.ValidationError, self.article.set_feedback, 1)
 
+    def test_an_invalid_vote_is_refused(self):
+        self.assertRaises(frappe.ValidationError, self.article.set_feedback, 7)
+
     def test_like_increases_like_count(self):
         self.article.set_feedback(1)
         likes, dislikes = self.get_counts()
