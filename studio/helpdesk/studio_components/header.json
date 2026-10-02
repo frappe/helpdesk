@@ -90,7 +90,7 @@
        "label": "{{ words.raiseTicket }}",
        "variant": "subtle"
       },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/tickets/new'].includes(route.path) }}"
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}"
      },
      {
       "baseStyles": {
@@ -191,7 +191,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-09-29 01:57:14.025397",
+ "modified": "2026-10-02 15:19:06.692502",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
