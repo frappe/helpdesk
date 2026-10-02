@@ -320,9 +320,10 @@ class HDCustomer(Document):
             params = {"customer": self.name}
             if item["contact"]:
                 params["contact"] = item["contact"]
+            roles = ["HD Customer", "HD Customer Manager"] if role == "HD Customer Manager" else [role]
             response = invite_by_email(
                 item["email"],
-                roles=[role],
+                roles=roles,
                 redirect_to_path="/helpdesk",
                 app_name="helpdesk",
                 **params,

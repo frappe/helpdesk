@@ -177,8 +177,14 @@ const ticket = createResource({
       createToast,
     });
   },
-  onError: () => {
-    toast.error(__("Ticket not found."));
+  onError: (err: any) => {
+    if (err && (err.status === 404 || err.exc_type === "DoesNotExistError")) {
+      toast.error(__("Ticket not found."));
+    } else {
+      toast.error(
+        err?.message || __("An error occurred while fetching the ticket.")
+      );
+    }
     router.replace("/my-tickets");
   },
 });
