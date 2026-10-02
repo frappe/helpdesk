@@ -972,3 +972,37 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def make_email_with_bcc(case, ticket, sender: str, bcc: str, cc: str | None = None):
+    """A sent email on `ticket` with a Bcc, removed when the test ends."""
+    email = frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": "Sent",
+            "sender": sender,
+            "recipients": ticket.raised_by,
+            "cc": cc,
+            "bcc": bcc,
+            "subject": ticket.subject,
+            "content": "<p>Reply</p>",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+        }
+    ).insert(ignore_permissions=True)
+    case.addCleanup(frappe.delete_doc, "Communication", email.name, force=True)
+    return email.name
+
+
+def get_communication_as(user: str, ticket: str, communication: str):
+    """`communication` as get_communications returns it to `user`."""
+    from helpdesk.helpdesk.doctype.hd_ticket.api import get_communications
+
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        return next(c for c in get_communications(ticket) if c.name == communication)
+    finally:
+        frappe.set_user(previous_user)
