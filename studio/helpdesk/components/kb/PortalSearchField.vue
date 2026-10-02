@@ -25,6 +25,7 @@
     </div>
 
     <span
+      v-if="!query"
       class="shrink-0 whitespace-nowrap rounded-4 border border-outline-gray-2 bg-surface-gray-2 px-[9px] py-1.5 text-[14px] leading-[1.15] tracking-[0.28px] text-ink-gray-4"
     >
       {{ isMac ? "Cmd+k" : "Ctrl+K" }}

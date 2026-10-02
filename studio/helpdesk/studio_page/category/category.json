@@ -325,7 +325,10 @@
             "data": "{{ filteredArticles }}",
             "dataKey": "name"
            },
-           "visibilityCondition": "{{ filteredArticles && filteredArticles.length }}"
+           "visibilityCondition": "{{ filteredArticles && filteredArticles.length }}",
+           "classes": [
+            "[&>*:last-child]:border-b-0"
+           ]
           }
          ],
          "classes": [
@@ -421,7 +424,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:43:28.582118",
+ "modified": "2026-10-02 15:58:06.688167",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
