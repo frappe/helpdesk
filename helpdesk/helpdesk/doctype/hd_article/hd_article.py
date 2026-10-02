@@ -127,8 +127,7 @@ class HDArticle(Document):
         if feedback:
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
             return
-        # Unchecked: the vote is the reader's own row, and `validate_voter` above is
-        # what decides whether they may cast it — a guest holds no create permission.
+        # A guest holds no create permission; `validate_voter` is the gate.
         frappe.get_doc(
             {
                 "doctype": "HD Article Feedback",

@@ -53,7 +53,6 @@
 </template>
 
 <script setup lang="ts">
-// Header search: the server matches, the Combobox lists and drives the keyboard.
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Combobox, createResource, debounce } from "frappe-ui";
@@ -72,7 +71,6 @@ withDefaults(defineProps<{ placeholder?: string }>(), {
 
 const router = useRouter();
 const query = ref("");
-// Query-driven: an empty box has nothing to open over.
 const isOpen = ref(false);
 
 const results = createResource({
@@ -100,7 +98,6 @@ const options = computed(() => [
     type: "custom",
     key: SEARCH_ALL,
     label: __("Search"),
-    // Always offered, so a search that matched nothing here still has somewhere to go.
     onClick: ({ query }) =>
       router.push({ path: ROUTES.help, query: { q: query.trim() } }),
   },

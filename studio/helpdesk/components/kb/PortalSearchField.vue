@@ -3,8 +3,7 @@
     class="flex h-[34px] w-full cursor-text items-center gap-[13px] rounded-4 border border-[--surface-gray-2] bg-surface-gray-2 pl-2.5 pr-0.5 transition-colors hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus-within:border-outline-gray-4 focus-within:bg-surface-base focus-within:shadow-sm hover:focus-within:border-outline-gray-4 hover:focus-within:bg-surface-base"
     @click="focus"
   >
-    <!-- TextInput fixes its height and leaves a suffix 36px, too little for the shortcut.
-         The box carries TextInput's subtle look itself, height and focus included, so the shortcut can come and go. -->
+    <!-- TextInput's suffix is 36px, too narrow for the shortcut, so this draws the subtle input itself. -->
     <div class="flex min-w-0 flex-1 items-center gap-2">
       <span class="relative size-4 shrink-0 overflow-hidden text-ink-gray-4">
         <svg
@@ -34,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-// A search box that ⌘K focuses, for lists that filter as you type.
 import { ref } from "vue";
 import { KeyboardShortcut, useKeyboardShortcut } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";

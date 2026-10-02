@@ -80,7 +80,6 @@ export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   listComponent: FieldAutocompleteList,
 });
 
-// Shared with the portal, which renders articles read-only through the same schema.
 export { ComponentUtils } from "@helpdesk/shared/tiptap";
 
 // The extensions that match frappe-ui's TextEditor schema, used for generateJSON

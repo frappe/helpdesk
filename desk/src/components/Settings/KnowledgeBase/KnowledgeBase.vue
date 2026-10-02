@@ -96,14 +96,11 @@ const settings = createDocumentResource({
 });
 const showRemoveDialog = ref(false);
 
-// Every control here writes a single field, so each edit saves itself — the tab
-// never carries a dirty state and needs no Save button.
 function update(fieldname: string, value: string | boolean) {
   settings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
 }
 
 function onSaved() {
-  // Both fields are served to the portals through `get_config`.
   configStore.configResource.reload();
   toast.success(__("Settings updated"));
 }

@@ -41,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-// An article in search results ("list") or under the new-ticket subject ("suggestion").
 import { RouterLink } from "vue-router";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleThumbnail from "@app/components/kb/PortalArticleThumbnail.vue";

@@ -357,7 +357,6 @@ export interface Article {
   article_image: string | null;
   _user_tags: string | null;
   status: string;
-  /** Who a published article is written for: Public, Customers only or Agents only. */
   visibility: string;
   creation: string;
   content: string;

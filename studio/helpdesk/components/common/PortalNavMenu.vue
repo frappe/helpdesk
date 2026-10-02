@@ -40,7 +40,6 @@
 </template>
 
 <script setup lang="ts">
-// With no options (a guest) there is nothing to choose: the logo just leads home.
 import { RouterLink } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";

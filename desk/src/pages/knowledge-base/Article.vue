@@ -59,7 +59,6 @@
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
               <div class="flex gap-4 text-p-sm items-center">
-                <!-- Counts only: readers vote on the customer portal. -->
                 <div class="flex items-center gap-2" v-if="!editable">
                   <Button
                     variant="ghost"
@@ -378,7 +377,6 @@ const articleUrl = computed(
     `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/articles/${props.articleId}`
 );
 
-// The sharing dialog settles the audience and publishes in one write.
 function publishArticle(visibility: string) {
   save(
     { status: "Published", visibility },

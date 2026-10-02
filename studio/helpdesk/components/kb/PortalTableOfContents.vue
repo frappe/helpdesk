@@ -18,8 +18,6 @@
 </template>
 
 <script setup lang="ts">
-// "On this page" rail: the headings live in the article body beside this, so they are
-// measured off the document rather than owned here.
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const props = withDefaults(
@@ -27,8 +25,7 @@ const props = withDefaults(
   { items: () => [] }
 );
 
-// A heading is current once it crosses this far down the viewport: a fixed offset
-// would leave every heading of a short article "below the line".
+// A fraction, not a fixed offset, so every heading of a short article can become current.
 const ACTIVE_RATIO = 0.25;
 
 const activeId = ref<string | null>(null);

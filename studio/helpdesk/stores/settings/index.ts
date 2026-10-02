@@ -40,8 +40,7 @@ const knowledgeBase = { icon: 'lucide-book-open', label: __('Knowledge base'), o
 
 const accountMenuOptions = computed(() =>
   session.isGuest.value
-    ? // The header already offers Login; the logo leads home.
-      []
+    ? []
     : [
         { icon: 'lucide-inbox', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
         knowledgeBase,

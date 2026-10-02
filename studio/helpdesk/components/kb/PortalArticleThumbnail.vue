@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-// An article's first image, or the document glyph when it has none or the image is dead.
 import { ref, watch } from "vue";
 
 const DOCUMENT_GLYPH =

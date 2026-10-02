@@ -44,7 +44,6 @@ class TestHDArticleFeedback(IntegrationTestCase):
         self.assertEqual(self.get_counts(), (0, 0))
 
     def test_anonymous_readers_are_counted_separately(self):
-        # Without the visitor id both votes are Guest's and the second overwrites the first.
         enable_anonymous_article_voting()
         frappe.set_user("Guest")
 

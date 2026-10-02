@@ -8,8 +8,6 @@ from markdownify import markdownify
 from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.utils import is_agent
 
-# Who a published article is written for, widest first. `Public` is the knowledge base as
-# it has always been; the other two are gates behind `Published`.
 PUBLIC = "Public"
 CUSTOMERS_ONLY = "Customers only"
 AGENTS_ONLY = "Agents only"
@@ -163,10 +161,7 @@ def get_categories():
     return categories
 
 
-# The public knowledge base reads through the endpoints below rather than
-# `frappe.client.get_list`/`get`, which frappe does not open to guests. The field
-# lists are fixed and the status filter is not a parameter, so an anonymous caller
-# can widen neither.
+# Fixed fields and no status parameter: guests read through these, so they cannot widen them.
 PUBLIC_ARTICLE_FIELDS = [
     "name",
     "title",
@@ -251,8 +246,6 @@ def get_public_article(name: str) -> dict:
     article.category_name = frappe.db.get_value(
         "HD Article Category", article.category, "category_name"
     )
-    # The reader's own vote rides along, so the page can show it filled in without
-    # a second call. Named as `get_article` names it.
     article.feedback = get_own_vote(name)
     return article
 
@@ -295,7 +288,10 @@ def get_public_categories(limit: int | None = None) -> list[dict]:
     counts = dict(
         frappe.get_all(
             "HD Article",
-            filters={**readable_filters(), "category": ["in", [c.name for c in categories]]},
+            filters={
+                **readable_filters(),
+                "category": ["in", [c.name for c in categories]],
+            },
             fields=["category", {"COUNT": "*", "as": "total"}],
             group_by="category",
             as_list=True,
@@ -416,8 +412,7 @@ def get_own_vote(article: str) -> str:
     elif visitor_id := get_visitor_id():
         voter = {"visitor_id": visitor_id}
     else:
-        # No cookie yet, so no vote. Filtering on a null visitor would otherwise
-        # match every signed-in reader's row.
+        # A null visitor id would match every signed-in reader's row.
         return "0"
 
     vote = frappe.db.get_value(
@@ -427,8 +422,7 @@ def get_own_vote(article: str) -> str:
 
 
 def get_article_votes(article: str) -> dict:
-    # `get_all` rather than `db.count`: the latter checks read permission, which a
-    # signed-out voter does not have on this doctype.
+    # Not `db.count`: it checks read permission, which a guest voter lacks.
     votes = [
         str(vote)
         for vote in frappe.get_all(

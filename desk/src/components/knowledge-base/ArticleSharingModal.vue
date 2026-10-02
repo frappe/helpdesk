@@ -31,14 +31,11 @@
 </template>
 
 <script setup lang="ts">
-// Who may read an article, asked as a question about access. Picking an audience does
-// not save it: publishing does, and the two travel in one write.
 import { Button, Dialog, Select } from "frappe-ui";
 import { ref, watch } from "vue";
 import { __ } from "@/translation";
 import { copyToClipboard } from "@/utils";
 
-// Keyed by what `HD Article.visibility` stores, in the order they widen.
 const ACCESS_LEVELS: Record<string, { label: string; icon: string }> = {
   "Agents only": {
     label: __("Accessible to agents only"),
@@ -63,7 +60,6 @@ const accessOptions = Object.entries(ACCESS_LEVELS).map(([value, level]) => ({
 
 const access = ref(DEFAULT_ACCESS);
 
-// Seeded on every open, so an abandoned pick does not carry over.
 watch(show, (open) => {
   if (!open) return;
   access.value =

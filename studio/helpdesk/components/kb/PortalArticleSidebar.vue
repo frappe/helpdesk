@@ -90,7 +90,6 @@
 </template>
 
 <script setup lang="ts">
-// Categories and their articles beside an article, one category open at a time.
 import { computed, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import {
@@ -116,7 +115,6 @@ const props = withDefaults(
 );
 
 const query = ref("");
-// One open at a time, like an accordion.
 const openName = ref<string | null>(null);
 
 const currentCategory = computed(
@@ -126,13 +124,11 @@ const currentCategory = computed(
     )?.name
 );
 
-// Reading an article opens its category, as clicking it would.
 watch(currentCategory, (name) => name && (openName.value = name), {
   immediate: true,
 });
 
 function toggle(name: string) {
-  // A search opens every match on its own; the reader's own state waits underneath.
   if (query.value.trim()) return;
   openName.value = openName.value === name ? null : name;
 }

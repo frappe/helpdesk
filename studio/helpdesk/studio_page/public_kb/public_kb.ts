@@ -7,7 +7,6 @@ const ARTICLE_LIMIT = 5
 export default function setup(context) {
   const { articles, categories } = context
 
-  // One or two categories need no grid: the page lists one category's articles, two get a picker.
   const fewCategories = computed(() => {
     const rows = categories.data || []
     return rows.length === 1 || rows.length === 2 ? rows : []
@@ -26,10 +25,9 @@ export default function setup(context) {
     return category.article_count === 1 ? __('1 article') : __('{0} articles', [category.article_count])
   }
 
-  // A lone category heads its own list in full; it has nothing to sort between or count against.
   const isLoneCategory = computed(() => Boolean(focusCategory.value && !hasCategoryPicker.value))
 
-  // Re-asked of the server, not re-sorted here, and only once the categories say which list this is.
+  // Waits for the categories: an earlier fetch could land after the right one.
   const sort = ref('latest')
   watch([sort, focusCategory, () => categories.data], ([value, category, loaded]) => {
     if (!loaded) return

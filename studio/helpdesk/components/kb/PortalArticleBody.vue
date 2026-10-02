@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-// The editor the desk writes articles in, read-only, so they read as written.
 import { TextEditor } from "frappe-ui/experimental";
 import { ComponentUtils } from "@helpdesk/shared/tiptap";
 

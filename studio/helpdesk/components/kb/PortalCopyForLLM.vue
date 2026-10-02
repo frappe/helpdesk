@@ -30,7 +30,6 @@
 </template>
 
 <script setup lang="ts">
-// The docs-site "Copy page" control: the article as Markdown, or handed to a chat assistant.
 import { computed, ref, watch } from "vue";
 import { useClipboard } from "@vueuse/core";
 import { Button, Dropdown, toast } from "frappe-ui";
@@ -42,7 +41,6 @@ const MARKDOWN_METHOD =
 const props = withDefaults(
   defineProps<{
     name: string;
-    /** Readable without a session, so an assistant can fetch it by URL. */
     isPublic?: boolean;
   }>(),
   { isPublic: false }
@@ -80,11 +78,7 @@ function openInAssistant(baseUrl: string) {
   const prompt = __("Read {0} so I can ask questions about it.", [
     markdownUrl.value,
   ]);
-  window.open(
-    `${baseUrl}${encodeURIComponent(prompt)}`,
-    "_blank",
-    "noopener"
-  );
+  window.open(`${baseUrl}${encodeURIComponent(prompt)}`, "_blank", "noopener");
 }
 
 const options = computed(() => [

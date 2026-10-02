@@ -67,7 +67,6 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  // Through the portal's own endpoint: it keeps to the articles this reader may see.
   const popularArticles = createResource({
     url: 'helpdesk.api.knowledge_base.get_public_articles',
     method: 'GET',

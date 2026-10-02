@@ -24,13 +24,9 @@ from helpdesk.test_utils import (
     make_article_category,
 )
 
-# A list row carries what it shows over the stored fields, computed, never asked for.
 LIST_ROW_FIELDS = {*PUBLIC_ARTICLE_FIELDS, "excerpt", "image"}
-# Not an agent and needs no User row: the audience rule reads the session name and roles.
 CUSTOMER = "fixture.customer@example.com"
-# The site's own articles carry real view counts; fixtures outrank them all.
 BASE_VIEWS = 1_000_000
-# Wide enough to cover every category on the site when asserting an absence.
 ALL = 100
 
 
@@ -47,7 +43,6 @@ class TestPopularCategories(IntegrationTestCase):
         quiet = make_article_category("Fixture Quiet").name
         loud = make_article_category("Fixture Loud").name
         self.make_viewed_article(quiet, BASE_VIEWS + 1)
-        # Two articles, so views are proven summed rather than maxed.
         self.make_viewed_article(loud, BASE_VIEWS)
         self.make_viewed_article(loud, BASE_VIEWS)
 
@@ -160,7 +155,6 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(get_public_article(self.published)["feedback"], "1")
 
     def test_a_cookieless_guest_is_shown_no_vote(self) -> None:
-        # An empty visitor id would match every signed-in reader's vote row.
         frappe.get_doc("HD Article", self.published).set_feedback(1)
         frappe.set_user("Guest")
 
@@ -246,7 +240,6 @@ class TestPublicReads(IntegrationTestCase):
         markdown = frappe.response.filecontent
         self.assertTrue(markdown.startswith("# Fixture markdown\n\n## Setup\n"))
         self.assertIn("Open **Settings**", markdown)
-        # Absolute, so an LLM reading the page can still fetch the image.
         self.assertIn(f"]({frappe.utils.get_url()}/files/a.png)", markdown)
 
     def test_a_guest_cannot_read_a_draft_as_markdown(self) -> None:
@@ -354,7 +347,6 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         self.assertRaises(frappe.DoesNotExistError, vote_on_article, self.members, 1)
 
     def test_its_views_do_not_rank_a_category_for_a_guest(self) -> None:
-        # A chip would point the guest at a category that looks empty once opened.
         members_only = make_article_category("Fixture Members Only").name
         make_article(
             "Fixture members elsewhere",
@@ -418,7 +410,6 @@ class TestSearch(IntegrationTestCase):
         [row] = [row for row in search_articles("zebra") if row["name"] == self.public]
 
         self.assertIn("<mark>zebra</mark>", row["title"])
-        # Author text is not HTML: the ampersand is escaped and the bold tag is text.
         self.assertIn("&amp;", row["excerpt"])
         self.assertNotIn("<b>", row["excerpt"])
         self.assertEqual(row["category_name"], "Fixture Search")

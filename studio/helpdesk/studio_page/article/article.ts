@@ -14,7 +14,6 @@ export default function setup(context) {
   // `article` is absent on the builder canvas, where the route has no name.
   const { article, articles, categories } = context
 
-  // The headings get ids here so the table of contents can scroll to them.
   const parsed = computed(() => {
     const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')
     const toc = Array.from(dom.querySelectorAll('h1, h2, h3')).map((heading, index) => {
@@ -36,7 +35,6 @@ export default function setup(context) {
     return date ? dayjs(date).format('D MMM YYYY') : ''
   })
 
-  // Only a page anyone can open can be handed to an assistant by URL.
   const { isPublicKnowledgeBase } = useSession()
   const isPublicArticle = computed(
     () => article?.data?.visibility === 'Public' && isPublicKnowledgeBase.value,
@@ -48,7 +46,6 @@ export default function setup(context) {
       : null,
   )
 
-  // Sidebar: each category with its articles, in the shape the sidebar reads.
   const sidebarCategories = computed(() =>
     (categories.data || []).map((category) => ({
       name: category.name,

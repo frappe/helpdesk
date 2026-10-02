@@ -1,7 +1,6 @@
 import { Extension } from "@tiptap/core";
 
-// Tiptap drops any attribute its schema does not declare. Both editors render
-// articles through this: the desk to edit them, the portal to read them.
+// Tiptap drops any attribute its schema does not declare.
 export const ComponentUtils: Extension = Extension.create({
   name: "ComponentUtils",
   addGlobalAttributes() {

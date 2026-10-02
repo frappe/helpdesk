@@ -70,7 +70,6 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
-  // Articles that may already answer the subject, before the form is filled in.
   const suggestions = createResource({
     url: 'helpdesk.api.knowledge_base.search_articles',
     method: 'GET',
