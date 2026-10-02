@@ -259,7 +259,14 @@ class TestPublicReads(IntegrationTestCase):
             row for row in get_public_categories() if row["name"] == self.category.name
         ]
 
-        self.assertEqual(set(category), set(PUBLIC_CATEGORY_FIELDS))
+        self.assertEqual(set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count"})
+
+    def test_a_category_counts_only_its_published_articles(self) -> None:
+        [category] = [
+            row for row in get_public_categories() if row["name"] == self.category.name
+        ]
+
+        self.assertEqual(category.article_count, 1)
 
     def test_reads_one_category(self) -> None:
         category = get_public_category(self.category.name)

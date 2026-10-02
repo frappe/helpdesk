@@ -284,13 +284,26 @@ def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_categories(limit: int | None = None) -> list[dict]:
+    """Each with `article_count`, the articles in it the reader may see."""
     validate_public_access()
-    return frappe.get_all(
+    categories = frappe.get_all(
         "HD Article Category",
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
         limit_page_length=int(limit) if limit else 0,
     )
+    counts = dict(
+        frappe.get_all(
+            "HD Article",
+            filters={**readable_filters(), "category": ["in", [c.name for c in categories]]},
+            fields=["category", {"COUNT": "*", "as": "total"}],
+            group_by="category",
+            as_list=True,
+        )
+    )
+    for category in categories:
+        category.article_count = counts.get(category.name, 0)
+    return categories
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
