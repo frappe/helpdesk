@@ -1,9 +1,10 @@
 <template>
   <div
-    class="flex w-full cursor-text items-center gap-[13px] rounded-4 bg-surface-gray-2 py-0.5 pl-2.5 pr-0.5"
+    class="flex h-[34px] w-full cursor-text items-center gap-[13px] rounded-4 border border-[--surface-gray-2] bg-surface-gray-2 pl-2.5 pr-0.5 transition-colors hover:border-outline-elevation-2 hover:bg-surface-gray-3 focus-within:border-outline-gray-4 focus-within:bg-surface-base focus-within:shadow-sm hover:focus-within:border-outline-gray-4 hover:focus-within:bg-surface-base"
     @click="focus"
   >
-    <!-- TextInput fixes its height and leaves a suffix 36px, too little for the shortcut chip. -->
+    <!-- TextInput fixes its height and leaves a suffix 36px, too little for the shortcut chip.
+         The box carries TextInput's subtle look itself, height and focus included, so the chip can come and go. -->
     <div class="flex min-w-0 flex-1 items-center gap-2">
       <span class="relative size-4 shrink-0 overflow-hidden text-ink-gray-4">
         <svg
