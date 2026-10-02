@@ -1,6 +1,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
@@ -460,3 +461,20 @@ class TestSearch(IntegrationTestCase):
 
     def test_limit_caps_the_list(self) -> None:
         self.assertEqual(len(search_articles("zebra", limit=1)), 1)
+
+    def test_related_help_keeps_to_the_reader_s_audience(self) -> None:
+        internal = make_article(
+            "Fixture zebra internal",
+            content="<p>zebra</p>",
+            visibility="Agents only",
+        ).name
+        self.search.index_documents_by_name("HD Article", [internal])
+        self.addCleanup(self.search.remove_doc, "HD Article", internal)
+        self.assertIn(internal, self.related())
+
+        frappe.session.user = CUSTOMER
+
+        self.assertNotIn(internal, self.related())
+
+    def related(self) -> list[str]:
+        return [row["name"] for row in get_related("zebra")]
