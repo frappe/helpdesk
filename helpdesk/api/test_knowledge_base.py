@@ -8,6 +8,7 @@ from helpdesk.api.knowledge_base import (
     get_article_markdown,
     get_popular_categories,
     get_public_article,
+    get_public_article_titles,
     get_public_articles,
     get_public_categories,
     get_public_category,
@@ -106,6 +107,7 @@ class TestPublicReads(IntegrationTestCase):
         for endpoint in (
             get_public_articles,
             get_public_article,
+            get_public_article_titles,
             get_article_markdown,
             get_public_categories,
             get_public_category,
@@ -114,12 +116,16 @@ class TestPublicReads(IntegrationTestCase):
         ):
             self.assertIn(endpoint, frappe.guest_methods)
 
+    def test_the_desk_reader_is_not_open_to_guests(self) -> None:
+        self.assertNotIn(get_article, frappe.guest_methods)
+
     def test_a_private_knowledge_base_refuses_every_anonymous_read(self) -> None:
         disable_public_knowledge_base()
         frappe.set_user("Guest")
 
         for endpoint, args in (
             (get_public_articles, ()),
+            (get_public_article_titles, ()),
             (get_public_categories, ()),
             (get_popular_categories, ()),
             (get_public_article, (self.published,)),
@@ -340,6 +346,26 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
         self.assertRaises(frappe.DoesNotExistError, get_public_article, self.members)
         self.assertRaises(frappe.PermissionError, get_article, self.members)
+
+    def test_a_guest_does_not_count_it(self) -> None:
+        self.assertEqual(self.count(), 2)
+
+        frappe.set_user("Guest")
+
+        self.assertEqual(self.count(), 1)
+
+    def test_a_guest_does_not_see_its_title(self) -> None:
+        frappe.set_user("Guest")
+
+        names = [row["name"] for row in get_public_article_titles()]
+        self.assertIn(self.public, names)
+        self.assertNotIn(self.members, names)
+
+    def count(self) -> int:
+        [row] = [
+            row for row in get_public_categories() if row["name"] == self.category.name
+        ]
+        return row["article_count"]
 
     def test_a_guest_cannot_vote_on_one(self) -> None:
         frappe.set_user("Guest")

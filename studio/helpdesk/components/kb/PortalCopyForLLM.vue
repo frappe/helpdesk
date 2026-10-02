@@ -1,12 +1,11 @@
 <template>
-  <div class="flex shrink-0 items-center">
+  <div class="flex shrink-0 items-center" @pointerenter="load" @focusin="load">
     <Button
       size="xs"
       variant="outline"
       class="rounded-e-none"
       :label="__('Copy for LLM')"
       :icon-left="copied ? 'lucide-check' : 'lucide-copy'"
-      :disabled="!markdown"
       @click="copyMarkdown"
     />
     <Dropdown :options="options" align="end">
@@ -49,8 +48,9 @@ const props = withDefaults(
 // `legacy` falls back to execCommand where the Clipboard API is missing (plain http).
 const { copy, copied } = useClipboard({ legacy: true });
 
-// Fetched ahead of the click: Safari drops a clipboard write that waits on the network.
+// Fetched on approach, not on click: Safari drops a clipboard write that waits on the network.
 const markdown = ref("");
+let request: Promise<void> | null = null;
 const markdownUrl = computed(
   () =>
     `${window.location.origin}${MARKDOWN_METHOD}?name=${encodeURIComponent(
@@ -60,16 +60,28 @@ const markdownUrl = computed(
 
 watch(
   () => props.name,
-  async (name) => {
+  () => {
     markdown.value = "";
-    if (!name) return;
-    const response = await fetch(markdownUrl.value);
-    if (response.ok) markdown.value = await response.text();
-  },
-  { immediate: true }
+    request = null;
+  }
 );
 
+function load() {
+  request ||= fetch(markdownUrl.value)
+    .then(async (response) => {
+      if (response.ok) markdown.value = await response.text();
+    })
+    .catch(() => {});
+  return request;
+}
+
 async function copyMarkdown() {
+  if (!markdown.value) await load();
+  if (!markdown.value) {
+    request = null;
+    toast.error(__("Could not copy the article"));
+    return;
+  }
   await copy(markdown.value);
   toast.success(__("Copied as Markdown"));
 }
@@ -85,7 +97,6 @@ const options = computed(() => [
   {
     label: __("Copy as Markdown"),
     icon: "lucide-copy",
-    disabled: !markdown.value,
     onClick: copyMarkdown,
   },
   {

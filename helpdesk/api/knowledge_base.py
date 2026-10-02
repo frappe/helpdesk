@@ -1,8 +1,14 @@
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.query_builder.functions import Coalesce
 from frappe.rate_limiter import rate_limit
-from frappe.utils import escape_html, expand_relative_urls, get_user_info_for_avatar
+from frappe.utils import (
+    cint,
+    escape_html,
+    expand_relative_urls,
+    get_user_info_for_avatar,
+)
 from markdownify import markdownify
 
 from helpdesk.search_sqlite import HelpdeskArticleSearch
@@ -14,11 +20,7 @@ AGENTS_ONLY = "Agents only"
 
 
 def validate_public_access():
-    """Anonymous readers only while the knowledge base is public.
-
-    The portal sends a signed-out visitor to the login page before it asks for
-    anything, but that is a courtesy — this is the boundary.
-    """
+    """Anonymous readers only while the knowledge base is public."""
     if frappe.session.user != "Guest":
         return
     if not frappe.db.get_single_value("HD Settings", "public_knowledge_base"):
@@ -28,12 +30,7 @@ def validate_public_access():
 
 
 def readable_audiences() -> list[str] | None:
-    """Which audiences the caller belongs to — `None` where every one of them is theirs.
-
-    An agent reads the whole knowledge base. Everyone else is held to what was written
-    for them: a signed-in customer to the public and customer articles, and an anonymous
-    reader to the public ones alone.
-    """
+    """The audiences the caller may read; `None` for an agent, who reads them all."""
     if is_agent():
         return None
     if frappe.session.user == "Guest":
@@ -42,12 +39,7 @@ def readable_audiences() -> list[str] | None:
 
 
 def readable_filters(**extra) -> dict:
-    """What a reader is allowed to see, as filters.
-
-    Published, always — plus the audiences that are theirs, so an article written for
-    someone else stays out of their lists, out of the popular-category tallies, and out
-    of search.
-    """
+    """Published articles in the caller's audiences, as filters."""
     filters = {"status": "Published", **extra}
     audiences = readable_audiences()
     if audiences is not None:
@@ -64,9 +56,8 @@ def is_readable(article) -> bool:
     return article.get("visibility") in readable_audiences()
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_article(name: str):
-    validate_public_access()
     article = frappe.get_doc("HD Article", name).as_dict()
 
     if not is_readable(article):
@@ -98,8 +89,6 @@ def get_article(name: str):
         "visibility": article.visibility,
         "feedback": int(feedback),
     }
-
-    return article
 
 
 @frappe.whitelist()
@@ -151,10 +140,9 @@ def get_categories():
         "HD Article Category",
         fields=["name", "category_name", "modified"],
     )
+    counts = readable_article_counts([c.name for c in categories])
     for c in categories:
-        c["article_count"] = frappe.db.count(
-            "HD Article", filters=readable_filters(category=c.name)
-        )
+        c["article_count"] = counts.get(c.name, 0)
 
     categories.sort(key=lambda c: c["article_count"], reverse=True)
     categories = [c for c in categories if c["article_count"] > 0]
@@ -176,6 +164,9 @@ PUBLIC_ARTICLE_FIELDS = [
 PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon"]
 EXCERPT_LENGTH = 140
 SEARCH_LIMIT = 10
+SEARCH_QUERY_LENGTH = 200
+# ponytail: a category past this many articles lists only the newest; paginate if one gets there.
+LIST_LIMIT = 100
 
 VISITOR_COOKIE = "hd_visitor"
 VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
@@ -192,7 +183,7 @@ def get_popular_categories(limit: int = 3) -> list[dict]:
         fields=["category", {"SUM": "views", "as": "total"}],
         group_by="category",
         order_by="total desc",
-        limit_page_length=int(limit),
+        limit_page_length=cint(limit),
     )
     labels = dict(
         frappe.get_all(
@@ -222,7 +213,7 @@ def get_public_articles(
         filters=filters,
         fields=[*PUBLIC_ARTICLE_FIELDS, "content"],
         order_by="views desc" if sort == "popular" else "published_on desc",
-        limit_page_length=int(limit) if limit else 0,
+        limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
     for article in articles:
         soup = BeautifulSoup(article.pop("content") or "", "html.parser")
@@ -236,6 +227,18 @@ def first_image(soup: BeautifulSoup) -> str | None:
     """HD Article has no cover field; the body's first image stands in for one."""
     image = soup.find("img")
     return image.get("src") if image else None
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])
+def get_public_article_titles() -> list[dict]:
+    """Every article the reader may see, as just its name, title and category."""
+    validate_public_access()
+    return frappe.get_all(
+        "HD Article",
+        filters=readable_filters(),
+        fields=["name", "title", "category"],
+        order_by="published_on desc",
+    )
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -283,23 +286,24 @@ def get_public_categories(limit: int | None = None) -> list[dict]:
         "HD Article Category",
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
-        limit_page_length=int(limit) if limit else 0,
+        limit_page_length=cint(limit),
     )
-    counts = dict(
+    counts = readable_article_counts([c.name for c in categories])
+    for category in categories:
+        category.article_count = counts.get(category.name, 0)
+    return categories
+
+
+def readable_article_counts(categories: list[str]) -> dict[str, int]:
+    return dict(
         frappe.get_all(
             "HD Article",
-            filters={
-                **readable_filters(),
-                "category": ["in", [c.name for c in categories]],
-            },
+            filters=readable_filters(category=["in", categories]),
             fields=["category", {"COUNT": "*", "as": "total"}],
             group_by="category",
             as_list=True,
         )
     )
-    for category in categories:
-        category.article_count = counts.get(category.name, 0)
-    return categories
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -314,14 +318,13 @@ def get_public_category(name: str) -> dict:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
+@rate_limit(limit=120, seconds=60)
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
-    """Full-text matches the reader may see, best first, with `<mark>` around the hits.
-
-    Empty until the index exists; frappe builds it in the background after migrate.
-    """
+    """Full-text matches the reader may see, best first, with `<mark>` around the hits."""
     validate_public_access()
+    query = query.strip()[:SEARCH_QUERY_LENGTH]
     search = HelpdeskArticleSearch()
-    if not query.strip() or not search.index_exists():
+    if not query or not search.index_exists():
         return []
     results = search.search(query)["results"]
     if not results:
@@ -355,7 +358,7 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         }
         for row in results
         if row["name"] in readable
-    ][: int(limit)]
+    ][: cint(limit)]
 
 
 def escape_marked(text: str) -> str:
@@ -370,27 +373,18 @@ def escape_marked(text: str) -> str:
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 @rate_limit(key="article", limit=5, seconds=60 * 60)
 def vote_on_article(article: str, value: int) -> dict:
-    """Vote on a published article, signed in or not.
-
-    Not `HD Article.set_feedback` over `run_doc_method`: a signed-out reader holds no
-    read permission on the doctype, which is why every public read here is an
-    allow-listed endpoint too.
-    """
+    """Vote on a published article, signed in or not."""
     validate_public_access()
     doc = frappe.get_doc("HD Article", article)
     if not is_readable(doc):
         frappe.throw(_("Article not found"), frappe.DoesNotExistError)
 
-    doc.set_feedback(int(value), visitor_id=get_visitor_id(create=True))
+    doc.set_feedback(cint(value), visitor_id=get_visitor_id(create=True))
     return get_article_votes(article)
 
 
 def get_visitor_id(create: bool = False) -> str | None:
-    """Tell one signed-out reader from another.
-
-    Frappe answers every anonymous request as the same `Guest` user, so without this
-    all their votes would land on one row. Reading never mints a cookie: only voting does.
-    """
+    """A cookie that tells one `Guest` voter from another; only voting mints it."""
     if frappe.session.user != "Guest":
         return None
 
@@ -423,13 +417,16 @@ def get_own_vote(article: str) -> str:
 
 def get_article_votes(article: str) -> dict:
     # Not `db.count`: it checks read permission, which a guest voter lacks.
-    votes = [
-        str(vote)
-        for vote in frappe.get_all(
-            "HD Article Feedback", filters={"article": article}, pluck="feedback"
+    totals = dict(
+        frappe.get_all(
+            "HD Article Feedback",
+            filters={"article": article, "feedback": ["in", ["1", "2"]]},
+            fields=["feedback", {"COUNT": "*", "as": "total"}],
+            group_by="feedback",
+            as_list=True,
         )
-    ]
-    return {"likes": votes.count("1"), "dislikes": votes.count("2")}
+    )
+    return {"likes": totals.get("1", 0), "dislikes": totals.get("2", 0)}
 
 
 @frappe.whitelist()
@@ -499,7 +496,10 @@ def increment_views(article: str):
     if frappe.cache.get_value(key):
         return
     frappe.cache.set_value(key, 1, expires_in_sec=VIEW_WINDOW)
-    views = frappe.db.get_value("HD Article", article, "views") or 0
-    frappe.db.set_value(
-        "HD Article", article, "views", views + 1, update_modified=False
+    HDArticle = frappe.qb.DocType("HD Article")
+    (
+        frappe.qb.update(HDArticle)
+        .set(HDArticle.views, Coalesce(HDArticle.views, 0) + 1)
+        .where(HDArticle.name == article)
+        .run()
     )
