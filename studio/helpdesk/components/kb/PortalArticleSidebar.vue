@@ -14,7 +14,8 @@
         <template #prefix>
           <span class="lucide-search size-4 text-ink-gray-4" />
         </template>
-        <template #suffix>
+        <!-- The input leaves room for an icon, not the hint; typed text would run under it. -->
+        <template v-if="!query" #suffix>
           <KeyboardShortcut combo="Mod+K" class="text-ink-gray-4" />
         </template>
       </TextInput>
