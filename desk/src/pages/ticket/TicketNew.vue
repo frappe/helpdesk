@@ -72,49 +72,6 @@
             maxlength="140"
           />
         </div>
-        <SearchArticles
-          v-if="isCustomerPortal"
-          :query="subject"
-          class="shadow-sm"
-        />
-        <div v-if="isCustomerPortal">
-          <h4
-            v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-ink-gray-4 ms-1"
-          >
-            {{ __("Please enter a subject to continue") }}
-          </h4>
-          <TicketTextEditor
-            v-show="subject.length > 2 || description.length > 0"
-            ref="editor"
-            v-model:attachments="attachments"
-            v-model:content="description"
-            :placeholder="__('Detailed explanation')"
-            expand
-            :uploadFunction="
-              (file: any, options: any) =>
-                track(uploadFunction(file, null, null, true, options))
-            "
-          >
-            <template #bottom-right>
-              <!-- A disabled button fires no pointer events, so the span
-                   carries the hover for the tooltip -->
-              <Tooltip
-                :text="isUploading ? __('Please wait, media is uploading') : ''"
-              >
-                <span class="inline-flex">
-                  <Button
-                    :label="__('Submit')"
-                    theme="gray"
-                    variant="solid"
-                    :disabled="!canSubmit"
-                    @click="() => ticket.submit()"
-                  />
-                </span>
-              </Tooltip>
-            </template>
-          </TicketTextEditor>
-        </div>
       </div>
 
       <!-- for agent portal -->
@@ -179,7 +136,6 @@ import {
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import SearchArticles from "../../components/SearchArticles.vue";
 
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
