@@ -88,7 +88,7 @@
       "componentName": "Button",
       "componentProps": {
        "label": "{{ words.raiseTicket }}",
-       "variant": "subtle"
+       "variant": "{{ route.path.startsWith('/articles/') ? 'solid' : 'subtle' }}"
       },
       "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}"
      },
@@ -191,7 +191,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-02 15:19:06.692502",
+ "modified": "2026-10-02 15:19:17.280299",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
