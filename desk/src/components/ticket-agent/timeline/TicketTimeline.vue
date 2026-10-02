@@ -10,7 +10,7 @@
       <ActivityTimeline
         ref="timelineRef"
         class="px-5 pb-6"
-        :class="pinnedComments.length ? 'scroll-pt-14 pt-14' : 'mt-4 pt-1'"
+        :class="pinnedComments.length ? 'scroll-pt-14 pt-14' : 'pt-5'"
         :activities="filtered"
         :loading="_loading"
         :paginate="paginate"

@@ -25,10 +25,14 @@ export function glideToRow(
   });
 }
 
+// centre below the scroll padding like scrollIntoView, or the flash's own
+// scroll after the glide nudges the row by half the padding
 function centerOffset(scroller: HTMLElement, row: Element): number {
   const view = scroller.getBoundingClientRect();
   const box = row.getBoundingClientRect();
-  return box.top + box.height / 2 - (view.top + view.height / 2);
+  const padding = parseFloat(getComputedStyle(scroller).scrollPaddingTop) || 0;
+  const viewCenter = view.top + padding + (view.height - padding) / 2;
+  return box.top + box.height / 2 - viewCenter;
 }
 
 function easeOutCubic(progress: number): number {
