@@ -244,7 +244,7 @@
                  "componentId": "Icon-copy-link",
                  "componentName": "Icon",
                  "componentProps": {
-                  "icon": "lucide-copy"
+                  "icon": "lucide-link"
                  }
                 },
                 {
@@ -675,7 +675,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 17:27:50.506730",
+ "modified": "2026-10-02 11:43:36.284413",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
