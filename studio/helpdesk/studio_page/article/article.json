@@ -337,34 +337,9 @@
              "blockName": "fb-actions",
              "children": [
               {
-               "blockName": "fb-button",
-               "children": [
-                {
-                 "baseStyles": {
-                  "color": "{{ vote === '1' ? 'var(--ink-gray-9)' : 'var(--ink-gray-6)' }}",
-                  "fill": "{{ vote === '1' ? 'currentColor' : 'none' }}"
-                 },
-                 "classes": [
-                  "size-4"
-                 ],
-                 "componentId": "HTML-vote-1",
-                 "componentName": "HTML",
-                 "componentProps": {
-                  "html": "<svg viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"size-full\"><path d=\"M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3\"/></svg>"
-                 }
-                }
-               ],
-               "classes": [
-                "hover:bg-surface-gray-2",
-                "items-center",
-                "border-0",
-                "rounded-4",
-                "cursor-pointer",
-                "flex",
-                "h-9",
-                "justify-center",
-                "w-9"
-               ],
+               "baseStyles": {
+                "borderColor": "{{ vote === '1' ? 'var(--outline-gray-5)' : '' }}"
+               },
                "componentEvents": {
                 "click": {
                  "action": "Run Script",
@@ -373,38 +348,17 @@
                 }
                },
                "componentId": "container-mg93ofc32",
-               "componentName": "container",
-               "originalElement": "div"
+               "componentName": "Button",
+               "componentProps": {
+                "iconLeft": "lucide-thumbs-up",
+                "label": "Yes",
+                "variant": "outline"
+               }
               },
               {
-               "blockName": "fb-button",
-               "children": [
-                {
-                 "baseStyles": {
-                  "color": "{{ vote === '2' ? 'var(--ink-gray-9)' : 'var(--ink-gray-6)' }}",
-                  "fill": "{{ vote === '2' ? 'currentColor' : 'none' }}"
-                 },
-                 "classes": [
-                  "size-4"
-                 ],
-                 "componentId": "HTML-vote-2",
-                 "componentName": "HTML",
-                 "componentProps": {
-                  "html": "<svg viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"size-full\"><path d=\"M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17\"/></svg>"
-                 }
-                }
-               ],
-               "classes": [
-                "hover:bg-surface-gray-2",
-                "items-center",
-                "border-0",
-                "rounded-4",
-                "cursor-pointer",
-                "flex",
-                "h-9",
-                "justify-center",
-                "w-9"
-               ],
+               "baseStyles": {
+                "borderColor": "{{ vote === '2' ? 'var(--outline-gray-5)' : '' }}"
+               },
                "componentEvents": {
                 "click": {
                  "action": "Run Script",
@@ -413,15 +367,19 @@
                 }
                },
                "componentId": "container-kw1gtpath",
-               "componentName": "container",
-               "originalElement": "div"
+               "componentName": "Button",
+               "componentProps": {
+                "iconLeft": "lucide-thumbs-down",
+                "label": "No",
+                "variant": "outline"
+               }
               }
              ],
              "classes": [
               "flex",
               "flex-row",
               "shrink-0",
-              "gap-0"
+              "gap-2"
              ],
              "componentId": "container-fl85fwgrt",
              "componentName": "container",
@@ -429,7 +387,9 @@
             }
            ],
            "classes": [
+            "border",
             "bg-surface-sidebar",
+            "border-outline-gray-2",
             "items-center",
             "rounded-4",
             "flex",
@@ -675,7 +635,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-02 15:32:07.954762",
+ "modified": "2026-10-02 15:44:55.477546",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
