@@ -1,5 +1,5 @@
 <template>
-  <Dropdown :options="options" :offset="4" align="start">
+  <Dropdown v-if="options?.length" :options="options" :offset="4" align="start">
     <template #default="{ open }">
       <button
         type="button"
@@ -22,11 +22,29 @@
       </button>
     </template>
   </Dropdown>
+  <RouterLink
+    v-else
+    :to="ROUTES.home"
+    class="flex rounded-5 p-0.5"
+    :aria-label="__('Knowledge base')"
+  >
+    <img
+      v-if="logo"
+      :src="logo"
+      alt=""
+      aria-hidden="true"
+      class="size-8 shrink-0 object-contain"
+    />
+    <span v-else class="size-8 shrink-0" />
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
+// With no options (a guest) there is nothing to choose: the logo just leads home.
+import { RouterLink } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
+import { ROUTES } from "@app/routes";
 
 defineProps<{ options?: unknown[]; logo?: string }>();
 </script>
