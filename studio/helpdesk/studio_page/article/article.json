@@ -256,7 +256,7 @@
                  "componentProps": {
                   "fontSize": "text-sm",
                   "tag": "span",
-                  "text": "Copy link"
+                  "text": "{{ t(\"Copy link\") }}"
                  }
                 }
                ],
@@ -326,7 +326,7 @@
              "componentProps": {
               "fontSize": "text-sm",
               "tag": "span",
-              "text": "Did this answer your question?"
+              "text": "{{ t(\"Did this answer your question?\") }}"
              }
             },
             {
@@ -347,7 +347,7 @@
                "componentName": "Button",
                "componentProps": {
                 "iconLeft": "lucide-thumbs-up",
-                "label": "Yes",
+                "label": "{{ t(\"Yes\") }}",
                 "variant": "outline"
                }
               },
@@ -366,7 +366,7 @@
                "componentName": "Button",
                "componentProps": {
                 "iconLeft": "lucide-thumbs-down",
-                "label": "No",
+                "label": "{{ t(\"No\") }}",
                 "variant": "outline"
                }
               }
@@ -413,7 +413,7 @@
              "componentProps": {
               "fontSize": "text-lg",
               "tag": "h2",
-              "text": "Related articles"
+              "text": "{{ t(\"Related articles\") }}"
              }
             },
             {

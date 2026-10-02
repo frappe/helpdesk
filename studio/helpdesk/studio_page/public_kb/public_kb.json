@@ -102,7 +102,7 @@
              "componentProps": {
               "fontSize": "text-6xl",
               "tag": "h1",
-              "text": "Here's what might help"
+              "text": "{{ t(\"Here's what might help\") }}"
              }
             },
             {
@@ -117,7 +117,7 @@
              "componentProps": {
               "fontSize": "text-p-lg",
               "tag": "p",
-              "text": "Explore answers to frequently asked questions about Frappe."
+              "text": "{{ config.brand_name ? t('Explore answers to frequently asked questions about {0}.', [config.brand_name]) : t('Explore answers to frequently asked questions.') }}"
              }
             }
            ],
@@ -139,7 +139,7 @@
              "componentId": "PortalArticleSearch-home",
              "componentName": "PortalArticleSearch",
              "componentProps": {
-              "placeholder": "Search articles (e.g. billing, integration, or general)"
+              "placeholder": "{{ t(\"Search articles (e.g. billing, integration, or general)\") }}"
              },
              "isCustomVueComponent": true
             }
@@ -168,7 +168,7 @@
              "componentProps": {
               "fontSize": "text-p-base",
               "tag": "span",
-              "text": "Popular searches:"
+              "text": "{{ t(\"Popular searches:\") }}"
              }
             },
             {
@@ -293,7 +293,7 @@
          "componentProps": {
           "fontSize": "text-lg",
           "tag": "h2",
-          "text": "All knowledge base"
+          "text": "{{ t(\"All knowledge base\") }}"
          }
         },
         {
@@ -368,7 +368,7 @@
                  "componentProps": {
                   "fontSize": "text-p-base",
                   "tag": "p",
-                  "text": "{{ dataItem.description || 'Browse articles in this category' }}"
+                  "text": "{{ dataItem.description || t('Browse articles in this category') }}"
                  }
                 }
                ],
@@ -451,9 +451,9 @@
          "componentId": "TextBlock-uboyx0fo9",
          "componentName": "PortalEmptyState",
          "componentProps": {
-          "description": "Categories show up here once they're published.",
+          "description": "{{ t(\"Categories show up here once they're published.\") }}",
           "icon": "article",
-          "title": "No categories yet"
+          "title": "{{ t(\"No categories yet\") }}"
          },
          "isCustomVueComponent": true,
          "visibilityCondition": "{{ !categories.data || categories.data.length === 0 }}"
@@ -490,7 +490,7 @@
          "componentProps": {
           "fontSize": "text-lg",
           "tag": "h2",
-          "text": "What do you need help with?"
+          "text": "{{ t(\"What do you need help with?\") }}"
          },
          "visibilityCondition": "{{ hasCategoryPicker }}"
         },
@@ -681,7 +681,7 @@
                "componentProps": {
                 "fontSize": "{{ focusCategory ? 'text-lg' : 'text-base' }}",
                 "tag": "h2",
-                "text": "{{ focusCategory ? focusCategory.category_name : 'Articles' }}"
+                "text": "{{ focusCategory ? focusCategory.category_name : t('Articles') }}"
                },
                "visibilityCondition": "{{ !hasCategoryPicker }}"
               },
@@ -731,16 +731,7 @@
              "$type": "variable",
              "name": "sort"
             },
-            "options": [
-             {
-              "label": "Latest",
-              "value": "latest"
-             },
-             {
-              "label": "Popular",
-              "value": "popular"
-             }
-            ],
+            "options": "{{ [{ label: t(\"Latest\"), value: \"latest\" }, { label: t(\"Popular\"), value: \"popular\" }] }}",
             "size": "sm",
             "type": "subtle",
             "vertical": false
@@ -915,9 +906,9 @@
          "componentId": "TextBlock-wlzd15fla",
          "componentName": "PortalEmptyState",
          "componentProps": {
-          "description": "New articles appear here as they're published.",
+          "description": "{{ t(\"New articles appear here as they're published.\") }}",
           "icon": "article",
-          "title": "No articles yet"
+          "title": "{{ t(\"No articles yet\") }}"
          },
          "isCustomVueComponent": true,
          "visibilityCondition": "{{ !articles.data || articles.data.length === 0 }}"
@@ -977,7 +968,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-02 17:24:37.452490",
+ "modified": "2026-10-02 22:23:48.516538",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

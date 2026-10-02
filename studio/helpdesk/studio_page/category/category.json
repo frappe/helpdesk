@@ -107,7 +107,7 @@
              "$type": "variable",
              "name": "query"
             },
-            "placeholder": "Search articles (e.g. billing, integration, or general)"
+            "placeholder": "{{ t(\"Search articles (e.g. billing, integration, or general)\") }}"
            },
            "isCustomVueComponent": true
           }
@@ -353,9 +353,9 @@
            "componentId": "TextBlock-7wj9iidyv",
            "componentName": "PortalEmptyState",
            "componentProps": {
-            "description": "{{ query ? 'Try a different search term.' : 'Articles show up here as they are published.' }}",
+            "description": "{{ query ? t('Try a different search term.') : t('Articles show up here as they are published.') }}",
             "icon": "{{ query ? 'search' : 'article' }}",
-            "title": "{{ query ? 'No matching articles' : 'No articles in this category' }}"
+            "title": "{{ query ? t('No matching articles') : t('No articles in this category') }}"
            },
            "isCustomVueComponent": true
           }
@@ -424,7 +424,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-02 15:58:06.688167",
+ "modified": "2026-10-02 22:23:48.518673",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

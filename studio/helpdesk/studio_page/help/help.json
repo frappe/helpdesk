@@ -45,7 +45,7 @@
            "$type": "variable",
            "name": "query"
           },
-          "placeholder": "Search for an answer, e.g. refund not received",
+          "placeholder": "{{ t(\"Search for an answer, e.g. refund not received\") }}",
           "size": "md",
           "type": "text",
           "variant": "outline"
@@ -139,7 +139,7 @@
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
-                "text": "Can\u2019t find what you\u2019re looking for?"
+                "text": "{{ t(\"Can\\u2019t find what you\\u2019re looking for?\") }}"
                }
               },
               {
@@ -151,7 +151,7 @@
                "componentProps": {
                 "fontSize": "text-p-sm",
                 "tag": "span",
-                "text": "Create a ticket and our team will get back to you."
+                "text": "{{ t(\"Create a ticket and our team will get back to you.\") }}"
                }
               }
              ],
@@ -223,7 +223,7 @@
            "componentProps": {
             "fontSize": "text-base",
             "tag": "span",
-            "text": "No articles found"
+            "text": "{{ t(\"No articles found\") }}"
            }
           },
           {
@@ -236,7 +236,7 @@
            "componentProps": {
             "fontSize": "text-p-sm",
             "tag": "p",
-            "text": "We couldn\u2019t find any matching articles. Create a ticket and our team will get back to you."
+            "text": "{{ t(\"We couldn\\u2019t find any matching articles. Create a ticket and our team will get back to you.\") }}"
            }
           },
           {
@@ -254,7 +254,7 @@
            "componentName": "Button",
            "componentProps": {
             "iconLeft": "lucide-plus",
-            "label": "Create ticket",
+            "label": "{{ t(\"Create ticket\") }}",
             "variant": "subtle"
            }
           }
@@ -329,7 +329,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 15:56:40.947948",
+ "modified": "2026-10-02 22:23:48.520725",
  "modified_by": "Administrator",
  "name": "help",
  "owner": "Administrator",
