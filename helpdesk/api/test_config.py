@@ -15,3 +15,12 @@ class TestConfig(IntegrationTestCase):
         self.assertFalse(config.is_agent)
         self.assertIn("confirm_resolution_after_days", config)
         self.assertTrue(config.date_format)
+        self.assertFalse(config.is_admin)
+        self.assertFalse(config.is_manager)
+
+    def test_it_names_the_roles_the_desk_settings_check(self) -> None:
+        config = get_config()
+        self.assertTrue(config.is_admin)
+        self.assertEqual(
+            config.is_manager, "Agent Manager" in frappe.get_roles("Administrator")
+        )
