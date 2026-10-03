@@ -24,6 +24,7 @@
   "prefer_knowledge_base",
   "allow_anonymous_article_voting",
   "banner_image",
+  "banner_preset",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -257,6 +258,14 @@
    "fieldname": "banner_image",
    "fieldtype": "Attach Image",
    "label": "Banner Image"
+  },
+  {
+   "depends_on": "eval:!doc.banner_image",
+   "description": "Background shown at the top of the Knowledge Base portal when no banner image is set",
+   "fieldname": "banner_preset",
+   "fieldtype": "Select",
+   "label": "Banner Preset",
+   "options": "\nDots\nSlate\nSage\nPaper\nHaze\nSky"
   },
   {
    "fieldname": "agent_status_section",
@@ -604,7 +613,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-02 18:30:00.000000",
+ "modified": "2026-10-03 11:35:29.766664",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

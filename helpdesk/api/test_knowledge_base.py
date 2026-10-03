@@ -7,7 +7,6 @@ from helpdesk.api.knowledge_base import (
     PUBLIC_CATEGORY_FIELDS,
     get_article,
     get_article_markdown,
-    get_popular_categories,
     get_public_article,
     get_public_article_titles,
     get_public_articles,
@@ -29,56 +28,6 @@ from helpdesk.test_utils import (
 LIST_ROW_FIELDS = {*PUBLIC_ARTICLE_FIELDS, "excerpt", "image"}
 CUSTOMER = "fixture.customer@example.com"
 BASE_VIEWS = 1_000_000
-ALL = 100
-
-
-class TestPopularCategories(IntegrationTestCase):
-    def make_viewed_article(self, category, views, status="Published"):
-        make_article(
-            f"Fixture {status} {views}", status, category=category, views=views
-        )
-
-    def names(self) -> list[str]:
-        return [row["name"] for row in get_popular_categories(limit=ALL)]
-
-    def test_ranks_categories_by_summed_views(self) -> None:
-        quiet = make_article_category("Fixture Quiet").name
-        loud = make_article_category("Fixture Loud").name
-        self.make_viewed_article(quiet, BASE_VIEWS + 1)
-        self.make_viewed_article(loud, BASE_VIEWS)
-        self.make_viewed_article(loud, BASE_VIEWS)
-
-        ranked = [
-            row["label"]
-            for row in get_popular_categories(limit=ALL)
-            if row["name"] in {quiet, loud}
-        ]
-        self.assertEqual(ranked, ["Fixture Loud", "Fixture Quiet"])
-
-    def test_caps_at_three_by_default(self) -> None:
-        for index in range(4):
-            category = make_article_category(f"Fixture {index}").name
-            self.make_viewed_article(category, BASE_VIEWS + index)
-
-        self.assertEqual(len(get_popular_categories()), 3)
-        self.assertEqual(len(get_popular_categories(limit=2)), 2)
-
-    def test_excludes_categories_with_no_views(self) -> None:
-        silent = make_article_category("Fixture Silent").name
-        self.make_viewed_article(silent, 0)
-
-        self.assertNotIn(silent, self.names())
-
-    def test_excludes_views_of_unpublished_articles(self) -> None:
-        drafted = make_article_category("Fixture Drafted").name
-        self.make_viewed_article(drafted, BASE_VIEWS, status="Draft")
-
-        self.assertNotIn(drafted, self.names())
-
-    def test_ignores_articles_without_a_category(self) -> None:
-        self.make_viewed_article(None, BASE_VIEWS)
-
-        self.assertTrue(all(self.names()))
 
 
 class TestPublicReads(IntegrationTestCase):
@@ -128,7 +77,6 @@ class TestPublicReads(IntegrationTestCase):
             (get_public_articles, ()),
             (get_public_article_titles, ()),
             (get_public_categories, ()),
-            (get_popular_categories, ()),
             (get_public_article, (self.published,)),
             (get_article_markdown, (self.published,)),
             (get_public_category, (self.category.name,)),
@@ -372,23 +320,6 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         frappe.set_user("Guest")
 
         self.assertRaises(frappe.DoesNotExistError, vote_on_article, self.members, 1)
-
-    def test_its_views_do_not_rank_a_category_for_a_guest(self) -> None:
-        members_only = make_article_category("Fixture Members Only").name
-        make_article(
-            "Fixture members elsewhere",
-            category=members_only,
-            visibility="Customers only",
-            views=BASE_VIEWS,
-        )
-        self.assertIn(members_only, self.ranked())
-
-        frappe.set_user("Guest")
-
-        self.assertNotIn(members_only, self.ranked())
-
-    def ranked(self) -> list[str]:
-        return [row["name"] for row in get_popular_categories(limit=ALL)]
 
 
 class TestSearch(IntegrationTestCase):

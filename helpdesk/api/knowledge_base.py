@@ -174,32 +174,6 @@ VIEW_WINDOW = 60 * 60
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_popular_categories(limit: int = 3) -> list[dict]:
-    """Categories drawing the most article views, most-viewed first; none with zero views."""
-    validate_public_access()
-    ranked = frappe.get_all(
-        "HD Article",
-        filters={**readable_filters(), "category": ["is", "set"], "views": [">", 0]},
-        fields=["category", {"SUM": "views", "as": "total"}],
-        group_by="category",
-        order_by="total desc",
-        limit_page_length=cint(limit),
-    )
-    labels = dict(
-        frappe.get_all(
-            "HD Article Category",
-            filters={"name": ["in", [row.category for row in ranked]]},
-            fields=["name", "category_name"],
-            as_list=True,
-        )
-    )
-    return [
-        {"name": row.category, "label": labels.get(row.category) or row.category}
-        for row in ranked
-    ]
-
-
-@frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_articles(
     category: str | None = None, limit: int | None = None, sort: str = "latest"
 ) -> list[dict]:

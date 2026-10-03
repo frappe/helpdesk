@@ -1,11 +1,22 @@
 import { computed, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
+import { findBannerPreset } from '@helpdesk/shared/kbBanner'
 import { useSettingsModal } from '@app/stores/settings'
+import { useSession } from '@app/stores/session'
 
 const ARTICLE_LIMIT = 5
 
 export default function setup(context) {
   const { articles, categories } = context
+  const { config } = useSession()
+
+  // The image itself is an ImageView under a dark scrim, so it only needs white text.
+  const bannerPreset = computed(() => !config.value?.banner_image && findBannerPreset(config.value?.banner_preset))
+  const bannerBackground = computed(() => (bannerPreset.value ? bannerPreset.value.background : ''))
+  const bannerTextColor = computed(() => {
+    if (config.value?.banner_image || bannerPreset.value?.dark) return '#fff'
+    return bannerPreset.value ? '#171717' : 'var(--ink-gray-8)'
+  })
 
   const fewCategories = computed(() => {
     const rows = categories.data || []
@@ -38,6 +49,8 @@ export default function setup(context) {
 
   return {
     ...useSettingsModal(context),
+    bannerBackground,
+    bannerTextColor,
     sort,
     focusCategory,
     hasCategoryPicker,

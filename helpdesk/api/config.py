@@ -15,6 +15,7 @@ def get_config():
         "prefer_knowledge_base",
         "allow_anonymous_article_voting",
         "banner_image",
+        "banner_preset",
         "setup_complete",
         "skip_email_workflow",
         "is_feedback_mandatory",

@@ -5,17 +5,10 @@
   >
     <template #content>
       <div class="flex flex-col">
-        <LogoUpload
-          :title="__('Banner image')"
-          :description="
-            __(
-              'Appears behind the search bar on the customer portal. Recommended size is minimum 1440x240 px in PNG or JPG.'
-            )
-          "
+        <BannerPicker
           :image="settings.doc?.banner_image || ''"
-          :is-loading="settings.setValue.loading"
-          @onUpload="(url) => update('banner_image', url)"
-          @onRemove="showRemoveDialog = true"
+          :preset="settings.doc?.banner_preset || ''"
+          @change="saveBanner"
         />
         <div class="flex flex-col gap-6 mt-8">
           <div class="flex items-center justify-between">
@@ -72,13 +65,6 @@
       </div>
     </template>
   </SettingsLayoutBase>
-  <ConfirmDialog
-    v-model="showRemoveDialog"
-    :title="__('Remove banner image')"
-    :message="__('Are you sure you want to remove the banner image?')"
-    :onConfirm="removeBanner"
-    :onCancel="() => (showRemoveDialog = false)"
-  />
 </template>
 
 <script setup lang="ts">
@@ -86,27 +72,24 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
-import { ref } from "vue";
-import LogoUpload from "../General/components/LogoUpload.vue";
+import BannerPicker from "./BannerPicker.vue";
 
 const configStore = useConfigStore();
 const settings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
 });
-const showRemoveDialog = ref(false);
 
 function update(fieldname: string, value: string | boolean) {
-  settings.setValue.submit({ [fieldname]: value }, { onSuccess: onSaved });
+  saveBanner({ [fieldname]: value });
+}
+
+function saveBanner(values: Record<string, string | boolean>) {
+  settings.setValue.submit(values, { onSuccess: onSaved });
 }
 
 function onSaved() {
   configStore.configResource.reload();
   toast.success(__("Settings updated"));
-}
-
-function removeBanner() {
-  showRemoveDialog.value = false;
-  update("banner_image", "");
 }
 </script>
