@@ -77,10 +77,20 @@ type BulkReplyResult = {
 };
 const failures = ref<BulkReplyResult["failed"]>([]);
 let responseGeneration = 0;
+// Bumped whenever the draft (text or attachments) changes or a new modal
+// session starts, so a late response can tell if the draft is still the one it sent.
+let draftRevision = 0;
 const pendingTicketIds = computed(() =>
   failures.value.length
     ? failures.value.map((failure) => failure.ticket_id)
     : Array.from(props.selections)
+);
+watch(
+  [content, attachments],
+  () => {
+    draftRevision++;
+  },
+  { flush: "sync", deep: true }
 );
 watch(
   () => Array.from(props.selections).join(","),
@@ -96,7 +106,10 @@ watch(
   open,
   (isOpen) => {
     responseGeneration++;
-    if (isOpen) failures.value = [];
+    if (isOpen) {
+      draftRevision++;
+      failures.value = [];
+    }
   },
   { flush: "sync" }
 );
@@ -137,6 +150,7 @@ function handleSubmit() {
   const requestGeneration = responseGeneration;
   const submittedMessage = content.value;
   const submittedAttachments = attachmentKey();
+  const submittedRevision = draftRevision;
   bulkReplyResource.submit(
     {
       ticket_ids: pendingTicketIds.value,
@@ -148,9 +162,12 @@ function handleSubmit() {
         // A response must not change the draft or retry targets of a newer session.
         if (!open.value || requestGeneration !== responseGeneration) {
           // Fully sent: drop the draft so reopening cannot resend it, unless
-          // the agent has already edited it (text or attachments) for a newer reply.
+          // the agent has already edited it (text or attachments) or reopened the
+          // modal for a newer reply. Equal text alone cannot prove the draft is
+          // still the one that was sent, so also require an unchanged revision.
           if (
             !result.failed.length &&
+            draftRevision === submittedRevision &&
             content.value === submittedMessage &&
             attachmentKey() === submittedAttachments
           ) {
