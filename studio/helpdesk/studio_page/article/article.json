@@ -56,7 +56,8 @@
          "componentName": "PortalArticleSidebar",
          "componentProps": {
           "activeName": "{{ article.data.name }}",
-          "categories": "{{ sidebarCategories }}"
+          "articles": "{{ articles.data || [] }}",
+          "categories": "{{ categories.data || [] }}"
          },
          "isCustomVueComponent": true
         }
@@ -631,7 +632,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-02 22:23:48.519733",
+ "modified": "2026-10-04 01:42:22.708246",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

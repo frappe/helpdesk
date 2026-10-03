@@ -102,16 +102,32 @@ import { __ } from "@helpdesk/shared/translation";
 import { ROUTES } from "@app/routes";
 import { matchesQuery } from "@app/utils";
 
-type SidebarCategory = {
-  name: string;
-  label: string;
-  icon?: string | null;
-  articles: { name: string; title: string }[];
-};
+type Category = { name: string; category_name?: string; icon?: string | null };
+type ArticleTitle = { name: string; title: string; category?: string | null };
 
+// `activeCategory` opens a category on its own page, where no article is current.
 const props = withDefaults(
-  defineProps<{ categories?: SidebarCategory[]; activeName?: string }>(),
-  { categories: () => [], activeName: "" }
+  defineProps<{
+    categories?: Category[];
+    articles?: ArticleTitle[];
+    activeName?: string;
+    activeCategory?: string;
+  }>(),
+  {
+    categories: () => [],
+    articles: () => [],
+    activeName: "",
+    activeCategory: "",
+  }
+);
+
+const tree = computed(() =>
+  props.categories.map((category) => ({
+    name: category.name,
+    label: category.category_name || category.name,
+    icon: category.icon,
+    articles: props.articles.filter((row) => row.category === category.name),
+  }))
 );
 
 const query = ref("");
@@ -119,9 +135,9 @@ const openName = ref<string | null>(null);
 
 const currentCategory = computed(
   () =>
-    props.categories.find((category) =>
-      category.articles.some((article) => article.name === props.activeName)
-    )?.name
+    props.activeCategory ||
+    props.articles.find((article) => article.name === props.activeName)
+      ?.category
 );
 
 watch(currentCategory, (name) => name && (openName.value = name), {
@@ -135,7 +151,7 @@ function toggle(name: string) {
 
 const visibleCategories = computed(() => {
   const searching = Boolean(query.value.trim());
-  return props.categories
+  return tree.value
     .map((category) => {
       const matches = category.articles.filter((article) =>
         matchesQuery(query.value, article.title)

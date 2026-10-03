@@ -284,10 +284,11 @@ def readable_article_counts(categories: list[str]) -> dict[str, int]:
 def get_public_category(name: str) -> dict:
     validate_public_access()
     category = frappe.db.get_value(
-        "HD Article Category", name, PUBLIC_CATEGORY_FIELDS, as_dict=True
+        "HD Article Category", name, [*PUBLIC_CATEGORY_FIELDS, "owner"], as_dict=True
     )
     if not category:
         frappe.throw(_("Category not found"), frappe.DoesNotExistError)
+    category.author = get_user_info_for_avatar(category.pop("owner"))
     return category
 
 

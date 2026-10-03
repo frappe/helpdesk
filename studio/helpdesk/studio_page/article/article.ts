@@ -13,7 +13,7 @@ const RELATED_LIMIT = 6
 
 export default function setup(context) {
   // `article` is absent on the builder canvas, where the route has no name.
-  const { article, articles, categories } = context
+  const { article, articles } = context
 
   const parsed = computed(() => {
     const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')
@@ -48,17 +48,6 @@ export default function setup(context) {
       : null,
   )
 
-  const sidebarCategories = computed(() =>
-    (categories.data || []).map((category) => ({
-      name: category.name,
-      label: category.category_name || category.name,
-      icon: category.icon,
-      articles: (articles.data || [])
-        .filter((row) => row.category === category.name)
-        .map((row) => ({ name: row.name, title: row.title })),
-    })),
-  )
-
   const relatedArticles = computed(() =>
     (articles.data || [])
       .filter((row) => row.category === article?.data?.category && row.name !== article.data.name)
@@ -75,7 +64,6 @@ export default function setup(context) {
         article.data.feedback = value
       },
       { success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
-  const { rememberArticle } = useRecent()
     )
   }
 
@@ -87,6 +75,7 @@ export default function setup(context) {
   }
 
   // Counted here, not on read: the endpoint is rate limited per article and reader.
+  const { rememberArticle } = useRecent()
   watch(
     () => article?.data?.name,
     (name) => {
@@ -110,7 +99,6 @@ export default function setup(context) {
     readingTime,
     publishedOn,
     currentCategory,
-    sidebarCategories,
     relatedArticles,
     vote,
     submitFeedback,

@@ -220,6 +220,9 @@ class TestPublicReads(IntegrationTestCase):
         category = get_public_category(self.category.name)
 
         self.assertEqual(category.description, "Fixture description")
+        owner = frappe.db.get_value("User", self.category.owner, "full_name")
+        self.assertEqual(category.author["name"], owner)
+        self.assertNotIn("owner", category)
 
     def test_an_unknown_category_is_not_found(self) -> None:
         self.assertRaises(
