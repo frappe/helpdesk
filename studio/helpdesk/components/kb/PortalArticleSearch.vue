@@ -2,15 +2,16 @@
   <Combobox
     v-model:open="isOpen"
     v-model:query="query"
-    class="w-full"
+    class="w-full !border-outline-gray-1 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 focus-within:!outline-1 data-[state=open]:!outline-1"
     trigger="input"
-    variant="subtle"
+    variant="outline"
     size="lg"
     :placeholder="placeholder"
     :options="options"
-    :loading="results.loading"
+    :loading="results.loading && !results.data"
     :filterable="false"
     :open-on-click="false"
+    @focus="isOpen = hasHistory"
   >
     <template #prefix>
       <!-- On the axis of a result's thumbnail: the trigger's own padding lands it 9px short. -->
@@ -18,9 +19,57 @@
     </template>
     <template #suffix><span /></template>
 
-    <template #item="{ item, query }">
+    <template #group-label="{ group }">
+      <span class="flex min-w-0 flex-1 items-center justify-between">
+        {{ group.group }}
+        <button
+          v-if="group.key === RECENT_SEARCHES"
+          type="button"
+          class="rounded-4 px-1 text-ink-gray-6 hover:text-ink-gray-8"
+          @mousedown.prevent
+          @click="clearSearches"
+        >
+          {{ __("Clear") }}
+        </button>
+      </span>
+    </template>
+    <template #item="{ item }">
       <div
-        v-if="item.key === SEARCH_ALL"
+        v-if="item.recentSearch"
+        class="recent-search flex min-w-0 items-center gap-2.5"
+      >
+        <LucideClock class="size-4 shrink-0 text-ink-gray-4" />
+        <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
+          {{ item.recentSearch }}
+        </span>
+        <button
+          type="button"
+          class="flex size-6 shrink-0 items-center justify-center rounded-4 text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
+          :aria-label="__('Remove')"
+          @pointerdown.stop.prevent
+          @click.stop.prevent="forgetSearch(item.recentSearch)"
+        >
+          <LucideX class="size-4" />
+        </button>
+      </div>
+      <div
+        v-else-if="item.recentArticle"
+        class="flex min-w-0 items-center gap-3"
+      >
+        <PortalArticleThumbnail :src="item.recentArticle.image" />
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span
+            class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8"
+          >
+            {{ item.recentArticle.title }}
+          </span>
+          <span class="truncate text-p-sm text-ink-gray-5">
+            {{ articleMeta(item.recentArticle) }}
+          </span>
+        </div>
+      </div>
+      <div
+        v-else-if="item.key === SEARCH_ALL"
         class="flex min-w-0 items-center gap-3"
       >
         <span
@@ -29,7 +78,7 @@
           <LucideSearch class="size-4" />
         </span>
         <span class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8">
-          {{ __("Search for “{0}”", [query.trim()]) }}
+          {{ __("Search for “{0}”", [searchText]) }}
         </span>
       </div>
       <div
@@ -56,13 +105,17 @@
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Combobox, createResource, debounce } from "frappe-ui";
+import LucideClock from "~icons/lucide/clock";
 import LucideSearch from "~icons/lucide/search";
+import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleThumbnail from "@app/components/kb/PortalArticleThumbnail.vue";
 import { ROUTES } from "@app/routes";
+import { useRecent, type RecentArticle } from "@app/stores/recent";
 
 const MAX_RESULTS = 5;
 const SEARCH_ALL = "search-all";
+const RECENT_SEARCHES = "recent-searches";
 const SEARCH_DEBOUNCE_MS = 300;
 
 withDefaults(defineProps<{ placeholder?: string }>(), {
@@ -72,6 +125,17 @@ withDefaults(defineProps<{ placeholder?: string }>(), {
 const router = useRouter();
 const query = ref("");
 const isOpen = ref(false);
+const {
+  recentSearches,
+  recentArticles,
+  rememberSearch,
+  forgetSearch,
+  clearSearches,
+} = useRecent();
+
+const hasHistory = computed(
+  () => recentSearches.value.length + recentArticles.value.length > 0
+);
 
 const results = createResource({
   url: "helpdesk.api.knowledge_base.search_articles",
@@ -81,46 +145,113 @@ const results = createResource({
 
 const search = debounce(() => results.fetch(), SEARCH_DEBOUNCE_MS);
 
-watch(query, (value) => {
-  isOpen.value = value.trim().length > 0;
-  if (isOpen.value) search();
+// Ours, not the slot's `query`: that stays empty when a recent search filled the box.
+const searchText = computed(() => query.value.trim());
+const isTyping = computed(() => searchText.value.length > 0);
+
+watch(query, () => {
+  isOpen.value = isTyping.value || hasHistory.value;
+  if (isTyping.value) search();
 });
 
-const options = computed(() => [
+// Emptied from inside the open list, it closes rather than show nothing.
+watch(hasHistory, (value) => {
+  if (!value && !isTyping.value) isOpen.value = false;
+});
+
+function openArticle(name: string) {
+  rememberSearch(query.value);
+  router.push(ROUTES.article(name));
+}
+
+function articleMeta(article: RecentArticle) {
+  const parts = [article.categoryName];
+  if (article.minutes) parts.push(__("{0} min read", [article.minutes]));
+  return parts.filter(Boolean).join(" · ");
+}
+
+const historyOptions = computed(() =>
+  [
+    {
+      key: RECENT_SEARCHES,
+      group: __("Recent searches"),
+      options: recentSearches.value.map((text) => ({
+        type: "custom",
+        key: `search:${text}`,
+        label: text,
+        recentSearch: text,
+        keepOpen: true,
+        onClick: () => (query.value = text),
+      })),
+    },
+    {
+      key: "recently-viewed",
+      group: __("Recently viewed"),
+      options: recentArticles.value.map((article) => ({
+        type: "custom",
+        key: `article:${article.name}`,
+        label: article.title,
+        recentArticle: article,
+        onClick: () => router.push(ROUTES.article(article.name)),
+      })),
+    },
+  ].filter((group) => group.options.length)
+);
+
+const resultOptions = computed(() => [
   ...(results.data || []).map((article) => ({
     type: "custom",
     key: article.name,
     label: article.title,
     article,
-    onClick: () => router.push(ROUTES.article(article.name)),
+    onClick: () => openArticle(article.name),
   })),
   {
     type: "custom",
     key: SEARCH_ALL,
     label: __("Search"),
-    onClick: ({ query }) =>
-      router.push({ path: ROUTES.help, query: { q: query.trim() } }),
+    onClick: () => {
+      rememberSearch(searchText.value);
+      router.push({ path: ROUTES.help, query: { q: searchText.value } });
+    },
   },
 ]);
+
+const options = computed(() =>
+  isTyping.value ? resultOptions.value : historyOptions.value
+);
 </script>
 
 <style>
-/* Portaled to <body>, so unscoped; the large subtle variant is this box's alone. */
-[data-slot="content"][data-variant="subtle"][data-size="lg"] {
+/* Portaled to <body>, so unscoped; the large outline variant is this box's alone. */
+[data-slot="content"][data-variant="outline"][data-size="lg"] {
   width: var(--reka-combobox-trigger-width);
 }
-[data-slot="content"][data-variant="subtle"][data-size="lg"]
+[data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="content-body"]
   > div {
   max-height: none;
 }
-[data-slot="content"][data-variant="subtle"][data-size="lg"]
+[data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"] {
   border-radius: 6px;
   padding: 0.75rem 0.5rem;
 }
-[data-slot="content"][data-variant="subtle"][data-size="lg"]
+[data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"]:not(:last-child) {
   border-bottom: 1px solid var(--outline-gray-1);
+}
+/* A past query is a line of text, not an article: shorter, and no rule between them. */
+[data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="item"]:has(.recent-search) {
+  padding: 0.375rem 0.5rem;
+  border-bottom: 0;
+}
+[data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="group"]
+  + [data-slot="group"] {
+  margin-top: 0.375rem;
+  padding-top: 0.375rem;
+  border-top: 1px solid var(--outline-gray-1);
 }
 </style>

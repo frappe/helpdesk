@@ -3,6 +3,7 @@ import { useClipboard } from '@vueuse/core'
 import { call, dayjs, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
+import { useRecent } from '@app/stores/recent'
 import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { runAction } from '@app/utils'
@@ -21,14 +22,15 @@ export default function setup(context) {
       return { id: heading.id, text: heading.textContent.trim() }
     })
     const words = dom.body.textContent.trim().split(/\s+/).filter(Boolean).length
-    return { html: dom.body.innerHTML, toc, words }
+    const image = dom.querySelector('img')?.getAttribute('src') || null
+    return { html: dom.body.innerHTML, toc, words, image }
   })
   const articleHtml = computed(() => parsed.value.html)
   const toc = computed(() => parsed.value.toc)
-  const readingTime = computed(() => {
-    const minutes = Math.max(1, Math.round(parsed.value.words / WORDS_PER_MINUTE))
-    return minutes === 1 ? __('1 minute to read') : __('{0} minutes to read', [minutes])
-  })
+  const minutes = computed(() => Math.max(1, Math.round(parsed.value.words / WORDS_PER_MINUTE)))
+  const readingTime = computed(() =>
+    minutes.value === 1 ? __('1 minute to read') : __('{0} minutes to read', [minutes.value]),
+  )
 
   const publishedOn = computed(() => {
     const date = article?.data?.published_on
@@ -73,6 +75,7 @@ export default function setup(context) {
         article.data.feedback = value
       },
       { success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
+  const { rememberArticle } = useRecent()
     )
   }
 
@@ -86,7 +89,17 @@ export default function setup(context) {
   // Counted here, not on read: the endpoint is rate limited per article and reader.
   watch(
     () => article?.data?.name,
-    (name) => name && call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {}),
+    (name) => {
+      if (!name) return
+      call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {})
+      rememberArticle({
+        name,
+        title: article.data.title,
+        categoryName: article.data.category_name,
+        image: parsed.value.image,
+        minutes: minutes.value,
+      })
+    },
     { immediate: true },
   )
 
