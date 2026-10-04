@@ -15,8 +15,8 @@ from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 from helpdesk.api.ticket import bulk_reply
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
-    get_timeline_changes,
     get_one,
+    get_timeline_changes,
     merge_ticket,
     new,
     show_outside_hours_banner,
@@ -2581,6 +2581,8 @@ class TestTicketTimelineChanges(IntegrationTestCase):
         frappe.set_user(non_agent)
 
         self.assertRaises(frappe.PermissionError, get_timeline_changes, ticket.name)
+
+
 PERMS_CUSTOMER = "perms.customer@example.com"
 PERMS_OTHER_CUSTOMER = "perms.other@example.com"
 PERMS_AGENT = "perms.agent@example.com"
