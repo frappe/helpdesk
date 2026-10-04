@@ -117,7 +117,7 @@ def set_user_email_accounts(email_accounts: list[str]):
 
     User Emails is a System Manager-only table, so an agent can neither read
     nor save it through their User document. Links to accounts without
-    outgoing email were set up by an admin and are kept.
+    outgoing email are kept.
     """
     outgoing_accounts = dict(
         frappe.get_all(
@@ -129,7 +129,7 @@ def set_user_email_accounts(email_accounts: list[str]):
     )
     user = frappe.get_doc("User", frappe.session.user)
     rows = {row.email_account: row for row in user.user_emails}
-    admin_links = [
+    kept_links = [
         row for row in user.user_emails if row.email_account not in outgoing_accounts
     ]
     agent_links = [
@@ -138,6 +138,6 @@ def set_user_email_accounts(email_accounts: list[str]):
         for account in dict.fromkeys(email_accounts)
         if account in outgoing_accounts
     ]
-    user.set("user_emails", admin_links + agent_links)
+    user.set("user_emails", kept_links + agent_links)
     user.flags.ignore_permlevel_for_fields = ["user_emails"]
     user.save()

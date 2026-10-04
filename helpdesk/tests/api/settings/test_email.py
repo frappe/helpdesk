@@ -163,7 +163,7 @@ class TestSetUserEmailAccounts(IntegrationTestCase):
         self.sales = self.make_account("Sendgrid", enable_incoming=0)
         self.incoming_only = self.make_account("GMail", enable_outgoing=0)
 
-    def test_agent_replaces_outgoing_links_and_keeps_admin_links(self) -> None:
+    def test_agent_replaces_outgoing_links_and_keeps_other_links(self) -> None:
         user = frappe.get_doc("User", self.agent)
         user.append("user_emails", {"email_account": self.incoming_only})
         user.save()

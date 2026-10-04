@@ -155,7 +155,16 @@ const currentUserEmailInfo = getUserEmailInfo();
 const linkedEmails = ref([]);
 watch(
   () => currentUserEmailInfo.data?.outgoing_emails,
-  (emails) => (linkedEmails.value = [...(emails || [])]),
+  (emails, previousEmails) => {
+    // the info is shared with the composer; a reload from there must not
+    // wipe unsaved edits here
+    if (
+      sortedAccountNames(linkedEmails.value) !==
+      sortedAccountNames(previousEmails)
+    )
+      return;
+    linkedEmails.value = [...(emails || [])];
+  },
   { immediate: true }
 );
 
@@ -186,10 +195,9 @@ const isSignatureDirty = computed(() => {
 });
 
 const isUserEmailListDirty = computed(() => {
-  const sortedAccounts = (list) => linkedAccountNames(list).sort().join();
   return (
-    sortedAccounts(currentUserEmailInfo.data?.outgoing_emails) !==
-    sortedAccounts(linkedEmails.value)
+    sortedAccountNames(currentUserEmailInfo.data?.outgoing_emails) !==
+    sortedAccountNames(linkedEmails.value)
   );
 });
 
@@ -205,6 +213,10 @@ if (isDirty.value) {
 
 function linkedAccountNames(list = []) {
   return list.map((e) => e.email_account);
+}
+
+function sortedAccountNames(list) {
+  return linkedAccountNames(list).sort().join();
 }
 
 function addEmail(email) {
@@ -223,14 +235,15 @@ function removeEmail(email) {
 async function update() {
   // one after the other, since both save the same User doc
   try {
-    await user.save.submit();
+    if (isSignatureDirty.value) await user.save.submit();
     if (isUserEmailListDirty.value) await saveEmailAccountsResource.submit();
   } catch {
     return; // the fallback error handler already showed a toast
   }
   toast.success(__("Email settings updated successfully."));
-  currentUserEmailInfo.reload();
   user.reload();
+  await currentUserEmailInfo.reload();
+  linkedEmails.value = [...currentUserEmailInfo.data.outgoing_emails];
 }
 
 watch(isDirty, (val) => {
