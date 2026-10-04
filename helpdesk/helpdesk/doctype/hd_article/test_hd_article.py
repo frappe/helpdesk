@@ -129,3 +129,7 @@ class TestHDArticleFeedback(IntegrationTestCase):
             },
         )
         self.assertEqual(total, 1)
+
+    def test_votes_go_through_vote_on_article_only(self):
+        # A whitelisted doc method would skip its readability check and rate limit.
+        self.assertNotIn(type(self.article).set_feedback, frappe.whitelisted)
