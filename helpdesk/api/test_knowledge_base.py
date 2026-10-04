@@ -151,6 +151,14 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(article.image, "/files/one.png")
         self.assertEqual(article.excerpt, "intro")
 
+    def test_an_excerpt_is_the_first_paragraph(self) -> None:
+        body = "<h2>Setup</h2><p></p><p>Open <b>Settings</b>.</p><table><td>Role</td></table>"
+        frappe.db.set_value("HD Article", self.published, "content", body)
+
+        [article] = get_public_articles(category=self.category.name)
+
+        self.assertEqual(article.excerpt, "Open Settings.")
+
     def test_popular_sorts_by_views(self) -> None:
         frappe.db.set_value("HD Article", self.published, "views", BASE_VIEWS)
         self.make_article("Fixture popular", views=BASE_VIEWS + 1)

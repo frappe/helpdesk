@@ -191,10 +191,16 @@ def get_public_articles(
     )
     for article in articles:
         soup = BeautifulSoup(article.pop("content") or "", "html.parser")
-        article.excerpt = soup.get_text(" ", strip=True)[:EXCERPT_LENGTH]
+        article.excerpt = excerpt(soup)
         article.image = first_image(soup)
         article.author = get_user_info_for_avatar(article.author)
     return articles
+
+
+def excerpt(soup: BeautifulSoup) -> str:
+    """The first paragraph, read as a sentence: headings and table cells would run into it."""
+    paragraph = next((p for p in soup.find_all("p") if p.get_text(strip=True)), soup)
+    return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
 
 
 def first_image(soup: BeautifulSoup) -> str | None:
