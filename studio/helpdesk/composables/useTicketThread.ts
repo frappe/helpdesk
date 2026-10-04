@@ -2,6 +2,7 @@ import { computed, watch } from 'vue'
 import { dayjs } from 'frappe-ui'
 import { timeAgo } from '@helpdesk/shared/utils'
 import { usePreferences } from '@app/stores/preferences'
+import { useSession } from '@app/stores/session'
 import { bubbleLayout, GROUP_SECONDS, GROUPED_GAP, ROW_GAP } from '@app/composables/messageLayout'
 import { DATE_FORMATS } from '@app/utils'
 
@@ -37,6 +38,7 @@ export function useTicketThread(ticket) {
   // The chat layout is a Repeater of bubbles; the timeline layout is ActivityTimeline.
   const { conversationLayout } = usePreferences()
   const isChat = computed(() => conversationLayout.value === 'chat')
+  const { isPhone } = useSession()
 
   const conversation = computed(() => {
     if (!isChat.value) return []
@@ -64,7 +66,7 @@ export function useTicketThread(ticket) {
       fullDate: dayjs(message.creation).format(DATE_FORMATS.tooltip),
       attachments: message.attachments || [],
       isAgentReply: message.sent_or_received === 'Sent',
-      ...bubbleLayout(message.sent_or_received !== 'Sent'),
+      ...bubbleLayout(message.sent_or_received !== 'Sent', isPhone.value),
     }
   }
 

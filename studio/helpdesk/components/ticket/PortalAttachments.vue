@@ -4,6 +4,7 @@
       v-for="(attachment, index) in attachments"
       :key="attachment.file_url"
       variant="outline"
+      class="max-w-full"
       :label="attachment.file_name"
       :icon-left="iconOf(attachment)"
       @click="openAttachment(index)"

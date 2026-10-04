@@ -48,7 +48,9 @@ const DEFAULT_COLUMNS = [
 ].map((column) => ({ ...column, label: __(COLUMN_LABELS[column.fieldname]) }))
 
 // Fetch-only: the SLA badges and the subject's unread weight need these, no column shows them.
-const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen']
+// The phone rows read their own fields, whichever columns the view has picked.
+const PHONE_FIELDS = ['subject', 'creation', 'status', 'name']
+const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen', ...PHONE_FIELDS]
 
 // `creation`/`modified` are keyed, not left to the type fallback: neither is a docfield.
 const CELLS = {
@@ -98,7 +100,7 @@ export default function setup(context) {
     columns: {
       ...view.columns,
       wire: settled(() =>
-        [...view.columns.wire.value.map((column) => column.key), ...SUPPORT_FIELDS].map(
+        [...new Set([...view.columns.wire.value.map((column) => column.key), ...SUPPORT_FIELDS])].map(
           (key) => ({ key }),
         ),
       ),
@@ -107,7 +109,9 @@ export default function setup(context) {
   const data = useListData(DOCTYPE, fetchView)
 
   const listColumns = computed(() =>
-    view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
+    settings.isPhone.value
+      ? PHONE_FIELDS.map((key) => ({ key, cell: cellFor({ key }) }))
+      : view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
   )
 
   function cellFor(column) {

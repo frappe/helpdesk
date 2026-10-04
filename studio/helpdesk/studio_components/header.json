@@ -5,7 +5,9 @@
    "display": "flex",
    "height": "fit-content",
    "justifyContent": "space-between",
-   "width": "100%"
+   "width": "100%",
+   "minWidth": "0",
+   "gap": "12px"
   },
   "children": [
    {
@@ -16,8 +18,9 @@
      "flexShrink": 1,
      "gap": "8px",
      "height": "fit-content",
-     "justifyContent": "center",
-     "width": "fit-content"
+     "justifyContent": "flex-start",
+     "width": "fit-content",
+     "minWidth": "0"
     },
     "blockName": "container",
     "children": [
@@ -37,7 +40,7 @@
       "componentId": "Breadcrumbs-header",
       "componentName": "Breadcrumbs",
       "componentProps": {
-       "items": "{{ (inputs.hideRoot ? [] : [{ label: 'Knowledge base', route: '/' }]).concat(inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(route.path === '/' ? [] : [{ label: inputs.crumb || route.name }]) }}"
+       "items": "{{ (inputs.hideRoot || (isPhone && inputs.parentCrumb) ? [] : [{ label: 'Knowledge base', route: '/' }]).concat(inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(route.path === '/' ? [] : [{ label: inputs.crumb || route.name }]) }}"
       },
       "componentSlots": {},
       "visibilityCondition": "{{ !inputs.currentView }}"
@@ -72,7 +75,8 @@
      "alignItems": "center",
      "display": "flex",
      "flexDirection": "row",
-     "gap": "12px"
+     "gap": "12px",
+     "flexShrink": 0
     },
     "blockName": "header-right",
     "children": [
@@ -90,7 +94,31 @@
        "label": "{{ words.raiseTicket }}",
        "variant": "{{ route.path.startsWith('/articles/') ? 'solid' : 'subtle' }}"
       },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}"
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}",
+      "classes": [
+       "max-sm:hidden"
+      ]
+     },
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "router.push('/tickets/new')"
+       }
+      },
+      "componentId": "Button-raise-ticket-icon",
+      "componentName": "Button",
+      "componentProps": {
+       "icon": "lucide-plus",
+       "variant": "{{ route.path.startsWith('/articles/') ? 'solid' : 'subtle' }}",
+       "aria-label": "{{ words.raiseTicket }}",
+       "tooltip": "{{ words.raiseTicket }}"
+      },
+      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}",
+      "classes": [
+       "sm:hidden"
+      ]
      },
      {
       "baseStyles": {
@@ -110,7 +138,12 @@
        "tag": "span",
        "text": "{{ t('Login') }}"
       },
-      "visibilityCondition": "{{ isGuest }}"
+      "visibilityCondition": "{{ isGuest }}",
+      "classes": [
+       "px-2",
+       "py-1.5",
+       "-mx-2"
+      ]
      },
      {
       "componentEvents": {
@@ -191,7 +224,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-02 15:19:17.280299",
+ "modified": "2026-10-04 11:41:22.993810",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

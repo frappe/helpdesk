@@ -7,6 +7,7 @@ import { useRecent } from '@app/stores/recent'
 import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { runAction } from '@app/utils'
+import { useDrawer } from '@app/composables/useDrawer'
 
 const WORDS_PER_MINUTE = 200
 const RELATED_LIMIT = 6
@@ -94,6 +95,7 @@ export default function setup(context) {
 
   return {
     ...useSettingsModal(context),
+    drawer: useDrawer(context.route),
     articleHtml,
     toc,
     readingTime,

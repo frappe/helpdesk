@@ -6,6 +6,7 @@ import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
 import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
+import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { runAction } from '@app/utils'
 
@@ -122,16 +123,20 @@ export default function setup(context) {
       })),
   )
 
+  // Fields alternate between two columns, which would stack out of order on a phone.
+  const { isPhone } = useSession()
   const layout = computed(() => [
     {
       sections: [
         {
           hideLabel: true,
           hideBorder: true,
-          columns: [
-            { fields: fields.value.filter((_, index) => index % 2 === 0) },
-            { fields: fields.value.filter((_, index) => index % 2 === 1) },
-          ],
+          columns: isPhone.value
+            ? [{ fields: fields.value }]
+            : [
+                { fields: fields.value.filter((_, index) => index % 2 === 0) },
+                { fields: fields.value.filter((_, index) => index % 2 === 1) },
+              ],
         },
       ],
     },

@@ -38,11 +38,12 @@
             icon="lucide-check"
             class="size-4 text-ink-gray-7"
           />
+          <!-- Shown outright on touch, where no row is ever hovered. -->
           <Dropdown side="right" align="start" :options="viewActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
+                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block [@media(hover:none)]:!block [@media(hover:none)]:!size-6"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop

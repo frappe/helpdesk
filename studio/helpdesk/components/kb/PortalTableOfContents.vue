@@ -1,5 +1,46 @@
 <template>
-  <nav v-if="items.length" class="flex flex-col">
+  <div
+    v-if="items.length && collapsible"
+    class="rounded-4 border border-outline-gray-2"
+  >
+    <button
+      type="button"
+      class="flex h-10 w-full items-center justify-between gap-2 px-3 text-left text-base text-ink-gray-8"
+      :aria-expanded="isOpen"
+      @click="isOpen = !isOpen"
+    >
+      {{ __("On this page") }}
+      <span
+        class="lucide-chevron-down size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
+        :class="isOpen && 'rotate-180'"
+      />
+    </button>
+    <div
+      class="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
+      :class="isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+      :inert="!isOpen"
+    >
+      <div class="min-h-0 overflow-hidden">
+        <nav class="flex flex-col px-3 pb-3">
+          <button
+            v-for="item in items"
+            :key="item.id"
+            type="button"
+            class="border-l py-2 pl-3 text-left text-[14px] leading-normal text-ink-gray-6"
+            :class="
+              item.id === activeId
+                ? 'border-ink-gray-9 text-ink-gray-9'
+                : 'border-outline-gray-1'
+            "
+            @click="scrollTo(item.id)"
+          >
+            {{ item.text }}
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <nav v-else-if="items.length" class="flex flex-col">
     <button
       v-for="item in items"
       :key="item.id"
@@ -19,11 +60,15 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { __ } from "@helpdesk/shared/translation";
 
+// `collapsible` folds the list behind an "On this page" toggle, for screens without a side column.
 const props = withDefaults(
-  defineProps<{ items?: { id: string; text: string }[] }>(),
-  { items: () => [] }
+  defineProps<{ items?: { id: string; text: string }[]; collapsible?: boolean }>(),
+  { items: () => [], collapsible: false }
 );
+
+const isOpen = ref(false);
 
 // A fraction, not a fixed offset, so every heading of a short article can become current.
 const ACTIVE_RATIO = 0.25;

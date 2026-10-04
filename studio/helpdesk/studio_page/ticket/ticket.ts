@@ -3,6 +3,7 @@ import { createResource, dayjs, dayjsLocal } from 'frappe-ui'
 import LucideCircleCheck from '~icons/lucide/circle-check'
 import LucideStar from '~icons/lucide/star'
 import { __ } from '@helpdesk/shared/translation'
+import { useDrawer } from '@app/composables/useDrawer'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
 import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
@@ -244,6 +245,7 @@ export default function setup(context) {
   return {
     ...settings,
     ...thread,
+    drawer: useDrawer(context.route),
     ...useTicketDetails(ticket, thread),
     ...useReplyComposer(ticket),
     ...useOutsideHoursBanner(ticket),

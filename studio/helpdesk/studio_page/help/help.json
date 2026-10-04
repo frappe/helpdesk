@@ -23,8 +23,9 @@
       "h-13",
       "justify-between",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-help-navbar",
      "componentName": "container",
@@ -40,12 +41,12 @@
          "componentId": "TextInput-help",
          "componentName": "TextInput",
          "componentProps": {
-          "autofocus": true,
+          "autofocus": "{{ !isPhone }}",
           "modelValue": {
            "$type": "variable",
            "name": "query"
           },
-          "placeholder": "{{ t(\"Search for an answer, e.g. refund not received\") }}",
+          "placeholder": "{{ isPhone ? t(\"Search for an answer\") : t(\"Search for an answer, e.g. refund not received\") }}",
           "size": "md",
           "type": "text",
           "variant": "outline"
@@ -281,9 +282,11 @@
         "w-full",
         "max-w-2xl",
         "flex-col",
-        "px-5",
-        "py-8",
-        "min-h-[70vh]"
+        "min-h-[70vh]",
+        "px-4",
+        "sm:px-5",
+        "py-5",
+        "sm:py-8"
        ],
        "componentId": "container-help-search",
        "componentName": "container",
@@ -315,8 +318,8 @@
     "bg-surface-base",
     "flex",
     "flex-col",
-    "h-screen",
-    "w-full"
+    "w-full",
+    "h-full"
    ],
    "componentId": "container-help-body",
    "componentName": "container",
@@ -329,7 +332,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-02 22:23:48.520725",
+ "modified": "2026-10-04 11:43:10.119248",
  "modified_by": "Administrator",
  "name": "help",
  "owner": "Administrator",

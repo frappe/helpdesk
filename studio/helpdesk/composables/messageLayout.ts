@@ -30,6 +30,10 @@ export const GROUP_SECONDS = 5 * 60
 export const GROUPED_GAP = '12px'
 export const ROW_GAP = '24px'
 
-export function bubbleLayout(isOwn: boolean) {
-  return isOwn ? OWN_BUBBLE : THEIR_BUBBLE
+// A phone has no gutter to pull the face into, and no width to leave beside a bubble.
+const PHONE = { rowLeft: '0px', cardMaxWidth: '88%' }
+
+export function bubbleLayout(isOwn: boolean, isPhone = false) {
+  const layout = isOwn ? OWN_BUBBLE : THEIR_BUBBLE
+  return isPhone ? { ...layout, ...PHONE } : layout
 }

@@ -17,7 +17,7 @@
       </Tooltip>
       <div
         v-if="image && editable"
-        class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline outline-black/5 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2"
+        class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline outline-black/5 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 before:absolute before:-inset-2 before:content-[''] [@media(hover:none)]:opacity-100"
         @click.stop="$emit('remove')"
       >
         <Icon icon="lucide-x" class="size-3.5 text-ink-gray-4" />
@@ -27,10 +27,12 @@
     <div class="flex min-w-0 flex-col gap-1">
       <div class="flex min-h-7 items-center gap-1">
         <template v-if="!isEditing">
-          <span class="text-2xl-semibold text-ink-gray-8">{{ name }}</span>
+          <span class="min-w-0 break-words text-2xl-semibold text-ink-gray-8">{{
+            name
+          }}</span>
           <Button
             v-if="editable"
-            class="!h-5 !px-1"
+            class="relative !h-5 shrink-0 !px-1 before:absolute before:-inset-1.5 before:content-['']"
             variant="ghost"
             @click="startEditing"
           >

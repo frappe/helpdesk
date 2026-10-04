@@ -16,7 +16,10 @@
         </template>
         <!-- The input leaves room for an icon, not the hint; typed text would run under it. -->
         <template v-if="!query" #suffix>
-          <KeyboardShortcut combo="Mod+K" class="text-ink-gray-4" />
+          <KeyboardShortcut
+            combo="Mod+K"
+            class="text-ink-gray-4 [@media(pointer:coarse)]:hidden"
+          />
         </template>
       </TextInput>
     </div>
@@ -27,7 +30,7 @@
       <div v-for="category in visibleCategories" :key="category.name">
         <button
           type="button"
-          class="flex h-7 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 text-left transition hover:bg-surface-gray-2"
+          class="flex h-9 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 md:h-7 text-left transition hover:bg-surface-gray-2"
           :aria-expanded="category.isOpen"
           :aria-controls="`kb-sidebar-${category.name}`"
           @click="toggle(category.name)"
@@ -65,7 +68,7 @@
                 :key="article.name"
                 :to="ROUTES.article(article.name)"
                 :aria-current="article.name === activeName ? 'page' : undefined"
-                class="flex min-h-7 items-center rounded-4 px-2 py-1.5 text-sm leading-tighter no-underline transition"
+                class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-tighter no-underline transition"
                 :class="
                   article.name === activeName
                     ? 'bg-surface-elevation-3 text-ink-gray-8 shadow-sm'

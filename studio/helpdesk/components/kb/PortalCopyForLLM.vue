@@ -1,5 +1,5 @@
 <template>
-  <div class="flex shrink-0 items-center" @pointerenter="load" @focusin="load">
+  <div class="flex shrink-0 items-center">
     <Button
       size="xs"
       variant="outline"
@@ -48,7 +48,8 @@ const props = withDefaults(
 // `legacy` falls back to execCommand where the Clipboard API is missing (plain http).
 const { copy, copied } = useClipboard({ legacy: true });
 
-// Fetched on approach, not on click: Safari drops a clipboard write that waits on the network.
+// Fetched up front, not on click or hover: Safari drops a clipboard write that waits on the
+// network, and a tap fires `pointerenter` only just before the click.
 const markdown = ref("");
 let request: Promise<void> | null = null;
 const markdownUrl = computed(
@@ -63,7 +64,9 @@ watch(
   () => {
     markdown.value = "";
     request = null;
-  }
+    if (props.name) load();
+  },
+  { immediate: true }
 );
 
 function load() {

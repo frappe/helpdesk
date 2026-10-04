@@ -171,8 +171,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-profile-header",
           "componentName": "container",
@@ -253,7 +255,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-language",
                     "componentName": "Combobox",
@@ -273,13 +276,19 @@
                    "description": "{{ t('Change language of the application.') }}",
                    "title": "{{ t('Language') }}"
                   },
-                  "componentSlots": {}
+                  "componentSlots": {},
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ]
                  },
                  {
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-time_zone",
                     "componentName": "Combobox",
@@ -299,13 +308,19 @@
                    "description": "{{ t('Change timezone of the application.') }}",
                    "title": "{{ t('Timezone') }}"
                   },
-                  "componentSlots": {}
+                  "componentSlots": {},
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ]
                  },
                  {
                   "children": [
                    {
                     "classes": [
-                     "w-32"
+                     "w-32",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-theme",
                     "componentName": "Select",
@@ -328,13 +343,19 @@
                    "description": "{{ t('Switch between light, dark, or system theme.') }}",
                    "title": "{{ t('Theme') }}"
                   },
-                  "componentSlots": {}
+                  "componentSlots": {},
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ]
                  },
                  {
                   "children": [
                    {
                     "classes": [
-                     "w-32"
+                     "w-32",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-layout",
                     "componentName": "Select",
@@ -357,7 +378,12 @@
                    "description": "{{ t('Read replies as a timeline, or as a chat with your own messages on the right.') }}",
                    "title": "{{ t('Conversation layout') }}"
                   },
-                  "componentSlots": {}
+                  "componentSlots": {},
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ]
                  }
                 ],
                 "classes": [
@@ -461,8 +487,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-profile-body",
           "componentName": "container",
@@ -529,8 +557,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-list-header",
           "componentName": "container",
@@ -557,8 +587,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-list-body",
           "componentName": "container",
@@ -701,8 +733,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-detail-header",
           "componentName": "container",
@@ -769,7 +803,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "\u2022"
+                   "text": "•"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ settingsOrg.email && settingsOrg.domain }}"
@@ -822,7 +856,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "\u2022"
+                   "text": "•"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ (settingsOrg.email || settingsOrg.domain) && settingsOrg.country }}"
@@ -871,7 +905,9 @@
                 "classes": [
                  "flex",
                  "items-center",
-                 "gap-x-1.5"
+                 "gap-x-1.5",
+                 "flex-wrap",
+                 "gap-y-0.5"
                 ],
                 "componentId": "kb_settings-organization-meta",
                 "componentName": "container",
@@ -983,8 +1019,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-detail-body",
           "componentName": "container",
@@ -1083,8 +1121,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-invite-header",
           "componentName": "container",
@@ -1102,7 +1142,8 @@
               "children": [
                {
                 "classes": [
-                 "w-32"
+                 "w-32",
+                 "max-sm:!w-full"
                 ],
                 "componentId": "kb_settings-invite-role",
                 "componentName": "Select",
@@ -1131,7 +1172,12 @@
                "description": "{{ t('New people will be added to the team as') }}",
                "title": "{{ t('Invite by email') }}"
               },
-              "componentSlots": {}
+              "componentSlots": {},
+              "classes": [
+               "max-sm:!flex-col",
+               "max-sm:!items-stretch",
+               "max-sm:!gap-2.5"
+              ]
              },
              {
               "componentId": "kb_settings-invite-emails",
@@ -1165,8 +1211,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-invite-body",
           "componentName": "container",
@@ -1433,7 +1481,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-03 13:22:19.765504",
+ "modified": "2026-10-04 11:55:01.234441",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

@@ -4,12 +4,14 @@
     :srcdoc="srcdoc"
     sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
     referrerpolicy="no-referrer"
-    class="block h-10 max-h-[500px] w-full max-w-full border-0"
+    class="block h-10 max-h-[500px] w-full max-w-full border-0 max-sm:max-h-none"
   />
 </template>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+// The frame's height cap lifts on a phone: a scroller inside the thread's scroller traps the thumb.
 import {
   applyCssToIframe,
   stripEmailColors,
@@ -78,7 +80,7 @@ function fold(doc: Document, quote: Element) {
   // Literal classes: the frame mirrors the page's sheets, and Tailwind scans this file.
   const label = doc.createElement("label");
   label.className =
-    "my-2.5 flex h-3 w-[23px] cursor-pointer items-center justify-center rounded-5 bg-surface-gray-2 text-lg font-bold leading-none text-ink-gray-8 hover:bg-surface-gray-3";
+    "relative my-2.5 flex h-3 w-[23px] cursor-pointer items-center before:absolute before:-inset-2 before:content-[''] justify-center rounded-5 bg-surface-gray-2 text-lg font-bold leading-none text-ink-gray-8 hover:bg-surface-gray-3";
   label.setAttribute("for", id);
   label.innerHTML = "...";
 
@@ -133,7 +135,7 @@ const srcdoc = computed(
   <base target="_blank" />
   <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }</style>
   </head><body class="m-0" style="font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}">
-  <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
+  <div class="email-content prose prose-sm max-w-none break-words [overflow-wrap:anywhere] prose-img:m-0 prose-img:h-auto prose-img:max-w-full prose-img:border-0 prose-pre:whitespace-pre-wrap [&_table]:!max-w-full">${body.value}</div>
   </body></html>`
 );
 

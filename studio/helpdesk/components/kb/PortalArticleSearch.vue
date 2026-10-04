@@ -25,7 +25,7 @@
         <button
           v-if="group.key === RECENT_SEARCHES"
           type="button"
-          class="rounded-4 px-1 text-ink-gray-6 hover:text-ink-gray-8"
+          class="rounded-4 px-1 text-ink-gray-6 hover:text-ink-gray-8 [@media(pointer:coarse)]:px-2 [@media(pointer:coarse)]:py-1.5"
           @mousedown.prevent
           @click="clearSearches"
         >
@@ -44,7 +44,7 @@
         </span>
         <button
           type="button"
-          class="flex size-6 shrink-0 items-center justify-center rounded-4 text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
+          class="flex size-6 shrink-0 items-center justify-center rounded-4 text-ink-gray-4 [@media(pointer:coarse)]:size-8 hover:bg-surface-gray-3 hover:text-ink-gray-7"
           :aria-label="__('Remove')"
           @pointerdown.stop.prevent
           @click.stop.prevent="forgetSearch(item.recentSearch)"
@@ -230,7 +230,9 @@ const options = computed(() =>
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="content-body"]
   > div {
-  max-height: none;
+  /* Whatever room the popper has, so results under a phone's keyboard still scroll into reach. */
+  max-height: calc(var(--reka-combobox-content-available-height, 100dvh) - 16px);
+  overflow-y: auto;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"] {

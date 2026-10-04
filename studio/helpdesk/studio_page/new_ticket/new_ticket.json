@@ -30,8 +30,9 @@
       "shrink-0",
       "h-13",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-topbar-nt",
      "componentName": "container",
@@ -156,7 +157,10 @@
             "items-center",
             "justify-between",
             "px-2",
-            "pt-1"
+            "pt-1",
+            "flex-wrap",
+            "gap-x-3",
+            "gap-y-1"
            ],
            "componentId": "container-nt-suggestions-head",
            "componentName": "container",
@@ -315,10 +319,9 @@
         "mx-auto",
         "my-0",
         "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[50px]",
-        "w-full"
+        "w-full",
+        "pt-6",
+        "sm:pt-[50px]"
        ],
        "componentId": "stack",
        "componentName": "container",
@@ -358,11 +361,10 @@
         "shrink",
         "gap-5",
         "h-fit",
-        "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[39px]",
-        "w-full"
+        "w-full",
+        "pt-8",
+        "sm:pt-[39px]",
+        "pb-8"
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
@@ -377,7 +379,10 @@
       "shrink",
       "justify-start",
       "max-w-[552px]",
-      "overflow-y-auto"
+      "overflow-y-auto",
+      "w-full",
+      "px-4",
+      "sm:px-0"
      ],
      "componentId": "content",
      "componentName": "container",
@@ -411,7 +416,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:51:38.034694",
+ "modified": "2026-10-04 11:43:34.000509",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

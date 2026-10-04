@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useSettingsModal } from '@app/stores/settings'
+import { useDrawer } from '@app/composables/useDrawer'
 
 export default function setup(context) {
   const { category, articles, route } = context
@@ -16,6 +17,7 @@ export default function setup(context) {
 
   return {
     ...useSettingsModal(context),
+    drawer: useDrawer(context.route),
     categoryName,
     categoryDescription,
     articleCount,

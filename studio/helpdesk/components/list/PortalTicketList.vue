@@ -7,6 +7,32 @@
       <LoadingIndicator :scale="8" />
     </div>
 
+    <!-- A phone gets one stacked row per ticket: table columns leave the subject no room. -->
+    <div v-else-if="rows.length && compact" class="min-h-0 flex-1 overflow-y-auto">
+      <button
+        v-for="row in rows"
+        :key="row.name"
+        type="button"
+        class="flex w-full flex-col gap-1.5 border-b border-outline-gray-1 px-4 py-3 text-left text-base text-ink-gray-8 transition-colors active:bg-surface-gray-2"
+        @click="onRowClick?.(row)"
+      >
+        <span class="flex w-full min-w-0 items-baseline gap-3">
+          <component :is="cell('subject', row)" />
+          <span class="shrink-0 text-ink-gray-5">
+            <component :is="cell('creation', row)" />
+          </span>
+        </span>
+        <span class="flex w-full min-w-0 items-center gap-3 text-ink-gray-6">
+          <span class="flex min-w-0 flex-1">
+            <component :is="cell('status', row)" />
+          </span>
+          <span class="shrink-0">
+            <component :is="cell('name', row)" />
+          </span>
+        </span>
+      </button>
+    </div>
+
     <ListView
       v-else-if="rows.length"
       class="min-h-0 flex-1"
@@ -84,7 +110,7 @@ import { loadTicketMeta } from "@app/stores/ticketMeta";
 // Here, not at module load: this file ships in the public page bundles too.
 loadTicketMeta();
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     columns?: any[];
     rows?: any[];
@@ -94,6 +120,7 @@ withDefaults(
     pageLengthOptions?: number[];
     emptyState?: { title: string; description?: string };
     onRowClick?: (row: any) => void;
+    compact?: boolean;
   }>(),
   {
     columns: () => [],
@@ -103,8 +130,14 @@ withDefaults(
     totalCount: 0,
     pageLengthOptions: () => [],
     emptyState: () => ({ title: "" }),
+    compact: false,
   }
 );
+
+function cell(key: string, row: any) {
+  const column = props.columns.find((column) => column.key === key);
+  return column?.cell?.({ row, item: row[key] }) ?? null;
+}
 
 const pageLength = defineModel<number>("pageLength", { default: 20 });
 

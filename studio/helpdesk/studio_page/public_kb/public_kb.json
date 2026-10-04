@@ -33,8 +33,9 @@
       "shrink-0",
       "h-13",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-cmv5rqe56",
      "componentName": "container",
@@ -139,7 +140,7 @@
              "componentId": "PortalArticleSearch-home",
              "componentName": "PortalArticleSearch",
              "componentProps": {
-              "placeholder": "{{ t(\"Search articles (e.g. billing, integration, or general)\") }}"
+              "placeholder": "{{ isPhone ? t(\"Search articles\") : t(\"Search articles (e.g. billing, integration, or general)\") }}"
              },
              "isCustomVueComponent": true
             }
@@ -148,9 +149,10 @@
             "mb-0",
             "ml-0",
             "mr-0",
-            "mt-[37px]",
             "max-w-full",
-            "w-[531px]"
+            "w-full",
+            "mt-8",
+            "sm:mt-[37px]"
            ],
            "componentId": "container-2ys8iri2i",
            "componentName": "container",
@@ -161,7 +163,9 @@
           "flex",
           "flex-col",
           "shrink",
-          "relative"
+          "relative",
+          "w-full",
+          "max-w-[531px]"
          ],
          "componentId": "container-dm3g8lv9a",
          "componentName": "container",
@@ -174,12 +178,13 @@
         "flex-col",
         "justify-start",
         "m-0",
-        "pb-20",
-        "pl-0",
-        "pr-0",
-        "pt-[84px]",
         "relative",
-        "w-full"
+        "w-full",
+        "px-4",
+        "pt-12",
+        "sm:pt-[84px]",
+        "pb-12",
+        "sm:pb-20"
        ],
        "componentId": "container-leo7uctqp",
        "componentName": "container",
@@ -213,7 +218,6 @@
             "display": "grid",
             "gap": "10px",
             "gridAutoColumns": "minmax(0, 1fr)",
-            "gridTemplateColumns": "repeat(3, minmax(0, 1fr))",
             "height": "auto",
             "width": "100%"
            },
@@ -306,15 +310,19 @@
               "flex",
               "flex-col",
               "gap-2.5",
-              "h-[132px]",
               "justify-center",
-              "min-w-[226px]",
               "overflow-hidden",
               "pb-4",
               "pl-5",
               "pr-5",
               "pt-4",
-              "w-full"
+              "w-full",
+              "sm:min-h-[132px]",
+              "max-sm:flex-row",
+              "max-sm:items-start",
+              "max-sm:gap-3",
+              "max-sm:px-4",
+              "max-sm:py-3.5"
              ],
              "componentEvents": {
               "click": {
@@ -335,7 +343,12 @@
             "data": "{{ categories.data }}",
             "dataKey": "name"
            },
-           "visibilityCondition": "{{ categories.data && categories.data.length }}"
+           "visibilityCondition": "{{ categories.data && categories.data.length }}",
+           "classes": [
+            "grid-cols-1",
+            "sm:grid-cols-2",
+            "lg:grid-cols-3"
+           ]
           }
          ],
          "classes": [
@@ -343,8 +356,6 @@
           "grid",
           "gap-3",
           "grid-cols-1",
-          "md:grid-cols-2",
-          "lg:grid-cols-1",
           "justify-stretch",
           "w-auto"
          ],
@@ -375,10 +386,11 @@
         "mx-auto",
         "max-w-[700px]",
         "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[41px]",
-        "w-full"
+        "w-full",
+        "px-4",
+        "md:px-0",
+        "pt-8",
+        "sm:pt-[41px]"
        ],
        "componentId": "container-a9wzslqxz",
        "componentName": "container",
@@ -654,7 +666,9 @@
           "flex-row",
           "justify-between",
           "w-full",
-          "gap-4"
+          "gap-4",
+          "flex-wrap",
+          "gap-y-3"
          ],
          "componentId": "container-yihf8crlt",
          "componentName": "container",
@@ -717,7 +731,8 @@
                   "flex-row",
                   "shrink",
                   "h-fit",
-                  "w-fit"
+                  "w-fit",
+                  "min-w-0"
                  ],
                  "componentId": "container-b3ofn4yxu",
                  "componentName": "container",
@@ -796,11 +811,12 @@
           "flex",
           "flex-col",
           "gap-0",
-          "pb-[190px]",
           "pl-0",
           "pr-0",
           "pt-0",
-          "w-full"
+          "w-full",
+          "pb-16",
+          "sm:pb-[190px]"
          ],
          "componentId": "container-njr6t61bb",
          "componentName": "container",
@@ -830,10 +846,11 @@
         "mx-auto",
         "max-w-[700px]",
         "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[57px]",
-        "w-full"
+        "w-full",
+        "px-4",
+        "md:px-0",
+        "pt-10",
+        "sm:pt-[57px]"
        ],
        "componentId": "container-yi3s1zcyy",
        "componentName": "container",
@@ -877,7 +894,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-04 01:42:22.706751",
+ "modified": "2026-10-04 11:43:00.945573",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

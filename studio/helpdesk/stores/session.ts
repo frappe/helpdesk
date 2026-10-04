@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { call } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
 
@@ -23,6 +24,8 @@ function createSessionStore() {
   const isAdmin = computed(() => Boolean(config.value?.is_admin))
   const isManager = computed(() => Boolean(config.value?.is_manager))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
+  // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
+  const isPhone = useMediaQuery('(max-width: 639px)')
 
   const loginUrl = computed(
     () => `/login?redirect-to=${encodeURIComponent(window.location.pathname + window.location.search)}`,
@@ -66,6 +69,7 @@ function createSessionStore() {
     isAdmin,
     isManager,
     brandLogo,
+    isPhone,
     loginUrl,
     loadSession,
     signIn,

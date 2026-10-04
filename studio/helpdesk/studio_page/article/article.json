@@ -16,6 +16,26 @@
      "blockName": "top-bar",
      "children": [
       {
+       "classes": [
+        "md:hidden",
+        "shrink-0"
+       ],
+       "componentEvents": {
+        "click": {
+         "action": "Run Script",
+         "event": "click",
+         "script": "drawer.toggle()"
+        }
+       },
+       "componentId": "article-menu",
+       "componentName": "Button",
+       "componentProps": {
+        "icon": "lucide-menu",
+        "variant": "ghost",
+        "aria-label": "{{ t('Browse articles') }}"
+       }
+      },
+      {
        "blockName": "Header",
        "componentId": "header-topbar",
        "componentName": "header",
@@ -24,7 +44,11 @@
         "parentCrumb": "{{ currentCategory?.label }}",
         "parentRoute": "{{ currentCategory?.route }}"
        },
-       "isStudioComponent": true
+       "isStudioComponent": true,
+       "classes": [
+        "min-w-0",
+        "flex-1"
+       ]
       }
      ],
      "classes": [
@@ -38,8 +62,10 @@
       "h-13",
       "justify-between",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "gap-2",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-1bvj813bs",
      "componentName": "container",
@@ -67,11 +93,29 @@
         "flex-col",
         "shrink-0",
         "h-full",
-        "w-[280px]"
+        "w-[280px]",
+        "max-md:fixed",
+        "max-md:inset-y-0",
+        "max-md:start-0",
+        "max-md:z-40",
+        "max-md:w-[min(320px,85vw)]",
+        "max-md:bg-surface-base",
+        "max-md:shadow-2xl",
+        "max-md:-translate-x-full",
+        "max-md:invisible",
+        "transition-[transform,visibility]",
+        "duration-200",
+        "ease-out",
+        "motion-reduce:transition-none",
+        "max-md:rtl:translate-x-full"
        ],
        "componentId": "container-mxaqix40f",
        "componentName": "container",
-       "originalElement": "div"
+       "originalElement": "div",
+       "baseStyles": {
+        "transform": "{{ drawer.open ? 'none' : '' }}",
+        "visibility": "{{ drawer.open ? 'visible' : '' }}"
+       }
       },
       {
        "blockName": "main-layout",
@@ -90,7 +134,8 @@
                 "text-ink-gray-8",
                 "font-bold",
                 "leading-[1.25]",
-                "min-w-0"
+                "min-w-0",
+                "max-sm:!text-[24px]"
                ],
                "componentId": "TextBlock-2so2pbuuk",
                "componentName": "TextBlock",
@@ -115,7 +160,9 @@
               "items-start",
               "justify-between",
               "gap-4",
-              "w-full"
+              "w-full",
+              "max-sm:flex-col",
+              "max-sm:gap-3"
              ],
              "componentId": "container-article-title-row",
              "componentName": "container",
@@ -225,7 +272,8 @@
               {
                "classes": [
                 "text-ink-gray-4",
-                "leading-[1.15]"
+                "leading-[1.15]",
+                "max-sm:hidden"
                ],
                "componentId": "article-permalink-dot",
                "componentName": "TextBlock",
@@ -268,7 +316,8 @@
                 "gap-1",
                 "text-ink-gray-5",
                 "transition-colors",
-                "hover:text-ink-gray-7"
+                "hover:text-ink-gray-7",
+                "max-sm:basis-full"
                ],
                "componentEvents": {
                 "click": {
@@ -287,7 +336,9 @@
               "flex",
               "flex-row",
               "gap-2",
-              "justify-start"
+              "justify-start",
+              "flex-wrap",
+              "gap-y-1"
              ],
              "componentId": "container-7rc7b7a0k",
              "componentName": "container",
@@ -305,6 +356,20 @@
            "componentId": "container-fkgmgcjko",
            "componentName": "container",
            "originalElement": "div"
+          },
+          {
+           "classes": [
+            "xl:hidden",
+            "w-full"
+           ],
+           "componentId": "PortalTableOfContents-article-folded",
+           "componentName": "PortalTableOfContents",
+           "componentProps": {
+            "items": "{{ toc }}",
+            "collapsible": true
+           },
+           "isCustomVueComponent": true,
+           "visibilityCondition": "{{ toc.length > 1 }}"
           },
           {
            "componentId": "PortalArticleBody-article",
@@ -394,7 +459,10 @@
             "justify-between",
             "mt-4",
             "p-4",
-            "w-full"
+            "w-full",
+            "max-sm:flex-col",
+            "max-sm:items-start",
+            "max-sm:gap-3"
            ],
            "componentId": "container-3vdv8rj18",
            "componentName": "container",
@@ -530,12 +598,18 @@
           "flex-1",
           "flex-col",
           "gap-6",
-          "ml-[170px]",
-          "mr-[70px]",
           "mt-0",
           "max-w-[700px]",
           "min-w-0",
-          "w-full"
+          "w-full",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "xl:px-0",
+          "xl:ml-16",
+          "xl:mr-10",
+          "min-[1440px]:ml-[170px]",
+          "min-[1440px]:mr-[70px]"
          ],
          "componentId": "container-rr220ojgc",
          "componentName": "container",
@@ -558,7 +632,6 @@
          ],
          "classes": [
           "self-start",
-          "flex",
           "flex-col",
           "shrink-0",
           "pb-4",
@@ -567,7 +640,9 @@
           "pt-4",
           "sticky",
           "top-0",
-          "w-[250px]"
+          "w-[250px]",
+          "hidden",
+          "xl:flex"
          ],
          "componentId": "container-ku83agf6x",
          "componentName": "container",
@@ -589,9 +664,10 @@
         "pb-10",
         "pl-0",
         "pr-0",
-        "pt-[34px]",
         "relative",
-        "w-full"
+        "w-full",
+        "pt-6",
+        "sm:pt-[34px]"
        ],
        "componentId": "container-gi1caqqm1",
        "componentName": "container",
@@ -616,6 +692,26 @@
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
+    },
+    {
+     "classes": [
+      "fixed",
+      "inset-0",
+      "z-30",
+      "bg-black-overlay-500",
+      "md:hidden"
+     ],
+     "componentEvents": {
+      "click": {
+       "action": "Run Script",
+       "event": "click",
+       "script": "drawer.close()"
+      }
+     },
+     "componentId": "article-drawer-backdrop",
+     "componentName": "container",
+     "originalElement": "div",
+     "visibilityCondition": "{{ drawer.open }}"
     }
    ],
    "componentId": "root",
@@ -632,7 +728,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-04 01:42:22.708246",
+ "modified": "2026-10-04 11:49:18.912836",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
