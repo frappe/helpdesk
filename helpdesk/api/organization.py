@@ -5,6 +5,7 @@ from frappe import _
 from frappe.rate_limiter import rate_limit
 from frappe.utils import sbool
 
+from helpdesk.api.auth import validate_uploaded_image
 from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
@@ -57,8 +58,7 @@ def get_organization(customer: str) -> dict:
 
 @frappe.whitelist()
 def get_invitable_contacts(customer: str) -> list[dict]:
-    """Contacts on the organization's email domain with a login, minus agents, members
-    and pending invitees."""
+    """Login-holding contacts on the org's domain, minus agents, members and invitees."""
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
     if not hd_customer.domain:
         return []
@@ -80,8 +80,7 @@ def get_invitable_contacts(customer: str) -> list[dict]:
 @frappe.whitelist(methods=["POST"])
 @rate_limit(limit=10, seconds=60 * 60, ip_based=False, user_based=True)
 def invite_members(customer: str, emails: list[str], role: str) -> None:
-    """Inserted with permissions ignored because customer managers hold none on User
-    Invitation; `HelpdeskUserInvitation` still checks they manage this customer."""
+    """Ignores permissions managers lack; `HelpdeskUserInvitation` checks the customer."""
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
     if role not in CUSTOMER_ROLES:
         frappe.throw(_("Invalid role {0}").format(role))
@@ -95,7 +94,7 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
             as_list=True,
         )
     )
-    for email in emails:
+    invitations = [
         frappe.get_doc(
             doctype="User Invitation",
             email=email,
@@ -104,7 +103,14 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
             redirect_to_path=CUSTOMER_PORTAL_ROOT,
             customer=hd_customer.name,
             contact=contacts.get(email),
-        ).insert(ignore_permissions=True)
+        )
+        for email in dict.fromkeys(emails)
+    ]
+    # Each insert mails at once, so a later refusal must not follow mails already sent.
+    for invitation in invitations:
+        invitation._validate_invite()
+    for invitation in invitations:
+        invitation.insert(ignore_permissions=True)
 
 
 @frappe.whitelist()
@@ -134,6 +140,7 @@ def update_organization(
 ) -> str:
     """Rename or re-logo an organization you manage; answers with its current docname."""
     hd_customer = _get_managed_customer(customer, PORTAL_EDIT_SETTING)
+    validate_uploaded_image(image)
     if image is not None:
         hd_customer.image = image or None
         hd_customer.save()
@@ -201,7 +208,10 @@ def _get_members(hd_customer) -> list[dict]:
             }
         )
     members.sort(
-        key=lambda member: (ROLE_ORDER[member["role"]], member["full_name"].lower())
+        key=lambda member: (
+            ROLE_ORDER[member["role"]],
+            (member["full_name"] or "").lower(),
+        )
     )
     return members
 
