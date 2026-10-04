@@ -466,7 +466,8 @@
            ],
            "componentId": "container-3vdv8rj18",
            "componentName": "container",
-           "originalElement": "div"
+           "originalElement": "div",
+           "visibilityCondition": "{{ !isGuest || config?.allow_anonymous_article_voting }}"
           },
           {
            "blockName": "related-section",
@@ -613,7 +614,23 @@
          ],
          "componentId": "container-rr220ojgc",
          "componentName": "container",
-         "originalElement": "div"
+         "originalElement": "div",
+         "visibilityCondition": "{{ !article?.error }}"
+        },
+        {
+         "blockName": "not-found",
+         "classes": [
+          "flex-1"
+         ],
+         "componentId": "PortalEmptyState-article-not-found",
+         "componentName": "PortalEmptyState",
+         "componentProps": {
+          "description": "{{ t('It may have moved, or you may need to sign in to read it.') }}",
+          "icon": "article",
+          "title": "{{ t('Article not found') }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ article?.error }}"
         },
         {
          "blockName": "toc-sidebar",
@@ -646,7 +663,8 @@
          ],
          "componentId": "container-ku83agf6x",
          "componentName": "container",
-         "originalElement": "div"
+         "originalElement": "div",
+         "visibilityCondition": "{{ !article?.error }}"
         }
        ],
        "classes": [
@@ -728,7 +746,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-04 11:49:18.912836",
+ "modified": "2026-10-05 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
