@@ -202,7 +202,7 @@ export function shortDuration(target: string): string {
 
 /**
  * Convert `link_filters` from the stored list format to the dict format that
- * `frappe.desk.search.search_link` expects. Doctypes with a standard query
+ * `frappe.desk.search.search_link` expects.
  * @example
  * // in:  '[["User", "name", "in", ["a@x.com", "b@x.com"]]]'
  * // out: { name: ["in", ["a@x.com", "b@x.com"]] }

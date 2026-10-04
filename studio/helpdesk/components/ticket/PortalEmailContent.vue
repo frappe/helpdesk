@@ -1,4 +1,5 @@
 <template>
+  <!-- No height cap on a phone: a scroller inside the thread's scroller traps the thumb. -->
   <iframe
     ref="frame"
     :srcdoc="srcdoc"
@@ -10,8 +11,6 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-
-// The frame's height cap lifts on a phone: a scroller inside the thread's scroller traps the thumb.
 import {
   applyCssToIframe,
   stripEmailColors,
@@ -24,10 +23,9 @@ const QUOTE_SELECTORS = [
   "p.reply-to-content",
 ];
 
-const props = withDefaults(
-  defineProps<{ content?: string }>(),
-  { content: "" }
-);
+const props = withDefaults(defineProps<{ content?: string }>(), {
+  content: "",
+});
 
 const frame = ref<HTMLIFrameElement | null>(null);
 
@@ -147,16 +145,16 @@ watch(
   (element) => {
     if (!element) return;
     element.onload = () => {
-      applyCssToIframe(element, () => resize(element));
-      resize(element);
+      applyCssToIframe(element, () => fit(element));
+      fit(element);
+      refitOnContentChange(element);
     };
-    // Text re-wraps on a width change, and a height measured at the old width clips it.
+    // Text re-wraps on a width change, so a height measured at the old width clips it.
     observer?.disconnect();
     observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
-      if (width === lastWidth) return;
-      lastWidth = width;
-      resize(element);
+      if (entry.contentRect.width === lastWidth) return;
+      lastWidth = entry.contentRect.width;
+      fit(element);
     });
     observer.observe(element);
   },
@@ -165,30 +163,31 @@ watch(
 
 onBeforeUnmount(() => observer?.disconnect());
 
-watch(srcdoc, () => frame.value && requestAnimationFrame(() => resize(frame.value!)));
-
-function resize(element: HTMLIFrameElement) {
+function fit(element: HTMLIFrameElement) {
   const root = element.contentDocument?.documentElement;
   if (!root) return;
-  const fit = () => {
-    fitFrameToContent(element);
-    element.style.height = `${root.offsetHeight + 1}px`;
-  };
-  fit();
-  element.contentDocument
-    ?.querySelectorAll('input[type="checkbox"]')
-    .forEach((toggle) => toggle.addEventListener("change", fit));
-  // Images and video reserve no space until they arrive, so measure again as each does.
-  element.contentDocument?.querySelectorAll("img").forEach((image) => {
-    if (!image.complete) image.addEventListener("load", fit);
+  fitWidthToContent(element);
+  element.style.height = `${root.offsetHeight + 1}px`;
+}
+
+// Quote toggles and late media change the height after load.
+function refitOnContentChange(element: HTMLIFrameElement) {
+  const doc = element.contentDocument;
+  if (!doc) return;
+  const refit = () => fit(element);
+  doc
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach((toggle) => toggle.addEventListener("change", refit));
+  doc.querySelectorAll("img").forEach((image) => {
+    if (!image.complete) image.addEventListener("load", refit);
   });
-  element.contentDocument
-    ?.querySelectorAll("video")
-    .forEach((video) => video.addEventListener("loadedmetadata", fit));
+  doc
+    .querySelectorAll("video")
+    .forEach((video) => video.addEventListener("loadedmetadata", refit));
 }
 
 // A bubble is as wide as its sentence; an iframe fills whatever it is given instead.
-function fitFrameToContent(element: HTMLIFrameElement) {
+function fitWidthToContent(element: HTMLIFrameElement) {
   const content =
     element.contentDocument?.querySelector<HTMLElement>(".email-content");
   if (!content) return;
@@ -199,6 +198,9 @@ function fitFrameToContent(element: HTMLIFrameElement) {
 }
 
 watch(dataTheme, (theme) =>
-  frame.value?.contentDocument?.documentElement.setAttribute("data-theme", theme)
+  frame.value?.contentDocument?.documentElement.setAttribute(
+    "data-theme",
+    theme
+  )
 );
 </script>

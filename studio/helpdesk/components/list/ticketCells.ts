@@ -1,9 +1,10 @@
 // Ported from the desk's list cells, which Studio cannot import (they live under `@/`).
-import { Badge, Tooltip, dayjs } from 'frappe-ui'
-import { parseJsonArray } from '@app/utils'
-import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
-import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
 import { h } from 'vue'
+import { Badge, Tooltip, dayjs } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
+import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
+import { parseJsonArray } from '@app/utils'
 
 export function statusCell({ item }: any) {
   const status = statusMeta(item)
@@ -57,29 +58,23 @@ function badge(label: string, theme: string) {
   return h(Badge, { label, theme, variant: 'subtle' })
 }
 
-function countdownBadge(deadline: string) {
-  return h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
-    h(Badge, { label: shortDuration(deadline), theme: 'amber', variant: 'subtle' }),
-  )
+function slaBadge(metOn: string | undefined, due: string) {
+  if (metOn) {
+    return dayjs(metOn).isBefore(dayjs(due)) ? badge(__('Fulfilled'), 'gray') : badge(__('Failed'), 'red')
+  }
+  if (dayjs(due).isBefore(dayjs())) return badge(__('Failed'), 'red')
+  return h(Tooltip, { text: dayjs(due).format('LLLL') }, () => badge(shortDuration(due), 'amber'))
 }
 
 export function responseCell({ row, item }: any) {
   if (!item) return null
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) return badge('Failed', 'red')
-  if (!row.first_responded_on) return countdownBadge(item)
-  return dayjs(row.first_responded_on).isBefore(item)
-    ? badge('Fulfilled', 'gray')
-    : badge('Failed', 'red')
+  return slaBadge(row.first_responded_on, item)
 }
 
 export function resolutionCell({ row, item }: any) {
-  if (getStatus(row.status)?.category === 'Paused') return badge('Paused', 'blue')
-  if (row.resolution_date) {
-    const fulfilled = dayjs(row.resolution_date).isBefore(dayjs(item))
-    return badge(fulfilled ? 'Fulfilled' : 'Failed', fulfilled ? 'gray' : 'red')
-  }
-  if (!item) return null
-  return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdownBadge(item)
+  if (getStatus(row.status)?.category === 'Paused') return badge(__('Paused'), 'blue')
+  if (!item && !row.resolution_date) return null
+  return slaBadge(row.resolution_date, item)
 }
 
 export function datetimeCell({ item }: any) {
@@ -91,6 +86,14 @@ export function subjectCell({ row, item }: any, reader: string) {
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)
 }
 
+const STAR_PATH = `<path d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
+  c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
+  c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685
+  c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528
+  c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956
+  C22.602,0.567,25.338,0.567,26.285,2.486z"/>`
+
+// HD Ticket stores the rating as a fraction of five stars.
 export function ratingCell({ item }: any) {
   const rating = item || 0
   return h(
@@ -113,10 +116,3 @@ export function textCell({ item }: any) {
 export function idCell({ row }: any) {
   return h('span', { class: 'truncate text-base text-ink-gray-6' }, row.name)
 }
-
-const STAR_PATH = `<path d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
-  c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
-  c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685
-  c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528
-  c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956
-  C22.602,0.567,25.338,0.567,26.285,2.486z"/>`

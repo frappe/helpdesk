@@ -3,14 +3,16 @@ import { FileUploadHandler, call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
 
-// Private: an attachment on a support ticket is not public content.
 const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
+
+export const SEARCH_DEBOUNCE_MS = 300
 
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
   clock: 'h:mm A',
   day: 'D MMMM',
   dayWithYear: 'D MMMM YYYY',
+  short: 'D MMM YYYY',
   step: 'ddd D MMM, h:mm A',
   date: 'DD-MM-YYYY',
 }
@@ -51,12 +53,15 @@ export async function runAction(action: () => Promise<unknown>, options: ActionO
   }
 }
 
-export function updateTicket(name: string, values: Record<string, unknown>) {
-  return call('frappe.client.set_value', { doctype: 'HD Ticket', name, fieldname: values })
+export function setValues(doctype: string, name: string, values: Record<string, unknown>) {
+  return call('frappe.client.set_value', { doctype, name, fieldname: values })
 }
 
-// Keeps the files that made it; one file over the size limit must not sink the rest.
-// ponytail: @framework/ui useUploader is the upgrade if restrictions or progress are needed
+export function updateTicket(name: string, values: Record<string, unknown>) {
+  return setValues('HD Ticket', name, values)
+}
+
+// One file over the size limit must not sink the rest.
 export async function uploadFiles(files: File[], args: Record<string, unknown> = UPLOAD_ARGS) {
   const results = await Promise.allSettled(
     files.map((file) => new FileUploadHandler().upload(file, args)),
@@ -65,12 +70,17 @@ export async function uploadFiles(files: File[], args: Record<string, unknown> =
     .filter((result) => result.status === 'fulfilled')
     .map((result: any) => result.value)
   const failedCount = files.length - uploaded.length
-  if (failedCount) toast.error(countLabel(failedCount, '1 file could not be uploaded', '{0} files could not be uploaded'))
+  if (failedCount) {
+    toast.error(
+      countLabel(failedCount, __('1 file could not be uploaded'), __('{0} files could not be uploaded')),
+    )
+  }
   return uploaded
 }
 
+// Takes strings already passed through `__()`, so the extractor sees the literals.
 export function countLabel(count: number, singular: string, plural: string) {
-  return count === 1 ? __(singular) : __(plural, [count])
+  return count === 1 ? singular : plural.replace('{0}', String(count))
 }
 
 export function matchesQuery(query: string, ...fields: (string | undefined)[]) {

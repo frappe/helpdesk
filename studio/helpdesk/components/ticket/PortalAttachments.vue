@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-row flex-wrap gap-2 pt-4">
     <Button
-      v-for="(attachment, index) in attachments"
+      v-for="attachment in attachments"
       :key="attachment.file_url"
       variant="outline"
       class="max-w-full"
       :label="attachment.file_name"
       :icon-left="iconOf(attachment)"
-      @click="openAttachment(index)"
+      @click="openAttachment(attachment)"
     />
 
     <Dialog v-model:open="showDialog" size="4xl">
@@ -150,8 +150,7 @@ function isViewable(attachment: Attachment) {
   return VIEWABLE.includes(kindOf(attachment));
 }
 
-function openAttachment(index: number) {
-  const attachment = props.attachments[index];
+function openAttachment(attachment: Attachment) {
   if (!isViewable(attachment)) return openInTab(attachment);
   position.value = viewable.value.indexOf(attachment);
   showDialog.value = true;

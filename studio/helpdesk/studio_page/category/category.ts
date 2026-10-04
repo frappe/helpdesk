@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useSettingsModal } from '@app/stores/settings'
 import { useDrawer } from '@app/composables/useDrawer'
+import { countLabel } from '@app/utils'
 
 export default function setup(context) {
   const { category, articles, route } = context
@@ -10,14 +11,11 @@ export default function setup(context) {
   const categoryDescription = computed(
     () => category.data?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
-  const articleCount = computed(() => {
-    const count = articles.data?.length || 0
-    return count === 1 ? __('1 article') : __('{0} articles', [count])
-  })
+  const articleCount = computed(() => countLabel(articles.data?.length || 0, __('1 article'), __('{0} articles')))
 
   return {
     ...useSettingsModal(context),
-    drawer: useDrawer(context.route),
+    drawer: useDrawer(route),
     categoryName,
     categoryDescription,
     articleCount,

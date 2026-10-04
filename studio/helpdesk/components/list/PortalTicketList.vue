@@ -7,8 +7,11 @@
       <LoadingIndicator :scale="8" />
     </div>
 
-    <!-- A phone gets one stacked row per ticket: table columns leave the subject no room. -->
-    <div v-else-if="rows.length && compact" class="min-h-0 flex-1 overflow-y-auto">
+    <!-- One stacked row per ticket on a phone, where table columns leave the subject no room. -->
+    <div
+      v-else-if="rows.length && compact"
+      class="min-h-0 flex-1 overflow-y-auto"
+    >
       <button
         v-for="row in rows"
         :key="row.name"
@@ -60,7 +63,7 @@
           :key="row.name"
           :row="row"
           v-slot="{ column, item }"
-          class="truncate text-base row"
+          class="truncate text-base"
         >
           <ListRowItem :item="item" :column="column" :row="row">
             <component
@@ -107,7 +110,7 @@ import {
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
 import { loadTicketMeta } from "@app/stores/ticketMeta";
 
-// Here, not at module load: this file ships in the public page bundles too.
+// Not at module load: this file ships in the public page bundles too.
 loadTicketMeta();
 
 const props = withDefaults(
@@ -134,18 +137,15 @@ const props = withDefaults(
   }
 );
 
+const pageLength = defineModel<number>("pageLength", { default: 20 });
+
+const emit = defineEmits<{
+  columnResize: [payload: { key: string; width: string; save: boolean }];
+  loadMore: [];
+}>();
+
 function cell(key: string, row: any) {
   const column = props.columns.find((column) => column.key === key);
   return column?.cell?.({ row, item: row[key] }) ?? null;
 }
-
-const pageLength = defineModel<number>("pageLength", { default: 20 });
-
-const emit = defineEmits<{
-  (
-    e: "columnResize",
-    payload: { key: string; width: string; save: boolean }
-  ): void;
-  (e: "loadMore"): void;
-}>();
 </script>

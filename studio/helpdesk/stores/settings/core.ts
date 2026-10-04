@@ -13,15 +13,15 @@ import { errorMessage, uploadFiles } from '@app/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
-  const settingsTab = ref('profile') // 'profile' | 'members' | 'organization'
+  const settingsTab = ref<'profile' | 'members'>('profile')
   const settingsData = ref(null)
   const isSettingsBusy = ref(false)
 
   const settingsUser = computed(() => settingsData.value?.user || {})
   const organizations = computed(() => settingsData.value?.organizations || [])
 
+  // Kept apart from the flag, so the dialog's text survives its closing animation.
   const confirmAction = ref(null)
-  // Apart from the options, so what is on the dialog survives its own closing animation.
   const isConfirmOpen = ref(false)
 
   function askConfirm(options) {
@@ -79,7 +79,7 @@ export function createSettingsCore() {
     input.type = 'file'
     input.accept = 'image/*'
     input.onchange = async () => {
-      const file = input.files && input.files[0]
+      const file = input.files?.[0]
       if (!file) return
       const [uploaded] = await uploadFiles([file], { private: false, optimize: true })
       if (uploaded) await onUploaded(uploaded.file_url)
@@ -105,8 +105,7 @@ export function createSettingsCore() {
   }
 }
 
-// The dialog lives in the hash, a segment per screen, so the device back button steps through it.
-
+// One hash segment per screen, so the device back button steps through the dialog.
 const HASH_ROOT = 'settings'
 
 export function createSettingsDialog(core, organization) {
@@ -164,7 +163,7 @@ export function createSettingsDialog(core, organization) {
   function readHash(hash) {
     try {
       return decodeURIComponent(String(hash || ''))
-    } catch (error) {
+    } catch {
       return String(hash || '')
     }
   }

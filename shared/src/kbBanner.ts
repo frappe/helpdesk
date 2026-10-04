@@ -1,5 +1,4 @@
-// Fixed colours, not theme tokens: a banner is brand art and looks the same in dark mode.
-// Photos are hotlinked from Unsplash, as their guidelines ask.
+// Fixed colours, not theme tokens: a banner looks the same in dark mode. Unsplash asks for hotlinking.
 const unsplash = (id: string) =>
   `center / cover url("https://images.unsplash.com/photo-${id}?w=2400&h=400&fit=crop&auto=format&q=80")`;
 

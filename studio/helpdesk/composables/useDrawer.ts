@@ -1,8 +1,7 @@
 import { reactive, ref, watch } from 'vue'
 import { onKeyStroke, useScrollLock } from '@vueuse/core'
 
-// A sidebar that slides over the page on small screens; the blocks own the breakpoint.
-// Reactive, so bindings read `drawer.open` without `.value`.
+// Reactive, so blocks bind `drawer.open` without `.value`.
 export function useDrawer(route) {
   const open = ref(false)
   const scrollLock = useScrollLock(document.body)

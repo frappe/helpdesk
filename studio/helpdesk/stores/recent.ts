@@ -12,7 +12,7 @@ export type RecentArticle = {
   minutes?: number
 }
 
-// Per browser, as DocSearch does: it works for guests and needs no server.
+// Per browser, as DocSearch does, so it works for guests.
 const searches = useStorage<string[]>('helpdesk-kb-recent-searches', [])
 const articles = useStorage<RecentArticle[]>('helpdesk-kb-recent-articles', [])
 

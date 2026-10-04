@@ -8,56 +8,26 @@
         <BannerPicker
           :image="settings.doc?.banner_image || ''"
           :preset="settings.doc?.banner_preset || ''"
-          @change="saveBanner"
+          @change="save"
         />
-        <div class="flex flex-col gap-6 mt-8">
-          <div class="flex items-center justify-between">
+        <div class="mt-8 flex flex-col gap-6">
+          <div
+            v-for="toggle in toggles"
+            :key="toggle.fieldname"
+            class="flex items-center justify-between"
+          >
             <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
-                __("Public knowledge base")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __("Anyone can read articles without signing in.")
-              }}</span>
+              <span class="text-base-medium text-ink-gray-8">
+                {{ toggle.label }}
+              </span>
+              <span class="text-p-sm text-ink-gray-6">
+                {{ toggle.description }}
+              </span>
             </div>
             <Switch
-              :model-value="Boolean(settings.doc?.public_knowledge_base)"
+              :model-value="Boolean(settings.doc?.[toggle.fieldname])"
               @update:model-value="
-                (value) => update('public_knowledge_base', value)
-              "
-            />
-          </div>
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
-                __("Prefer knowledge base")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __("Guide users to articles before tickets.")
-              }}</span>
-            </div>
-            <Switch
-              :model-value="Boolean(settings.doc?.prefer_knowledge_base)"
-              @update:model-value="
-                (value) => update('prefer_knowledge_base', value)
-              "
-            />
-          </div>
-          <div class="flex items-center justify-between">
-            <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
-                __("Anonymous voting on articles")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __("Allow anonymous users to vote on articles.")
-              }}</span>
-            </div>
-            <Switch
-              :model-value="
-                Boolean(settings.doc?.allow_anonymous_article_voting)
-              "
-              @update:model-value="
-                (value) => update('allow_anonymous_article_voting', value)
+                (value) => save({ [toggle.fieldname]: value })
               "
             />
           </div>
@@ -72,7 +42,27 @@ import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
+import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
+
+// computed, so labels follow a translation load
+const toggles = computed(() => [
+  {
+    fieldname: "public_knowledge_base",
+    label: __("Public knowledge base"),
+    description: __("Anyone can read articles without signing in."),
+  },
+  {
+    fieldname: "prefer_knowledge_base",
+    label: __("Prefer knowledge base"),
+    description: __("Guide users to articles before tickets."),
+  },
+  {
+    fieldname: "allow_anonymous_article_voting",
+    label: __("Anonymous voting on articles"),
+    description: __("Allow anonymous users to vote on articles."),
+  },
+]);
 
 const configStore = useConfigStore();
 const settings = createDocumentResource({
@@ -80,16 +70,12 @@ const settings = createDocumentResource({
   name: "HD Settings",
 });
 
-function update(fieldname: string, value: string | boolean) {
-  saveBanner({ [fieldname]: value });
-}
-
-function saveBanner(values: Record<string, string | boolean>) {
-  settings.setValue.submit(values, { onSuccess: onSaved });
-}
-
-function onSaved() {
-  configStore.configResource.reload();
-  toast.success(__("Settings updated"));
+function save(values: Record<string, string | boolean>) {
+  settings.setValue.submit(values, {
+    onSuccess: () => {
+      configStore.configResource.reload();
+      toast.success(__("Settings updated"));
+    },
+  });
 }
 </script>

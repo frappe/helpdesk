@@ -15,30 +15,24 @@
         :class="isOpen && 'rotate-180'"
       />
     </button>
-    <div
-      class="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
-      :class="isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
-      :inert="!isOpen"
-    >
-      <div class="min-h-0 overflow-hidden">
-        <nav class="flex flex-col px-3 pb-3">
-          <button
-            v-for="item in items"
-            :key="item.id"
-            type="button"
-            class="border-l py-2 pl-3 text-left text-[14px] leading-normal text-ink-gray-6"
-            :class="
-              item.id === activeId
-                ? 'border-ink-gray-9 text-ink-gray-9'
-                : 'border-outline-gray-1'
-            "
-            @click="scrollTo(item.id)"
-          >
-            {{ item.text }}
-          </button>
-        </nav>
-      </div>
-    </div>
+    <PortalCollapse :open="isOpen">
+      <nav class="flex flex-col px-3 pb-3">
+        <button
+          v-for="item in items"
+          :key="item.id"
+          type="button"
+          class="border-l py-2 pl-3 text-left text-[14px] leading-normal text-ink-gray-6"
+          :class="
+            item.id === activeId
+              ? 'border-ink-gray-9 text-ink-gray-9'
+              : 'border-outline-gray-1'
+          "
+          @click="scrollTo(item.id)"
+        >
+          {{ item.text }}
+        </button>
+      </nav>
+    </PortalCollapse>
   </div>
   <nav v-else-if="items.length" class="flex flex-col">
     <button
@@ -59,20 +53,24 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useEventListener } from "@vueuse/core";
 import { __ } from "@helpdesk/shared/translation";
-
-// `collapsible` folds the list behind an "On this page" toggle, for screens without a side column.
-const props = withDefaults(
-  defineProps<{ items?: { id: string; text: string }[]; collapsible?: boolean }>(),
-  { items: () => [], collapsible: false }
-);
-
-const isOpen = ref(false);
+import PortalCollapse from "@app/components/common/PortalCollapse.vue";
 
 // A fraction, not a fixed offset, so every heading of a short article can become current.
 const ACTIVE_RATIO = 0.25;
 
+// `collapsible` folds the list behind a toggle, for screens without a side column.
+const props = withDefaults(
+  defineProps<{
+    items?: { id: string; text: string }[];
+    collapsible?: boolean;
+  }>(),
+  { items: () => [], collapsible: false }
+);
+
+const isOpen = ref(false);
 const activeId = ref<string | null>(null);
 
 function measure(scrolled?: EventTarget | null) {
@@ -91,32 +89,21 @@ function measure(scrolled?: EventTarget | null) {
   activeId.value = current;
 }
 
-// Scroll events do not bubble, but they do capture: this hears the nested body scroller.
-const onScroll = (event: Event) => measure(event.target);
-const onResize = () => measure();
-
 function scrollTo(id: string) {
   // Instant on purpose: Chrome drops smooth scrolls under an overflow-hidden ancestor.
   document.getElementById(id)?.scrollIntoView({ block: "start" });
 }
 
+// Captured, since scroll does not bubble: this hears the nested body scroller.
+useEventListener(document, "scroll", (event) => measure(event.target), {
+  capture: true,
+  passive: true,
+});
+useEventListener(window, "resize", () => measure());
 watch(
   () => props.items,
   () => measure(),
   { flush: "post" }
 );
-
-onMounted(() => {
-  document.addEventListener("scroll", onScroll, {
-    capture: true,
-    passive: true,
-  });
-  window.addEventListener("resize", onResize);
-  measure();
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener("scroll", onScroll, { capture: true });
-  window.removeEventListener("resize", onResize);
-});
+onMounted(() => measure());
 </script>

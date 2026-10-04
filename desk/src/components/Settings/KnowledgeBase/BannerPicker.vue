@@ -11,7 +11,7 @@
       }}</span>
     </div>
     <div
-      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 bg-surface-gray-1 bg-cover bg-center px-4"
+      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 bg-surface-gray-1 px-4"
       :style="{ background: previewBackground }"
     >
       <div
@@ -29,15 +29,9 @@
       >
         <template #default="{ progress, uploading, openFileSelector }">
           <BannerOption
-            :label="
-              uploading
-                ? __('Uploading {0}%', [progress])
-                : image
-                ? __('Custom image')
-                : __('PNG or JPG, 1440×240+')
-            "
+            :label="uploadLabel(uploading, progress)"
             :selected="Boolean(image)"
-            :background="image ? `center / cover url('${image}')` : ''"
+            :background="image ? imageBackground(image) : ''"
             class="border-dashed !bg-surface-base hover:!bg-surface-gray-1"
             @click="openFileSelector"
           >
@@ -56,7 +50,7 @@
       <BannerOption
         v-for="option in BANNER_PRESETS"
         :key="option.name"
-        :label="__(option.name)"
+        :label="presetLabel(option.name)"
         :selected="!image && preset === option.name"
         :background="option.background"
         @click="save('', option.name)"
@@ -80,10 +74,31 @@ const emit = defineEmits<{
   change: [value: { banner_image: string; banner_preset: string }];
 }>();
 
-const previewBackground = computed(() => {
-  if (props.image) return `center / cover url('${props.image}')`;
-  return findBannerPreset(props.preset)?.background || "";
-});
+const previewBackground = computed(() =>
+  props.image
+    ? imageBackground(props.image)
+    : findBannerPreset(props.preset)?.background || ""
+);
+
+function imageBackground(url: string) {
+  return `center / cover url('${url}')`;
+}
+
+function uploadLabel(uploading: boolean, progress: number) {
+  if (uploading) return __("Uploading {0}%", [progress]);
+  return props.image ? __("Custom image") : __("PNG or JPG, 1440×240+");
+}
+
+function presetLabel(name: string) {
+  return {
+    Dots: __("Dots"),
+    Slate: __("Slate"),
+    Sage: __("Sage"),
+    Paper: __("Paper"),
+    Haze: __("Haze"),
+    Sky: __("Sky"),
+  }[name];
+}
 
 function save(image: string, preset: string) {
   if (image === props.image && preset === props.preset) return;

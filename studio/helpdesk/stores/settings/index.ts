@@ -14,7 +14,7 @@ const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 
-// One instance for the whole app: a private copy per page would go stale on the others.
+// One instance for the whole app, or each page's copy would go stale on the others.
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
@@ -38,24 +38,19 @@ const themeOptions = computed(() => [
 
 const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
 
-const knowledgeBase = { icon: 'lucide-book-open', label: __('Knowledge base'), onClick: () => navigateTo(ROUTES.home) }
-
 const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? []
     : [
         { icon: 'lucide-inbox', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
-        knowledgeBase,
+        { icon: 'lucide-book-open', label: __('Knowledge base'), onClick: () => navigateTo(ROUTES.home) },
         { icon: 'lucide-user', label: __('My account'), onClick: () => dialog.openSettings('profile') },
-        ...(session.isAgent.value
-          ? [
-              {
-                icon: 'lucide-headphones',
-                label: __('Agent portal'),
-                onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
-              },
-            ]
-          : []),
+        {
+          icon: 'lucide-headphones',
+          label: __('Agent portal'),
+          condition: () => session.isAgent.value,
+          onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
+        },
         { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
       ],
 )
@@ -64,7 +59,7 @@ const store = {
   words,
   themeOptions,
   theme,
-  // The blocks bind `t`; the alias keeps them off the module's own name.
+  // Blocks bind `t`, not `__`.
   t: __,
   accountMenuOptions,
   isSettingsOpen: core.isSettingsOpen,

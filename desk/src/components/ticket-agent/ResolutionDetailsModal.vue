@@ -1,56 +1,52 @@
 <template>
   <Dialog v-model:open="show" :title="__('Resolution details')">
-    <template #default>
-      <div class="flex flex-1 flex-col gap-4">
-        <div class="flex flex-col gap-1.5">
-          <span class="text-base-medium text-ink-gray-8">{{
-            __("What did you do?")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __(
-              "The customer sees this on their ticket. Leave it empty to continue without a note."
-            )
-          }}</span>
-        </div>
-        <div
-          class="rounded border border-outline-gray-2"
-          @keydown.ctrl.enter.capture.stop="saveResolution"
-          @keydown.meta.enter.capture.stop="saveResolution"
-        >
-          <Editor
-            ref="editorRef"
-            v-model="resolutionDetails"
-            :extensions="extensions"
-            :placeholder="
-              __('Re-synced the auth server; codes are accepted again.')
-            "
-          >
-            <template #default>
-              <EditorContent
-                :class="[
-                  'prose-sm max-w-none min-h-[7rem] max-h-[40vh] overflow-y-auto px-3 py-2',
-                  getFontFamily(resolutionDetails),
-                ]"
-              />
-              <div
-                class="flex items-center overflow-x-auto border-t px-2 py-1.5"
-              >
-                <EditorFixedMenu :items="ticketToolbar" />
-              </div>
-            </template>
-          </Editor>
-        </div>
-        <div class="flex justify-end gap-2">
-          <Button :label="__('Cancel')" @click="show = false" />
-          <Button
-            variant="solid"
-            :loading="isSaving"
-            :label="__('Mark as {0}', [status])"
-            @click="saveResolution"
-          />
-        </div>
+    <div class="flex flex-1 flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <span class="text-base-medium text-ink-gray-8">{{
+          __("What did you do?")
+        }}</span>
+        <span class="text-p-sm text-ink-gray-6">{{
+          __(
+            "The customer sees this on their ticket. Leave it empty to continue without a note."
+          )
+        }}</span>
       </div>
-    </template>
+      <div
+        class="rounded border border-outline-gray-2"
+        @keydown.ctrl.enter.capture.stop="saveResolution"
+        @keydown.meta.enter.capture.stop="saveResolution"
+      >
+        <Editor
+          ref="editorRef"
+          v-model="resolutionDetails"
+          :extensions="extensions"
+          :placeholder="
+            __('Re-synced the auth server; codes are accepted again.')
+          "
+        >
+          <template #default>
+            <EditorContent
+              :class="[
+                'prose-sm max-w-none min-h-[7rem] max-h-[40vh] overflow-y-auto px-3 py-2',
+                getFontFamily(resolutionDetails),
+              ]"
+            />
+            <div class="flex items-center overflow-x-auto border-t px-2 py-1.5">
+              <EditorFixedMenu :items="ticketToolbar" />
+            </div>
+          </template>
+        </Editor>
+      </div>
+      <div class="flex justify-end gap-2">
+        <Button :label="__('Cancel')" @click="show = false" />
+        <Button
+          variant="solid"
+          :loading="ticket.setValue.loading"
+          :label="__('Mark as {0}', [status])"
+          @click="saveResolution"
+        />
+      </div>
+    </div>
   </Dialog>
 </template>
 
@@ -74,10 +70,9 @@ const show = defineModel<boolean>({ default: false });
 const emit = defineEmits<{ saved: [] }>();
 
 const resolutionDetails = ref("");
-const isSaving = ref(false);
 const editorRef = ref<any>(null);
 
-// Minus mentions: this note is written for the customer.
+// no mentions: the customer reads this note
 const extensions = buildEditorExtensions();
 
 watch(show, async (open) => {
@@ -87,10 +82,9 @@ watch(show, async (open) => {
   editorRef.value?.editor?.commands.focus();
 });
 
-// Asked of the editor: untouched markup is still `<p></p>`, and a lone screenshot is not empty.
+// the editor's isEmpty, not the markup: `<p></p>` reads as content, a lone image does not
 function saveResolution() {
-  if (isSaving.value) return;
-  isSaving.value = true;
+  if (ticket.value.setValue.loading) return;
   ticket.value.setValue.submit(
     {
       status: props.status,
@@ -100,12 +94,8 @@ function saveResolution() {
     },
     {
       onSuccess() {
-        isSaving.value = false;
         show.value = false;
         emit("saved");
-      },
-      onError() {
-        isSaving.value = false;
       },
     }
   );

@@ -361,7 +361,6 @@ export interface Article {
   creation: string;
   content: string;
   modified: string;
-  feedback: 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 }
 
 export interface Author {

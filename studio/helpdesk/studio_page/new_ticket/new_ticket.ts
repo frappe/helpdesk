@@ -1,57 +1,54 @@
 import { computed, reactive, ref, watch } from 'vue'
-import { createListResource, createResource, debounce, toast, useFileUpload } from 'frappe-ui'
+import { createListResource, toast, useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
 import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
-import { useSession } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { runAction } from '@app/utils'
+import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
-const SUGGESTION_DEBOUNCE_MS = 400
-const MIN_SUBJECT_LENGTH = 3
 const SUGGESTION_LIMIT = 3
-
-// The upload queue keeps only `file_url`; the server links attachments by File name.
-const uploadedByUrl = new Map()
-
-function uploadPrivately(file, _args, { signal, onProgress }) {
-  return useFileUpload()
-    .upload(file, {
-      private: true,
-      folder: UPLOAD_FOLDER,
-      signal,
-      onProgress: ({ loaded, total }) => onProgress(loaded, total),
-    })
-    .then((doc) => {
-      uploadedByUrl.set(doc.file_url, doc)
-      return doc
-    })
-}
 
 export default function setup(context) {
   const { subject, description, template, newTicket, route } = context
-  const session = useSettingsModal(context)
+  const settings = useSettingsModal(context)
 
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
 
   const model = reactive({})
-
   const attachments = ref([])
+
+  // The upload queue keeps only `file_url`; the server links attachments by File name.
+  const uploadedByUrl = new Map()
+
+  function uploadPrivately(file, _args, { signal, onProgress }) {
+    return useFileUpload()
+      .upload(file, {
+        private: true,
+        folder: UPLOAD_FOLDER,
+        signal,
+        onProgress: ({ loaded, total }) => onProgress(loaded, total),
+      })
+      .then((doc) => {
+        uploadedByUrl.set(doc.file_url, doc)
+        return doc
+      })
+  }
 
   const priorities = createListResource({
     doctype: 'HD Ticket Priority',
     fields: ['name', 'description'],
   })
 
-  // Permission-gated, so fetched once the session is known: a guest would only 403.
+  // Permission-gated: a guest would only get a 403.
   watch(
-    session.isGuest,
+    settings.isGuest,
     (isGuest) => {
       if (isGuest) return
       template.fetch()
@@ -71,26 +68,17 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
-  const suggestions = createResource({
-    url: 'helpdesk.api.knowledge_base.search_articles',
-    method: 'GET',
-    makeParams: () => ({ query: subject.value, limit: SUGGESTION_LIMIT }),
-  })
-  const suggest = debounce(() => {
-    if (subject.value.trim().length >= MIN_SUBJECT_LENGTH) suggestions.fetch()
-    else suggestions.reset()
-  }, SUGGESTION_DEBOUNCE_MS)
-  watch(subject, suggest)
+  const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT })
 
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
     description.value = html
   }
 
-  const dateFormat = computed(() => session.config.value?.date_format?.toUpperCase())
-  const timeFormat = computed(() => session.config.value?.time_format)
+  const dateFormat = computed(() => settings.config.value?.date_format?.toUpperCase())
+  const timeFormat = computed(() => settings.config.value?.time_format)
 
-  // Only a priority carries a description worth showing, as on the desk's form.
+  // As on the desk's form, only priority shows its description.
   const priorityHint = computed(() => {
     const priority = (priorities.data || []).find((row) => row.name === model.priority)
     return priority?.description?.trim() || undefined
@@ -104,14 +92,13 @@ export default function setup(context) {
     if (row.fieldtype === 'Date') return { props: { format: dateFormat.value } }
   }
 
-  // FormLayout resolves the depends_on rules itself against the values typed so far.
   const fields = computed(() =>
     (template.data?.fields || [])
       .filter((row) => !row.hide_from_customer)
       .map((row) => ({
         fieldname: row.fieldname,
         fieldtype: row.fieldtype,
-        label: row.label,
+        label: __(row.label),
         options: row.options,
         reqd: Boolean(row.required),
         placeholder: row.placeholder || undefined,
@@ -124,14 +111,13 @@ export default function setup(context) {
   )
 
   // Fields alternate between two columns, which would stack out of order on a phone.
-  const { isPhone } = useSession()
   const layout = computed(() => [
     {
       sections: [
         {
           hideLabel: true,
           hideBorder: true,
-          columns: isPhone.value
+          columns: settings.isPhone.value
             ? [{ fields: fields.value }]
             : [
                 { fields: fields.value.filter((_, index) => index % 2 === 0) },
@@ -145,10 +131,13 @@ export default function setup(context) {
   const canSubmit = computed(() => {
     if (!subject.value || isContentEmpty(description.value)) return false
     return fields.value
-      .filter((field) => evaluateDependsOn(field.dependsOn, model))
-      .filter((field) => field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model)))
+      .filter((field) => evaluateDependsOn(field.dependsOn, model) && isRequired(field))
       .every((field) => model[field.fieldname])
   })
+
+  function isRequired(field) {
+    return field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model))
+  }
 
   function createTicket() {
     if (!canSubmit.value) return
@@ -175,7 +164,7 @@ export default function setup(context) {
   }
 
   return {
-    ...session,
+    ...settings,
     about,
     suggestions,
     fields,

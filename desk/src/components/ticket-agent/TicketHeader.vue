@@ -159,8 +159,7 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      // Keyed on the category so every resolving status asks for the note the portal shows;
-      // the dialog writes the status itself.
+      // every resolving status asks for the note the portal shows; the dialog saves the status
       if (o.category === "Resolved") {
         pendingStatus.value = o.label_agent;
         showResolutionDialog.value = true;

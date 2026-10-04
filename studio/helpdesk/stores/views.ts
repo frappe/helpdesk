@@ -6,18 +6,16 @@ import { parseOrderBy } from '@framework/ui/SortBy'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
-import { parseJson } from '@app/utils'
+import { parseJson, runAction, setValues } from '@app/utils'
 
-
-// ponytail: Studio dropped the lucide sprite, but view icons are any lucide name stored per
-// view, which build-time classes cannot cover. Move off it before frappe-ui removes it.
+// ponytail: view icons are any stored lucide name, so they need the sprite Studio dropped
 if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 const DOCTYPE = 'HD Ticket'
 
-const DEFAULT_VIEW = { name: '', label: 'List', icon: 'text-align-justify' }
+const DEFAULT_VIEW = { name: '', icon: 'text-align-justify' }
 
-// Storage, not the URL: every way back into this list pushes a bare `/customer-tickets`.
+// Storage, not the URL: every way back into this list pushes a bare route.
 const MEMORY_PREFIX = 'kb:list'
 
 const store = createViewsStore()
@@ -42,16 +40,15 @@ function createViewsStore() {
     pageLength: 1000,
   })
 
-  // `if_owner` covers HD Customer but not the Agent roles, who would see everyone's views.
   const views = computed(() => list.data || [])
 
-  let listView = null // the page's useListView
+  let listView = null
   let hasAttached = false
-  let defaultSnapshot = null // the page's own layout, restored by the unnamed "List" view
-  let isRestoring = false // guards the remember-watch while a restore writes the refs
+  let defaultSnapshot = null
+  let isRestoring = false
 
   const isViewModalOpen = ref(false)
-  const viewModalMode = ref('create') // 'create' | 'rename'
+  const viewModalMode = ref<'create' | 'rename'>('create')
   const viewModalLabel = ref('')
   const viewModalIcon = ref('')
   const viewModalName = ref('')
@@ -65,7 +62,7 @@ function createViewsStore() {
   const currentView = computed(() =>
     activeView.value
       ? { ...activeView.value, icon: activeView.value.icon || DEFAULT_VIEW.icon }
-      : DEFAULT_VIEW,
+      : { ...DEFAULT_VIEW, label: __('List') },
   )
 
   const rememberedLayout = useStorage(
@@ -75,23 +72,21 @@ function createViewsStore() {
     { serializer: StorageSerializers.object, writeDefaults: false },
   )
 
+  // The store outlives the page, so each mount hands over its fresh `useListView`.
   function attachListView(view) {
-    // This store outlives the page, so never hold the first mount's `useListView`.
     listView = view
-    // On every mount: the watch below fires on neither a same-view return nor a remount.
     applyActiveView()
     if (hasAttached) return
     hasAttached = true
-    // The page's default columns, or leaving a saved view would restore no columns at all.
+    // Restored by the unnamed "List" view, which has no saved columns of its own.
     defaultSnapshot = snapshotOf(view)
-    // The fetch waits for the session: an empty owner would return nothing, silently.
+    // `if_owner` does not cover agents, so filter by owner once the session names them.
     useSession()
       .loadSession()
       .then(() => {
         list.update({ filters: { ...list.filters, owner: sessionUser() } })
         return list.reload()
       })
-    // On route change, not on click, so a shared URL lands on the same view.
     watch(() => [activeName.value, list.data], () => applyActiveView())
     watch(
       () => [listView.filters.conditions.value, listView.sort.by.value],
@@ -121,7 +116,7 @@ function createViewsStore() {
         columns: parseJson(row.columns, []),
       })
     }
-    // After the view, never instead of it. An empty sort means the reader never chose one.
+    // The remembered layout refines the view; an empty sort was never chosen.
     const remembered = rememberedLayout.value
     if (remembered) {
       listView.restore({
@@ -129,7 +124,7 @@ function createViewsStore() {
         ...(remembered.sort?.length ? { sort: remembered.sort } : {}),
       })
     }
-    // Next tick, so the restore's own writes do not re-record what was just read.
+    // Next tick, so the restore's own writes are not remembered.
     nextTick(() => (isRestoring = false))
   }
 
@@ -160,29 +155,30 @@ function createViewsStore() {
   }
 
   async function renameView(name, label, icon) {
-    await call('frappe.client.set_value', {
-      doctype: 'HD View',
-      name,
-      fieldname: { label, icon: icon || DEFAULT_VIEW.icon },
-    })
+    await setValues('HD View', name, { label, icon: icon || DEFAULT_VIEW.icon })
     await list.reload()
   }
 
-  async function saveCurrentView() {
+  function saveCurrentView() {
     if (!activeView.value) return
-    await call('frappe.client.set_value', {
-      doctype: 'HD View',
-      name: activeView.value.name,
-      fieldname: currentPayload(),
-    })
-    await list.reload()
-    toast.success(__('View updated'))
+    return runAction(
+      async () => {
+        await setValues('HD View', activeView.value.name, currentPayload())
+        await list.reload()
+      },
+      { success: __('View updated'), fallback: __('Could not update the view') },
+    )
   }
 
-  async function deleteView(name) {
-    await call('frappe.client.delete', { doctype: 'HD View', name })
-    await list.reload()
-    if (activeName.value === name) openView('')
+  function deleteView(name) {
+    return runAction(
+      async () => {
+        await call('frappe.client.delete', { doctype: 'HD View', name })
+        await list.reload()
+        if (activeName.value === name) openView('')
+      },
+      { fallback: __('Could not delete the view') },
+    )
   }
 
   function openView(name) {
@@ -202,7 +198,7 @@ function createViewsStore() {
       group: 'Views',
       hideLabel: true,
       options: [
-        { label: DEFAULT_VIEW.label, icon: DEFAULT_VIEW.icon, onClick: () => openView('') },
+        { label: __('List'), icon: DEFAULT_VIEW.icon, onClick: () => openView('') },
         ...views.value.map((view) => ({
           name: view.name,
           label: view.label || __('Untitled view'),
@@ -232,11 +228,15 @@ function createViewsStore() {
   function submitViewModal() {
     const label = viewModalLabel.value.trim()
     if (!label) return
-    const done =
-      viewModalMode.value === 'rename'
-        ? renameView(viewModalName.value, label, viewModalIcon.value)
-        : createView(label, viewModalIcon.value)
-    return done.then(() => (isViewModalOpen.value = false))
+    const isRename = viewModalMode.value === 'rename'
+    return runAction(
+      async () => {
+        if (isRename) await renameView(viewModalName.value, label, viewModalIcon.value)
+        else await createView(label, viewModalIcon.value)
+        isViewModalOpen.value = false
+      },
+      { fallback: isRename ? __('Could not rename the view') : __('Could not create the view') },
+    )
   }
 
   const bindings = {
@@ -253,7 +253,7 @@ function createViewsStore() {
   return { attachListView, bindings }
 }
 
-// Copied, so a restore cannot alias the stored default into live refs.
+// Cloned, so a restore cannot alias the stored default into live refs.
 function snapshotOf(listView) {
   return structuredClone({
     filters: toRaw(listView.filters.conditions.value),

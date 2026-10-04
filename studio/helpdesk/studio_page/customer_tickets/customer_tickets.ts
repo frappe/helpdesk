@@ -11,25 +11,26 @@ import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
 
-// No client-side scoping: HD Ticket's permission_query already limits what a requester sees.
-
+// HD Ticket's permission_query already scopes the rows to what the requester may see.
 const DOCTYPE = 'HD Ticket'
 const PAGE_LENGTH_OPTIONS = [20, 50, 100]
 
-// Kept in English and translated on the way out, so a heading survives a language change.
-const COLUMN_LABELS = {
-  name: 'ID',
-  subject: 'Subject',
-  status: 'Status',
-  response_by: 'First Response',
-  resolution_by: 'Resolution',
-  customer: 'Customer',
-  priority: 'Priority',
-  ticket_type: 'Type',
-  agent_group: 'Team',
-  contact: 'Contact',
-  feedback_rating: 'Rating',
-  creation: 'Created',
+// A function, so headings follow a language change; literal `__()` calls, so they extract.
+function columnLabels() {
+  return {
+    name: __('ID'),
+    subject: __('Subject'),
+    status: __('Status'),
+    response_by: __('First Response'),
+    resolution_by: __('Resolution'),
+    customer: __('Customer'),
+    priority: __('Priority'),
+    ticket_type: __('Type'),
+    agent_group: __('Team'),
+    contact: __('Contact'),
+    feedback_rating: __('Rating'),
+    creation: __('Created'),
+  }
 }
 
 const DEFAULT_COLUMNS = [
@@ -45,10 +46,9 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'contact', width: '8rem' },
   { fieldname: 'feedback_rating', width: '10rem' },
   { fieldname: 'creation', width: '8rem' },
-].map((column) => ({ ...column, label: __(COLUMN_LABELS[column.fieldname]) }))
+]
 
-// Fetch-only: the SLA badges and the subject's unread weight need these, no column shows them.
-// The phone rows read their own fields, whichever columns the view has picked.
+// Always fetched: the phone rows, SLA badges and unread subjects read them whatever the columns.
 const PHONE_FIELDS = ['subject', 'creation', 'status', 'name']
 const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen', ...PHONE_FIELDS]
 
@@ -65,8 +65,7 @@ const CELLS = {
 }
 const CELLS_BY_TYPE = { Datetime: datetimeCell, Date: datetimeCell, Rating: ratingCell }
 
-// `useListData` refetches on a new identity, which meta, translations and a restored view
-// all produce without changing what is asked for.
+// `useListData` refetches on every new identity, even when the request is unchanged.
 function settled(source) {
   let last
   return computed(() => {
@@ -75,23 +74,20 @@ function settled(source) {
   })
 }
 
+function withLabel(column) {
+  const label = columnLabels()[column.fieldname || column.key]
+  return label ? { ...column, label } : column
+}
+
 export default function setup(context) {
   const settings = useSettingsModal(context)
   settings.loadSettings()
 
+  // Seeded before `useListData`, which fetches on creation.
   const view = useListView(DOCTYPE)
-  // Before the data layer: `useListData` fetches on creation, so seeding after costs a request.
-  view.columns.shown.value = DEFAULT_COLUMNS
-  watch(translations, () => {
-    view.columns.shown.value = view.columns.shown.value.map((column) => {
-      const english = COLUMN_LABELS[column.fieldname || column.key]
-      return english ? { ...column, label: __(english) } : column
-    })
-  })
-  // Unset, the server orders by `modified`, which never settles for a requester.
+  view.columns.shown.value = DEFAULT_COLUMNS.map(withLabel)
+  watch(translations, () => (view.columns.shown.value = view.columns.shown.value.map(withLabel)))
   view.sort.by.value = [{ fieldname: 'creation', direction: 'desc' }]
-
-  // Before the data layer too: the remembered filters belong in the first fetch.
   const views = useViews(view)
 
   const fetchView = {

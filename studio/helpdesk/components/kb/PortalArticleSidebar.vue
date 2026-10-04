@@ -52,34 +52,29 @@
           />
         </button>
 
-        <!-- Rows 0fr -> 1fr animates to the list's own height; inert keeps a closed list out of the tab order. -->
-        <div
+        <PortalCollapse
           :id="`kb-sidebar-${category.name}`"
-          class="grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none"
-          :class="category.isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
-          :inert="!category.isOpen"
+          :open="category.isOpen"
         >
-          <div class="min-h-0 overflow-hidden">
-            <div
-              class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2"
+          <div
+            class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2"
+          >
+            <RouterLink
+              v-for="article in category.matches"
+              :key="article.name"
+              :to="ROUTES.article(article.name)"
+              :aria-current="article.name === activeName ? 'page' : undefined"
+              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-tighter no-underline transition"
+              :class="
+                article.name === activeName
+                  ? 'bg-surface-elevation-3 text-ink-gray-8 shadow-sm'
+                  : 'text-ink-gray-6 hover:bg-surface-gray-2'
+              "
             >
-              <RouterLink
-                v-for="article in category.matches"
-                :key="article.name"
-                :to="ROUTES.article(article.name)"
-                :aria-current="article.name === activeName ? 'page' : undefined"
-                class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-tighter no-underline transition"
-                :class="
-                  article.name === activeName
-                    ? 'bg-surface-elevation-3 text-ink-gray-8 shadow-sm'
-                    : 'text-ink-gray-6 hover:bg-surface-gray-2'
-                "
-              >
-                {{ article.title }}
-              </RouterLink>
-            </div>
+              {{ article.title }}
+            </RouterLink>
           </div>
-        </div>
+        </PortalCollapse>
       </div>
 
       <p
@@ -102,6 +97,7 @@ import {
   useKeyboardShortcut,
 } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
+import PortalCollapse from "@app/components/common/PortalCollapse.vue";
 import { ROUTES } from "@app/routes";
 import { matchesQuery } from "@app/utils";
 

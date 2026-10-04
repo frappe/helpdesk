@@ -9,19 +9,23 @@
         side="bottom"
         :text="uploadLabel"
       >
-        <div
+        <button
+          type="button"
           class="absolute inset-0 cursor-pointer"
           :class="shape === 'square' ? 'rounded-5' : 'rounded-full'"
-          @click="$emit('upload')"
+          :aria-label="uploadLabel"
+          @click="emit('upload')"
         />
       </Tooltip>
-      <div
+      <button
         v-if="image && editable"
+        type="button"
+        :aria-label="__('Remove photo')"
         class="absolute -right-1 -top-1 flex size-4 cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 outline outline-black/5 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 before:absolute before:-inset-2 before:content-[''] [@media(hover:none)]:opacity-100"
-        @click.stop="$emit('remove')"
+        @click.stop="emit('remove')"
       >
         <Icon icon="lucide-x" class="size-3.5 text-ink-gray-4" />
-      </div>
+      </button>
     </div>
 
     <div class="flex min-w-0 flex-col gap-1">
@@ -34,6 +38,7 @@
             v-if="editable"
             class="relative !h-5 shrink-0 !px-1 before:absolute before:-inset-1.5 before:content-['']"
             variant="ghost"
+            :aria-label="__('Edit name')"
             @click="startEditing"
           >
             <LucideSquarePen class="size-3.5" />

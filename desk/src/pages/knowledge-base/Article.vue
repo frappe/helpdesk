@@ -174,8 +174,9 @@
                 <span
                   v-if="isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
-                  >{{ views }} views</span
                 >
+                  {{ __("{0} views", [views]) }}
+                </span>
               </div>
             </div>
           </div>
@@ -384,9 +385,9 @@ function publishArticle(visibility: string) {
   );
 }
 
-function save(fieldname: Record<string, string>, message: string) {
+function save(values: Record<string, string>, message: string) {
   updateArticle.submit(
-    { doctype: "HD Article", name: article.data.name, fieldname },
+    { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
       onSuccess: () => {
         toast.success(message);

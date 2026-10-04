@@ -104,19 +104,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { Combobox, createResource, debounce } from "frappe-ui";
+import { Combobox } from "frappe-ui";
 import LucideClock from "~icons/lucide/clock";
 import LucideSearch from "~icons/lucide/search";
 import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleThumbnail from "@app/components/kb/PortalArticleThumbnail.vue";
 import { ROUTES } from "@app/routes";
+import { useArticleSearch } from "@app/composables/useArticleSearch";
 import { useRecent, type RecentArticle } from "@app/stores/recent";
 
 const MAX_RESULTS = 5;
 const SEARCH_ALL = "search-all";
 const RECENT_SEARCHES = "recent-searches";
-const SEARCH_DEBOUNCE_MS = 300;
 
 withDefaults(defineProps<{ placeholder?: string }>(), {
   placeholder: "",
@@ -137,22 +137,13 @@ const hasHistory = computed(
   () => recentSearches.value.length + recentArticles.value.length > 0
 );
 
-const results = createResource({
-  url: "helpdesk.api.knowledge_base.search_articles",
-  method: "GET",
-  makeParams: () => ({ query: query.value, limit: MAX_RESULTS }),
-});
-
-const search = debounce(() => results.fetch(), SEARCH_DEBOUNCE_MS);
+const results = useArticleSearch(query, { limit: MAX_RESULTS, minLength: 1 });
 
 // Ours, not the slot's `query`: that stays empty when a recent search filled the box.
 const searchText = computed(() => query.value.trim());
 const isTyping = computed(() => searchText.value.length > 0);
 
-watch(query, () => {
-  isOpen.value = isTyping.value || hasHistory.value;
-  if (isTyping.value) search();
-});
+watch(query, () => (isOpen.value = isTyping.value || hasHistory.value));
 
 // Emptied from inside the open list, it closes rather than show nothing.
 watch(hasHistory, (value) => {
@@ -231,7 +222,9 @@ const options = computed(() =>
   [data-slot="content-body"]
   > div {
   /* Whatever room the popper has, so results under a phone's keyboard still scroll into reach. */
-  max-height: calc(var(--reka-combobox-content-available-height, 100dvh) - 16px);
+  max-height: calc(
+    var(--reka-combobox-content-available-height, 100dvh) - 16px
+  );
   overflow-y: auto;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]

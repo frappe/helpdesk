@@ -8,12 +8,7 @@ import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
-
-import {
-  CUSTOMER_PORTAL_ROOT,
-  isContentEmpty,
-  isEmoji,
-} from "@helpdesk/shared/utils";
+import { isEmoji } from "@helpdesk/shared/utils";
 
 export {
   CUSTOMER_PORTAL_ROOT,

@@ -11,7 +11,7 @@
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
       </TextInput>
-      <Select v-model="role" :options="ROLE_FILTERS" size="sm" />
+      <Select v-model="role" :options="roleFilters" size="sm" />
     </div>
 
     <div>
@@ -68,7 +68,7 @@
           class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
         >
           <component :is="ROLES[member.role].icon" class="size-4" />
-          {{ member.role }}
+          {{ roleLabel(member.role) }}
         </span>
 
         <div class="flex justify-end">
@@ -105,7 +105,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
-import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width.
@@ -126,14 +126,14 @@ type Member = {
 
 // Owner is left out: there is one per organization, already first in the list.
 const FILTERABLE_ROLES: RoleLabel[] = ["Manager", "Member"];
-const ROLE_FILTERS = [
-  { label: "All", value: "All", icon: LucideUsers },
-  ...FILTERABLE_ROLES.map((label) => ({
-    label,
-    value: label,
-    icon: ROLES[label].icon,
+const roleFilters = computed(() => [
+  { label: __("All"), value: "All", icon: LucideUsers },
+  ...FILTERABLE_ROLES.map((role) => ({
+    label: roleLabel(role),
+    value: role,
+    icon: ROLES[role].icon,
   })),
-];
+]);
 
 const props = withDefaults(
   defineProps<{

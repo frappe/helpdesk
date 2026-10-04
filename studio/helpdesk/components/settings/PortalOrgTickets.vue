@@ -72,9 +72,9 @@ import { timeAgo } from "@helpdesk/shared/utils";
 import PortalStatusPill from "@app/components/ticket/PortalStatusPill.vue";
 import { ROUTES } from "@app/routes";
 import { statusMeta } from "@app/stores/ticketMeta";
+import { SEARCH_DEBOUNCE_MS } from "@app/utils";
 
 const RECENT_TICKET_LIMIT = 10;
-const SEARCH_DEBOUNCE_MS = 300;
 
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
@@ -114,8 +114,6 @@ async function load() {
   }
 }
 
-const searchLater = debounce(load, SEARCH_DEBOUNCE_MS);
-
 watch(
   () => props.customer,
   () => {
@@ -124,5 +122,5 @@ watch(
   },
   { immediate: true }
 );
-watch(search, () => searchLater());
+watch(search, debounce(load, SEARCH_DEBOUNCE_MS));
 </script>

@@ -38,7 +38,7 @@
             icon="lucide-check"
             class="size-4 text-ink-gray-7"
           />
-          <!-- Shown outright on touch, where no row is ever hovered. -->
+          <!-- Always shown on touch, where no row is hovered. -->
           <Dropdown side="right" align="start" :options="viewActions(item)">
             <template #default="{ open }">
               <Button
@@ -62,11 +62,10 @@ import { Button, Dropdown, Icon } from "frappe-ui";
 import { Icon as SpriteIcon } from "frappe-ui/experimental";
 import { isEmoji } from "@helpdesk/shared/utils";
 
-const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
-// lucide names this glyph `text-align-justify`; `align-justify` is not in the sprite.
 const DEFAULT_ICON = "text-align-justify";
+const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 
-// The sprite, not the mask class: a stored name may be one the build never saw.
+// The sprite, not a mask class: a stored name may be one the build never saw.
 function ViewIcon(props: { icon?: string }) {
   const icon = props.icon || DEFAULT_ICON;
   if (isEmoji(icon))
@@ -81,18 +80,11 @@ function ViewIcon(props: { icon?: string }) {
   });
 }
 
-withDefaults(
-  defineProps<{
-    label?: string;
-    currentView?: { name?: string; label: string; icon: string };
-    options?: any[];
-    viewActions?: (item: any) => any[];
-  }>(),
-  {
-    label: "Tickets",
-    currentView: () => ({ label: "List", icon: DEFAULT_ICON }),
-    options: () => [],
-    viewActions: () => () => [],
-  }
-);
+// The header renders this only when a page hands it a view, so every prop arrives set.
+defineProps<{
+  label: string;
+  currentView: { name?: string; label: string; icon: string };
+  options: any[];
+  viewActions: (item: any) => any[];
+}>();
 </script>

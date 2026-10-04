@@ -45,11 +45,10 @@ const props = withDefaults(
   { isPublic: false }
 );
 
-// `legacy` falls back to execCommand where the Clipboard API is missing (plain http).
+// `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
 const { copy, copied } = useClipboard({ legacy: true });
 
-// Fetched up front, not on click or hover: Safari drops a clipboard write that waits on the
-// network, and a tap fires `pointerenter` only just before the click.
+// Prefetched: Safari drops a clipboard write that waits on the network.
 const markdown = ref("");
 let request: Promise<void> | null = null;
 const markdownUrl = computed(

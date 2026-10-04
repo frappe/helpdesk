@@ -4,7 +4,6 @@ import { call } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
 
 // A published Studio app has no boot payload; `get_config` is the one call guests may make.
-
 const store = createSessionStore()
 
 export function useSession() {
@@ -72,7 +71,6 @@ function createSessionStore() {
     isPhone,
     loginUrl,
     loadSession,
-    signIn,
     signOut,
   }
 }
