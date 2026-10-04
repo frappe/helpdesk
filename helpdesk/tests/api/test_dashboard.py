@@ -39,6 +39,23 @@ class TestSlaFulfilledCard(IntegrationTestCase):
         card = self.get_sla_card()
         self.assertEqual(card["value"], 100)
 
+    def test_trend_plots_sla_fulfilled_as_percentage(self):
+        with self.freeze_time("2031-03-12 10:00:00"):
+            for subject, agreement_status in (
+                ("Answered in time", "Fulfilled"),
+                ("Answered late", "Failed"),
+            ):
+                ticket = self.make_assigned_ticket(subject, status="Closed")
+                frappe.db.set_value(
+                    "HD Ticket", ticket.name, "agreement_status", agreement_status
+                )
+
+        filters = frappe._dict(
+            from_date="2031-03-12", to_date="2031-03-12", agent=AGENT
+        )
+        [day] = HelpdeskDashboard(filters).get_ticket_trend_data()["data"]
+        self.assertEqual(day["SLA Fulfilled"], 50)
+
     def make_assigned_ticket(self, subject: str, status: str | None = None):
         """A ticket that has been responded to, scoped to this test's agent."""
         ticket = make_ticket(subject=subject)
