@@ -131,6 +131,7 @@ export function useTicketThread(ticket) {
 
   return {
     rating,
+    clockTime,
     lastAgentReply,
     firstAgentReply,
     activities,

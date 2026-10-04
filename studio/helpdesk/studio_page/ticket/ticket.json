@@ -307,7 +307,202 @@
                  ],
                  "componentId": "container-ticket-row",
                  "componentName": "container",
-                 "originalElement": "div"
+                 "originalElement": "div",
+                 "visibilityCondition": "{{ !dataItem.kind }}"
+                },
+                {
+                 "componentId": "container-ticket-chat-closed",
+                 "componentName": "container",
+                 "originalElement": "div",
+                 "classes": [
+                  "flex",
+                  "w-full",
+                  "items-center",
+                  "gap-3",
+                  "pb-6"
+                 ],
+                 "children": [
+                  {
+                   "componentId": "container-ticket-chat-closed-rule-start",
+                   "componentName": "container",
+                   "originalElement": "div",
+                   "classes": [
+                    "h-px",
+                    "flex-1",
+                    "bg-[--outline-gray-2]"
+                   ],
+                   "children": []
+                  },
+                  {
+                   "componentId": "container-ticket-chat-closed-label",
+                   "componentName": "container",
+                   "originalElement": "div",
+                   "classes": [
+                    "flex",
+                    "shrink-0",
+                    "items-center",
+                    "gap-1.5"
+                   ],
+                   "children": [
+                    {
+                     "componentId": "Icon-ticket-chat-closed",
+                     "componentName": "Icon",
+                     "componentProps": {
+                      "icon": "lucide-circle-check"
+                     },
+                     "classes": [
+                      "size-4",
+                      "text-ink-gray-5"
+                     ]
+                    },
+                    {
+                     "componentId": "TextBlock-ticket-chat-closed-text",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-p-sm",
+                      "tag": "span",
+                      "text": "{{ dataItem.text }}"
+                     },
+                     "classes": [
+                      "text-ink-gray-5"
+                     ]
+                    },
+                    {
+                     "componentId": "TextBlock-ticket-chat-closed-dot",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-p-sm",
+                      "tag": "span",
+                      "text": "·"
+                     },
+                     "classes": [
+                      "text-ink-gray-4"
+                     ]
+                    },
+                    {
+                     "componentId": "Tooltip-TextBlock-ticket-chat-closed-time",
+                     "componentName": "Tooltip",
+                     "componentProps": {
+                      "text": "{{ dataItem.fullDate }}"
+                     },
+                     "children": [
+                      {
+                       "componentId": "TextBlock-ticket-chat-closed-time",
+                       "componentName": "TextBlock",
+                       "componentProps": {
+                        "fontSize": "text-p-sm",
+                        "tag": "span",
+                        "text": "{{ dataItem.clock }}"
+                       },
+                       "classes": [
+                        "text-ink-gray-5"
+                       ]
+                      }
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "componentId": "container-ticket-chat-closed-rule-end",
+                   "componentName": "container",
+                   "originalElement": "div",
+                   "classes": [
+                    "h-px",
+                    "flex-1",
+                    "bg-[--outline-gray-2]"
+                   ],
+                   "children": []
+                  }
+                 ],
+                 "visibilityCondition": "{{ dataItem.kind === 'closed' }}"
+                },
+                {
+                 "componentId": "container-ticket-chat-rating",
+                 "componentName": "container",
+                 "originalElement": "div",
+                 "classes": [
+                  "flex",
+                  "flex-col",
+                  "items-center",
+                  "gap-3",
+                  "border-t",
+                  "border-outline-gray-1",
+                  "pt-6",
+                  "pb-6",
+                  "text-center"
+                 ],
+                 "visibilityCondition": "{{ dataItem.kind === 'rating' && rating }}",
+                 "children": [
+                  {
+                   "componentId": "Tooltip-ticket-chat-closed-line",
+                   "componentName": "Tooltip",
+                   "componentProps": {
+                    "text": "{{ dataItem.fullDate }}"
+                   },
+                   "visibilityCondition": "{{ dataItem.closedLine }}",
+                   "children": [
+                    {
+                     "componentId": "TextBlock-ticket-chat-closed-line",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-p-sm",
+                      "tag": "span",
+                      "text": "{{ dataItem.closedLine }}"
+                     },
+                     "classes": [
+                      "text-ink-gray-5"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "componentId": "Rating-ticket-chat",
+                   "componentName": "Rating",
+                   "componentProps": {
+                    "disabled": true,
+                    "modelValue": "{{ rating.rating }}",
+                    "size": "lg"
+                   }
+                  },
+                  {
+                   "componentId": "TextBlock-ticket-chat-rating-comment",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-lg",
+                    "tag": "p",
+                    "text": "{{ rating.comment }}"
+                   },
+                   "classes": [
+                    "text-ink-gray-8"
+                   ],
+                   "visibilityCondition": "{{ rating.comment }}"
+                  },
+                  {
+                   "componentId": "TextBlock-ticket-chat-rating-tags",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-p-base",
+                    "tag": "span",
+                    "text": "{{ dataItem.tags }}"
+                   },
+                   "classes": [
+                    "text-ink-gray-6"
+                   ],
+                   "visibilityCondition": "{{ dataItem.tags }}"
+                  },
+                  {
+                   "componentId": "TextBlock-ticket-chat-rated-line",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-p-sm",
+                    "tag": "span",
+                    "text": "{{ dataItem.ratedLine }}"
+                   },
+                   "classes": [
+                    "text-ink-gray-4"
+                   ]
+                  }
+                 ]
                 }
                ],
                "classes": [
@@ -411,6 +606,167 @@
                ],
                "slotId": "ActivityTimeline-ticket-thread:item-solve_prompt",
                "slotName": "item-solve_prompt"
+              },
+              "item-feedback": {
+               "parentBlockId": "ActivityTimeline-ticket-thread",
+               "slotContent": [
+                {
+                 "componentId": "container-ticket-thread-feedback",
+                 "componentName": "container",
+                 "originalElement": "div",
+                 "classes": [
+                  "flex",
+                  "flex-1",
+                  "flex-col",
+                  "gap-2",
+                  "ps-[13px]",
+                  "min-w-0"
+                 ],
+                 "children": [
+                  {
+                   "componentId": "container-ticket-thread-feedback-line",
+                   "componentName": "container",
+                   "originalElement": "div",
+                   "classes": [
+                    "flex",
+                    "flex-wrap",
+                    "items-center",
+                    "gap-1.5",
+                    "text-sm",
+                    "leading-6"
+                   ],
+                   "children": [
+                    {
+                     "componentId": "TextBlock-ticket-thread-feedback-by",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-sm",
+                      "tag": "span",
+                      "text": "{{ ratedBy }}"
+                     },
+                     "classes": [
+                      "font-medium",
+                      "text-ink-gray-8"
+                     ]
+                    },
+                    {
+                     "componentId": "TextBlock-ticket-thread-feedback-verb",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-sm",
+                      "tag": "span",
+                      "text": "{{ words.ratedSupport }}"
+                     },
+                     "classes": [
+                      "text-ink-gray-5"
+                     ]
+                    },
+                    {
+                     "componentId": "Rating-ticket-thread-feedback",
+                     "componentName": "Rating",
+                     "componentProps": {
+                      "disabled": true,
+                      "modelValue": "{{ rating.rating }}",
+                      "size": "sm"
+                     }
+                    },
+                    {
+                     "componentId": "TextBlock-ticket-thread-feedback-dot",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-sm",
+                      "tag": "span",
+                      "text": "·"
+                     },
+                     "classes": [
+                      "text-ink-gray-4"
+                     ]
+                    },
+                    {
+                     "componentId": "TextBlock-ticket-thread-feedback-time",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-sm",
+                      "tag": "span",
+                      "text": "{{ ratedTimeAgo }}"
+                     },
+                     "classes": [
+                      "text-ink-gray-5"
+                     ]
+                    }
+                   ]
+                  },
+                  {
+                   "componentId": "container-ticket-thread-feedback-card",
+                   "componentName": "container",
+                   "originalElement": "div",
+                   "classes": [
+                    "flex",
+                    "flex-col",
+                    "gap-3",
+                    "rounded-6",
+                    "border",
+                    "border-outline-gray-2",
+                    "p-3",
+                    "max-w-[520px]"
+                   ],
+                   "children": [
+                    {
+                     "componentId": "TextBlock-ticket-thread-feedback-comment",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-p-base",
+                      "tag": "div",
+                      "text": "{{ rating.comment }}"
+                     },
+                     "classes": [
+                      "text-ink-gray-8"
+                     ],
+                     "visibilityCondition": "{{ rating.comment }}"
+                    },
+                    {
+                     "baseStyles": {
+                      "gap": "6px"
+                     },
+                     "children": [
+                      {
+                       "classes": [
+                        "border",
+                        "border-outline-gray-2",
+                        "rounded-full",
+                        "text-ink-gray-7",
+                        "py-1",
+                        "px-2.5"
+                       ],
+                       "componentId": "TextBlock-ticket-thread-feedback-tag",
+                       "componentName": "TextBlock",
+                       "componentProps": {
+                        "fontSize": "text-base",
+                        "tag": "span",
+                        "text": "{{ dataItem.label }}"
+                       }
+                      }
+                     ],
+                     "classes": [
+                      "flex",
+                      "flex-wrap"
+                     ],
+                     "componentId": "Repeater-ticket-thread-feedback-tags",
+                     "componentName": "Repeater",
+                     "componentProps": {
+                      "data": "{{ rating.tags }}",
+                      "dataKey": "label"
+                     },
+                     "visibilityCondition": "{{ rating.tags.length }}"
+                    }
+                   ],
+                   "visibilityCondition": "{{ rating.comment || rating.tags.length }}"
+                  }
+                 ]
+                }
+               ],
+               "slotId": "ActivityTimeline-ticket-thread:item-feedback",
+               "slotName": "item-feedback"
               }
              },
              "visibilityCondition": "{{ !isChat }}"
@@ -710,6 +1066,41 @@
               "data": "{{ basics }}",
               "dataKey": "label"
              }
+            },
+            {
+             "componentId": "container-ticket-rating",
+             "componentName": "container",
+             "originalElement": "div",
+             "classes": [
+              "items-center",
+              "flex",
+              "justify-between",
+              "w-full"
+             ],
+             "children": [
+              {
+               "componentId": "TextBlock-ticket-rating-label",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-p-sm",
+                "tag": "span",
+                "text": "{{ words.ratingLabel }}"
+               },
+               "classes": [
+                "text-ink-gray-5"
+               ]
+              },
+              {
+               "componentId": "Rating-ticket-sidebar",
+               "componentName": "Rating",
+               "componentProps": {
+                "disabled": true,
+                "modelValue": "{{ rating.rating }}",
+                "size": "sm"
+               }
+              }
+             ],
+             "visibilityCondition": "{{ rating }}"
             }
            ],
            "classes": [
@@ -747,106 +1138,6 @@
            "componentId": "container-ticket-timeline",
            "componentName": "container",
            "originalElement": "div"
-          },
-          {
-           "children": [
-            {
-             "children": [
-              {
-               "classes": [
-                "text-ink-gray-9",
-                "font-medium"
-               ],
-               "componentId": "TextBlock-ticket-feedback-title",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "div",
-                "text": "{{ words.feedbackTitle }}"
-               }
-              },
-              {
-               "componentId": "Rating-ticket-feedback",
-               "componentName": "Rating",
-               "componentProps": {
-                "disabled": true,
-                "modelValue": "{{ rating.rating }}",
-                "size": "md"
-               }
-              },
-              {
-               "classes": [
-                "text-ink-gray-8"
-               ],
-               "componentId": "TextBlock-ticket-feedback-comment",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-p-base",
-                "tag": "div",
-                "text": "{{ rating.comment }}"
-               },
-               "visibilityCondition": "{{ rating.comment }}"
-              },
-              {
-               "baseStyles": {
-                "gap": "6px"
-               },
-               "children": [
-                {
-                 "classes": [
-                  "border",
-                  "border-outline-gray-2",
-                  "rounded-full",
-                  "text-ink-gray-7",
-                  "py-1",
-                  "px-2.5"
-                 ],
-                 "componentId": "TextBlock-ticket-feedback-tag",
-                 "componentName": "TextBlock",
-                 "componentProps": {
-                  "fontSize": "text-base",
-                  "tag": "span",
-                  "text": "{{ dataItem.label }}"
-                 }
-                }
-               ],
-               "classes": [
-                "flex",
-                "flex-wrap"
-               ],
-               "componentId": "Repeater-ticket-feedback-tags",
-               "componentName": "Repeater",
-               "componentProps": {
-                "data": "{{ rating.tags }}",
-                "dataKey": "label"
-               },
-               "visibilityCondition": "{{ rating.tags.length }}"
-              }
-             ],
-             "classes": [
-              "items-start",
-              "flex",
-              "flex-col",
-              "gap-4",
-              "min-w-0"
-             ],
-             "componentId": "container-ticket-feedback-card",
-             "componentName": "container",
-             "originalElement": "div"
-            }
-           ],
-           "classes": [
-            "border-t",
-            "border-outline-gray-2",
-            "flex",
-            "flex-col",
-            "py-4",
-            "px-5"
-           ],
-           "componentId": "container-ticket-panel-feedback",
-           "componentName": "container",
-           "originalElement": "div",
-           "visibilityCondition": "{{ rating }}"
           },
           {
            "children": [
@@ -1244,7 +1535,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:49:11.549993",
+ "modified": "2026-10-04 11:53:13.166627",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

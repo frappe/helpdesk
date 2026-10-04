@@ -35,6 +35,36 @@ def new(doc: dict, attachments: list[dict] = []):
     return d
 
 
+TIMELINE_FIELDS = ("status", "feedback_rating")
+
+
+@frappe.whitelist(methods=["GET"])
+def get_timeline_changes(name: str) -> list[dict]:
+    """Status and rating changes, oldest first, with who made them: readers of a ticket can't read Version."""
+    frappe.has_permission("HD Ticket", "read", name, throw=True)
+    versions = frappe.get_all(
+        "Version",
+        filters={"ref_doctype": "HD Ticket", "docname": name},
+        or_filters=[["data", "like", f'%"{field}"%'] for field in TIMELINE_FIELDS],
+        fields=["owner", "creation", "data"],
+        order_by="creation asc",
+    )
+    changes = []
+    for version in versions:
+        for field, old, new in frappe.parse_json(version.data).get("changed", []):
+            if field in TIMELINE_FIELDS:
+                changes.append(
+                    {
+                        "field": field,
+                        "from": old,
+                        "to": new,
+                        "by": get_user_info_for_avatar(version.owner),
+                        "on": version.creation,
+                    }
+                )
+    return changes
+
+
 @frappe.whitelist()
 def get_one(name: str, is_customer_portal: bool = False):
     frappe.has_permission("HD Ticket", "read", name, throw=True)
