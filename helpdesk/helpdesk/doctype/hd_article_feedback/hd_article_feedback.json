@@ -30,7 +30,8 @@
    "fieldname": "article",
    "fieldtype": "Link",
    "label": "Article",
-   "options": "HD Article"
+   "options": "HD Article",
+   "search_index": 1
   },
   {
    "description": "Cookie that tells one signed-out reader from another",
@@ -42,7 +43,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-24 10:39:16.296257",
+ "modified": "2026-10-05 02:23:21.495108",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Feedback",
