@@ -231,13 +231,7 @@ def setup_customer_role(fresh_install=True):
 
 
 def set_portal_defaults(overwrite=False):
-    """Point the portal at the studio customer portal. Installing claims the
-    settings outright; the upgrade patch only fills what a site left empty.
-
-    Writes straight into the Single rather than saving the document. A save
-    also validates the portal menu rows, and a row left behind by a deleted
-    doctype fails that validation and takes the whole migration down.
-    """
+    """Install claims the portal settings; the patch only fills empty ones. Writes the Single directly: a save validates stale menu rows."""
     defaults = {
         "default_role": "HD Customer",
         "default_portal_home": CUSTOMER_PORTAL_ROOT,
