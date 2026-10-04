@@ -55,8 +55,7 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Frappe's legacy `/kb/<category>` rule would shadow the Studio app's single-segment pages;
-    # only a static rule outranks it, so each of those pages needs an entry.
+    # Static rules outrank frappe's /kb/<category>; add one per single-segment Studio page.
     {
         "from_route": "/kb/customer-tickets",
         "to_route": "kb",
@@ -82,6 +81,7 @@ website_redirects = [
     {
         "source": r"/helpdesk/my-tickets/(.*)",
         "target": r"/kb/tickets/\1",
+        "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/kb-public",

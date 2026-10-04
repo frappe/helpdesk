@@ -55,6 +55,7 @@
           <Button
             variant="outline"
             icon="lucide-check"
+            :aria-label="__('Save name')"
             :loading="busy"
             @click="saveName"
           />
@@ -92,17 +93,17 @@ const emit = defineEmits<{
 }>();
 
 const uploadLabel = computed(() =>
-  props.image ? __("Change Photo") : __("Upload Photo")
+  props.image ? __("Change photo") : __("Upload photo")
 );
 
 const isEditing = ref(false);
 const draft = ref("");
-const nameInput = ref<{ el?: HTMLInputElement } | null>(null);
+const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
 
 function startEditing() {
   draft.value = props.name || "";
   isEditing.value = true;
-  nextTick(() => nameInput.value?.el?.focus());
+  nextTick(() => nameInput.value?.focus());
 }
 
 function saveName() {

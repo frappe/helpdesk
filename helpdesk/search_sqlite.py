@@ -264,6 +264,12 @@ class HelpdeskArticleSearch(SQLiteSearch):
         terms = [term for term in query.split() if term.lower() not in stopwords]
         return " OR ".join(quote(term) for term in terms)
 
+    def _execute_search_query(self, fts_query, title_only, filters):
+        # A stopwords-only query leaves an empty MATCH, which FTS5 rejects.
+        if not fts_query:
+            return []
+        return super()._execute_search_query(fts_query, title_only, filters)
+
 
 def build_index():
     """Build search index - can be called from console."""

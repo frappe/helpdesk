@@ -125,8 +125,6 @@ export default defineConfig(async ({ mode }) => {
         "vue-router",
         "frappe-ui",
         "dompurify",
-        // the shared package brings its own copy; collapse it into desk's
-        "@vueuse/core",
         "reka-ui",
         "@tiptap/core",
         "@tiptap/pm",

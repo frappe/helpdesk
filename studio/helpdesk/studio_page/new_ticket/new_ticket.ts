@@ -23,6 +23,7 @@ export default function setup(context) {
 
   const model = reactive({})
   const attachments = ref([])
+  const isCreating = ref(false)
 
   // The upload queue keeps only `file_url`; the server links attachments by File name.
   const uploadedByUrl = new Map()
@@ -157,7 +158,7 @@ export default function setup(context) {
         })
         navigateTo(ROUTES.ticketList)
       },
-      { fallback: __('Could not create the ticket') },
+      { busy: isCreating, fallback: __('Could not create the ticket') },
     )
   }
 
@@ -172,6 +173,7 @@ export default function setup(context) {
     canSubmit,
     attachments,
     uploadPrivately,
+    isCreating,
     createTicket,
   }
 }

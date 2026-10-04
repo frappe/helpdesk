@@ -188,14 +188,17 @@ class TestRelatedArticles(FrappeTestCase):
         frappe.db.set_value("HD Article", self.published, "status", "Draft")
         # What the index queue does for a changed article: re-add it, filter or not.
         self.search._index_documents(
-            [
-                self.search.prepare_document(
-                    frappe.get_doc("HD Article", self.published)
-                )
-            ]
+            [self.search.prepare_document(frappe.get_doc("HD Article", self.published))]
         )
 
         self.assertEqual(self.related("zephyrine webhook"), [])
+
+    def test_a_query_of_only_stopwords_finds_nothing_and_logs_nothing(self):
+        self.search.build_index()
+        errors = frappe.db.count("Error Log")
+
+        self.assertEqual(self.related("how to"), [])
+        self.assertEqual(frappe.db.count("Error Log"), errors)
 
     def test_no_index_yet_returns_nothing(self):
         self.assertEqual(self.related("zephyrine webhook"), [])

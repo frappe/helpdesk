@@ -20,9 +20,7 @@
           ref="editorRef"
           v-model="resolutionDetails"
           :extensions="extensions"
-          :placeholder="
-            __('Re-synced the auth server; codes are accepted again.')
-          "
+          :placeholder="__('Describe what fixed the issue')"
         >
           <template #default>
             <EditorContent

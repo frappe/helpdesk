@@ -53,7 +53,6 @@ export function createOrganizationSettings(core) {
   }
 
   async function loadOrganization(name) {
-    orgTab.value = 'members'
     try {
       organization.value = await call(`${API}.get_organization`, { customer: name })
     } catch (error) {
@@ -67,6 +66,7 @@ export function createOrganizationSettings(core) {
     selectedOrganizationName.value = name
     organization.value = null
     inviteOpen.value = false
+    orgTab.value = 'members'
     return loadOrganization(name)
   }
 

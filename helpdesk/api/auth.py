@@ -91,12 +91,16 @@ def update_profile(
         user.first_name = first_name
     if last_name is not None:
         user.last_name = last_name
-    if image and not image.startswith("/files/"):
-        frappe.throw(_("Please upload the picture rather than linking to it"))
+    validate_uploaded_image(image)
     if image is not None:
         user.user_image = image or None
     user.save(ignore_permissions=True)
     _sync_contact(user)
+
+
+def validate_uploaded_image(image: str | None) -> None:
+    if image and not image.startswith("/files/"):
+        frappe.throw(_("Please upload the picture rather than linking to it"))
 
 
 def _sync_contact(user) -> None:

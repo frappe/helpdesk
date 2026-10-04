@@ -27,6 +27,7 @@ from helpdesk.test_utils import (
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 NEWCOMER = "newcomer@invitations.test"
+INVITEE = "invitee@invitations.test"
 
 
 class TestOrganizationMembers(IntegrationTestCase):
@@ -39,6 +40,7 @@ class TestOrganizationMembers(IntegrationTestCase):
         cls.owner = create_contact("Org Owner", "org-owner@example.com")
         cls.manager = create_contact("Org Manager", "org-manager@example.com")
         cls.member = create_contact("Org Member", "org-member@example.com")
+        cls.outsider = create_contact("Org Outsider", "org-outsider@example.com")
         cls.customer = create_customer(
             "Test Member List",
             [
@@ -82,6 +84,11 @@ class TestOrganizationMembers(IntegrationTestCase):
         self.assertEqual(
             [member["contact"] for member in you], [self.manager["contact"]]
         )
+
+    def test_a_non_member_cannot_read_the_organization(self) -> None:
+        frappe.set_user(self.outsider["user"])
+        with self.assertRaises(frappe.PermissionError):
+            get_organization(self.customer.name)
 
     def test_a_manager_can_switch_a_member_to_manager(self) -> None:
         update_member_role(self.customer.name, self.member["contact"], True)
@@ -180,6 +187,23 @@ class TestInvitations(IntegrationTestCase):
         )
         with self.assertRaises(frappe.PermissionError):
             invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+
+    def test_a_role_outside_the_customer_roles_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            invite_members(self.customer.name, [NEWCOMER], "System Manager")
+
+    def test_a_refused_email_stops_the_whole_batch(self) -> None:
+        invite_members(self.customer.name, [INVITEE], "HD Customer")
+        self.addCleanup(delete_invitations, INVITEE)
+
+        with self.assertRaises(frappe.ValidationError):
+            invite_members(self.customer.name, [NEWCOMER, INVITEE], "HD Customer")
+
+        self.assertFalse(frappe.db.exists("User Invitation", {"email": NEWCOMER}))
+
+    def test_a_repeated_email_is_invited_once(self) -> None:
+        invite_members(self.customer.name, [NEWCOMER, NEWCOMER], "HD Customer")
+        self.assertEqual(frappe.db.count("User Invitation", {"email": NEWCOMER}), 1)
 
     def test_more_than_the_cap_is_refused(self) -> None:
         emails = [f"invitee{i}@invitations.test" for i in range(MAX_INVITES + 1)]
@@ -313,6 +337,10 @@ class TestOrganizationEdits(IntegrationTestCase):
         frappe.set_user(self.member["user"])
         with self.assertRaises(frappe.PermissionError):
             update_organization(self.customer.name, image="/files/logo.png")
+
+    def test_a_linked_logo_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            update_organization(self.customer.name, image="https://tracker.test/a.png")
 
     def test_a_rename_answers_with_the_new_name(self) -> None:
         renamed = update_organization(self.customer.name, "Test Org Edits Renamed")

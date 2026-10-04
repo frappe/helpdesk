@@ -1,4 +1,4 @@
-import { computed, nextTick, ref, toRaw, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, toRaw, watch } from 'vue'
 import { StorageSerializers, useStorage } from '@vueuse/core'
 import { call, createListResource, toast } from 'frappe-ui'
 import { spritePlugin } from 'frappe-ui/experimental'
@@ -42,7 +42,7 @@ function createViewsStore() {
 
   const views = computed(() => list.data || [])
 
-  let listView = null
+  const listView = shallowRef(null) // the page's useListView
   let hasAttached = false
   let defaultSnapshot = null
   let isRestoring = false
@@ -72,9 +72,19 @@ function createViewsStore() {
     { serializer: StorageSerializers.object, writeDefaults: false },
   )
 
-  // The store outlives the page, so each mount hands over its fresh `useListView`.
+  // Here, not in attachListView: Studio stops the page's effect scope on navigation.
+  // On route change, not on click, so a shared URL lands on the same view.
+  watch(() => [activeName.value, list.data], () => applyActiveView())
+  watch(
+    () => listView.value && [listView.value.filters.conditions.value, listView.value.sort.by.value],
+    () => rememberLayout(),
+    { deep: true },
+  )
+
   function attachListView(view) {
-    listView = view
+    // This store outlives the page, so never hold the first mount's `useListView`.
+    listView.value = view
+    // On every mount: the watch above fires on neither a same-view return nor a remount.
     applyActiveView()
     if (hasAttached) return
     hasAttached = true
@@ -87,30 +97,26 @@ function createViewsStore() {
         list.update({ filters: { ...list.filters, owner: sessionUser() } })
         return list.reload()
       })
-    watch(() => [activeName.value, list.data], () => applyActiveView())
-    watch(
-      () => [listView.filters.conditions.value, listView.sort.by.value],
-      () => rememberLayout(),
-      { deep: true },
-    )
   }
 
   function rememberLayout() {
-    if (isRestoring || !listView) return
+    const view = listView.value
+    if (isRestoring || !view) return
     rememberedLayout.value = {
-      filters: listView.filters.conditions.value,
-      sort: listView.sort.by.value,
+      filters: view.filters.conditions.value,
+      sort: view.sort.by.value,
     }
   }
 
   function applyActiveView() {
-    if (!listView) return
+    const view = listView.value
+    if (!view) return
     isRestoring = true
     const row = activeView.value
     if (!row) {
-      if (defaultSnapshot) listView.restore(structuredClone(defaultSnapshot))
+      if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
     } else {
-      listView.restore({
+      view.restore({
         filters: parseJson(row.filters, []),
         sort: parseOrderBy(row.order_by || ''),
         columns: parseJson(row.columns, []),
@@ -119,7 +125,7 @@ function createViewsStore() {
     // The remembered layout refines the view; an empty sort was never chosen.
     const remembered = rememberedLayout.value
     if (remembered) {
-      listView.restore({
+      view.restore({
         filters: remembered.filters,
         ...(remembered.sort?.length ? { sort: remembered.sort } : {}),
       })
@@ -129,10 +135,11 @@ function createViewsStore() {
   }
 
   function currentPayload() {
+    const view = listView.value
     return {
-      filters: JSON.stringify(listView.filters.conditions.value),
-      order_by: listView.sort.orderBy.value,
-      columns: JSON.stringify(listView.columns.shown.value),
+      filters: JSON.stringify(view.filters.conditions.value),
+      order_by: view.sort.orderBy.value,
+      columns: JSON.stringify(view.columns.shown.value),
     }
   }
 

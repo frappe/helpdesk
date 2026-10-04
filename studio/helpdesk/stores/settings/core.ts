@@ -121,6 +121,12 @@ export function createSettingsDialog(core, organization) {
     core.isSettingsOpen.value = false
   }
 
+  // At module load, not in watchRoute: Studio stops the page's effect scope on navigation.
+  watch(
+    [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
+    () => pushHash(),
+  )
+
   // `afterEach`, not a route watcher: a page script's `route` is a snapshot.
   let isWatchingRoute = false
 
@@ -129,10 +135,6 @@ export function createSettingsDialog(core, organization) {
     isWatchingRoute = true
     applyHash(currentRoute().hash)
     afterEachRoute((to) => applyHash(to.hash))
-    watch(
-      [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
-      () => pushHash(),
-    )
   }
 
   function applyHash(hash) {

@@ -5,7 +5,7 @@ from helpdesk.api.config import get_config
 
 
 class TestConfig(IntegrationTestCase):
-    """The portal's only guest-readable endpoint; the signed-out topbar is drawn from it."""
+    """Guest-readable settings; the signed-out topbar is drawn from them."""
 
     def test_a_guest_gets_every_field_and_their_own_name(self) -> None:
         frappe.set_user("Guest")

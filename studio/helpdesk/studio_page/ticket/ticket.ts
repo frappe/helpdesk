@@ -230,7 +230,7 @@ export default function setup(context) {
     canCreateTicket: computed(() => settings.canCreateTicket.value && isClosed.value),
     // Empty hides the header button: a customer may close only what support has resolved.
     pageActionLabel: computed(() => (isResolved.value ? __('Close') : '')),
-    pageActionIcon: 'check',
+    pageActionIcon: 'lucide-check',
     onPageAction,
     confirmSolved,
     reopenTicket,
