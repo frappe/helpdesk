@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import {
   applyCssToIframe,
   stripEmailColors,
@@ -112,17 +112,6 @@ function hash(value: string) {
   return result;
 }
 
-// Inline, not a class: the face is a runtime value read off the page.
-const pageStyle = getComputedStyle(document.body);
-const contextFont = ref({
-  family: pageStyle.fontFamily,
-  size: pageStyle.fontSize,
-});
-onMounted(() => {
-  const style = getComputedStyle(frame.value?.parentElement || document.body);
-  contextFont.value = { family: style.fontFamily, size: style.fontSize };
-});
-
 // Read once: a reactive theme in the srcdoc would reload the frame on every toggle.
 const dataTheme = useDataTheme();
 const initialTheme = dataTheme.value;
@@ -132,7 +121,7 @@ const srcdoc = computed(
   <meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none';" />
   <base target="_blank" />
   <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }</style>
-  </head><body class="m-0" style="font-family: ${contextFont.value.family}; font-size: ${contextFont.value.size}">
+  </head><body class="m-0">
   <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
   </body></html>`
 );
