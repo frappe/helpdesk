@@ -17,7 +17,7 @@ from helpdesk.integrations.erpnext.utils import (
     sync_related_fields,
     validate_rename_conflict,
 )
-from helpdesk.utils import agent_only, get_customers, is_agent
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, get_customers, is_agent
 
 CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
 
@@ -331,7 +331,7 @@ class HDCustomer(Document):
             response = invite_by_email(
                 item["email"],
                 roles=[role],
-                redirect_to_path="/helpdesk",
+                redirect_to_path=CUSTOMER_PORTAL_ROOT,
                 app_name="helpdesk",
                 **params,
             )
