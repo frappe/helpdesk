@@ -39,6 +39,7 @@ export default function setup(context) {
   const model = reactive({})
 
   const attachments = ref([])
+  const isCreating = ref(false)
 
   const priorities = createListResource({
     doctype: 'HD Ticket Priority',
@@ -149,7 +150,7 @@ export default function setup(context) {
         })
         navigateTo(ROUTES.ticketList)
       },
-      { fallback: __('Could not create the ticket') },
+      { busy: isCreating, fallback: __('Could not create the ticket') },
     )
   }
 
@@ -163,6 +164,7 @@ export default function setup(context) {
     canSubmit,
     attachments,
     uploadPrivately,
+    isCreating,
     createTicket,
   }
 }

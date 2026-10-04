@@ -181,7 +181,7 @@ export default function setup(context) {
     solvePromptAt,
     canCreateTicket,
     pageActionLabel,
-    pageActionIcon: 'check',
+    pageActionIcon: 'lucide-check',
     onPageAction,
     confirmSolved,
     reopenTicket,

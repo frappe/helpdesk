@@ -45,6 +45,7 @@
                 class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
+                :aria-label="__('View actions')"
                 @click.stop
               />
             </template>
@@ -59,6 +60,7 @@
 import { h } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
 import { Icon as SpriteIcon } from "frappe-ui/experimental";
+import { __ } from "@helpdesk/shared/translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";

@@ -940,6 +940,20 @@
        "componentName": "container",
        "originalElement": "div",
        "visibilityCondition": "{{ !ticketId || ticket.data }}"
+      },
+      {
+       "classes": [
+        "flex-1"
+       ],
+       "componentId": "PortalEmptyState-ticket-error",
+       "componentName": "PortalEmptyState",
+       "componentProps": {
+        "description": "{{ t('It may have been removed, or you may not have access to it.') }}",
+        "icon": "ticket",
+        "title": "{{ t('Ticket not found') }}"
+       },
+       "isCustomVueComponent": true,
+       "visibilityCondition": "{{ ticket.error }}"
       }
      ],
      "classes": [
@@ -1244,7 +1258,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-01 16:49:11.549993",
+ "modified": "2026-10-05 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
