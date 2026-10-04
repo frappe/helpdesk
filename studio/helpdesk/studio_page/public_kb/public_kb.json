@@ -894,7 +894,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-04 11:43:00.945573",
+ "modified": "2026-10-05 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
@@ -907,7 +907,7 @@
    "fetch_document_using_filters": 0,
    "limit": 0,
    "method": "GET",
-   "params": "{\"limit\": 9}",
+   "params": "{}",
    "resource_name": "categories",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_public_categories"
