@@ -1,6 +1,10 @@
+from unittest.mock import patch
+
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.api import article as article_api
+from helpdesk.api import knowledge_base
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
@@ -28,6 +32,8 @@ from helpdesk.test_utils import (
 LIST_ROW_FIELDS = {*PUBLIC_ARTICLE_FIELDS, "excerpt", "image"}
 CUSTOMER = "fixture.customer@example.com"
 BASE_VIEWS = 1_000_000
+BYLINE_FIELDS = {"name", "image"}
+TEST_INDEX = "test_knowledge_base_search.db"
 
 
 class TestPublicReads(IntegrationTestCase):
@@ -141,6 +147,7 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(article.excerpt, "Fixture published")
         self.assertIsNone(article.image)
         self.assertEqual(article.author["name"], "Administrator")
+        self.assertEqual(set(article.author), BYLINE_FIELDS)
 
     def test_a_row_carries_the_body_s_first_image(self) -> None:
         body = '<p>intro</p><img src="/files/one.png"><img src="/files/two.png">'
@@ -173,6 +180,7 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(article.content, "<p>Fixture published</p>")
         self.assertEqual(article.category_name, "Fixture Public")
         self.assertEqual(article.author["name"], "Administrator")
+        self.assertEqual(set(article.author), BYLINE_FIELDS)
         self.assertEqual(
             set(article),
             {*PUBLIC_ARTICLE_FIELDS, "content", "category_name", "feedback"},
@@ -230,6 +238,7 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(category.description, "Fixture description")
         owner = frappe.db.get_value("User", self.category.owner, "full_name")
         self.assertEqual(category.author["name"], owner)
+        self.assertEqual(set(category.author), BYLINE_FIELDS)
         self.assertNotIn("owner", category)
 
     def test_an_unknown_category_is_not_found(self) -> None:
@@ -275,7 +284,9 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def test_defaults_to_public(self) -> None:
         name = make_article("Fixture default")
-        self.assertEqual(frappe.db.get_value("HD Article", name, "visibility"), "Public")
+        self.assertEqual(
+            frappe.db.get_value("HD Article", name, "visibility"), "Public"
+        )
 
     def test_a_guest_is_shown_only_public_articles(self) -> None:
         frappe.set_user("Guest")
@@ -328,6 +339,20 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         ]
         return row["article_count"]
 
+    def test_a_guest_is_not_shown_a_category_with_nothing_for_them(self) -> None:
+        hidden = make_article_category("Fixture Members Only")
+        make_article(
+            "Fixture members elsewhere",
+            category=hidden.name,
+            visibility="Customers only",
+        )
+        self.assertIn(hidden.name, [row["name"] for row in get_public_categories()])
+
+        frappe.set_user("Guest")
+
+        self.assertNotIn(hidden.name, [row["name"] for row in get_public_categories()])
+        self.assertRaises(frappe.DoesNotExistError, get_public_category, hidden.name)
+
     def test_a_guest_cannot_vote_on_one(self) -> None:
         frappe.set_user("Guest")
 
@@ -340,10 +365,19 @@ class TestSearch(IntegrationTestCase):
     def setUp(self) -> None:
         enable_public_knowledge_base()
         category = make_article_category("Fixture Search").name
-        # The index is a file outside the transaction, so fixtures go in and out by hand.
-        self.search = HelpdeskArticleSearch()
-        if not self.search.index_exists():
-            self.search.build_index()
+        # A throwaway index holding only the fixtures, so the site's real one is never touched.
+        self.search = HelpdeskArticleSearch(db_name=TEST_INDEX)
+        self.search.drop_index()
+        self.addCleanup(self.search.drop_index)
+        self.search._ensure_fts_table()
+        for module in (knowledge_base, article_api):
+            patcher = patch.object(
+                module,
+                "HelpdeskArticleSearch",
+                lambda: HelpdeskArticleSearch(db_name=TEST_INDEX),
+            )
+            patcher.start()
+            self.addCleanup(patcher.stop)
         body = "<p>Where the <b>zebra</b> crosses & how</p>"
         self.public = make_article(
             "Fixture zebra crossing", category=category, content=body
@@ -363,8 +397,6 @@ class TestSearch(IntegrationTestCase):
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
-        for name in (self.public, self.members, self.draft):
-            self.search.remove_doc("HD Article", name)
 
     def names(self) -> list[str]:
         return [row["name"] for row in search_articles("zebra")]
@@ -412,7 +444,6 @@ class TestSearch(IntegrationTestCase):
             visibility="Agents only",
         )
         self.search.index_documents_by_name("HD Article", [internal])
-        self.addCleanup(self.search.remove_doc, "HD Article", internal)
         self.assertIn(internal, self.related())
 
         frappe.session.user = CUSTOMER
