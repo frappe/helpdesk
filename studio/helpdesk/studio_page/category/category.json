@@ -151,7 +151,7 @@
              "componentId": "TextBlock-m2czs0278",
              "componentName": "TextBlock",
              "componentProps": {
-              "fontSize": "text-p-lg",
+              "fontSize": "text-p-base",
               "tag": "p",
               "text": "{{ categoryDescription }}"
              },
@@ -237,25 +237,11 @@
            "classes": [
             "flex",
             "flex-col",
-            "gap-2",
-            "mt-10",
+            "gap-1",
+            "mt-8",
             "w-full"
            ],
            "children": [
-            {
-             "componentId": "category-articles-title",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-xl",
-              "tag": "h2",
-              "text": "{{ t('Articles') }}"
-             },
-             "classes": [
-              "text-ink-gray-8",
-              "font-semibold",
-              "leading-[1.25]"
-             ]
-            },
             {
              "componentId": "Repeater-m7atz02fl",
              "componentName": "Repeater",
@@ -267,8 +253,7 @@
               "w-full",
               "!flex-col",
               "!flex-nowrap",
-              "!gap-0",
-              "[&>*:last-child]:border-b-0"
+              "!gap-0"
              ],
              "children": [
               {
@@ -278,13 +263,23 @@
                "classes": [
                 "group",
                 "flex",
-                "w-full",
                 "cursor-pointer",
                 "items-center",
-                "gap-6",
-                "border-b",
-                "border-outline-gray-1",
-                "py-5"
+                "gap-4",
+                "py-3.5",
+                "-mx-2.5",
+                "px-2.5",
+                "rounded-4",
+                "transition-colors",
+                "hover:bg-surface-gray-2",
+                "relative",
+                "after:absolute",
+                "after:inset-x-2.5",
+                "after:bottom-0",
+                "after:h-px",
+                "after:bg-[--outline-gray-1]",
+                "hover:after:opacity-0",
+                "[&:has(+*:hover)]:after:opacity-0"
                ],
                "children": [
                 {
@@ -296,14 +291,14 @@
                   "min-w-0",
                   "flex-1",
                   "flex-col",
-                  "gap-1"
+                  "gap-0.5"
                  ],
                  "children": [
                   {
                    "componentId": "TextBlock-eigpkjuxp",
                    "componentName": "TextBlock",
                    "componentProps": {
-                    "fontSize": "text-lg",
+                    "fontSize": "text-base",
                     "tag": "p",
                     "text": "{{ dataItem.title }}"
                    },
@@ -311,7 +306,7 @@
                     "text-ink-gray-8",
                     "font-medium",
                     "truncate",
-                    "leading-[1.25]",
+                    "leading-[1.15]",
                     "group-hover:text-ink-gray-9"
                    ]
                   },
@@ -319,12 +314,12 @@
                    "componentId": "TextBlock-zhpgz9f0r",
                    "componentName": "TextBlock",
                    "componentProps": {
-                    "fontSize": "text-p-base",
+                    "fontSize": "text-p-sm",
                     "tag": "p",
                     "text": "{{ dataItem.excerpt }}"
                    },
                    "classes": [
-                    "text-ink-gray-6",
+                    "text-ink-gray-5",
                     "truncate"
                    ]
                   }
@@ -338,9 +333,11 @@
                   "icon": "lucide-file-text"
                  },
                  "classes": [
-                  "size-5",
+                  "size-4",
                   "shrink-0",
-                  "text-ink-gray-5"
+                  "text-ink-gray-4",
+                  "transition-colors",
+                  "group-hover:text-ink-gray-6"
                  ]
                 }
                ],
@@ -419,7 +416,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-04 01:47:48.286179",
+ "modified": "2026-10-04 11:49:18.914353",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
