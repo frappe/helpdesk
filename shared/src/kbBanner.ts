@@ -2,6 +2,7 @@
 const unsplash = (id: string) =>
   `center / cover url("https://images.unsplash.com/photo-${id}?w=2400&h=400&fit=crop&auto=format&q=80")`;
 
+// keep in sync with HD Settings banner_preset options and BannerPicker.vue labels
 export const BANNER_PRESETS = [
   {
     name: "Dots",
