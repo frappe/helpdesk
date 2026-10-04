@@ -10,7 +10,9 @@ from helpdesk.api.settings.email import create_email_account
 from helpdesk.test_utils import (
     create_agent,
     create_user,
+    get_linked_email_accounts,
     make_agent_manager,
+    make_email_account,
     make_email_account_data,
     unique_email,
 )
@@ -159,9 +161,9 @@ class TestSetUserEmailAccounts(IntegrationTestCase):
         frappe.set_user("Administrator")
         self.enterContext(patch(f"{EMAIL_ACCOUNT_MODULE}.EmailServer"))
         self.agent = create_agent(unique_email("email-agent")).name
-        self.support = self.make_account("Sendgrid", enable_incoming=0)
-        self.sales = self.make_account("Sendgrid", enable_incoming=0)
-        self.incoming_only = self.make_account("GMail", enable_outgoing=0)
+        self.support = make_email_account("Sendgrid", enable_incoming=0)
+        self.sales = make_email_account("Sendgrid", enable_incoming=0)
+        self.incoming_only = make_email_account("GMail", enable_outgoing=0)
 
     def test_agent_replaces_outgoing_links_and_keeps_other_links(self) -> None:
         user = frappe.get_doc("User", self.agent)
@@ -170,32 +172,27 @@ class TestSetUserEmailAccounts(IntegrationTestCase):
 
         with self.set_user(self.agent):
             set_user_email_accounts([self.support])
-            self.assertEqual(self.linked_accounts(), {self.incoming_only, self.support})
+            self.assertEqual(
+                get_linked_email_accounts(self.agent),
+                {self.incoming_only, self.support},
+            )
             # the settings screen lists only the outgoing links
             outgoing = get_current_user_email_info()["outgoing_emails"]
             self.assertEqual([row.email_account for row in outgoing], [self.support])
 
             set_user_email_accounts([self.sales, self.sales])
-            self.assertEqual(self.linked_accounts(), {self.incoming_only, self.sales})
+            self.assertEqual(
+                get_linked_email_accounts(self.agent), {self.incoming_only, self.sales}
+            )
 
     def test_accounts_without_outgoing_email_are_not_linked(self) -> None:
         with self.set_user(self.agent):
             set_user_email_accounts([self.incoming_only, "No Such Account"])
 
-        self.assertEqual(self.linked_accounts(), set())
+        self.assertEqual(get_linked_email_accounts(self.agent), set())
 
     def test_non_agent_cannot_set_email_accounts(self) -> None:
         user = create_user(unique_email("not-an-agent")).name
 
         with self.set_user(user), self.assertRaises(frappe.PermissionError):
             set_user_email_accounts([self.support])
-
-    def make_account(self, service: str, **overrides: Any) -> str:
-        return create_email_account(make_email_account_data(service, **overrides))
-
-    def linked_accounts(self) -> set[str]:
-        return set(
-            frappe.get_all(
-                "User Email", filters={"parent": self.agent}, pluck="email_account"
-            )
-        )
