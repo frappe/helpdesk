@@ -167,7 +167,7 @@ import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   createResource,
-  dayjs,
+  dayjsLocal,
   Dropdown,
   frappeRequest,
   LoadingIndicator,
@@ -562,7 +562,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (column.type === "Datetime") {
     return h("span", {
       class: "text-base",
-      textContent: dayjs(item).fromNow(),
+      textContent: dayjsLocal(item).fromNow(),
     });
   }
   if (column.type === "MultipleAvatar") {

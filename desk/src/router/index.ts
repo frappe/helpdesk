@@ -2,10 +2,7 @@ import { useScreenSize } from "@/composables/screen";
 import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import {
-  CUSTOMER_PORTAL_ROOT,
-  isCustomerPortal,
-} from "@/utils";
+import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
@@ -217,7 +214,9 @@ router.beforeEach(async (to, _, next) => {
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
-    window.location.replace(`${CUSTOMER_PORTAL_ROOT}/tickets/${to.params.ticketId}`);
+    window.location.replace(
+      `${CUSTOMER_PORTAL_ROOT}/tickets/${to.params.ticketId}`
+    );
   } else {
     next();
   }

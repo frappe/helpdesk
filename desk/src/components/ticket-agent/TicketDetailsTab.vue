@@ -100,13 +100,16 @@
         <!-- Recent / Similar Tickets -->
         <template v-if="showRecentSimilarTickets">
           <div v-for="section in sections" :key="section.label">
+            <!-- rows carry py-3 for their hover background, so the header and
+                 list give that space back to match the other sections -->
             <Section
               :label="section.label"
               :tooltip="section.tooltipMessage"
               :hideLabel="section.hideLabel"
+              header-class="pb-2.5"
               v-model:opened="openedSections[section.key]"
             >
-              <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
+              <ul class="divide-y divide-outline-gray-1">
                 <li
                   v-for="t in section.tickets"
                   :key="t.name"
@@ -189,16 +192,21 @@ const coreFields = computed(() => {
   if (!fieldsMeta || fieldsMeta.length === 0) {
     return [];
   }
-  return CORE_FIELDS.map((fieldname) => {
-    let field = getField(fieldname);
-    if (!field) return null;
-    field = parseField(field, ticket.value.doc);
-    // cant handle required depends on as we directly set the value in DB on change
-    field["required"] = field.reqd;
-    const formatted = getFieldInFormat(field, field);
-    formatted["visible"] = true;
-    return formatted;
-  }).filter(Boolean);
+  const shown = new Set(
+    (customizations.value.data?.fields || []).map((f) => f.fieldname)
+  );
+  return CORE_FIELDS.filter((f) => shown.has(f))
+    .map((fieldname) => {
+      let field = getField(fieldname);
+      if (!field) return null;
+      field = parseField(field, ticket.value.doc);
+      // cant handle required depends on as we directly set the value in DB on change
+      field["required"] = field.reqd;
+      const formatted = getFieldInFormat(field, field);
+      formatted["visible"] = true;
+      return formatted;
+    })
+    .filter(Boolean);
 });
 
 const customFields = computed(() => {
@@ -208,7 +216,7 @@ const customFields = computed(() => {
   }
 
   if (!customizations.value.data || customizations.value.loading) return [];
-  let customFields = customizations.value.data?.custom_fields || [];
+  let customFields = customizations.value.data?.fields || [];
   const excludedFields = [...CORE_FIELDS, "subject", "status"];
   customFields = customFields.filter(
     (f) => !excludedFields.includes(f.fieldname)

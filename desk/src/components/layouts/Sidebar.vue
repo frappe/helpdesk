@@ -16,10 +16,16 @@
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <CustomerPortalPermissionBanner
-          v-if="showPermissionNoticeBanner"
-          :isSidebarCollapsed="isCollapsed"
-        />
+        <template v-if="!isCustomerPortal">
+          <CustomerPortalPermissionBanner
+            v-if="isBannerVisible('customer_portal_permission')"
+            :isSidebarCollapsed="isCollapsed"
+          />
+          <TicketFieldPermissionBanner
+            v-if="isBannerVisible('ticket_field_permission')"
+            :isSidebarCollapsed="isCollapsed"
+          />
+        </template>
       </div>
       <SidebarItem
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
@@ -59,11 +65,13 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
+import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
+import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useApps } from "@/composables/useApps";
+import { useBanners } from "@/composables/useBanners";
 import { useScreenSize } from "@/composables/screen";
 import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
@@ -72,7 +80,6 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
@@ -116,7 +123,7 @@ const { isMobileView } = useScreenSize();
 
 const router = useRouter();
 const authStore = useAuthStore();
-const configStore = useConfigStore();
+const { isVisible: isBannerVisible } = useBanners();
 
 const { appsMenuOption } = useApps();
 const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -203,14 +210,6 @@ const logo = h(
   },
   null
 );
-
-const showPermissionNoticeBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    (authStore.isManager || authStore.isAdmin) &&
-    configStore.showCustomerPortalPermissionNotice
-  );
-});
 
 const showOnboardingBanner = computed(() => {
   return (

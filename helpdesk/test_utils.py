@@ -1,12 +1,16 @@
 from datetime import datetime
+from typing import Any
+from unittest.mock import MagicMock, patch
 
 import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.tests.classes.context_managers import freeze_time
 from frappe.utils import add_to_date, getdate
 
+from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
-from helpdesk.consts import DEFAULT_SLA
+from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
 
@@ -178,16 +182,155 @@ def make_feedback_option(label: str, rating: float = 1.0):
     ).insert()
 
 
-def make_article(title: str, status: str = "Published"):
-    """Creates an HD Article whose content repeats its title."""
-    return frappe.get_doc(
+def close_emailed_ticket(raised_by: str) -> str:
+    """Only a ticket that arrived by email is ever sent a feedback link."""
+    ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "via_customer_portal", 0)
+
+    doc = frappe.get_doc("HD Ticket", ticket.name)
+    doc.status = "Closed"
+    doc.save()
+    return doc.name
+
+
+def make_customer_ticket(case, raised_by: str, **values):
+    """A ticket raised by a customer, removed when the test ends."""
+    ticket = make_ticket(raised_by=raised_by, **values)
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket
+
+
+def make_form_script(
+    case,
+    name: str,
+    body: str,
+    apply_to_customer_portal: bool = False,
+    apply_on_new_page: bool = False,
+):
+    """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
+    frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
+    frappe.get_doc(
         {
-            "doctype": "HD Article",
-            "title": title,
-            "status": status,
-            "content": f"<p>{title}</p>",
+            "doctype": "HD Form Script",
+            "name": name,
+            "dt": "HD Ticket",
+            "apply_to": "Form",
+            "enabled": 1,
+            "apply_to_customer_portal": int(apply_to_customer_portal),
+            "apply_on_new_page": int(apply_on_new_page),
+            "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()
+    case.addCleanup(
+        frappe.delete_doc, "HD Form Script", name, force=True, ignore_missing=True
+    )
+
+
+def reply_from_the_portal(case, raised_by: str, status: str) -> str:
+    """The customer answers a ticket left at `status`; returns where it lands."""
+    ticket = make_customer_ticket(case, raised_by)
+    frappe.db.set_value("HD Ticket", ticket.name, "status", status)
+    frappe.set_user(raised_by)
+    frappe.get_doc("HD Ticket", ticket.name).create_communication_via_contact(
+        "it is happening again"
+    )
+    frappe.set_user("Administrator")
+    return frappe.db.get_value("HD Ticket", ticket.name, "status")
+
+
+def make_template(name: str, fields: list[dict]):
+    """Create an HD Ticket Template, replacing any leftover with the name."""
+    if frappe.db.exists("HD Ticket Template", name):
+        frappe.db.delete("HD Ticket", {"template": name})
+        frappe.delete_doc("HD Ticket Template", name, force=True)
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Template", "template_name": name, "fields": fields}
+    ).insert()
+
+
+def other_priority(current: str) -> str:
+    """A priority different from `current`."""
+    return "Urgent" if current != "Urgent" else "Low"
+
+
+def default_template_rows() -> list[dict]:
+    """The Default template's rows as plain dicts, for restoring later."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    # every column, so a column added later is restored too
+    return [
+        f.as_dict(no_default_fields=True, no_child_table_fields=True)
+        for f in template.fields
+    ]
+
+
+def set_default_template_rows(rows: list[dict]):
+    """Replace every row of the Default template; returns the saved template."""
+    template = frappe.get_doc("HD Ticket Template", DEFAULT_TICKET_TEMPLATE)
+    template.fields = []
+    for row in rows:
+        template.append("fields", row)
+    template.save()
+    return template
+
+
+def set_custom_field_permlevel(fieldname: str, permlevel: int):
+    frappe.db.set_value(
+        "Custom Field",
+        frappe.db.get_value(
+            "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}
+        ),
+        "permlevel",
+        permlevel,
+    )
+    frappe.clear_cache(doctype="HD Ticket")
+
+
+def get_custom_field_permlevel(fieldname: str) -> int:
+    return frappe.db.get_value(
+        "Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "permlevel"
+    )
+
+
+def ticket_field_permlevel(fieldname: str) -> int:
+    """The live level, Customize Form overrides included."""
+    return frappe.get_meta("HD Ticket").get_field(fieldname).permlevel
+
+
+def set_default_template_visibility(fieldname: str, visible_to: str):
+    """Set who sees a field on the Default template; returns an undo for addCleanup."""
+    template = frappe.get_doc("HD Ticket Template", "Default")
+    row_keys = (
+        "fieldname",
+        "visible_to",
+        "editable_after_creation",
+        "required",
+        "placeholder",
+        "url_method",
+    )
+    original_rows = [{k: row.get(k) for k in row_keys} for row in template.fields]
+
+    row = next((r for r in template.fields if r.fieldname == fieldname), None)
+    if row:
+        row.visible_to = visible_to
+    else:
+        template.append("fields", {"fieldname": fieldname, "visible_to": visible_to})
+    template.save(ignore_permissions=True)
+
+    def undo():
+        doc = frappe.get_doc("HD Ticket Template", "Default")
+        doc.fields = []
+        for original in original_rows:
+            doc.append("fields", original)
+        doc.save(ignore_permissions=True)
+
+    return undo
+
+
+def get_customer_ticket(email: str):
+    """Make a ticket and return it as the customer `email` sees it."""
+    ticket = make_ticket(raised_by=email)
+    frappe.set_user(email)
+    return frappe.get_doc("HD Ticket", ticket.name)
 
 
 def create_agent(
@@ -698,3 +841,176 @@ def make_notification_log(name: str, ticket: str, user: str, **values) -> None:
         }
     )
     doc.db_insert()
+
+
+def unique_name(prefix: str) -> str:
+    """`prefix` plus a random suffix, for records that must not clash across tests."""
+    return f"{prefix}-{frappe.generate_hash(length=8)}"
+
+
+def unique_email(prefix: str) -> str:
+    """A random example.com address starting with `prefix`."""
+    return f"{unique_name(prefix)}@example.com"
+
+
+def make_agent_manager(prefix: str = "agent-manager") -> str:
+    """Create an agent with a unique email and the Agent Manager role, returning the user name."""
+    manager = create_agent(unique_email(prefix)).name
+    frappe.get_doc("User", manager).add_roles("Agent Manager")
+    return manager
+
+
+def make_article(
+    title: str | None = None,
+    status: str = "Published",
+    category: str | None = None,
+) -> str:
+    """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    return (
+        frappe.get_doc(
+            {
+                "doctype": "HD Article",
+                "title": title or unique_name("Test Article"),
+                "content": "<p>Open settings and click reset.</p>",
+                "status": status,
+                "category": category,
+            }
+        )
+        .insert(ignore_permissions=True)
+        .name
+    )
+
+
+def make_article_feedback(article: str, feedback: int) -> None:
+    """Record Administrator's feedback on an article (1 like, 2 dislike)."""
+    frappe.get_doc(
+        {
+            "doctype": "HD Article Feedback",
+            "user": "Administrator",
+            "article": article,
+            "feedback": feedback,
+        }
+    ).insert(ignore_permissions=True)
+
+
+def make_search_hit(article: str, section: str = "intro") -> frappe._dict:
+    """A search index hit shaped like helpdesk.search.search items."""
+    name = f"{article}#{section}"
+    return frappe._dict(id=f"HD Article:{name}", name=name, subject=article)
+
+
+def make_search_page(*hits: frappe._dict) -> list[dict]:
+    """A helpdesk.search.search result holding the given article hits."""
+    return [{"title": "Articles", "items": list(hits)}]
+
+
+def make_assignment_rule(
+    name: str, document_type: str, users: list[str] | None = None
+) -> str:
+    """A disabled rule, so it never enters the live assignment rule cache."""
+    rule = frappe.get_doc(
+        {
+            "doctype": "Assignment Rule",
+            "name": name,
+            "assignment_rule_name": name,
+            "document_type": document_type,
+            "description": "Test assignment rule",
+            "assign_condition": "status == 'Open'",
+            "rule": "Round Robin",
+            "priority": 2,
+            "disabled": 1,
+            "assignment_days": [{"day": "Monday"}],
+            "users": [{"user": user} for user in users or []],
+        }
+    ).insert(ignore_permissions=True)
+    return rule.name
+
+
+def make_todo(ticket: str, user: str, creation: str | None = None) -> str:
+    """Open a ToDo for `user` on `ticket`, optionally backdated to `creation`."""
+    todo = frappe.get_doc(
+        {
+            "doctype": "ToDo",
+            "allocated_to": user,
+            "reference_type": "HD Ticket",
+            "reference_name": ticket,
+            "description": "Assigned in test",
+        }
+    ).insert(ignore_permissions=True)
+    if creation:
+        frappe.db.set_value(
+            "ToDo", todo.name, "creation", creation, update_modified=False
+        )
+    return todo.name
+
+
+def make_default_view(
+    user: str, columns: list | None = None, rows: list | None = None
+) -> None:
+    """Replace `user`'s default HD Ticket list view with one of the given columns and rows."""
+    delete_default_views(user)
+    frappe.get_doc(
+        {
+            "doctype": "HD View",
+            "dt": "HD Ticket",
+            "user": user,
+            "is_default": 1,
+            "columns": frappe.as_json(columns or []),
+            "rows": frappe.as_json(rows or []),
+        }
+    ).insert(ignore_permissions=True)
+
+
+def delete_default_views(user: str) -> None:
+    """Delete `user`'s default HD Ticket list views."""
+    frappe.db.delete("HD View", {"user": user, "dt": "HD Ticket", "is_default": 1})
+
+
+def make_tagged_ticket(team: str, created_on: str, *tags: str):
+    """A ticket for `team` created at `created_on`, carrying the given tags."""
+    with freeze_time(created_on):
+        ticket = make_ticket(subject="Tag chart", agent_group=team)
+    for tag in tags:
+        ticket.add_tag(tag)
+    return ticket
+
+
+def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, Any]:
+    """The payload EmailAdd.vue sends, with a unique name and address."""
+    suffix = frappe.generate_hash(length=6)
+    return {
+        "email_account_name": f"Support {suffix}",
+        "email_id": f"support-{suffix}@example.com",
+        "service": service,
+        "password": "app-password",
+        "enable_incoming": 1,
+        "enable_outgoing": 1,
+        "default_incoming": 0,
+        "default_outgoing": 0,
+        **overrides,
+    }
+
+
+def get_user_roles(user: str) -> list[str]:
+    """A user's Has Role rows, duplicates included (unlike frappe.get_roles)."""
+    return frappe.get_all(
+        "Has Role", filters={"parent": user, "parenttype": "User"}, pluck="role"
+    )
+
+
+def show_only_banners(*banners: str):
+    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
+    for banner, flag in BANNERS.items():
+        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
+
+
+def dismiss_banner_as(user: str, banner: str) -> MagicMock:
+    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        with patch("frappe.publish_realtime") as publish_realtime:
+            dismiss_banner(banner)
+    finally:
+        frappe.set_user(previous_user)
+    return publish_realtime

@@ -91,21 +91,19 @@ export default function setup(context) {
 
   // FormLayout resolves the depends_on rules itself against the values typed so far.
   const fields = computed(() =>
-    (template.data?.fields || [])
-      .filter((row) => !row.hide_from_customer)
-      .map((row) => ({
-        fieldname: row.fieldname,
-        fieldtype: row.fieldtype,
-        label: row.label,
-        options: row.options,
-        reqd: Boolean(row.required),
-        placeholder: row.placeholder || undefined,
-        description: row.fieldname === 'priority' ? priorityHint.value : undefined,
-        dependsOn: row.depends_on,
-        mandatoryDependsOn: row.mandatory_depends_on,
-        filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
-        ui: uiFor(row),
-      })),
+    (template.data?.fields || []).map((row) => ({
+      fieldname: row.fieldname,
+      fieldtype: row.fieldtype,
+      label: row.label,
+      options: row.options,
+      reqd: Boolean(row.required),
+      placeholder: row.placeholder || undefined,
+      description: row.fieldname === 'priority' ? priorityHint.value : undefined,
+      dependsOn: row.depends_on,
+      mandatoryDependsOn: row.mandatory_depends_on,
+      filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
+      ui: uiFor(row),
+    })),
   )
 
   const layout = computed(() => [

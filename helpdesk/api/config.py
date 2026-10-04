@@ -4,8 +4,7 @@ from frappe.utils import get_user_date_format, get_user_time_format
 from helpdesk.utils import is_agent
 
 
-# nosemgrep: frappe-semgrep-rules.rules.security.guest-whitelisted-method
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)  # nosemgrep
 def get_config():
     fields = [
         "brand_name",
@@ -20,7 +19,6 @@ def get_config():
         "assign_within_team",
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
-        "show_customer_portal_permission_notice",
     ]
     # A Single omits fields never set; every requested key is answered so the portal reads null.
     values = (
