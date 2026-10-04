@@ -12,6 +12,8 @@ export function useArticleSearch(query: Ref<string>, { limit = 0, minLength = MI
   })
 
   const search = debounce(() => {
+    // fetch() doesn't drop an older in-flight response, so a slow one would overwrite this query's
+    results.abort()
     if ((query.value || '').trim().length >= minLength) results.fetch()
     else results.reset()
   }, SEARCH_DEBOUNCE_MS)

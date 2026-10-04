@@ -69,9 +69,13 @@ watch(
 );
 
 function load() {
+  const name = props.name;
   request ||= fetch(markdownUrl.value)
     .then(async (response) => {
-      if (response.ok) markdown.value = await response.text();
+      if (!response.ok) return;
+      const text = await response.text();
+      // the page reuses this component across articles; drop a late answer for the previous one
+      if (name === props.name) markdown.value = text;
     })
     .catch(() => {});
   return request;
