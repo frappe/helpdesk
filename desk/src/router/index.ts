@@ -211,12 +211,12 @@ router.beforeEach(async (to, _, next) => {
     window.location.href =
       LOGIN_PAGE +
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
-  } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
     window.location.replace(
       `${CUSTOMER_PORTAL_ROOT}/tickets/${to.params.ticketId}`
     );
+  } else if (!to.meta.public && !authStore.hasDeskAccess) {
+    window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else {
     next();
   }
