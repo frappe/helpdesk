@@ -39,7 +39,7 @@
       <div class="flex min-w-0 flex-1 items-center gap-2">
         <!-- the width lives on the wrapper: a Combobox with its own #trigger
              slot drops the class it is handed -->
-        <div class="min-w-0 flex-1">
+        <div v-if="showTeamPicker" class="min-w-0 flex-1">
           <Link
             doctype="HD Team"
             :hide-clear-button="true"
@@ -95,17 +95,26 @@
             @update:modelValue="changeTabTo"
             class="flex flex-col flex-1 overflow-hidden"
           >
-            <!-- Scroll here so the active underline isn't clipped. -->
-            <div class="shrink-0 overflow-x-auto hide-scrollbar">
-              <TabList size="md" class="w-max min-w-full px-3 py-1.5">
-                <TabTrigger
-                  v-for="tab in visibleTabs"
-                  :key="tab.value"
-                  :value="tab.value"
-                  :label="tab.label"
-                  :icon-left="tab.iconLeft"
-                />
-              </TabList>
+            <div class="flex shrink-0">
+              <!-- Scroll here so the active underline isn't clipped. -->
+              <div class="min-w-0 flex-1 overflow-x-auto hide-scrollbar">
+                <TabList size="md" class="w-max min-w-full px-3 py-1.5">
+                  <TabTrigger
+                    v-for="tab in visibleTabs"
+                    :key="tab.value"
+                    :value="tab.value"
+                    :label="tab.label"
+                    :icon-left="tab.iconLeft"
+                  />
+                </TabList>
+              </div>
+              <!-- own border, so the tab underline runs on beneath it -->
+              <div
+                v-if="activeTab === 'call'"
+                class="flex items-center border-b border-outline-gray-1 pe-3"
+              >
+                <TicketCallActions />
+              </div>
             </div>
             <TabPanel
               v-for="tab in visibleTabs"
@@ -274,6 +283,7 @@ import {
   IndicatorIcon,
   PhoneIcon,
 } from "@/components/icons";
+import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
 import CustomActions from "@/components/CustomActions.vue";
@@ -394,6 +404,10 @@ const mobileCustomActions = computed(() => {
   return [{ group: "Actions", hideLabel: true, options: items }];
 });
 
+const showTeamPicker = computed(() =>
+  (customizations.data?.fields || []).some((f) => f.fieldname === "agent_group")
+);
+
 const ticketFields = computed(() => {
   if (!customizations.data || !ticket.value.doc) return [];
   const fieldsMeta = getFields();
@@ -407,7 +421,7 @@ const ticketFields = computed(() => {
     "subject",
     "status",
   ];
-  let custom_fields = customizations.data?.custom_fields || [];
+  let custom_fields = customizations.data?.fields || [];
   custom_fields = custom_fields.filter(
     (f) => !coreFieldNames.includes(f.fieldname)
   );

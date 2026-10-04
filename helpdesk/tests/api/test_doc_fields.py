@@ -2,12 +2,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
 
-from helpdesk.api.doc import (
-    _get_filterable_fields,
-    get_filterable_fields,
-    get_quick_filters,
-    sort_options,
-)
+from helpdesk.api.doc import get_filterable_fields, get_quick_filters, sort_options
 from helpdesk.test_utils import create_agent, create_contact, create_user, unique_email
 
 AGENT_ONLY_FIELDS = {"_assign", "_user_tags", "agent_group", "ticket_type", "contact"}
@@ -25,9 +20,6 @@ class FieldPersonas(IntegrationTestCase):
 
 class TestFilterableFields(FieldPersonas):
     """The filter picker lists what `get_filterable_fields` returns."""
-
-    def setUp(self) -> None:
-        _get_filterable_fields.clear_cache()
 
     def test_agent_gets_ticket_and_pseudo_fields(self) -> None:
         with self.set_user(self.agent):

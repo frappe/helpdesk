@@ -121,7 +121,7 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { useUploadTracker } from "@/composables/useUploadTracker";
-import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { isContentEmpty, uploadFunction } from "@/utils";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
   Alert,
@@ -163,7 +163,6 @@ const ticket = createResource({
   cache: ["Ticket", props.ticketId],
   params: {
     name: props.ticketId,
-    is_customer_portal: isCustomerPortal.value,
   },
   auto: true,
   onSuccess: (data) => {

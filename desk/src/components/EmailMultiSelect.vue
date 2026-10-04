@@ -168,6 +168,7 @@ const filterContacts = createResource({
       label: full_name || email_id || name,
       value: email_id || name,
       email: email_id,
+      name,
     })),
 });
 
@@ -202,19 +203,12 @@ const options = computed(() => {
     if (props.existingUsers?.length) {
       list = list.filter((o) => !props.existingUsers.includes(o.value));
     }
-    if (query.value) {
-      const q = query.value.toLowerCase();
-      list = list.filter(
-        (o) =>
-          o.label?.toLowerCase().includes(q) ||
-          o.value?.toLowerCase().includes(q)
-      );
-    }
-    return list;
+    return list.filter(matchesQuery);
   }
 
-  // contacts mode
-  let list = filterContacts.data || [];
+  // contacts mode; the search is debounced, so narrow the last results to the
+  // typed text, or a quick Enter picks a contact that no longer matches
+  let list = (filterContacts.data || []).filter(matchesQuery);
   if (values.value?.length) {
     list = list.filter((o) => !values.value.includes(o.value));
   }
@@ -232,6 +226,13 @@ const options = computed(() => {
   }
   return list;
 });
+
+function matchesQuery(option) {
+  const q = query.value.toLowerCase();
+  return [option.label, option.value, option.name].some((field) =>
+    field?.toLowerCase().includes(q)
+  );
+}
 
 function isExistingUser(email) {
   if (!email) return false;
@@ -331,6 +332,8 @@ function removeLastValue() {
   }
 }
 
+// TODO: use single contact component. This refocus also fires when focus has
+// already moved on, so a click elsewhere within 200ms is pulled back here.
 function setFocus() {
   setTimeout(() => {
     search.value?.$el?.focus();

@@ -4,8 +4,6 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.customer_portal_notice import (
-    NOTICE_FLAG,
-    dismiss_notice,
     promote_all_contacts_to_managers,
     restore_ticket_access,
 )
@@ -14,60 +12,17 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     get_user_roles,
-    is_portal_notice_shown,
     make_agent_manager,
     unique_email,
 )
-
-
-class TestDismissNotice(IntegrationTestCase):
-    def setUp(self) -> None:
-        frappe.set_user("Administrator")
-
-    def test_administrator_dismisses_notice_and_notifies_clients(self) -> None:
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            publish_realtime = self.dismiss_as("Administrator")
-            self.assertFalse(is_portal_notice_shown())
-
-        publish_realtime.assert_called_once()
-        event = publish_realtime.call_args.args[0]
-        self.assertEqual(event, "helpdesk:settings-updated")
-
-    def test_agent_manager_dismisses_notice(self) -> None:
-        manager = make_agent_manager("notice-manager")
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            self.dismiss_as(manager)
-            self.assertFalse(is_portal_notice_shown())
-
-    def test_agent_cannot_dismiss_notice(self) -> None:
-        agent = create_agent(unique_email("notice-agent")).name
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            with self.assertRaises(frappe.PermissionError):
-                self.dismiss_as(agent)
-            self.assertTrue(is_portal_notice_shown())
-
-    def test_customer_cannot_dismiss_notice(self) -> None:
-        customer = create_contact("Notice Customer", unique_email("notice-customer"))
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            with self.assertRaises(frappe.PermissionError):
-                self.dismiss_as(customer["user"])
-            self.assertTrue(is_portal_notice_shown())
-
-    def dismiss_as(self, user: str) -> MagicMock:
-        """Dismiss the notice as `user`, returning the realtime publisher mock."""
-        with patch("frappe.publish_realtime") as publish_realtime, self.set_user(user):
-            dismiss_notice()
-        return publish_realtime
 
 
 class TestRestoreTicketAccess(IntegrationTestCase):
     def setUp(self) -> None:
         frappe.set_user("Administrator")
 
-    def test_administrator_queues_promotion_and_dismisses_notice(self) -> None:
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            enqueue = self.restore_as("Administrator")
-            self.assertFalse(is_portal_notice_shown())
+    def test_administrator_queues_promotion(self) -> None:
+        enqueue = self.restore_as("Administrator")
 
         enqueue.assert_called_once()
         self.assertIs(enqueue.call_args.args[0], promote_all_contacts_to_managers)
@@ -78,10 +33,8 @@ class TestRestoreTicketAccess(IntegrationTestCase):
 
     def test_agent_cannot_restore_access(self) -> None:
         agent = create_agent(unique_email("restore-agent")).name
-        with self.change_settings("HD Settings", {NOTICE_FLAG: 1}):
-            with self.assertRaises(frappe.PermissionError):
-                self.restore_as(agent)
-            self.assertTrue(is_portal_notice_shown())
+        with self.assertRaises(frappe.PermissionError):
+            self.restore_as(agent)
 
     def test_customer_cannot_restore_access(self) -> None:
         customer = create_contact("Restore Customer", unique_email("restore-customer"))

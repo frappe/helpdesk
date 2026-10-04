@@ -1,9 +1,9 @@
 import type { Page } from "@playwright/test";
-import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { raiseTicket } from "../../helpers/factories";
-import { PASSWORD, personas } from "../../helpers/personas";
-import { expectDenied, type Api } from "../../helpers/api";
-import { loginContext, openTicketInList } from "../../helpers/portal";
+import { expect, test, uid, usePersona } from "../helpers/fixtures";
+import { raiseTicket } from "../helpers/factories";
+import { PASSWORD, personas } from "../helpers/personas";
+import { expectDenied, type Api } from "../helpers/api";
+import { loginContext, openTicketInList } from "../helpers/portal";
 
 test.describe("plain agent", () => {
   usePersona("agent");
@@ -70,10 +70,7 @@ test.describe("customer", () => {
       customer.raw("frappe.desk.form.load.getdoc", { doctype: "HD Ticket", name: ticket.name }),
       customer.raw("frappe.desk.form.load.get_docinfo", { doctype: "HD Ticket", name: ticket.name }),
       customer.raw("helpdesk.api.timeline.get_comment_extras", { ticket: ticket.name }),
-      customer.raw("helpdesk.helpdesk.doctype.hd_ticket.api.get_one", {
-        name: ticket.name,
-        is_customer_portal: true,
-      }),
+      customer.raw("helpdesk.helpdesk.doctype.hd_ticket.api.get_one", { name: ticket.name }),
       customer.raw("frappe.client.get_list", {
         doctype: "Comment",
         filters: { reference_name: ticket.name },
