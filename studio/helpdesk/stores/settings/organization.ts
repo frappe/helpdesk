@@ -50,7 +50,6 @@ export function createOrganizationSettings(core) {
   })
 
   async function loadOrganization(name) {
-    orgTab.value = 'members'
     try {
       organization.value = await call('helpdesk.api.organization.get_organization', {
         customer: name,
@@ -66,6 +65,7 @@ export function createOrganizationSettings(core) {
     selectedOrganizationName.value = name
     organization.value = null
     inviteOpen.value = false
+    orgTab.value = 'members'
     return loadOrganization(name)
   }
 
