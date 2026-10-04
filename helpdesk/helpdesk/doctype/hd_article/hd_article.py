@@ -96,7 +96,6 @@ class HDArticle(Document):
         ]
         return {"columns": columns}
 
-    @frappe.whitelist()
     def set_feedback(self, value: int, visitor_id: str | None = None):
         """Record one vote: 0 none, 1 like, 2 dislike; a guest's is kept by `visitor_id`."""
         value = cint(value)
@@ -111,7 +110,6 @@ class HDArticle(Document):
         self.save_feedback(owner, value)
 
     def validate_voter(self, visitor_id: str | None):
-        # Whitelisted, so hiding the buttons is not the gate — this is.
         if frappe.session.user != "Guest":
             return
         if not frappe.db.get_single_value(

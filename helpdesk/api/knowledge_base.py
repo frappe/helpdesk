@@ -140,7 +140,7 @@ def get_categories():
         "HD Article Category",
         fields=["name", "category_name", "modified"],
     )
-    counts = readable_article_counts([c.name for c in categories])
+    counts = readable_article_counts()
     for c in categories:
         c["article_count"] = counts.get(c.name, 0)
 
@@ -165,7 +165,7 @@ PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon"]
 EXCERPT_LENGTH = 140
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
-# ponytail: a category past this many articles lists only the newest; paginate if one gets there.
+# A category past this many articles lists only the newest.
 LIST_LIMIT = 100
 
 VISITOR_COOKIE = "hd_visitor"
@@ -193,8 +193,14 @@ def get_public_articles(
         soup = BeautifulSoup(article.pop("content") or "", "html.parser")
         article.excerpt = excerpt(soup)
         article.image = first_image(soup)
-        article.author = get_user_info_for_avatar(article.author)
+        article.author = byline(article.author)
     return articles
+
+
+def byline(user: str) -> dict:
+    """What a byline shows; never the email, which guests could harvest."""
+    info = get_user_info_for_avatar(user)
+    return {"name": info["name"], "image": info["image"]}
 
 
 def excerpt(soup: BeautifulSoup) -> str:
@@ -225,7 +231,7 @@ def get_public_article_titles() -> list[dict]:
 def get_public_article(name: str) -> dict:
     """One article, published — or any article to an agent previewing a draft."""
     article = get_readable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
-    article.author = get_user_info_for_avatar(article.author)
+    article.author = byline(article.author)
     article.category_name = frappe.db.get_value(
         "HD Article Category", article.category, "category_name"
     )
@@ -260,25 +266,28 @@ def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_categories(limit: int | None = None) -> list[dict]:
-    """Each with `article_count`, the articles in it the reader may see."""
+    """Only those with an article the reader may see, each with `article_count`."""
     validate_public_access()
+    counts = readable_article_counts()
+    if not counts:
+        return []
     categories = frappe.get_all(
         "HD Article Category",
+        filters={"name": ["in", list(counts)]},
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
         limit_page_length=cint(limit),
     )
-    counts = readable_article_counts([c.name for c in categories])
     for category in categories:
-        category.article_count = counts.get(category.name, 0)
+        category.article_count = counts[category.name]
     return categories
 
 
-def readable_article_counts(categories: list[str]) -> dict[str, int]:
+def readable_article_counts() -> dict[str, int]:
     return dict(
         frappe.get_all(
             "HD Article",
-            filters=readable_filters(category=["in", categories]),
+            filters=readable_filters(category=["is", "set"]),
             fields=["category", {"COUNT": "*", "as": "total"}],
             group_by="category",
             as_list=True,
@@ -292,9 +301,11 @@ def get_public_category(name: str) -> dict:
     category = frappe.db.get_value(
         "HD Article Category", name, [*PUBLIC_CATEGORY_FIELDS, "owner"], as_dict=True
     )
-    if not category:
+    if not category or not frappe.db.exists(
+        "HD Article", readable_filters(category=name)
+    ):
         frappe.throw(_("Category not found"), frappe.DoesNotExistError)
-    category.author = get_user_info_for_avatar(category.pop("owner"))
+    category.author = byline(category.pop("owner"))
     return category
 
 
@@ -319,10 +330,11 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
             fields=["name", "content", "category"],
         )
     }
+    hits = [row for row in results if row["name"] in readable][: cint(limit)]
     labels = dict(
         frappe.get_all(
             "HD Article Category",
-            filters={"name": ["in", [a.category for a in readable.values()]]},
+            filters={"name": ["in", [readable[row["name"]].category for row in hits]]},
             fields=["name", "category_name"],
             as_list=True,
         )
@@ -337,9 +349,8 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
             ),
             "category_name": labels.get(readable[row["name"]].category),
         }
-        for row in results
-        if row["name"] in readable
-    ][: cint(limit)]
+        for row in hits
+    ]
 
 
 def escape_marked(text: str) -> str:
@@ -408,21 +419,6 @@ def get_article_votes(article: str) -> dict:
         )
     )
     return {"likes": totals.get("1", 0), "dislikes": totals.get("2", 0)}
-
-
-@frappe.whitelist()
-def get_category_articles(category: str):
-    articles = frappe.get_list(
-        "HD Article",
-        filters=readable_filters(category=category),
-        fields=["name", "title", "published_on", "modified", "author", "content"],
-    )
-    for article in articles:
-        article["author"] = get_user_info_for_avatar(article["author"])
-        soup = BeautifulSoup(article["content"], "html.parser")
-        article["content"] = str(soup.text)[:100]
-
-    return articles
 
 
 @frappe.whitelist()
