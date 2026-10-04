@@ -180,17 +180,17 @@ class TestRelatedArticles(FrappeTestCase):
         # A sentence: ANDing every word would match nothing.
         found = self.related("Our zephyrine webhook stopped firing after the update")
 
-        self.assertEqual([row["name"] for row in found], [self.published.name])
+        self.assertEqual([row["name"] for row in found], [self.published])
         self.assertNotIn("<mark>", found[0]["title"])
 
     def test_an_article_unpublished_after_indexing_stops_matching(self):
         self.search.build_index()
-        frappe.db.set_value("HD Article", self.published.name, "status", "Draft")
+        frappe.db.set_value("HD Article", self.published, "status", "Draft")
         # What the index queue does for a changed article: re-add it, filter or not.
         self.search._index_documents(
             [
                 self.search.prepare_document(
-                    frappe.get_doc("HD Article", self.published.name)
+                    frappe.get_doc("HD Article", self.published)
                 )
             ]
         )

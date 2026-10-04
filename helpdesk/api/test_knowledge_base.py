@@ -45,7 +45,7 @@ class TestPublicReads(IntegrationTestCase):
         frappe.set_user("Administrator")
 
     def make_article(self, title, status="Published", **values) -> str:
-        return make_article(title, status, category=self.category.name, **values).name
+        return make_article(title, status, category=self.category.name, **values)
 
     def titles(self, **kwargs) -> list[str]:
         return [
@@ -266,7 +266,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
     def make_article(self, title, visibility) -> str:
         return make_article(
             title, category=self.category.name, visibility=visibility, views=BASE_VIEWS
-        ).name
+        )
 
     def titles(self) -> list[str]:
         return [
@@ -274,7 +274,8 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         ]
 
     def test_defaults_to_public(self) -> None:
-        self.assertEqual(make_article("Fixture default").visibility, "Public")
+        name = make_article("Fixture default")
+        self.assertEqual(frappe.db.get_value("HD Article", name, "visibility"), "Public")
 
     def test_a_guest_is_shown_only_public_articles(self) -> None:
         frappe.set_user("Guest")
@@ -346,16 +347,16 @@ class TestSearch(IntegrationTestCase):
         body = "<p>Where the <b>zebra</b> crosses & how</p>"
         self.public = make_article(
             "Fixture zebra crossing", category=category, content=body
-        ).name
+        )
         self.members = make_article(
             "Fixture zebra members",
             category=category,
             content=body,
             visibility="Customers only",
-        ).name
+        )
         self.draft = make_article(
             "Fixture zebra draft", "Draft", category=category, content=body
-        ).name
+        )
         self.search.index_documents_by_name(
             "HD Article", [self.public, self.members, self.draft]
         )
@@ -409,7 +410,7 @@ class TestSearch(IntegrationTestCase):
             "Fixture zebra internal",
             content="<p>zebra</p>",
             visibility="Agents only",
-        ).name
+        )
         self.search.index_documents_by_name("HD Article", [internal])
         self.addCleanup(self.search.remove_doc, "HD Article", internal)
         self.assertIn(internal, self.related())

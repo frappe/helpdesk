@@ -143,6 +143,10 @@ def update_share_feedback(
     content: str,
 ):
     only_for_managers()
+    settings = frappe.get_single("HD Settings")
+    settings.enable_email_ticket_feedback = enabled
+    settings.send_email_feedback_on_status = ticket_status["value"]
+    settings.validate_send_feedback_when_ticket_closed()
     common_settings = set_common_settings(
         "enable_email_ticket_feedback",
         enabled,

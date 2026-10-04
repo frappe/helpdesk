@@ -264,6 +264,9 @@ class HelpdeskDashboard:
         )
         if self.combined_cond:
             base_cond = base_cond & self.combined_cond
+        sla_resolved_cond = self.ticket.sla.isnotnull() & self.ticket.status.isin(
+            self.resolved_statuses
+        )
 
         query = (
             frappe.qb.from_(self.ticket)
@@ -282,10 +285,20 @@ class HelpdeskDashboard:
                     )
                     .else_(None)
                 ).as_(closed_status),
-                Count(
-                    Case()
-                    .when(self.ticket.agreement_status == "Fulfilled", self.ticket.name)
-                    .else_(None)
+                (
+                    Count(
+                        Case()
+                        .when(
+                            sla_resolved_cond
+                            & (self.ticket.agreement_status == "Fulfilled"),
+                            self.ticket.name,
+                        )
+                        .else_(None)
+                    )
+                    * 100
+                    / Count(
+                        Case().when(sla_resolved_cond, self.ticket.name).else_(None)
+                    )
                 ).as_(sla_fulfilled_status),
             )
             .where(base_cond)

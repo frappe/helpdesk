@@ -93,21 +93,19 @@ export default function setup(context) {
   }
 
   const fields = computed(() =>
-    (template.data?.fields || [])
-      .filter((row) => !row.hide_from_customer)
-      .map((row) => ({
-        fieldname: row.fieldname,
-        fieldtype: row.fieldtype,
-        label: __(row.label),
-        options: row.options,
-        reqd: Boolean(row.required),
-        placeholder: row.placeholder || undefined,
-        description: row.fieldname === 'priority' ? priorityHint.value : undefined,
-        dependsOn: row.depends_on,
-        mandatoryDependsOn: row.mandatory_depends_on,
-        filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
-        ui: uiFor(row),
-      })),
+    (template.data?.fields || []).map((row) => ({
+      fieldname: row.fieldname,
+      fieldtype: row.fieldtype,
+      label: __(row.label),
+      options: row.options,
+      reqd: Boolean(row.required),
+      placeholder: row.placeholder || undefined,
+      description: row.fieldname === 'priority' ? priorityHint.value : undefined,
+      dependsOn: row.depends_on,
+      mandatoryDependsOn: row.mandatory_depends_on,
+      filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
+      ui: uiFor(row),
+    })),
   )
 
   // Fields alternate between two columns, which would stack out of order on a phone.

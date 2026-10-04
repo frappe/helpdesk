@@ -34,7 +34,7 @@ export function useTicketDetails(ticket, thread) {
 
   function templateFields() {
     return (data.value.template?.fields || [])
-      .filter((field) => !field.hide_from_customer && !HIDDEN_FIELDS.includes(field.fieldname))
+      .filter((field) => !HIDDEN_FIELDS.includes(field.fieldname))
       .map((field) => ({ label: __(field.label), value: formatValue(field, data.value[field.fieldname]) }))
   }
 
