@@ -10,9 +10,7 @@
 			"@framework/ui": ["../../frappe/ui/src/index.ts"],
 			"@framework/ui/*": ["../../frappe/ui/src/*"],
 			"@helpdesk/shared/*": ["../shared/src/*"],
-			// @helpdesk/shared ships source and takes vue/frappe-ui as peers. Its files sit
-			// outside desk/, where node resolution finds neither, so point tsc at desk's copies
-			// (what the bundlers already dedupe to).
+			// shared/ sits outside desk/; resolve its vue/frappe-ui peers to desk's copies
 			"vue": ["./node_modules/vue"],
 			"frappe-ui": ["./node_modules/frappe-ui/src/index.ts"]
 		},

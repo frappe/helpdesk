@@ -1,6 +1,6 @@
 import { shallowRef } from 'vue'
 
-// Each page hands over its own router proxy; the first page's is dead once it unmounts.
+// Each page hands over its router: the app's own one, or a readonly proxy in the editor.
 const router = shallowRef<any>(null)
 
 export function bindRouter(value: unknown) {
