@@ -79,6 +79,7 @@
               <Button
                 variant="ghost"
                 icon="lucide-more-horizontal"
+                :aria-label="__('Member actions')"
                 :active="open"
               />
             </template>
