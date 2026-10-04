@@ -39,7 +39,6 @@
 
 <script setup lang="ts">
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
-import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
 import { computed } from "vue";
@@ -53,18 +52,12 @@ const toggles = computed(() => [
     description: __("Anyone can read articles without signing in."),
   },
   {
-    fieldname: "prefer_knowledge_base",
-    label: __("Prefer knowledge base"),
-    description: __("Guide users to articles before tickets."),
-  },
-  {
     fieldname: "allow_anonymous_article_voting",
     label: __("Anonymous voting on articles"),
     description: __("Allow anonymous users to vote on articles."),
   },
 ]);
 
-const configStore = useConfigStore();
 const settings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
@@ -72,10 +65,7 @@ const settings = createDocumentResource({
 
 function save(values: Record<string, string | boolean>) {
   settings.setValue.submit(values, {
-    onSuccess: () => {
-      configStore.configResource.reload();
-      toast.success(__("Settings updated"));
-    },
+    onSuccess: () => toast.success(__("Settings updated")),
   });
 }
 </script>

@@ -47,7 +47,7 @@ export default function setup(context) {
     fields: ['name', 'description'],
   })
 
-  // Permission-gated: a guest would only get a 403.
+  // Waits for the session: isGuest reads true until get_config answers.
   watch(
     settings.isGuest,
     (isGuest) => {
