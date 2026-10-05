@@ -500,6 +500,8 @@ watch(activeIndex, (index) => {
 });
 
 watch(operator, (newOperator, oldOperator) => {
+  // typed text belongs to the old operator, so drop it instead of applying it late
+  textApplyPending = false;
   search.value = "";
   activeIndex.value = 0;
   if (newOperator === "is") {
@@ -553,7 +555,9 @@ watch(operatorMenuOpen, (open) => {
   if (!open) focusSearch();
 });
 
-onBeforeUnmount(applyPendingText);
+// Closing the popover can mean every filter was just cleared, so a pending edit
+// is dropped rather than applied back
+onBeforeUnmount(() => (textApplyPending = false));
 
 function cycleOperator(direction: number) {
   const operatorList = operators.value;
