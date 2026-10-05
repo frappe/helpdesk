@@ -279,7 +279,7 @@ export default function setup(context) {
     setDescription,
     refuseGuestImages,
     submittedEmail,
-    receipt: computed(() => __("Thanks! We'll be in touch at {0}.", [submittedEmail.value])),
+    receipt: computed(() => __("Thanks, we'll be in touch at {0}.", [submittedEmail.value])),
     canSubmit,
     attachments,
     uploadPrivately,
