@@ -23,11 +23,6 @@ export function parseJson(value: unknown, fallback: any = undefined) {
   }
 }
 
-export function parseJsonArray(value: unknown): any[] {
-  const parsed = parseJson(value, [])
-  return Array.isArray(parsed) ? parsed : []
-}
-
 export function errorMessage(error: any, fallback: string) {
   return error?.messages?.join(', ') || error?.message || fallback
 }
