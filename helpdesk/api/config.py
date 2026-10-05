@@ -40,6 +40,7 @@ def get_config():
         "assign_within_team",
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
+        "allow_anyone_to_create_tickets",
     ]
     # A Single omits fields never set; every requested key is answered so the portal reads null.
     values = (

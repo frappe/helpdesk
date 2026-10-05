@@ -200,6 +200,13 @@ def make_customer_ticket(case, raised_by: str, **values):
     return ticket
 
 
+def enable_guest_tickets(enabled: bool | int = True):
+    """Toggle `allow_anyone_to_create_tickets` through the settings doc, so its perm rules follow."""
+    settings = frappe.get_single("HD Settings")
+    settings.allow_anyone_to_create_tickets = enabled
+    settings.save(ignore_permissions=True)
+
+
 def make_form_script(
     case,
     name: str,
@@ -1065,3 +1072,52 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def submit_guest_form(case, email: str, **values) -> None:
+    """Send the portal's guest ticket form as a signed-out visitor; what it creates goes when the test ends."""
+    from helpdesk.api.ticket import new_guest_ticket
+
+    case.addCleanup(clean_up_guest_requests, email.strip().lower())
+    frappe.set_user("Guest")
+    try:
+        new_guest_ticket(
+            subject=values.get("subject", "Printer offline"),
+            description=values.get("description", "<p>It stopped printing.</p>"),
+            email=email,
+            first_name=values.get("first_name"),
+        )
+    finally:
+        frappe.set_user("Administrator")
+
+
+def clean_up_guest_requests(email: str) -> None:
+    frappe.set_user("Administrator")
+    for name in frappe.get_all("HD Ticket", {"raised_by": email}, pluck="name"):
+        frappe.delete_doc("HD Ticket", name, force=True)
+    for name in frappe.get_all("Contact", {"email_id": email}, pluck="name"):
+        frappe.delete_doc("Contact", name, force=True)
+    delete_invitations(email)
+    frappe.cache.delete_value(f"hd_guest_continue:{email}")
+    for token in guest_draft_tokens(email):
+        frappe.cache.delete_value(f"hd_guest_draft:{token}")
+
+
+def guest_draft_tokens(email: str) -> list[str]:
+    """Tokens of the drafts kept for `email`."""
+    tokens = [
+        frappe.safe_decode(key).split("hd_guest_draft:")[1]
+        for key in frappe.cache.get_keys("hd_guest_draft:")
+    ]
+    return [
+        token
+        for token in tokens
+        if (frappe.cache.get_value(f"hd_guest_draft:{token}") or {}).get("email")
+        == email
+    ]
+
+
+def emails_queued_to(email: str) -> int:
+    return frappe.db.count(
+        "Email Queue", filters=[["Email Queue Recipient", "recipient", "=", email]]
+    )

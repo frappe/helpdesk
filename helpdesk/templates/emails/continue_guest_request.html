@@ -1,0 +1,16 @@
+{% import "templates/emails/macros.html" as utils %} {% block content %}
+
+<td class="text-base leading-6 text-gray-900">
+  <div class="from-markdown bg-white p-8">
+    <p>
+      {{ _("You already have an account with us, so sign in to send your request. We've saved what you wrote, and it'll be waiting for you on the form.") }}
+    </p>
+    {{ utils.button(_("Sign in and continue"), link, true) }} {{
+    utils.separator() }}
+    <p class="text-gray-600">
+      {{ _("This link works for 3 days. If you didn't try to raise a ticket, you can ignore this email.") }}
+    </p>
+  </div>
+</td>
+
+{% endblock %}
