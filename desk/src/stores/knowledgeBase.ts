@@ -86,16 +86,3 @@ export const mergeCategory = createResource({
     if (!target) throw { message: "Target is required" };
   },
 });
-
-export const categories = createResource({
-  url: "helpdesk.api.knowledge_base.get_categories",
-  cache: ["categories"],
-});
-
-export const categoryName = createResource({
-  url: "helpdesk.api.knowledge_base.get_category_title",
-  cache: ["categoryName"],
-  makeParams({ category }) {
-    return { category };
-  },
-});
