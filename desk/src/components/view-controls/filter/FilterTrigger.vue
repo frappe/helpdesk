@@ -19,6 +19,7 @@
         <Button
           class="rounded-s-none border-s"
           icon="lucide-x"
+          :aria-label="__('Clear all Filter')"
           @click.stop="$emit('clear')"
         />
       </div>

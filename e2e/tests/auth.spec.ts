@@ -13,7 +13,7 @@ test.describe("logged out", () => {
     await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
-    await expect(page.getByRole("button", { name: "Filter" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: /^Helpdesk / }).click();
     await page.getByRole("menuitem", { name: "Log out" }).click();
