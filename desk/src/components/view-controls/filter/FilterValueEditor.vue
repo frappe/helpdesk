@@ -359,6 +359,7 @@ function onSearchPaste(event: ClipboardEvent) {
   event.preventDefault();
   const selectedValues = Array.isArray(value.value) ? value.value : [];
   applyValue([...new Set([...selectedValues, ...pastedValues])]);
+  search.value = "";
 }
 
 function splitValues(text: string): string[] {
@@ -457,6 +458,11 @@ const debouncedTextApply = useDebounceFn(() => {
   const nextValue = isMultiple.value
     ? splitValues(textValue.value)
     : textValue.value;
+  if (!hasValue(nextValue)) {
+    value.value = defaultValueFor(operator.value);
+    emit("clear");
+    return;
+  }
   applyValue(nextValue);
 }, 500);
 
