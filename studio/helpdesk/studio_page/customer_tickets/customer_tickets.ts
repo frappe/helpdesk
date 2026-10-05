@@ -158,16 +158,6 @@ export default function setup(context) {
     auto: true,
   })
 
-  // One organization is not a choice, but never override a condition already there.
-  watch(
-    settings.organizations,
-    (organizations) => {
-      if (organizations.length !== 1 || selectedOrganizations.value.length) return
-      selectOrganization([organizations[0].name])
-    },
-    { immediate: true },
-  )
-
   // Customer arrives as a quick filter, but the switcher is that filter here.
   const quickFilterFields = computed({
     get: () => view.quickFilter.fields.value.filter((field) => field.fieldname !== 'customer'),
