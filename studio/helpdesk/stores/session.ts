@@ -20,8 +20,6 @@ function createSessionStore() {
   const canCreateTicket = computed(() => !isGuest.value)
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
-  const isAdmin = computed(() => Boolean(config.value?.is_admin))
-  const isManager = computed(() => Boolean(config.value?.is_manager))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
   // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
@@ -65,8 +63,6 @@ function createSessionStore() {
     isPublicKnowledgeBase,
     canCreateTicket,
     isAgent,
-    isAdmin,
-    isManager,
     brandLogo,
     isPhone,
     loginUrl,

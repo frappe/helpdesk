@@ -50,10 +50,6 @@ def get_config():
     # The Studio portal has no boot payload, so this also names the session user.
     res.session_user = frappe.session.user
     res.is_agent = is_agent()
-    # The same roles the desk's settings tabs check, so the portal can link to the ones this agent sees.
-    roles = frappe.get_roles()
-    res.is_admin = "System Manager" in roles or "Administrator" in roles
-    res.is_manager = "Agent Manager" in roles
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 

@@ -101,16 +101,6 @@
         },
         "componentSlots": {},
         "visibilityCondition": "{{ organizations.length }}"
-       },
-       {
-        "componentId": "kb_settings-nav-agent",
-        "componentName": "PortalAgentSettingsNav",
-        "isCustomVueComponent": true,
-        "componentProps": {
-         "groups": "{{ agentSettingsGroups }}"
-        },
-        "componentSlots": {},
-        "visibilityCondition": "{{ agentSettingsGroups.length }}"
        }
       ],
       "componentId": "kb_settings-sidebar",
@@ -1481,7 +1471,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-04 11:55:01.234441",
+ "modified": "2026-10-06 21:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
