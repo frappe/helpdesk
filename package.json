@@ -1,7 +1,8 @@
 {
 	"private": true,
 	"dependencies": {
-		"@helpdesk/shared": "link:./shared"
+		"@helpdesk/shared": "link:./shared",
+		"@vueuse/core": "^14.1.0"
 	},
 	"scripts": {
 		"postinstall": "cd desk && yarn install",
