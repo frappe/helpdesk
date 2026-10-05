@@ -99,9 +99,6 @@
       "isCustomVueComponent": true
      },
      {
-      "baseStyles": {
-       "cursor": "pointer"
-      },
       "componentEvents": {
        "click": {
         "action": "Run Script",
@@ -109,19 +106,14 @@
         "script": "signIn()"
        }
       },
-      "componentId": "TextBlock-login",
-      "componentName": "TextBlock",
+      "componentId": "Button-login",
+      "componentName": "Button",
       "componentProps": {
-       "fontSize": "text-base",
-       "tag": "span",
-       "text": "{{ t('Login') }}"
+       "label": "{{ t('Log in') }}",
+       "variant": "solid"
       },
       "visibilityCondition": "{{ isGuest }}",
-      "classes": [
-       "px-2",
-       "py-1.5",
-       "-mx-2"
-      ]
+      "componentSlots": {}
      },
      {
       "componentEvents": {
@@ -202,7 +194,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-06 22:20:00.000000",
+ "modified": "2026-10-06 23:30:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
