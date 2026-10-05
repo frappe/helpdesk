@@ -81,46 +81,6 @@
     "blockName": "header-right",
     "children": [
      {
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "router.push('/tickets/new')"
-       }
-      },
-      "componentId": "Button-raise-ticket",
-      "componentName": "Button",
-      "componentProps": {
-       "label": "{{ words.raiseTicket }}",
-       "variant": "{{ route.path.startsWith('/articles/') ? 'solid' : 'subtle' }}"
-      },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}",
-      "classes": [
-       "max-sm:hidden"
-      ]
-     },
-     {
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "router.push('/tickets/new')"
-       }
-      },
-      "componentId": "Button-raise-ticket-icon",
-      "componentName": "Button",
-      "componentProps": {
-       "icon": "lucide-plus",
-       "variant": "{{ route.path.startsWith('/articles/') ? 'solid' : 'subtle' }}",
-       "aria-label": "{{ words.raiseTicket }}",
-       "tooltip": "{{ words.raiseTicket }}"
-      },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}",
-      "classes": [
-       "sm:hidden"
-      ]
-     },
-     {
       "baseStyles": {
        "cursor": "pointer"
       },
@@ -144,6 +104,16 @@
        "py-1.5",
        "-mx-2"
       ]
+     },
+     {
+      "componentId": "PortalCustomActions-header",
+      "componentName": "PortalCustomActions",
+      "componentProps": {
+       "actions": "{{ customActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ customActions.length }}"
      },
      {
       "componentEvents": {
@@ -224,7 +194,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-04 11:41:22.993810",
+ "modified": "2026-10-06 01:40:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

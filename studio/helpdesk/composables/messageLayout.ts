@@ -11,7 +11,7 @@ const THEIR_BUBBLE = {
   contentAlign: 'flex-start',
   cardWidth: 'fit-content',
   cardMaxWidth: '76%',
-  cardPadding: '12px 16px 14px',
+  cardPadding: '6px 12px',
   cardBackground: 'var(--surface-elevation-1)',
   cardBorder: '1px solid var(--outline-gray-2)',
 }

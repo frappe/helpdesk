@@ -1,7 +1,8 @@
 import { computed, markRaw, ref, watch } from 'vue'
-import { createResource, dayjs, dayjsLocal } from 'frappe-ui'
+import { createResource, dayjs, dayjsLocal, toast } from 'frappe-ui'
 import LucideCircleCheck from '~icons/lucide/circle-check'
 import LucideStar from '~icons/lucide/star'
+import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useDrawer } from '@app/composables/useDrawer'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
@@ -14,7 +15,7 @@ import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { DATE_FORMATS, runAction, updateTicket } from '@app/utils'
+import { DATE_FORMATS, runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Used when HD Settings has no `confirm_resolution_after_days`.
 const RESOLVED_PROMPT_DAYS = 5
@@ -31,10 +32,39 @@ export default function setup(context) {
 
   const ticketId = computed(() => String(route?.params?.name || ''))
 
+  const customActions = ref([])
+
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
+    onSuccess: runFormScripts,
   })
+
+  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
+  async function runFormScripts(data) {
+    await setupCustomizations(data, {
+      doc: data,
+      call: context.call,
+      router: context.router,
+      toast,
+      createToast,
+      $dialog: scriptDialog,
+      updateField,
+    })
+    customActions.value = data._customActions || []
+  }
+
+  function updateField(fieldname: string, value: unknown, callback = () => {}) {
+    runAction(
+      async () => {
+        await updateTicket(ticketId.value, { [fieldname]: value })
+        ticket.fetch()
+      },
+      { success: __('Ticket updated successfully.'), fallback: __('Could not update this ticket') },
+    )
+    callback()
+  }
+
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
   const feedback = useTicketFeedback(ticket)
@@ -186,6 +216,7 @@ export default function setup(context) {
   }
 
   function onPageAction() {
+    if (isClosed.value) return navigateTo(ROUTES.newTicket)
     if (wantsFeedback.value) return feedback.openFeedback()
     settings.askConfirm({
       title: __('Close ticket'),
@@ -227,10 +258,13 @@ export default function setup(context) {
     ratedBy,
     // dayjsLocal, the clock ActivityTimeline uses for the rows around it.
     ratedTimeAgo: computed(() => (ratedAt.value ? dayjsLocal(ratedAt.value).fromNow() : '')),
-    canCreateTicket: computed(() => settings.canCreateTicket.value && isClosed.value),
-    // Empty hides the header button: a customer may close only what support has resolved.
-    pageActionLabel: computed(() => (isResolved.value ? __('Close') : '')),
-    pageActionIcon: 'lucide-check',
+    customActions,
+    // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
+    pageActionLabel: computed(() => {
+      if (!isClosed.value) return __('Close')
+      return settings.canCreateTicket.value ? __('Raise a ticket') : ''
+    }),
+    pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
     onPageAction,
     confirmSolved,
     reopenTicket,

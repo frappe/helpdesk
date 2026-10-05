@@ -62,6 +62,8 @@ const store = {
   // Blocks bind `t`, not `__`.
   t: __,
   accountMenuOptions,
+  // HD Form Script header actions; the ticket pages fill them.
+  customActions: [],
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
   isSettingsBusy: core.isSettingsBusy,
