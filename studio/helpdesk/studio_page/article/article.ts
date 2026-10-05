@@ -27,8 +27,6 @@ export default function setup(context) {
     const image = dom.querySelector('img')?.getAttribute('src') || null
     return { html: dom.body.innerHTML, toc, words, image }
   })
-  const articleHtml = computed(() => parsed.value.html)
-  const toc = computed(() => parsed.value.toc)
   const minutes = computed(() => Math.max(1, Math.round(parsed.value.words / WORDS_PER_MINUTE)))
   const readingTime = computed(() => countLabel(minutes.value, __('1 minute to read'), __('{0} minutes to read')))
 
@@ -54,8 +52,6 @@ export default function setup(context) {
   )
 
   // `get_public_article` answers with the reader's own vote: '1' like, '2' dislike, '0' none.
-  const vote = computed(() => article?.data?.feedback)
-
   function submitFeedback(value) {
     return runAction(
       async () => {
@@ -95,13 +91,11 @@ export default function setup(context) {
     ...settings,
     ...useKbHeader(context),
     drawer: useDrawer(context.route),
-    articleHtml,
-    toc,
+    parsed,
     readingTime,
     publishedOn,
     currentCategory,
     relatedArticles,
-    vote,
     submitFeedback,
     copyLink,
     isPublicArticle,

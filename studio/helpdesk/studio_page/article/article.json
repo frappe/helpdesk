@@ -366,17 +366,17 @@
            "componentId": "PortalTableOfContents-article-folded",
            "componentName": "PortalTableOfContents",
            "componentProps": {
-            "items": "{{ toc }}",
+            "items": "{{ parsed.toc }}",
             "collapsible": true
            },
            "isCustomVueComponent": true,
-           "visibilityCondition": "{{ toc.length > 1 }}"
+           "visibilityCondition": "{{ parsed.toc.length > 1 }}"
           },
           {
            "componentId": "PortalArticleBody-article",
            "componentName": "PortalArticleBody",
            "componentProps": {
-            "content": "{{ articleHtml }}"
+            "content": "{{ parsed.html }}"
            },
            "isCustomVueComponent": true,
            "classes": [
@@ -392,7 +392,7 @@
            "componentId": "PortalArticleFeedback-fb7k2qd",
            "componentName": "PortalArticleFeedback",
            "componentProps": {
-            "vote": "{{ vote }}",
+            "vote": "{{ article.data.feedback }}",
             "onVote": "{{ submitFeedback }}",
             "canRaiseTicket": "{{ canCreateTicket }}"
            },
@@ -498,8 +498,7 @@
              "componentProps": {
               "data": "{{ relatedArticles }}",
               "dataKey": "name"
-             },
-             "visibilityCondition": "{{ relatedArticles && relatedArticles.length }}"
+             }
             }
            ],
            "classes": [
@@ -566,7 +565,7 @@
            "componentId": "PortalTableOfContents-article",
            "componentName": "PortalTableOfContents",
            "componentProps": {
-            "items": "{{ toc }}"
+            "items": "{{ parsed.toc }}"
            },
            "isCustomVueComponent": true
           }
@@ -670,7 +669,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 01:30:00.000000",
+ "modified": "2026-10-06 22:40:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

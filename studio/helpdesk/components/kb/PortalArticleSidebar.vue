@@ -122,15 +122,6 @@ const props = withDefaults(
   }
 );
 
-const tree = computed(() =>
-  props.categories.map((category) => ({
-    name: category.name,
-    label: category.category_name || category.name,
-    icon: category.icon,
-    articles: props.articles.filter((row) => row.category === category.name),
-  }))
-);
-
 const query = ref("");
 const openName = ref<string | null>(null);
 
@@ -152,13 +143,17 @@ function toggle(name: string) {
 
 const visibleCategories = computed(() => {
   const searching = Boolean(query.value.trim());
-  return tree.value
+  return props.categories
     .map((category) => {
-      const matches = category.articles.filter((article) =>
-        matchesQuery(query.value, article.title)
+      const matches = props.articles.filter(
+        (article) =>
+          article.category === category.name &&
+          matchesQuery(query.value, article.title)
       );
       return {
-        ...category,
+        name: category.name,
+        label: category.category_name || category.name,
+        icon: category.icon,
         matches,
         isCurrent: category.name === currentCategory.value,
         isOpen: searching

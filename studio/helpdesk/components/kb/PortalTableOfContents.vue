@@ -63,7 +63,7 @@ const ACTIVE_RATIO = 1 / 3;
 // Near the top the first heading is current, even before it reaches the line.
 const TOP_ZONE = 100;
 
-type Item = { id: string; text: string; level?: number };
+type Item = { id: string; text: string; level: number };
 
 // `collapsible` folds the list behind a toggle, for screens without a side column.
 const props = withDefaults(
@@ -79,13 +79,13 @@ let pinnedId: string | null = null;
 
 // Deeper headings indent only when shallower ones exist, so a flat list stays aligned.
 const topLevel = computed(() =>
-  Math.min(...props.items.map((item) => item.level ?? 2))
+  Math.min(...props.items.map((item) => item.level))
 );
 
 function linkClass(item: Item) {
   return [
     "border-l py-1 text-left",
-    (item.level ?? 2) > topLevel.value ? "pl-7" : "pl-4",
+    item.level > topLevel.value ? "pl-7" : "pl-4",
     item.id === activeId.value
       ? "border-outline-gray-7 text-ink-gray-9"
       : "border-outline-gray-1 text-ink-gray-6 hover:text-ink-gray-9",
