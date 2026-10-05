@@ -87,8 +87,8 @@ export default function setup(context) {
     __(isRelated.value ? 'Related help' : 'Popular help'),
   )
 
-  // Empty hides the button: a customer may close only what support has resolved.
-  const pageActionLabel = computed(() => (isResolved.value ? __('Close') : ''))
+  // Empty hides the button; as on the desk portal, any open ticket can be closed.
+  const pageActionLabel = computed(() => (isClosed.value ? '' : __('Close')))
 
   const canCreateTicket = computed(() => settings.canCreateTicket.value && isClosed.value)
 
