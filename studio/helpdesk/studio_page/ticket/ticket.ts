@@ -151,7 +151,7 @@ export default function setup(context) {
 
   // Where a rating is still owed, the dialog's save is the only way past `validate_feedback`.
   function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback(CLOSED_STATUS)
+    if (canRate.value) return feedback.openFeedback()
     return closeTicket()
   }
 

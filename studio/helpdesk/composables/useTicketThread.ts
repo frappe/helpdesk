@@ -5,11 +5,7 @@ import { DATE_FORMATS } from '@app/utils'
 
 export function useTicketThread(ticket) {
   // Oldest first, the order ActivityTimeline keeps in the DOM.
-  const messages = computed(() =>
-    [...(ticket.data?.communications || [])].sort(
-      (first, second) => new Date(first.creation).getTime() - new Date(second.creation).getTime(),
-    ),
-  )
+  const messages = computed(() => ticket.data?.communications || [])
 
   const activities = computed(() => messages.value.map(toEmailActivity))
 
