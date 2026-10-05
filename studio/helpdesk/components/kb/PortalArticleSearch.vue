@@ -25,7 +25,7 @@
         <button
           v-if="group.key === RECENT_SEARCHES"
           type="button"
-          class="rounded-4 px-1 text-ink-gray-6 hover:text-ink-gray-8 [@media(pointer:coarse)]:px-2 [@media(pointer:coarse)]:py-1.5"
+          class="rounded-4 px-1 text-ink-gray-5 hover:text-ink-gray-8 [@media(pointer:coarse)]:px-2 [@media(pointer:coarse)]:py-1.5"
           @mousedown.prevent
           @click="clearSearches"
         >
@@ -36,9 +36,11 @@
     <template #item="{ item }">
       <div
         v-if="item.recentSearch"
-        class="recent-search flex min-w-0 items-center gap-2.5"
+        class="recent-search flex min-w-0 items-center gap-3"
       >
-        <LucideClock class="size-4 shrink-0 text-ink-gray-4" />
+        <span class="flex w-9 shrink-0 justify-center">
+          <LucideClock class="size-4 text-ink-gray-4" />
+        </span>
         <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
           {{ item.recentSearch }}
         </span>
