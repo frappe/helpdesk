@@ -1,10 +1,7 @@
 import type { Ref } from 'vue'
-import { FileUploadHandler, call, dialog, toast } from 'frappe-ui'
+import { call, dialog, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
-
-// Private: an attachment on a support ticket is not public content.
-const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
 
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
@@ -64,19 +61,6 @@ export function askConfirm({ title, message, label, theme, action }) {
 
 export function updateTicket(name: string, values: Record<string, unknown>) {
   return call('frappe.client.set_value', { doctype: 'HD Ticket', name, fieldname: values })
-}
-
-// Keeps the files that made it; one file over the size limit must not sink the rest.
-export async function uploadFiles(files: File[], args: Record<string, unknown> = UPLOAD_ARGS) {
-  const results = await Promise.allSettled(
-    files.map((file) => new FileUploadHandler().upload(file, args)),
-  )
-  const uploaded = results
-    .filter((result) => result.status === 'fulfilled')
-    .map((result: any) => result.value)
-  const failedCount = files.length - uploaded.length
-  if (failedCount) toast.error(countLabel(failedCount, '1 file could not be uploaded', '{0} files could not be uploaded'))
-  return uploaded
 }
 
 export function countLabel(count: number, singular: string, plural: string) {

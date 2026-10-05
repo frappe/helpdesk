@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import { call, toast } from 'frappe-ui'
+import { FileUploadHandler, call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { usePreferences } from '@app/stores/preferences'
 import {
@@ -9,7 +9,7 @@ import {
   navigateTo,
   previousLocation,
 } from '@app/stores/router'
-import { errorMessage, uploadFiles } from '@app/utils'
+import { errorMessage } from '@app/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
@@ -63,7 +63,9 @@ export function createSettingsCore() {
     input.onchange = async () => {
       const file = input.files && input.files[0]
       if (!file) return
-      const [uploaded] = await uploadFiles([file], { private: false, optimize: true })
+      const uploaded = await new FileUploadHandler()
+        .upload(file, { private: false, optimize: true })
+        .catch(() => toast.error(__('Could not upload the image')))
       if (uploaded) await onUploaded(uploaded.file_url)
     }
     input.click()
