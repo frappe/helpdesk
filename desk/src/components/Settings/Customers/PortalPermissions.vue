@@ -55,7 +55,7 @@ const toggles = computed(() => [
     fieldname: "allow_anyone_to_create_tickets",
     label: __("Allow anyone to create tickets"),
     description: __(
-      "Visitors can raise a ticket from the portal without signing in. If their email already has an account, they're asked to sign in instead."
+      "Visitors can raise a ticket from the portal without signing in."
     ),
   },
   {
