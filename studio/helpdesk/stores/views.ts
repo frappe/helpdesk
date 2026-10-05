@@ -8,7 +8,7 @@ import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { parseJson, runAction, setValues } from '@app/utils'
 
-// ponytail: view icons are any stored lucide name, so they need the sprite Studio dropped
+// View icons are any lucide name stored per view, which Studio's build-time classes cannot cover.
 if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 const DOCTYPE = 'HD Ticket'
