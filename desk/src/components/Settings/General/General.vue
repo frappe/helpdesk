@@ -97,7 +97,6 @@ const settingsData = ref({
   autoUpdateStatus: false,
   isFeedbackMandatory: false,
   enableCommentReactions: false,
-  allowAnyoneToCreateTickets: false,
   defaultTicketType: "",
   skipEmailWorkflow: false,
   disableSavedRepliesGlobalScope: false,
@@ -148,8 +147,6 @@ const saveSettingsResource = createResource({
         auto_update_status: settingsData.value.autoUpdateStatus,
         is_feedback_mandatory: settingsData.value.isFeedbackMandatory,
         enable_comment_reactions: settingsData.value.enableCommentReactions,
-        allow_anyone_to_create_tickets:
-          settingsData.value.allowAnyoneToCreateTickets,
         default_ticket_type: settingsData.value.defaultTicketType,
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
         disable_saved_replies_global_scope:
@@ -186,7 +183,6 @@ const transformData = (data: any) => {
     autoUpdateStatus: data.auto_update_status,
     isFeedbackMandatory: Boolean(data.is_feedback_mandatory),
     enableCommentReactions: Boolean(data.enable_comment_reactions),
-    allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),
     defaultTicketType: data.default_ticket_type,
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
     disableSavedRepliesGlobalScope: Boolean(
@@ -255,7 +251,6 @@ const toggleFieldnames = {
   isFeedbackMandatory: "is_feedback_mandatory",
   enableCommentReactions: "enable_comment_reactions",
   disableSavedRepliesGlobalScope: "disable_saved_replies_global_scope",
-  allowAnyoneToCreateTickets: "allow_anyone_to_create_tickets",
   skipEmailWorkflow: "skip_email_workflow",
 } as const;
 const toggleFields = Object.keys(toggleFieldnames) as Array<

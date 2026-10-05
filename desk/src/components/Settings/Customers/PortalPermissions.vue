@@ -2,7 +2,9 @@
   <SettingsLayoutBase
     :title="__('Portal permissions')"
     :description="
-      __('Choose what customer managers can do from the customer portal.')
+      __(
+        'Choose what visitors and customer managers can do from the customer portal.'
+      )
     "
   >
     <template #content>
@@ -38,6 +40,13 @@ import { computed } from "vue";
 
 // computed, so labels follow a translation load
 const toggles = computed(() => [
+  {
+    fieldname: "allow_anyone_to_create_tickets",
+    label: __("Allow anyone to create tickets"),
+    description: __(
+      "Visitors can raise a ticket from the portal without signing in. If their email already has an account, they're asked to sign in instead."
+    ),
+  },
   {
     fieldname: "allow_customer_managers_to_invite",
     label: __("Invite and manage members"),
