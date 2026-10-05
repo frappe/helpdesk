@@ -250,10 +250,10 @@
   },
   {
    "default": "0",
-   "description": "Allow anonymous users to vote on articles.",
+   "description": "Visitors who aren't signed in can mark an article as helpful or not.",
    "fieldname": "allow_anonymous_article_voting",
    "fieldtype": "Check",
-   "label": "Anonymous voting on articles"
+   "label": "Allow guests to vote on articles"
   },
   {
    "description": "Banner image shown at the top of the Knowledge Base portal",
@@ -273,7 +273,7 @@
    "description": "Links shown at the top right of every portal page.",
    "fieldname": "portal_header_links",
    "fieldtype": "Table",
-   "label": "Header links",
+   "label": "Quick links",
    "options": "Top Bar Item"
   },
   {
@@ -622,7 +622,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 22:30:00.000000",
+ "modified": "2026-10-06 23:10:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

@@ -59,8 +59,10 @@ const toggles = computed(() => [
   },
   {
     fieldname: "allow_anonymous_article_voting",
-    label: __("Anonymous voting on articles"),
-    description: __("Allow anonymous users to vote on articles."),
+    label: __("Allow guests to vote on articles"),
+    description: __(
+      "Visitors who aren't signed in can mark an article as helpful or not."
+    ),
   },
 ]);
 

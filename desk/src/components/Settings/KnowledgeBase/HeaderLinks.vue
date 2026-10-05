@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-3">
     <div class="flex flex-col gap-1">
       <span class="text-base-medium text-ink-gray-8">
-        {{ __("Header links") }}
+        {{ __("Quick links") }}
       </span>
       <span class="text-p-sm text-ink-gray-6">
         {{ __("Shown at the top right of every knowledge base page.") }}
