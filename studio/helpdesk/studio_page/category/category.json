@@ -92,7 +92,7 @@
         "flex-col",
         "shrink-0",
         "h-full",
-        "w-[280px]",
+        "w-[239px]",
         "max-md:fixed",
         "max-md:inset-y-0",
         "max-md:start-0",
@@ -344,7 +344,7 @@
                   "min-w-0",
                   "flex-1",
                   "flex-col",
-                  "gap-0.5"
+                  "gap-1"
                  ],
                  "children": [
                   {
@@ -359,7 +359,7 @@
                     "text-ink-gray-8",
                     "font-medium",
                     "truncate",
-                    "leading-[1.15]",
+                    "leading-snug",
                     "group-hover:text-ink-gray-9",
                     "max-sm:whitespace-normal",
                     "max-sm:line-clamp-2"
@@ -450,7 +450,8 @@
         {
          "blockName": "not-found",
          "classes": [
-          "flex-1"
+          "flex-1",
+          "self-stretch"
          ],
          "componentId": "PortalEmptyState-category-not-found",
          "componentName": "PortalEmptyState",
@@ -509,7 +510,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-05 02:30:07.979885",
+ "modified": "2026-10-05 16:25:12.922093",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

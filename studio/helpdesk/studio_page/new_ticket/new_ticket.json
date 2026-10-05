@@ -45,24 +45,6 @@
        "blockName": "stack",
        "children": [
         {
-         "blockName": "title",
-         "classes": [
-          "font-semibold",
-          "mb-1",
-          "ml-0",
-          "mr-0",
-          "mt-0",
-          "text-ink-gray-8"
-         ],
-         "componentId": "title",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-2xl",
-          "tag": "span",
-          "text": "{{ t('Create new ticket') }}"
-         }
-        },
-        {
          "blockName": "about",
          "classes": [
           "prose-sm",
@@ -322,7 +304,8 @@
         "pb-0",
         "w-full",
         "pt-6",
-        "sm:pt-[50px]"
+        "sm:pt-[50px]",
+        "max-w-[896px]"
        ],
        "componentId": "stack",
        "componentName": "container",
@@ -365,7 +348,8 @@
         "w-full",
         "pt-8",
         "sm:pt-[39px]",
-        "pb-8"
+        "pb-8",
+        "max-w-[896px]"
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
@@ -373,13 +357,12 @@
       }
      ],
      "classes": [
-      "items-start",
+      "items-center",
       "flex",
       "flex-col",
       "grow",
       "shrink",
       "justify-start",
-      "max-w-[552px]",
       "overflow-y-auto",
       "w-full",
       "px-4",
@@ -417,7 +400,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 01:10:00.000000",
+ "modified": "2026-10-06 01:15:00.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

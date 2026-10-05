@@ -21,7 +21,7 @@ export default function setup(context) {
     const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')
     const toc = Array.from(dom.querySelectorAll('h1, h2, h3')).map((heading, index) => {
       heading.id = `section-${index}`
-      return { id: heading.id, text: heading.textContent.trim() }
+      return { id: heading.id, text: heading.textContent.trim(), level: Number(heading.tagName[1]) }
     })
     const words = dom.body.textContent.trim().split(/\s+/).filter(Boolean).length
     const image = dom.querySelector('img')?.getAttribute('src') || null

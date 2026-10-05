@@ -93,7 +93,7 @@
         "flex-col",
         "shrink-0",
         "h-full",
-        "w-[280px]",
+        "w-[239px]",
         "max-md:fixed",
         "max-md:inset-y-0",
         "max-md:start-0",
@@ -131,16 +131,14 @@
              "children": [
               {
                "classes": [
-                "text-ink-gray-8",
-                "font-bold",
-                "leading-[1.25]",
+                "text-[var(--ink-gray-9)]",
                 "min-w-0",
                 "max-sm:!text-[24px]"
                ],
                "componentId": "TextBlock-2so2pbuuk",
                "componentName": "TextBlock",
                "componentProps": {
-                "fontSize": "text-3xl",
+                "fontSize": "text-4xl-semibold",
                 "tag": "h1",
                 "text": "{{ article.data.title }}"
                }
@@ -351,7 +349,10 @@
             "shrink",
             "gap-3",
             "h-fit",
-            "w-full"
+            "w-full",
+            "pb-6",
+            "border-b",
+            "border-outline-gray-1"
            ],
            "componentId": "container-fkgmgcjko",
            "componentName": "container",
@@ -377,96 +378,25 @@
            "componentProps": {
             "content": "{{ articleHtml }}"
            },
-           "isCustomVueComponent": true
+           "isCustomVueComponent": true,
+           "classes": [
+            "flex-1"
+           ]
           },
           {
            "blockName": "feedback-box",
-           "children": [
-            {
-             "classes": [
-              "text-ink-gray-7",
-              "leading-[1.15]"
-             ],
-             "componentId": "TextBlock-x7azonved",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-sm",
-              "tag": "span",
-              "text": "{{ t(\"Did this answer your question?\") }}"
-             }
-            },
-            {
-             "blockName": "fb-actions",
-             "children": [
-              {
-               "baseStyles": {
-                "borderColor": "{{ vote === '1' ? 'var(--outline-gray-5)' : '' }}"
-               },
-               "componentEvents": {
-                "click": {
-                 "action": "Run Script",
-                 "event": "click",
-                 "script": "submitFeedback('1')"
-                }
-               },
-               "componentId": "container-mg93ofc32",
-               "componentName": "Button",
-               "componentProps": {
-                "iconLeft": "lucide-thumbs-up",
-                "label": "{{ t(\"Yes\") }}",
-                "variant": "outline"
-               }
-              },
-              {
-               "baseStyles": {
-                "borderColor": "{{ vote === '2' ? 'var(--outline-gray-5)' : '' }}"
-               },
-               "componentEvents": {
-                "click": {
-                 "action": "Run Script",
-                 "event": "click",
-                 "script": "submitFeedback('2')"
-                }
-               },
-               "componentId": "container-kw1gtpath",
-               "componentName": "Button",
-               "componentProps": {
-                "iconLeft": "lucide-thumbs-down",
-                "label": "{{ t(\"No\") }}",
-                "variant": "outline"
-               }
-              }
-             ],
-             "classes": [
-              "flex",
-              "flex-row",
-              "shrink-0",
-              "gap-2"
-             ],
-             "componentId": "container-fl85fwgrt",
-             "componentName": "container",
-             "originalElement": "div"
-            }
-           ],
            "classes": [
-            "border",
-            "bg-surface-sidebar",
-            "border-outline-gray-2",
-            "items-center",
-            "rounded-4",
-            "flex",
-            "gap-4",
-            "justify-between",
-            "mt-4",
-            "p-4",
-            "w-full",
-            "max-sm:flex-col",
-            "max-sm:items-start",
-            "max-sm:gap-3"
+            "mt-6",
+            "w-full"
            ],
-           "componentId": "container-3vdv8rj18",
-           "componentName": "container",
-           "originalElement": "div",
+           "componentId": "PortalArticleFeedback-fb7k2qd",
+           "componentName": "PortalArticleFeedback",
+           "componentProps": {
+            "vote": "{{ vote }}",
+            "onVote": "{{ submitFeedback }}",
+            "canRaiseTicket": "{{ canCreateTicket }}"
+           },
+           "isCustomVueComponent": true,
            "visibilityCondition": "{{ !isGuest || config?.allow_anonymous_article_voting }}"
           },
           {
@@ -499,61 +429,56 @@
                "blockName": "related-row",
                "children": [
                 {
+                 "classes": [
+                  "truncate",
+                  "flex-1",
+                  "text-ink-gray-8"
+                 ],
+                 "componentId": "TextBlock-paoqq6dak",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-base",
+                  "tag": "span",
+                  "text": "{{ dataItem.title }}"
+                 }
+                },
+                {
                  "baseStyles": {
                   "flexShrink": 0
                  },
                  "classes": [
                   "size-4",
-                  "text-ink-gray-6"
+                  "text-ink-gray-6",
+                  "transition-colors",
+                  "group-hover:text-ink-gray-8"
                  ],
                  "componentId": "HTML-related-article-icon",
                  "componentName": "HTML",
                  "componentProps": {
                   "html": "<svg viewBox=\"0 0 16 16\" fill=\"currentColor\" class=\"size-full\"><path d=\"M11 1C12.6569 1 14 2.34315 14 4V12.5C14 13.8807 12.8807 15 11.5 15H4.5C3.11929 15 2 13.8807 2 12.5V3.5C2 2.11929 3.11929 1 4.5 1H11ZM4.5 2C3.67157 2 3 2.67157 3 3.5V12.5C3 13.3284 3.67157 14 4.5 14H11.5C12.3284 14 13 13.3284 13 12.5V4C13 2.89543 12.1046 2 11 2H4.5ZM10.75 10.5C11.0261 10.5 11.25 10.7239 11.25 11C11.25 11.2761 11.0261 11.5 10.75 11.5H5.25C4.97386 11.5 4.75 11.2761 4.75 11C4.75 10.7239 4.97386 10.5 5.25 10.5H10.75ZM10.75 7.5C11.0261 7.5 11.25 7.72386 11.25 8C11.25 8.27614 11.0261 8.5 10.75 8.5H5.25C4.97386 8.5 4.75 8.27614 4.75 8C4.75 7.72386 4.97386 7.5 5.25 7.5H10.75ZM10.75 4.5C11.0261 4.5 11.25 4.72386 11.25 5C11.25 5.27614 11.0261 5.5 10.75 5.5H5.25C4.97386 5.5 4.75 5.27614 4.75 5C4.75 4.72386 4.97386 4.5 5.25 4.5H10.75Z\"/></svg>"
                  }
-                },
-                {
-                 "classes": [
-                  "truncate",
-                  "text-ink-gray-8",
-                  "flex-1",
-                  "leading-[1.15]"
-                 ],
-                 "componentId": "TextBlock-paoqq6dak",
-                 "componentName": "TextBlock",
-                 "componentProps": {
-                  "fontSize": "text-sm",
-                  "tag": "span",
-                  "text": "{{ dataItem.title }}"
-                 }
-                },
-                {
-                 "classes": [
-                  "size-4",
-                  "shrink-0",
-                  "text-ink-gray-4"
-                 ],
-                 "componentId": "Icon-related-chevron",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "lucide-chevron-right"
-                 }
                 }
                ],
                "classes": [
-                "hover:bg-surface-gray-1",
-                "items-center",
-                "border-outline-gray-2",
-                "rounded-none",
-                "border-t",
-                "border-r",
-                "border-l",
-                "cursor-pointer",
+                "group",
                 "flex",
-                "gap-2.5",
-                "py-2.5",
-                "px-3",
-                "w-full"
+                "cursor-pointer",
+                "items-center",
+                "gap-3",
+                "py-3",
+                "-mx-2.5",
+                "px-2.5",
+                "rounded-4",
+                "transition-colors",
+                "hover:bg-surface-gray-2",
+                "relative",
+                "after:absolute",
+                "after:inset-x-2.5",
+                "after:bottom-0",
+                "after:h-px",
+                "after:bg-[--outline-gray-1]",
+                "hover:after:opacity-0",
+                "[&:has(+*:hover)]:after:opacity-0"
                ],
                "componentEvents": {
                 "click": {
@@ -567,11 +492,7 @@
                "originalElement": "div"
               }
              ],
-             "classes": [
-              "[&>*:first-child]:rounded-t-4",
-              "[&>*:last-child]:rounded-b-4",
-              "[&>*:last-child]:border-b"
-             ],
+             "classes": [],
              "componentId": "Repeater-qufpavvce",
              "componentName": "Repeater",
              "componentProps": {
@@ -584,7 +505,7 @@
            "classes": [
             "flex",
             "flex-col",
-            "gap-3",
+            "gap-2",
             "mt-6",
             "w-full"
            ],
@@ -610,7 +531,9 @@
           "xl:ml-16",
           "xl:mr-10",
           "min-[1440px]:ml-[170px]",
-          "min-[1440px]:mr-[70px]"
+          "min-[1440px]:mr-[70px]",
+          "pb-20",
+          "min-h-full"
          ],
          "componentId": "container-rr220ojgc",
          "componentName": "container",
@@ -620,7 +543,8 @@
         {
          "blockName": "not-found",
          "classes": [
-          "flex-1"
+          "flex-1",
+          "self-stretch"
          ],
          "componentId": "PortalEmptyState-article-not-found",
          "componentName": "PortalEmptyState",
@@ -746,7 +670,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-05 02:30:07.979885",
+ "modified": "2026-10-06 01:30:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

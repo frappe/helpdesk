@@ -9,6 +9,7 @@
         v-model="query"
         size="sm"
         variant="outline"
+        class="[&_input]:!shadow-none"
         :placeholder="__('Search articles')"
       >
         <template #prefix>
@@ -57,21 +58,22 @@
           :open="category.isOpen"
         >
           <div
-            class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2"
+            class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2 pr-1"
           >
             <RouterLink
               v-for="article in category.matches"
               :key="article.name"
               :to="ROUTES.article(article.name)"
               :aria-current="article.name === activeName ? 'page' : undefined"
-              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-tighter no-underline transition"
+              :title="article.title"
+              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-snug no-underline transition"
               :class="
                 article.name === activeName
                   ? 'bg-surface-elevation-3 text-ink-gray-8 shadow-sm'
                   : 'text-ink-gray-6 hover:bg-surface-gray-2'
               "
             >
-              {{ article.title }}
+              <span class="min-w-0 truncate">{{ article.title }}</span>
             </RouterLink>
           </div>
         </PortalCollapse>

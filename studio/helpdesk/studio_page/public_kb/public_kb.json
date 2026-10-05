@@ -228,7 +228,7 @@
               {
                "classes": [
                 "size-6",
-                "text-ink-gray-5"
+                "text-ink-gray-8"
                ],
                "componentId": "Icon-category-card",
                "componentName": "Icon",
@@ -257,7 +257,7 @@
                 {
                  "blockName": "category-title",
                  "classes": [
-                  "text-ink-gray-9",
+                  "text-ink-gray-7",
                   "font-semibold",
                   "leading-[1.15]"
                  ],
@@ -385,7 +385,8 @@
         "gap-5",
         "mx-auto",
         "max-w-[700px]",
-        "pb-0",
+        "pb-2",
+        "sm:pb-4",
         "w-full",
         "px-4",
         "md:px-0",
@@ -849,8 +850,8 @@
         "w-full",
         "px-4",
         "md:px-0",
-        "pt-10",
-        "sm:pt-[57px]"
+        "pt-8",
+        "sm:pt-[41px]"
        ],
        "componentId": "container-yi3s1zcyy",
        "componentName": "container",
@@ -894,7 +895,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-05 02:30:07.979885",
+ "modified": "2026-10-06 00:50:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

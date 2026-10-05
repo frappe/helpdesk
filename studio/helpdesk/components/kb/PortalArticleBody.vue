@@ -3,7 +3,7 @@
     :content="content"
     :editable="false"
     :extensions="[ComponentUtils]"
-    editor-class="prose-sm max-w-none [&_:is(h1,h2,h3)]:scroll-mt-4 [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:h-auto [&_img]:max-w-full"
+    editor-class="prose-v3 max-w-none [&>*:first-child]:mt-0 [&_p+p]:mt-4 [&_:is(h1,h2,h3)]:scroll-mt-4 [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto [&_img]:h-auto [&_img]:max-w-full"
   />
 </template>
 

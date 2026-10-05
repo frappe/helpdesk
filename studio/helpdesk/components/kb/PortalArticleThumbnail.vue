@@ -10,7 +10,7 @@
   <span
     v-else
     class="flex size-9 shrink-0 items-center justify-center rounded-5 text-ink-gray-6"
-    :class="bordered ? 'border border-outline-gray-2' : 'bg-surface-gray-2'"
+    :class="bordered && 'border border-outline-gray-2'"
   >
     <svg
       viewBox="0 0 16 16"
