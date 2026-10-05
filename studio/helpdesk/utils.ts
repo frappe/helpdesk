@@ -58,7 +58,6 @@ export function setValues(doctype: string, name: string, values: Record<string, 
 }
 
 // `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
-// ponytail: no `html` body, frappe-ui's dialog takes a message only
 export function scriptDialog({ title, message, size, icon, actions }) {
   return dialog.confirm({
     title,

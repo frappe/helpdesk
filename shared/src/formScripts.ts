@@ -10,7 +10,6 @@ let spriteLoad: Promise<unknown> | undefined;
 
 // Scripts name any lucide icon, so it comes from frappe-ui's sprite: the desk
 // installs it at boot, the portal fetches it the first time a script asks.
-// ponytail: the sprite is ~470 KB; an icon list per script is the upgrade if that hurts.
 export function ScriptIcon({ icon }: { icon: string }) {
   if (!document.getElementById("lucide-sprite")) {
     spriteLoad ??= import("frappe-ui/experimental").then(({ spritePlugin }) =>
