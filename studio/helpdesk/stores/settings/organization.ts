@@ -147,7 +147,6 @@ export function createOrganizationSettings(core) {
   }
 
   function setMemberRole(member, role) {
-    if (member.role === 'Owner' || member.pending || role === member.role) return
     const isManager = role === 'Manager'
     askConfirm({
       title: isManager ? __('Grant manager access') : __('Revoke manager access'),
@@ -169,7 +168,6 @@ export function createOrganizationSettings(core) {
   }
 
   function removeMember(member) {
-    if (member.role === 'Owner') return
     if (member.pending) return cancelInvitation(member)
     askConfirm({
       title: __('Remove member'),

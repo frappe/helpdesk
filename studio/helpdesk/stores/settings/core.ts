@@ -90,7 +90,6 @@ export function createSettingsDialog(core, organization) {
   function openSettings(tab) {
     core.settingsTab.value = tab || 'profile'
     core.isSettingsOpen.value = true
-    organization.inviteOpen.value = false
     organization.closeOrganization()
     core.loadSettings()
   }
