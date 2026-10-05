@@ -267,7 +267,7 @@
    "fieldname": "banner_preset",
    "fieldtype": "Select",
    "label": "Banner Preset",
-   "options": "\nDots\nSlate\nSage\nPaper\nHaze\nSky"
+   "options": "\nStone\nBlue\nGreen\nCharcoal\nNavy\nForest"
   },
   {
    "description": "Links shown at the top right of every portal page.",
@@ -622,7 +622,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 23:10:00.000000",
+ "modified": "2026-10-06 23:20:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
