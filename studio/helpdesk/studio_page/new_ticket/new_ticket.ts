@@ -139,7 +139,7 @@ export default function setup(context) {
     }
     return runAction(
       async () => {
-        await newTicket.submit({
+        const ticket = await newTicket.submit({
           doc: {
             subject: subject.value,
             description: description.value,
@@ -148,7 +148,7 @@ export default function setup(context) {
           },
           attachments: uploaded,
         })
-        navigateTo(ROUTES.ticketList)
+        navigateTo(ROUTES.ticket(ticket.name))
       },
       { busy: isCreating, fallback: __('Could not create the ticket') },
     )
