@@ -485,6 +485,65 @@ class TestHDCustomer(IntegrationTestCase):
             customer.save()
 
 
+    def test_accepted_invitation_syncs_role_when_already_member(self) -> None:
+        customer = create_customer("Test Customer Already Member")
+        email = "already-member-invite@example.com"
+
+        contact = create_contact("AlreadyMember", email, user=False)
+        customer.append(
+            "contacts", {"contact_name": contact["contact"], "is_manager": False}
+        )
+        customer.save()
+
+        invitation = frappe.get_doc(
+            {
+                "doctype": "User Invitation",
+                "email": email,
+                "app_name": "helpdesk",
+                "redirect_to_path": "/helpdesk",
+                "roles": [{"role": "HD Customer"}],
+                "customer": customer.name,
+                "contact": contact["contact"],
+            }
+        ).insert(ignore_permissions=True)
+
+        user = create_user(email)
+
+        frappe.set_user(user.name)
+        after_accept(invitation, user, user_inserted=True)
+        frappe.set_user("Administrator")
+
+        customer.reload()
+        member = next(
+            row for row in customer.contacts if row.contact_name == contact["contact"]
+        )
+        self.assertFalse(member.is_manager)
+
+        roles = frappe.get_roles(user.name)
+        self.assertIn("HD Customer", roles)
+        self.assertNotIn("HD Customer Manager", roles)
+
+    def test_sync_customer_manager_roles_patch(self) -> None:
+        from helpdesk.patches.sync_customer_manager_roles import execute
+
+        customer = create_customer("Test Patch Manager Roles")
+        contact = create_contact("PatchManager", "patch-manager@example.com")
+        add_contact_in_customer(customer, contact["contact"], is_manager=True)
+
+        user = frappe.get_doc("User", contact["user"])
+        user.remove_roles("HD Customer", "HD Customer Manager")
+
+        roles_before = frappe.get_roles(user.name)
+        self.assertNotIn("HD Customer Manager", roles_before)
+        self.assertNotIn("HD Customer", roles_before)
+
+        execute()
+
+        roles_after = frappe.get_roles(user.name)
+        self.assertIn("HD Customer", roles_after)
+        self.assertIn("HD Customer Manager", roles_after)
+
+
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
     if frappe.db.exists("HD Customer", customer_name):
         frappe.delete_doc("HD Customer", customer_name, force=True)
