@@ -10,8 +10,6 @@ export const SEARCH_DEBOUNCE_MS = 300
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
   clock: 'h:mm A',
-  day: 'D MMMM',
-  dayWithYear: 'D MMMM YYYY',
   short: 'D MMM YYYY',
   step: 'ddd D MMM, h:mm A',
   date: 'DD-MM-YYYY',
