@@ -95,7 +95,7 @@ export default function setup(context) {
     (template.data?.fields || []).map((row) => ({
       fieldname: row.fieldname,
       fieldtype: row.fieldtype,
-      label: row.label,
+      label: __(row.label),
       options: row.options,
       reqd: Boolean(row.required),
       placeholder: row.placeholder || undefined,
