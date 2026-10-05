@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import { computed, inject, Component, ComputedRef } from "vue";
@@ -330,12 +331,21 @@ function displayValue(filter: ActiveFilter): string {
       return Number.isFinite(n) ? String(Math.round(n * 5)) : String(v ?? "");
     };
     return Array.isArray(value)
-      ? value.map(toStars).join(", ")
+      ? shortList(value.map(toStars))
       : toStars(value);
   }
-  if (Array.isArray(value)) return value.join(", ");
+  if (Array.isArray(value)) return shortList(value);
   if (typeof value === "string") return value.replaceAll("%", "");
   return String(value ?? "");
+}
+
+// "1, 2, 3 and 4 others", so long pasted lists stay readable
+function shortList(values: any[]): string {
+  const shown = values.slice(0, 3).join(", ");
+  const hidden = values.length - 3;
+  if (hidden <= 0) return shown;
+  if (hidden === 1) return __("{0} and 1 other", shown);
+  return __("{0} and {1} others", shown, hidden);
 }
 
 const operatorMap: Record<string, string> = {

@@ -72,7 +72,7 @@ test.describe("onboarding persona form", () => {
 
     const withoutTelemetry = await pageAs("admin");
     await withoutTelemetry.goto("/helpdesk/tickets");
-    await expect(withoutTelemetry.getByRole("button", { name: "Filter" })).toBeVisible();
+    await expect(withoutTelemetry.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
     await expect(withoutTelemetry).toHaveURL(/\/helpdesk\/tickets$/);
   });
 });
