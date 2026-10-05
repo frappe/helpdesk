@@ -2,7 +2,9 @@
   <SettingsLayoutBase
     :title="__('Portal permissions')"
     :description="
-      __('Choose what customer managers can do from the customer portal.')
+      __(
+        'Choose what visitors and customer managers can do from the customer portal.'
+      )
     "
   >
     <template #content>
@@ -21,8 +23,8 @@
             </span>
           </div>
           <Switch
-            :model-value="Boolean(hdSettings.doc?.[toggle.fieldname])"
-            @update:model-value="(value) => save(toggle.fieldname, value)"
+            :model-value="Boolean(toggle.settings.doc?.[toggle.fieldname])"
+            @update:model-value="(value) => save(toggle, value)"
           />
         </div>
       </div>
@@ -36,9 +38,28 @@ import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
 import { computed } from "vue";
 
+const hdSettings = createDocumentResource({
+  doctype: "HD Settings",
+  name: "HD Settings",
+});
+
+const websiteSettings = createDocumentResource({
+  doctype: "Website Settings",
+  name: "Website Settings",
+});
+
 // computed, so labels follow a translation load
 const toggles = computed(() => [
   {
+    settings: websiteSettings,
+    fieldname: "disable_signup",
+    label: __("Disable signup"),
+    description: __(
+      "New users will have to be manually registered by system managers."
+    ),
+  },
+  {
+    settings: hdSettings,
     fieldname: "allow_customer_managers_to_invite",
     label: __("Invite and manage members"),
     description: __(
@@ -46,6 +67,7 @@ const toggles = computed(() => [
     ),
   },
   {
+    settings: hdSettings,
     fieldname: "allow_customer_managers_to_edit_organization",
     label: __("Edit organization details"),
     description: __(
@@ -54,14 +76,9 @@ const toggles = computed(() => [
   },
 ]);
 
-const hdSettings = createDocumentResource({
-  doctype: "HD Settings",
-  name: "HD Settings",
-});
-
-function save(fieldname: string, value: boolean) {
-  hdSettings.setValue.submit(
-    { [fieldname]: value },
+function save(toggle, value: boolean) {
+  toggle.settings.setValue.submit(
+    { [toggle.fieldname]: value },
     { onSuccess: () => toast.success(__("Settings updated")) }
   );
 }
