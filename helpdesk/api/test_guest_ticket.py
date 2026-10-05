@@ -94,6 +94,18 @@ class TestGuestTicket(IntegrationTestCase):
         self.assertEqual(len(self.guest_tickets(email)), 1)
         self.assertIsNone(get_invitation(email))
 
+    def test_an_unsubscribed_account_holder_gets_a_ticket(self):
+        email = create_user(unique_email("unsubscribed")).name
+        self.addCleanup(frappe.delete_doc, "User", email, force=True)
+        unsubscribe = frappe.get_doc(
+            {"doctype": "Email Unsubscribe", "email": email, "global_unsubscribe": 1}
+        ).insert(ignore_permissions=True)
+        self.addCleanup(
+            frappe.delete_doc, "Email Unsubscribe", unsubscribe.name, force=True
+        )
+        submit_guest_form(self, email)
+        self.assertEqual(len(self.guest_tickets(email)), 1)
+
     def test_a_disabled_account_gets_a_ticket_and_no_invite(self):
         email = create_user(unique_email("disabled")).name
         self.addCleanup(frappe.delete_doc, "User", email, force=True)

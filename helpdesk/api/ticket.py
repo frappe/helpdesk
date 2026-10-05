@@ -129,9 +129,7 @@ def new_guest_ticket(
         )
 
     # Nothing is returned either way, so the form never tells who has an account.
-    if frappe.db.exists("User", {"email": email, "enabled": 1}) and (
-        EmailAccount.find_outgoing()
-    ):
+    if frappe.db.exists("User", {"email": email, "enabled": 1}) and can_email(email):
         send_continue_email(email, subject, description)
         return
 
@@ -146,6 +144,13 @@ def new_guest_ticket(
         }
     ).insert()
     invite_requester(ticket)
+
+
+def can_email(email: str) -> bool:
+    """Whether a mail to `email` would go out; if not, the ticket beats a sign-in link."""
+    return bool(EmailAccount.find_outgoing()) and not frappe.db.exists(
+        "Email Unsubscribe", {"email": email, "global_unsubscribe": 1}
+    )
 
 
 def guest_tickets_in_last_hour() -> int:
