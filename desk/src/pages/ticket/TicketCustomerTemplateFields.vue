@@ -39,7 +39,7 @@
       class="flex items-center gap-4"
     >
       <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">{{
-        field.label
+        __(field.label)
       }}</span>
       <span
         class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"

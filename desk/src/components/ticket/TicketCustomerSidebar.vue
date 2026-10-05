@@ -41,7 +41,9 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{
+          __(field.label)
+        }}</span>
         <span
           class="text-base text-ink-gray-8 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
@@ -96,7 +98,9 @@
         v-for="field in ticketAdditionalInfo"
         :key="field.fieldname"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{
+          __(field.label)
+        }}</span>
         <Tooltip :disabled="!storedStamp(field)" :text="storedStamp(field)">
           <span class="text-base text-ink-gray-8 flex-1">{{
             field.value
