@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { FileUploadHandler, call, toast } from 'frappe-ui'
+import { FileUploadHandler, call, dialog, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
 
@@ -49,6 +49,21 @@ export async function runAction(action: () => Promise<unknown>, options: ActionO
   } finally {
     if (busy) busy.value = false
   }
+}
+
+// `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
+// ponytail: no `html` body, frappe-ui's dialog takes a message only
+export function scriptDialog({ title, message, size, icon, actions }) {
+  return dialog.confirm({
+    title,
+    message,
+    size,
+    icon,
+    actions: actions?.map((action) => ({
+      ...action,
+      onClick: action.onClick && (({ close }) => action.onClick(Object.assign(() => close(), { close }))),
+    })),
+  })
 }
 
 export function updateTicket(name: string, values: Record<string, unknown>) {

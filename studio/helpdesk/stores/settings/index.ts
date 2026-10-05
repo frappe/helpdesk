@@ -62,6 +62,8 @@ const store = {
   // The blocks bind `t`; the alias keeps them off the module's own name.
   t: __,
   accountMenuOptions,
+  // HD Form Script header actions; the ticket pages fill them.
+  customActions: [],
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
   isSettingsBusy: core.isSettingsBusy,

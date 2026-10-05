@@ -113,6 +113,16 @@
       "visibilityCondition": "{{ isGuest }}"
      },
      {
+      "componentId": "PortalCustomActions-header",
+      "componentName": "PortalCustomActions",
+      "componentProps": {
+       "actions": "{{ customActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ customActions.length }}"
+     },
+     {
       "componentEvents": {
        "click": {
         "action": "Run Script",
@@ -191,7 +201,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-02 15:19:06.692502",
+ "modified": "2026-10-05 16:00:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

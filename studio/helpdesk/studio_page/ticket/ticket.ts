@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue'
-import { createListResource, createResource, dayjs } from 'frappe-ui'
+import { createListResource, createResource, dayjs, toast } from 'frappe-ui'
+import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
 import { useReplyComposer } from '@app/composables/useReplyComposer'
@@ -13,7 +14,7 @@ import {
   isResolvedStatus,
   loadTicketMeta,
 } from '@app/stores/ticketMeta'
-import { runAction, updateTicket } from '@app/utils'
+import { runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
 const RESOLVED_PROMPT_DAYS = 5
@@ -30,10 +31,38 @@ export default function setup(context) {
 
   const ticketId = computed(() => String(route?.params?.name || ''))
 
+  const customActions = ref([])
+
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
+    onSuccess: runFormScripts,
   })
+
+  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
+  async function runFormScripts(data) {
+    await setupCustomizations(data, {
+      doc: data,
+      call: context.call,
+      router: context.router,
+      toast,
+      createToast,
+      $dialog: scriptDialog,
+      updateField,
+    })
+    customActions.value = data._customActions || []
+  }
+
+  function updateField(fieldname: string, value: unknown, callback = () => {}) {
+    runAction(
+      async () => {
+        await updateTicket(ticketId.value, { [fieldname]: value })
+        ticket.fetch()
+      },
+      { success: __('Ticket updated successfully.'), fallback: __('Could not update this ticket') },
+    )
+    callback()
+  }
 
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
@@ -180,6 +209,7 @@ export default function setup(context) {
     conversation: thread.conversation,
     solvePromptAt,
     canCreateTicket,
+    customActions,
     pageActionLabel,
     pageActionIcon: 'lucide-check',
     onPageAction,

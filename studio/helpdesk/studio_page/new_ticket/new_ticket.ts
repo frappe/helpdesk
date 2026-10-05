@@ -1,13 +1,18 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { createListResource, toast, useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
+import {
+  handleLinkFieldUpdate,
+  handleSelectFieldUpdate,
+  setupCustomizations,
+} from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
 import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import { runAction } from '@app/utils'
+import { runAction, scriptDialog } from '@app/utils'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
@@ -66,6 +71,41 @@ export default function setup(context) {
     },
   )
 
+  const customActions = ref([])
+  // The template's own fields, for `applyFilters` to restore once a filter is lifted.
+  let oldFields = []
+
+  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
+  watch(
+    () => template.data,
+    async (data) => {
+      if (!data) return
+      oldFields = JSON.parse(JSON.stringify(data.fields || []))
+      await setupCustomizations(data, {
+        doc: model,
+        call: context.call,
+        router: context.router,
+        $dialog: scriptDialog,
+        applyFilters,
+      })
+      customActions.value = data._customActions || []
+    },
+    { immediate: true },
+  )
+
+  function applyFilters(fieldname: string, filters: any = null) {
+    const field = template.data.fields.find((row) => row.fieldname === fieldname)
+    if (field?.fieldtype === 'Select') handleSelectFieldUpdate(field, fieldname, filters, model, oldFields)
+    else if (field?.fieldtype === 'Link') handleLinkFieldUpdate(field, fieldname, filters, model, oldFields)
+  }
+
+  // A script's `onChange` handlers for a field, run when its value is committed.
+  function scriptListeners(row) {
+    const handlers = template.data?._customOnChange?.[row.fieldname]
+    if (!handlers) return undefined
+    return { change: (value) => handlers.forEach((handler) => handler(value, row.fieldtype)) }
+  }
+
   const about = computed(() => template.data?.about || '')
 
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
@@ -103,7 +143,8 @@ export default function setup(context) {
       dependsOn: row.depends_on,
       mandatoryDependsOn: row.mandatory_depends_on,
       filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
-      ui: uiFor(row),
+      readOnly: Boolean(row.disabled),
+      ui: { ...uiFor(row), on: scriptListeners(row) },
     })),
   )
 
@@ -156,6 +197,7 @@ export default function setup(context) {
 
   return {
     ...session,
+    customActions,
     about,
     fields,
     layout,

@@ -5,6 +5,7 @@
 	"description": "Source-only helpers shared by the desk and the Studio portal",
 	"type": "module",
 	"exports": {
+		"./formScripts": "./src/formScripts.ts",
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts"
 	},
