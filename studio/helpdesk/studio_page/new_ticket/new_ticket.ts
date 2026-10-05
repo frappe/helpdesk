@@ -97,6 +97,8 @@ export default function setup(context) {
         description.value = data.description_template
       }
       oldFields = JSON.parse(JSON.stringify(data.fields || []))
+      // Field dependency rules compare with '' (`doc.priority != ''`), which undefined passes.
+      for (const row of data.fields || []) model[row.fieldname] ??= ''
       await setupCustomizations(data, {
         doc: model,
         call: context.call,
