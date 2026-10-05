@@ -10,12 +10,11 @@ import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
-import { ROW_GAP } from '@app/composables/messageLayout'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { DATE_FORMATS, runAction, scriptDialog, updateTicket } from '@app/utils'
+import { runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Used when HD Settings has no `confirm_resolution_after_days`.
 const RESOLVED_PROMPT_DAYS = 5
@@ -167,36 +166,6 @@ export default function setup(context) {
     ),
   )
 
-  // The chat layout's rows for the same events, merged with its bubbles by time.
-  const chatEvents = computed(() => {
-    const rows = timelineEvents.value.map((event) => ({
-      name: event.key,
-      kind: event.type === 'log' ? 'closed' : 'rating',
-      creation: event.timestamp,
-      clock: event.timestamp ? thread.clockTime(event.timestamp) : '',
-      fullDate: event.timestamp ? dayjs(event.timestamp).format(DATE_FORMATS.tooltip) : '',
-      text: event.type === 'log' ? __('Closed by {0}', [event.author.fullname]) : '',
-    }))
-    const rating = rows.find((row) => row.kind === 'rating')
-    if (!rating) return rows
-    // The close the rating answers heads the rating card, so it is not drawn twice.
-    const closing = rows.findLast(
-      (row) => row.kind === 'closed' && dayjs(row.creation).valueOf() <= dayjs(rating.creation).valueOf(),
-    )
-    Object.assign(rating, {
-      closedLine: closing ? `${closing.text} · ${closing.clock}` : '',
-      tags: thread.rating.value.tags.map((tag) => tag.label).join(' · '),
-      ratedLine: __('{0} rated {1} of 5', [ratedBy.value, Math.round(thread.rating.value.rating)]),
-    })
-    return rows.filter((row) => row !== closing)
-  })
-
-  const conversation = computed(() => {
-    const rows = byTime([...thread.conversation.value, ...chatEvents.value], 'creation')
-    // A bubble's gap was set for the bubble after it; an event below it gets the full gap.
-    return rows.map((row, index) => (!row.kind && rows[index + 1]?.kind ? { ...row, rowSpacing: ROW_GAP } : row))
-  })
-
   function byTime(rows, key: string) {
     return rows.sort((first, second) => dayjs(first[key]).valueOf() - dayjs(second[key]).valueOf())
   }
@@ -250,11 +219,8 @@ export default function setup(context) {
     words,
     ticketId,
     ticket,
-    isChat: thread.isChat,
     rating: thread.rating,
     activities,
-    conversation,
-    solvePromptAt,
     ratedBy,
     // dayjsLocal, the clock ActivityTimeline uses for the rows around it.
     ratedTimeAgo: computed(() => (ratedAt.value ? dayjsLocal(ratedAt.value).fromNow() : '')),
