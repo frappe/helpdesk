@@ -1,7 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { FileUploadHandler, call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { usePreferences } from '@app/stores/preferences'
 import {
   afterEachRoute,
   currentRoute,
@@ -28,8 +27,6 @@ export function createSettingsCore() {
   async function loadSettings() {
     try {
       settingsData.value = await call('helpdesk.api.organization.get_settings')
-      // By docname, not email: they differ for Administrator.
-      usePreferences().loadPreferences(settingsUser.value.name)
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)

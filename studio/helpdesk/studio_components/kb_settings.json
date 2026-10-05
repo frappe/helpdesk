@@ -248,7 +248,7 @@
                     "componentId": "kb_settings-select-language",
                     "componentName": "Combobox",
                     "componentProps": {
-                     "modelValue": "{{ preferences.language }}",
+                     "modelValue": "{{ settingsUser.language }}",
                      "onUpdate:modelValue": "(value) => setPreference('language', value)",
                      "options": "{{ languageOptions }}",
                      "placeholder": "{{ t('Select language') }}",
@@ -274,7 +274,7 @@
                     "componentId": "kb_settings-select-time_zone",
                     "componentName": "Combobox",
                     "componentProps": {
-                     "modelValue": "{{ preferences.time_zone }}",
+                     "modelValue": "{{ settingsUser.time_zone }}",
                      "onUpdate:modelValue": "(value) => setPreference('time_zone', value)",
                      "options": "{{ timezoneOptions }}",
                      "placeholder": "{{ t('Select timezone') }}",
@@ -1310,7 +1310,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-06 22:00:00.000000",
+ "modified": "2026-10-06 22:10:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

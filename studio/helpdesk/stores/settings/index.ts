@@ -2,7 +2,6 @@ import { computed } from 'vue'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
-import { usePreferences } from '@app/stores/preferences'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { createSettingsCore, createSettingsDialog } from './core'
@@ -74,5 +73,5 @@ const store = {
 export function useSettingsModal(context) {
   bindRouter(context?.router)
   dialog.watchRoute()
-  return { ...store, ...usePreferences(), ...session }
+  return { ...store, ...session }
 }

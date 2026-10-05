@@ -1,5 +1,6 @@
-import { ref } from 'vue'
-import { call, toast } from 'frappe-ui'
+import { computed, ref } from 'vue'
+import { call, createResource, toast } from 'frappe-ui'
+import { __, fetchTranslations } from '@helpdesk/shared/translation'
 
 export function createProfileSettings(core) {
   const profileFirstName = ref('')
@@ -8,10 +9,35 @@ export function createProfileSettings(core) {
   const currentPassword = ref('')
   const newPassword = ref('')
 
+  const languages = createResource({
+    url: 'frappe.client.get_list',
+    params: {
+      doctype: 'Language',
+      fields: ['name', 'language_name'],
+      limit_page_length: 0,
+      order_by: 'language_name asc',
+    },
+    transform: (rows) => rows.map((row) => ({ label: row.language_name || row.name, value: row.name })),
+  })
+
+  const timezones = createResource({
+    url: 'frappe.core.doctype.user.user.get_timezones',
+    transform: (data) => data.timezones.map((zone) => ({ label: zone, value: zone })),
+  })
+
   core.afterLoad(() => {
     profileFirstName.value = core.settingsUser.value.first_name || ''
     profileLastName.value = core.settingsUser.value.last_name || ''
+    if (!languages.fetched) languages.fetch()
+    if (!timezones.fetched) timezones.fetch()
   })
+
+  function setPreference(field, value) {
+    if (!value || value === core.settingsUser.value[field]) return
+    return core
+      .run(() => call('helpdesk.api.auth.update_profile', { [field]: value }), __('Preferences updated successfully.'))
+      .then(fetchTranslations)
+  }
 
   function saveProfile() {
     return core.run(
@@ -70,5 +96,8 @@ export function createProfileSettings(core) {
     renameProfile,
     uploadProfileImage,
     removeProfileImage,
+    languageOptions: computed(() => languages.data || []),
+    timezoneOptions: computed(() => timezones.data || []),
+    setPreference,
   }
 }

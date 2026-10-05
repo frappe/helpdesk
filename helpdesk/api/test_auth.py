@@ -33,6 +33,14 @@ class TestUpdateProfile(IntegrationTestCase):
             "/files/me.png",
         )
 
+    def test_language_and_time_zone_are_saved(self) -> None:
+        update_profile(language="en", time_zone="Asia/Kolkata")
+
+        self.assertEqual(
+            frappe.db.get_value("User", self.person["user"], ["language", "time_zone"]),
+            ("en", "Asia/Kolkata"),
+        )
+
     def test_a_linked_picture_is_refused(self) -> None:
         with self.assertRaises(frappe.ValidationError):
             update_profile(image="https://tracker.example.com/pixel.png")

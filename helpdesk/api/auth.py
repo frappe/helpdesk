@@ -84,8 +84,10 @@ def update_profile(
     first_name: str | None = None,
     last_name: str | None = None,
     image: str | None = None,
+    language: str | None = None,
+    time_zone: str | None = None,
 ) -> None:
-    """Change the session user's own name or picture."""
+    """Change the session user's own name, picture, language or time zone."""
     user = frappe.get_doc("User", frappe.session.user)
     if first_name is not None:
         user.first_name = first_name
@@ -94,6 +96,10 @@ def update_profile(
     validate_uploaded_image(image)
     if image is not None:
         user.user_image = image or None
+    if language:
+        user.language = language
+    if time_zone:
+        user.time_zone = time_zone
     user.save(ignore_permissions=True)
     _sync_contact(user)
 
