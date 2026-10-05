@@ -52,7 +52,6 @@ export async function runAction(action: () => Promise<unknown>, options: ActionO
 }
 
 // `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
-// ponytail: no `html` body, frappe-ui's dialog takes a message only
 export function scriptDialog({ title, message, size, icon, actions }) {
   return dialog.confirm({
     title,
@@ -71,7 +70,6 @@ export function updateTicket(name: string, values: Record<string, unknown>) {
 }
 
 // Keeps the files that made it; one file over the size limit must not sink the rest.
-// ponytail: @framework/ui useUploader is the upgrade if restrictions or progress are needed
 export async function uploadFiles(files: File[], args: Record<string, unknown> = UPLOAD_ARGS) {
   const results = await Promise.allSettled(
     files.map((file) => new FileUploadHandler().upload(file, args)),

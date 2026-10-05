@@ -9,8 +9,7 @@ import { useSession } from '@app/stores/session'
 import { parseJson } from '@app/utils'
 
 
-// ponytail: Studio dropped the lucide sprite, but view icons are any lucide name stored per
-// view, which build-time classes cannot cover. Move off it before frappe-ui removes it.
+// View icons are any lucide name stored per view, which Studio's build-time classes cannot cover.
 if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 const DOCTYPE = 'HD Ticket'
