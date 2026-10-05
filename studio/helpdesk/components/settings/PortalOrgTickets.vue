@@ -13,7 +13,7 @@
       </TextInput>
     </div>
 
-    <div v-if="tickets.length" class="isolate">
+    <div v-if="tickets.data?.length" class="isolate">
       <div :class="[ROW, 'min-h-8 text-p-xs text-ink-gray-5']">
         <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{
           __("ID")
@@ -29,7 +29,7 @@
       </div>
 
       <RouterLink
-        v-for="ticket in tickets"
+        v-for="ticket in tickets.data"
         :key="ticket.name"
         :class="[ROW, BODY_ROW]"
         :to="ROUTES.ticket(ticket.name)"
@@ -50,7 +50,7 @@
     </div>
 
     <p
-      v-if="!isLoading && !tickets.length"
+      v-if="!tickets.loading && !tickets.data?.length"
       class="py-4 text-p-base text-ink-gray-5"
     >
       {{
@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { RouterLink } from "vue-router";
-import { TextInput, call, debounce } from "frappe-ui";
+import { TextInput, createListResource, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
@@ -84,34 +84,21 @@ const BODY_ROW =
 
 const props = defineProps<{ customer?: string }>();
 
-const tickets = ref<any[]>([]);
-const isLoading = ref(false);
+const tickets = createListResource({
+  doctype: "HD Ticket",
+  fields: ["name", "subject", "status", "creation"],
+  orderBy: "creation desc",
+  pageLength: RECENT_TICKET_LIMIT,
+});
 const search = ref("");
 
-async function load() {
-  const customer = props.customer;
-  if (!customer) {
-    tickets.value = [];
-    return;
-  }
-  const filters: Record<string, unknown> = { customer };
+function load() {
+  if (!props.customer) return;
+  const filters: Record<string, unknown> = { customer: props.customer };
   const query = search.value.trim();
   if (query) filters.subject = ["like", `%${query}%`];
-
-  isLoading.value = true;
-  try {
-    tickets.value = await call("frappe.client.get_list", {
-      doctype: "HD Ticket",
-      filters,
-      fields: ["name", "subject", "status", "creation"],
-      order_by: "creation desc",
-      limit_page_length: RECENT_TICKET_LIMIT,
-    });
-  } catch {
-    tickets.value = [];
-  } finally {
-    isLoading.value = false;
-  }
+  tickets.update({ filters });
+  tickets.reload();
 }
 
 watch(

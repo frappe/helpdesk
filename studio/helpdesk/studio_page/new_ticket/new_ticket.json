@@ -386,8 +386,7 @@
              "name": "attachments"
             },
             "transport": "{{ uploadPrivately }}"
-           },
-           "visibilityCondition": "{{ attachments }}"
+           }
           }
          ],
          "classes": [
@@ -508,7 +507,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 20:20:00.000000",
+ "modified": "2026-10-06 22:20:00.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

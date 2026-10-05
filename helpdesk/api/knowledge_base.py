@@ -16,7 +16,6 @@ from helpdesk.utils import is_agent
 
 PUBLIC = "Public"
 CUSTOMERS_ONLY = "Customers only"
-AGENTS_ONLY = "Agents only"
 
 
 def validate_public_access():
@@ -185,15 +184,14 @@ def get_public_articles(
     articles = frappe.get_all(
         "HD Article",
         filters=filters,
-        fields=[*PUBLIC_ARTICLE_FIELDS, "content"],
+        fields=["name", "title", "content"],
         order_by="views desc" if sort == "popular" else "published_on desc",
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
     for article in articles:
-        soup = BeautifulSoup(article.pop("content") or "", "html.parser")
-        article.excerpt = excerpt(soup)
-        article.image = first_image(soup)
-        article.author = byline(article.author)
+        article.excerpt = excerpt(
+            BeautifulSoup(article.pop("content") or "", "html.parser")
+        )
     return articles
 
 
@@ -265,7 +263,7 @@ def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_categories(limit: int | None = None) -> list[dict]:
+def get_public_categories() -> list[dict]:
     """Only those with an article the reader may see, each with `article_count`."""
     validate_public_access()
     counts = readable_article_counts()
@@ -276,7 +274,6 @@ def get_public_categories(limit: int | None = None) -> list[dict]:
         filters={"name": ["in", list(counts)]},
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
-        limit_page_length=cint(limit),
     )
     for category in categories:
         category.article_count = counts[category.name]
@@ -364,7 +361,7 @@ def escape_marked(text: str) -> str:
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 @rate_limit(key="article", limit=5, seconds=60 * 60)
-def vote_on_article(article: str, value: int) -> dict:
+def vote_on_article(article: str, value: int) -> None:
     """Vote on a published article, signed in or not."""
     validate_public_access()
     doc = frappe.get_doc("HD Article", article)
@@ -372,7 +369,6 @@ def vote_on_article(article: str, value: int) -> dict:
         frappe.throw(_("Article not found"), frappe.DoesNotExistError)
 
     doc.set_feedback(cint(value), visitor_id=get_visitor_id(create=True))
-    return get_article_votes(article)
 
 
 def get_visitor_id(create: bool = False) -> str | None:
@@ -405,20 +401,6 @@ def get_own_vote(article: str) -> str:
         "HD Article Feedback", {**voter, "article": article}, "feedback"
     )
     return str(vote or "0")
-
-
-def get_article_votes(article: str) -> dict:
-    # Not `db.count`: it checks read permission, which a guest voter lacks.
-    totals = dict(
-        frappe.get_all(
-            "HD Article Feedback",
-            filters={"article": article, "feedback": ["in", ["1", "2"]]},
-            fields=["feedback", {"COUNT": "*", "as": "total"}],
-            group_by="feedback",
-            as_list=True,
-        )
-    )
-    return {"likes": totals.get("1", 0), "dislikes": totals.get("2", 0)}
 
 
 @frappe.whitelist()

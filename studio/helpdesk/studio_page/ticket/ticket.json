@@ -140,7 +140,7 @@
                    "componentProps": {
                     "fontSize": "text-p-base",
                     "tag": "span",
-                    "text": "{{ words.solveAsk }}"
+                    "text": "{{ t('Did this solve your issue?') }}"
                    }
                   },
                   {
@@ -153,7 +153,7 @@
                    "componentId": "KbDotAction-ticket-solve-yes",
                    "componentName": "PortalDotAction",
                    "componentProps": {
-                    "label": "{{ words.solveYes }}",
+                    "label": "{{ t(\"Yes, it's fixed\") }}",
                     "state": "done"
                    },
                    "isCustomVueComponent": true
@@ -168,7 +168,7 @@
                    "componentId": "KbDotAction-ticket-solve-no",
                    "componentName": "PortalDotAction",
                    "componentProps": {
-                    "label": "{{ words.solveNo }}",
+                    "label": "{{ t('No, still an issue') }}",
                     "state": "next"
                    },
                    "isCustomVueComponent": true
@@ -236,7 +236,7 @@
                      "componentProps": {
                       "fontSize": "text-sm",
                       "tag": "span",
-                      "text": "{{ words.ratedSupport }}"
+                      "text": "{{ t('rated the support') }}"
                      },
                      "classes": [
                       "text-ink-gray-5"
@@ -394,7 +394,7 @@
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
-                "text": "{{ words.composerPrompt }}"
+                "text": "{{ t('Type a message') }}"
                }
               }
              ],
@@ -423,7 +423,7 @@
              "componentId": "container-ticket-prompt",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ canReply && !isComposerOpen }}"
+             "visibilityCondition": "{{ !isComposerOpen }}"
             },
             {
              "children": [
@@ -462,7 +462,7 @@
              "componentId": "container-ticket-editor",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ canReply && isComposerOpen }}"
+             "visibilityCondition": "{{ isComposerOpen }}"
             }
            ],
            "classes": [
@@ -591,7 +591,7 @@
                "componentProps": {
                 "fontSize": "text-p-sm",
                 "tag": "span",
-                "text": "{{ words.status }}"
+                "text": "{{ t('Status') }}"
                }
               },
               {
@@ -691,7 +691,7 @@
                "componentProps": {
                 "fontSize": "text-p-sm",
                 "tag": "span",
-                "text": "{{ words.ratingLabel }}"
+                "text": "{{ t('Rating') }}"
                },
                "classes": [
                 "text-ink-gray-5"
@@ -929,10 +929,6 @@
        "parentBlockId": "Dialog-ticket-feedback",
        "slotContent": [
         {
-         "baseStyles": {
-          "display": "{{ dataItem.rowDisplay }}",
-          "flexDirection": "{{ dataItem.rowDirection }}"
-         },
          "children": [
           {
            "children": [
@@ -1196,7 +1192,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 21:30:00.000000",
+ "modified": "2026-10-06 22:20:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

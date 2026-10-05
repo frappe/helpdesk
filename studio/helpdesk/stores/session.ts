@@ -26,10 +26,6 @@ function createSessionStore() {
   // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
 
-  const loginUrl = computed(
-    () => `/login?redirect-to=${encodeURIComponent(window.location.pathname + window.location.search)}`,
-  )
-
   function loadSession() {
     if (sessionRequest) return sessionRequest
     sessionRequest = call('helpdesk.api.config.get_config')
@@ -50,7 +46,7 @@ function createSessionStore() {
   }
 
   function signIn() {
-    window.location.href = loginUrl.value
+    window.location.href = `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
   }
 
   // Posted, not navigated: frappe only accepts POST on logout.
@@ -71,7 +67,6 @@ function createSessionStore() {
     isAgent,
     brandLogo,
     isPhone,
-    loginUrl,
     loadSession,
     signIn,
     signOut,

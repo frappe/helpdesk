@@ -28,7 +28,6 @@ def get_config():
         "brand_logo",
         "favicon",
         "public_knowledge_base",
-        "prefer_knowledge_base",
         "allow_anonymous_article_voting",
         "banner_image",
         "banner_preset",

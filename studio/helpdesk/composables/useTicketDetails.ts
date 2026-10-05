@@ -5,15 +5,12 @@ import { twoUnitDuration } from '@helpdesk/shared/utils'
 import { isClosedStatus, statusMeta } from '@app/stores/ticketMeta'
 import { DATE_FORMATS } from '@app/utils'
 
-// The page heading already carries the subject.
-const HIDDEN_FIELDS = ['subject']
 const MINUTE = 60
 // A reply inside this window reads as "someone was already there", not as a measured wait.
 const IMMEDIATE_SECONDS = 5 * MINUTE
 
 export function useTicketDetails(ticket, thread) {
   const data = computed(() => ticket.data || {})
-  const firstReply = computed(() => thread.firstAgentReply.value)
 
   const identity = computed(() => ({
     // A Contact's docname is whatever created it; the person's name is `full_name`.
@@ -34,7 +31,8 @@ export function useTicketDetails(ticket, thread) {
 
   function templateFields() {
     return (data.value.template?.fields || [])
-      .filter((field) => !HIDDEN_FIELDS.includes(field.fieldname))
+      // The page heading already carries the subject.
+      .filter((field) => field.fieldname !== 'subject')
       .map((field) => ({ label: __(field.label), value: formatValue(field, data.value[field.fieldname]) }))
   }
 
@@ -61,13 +59,13 @@ export function useTicketDetails(ticket, thread) {
 
   // Assignment is agent-only data, so the first agent reply stands in for it.
   function assigned() {
-    const reply = firstReply.value
+    const reply = thread.firstAgentReply.value
     if (!reply) return makeStep(__('Assigned to agent'), __('Waiting to be assigned'), 'pending')
     return makeStep(__('Assigned to {0}', [reply.sender]), elapsedPhrase(reply.creation), 'done', reply.creation)
   }
 
   function answered() {
-    const reply = firstReply.value
+    const reply = thread.firstAgentReply.value
     if (!reply) return awaiting(__('Awaiting first response'), data.value.response_by)
     const summary = durationSummary(reply.creation, __('Answered immediately'), (took) => __('Answered in {0}', [took]))
     const late = secondsLate(reply.creation, data.value.response_by, data.value.first_response_failed_by)
@@ -78,7 +76,7 @@ export function useTicketDetails(ticket, thread) {
   function resolution() {
     const on = data.value.resolution_date
     if (!on) {
-      if (!firstReply.value) return [makeStep(__('Resolved'), '', 'pending')]
+      if (!thread.firstAgentReply.value) return [makeStep(__('Resolved'), '', 'pending')]
       return [awaiting(__('Awaiting resolution'), data.value.resolution_by)]
     }
     if (!wasResolved()) return []

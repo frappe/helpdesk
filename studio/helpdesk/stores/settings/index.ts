@@ -2,7 +2,6 @@ import { computed } from 'vue'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
-import { usePreferences } from '@app/stores/preferences'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { createSettingsCore, createSettingsDialog } from './core'
@@ -34,8 +33,6 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
-
 export const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? []
@@ -54,7 +51,6 @@ export const accountMenuOptions = computed(() =>
 )
 
 const store = {
-  words,
   themeOptions,
   theme,
   // Blocks bind `t`, not `__`.
@@ -70,11 +66,6 @@ const store = {
   settingsUser: core.settingsUser,
   organizations: core.organizations,
   loadSettings: core.loadSettings,
-  confirmAction: core.confirmAction,
-  isConfirmOpen: core.isConfirmOpen,
-  askConfirm: core.askConfirm,
-  cancelConfirm: core.cancelConfirm,
-  acceptConfirm: core.acceptConfirm,
   ...organization,
   ...profile,
 }
@@ -82,5 +73,5 @@ const store = {
 export function useSettingsModal(context) {
   bindRouter(context?.router)
   dialog.watchRoute()
-  return { ...store, ...usePreferences(), ...session }
+  return { ...store, ...session }
 }

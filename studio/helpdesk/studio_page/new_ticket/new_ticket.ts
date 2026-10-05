@@ -1,5 +1,5 @@
 import { computed, reactive, ref, watch } from 'vue'
-import { call, createListResource, toast, useFileUpload } from 'frappe-ui'
+import { call, toast, useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import {
   handleLinkFieldUpdate,
@@ -12,6 +12,7 @@ import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
+import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
 import { runAction, scriptDialog } from '@app/utils'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
 
@@ -72,29 +73,15 @@ export default function setup(context) {
       })
   }
 
-  const priorities = createListResource({
-    doctype: 'HD Ticket Priority',
-    fields: ['name', 'description'],
-  })
-
   // Waits for the session: isGuest reads true until get_config answers.
   watch(
     settings.isGuest,
     (isGuest) => {
       if (isGuest) return
       template.fetch()
-      priorities.fetch()
+      loadTicketMeta()
     },
     { immediate: true },
-  )
-
-  watch(
-    () => template.data,
-    (data) => {
-      if (data?.description_template && isContentEmpty(description.value)) {
-        description.value = data.description_template
-      }
-    },
   )
 
   const customActions = ref([])
@@ -106,6 +93,9 @@ export default function setup(context) {
     () => template.data,
     async (data) => {
       if (!data) return
+      if (data.description_template && isContentEmpty(description.value)) {
+        description.value = data.description_template
+      }
       oldFields = JSON.parse(JSON.stringify(data.fields || []))
       await setupCustomizations(data, {
         doc: model,
@@ -153,10 +143,7 @@ export default function setup(context) {
   const timeFormat = computed(() => settings.config.value?.time_format)
 
   // As on the desk's form, only priority shows its description.
-  const priorityHint = computed(() => {
-    const priority = (priorities.data || []).find((row) => row.name === model.priority)
-    return priority?.description?.trim() || undefined
-  })
+  const priorityHint = computed(() => getPriority(model.priority)?.description?.trim() || undefined)
 
   // The desk's fallback when the template sets no placeholder.
   function defaultPlaceholder(fieldtype) {

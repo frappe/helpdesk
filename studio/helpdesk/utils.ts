@@ -1,9 +1,7 @@
 import type { Ref } from 'vue'
-import { FileUploadHandler, call, dialog, toast } from 'frappe-ui'
+import { call, dialog, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
-
-const UPLOAD_ARGS = { folder: 'Home/Helpdesk', private: true }
 
 export const SEARCH_DEBOUNCE_MS = 300
 
@@ -23,11 +21,6 @@ export function parseJson(value: unknown, fallback: any = undefined) {
   } catch {
     return fallback
   }
-}
-
-export function parseJsonArray(value: unknown): any[] {
-  const parsed = parseJson(value, [])
-  return Array.isArray(parsed) ? parsed : []
 }
 
 export function errorMessage(error: any, fallback: string) {
@@ -69,25 +62,12 @@ export function scriptDialog({ title, message, size, icon, actions }) {
   })
 }
 
-export function updateTicket(name: string, values: Record<string, unknown>) {
-  return setValues('HD Ticket', name, values)
+export function askConfirm({ title, message, label, theme, action }) {
+  return dialog.confirm({ title, message, theme, confirmLabel: label, cancelLabel: __('Cancel'), onConfirm: action })
 }
 
-// One file over the size limit must not sink the rest.
-export async function uploadFiles(files: File[], args: Record<string, unknown> = UPLOAD_ARGS) {
-  const results = await Promise.allSettled(
-    files.map((file) => new FileUploadHandler().upload(file, args)),
-  )
-  const uploaded = results
-    .filter((result) => result.status === 'fulfilled')
-    .map((result: any) => result.value)
-  const failedCount = files.length - uploaded.length
-  if (failedCount) {
-    toast.error(
-      countLabel(failedCount, __('1 file could not be uploaded'), __('{0} files could not be uploaded')),
-    )
-  }
-  return uploaded
+export function updateTicket(name: string, values: Record<string, unknown>) {
+  return setValues('HD Ticket', name, values)
 }
 
 // Takes strings already passed through `__()`, so the extractor sees the literals.

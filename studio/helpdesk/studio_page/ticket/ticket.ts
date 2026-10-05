@@ -14,7 +14,7 @@ import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { runAction, scriptDialog, updateTicket } from '@app/utils'
+import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Used when HD Settings has no `confirm_resolution_after_days`.
 const RESOLVED_PROMPT_DAYS = 5
@@ -71,17 +71,6 @@ export default function setup(context) {
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
   const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
-
-  const words = computed(() => ({
-    ...settings.words.value,
-    status: __('Status'),
-    composerPrompt: __('Type a message'),
-    solveAsk: __('Did this solve your issue?'),
-    solveYes: __("Yes, it's fixed"),
-    solveNo: __('No, still an issue'),
-    ratingLabel: __('Rating'),
-    ratedSupport: __('rated the support'),
-  }))
 
   // Closing and rating change the ticket, not the thread, so their dates come from its history.
   const timelineChanges = createResource({
@@ -172,7 +161,7 @@ export default function setup(context) {
 
   // Where a rating is still owed, the feedback dialog is the only way past `validate_feedback`.
   function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback(CLOSED_STATUS)
+    if (canRate.value) return feedback.openFeedback()
     return closeTicket()
   }
 
@@ -187,10 +176,11 @@ export default function setup(context) {
   function onPageAction() {
     if (isClosed.value) return navigateTo(ROUTES.newTicket)
     if (wantsFeedback.value) return feedback.openFeedback()
-    settings.askConfirm({
+    askConfirm({
       title: __('Close ticket'),
       message: __('Are you sure you want to close this ticket?'),
       label: __('Close'),
+      theme: 'red',
       action: closeTicket,
     })
   }
@@ -216,7 +206,6 @@ export default function setup(context) {
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),
-    words,
     ticketId,
     ticket,
     rating: thread.rating,

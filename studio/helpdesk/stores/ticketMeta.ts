@@ -34,7 +34,7 @@ const statuses = createListResource({
 const priorities = createListResource({
   doctype: 'HD Ticket Priority',
   cache: ['HD Ticket Priority', 'list'],
-  fields: ['name', 'level'],
+  fields: ['name', 'level', 'description'],
   pageLength: 1000,
 })
 
@@ -68,6 +68,10 @@ function statusColor(color: string): StatusColor {
   return name in STATUS_DOT_CLASSES ? (name as StatusColor) : 'gray'
 }
 
+export function getPriority(name: string) {
+  return (priorities.data || []).find((priority: any) => priority.name === name)
+}
+
 export function getPriorityLevel(name: string) {
-  return (priorities.data || []).find((priority: any) => priority.name === name)?.level ?? 'Medium'
+  return getPriority(name)?.level ?? 'Medium'
 }

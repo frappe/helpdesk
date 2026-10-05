@@ -30,6 +30,8 @@ def get_settings() -> dict:
             "last_name",
             "full_name",
             "user_image as image",
+            "language",
+            "time_zone",
         ],
         as_dict=True,
     )

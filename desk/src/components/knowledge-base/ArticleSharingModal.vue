@@ -32,8 +32,6 @@ import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
 import { copyToClipboard } from "@/utils";
 
-const DEFAULT_VISIBILITY = "Public";
-
 const props = defineProps<{ title: string; visibility: string; url: string }>();
 const emit = defineEmits<{ publish: [visibility: string] }>();
 const show = defineModel<boolean>({ default: false });
@@ -56,12 +54,10 @@ const accessOptions = computed(() => [
   },
 ]);
 
-const access = ref(DEFAULT_VISIBILITY);
+const access = ref(props.visibility);
 
 watch(show, (open) => {
-  if (!open) return;
-  const known = accessOptions.value.some((o) => o.value === props.visibility);
-  access.value = known ? props.visibility : DEFAULT_VISIBILITY;
+  if (open) access.value = props.visibility;
 });
 
 function publish() {

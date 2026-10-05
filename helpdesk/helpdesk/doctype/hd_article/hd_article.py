@@ -8,8 +8,6 @@ from frappe.utils import cint
 
 from helpdesk.utils import capture_event
 
-VOTE_VALUES = (0, 1, 2)
-
 
 class HDArticle(Document):
     def validate(self):
@@ -99,8 +97,8 @@ class HDArticle(Document):
     def set_feedback(self, value: int, visitor_id: str | None = None):
         """Record one vote: 0 none, 1 like, 2 dislike; a guest's is kept by `visitor_id`."""
         value = cint(value)
-        if value not in VOTE_VALUES:
-            frappe.throw(_("Invalid vote"), frappe.ValidationError)
+        if value not in (0, 1, 2):
+            frappe.throw(_("Invalid vote"))
         self.validate_voter(visitor_id)
         owner = (
             {"visitor_id": visitor_id}
@@ -117,7 +115,7 @@ class HDArticle(Document):
         ):
             frappe.throw(_("Voting requires an account"), frappe.PermissionError)
         if not visitor_id:
-            frappe.throw(_("Please enable cookies to vote"), frappe.ValidationError)
+            frappe.throw(_("Please enable cookies to vote"))
 
     def save_feedback(self, owner: dict, value: int):
         feedback = frappe.db.exists(

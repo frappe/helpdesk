@@ -60,9 +60,7 @@ import { Button, Dialog } from "frappe-ui";
 import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
 import { inject, nextTick, ref, watch } from "vue";
 
-const props = withDefaults(defineProps<{ status?: string }>(), {
-  status: "Closed",
-});
+const props = defineProps<{ status: string }>();
 const ticket = inject(TicketSymbol)!;
 const show = defineModel<boolean>({ default: false });
 const emit = defineEmits<{ saved: [] }>();

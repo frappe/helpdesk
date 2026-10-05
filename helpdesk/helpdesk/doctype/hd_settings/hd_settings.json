@@ -21,7 +21,6 @@
   "base_support_rotation",
   "knowledge_base_section",
   "public_knowledge_base",
-  "prefer_knowledge_base",
   "allow_anonymous_article_voting",
   "banner_image",
   "banner_preset",
@@ -248,12 +247,6 @@
    "fieldname": "public_knowledge_base",
    "fieldtype": "Check",
    "label": "Public knowledge base"
-  },
-  {
-   "default": "0",
-   "fieldname": "prefer_knowledge_base",
-   "fieldtype": "Check",
-   "label": "Prefer knowledge base"
   },
   {
    "default": "0",
@@ -629,7 +622,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-05 20:23:15.465806",
+ "modified": "2026-10-06 22:30:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
