@@ -11,7 +11,7 @@
       }}</span>
     </div>
     <div
-      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 bg-surface-gray-1 px-4"
+      class="flex h-28 items-center justify-center rounded-6 bg-surface-gray-1 px-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
       :style="{ background: previewBackground }"
     >
       <div
@@ -91,12 +91,12 @@ function uploadLabel(uploading: boolean, progress: number) {
 
 function presetLabel(name: string) {
   return {
-    Dots: __("Dots"),
-    Slate: __("Slate"),
-    Sage: __("Sage"),
-    Paper: __("Paper"),
-    Haze: __("Haze"),
-    Sky: __("Sky"),
+    Stone: __("Stone"),
+    Blue: __("Blue"),
+    Green: __("Green"),
+    Charcoal: __("Charcoal"),
+    Navy: __("Navy"),
+    Forest: __("Forest"),
   }[name];
 }
 

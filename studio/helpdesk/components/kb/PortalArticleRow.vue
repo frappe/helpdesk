@@ -11,7 +11,6 @@
     <PortalArticleThumbnail
       :class="{ 'mt-px': isList }"
       :src="isList ? article.image : null"
-      :bordered="!isList"
     />
     <!-- v-html: the server escapes the text and leaves only the search <mark> tags. -->
     <span
