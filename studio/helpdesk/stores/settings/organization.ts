@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { countLabel, errorMessage } from '@app/utils'
+import { askConfirm, countLabel, errorMessage } from '@app/utils'
 import { ROLES } from './roles'
 
 export function createOrganizationSettings(core) {
@@ -149,14 +149,12 @@ export function createOrganizationSettings(core) {
   function setMemberRole(member, role) {
     if (member.role === 'Owner' || member.pending || role === member.role) return
     const isManager = role === 'Manager'
-    core.askConfirm({
+    askConfirm({
       title: isManager ? __('Grant manager access') : __('Revoke manager access'),
       message: isManager
         ? __('{0} will get access to tickets raised by everyone in the organization.', [member.full_name])
         : __('{0} will only see their own tickets going forward.', [member.full_name]),
       label: __('Confirm'),
-      // Not destructive either way, so it does not take the dialog's red default.
-      theme: 'gray',
       action: () =>
         core.run(
           () =>
@@ -173,10 +171,11 @@ export function createOrganizationSettings(core) {
   function removeMember(member) {
     if (member.role === 'Owner') return
     if (member.pending) return cancelInvitation(member)
-    core.askConfirm({
+    askConfirm({
       title: __('Remove member'),
       message: __("{0} will lose access to this organization's tickets.", [member.full_name]),
       label: __('Remove'),
+      theme: 'red',
       action: () =>
         core.run(
           () =>
@@ -190,10 +189,11 @@ export function createOrganizationSettings(core) {
   }
 
   function cancelInvitation(member) {
-    core.askConfirm({
+    askConfirm({
       title: __('Cancel invitation'),
       message: __('The invitation sent to {0} will no longer be usable.', [member.email]),
       label: __('Cancel invitation'),
+      theme: 'red',
       action: () =>
         core.run(
           () =>

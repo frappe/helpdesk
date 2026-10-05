@@ -1184,90 +1184,6 @@
     }
    },
    {
-    "blockName": "Confirm dialog",
-    "componentId": "kb_settings-confirm-dialog",
-    "componentName": "Dialog",
-    "componentProps": {
-     "modelValue": "{{ isConfirmOpen }}",
-     "onUpdate:modelValue": "(value) => { if (!value) cancelConfirm() }",
-     "title": "{{ confirmAction ? confirmAction.title : '' }}"
-    },
-    "componentSlots": {
-     "actions": {
-      "slotContent": [
-       {
-        "children": [
-         {
-          "componentEvents": {
-           "click": {
-            "action": "Run Script",
-            "event": "click",
-            "script": "cancelConfirm()"
-           }
-          },
-          "componentId": "kb_settings-confirm-cancel",
-          "componentName": "Button",
-          "componentProps": {
-           "label": "Cancel"
-          },
-          "componentSlots": {}
-         },
-         {
-          "componentEvents": {
-           "click": {
-            "action": "Run Script",
-            "event": "click",
-            "script": "acceptConfirm()"
-           }
-          },
-          "componentId": "kb_settings-confirm-accept",
-          "componentName": "Button",
-          "componentProps": {
-           "label": "{{ confirmAction.label || 'Confirm' }}",
-           "loading": "{{ isSettingsBusy }}",
-           "theme": "{{ confirmAction.theme || 'red' }}",
-           "variant": "solid"
-          },
-          "componentSlots": {}
-         }
-        ],
-        "classes": [
-         "flex",
-         "justify-end",
-         "gap-2"
-        ],
-        "componentId": "kb_settings-confirm-actions",
-        "componentName": "container",
-        "componentProps": {},
-        "componentSlots": {},
-        "originalElement": "div"
-       }
-      ],
-      "slotId": "kb_settings-slot-actions",
-      "slotName": "actions"
-     },
-     "default": {
-      "slotContent": [
-       {
-        "classes": [
-         "text-p-base",
-         "text-ink-gray-8"
-        ],
-        "componentId": "kb_settings-confirm-message",
-        "componentName": "TextBlock",
-        "componentProps": {
-         "tag": "span",
-         "text": "{{ confirmAction.message }}"
-        },
-        "componentSlots": {}
-       }
-      ],
-      "slotId": "kb_settings-slot-body-content:default",
-      "slotName": "default"
-     }
-    }
-   },
-   {
     "blockName": "Password dialog",
     "componentId": "kb_settings-password-dialog",
     "componentName": "Dialog",
@@ -1394,7 +1310,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-06 21:30:00.000000",
+ "modified": "2026-10-06 22:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

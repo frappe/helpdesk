@@ -16,7 +16,7 @@ import {
   isResolvedStatus,
   loadTicketMeta,
 } from '@app/stores/ticketMeta'
-import { runAction, scriptDialog, updateTicket } from '@app/utils'
+import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
 const RESOLVED_PROMPT_DAYS = 5
@@ -176,10 +176,11 @@ export default function setup(context) {
   function onPageAction() {
     if (isClosed.value) return navigateTo(ROUTES.newTicket)
     if (wantsFeedback.value) return feedback.openFeedback()
-    settings.askConfirm({
+    askConfirm({
       title: __('Close ticket'),
       message: __('Are you sure you want to close this ticket?'),
       label: __('Close'),
+      theme: 'red',
       action: closeTicket,
     })
   }

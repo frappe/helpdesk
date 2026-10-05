@@ -70,11 +70,6 @@ const store = {
   settingsUser: core.settingsUser,
   organizations: core.organizations,
   loadSettings: core.loadSettings,
-  confirmAction: core.confirmAction,
-  isConfirmOpen: core.isConfirmOpen,
-  askConfirm: core.askConfirm,
-  cancelConfirm: core.cancelConfirm,
-  acceptConfirm: core.acceptConfirm,
   ...organization,
   ...profile,
 }

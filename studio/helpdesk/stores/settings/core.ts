@@ -20,24 +20,6 @@ export function createSettingsCore() {
   const settingsUser = computed(() => settingsData.value?.user || {})
   const organizations = computed(() => settingsData.value?.organizations || [])
 
-  const confirmAction = ref(null)
-  // Apart from the options, so what is on the dialog survives its own closing animation.
-  const isConfirmOpen = ref(false)
-
-  function askConfirm(options) {
-    confirmAction.value = options
-    isConfirmOpen.value = true
-  }
-
-  function cancelConfirm() {
-    isConfirmOpen.value = false
-  }
-
-  function acceptConfirm() {
-    isConfirmOpen.value = false
-    return confirmAction.value?.action?.()
-  }
-
   const reloadHooks = []
   function afterLoad(hook) {
     reloadHooks.push(hook)
@@ -93,11 +75,6 @@ export function createSettingsCore() {
     isSettingsBusy,
     settingsUser,
     organizations,
-    confirmAction,
-    isConfirmOpen,
-    askConfirm,
-    cancelConfirm,
-    acceptConfirm,
     afterLoad,
     loadSettings,
     run,

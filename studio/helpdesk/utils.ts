@@ -63,6 +63,10 @@ export function scriptDialog({ title, message, size, icon, actions }) {
   })
 }
 
+export function askConfirm({ title, message, label, theme, action }) {
+  return dialog.confirm({ title, message, theme, confirmLabel: label, cancelLabel: __('Cancel'), onConfirm: action })
+}
+
 export function updateTicket(name: string, values: Record<string, unknown>) {
   return call('frappe.client.set_value', { doctype: 'HD Ticket', name, fieldname: values })
 }
