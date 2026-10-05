@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
+import { useKbHeader } from '@app/composables/useKbHeader'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 export default function setup(context) {
@@ -13,5 +14,5 @@ export default function setup(context) {
     navigateTo({ path: ROUTES.newTicket, query: subject ? { subject } : {} })
   }
 
-  return { ...useSettingsModal(context), query, results, createTicket }
+  return { ...useSettingsModal(context), ...useKbHeader(context), query, results, createTicket }
 }

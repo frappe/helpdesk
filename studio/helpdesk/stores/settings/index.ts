@@ -38,7 +38,7 @@ const themeOptions = computed(() => [
 
 const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
 
-const accountMenuOptions = computed(() =>
+export const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? []
     : [
@@ -64,6 +64,8 @@ const store = {
   accountMenuOptions,
   // HD Form Script header actions; the ticket pages fill them.
   customActions: [],
+  // The admin's header links; the knowledge base pages fill them.
+  headerLinks: [],
   isSettingsOpen: core.isSettingsOpen,
   settingsTab: core.settingsTab,
   isSettingsBusy: core.isSettingsBusy,

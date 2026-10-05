@@ -32,6 +32,11 @@
             />
           </div>
         </div>
+        <HeaderLinks
+          class="mt-8"
+          :links="settings.doc?.portal_header_links || []"
+          @saved="settings.reload()"
+        />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -43,6 +48,7 @@ import { __ } from "@/translation";
 import { createDocumentResource, Switch, toast } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
+import HeaderLinks from "./HeaderLinks.vue";
 
 // computed, so labels follow a translation load
 const toggles = computed(() => [

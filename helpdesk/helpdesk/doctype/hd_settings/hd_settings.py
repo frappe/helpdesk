@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+from urllib.parse import urlparse
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -16,6 +18,8 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     set_guest_ticket_creation_permission,
 )
 
+SAFE_LINK_SCHEMES = ("http", "https", "mailto")
+
 
 class HDSettings(Document):
     def validate(self):
@@ -23,6 +27,7 @@ class HDSettings(Document):
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
         self.validate_default_agent_status()
+        self.validate_header_links()
 
     def validate_default_agent_status(self):
         """The default status should be enabled, else agent creation breaks.
@@ -34,6 +39,21 @@ class HDSettings(Document):
             return
 
         frappe.throw(_("The default agent status must be enabled."))
+
+    def validate_header_links(self):
+        """Portal links reach guests, so only web, mail and site-relative URLs are allowed."""
+        for row in self.portal_header_links:
+            url = (row.url or "").strip()
+            if not row.label or not url:
+                frappe.throw(_("Header link {0} needs a label and a URL").format(row.idx))
+            is_safe = url.startswith("/") or urlparse(url).scheme.lower() in SAFE_LINK_SCHEMES
+            if not is_safe:
+                frappe.throw(
+                    _("Header link {0}: use a web address, an email link or a path starting with /").format(
+                        row.idx
+                    )
+                )
+            row.url = url
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:

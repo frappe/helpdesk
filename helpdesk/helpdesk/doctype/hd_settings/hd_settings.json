@@ -25,6 +25,7 @@
   "allow_anonymous_article_voting",
   "banner_image",
   "banner_preset",
+  "portal_header_links",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -274,6 +275,13 @@
    "fieldtype": "Select",
    "label": "Banner Preset",
    "options": "\nDots\nSlate\nSage\nPaper\nHaze\nSky"
+  },
+  {
+   "description": "Links shown at the top right of every portal page.",
+   "fieldname": "portal_header_links",
+   "fieldtype": "Table",
+   "label": "Header links",
+   "options": "Top Bar Item"
   },
   {
    "fieldname": "agent_status_section",
@@ -621,7 +629,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-03 11:35:29.766664",
+ "modified": "2026-10-05 20:23:15.465806",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

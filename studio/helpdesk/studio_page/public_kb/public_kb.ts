@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { findBannerPreset } from '@helpdesk/shared/kbBanner'
 import { useSettingsModal } from '@app/stores/settings'
+import { useKbHeader } from '@app/composables/useKbHeader'
 import { countLabel } from '@app/utils'
 
 const ARTICLE_LIMIT = 5
@@ -55,6 +56,7 @@ export default function setup(context) {
 
   return {
     ...settings,
+    ...useKbHeader(context),
     bannerBackground,
     bannerTextColor,
     sort,

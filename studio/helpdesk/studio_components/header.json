@@ -81,6 +81,24 @@
     "blockName": "header-right",
     "children": [
      {
+      "componentId": "PortalCustomActions-header",
+      "componentName": "PortalCustomActions",
+      "componentProps": {
+       "actions": "{{ customActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ customActions.length }}"
+     },
+     {
+      "componentId": "PortalHeaderLinks-header",
+      "componentName": "PortalHeaderLinks",
+      "componentProps": {
+       "links": "{{ headerLinks }}"
+      },
+      "isCustomVueComponent": true
+     },
+     {
       "baseStyles": {
        "cursor": "pointer"
       },
@@ -104,16 +122,6 @@
        "py-1.5",
        "-mx-2"
       ]
-     },
-     {
-      "componentId": "PortalCustomActions-header",
-      "componentName": "PortalCustomActions",
-      "componentProps": {
-       "actions": "{{ customActions }}"
-      },
-      "componentSlots": {},
-      "isCustomVueComponent": true,
-      "visibilityCondition": "{{ customActions.length }}"
      },
      {
       "componentEvents": {
@@ -194,7 +202,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-06 01:40:00.000000",
+  "modified": "2026-10-06 01:45:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useSettingsModal } from '@app/stores/settings'
+import { useKbHeader } from '@app/composables/useKbHeader'
 import { useDrawer } from '@app/composables/useDrawer'
 import { countLabel } from '@app/utils'
 
@@ -22,6 +23,7 @@ export default function setup(context) {
 
   return {
     ...useSettingsModal(context),
+    ...useKbHeader(context),
     drawer: useDrawer(route),
     categoryName,
     categoryDescription,

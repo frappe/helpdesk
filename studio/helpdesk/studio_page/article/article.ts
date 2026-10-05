@@ -5,6 +5,7 @@ import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
 import { useRecent } from '@app/stores/recent'
 import { useSettingsModal } from '@app/stores/settings'
+import { useKbHeader } from '@app/composables/useKbHeader'
 import { countLabel, DATE_FORMATS, runAction } from '@app/utils'
 import { useDrawer } from '@app/composables/useDrawer'
 
@@ -92,6 +93,7 @@ export default function setup(context) {
 
   return {
     ...settings,
+    ...useKbHeader(context),
     drawer: useDrawer(context.route),
     articleHtml,
     toc,
