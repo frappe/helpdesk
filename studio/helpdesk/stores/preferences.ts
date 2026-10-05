@@ -1,14 +1,6 @@
 import { computed, ref } from 'vue'
-import { useStorage } from '@vueuse/core'
 import { createDocumentResource, createResource, toast } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
-
-// In the browser, not on the User doc: it describes this screen on this device.
-const LAYOUT_KEY = 'kb:conversation-layout'
-const LAYOUT_OPTIONS = [
-  { label: 'Timeline', value: 'timeline' },
-  { label: 'Chat', value: 'chat' },
-]
 
 const store = createPreferencesStore()
 
@@ -17,8 +9,6 @@ export function usePreferences() {
 }
 
 function createPreferencesStore() {
-  const conversationLayout = useStorage(LAYOUT_KEY, 'timeline')
-
   const user = ref(null)
   const languageOptions = ref([])
   const timezoneOptions = ref([])
@@ -74,10 +64,6 @@ function createPreferencesStore() {
   })
 
   return {
-    conversationLayout,
-    conversationLayoutOptions: computed(() =>
-      LAYOUT_OPTIONS.map((option) => ({ ...option, label: __(option.label) })),
-    ),
     preferences,
     languageOptions,
     timezoneOptions,
