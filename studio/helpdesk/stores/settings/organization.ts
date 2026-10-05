@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { countLabel, errorMessage } from '@app/utils'
+import { askConfirm, countLabel, errorMessage } from '@app/utils'
 import { ROLES } from './roles'
 
 const API = 'helpdesk.api.organization'
@@ -135,11 +135,10 @@ export function createOrganizationSettings(core) {
   }
 
   function confirmAndRun(dialog, request, successMessage, landed?) {
-    core.askConfirm({ ...dialog, action: () => core.run(request, successMessage, landed) })
+    askConfirm({ ...dialog, action: () => core.run(request, successMessage, landed) })
   }
 
   function setMemberRole(member, role) {
-    if (member.role === 'Owner' || member.pending || role === member.role) return
     const makeManager = role === 'Manager'
     confirmAndRun(
       {
@@ -148,8 +147,6 @@ export function createOrganizationSettings(core) {
           ? __('{0} will get access to tickets raised by everyone in the organization.', [member.full_name])
           : __('{0} will only see their own tickets going forward.', [member.full_name]),
         label: __('Confirm'),
-        // Not destructive either way, so not the dialog's red default.
-        theme: 'gray',
       },
       () => callOrganization('update_member_role', { contact: member.contact, is_manager: makeManager }),
       __('Role updated'),
@@ -157,13 +154,13 @@ export function createOrganizationSettings(core) {
   }
 
   function removeMember(member) {
-    if (member.role === 'Owner') return
     if (member.pending) return cancelInvitation(member)
     confirmAndRun(
       {
         title: __('Remove member'),
         message: __("{0} will lose access to this organization's tickets.", [member.full_name]),
         label: __('Remove'),
+        theme: 'red',
       },
       () => callOrganization('remove_member', { contact: member.contact }),
       __('Member removed'),
@@ -176,6 +173,7 @@ export function createOrganizationSettings(core) {
         title: __('Cancel invitation'),
         message: __('The invitation sent to {0} will no longer be usable.', [member.email]),
         label: __('Cancel invitation'),
+        theme: 'red',
       },
       () => callOrganization('remove_member', { invitation: member.invitation }),
       __('Invitation cancelled'),

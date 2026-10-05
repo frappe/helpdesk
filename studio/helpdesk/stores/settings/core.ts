@@ -1,7 +1,6 @@
 import { ref, computed, watch } from 'vue'
-import { call, toast } from 'frappe-ui'
+import { FileUploadHandler, call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { usePreferences } from '@app/stores/preferences'
 import {
   afterEachRoute,
   currentRoute,
@@ -9,7 +8,7 @@ import {
   navigateTo,
   previousLocation,
 } from '@app/stores/router'
-import { errorMessage, uploadFiles } from '@app/utils'
+import { errorMessage } from '@app/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
@@ -20,24 +19,6 @@ export function createSettingsCore() {
   const settingsUser = computed(() => settingsData.value?.user || {})
   const organizations = computed(() => settingsData.value?.organizations || [])
 
-  // Kept apart from the flag, so the dialog's text survives its closing animation.
-  const confirmAction = ref(null)
-  const isConfirmOpen = ref(false)
-
-  function askConfirm(options) {
-    confirmAction.value = options
-    isConfirmOpen.value = true
-  }
-
-  function cancelConfirm() {
-    isConfirmOpen.value = false
-  }
-
-  function acceptConfirm() {
-    isConfirmOpen.value = false
-    return confirmAction.value?.action?.()
-  }
-
   const reloadHooks = []
   function afterLoad(hook) {
     reloadHooks.push(hook)
@@ -46,8 +27,6 @@ export function createSettingsCore() {
   async function loadSettings() {
     try {
       settingsData.value = await call('helpdesk.api.organization.get_settings')
-      // By docname, not email: they differ for Administrator.
-      usePreferences().loadPreferences(settingsUser.value.name)
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)
@@ -81,7 +60,9 @@ export function createSettingsCore() {
     input.onchange = async () => {
       const file = input.files?.[0]
       if (!file) return
-      const [uploaded] = await uploadFiles([file], { private: false, optimize: true })
+      const uploaded = await new FileUploadHandler()
+        .upload(file, { private: false, optimize: true })
+        .catch(() => toast.error(__('Could not upload the image')))
       if (uploaded) await onUploaded(uploaded.file_url)
     }
     input.click()
@@ -93,11 +74,6 @@ export function createSettingsCore() {
     isSettingsBusy,
     settingsUser,
     organizations,
-    confirmAction,
-    isConfirmOpen,
-    askConfirm,
-    cancelConfirm,
-    acceptConfirm,
     afterLoad,
     loadSettings,
     run,
@@ -112,7 +88,6 @@ export function createSettingsDialog(core, organization) {
   function openSettings(tab) {
     core.settingsTab.value = tab || 'profile'
     core.isSettingsOpen.value = true
-    organization.inviteOpen.value = false
     organization.closeOrganization()
     core.loadSettings()
   }

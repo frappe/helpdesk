@@ -6,7 +6,6 @@ import { runAction, updateTicket } from '@app/utils'
 
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
-  const pendingStatus = ref(CLOSED_STATUS)
   // In stars, as the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
@@ -44,13 +43,8 @@ export function useTicketFeedback(ticket) {
   }
 
   // The status is saved with the rating: `validate_feedback` refuses a customer's close without one.
-  function openFeedback(status = CLOSED_STATUS) {
-    pendingStatus.value = status
+  function openFeedback() {
     isFeedbackOpen.value = true
-  }
-
-  function closeFeedback() {
-    isFeedbackOpen.value = false
   }
 
   function selectFeedbackOption(name: string) {
@@ -62,12 +56,11 @@ export function useTicketFeedback(ticket) {
     return runAction(
       async () => {
         await updateTicket(ticket.data.name, {
-          status: pendingStatus.value,
-          ...(ticket.data.feedback
-            ? {}
-            : { feedback: feedbackOption.value, feedback_extra: feedbackText.value }),
+          status: CLOSED_STATUS,
+          feedback: feedbackOption.value,
+          feedback_extra: feedbackText.value,
         })
-        closeFeedback()
+        isFeedbackOpen.value = false
         ticket.fetch()
       },
       { busy: isFeedbackSaving, fallback: __('Could not save the feedback') },
