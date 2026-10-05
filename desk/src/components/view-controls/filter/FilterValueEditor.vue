@@ -7,7 +7,7 @@
         :label="field.label"
         size="sm"
         class="min-w-0"
-        @back="emit('back')"
+        @back="goBack"
       />
       <Dropdown
         v-model:open="operatorMenuOpen"
@@ -153,7 +153,7 @@ import {
   Rating,
   TextInput,
 } from "frappe-ui";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import {
   ActiveFilter,
   FilterField,
@@ -189,6 +189,7 @@ const textValue = ref(plainText(value.value));
 const search = ref("");
 const activeIndex = ref(0);
 const operatorMenuOpen = ref(false);
+let textApplyPending = false;
 const searchInput = ref(null);
 const valueInput = ref(null);
 const listEl = ref<HTMLElement | null>(null);
@@ -425,7 +426,7 @@ function onKeydown(event: KeyboardEvent) {
     selectActive();
   } else if (event.key === "Backspace" && !search.value) {
     event.stopPropagation();
-    emit("back");
+    goBack();
   }
 }
 
@@ -440,7 +441,7 @@ function focusSearch() {
 function onTextKeydown(event: KeyboardEvent) {
   if (event.key === "Backspace" && !textValue.value) {
     event.stopPropagation();
-    emit("back");
+    goBack();
   }
 }
 
@@ -452,10 +453,22 @@ function onTextChange() {
     emit("clear");
     return;
   }
+  textApplyPending = true;
   debouncedTextApply();
 }
 
-const debouncedTextApply = useDebounceFn(() => {
+// Leaving flushes typed text first, so a pending debounce can never fire
+// after another filter has been opened and land on that one
+function goBack() {
+  applyPendingText();
+  emit("back");
+}
+
+const debouncedTextApply = useDebounceFn(applyPendingText, 500);
+
+function applyPendingText() {
+  if (!textApplyPending) return;
+  textApplyPending = false;
   if (!textValue.value) return;
   const nextValue = isMultiple.value
     ? splitValues(textValue.value)
@@ -466,7 +479,7 @@ const debouncedTextApply = useDebounceFn(() => {
     return;
   }
   applyValue(nextValue);
-}, 500);
+}
 
 function hasValue(candidate: any): boolean {
   if (Array.isArray(candidate)) return candidate.length > 0;
@@ -540,6 +553,8 @@ watch(operatorMenuOpen, (open) => {
   if (!open) focusSearch();
 });
 
+onBeforeUnmount(applyPendingText);
+
 function cycleOperator(direction: number) {
   const operatorList = operators.value;
   if (operatorList.length < 2) return;
@@ -582,7 +597,7 @@ useEventListener(document, "keydown", (event: KeyboardEvent) => {
       return;
     }
     event.preventDefault();
-    emit("back");
+    goBack();
   }
 });
 </script>
