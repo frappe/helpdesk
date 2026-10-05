@@ -20,7 +20,6 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, is_admin
 GUEST_TICKETS_PER_HOUR = 100
 GUEST_DRAFT_SECONDS = 3 * 24 * 60 * 60
 CONTINUE_EMAIL_COOLDOWN_SECONDS = 10 * 60
-# Long enough for two requests to commit; a claimed email's Contact is left to the first.
 CONTACT_CLAIM_SECONDS = 60
 
 
@@ -111,14 +110,12 @@ def delete_ticket(name: str):
 def new_guest_ticket(
     subject: str, description: str, email: str, first_name: str | None = None
 ) -> None:
-    """A signed-out visitor's ticket; only these fields reach it, the rest are HD Ticket's defaults."""
     if not frappe.db.get_single_value("HD Settings", "allow_anyone_to_create_tickets"):
         frappe.throw(_("Sign in to raise a ticket"), frappe.PermissionError)
 
     email = (email or "").strip().lower()
     validate_email_address(email, throw=True)
     subject = (subject or "").strip()
-    # The editor's empty value is `<p></p>`, not "".
     if not subject or not strip_html_tags(description or "").strip():
         frappe.throw(_("Subject and description are required"))
     if frappe.db.exists("Email Account", {"email_id": email}):
@@ -135,13 +132,12 @@ def new_guest_ticket(
             frappe.RateLimitExceededError,
         )
 
-    # Nothing is returned either way, so the form never tells who has an account.
+    # Same reply for every email, so the form never reveals who has an account.
     if frappe.db.exists("User", {"email": email, "enabled": 1}) and can_email(email):
         send_continue_email(email, subject, description)
         return
 
     ensure_contact(email, first_name)
-    # `set_contact` links the Contact by email; the toggle's Guest rule allows the insert.
     ticket = frappe.get_doc(
         {
             "doctype": "HD Ticket",
@@ -154,7 +150,6 @@ def new_guest_ticket(
 
 
 def can_email(email: str) -> bool:
-    """Whether a mail to `email` would go out; if not, the ticket beats a sign-in link."""
     return bool(EmailAccount.find_outgoing()) and not frappe.db.exists(
         "Email Unsubscribe", {"email": email, "global_unsubscribe": 1}
     )
@@ -163,7 +158,6 @@ def can_email(email: str) -> bool:
 def ensure_contact(email: str, first_name: str | None) -> None:
     if get_contact_name(email):
         return
-    # SET NX is atomic, so two requests for a new email cannot both insert a Contact.
     claim = frappe.cache.make_key(f"hd_guest_contact:{email}")
     if not frappe.cache.set(claim, 1, nx=True, ex=CONTACT_CLAIM_SECONDS):
         return
@@ -174,16 +168,13 @@ def ensure_contact(email: str, first_name: str | None) -> None:
         }
     )
     contact.append("email_ids", {"email_id": email, "is_primary": True})
-    # Guest has no Contact rights; the toggle checked above is the permission.
+    # Guest has no Contact permission; the setting checked above stands in for it.
     contact.insert(ignore_permissions=True)
 
 
 def invite_requester(ticket) -> None:
-    """Ask a new requester to take an account, so they can follow the ticket."""
-    # An existing account, even a disabled one, must not be handed HD Customer by an invite.
     if frappe.db.exists("User", {"email": ticket.raised_by}):
         return
-    # Queued: the invite's mail flushes on commit, and a dead mail server must not fail the ticket.
     frappe.enqueue(
         send_requester_invite,
         queue="short",
@@ -207,8 +198,6 @@ def send_requester_invite(ticket_name: str, email: str, contact: str | None) -> 
 
 
 def send_continue_email(email: str, subject: str, description: str) -> None:
-    """Email an account holder a sign-in link that brings back what they wrote."""
-    # One draft per address: a resubmission replaces it, so a link already sent opens the latest.
     token_key = f"hd_guest_draft_token:{email}"
     token = frappe.cache.get_value(token_key) or frappe.generate_hash(length=32)
     frappe.cache.set_value(token_key, token, expires_in_sec=GUEST_DRAFT_SECONDS)
@@ -218,7 +207,6 @@ def send_continue_email(email: str, subject: str, description: str) -> None:
         expires_in_sec=GUEST_DRAFT_SECONDS,
     )
 
-    # One mail per address per cooldown, so a stranger cannot flood someone's inbox.
     cooldown_key = f"hd_guest_continue:{email}"
     if frappe.cache.get_value(cooldown_key):
         return
@@ -236,7 +224,6 @@ def send_continue_email(email: str, subject: str, description: str) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def get_guest_draft(token: str) -> dict | None:
-    """What a guest wrote before being asked to sign in: once, and only to that email's account."""
     key = f"hd_guest_draft:{token}"
     draft = frappe.cache.get_value(key)
     if not draft or draft["email"] != frappe.db.get_value(

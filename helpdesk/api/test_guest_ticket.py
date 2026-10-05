@@ -91,7 +91,6 @@ class TestGuestTicket(IntegrationTestCase):
 
     def test_a_claimed_email_gets_no_second_contact(self):
         email = unique_email("racing")
-        # What a concurrent first request leaves behind before it commits.
         frappe.cache.set(frappe.cache.make_key(f"hd_guest_contact:{email}"), 1, ex=60)
         submit_guest_form(self, email)
         self.assertEqual(frappe.db.count("Contact", {"email_id": email}), 0)
@@ -126,7 +125,6 @@ class TestGuestTicket(IntegrationTestCase):
         self.assertIsNone(get_invitation(email))
 
     def test_the_support_address_is_refused(self):
-        # `before_tests` makes this account on every test site.
         address = frappe.get_doc("Email Account", "_Test Comm Account 1").email_id
         with self.assertRaises(frappe.ValidationError):
             submit_guest_form(self, address)

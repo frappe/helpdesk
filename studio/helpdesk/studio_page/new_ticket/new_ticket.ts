@@ -31,7 +31,6 @@ export default function setup(context) {
   const isCreating = ref(false)
   const submittedEmail = ref('')
 
-  // Waits for the config: with "Allow anyone to create tickets" off, a guest signs in first.
   watch(
     settings.config,
     (config) => {
@@ -40,7 +39,6 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  // The link in the "continue your request" email: what this account holder wrote as a guest.
   const draftToken = String(route?.query?.draft || '')
   if (draftToken) {
     watch(
@@ -136,7 +134,6 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
-  // A private knowledge base refuses guests its search.
   const searchQuery = computed(() =>
     settings.isGuest.value && !settings.isPublicKnowledgeBase.value ? '' : subject.value,
   )
@@ -147,7 +144,6 @@ export default function setup(context) {
     description.value = html
   }
 
-  // Guests can't upload files, so a pasted image would only fail.
   function refuseGuestImages() {
     toast.info(__('Sign in to add images'))
     return Promise.reject(new Error('Guests cannot upload images'))
@@ -247,7 +243,6 @@ export default function setup(context) {
     )
   }
 
-  // The same reply for every email, so the form never tells who has an account.
   function createGuestTicket() {
     return runAction(
       async () => {

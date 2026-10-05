@@ -42,7 +42,6 @@ function createSessionStore() {
   }
 
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
-  // The new-ticket page decides for itself, by `canCreateTicket`.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value || isNewTicketPage()) return
     signIn()

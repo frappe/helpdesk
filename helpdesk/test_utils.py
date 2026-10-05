@@ -1102,7 +1102,6 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
 
 
 def submit_guest_form(case, email: str, **values) -> None:
-    """Send the portal's guest ticket form as a signed-out visitor; what it creates goes when the test ends."""
     case.addCleanup(clean_up_guest_requests, email.strip().lower())
     frappe.set_user("Guest")
     try:
@@ -1135,7 +1134,6 @@ def clean_up_guest_requests(email: str) -> None:
 
 
 def guest_draft_token(email: str) -> str | None:
-    """The token of the draft kept for `email`, as its "continue" link carries it."""
     return frappe.cache.get_value(f"hd_guest_draft_token:{email}")
 
 
