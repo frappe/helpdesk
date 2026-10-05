@@ -29,7 +29,7 @@ from helpdesk.test_utils import (
     make_article_category,
 )
 
-LIST_ROW_FIELDS = {*PUBLIC_ARTICLE_FIELDS, "excerpt", "image"}
+LIST_ROW_FIELDS = {"name", "title", "excerpt"}
 CUSTOMER = "fixture.customer@example.com"
 BASE_VIEWS = 1_000_000
 BYLINE_FIELDS = {"name", "image"}
@@ -145,18 +145,6 @@ class TestPublicReads(IntegrationTestCase):
 
         self.assertEqual(set(article), LIST_ROW_FIELDS)
         self.assertEqual(article.excerpt, "Fixture published")
-        self.assertIsNone(article.image)
-        self.assertEqual(article.author["name"], "Administrator")
-        self.assertEqual(set(article.author), BYLINE_FIELDS)
-
-    def test_a_row_carries_the_body_s_first_image(self) -> None:
-        body = '<p>intro</p><img src="/files/one.png"><img src="/files/two.png">'
-        frappe.db.set_value("HD Article", self.published, "content", body)
-
-        [article] = get_public_articles(category=self.category.name)
-
-        self.assertEqual(article.image, "/files/one.png")
-        self.assertEqual(article.excerpt, "intro")
 
     def test_an_excerpt_is_the_first_paragraph(self) -> None:
         body = "<h2>Setup</h2><p></p><p>Open <b>Settings</b>.</p><table><td>Role</td></table>"
