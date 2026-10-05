@@ -1016,6 +1016,23 @@ def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, 
     }
 
 
+def make_email_account(service: str, **overrides: Any) -> str:
+    """An Email Account saved through the helpdesk settings API.
+
+    Patch EmailServer first, or it tries to log in to the provider.
+    """
+    from helpdesk.api.settings.email import create_email_account
+
+    return create_email_account(make_email_account_data(service, **overrides))
+
+
+def get_linked_email_accounts(user: str) -> set[str]:
+    """The Email Accounts linked to a user through their User Emails table."""
+    return set(
+        frappe.get_all("User Email", filters={"parent": user}, pluck="email_account")
+    )
+
+
 def get_user_roles(user: str) -> list[str]:
     """A user's Has Role rows, duplicates included (unlike frappe.get_roles)."""
     return frappe.get_all(
