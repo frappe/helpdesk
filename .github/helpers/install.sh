@@ -42,6 +42,7 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app erpnext --branch "develop"
 bench get-app telephony
+bench get-app https://github.com/frappe/studio --branch develop
 bench get-app helpdesk "${GITHUB_WORKSPACE}"
 bench setup requirements --dev
 
