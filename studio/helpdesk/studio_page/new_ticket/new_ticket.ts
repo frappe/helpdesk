@@ -1,5 +1,5 @@
 import { computed, reactive, ref, watch } from 'vue'
-import { createListResource, toast, useFileUpload } from 'frappe-ui'
+import { call, createListResource, toast, useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import {
   handleLinkFieldUpdate,
@@ -20,7 +20,7 @@ const UPLOAD_FOLDER = 'Home/Helpdesk'
 const SUGGESTION_LIMIT = 3
 
 export default function setup(context) {
-  const { subject, description, template, newTicket, route } = context
+  const { subject, description, guestName, guestEmail, template, newTicket, route } = context
   const settings = useSettingsModal(context)
 
   const searched = String(route?.query?.subject || '').trim()
@@ -29,6 +29,33 @@ export default function setup(context) {
   const model = reactive({})
   const attachments = ref([])
   const isCreating = ref(false)
+  const submittedEmail = ref('')
+
+  // Waits for the config: with "Allow anyone to create tickets" off, a guest signs in first.
+  watch(
+    settings.config,
+    (config) => {
+      if (config && settings.isGuest.value && !settings.canCreateTicket.value) settings.signIn()
+    },
+    { immediate: true },
+  )
+
+  // The link in the "continue your request" email: what this account holder wrote as a guest.
+  const draftToken = String(route?.query?.draft || '')
+  if (draftToken) {
+    watch(
+      settings.isGuest,
+      async (isGuest) => {
+        if (isGuest) return
+        const draft = await call('helpdesk.api.ticket.get_guest_draft', { token: draftToken }).catch(() => null)
+        context.router.replace({ query: { ...route.query, draft: undefined } })
+        if (!draft) return toast.info(__("We couldn't find your saved request. It may have expired."))
+        subject.value = draft.subject
+        description.value = draft.description
+      },
+      { immediate: true },
+    )
+  }
 
   // The upload queue keeps only `file_url`; the server links attachments by File name.
   const uploadedByUrl = new Map()
@@ -109,11 +136,21 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
-  const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT })
+  // A private knowledge base refuses guests its search.
+  const searchQuery = computed(() =>
+    settings.isGuest.value && !settings.isPublicKnowledgeBase.value ? '' : subject.value,
+  )
+  const suggestions = useArticleSearch(searchQuery, { limit: SUGGESTION_LIMIT })
 
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
     description.value = html
+  }
+
+  // Guests can't upload files, so a pasted image would only fail.
+  function refuseGuestImages() {
+    toast.info(__('Sign in to add images'))
+    return Promise.reject(new Error('Guests cannot upload images'))
   }
 
   const dateFormat = computed(() => settings.config.value?.date_format?.toUpperCase())
@@ -175,6 +212,7 @@ export default function setup(context) {
 
   const canSubmit = computed(() => {
     if (!subject.value || isContentEmpty(description.value)) return false
+    if (settings.isGuest.value && !guestEmail.value.trim()) return false
     return fields.value
       .filter((field) => evaluateDependsOn(field.dependsOn, model) && isRequired(field))
       .every((field) => model[field.fieldname])
@@ -186,6 +224,7 @@ export default function setup(context) {
 
   function createTicket() {
     if (!canSubmit.value) return
+    if (settings.isGuest.value) return createGuestTicket()
     // The dialog's "Web link" source stores a URL without a File doc, which the server cannot link.
     const uploaded = attachments.value.map((file) => uploadedByUrl.get(file.file_url))
     if (uploaded.includes(undefined)) {
@@ -208,6 +247,27 @@ export default function setup(context) {
     )
   }
 
+  // The same reply for every email, so the form never tells who has an account.
+  function createGuestTicket() {
+    return runAction(
+      async () => {
+        try {
+          await call('helpdesk.api.ticket.new_guest_ticket', {
+            subject: subject.value,
+            description: description.value,
+            email: guestEmail.value,
+            first_name: guestName.value,
+          })
+        } catch (error) {
+          if (error?.exc_type !== 'RateLimitExceededError') throw error
+          throw new Error(__("You've sent a lot of requests. Please try again in an hour, or sign in."))
+        }
+        submittedEmail.value = guestEmail.value.trim()
+      },
+      { busy: isCreating, fallback: __('Could not send your request') },
+    )
+  }
+
   return {
     ...settings,
     customActions,
@@ -217,6 +277,9 @@ export default function setup(context) {
     layout,
     model,
     setDescription,
+    refuseGuestImages,
+    submittedEmail,
+    receipt: computed(() => __("Thanks! We'll be in touch at {0}.", [submittedEmail.value])),
     canSubmit,
     attachments,
     uploadPrivately,

@@ -1,5 +1,5 @@
 {
- "allow_guest": 0,
+ "allow_guest": 1,
  "blocks": [
   {
    "blockName": "body",
@@ -13,8 +13,8 @@
        "componentName": "header",
        "componentProps": {
         "crumb": "New ticket",
-        "hideRoot": "{{ true }}",
-        "parentCrumb": "Tickets",
+        "hideRoot": "{{ !isGuest }}",
+        "parentCrumb": "{{ isGuest ? '' : 'Tickets' }}",
         "parentRoute": "/customer-tickets"
        },
        "isStudioComponent": true
@@ -42,6 +42,55 @@
      "blockName": "content",
      "children": [
       {
+       "blockName": "receipt",
+       "children": [
+        {
+         "classes": [
+          "text-ink-gray-9",
+          "font-semibold",
+          "leading-[1.3]"
+         ],
+         "componentId": "TextBlock-receipt",
+         "componentName": "TextBlock",
+         "componentProps": {
+          "fontSize": "text-xl",
+          "tag": "h1",
+          "text": "{{ receipt }}"
+         }
+        },
+        {
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "router.push('/')"
+          }
+         },
+         "componentId": "Button-receipt-home",
+         "componentName": "Button",
+         "componentProps": {
+          "label": "{{ t('Back to the knowledge base') }}",
+          "variant": "subtle"
+         }
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "items-start",
+        "gap-5",
+        "w-full",
+        "max-w-[896px]",
+        "pt-6",
+        "sm:pt-[50px]",
+        "pb-8"
+       ],
+       "componentId": "receipt",
+       "componentName": "container",
+       "originalElement": "div",
+       "visibilityCondition": "{{ submittedEmail }}"
+      },
+      {
        "blockName": "stack",
        "children": [
         {
@@ -57,6 +106,61 @@
           "html": "{{ about }}"
          },
          "visibilityCondition": "{{ about }}"
+        },
+        {
+         "blockName": "f-guest",
+         "children": [
+          {
+           "classes": [
+            "flex-1",
+            "min-w-0"
+           ],
+           "componentId": "c-guest-name",
+           "componentName": "FormControl",
+           "componentProps": {
+            "label": "Name",
+            "modelValue": {
+             "$type": "variable",
+             "name": "guestName"
+            },
+            "placeholder": "{{ t('Jane Cooper') }}",
+            "size": "sm",
+            "type": "text",
+            "variant": "subtle"
+           }
+          },
+          {
+           "classes": [
+            "flex-1",
+            "min-w-0"
+           ],
+           "componentId": "c-guest-email",
+           "componentName": "FormControl",
+           "componentProps": {
+            "label": "Email",
+            "modelValue": {
+             "$type": "variable",
+             "name": "guestEmail"
+            },
+            "placeholder": "{{ t('jane@acme.com') }}",
+            "size": "sm",
+            "type": "email",
+            "variant": "subtle",
+            "required": true
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "sm:flex-row",
+          "gap-5",
+          "w-full"
+         ],
+         "componentId": "f-guest",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ isGuest }}"
         },
         {
          "blockName": "f-subject",
@@ -225,7 +329,8 @@
             "fixedMenu": true,
             "mentions": null,
             "placeholder": "{{ t('Describe your issue…') }}",
-            "tags": null
+            "tags": null,
+            "uploadFunction": "{{ isGuest ? refuseGuestImages : undefined }}"
            }
           }
          ],
@@ -292,7 +397,8 @@
          ],
          "componentId": "f-attach",
          "componentName": "container",
-         "originalElement": "div"
+         "originalElement": "div",
+         "visibilityCondition": "{{ !isGuest }}"
         }
        ],
        "classes": [
@@ -309,7 +415,8 @@
        ],
        "componentId": "stack",
        "componentName": "container",
-       "originalElement": "div"
+       "originalElement": "div",
+       "visibilityCondition": "{{ !submittedEmail }}"
       },
       {
        "blockName": "container",
@@ -353,7 +460,8 @@
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
-       "originalElement": "div"
+       "originalElement": "div",
+       "visibilityCondition": "{{ !submittedEmail }}"
       }
      ],
      "classes": [
@@ -400,7 +508,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 01:15:00.000000",
+ "modified": "2026-10-06 20:20:00.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",
@@ -440,6 +548,16 @@
   {
    "initial_value": "\"\"",
    "variable_name": "description",
+   "variable_type": "String"
+  },
+  {
+   "initial_value": "\"\"",
+   "variable_name": "guestName",
+   "variable_type": "String"
+  },
+  {
+   "initial_value": "\"\"",
+   "variable_name": "guestEmail",
    "variable_type": "String"
   }
  ]
