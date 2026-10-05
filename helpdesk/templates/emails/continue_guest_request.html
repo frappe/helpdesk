@@ -1,16 +1,17 @@
-{% import "templates/emails/macros.html" as utils %} {% block content %}
-
+{% import "templates/emails/macros.html" as utils %}
+{% block content %}
 <td class="text-base leading-6 text-gray-900">
   <div class="from-markdown bg-white p-8">
+    <p>{{ _("Hi {0},").format(first_name) if first_name else _("Hi there,") }}</p>
     <p>
-      {{ _("You already have an account with us, so sign in to send your request. We've saved what you wrote, and it'll be waiting for you on the form.") }}
+      {{ _("Looks like you tried to raise a ticket without signing in. You already have an account with us, so just sign in to send it.") }}
     </p>
-    {{ utils.button(_("Sign in and continue"), link, true) }} {{
-    utils.separator() }}
+    <p>{{ _("We've saved what you wrote, so it'll be waiting for you on the form.") }}</p>
+    {{ utils.button(_("Sign in and continue"), link, true) }}
+    {{ utils.separator() }}
     <p class="text-gray-600">
-      {{ _("This link works for 3 days. If you didn't try to raise a ticket, you can ignore this email.") }}
+      {{ _("This link works for 3 days. If this wasn't you, you can safely ignore this email.") }}
     </p>
   </div>
 </td>
-
 {% endblock %}

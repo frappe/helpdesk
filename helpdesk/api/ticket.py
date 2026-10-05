@@ -216,9 +216,12 @@ def send_continue_email(email: str, subject: str, description: str) -> None:
     form = f"{CUSTOMER_PORTAL_ROOT}/tickets/new?draft={token}"
     frappe.sendmail(
         recipients=email,
-        subject=_("Continue your request"),
+        subject=_("Continue your support request"),
         template="continue_guest_request",
-        args={"link": get_url(f"/login?redirect-to={quote(form, safe='')}")},
+        args={
+            "link": get_url(f"/login?redirect-to={quote(form, safe='')}"),
+            "first_name": frappe.db.get_value("User", {"email": email}, "first_name"),
+        },
     )
 
 
