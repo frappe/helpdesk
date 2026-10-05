@@ -122,6 +122,11 @@ export default function setup(context) {
     return priority?.description?.trim() || undefined
   })
 
+  // The desk's fallback when the template sets no placeholder.
+  function defaultPlaceholder(fieldtype) {
+    return ['Select', 'Link', 'Check'].includes(fieldtype) ? __('Select an option') : __('Type something')
+  }
+
   // Site date formats reach the pickers as attrs; unset until the config arrives.
   function uiFor(row) {
     if (row.url_method) return { component: ApiOptionsField, props: { url: row.url_method } }
@@ -138,7 +143,7 @@ export default function setup(context) {
       label: __(row.label),
       options: row.options,
       reqd: Boolean(row.required),
-      placeholder: row.placeholder || undefined,
+      placeholder: row.placeholder || defaultPlaceholder(row.fieldtype),
       description: row.fieldname === 'priority' ? priorityHint.value : undefined,
       dependsOn: row.depends_on,
       mandatoryDependsOn: row.mandatory_depends_on,
