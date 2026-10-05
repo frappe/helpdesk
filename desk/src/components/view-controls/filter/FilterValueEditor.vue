@@ -10,6 +10,7 @@
         @back="emit('back')"
       />
       <Dropdown
+        v-model:open="operatorMenuOpen"
         side="bottom"
         :options="operatorOptions"
         :portal-to="operatorMenuTarget || 'body'"
@@ -187,6 +188,7 @@ const value = ref(props.filter?.value ?? defaultValueFor(operator.value));
 const textValue = ref(plainText(value.value));
 const search = ref("");
 const activeIndex = ref(0);
+const operatorMenuOpen = ref(false);
 const searchInput = ref(null);
 const valueInput = ref(null);
 const listEl = ref<HTMLElement | null>(null);
@@ -524,13 +526,19 @@ function convertValue(rawValue: any): any {
   return single ? [single] : [];
 }
 
+// Moving focus while the operator menu is open makes the menu close the whole
+// popover, so wait for the menu to close first
 watch(
   () => isListMode.value,
   () => {
-    focusSearch();
+    if (!operatorMenuOpen.value) focusSearch();
   },
   { immediate: true }
 );
+
+watch(operatorMenuOpen, (open) => {
+  if (!open) focusSearch();
+});
 
 function cycleOperator(direction: number) {
   const operatorList = operators.value;
