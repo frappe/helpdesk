@@ -74,16 +74,6 @@ export default function setup(context) {
   const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
 
-  const words = computed(() => ({
-    ...settings.words.value,
-    status: __('Status'),
-    composerPrompt: __('Type a message'),
-    solveAsk: __('Did this solve your issue?'),
-    solveYes: __("Yes, it's fixed"),
-    solveNo: __('No, still an issue'),
-    feedbackTitle: __('Feedback Rating'),
-  }))
-
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
     makeParams: () => ({ query: ticket.data?.subject }),
@@ -206,7 +196,6 @@ export default function setup(context) {
     ...useReplyComposer(ticket),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
-    words,
     ticketId,
     ticket,
     activities,

@@ -34,8 +34,6 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-const words = computed(() => ({ raiseTicket: __('Raise a ticket') }))
-
 const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? [{ icon: 'lucide-log-in', label: __('Log in'), onClick: session.signIn }]
@@ -56,7 +54,6 @@ const accountMenuOptions = computed(() =>
 )
 
 const store = {
-  words,
   themeOptions,
   theme,
   // The blocks bind `t`; the alias keeps them off the module's own name.
