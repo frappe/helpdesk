@@ -466,6 +466,11 @@ function goBack() {
 
 const debouncedTextApply = useDebounceFn(applyPendingText, 500);
 
+// Called before clearing every filter, so closing the editor can't bring one back
+function discardPendingText() {
+  textApplyPending = false;
+}
+
 function applyPendingText() {
   if (!textApplyPending) return;
   textApplyPending = false;
@@ -501,7 +506,7 @@ watch(activeIndex, (index) => {
 
 watch(operator, (newOperator, oldOperator) => {
   // typed text belongs to the old operator, so drop it instead of applying it late
-  textApplyPending = false;
+  discardPendingText();
   search.value = "";
   activeIndex.value = 0;
   if (newOperator === "is") {
@@ -555,9 +560,7 @@ watch(operatorMenuOpen, (open) => {
   if (!open) focusSearch();
 });
 
-// Closing the popover can mean every filter was just cleared, so a pending edit
-// is dropped rather than applied back
-onBeforeUnmount(() => (textApplyPending = false));
+onBeforeUnmount(applyPendingText);
 
 function cycleOperator(direction: number) {
   const operatorList = operators.value;
@@ -604,4 +607,6 @@ useEventListener(document, "keydown", (event: KeyboardEvent) => {
     goBack();
   }
 });
+
+defineExpose({ discardPendingText });
 </script>

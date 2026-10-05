@@ -24,11 +24,8 @@ interface Context {
   names: Record<Key, string>;
 }
 
-/**
- * One row per field type and operator. Each case raises three tickets (a, b, c),
- * sets them up over REST, applies the filter through the popover and checks
- * which of the three tickets stay in the list.
- */
+// One case per field type and operator: raise tickets a, b and c, set them up
+// over REST, apply the filter in the popover and check which ones stay listed.
 interface FilterCase {
   field: string;
   operator?: string;

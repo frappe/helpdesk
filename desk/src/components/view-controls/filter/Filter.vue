@@ -5,10 +5,7 @@
         <FilterTrigger
           :count="activeFilters.length"
           @toggle="resetSteps()"
-          @clear="
-            clearFilters();
-            popover?.close();
-          "
+          @clear="clearAllAndClose"
         />
       </div>
     </template>
@@ -131,6 +128,7 @@
               <!-- Step: value — pick operator + value (renders its own header) -->
               <FilterValueEditor
                 v-else-if="step === 'value' && selectedField"
+                ref="valueEditor"
                 :key="editSession"
                 :field="selectedField"
                 :filter="editingFilter"
@@ -191,6 +189,7 @@ const overviewHeader = ref<HTMLElement | null>(null);
 // sits above the filter popover panel instead of behind it.
 const operatorMenuLayer = ref<HTMLElement | null>(null);
 const popover = ref<InstanceType<typeof Popover> | null>(null);
+const valueEditor = ref<InstanceType<typeof FilterValueEditor> | null>(null);
 
 // Row actions stay out of the way until the row is hovered or focused.
 const revealOnRowActivity =
@@ -280,6 +279,12 @@ function applyFilter(operator: string, value: any) {
     editingIndex.value = targetIndex;
   }
   replacingIndex.value = null;
+}
+
+function clearAllAndClose() {
+  valueEditor.value?.discardPendingText();
+  clearFilters();
+  popover.value?.close();
 }
 
 function clearCurrentFilter() {
