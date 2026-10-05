@@ -7,6 +7,8 @@ import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
+import { ROUTES } from '@app/routes'
+import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import {
   CLOSED_STATUS,
@@ -117,9 +119,10 @@ export default function setup(context) {
   )
 
   // Empty hides the button; as on the desk portal, any open ticket can be closed.
-  const pageActionLabel = computed(() => (isClosed.value ? '' : __('Close')))
-
-  const canCreateTicket = computed(() => settings.canCreateTicket.value && isClosed.value)
+  const pageActionLabel = computed(() => {
+    if (!isClosed.value) return __('Close')
+    return settings.canCreateTicket.value ? __('Raise a ticket') : ''
+  })
 
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
 
@@ -171,6 +174,7 @@ export default function setup(context) {
   }
 
   function onPageAction() {
+    if (isClosed.value) return navigateTo(ROUTES.newTicket)
     if (wantsFeedback.value) return feedback.openFeedback()
     settings.askConfirm({
       title: __('Close ticket'),
@@ -208,10 +212,9 @@ export default function setup(context) {
     isChat: thread.isChat,
     conversation: thread.conversation,
     solvePromptAt,
-    canCreateTicket,
     customActions,
     pageActionLabel,
-    pageActionIcon: 'lucide-check',
+    pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
     onPageAction,
     confirmSolved,
     reopenTicket,

@@ -77,22 +77,6 @@
     "blockName": "header-right",
     "children": [
      {
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "router.push('/tickets/new')"
-       }
-      },
-      "componentId": "Button-raise-ticket",
-      "componentName": "Button",
-      "componentProps": {
-       "label": "{{ words.raiseTicket }}",
-       "variant": "subtle"
-      },
-      "visibilityCondition": "{{ canCreateTicket && !['/', '/customer-tickets', '/tickets/new'].includes(route.path) }}"
-     },
-     {
       "baseStyles": {
        "cursor": "pointer"
       },
@@ -201,7 +185,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-05 16:00:00.000000",
+ "modified": "2026-10-06 01:40:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
