@@ -2,11 +2,35 @@
   <SettingsLayoutBase
     :title="__('Portal permissions')"
     :description="
-      __('Choose what customer managers can do from the customer portal.')
+      __(
+        'Choose what visitors and customer managers can do from the customer portal.'
+      )
     "
   >
     <template #content>
       <div class="flex flex-col gap-6">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-1">
+            <span class="text-base-medium text-ink-gray-8">{{
+              __("Disable signup")
+            }}</span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __(
+                "New users will have to be manually registered by system managers."
+              )
+            }}</span>
+          </div>
+          <Switch
+            :model-value="Boolean(websiteSettings.doc?.disable_signup)"
+            @update:model-value="
+              (value) =>
+                websiteSettings.setValue.submit(
+                  { disable_signup: value },
+                  { onSuccess: () => toast.success(__('Settings updated')) }
+                )
+            "
+          />
+        </div>
         <div class="flex items-center justify-between">
           <div class="flex flex-col gap-1">
             <span class="text-base-medium text-ink-gray-8">{{
@@ -63,6 +87,11 @@ import { createDocumentResource, Switch, toast } from "frappe-ui";
 const hdSettings = createDocumentResource({
   doctype: "HD Settings",
   name: "HD Settings",
+});
+
+const websiteSettings = createDocumentResource({
+  doctype: "Website Settings",
+  name: "Website Settings",
 });
 
 function onToggle(fieldname: string, value: boolean) {
