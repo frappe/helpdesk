@@ -10,7 +10,7 @@ from helpdesk.test_utils import (
     emails_queued_to,
     enable_guest_tickets,
     get_invitation,
-    guest_draft_tokens,
+    guest_draft_token,
     submit_guest_form,
     unique_email,
 )
@@ -70,7 +70,7 @@ class TestGuestTicket(IntegrationTestCase):
         self.assertIsNone(get_invitation(email))
         self.assertEqual(emails_queued_to(email), 1)
 
-        [token] = guest_draft_tokens(email)
+        token = guest_draft_token(email)
         other = create_user(unique_email("other")).name
         self.addCleanup(frappe.delete_doc, "User", other, force=True)
         frappe.set_user(other)
@@ -79,12 +79,23 @@ class TestGuestTicket(IntegrationTestCase):
         self.assertEqual(get_guest_draft(token)["subject"], "Billing question")
         self.assertIsNone(get_guest_draft(token))
 
-    def test_continue_emails_are_spaced_out(self):
+    def test_continue_emails_are_spaced_out_but_keep_the_latest_draft(self):
         email = create_user(unique_email("flooded")).name
         self.addCleanup(frappe.delete_doc, "User", email, force=True)
-        submit_guest_form(self, email)
-        submit_guest_form(self, email)
+        submit_guest_form(self, email, subject="Printer offline")
+        submit_guest_form(self, email, subject="Printer offline on floor 2")
         self.assertEqual(emails_queued_to(email), 1)
+        frappe.set_user(email)
+        draft = get_guest_draft(guest_draft_token(email))
+        self.assertEqual(draft["subject"], "Printer offline on floor 2")
+
+    def test_a_claimed_email_gets_no_second_contact(self):
+        email = unique_email("racing")
+        # What a concurrent first request leaves behind before it commits.
+        frappe.cache.set(frappe.cache.make_key(f"hd_guest_contact:{email}"), 1, ex=60)
+        submit_guest_form(self, email)
+        self.assertEqual(frappe.db.count("Contact", {"email_id": email}), 0)
+        self.assertEqual(len(self.guest_tickets(email)), 1)
 
     def test_an_account_holder_gets_a_ticket_when_mail_cannot_go_out(self):
         email = create_user(unique_email("offline")).name
@@ -115,11 +126,8 @@ class TestGuestTicket(IntegrationTestCase):
         self.assertIsNone(get_invitation(email))
 
     def test_the_support_address_is_refused(self):
-        address = frappe.db.get_value(
-            "Email Account", {"email_id": ("is", "set")}, "email_id"
-        )
-        if not address:
-            self.skipTest("no email account on this site")
+        # `before_tests` makes this account on every test site.
+        address = frappe.get_doc("Email Account", "_Test Comm Account 1").email_id
         with self.assertRaises(frappe.ValidationError):
             submit_guest_form(self, address)
 

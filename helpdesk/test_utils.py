@@ -10,6 +10,7 @@ from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.api.ticket import new_guest_ticket
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
@@ -1102,8 +1103,6 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
 
 def submit_guest_form(case, email: str, **values) -> None:
     """Send the portal's guest ticket form as a signed-out visitor; what it creates goes when the test ends."""
-    from helpdesk.api.ticket import new_guest_ticket
-
     case.addCleanup(clean_up_guest_requests, email.strip().lower())
     frappe.set_user("Guest")
     try:
@@ -1124,23 +1123,20 @@ def clean_up_guest_requests(email: str) -> None:
     for name in frappe.get_all("Contact", {"email_id": email}, pluck="name"):
         frappe.delete_doc("Contact", name, force=True)
     delete_invitations(email)
-    frappe.cache.delete_value(f"hd_guest_continue:{email}")
-    for token in guest_draft_tokens(email):
+    if token := guest_draft_token(email):
         frappe.cache.delete_value(f"hd_guest_draft:{token}")
+    frappe.cache.delete_value(
+        [
+            f"hd_guest_continue:{email}",
+            f"hd_guest_draft_token:{email}",
+            f"hd_guest_contact:{email}",
+        ]
+    )
 
 
-def guest_draft_tokens(email: str) -> list[str]:
-    """Tokens of the drafts kept for `email`."""
-    tokens = [
-        frappe.safe_decode(key).split("hd_guest_draft:")[1]
-        for key in frappe.cache.get_keys("hd_guest_draft:")
-    ]
-    return [
-        token
-        for token in tokens
-        if (frappe.cache.get_value(f"hd_guest_draft:{token}") or {}).get("email")
-        == email
-    ]
+def guest_draft_token(email: str) -> str | None:
+    """The token of the draft kept for `email`, as its "continue" link carries it."""
+    return frappe.cache.get_value(f"hd_guest_draft_token:{email}")
 
 
 def emails_queued_to(email: str) -> int:
