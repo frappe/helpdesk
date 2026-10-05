@@ -39,9 +39,12 @@ class TestGuestTickets(IntegrationTestCase):
         self.assertEqual(
             frappe.db.get_value("HD Ticket", ticket_name, "owner"), "Guest"
         )
-        # the description becomes the ticket's first message
-        self.assertTrue(
-            frappe.db.exists("Communication", {"reference_name": ticket_name})
+        # the description becomes the ticket's first message, from the guest's email
+        self.assertEqual(
+            frappe.db.get_value(
+                "Communication", {"reference_name": ticket_name}, "sender"
+            ),
+            "first.guest@example.com",
         )
 
     def test_guest_cannot_read_edit_or_list_guest_tickets(self):

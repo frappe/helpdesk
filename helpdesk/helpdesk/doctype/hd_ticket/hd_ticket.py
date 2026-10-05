@@ -825,7 +825,10 @@ class HDTicket(Document, CustomerEditController):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        c.sender = frappe.session.user
+        # a guest is only "Guest" here; the email they gave is who it's from
+        c.sender = (
+            self.raised_by if frappe.session.user == "Guest" else frappe.session.user
+        )
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
