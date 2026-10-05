@@ -187,14 +187,13 @@ export const nextActiveTab = ref(null);
 
 export const disableSettingModalOutsideClick = ref(false);
 
-export type TabName =
+type TabName =
   | "Profile"
   | "Preferences"
   | "Email Accounts"
   | "Email Notifications"
   | "General"
   | "Knowledge Base"
-  | "Portal permissions"
   | "Agents"
   | "Invite Agents"
   | "Teams"

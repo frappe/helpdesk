@@ -5,7 +5,6 @@ import { ROUTES } from '@app/routes'
 import { usePreferences } from '@app/stores/preferences'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
-import { createAgentSettings } from './agent'
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
@@ -18,7 +17,6 @@ fetchTranslations()
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
-const agentSettings = createAgentSettings()
 const dialog = createSettingsDialog(core, organization)
 const session = useSession()
 
@@ -79,7 +77,6 @@ const store = {
   acceptConfirm: core.acceptConfirm,
   ...organization,
   ...profile,
-  ...agentSettings,
 }
 
 export function useSettingsModal(context) {

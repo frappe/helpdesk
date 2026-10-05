@@ -95,7 +95,7 @@ import {
 
 import { HelpIcon } from "frappe-ui/icons";
 import { computed, h, markRaw, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
@@ -117,13 +117,11 @@ import LucideUserPlus from "~icons/lucide/user-plus";
 import {
   setActiveSettingsTab,
   showSettingsModal,
-  type TabName,
 } from "../Settings/settingsModal";
 
 const { isMobileView } = useScreenSize();
 
 const router = useRouter();
-const route = useRoute();
 const authStore = useAuthStore();
 const { isVisible: isBannerVisible } = useBanners();
 
@@ -493,15 +491,5 @@ onMounted(() => {
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });
-  openLinkedSettings();
 });
-
-// The customer portal links agents to a settings tab as `?settings=<tab label>`.
-function openLinkedSettings() {
-  const tab = route.query.settings;
-  if (typeof tab !== "string") return;
-  setActiveSettingsTab(tab as TabName);
-  showSettingsModal.value = true;
-  router.replace({ query: { ...route.query, settings: undefined } });
-}
 </script>
