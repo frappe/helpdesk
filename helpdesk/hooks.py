@@ -87,6 +87,9 @@ user_invitation = {
 }
 
 doc_events = {
+    "Task": {
+        "validate": "helpdesk.tasky.api.stamp_task_times",
+    },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",

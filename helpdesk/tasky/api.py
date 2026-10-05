@@ -16,6 +16,43 @@ def _resolve_project(project):
     frappe.throw(_("Project not found: {0}").format(project))
 
 
+def _status_time_updates(new_status, started_on, completed_at):
+    """Field updates that record when a task started and finished.
+
+    Elapsed time between the two is what shows a "2 hour" task that actually took a day.
+    """
+    updates = {}
+    if new_status == "Working" and not started_on:
+        updates["custom_started_on"] = frappe.utils.now()
+    if new_status == "Completed" and not completed_at:
+        updates["custom_completed_at"] = frappe.utils.now()
+    if new_status != "Completed" and completed_at:
+        updates["custom_completed_at"] = None  # task was reopened
+    return updates
+
+
+def stamp_task_times(doc, method=None):
+    """Task validate hook, covers edits made outside the Tasky UI."""
+    for field, value in _status_time_updates(doc.status, doc.get("custom_started_on"), doc.get("custom_completed_at")).items():
+        doc.set(field, value)
+
+
+def _set_status_with_times(task_id, new_status):
+    started_on, completed_at = frappe.db.get_value("Task", task_id, ["custom_started_on", "custom_completed_at"])
+    frappe.db.set_value(
+        "Task", task_id, {"status": new_status, **_status_time_updates(new_status, started_on, completed_at)}
+    )
+
+
+def _can_view_all(user=None):
+    """Administrator and project managers (Project User) see the whole team; everyone else only themselves.
+
+    Deliberately not "System Manager": a person with that role should still get a personal view here.
+    """
+    user = user or frappe.session.user
+    return user == "Administrator" or bool(frappe.db.exists("Project User", {"user": user}))
+
+
 def _format_task(task):
     """Normalize a Task dict for frontend consumption."""
     assign_raw = task.pop("_assign", None) or ""
@@ -275,7 +312,7 @@ def get_task_detail(task):
 @frappe.whitelist()
 def update_task_status(task, status):
     """Update a task's status."""
-    frappe.db.set_value("Task", str(task), "status", str(status))
+    _set_status_with_times(str(task), str(status))
     frappe.db.commit()
     return {"status": str(status)}
 
@@ -549,7 +586,7 @@ def move_task(task, new_status):
     if new_status == "Working":
         frappe.db.set_value("Task", task_id, "custom_timer_start", frappe.utils.now())
 
-    frappe.db.set_value("Task", task_id, "status", new_status)
+    _set_status_with_times(task_id, new_status)
     frappe.db.commit()
     return {"status": new_status, "elapsed": round(elapsed_this_move, 2)}
 
@@ -637,6 +674,9 @@ def get_task_status_report(user=None, from_date=None, to_date=None, project=None
     Overdue overlaps Ongoing/Pending (a late task is still being worked on or not started),
     so it is reported alongside them rather than as a separate bucket.
     """
+    can_view_all = _can_view_all()
+    if not can_view_all:
+        user = frappe.session.user
     filters = [["status", "!=", "Cancelled"]]
     if project:
         filters.append(["project", "=", _resolve_project(str(project))])
@@ -645,11 +685,13 @@ def get_task_status_report(user=None, from_date=None, to_date=None, project=None
     if to_date:
         filters.append(["exp_end_date", "<=", to_date])
 
-    # get_list (not get_all) so non-PM users only see their own tasks
     tasks = frappe.get_list(
         "Task",
         filters=filters,
-        fields=["name", "status", "exp_end_date", "_assign"],
+        fields=[
+            "name", "subject", "status", "exp_end_date", "_assign", "modified", "completed_on",
+            "custom_estimated_hours", "custom_actual_hours", "custom_started_on", "custom_completed_at",
+        ],
         limit_page_length=0,
     )
 
@@ -665,15 +707,52 @@ def get_task_status_report(user=None, from_date=None, to_date=None, project=None
     def is_overdue(task):
         return bool(task.exp_end_date) and task.status != "Completed" and frappe.utils.getdate(task.exp_end_date) < today
 
+    def hours_taken(task):
+        """Hours actually worked, else wall-clock time from start to finish."""
+        if task.custom_actual_hours:
+            return task.custom_actual_hours
+        if task.custom_started_on and task.custom_completed_at:
+            return (task.custom_completed_at - task.custom_started_on).total_seconds() / 3600
+        return None
+
+    def delay_hours(task):
+        """Hours over the estimate for a finished task, None when it can't be judged."""
+        if task.status != "Completed" or not task.custom_estimated_hours:
+            return None
+        taken = hours_taken(task)
+        return None if taken is None else taken - task.custom_estimated_hours
+
     def matches_status(task):
         if not status:
             return True
+        if status == "Over Estimate":
+            return (delay_hours(task) or 0) > 0
         if status == "Overdue":
             return is_overdue(task)
         return bucket(task) == {"Completed": "completed", "Working": "ongoing", "Pending Review": "ongoing", "Open": "pending"}.get(status)
 
     members = {}
-    summary = {"total": 0, "completed": 0, "ongoing": 0, "pending": 0, "overdue": 0}
+    points = []
+    def blank_row(user_id):
+        return {
+            "user": user_id, "total": 0, "completed": 0, "ongoing": 0, "pending": 0, "overdue": 0,
+            "judged": 0, "estimated_hours": 0.0, "actual_hours": 0.0, "no_estimate": 0,
+        }
+
+    def count_estimate(row, task):
+        if task.status != "Completed":
+            return
+        if not task.custom_estimated_hours:
+            row["no_estimate"] += 1
+            return
+        taken = hours_taken(task)
+        if taken is None:
+            return
+        row["judged"] += 1
+        row["estimated_hours"] += task.custom_estimated_hours
+        row["actual_hours"] += taken
+
+    summary = blank_row("")
     for task in tasks:
         if not matches_status(task):
             continue
@@ -687,17 +766,25 @@ def get_task_status_report(user=None, from_date=None, to_date=None, project=None
         summary["total"] += 1
         summary[bucket(task)] += 1
         summary["overdue"] += is_overdue(task)
+        count_estimate(summary, task)
+        if user and delay_hours(task) is not None:
+            finished = task.custom_completed_at or task.completed_on or task.modified
+            points.append({
+                "name": task.name,
+                "subject": task.subject,
+                "estimated": task.custom_estimated_hours,
+                "actual": round(hours_taken(task), 1),
+                "finished": str(finished),
+            })
         for assignee in assignees or [None]:
             if user and assignee != user:
                 continue
-            row = members.setdefault(
-                assignee or "",
-                {"user": assignee or "", "total": 0, "completed": 0, "ongoing": 0, "pending": 0, "overdue": 0},
-            )
+            row = members.setdefault(assignee or "", blank_row(assignee or ""))
             row["total"] += 1
             row[bucket(task)] += 1
             if is_overdue(task):
                 row["overdue"] += 1
+            count_estimate(row, task)
 
     full_names = {
         u.name: u.full_name
@@ -705,8 +792,101 @@ def get_task_status_report(user=None, from_date=None, to_date=None, project=None
     }
     rows = []
     for key, row in members.items():
+        row["estimated_hours"] = round(row["estimated_hours"], 1)
+        row["actual_hours"] = round(row["actual_hours"], 1)
         row["full_name"] = full_names.get(key) or key or _("Unassigned")
         rows.append(row)
     rows.sort(key=lambda r: (-r["total"], r["full_name"]))
 
-    return {"summary": summary, "members": rows}
+    summary["estimated_hours"] = round(summary["estimated_hours"], 1)
+    summary["actual_hours"] = round(summary["actual_hours"], 1)
+    points.sort(key=lambda p: p["finished"])
+    return {"summary": summary, "members": rows, "tasks": points[-15:], "can_view_all": can_view_all}
+
+
+MIN_TASKS_FOR_RANKING = 5
+
+
+@frappe.whitelist()
+def get_performance_report(user=None, from_date=None, to_date=None, project=None):
+    """Per-assignee performance: how much was finished, how often on time, how much is late.
+
+    Score = 60% completion rate + 40% on-time rate. People with fewer than
+    MIN_TASKS_FOR_RANKING tasks are listed after everyone else, since a rate over a
+    handful of tasks says little.
+    """
+    can_view_all = _can_view_all()
+    if not can_view_all:
+        user = frappe.session.user
+    filters = [["status", "!=", "Cancelled"]]
+    if project:
+        filters.append(["project", "=", _resolve_project(str(project))])
+    if from_date:
+        filters.append(["exp_end_date", ">=", from_date])
+    if to_date:
+        filters.append(["exp_end_date", "<=", to_date])
+
+    tasks = frappe.get_list(
+        "Task",
+        filters=filters,
+        fields=[
+            "name", "status", "exp_end_date", "_assign", "custom_actual_hours",
+            "custom_completed_at", "completed_on",
+        ],
+        limit_page_length=0,
+    )
+
+    today = frappe.utils.getdate(frappe.utils.today())
+
+    def blank():
+        return {"total": 0, "completed": 0, "on_time": 0, "on_time_judged": 0, "overdue": 0, "hours": 0.0}
+
+    def tally(row, task):
+        row["total"] += 1
+        row["hours"] += task.custom_actual_hours or 0
+        due = frappe.utils.getdate(task.exp_end_date) if task.exp_end_date else None
+        if task.status == "Completed":
+            row["completed"] += 1
+            done = task.custom_completed_at or task.completed_on
+            if due and done:
+                row["on_time_judged"] += 1
+                row["on_time"] += frappe.utils.getdate(done) <= due
+        elif due and due < today:
+            row["overdue"] += 1
+
+    summary = blank()
+    members = {}
+    for task in tasks:
+        try:
+            assignees = json.loads(task._assign or "[]")
+        except (json.JSONDecodeError, TypeError):
+            assignees = []
+        if user and user not in assignees:
+            continue
+        tally(summary, task)
+        for assignee in assignees:
+            tally(members.setdefault(assignee, blank()), task)
+
+    def finish(row):
+        row["hours"] = round(row["hours"], 1)
+        row["completion_rate"] = round(row["completed"] / row["total"] * 100) if row["total"] else 0
+        row["on_time_rate"] = round(row["on_time"] / row["on_time_judged"] * 100) if row["on_time_judged"] else None
+        if row["on_time_rate"] is None:
+            row["score"] = row["completion_rate"]
+        else:
+            row["score"] = round(0.6 * row["completion_rate"] + 0.4 * row["on_time_rate"])
+        row["low_data"] = row["total"] < MIN_TASKS_FOR_RANKING
+        return row
+
+    full_names = {
+        u.name: u.full_name
+        for u in frappe.get_all("User", filters={"name": ("in", list(members))}, fields=["name", "full_name"])
+    }
+    rows = []
+    for key, row in members.items():
+        row["user"] = key
+        row["full_name"] = full_names.get(key) or key
+        rows.append(finish(row))
+    rows.sort(key=lambda r: (r["low_data"], -r["score"], -r["total"]))
+
+    return {"summary": finish(summary), "members": rows, "min_tasks": MIN_TASKS_FOR_RANKING, "can_view_all": can_view_all}

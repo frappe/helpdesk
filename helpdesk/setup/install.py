@@ -355,6 +355,20 @@ def get_custom_fields():
                 "insert_after": "custom_timer_start",
                 "read_only": 1,
             },
+            {
+                "fieldname": "custom_started_on",
+                "fieldtype": "Datetime",
+                "label": "Started On",
+                "insert_after": "custom_timer_elapsed",
+                "read_only": 1,
+            },
+            {
+                "fieldname": "custom_completed_at",
+                "fieldtype": "Datetime",
+                "label": "Completed At",
+                "insert_after": "custom_started_on",
+                "read_only": 1,
+            },
         ],
         "HD Ticket": [
             {

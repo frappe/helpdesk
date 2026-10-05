@@ -8,6 +8,7 @@ import LucideListTodo from "~icons/lucide/list-todo";
 import LucideClipboardList from "~icons/lucide/clipboard-list";
 import LucideClock from "~icons/lucide/clock";
 import LucideBarChartHorizontal from "~icons/lucide/bar-chart-horizontal";
+import LucideTrophy from "~icons/lucide/trophy";
 import { __ } from "@/translation";
 
 export const agentPortalSidebarOptions = [
@@ -50,6 +51,11 @@ export const agentPortalSidebarOptions = [
     label: __("Task Status"),
     icon: LucideBarChartHorizontal,
     to: "TaskyStatusReport",
+  },
+  {
+    label: __("Performance"),
+    icon: LucideTrophy,
+    to: "TaskyPerformance",
   },
   {
     label: __("Customers"),

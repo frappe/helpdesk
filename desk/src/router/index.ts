@@ -182,6 +182,11 @@ const portalRoutes = [
     component: () => import("@/pages/tasky/TaskStatusReport.vue"),
   },
   {
+    path: "/reports/performance",
+    name: "TaskyPerformance",
+    component: () => import("@/pages/tasky/PerformanceReport.vue"),
+  },
+  {
     path: "/call-logs",
     name: "CallLogs",
     component: () => import("@/pages/call-logs/CallLogs.vue"),
