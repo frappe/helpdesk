@@ -15,10 +15,7 @@
             :label="__('Save')"
             variant="solid"
             @click="saveSettings"
-            :loading="
-              saveSettingsResource.loading ||
-              saveWebsiteSettingsResource.loading
-            "
+            :loading="saveSettingsResource.loading"
           />
         </div>
       </Transition>
@@ -36,25 +33,6 @@
         <TicketSettings />
         <hr class="my-8" />
         <WorkflowSettings />
-        <hr class="my-8" />
-        <div>
-          <div class="text-base-semibold text-ink-gray-9">
-            {{ __("User Signup") }}
-          </div>
-          <div class="flex items-center justify-between mt-6">
-            <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
-                __("Disable signup")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __(
-                  "New users will have to be manually registered by system managers."
-                )
-              }}</span>
-            </div>
-            <Switch v-model="disableSignup" />
-          </div>
-        </div>
       </div>
     </template>
   </SettingsLayoutBase>
@@ -70,10 +48,9 @@ import {
   Button,
   createResource,
   LoadingIndicator,
-  Switch,
   toast,
 } from "frappe-ui";
-import { computed, provide, ref, watch } from "vue";
+import { provide, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
@@ -103,7 +80,6 @@ const settingsData = ref({
   enableOutsideHoursBanner: false,
   outsideWorkingHoursBannerMessage: "",
 });
-const disableSignup = ref(false);
 
 provide(HDSettingsSymbol, settingsData);
 
@@ -118,13 +94,6 @@ const settingsDataResource = createResource({
     settingsData.value = transformData(data);
     initialData.value = JSON.stringify(settingsData.value);
   },
-});
-
-const isWebsiteSettingsChanged = computed(() => {
-  return (
-    disableSignup.value !==
-    Boolean(websiteSettingsResource.data?.disable_signup)
-  );
 });
 
 const saveSettingsResource = createResource({
@@ -193,35 +162,6 @@ const transformData = (data: any) => {
   };
 };
 
-const websiteSettingsResource = createResource({
-  url: "frappe.client.get",
-  params: {
-    doctype: "Website Settings",
-    name: "Website Settings",
-    fields: ["disable_signup"],
-  },
-  auto: true,
-  onSuccess(data: any) {
-    disableSignup.value = Boolean(data.disable_signup);
-  },
-});
-
-const saveWebsiteSettingsResource = createResource({
-  url: "frappe.client.set_value",
-  makeParams() {
-    return {
-      doctype: "Website Settings",
-      name: "Website Settings",
-      fieldname: {
-        disable_signup: disableSignup.value,
-      },
-    };
-  },
-  onSuccess() {
-    websiteSettingsResource.reload();
-  },
-});
-
 const saveSettings = async () => {
   if (
     settingsData.value.restrictTicketsByAgentGroup &&
@@ -238,9 +178,6 @@ const saveSettings = async () => {
   const promises = [];
   if (isDirty.value) {
     promises.push(saveSettingsResource.submit());
-  }
-  if (isWebsiteSettingsChanged.value) {
-    promises.push(saveWebsiteSettingsResource.submit());
   }
   await Promise.allSettled(promises).then(() => {
     toast.success(__("Settings updated"));
@@ -330,12 +267,4 @@ watch(
     );
   }
 );
-
-watch(disableSignup, async (newVal) => {
-  if (!websiteSettingsResource.data) return;
-  if (newVal !== Boolean(websiteSettingsResource.data.disable_signup)) {
-    await saveWebsiteSettingsResource.submit();
-    toast.success(__("Settings updated"));
-  }
-});
 </script>
