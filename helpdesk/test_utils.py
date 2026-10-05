@@ -206,6 +206,7 @@ def make_form_script(
     body: str,
     apply_to_customer_portal: bool = False,
     apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
 ):
     """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
     frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
@@ -218,6 +219,7 @@ def make_form_script(
             "enabled": 1,
             "apply_to_customer_portal": int(apply_to_customer_portal),
             "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
             "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()

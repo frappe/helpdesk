@@ -40,6 +40,14 @@ def get_config():
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 
+    # Form scripts for the knowledge base pages; a private one keeps them from guests.
+    if res.public_knowledge_base or res.session_user != "Guest":
+        res.kb_form_scripts = frappe.get_all(
+            "HD Form Script",
+            filters={"enabled": 1, "apply_to_knowledge_base": 1},
+            pluck="script",
+        )
+
     res.favicon = (
         res.favicon
         or frappe.db.get_single_value("Website Settings", "favicon")
