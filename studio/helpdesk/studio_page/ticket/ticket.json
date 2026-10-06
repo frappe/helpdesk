@@ -584,12 +584,15 @@
              "children": [
               {
                "classes": [
+                "w-[106px]",
+                "shrink-0",
+                "truncate",
                 "text-ink-gray-5"
                ],
                "componentId": "TextBlock-ticket-status-label",
                "componentName": "TextBlock",
                "componentProps": {
-                "fontSize": "text-p-sm",
+                "fontSize": "text-base",
                 "tag": "span",
                 "text": "{{ t('Status') }}"
                }
@@ -605,9 +608,10 @@
               }
              ],
              "classes": [
-              "items-center",
               "flex",
-              "justify-between",
+              "items-center",
+              "gap-2",
+              "min-h-7",
               "w-full"
              ],
              "componentId": "container-ticket-status",
@@ -623,13 +627,15 @@
                "children": [
                 {
                  "classes": [
-                  "text-ink-gray-5",
-                  "shrink-0"
+                  "w-[106px]",
+                  "shrink-0",
+                  "truncate",
+                  "text-ink-gray-5"
                  ],
                  "componentId": "TextBlock-ticket-basics-label",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-p-sm",
+                  "fontSize": "text-base",
                   "tag": "span",
                   "text": "{{ dataItem.label }}"
                  }
@@ -637,24 +643,24 @@
                 {
                  "classes": [
                   "truncate",
-                  "text-ink-gray-8",
                   "min-w-0",
-                  "text-right"
+                  "flex-1",
+                  "text-ink-gray-8"
                  ],
                  "componentId": "TextBlock-ticket-basics-value",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-p-sm",
+                  "fontSize": "text-base",
                   "tag": "span",
                   "text": "{{ dataItem.value }}"
                  }
                 }
                ],
                "classes": [
-                "items-center",
                 "flex",
-                "gap-4",
-                "justify-between",
+                "items-center",
+                "gap-2",
+                "min-h-7",
                 "w-full"
                ],
                "componentId": "container-ticket-basics-row",
@@ -717,7 +723,7 @@
             "flex-col",
             "gap-2.5",
             "py-4",
-            "px-5"
+            "px-4"
            ],
            "componentId": "container-ticket-panel-basic",
            "componentName": "container",
@@ -739,7 +745,7 @@
             "flex-col",
             "gap-4",
             "py-4",
-            "px-5",
+            "px-4",
             "border-b-0"
            ],
            "componentId": "container-ticket-timeline",
@@ -750,12 +756,13 @@
            "children": [
             {
              "classes": [
-              "text-ink-gray-5"
+              "text-ink-gray-8",
+              "font-medium"
              ],
              "componentId": "TextBlock-ticket-help-title",
              "componentName": "TextBlock",
              "componentProps": {
-              "fontSize": "text-p-sm",
+              "fontSize": "text-base",
               "tag": "div",
               "text": "{{ suggestedHeading }}"
              }
@@ -791,7 +798,7 @@
                  "componentId": "TextBlock-ticket-help-link",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-sm",
+                  "fontSize": "text-base",
                   "tag": "span",
                   "text": "{{ dataItem.title }}"
                  },
@@ -843,9 +850,9 @@
             "border-outline-gray-2",
             "flex",
             "flex-col",
-            "gap-2",
+            "gap-3",
             "py-4",
-            "px-5"
+            "px-4"
            ],
            "componentId": "container-ticket-panel-help",
            "componentName": "container",
@@ -1234,7 +1241,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 00:50:00.000000",
+ "modified": "2026-10-07 01:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
