@@ -37,6 +37,7 @@ export const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? []
     : [
+        { icon: 'lucide-home', label: __('Home'), onClick: () => navigateTo(ROUTES.home) },
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
         { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         {
