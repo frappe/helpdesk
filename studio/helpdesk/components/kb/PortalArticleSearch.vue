@@ -36,7 +36,7 @@
         </span>
         <button
           type="button"
-          class="flex size-8 shrink-0 items-center justify-center rounded-[6px] text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
+          class="history-remove flex size-8 shrink-0 items-center justify-center rounded-[6px] text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
           :aria-label="__('Remove')"
           @pointerdown.stop.prevent
           @click.stop.prevent="forgetSearch(item.recentSearch)"
@@ -62,6 +62,15 @@
             {{ articleMeta(item.recentArticle) }}
           </span>
         </div>
+        <button
+          type="button"
+          class="history-remove flex size-8 shrink-0 items-center justify-center rounded-[6px] text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
+          :aria-label="__('Remove')"
+          @pointerdown.stop.prevent
+          @click.stop.prevent="forgetArticle(item.recentArticle.name)"
+        >
+          <LucideX class="size-4" />
+        </button>
       </div>
       <div
         v-else-if="item.key === SEARCH_ALL"
@@ -120,8 +129,13 @@ withDefaults(defineProps<{ placeholder?: string }>(), {
 const router = useRouter();
 const query = ref("");
 const isOpen = ref(false);
-const { recentSearches, recentArticles, rememberSearch, forgetSearch } =
-  useRecent();
+const {
+  recentSearches,
+  recentArticles,
+  rememberSearch,
+  forgetSearch,
+  forgetArticle,
+} = useRecent();
 
 const hasHistory = computed(
   () => recentSearches.value.length + recentArticles.value.length > 0
@@ -251,7 +265,20 @@ const options = computed(() =>
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"]:has(.recent-article) {
   min-height: 56px;
-  padding: 0 8px;
+  padding: 0 4px 0 8px;
+}
+/* Only on the hovered row: the list highlights its first row on open. Touch has no hover, so it stays. */
+.history-remove {
+  opacity: 0;
+}
+[data-slot="item"]:hover .history-remove,
+.history-remove:focus-visible {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .history-remove {
+    opacity: 1;
+  }
 }
 /* The rule between the sections runs edge to edge, through the panel's padding. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]

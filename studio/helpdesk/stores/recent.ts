@@ -36,6 +36,10 @@ export function useRecent() {
     searches.value = []
   }
 
+  function forgetArticle(name: string) {
+    articles.value = articles.value.filter((row) => row.name !== name)
+  }
+
   function rememberArticle(article: RecentArticle) {
     articles.value = remember(articles.value, article, (row) => row.name === article.name, ARTICLE_LIMIT)
   }
@@ -47,5 +51,6 @@ export function useRecent() {
     forgetSearch,
     clearSearches,
     rememberArticle,
+    forgetArticle,
   }
 }
