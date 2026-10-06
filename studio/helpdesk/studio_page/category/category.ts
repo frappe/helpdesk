@@ -6,25 +6,24 @@ import { useDrawer } from '@app/composables/useDrawer'
 import { countLabel } from '@app/utils'
 
 export default function setup(context) {
-  const { category, articles, categories, route } = context
+  const { articles, categories, route } = context
 
-  const categoryName = computed(() => category.data?.category_name || route.params.category)
+  const category = computed(() => categories.data?.find((row) => row.name === route.params.category))
+  // The list holds only categories with an article this reader may see.
+  const notFound = computed(() => Boolean(categories.data) && !category.value)
+  const categoryName = computed(() => category.value?.category_name || route.params.category)
   const categoryDescription = computed(
-    () => category.data?.description || __('Find answers to common {0} questions.', [categoryName.value]),
+    () => category.value?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
   // `articles` is capped server side; the categories list carries the full count.
-  const total = computed(
-    () =>
-      categories.data?.find((row) => row.name === route.params.category)?.article_count ??
-      articles.data?.length ??
-      0,
-  )
+  const total = computed(() => category.value?.article_count ?? articles.data?.length ?? 0)
   const articleCount = computed(() => countLabel(total.value, __('1 article'), __('{0} articles')))
 
   return {
     ...useSettingsModal(context),
     ...useKbHeader(context),
     drawer: useDrawer(route),
+    notFound,
     categoryName,
     categoryDescription,
     articleCount,

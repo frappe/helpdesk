@@ -226,46 +226,6 @@
              "blockName": "meta-row",
              "children": [
               {
-               "componentId": "category-author-avatar",
-               "componentName": "Avatar",
-               "componentProps": {
-                "image": "{{ category.data?.author?.image }}",
-                "label": "{{ category.data?.author?.name }}",
-                "shape": "circle",
-                "size": "md",
-                "theme": "gray"
-               },
-               "visibilityCondition": "{{ category.data?.author }}"
-              },
-              {
-               "componentId": "category-author-name",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-sm",
-                "tag": "span",
-                "text": "{{ t('By {0}', [category.data?.author?.name]) }}"
-               },
-               "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
-               ],
-               "visibilityCondition": "{{ category.data?.author }}"
-              },
-              {
-               "componentId": "category-meta-dot",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-sm",
-                "tag": "span",
-                "text": "·"
-               },
-               "classes": [
-                "text-ink-gray-4",
-                "leading-[1.15]"
-               ],
-               "visibilityCondition": "{{ category.data?.author }}"
-              },
-              {
                "componentId": "category-article-count",
                "componentName": "TextBlock",
                "componentProps": {
@@ -445,7 +405,7 @@
           }
          ],
          "blockName": "category-column",
-         "visibilityCondition": "{{ !category?.error }}"
+         "visibilityCondition": "{{ !notFound }}"
         },
         {
          "blockName": "not-found",
@@ -461,7 +421,7 @@
           "title": "{{ t('Category not found') }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ category?.error }}"
+         "visibilityCondition": "{{ notFound }}"
         }
        ],
        "blockName": "main-layout"
@@ -510,7 +470,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 02:10:00.000000",
+ "modified": "2026-10-07 02:20:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -527,16 +487,6 @@
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_public_articles"
-  },
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{\"name\": \"{{ route.params.category }}\"}",
-   "resource_name": "category",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_public_category"
   },
   {
    "auto": 1,
