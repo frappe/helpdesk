@@ -384,20 +384,11 @@
                   "blockName": "Password row",
                   "children": [
                    {
-                    "componentEvents": {
-                     "click": {
-                      "action": "Run Script",
-                      "event": "click",
-                      "script": "openPasswordChange()"
-                     }
-                    },
                     "componentId": "kb_settings-password-change",
-                    "componentName": "Button",
-                    "componentProps": {
-                     "label": "{{ t('Change password') }}",
-                     "variant": "subtle"
-                    },
-                    "componentSlots": {}
+                    "componentName": "PortalChangePassword",
+                    "componentProps": {},
+                    "componentSlots": {},
+                    "isCustomVueComponent": true
                    }
                   ],
                   "componentId": "kb_settings-password-row",
@@ -1224,119 +1215,6 @@
       "slotName": "title"
      }
     }
-   },
-   {
-    "blockName": "Password dialog",
-    "componentId": "kb_settings-password-dialog",
-    "componentName": "Dialog",
-    "componentProps": {
-     "modelValue": {
-      "$type": "variable",
-      "name": "passwordOpen"
-     }
-    },
-    "componentSlots": {
-     "default": {
-      "slotContent": [
-       {
-        "children": [
-         {
-          "classes": [
-           "mb-4",
-           "text-lg",
-           "font-semibold",
-           "text-ink-gray-9"
-          ],
-          "componentId": "kb_settings-password-title",
-          "componentName": "TextBlock",
-          "componentProps": {
-           "tag": "span",
-           "text": "Change password"
-          },
-          "componentSlots": {}
-         },
-         {
-          "children": [
-           {
-            "componentId": "kb_settings-password-current",
-            "componentName": "FormControl",
-            "componentProps": {
-             "label": "Current password",
-             "modelValue": {
-              "$type": "variable",
-              "name": "currentPassword"
-             },
-             "type": "password"
-            },
-            "componentSlots": {}
-           },
-           {
-            "componentId": "kb_settings-password-new",
-            "componentName": "FormControl",
-            "componentProps": {
-             "label": "New password",
-             "modelValue": {
-              "$type": "variable",
-              "name": "newPassword"
-             },
-             "type": "password"
-            },
-            "componentSlots": {}
-           },
-           {
-            "children": [
-             {
-              "componentEvents": {
-               "click": {
-                "action": "Run Script",
-                "event": "click",
-                "script": "changePassword()"
-               }
-              },
-              "componentId": "kb_settings-password-submit",
-              "componentName": "Button",
-              "componentProps": {
-               "label": "Change password",
-               "loading": "{{ isSettingsBusy }}",
-               "variant": "solid"
-              },
-              "componentSlots": {}
-             }
-            ],
-            "classes": [
-             "flex",
-             "justify-end"
-            ],
-            "componentId": "kb_settings-password-actions",
-            "componentName": "container",
-            "componentProps": {},
-            "componentSlots": {},
-            "originalElement": "div"
-           }
-          ],
-          "classes": [
-           "flex",
-           "flex-col",
-           "gap-4"
-          ],
-          "componentId": "kb_settings-password-fields",
-          "componentName": "container",
-          "componentProps": {},
-          "componentSlots": {},
-          "originalElement": "div"
-         }
-        ],
-        "componentId": "kb_settings-password-body",
-        "componentName": "container",
-        "componentProps": {},
-        "componentSlots": {},
-        "originalElement": "div"
-       }
-      ],
-      "slotId": "kb_settings-slot-password-body:default",
-      "slotName": "default"
-     }
-    }
    }
   ],
   "componentId": "kb_settings-root",
@@ -1352,7 +1230,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-06 22:10:00.000000",
+ "modified": "2026-10-06 23:30:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
