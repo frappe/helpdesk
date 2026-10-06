@@ -91,30 +91,44 @@
       "visibilityCondition": "{{ customActions.length }}"
      },
      {
-      "componentId": "PortalHeaderLinks-header",
-      "componentName": "PortalHeaderLinks",
-      "componentProps": {
-       "links": "{{ headerLinks }}"
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "gap": "4px"
       },
-      "isCustomVueComponent": true
-     },
-     {
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "toggleTheme()"
+      "blockName": "header-tail",
+      "children": [
+       {
+        "componentId": "PortalHeaderLinks-header",
+        "componentName": "PortalHeaderLinks",
+        "componentProps": {
+         "links": "{{ headerLinks }}"
+        },
+        "isCustomVueComponent": true
+       },
+       {
+        "componentEvents": {
+         "click": {
+          "action": "Run Script",
+          "event": "click",
+          "script": "toggleTheme()"
+         }
+        },
+        "componentId": "Button-theme",
+        "componentName": "Button",
+        "componentProps": {
+         "aria-label": "{{ t('Toggle theme') }}",
+         "icon": "{{ themeIcon }}",
+         "variant": "ghost"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ themeIcon }}"
        }
-      },
-      "componentId": "Button-theme",
-      "componentName": "Button",
-      "componentProps": {
-       "aria-label": "{{ t('Toggle theme') }}",
-       "icon": "{{ themeIcon }}",
-       "variant": "ghost"
-      },
-      "componentSlots": {},
-      "visibilityCondition": "{{ themeIcon }}"
+      ],
+      "componentId": "container-header-tail",
+      "componentName": "container",
+      "originalElement": "div",
+      "visibilityCondition": "{{ headerLinks.length || themeIcon }}"
      },
      {
       "componentEvents": {
@@ -207,7 +221,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-07 06:00:00.000000",
+ "modified": "2026-10-07 06:30:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
