@@ -42,7 +42,7 @@ const accountMenuOptions = computed(() =>
         ...(session.isAgent.value
           ? [
               {
-                icon: 'lucide-arrow-left-right',
+                icon: 'lucide-headphones',
                 label: __('Agent portal'),
                 onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
               },
