@@ -356,19 +356,7 @@
              "componentId": "container-ticket-contact",
              "componentName": "container",
              "originalElement": "div"
-            }
-           ],
-           "classes": [
-            "flex",
-            "flex-col",
-            "p-4"
-           ],
-           "componentId": "container-ticket-panel-basic",
-           "componentName": "container",
-           "originalElement": "div"
-          },
-          {
-           "children": [
+            },
             {
              "children": [
               {
@@ -475,9 +463,7 @@
              "classes": [
               "flex",
               "flex-col",
-              "gap-2.5",
-              "pb-3",
-              "pt-0.5"
+              "gap-2.5"
              ],
              "componentId": "container-ticket-details",
              "componentName": "container",
@@ -487,16 +473,14 @@
             }
            ],
            "classes": [
-            "border-t",
-            "border-outline-gray-2"
+            "flex",
+            "flex-col",
+            "gap-4",
+            "p-4"
            ],
-           "componentId": "PortalSidebarSection-ticket-details",
-           "componentName": "PortalSidebarSection",
-           "componentProps": {
-            "label": "{{ t('Details') }}"
-           },
-           "componentSlots": {},
-           "isCustomVueComponent": true
+           "componentId": "container-ticket-panel-basic",
+           "componentName": "container",
+           "originalElement": "div"
           },
           {
            "children": [
@@ -1082,7 +1066,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:20:00.000000",
+ "modified": "2026-10-07 01:30:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
