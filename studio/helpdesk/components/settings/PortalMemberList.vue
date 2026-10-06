@@ -17,6 +17,7 @@
     <div>
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ __("Members") }}</span>
+        <span>{{ __("Role") }}</span>
         <span class="max-sm:hidden">{{ __("Last seen") }}</span>
         <span />
       </div>
@@ -44,7 +45,6 @@
                 class="text-p-xs font-normal text-ink-gray-5"
                 >{{ __("You") }}</span
               >
-              <Badge :label="roleLabel(member.role)" variant="subtle" />
               <Badge
                 v-if="member.pending"
                 :label="__('Pending')"
@@ -59,6 +59,14 @@
               {{ member.email }}
             </div>
           </div>
+        </div>
+
+        <div>
+          <Badge
+            :label="roleLabel(member.role)"
+            :theme="ROLES[member.role].theme"
+            variant="subtle"
+          />
         </div>
 
         <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
@@ -105,7 +113,7 @@ import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width.
 const ROW =
-  "grid grid-cols-[minmax(0,1fr)_32px] sm:grid-cols-[minmax(0,1fr)_120px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
+  "grid grid-cols-[minmax(0,1fr)_88px_32px] sm:grid-cols-[minmax(0,1fr)_88px_120px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
 type Member = {
   contact?: string;
