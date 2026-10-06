@@ -19,7 +19,7 @@ export function createOrganizationSettings(core) {
     core.organizations.value.some((row) => row.role !== 'Member'),
   )
   const organizationScreenTitle = computed(() =>
-    __(managesAnyOrganization.value ? 'Manage organization' : 'View organization'),
+    __(managesAnyOrganization.value ? 'Manage Organization' : 'View Organization'),
   )
   const organizationScreenDescription = computed(() =>
     __(
