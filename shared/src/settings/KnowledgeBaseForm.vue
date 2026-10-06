@@ -1,11 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <BannerPicker
-      :image="settings.doc?.banner_image || ''"
-      :preset="settings.doc?.banner_preset || ''"
-      @change="save"
-    />
-    <div class="mt-8 flex flex-col gap-6">
+    <div class="flex flex-col gap-6">
       <div
         v-for="toggle in toggles"
         :key="toggle.fieldname"
@@ -25,6 +20,16 @@
         />
       </div>
     </div>
+    <hr class="my-8" />
+    <div class="text-base-semibold text-ink-gray-9">
+      {{ __("Customize Knowledge Base") }}
+    </div>
+    <BannerPicker
+      class="mt-6"
+      :image="settings.doc?.banner_image || ''"
+      :preset="settings.doc?.banner_preset || ''"
+      @change="save"
+    />
     <HeaderLinks
       class="mt-8"
       :links="settings.doc?.portal_header_links || []"
