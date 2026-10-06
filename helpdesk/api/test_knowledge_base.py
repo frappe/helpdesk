@@ -330,6 +330,23 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
         self.assertNotIn(hidden.name, [row["name"] for row in get_categories()])
 
+    def test_a_customer_is_not_shown_a_category_with_nothing_for_them(self) -> None:
+        internal = make_article_category("Fixture Internal Only")
+        make_article(
+            "Fixture internal elsewhere",
+            category=internal.name,
+            visibility="Agents only",
+        )
+        drafts = make_article_category("Fixture Drafts Only")
+        make_article("Fixture draft elsewhere", "Draft", category=drafts.name)
+        self.assertIn(internal.name, [row["name"] for row in get_categories()])
+
+        frappe.session.user = CUSTOMER
+
+        names = [row["name"] for row in get_categories()]
+        self.assertNotIn(internal.name, names)
+        self.assertNotIn(drafts.name, names)
+
     def test_a_guest_cannot_vote_on_one(self) -> None:
         frappe.set_user("Guest")
 
