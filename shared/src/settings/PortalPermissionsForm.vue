@@ -25,11 +25,11 @@
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
         <span class="text-base-medium text-ink-gray-8">{{
-          __("Invite members")
+          __("Allow member invites")
         }}</span>
         <span class="text-p-sm text-ink-gray-6">{{
           __(
-            "Customer managers can invite people into their own organization. Invited people get a login for your helpdesk."
+            "Customer managers will be able to invite people to their organization. Invited people get a portal login."
           )
         }}</span>
       </div>
@@ -45,11 +45,11 @@
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
         <span class="text-base-medium text-ink-gray-8">{{
-          __("Change member roles")
+          __("Allow role changes")
         }}</span>
         <span class="text-p-sm text-ink-gray-6">{{
           __(
-            "Customer managers can make members of their own organization managers, and back."
+            "Customer managers will be able to promote members to managers, or demote them back."
           )
         }}</span>
       </div>
@@ -65,10 +65,12 @@
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
         <span class="text-base-medium text-ink-gray-8">{{
-          __("Remove members")
+          __("Allow member removal")
         }}</span>
         <span class="text-p-sm text-ink-gray-6">{{
-          __("Customer managers can remove people from their own organization.")
+          __(
+            "Customer managers will be able to remove people from their organization."
+          )
         }}</span>
       </div>
       <Switch
@@ -84,11 +86,11 @@
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
         <span class="text-base-medium text-ink-gray-8">{{
-          __("Edit organization details")
+          __("Allow organization edits")
         }}</span>
         <span class="text-p-sm text-ink-gray-6">{{
           __(
-            "Customer managers can change their own organization's name and logo."
+            "Customer managers will be able to change their organization's name and logo."
           )
         }}</span>
       </div>

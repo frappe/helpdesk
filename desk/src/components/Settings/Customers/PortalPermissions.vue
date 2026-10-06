@@ -2,9 +2,7 @@
   <SettingsLayoutBase
     :title="__('Portal Permissions')"
     :description="
-      __(
-        'Choose what visitors and customer managers can do from the customer portal.'
-      )
+      __('Manage what customers and visitors can do on the customer portal.')
     "
   >
     <template #content>
