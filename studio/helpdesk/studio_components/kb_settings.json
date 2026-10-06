@@ -1303,7 +1303,7 @@
               "componentProps": {
                "fontSize": "text-base",
                "tag": "p",
-               "text": "{{ t('Manage how the knowledge base appears to customers.') }}"
+               "text": "{{ t('Manage who can read your knowledge base and how it looks.') }}"
               },
               "componentSlots": {}
              }

@@ -245,34 +245,34 @@
   },
   {
    "default": "0",
-   "description": "Anyone can read articles without signing in.",
+   "description": "If enabled, anyone can read articles without logging in.",
    "fieldname": "public_knowledge_base",
    "fieldtype": "Check",
-   "label": "Public knowledge base"
+   "label": "Make knowledge base public"
   },
   {
    "default": "0",
-   "description": "Visitors who aren't signed in can mark an article as helpful or not.",
+   "description": "If enabled, visitors who aren't logged in can mark articles as helpful or not.",
    "fieldname": "allow_anonymous_article_voting",
    "fieldtype": "Check",
    "label": "Allow guests to vote on articles"
   },
   {
-   "description": "Banner image shown at the top of the Knowledge Base portal",
+   "description": "Appears behind the search bar on the knowledge base home page.",
    "fieldname": "banner_image",
    "fieldtype": "Attach Image",
-   "label": "Banner Image"
+   "label": "Banner image"
   },
   {
    "depends_on": "eval:!doc.banner_image",
-   "description": "Background shown at the top of the Knowledge Base portal when no banner image is set",
+   "description": "Background color used when no banner image is set.",
    "fieldname": "banner_preset",
    "fieldtype": "Select",
-   "label": "Banner Preset",
+   "label": "Banner preset",
    "options": "\nStone\nBlue\nGreen\nCharcoal\nNavy\nForest"
   },
   {
-   "description": "Links shown at the top right of every portal page.",
+   "description": "Appear at the top right of every knowledge base page.",
    "fieldname": "portal_header_links",
    "fieldtype": "Table",
    "label": "Quick links",

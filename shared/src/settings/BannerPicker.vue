@@ -6,7 +6,7 @@
       }}</span>
       <span class="text-p-sm text-ink-gray-6">{{
         __(
-          "Shown behind the portal search bar. PNG or JPG, 1440×240px or larger."
+          "Appears behind the search bar on the knowledge base home page. Recommended size is minimum 1440x240 px in PNG or JPG."
         )
       }}</span>
     </div>
