@@ -15,7 +15,6 @@ from helpdesk.api.knowledge_base import (
     get_public_article,
     get_public_article_titles,
     get_public_articles,
-    get_public_category,
     increment_views,
     search_articles,
     vote_on_article,
@@ -68,7 +67,6 @@ class TestPublicReads(IntegrationTestCase):
             get_public_article_titles,
             get_article_markdown,
             get_categories,
-            get_public_category,
             vote_on_article,
             increment_views,
         ):
@@ -87,7 +85,6 @@ class TestPublicReads(IntegrationTestCase):
             (get_categories, ()),
             (get_public_article, (self.published,)),
             (get_article_markdown, (self.published,)),
-            (get_public_category, (self.category.name,)),
             (increment_views, (self.published,)),
         ):
             with self.subTest(endpoint=endpoint.__name__):
@@ -222,19 +219,12 @@ class TestPublicReads(IntegrationTestCase):
 
         self.assertEqual(category.article_count, 1)
 
-    def test_reads_one_category(self) -> None:
-        category = get_public_category(self.category.name)
+    def test_a_category_carries_its_description(self) -> None:
+        [category] = [
+            row for row in get_categories() if row["name"] == self.category.name
+        ]
 
         self.assertEqual(category.description, "Fixture description")
-        owner = frappe.db.get_value("User", self.category.owner, "full_name")
-        self.assertEqual(category.author["name"], owner)
-        self.assertEqual(set(category.author), BYLINE_FIELDS)
-        self.assertNotIn("owner", category)
-
-    def test_an_unknown_category_is_not_found(self) -> None:
-        self.assertRaises(
-            frappe.DoesNotExistError, get_public_category, "no-such-category"
-        )
 
     def test_a_reader_is_counted_once_an_hour(self) -> None:
         increment_views(self.published)
@@ -339,7 +329,6 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         frappe.set_user("Guest")
 
         self.assertNotIn(hidden.name, [row["name"] for row in get_categories()])
-        self.assertRaises(frappe.DoesNotExistError, get_public_category, hidden.name)
 
     def test_a_guest_cannot_vote_on_one(self) -> None:
         frappe.set_user("Guest")

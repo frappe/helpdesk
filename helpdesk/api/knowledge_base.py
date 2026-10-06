@@ -280,20 +280,6 @@ def readable_article_counts() -> dict[str, int]:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_category(name: str) -> dict:
-    validate_public_access()
-    category = frappe.db.get_value(
-        "HD Article Category", name, [*PUBLIC_CATEGORY_FIELDS, "owner"], as_dict=True
-    )
-    if not category or not frappe.db.exists(
-        "HD Article", readable_filters(category=name)
-    ):
-        frappe.throw(_("Category not found"), frappe.DoesNotExistError)
-    category.author = byline(category.pop("owner"))
-    return category
-
-
-@frappe.whitelist(allow_guest=True, methods=["GET"])
 @rate_limit(limit=120, seconds=60)
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     """Full-text matches the reader may see, best first, with `<mark>` around the hits."""
@@ -417,11 +403,6 @@ def get_general_category():
     return frappe.db.get_value(
         "HD Article Category", {"category_name": "General"}, "name"
     )
-
-
-@frappe.whitelist()
-def get_category_title(category: str):
-    return frappe.db.get_value("HD Article Category", category, "category_name")
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
