@@ -71,7 +71,7 @@
 
         <div class="flex justify-end">
           <Dropdown
-            v-if="canRemove(member)"
+            v-if="rowOptions(member).length"
             :options="rowOptions(member)"
             align="end"
           >
@@ -136,9 +136,16 @@ const ROLE_FILTERS = [
 const props = withDefaults(
   defineProps<{
     members?: Member[];
-    canManage?: boolean;
+    canInvite?: boolean;
+    canChangeRoles?: boolean;
+    canRemoveMembers?: boolean;
   }>(),
-  { members: () => [], canManage: false }
+  {
+    members: () => [],
+    canInvite: false,
+    canChangeRoles: false,
+    canRemoveMembers: false,
+  }
 );
 
 const emit = defineEmits<{
@@ -165,44 +172,33 @@ function lastSeen(member: Member) {
   return member.last_seen ? timeAgo(member.last_seen) : __("Never");
 }
 
-// The owner's role is fixed, and demoting yourself revokes the rights the call needs.
-function canSwitchRole(member: Member) {
-  return Boolean(
-    props.canManage &&
-      member.role !== "Owner" &&
-      !member.is_you &&
-      !member.pending
-  );
-}
-
-function canRemove(member: Member) {
-  return Boolean(props.canManage && member.role !== "Owner" && !member.is_you);
-}
-
+// The owner's role is fixed, and changing yourself revokes the rights the call needs.
 function rowOptions(member: Member) {
+  if (member.role === "Owner" || member.is_you) return [];
   if (member.pending) {
-    return [
-      {
-        label: __("Cancel invitation"),
-        icon: "lucide-x-circle",
-        onClick: () => emit("remove", member),
-      },
-    ];
+    return props.canInvite
+      ? [
+          {
+            label: __("Cancel invitation"),
+            icon: "lucide-x-circle",
+            onClick: () => emit("remove", member),
+          },
+        ]
+      : [];
   }
   const next: RoleLabel = member.role === "Manager" ? "Member" : "Manager";
   return [
-    {
+    props.canChangeRoles && {
       label: next === "Manager" ? __("Make manager") : __("Make member"),
       icon: ROLES[next].icon,
       onClick: () => emit("setRole", member, next),
-      condition: () => canSwitchRole(member),
     },
-    {
+    props.canRemoveMembers && {
       label: __("Remove from organization"),
       icon: "lucide-user-minus",
       onClick: () => emit("remove", member),
     },
-  ];
+  ].filter(Boolean);
 }
 
 function keyOf(member: Member) {

@@ -12,6 +12,8 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
 
 MANAGER_ROLE = "HD Customer Manager"
 PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
+PORTAL_ROLES_SETTING = "allow_customer_managers_to_change_roles"
+PORTAL_REMOVE_SETTING = "allow_customer_managers_to_remove_members"
 PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 MAX_INVITES = 20
@@ -53,6 +55,9 @@ def get_organization(customer: str) -> dict:
         "country": hd_customer.country,
         "is_manager": is_manager,
         "can_invite": is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING),
+        "can_change_roles": is_manager and _is_portal_setting_on(PORTAL_ROLES_SETTING),
+        "can_remove_members": is_manager
+        and _is_portal_setting_on(PORTAL_REMOVE_SETTING),
         "can_edit": is_manager and _is_portal_setting_on(PORTAL_EDIT_SETTING),
         "members": _get_members(hd_customer) + _get_pending_members(hd_customer),
     }
@@ -117,7 +122,7 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
 
 @frappe.whitelist()
 def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
-    hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
+    hd_customer = _get_managed_customer(customer, PORTAL_ROLES_SETTING)
     member = _get_editable_member(hd_customer, contact)
     member.is_manager = int(sbool(is_manager))
     hd_customer.save()
@@ -128,7 +133,9 @@ def remove_member(
     customer: str, contact: str | None = None, invitation: str | None = None
 ) -> None:
     """Drop a member, or cancel the invitation of someone who has not joined yet."""
-    hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
+    hd_customer = _get_managed_customer(
+        customer, PORTAL_INVITE_SETTING if invitation else PORTAL_REMOVE_SETTING
+    )
     if invitation:
         return _cancel_invitation(hd_customer, invitation)
     _get_editable_member(hd_customer, contact)
@@ -258,16 +265,21 @@ def _is_portal_setting_on(setting: str) -> bool:
 def _get_managed_customer(customer: str, setting: str):
     """The HD Customer, once the helpdesk allows the action and the caller manages it."""
     if not _is_portal_setting_on(setting):
-        frappe.throw(
-            (
-                _("Your helpdesk does not allow customers to manage members")
-                if setting == PORTAL_INVITE_SETTING
-                else _(
-                    "Your helpdesk does not allow customers to edit their organization"
-                )
+        refusals = {
+            PORTAL_INVITE_SETTING: _(
+                "Your helpdesk does not allow customers to invite members"
             ),
-            frappe.PermissionError,
-        )
+            PORTAL_ROLES_SETTING: _(
+                "Your helpdesk does not allow customers to change member roles"
+            ),
+            PORTAL_REMOVE_SETTING: _(
+                "Your helpdesk does not allow customers to remove members"
+            ),
+            PORTAL_EDIT_SETTING: _(
+                "Your helpdesk does not allow customers to edit their organization"
+            ),
+        }
+        frappe.throw(refusals[setting], frappe.PermissionError)
     hd_customer = frappe.get_doc("HD Customer", customer)
     hd_customer.check_permission("write")
     return hd_customer

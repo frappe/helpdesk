@@ -942,7 +942,9 @@
                 "componentId": "kb_settings-members-list",
                 "componentName": "PortalMemberList",
                 "componentProps": {
-                 "canManage": "{{ canInvite }}",
+                 "canChangeRoles": "{{ canChangeRoles }}",
+                 "canInvite": "{{ canInvite }}",
+                 "canRemoveMembers": "{{ canRemoveMembers }}",
                  "members": "{{ orgMembers }}",
                  "onRemove": "{{ removeMember }}",
                  "onSetRole": "{{ setMemberRole }}"
@@ -1332,7 +1334,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 04:50:00.000000",
+ "modified": "2026-10-07 07:30:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

@@ -25,11 +25,11 @@
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
         <span class="text-base-medium text-ink-gray-8">{{
-          __("Invite and manage members")
+          __("Invite members")
         }}</span>
         <span class="text-p-sm text-ink-gray-6">{{
           __(
-            "Customer managers can invite people into their own organization, change their roles and remove them. Invited people get a login for your helpdesk."
+            "Customer managers can invite people into their own organization. Invited people get a login for your helpdesk."
           )
         }}</span>
       </div>
@@ -39,6 +39,45 @@
         "
         @update:model-value="
           (value) => onToggle('allow_customer_managers_to_invite', value)
+        "
+      />
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1">
+        <span class="text-base-medium text-ink-gray-8">{{
+          __("Change member roles")
+        }}</span>
+        <span class="text-p-sm text-ink-gray-6">{{
+          __(
+            "Customer managers can make members of their own organization managers, and back."
+          )
+        }}</span>
+      </div>
+      <Switch
+        :model-value="
+          Boolean(hdSettings.doc?.allow_customer_managers_to_change_roles)
+        "
+        @update:model-value="
+          (value) => onToggle('allow_customer_managers_to_change_roles', value)
+        "
+      />
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1">
+        <span class="text-base-medium text-ink-gray-8">{{
+          __("Remove members")
+        }}</span>
+        <span class="text-p-sm text-ink-gray-6">{{
+          __("Customer managers can remove people from their own organization.")
+        }}</span>
+      </div>
+      <Switch
+        :model-value="
+          Boolean(hdSettings.doc?.allow_customer_managers_to_remove_members)
+        "
+        @update:model-value="
+          (value) =>
+            onToggle('allow_customer_managers_to_remove_members', value)
         "
       />
     </div>
