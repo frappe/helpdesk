@@ -166,11 +166,10 @@ function createViewsStore() {
     await list.reload()
   }
 
-  function saveCurrentView() {
-    if (!activeView.value) return
+  function saveCurrentView(name) {
     return runAction(
       async () => {
-        await setValues('HD View', activeView.value.name, currentPayload())
+        await setValues('HD View', name, currentPayload())
         await list.reload()
       },
       { success: __('View updated'), fallback: __('Could not update the view') },
@@ -226,7 +225,7 @@ function createViewsStore() {
   function viewActions(item) {
     if (!item?.name) return []
     return [
-      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView() },
+      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView(item.name) },
       { label: __('Rename'), icon: 'lucide-edit-2', onClick: () => openViewModal('rename', item) },
       { label: __('Delete'), icon: 'lucide-trash-2', onClick: () => deleteView(item.name) },
     ]
