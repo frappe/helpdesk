@@ -18,7 +18,6 @@
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ __("Members") }}</span>
         <span class="max-sm:hidden">{{ __("Last seen") }}</span>
-        <span>{{ __("Role") }}</span>
         <span />
       </div>
 
@@ -44,6 +43,7 @@
                 class="text-p-xs font-normal text-ink-gray-5"
                 >{{ __("You") }}</span
               >
+              <Badge :label="roleLabel(member.role)" variant="subtle" />
               <Badge
                 v-if="member.pending"
                 :label="__('Pending')"
@@ -63,13 +63,6 @@
         <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
           {{ lastSeen(member) }}
         </div>
-
-        <span
-          class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
-        >
-          <component :is="ROLES[member.role].icon" class="size-4" />
-          {{ roleLabel(member.role) }}
-        </span>
 
         <div class="flex justify-end">
           <Dropdown
@@ -111,7 +104,7 @@ import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width.
 const ROW =
-  "grid grid-cols-[minmax(0,1fr)_auto_32px] sm:grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
+  "grid grid-cols-[minmax(0,1fr)_32px] sm:grid-cols-[minmax(0,1fr)_120px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
 type Member = {
   contact?: string;

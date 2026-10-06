@@ -38,7 +38,7 @@
             v-if="organization.role"
             :label="roleLabel(organization.role)"
             :theme="ROLES[organization.role]?.theme || 'gray'"
-            variant="outline"
+            variant="subtle"
           />
         </div>
         <div
