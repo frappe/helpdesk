@@ -24,6 +24,7 @@ function createSessionStore() {
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
+  const brandName = computed(() => config.value?.brand_name || 'Helpdesk')
   // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
 
@@ -73,6 +74,7 @@ function createSessionStore() {
     isAgent,
     canEditSettings,
     brandLogo,
+    brandName,
     isPhone,
     loadSession,
     signIn,

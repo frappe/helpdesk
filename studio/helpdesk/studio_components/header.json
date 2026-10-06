@@ -40,7 +40,7 @@
       "componentId": "Breadcrumbs-header",
       "componentName": "Breadcrumbs",
       "componentProps": {
-       "items": "{{ (inputs.hideRoot || (isPhone && inputs.parentCrumb) ? [] : [{ label: 'Knowledge base', route: '/' }]).concat(inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(inputs.crumb ? [{ label: inputs.crumb }] : []) }}"
+       "items": "{{ (inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(inputs.crumb ? [{ label: inputs.crumb }] : []) }}"
       },
       "componentSlots": {},
       "visibilityCondition": "{{ !inputs.currentView }}"
@@ -186,15 +186,10 @@
    "input_name": "viewLabel",
    "required": 0,
    "type": "Data"
-  },
-  {
-   "input_name": "hideRoot",
-   "required": 0,
-   "type": "Data"
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-07 03:00:00.000000",
+ "modified": "2026-10-07 04:00:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
