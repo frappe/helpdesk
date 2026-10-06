@@ -45,12 +45,17 @@
               <Checkbox v-model="row.open_in_new_tab" />
             </ListCell>
             <ListCell>
-              <Button
-                variant="ghost"
-                icon="lucide-trash-2"
-                :label="__('Delete')"
-                @click="rows.splice(index, 1)"
-              />
+              <Dropdown
+                align="end"
+                :options="rowOptions(index)"
+                @update:open="(open) => open && (isConfirmingDelete = false)"
+              >
+                <Button
+                  variant="ghost"
+                  icon="lucide-more-horizontal"
+                  :label="__('Row actions')"
+                />
+              </Dropdown>
             </ListCell>
           </ListRow>
         </ListRows>
@@ -71,7 +76,8 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { Button, Checkbox, TextInput } from "frappe-ui";
+import { ConfirmDelete } from "../utils";
+import { Button, Checkbox, Dropdown, TextInput } from "frappe-ui";
 import {
   List,
   ListCell,
@@ -80,10 +86,20 @@ import {
   ListRow,
   ListRows,
 } from "frappe-ui/list";
+import { ref } from "vue";
 
 type HeaderLink = { label: string; url: string; open_in_new_tab: boolean };
 
 const rows = defineModel<HeaderLink[]>({ required: true });
 
 const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "64px", "32px"];
+
+const isConfirmingDelete = ref(false);
+
+function rowOptions(index: number) {
+  return ConfirmDelete({
+    isConfirmingDelete,
+    onConfirmDelete: () => rows.value.splice(index, 1),
+  });
+}
 </script>
