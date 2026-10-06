@@ -1,6 +1,7 @@
 import { computed, effectScope, ref, watch } from 'vue'
 import { toast, useColorScheme } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
+import { readKbPreview } from '@helpdesk/shared/kbPreview'
 import { isSafeLink } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions } from '@app/stores/settings'
@@ -47,13 +48,16 @@ function serviceIcon(url: string) {
   return domain ? SERVICE_ICONS[domain] : null
 }
 
+// Settings' Preview shows its unsaved quick links in place of the saved ones.
+const preview = readKbPreview()
+
 let scriptContext = null
 
 async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
   await setupCustomizations(data, scriptContext)
   customActions.value = data._customActions || []
-  headerLinks.value = (data._customLinks || [])
+  headerLinks.value = (preview?.links || data._customLinks || [])
     .filter((link) => link?.label && isSafeLink(link.url))
     .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 }

@@ -59,35 +59,19 @@
         {{ __("No links yet. Add one to show it in the portal header") }}
       </div>
     </div>
-    <div class="flex items-center justify-between">
-      <Button
-        variant="subtle"
-        icon-left="lucide-plus"
-        :label="__('Add link')"
-        @click="rows.push({ label: '', url: '', open_in_new_tab: false })"
-      />
-      <Button
-        v-if="isDirty"
-        variant="solid"
-        :label="__('Save')"
-        :loading="saving"
-        @click="save"
-      />
-    </div>
+    <Button
+      class="self-start"
+      variant="subtle"
+      icon-left="lucide-plus"
+      :label="__('Add link')"
+      @click="rows.push({ label: '', url: '', open_in_new_tab: false })"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { getErrorMessage, isSafeLink } from "../utils";
-import {
-  Button,
-  call,
-  Checkbox,
-  createResource,
-  TextInput,
-  toast,
-} from "frappe-ui";
+import { Button, Checkbox, TextInput } from "frappe-ui";
 import {
   List,
   ListCell,
@@ -96,103 +80,10 @@ import {
   ListRow,
   ListRows,
 } from "frappe-ui/list";
-import { computed, ref, watch } from "vue";
 
 type HeaderLink = { label: string; url: string; open_in_new_tab: boolean };
 
-const emit = defineEmits<{ saved: [] }>();
-
-// Kept as a knowledge base form script, the way field dependencies are; its last line holds the rows.
-const SCRIPT_NAME = "Knowledge Base Quick Links";
-const JSON_MARKER = "//JSON: ";
+const rows = defineModel<HeaderLink[]>({ required: true });
 
 const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "64px", "32px"];
-
-const rows = ref<HeaderLink[]>([]);
-
-// Only the editable fields, trimmed, so formatting alone doesn't count as an edit.
-function pick(links: HeaderLink[]) {
-  return links.map(({ label, url, open_in_new_tab }) => ({
-    label: label?.trim() || "",
-    url: url?.trim() || "",
-    open_in_new_tab: Boolean(open_in_new_tab),
-  }));
-}
-
-const script = createResource({
-  url: "frappe.client.get_value",
-  params: {
-    doctype: "HD Form Script",
-    filters: { name: SCRIPT_NAME },
-    fieldname: "script",
-  },
-  auto: true,
-});
-
-const saved = computed(() => {
-  const source = script.data?.script || "";
-  return source.includes(JSON_MARKER) ? source.split(JSON_MARKER).pop() : "[]";
-});
-
-watch(saved, (links) => (rows.value = JSON.parse(links)), { immediate: true });
-
-function scriptFor(links: HeaderLink[]) {
-  const json = JSON.stringify(links);
-  return `function setupForm() {\n  return { links: ${json} };\n}\n${JSON_MARKER}${json}`;
-}
-
-const saving = ref(false);
-
-async function saveLinks(links: HeaderLink[]) {
-  saving.value = true;
-  try {
-    if (script.data?.script) {
-      await call("frappe.client.set_value", {
-        doctype: "HD Form Script",
-        name: SCRIPT_NAME,
-        fieldname: "script",
-        value: scriptFor(links),
-      });
-    } else {
-      await call("frappe.client.insert", {
-        doc: {
-          doctype: "HD Form Script",
-          name: SCRIPT_NAME,
-          dt: "HD Ticket",
-          apply_to_knowledge_base: 1,
-          enabled: 1,
-          script: scriptFor(links),
-        },
-      });
-    }
-    toast.success(__("Settings updated"));
-    script.reload();
-    emit("saved");
-  } catch (error) {
-    getErrorMessage(error, true);
-  } finally {
-    saving.value = false;
-  }
-}
-
-function save() {
-  const links = pick(rows.value).filter((link) => link.label || link.url);
-  const incomplete = links.find((link) => !link.label || !link.url);
-  if (incomplete) return toast.error(__("Each link needs a label and a URL"));
-  const unsafe = links.find((link) => !isSafeLink(link.url));
-  if (unsafe) {
-    return toast.error(
-      __("{0}: use a web address, an email link or a path starting with /", [
-        unsafe.label,
-      ])
-    );
-  }
-  saveLinks(links);
-}
-
-const isDirty = computed(
-  () =>
-    JSON.stringify(pick(rows.value)) !==
-    JSON.stringify(pick(JSON.parse(saved.value)))
-);
 </script>
