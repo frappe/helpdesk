@@ -953,8 +953,10 @@
           }
          ],
          "classes": [
-          "text-ink-gray-7",
-          "gap-4"
+          "flex",
+          "flex-col",
+          "gap-4",
+          "text-ink-gray-7"
          ],
          "componentId": "container-ticket-feedback",
          "componentName": "container",
@@ -994,7 +996,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 23:00:00.000000",
+ "modified": "2026-10-07 00:10:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
