@@ -18,7 +18,6 @@ import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Used when HD Settings has no `confirm_resolution_after_days`.
 const RESOLVED_PROMPT_DAYS = 5
-const POPULAR_ARTICLE_LIMIT = 3
 const REOPENED_STATUS = 'Open'
 
 export default function setup(context) {
@@ -109,17 +108,9 @@ export default function setup(context) {
     ]
   })
 
-  const popularArticles = createResource({
-    url: 'helpdesk.api.knowledge_base.get_public_articles',
-    method: 'GET',
-    params: { limit: POPULAR_ARTICLE_LIMIT, sort: 'popular' },
-  })
-
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
     makeParams: () => ({ query: ticket.data?.subject }),
-    onSuccess: (data) => !data.length && popularArticles.fetch(),
-    onError: () => popularArticles.fetch(),
   })
   watch(
     () => ticket.data?.subject,
@@ -127,9 +118,7 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  const isRelated = computed(() => Boolean(relatedArticles.data?.length))
-  const suggestedArticles = computed(() => (isRelated.value ? relatedArticles.data : popularArticles.data) || [])
-  const suggestedHeading = computed(() => (isRelated.value ? __('Related help') : __('Popular help')))
+  const suggestedArticles = computed(() => relatedArticles.data || [])
 
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
   // Where a rating is required, the status cannot be written without it.
@@ -224,7 +213,6 @@ export default function setup(context) {
     confirmSolved,
     reopenTicket,
     suggestedArticles,
-    suggestedHeading,
     openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
   }
 }
