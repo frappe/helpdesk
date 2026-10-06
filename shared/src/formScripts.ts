@@ -82,15 +82,18 @@ export async function setupCustomizations(doc, obj) {
     ? data._form_script
     : [data._form_script];
   let actions = [];
+  let links = [];
   let onChangeFieldMap = {};
   for (const script of scripts) {
     const parsed = await parseScript(script, obj);
     actions = actions.concat(parsed.actions);
+    links = links.concat(parsed.links);
     if (parsed.onChange) {
       parseOnChangeFn(onChangeFieldMap, parsed.onChange);
     }
   }
   data._customActions = withLegacyGroupOptions(actions);
+  data._customLinks = links;
   if (Object.keys(onChangeFieldMap).length) {
     data._customOnChange = onChangeFieldMap;
   }
@@ -122,12 +125,13 @@ async function parseScript(script, obj) {
     const formScript = await scriptFn(obj);
     return {
       actions: formScript?.actions || [],
+      links: formScript?.links || [],
       onChange: formScript?.onChange || null,
     };
   } catch (error) {
     console.error(error);
     toast.error(__("A form script on this page failed to run"));
-    return { actions: [], onChange: null };
+    return { actions: [], links: [], onChange: null };
   }
 }
 

@@ -24,7 +24,6 @@
   "allow_anonymous_article_voting",
   "banner_image",
   "banner_preset",
-  "portal_header_links",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -270,13 +269,6 @@
    "fieldtype": "Select",
    "label": "Banner preset",
    "options": "\nStone\nBlue\nGreen\nCharcoal\nNavy\nForest"
-  },
-  {
-   "description": "Appear at the top right of every knowledge base page.",
-   "fieldname": "portal_header_links",
-   "fieldtype": "Table",
-   "label": "Quick links",
-   "options": "Top Bar Item"
   },
   {
    "fieldname": "agent_status_section",
@@ -638,7 +630,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-07 09:00:00.000000",
+ "modified": "2026-10-07 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

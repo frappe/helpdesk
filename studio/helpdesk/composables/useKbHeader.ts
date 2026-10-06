@@ -1,16 +1,33 @@
-import { computed, ref } from 'vue'
+import { computed, effectScope, ref, watch } from 'vue'
 import { toast, useColorScheme } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
+import { isSafeLink } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions } from '@app/stores/settings'
 import { scriptDialog } from '@app/utils'
+
+// A quick link to one of these shows as its icon, as on Frappe Wiki.
+const SERVICE_ICONS = {
+  'github.com': 'github',
+  'youtube.com': 'youtube',
+  'twitter.com': 'x',
+  'x.com': 'x',
+  'linkedin.com': 'linkedin',
+  'discord.com': 'discord',
+  'discord.gg': 'discord',
+  'slack.com': 'slack',
+  'facebook.com': 'facebook',
+  'instagram.com': 'instagram',
+  'reddit.com': 'reddit',
+}
 
 const session = useSession()
 
 const { resolvedColorScheme, toggleColorScheme } = useColorScheme()
 const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 
-const headerLinks = computed(() => session.config.value?.header_links || [])
+const customActions = ref([])
+const headerLinks = ref([])
 
 // On a phone the text links leave the header for the logo menu; service icons stay put.
 const menuOptions = computed(() => [
@@ -23,26 +40,38 @@ const menuOptions = computed(() => [
   ...accountMenuOptions.value,
 ])
 
-// Shared by every KB page, so a script runs once a visit: an announcement dialog does not reopen on each page.
-const customActions = ref([])
-let started = false
+function serviceIcon(url: string) {
+  const host = url.match(/^https?:\/\/(?:[^@/?#]*@)?([^/?#:]+)/i)?.[1].toLowerCase()
+  if (!host) return null
+  const domain = Object.keys(SERVICE_ICONS).find((domain) => host === domain || host.endsWith(`.${domain}`))
+  return domain ? SERVICE_ICONS[domain] : null
+}
 
-// The knowledge base header: the admin's links, and form scripts with "Apply to knowledge base",
+let scriptContext = null
+
+async function runScripts(scripts: string[]) {
+  const data = { _form_script: scripts }
+  await setupCustomizations(data, scriptContext)
+  customActions.value = data._customActions || []
+  headerLinks.value = (data._customLinks || [])
+    .filter((link) => link?.label && isSafeLink(link.url))
+    .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
+}
+
+// The knowledge base header: form scripts with "Apply to knowledge base", quick links among them,
 // whose context is the ticket pages' minus the field helpers.
 export function useKbHeader(context) {
-  if (!started) {
-    started = true
-    session.loadSession().then(async () => {
-      const data = { _form_script: session.config.value?.kb_form_scripts }
-      await setupCustomizations(data, {
-        call: context.call,
-        router: context.router,
-        toast,
-        createToast,
-        $dialog: scriptDialog,
-      })
-      customActions.value = data._customActions || []
-    })
+  if (!scriptContext) {
+    scriptContext = { call: context.call, router: context.router, toast, createToast, $dialog: scriptDialog }
+    // Detached from the page, so the scripts run once a visit: an announcement dialog does not reopen on each page.
+    // They rerun when the list changes, as when quick links are saved.
+    effectScope(true).run(() =>
+      watch(
+        () => JSON.stringify(session.config.value?.kb_form_scripts || []),
+        (scripts) => runScripts(JSON.parse(scripts)),
+        { immediate: true },
+      ),
+    )
   }
   return { customActions, headerLinks, accountMenuOptions: menuOptions, themeIcon, toggleTheme: toggleColorScheme }
 }

@@ -64,8 +64,8 @@
         v-if="isDirty"
         variant="solid"
         :label="__('Save')"
-        :loading="saveLinks.loading"
-        @click="saveLinks.submit()"
+        :loading="saving"
+        @click="save"
       />
     </div>
   </div>
@@ -73,48 +73,112 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { getErrorMessage } from "../utils";
-import { Button, Checkbox, createResource, TextInput, toast } from "frappe-ui";
+import { getErrorMessage, isSafeLink } from "../utils";
+import {
+  Button,
+  call,
+  Checkbox,
+  createResource,
+  TextInput,
+  toast,
+} from "frappe-ui";
 import { computed, ref, watch } from "vue";
 
 type HeaderLink = { label: string; url: string; open_in_new_tab: boolean };
 
-const props = defineProps<{ links: HeaderLink[] }>();
 const emit = defineEmits<{ saved: [] }>();
+
+// Kept as a knowledge base form script, the way field dependencies are; its last line holds the rows.
+const SCRIPT_NAME = "Knowledge Base Quick Links";
+const JSON_MARKER = "//JSON: ";
 
 const gridTemplateColumns = "1fr 2fr 64px 32px";
 
 const rows = ref<HeaderLink[]>([]);
 
-// Only the editable fields, so the saved rows' name and idx don't count as edits.
+// Only the editable fields, trimmed, so formatting alone doesn't count as an edit.
 function pick(links: HeaderLink[]) {
   return links.map(({ label, url, open_in_new_tab }) => ({
-    label: label || "",
-    url: url || "",
+    label: label?.trim() || "",
+    url: url?.trim() || "",
     open_in_new_tab: Boolean(open_in_new_tab),
   }));
 }
 
-const saved = computed(() => JSON.stringify(pick(props.links)));
+const script = createResource({
+  url: "frappe.client.get_value",
+  params: {
+    doctype: "HD Form Script",
+    filters: { name: SCRIPT_NAME },
+    fieldname: "script",
+  },
+  auto: true,
+});
+
+const saved = computed(() => {
+  const source = script.data?.script || "";
+  return source.includes(JSON_MARKER) ? source.split(JSON_MARKER).pop() : "[]";
+});
 
 watch(saved, (links) => (rows.value = JSON.parse(links)), { immediate: true });
 
-// Saved here, not through the tab's doc: its optimistic setValue would wipe the rows on a rejection.
-const saveLinks = createResource({
-  url: "frappe.client.set_value",
-  makeParams: () => ({
-    doctype: "HD Settings",
-    name: "HD Settings",
-    fieldname: { portal_header_links: pick(rows.value) },
-  }),
-  onSuccess: () => {
+function scriptFor(links: HeaderLink[]) {
+  const json = JSON.stringify(links);
+  return `function setupForm() {\n  return { links: ${json} };\n}\n${JSON_MARKER}${json}`;
+}
+
+const saving = ref(false);
+
+async function saveLinks(links: HeaderLink[]) {
+  saving.value = true;
+  try {
+    if (script.data?.script) {
+      await call("frappe.client.set_value", {
+        doctype: "HD Form Script",
+        name: SCRIPT_NAME,
+        fieldname: "script",
+        value: scriptFor(links),
+      });
+    } else {
+      await call("frappe.client.insert", {
+        doc: {
+          doctype: "HD Form Script",
+          name: SCRIPT_NAME,
+          dt: "HD Ticket",
+          apply_to_knowledge_base: 1,
+          enabled: 1,
+          script: scriptFor(links),
+        },
+      });
+    }
     toast.success(__("Settings updated"));
+    script.reload();
     emit("saved");
-  },
-  onError: (error) => getErrorMessage(error, true),
-});
+  } catch (error) {
+    getErrorMessage(error, true);
+  } finally {
+    saving.value = false;
+  }
+}
+
+function save() {
+  const links = pick(rows.value).filter((link) => link.label || link.url);
+  const incomplete = links.find((link) => !link.label || !link.url);
+  if (incomplete) return toast.error(__("Each link needs a label and a URL"));
+  const unsafe = links.find((link) => !isSafeLink(link.url));
+  if (unsafe) {
+    return toast.error(
+      __("{0}: use a web address, an email link or a path starting with /", [
+        unsafe.label,
+      ])
+    );
+  }
+  saveLinks(links);
+}
 
 const isDirty = computed(
-  () => JSON.stringify(pick(rows.value)) !== saved.value
+  () =>
+    JSON.stringify(pick(rows.value)) !==
+    JSON.stringify(pick(JSON.parse(saved.value)))
 );
 </script>
