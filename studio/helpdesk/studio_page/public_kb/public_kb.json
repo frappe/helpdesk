@@ -197,18 +197,49 @@
        "blockName": "categories-section",
        "children": [
         {
-         "classes": [
-          "text-ink-gray-7",
-          "font-semibold",
-          "leading-[1.15]"
+         "blockName": "categories-heading",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-7",
+            "font-semibold",
+            "leading-[1.15]"
+           ],
+           "componentId": "TextBlock-fbq9hffj6",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-lg",
+            "tag": "h2",
+            "text": "{{ t(\"All knowledge base\") }}"
+           }
+          },
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push({ path: '/categories' })"
+            }
+           },
+           "componentId": "Button-view-all-categories",
+           "componentName": "Button",
+           "componentProps": {
+            "label": "{{ t('View all categories') }}",
+            "variant": "ghost",
+            "iconRight": "lucide-chevron-right"
+           },
+           "visibilityCondition": "{{ hasHiddenCategories }}"
+          }
          ],
-         "componentId": "TextBlock-fbq9hffj6",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-lg",
-          "tag": "h2",
-          "text": "{{ t(\"All knowledge base\") }}"
-         }
+         "classes": [
+          "flex",
+          "items-center",
+          "justify-between",
+          "gap-4"
+         ],
+         "componentId": "container-categories-heading",
+         "componentName": "container",
+         "originalElement": "div"
         },
         {
          "blockName": "categories-grid",
@@ -885,7 +916,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 17:00:00.000000",
+ "modified": "2026-10-07 18:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

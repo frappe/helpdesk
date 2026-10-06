@@ -4,6 +4,7 @@ import { CUSTOMER_PORTAL_ROOT } from '@helpdesk/shared/utils'
 export const ROUTES = {
   home: '/',
   help: '/help',
+  categories: '/categories',
   article: (name: string) => `/articles/${name}`,
   category: (name: string) => `/category/${name}`,
   ticketList: '/customer-tickets',

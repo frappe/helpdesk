@@ -31,6 +31,8 @@ export default function setup(context) {
     return pinned.length ? pinned : rows
   })
 
+  const hasHiddenCategories = computed(() => homeCategories.value.length < (categories.data || []).length)
+
   // One or two home categories get their own layouts.
   const fewCategories = computed(() => (homeCategories.value.length <= 2 ? homeCategories.value : []))
   const hasCategoryPicker = computed(() => fewCategories.value.length === 2)
@@ -68,6 +70,7 @@ export default function setup(context) {
     bannerBackground,
     bannerTextColor,
     homeCategories,
+    hasHiddenCategories,
     sort,
     focusCategory,
     hasCategoryPicker,
