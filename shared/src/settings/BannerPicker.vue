@@ -11,50 +11,71 @@
       }}</span>
     </div>
     <div
-      class="flex h-28 items-center justify-center rounded-6 bg-surface-gray-1 px-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
+      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 px-4"
       :style="{ background: previewBackground }"
     >
       <div
-        class="flex h-8 w-full max-w-sm items-center gap-2 rounded-4 bg-white px-2.5 text-base text-gray-500 shadow-sm"
+        class="flex h-8 w-full max-w-sm items-center gap-2 rounded-4 border border-outline-gray-1 bg-surface-base px-2.5 text-base text-ink-gray-4 shadow-sm"
       >
         <LucideSearch class="size-4 shrink-0" />
         {{ __("Search articles...") }}
       </div>
     </div>
-    <div class="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2" role="radiogroup">
+        <Tooltip :text="__('None')">
+          <button
+            type="button"
+            role="radio"
+            :aria-label="__('None')"
+            :aria-checked="!image && !preset"
+            :class="[swatch, ring(!image && !preset)]"
+            class="flex items-center justify-center bg-surface-base text-ink-gray-4"
+            @click="save('', '')"
+          >
+            <LucideBan class="size-4" />
+          </button>
+        </Tooltip>
+        <Tooltip
+          v-for="option in BANNER_PRESETS"
+          :key="option.name"
+          :text="presetLabel(option.name)"
+        >
+          <button
+            type="button"
+            role="radio"
+            :aria-label="presetLabel(option.name)"
+            :aria-checked="!image && preset === option.name"
+            :class="[swatch, ring(!image && preset === option.name)]"
+            :style="{ background: option.background }"
+            @click="save('', option.name)"
+          />
+        </Tooltip>
+        <Tooltip v-if="image" :text="__('Custom image')">
+          <span
+            role="radio"
+            :aria-label="__('Custom image')"
+            aria-checked="true"
+            :class="[swatch, ring(true)]"
+            :style="{ background: imageBackground(image) }"
+          />
+        </Tooltip>
+      </div>
       <FileUploader
         :fileTypes="['image/*']"
         :private="false"
         @success="(file) => save(file.file_url, '')"
       >
         <template #default="{ progress, uploading, openFileSelector }">
-          <BannerOption
+          <Button
+            variant="subtle"
+            icon-left="lucide-image-up"
             :label="uploadLabel(uploading, progress)"
-            :selected="Boolean(image)"
-            :background="image ? imageBackground(image) : ''"
-            class="border-dashed !bg-surface-base hover:!bg-surface-gray-1"
+            :loading="uploading"
             @click="openFileSelector"
-          >
-            <LucideImageUp v-if="image" class="size-4 text-white" />
-            <LucidePlus v-else class="size-4 text-ink-gray-5" />
-          </BannerOption>
+          />
         </template>
       </FileUploader>
-      <BannerOption
-        :label="__('None')"
-        :selected="!image && !preset"
-        @click="save('', '')"
-      >
-        <span class="text-base text-ink-gray-5">{{ __("None") }}</span>
-      </BannerOption>
-      <BannerOption
-        v-for="option in BANNER_PRESETS"
-        :key="option.name"
-        :label="presetLabel(option.name)"
-        :selected="!image && preset === option.name"
-        :background="option.background"
-        @click="save('', option.name)"
-      />
     </div>
   </div>
 </template>
@@ -62,17 +83,24 @@
 <script setup lang="ts">
 import { __ } from "../translation";
 import { BANNER_PRESETS, findBannerPreset } from "../kbBanner";
-import { FileUploader } from "frappe-ui";
+import { Button, FileUploader, Tooltip } from "frappe-ui";
 import { computed } from "vue";
-import LucideImageUp from "~icons/lucide/image-up";
-import LucidePlus from "~icons/lucide/plus";
+import LucideBan from "~icons/lucide/ban";
 import LucideSearch from "~icons/lucide/search";
-import BannerOption from "./BannerOption.vue";
 
 const props = defineProps<{ image: string; preset: string }>();
 const emit = defineEmits<{
   change: [value: { banner_image: string; banner_preset: string }];
 }>();
+
+const swatch =
+  "size-8 shrink-0 rounded-[8px] border border-outline-gray-2 outline outline-2 outline-offset-2 transition-[outline-color]";
+
+function ring(selected: boolean) {
+  return selected
+    ? "outline-[--ink-gray-9]"
+    : "outline-transparent hover:outline-[--outline-gray-3]";
+}
 
 const previewBackground = computed(() =>
   props.image
@@ -86,17 +114,16 @@ function imageBackground(url: string) {
 
 function uploadLabel(uploading: boolean, progress: number) {
   if (uploading) return __("Uploading {0}%", [progress]);
-  return props.image ? __("Custom image") : __("Upload image");
+  return props.image ? __("Replace image") : __("Upload image");
 }
 
 function presetLabel(name: string) {
   return {
-    Stone: __("Stone"),
+    Gray: __("Gray"),
     Blue: __("Blue"),
     Green: __("Green"),
-    Charcoal: __("Charcoal"),
-    Navy: __("Navy"),
-    Forest: __("Forest"),
+    Amber: __("Amber"),
+    Violet: __("Violet"),
   }[name];
 }
 
