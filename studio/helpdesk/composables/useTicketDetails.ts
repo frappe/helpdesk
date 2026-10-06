@@ -37,8 +37,8 @@ export function useTicketDetails(ticket, thread) {
 
   function templateFields() {
     return (data.value.template?.fields || [])
-      // The page heading already carries the subject.
-      .filter((field) => field.fieldname !== 'subject')
+      // The heading carries the subject; Team and Priority are listed above.
+      .filter((field) => !['subject', 'agent_group', 'priority'].includes(field.fieldname))
       .map((field) => ({
         label: __(field.label),
         value: formatValue(field, data.value[field.fieldname]),
