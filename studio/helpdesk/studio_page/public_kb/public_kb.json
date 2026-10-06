@@ -420,7 +420,7 @@
          "componentId": "Repeater-category-picker",
          "componentName": "Repeater",
          "componentProps": {
-          "data": "{{ categories.data }}",
+          "data": "{{ homeCategories }}",
           "dataKey": "name"
          },
          "classes": [
@@ -895,7 +895,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 14:00:00.000000",
+ "modified": "2026-10-07 15:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
