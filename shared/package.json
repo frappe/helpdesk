@@ -9,7 +9,8 @@
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts",
 		"./tiptap": "./src/tiptap.ts",
-		"./kbBanner": "./src/kbBanner.ts"
+		"./kbBanner": "./src/kbBanner.ts",
+		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue"
 	},
 	"peerDependencies": {
 		"@tiptap/core": "*",
