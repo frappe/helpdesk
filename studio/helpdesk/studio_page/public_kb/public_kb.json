@@ -465,12 +465,7 @@
              "blockName": "category-choice-icon",
              "classes": [
               "flex",
-              "items-center",
-              "justify-center",
-              "shrink-0",
-              "size-10",
-              "rounded-4",
-              "bg-surface-gray-2"
+              "shrink-0"
              ],
              "componentId": "container-category-choice-icon",
              "componentName": "container",
@@ -564,12 +559,7 @@
              "blockName": "lone-category-icon",
              "classes": [
               "flex",
-              "items-center",
-              "justify-center",
-              "shrink-0",
-              "size-10",
-              "rounded-4",
-              "bg-surface-gray-2"
+              "shrink-0"
              ],
              "componentId": "container-lone-category-icon",
              "componentName": "container",
@@ -895,7 +885,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 15:00:00.000000",
+ "modified": "2026-10-07 16:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
