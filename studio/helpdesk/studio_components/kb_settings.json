@@ -101,6 +101,55 @@
         },
         "componentSlots": {},
         "visibilityCondition": "{{ organizations.length }}"
+       },
+       {
+        "children": [
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-portal-permissions-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Portal permissions') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-portal-permissions",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "portal-permissions"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-portal-permissions-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-user-cog"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-portal-permissions-prefix",
+            "slotName": "prefix"
+           }
+          }
+         }
+        ],
+        "componentId": "kb_settings-nav-app",
+        "componentName": "SettingsNavGroup",
+        "componentProps": {
+         "label": "{{ t('App Settings') }}"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ canEditSettings }}"
        }
       ],
       "componentId": "kb_settings-sidebar",
@@ -1176,6 +1225,99 @@
          "value": "members"
         },
         "componentSlots": {}
+       },
+       {
+        "blockName": "Portal permissions",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "classes": [
+               "text-ink-gray-8",
+               "font-semibold"
+              ],
+              "componentId": "kb_settings-portal-permissions-header-title",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-lg",
+               "tag": "h2",
+               "text": "{{ t('Portal permissions') }}"
+              },
+              "componentSlots": {}
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-portal-permissions-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ t('Choose what visitors and customer managers can do from the customer portal.') }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-portal-permissions-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "py-8",
+           "px-10"
+          ],
+          "componentId": "kb_settings-portal-permissions-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-portal-permissions-form",
+            "componentName": "PortalPermissionsPanel",
+            "componentProps": {},
+            "componentSlots": {},
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-10",
+           "pb-8"
+          ],
+          "componentId": "kb_settings-portal-permissions-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-portal-permissions-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "portal-permissions"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ canEditSettings }}"
        }
       ],
       "componentId": "kb_settings-content",
@@ -1230,7 +1372,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-06 23:30:00.000000",
+ "modified": "2026-10-07 00:10:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

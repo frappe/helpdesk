@@ -49,6 +49,7 @@ def get_config():
     # The Studio portal has no boot payload, so this also names the session user.
     res.session_user = frappe.session.user
     res.is_agent = is_agent()
+    res.can_edit_settings = frappe.has_permission("HD Settings", "write")
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 

@@ -12,7 +12,7 @@ import { errorMessage } from '@app/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
-  const settingsTab = ref<'profile' | 'members'>('profile')
+  const settingsTab = ref<'profile' | 'members' | 'portal-permissions'>('profile')
   const settingsData = ref(null)
   const isSettingsBusy = ref(false)
 
