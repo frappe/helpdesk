@@ -18,7 +18,7 @@
       <div
         :class="[
           ROW,
-          'h-8 rounded-5 bg-surface-gray-2 px-3 text-p-sm text-ink-gray-5',
+          'mb-1 h-8 rounded-5 bg-surface-gray-2 px-3 text-p-sm text-ink-gray-5',
         ]"
       >
         <span>{{ __("Name") }}</span>
