@@ -13,13 +13,7 @@
         />
       </div>
 
-      <div class="flex justify-between">
-        <Button
-          variant="subtle"
-          iconLeft="lucide-link"
-          :label="__('Copy link')"
-          @click="copyToClipboard(url, __('Article link copied to clipboard'))"
-        />
+      <div class="flex justify-end">
         <Button variant="solid" :label="__('Publish')" @click="publish" />
       </div>
     </div>
@@ -30,9 +24,8 @@
 import { Button, Dialog, Select } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
-import { copyToClipboard } from "@/utils";
 
-const props = defineProps<{ title: string; visibility: string; url: string }>();
+const props = defineProps<{ title: string; visibility: string }>();
 const emit = defineEmits<{ publish: [visibility: string] }>();
 const show = defineModel<boolean>({ default: false });
 

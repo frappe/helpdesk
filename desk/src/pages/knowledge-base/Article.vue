@@ -206,7 +206,6 @@
       v-model="showSharingModal"
       :title="article.data.title"
       :visibility="article.data.visibility"
-      :url="articleUrl"
       @publish="publishArticle"
     />
   </div>
@@ -230,7 +229,7 @@ import {
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import { ConfirmDelete, CUSTOMER_PORTAL_ROOT, uploadFunction } from "@/utils";
+import { ConfirmDelete, uploadFunction } from "@/utils";
 import {
   Avatar,
   Badge,
@@ -373,10 +372,6 @@ const togglePublished = debounce(
 );
 
 const showSharingModal = ref(false);
-const articleUrl = computed(
-  () =>
-    `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/articles/${props.articleId}`
-);
 
 function publishArticle(visibility: string) {
   save(
