@@ -685,9 +685,10 @@
              "componentName": "container",
              "originalElement": "div",
              "classes": [
-              "items-center",
               "flex",
-              "justify-between",
+              "items-center",
+              "gap-2",
+              "min-h-7",
               "w-full"
              ],
              "children": [
@@ -695,11 +696,14 @@
                "componentId": "TextBlock-ticket-rating-label",
                "componentName": "TextBlock",
                "componentProps": {
-                "fontSize": "text-p-sm",
+                "fontSize": "text-base",
                 "tag": "span",
                 "text": "{{ t('Rating') }}"
                },
                "classes": [
+                "w-[106px]",
+                "shrink-0",
+                "truncate",
                 "text-ink-gray-5"
                ]
               },
@@ -1241,7 +1245,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:00:00.000000",
+ "modified": "2026-10-07 01:05:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
