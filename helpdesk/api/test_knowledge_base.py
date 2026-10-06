@@ -11,10 +11,10 @@ from helpdesk.api.knowledge_base import (
     PUBLIC_CATEGORY_FIELDS,
     get_article,
     get_article_markdown,
+    get_categories,
     get_public_article,
     get_public_article_titles,
     get_public_articles,
-    get_public_categories,
     get_public_category,
     increment_views,
     search_articles,
@@ -26,8 +26,8 @@ from helpdesk.test_utils import (
     disable_public_knowledge_base,
     enable_anonymous_article_voting,
     enable_public_knowledge_base,
-    make_article,
     make_agent,
+    make_article,
     make_article_category,
 )
 
@@ -67,7 +67,7 @@ class TestPublicReads(IntegrationTestCase):
             get_public_article,
             get_public_article_titles,
             get_article_markdown,
-            get_public_categories,
+            get_categories,
             get_public_category,
             vote_on_article,
             increment_views,
@@ -84,7 +84,7 @@ class TestPublicReads(IntegrationTestCase):
         for endpoint, args in (
             (get_public_articles, ()),
             (get_public_article_titles, ()),
-            (get_public_categories, ()),
+            (get_categories, ()),
             (get_public_article, (self.published,)),
             (get_article_markdown, (self.published,)),
             (get_public_category, (self.category.name,)),
@@ -210,14 +210,14 @@ class TestPublicReads(IntegrationTestCase):
 
     def test_categories_carry_a_fixed_shape(self) -> None:
         [category] = [
-            row for row in get_public_categories() if row["name"] == self.category.name
+            row for row in get_categories() if row["name"] == self.category.name
         ]
 
         self.assertEqual(set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count"})
 
     def test_a_category_counts_only_its_published_articles(self) -> None:
         [category] = [
-            row for row in get_public_categories() if row["name"] == self.category.name
+            row for row in get_categories() if row["name"] == self.category.name
         ]
 
         self.assertEqual(category.article_count, 1)
@@ -324,9 +324,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         self.assertNotIn(self.members, names)
 
     def count(self) -> int:
-        [row] = [
-            row for row in get_public_categories() if row["name"] == self.category.name
-        ]
+        [row] = [row for row in get_categories() if row["name"] == self.category.name]
         return row["article_count"]
 
     def test_a_guest_is_not_shown_a_category_with_nothing_for_them(self) -> None:
@@ -336,11 +334,11 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
             category=hidden.name,
             visibility="Customers only",
         )
-        self.assertIn(hidden.name, [row["name"] for row in get_public_categories()])
+        self.assertIn(hidden.name, [row["name"] for row in get_categories()])
 
         frappe.set_user("Guest")
 
-        self.assertNotIn(hidden.name, [row["name"] for row in get_public_categories()])
+        self.assertNotIn(hidden.name, [row["name"] for row in get_categories()])
         self.assertRaises(frappe.DoesNotExistError, get_public_category, hidden.name)
 
     def test_a_guest_cannot_vote_on_one(self) -> None:

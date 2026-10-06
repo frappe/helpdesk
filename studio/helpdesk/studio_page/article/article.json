@@ -669,7 +669,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-06 22:40:00.000000",
+ "modified": "2026-10-07 02:10:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
@@ -705,7 +705,7 @@
    "params": "{}",
    "resource_name": "categories",
    "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_public_categories"
+   "url": "helpdesk.api.knowledge_base.get_categories"
   }
  ],
  "route": "/articles/:name",

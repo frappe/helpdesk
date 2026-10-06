@@ -135,21 +135,6 @@ def move_to_category(category: str, articles: list[str]):
             frappe.throw(_("Error moving article to category"))
 
 
-@frappe.whitelist()
-def get_categories():
-    categories = frappe.get_list(
-        "HD Article Category",
-        fields=["name", "category_name", "modified"],
-    )
-    counts = readable_article_counts()
-    for c in categories:
-        c["article_count"] = counts.get(c.name, 0)
-
-    categories.sort(key=lambda c: c["article_count"], reverse=True)
-    categories = [c for c in categories if c["article_count"] > 0]
-    return categories
-
-
 # Fixed fields and no status parameter: guests read through these, so they cannot widen them.
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -265,7 +250,7 @@ def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_categories() -> list[dict]:
+def get_categories() -> list[dict]:
     """Only those with an article the reader may see, each with `article_count`."""
     validate_public_access()
     counts = readable_article_counts()
