@@ -1,6 +1,6 @@
 <template>
   <SettingsLayoutBase
-    :title="__('Portal permissions')"
+    :title="__('Portal Permissions')"
     :description="
       __(
         'Choose what visitors and customer managers can do from the customer portal.'
