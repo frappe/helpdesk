@@ -372,7 +372,7 @@
   },
   {
    "default": "5",
-   "description": "How long a resolution stands before the customer portal asks the requester to confirm it. Set 0 to ask as soon as a ticket is resolved.",
+   "description": "Customers will be asked to confirm a resolved ticket after this many days. Set to 0 to ask right away.",
    "fieldname": "confirm_resolution_after_days",
    "fieldtype": "Int",
    "label": "Ask to confirm resolution after (Days)"
@@ -611,34 +611,34 @@
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to invite members",
-   "description": "Lets a customer manager invite people into their own organization from the portal. This creates logins for your helpdesk."
+   "description": "If enabled, customer managers can invite people to their organization from the portal. Invited people get a portal login."
   },
   {
    "fieldname": "allow_customer_managers_to_change_roles",
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to change member roles",
-   "description": "Lets a customer manager make members of their own organization managers, and back, from the portal."
+   "description": "If enabled, customer managers can promote members of their organization to managers, or demote them back."
   },
   {
    "fieldname": "allow_customer_managers_to_remove_members",
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to remove members",
-   "description": "Lets a customer manager remove people from their own organization from the portal."
+   "description": "If enabled, customer managers can remove people from their organization."
   },
   {
    "fieldname": "allow_customer_managers_to_edit_organization",
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to edit organization details",
-   "description": "Lets a customer manager change their organization's name and logo from the portal."
+   "description": "If enabled, customer managers can change their organization's name and logo."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-07 07:30:00.000000",
+ "modified": "2026-10-07 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

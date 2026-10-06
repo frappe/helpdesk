@@ -49,33 +49,33 @@ const toggles = computed(() => [
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_invite",
-    label: __("Invite members"),
+    label: __("Allow member invites"),
     description: __(
-      "Customer managers can invite people into their own organization. Invited people get a login for your helpdesk."
+      "Customer managers will be able to invite people to their organization. Invited people get a portal login."
     ),
   },
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_change_roles",
-    label: __("Change member roles"),
+    label: __("Allow role changes"),
     description: __(
-      "Customer managers can make members of their own organization managers, and back."
+      "Customer managers will be able to promote members to managers, or demote them back."
     ),
   },
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_remove_members",
-    label: __("Remove members"),
+    label: __("Allow member removal"),
     description: __(
-      "Customer managers can remove people from their own organization."
+      "Customer managers will be able to remove people from their organization."
     ),
   },
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_edit_organization",
-    label: __("Edit organization details"),
+    label: __("Allow organization edits"),
     description: __(
-      "Customer managers can change their own organization's name and logo."
+      "Customer managers will be able to change their organization's name and logo."
     ),
   },
 ]);
