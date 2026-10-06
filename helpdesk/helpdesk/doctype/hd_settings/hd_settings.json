@@ -268,7 +268,7 @@
    "fieldname": "banner_preset",
    "fieldtype": "Select",
    "label": "Banner preset",
-   "options": "\nGray\nBlue\nGreen\nAmber\nViolet"
+   "options": "\nGray\nBlue\nViolet\nDots\nGrid"
   },
   {
    "fieldname": "agent_status_section",
@@ -630,7 +630,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-07 11:00:00.000000",
+ "modified": "2026-10-07 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

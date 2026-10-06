@@ -3,13 +3,33 @@
 const tint = (color: string) =>
   `color-mix(in oklab, var(--surface-${color}-3) 40%, var(--surface-base))`;
 
+// Pattern spacing follows --banner-pattern-scale, so a small swatch still shows a few repeats.
+const cell = (size: number) =>
+  `calc(${size}px * var(--banner-pattern-scale, 1))`;
+
 // keep in sync with HD Settings banner_preset options and BannerPicker.vue labels
 export const BANNER_PRESETS = [
   { name: "Gray", background: tint("gray") },
   { name: "Blue", background: tint("blue") },
-  { name: "Green", background: tint("green") },
-  { name: "Amber", background: tint("amber") },
   { name: "Violet", background: tint("violet") },
+  {
+    name: "Dots",
+    background: `radial-gradient(circle, var(--outline-gray-4) 1px, transparent 1.5px) 0 0 / ${cell(
+      16
+    )} ${cell(16)}, ${tint("gray")}`,
+  },
+  {
+    name: "Grid",
+    background: [0, 90]
+      .map(
+        (angle) =>
+          `linear-gradient(${angle}deg, var(--outline-gray-2) 1px, transparent 1px) 0 0 / ${cell(
+            24
+          )} ${cell(24)}`
+      )
+      .concat("var(--surface-base)")
+      .join(", "),
+  },
 ] as const;
 
 export function findBannerPreset(name?: string | null) {
