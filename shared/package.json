@@ -10,7 +10,8 @@
 		"./utils": "./src/utils.ts",
 		"./tiptap": "./src/tiptap.ts",
 		"./kbBanner": "./src/kbBanner.ts",
-		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue"
+		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
+		"./settings/*": "./src/settings/*"
 	},
 	"peerDependencies": {
 		"@tiptap/core": "*",

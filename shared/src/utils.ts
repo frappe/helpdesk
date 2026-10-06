@@ -1,4 +1,4 @@
-import { dayjs, dayjsLocal } from "frappe-ui";
+import { dayjs, dayjsLocal, toast } from "frappe-ui";
 
 import { __ } from "./translation";
 
@@ -243,4 +243,17 @@ export function parseApiOptions(
         }
       }) || []
   );
+}
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
 }

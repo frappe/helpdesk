@@ -4,6 +4,7 @@ from frappe.tests import IntegrationTestCase
 from helpdesk.api.config import get_config, service_icon
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.test_utils import (
+    create_agent,
     disable_public_knowledge_base,
     enable_public_knowledge_base,
     make_form_script,
@@ -20,6 +21,7 @@ class TestConfig(IntegrationTestCase):
         config = get_config()
         self.assertEqual(config.session_user, "Guest")
         self.assertFalse(config.is_agent)
+        self.assertFalse(config.can_edit_settings)
         self.assertIn("confirm_resolution_after_days", config)
         self.assertTrue(config.date_format)
 
@@ -90,3 +92,10 @@ class TestConfig(IntegrationTestCase):
         for portal in (False, True):
             scripts = get_form_script("HD Ticket", is_customer_portal=portal) or []
             self.assertFalse(any(script.endswith("// kb") for script in scripts))
+
+    def test_only_those_who_can_write_hd_settings_may_edit_them(self) -> None:
+        self.assertTrue(get_config().can_edit_settings)
+        agent = create_agent("config-agent@example.com")
+        frappe.set_user(agent.name)
+        self.addCleanup(frappe.set_user, "Administrator")
+        self.assertFalse(get_config().can_edit_settings)

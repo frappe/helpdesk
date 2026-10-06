@@ -22,6 +22,7 @@ function createSessionStore() {
   )
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
+  const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
   // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
@@ -33,6 +34,11 @@ function createSessionStore() {
       .then(sendGuestToLogin)
       .catch((error) => console.error(error))
     return sessionRequest
+  }
+
+  function reloadSession() {
+    sessionRequest = null
+    return loadSession()
   }
 
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
@@ -65,10 +71,12 @@ function createSessionStore() {
     isPublicKnowledgeBase,
     canCreateTicket,
     isAgent,
+    canEditSettings,
     brandLogo,
     isPhone,
     loadSession,
     signIn,
+    reloadSession,
     signOut,
   }
 }
