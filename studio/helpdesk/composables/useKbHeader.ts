@@ -1,11 +1,14 @@
 import { computed, ref } from 'vue'
-import { toast } from 'frappe-ui'
+import { toast, useColorScheme } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions } from '@app/stores/settings'
 import { scriptDialog } from '@app/utils'
 
 const session = useSession()
+
+const { resolvedColorScheme, toggleColorScheme } = useColorScheme()
+const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 
 const headerLinks = computed(() => session.config.value?.header_links || [])
 
@@ -41,5 +44,5 @@ export function useKbHeader(context) {
       customActions.value = data._customActions || []
     })
   }
-  return { customActions, headerLinks, accountMenuOptions: menuOptions }
+  return { customActions, headerLinks, accountMenuOptions: menuOptions, themeIcon, toggleTheme: toggleColorScheme }
 }
