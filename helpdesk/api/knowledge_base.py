@@ -147,7 +147,7 @@ PUBLIC_ARTICLE_FIELDS = [
     "modified",
     "views",
 ]
-PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon"]
+PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon", "pinned"]
 EXCERPT_LENGTH = 140
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200

@@ -11,7 +11,8 @@
   "category_name",
   "description",
   "column_break_iczs",
-  "icon"
+  "icon",
+  "pinned"
  ],
  "fields": [
   {
@@ -35,10 +36,17 @@
   {
    "fieldname": "column_break_iczs",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, this category will appear on the knowledge base home page. When no category is pinned, every category appears.",
+   "fieldname": "pinned",
+   "fieldtype": "Check",
+   "label": "Pinned"
   }
  ],
  "links": [],
- "modified": "2026-06-28 13:55:47.056437",
+ "modified": "2026-10-07 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",

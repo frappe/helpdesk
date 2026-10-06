@@ -19,6 +19,13 @@ export default function setup(context) {
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
   const bannerTextColor = computed(() => (config.value?.banner_image ? '#fff' : 'var(--ink-gray-8)'))
 
+  // Only the pinned categories, unless none are.
+  const homeCategories = computed(() => {
+    const rows = categories.data || []
+    const pinned = rows.filter((row) => row.pinned)
+    return pinned.length ? pinned : rows
+  })
+
   const fewCategories = computed(() => {
     const rows = categories.data || []
     return rows.length <= 2 ? rows : []
@@ -56,6 +63,7 @@ export default function setup(context) {
     ...useKbHeader(context),
     bannerBackground,
     bannerTextColor,
+    homeCategories,
     sort,
     focusCategory,
     hasCategoryPicker,
