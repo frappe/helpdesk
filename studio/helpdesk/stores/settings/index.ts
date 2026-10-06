@@ -41,7 +41,7 @@ export const accountMenuOptions = computed(() =>
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
         { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         {
-          icon: 'lucide-arrow-left-right',
+          icon: 'lucide-headphones',
           label: __('Agent portal'),
           condition: () => session.isAgent.value,
           onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
