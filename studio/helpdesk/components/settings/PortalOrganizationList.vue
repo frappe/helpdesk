@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mb-3">
+    <div class="mb-6">
       <TextInput v-model="search" type="text" :placeholder="__('Search')">
         <template #prefix>
           <LucideSearch class="size-4 text-ink-gray-5" />
@@ -14,63 +14,65 @@
       v-bind="emptyState"
     />
 
-    <div v-else>
-      <div
-        :class="[
-          ROW,
-          'mb-1 h-8 rounded-5 bg-surface-gray-2 px-3 text-p-sm text-ink-gray-5',
-        ]"
-      >
-        <span>{{ __("Name") }}</span>
-        <span>{{ __("Role") }}</span>
-        <span class="max-sm:hidden">{{ __("Domain") }}</span>
-        <span class="max-sm:hidden">{{ __("Members") }}</span>
-        <span class="max-sm:hidden">{{ __("Tickets") }}</span>
-      </div>
-
+    <div
+      v-else
+      class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3"
+    >
       <div
         v-for="organization in matches"
         :key="organization.name"
-        class="group cursor-pointer rounded-5 px-3 hover:bg-surface-gray-2"
+        class="cursor-pointer rounded-[10px] border border-outline-gray-1 p-4 transition-[box-shadow,border-color] duration-150 hover:border-transparent hover:bg-surface-elevation-1 hover:shadow-[var(--elevation-sm)]"
         role="button"
         tabindex="0"
         @click="emit('select', organization.name)"
         @keydown.enter="emit('select', organization.name)"
       >
+        <div class="mb-3 flex items-start justify-between gap-2">
+          <Avatar
+            class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
+            shape="square"
+            size="3xl"
+            :image="organization.image"
+            :label="organization.customer_name"
+          />
+          <Badge
+            v-if="organization.role"
+            :label="roleLabel(organization.role)"
+            :theme="ROLES[organization.role]?.theme || 'gray'"
+            variant="subtle"
+          />
+        </div>
         <div
-          :class="[
-            ROW,
-            'min-h-14 border-b border-outline-gray-1 group-last:border-b-0',
-          ]"
+          class="truncate text-[15px] font-semibold leading-5 text-ink-gray-9"
         >
-          <div class="flex min-w-0 items-center gap-2.5">
-            <Avatar
-              class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
-              shape="square"
-              size="xl"
-              :image="organization.image"
-              :label="organization.customer_name"
-            />
-            <span class="truncate text-base-medium text-ink-gray-8">
-              {{ organization.customer_name }}
-            </span>
-          </div>
-          <div>
-            <Badge
-              v-if="organization.role"
-              :label="roleLabel(organization.role)"
-              :theme="ROLES[organization.role].theme"
-              variant="subtle"
-            />
-          </div>
-          <span class="truncate text-p-base text-ink-gray-5 max-sm:hidden">
-            {{ organization.domain }}
+          {{ organization.customer_name }}
+        </div>
+        <div class="mt-0.5 truncate text-p-base text-ink-gray-5">
+          {{ organization.domain }}
+        </div>
+        <div
+          class="mt-3 flex items-center gap-1.5 border-t border-outline-gray-1 pt-3 text-p-sm text-ink-gray-5"
+        >
+          <span class="flex items-center gap-1 whitespace-nowrap">
+            <LucideTicket class="size-3.5 shrink-0" />
+            {{
+              countLabel(
+                organization.ticket_count || 0,
+                __("1 ticket"),
+                __("{0} tickets")
+              )
+            }}
           </span>
-          <span class="text-p-base text-ink-gray-7 max-sm:hidden">
-            {{ organization.member_count || 0 }}
-          </span>
-          <span class="text-p-base text-ink-gray-7 max-sm:hidden">
-            {{ organization.ticket_count || 0 }}
+          <span class="text-ink-gray-4">·</span>
+          <span class="flex items-center gap-1 whitespace-nowrap">
+            <LucideSquareUser class="size-3.5 shrink-0" />
+            {{
+              countLabel(
+                organization.member_count || 0,
+                __("1 member"),
+                __("{0} members")
+              )
+            }}
           </span>
         </div>
       </div>
@@ -82,13 +84,12 @@
 import { computed, ref } from "vue";
 import { Avatar, Badge, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
+import LucideSquareUser from "~icons/lucide/square-user";
+import LucideTicket from "~icons/lucide/ticket";
 import { __ } from "@helpdesk/shared/translation";
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
 import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
-import { matchesQuery } from "@app/utils";
-
-const ROW =
-  "grid grid-cols-[minmax(0,1fr)_88px] sm:grid-cols-[minmax(0,1fr)_88px_minmax(0,160px)_64px_64px] items-center gap-3";
+import { countLabel, matchesQuery } from "@app/utils";
 
 type Organization = {
   name: string;
