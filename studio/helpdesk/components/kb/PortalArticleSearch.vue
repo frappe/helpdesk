@@ -27,9 +27,9 @@
     <template #item="{ item }">
       <div
         v-if="item.recentSearch"
-        class="recent-search flex min-w-0 items-center gap-3"
+        class="recent-search flex min-w-0 items-center gap-2.5"
       >
-        <span class="flex w-9 shrink-0 justify-center">
+        <span class="flex w-5 shrink-0 justify-center">
           <LucideClock class="size-4 text-ink-gray-4" />
         </span>
         <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
@@ -47,9 +47,12 @@
       </div>
       <div
         v-else-if="item.recentArticle"
-        class="flex min-w-0 items-center gap-3"
+        class="recent-article flex min-w-0 items-center gap-2.5"
       >
-        <PortalArticleThumbnail :src="item.recentArticle.image" />
+        <PortalArticleThumbnail
+          class="!size-5"
+          :src="item.recentArticle.image"
+        />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
             class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8"
@@ -224,9 +227,9 @@ const options = computed(() =>
   [data-slot="item"]:not(:last-child) {
   border-bottom: 1px solid var(--outline-gray-1);
 }
-/* A past query is a line of text, not an article: shorter, and no rule between them. */
+/* History rows sit tight, with no rule between them. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]
-  [data-slot="item"]:has(.recent-search) {
+  [data-slot="item"]:has(.recent-search, .recent-article) {
   padding: 0.375rem 0.5rem;
   border-bottom: 0;
 }
