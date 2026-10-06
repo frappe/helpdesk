@@ -89,7 +89,7 @@ export const tabs = computed(() => {
           condition: () => auth.isAdmin,
         },
         {
-          label: __("Portal permissions"),
+          label: __("Portal Permissions"),
           icon: markRaw(LucideUserCog),
           component: markRaw(PortalPermissions),
           condition: () => auth.isAdmin || auth.isManager,
