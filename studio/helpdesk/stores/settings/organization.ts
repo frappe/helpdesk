@@ -26,8 +26,8 @@ export function createOrganizationSettings(core) {
   )
   const organizationScreenDescription = computed(() =>
     managesAnyOrganization.value
-      ? __('Pick an organization to manage its people and settings.')
-      : __('Pick an organization to see its people and settings.'),
+      ? __('Manage the organizations you belong to and their members.')
+      : __('View the organizations you belong to and their members.'),
   )
   const organizationDetailDescription = computed(() =>
     isManager.value

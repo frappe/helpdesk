@@ -49,14 +49,14 @@ import HeaderLinks from "./HeaderLinks.vue";
 const toggles = computed(() => [
   {
     fieldname: "public_knowledge_base",
-    label: __("Public knowledge base"),
-    description: __("Anyone can read articles without signing in."),
+    label: __("Make knowledge base public"),
+    description: __("Anyone will be able to read articles without logging in."),
   },
   {
     fieldname: "allow_anonymous_article_voting",
     label: __("Allow guests to vote on articles"),
     description: __(
-      "Visitors who aren't signed in can mark an article as helpful or not."
+      "Visitors who aren't logged in will be able to mark articles as helpful or not."
     ),
   },
 ]);

@@ -1215,7 +1215,7 @@
               "componentId": "kb_settings-invite-row",
               "componentName": "SettingsRow",
               "componentProps": {
-               "description": "{{ t('New people will be added to the team as') }}",
+               "description": "{{ t('Invited people will join as') }}",
                "title": "{{ t('Invite by email') }}"
               },
               "componentSlots": {}
@@ -1303,7 +1303,7 @@
               "componentProps": {
                "fontSize": "text-base",
                "tag": "p",
-               "text": "{{ t('Manage how the knowledge base appears to customers.') }}"
+               "text": "{{ t('Manage who can read your knowledge base and how it looks.') }}"
               },
               "componentSlots": {}
              }
@@ -1400,7 +1400,7 @@
               "componentProps": {
                "fontSize": "text-base",
                "tag": "p",
-               "text": "{{ t('Choose what visitors and customer managers can do from the customer portal.') }}"
+               "text": "{{ t('Manage what customers and visitors can do on the customer portal.') }}"
               },
               "componentSlots": {}
              }
@@ -1515,7 +1515,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 08:00:00.000000",
+ "modified": "2026-10-07 09:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

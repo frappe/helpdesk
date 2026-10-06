@@ -1,7 +1,9 @@
 <template>
   <SettingsLayoutBase
     :title="__('Knowledge Base')"
-    :description="__('Manage how the knowledge base appears to customers.')"
+    :description="
+      __('Manage who can read your knowledge base and how it looks.')
+    "
   >
     <template #content>
       <KnowledgeBaseForm />
