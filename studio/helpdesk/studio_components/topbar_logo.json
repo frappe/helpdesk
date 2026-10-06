@@ -2,7 +2,6 @@
  "block": {
   "baseStyles": {
    "display": "flex",
-   "height": "fit-content",
    "width": "fit-content"
   },
   "blockName": "topbar-left",
@@ -23,7 +22,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 04:00:00.000000",
+ "modified": "2026-10-07 04:10:00.000000",
  "modified_by": "Administrator",
  "name": "topbar_logo",
  "owner": "Administrator"
