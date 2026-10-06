@@ -3,6 +3,7 @@
     <template #default="{ open }">
       <button
         type="button"
+        :aria-label="name"
         class="-ms-2 flex h-8 min-w-0 max-w-[15rem] cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
         :class="open ? 'bg-surface-gray-3' : 'hover:bg-surface-gray-3'"
       >
@@ -13,7 +14,9 @@
           aria-hidden="true"
           class="size-6 shrink-0 rounded-2 object-contain"
         />
-        <span class="truncate text-base-medium leading-tight text-ink-gray-9">
+        <span
+          class="hidden truncate text-base-medium leading-tight text-ink-gray-9 sm:block"
+        >
           {{ name }}
         </span>
         <Icon
