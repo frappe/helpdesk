@@ -2,7 +2,12 @@
   <div class="flex items-center gap-4 pt-1.5">
     <div class="group relative size-16 shrink-0">
       <!-- Avatar's size enum stops at 46px, so the block sizes it itself. -->
-      <Avatar class="size-16" :image="image" :label="name" :shape="shape" />
+      <Avatar
+        class="size-16 has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
+        :image="image"
+        :label="name"
+        :shape="shape"
+      />
       <Tooltip
         v-if="editable"
         :hover-delay="0"

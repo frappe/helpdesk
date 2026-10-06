@@ -166,6 +166,10 @@
              "blockName": "meta-row",
              "children": [
               {
+               "classes": [
+                "has-[>div:first-child]:border",
+                "has-[>div:first-child]:border-outline-gray-2"
+               ],
                "componentId": "Avatar-jsgl5l2bo",
                "componentName": "Avatar",
                "componentProps": {
@@ -664,7 +668,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 04:20:00.000000",
+ "modified": "2026-10-07 07:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

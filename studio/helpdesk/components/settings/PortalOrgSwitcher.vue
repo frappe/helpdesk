@@ -13,6 +13,7 @@
     >
       <template #prefix="{ selectedOptions }">
         <Avatar
+          class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
           v-if="selectedOptions.length === 1"
           size="xs"
           shape="square"
@@ -27,6 +28,7 @@
         <ItemListRow size="sm" :selected="selected" :disabled="item.disabled">
           <template #prefix>
             <Avatar
+              class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
               size="sm"
               shape="square"
               :image="item.image"

@@ -30,6 +30,10 @@
            "prefix": {
             "slotContent": [
              {
+              "classes": [
+               "has-[>div:first-child]:border",
+               "has-[>div:first-child]:border-outline-gray-2"
+              ],
               "componentId": "kb_settings-nav-profile-avatar",
               "componentName": "Avatar",
               "componentProps": {
@@ -1509,7 +1513,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 04:50:00.000000",
+ "modified": "2026-10-07 07:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
