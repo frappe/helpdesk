@@ -383,13 +383,6 @@ def disable_public_knowledge_base():
     frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
 
 
-def set_portal_header_links(rows: list[dict]):
-    """Replace the portal header links, skipping HD Settings' validation."""
-    settings = frappe.get_single("HD Settings")
-    settings.set("portal_header_links", rows)
-    settings.update_child_table("portal_header_links")
-
-
 def enable_anonymous_article_voting():
     frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
 

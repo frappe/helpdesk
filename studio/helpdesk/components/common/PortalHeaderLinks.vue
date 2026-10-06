@@ -46,7 +46,7 @@ type HeaderLink = {
   icon?: string | null;
 };
 
-// Set by admins in HD Settings; the server only accepts web, mail and site paths.
+// From the quick links form script; useKbHeader drops any unsafe URL.
 const props = defineProps<{ links?: HeaderLink[] }>();
 
 const textLinks = computed(() => (props.links || []).filter((l) => !l.icon));

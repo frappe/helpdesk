@@ -11,6 +11,11 @@ const YEAR = 365 * DAY;
 // The studio-built customer portal, served outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/kb";
 
+// Quick links reach guests, so only site paths, web and mail addresses are allowed.
+export function isSafeLink(url: unknown) {
+  return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
+}
+
 export function validateEmail(email) {
   const regExp =
     /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;

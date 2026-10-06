@@ -30,11 +30,7 @@
       :preset="settings.doc?.banner_preset || ''"
       @change="save"
     />
-    <HeaderLinks
-      class="mt-8"
-      :links="settings.doc?.portal_header_links || []"
-      @saved="onLinksSaved"
-    />
+    <HeaderLinks class="mt-8" @saved="emit('saved')" />
   </div>
 </template>
 
@@ -75,10 +71,5 @@ function save(values: Record<string, string | boolean>) {
       emit("saved");
     },
   });
-}
-
-function onLinksSaved() {
-  settings.reload();
-  emit("saved");
 }
 </script>
