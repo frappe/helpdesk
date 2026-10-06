@@ -1,13 +1,10 @@
 import { computed, ref } from 'vue'
-import { call, createResource, toast } from 'frappe-ui'
+import { call, createResource } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 
 export function createProfileSettings(core) {
   const profileFirstName = ref('')
   const profileLastName = ref('')
-  const passwordOpen = ref(false)
-  const currentPassword = ref('')
-  const newPassword = ref('')
 
   const languages = createResource({
     url: 'frappe.client.get_list',
@@ -67,32 +64,7 @@ export function createProfileSettings(core) {
     return core.run(() => call('helpdesk.api.auth.update_profile', { image: '' }), 'Photo removed')
   }
 
-  function openPasswordChange() {
-    currentPassword.value = ''
-    newPassword.value = ''
-    passwordOpen.value = true
-  }
-
-  function changePassword() {
-    if (!currentPassword.value || !newPassword.value) {
-      toast.error('Please fill in both passwords')
-      return
-    }
-    return core.run(async () => {
-      await call('frappe.core.doctype.user.user.update_password', {
-        old_password: currentPassword.value,
-        new_password: newPassword.value,
-      })
-      passwordOpen.value = false
-    }, 'Password updated')
-  }
-
   return {
-    passwordOpen,
-    currentPassword,
-    newPassword,
-    openPasswordChange,
-    changePassword,
     renameProfile,
     uploadProfileImage,
     removeProfileImage,

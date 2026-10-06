@@ -7,7 +7,8 @@
 	"exports": {
 		"./formScripts": "./src/formScripts.ts",
 		"./translation": "./src/translation.ts",
-		"./utils": "./src/utils.ts"
+		"./utils": "./src/utils.ts",
+		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue"
 	},
 	"peerDependencies": {
 		"frappe-ui": "*",
