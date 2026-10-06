@@ -64,6 +64,10 @@ website_route_rules = [
         "from_route": "/kb/help",
         "to_route": "kb",
     },
+    {
+        "from_route": "/kb/categories",
+        "to_route": "kb",
+    },
 ]
 
 # The old customer portal's URLs keep working through these.
