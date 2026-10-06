@@ -18,18 +18,6 @@ export const BANNER_PRESETS = [
       16
     )} ${cell(16)}, ${tint("gray")}`,
   },
-  {
-    name: "Grid",
-    background: [0, 90]
-      .map(
-        (angle) =>
-          `linear-gradient(${angle}deg, var(--outline-gray-2) 1px, transparent 1px) 0 0 / ${cell(
-            24
-          )} ${cell(24)}`
-      )
-      .concat("var(--surface-base)")
-      .join(", "),
-  },
 ] as const;
 
 export function findBannerPreset(name?: string | null) {

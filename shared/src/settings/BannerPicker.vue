@@ -123,7 +123,6 @@ function presetLabel(name: string) {
     Blue: __("Blue"),
     Violet: __("Violet"),
     Dots: __("Dots"),
-    Grid: __("Grid"),
   }[name];
 }
 
