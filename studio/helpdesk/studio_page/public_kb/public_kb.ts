@@ -26,10 +26,8 @@ export default function setup(context) {
     return pinned.length ? pinned : rows
   })
 
-  const fewCategories = computed(() => {
-    const rows = categories.data || []
-    return rows.length <= 2 ? rows : []
-  })
+  // One or two home categories get their own layouts.
+  const fewCategories = computed(() => (homeCategories.value.length <= 2 ? homeCategories.value : []))
   const hasCategoryPicker = computed(() => fewCategories.value.length === 2)
   const pickedName = ref(null)
   const focusCategory = computed(
