@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { createListResource, createResource, dayjs, toast } from 'frappe-ui'
+import { createResource, dayjs, toast } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
@@ -20,7 +20,6 @@ import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
 
 // Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
 const RESOLVED_PROMPT_DAYS = 5
-const POPULAR_ARTICLE_LIMIT = 3
 const REOPENED_STATUS = 'Open'
 
 export default function setup(context) {
@@ -77,8 +76,6 @@ export default function setup(context) {
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
     makeParams: () => ({ query: ticket.data?.subject }),
-    onSuccess: (data) => !data.length && popularArticles.fetch(),
-    onError: () => popularArticles.fetch(),
   })
   watch(
     () => ticket.data?.subject,
@@ -86,26 +83,12 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  const popularArticles = createListResource({
-    doctype: 'HD Article',
-    filters: { status: 'Published' },
-    fields: ['name', 'title'],
-    orderBy: 'views desc',
-    pageLength: POPULAR_ARTICLE_LIMIT,
-  })
-
-  const isRelated = computed(() => Boolean(relatedArticles.data?.length))
-
   // The article pages are the desk's, under its `/helpdesk` router base.
   const suggestedArticles = computed(() =>
-    ((isRelated.value ? relatedArticles.data : popularArticles.data) || []).map((article) => ({
+    (relatedArticles.data || []).map((article) => ({
       ...article,
       url: `/helpdesk/kb-public/articles/${article.name}`,
     })),
-  )
-
-  const suggestedHeading = computed(() =>
-    __(isRelated.value ? 'Related help' : 'Popular help'),
   )
 
   // Empty hides the button; as on the desk portal, any open ticket can be closed.
@@ -206,7 +189,6 @@ export default function setup(context) {
     confirmSolved,
     reopenTicket,
     suggestedArticles,
-    suggestedHeading,
     openHelpArticle: (article) => (window.location.href = article.url),
   }
 }
