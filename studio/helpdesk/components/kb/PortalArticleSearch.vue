@@ -20,17 +20,8 @@
     <template #suffix><span /></template>
 
     <template #group-label="{ group }">
-      <span class="flex min-w-0 flex-1 items-center justify-between">
+      <span class="flex min-w-0 flex-1 items-center">
         {{ group.group }}
-        <button
-          v-if="group.key === RECENT_SEARCHES"
-          type="button"
-          class="rounded-4 px-1 text-ink-gray-5 hover:text-ink-gray-8 [@media(pointer:coarse)]:px-2 [@media(pointer:coarse)]:py-1.5"
-          @mousedown.prevent
-          @click="clearSearches"
-        >
-          {{ __("Clear") }}
-        </button>
       </span>
     </template>
     <template #item="{ item }">
@@ -127,13 +118,8 @@ withDefaults(defineProps<{ placeholder?: string }>(), {
 const router = useRouter();
 const query = ref("");
 const isOpen = ref(false);
-const {
-  recentSearches,
-  recentArticles,
-  rememberSearch,
-  forgetSearch,
-  clearSearches,
-} = useRecent();
+const { recentSearches, recentArticles, rememberSearch, forgetSearch } =
+  useRecent();
 
 const hasHistory = computed(
   () => recentSearches.value.length + recentArticles.value.length > 0
