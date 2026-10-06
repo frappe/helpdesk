@@ -74,11 +74,6 @@
     @update="ticket.reload()"
   />
   <TicketSubjectModal v-model="showSubjectDialog" />
-  <ResolutionDetailsModal
-    v-model="showResolutionDialog"
-    :status="pendingStatus"
-    @saved="reloadTicketFeed(ticket.name)"
-  />
 </template>
 
 <script setup lang="ts">
@@ -126,7 +121,6 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
 import { IndicatorIcon } from "../icons";
-import ResolutionDetailsModal from "./ResolutionDetailsModal.vue";
 import TicketSubjectModal from "./TicketSubjectModal.vue";
 const { isAdmin } = useAuthStore();
 const { $dialog } = globalStore();
@@ -146,8 +140,6 @@ const ticketStatusStore = useTicketStatusStore();
 const ticket = inject(TicketSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
 const showSubjectDialog = ref(false);
-const showResolutionDialog = ref(false);
-const pendingStatus = ref("");
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
 const statusDropdown = computed(() => {
@@ -159,14 +151,10 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      // Keyed on the category so every resolving status asks for the note the portal shows;
-      // the dialog writes the status itself.
-      if (o.category === "Resolved") {
-        pendingStatus.value = o.label_agent;
-        showResolutionDialog.value = true;
-        return;
-      }
-      ticket.value.setValue.submit({ status: o.label_agent });
+      ticket.value.setValue.submit(
+        { status: o.label_agent },
+        { onSuccess: () => reloadTicketFeed(ticket.value.name) }
+      );
     },
     icon: () =>
       h(IndicatorIcon, {
