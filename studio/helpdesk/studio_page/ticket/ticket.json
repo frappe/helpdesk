@@ -513,7 +513,7 @@
            "componentId": "PortalSidebarSection-ticket-progress",
            "componentName": "PortalSidebarSection",
            "componentProps": {
-            "label": "{{ t('Progress') }}"
+            "label": "{{ t('Timeline') }}"
            },
            "componentSlots": {},
            "isCustomVueComponent": true
@@ -1063,7 +1063,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:50:00.000000",
+ "modified": "2026-10-07 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
