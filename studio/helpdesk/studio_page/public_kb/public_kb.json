@@ -221,6 +221,12 @@
              "script": "router.push({ path: '/categories' })"
             }
            },
+           "classes": [
+            "!bg-transparent",
+            "!px-0",
+            "hover:underline",
+            "underline-offset-2"
+           ],
            "componentId": "Button-view-all-categories",
            "componentName": "Button",
            "componentProps": {
@@ -916,7 +922,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 18:00:00.000000",
+ "modified": "2026-10-07 18:30:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
