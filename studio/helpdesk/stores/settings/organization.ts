@@ -12,6 +12,8 @@ export function createOrganizationSettings(core) {
 
   const isManager = computed(() => Boolean(organization.value?.is_manager))
   const canInvite = computed(() => Boolean(organization.value?.can_invite))
+  const canChangeRoles = computed(() => Boolean(organization.value?.can_change_roles))
+  const canRemoveMembers = computed(() => Boolean(organization.value?.can_remove_members))
   const canEdit = computed(() => Boolean(organization.value?.can_edit))
   const members = computed(() => organization.value?.members || [])
   const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
@@ -210,6 +212,8 @@ export function createOrganizationSettings(core) {
     settingsOrg: organization,
     canLeaveOrganization,
     canInvite,
+    canChangeRoles,
+    canRemoveMembers,
     canEdit,
     orgMembers: members,
     organizationScreenTitle,

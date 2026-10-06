@@ -57,9 +57,25 @@ const toggles = computed(() => [
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_invite",
-    label: __("Invite and manage members"),
+    label: __("Invite members"),
     description: __(
-      "Customer managers can invite people into their own organization, change their roles and remove them. Invited people get a login for your helpdesk."
+      "Customer managers can invite people into their own organization. Invited people get a login for your helpdesk."
+    ),
+  },
+  {
+    settings: hdSettings,
+    fieldname: "allow_customer_managers_to_change_roles",
+    label: __("Change member roles"),
+    description: __(
+      "Customer managers can make members of their own organization managers, and back."
+    ),
+  },
+  {
+    settings: hdSettings,
+    fieldname: "allow_customer_managers_to_remove_members",
+    label: __("Remove members"),
+    description: __(
+      "Customer managers can remove people from their own organization."
     ),
   },
   {
