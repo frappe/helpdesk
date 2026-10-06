@@ -45,6 +45,7 @@
         >
           <div class="flex min-w-0 items-center gap-2.5">
             <Avatar
+              class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
               shape="square"
               size="xl"
               :image="organization.image"
