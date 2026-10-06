@@ -39,9 +39,7 @@
        "blockName": "Header",
        "componentId": "header-topbar",
        "componentName": "header",
-       "componentProps": {
-        "crumb": "{{ categoryName }}"
-       },
+       "componentProps": {},
        "isStudioComponent": true,
        "classes": [
         "min-w-0",
@@ -470,7 +468,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 02:20:00.000000",
+ "modified": "2026-10-07 03:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
