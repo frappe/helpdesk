@@ -53,7 +53,7 @@ class TestOrganizationMembers(IntegrationTestCase):
         cls.customer.save()
         # `update_member_role` needs this on; set here so a fresh site passes too.
         frappe.db.set_single_value(
-            "HD Settings", "allow_customer_managers_to_invite", 1
+            "HD Settings", "allow_customer_managers_to_change_roles", 1
         )
 
     def setUp(self) -> None:
@@ -112,6 +112,30 @@ class TestOrganizationMembers(IntegrationTestCase):
     def test_you_cannot_switch_your_own_role(self) -> None:
         with self.assertRaises(frappe.ValidationError):
             update_member_role(self.customer.name, self.manager["contact"], False)
+
+    def test_role_changes_need_their_own_portal_setting(self) -> None:
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_invite",
+            frappe.db.get_single_value(
+                "HD Settings", "allow_customer_managers_to_invite"
+            ),
+        )
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 1
+        )
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_change_roles", 0
+        )
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_change_roles",
+            1,
+        )
+        with self.assertRaises(frappe.PermissionError):
+            update_member_role(self.customer.name, self.member["contact"], True)
 
     def test_a_plain_member_cannot_switch_anyone(self) -> None:
         frappe.set_user(self.member["user"])
@@ -232,8 +256,12 @@ class TestMemberRemoval(IntegrationTestCase):
         cls.customer.primary_contact = cls.owner["contact"]
         cls.customer.save()
         cls.other_customer = create_customer("Test Other Removal")
+        # Removing needs its own setting; cancelling an invitation needs the invite one.
         frappe.db.set_single_value(
             "HD Settings", "allow_customer_managers_to_invite", 1
+        )
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_remove_members", 1
         )
 
     def setUp(self) -> None:
@@ -268,6 +296,19 @@ class TestMemberRemoval(IntegrationTestCase):
         frappe.set_user(self.member["user"])
         with self.assertRaises(frappe.PermissionError):
             remove_member(self.customer.name, self.owner["contact"])
+
+    def test_removal_needs_its_own_portal_setting(self) -> None:
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_remove_members", 0
+        )
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_remove_members",
+            1,
+        )
+        with self.assertRaises(frappe.PermissionError):
+            remove_member(self.customer.name, self.member["contact"])
 
     def test_a_manager_cancels_an_invitation(self) -> None:
         invite_members(self.customer.name, [NEWCOMER], "HD Customer")
