@@ -172,11 +172,10 @@ function createViewsStore() {
     await list.reload()
   }
 
-  async function saveCurrentView() {
-    if (!activeView.value) return
+  async function saveCurrentView(name) {
     await call('frappe.client.set_value', {
       doctype: 'HD View',
-      name: activeView.value.name,
+      name,
       fieldname: currentPayload(),
     })
     await list.reload()
@@ -227,7 +226,7 @@ function createViewsStore() {
   function viewActions(item) {
     if (!item?.name) return []
     return [
-      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView() },
+      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView(item.name) },
       { label: __('Rename'), icon: 'lucide-edit-2', onClick: () => openViewModal('rename', item) },
       { label: __('Delete'), icon: 'lucide-trash-2', onClick: () => deleteView(item.name) },
     ]
