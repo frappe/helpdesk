@@ -61,7 +61,7 @@ export function useTicketDetails(ticket, thread) {
   function assigned() {
     const reply = thread.firstAgentReply.value
     if (!reply) return makeStep(__('Assigned to agent'), __('Waiting to be assigned'), 'pending')
-    return makeStep(__('Assigned to {0}', [reply.sender]), elapsedPhrase(reply.creation), 'done', reply.creation)
+    return makeStep(__('Assigned to agent'), elapsedPhrase(reply.creation), 'done', reply.creation)
   }
 
   function answered() {
