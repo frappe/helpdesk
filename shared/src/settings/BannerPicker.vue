@@ -86,7 +86,7 @@ function imageBackground(url: string) {
 
 function uploadLabel(uploading: boolean, progress: number) {
   if (uploading) return __("Uploading {0}%", [progress]);
-  return props.image ? __("Custom image") : __("PNG or JPG, 1440×240+");
+  return props.image ? __("Custom image") : __("Upload image");
 }
 
 function presetLabel(name: string) {
