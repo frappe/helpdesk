@@ -103,6 +103,24 @@
        "click": {
         "action": "Run Script",
         "event": "click",
+        "script": "toggleTheme()"
+       }
+      },
+      "componentId": "Button-theme",
+      "componentName": "Button",
+      "componentProps": {
+       "aria-label": "{{ t('Toggle theme') }}",
+       "icon": "{{ themeIcon }}",
+       "variant": "ghost"
+      },
+      "componentSlots": {},
+      "visibilityCondition": "{{ themeIcon }}"
+     },
+     {
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
         "script": "signIn()"
        }
       },
@@ -189,7 +207,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-07 04:00:00.000000",
+ "modified": "2026-10-07 06:00:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"
