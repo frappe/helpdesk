@@ -4,6 +4,7 @@ import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
+import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft.ts'
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
@@ -32,6 +33,17 @@ const themeOptions = computed(() => [
   { label: __('Dark'), value: 'dark' },
   { label: __('System'), value: 'system' },
 ])
+
+// The Knowledge Base panel's header buttons; the panel's form makes the draft.
+const knowledgeBase = {
+  kbIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
+  kbCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
+  kbSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
+  previewKnowledgeBase: () => knowledgeBaseDraft.value?.preview(),
+  saveKnowledgeBase: async () => {
+    if (await knowledgeBaseDraft.value?.save()) session.reloadSession()
+  },
+}
 
 export const accountMenuOptions = computed(() =>
   session.isGuest.value
@@ -68,6 +80,7 @@ const store = {
   loadSettings: core.loadSettings,
   ...organization,
   ...profile,
+  ...knowledgeBase,
 }
 
 export function useSettingsModal(context) {

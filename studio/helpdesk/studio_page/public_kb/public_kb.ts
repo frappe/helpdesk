@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { findBannerPreset } from '@helpdesk/shared/kbBanner'
+import { readKbPreview } from '@helpdesk/shared/kbPreview'
 import { useSettingsModal } from '@app/stores/settings'
 import { useKbHeader } from '@app/composables/useKbHeader'
 import { countLabel } from '@app/utils'
@@ -12,17 +13,21 @@ export default function setup(context) {
   const settings = useSettingsModal(context)
   const { config } = settings
 
+  // Settings' Preview shows its unsaved banner and pins in place of the saved ones.
+  const preview = readKbPreview()
+  const bannerImage = computed(() => (preview ? preview.banner_image : config.value?.banner_image))
+
   // An uploaded image sits under a dark scrim, so it always takes white text.
   const bannerPreset = computed(() =>
-    config.value?.banner_image ? null : findBannerPreset(config.value?.banner_preset),
+    bannerImage.value ? null : findBannerPreset(preview ? preview.banner_preset : config.value?.banner_preset),
   )
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
-  const bannerTextColor = computed(() => (config.value?.banner_image ? '#fff' : 'var(--ink-gray-8)'))
+  const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
 
   // Only the pinned categories, unless none are.
   const homeCategories = computed(() => {
     const rows = categories.data || []
-    const pinned = rows.filter((row) => row.pinned)
+    const pinned = rows.filter((row) => (preview ? preview.pinned.includes(row.name) : row.pinned))
     return pinned.length ? pinned : rows
   })
 
@@ -59,6 +64,7 @@ export default function setup(context) {
   return {
     ...settings,
     ...useKbHeader(context),
+    bannerImage,
     bannerBackground,
     bannerTextColor,
     homeCategories,

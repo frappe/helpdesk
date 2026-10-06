@@ -1280,18 +1280,44 @@
            {
             "children": [
              {
-              "classes": [
-               "text-ink-gray-8",
-               "font-semibold"
+              "children": [
+               {
+                "classes": [
+                 "text-ink-gray-8",
+                 "font-semibold"
+                ],
+                "componentId": "kb_settings-knowledge-base-header-title",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-lg",
+                 "tag": "h2",
+                 "text": "{{ t('Knowledge Base') }}"
+                },
+                "componentSlots": {}
+               },
+               {
+                "componentId": "kb_settings-knowledge-base-unsaved",
+                "componentName": "Badge",
+                "componentProps": {
+                 "label": "{{ t('Unsaved') }}",
+                 "size": "sm",
+                 "theme": "amber",
+                 "variant": "subtle"
+                },
+                "componentSlots": {},
+                "visibilityCondition": "{{ kbIsDirty }}"
+               }
               ],
-              "componentId": "kb_settings-knowledge-base-header-title",
-              "componentName": "TextBlock",
-              "componentProps": {
-               "fontSize": "text-lg",
-               "tag": "h2",
-               "text": "{{ t('Knowledge Base') }}"
-              },
-              "componentSlots": {}
+              "classes": [
+               "flex",
+               "items-center",
+               "gap-2"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-title-row",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
              },
              {
               "classes": [
@@ -1319,9 +1345,63 @@
             "componentProps": {},
             "componentSlots": {},
             "originalElement": "div"
+           },
+           {
+            "children": [
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "previewKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-preview",
+              "componentName": "Button",
+              "componentProps": {
+               "iconLeft": "lucide-external-link",
+               "label": "{{ t('Preview') }}"
+              },
+              "componentSlots": {},
+              "visibilityCondition": "{{ kbCanPreview }}"
+             },
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "saveKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-save",
+              "componentName": "Button",
+              "componentProps": {
+               "label": "{{ t('Save') }}",
+               "loading": "{{ kbSaving }}",
+               "variant": "solid"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "items-center",
+             "gap-2",
+             "shrink-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-actions",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div",
+            "visibilityCondition": "{{ kbIsDirty }}"
            }
           ],
           "classes": [
+           "flex",
+           "items-start",
+           "justify-between",
+           "gap-4",
            "shrink-0",
            "px-4",
            "sm:px-10",
@@ -1515,7 +1595,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 09:00:00.000000",
+ "modified": "2026-10-07 17:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
