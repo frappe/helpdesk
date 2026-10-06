@@ -9,46 +9,52 @@
       </span>
     </div>
     <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
-      <template v-if="rows.length">
-        <div
-          class="grid items-center gap-4 p-2"
-          :style="{ gridTemplateColumns }"
-        >
-          <span class="ms-2 text-ink-gray-5">{{ __("Label") }}</span>
-          <span class="ms-2 text-ink-gray-5">{{ __("URL") }}</span>
-          <span class="text-ink-gray-5">{{ __("New tab") }}</span>
-          <span />
-        </div>
-        <hr />
-        <template v-for="(row, index) in rows" :key="index">
-          <div
-            class="grid items-center gap-4 p-2"
-            :style="{ gridTemplateColumns }"
-          >
-            <TextInput
-              v-model="row.label"
-              variant="ghost"
-              :placeholder="__('Contact sales')"
-            />
-            <TextInput
-              v-model="row.url"
-              variant="ghost"
-              :placeholder="__('https://example.com/contact')"
-            />
-            <Checkbox
-              v-model="row.open_in_new_tab"
-              class="justify-self-center"
-            />
-            <Button
-              variant="ghost"
-              icon="lucide-trash-2"
-              :label="__('Delete')"
-              @click="rows.splice(index, 1)"
-            />
-          </div>
-          <hr v-if="index !== rows.length - 1" />
-        </template>
-      </template>
+      <List
+        v-if="rows.length"
+        :columns="columns"
+        :row-height="44"
+        class="[--list-gap:1rem] [--list-row-padding-x:0.5rem]"
+      >
+        <ListHeader>
+          <ListHeaderCell class="ms-2">{{ __("Label") }}</ListHeaderCell>
+          <ListHeaderCell class="ms-2">{{ __("URL") }}</ListHeaderCell>
+          <ListHeaderCell class="justify-center">
+            {{ __("New tab") }}
+          </ListHeaderCell>
+          <ListHeaderCell />
+        </ListHeader>
+        <ListRows :items="rows" v-slot="{ item: row, index }">
+          <ListRow>
+            <ListCell>
+              <TextInput
+                v-model="row.label"
+                class="w-full"
+                variant="ghost"
+                :placeholder="__('Contact sales')"
+              />
+            </ListCell>
+            <ListCell>
+              <TextInput
+                v-model="row.url"
+                class="w-full"
+                variant="ghost"
+                :placeholder="__('https://example.com/contact')"
+              />
+            </ListCell>
+            <ListCell class="justify-center">
+              <Checkbox v-model="row.open_in_new_tab" />
+            </ListCell>
+            <ListCell>
+              <Button
+                variant="ghost"
+                icon="lucide-trash-2"
+                :label="__('Delete')"
+                @click="rows.splice(index, 1)"
+              />
+            </ListCell>
+          </ListRow>
+        </ListRows>
+      </List>
       <div v-else class="p-4 text-center text-ink-gray-5">
         {{ __("No links yet. Add one to show it in the portal header") }}
       </div>
@@ -82,6 +88,14 @@ import {
   TextInput,
   toast,
 } from "frappe-ui";
+import {
+  List,
+  ListCell,
+  ListHeader,
+  ListHeaderCell,
+  ListRow,
+  ListRows,
+} from "frappe-ui/list";
 import { computed, ref, watch } from "vue";
 
 type HeaderLink = { label: string; url: string; open_in_new_tab: boolean };
@@ -92,7 +106,7 @@ const emit = defineEmits<{ saved: [] }>();
 const SCRIPT_NAME = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
 
-const gridTemplateColumns = "1fr 2fr 64px 32px";
+const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "64px", "32px"];
 
 const rows = ref<HeaderLink[]>([]);
 
