@@ -37,11 +37,10 @@ export const accountMenuOptions = computed(() =>
   session.isGuest.value
     ? []
     : [
-        { icon: 'lucide-inbox', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
-        { icon: 'lucide-book-open', label: __('Knowledge base'), onClick: () => navigateTo(ROUTES.home) },
-        { icon: 'lucide-user', label: __('My account'), onClick: () => dialog.openSettings('profile') },
+        { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
+        { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         {
-          icon: 'lucide-headphones',
+          icon: 'lucide-arrow-left-right',
           label: __('Agent portal'),
           condition: () => session.isAgent.value,
           onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
