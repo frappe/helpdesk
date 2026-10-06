@@ -30,7 +30,7 @@ export function useTicketDetails(ticket, thread) {
   const basics = computed(() =>
     [
       { label: __('Team'), value: data.value.agent_group },
-      { label: __('Priority'), value: data.value.priority },
+      { label: __('Priority'), value: data.value.priority, isPriority: true },
       ...templateFields(),
     ].filter((row) => row.value),
   )
