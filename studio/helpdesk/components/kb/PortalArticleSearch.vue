@@ -11,6 +11,7 @@
     :loading="results.loading && !results.data"
     :filterable="false"
     :open-on-click="false"
+    :offset="8"
     @focus="isOpen = hasHistory"
   >
     <template #prefix>
@@ -27,17 +28,15 @@
     <template #item="{ item }">
       <div
         v-if="item.recentSearch"
-        class="recent-search flex min-w-0 items-center gap-2.5"
+        class="recent-search flex min-w-0 flex-1 items-center gap-3"
       >
-        <span class="flex w-5 shrink-0 justify-center">
-          <LucideClock class="size-4 text-ink-gray-4" />
-        </span>
+        <LucideClock class="size-4 shrink-0 text-ink-gray-4" />
         <span class="min-w-0 flex-1 truncate text-base text-ink-gray-8">
           {{ item.recentSearch }}
         </span>
         <button
           type="button"
-          class="flex size-6 shrink-0 items-center justify-center rounded-4 text-ink-gray-4 [@media(pointer:coarse)]:size-8 hover:bg-surface-gray-3 hover:text-ink-gray-7"
+          class="flex size-8 shrink-0 items-center justify-center rounded-[6px] text-ink-gray-4 hover:bg-surface-gray-3 hover:text-ink-gray-7"
           :aria-label="__('Remove')"
           @pointerdown.stop.prevent
           @click.stop.prevent="forgetSearch(item.recentSearch)"
@@ -47,10 +46,10 @@
       </div>
       <div
         v-else-if="item.recentArticle"
-        class="recent-article flex min-w-0 items-center gap-2.5"
+        class="recent-article flex min-w-0 flex-1 items-center gap-3"
       >
         <PortalArticleThumbnail
-          class="!size-5"
+          class="!size-4 [&_svg]:!size-4"
           :src="item.recentArticle.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -219,25 +218,47 @@ const options = computed(() =>
   overflow-y: auto;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="content-body"]
+  > div {
+  padding: 8px;
+}
+[data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"] {
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0.75rem 0.5rem;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"]:not(:last-child) {
   border-bottom: 1px solid var(--outline-gray-1);
 }
-/* History rows sit tight, with no rule between them. */
+/* History, on an 8px grid: 40px search rows, 56px article rows, icons on the labels' edge. */
+[data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="group-label"] {
+  height: auto;
+  padding: 8px 8px 4px;
+}
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"]:has(.recent-search, .recent-article) {
-  padding: 0.375rem 0.5rem;
+  display: flex;
+  align-items: center;
   border-bottom: 0;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="item"]:has(.recent-search) {
+  height: 40px;
+  padding: 0 4px 0 8px;
+}
+[data-slot="content"][data-variant="outline"][data-size="lg"]
+  [data-slot="item"]:has(.recent-article) {
+  min-height: 56px;
+  padding: 0 8px;
+}
+/* The rule between the sections runs edge to edge, through the panel's padding. */
+[data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="group"]
   + [data-slot="group"] {
-  margin-top: 0.375rem;
-  padding-top: 0.375rem;
-  border-top: 1px solid var(--outline-gray-1);
+  margin: 8px -8px 0;
+  padding: 8px 8px 0;
+  border-top: 1px solid var(--outline-elevation-2);
 }
 </style>
