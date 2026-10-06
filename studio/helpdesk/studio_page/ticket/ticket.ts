@@ -129,7 +129,6 @@ export default function setup(context) {
 
   const isRelated = computed(() => Boolean(relatedArticles.data?.length))
   const suggestedArticles = computed(() => (isRelated.value ? relatedArticles.data : popularArticles.data) || [])
-  const suggestedHeading = computed(() => (isRelated.value ? __('Related help') : __('Popular help')))
 
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
   // Where a rating is required, the status cannot be written without it.
@@ -224,7 +223,6 @@ export default function setup(context) {
     confirmSolved,
     reopenTicket,
     suggestedArticles,
-    suggestedHeading,
     openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
   }
 }
