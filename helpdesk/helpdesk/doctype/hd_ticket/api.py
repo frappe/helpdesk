@@ -27,12 +27,12 @@ def new(doc: dict, attachments: list[dict] = []):
     return TicketFields().strip_hidden_fields(d.as_dict())
 
 
-TIMELINE_FIELDS = ("status", "feedback_rating")
+TIMELINE_FIELDS = ("status",)
 
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status and rating changes, oldest first, with who made them: readers of a ticket can't read Version."""
+    """Status changes, oldest first, with who made them: readers of a ticket can't read Version."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",

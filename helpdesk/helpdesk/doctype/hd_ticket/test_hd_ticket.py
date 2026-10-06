@@ -2569,12 +2569,12 @@ class TestTicketTimelineChanges(IntegrationTestCase):
         self.assertEqual(change["by"]["name"], "Administrator")
         self.assertTrue(change["on"])
 
-    def test_lists_when_the_rating_was_given(self) -> None:
+    def test_leaves_the_rating_out(self) -> None:
         ticket = self.close(feedback_rating=0.8)
 
         fields = [change["field"] for change in get_timeline_changes(ticket.name)]
 
-        self.assertEqual(fields, ["status", "feedback_rating"])
+        self.assertEqual(fields, ["status"])
 
     def test_a_stranger_cannot_read_them(self) -> None:
         ticket = make_ticket(raised_by="Administrator")

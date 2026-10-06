@@ -1,7 +1,6 @@
 import { computed, markRaw, ref, watch } from 'vue'
-import { createResource, dayjs, dayjsLocal, toast } from 'frappe-ui'
+import { createResource, dayjs, toast } from 'frappe-ui'
 import LucideCircleCheck from '~icons/lucide/circle-check'
-import LucideStar from '~icons/lucide/star'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useDrawer } from '@app/composables/useDrawer'
@@ -71,7 +70,7 @@ export default function setup(context) {
   const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
 
-  // Closing and rating change the ticket, not the thread, so their dates come from its history.
+  // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
   const timelineChanges = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_timeline_changes',
     method: 'GET',
@@ -83,15 +82,8 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  const ratingChange = computed(() =>
-    (timelineChanges.data || []).findLast((change) => change.field === 'feedback_rating' && change.to),
-  )
-  const ratedBy = computed(() => ratingChange.value?.by?.name || ticket.data?.raised_by || '')
-  // A rating from before the history was kept falls back to the resolution date.
-  const ratedAt = computed(() => ratingChange.value?.on || ticket.data?.resolution_date)
-
-  const timelineEvents = computed(() => {
-    const closings = (timelineChanges.data || [])
+  const timelineEvents = computed(() =>
+    (timelineChanges.data || [])
       .filter((change) => change.field === 'status' && isClosedStatus(change.to))
       .map((change) => ({
         type: 'log',
@@ -100,13 +92,8 @@ export default function setup(context) {
         author: { fullname: change.by.name, image: change.by.image },
         icon: markRaw(LucideCircleCheck),
         data: { name: `closed:${change.on}`, subtype: 'info', text: __('{0} closed the ticket', [change.by.name]) },
-      }))
-    if (!thread.rating.value) return closings
-    return [
-      ...closings,
-      { type: 'feedback', key: 'feedback', timestamp: ratedAt.value, icon: markRaw(LucideStar), data: {} },
-    ]
-  })
+      })),
+  )
 
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
@@ -199,9 +186,6 @@ export default function setup(context) {
     ticket,
     rating: thread.rating,
     activities,
-    ratedBy,
-    // dayjsLocal, the clock ActivityTimeline uses for the rows around it.
-    ratedTimeAgo: computed(() => (ratedAt.value ? dayjsLocal(ratedAt.value).fromNow() : '')),
     customActions,
     // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
     pageActionLabel: computed(() => {
