@@ -1,12 +1,15 @@
-// Fixed colours, not theme tokens: a banner looks the same in dark mode.
+// Theme tokens, so a banner follows the reader's light or dark mode. Thinned with the page
+// background: the raw dark-mode tints read as saturated blocks.
+const tint = (color: string) =>
+  `color-mix(in oklab, var(--surface-${color}-3) 40%, var(--surface-base))`;
+
 // keep in sync with HD Settings banner_preset options and BannerPicker.vue labels
 export const BANNER_PRESETS = [
-  { name: "Stone", dark: false, background: "#f1efea" },
-  { name: "Blue", dark: false, background: "#e9f0f8" },
-  { name: "Green", dark: false, background: "#e8f1ec" },
-  { name: "Charcoal", dark: true, background: "#2a2c30" },
-  { name: "Navy", dark: true, background: "#1c2b45" },
-  { name: "Forest", dark: true, background: "#1e3a30" },
+  { name: "Gray", background: tint("gray") },
+  { name: "Blue", background: tint("blue") },
+  { name: "Green", background: tint("green") },
+  { name: "Amber", background: tint("amber") },
+  { name: "Violet", background: tint("violet") },
 ] as const;
 
 export function findBannerPreset(name?: string | null) {

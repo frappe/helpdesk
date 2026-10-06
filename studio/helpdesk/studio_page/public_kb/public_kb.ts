@@ -17,10 +17,7 @@ export default function setup(context) {
     config.value?.banner_image ? null : findBannerPreset(config.value?.banner_preset),
   )
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
-  const bannerTextColor = computed(() => {
-    if (config.value?.banner_image || bannerPreset.value?.dark) return '#fff'
-    return bannerPreset.value ? '#171717' : 'var(--ink-gray-8)'
-  })
+  const bannerTextColor = computed(() => (config.value?.banner_image ? '#fff' : 'var(--ink-gray-8)'))
 
   const fewCategories = computed(() => {
     const rows = categories.data || []
