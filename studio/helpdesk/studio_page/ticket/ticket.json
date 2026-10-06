@@ -579,49 +579,20 @@
              "componentId": "container-ticket-contact",
              "componentName": "container",
              "originalElement": "div"
-            },
+            }
+           ],
+           "classes": [
+            "flex",
+            "flex-col",
+            "p-4"
+           ],
+           "componentId": "container-ticket-panel-basic",
+           "componentName": "container",
+           "originalElement": "div"
+          },
+          {
+           "children": [
             {
-             "children": [
-              {
-               "classes": [
-                "w-[106px]",
-                "shrink-0",
-                "truncate",
-                "text-ink-gray-5"
-               ],
-               "componentId": "TextBlock-ticket-status-label",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "span",
-                "text": "{{ t('Status') }}"
-               }
-              },
-              {
-               "componentId": "KbStatusPill-ticket",
-               "componentName": "PortalStatusPill",
-               "componentProps": {
-                "color": "{{ statusPill.color }}",
-                "label": "{{ statusPill.label }}"
-               },
-               "isCustomVueComponent": true
-              }
-             ],
-             "classes": [
-              "flex",
-              "items-center",
-              "gap-2",
-              "min-h-7",
-              "w-full"
-             ],
-             "componentId": "container-ticket-status",
-             "componentName": "container",
-             "originalElement": "div"
-            },
-            {
-             "baseStyles": {
-              "gap": "10px"
-             },
              "children": [
               {
                "children": [
@@ -632,28 +603,22 @@
                   "truncate",
                   "text-ink-gray-5"
                  ],
-                 "componentId": "TextBlock-ticket-basics-label",
+                 "componentId": "TextBlock-ticket-status-label",
                  "componentName": "TextBlock",
                  "componentProps": {
                   "fontSize": "text-base",
                   "tag": "span",
-                  "text": "{{ dataItem.label }}"
+                  "text": "{{ t('Status') }}"
                  }
                 },
                 {
-                 "classes": [
-                  "truncate",
-                  "min-w-0",
-                  "flex-1",
-                  "text-ink-gray-8"
-                 ],
-                 "componentId": "TextBlock-ticket-basics-value",
-                 "componentName": "TextBlock",
+                 "componentId": "KbStatusPill-ticket",
+                 "componentName": "PortalStatusPill",
                  "componentProps": {
-                  "fontSize": "text-base",
-                  "tag": "span",
-                  "text": "{{ dataItem.value }}"
-                 }
+                  "color": "{{ statusPill.color }}",
+                  "label": "{{ statusPill.label }}"
+                 },
+                 "isCustomVueComponent": true
                 }
                ],
                "classes": [
@@ -663,204 +628,277 @@
                 "min-h-7",
                 "w-full"
                ],
-               "componentId": "container-ticket-basics-row",
+               "componentId": "container-ticket-status",
                "componentName": "container",
                "originalElement": "div"
+              },
+              {
+               "baseStyles": {
+                "gap": "10px"
+               },
+               "children": [
+                {
+                 "children": [
+                  {
+                   "classes": [
+                    "w-[106px]",
+                    "shrink-0",
+                    "truncate",
+                    "text-ink-gray-5"
+                   ],
+                   "componentId": "TextBlock-ticket-basics-label",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base",
+                    "tag": "span",
+                    "text": "{{ dataItem.label }}"
+                   }
+                  },
+                  {
+                   "classes": [
+                    "truncate",
+                    "min-w-0",
+                    "flex-1",
+                    "text-ink-gray-8"
+                   ],
+                   "componentId": "TextBlock-ticket-basics-value",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base",
+                    "tag": "span",
+                    "text": "{{ dataItem.value }}"
+                   }
+                  }
+                 ],
+                 "classes": [
+                  "flex",
+                  "items-center",
+                  "gap-2",
+                  "min-h-7",
+                  "w-full"
+                 ],
+                 "componentId": "container-ticket-basics-row",
+                 "componentName": "container",
+                 "originalElement": "div"
+                }
+               ],
+               "classes": [
+                "flex",
+                "flex-col",
+                "w-full"
+               ],
+               "componentId": "Repeater-ticket-basics",
+               "componentName": "Repeater",
+               "componentProps": {
+                "data": "{{ basics }}",
+                "dataKey": "label"
+               }
+              },
+              {
+               "componentId": "container-ticket-rating",
+               "componentName": "container",
+               "originalElement": "div",
+               "classes": [
+                "flex",
+                "items-center",
+                "gap-2",
+                "min-h-7",
+                "w-full"
+               ],
+               "children": [
+                {
+                 "componentId": "TextBlock-ticket-rating-label",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-base",
+                  "tag": "span",
+                  "text": "{{ t('Rating') }}"
+                 },
+                 "classes": [
+                  "w-[106px]",
+                  "shrink-0",
+                  "truncate",
+                  "text-ink-gray-5"
+                 ]
+                },
+                {
+                 "componentId": "Rating-ticket-sidebar",
+                 "componentName": "Rating",
+                 "componentProps": {
+                  "disabled": true,
+                  "modelValue": "{{ rating.rating }}",
+                  "size": "sm"
+                 }
+                }
+               ],
+               "visibilityCondition": "{{ rating }}"
               }
              ],
              "classes": [
               "flex",
               "flex-col",
-              "w-full"
+              "gap-2.5",
+              "pb-3",
+              "pt-0.5"
              ],
-             "componentId": "Repeater-ticket-basics",
-             "componentName": "Repeater",
-             "componentProps": {
-              "data": "{{ basics }}",
-              "dataKey": "label"
-             }
-            },
-            {
-             "componentId": "container-ticket-rating",
+             "componentId": "container-ticket-details",
              "componentName": "container",
-             "originalElement": "div",
-             "classes": [
-              "flex",
-              "items-center",
-              "gap-2",
-              "min-h-7",
-              "w-full"
-             ],
+             "componentProps": {},
+             "componentSlots": {},
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "border-t",
+            "border-outline-gray-2"
+           ],
+           "componentId": "PortalSidebarSection-ticket-details",
+           "componentName": "PortalSidebarSection",
+           "componentProps": {
+            "label": "{{ t('Details') }}"
+           },
+           "componentSlots": {},
+           "isCustomVueComponent": true
+          },
+          {
+           "children": [
+            {
              "children": [
               {
-               "componentId": "TextBlock-ticket-rating-label",
-               "componentName": "TextBlock",
+               "componentId": "KbTicketTimeline-ticket",
+               "componentName": "PortalTicketTimeline",
                "componentProps": {
-                "fontSize": "text-base",
-                "tag": "span",
-                "text": "{{ t('Rating') }}"
+                "steps": "{{ timeline }}"
                },
-               "classes": [
-                "w-[106px]",
-                "shrink-0",
-                "truncate",
-                "text-ink-gray-5"
-               ]
-              },
-              {
-               "componentId": "Rating-ticket-sidebar",
-               "componentName": "Rating",
-               "componentProps": {
-                "disabled": true,
-                "modelValue": "{{ rating.rating }}",
-                "size": "sm"
-               }
+               "isCustomVueComponent": true
               }
              ],
-             "visibilityCondition": "{{ rating }}"
-            }
-           ],
-           "classes": [
-            "border-b",
-            "border-outline-gray-2",
-            "flex",
-            "flex-col",
-            "gap-2.5",
-            "py-4",
-            "px-4"
-           ],
-           "componentId": "container-ticket-panel-basic",
-           "componentName": "container",
-           "originalElement": "div"
-          },
-          {
-           "children": [
-            {
-             "componentId": "KbTicketTimeline-ticket",
-             "componentName": "PortalTicketTimeline",
-             "componentProps": {
-              "steps": "{{ timeline }}"
-             },
-             "isCustomVueComponent": true
-            }
-           ],
-           "classes": [
-            "flex",
-            "flex-col",
-            "gap-4",
-            "py-4",
-            "px-4",
-            "border-b-0"
-           ],
-           "componentId": "container-ticket-timeline",
-           "componentName": "container",
-           "originalElement": "div"
-          },
-          {
-           "children": [
-            {
              "classes": [
-              "text-ink-gray-8",
-              "font-medium"
+              "flex",
+              "flex-col",
+              "pb-4",
+              "pt-0.5"
              ],
-             "componentId": "TextBlock-ticket-help-title",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-base",
-              "tag": "div",
-              "text": "{{ suggestedHeading }}"
-             }
-            },
+             "componentId": "container-ticket-timeline",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "border-t",
+            "border-outline-gray-2"
+           ],
+           "componentId": "PortalSidebarSection-ticket-progress",
+           "componentName": "PortalSidebarSection",
+           "componentProps": {
+            "label": "{{ t('Progress') }}"
+           },
+           "componentSlots": {},
+           "isCustomVueComponent": true
+          },
+          {
+           "children": [
             {
              "children": [
               {
                "children": [
                 {
-                 "baseStyles": {
-                  "flexShrink": 0
-                 },
+                 "children": [
+                  {
+                   "baseStyles": {
+                    "flexShrink": 0
+                   },
+                   "classes": [
+                    "size-4",
+                    "text-ink-gray-5",
+                    "transition-colors",
+                    "group-hover:text-ink-gray-7"
+                   ],
+                   "componentId": "HTML-ticket-help-icon",
+                   "componentName": "HTML",
+                   "componentProps": {
+                    "html": "<svg viewBox=\"0 0 16 16\" fill=\"currentColor\" class=\"size-full\"><path d=\"M11 1C12.6569 1 14 2.34315 14 4V12.5C14 13.8807 12.8807 15 11.5 15H4.5C3.11929 15 2 13.8807 2 12.5V3.5C2 2.11929 3.11929 1 4.5 1H11ZM4.5 2C3.67157 2 3 2.67157 3 3.5V12.5C3 13.3284 3.67157 14 4.5 14H11.5C12.3284 14 13 13.3284 13 12.5V4C13 2.89543 12.1046 2 11 2H4.5ZM10.75 10.5C11.0261 10.5 11.25 10.7239 11.25 11C11.25 11.2761 11.0261 11.5 10.75 11.5H5.25C4.97386 11.5 4.75 11.2761 4.75 11C4.75 10.7239 4.97386 10.5 5.25 10.5H10.75ZM10.75 7.5C11.0261 7.5 11.25 7.72386 11.25 8C11.25 8.27614 11.0261 8.5 10.75 8.5H5.25C4.97386 8.5 4.75 8.27614 4.75 8C4.75 7.72386 4.97386 7.5 5.25 7.5H10.75ZM10.75 4.5C11.0261 4.5 11.25 4.72386 11.25 5C11.25 5.27614 11.0261 5.5 10.75 5.5H5.25C4.97386 5.5 4.75 5.27614 4.75 5C4.75 4.72386 4.97386 4.5 5.25 4.5H10.75Z\"/></svg>"
+                   },
+                   "componentSlots": {}
+                  },
+                  {
+                   "classes": [
+                    "truncate",
+                    "min-w-0",
+                    "flex-1",
+                    "text-ink-gray-8"
+                   ],
+                   "componentId": "TextBlock-ticket-help-link",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base",
+                    "tag": "span",
+                    "text": "{{ dataItem.title }}"
+                   },
+                   "componentSlots": {}
+                  }
+                 ],
                  "classes": [
-                  "size-4",
-                  "text-ink-gray-5",
+                  "group",
+                  "flex",
+                  "items-center",
+                  "gap-2",
+                  "h-7",
+                  "-mx-2",
+                  "px-2",
+                  "rounded-4",
+                  "cursor-pointer",
                   "transition-colors",
-                  "group-hover:text-ink-gray-7"
+                  "hover:bg-surface-gray-2"
                  ],
-                 "componentId": "HTML-ticket-help-icon",
-                 "componentName": "HTML",
-                 "componentProps": {
-                  "html": "<svg viewBox=\"0 0 16 16\" fill=\"currentColor\" class=\"size-full\"><path d=\"M11 1C12.6569 1 14 2.34315 14 4V12.5C14 13.8807 12.8807 15 11.5 15H4.5C3.11929 15 2 13.8807 2 12.5V3.5C2 2.11929 3.11929 1 4.5 1H11ZM4.5 2C3.67157 2 3 2.67157 3 3.5V12.5C3 13.3284 3.67157 14 4.5 14H11.5C12.3284 14 13 13.3284 13 12.5V4C13 2.89543 12.1046 2 11 2H4.5ZM10.75 10.5C11.0261 10.5 11.25 10.7239 11.25 11C11.25 11.2761 11.0261 11.5 10.75 11.5H5.25C4.97386 11.5 4.75 11.2761 4.75 11C4.75 10.7239 4.97386 10.5 5.25 10.5H10.75ZM10.75 7.5C11.0261 7.5 11.25 7.72386 11.25 8C11.25 8.27614 11.0261 8.5 10.75 8.5H5.25C4.97386 8.5 4.75 8.27614 4.75 8C4.75 7.72386 4.97386 7.5 5.25 7.5H10.75ZM10.75 4.5C11.0261 4.5 11.25 4.72386 11.25 5C11.25 5.27614 11.0261 5.5 10.75 5.5H5.25C4.97386 5.5 4.75 5.27614 4.75 5C4.75 4.72386 4.97386 4.5 5.25 4.5H10.75Z\"/></svg>"
+                 "componentEvents": {
+                  "click": {
+                   "action": "Run Script",
+                   "event": "click",
+                   "script": "openHelpArticle(dataItem)"
+                  }
                  },
-                 "componentSlots": {}
-                },
-                {
-                 "classes": [
-                  "truncate",
-                  "min-w-0",
-                  "flex-1",
-                  "text-ink-gray-8"
-                 ],
-                 "componentId": "TextBlock-ticket-help-link",
-                 "componentName": "TextBlock",
-                 "componentProps": {
-                  "fontSize": "text-base",
-                  "tag": "span",
-                  "text": "{{ dataItem.title }}"
-                 },
-                 "componentSlots": {}
+                 "componentId": "container-ticket-help-link",
+                 "componentName": "container",
+                 "componentProps": {},
+                 "componentSlots": {},
+                 "originalElement": "div"
                 }
                ],
                "classes": [
-                "group",
                 "flex",
-                "items-center",
-                "gap-2",
-                "h-7",
-                "-mx-2",
-                "px-2",
-                "rounded-4",
-                "cursor-pointer",
-                "transition-colors",
-                "hover:bg-surface-gray-2"
+                "flex-col",
+                "!gap-0"
                ],
-               "componentEvents": {
-                "click": {
-                 "action": "Run Script",
-                 "event": "click",
-                 "script": "openHelpArticle(dataItem)"
-                }
-               },
-               "componentId": "container-ticket-help-link",
-               "componentName": "container",
-               "componentProps": {},
-               "componentSlots": {},
-               "originalElement": "div"
+               "componentId": "Repeater-ticket-help-links",
+               "componentName": "Repeater",
+               "componentProps": {
+                "data": "{{ suggestedArticles }}",
+                "dataKey": "name"
+               }
               }
              ],
              "classes": [
               "flex",
               "flex-col",
-              "!gap-0"
+              "pb-3"
              ],
-             "componentId": "Repeater-ticket-help-links",
-             "componentName": "Repeater",
-             "componentProps": {
-              "data": "{{ suggestedArticles }}",
-              "dataKey": "name"
-             }
+             "componentId": "container-ticket-panel-help",
+             "componentName": "container",
+             "originalElement": "div"
             }
            ],
            "classes": [
             "border-t",
-            "border-outline-gray-2",
-            "flex",
-            "flex-col",
-            "gap-3",
-            "py-4",
-            "px-4"
+            "border-outline-gray-2"
            ],
-           "componentId": "container-ticket-panel-help",
-           "componentName": "container",
-           "originalElement": "div",
+           "componentId": "PortalSidebarSection-ticket-help",
+           "componentName": "PortalSidebarSection",
+           "componentProps": {
+            "label": "{{ suggestedHeading }}"
+           },
+           "componentSlots": {},
+           "isCustomVueComponent": true,
            "visibilityCondition": "{{ suggestedArticles.length }}"
           }
          ],
@@ -1245,7 +1283,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:05:00.000000",
+ "modified": "2026-10-07 01:20:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
