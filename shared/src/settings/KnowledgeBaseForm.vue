@@ -20,12 +20,8 @@
         />
       </div>
     </div>
-    <hr class="my-8" />
-    <div class="text-base-semibold text-ink-gray-9">
-      {{ __("Customize Knowledge Base") }}
-    </div>
     <BannerPicker
-      class="mt-6"
+      class="mt-8"
       :image="settings.doc?.banner_image || ''"
       :preset="settings.doc?.banner_preset || ''"
       @change="save"
