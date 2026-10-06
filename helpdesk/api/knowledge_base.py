@@ -28,11 +28,12 @@ def validate_public_access():
         )
 
 
-def readable_audiences() -> list[str] | None:
-    """The audiences the caller may read; `None` for an agent, who reads them all."""
-    if is_agent():
+def readable_audiences(user: str | None = None) -> list[str] | None:
+    """The audiences `user` may read; `None` for an agent, who reads them all."""
+    user = user or frappe.session.user
+    if is_agent(user):
         return None
-    if frappe.session.user == "Guest":
+    if user == "Guest":
         return [PUBLIC]
     return [PUBLIC, CUSTOMERS_ONLY]
 
@@ -46,13 +47,14 @@ def readable_filters(**extra) -> dict:
     return filters
 
 
-def is_readable(article) -> bool:
+def is_readable(article, user: str | None = None) -> bool:
     """The same rule for one article already fetched."""
-    if is_agent():
+    audiences = readable_audiences(user)
+    if audiences is None:
         return True
-    if article.get("status") != "Published":
-        return False
-    return article.get("visibility") in readable_audiences()
+    return (
+        article.get("status") == "Published" and article.get("visibility") in audiences
+    )
 
 
 @frappe.whitelist()

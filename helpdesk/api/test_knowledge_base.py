@@ -22,10 +22,12 @@ from helpdesk.api.knowledge_base import (
 )
 from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.test_utils import (
+    create_contact,
     disable_public_knowledge_base,
     enable_anonymous_article_voting,
     enable_public_knowledge_base,
     make_article,
+    make_agent,
     make_article_category,
 )
 
@@ -345,6 +347,54 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         frappe.set_user("Guest")
 
         self.assertRaises(frappe.DoesNotExistError, vote_on_article, self.members, 1)
+
+
+class TestArticlePermissions(IntegrationTestCase):
+    """The framework applies the portal's audience rule, so `/api/resource` does too."""
+
+    def setUp(self) -> None:
+        self.customer = create_contact("Fixture Reader", "fixture.reader@example.com")[
+            "user"
+        ]
+        self.agent = make_agent("fixture.kb.agent@example.com")
+        self.members = make_article("Fixture perm members", visibility="Customers only")
+        self.internal = make_article("Fixture perm internal", visibility="Agents only")
+        self.draft = make_article("Fixture perm draft", status="Draft")
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def listed(self) -> set[str]:
+        names = [self.members, self.internal, self.draft]
+        return set(
+            frappe.get_list("HD Article", filters={"name": ["in", names]}, pluck="name")
+        )
+
+    def test_a_customer_lists_only_what_the_portal_shows(self) -> None:
+        frappe.set_user(self.customer)
+
+        self.assertEqual(self.listed(), {self.members})
+
+    def test_a_customer_cannot_open_a_hidden_article(self) -> None:
+        frappe.set_user(self.customer)
+
+        frappe.get_doc("HD Article", self.members).check_permission("read")
+        for name in (self.internal, self.draft):
+            with self.assertRaises(frappe.PermissionError):
+                frappe.get_doc("HD Article", name).check_permission("read")
+
+    def test_an_agent_still_reads_everything(self) -> None:
+        frappe.set_user(self.agent)
+
+        self.assertEqual(self.listed(), {self.members, self.internal, self.draft})
+
+    def test_a_check_for_another_user_uses_their_audience(self) -> None:
+        internal = frappe.get_doc("HD Article", self.internal)
+
+        self.assertTrue(frappe.has_permission("HD Article", "read", internal))
+        self.assertFalse(
+            frappe.has_permission("HD Article", "read", internal, user=self.customer)
+        )
 
 
 class TestSearch(IntegrationTestCase):

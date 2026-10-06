@@ -6,6 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
+from helpdesk.api.knowledge_base import is_readable, readable_audiences
 from helpdesk.utils import capture_event
 
 
@@ -143,3 +144,16 @@ class HDArticle(Document):
         :return: Generated slug
         """
         return self.title.lower().replace(" ", "-")
+
+
+def permission_query(user: str | None = None) -> str | None:
+    """Non-agents list only the published articles in their audiences, as on the portal."""
+    audiences = readable_audiences(user)
+    if audiences is None:
+        return None
+    values = ", ".join(frappe.db.escape(audience) for audience in audiences)
+    return f"`tabHD Article`.status = 'Published' and `tabHD Article`.visibility in ({values})"
+
+
+def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    return is_readable(doc, user)
