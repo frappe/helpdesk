@@ -22,6 +22,7 @@ function createSessionStore() {
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
+  const brandName = computed(() => config.value?.brand_name || 'Helpdesk')
 
   function loadSession() {
     if (sessionRequest) return sessionRequest
@@ -59,6 +60,7 @@ function createSessionStore() {
     isAgent,
     canEditSettings,
     brandLogo,
+    brandName,
     loadSession,
     signIn,
     signOut,

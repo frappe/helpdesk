@@ -13,7 +13,6 @@
        "componentName": "header",
        "componentProps": {
         "crumb": "{{ ticket.data && ticket.data.subject }}",
-        "hideRoot": "{{ true }}",
         "parentCrumb": "Tickets",
         "parentRoute": "/customer-tickets"
        },
@@ -1063,7 +1062,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 02:00:00.000000",
+ "modified": "2026-10-07 04:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

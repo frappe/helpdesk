@@ -3,21 +3,22 @@
     <template #default="{ open }">
       <button
         type="button"
-        class="group flex cursor-pointer items-center gap-1 rounded-5 bg-transparent p-0.5"
-        :aria-label="__('Menu')"
+        class="flex h-9 min-w-0 max-w-64 cursor-pointer items-center gap-2 rounded-lg pe-2 ps-1.5 transition-colors hover:bg-surface-gray-3"
+        :class="open ? 'bg-surface-gray-3' : 'bg-surface-gray-2'"
       >
         <img
           v-if="logo"
           :src="logo"
           alt=""
           aria-hidden="true"
-          class="size-8 shrink-0 object-contain"
+          class="size-6 shrink-0 rounded-md object-contain"
         />
-        <span v-else class="size-8 shrink-0" />
+        <span class="truncate text-base font-medium text-ink-gray-8">
+          {{ name }}
+        </span>
         <Icon
           :icon="open ? 'lucide-chevron-up' : 'lucide-chevron-down'"
-          class="size-4 shrink-0 transition-colors duration-150 group-hover:text-ink-gray-9"
-          :class="open ? 'text-ink-gray-9' : 'text-ink-gray-5'"
+          class="size-4 shrink-0 text-ink-gray-5"
         />
       </button>
     </template>
@@ -26,7 +27,6 @@
 
 <script setup lang="ts">
 import { Dropdown, Icon } from "frappe-ui";
-import { __ } from "@helpdesk/shared/translation";
 
-defineProps<{ options?: unknown[]; logo?: string }>();
+defineProps<{ options?: unknown[]; logo?: string; name?: string }>();
 </script>
