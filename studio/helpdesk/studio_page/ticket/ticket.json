@@ -690,7 +690,7 @@
                "classes": [
                 "flex",
                 "flex-col",
-                "!gap-0"
+                "!gap-2.5"
                ],
                "componentId": "Repeater-ticket-help-links",
                "componentName": "Repeater",
@@ -1066,7 +1066,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:30:00.000000",
+ "modified": "2026-10-07 01:40:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
