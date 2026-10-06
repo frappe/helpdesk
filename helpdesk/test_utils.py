@@ -989,3 +989,62 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def make_ticket_email(case, ticket: str, sender: str, sent_or_received="Received"):
+    """A customer-visible email on `ticket`, removed when the test ends."""
+    email = frappe.get_doc(
+        {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "communication_medium": "Email",
+            "sent_or_received": sent_or_received,
+            "sender": sender,
+            "subject": frappe.db.get_value("HD Ticket", ticket, "subject"),
+            "content": "<p>See attachment</p>",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket,
+        }
+    ).insert(ignore_permissions=True)
+    case.addCleanup(frappe.delete_doc, "Communication", email.name, force=True)
+    return email
+
+
+def attach_private_file(case, doctype: str, name: str, file_name="invoice.txt"):
+    """A private File on the given document; every row of its url is removed when the test ends."""
+    file = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "content": frappe.generate_hash(),
+            "is_private": 1,
+            "attached_to_doctype": doctype,
+            "attached_to_name": name,
+        }
+    ).insert(ignore_permissions=True)
+    case.addCleanup(frappe.db.delete, "File", {"file_url": file.file_url})
+    return file
+
+
+def can_download(user: str, file_url: str, fid: str | None = None) -> bool:
+    """Whether `user` would be served `file_url` (see frappe's find_file_by_url)."""
+    from frappe.core.doctype.file.utils import find_file_by_url
+
+    previous_user = frappe.session.user
+    frappe.set_user(user)
+    try:
+        return bool(find_file_by_url(file_url, name=fid))
+    finally:
+        frappe.set_user(previous_user)
+
+
+def count_ticket_files(ticket: str, file_url: str) -> int:
+    """File rows of `file_url` attached to `ticket`."""
+    return frappe.db.count(
+        "File",
+        {
+            "file_url": file_url,
+            "attached_to_doctype": "HD Ticket",
+            "attached_to_name": ticket,
+        },
+    )
