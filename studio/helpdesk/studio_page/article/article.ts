@@ -2,7 +2,6 @@ import { computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
 import { call, dayjs, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { ROUTES } from '@app/routes'
 import { useRecent } from '@app/stores/recent'
 import { useSettingsModal } from '@app/stores/settings'
 import { useKbHeader } from '@app/composables/useKbHeader'
@@ -37,12 +36,6 @@ export default function setup(context) {
 
   const isPublicArticle = computed(
     () => article?.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
-  )
-
-  const currentCategory = computed(() =>
-    article?.data?.category
-      ? { label: article.data.category_name, route: ROUTES.category(article.data.category) }
-      : null,
   )
 
   const relatedArticles = computed(() =>
@@ -94,7 +87,6 @@ export default function setup(context) {
     parsed,
     readingTime,
     publishedOn,
-    currentCategory,
     relatedArticles,
     submitFeedback,
     copyLink,
