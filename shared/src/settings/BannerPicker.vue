@@ -94,7 +94,7 @@ const emit = defineEmits<{
 }>();
 
 const swatch =
-  "size-8 shrink-0 rounded-[8px] border border-outline-gray-2 outline outline-2 outline-offset-2 transition-[outline-color]";
+  "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-2 outline-offset-2 transition-[outline-color]";
 
 function ring(selected: boolean) {
   return selected
@@ -121,9 +121,9 @@ function presetLabel(name: string) {
   return {
     Gray: __("Gray"),
     Blue: __("Blue"),
-    Green: __("Green"),
-    Amber: __("Amber"),
     Violet: __("Violet"),
+    Dots: __("Dots"),
+    Grid: __("Grid"),
   }[name];
 }
 
