@@ -3,6 +3,7 @@
     <template #default="{ open }">
       <button
         type="button"
+        :aria-label="name"
         class="-ms-2 flex h-8 min-w-0 max-w-[15rem] cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
         :class="open ? 'bg-surface-gray-3' : 'hover:bg-surface-gray-3'"
       >
@@ -18,6 +19,7 @@
   <RouterLink
     v-else
     :to="ROUTES.home"
+    :aria-label="name"
     class="flex h-8 min-w-0 max-w-[15rem] items-center gap-2"
   >
     <Brand />
@@ -47,7 +49,10 @@ function Brand() {
       }),
     h(
       "span",
-      { class: "truncate text-base-medium leading-tight text-ink-gray-9" },
+      {
+        class:
+          "hidden truncate text-base-medium leading-tight text-ink-gray-9 sm:block",
+      },
       props.name
     ),
   ];
