@@ -34,6 +34,11 @@ function createSessionStore() {
     return sessionRequest
   }
 
+  function reloadSession() {
+    sessionRequest = null
+    return loadSession()
+  }
+
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value) return
@@ -65,6 +70,7 @@ function createSessionStore() {
     isPhone,
     signIn,
     loadSession,
+    reloadSession,
     signOut,
   }
 }

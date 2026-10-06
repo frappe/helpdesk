@@ -12,6 +12,7 @@ import { isEmoji } from "@helpdesk/shared/utils";
 
 export {
   CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
   isContentEmpty,
   isEmoji,
   parseApiOptions,
@@ -683,18 +684,6 @@ export function hasPermission() {
   return authStore.isAdmin || authStore.isManager;
 }
 
-export function getErrorMessage(
-  error: any,
-  showToast: boolean = false
-): string {
-  const msg = error.exc_type
-    ? (error.messages || error.message || []).join(", ")
-    : error.message;
-  if (showToast) {
-    toast.error(msg);
-  }
-  return msg;
-}
 const emailsToStr = (emails: readonly string[]) => emails.join(", ");
 
 export function handleInviteUserSuccess(

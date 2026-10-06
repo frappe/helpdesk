@@ -60,8 +60,8 @@
 </template>
 
 <script setup lang="ts">
-import { __ } from "@/translation";
-import { BANNER_PRESETS, findBannerPreset } from "@helpdesk/shared/kbBanner";
+import { __ } from "../translation";
+import { BANNER_PRESETS, findBannerPreset } from "../kbBanner";
 import { FileUploader } from "frappe-ui";
 import { computed } from "vue";
 import LucideImageUp from "~icons/lucide/image-up";

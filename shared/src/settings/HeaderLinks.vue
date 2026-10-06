@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { __ } from "@/translation";
-import { getErrorMessage } from "@/utils";
+import { __ } from "../translation";
+import { getErrorMessage } from "../utils";
 import { Button, Checkbox, createResource, TextInput, toast } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 

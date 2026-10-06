@@ -107,6 +107,44 @@
          {
           "children": [
            {
+            "componentId": "kb_settings-nav-knowledge-base-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Knowledge Base') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-knowledge-base",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "knowledge-base"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-knowledge-base-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-book-open"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-knowledge-base-prefix",
+            "slotName": "prefix"
+           }
+          }
+         },
+         {
+          "children": [
+           {
             "componentId": "kb_settings-nav-portal-permissions-label",
             "componentName": "TextBlock",
             "componentProps": {
@@ -309,18 +347,18 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-language",
                   "componentName": "SettingsRow",
                   "componentProps": {
                    "description": "{{ t('Change language of the application.') }}",
                    "title": "{{ t('Language') }}"
                   },
-                  "componentSlots": {},
-                  "classes": [
-                   "max-sm:!flex-col",
-                   "max-sm:!items-stretch",
-                   "max-sm:!gap-2.5"
-                  ]
+                  "componentSlots": {}
                  },
                  {
                   "children": [
@@ -341,18 +379,18 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-time_zone",
                   "componentName": "SettingsRow",
                   "componentProps": {
                    "description": "{{ t('Change timezone of the application.') }}",
                    "title": "{{ t('Timezone') }}"
                   },
-                  "componentSlots": {},
-                  "classes": [
-                   "max-sm:!flex-col",
-                   "max-sm:!items-stretch",
-                   "max-sm:!gap-2.5"
-                  ]
+                  "componentSlots": {}
                  },
                  {
                   "children": [
@@ -376,18 +414,18 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-theme",
                   "componentName": "SettingsRow",
                   "componentProps": {
                    "description": "{{ t('Switch between light, dark, or system theme.') }}",
                    "title": "{{ t('Theme') }}"
                   },
-                  "componentSlots": {},
-                  "classes": [
-                   "max-sm:!flex-col",
-                   "max-sm:!items-stretch",
-                   "max-sm:!gap-2.5"
-                  ]
+                  "componentSlots": {}
                  }
                 ],
                 "classes": [
@@ -798,7 +836,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "•"
+                   "text": "\u2022"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ settingsOrg.email && settingsOrg.domain }}"
@@ -851,7 +889,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "•"
+                   "text": "\u2022"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ (settingsOrg.email || settingsOrg.domain) && settingsOrg.country }}"
@@ -1161,18 +1199,18 @@
                 "componentSlots": {}
                }
               ],
+              "classes": [
+               "max-sm:!flex-col",
+               "max-sm:!items-stretch",
+               "max-sm:!gap-2.5"
+              ],
               "componentId": "kb_settings-invite-row",
               "componentName": "SettingsRow",
               "componentProps": {
                "description": "{{ t('New people will be added to the team as') }}",
                "title": "{{ t('Invite by email') }}"
               },
-              "componentSlots": {},
-              "classes": [
-               "max-sm:!flex-col",
-               "max-sm:!items-stretch",
-               "max-sm:!gap-2.5"
-              ]
+              "componentSlots": {}
              },
              {
               "componentId": "kb_settings-invite-emails",
@@ -1225,6 +1263,103 @@
          "value": "members"
         },
         "componentSlots": {}
+       },
+       {
+        "blockName": "Knowledge Base",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "classes": [
+               "text-ink-gray-8",
+               "font-semibold"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-title",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-lg",
+               "tag": "h2",
+               "text": "{{ t('Knowledge Base') }}"
+              },
+              "componentSlots": {}
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ t('Manage how the knowledge base appears to customers.') }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           }
+          ],
+          "classes": [
+           "shrink-0",
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-knowledge-base-form",
+            "componentName": "KnowledgeBasePanel",
+            "componentProps": {},
+            "componentSlots": {},
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-knowledge-base-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "knowledge-base"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ canEditSettings }}"
        },
        {
         "blockName": "Portal permissions",
@@ -1372,7 +1507,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 00:10:00.000000",
+ "modified": "2026-10-07 00:20:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
