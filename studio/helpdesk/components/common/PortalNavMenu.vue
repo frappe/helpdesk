@@ -31,7 +31,7 @@ const props = defineProps<{
 }>();
 
 const BUTTON =
-  "flex h-9 min-w-0 max-w-64 cursor-pointer items-center gap-2 rounded-lg pe-2 ps-1.5 transition-colors hover:bg-surface-gray-3";
+  "flex h-9 min-w-0 max-w-64 cursor-pointer items-center gap-2 rounded-5 pe-2 ps-1.5 transition-colors hover:bg-surface-gray-3";
 
 function Brand() {
   return [
@@ -40,7 +40,7 @@ function Brand() {
         src: props.logo,
         alt: "",
         "aria-hidden": "true",
-        class: "size-6 shrink-0 rounded-md object-contain",
+        class: "size-6 shrink-0 rounded-3 object-contain",
       }),
     h(
       "span",
