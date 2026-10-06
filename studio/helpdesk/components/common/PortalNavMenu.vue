@@ -3,7 +3,7 @@
     <template #default="{ open }">
       <button
         type="button"
-        class="flex h-9 min-w-0 max-w-64 cursor-pointer items-center gap-2 rounded-lg pe-2 ps-1.5 transition-colors hover:bg-surface-gray-3"
+        class="flex h-9 min-w-0 max-w-64 cursor-pointer items-center gap-2 rounded-5 pe-2 ps-1.5 transition-colors hover:bg-surface-gray-3"
         :class="open ? 'bg-surface-gray-3' : 'bg-surface-gray-2'"
       >
         <img
@@ -11,7 +11,7 @@
           :src="logo"
           alt=""
           aria-hidden="true"
-          class="size-6 shrink-0 rounded-md object-contain"
+          class="size-6 shrink-0 rounded-3 object-contain"
         />
         <span class="truncate text-base font-medium text-ink-gray-8">
           {{ name }}
