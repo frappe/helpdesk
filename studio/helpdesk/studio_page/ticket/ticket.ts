@@ -104,10 +104,6 @@ export default function setup(context) {
     })),
   )
 
-  const suggestedHeading = computed(() =>
-    __(isRelated.value ? 'Related help' : 'Popular help'),
-  )
-
   // Empty hides the button; as on the desk portal, any open ticket can be closed.
   const pageActionLabel = computed(() => {
     if (!isClosed.value) return __('Close')
@@ -206,7 +202,6 @@ export default function setup(context) {
     confirmSolved,
     reopenTicket,
     suggestedArticles,
-    suggestedHeading,
     openHelpArticle: (article) => (window.location.href = article.url),
   }
 }
