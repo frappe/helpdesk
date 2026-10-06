@@ -648,7 +648,9 @@
                     "truncate",
                     "min-w-0",
                     "flex-1",
-                    "text-ink-gray-8"
+                    "text-ink-gray-8",
+                    "underline-offset-2",
+                    "group-hover:underline"
                    ],
                    "componentId": "TextBlock-ticket-help-link",
                    "componentName": "TextBlock",
@@ -666,12 +668,7 @@
                   "items-center",
                   "gap-2",
                   "h-7",
-                  "-mx-2",
-                  "px-2",
-                  "rounded-4",
-                  "cursor-pointer",
-                  "transition-colors",
-                  "hover:bg-surface-gray-2"
+                  "cursor-pointer"
                  ],
                  "componentEvents": {
                   "click": {
@@ -1066,7 +1063,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 01:40:00.000000",
+ "modified": "2026-10-07 01:50:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
