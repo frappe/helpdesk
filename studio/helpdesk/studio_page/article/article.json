@@ -528,7 +528,7 @@
          "blockName": "not-found",
          "classes": [
           "self-stretch",
-          "xl:col-span-3"
+          "xl:col-span-4"
          ],
          "componentId": "PortalEmptyState-article-not-found",
          "componentName": "PortalEmptyState",
@@ -559,7 +559,6 @@
           "self-start",
           "flex-col",
           "pb-4",
-          "pl-4",
           "pr-3",
           "pt-4",
           "sticky",
@@ -567,9 +566,7 @@
           "w-[300px]",
           "hidden",
           "xl:flex",
-          "xl:col-start-3",
-          "xl:justify-self-end",
-          "xl:me-4"
+          "xl:col-start-4"
          ],
          "componentId": "container-ku83agf6x",
          "componentName": "container",
@@ -582,8 +579,8 @@
         "border-outline-gray-1",
         "grid",
         "grid-cols-1",
-        "xl:grid-cols-[minmax(0,1fr)_minmax(0,700px)_minmax(300px,1fr)]",
-        "xl:gap-x-6",
+        "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
+        "xl:pe-4",
         "flex-1",
         "h-full",
         "min-w-0",
@@ -653,7 +650,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:00:00.000000",
+ "modified": "2026-10-08 06:05:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
