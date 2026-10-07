@@ -53,9 +53,7 @@
           :src="item.recentArticle.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span
-            class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8"
-          >
+          <span class="min-w-0 truncate text-base text-ink-gray-8">
             {{ item.recentArticle.title }}
           </span>
           <span class="truncate text-p-sm text-ink-gray-5">
@@ -81,7 +79,7 @@
         >
           <LucideSearch class="size-4" />
         </span>
-        <span class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8">
+        <span class="min-w-0 truncate text-base text-ink-gray-8">
           {{ __("Search for “{0}”", [searchText]) }}
         </span>
       </div>
@@ -95,7 +93,7 @@
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
-            class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8"
+            class="min-w-0 truncate text-base text-ink-gray-8"
             v-html="item.article.title"
           />
           <span

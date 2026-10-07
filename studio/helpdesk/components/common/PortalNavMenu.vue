@@ -51,7 +51,7 @@ function Brand() {
       "span",
       {
         class:
-          "hidden truncate text-base-medium leading-tight text-ink-gray-9 sm:block",
+          "hidden truncate text-base-medium text-ink-gray-9 sm:block",
       },
       props.name
     ),

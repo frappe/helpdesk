@@ -185,8 +185,7 @@
              },
              "classes": [
               "text-ink-gray-8",
-              "font-bold",
-              "leading-[1.25]"
+              "font-bold"
              ]
             },
             {
@@ -234,8 +233,7 @@
                 "text": "{{ articleCount }}"
                },
                "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
+                "text-ink-gray-5"
                ]
               }
              ]
@@ -319,7 +317,6 @@
                     "text-ink-gray-8",
                     "font-medium",
                     "truncate",
-                    "leading-snug",
                     "group-hover:text-ink-gray-9",
                     "max-sm:whitespace-normal",
                     "max-sm:line-clamp-2"
@@ -470,7 +467,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 01:00:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
