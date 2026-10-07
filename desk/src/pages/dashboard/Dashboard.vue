@@ -100,10 +100,9 @@
           v-for="(config, index) in numberCards.data"
           :text="config.tooltip"
         >
-          <NumberChart
+          <NumberCard
             :key="index"
-            class="border rounded-5 min-h-[114px]"
-            :config="config"
+            v-bind="toNumberCardProps(config, deltaCaption)"
           />
         </Tooltip>
       </div>
@@ -118,9 +117,9 @@
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -139,9 +138,9 @@
         >
           <template v-for="(chart, index) in masterData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -161,9 +160,9 @@
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -226,8 +225,31 @@ import {
   dayjs,
   usePageMeta,
 } from "frappe-ui";
-import { AxisChart, DonutChart, NumberChart } from "frappe-ui/experimental";
-import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import {
+  AreaChart,
+  BarChart,
+  ChartCard,
+  DonutChart,
+  LineChart,
+  NumberCard,
+} from "frappe-ui/charts";
+import {
+  type AxisChartConfig,
+  type AxisChartKind,
+  getAxisChartKind,
+  toAxisChartProps,
+  toDonutChartProps,
+  toNumberCardProps,
+} from "./dashboardCharts";
+import {
+  type Component,
+  computed,
+  h,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 const { isMobileView } = useScreenSize();
@@ -272,18 +294,6 @@ const dashboardTitle = computed(() => {
   return viewMyStats.value ? __("My Dashboard") : __("Organization Dashboard");
 });
 
-const colors = [
-  "#318AD8",
-  "#F683AE",
-  "#48BB74",
-  "#F56B6B",
-  "#FACF7A",
-  "#44427B",
-  "#5FD8C4",
-  "#F8814F",
-  "#15CCEF",
-  "#A6B1B9",
-];
 interface ChartEmptyState {
   // header of the card, shown untranslated only when the chart itself is missing
   chartTitle: string;
@@ -506,17 +516,19 @@ const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
 
+const axisChartComponents: Record<AxisChartKind, Component> = {
+  line: LineChart,
+  area: AreaChart,
+  bar: BarChart,
+};
+
 function getChartType(chart: any) {
-  chart.colors = colors;
   if (chart["type"] === "axis") {
-    return h(AxisChart, {
-      config: chart,
-    });
+    const component = axisChartComponents[getAxisChartKind(chart)];
+    return h(component, toAxisChartProps(chart as AxisChartConfig));
   }
   if (chart["type"] === "pie") {
-    return h(DonutChart, {
-      config: chart,
-    });
+    return h(DonutChart, toDonutChartProps(chart));
   }
 }
 
@@ -529,6 +541,15 @@ function getLastXDays(range: number = 30): string {
     "YYYY-MM-DD"
   )}`;
 }
+
+// The API compares against the period of the same length just before this one.
+const deltaCaption = computed(() => {
+  const [from, to] = (filters.period || "").split(",");
+  if (!from || !to) return undefined;
+  const days = dayjs(to).diff(dayjs(from), "day");
+  if (days <= 0) return __("vs yesterday");
+  return __("vs prev. {0} days", [days]);
+});
 
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
