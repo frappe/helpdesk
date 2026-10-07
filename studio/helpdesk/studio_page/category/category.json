@@ -131,18 +131,15 @@
        "classes": [
         "items-start",
         "border-outline-gray-1",
-        "flex",
+        "grid",
+        "grid-cols-1",
+        "xl:grid-cols-[minmax(0,1fr)_minmax(0,700px)_minmax(220px,1fr)]",
+        "xl:gap-x-6",
         "flex-1",
-        "flex-row",
         "h-full",
-        "mx-auto",
-        "ml-0",
-        "max-w-[1200px]",
         "min-w-0",
         "overflow-y-auto",
         "pb-10",
-        "pl-0",
-        "pr-0",
         "relative",
         "w-full",
         "pt-6",
@@ -155,7 +152,6 @@
          "originalElement": "div",
          "classes": [
           "flex",
-          "flex-1",
           "flex-col",
           "mt-0",
           "max-w-[700px]",
@@ -165,10 +161,7 @@
           "px-4",
           "sm:px-6",
           "xl:px-0",
-          "xl:ml-16",
-          "xl:mr-10",
-          "min-[1440px]:ml-[170px]",
-          "min-[1440px]:mr-[70px]"
+          "xl:col-start-2"
          ],
          "children": [
           {
@@ -417,8 +410,8 @@
         {
          "blockName": "not-found",
          "classes": [
-          "flex-1",
-          "self-stretch"
+          "self-stretch",
+          "xl:col-span-3"
          ],
          "componentId": "PortalEmptyState-category-not-found",
          "componentName": "PortalEmptyState",
@@ -477,7 +470,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 21:00:00.000000",
+ "modified": "2026-10-08 00:30:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
