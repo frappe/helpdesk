@@ -148,8 +148,6 @@ PUBLIC_ARTICLE_FIELDS = [
     "views",
 ]
 PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon", "pinned"]
-# Avatars on the all-categories list.
-CREATOR_LIMIT = 3
 EXCERPT_LENGTH = 140
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
@@ -252,9 +250,8 @@ def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_categories(with_creators: bool = False) -> list[dict]:
-    """Only those with an article the reader may see, each with `article_count`,
-    and with `with_creators`, its first few authors and how many there are."""
+def get_categories() -> list[dict]:
+    """Only those with an article the reader may see, each with `article_count`."""
     validate_public_access()
     counts = readable_article_counts()
     if not counts:
@@ -265,30 +262,9 @@ def get_categories(with_creators: bool = False) -> list[dict]:
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
     )
-    authors = readable_authors() if cint(with_creators) else None
     for category in categories:
         category.article_count = counts[category.name]
-        if authors is not None:
-            names = authors.get(category.name, [])
-            category.creators = [byline(name) for name in names[:CREATOR_LIMIT]]
-            category.creator_count = len(names)
     return categories
-
-
-def readable_authors() -> dict[str, list[str]]:
-    """Each category's authors of readable articles, the most prolific first."""
-    rows = frappe.get_all(
-        "HD Article",
-        filters=readable_filters(category=["is", "set"]),
-        fields=["category", "author", {"COUNT": "*", "as": "total"}],
-        group_by="category, author",
-        order_by="total desc",
-        as_list=True,
-    )
-    authors = {}
-    for category, author, _total in rows:
-        authors.setdefault(category, []).append(author)
-    return authors
 
 
 def readable_article_counts() -> dict[str, int]:

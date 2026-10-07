@@ -47,18 +47,163 @@
          "componentId": "TextBlock-fbq9hffj6-all",
          "componentName": "TextBlock",
          "componentProps": {
-          "fontSize": "text-2xl",
+          "fontSize": "text-lg",
           "tag": "h1",
           "text": "{{ t(\"All categories\") }}"
          }
         },
         {
-         "componentId": "PortalCategoryList-all",
-         "componentName": "PortalCategoryList",
-         "componentProps": {
-          "categories": "{{ categories.data || [] }}"
-         },
-         "isCustomVueComponent": true
+         "blockName": "categories-grid",
+         "children": [
+          {
+           "baseStyles": {
+            "display": "grid",
+            "gap": "10px",
+            "gridAutoColumns": "minmax(0, 1fr)",
+            "height": "auto",
+            "width": "100%"
+           },
+           "children": [
+            {
+             "blockName": "category-card",
+             "children": [
+              {
+               "classes": [
+                "size-6",
+                "text-ink-gray-8"
+               ],
+               "componentId": "Icon-category-card-all",
+               "componentName": "Icon",
+               "componentProps": {
+                "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+               }
+              },
+              {
+               "blockName": "card-icon-wrapper",
+               "classes": [
+                "items-center",
+                "hidden",
+                "shrink-0",
+                "h-9",
+                "justify-center",
+                "mb-1",
+                "w-fit"
+               ],
+               "componentId": "container-rf6xi6a78-all",
+               "componentName": "container",
+               "originalElement": "div"
+              },
+              {
+               "blockName": "container",
+               "children": [
+                {
+                 "blockName": "category-title",
+                 "classes": [
+                  "text-ink-gray-7",
+                  "font-semibold",
+                  "leading-[1.15]"
+                 ],
+                 "componentId": "TextBlock-sn7kwi5gk-all",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-lg",
+                  "tag": "h3",
+                  "text": "{{ dataItem.category_name }}"
+                 }
+                },
+                {
+                 "blockName": "category-description",
+                 "classes": [
+                  "line-clamp-2",
+                  "text-ink-gray-5",
+                  "grow-0"
+                 ],
+                 "componentId": "TextBlock-2jee9t8sl-all",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-p-base",
+                  "tag": "p",
+                  "text": "{{ dataItem.description || t('Browse articles in this category') }}"
+                 }
+                }
+               ],
+               "classes": [
+                "flex",
+                "flex-col",
+                "shrink",
+                "gap-1",
+                "h-fit",
+                "min-w-0",
+                "w-full"
+               ],
+               "componentId": "container-fynnwc9gx-all",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "transition",
+              "hover:bg-surface-gray-1",
+              "items-start",
+              "border-outline-gray-2",
+              "rounded-5",
+              "border",
+              "cursor-pointer",
+              "flex",
+              "flex-col",
+              "gap-2.5",
+              "justify-center",
+              "overflow-hidden",
+              "pb-4",
+              "pl-5",
+              "pr-5",
+              "pt-4",
+              "w-full",
+              "sm:min-h-[132px]",
+              "max-sm:flex-row",
+              "max-sm:items-start",
+              "max-sm:gap-3",
+              "max-sm:px-4",
+              "max-sm:py-3.5"
+             ],
+             "componentEvents": {
+              "click": {
+               "action": "Run Script",
+               "event": "click",
+               "oldEvent": "click",
+               "script": "router.push({ path: `/category/${dataItem.name}` })\n"
+              }
+             },
+             "componentId": "container-fvud8e41t-all",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "grid-cols-1",
+            "sm:grid-cols-2",
+            "lg:grid-cols-3"
+           ],
+           "componentId": "Repeater-sxfnpzbam-all",
+           "componentName": "Repeater",
+           "componentProps": {
+            "data": "{{ categories.data || [] }}",
+            "dataKey": "name"
+           },
+           "visibilityCondition": "{{ categories.data && categories.data.length }}"
+          }
+         ],
+         "classes": [
+          "items-stretch",
+          "grid",
+          "gap-3",
+          "grid-cols-1",
+          "justify-stretch",
+          "w-auto"
+         ],
+         "componentId": "container-3jcpczdo3-all",
+         "componentName": "container",
+         "originalElement": "div"
         }
        ],
        "classes": [
@@ -118,7 +263,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 19:00:00.000000",
+ "modified": "2026-10-07 20:00:00.000000",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",
@@ -131,7 +276,7 @@
    "fetch_document_using_filters": 0,
    "limit": 0,
    "method": "GET",
-   "params": "{\"with_creators\": 1}",
+   "params": "{}",
    "resource_name": "categories",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_categories"
