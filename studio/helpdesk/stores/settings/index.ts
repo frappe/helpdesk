@@ -57,6 +57,14 @@ const settingsTab = computed({
   },
 })
 
+// Like the desk's, the dialog stays open while the Knowledge Base tab has unsaved changes.
+const isSettingsOpen = computed({
+  get: () => core.isSettingsOpen.value,
+  set: (open) => {
+    if (open || !knowledgeBaseDraft.value?.isDirty.value) core.isSettingsOpen.value = open
+  },
+})
+
 // The Knowledge Base panel's header buttons; the panel's form makes the draft.
 const knowledgeBase = {
   kbIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
@@ -95,7 +103,7 @@ const store = {
   customActions: [],
   // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
-  isSettingsOpen: core.isSettingsOpen,
+  isSettingsOpen,
   settingsTab,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
