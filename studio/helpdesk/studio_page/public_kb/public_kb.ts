@@ -14,12 +14,13 @@ export default function setup(context) {
   const { config } = settings
 
   // Settings' Preview shows its unsaved banner and pins in place of the saved ones.
-  const preview = readKbPreview()
-  const bannerImage = computed(() => (preview ? preview.banner_image : config.value?.banner_image))
+  // Read again with each session reload: saving the settings clears a stored preview.
+  const preview = computed(() => config.value && readKbPreview())
+  const bannerImage = computed(() => (preview.value ? preview.value.banner_image : config.value?.banner_image))
 
   // An uploaded image sits under a dark scrim, so it always takes white text.
   const bannerPreset = computed(() =>
-    bannerImage.value ? null : findBannerPreset(preview ? preview.banner_preset : config.value?.banner_preset),
+    bannerImage.value ? null : findBannerPreset(preview.value ? preview.value.banner_preset : config.value?.banner_preset),
   )
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
   const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
@@ -30,7 +31,7 @@ export default function setup(context) {
   // Only the pinned categories, unless none are.
   const homeCategories = computed(() => {
     const rows = categories.data || []
-    const pinned = rows.filter((row) => (preview ? preview.pinned.includes(row.name) : row.pinned))
+    const pinned = rows.filter((row) => (preview.value ? preview.value.pinned.includes(row.name) : row.pinned))
     return pinned.length ? pinned : rows
   })
 

@@ -137,6 +137,7 @@ function createDraft() {
       }
       if (changed.value.includes("pinned")) await savePinned(value.pinned);
       if (changed.value.includes("links")) await saveLinks(value.links);
+      clearPreview();
       await Promise.all([
         settings.reload(),
         categories.reload(),
@@ -193,6 +194,13 @@ function createDraft() {
 
   function discard() {
     draft.value = JSON.parse(JSON.stringify(saved.value));
+  }
+
+  // Preview tabs read the stored look until it's gone, so a save must not leave them on the old draft.
+  function clearPreview() {
+    try {
+      localStorage.removeItem(KB_PREVIEW_KEY);
+    } catch {}
   }
 
   function preview() {
