@@ -6,7 +6,7 @@
       }}</span>
       <span class="text-p-sm text-ink-gray-6">{{
         __(
-          "Choose a color, pattern or image to show behind the search bar on the knowledge base home page. Recommended image size is minimum 1440x240 px in PNG or JPG."
+          "Choose a color, pattern or image to show behind the search bar to customize your knowledge base home page. For custom images recommended image size is minimum 1440x240 px in PNG or JPG."
         )
       }}</span>
     </div>
