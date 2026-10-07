@@ -13,10 +13,10 @@ export const BANNER_PRESETS = [
   { name: "Blue", background: tint("blue") },
   { name: "Violet", background: tint("violet") },
   {
-    name: "Dots",
-    background: `radial-gradient(circle, var(--outline-gray-4) 1px, transparent 1.5px) 0 0 / ${cell(
-      16
-    )} ${cell(16)}, ${tint("gray")}`,
+    name: "Lines",
+    background: `repeating-linear-gradient(135deg, var(--outline-gray-2) 0 1px, transparent 1px ${cell(
+      10
+    )}), ${tint("gray")}`,
   },
 ] as const;
 
