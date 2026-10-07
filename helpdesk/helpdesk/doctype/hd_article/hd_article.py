@@ -6,7 +6,12 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
-from helpdesk.api.knowledge_base import is_readable, readable_audiences
+from helpdesk.api.knowledge_base import (
+    PUBLIC,
+    category_visibility,
+    is_readable,
+    readable_audiences,
+)
 from helpdesk.utils import capture_event
 
 
@@ -26,6 +31,9 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
+        # Public is also the default, so it yields to the access the category shares.
+        if self.visibility == PUBLIC and self.category:
+            self.visibility = category_visibility(self.category) or PUBLIC
 
     def before_save(self):
         # set published date of the hd_article

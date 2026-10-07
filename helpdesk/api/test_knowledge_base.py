@@ -16,7 +16,10 @@ from helpdesk.api.knowledge_base import (
     get_public_article_titles,
     get_public_articles,
     increment_views,
+    merge_category,
+    move_to_category,
     search_articles,
+    set_category_visibility,
     vote_on_article,
 )
 from helpdesk.search_sqlite import HelpdeskArticleSearch
@@ -419,6 +422,114 @@ class TestArticlePermissions(IntegrationTestCase):
         self.assertFalse(
             frappe.has_permission("HD Article", "read", internal, user=self.customer)
         )
+
+
+class TestCategoryAccess(IntegrationTestCase):
+    """A category's access is the one its articles share; setting it sets them all."""
+
+    def setUp(self) -> None:
+        enable_public_knowledge_base()
+        self.customer = create_contact("Fixture Reader", "fixture.reader@example.com")[
+            "user"
+        ]
+        self.category = make_article_category("Fixture Access")
+        self.articles = [
+            make_article("Fixture access one", category=self.category.name),
+            make_article("Fixture access two", category=self.category.name),
+        ]
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def visibility(self, name) -> str:
+        return frappe.db.get_value("HD Article", name, "visibility")
+
+    def listed(self, user) -> bool:
+        frappe.set_user(user)
+        names = [row["name"] for row in get_categories()]
+        frappe.set_user("Administrator")
+        return self.category.name in names
+
+    def test_agents_only_hides_the_category_and_everything_in_it(self) -> None:
+        set_category_visibility(self.category.name, "Agents only")
+
+        self.assertEqual({self.visibility(a) for a in self.articles}, {"Agents only"})
+        self.assertFalse(self.listed("Guest"))
+        self.assertFalse(self.listed(self.customer))
+
+        set_category_visibility(self.category.name, "Public")
+
+        self.assertTrue(self.listed("Guest"))
+
+    def test_an_unknown_access_is_refused(self) -> None:
+        self.assertRaises(
+            frappe.ValidationError,
+            set_category_visibility,
+            self.category.name,
+            "Everyone",
+        )
+
+    def test_a_customer_cannot_set_it(self) -> None:
+        frappe.set_user(self.customer)
+
+        self.assertRaises(
+            frappe.PermissionError,
+            set_category_visibility,
+            self.category.name,
+            "Public",
+        )
+
+    def test_a_new_article_takes_the_access_its_category_shares(self) -> None:
+        set_category_visibility(self.category.name, "Customers only")
+
+        new = make_article("Fixture access new", category=self.category.name)
+
+        self.assertEqual(self.visibility(new), "Customers only")
+
+    def test_a_new_article_in_a_mixed_category_starts_public(self) -> None:
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", "Agents only")
+
+        new = make_article("Fixture access mixed", category=self.category.name)
+
+        self.assertEqual(self.visibility(new), "Public")
+
+    def test_an_explicit_access_is_kept(self) -> None:
+        new = make_article(
+            "Fixture access explicit",
+            category=self.category.name,
+            visibility="Agents only",
+        )
+
+        self.assertEqual(self.visibility(new), "Agents only")
+
+    def test_moving_in_takes_the_access_the_category_shares(self) -> None:
+        set_category_visibility(self.category.name, "Agents only")
+        other = make_article_category("Fixture Access Other")
+        moved = make_article("Fixture access moved", category=other.name)
+        make_article("Fixture access stays", category=other.name)
+
+        move_to_category(self.category.name, [moved])
+
+        self.assertEqual(self.visibility(moved), "Agents only")
+
+    def test_moving_into_a_mixed_category_keeps_the_article_s_access(self) -> None:
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", "Agents only")
+        other = make_article_category("Fixture Access Other")
+        moved = make_article("Fixture access moved", category=other.name)
+        make_article("Fixture access stays", category=other.name)
+
+        move_to_category(self.category.name, [moved])
+
+        self.assertEqual(self.visibility(moved), "Public")
+
+    def test_merging_in_takes_the_access_the_category_shares(self) -> None:
+        set_category_visibility(self.category.name, "Agents only")
+        other = make_article_category("Fixture Access Merged")
+        merged = make_article("Fixture access merged", category=other.name)
+
+        merge_category(other.name, self.category.name)
+
+        self.assertEqual(self.visibility(merged), "Agents only")
 
 
 class TestSearch(IntegrationTestCase):
