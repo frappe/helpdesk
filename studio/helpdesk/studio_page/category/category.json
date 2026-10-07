@@ -224,6 +224,15 @@
              "blockName": "meta-row",
              "children": [
               {
+               "componentId": "category-byline",
+               "componentName": "PortalCategoryByline",
+               "componentProps": {
+                "creatorCount": "{{ category?.creator_count }}",
+                "creators": "{{ category?.creators }}"
+               },
+               "isCustomVueComponent": true
+              },
+              {
                "componentId": "category-article-count",
                "componentName": "TextBlock",
                "componentProps": {
@@ -468,7 +477,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 19:00:00.000000",
+ "modified": "2026-10-07 21:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -501,7 +510,7 @@
    "fetch_document_using_filters": 0,
    "limit": 0,
    "method": "GET",
-   "params": "{}",
+   "params": "{\"with_creators\": 1}",
    "resource_name": "categories",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_categories"

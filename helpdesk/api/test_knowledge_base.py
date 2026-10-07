@@ -219,6 +219,26 @@ class TestPublicReads(IntegrationTestCase):
 
         self.assertEqual(category.article_count, 1)
 
+    def test_creators_come_most_prolific_first_without_emails(self) -> None:
+        author = make_agent("fixture.kb.author@example.com", "Fixture Author")
+        frappe.set_user(author)
+        self.make_article("Fixture by author")
+        self.make_article("Fixture by author again")
+        frappe.set_user("Administrator")
+
+        [category] = [
+            row
+            for row in get_categories(with_creators=True)
+            if row["name"] == self.category.name
+        ]
+
+        self.assertEqual(category.creator_count, 2)
+        self.assertEqual(
+            category.creators[0]["name"],
+            frappe.db.get_value("User", author, "full_name"),
+        )
+        self.assertEqual(set(category.creators[0]), BYLINE_FIELDS)
+
     def test_a_category_carries_its_description(self) -> None:
         [category] = [
             row for row in get_categories() if row["name"] == self.category.name
