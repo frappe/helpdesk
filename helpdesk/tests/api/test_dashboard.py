@@ -9,6 +9,7 @@ from helpdesk.test_utils import (
     create_agent,
     create_contact,
     make_agent_manager,
+    make_assigned_ticket,
     make_sla,
     make_tagged_ticket,
     make_team,
@@ -72,6 +73,37 @@ class TestSlaFulfilledCard(IntegrationTestCase):
             from_date=add_days(nowdate(), -1), to_date=nowdate(), agent=AGENT
         )
         return HelpdeskDashboard(filters).get_sla_fulfilled_count()
+
+
+class TestNumberCardDelta(IntegrationTestCase):
+    """Number cards compare against the period of the same length just before."""
+
+    AGENT = "dashboard-delta-agent@example.com"
+
+    def setUp(self):
+        create_agent(self.AGENT)
+
+    def test_cards_show_no_change_without_a_previous_period(self):
+        with self.freeze_time("2031-05-10 10:00:00"):
+            make_assigned_ticket(self.AGENT, "Only ticket", status="Closed")
+
+        for card in self.get_cards("2031-05-10", "2031-05-10"):
+            self.assertIsNone(card["delta"], card["title"])
+
+    def test_ticket_count_changes_against_the_previous_period(self):
+        with self.freeze_time("2031-06-09 10:00:00"):
+            make_assigned_ticket(self.AGENT, "Yesterday")
+        with self.freeze_time("2031-06-10 10:00:00"):
+            make_assigned_ticket(self.AGENT, "Today")
+            make_assigned_ticket(self.AGENT, "Today again")
+
+        [tickets, *_] = self.get_cards("2031-06-10", "2031-06-10")
+        self.assertEqual(tickets["value"], 2)
+        self.assertEqual(tickets["delta"], 100)
+
+    def get_cards(self, from_date: str, to_date: str) -> list[dict]:
+        filters = frappe._dict(from_date=from_date, to_date=to_date, agent=self.AGENT)
+        return HelpdeskDashboard(filters).get_number_card_data()
 
 
 class TestTagDashboard(IntegrationTestCase):
