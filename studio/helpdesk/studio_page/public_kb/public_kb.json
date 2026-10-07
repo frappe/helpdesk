@@ -438,18 +438,54 @@
        "blockName": "articles-section",
        "children": [
         {
+         "componentId": "container-category-picker-heading",
+         "componentName": "container",
+         "originalElement": "div",
          "classes": [
-          "text-ink-gray-9",
-          "font-semibold",
-          "leading-[1.15]"
+          "flex",
+          "items-center",
+          "justify-between",
+          "gap-4"
          ],
-         "componentId": "TextBlock-category-picker-title",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-lg",
-          "tag": "h2",
-          "text": "{{ t(\"What do you need help with?\") }}"
-         },
+         "blockName": "category-picker-heading",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-9",
+            "font-semibold",
+            "leading-[1.15]"
+           ],
+           "componentId": "TextBlock-category-picker-title",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-lg",
+            "tag": "h2",
+            "text": "{{ t(\"What do you need help with?\") }}"
+           }
+          },
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push({ path: '/categories' })"
+            }
+           },
+           "classes": [
+            "!bg-transparent",
+            "!px-0",
+            "hover:underline",
+            "underline-offset-2"
+           ],
+           "componentId": "Button-view-all-categories-picker",
+           "componentName": "Button",
+           "componentProps": {
+            "label": "{{ t('View all categories') }}",
+            "variant": "ghost"
+           },
+           "visibilityCondition": "{{ hasHiddenCategories }}"
+          }
+         ],
          "visibilityCondition": "{{ hasCategoryPicker }}"
         },
         {
@@ -685,6 +721,28 @@
             "vertical": false
            },
            "visibilityCondition": "{{ !isLoneCategory }}"
+          },
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push({ path: '/categories' })"
+            }
+           },
+           "classes": [
+            "!bg-transparent",
+            "!px-0",
+            "hover:underline",
+            "underline-offset-2"
+           ],
+           "componentId": "Button-view-all-categories-lone",
+           "componentName": "Button",
+           "componentProps": {
+            "label": "{{ t('View all categories') }}",
+            "variant": "ghost"
+           },
+           "visibilityCondition": "{{ isLoneCategory && hasHiddenCategories }}"
           }
          ],
          "classes": [
@@ -921,7 +979,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 18:45:00.000000",
+ "modified": "2026-10-07 22:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
