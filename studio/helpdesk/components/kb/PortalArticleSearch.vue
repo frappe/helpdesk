@@ -49,7 +49,7 @@
         class="recent-article flex min-w-0 flex-1 items-center gap-3"
       >
         <PortalArticleThumbnail
-          class="!size-4 [&_svg]:!size-4"
+          class="!size-4 !rounded-[4px] [&_svg]:!size-4 [&:is(img)]:border [&:is(img)]:border-outline-gray-2"
           :src="item.recentArticle.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
