@@ -5,7 +5,7 @@
       variant="outline"
       class="rounded-e-none"
       :label="__('Copy for LLM')"
-      :icon-left="copied ? 'lucide-check' : 'lucide-copy'"
+      icon-left="lucide-copy"
       @click="copyMarkdown"
     />
     <Dropdown :options="options" align="end">
@@ -46,7 +46,7 @@ const props = withDefaults(
 );
 
 // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
-const { copy, copied } = useClipboard({ legacy: true });
+const { copy } = useClipboard({ legacy: true });
 
 // Prefetched: Safari drops a clipboard write that waits on the network.
 const markdown = ref("");
