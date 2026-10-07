@@ -3,6 +3,7 @@ import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
 import { bindRouter, navigateTo } from '@app/stores/router'
+import { askConfirm } from '@app/utils'
 import { useSession } from '@app/stores/session'
 import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft.ts'
 import { createSettingsCore, createSettingsDialog } from './core'
@@ -33,6 +34,28 @@ const themeOptions = computed(() => [
   { label: __('Dark'), value: 'dark' },
   { label: __('System'), value: 'system' },
 ])
+
+// Leaving the Knowledge Base tab with unsaved changes asks first, as the desk's settings do.
+const settingsTab = computed({
+  get: () => core.settingsTab.value,
+  set: (tab) => {
+    if (tab === core.settingsTab.value) return
+    const draft = knowledgeBaseDraft.value
+    if (!draft?.isDirty.value) {
+      core.settingsTab.value = tab
+      return
+    }
+    askConfirm({
+      title: __('Unsaved changes'),
+      message: __('Are you sure you want to change tabs? Unsaved changes will be lost.'),
+      label: __('Confirm'),
+      action: () => {
+        draft.discard()
+        core.settingsTab.value = tab
+      },
+    })
+  },
+})
 
 // The Knowledge Base panel's header buttons; the panel's form makes the draft.
 const knowledgeBase = {
@@ -73,7 +96,7 @@ const store = {
   // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
   isSettingsOpen: core.isSettingsOpen,
-  settingsTab: core.settingsTab,
+  settingsTab,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,

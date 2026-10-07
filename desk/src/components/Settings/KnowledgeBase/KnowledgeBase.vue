@@ -43,6 +43,20 @@ import { __ } from "@/translation";
 import KnowledgeBaseForm from "@helpdesk/shared/settings/KnowledgeBaseForm.vue";
 import { useKnowledgeBaseDraft } from "@helpdesk/shared/settings/knowledgeBaseDraft.ts";
 import { Button } from "frappe-ui";
+import { onUnmounted, watch } from "vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
-const { isDirty, canPreview, saving, save, preview } = useKnowledgeBaseDraft();
+const { isDirty, canPreview, saving, save, discard, preview } =
+  useKnowledgeBaseDraft();
+
+// Unsaved changes hold the modal open and make a tab change ask first, as General does.
+watch(isDirty, (dirty) => (disableSettingModalOutsideClick.value = dirty), {
+  immediate: true,
+});
+
+// The draft outlives this tab, so changes left behind by a confirmed tab change go here.
+onUnmounted(() => {
+  if (isDirty.value) discard();
+  disableSettingModalOutsideClick.value = false;
+});
 </script>
