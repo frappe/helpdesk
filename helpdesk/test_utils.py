@@ -206,6 +206,7 @@ def make_form_script(
     body: str,
     apply_to_customer_portal: bool = False,
     apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
 ):
     """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
     frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
@@ -218,6 +219,7 @@ def make_form_script(
             "enabled": 1,
             "apply_to_customer_portal": int(apply_to_customer_portal),
             "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
             "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()
@@ -331,6 +333,28 @@ def get_customer_ticket(email: str):
     ticket = make_ticket(raised_by=email)
     frappe.set_user(email)
     return frappe.get_doc("HD Ticket", ticket.name)
+
+
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
+
+
+def enable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+
+
+def disable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+
+
+def enable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+
+
+def disable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 0)
 
 
 def create_agent(
@@ -864,16 +888,19 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    **values,
 ) -> str:
     """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
             {
                 "doctype": "HD Article",
-                "title": title or unique_name("Test Article"),
-                "content": "<p>Open settings and click reset.</p>",
+                "title": title,
+                "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                **values,
             }
         )
         .insert(ignore_permissions=True)

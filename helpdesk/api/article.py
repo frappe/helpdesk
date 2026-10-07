@@ -6,10 +6,10 @@ from frappe.utils import strip_html_tags
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
+from helpdesk.api.knowledge_base import is_readable, readable_filters
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
 from helpdesk.search_sqlite import HelpdeskArticleSearch
-from helpdesk.utils import is_agent
 
 RELATED_LIMIT = 3
 
@@ -64,10 +64,13 @@ def sanitize_query(query: str) -> str:
 
 @frappe.whitelist()
 def get_article_stats(article_name: str):
-    views, status = frappe.db.get_value(
-        "HD Article", article_name, ["views", "status"]
-    ) or (None, None)
-    if not is_agent() and status != "Published":
+    article = (
+        frappe.db.get_value(
+            "HD Article", article_name, ["views", "status", "visibility"], as_dict=True
+        )
+        or {}
+    )
+    if not is_readable(article):
         frappe.throw(_("Access denied"), frappe.PermissionError)
 
     likes = frappe.db.count(
@@ -87,7 +90,7 @@ def get_article_stats(article_name: str):
     )
 
     return {
-        "views": views,
+        "views": article.get("views"),
         "likes": likes,
         "dislikes": dislikes,
     }
@@ -123,8 +126,16 @@ def get_related(query: str) -> list[dict]:
     search = HelpdeskArticleSearch()
     if not search.index_exists():
         return []
-    results = search.search(query)["results"][:RELATED_LIMIT]
+    results = search.search(query)["results"]
+    # The index knows status, not audience.
+    readable = frappe.get_all(
+        "HD Article",
+        filters=readable_filters(name=["in", [row["name"] for row in results]]),
+        pluck="name",
+    )
     # Titles come back with the highlighter's <mark> tags; a link list shows plain text.
     return [
-        {"name": row["name"], "title": strip_html_tags(row["title"])} for row in results
-    ]
+        {"name": row["name"], "title": strip_html_tags(row["title"])}
+        for row in results
+        if row["name"] in readable
+    ][:RELATED_LIMIT]

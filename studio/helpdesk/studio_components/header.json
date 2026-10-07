@@ -5,7 +5,9 @@
    "display": "flex",
    "height": "fit-content",
    "justifyContent": "space-between",
-   "width": "100%"
+   "width": "100%",
+   "minWidth": "0",
+   "gap": "12px"
   },
   "children": [
    {
@@ -16,8 +18,9 @@
      "flexShrink": 1,
      "gap": "8px",
      "height": "fit-content",
-     "justifyContent": "center",
-     "width": "fit-content"
+     "justifyContent": "flex-start",
+     "width": "fit-content",
+     "minWidth": "0"
     },
     "blockName": "container",
     "children": [
@@ -37,7 +40,7 @@
       "componentId": "Breadcrumbs-header",
       "componentName": "Breadcrumbs",
       "componentProps": {
-       "items": "{{ (inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(route.path === '/' ? [] : [{ label: inputs.crumb || route.name }]) }}"
+       "items": "{{ (inputs.parentCrumb ? [{ label: inputs.parentCrumb, route: inputs.parentRoute }] : []).concat(inputs.crumb ? [{ label: inputs.crumb }] : []) }}"
       },
       "componentSlots": {},
       "visibilityCondition": "{{ !inputs.currentView }}"
@@ -72,10 +75,61 @@
      "alignItems": "center",
      "display": "flex",
      "flexDirection": "row",
-     "gap": "12px"
+     "gap": "12px",
+     "flexShrink": 0
     },
     "blockName": "header-right",
     "children": [
+     {
+      "componentId": "PortalCustomActions-header",
+      "componentName": "PortalCustomActions",
+      "componentProps": {
+       "actions": "{{ customActions }}"
+      },
+      "componentSlots": {},
+      "isCustomVueComponent": true,
+      "visibilityCondition": "{{ customActions.length }}"
+     },
+     {
+      "baseStyles": {
+       "alignItems": "center",
+       "display": "flex",
+       "gap": "4px"
+      },
+      "blockName": "header-tail",
+      "children": [
+       {
+        "componentId": "PortalHeaderLinks-header",
+        "componentName": "PortalHeaderLinks",
+        "componentProps": {
+         "links": "{{ headerLinks }}"
+        },
+        "isCustomVueComponent": true
+       },
+       {
+        "componentEvents": {
+         "click": {
+          "action": "Run Script",
+          "event": "click",
+          "script": "toggleTheme()"
+         }
+        },
+        "componentId": "Button-theme",
+        "componentName": "Button",
+        "componentProps": {
+         "aria-label": "{{ t('Toggle theme') }}",
+         "icon": "{{ themeIcon }}",
+         "variant": "ghost"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ themeIcon }}"
+       }
+      ],
+      "componentId": "container-header-tail",
+      "componentName": "container",
+      "originalElement": "div",
+      "visibilityCondition": "{{ headerLinks.length || themeIcon }}"
+     },
      {
       "componentEvents": {
        "click": {
@@ -90,18 +144,8 @@
        "label": "{{ t('Log in') }}",
        "variant": "solid"
       },
-      "componentSlots": {},
-      "visibilityCondition": "{{ isGuest }}"
-     },
-     {
-      "componentId": "PortalCustomActions-header",
-      "componentName": "PortalCustomActions",
-      "componentProps": {
-       "actions": "{{ customActions }}"
-      },
-      "componentSlots": {},
-      "isCustomVueComponent": true,
-      "visibilityCondition": "{{ customActions.length }}"
+      "visibilityCondition": "{{ isGuest }}",
+      "componentSlots": {}
      },
      {
       "componentEvents": {
@@ -177,7 +221,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-07 04:00:00.000000",
+ "modified": "2026-10-07 06:30:00.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

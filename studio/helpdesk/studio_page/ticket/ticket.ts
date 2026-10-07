@@ -1,7 +1,9 @@
-import { computed, ref, watch } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 import { createResource, dayjs, toast } from 'frappe-ui'
+import LucideCircleCheck from '~icons/lucide/circle-check'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
+import { useDrawer } from '@app/composables/useDrawer'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
 import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
@@ -10,15 +12,10 @@ import { useTicketThread } from '@app/composables/useTicketThread'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import {
-  CLOSED_STATUS,
-  isClosedStatus,
-  isResolvedStatus,
-  loadTicketMeta,
-} from '@app/stores/ticketMeta'
+import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
 import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
 
-// Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
+// Used when HD Settings has no `confirm_resolution_after_days`.
 const RESOLVED_PROMPT_DAYS = 5
 const REOPENED_STATUS = 'Open'
 
@@ -26,7 +23,7 @@ export default function setup(context) {
   const { route } = context
   const settings = useSettingsModal(context)
   const { config } = settings
-  // The composer shows the reader's own avatar, which rides on the settings payload.
+  // The composer shows the reader's avatar, which comes with the settings payload.
   settings.loadSettings()
   loadTicketMeta()
 
@@ -73,6 +70,31 @@ export default function setup(context) {
   const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
 
+  // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
+  const timelineChanges = createResource({
+    url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_timeline_changes',
+    method: 'GET',
+    makeParams: () => ({ name: ticketId.value }),
+  })
+  watch(
+    () => ticket.data?.modified,
+    (modified) => modified && timelineChanges.fetch(),
+    { immediate: true },
+  )
+
+  const timelineEvents = computed(() =>
+    (timelineChanges.data || [])
+      .filter((change) => change.field === 'status' && isClosedStatus(change.to))
+      .map((change) => ({
+        type: 'log',
+        key: `closed:${change.on}`,
+        timestamp: change.on,
+        author: { fullname: change.by.name, image: change.by.image },
+        icon: markRaw(LucideCircleCheck),
+        data: { name: `closed:${change.on}`, subtype: 'info', text: __('{0} closed the ticket', [change.by.name]) },
+      })),
+  )
+
   const relatedArticles = createResource({
     url: 'helpdesk.api.article.get_related',
     makeParams: () => ({ query: ticket.data?.subject }),
@@ -83,56 +105,29 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  // The article pages are the desk's, under its `/helpdesk` router base.
-  const suggestedArticles = computed(() =>
-    (relatedArticles.data || []).map((article) => ({
-      ...article,
-      url: `/helpdesk/kb-public/articles/${article.name}`,
-    })),
-  )
-
-  // Empty hides the button; as on the desk portal, any open ticket can be closed.
-  const pageActionLabel = computed(() => {
-    if (!isClosed.value) return __('Close')
-    return settings.canCreateTicket.value ? __('Raise a ticket') : ''
-  })
+  const suggestedArticles = computed(() => relatedArticles.data || [])
 
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
-
-  // Where a rating is required the status cannot be written without it.
+  // Where a rating is required, the status cannot be written without it.
   const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
 
-  // Asked once, under the latest agent reply, and only after the resolution has stood a while.
-  const solvePromptAt = computed(() => {
+  const promptAfterDays = computed(() => Number(config.value?.confirm_resolution_after_days ?? RESOLVED_PROMPT_DAYS))
+
+  // Asked once, of the requester, under the latest agent reply, once the resolution has stood a while.
+  // It takes the reply's time, and the thread puts the page's rows after emails at the same time.
+  const solvePrompt = computed(() => {
     const data = ticket.data
-    if (!data || !isResolved.value) return null
-    if (!settledFor(promptAfterDays.value)) return null
+    const reply = thread.lastAgentReply.value
+    if (!data || !reply || !isResolved.value || !data.resolution_date) return null
+    if (dayjs().diff(dayjs(data.resolution_date), 'day') < promptAfterDays.value) return null
     const viewer = config.value?.session_user
     if (viewer && data.raised_by && viewer !== data.raised_by) return null
-    return thread.lastAgentReply.value?.name || null
+    return { type: 'solve_prompt', key: 'solve-prompt', timestamp: reply.communication_date || reply.creation, data: {} }
   })
 
-  // A Single omits a field it was never given, so a missing key falls back, not to zero.
-  const promptAfterDays = computed(() => {
-    const days = config.value?.confirm_resolution_after_days
-    return days === undefined || days === null ? RESOLVED_PROMPT_DAYS : Number(days)
-  })
+  const threadExtras = computed(() => [...timelineEvents.value, ...(solvePrompt.value ? [solvePrompt.value] : [])])
 
-  function settledFor(days: number) {
-    const resolvedOn = ticket.data?.resolution_date
-    return Boolean(resolvedOn) && dayjs().diff(dayjs(resolvedOn), 'day') >= days
-  }
-
-  // The prompt is a row of its own, drawn by the timeline's `item-solve_prompt` slot.
-  const activities = computed(() =>
-    thread.activities.value.flatMap((activity) =>
-      activity.key === solvePromptAt.value
-        ? [activity, { type: 'solve_prompt', key: 'solve-prompt', timestamp: activity.timestamp, data: {} }]
-        : [activity],
-    ),
-  )
-
-  // Where a rating is still owed, the dialog's save is the only way past `validate_feedback`.
+  // Where a rating is still owed, the feedback dialog is the only way past `validate_feedback`.
   function confirmSolved() {
     if (canRate.value) return feedback.openFeedback()
     return closeTicket()
@@ -174,21 +169,26 @@ export default function setup(context) {
 
   return {
     ...settings,
-    ...thread,
     ...useTicketDetails(ticket, thread),
     ...useReplyComposer(ticket),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
+    drawer: useDrawer(route),
     ticketId,
     ticket,
-    activities,
+    rating: thread.rating,
+    threadExtras,
     customActions,
-    pageActionLabel,
+    // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
+    pageActionLabel: computed(() => {
+      if (!isClosed.value) return __('Close')
+      return settings.canCreateTicket.value ? __('Raise a ticket') : ''
+    }),
     pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
     onPageAction,
     confirmSolved,
     reopenTicket,
     suggestedArticles,
-    openHelpArticle: (article) => (window.location.href = article.url),
+    openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
   }
 }

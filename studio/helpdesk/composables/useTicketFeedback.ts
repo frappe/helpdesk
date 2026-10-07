@@ -6,7 +6,7 @@ import { runAction, updateTicket } from '@app/utils'
 
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
-  // In stars, the way the Rating component counts; HD Ticket stores a fraction.
+  // In stars, as the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
   const feedbackText = ref('')
@@ -42,7 +42,7 @@ export function useTicketFeedback(ticket) {
     feedbackText.value = ''
   }
 
-  // `validate_feedback` blocks a non-agent from the Resolved category without a rating.
+  // The status is saved with the rating: `validate_feedback` refuses a customer's close without one.
   function openFeedback() {
     isFeedbackOpen.value = true
   }

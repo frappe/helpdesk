@@ -1,25 +1,9 @@
 <template>
   <div>
     <div class="text-base-semibold text-ink-gray-9">
-      {{ __("Workflow & Knowledge Base Settings") }}
+      {{ __("Workflow Settings") }}
     </div>
     <div class="mt-6 flex flex-col gap-6">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">{{
-            __("Prefer knowledge base")
-          }}</span>
-          <span class="text-p-sm text-ink-gray-6">{{
-            __("Guide users to articles before tickets.")
-          }}</span>
-        </div>
-        <Switch
-          :model-value="settingsData.preferKnowledgeBase"
-          @update:model-value="
-            (value) => (settingsData.preferKnowledgeBase = value)
-          "
-        />
-      </div>
       <div class="flex items-center justify-between">
         <div class="flex flex-col gap-1">
           <span class="text-base-medium text-ink-gray-8">{{

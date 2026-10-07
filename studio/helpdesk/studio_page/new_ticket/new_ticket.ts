@@ -14,42 +14,43 @@ import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
 import { runAction, scriptDialog } from '@app/utils'
+import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
-
-// The upload queue keeps only `file_url`; the server links attachments by File name.
-const uploadedByUrl = new Map()
-
-function uploadPrivately(file, _args, { signal, onProgress }) {
-  return useFileUpload()
-    .upload(file, {
-      private: true,
-      folder: UPLOAD_FOLDER,
-      signal,
-      onProgress: ({ loaded, total }) => onProgress(loaded, total),
-    })
-    .then((doc) => {
-      uploadedByUrl.set(doc.file_url, doc)
-      return doc
-    })
-}
+const SUGGESTION_LIMIT = 3
 
 export default function setup(context) {
   const { subject, description, template, newTicket, route } = context
-  const session = useSettingsModal(context)
+  const settings = useSettingsModal(context)
 
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
 
   const model = reactive({})
-
   const attachments = ref([])
   const isCreating = ref(false)
 
-  // Permission-gated, so fetched once the session is known: a guest would only 403.
+  // The upload queue keeps only `file_url`; the server links attachments by File name.
+  const uploadedByUrl = new Map()
+
+  function uploadPrivately(file, _args, { signal, onProgress }) {
+    return useFileUpload()
+      .upload(file, {
+        private: true,
+        folder: UPLOAD_FOLDER,
+        signal,
+        onProgress: ({ loaded, total }) => onProgress(loaded, total),
+      })
+      .then((doc) => {
+        uploadedByUrl.set(doc.file_url, doc)
+        return doc
+      })
+  }
+
+  // Waits for the session: isGuest reads true until get_config answers.
   watch(
-    session.isGuest,
+    settings.isGuest,
     (isGuest) => {
       if (isGuest) return
       template.fetch()
@@ -100,15 +101,17 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
+  const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT })
+
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
     description.value = html
   }
 
-  const dateFormat = computed(() => session.config.value?.date_format?.toUpperCase())
-  const timeFormat = computed(() => session.config.value?.time_format)
+  const dateFormat = computed(() => settings.config.value?.date_format?.toUpperCase())
+  const timeFormat = computed(() => settings.config.value?.time_format)
 
-  // Only a priority carries a description worth showing, as on the desk's form.
+  // As on the desk's form, only priority shows its description.
   const priorityHint = computed(() => getPriority(model.priority)?.description?.trim() || undefined)
 
   // The desk's fallback when the template sets no placeholder.
@@ -124,7 +127,6 @@ export default function setup(context) {
     if (row.fieldtype === 'Date') return { props: { format: dateFormat.value } }
   }
 
-  // FormLayout resolves the depends_on rules itself against the values typed so far.
   const fields = computed(() =>
     (template.data?.fields || []).map((row) => ({
       fieldname: row.fieldname,
@@ -142,16 +144,19 @@ export default function setup(context) {
     })),
   )
 
+  // Fields alternate between two columns, which would stack out of order on a phone.
   const layout = computed(() => [
     {
       sections: [
         {
           hideLabel: true,
           hideBorder: true,
-          columns: [
-            { fields: fields.value.filter((_, index) => index % 2 === 0) },
-            { fields: fields.value.filter((_, index) => index % 2 === 1) },
-          ],
+          columns: settings.isPhone.value
+            ? [{ fields: fields.value }]
+            : [
+                { fields: fields.value.filter((_, index) => index % 2 === 0) },
+                { fields: fields.value.filter((_, index) => index % 2 === 1) },
+              ],
         },
       ],
     },
@@ -160,10 +165,13 @@ export default function setup(context) {
   const canSubmit = computed(() => {
     if (!subject.value || isContentEmpty(description.value)) return false
     return fields.value
-      .filter((field) => evaluateDependsOn(field.dependsOn, model))
-      .filter((field) => field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model)))
+      .filter((field) => evaluateDependsOn(field.dependsOn, model) && isRequired(field))
       .every((field) => model[field.fieldname])
   })
+
+  function isRequired(field) {
+    return field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model))
+  }
 
   function createTicket() {
     if (!canSubmit.value) return
@@ -190,9 +198,10 @@ export default function setup(context) {
   }
 
   return {
-    ...session,
+    ...settings,
     customActions,
     about,
+    suggestions,
     fields,
     layout,
     model,

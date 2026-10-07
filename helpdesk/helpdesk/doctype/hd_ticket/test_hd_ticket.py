@@ -16,6 +16,7 @@ from helpdesk.api.ticket import bulk_reply
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
+    get_timeline_changes,
     merge_ticket,
     new,
     show_outside_hours_banner,
@@ -2541,6 +2542,45 @@ class TestHDTicket(IntegrationTestCase):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
+
+
+class TestTicketTimelineChanges(IntegrationTestCase):
+    """The portal draws "closed the ticket" and the rating from these, so a reader gets them without Version."""
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def close(self, **values):
+        ticket = make_ticket(raised_by="Administrator")
+        # Assignment rules write to it on insert.
+        ticket.reload()
+        ticket.update({"status": "Closed", **values})
+        # Tests skip Version by default; this endpoint reads nothing else.
+        ticket.save(ignore_permissions=True, ignore_version=False)
+        return ticket
+
+    def test_lists_a_status_change_with_its_author(self) -> None:
+        ticket = self.close()
+
+        [change] = get_timeline_changes(ticket.name)
+
+        self.assertEqual(change["field"], "status")
+        self.assertEqual((change["from"], change["to"]), ("Open", "Closed"))
+        self.assertEqual(change["by"]["name"], "Administrator")
+        self.assertTrue(change["on"])
+
+    def test_leaves_the_rating_out(self) -> None:
+        ticket = self.close(feedback_rating=0.8)
+
+        fields = [change["field"] for change in get_timeline_changes(ticket.name)]
+
+        self.assertEqual(fields, ["status"])
+
+    def test_a_stranger_cannot_read_them(self) -> None:
+        ticket = make_ticket(raised_by="Administrator")
+        frappe.set_user(non_agent)
+
+        self.assertRaises(frappe.PermissionError, get_timeline_changes, ticket.name)
 
 
 PERMS_CUSTOMER = "perms.customer@example.com"

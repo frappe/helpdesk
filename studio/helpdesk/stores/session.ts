@@ -1,9 +1,9 @@
 import { computed, ref } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { call } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
 
 // A published Studio app has no boot payload; `get_config` is the one call guests may make.
-
 const store = createSessionStore()
 
 export function useSession() {
@@ -23,6 +23,8 @@ function createSessionStore() {
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
   const brandName = computed(() => config.value?.brand_name || 'Helpdesk')
+  // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
+  const isPhone = useMediaQuery('(max-width: 639px)')
 
   function loadSession() {
     if (sessionRequest) return sessionRequest
@@ -31,6 +33,11 @@ function createSessionStore() {
       .then(sendGuestToLogin)
       .catch((error) => console.error(error))
     return sessionRequest
+  }
+
+  function reloadSession() {
+    sessionRequest = null
+    return loadSession()
   }
 
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
@@ -56,13 +63,16 @@ function createSessionStore() {
   return {
     config,
     isGuest,
+    isPublicKnowledgeBase,
     canCreateTicket,
     isAgent,
     canEditSettings,
     brandLogo,
     brandName,
-    loadSession,
+    isPhone,
     signIn,
+    loadSession,
+    reloadSession,
     signOut,
   }
 }

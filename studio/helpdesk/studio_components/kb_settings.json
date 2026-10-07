@@ -30,6 +30,10 @@
            "prefix": {
             "slotContent": [
              {
+              "classes": [
+               "has-[>div:first-child]:border",
+               "has-[>div:first-child]:border-outline-gray-2"
+              ],
               "componentId": "kb_settings-nav-profile-avatar",
               "componentName": "Avatar",
               "componentProps": {
@@ -104,6 +108,44 @@
        },
        {
         "children": [
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-knowledge-base-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Knowledge Base') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-knowledge-base",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "knowledge-base"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-knowledge-base-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-book-open"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-knowledge-base-prefix",
+            "slotName": "prefix"
+           }
+          }
+         },
          {
           "children": [
            {
@@ -210,8 +252,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-profile-header",
           "componentName": "container",
@@ -292,7 +336,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-language",
                     "componentName": "Combobox",
@@ -307,6 +352,11 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-language",
                   "componentName": "SettingsRow",
                   "componentProps": {
@@ -319,7 +369,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-time_zone",
                     "componentName": "Combobox",
@@ -334,6 +385,11 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-time_zone",
                   "componentName": "SettingsRow",
                   "componentProps": {
@@ -346,7 +402,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-32"
+                     "w-32",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-theme",
                     "componentName": "Select",
@@ -362,6 +419,11 @@
                     },
                     "componentSlots": {}
                    }
+                  ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
                   ],
                   "componentId": "kb_settings-row-theme",
                   "componentName": "SettingsRow",
@@ -464,8 +526,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-profile-body",
           "componentName": "container",
@@ -532,8 +596,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-list-header",
           "componentName": "container",
@@ -560,8 +626,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-list-body",
           "componentName": "container",
@@ -704,8 +772,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-detail-header",
           "componentName": "container",
@@ -874,7 +944,9 @@
                 "classes": [
                  "flex",
                  "items-center",
-                 "gap-x-1.5"
+                 "gap-x-1.5",
+                 "flex-wrap",
+                 "gap-y-0.5"
                 ],
                 "componentId": "kb_settings-organization-meta",
                 "componentName": "container",
@@ -987,8 +1059,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-detail-body",
           "componentName": "container",
@@ -1087,8 +1161,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-invite-header",
           "componentName": "container",
@@ -1106,7 +1182,8 @@
               "children": [
                {
                 "classes": [
-                 "w-32"
+                 "w-32",
+                 "max-sm:!w-full"
                 ],
                 "componentId": "kb_settings-invite-role",
                 "componentName": "Select",
@@ -1128,6 +1205,11 @@
                 },
                 "componentSlots": {}
                }
+              ],
+              "classes": [
+               "max-sm:!flex-col",
+               "max-sm:!items-stretch",
+               "max-sm:!gap-2.5"
               ],
               "componentId": "kb_settings-invite-row",
               "componentName": "SettingsRow",
@@ -1179,8 +1261,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-invite-body",
           "componentName": "container",
@@ -1196,6 +1280,183 @@
          "value": "members"
         },
         "componentSlots": {}
+       },
+       {
+        "blockName": "Knowledge Base",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "classes": [
+                 "text-ink-gray-8",
+                 "font-semibold"
+                ],
+                "componentId": "kb_settings-knowledge-base-header-title",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-lg",
+                 "tag": "h2",
+                 "text": "{{ t('Knowledge Base') }}"
+                },
+                "componentSlots": {}
+               },
+               {
+                "componentId": "kb_settings-knowledge-base-unsaved",
+                "componentName": "Badge",
+                "componentProps": {
+                 "label": "{{ t('Unsaved') }}",
+                 "size": "sm",
+                 "theme": "amber",
+                 "variant": "subtle"
+                },
+                "componentSlots": {},
+                "visibilityCondition": "{{ kbIsDirty }}"
+               }
+              ],
+              "classes": [
+               "flex",
+               "items-center",
+               "gap-2"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-title-row",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ t('Manage who can read your knowledge base and how it looks.') }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           },
+           {
+            "children": [
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "previewKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-preview",
+              "componentName": "Button",
+              "componentProps": {
+               "iconLeft": "lucide-external-link",
+               "label": "{{ t('Preview') }}"
+              },
+              "componentSlots": {},
+              "visibilityCondition": "{{ kbCanPreview }}"
+             },
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "saveKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-save",
+              "componentName": "Button",
+              "componentProps": {
+               "label": "{{ t('Save') }}",
+               "loading": "{{ kbSaving }}",
+               "variant": "solid"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "items-center",
+             "gap-2",
+             "shrink-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-actions",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div",
+            "visibilityCondition": "{{ kbIsDirty }}"
+           }
+          ],
+          "classes": [
+           "flex",
+           "items-start",
+           "justify-between",
+           "gap-4",
+           "shrink-0",
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-knowledge-base-form",
+            "componentName": "KnowledgeBasePanel",
+            "componentProps": {},
+            "componentSlots": {},
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-knowledge-base-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "knowledge-base"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ canEditSettings }}"
        },
        {
         "blockName": "Portal Permissions",

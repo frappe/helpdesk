@@ -21,7 +21,7 @@ export function useReplyComposer(ticket) {
     isComposerOpen.value = true
   }
 
-  // Inline images and attachments alike; the File doc it resolves carries the `name` the send links on.
+  // Inline images and attachments alike; the send links each by its File `name`.
   function uploadFile(file: File) {
     return useFileUpload().upload(file, {
       private: true,

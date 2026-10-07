@@ -11,14 +11,14 @@
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
       </TextInput>
-      <Select v-model="role" :options="ROLE_FILTERS" size="sm" />
+      <Select v-model="role" :options="roleFilters" size="sm" />
     </div>
 
     <div>
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ __("Members") }}</span>
-        <span>{{ __("Last seen") }}</span>
         <span>{{ __("Role") }}</span>
+        <span class="max-sm:hidden">{{ __("Last seen") }}</span>
         <span />
       </div>
 
@@ -29,6 +29,7 @@
       >
         <div class="flex min-w-0 items-center gap-2">
           <Avatar
+            class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
             shape="circle"
             size="lg"
             :image="member.image"
@@ -51,14 +52,17 @@
           </div>
         </div>
 
-        <div class="text-p-sm text-ink-gray-5">{{ lastSeen(member) }}</div>
+        <div>
+          <Badge
+            :label="roleLabel(member.role)"
+            :theme="ROLES[member.role].theme"
+            variant="subtle"
+          />
+        </div>
 
-        <span
-          class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
-        >
-          <component :is="ROLES[member.role].icon" class="size-4" />
-          {{ member.role }}
-        </span>
+        <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
+          {{ lastSeen(member) }}
+        </div>
 
         <div class="flex justify-end">
           <Dropdown
@@ -95,11 +99,12 @@ import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
-import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
+// A phone drops "Last seen", so the name keeps its width.
 const ROW =
-  "grid grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
+  "grid grid-cols-[minmax(0,1fr)_88px_32px] sm:grid-cols-[minmax(0,1fr)_88px_120px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
 
 type Member = {
   contact?: string;
@@ -113,14 +118,14 @@ type Member = {
 
 // Owner is left out: there is one per organization, already first in the list.
 const FILTERABLE_ROLES: RoleLabel[] = ["Manager", "Member"];
-const ROLE_FILTERS = [
-  { label: "All", value: "All", icon: LucideUsers },
-  ...FILTERABLE_ROLES.map((label) => ({
-    label,
-    value: label,
-    icon: ROLES[label].icon,
+const roleFilters = computed(() => [
+  { label: __("All"), value: "All", icon: LucideUsers },
+  ...FILTERABLE_ROLES.map((role) => ({
+    label: roleLabel(role),
+    value: role,
+    icon: ROLES[role].icon,
   })),
-];
+]);
 
 const props = withDefaults(
   defineProps<{

@@ -1,4 +1,4 @@
-import { dayjs, dayjsLocal } from "frappe-ui";
+import { dayjs, dayjsLocal, toast } from "frappe-ui";
 
 import { __ } from "./translation";
 
@@ -10,6 +10,42 @@ const YEAR = 365 * DAY;
 
 // The studio-built customer portal, served outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/kb";
+
+/**
+ * @param {Object} config - Configuration object
+ * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
+ * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
+ * @returns {Array} Array of option objects for use in dropdowns
+ */
+export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
+  return [
+    {
+      label: "Delete",
+      icon: "lucide-trash-2",
+      // preventDefault keeps the menu open so the confirm row can replace this one
+      onClick: (event) => {
+        event.preventDefault();
+        isConfirmingDelete.value = true;
+      },
+      condition: () => !isConfirmingDelete.value,
+    },
+    {
+      label: "Confirm Delete",
+      icon: "lucide-trash-2",
+      theme: "red",
+      onClick: () => {
+        onConfirmDelete();
+        isConfirmingDelete.value = false;
+      },
+      condition: () => isConfirmingDelete.value,
+    },
+  ];
+}
+
+// Quick links reach guests, so only site paths, web and mail addresses are allowed.
+export function isSafeLink(url: unknown) {
+  return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
+}
 
 export function validateEmail(email) {
   const regExp =
@@ -202,7 +238,7 @@ export function shortDuration(target: string): string {
 
 /**
  * Convert `link_filters` from the stored list format to the dict format that
- * `frappe.desk.search.search_link` expects. Doctypes with a standard query
+ * `frappe.desk.search.search_link` expects.
  * @example
  * // in:  '[["User", "name", "in", ["a@x.com", "b@x.com"]]]'
  * // out: { name: ["in", ["a@x.com", "b@x.com"]] }
@@ -243,4 +279,17 @@ export function parseApiOptions(
         }
       }) || []
   );
+}
+
+export function getErrorMessage(
+  error: any,
+  showToast: boolean = false
+): string {
+  const msg = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
+  if (showToast) {
+    toast.error(msg);
+  }
+  return msg;
 }

@@ -1,9 +1,10 @@
 // Ported from the desk's list cells, which Studio cannot import (they live under `@/`).
-import { Badge, Rating, Tooltip, dayjs } from 'frappe-ui'
-import { parseJson } from '@app/utils'
-import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
-import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
 import { h } from 'vue'
+import { Badge, Rating, Tooltip, dayjs } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
+import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
+import { parseJson } from '@app/utils'
 
 export function statusCell({ item }: any) {
   const status = statusMeta(item)
@@ -57,29 +58,23 @@ function badge(label: string, theme: string) {
   return h(Badge, { label, theme, variant: 'subtle' })
 }
 
-function countdownBadge(deadline: string) {
-  return h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
-    h(Badge, { label: shortDuration(deadline), theme: 'amber', variant: 'subtle' }),
-  )
+function slaBadge(metOn: string | undefined, due: string) {
+  if (metOn) {
+    return dayjs(metOn).isBefore(dayjs(due)) ? badge(__('Fulfilled'), 'gray') : badge(__('Failed'), 'red')
+  }
+  if (dayjs(due).isBefore(dayjs())) return badge(__('Failed'), 'red')
+  return h(Tooltip, { text: dayjs(due).format('LLLL') }, () => badge(shortDuration(due), 'amber'))
 }
 
 export function responseCell({ row, item }: any) {
   if (!item) return null
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) return badge('Failed', 'red')
-  if (!row.first_responded_on) return countdownBadge(item)
-  return dayjs(row.first_responded_on).isBefore(item)
-    ? badge('Fulfilled', 'gray')
-    : badge('Failed', 'red')
+  return slaBadge(row.first_responded_on, item)
 }
 
 export function resolutionCell({ row, item }: any) {
-  if (getStatus(row.status)?.category === 'Paused') return badge('Paused', 'blue')
-  if (row.resolution_date) {
-    const fulfilled = dayjs(row.resolution_date).isBefore(dayjs(item))
-    return badge(fulfilled ? 'Fulfilled' : 'Failed', fulfilled ? 'gray' : 'red')
-  }
-  if (!item) return null
-  return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdownBadge(item)
+  if (getStatus(row.status)?.category === 'Paused') return badge(__('Paused'), 'blue')
+  if (!item && !row.resolution_date) return null
+  return slaBadge(row.resolution_date, item)
 }
 
 export function datetimeCell({ item }: any) {
@@ -91,6 +86,7 @@ export function subjectCell({ row, item }: any, reader: string) {
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)
 }
 
+// HD Ticket stores the rating as a fraction of five stars.
 export function ratingCell({ item }: any) {
   return h(Rating, { modelValue: (item || 0) * 5, disabled: true, size: 'sm' })
 }
@@ -102,4 +98,3 @@ export function textCell({ item }: any) {
 export function idCell({ row }: any) {
   return h('span', { class: 'truncate text-base text-ink-gray-6' }, row.name)
 }
-

@@ -19,12 +19,13 @@
           __("ID")
         }}</span>
         <span class="min-w-0 flex-1 truncate">{{ __("Subject") }}</span>
-        <span class="w-36 shrink-0 text-p-sm text-ink-gray-7">{{
+        <span class="w-36 shrink-0 text-p-sm text-ink-gray-7 max-sm:w-auto">{{
           __("Status")
         }}</span>
-        <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
-          __("Created")
-        }}</span>
+        <span
+          class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5 max-sm:hidden"
+          >{{ __("Created") }}</span
+        >
       </div>
 
       <RouterLink
@@ -38,12 +39,13 @@
         >
         <span class="min-w-0 flex-1 truncate">{{ ticket.subject }}</span>
         <PortalStatusPill
-          class="w-36 shrink-0"
+          class="w-36 shrink-0 max-sm:w-auto"
           v-bind="statusMeta(ticket.status)"
         />
-        <span class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5">{{
-          timeAgo(ticket.creation)
-        }}</span>
+        <span
+          class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5 max-sm:hidden"
+          >{{ timeAgo(ticket.creation) }}</span
+        >
       </RouterLink>
     </div>
 
@@ -70,9 +72,9 @@ import { timeAgo } from "@helpdesk/shared/utils";
 import PortalStatusPill from "@app/components/ticket/PortalStatusPill.vue";
 import { ROUTES } from "@app/routes";
 import { statusMeta } from "@app/stores/ticketMeta";
+import { SEARCH_DEBOUNCE_MS } from "@app/utils";
 
 const RECENT_TICKET_LIMIT = 10;
-const SEARCH_DEBOUNCE_MS = 300;
 
 const ROW =
   "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
@@ -99,8 +101,6 @@ function load() {
   tickets.reload();
 }
 
-const searchLater = debounce(load, SEARCH_DEBOUNCE_MS);
-
 watch(
   () => props.customer,
   () => {
@@ -109,5 +109,5 @@ watch(
   },
   { immediate: true }
 );
-watch(search, () => searchLater());
+watch(search, debounce(load, SEARCH_DEBOUNCE_MS));
 </script>

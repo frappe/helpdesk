@@ -6,6 +6,12 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
+from helpdesk.api.knowledge_base import (
+    PUBLIC,
+    category_visibility,
+    is_readable,
+    readable_audiences,
+)
 from helpdesk.utils import capture_event
 
 
@@ -25,6 +31,9 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
+        # Public is also the default, so it yields to the access the category shares.
+        if self.visibility == PUBLIC and self.category:
+            self.visibility = category_visibility(self.category) or PUBLIC
 
     def before_save(self):
         # set published date of the hd_article
@@ -94,26 +103,45 @@ class HDArticle(Document):
         ]
         return {"columns": columns}
 
-    @frappe.whitelist()
-    def set_feedback(self, value: int):
-        # 0 empty, 1 like, 2 dislike
-        user = frappe.session.user
+    def set_feedback(self, value: int, visitor_id: str | None = None):
+        """Record one vote: 0 none, 1 like, 2 dislike; a guest's is kept by `visitor_id`."""
+        value = cint(value)
+        if value not in (0, 1, 2):
+            frappe.throw(_("Invalid vote"))
+        self.validate_voter(visitor_id)
+        owner = (
+            {"visitor_id": visitor_id}
+            if frappe.session.user == "Guest"
+            else {"user": frappe.session.user}
+        )
+        self.save_feedback(owner, value)
 
+    def validate_voter(self, visitor_id: str | None):
+        if frappe.session.user != "Guest":
+            return
+        if not frappe.db.get_single_value(
+            "HD Settings", "allow_anonymous_article_voting"
+        ):
+            frappe.throw(_("Voting requires an account"), frappe.PermissionError)
+        if not visitor_id:
+            frappe.throw(_("Please enable cookies to vote"))
+
+    def save_feedback(self, owner: dict, value: int):
         feedback = frappe.db.exists(
-            "HD Article Feedback", {"user": user, "article": self.name}
+            "HD Article Feedback", {**owner, "article": self.name}
         )
         if feedback:
-            current_value = frappe.db.get_value(
-                "HD Article Feedback", feedback, "feedback"
-            )
-            if int(current_value) == value:
-                return
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-        else:
-            frappe.new_doc(
-                "HD Article Feedback", user=user, article=self.name, feedback=value
-            ).insert()
+            return
+        # A guest holds no create permission; `validate_voter` is the gate.
+        frappe.get_doc(
+            {
+                "doctype": "HD Article Feedback",
+                "article": self.name,
+                "feedback": value,
+                **owner,
+            }
+        ).insert(ignore_permissions=True)
 
     @property
     def title_slug(self) -> str:
@@ -124,3 +152,16 @@ class HDArticle(Document):
         :return: Generated slug
         """
         return self.title.lower().replace(" ", "-")
+
+
+def permission_query(user: str | None = None) -> str | None:
+    """Non-agents list only the published articles in their audiences, as on the portal."""
+    audiences = readable_audiences(user)
+    if audiences is None:
+        return None
+    values = ", ".join(frappe.db.escape(audience) for audience in audiences)
+    return f"`tabHD Article`.status = 'Published' and `tabHD Article`.visibility in ({values})"
+
+
+def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    return is_readable(doc, user)

@@ -1,5 +1,5 @@
 <template>
-  <Dropdown :options="options" :offset="4" align="start">
+  <Dropdown v-if="options?.length" :options="options" :offset="4" align="start">
     <template #default="{ open }">
       <button
         type="button"
@@ -7,18 +7,7 @@
         class="-ms-2 flex h-8 min-w-0 max-w-[15rem] cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
         :class="open ? 'bg-surface-gray-3' : 'hover:bg-surface-gray-3'"
       >
-        <img
-          v-if="logo"
-          :src="logo"
-          alt=""
-          aria-hidden="true"
-          class="size-6 shrink-0 rounded-2 object-contain"
-        />
-        <span
-          class="hidden truncate text-base-medium text-ink-gray-9 sm:block"
-        >
-          {{ name }}
-        </span>
+        <Brand />
         <Icon
           icon="lucide-chevron-down"
           class="size-4 shrink-0 text-ink-gray-5 transition-transform duration-200"
@@ -27,10 +16,45 @@
       </button>
     </template>
   </Dropdown>
+  <RouterLink
+    v-else
+    :to="ROUTES.home"
+    :aria-label="name"
+    class="flex h-8 min-w-0 max-w-[15rem] items-center gap-2"
+  >
+    <Brand />
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
+import { h } from "vue";
+import { RouterLink } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
+import { ROUTES } from "@app/routes";
 
-defineProps<{ options?: unknown[]; logo?: string; name?: string }>();
+const props = defineProps<{
+  options?: unknown[];
+  logo?: string;
+  name?: string;
+}>();
+
+function Brand() {
+  return [
+    props.logo &&
+      h("img", {
+        src: props.logo,
+        alt: "",
+        "aria-hidden": "true",
+        class: "size-6 shrink-0 rounded-2 object-contain",
+      }),
+    h(
+      "span",
+      {
+        class:
+          "hidden truncate text-base-medium text-ink-gray-9 sm:block",
+      },
+      props.name
+    ),
+  ];
+}
 </script>

@@ -39,6 +39,28 @@
       v-model="mergeModal"
       @merge="handleMergeCategory"
     />
+    <ArticleSharingModal
+      v-model="sharing.open"
+      :title="sharing.title"
+      :visibility="sharing.visibility"
+      :action-label="__('Update access')"
+      require-change
+      @publish="
+        sharing.forCategory
+          ? updateCategoryAccess($event)
+          : updateArticlesAccess($event)
+      "
+    >
+      <template #default="{ access }">
+        <p class="text-p-sm text-ink-gray-7">
+          {{
+            sharing.forCategory
+              ? categoryAccessNote(access)
+              : articlesAccessNote(access)
+          }}
+        </p>
+      </template>
+    </ArticleSharingModal>
   </div>
 </template>
 
@@ -46,6 +68,7 @@
 import Icon from "@/components/Icon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
@@ -60,11 +83,11 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { copyToClipboard } from "@/utils";
 import {
   Badge,
   Button,
   Dropdown,
+  call,
   createResource,
   toast,
   usePageMeta,
@@ -91,6 +114,13 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
+// One dialog for a category's articles and for a selection of them.
+const sharing = reactive({
+  open: false,
+  forCategory: true,
+  title: "",
+  visibility: null as string | null,
+});
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -165,15 +195,19 @@ const groupByActions = [
   },
   {
     label: __("Share"),
-    icon: "lucide-link",
+    icon: "lucide-share-2",
     onClick: async ({ group }) => {
-      const { label, value } = group;
-      const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/${value}`;
-      await copyToClipboard(
-        url.toString(),
-        __("Category '{0}' link copied to clipboard", [label])
-      );
+      category.title = group.label;
+      category.id = group.value;
+      const visibility = await categoryVisibility.submit({
+        category: group.value,
+      });
+      Object.assign(sharing, {
+        open: true,
+        forCategory: true,
+        title: __("Sharing “{0}”", [group.label]),
+        visibility,
+      });
     },
   },
   {
@@ -185,8 +219,140 @@ const groupByActions = [
   },
 ];
 
+const categoryVisibility = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_visibility",
+});
+const setCategoryVisibility = createResource({
+  url: "helpdesk.api.knowledge_base.set_category_visibility",
+});
+
+function categoryAccessNote(access: string | null) {
+  const name = category.title;
+  if (!access) {
+    return __(
+      "Articles in {0} have different access. Choosing one applies it to every article.",
+      [name]
+    );
+  }
+  if (access === sharing.visibility) {
+    return {
+      Public: __(
+        "Anyone, including visitors who aren't logged in, can read the articles in {0}.",
+        [name]
+      ),
+      "Customers only": __(
+        "Only logged-in customers and agents can read the articles in {0}.",
+        [name]
+      ),
+      "Agents only": __(
+        "Only agents can read the articles in {0}. It doesn't appear on the customer portal.",
+        [name]
+      ),
+    }[access];
+  }
+  return {
+    Public: __(
+      "Every article in {0} will be readable by anyone, including visitors who aren't logged in.",
+      [name]
+    ),
+    "Customers only": __(
+      "Every article in {0} will be readable only by logged-in customers and agents.",
+      [name]
+    ),
+    "Agents only": __(
+      "Every article in {0} will be readable only by agents, and {0} will no longer appear on the customer portal.",
+      [name]
+    ),
+  }[access];
+}
+
+function updateCategoryAccess(visibility: string) {
+  setCategoryVisibility.submit(
+    { category: category.id, visibility },
+    {
+      onSuccess: () =>
+        toast.success(
+          __("Access updated for every article in {0}.", [category.title])
+        ),
+      onError: (error: Error) =>
+        toast.error(error?.messages?.[0] || error.message),
+    }
+  );
+}
+
+function articlesAccessNote(access: string | null) {
+  if (!access) {
+    return __(
+      "The selected articles have different access. Choosing one applies it to all of them."
+    );
+  }
+  if (access === sharing.visibility) {
+    return {
+      Public: __(
+        "Anyone, including visitors who aren't logged in, can read the selected articles."
+      ),
+      "Customers only": __(
+        "Only logged-in customers and agents can read the selected articles."
+      ),
+      "Agents only": __("Only agents can read the selected articles."),
+    }[access];
+  }
+  return {
+    Public: __(
+      "The selected articles will be readable by anyone, including visitors who aren't logged in."
+    ),
+    "Customers only": __(
+      "The selected articles will be readable only by logged-in customers and agents."
+    ),
+    "Agents only": __("The selected articles will be readable only by agents."),
+  }[access];
+}
+
+async function shareArticles(selections: Set<string>) {
+  listSelections.value = new Set(selections);
+  const rows = await call("frappe.client.get_list", {
+    doctype: "HD Article",
+    filters: { name: ["in", Array.from(selections)] },
+    fields: ["visibility"],
+    limit_page_length: 0,
+  });
+  const shared = new Set(rows.map((row) => row.visibility));
+  Object.assign(sharing, {
+    open: true,
+    forCategory: false,
+    title:
+      selections.size === 1
+        ? __("Sharing 1 article")
+        : __("Sharing {0} articles", [selections.size]),
+    visibility: shared.size === 1 ? [...shared][0] : null,
+  });
+}
+
+async function updateArticlesAccess(visibility: string) {
+  const { failed_docs } = await call("frappe.client.bulk_update", {
+    docs: Array.from(listSelections.value).map((docname) => ({
+      doctype: "HD Article",
+      docname,
+      visibility,
+    })),
+  });
+  if (failed_docs.length) {
+    toast.error(__("Could not update access for some articles."));
+  } else {
+    toast.success(__("Access updated for the selected articles."));
+  }
+  listViewRef.value?.reload();
+  listViewRef.value?.unselectAll();
+  listSelections.value.clear();
+}
+
 const listSelections = ref(new Set());
 const selectBannerActions = [
+  {
+    label: __("Change access"),
+    icon: "lucide-share-2",
+    onClick: shareArticles,
+  },
   {
     label: __("Move To"),
     icon: "lucide-corner-up-right",

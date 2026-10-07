@@ -1,0 +1,511 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "baseStyles": {
+    "display": "flex",
+    "flexDirection": "column",
+    "flexShrink": 0,
+    "height": "100%",
+    "overflowX": "hidden",
+    "width": "inherit"
+   },
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "top-bar",
+     "children": [
+      {
+       "classes": [
+        "md:hidden",
+        "shrink-0"
+       ],
+       "componentEvents": {
+        "click": {
+         "action": "Run Script",
+         "event": "click",
+         "script": "drawer.toggle()"
+        }
+       },
+       "componentId": "category-menu",
+       "componentName": "Button",
+       "componentProps": {
+        "icon": "lucide-menu",
+        "variant": "ghost",
+        "aria-label": "{{ t('Browse articles') }}"
+       }
+      },
+      {
+       "blockName": "Header",
+       "componentId": "header-topbar",
+       "componentName": "header",
+       "componentProps": {},
+       "isStudioComponent": true,
+       "classes": [
+        "min-w-0",
+        "flex-1"
+       ]
+      }
+     ],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "flex-row",
+      "shrink-0",
+      "h-[43px]",
+      "justify-between",
+      "py-0",
+      "w-full",
+      "gap-2",
+      "px-3",
+      "sm:px-5"
+     ],
+     "componentId": "container-7gbdjfb3o",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "componentId": "container-ym3ue277e",
+     "componentName": "container",
+     "originalElement": "div",
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-row",
+      "min-h-0",
+      "overflow-y-hidden",
+      "static",
+      "w-full"
+     ],
+     "children": [
+      {
+       "componentId": "container-category-sidebar",
+       "componentName": "container",
+       "originalElement": "div",
+       "classes": [
+        "flex",
+        "flex-col",
+        "shrink-0",
+        "h-full",
+        "w-[239px]",
+        "max-md:fixed",
+        "max-md:inset-y-0",
+        "max-md:start-0",
+        "max-md:z-40",
+        "max-md:w-[min(320px,85vw)]",
+        "max-md:bg-surface-base",
+        "max-md:shadow-2xl",
+        "max-md:-translate-x-full",
+        "max-md:invisible",
+        "transition-[transform,visibility]",
+        "duration-200",
+        "ease-out",
+        "motion-reduce:transition-none",
+        "max-md:rtl:translate-x-full"
+       ],
+       "children": [
+        {
+         "componentId": "PortalArticleSidebar-category",
+         "componentName": "PortalArticleSidebar",
+         "componentProps": {
+          "activeCategory": "{{ route.params.category }}",
+          "articles": "{{ articleTitles.data || [] }}",
+          "categories": "{{ categories.data || [] }}"
+         },
+         "isCustomVueComponent": true
+        }
+       ],
+       "blockName": "sidebar",
+       "baseStyles": {
+        "transform": "{{ drawer.open ? 'none' : '' }}",
+        "visibility": "{{ drawer.open ? 'visible' : '' }}"
+       }
+      },
+      {
+       "componentId": "container-category-main",
+       "componentName": "container",
+       "originalElement": "div",
+       "classes": [
+        "items-start",
+        "border-outline-gray-1",
+        "grid",
+        "grid-cols-1",
+        "xl:grid-cols-[minmax(0,1fr)_minmax(0,700px)_minmax(300px,1fr)]",
+        "xl:gap-x-6",
+        "flex-1",
+        "h-full",
+        "min-w-0",
+        "overflow-y-auto",
+        "pb-10",
+        "relative",
+        "w-full",
+        "pt-6",
+        "sm:pt-[34px]"
+       ],
+       "children": [
+        {
+         "componentId": "container-pdx9evglv",
+         "componentName": "container",
+         "originalElement": "div",
+         "classes": [
+          "flex",
+          "flex-col",
+          "mt-0",
+          "max-w-[700px]",
+          "min-w-0",
+          "w-full",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "xl:px-0",
+          "xl:col-start-2"
+         ],
+         "children": [
+          {
+           "componentId": "container-cttvx11fi",
+           "componentName": "container",
+           "originalElement": "div",
+           "classes": [
+            "flex",
+            "flex-col",
+            "gap-3",
+            "w-full"
+           ],
+           "children": [
+            {
+             "componentId": "TextBlock-h8bm1mp3i",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-3xl",
+              "tag": "h1",
+              "text": "{{ categoryName }}"
+             },
+             "classes": [
+              "text-ink-gray-8",
+              "font-bold"
+             ]
+            },
+            {
+             "componentId": "TextBlock-m2czs0278",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-p-base",
+              "tag": "p",
+              "text": "{{ categoryDescription }}"
+             },
+             "classes": [
+              "text-ink-gray-6"
+             ]
+            },
+            {
+             "componentId": "category-meta-row",
+             "componentName": "container",
+             "originalElement": "div",
+             "classes": [
+              "items-center",
+              "flex",
+              "flex-row",
+              "gap-2",
+              "justify-start",
+              "flex-wrap",
+              "gap-y-1"
+             ],
+             "blockName": "meta-row",
+             "children": [
+              {
+               "componentId": "category-byline",
+               "componentName": "PortalCategoryByline",
+               "componentProps": {
+                "creatorCount": "{{ category?.creator_count }}",
+                "creators": "{{ category?.creators }}"
+               },
+               "isCustomVueComponent": true
+              },
+              {
+               "componentId": "category-article-count",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-sm",
+                "tag": "span",
+                "text": "{{ articleCount }}"
+               },
+               "classes": [
+                "text-ink-gray-5"
+               ]
+              }
+             ]
+            }
+           ],
+           "blockName": "category-header"
+          },
+          {
+           "componentId": "category-articles",
+           "componentName": "container",
+           "originalElement": "div",
+           "classes": [
+            "flex",
+            "flex-col",
+            "gap-1",
+            "mt-8",
+            "w-full"
+           ],
+           "children": [
+            {
+             "componentId": "Repeater-m7atz02fl",
+             "componentName": "Repeater",
+             "componentProps": {
+              "data": "{{ articles.data || [] }}",
+              "dataKey": "name"
+             },
+             "classes": [
+              "w-full",
+              "!flex-col",
+              "!flex-nowrap",
+              "!gap-0"
+             ],
+             "children": [
+              {
+               "componentId": "container-jpuhf5mpa",
+               "componentName": "container",
+               "originalElement": "div",
+               "classes": [
+                "group",
+                "flex",
+                "cursor-pointer",
+                "items-center",
+                "gap-4",
+                "py-3.5",
+                "-mx-2.5",
+                "px-2.5",
+                "rounded-4",
+                "transition-colors",
+                "hover:bg-surface-gray-1",
+                "relative",
+                "after:absolute",
+                "after:inset-x-2.5",
+                "after:bottom-0",
+                "after:h-px",
+                "after:bg-[--outline-gray-1]",
+                "hover:after:opacity-0",
+                "[&:has(+*:hover)]:after:opacity-0"
+               ],
+               "children": [
+                {
+                 "componentId": "category-row-text",
+                 "componentName": "container",
+                 "originalElement": "div",
+                 "classes": [
+                  "flex",
+                  "min-w-0",
+                  "flex-1",
+                  "flex-col",
+                  "gap-1"
+                 ],
+                 "children": [
+                  {
+                   "componentId": "TextBlock-eigpkjuxp",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base",
+                    "tag": "p",
+                    "text": "{{ dataItem.title }}"
+                   },
+                   "classes": [
+                    "text-ink-gray-8",
+                    "font-medium",
+                    "truncate",
+                    "group-hover:text-ink-gray-9",
+                    "max-sm:whitespace-normal",
+                    "max-sm:line-clamp-2"
+                   ]
+                  },
+                  {
+                   "componentId": "TextBlock-zhpgz9f0r",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-p-sm",
+                    "tag": "p",
+                    "text": "{{ dataItem.excerpt }}"
+                   },
+                   "classes": [
+                    "text-ink-gray-5",
+                    "truncate",
+                    "max-sm:whitespace-normal",
+                    "max-sm:line-clamp-2"
+                   ]
+                  }
+                 ],
+                 "blockName": "article-text"
+                },
+                {
+                 "componentId": "category-row-icon",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "lucide-file-text"
+                 },
+                 "classes": [
+                  "size-4",
+                  "shrink-0",
+                  "text-ink-gray-4",
+                  "transition-colors",
+                  "group-hover:text-ink-gray-6"
+                 ]
+                }
+               ],
+               "blockName": "article-row",
+               "componentEvents": {
+                "click": {
+                 "action": "Run Script",
+                 "event": "click",
+                 "script": "router.push(`/articles/${dataItem.name}`)"
+                }
+               }
+              }
+             ],
+             "visibilityCondition": "{{ articles.data && articles.data.length }}"
+            },
+            {
+             "componentId": "container-7hq5bv7hx",
+             "componentName": "container",
+             "originalElement": "div",
+             "classes": [
+              "flex",
+              "items-center",
+              "justify-center",
+              "py-16",
+              "w-full"
+             ],
+             "children": [
+              {
+               "baseStyles": {
+                "color": "var(--ink-gray-6)",
+                "fontWeight": "600"
+               },
+               "componentId": "TextBlock-7wj9iidyv",
+               "componentName": "PortalEmptyState",
+               "componentProps": {
+                "description": "{{ t('Articles show up here as they are published.') }}",
+                "icon": "article",
+                "title": "{{ t('No articles in this category') }}"
+               },
+               "isCustomVueComponent": true
+              }
+             ],
+             "blockName": "empty-state",
+             "visibilityCondition": "{{ articles.data && articles.data.length === 0 }}"
+            }
+           ],
+           "blockName": "articles-section"
+          }
+         ],
+         "blockName": "category-column",
+         "visibilityCondition": "{{ !notFound }}"
+        },
+        {
+         "blockName": "not-found",
+         "classes": [
+          "self-stretch",
+          "xl:col-span-3"
+         ],
+         "componentId": "PortalEmptyState-category-not-found",
+         "componentName": "PortalEmptyState",
+         "componentProps": {
+          "description": "{{ t('It may have moved, or you may need to sign in to see it.') }}",
+          "icon": "article",
+          "title": "{{ t('Category not found') }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ notFound }}"
+        }
+       ],
+       "blockName": "main-layout"
+      }
+     ],
+     "blockName": "page-wrapper"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    },
+    {
+     "classes": [
+      "fixed",
+      "inset-0",
+      "z-30",
+      "bg-black-overlay-500",
+      "md:hidden"
+     ],
+     "componentEvents": {
+      "click": {
+       "action": "Run Script",
+       "event": "click",
+       "script": "drawer.close()"
+      }
+     },
+     "componentId": "category-drawer-backdrop",
+     "componentName": "container",
+     "originalElement": "div",
+     "visibilityCondition": "{{ drawer.open }}"
+    }
+   ],
+   "componentId": "root",
+   "componentName": "div",
+   "originalElement": "body",
+   "classes": [
+    "bg-surface-base"
+   ]
+  }
+ ],
+ "creation": "2026-10-01 15:56:40.041068",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-08 02:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "category",
+ "owner": "Administrator",
+ "page_name": "page-792261d2",
+ "page_title": "Category",
+ "published": 1,
+ "resources": [
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"category\": \"{{ route.params.category }}\"}",
+   "resource_name": "articles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_public_articles"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "articleTitles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_public_article_titles"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"with_creators\": 1}",
+   "resource_name": "categories",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_categories"
+  }
+ ],
+ "route": "/category/:category",
+ "studio_app": "helpdesk"
+}

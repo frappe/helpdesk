@@ -22,7 +22,7 @@ const props = withDefaults(
     contacts?: { full_name: string; email: string; image?: string }[];
     placeholder?: string;
   }>(),
-  { contacts: () => [], placeholder: "Add email…" }
+  { contacts: () => [] }
 );
 
 const emails = defineModel<string[]>({ default: () => [] });

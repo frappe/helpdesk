@@ -27,6 +27,36 @@ def new(doc: dict, attachments: list[dict] = []):
     return TicketFields().strip_hidden_fields(d.as_dict())
 
 
+TIMELINE_FIELDS = ("status",)
+
+
+@frappe.whitelist(methods=["GET"])
+def get_timeline_changes(name: str) -> list[dict]:
+    """Status changes, oldest first, with who made them: readers of a ticket can't read Version."""
+    frappe.has_permission("HD Ticket", "read", name, throw=True)
+    versions = frappe.get_all(
+        "Version",
+        filters={"ref_doctype": "HD Ticket", "docname": name},
+        or_filters=[["data", "like", f'%"{field}"%'] for field in TIMELINE_FIELDS],
+        fields=["owner", "creation", "data"],
+        order_by="creation asc",
+    )
+    changes = []
+    for version in versions:
+        for field, old, new in frappe.parse_json(version.data).get("changed", []):
+            if field in TIMELINE_FIELDS:
+                changes.append(
+                    {
+                        "field": field,
+                        "from": old,
+                        "to": new,
+                        "by": get_user_info_for_avatar(version.owner),
+                        "on": version.creation,
+                    }
+                )
+    return changes
+
+
 @frappe.whitelist()
 def get_one(name: str):
     """The customer portal's ticket page: the ticket as this user may read it,

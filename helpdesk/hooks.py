@@ -60,15 +60,18 @@ website_route_rules = [
         "from_route": "/kb/customer-tickets",
         "to_route": "kb",
     },
+    {
+        "from_route": "/kb/help",
+        "to_route": "kb",
+    },
+    {
+        "from_route": "/kb/categories",
+        "to_route": "kb",
+    },
 ]
 
-# The old customer portal's ticket URLs keep working through these.
+# The old customer portal's URLs keep working through these.
 website_redirects = [
-    # The app root will be the knowledge base once its pages land.
-    {
-        "source": "/kb",
-        "target": "/kb/customer-tickets",
-    },
     {
         "source": "/helpdesk/my-tickets/new",
         "target": "/kb/tickets/new",
@@ -83,6 +86,18 @@ website_redirects = [
         "source": r"/helpdesk/my-tickets/(.*)",
         "target": r"/kb/tickets/\1",
         "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/kb-public",
+        "target": "/kb",
+    },
+    {
+        "source": r"/helpdesk/kb-public/articles/(.*)",
+        "target": r"/kb/articles/\1",
+    },
+    {
+        "source": r"/helpdesk/kb-public/(.*)",
+        "target": r"/kb/category/\1",
     },
 ]
 
@@ -143,6 +158,7 @@ doc_events = {
 # For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
@@ -151,6 +167,7 @@ permission_query_conditions = {
 has_permission = {
     "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
     "Comment": "helpdesk.extends.comment.has_permission",

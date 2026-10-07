@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-// The framework's FieldComponent contract, spelled out: the SFC compiler cannot resolve its types through the alias.
+// FieldComponent's props inlined: the SFC compiler cannot resolve that type through the alias.
 import { __ } from "@helpdesk/shared/translation";
 import { parseApiOptions } from "@helpdesk/shared/utils";
 import { Combobox, createResource } from "frappe-ui";

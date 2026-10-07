@@ -29,8 +29,9 @@
       "shrink-0",
       "h-[43px]",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-topbar-nt",
      "componentName": "container",
@@ -42,24 +43,6 @@
       {
        "blockName": "stack",
        "children": [
-        {
-         "blockName": "title",
-         "classes": [
-          "font-semibold",
-          "mb-1",
-          "ml-0",
-          "mr-0",
-          "mt-0",
-          "text-ink-gray-8"
-         ],
-         "componentId": "title",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-2xl",
-          "tag": "span",
-          "text": "{{ t('Create new ticket') }}"
-         }
-        },
         {
          "blockName": "about",
          "classes": [
@@ -107,6 +90,95 @@
          "componentId": "f-subject",
          "componentName": "container",
          "originalElement": "div"
+        },
+        {
+         "blockName": "suggestions",
+         "children": [
+          {
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-5"
+             ],
+             "componentId": "TextBlock-nt-suggestions",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-base",
+              "tag": "span",
+              "text": "{{ t('Suggested articles based on your subject') }}"
+             }
+            },
+            {
+             "classes": [
+              "cursor-pointer",
+              "text-ink-blue-link",
+              "hover:underline"
+             ],
+             "componentEvents": {
+              "click": {
+               "action": "Run Script",
+               "event": "click",
+               "script": "router.push({ path: '/help', query: { q: subject } })"
+              }
+             },
+             "componentId": "TextBlock-nt-see-all",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-base",
+              "tag": "span",
+              "text": "{{ t('See all') }}"
+             }
+            }
+           ],
+           "classes": [
+            "mb-1",
+            "flex",
+            "items-center",
+            "justify-between",
+            "px-2",
+            "pt-1",
+            "flex-wrap",
+            "gap-x-3",
+            "gap-y-1"
+           ],
+           "componentId": "container-nt-suggestions-head",
+           "componentName": "container",
+           "originalElement": "div"
+          },
+          {
+           "baseStyles": {
+            "display": "flex",
+            "flexDirection": "column",
+            "gap": "0px"
+           },
+           "children": [
+            {
+             "componentId": "PortalArticleRow-nt",
+             "componentName": "PortalArticleRow",
+             "componentProps": {
+              "article": "{{ dataItem }}",
+              "variant": "suggestion"
+             },
+             "isCustomVueComponent": true
+            }
+           ],
+           "componentId": "Repeater-nt-suggestions",
+           "componentName": "Repeater",
+           "componentProps": {
+            "data": "{{ suggestions.data }}",
+            "dataKey": "name"
+           }
+          }
+         ],
+         "classes": [
+          "rounded-7",
+          "bg-surface-gray-2",
+          "p-3"
+         ],
+         "componentId": "container-nt-suggestions",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ suggestions.data && suggestions.data.length }}"
         },
         {
          "blockName": "f-desc",
@@ -226,10 +298,10 @@
         "mx-auto",
         "my-0",
         "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[50px]",
-        "w-full"
+        "w-full",
+        "pt-6",
+        "sm:pt-[50px]",
+        "max-w-[896px]"
        ],
        "componentId": "stack",
        "componentName": "container",
@@ -269,11 +341,11 @@
         "shrink",
         "gap-5",
         "h-fit",
-        "pb-0",
-        "pl-0",
-        "pr-0",
-        "pt-[39px]",
-        "w-full"
+        "w-full",
+        "pt-8",
+        "sm:pt-[39px]",
+        "pb-8",
+        "max-w-[896px]"
        ],
        "componentId": "container-pp0kzmif9",
        "componentName": "container",
@@ -281,14 +353,16 @@
       }
      ],
      "classes": [
-      "items-start",
+      "items-center",
       "flex",
       "flex-col",
       "grow",
       "shrink",
       "justify-start",
-      "max-w-[552px]",
-      "overflow-y-auto"
+      "overflow-y-auto",
+      "w-full",
+      "px-4",
+      "sm:px-0"
      ],
      "componentId": "content",
      "componentName": "container",
@@ -316,13 +390,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-07-30 15:26:13.484982",
+ "creation": "2026-10-01 15:56:40.168008",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 04:20:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

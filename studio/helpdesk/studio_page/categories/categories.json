@@ -1,0 +1,285 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "navbar",
+     "children": [
+      {
+       "blockName": "Header",
+       "componentId": "header-categories",
+       "componentName": "header",
+       "componentProps": {},
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [
+      "items-center",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "shrink-0",
+      "h-[43px]",
+      "justify-between",
+      "py-0",
+      "w-full",
+      "px-3",
+      "sm:px-5"
+     ],
+     "componentId": "container-categories-navbar",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "categories-body",
+     "children": [
+      {
+       "blockName": "categories-section",
+       "children": [
+        {
+         "classes": [
+          "text-ink-gray-7",
+          "font-semibold"
+         ],
+         "componentId": "TextBlock-fbq9hffj6-all",
+         "componentName": "TextBlock",
+         "componentProps": {
+          "fontSize": "text-lg",
+          "tag": "h1",
+          "text": "{{ t(\"All categories\") }}"
+         }
+        },
+        {
+         "blockName": "categories-grid",
+         "children": [
+          {
+           "baseStyles": {
+            "display": "grid",
+            "gap": "10px",
+            "gridAutoColumns": "minmax(0, 1fr)",
+            "height": "auto",
+            "width": "100%"
+           },
+           "children": [
+            {
+             "blockName": "category-card",
+             "children": [
+              {
+               "classes": [
+                "size-6",
+                "text-ink-gray-8"
+               ],
+               "componentId": "Icon-category-card-all",
+               "componentName": "Icon",
+               "componentProps": {
+                "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+               }
+              },
+              {
+               "blockName": "card-icon-wrapper",
+               "classes": [
+                "items-center",
+                "hidden",
+                "shrink-0",
+                "h-9",
+                "justify-center",
+                "mb-1",
+                "w-fit"
+               ],
+               "componentId": "container-rf6xi6a78-all",
+               "componentName": "container",
+               "originalElement": "div"
+              },
+              {
+               "blockName": "container",
+               "children": [
+                {
+                 "blockName": "category-title",
+                 "classes": [
+                  "text-ink-gray-7",
+                  "font-semibold"
+                 ],
+                 "componentId": "TextBlock-sn7kwi5gk-all",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-lg",
+                  "tag": "h3",
+                  "text": "{{ dataItem.category_name }}"
+                 }
+                },
+                {
+                 "blockName": "category-description",
+                 "classes": [
+                  "line-clamp-2",
+                  "text-ink-gray-5",
+                  "grow-0"
+                 ],
+                 "componentId": "TextBlock-2jee9t8sl-all",
+                 "componentName": "TextBlock",
+                 "componentProps": {
+                  "fontSize": "text-p-base",
+                  "tag": "p",
+                  "text": "{{ dataItem.description || t('Browse articles in this category') }}"
+                 }
+                }
+               ],
+               "classes": [
+                "flex",
+                "flex-col",
+                "shrink",
+                "gap-1",
+                "h-fit",
+                "min-w-0",
+                "w-full"
+               ],
+               "componentId": "container-fynnwc9gx-all",
+               "componentName": "container",
+               "originalElement": "div"
+              }
+             ],
+             "classes": [
+              "transition",
+              "hover:bg-surface-gray-1",
+              "items-start",
+              "border-outline-gray-2",
+              "rounded-5",
+              "border",
+              "cursor-pointer",
+              "flex",
+              "flex-col",
+              "gap-2.5",
+              "justify-center",
+              "overflow-hidden",
+              "pb-4",
+              "pl-5",
+              "pr-5",
+              "pt-4",
+              "w-full",
+              "sm:min-h-[132px]",
+              "max-sm:flex-row",
+              "max-sm:items-start",
+              "max-sm:gap-3",
+              "max-sm:px-4",
+              "max-sm:py-3.5"
+             ],
+             "componentEvents": {
+              "click": {
+               "action": "Run Script",
+               "event": "click",
+               "oldEvent": "click",
+               "script": "router.push({ path: `/category/${dataItem.name}` })\n"
+              }
+             },
+             "componentId": "container-fvud8e41t-all",
+             "componentName": "container",
+             "originalElement": "div"
+            }
+           ],
+           "classes": [
+            "grid-cols-1",
+            "sm:grid-cols-2",
+            "lg:grid-cols-3"
+           ],
+           "componentId": "Repeater-sxfnpzbam-all",
+           "componentName": "Repeater",
+           "componentProps": {
+            "data": "{{ categories.data || [] }}",
+            "dataKey": "name"
+           },
+           "visibilityCondition": "{{ categories.data && categories.data.length }}"
+          }
+         ],
+         "classes": [
+          "items-stretch",
+          "grid",
+          "gap-3",
+          "grid-cols-1",
+          "justify-stretch",
+          "w-auto"
+         ],
+         "componentId": "container-3jcpczdo3-all",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "max-w-[700px]",
+        "w-full",
+        "px-4",
+        "md:px-0",
+        "pt-8",
+        "sm:pt-[41px]",
+        "pb-8"
+       ],
+       "componentId": "container-categories-section",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-col",
+      "min-h-0",
+      "overflow-y-auto",
+      "w-full"
+     ],
+     "componentId": "container-categories-content",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "componentProps": {},
+     "componentSlots": {},
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base",
+    "flex",
+    "flex-col",
+    "w-full",
+    "h-full"
+   ],
+   "componentId": "container-categories-body",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-10-07 18:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-08 02:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "categories",
+ "owner": "Administrator",
+ "page_name": "page-aaf46b8b",
+ "page_title": "Categories",
+ "published": 1,
+ "resources": [
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{}",
+   "resource_name": "categories",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_categories"
+  }
+ ],
+ "route": "/categories",
+ "studio_app": "helpdesk"
+}
