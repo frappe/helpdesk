@@ -22,6 +22,14 @@
         label="Category"
         :page-length="100"
       />
+      <p v-if="joining.data" class="mt-3 text-p-sm text-ink-gray-7">
+        {{
+          __(
+            "Articles in this category are visible to {0}, so merged articles will be too.",
+            [visibleTo(joining.data)]
+          )
+        }}
+      </p>
     </template>
     <template #actions>
       <Button
@@ -37,6 +45,7 @@
 import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import { Link } from "@/components";
+import { useCategoryVisibility, visibleTo } from "@/stores/knowledgeBase";
 defineProps<{
   categoryId: string;
   categoryTitle: string;
@@ -45,4 +54,5 @@ const emit = defineEmits(["merge"]);
 const showDialog = defineModel<boolean>();
 
 const toCategory = ref("");
+const joining = useCategoryVisibility(toCategory);
 </script>
