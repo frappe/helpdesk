@@ -204,7 +204,7 @@
     <ArticleSharingModal
       v-if="article.data"
       v-model="showSharingModal"
-      :title="article.data.title"
+      :title="__('Sharing “{0}”', [article.data.title])"
       :visibility="article.data.visibility"
       @publish="publishArticle"
     >
