@@ -48,16 +48,14 @@ function serviceIcon(url: string) {
   return domain ? SERVICE_ICONS[domain] : null
 }
 
-// Settings' Preview shows its unsaved quick links in place of the saved ones.
-const preview = readKbPreview()
-
 let scriptContext = null
 
 async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
   await setupCustomizations(data, scriptContext)
   customActions.value = data._customActions || []
-  headerLinks.value = (preview?.links || data._customLinks || [])
+  // Settings' Preview shows its unsaved quick links in place of the saved ones, until a save clears it.
+  headerLinks.value = (readKbPreview()?.links || data._customLinks || [])
     .filter((link) => link?.label && isSafeLink(link.url))
     .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 }
