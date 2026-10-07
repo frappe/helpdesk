@@ -1,7 +1,7 @@
 <template>
   <nav
     :aria-label="__('Knowledge base')"
-    class="flex h-full flex-col border-r border-outline-gray-1 bg-surface-sidebar"
+    class="flex h-full flex-col border-r border-outline-gray-1 bg-surface-base"
   >
     <div class="px-3 pb-2 pt-4">
       <TextInput
@@ -69,7 +69,7 @@
               class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-snug no-underline transition"
               :class="
                 article.name === activeName
-                  ? 'bg-surface-elevation-3 text-ink-gray-8 shadow-sm'
+                  ? 'bg-surface-gray-2 text-ink-gray-8'
                   : 'text-ink-gray-6 hover:bg-surface-gray-2'
               "
             >
