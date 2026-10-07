@@ -23,7 +23,7 @@
           <ListHeaderCell class="ms-2">{{ __("Label") }}</ListHeaderCell>
           <ListHeaderCell class="ms-2">{{ __("URL") }}</ListHeaderCell>
           <ListHeaderCell class="justify-center">
-            {{ __("New tab") }}
+            {{ __("Open in new tab") }}
           </ListHeaderCell>
           <ListHeaderCell />
         </ListHeader>
@@ -96,7 +96,7 @@ type HeaderLink = { label: string; url: string; open_in_new_tab: boolean };
 
 const rows = defineModel<HeaderLink[]>({ required: true });
 
-const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "64px", "32px"];
+const columns = ["minmax(0,1fr)", "minmax(0,2fr)", "112px", "32px"];
 
 const isConfirmingDelete = ref(false);
 
