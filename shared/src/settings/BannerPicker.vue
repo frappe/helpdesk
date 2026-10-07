@@ -2,11 +2,11 @@
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-1">
       <span class="text-base-medium text-ink-gray-8">{{
-        __("Banner image")
+        __("Banner")
       }}</span>
       <span class="text-p-sm text-ink-gray-6">{{
         __(
-          "Appears behind the search bar on the knowledge base home page. Recommended size is minimum 1440x240 px in PNG or JPG."
+          "Choose a color, pattern or image to show behind the search bar on the knowledge base home page. Recommended image size is minimum 1440x240 px in PNG or JPG."
         )
       }}</span>
     </div>
