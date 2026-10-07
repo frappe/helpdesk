@@ -24,7 +24,7 @@
           <span class="text-p-sm text-ink-gray-6">
             {{
               __(
-                "Only these categories will appear on the knowledge base home page. Leave empty to show all of them."
+                "Select the categories you want on your knowledge base home page. Leave empty or select all to show all of them."
               )
             }}
           </span>
