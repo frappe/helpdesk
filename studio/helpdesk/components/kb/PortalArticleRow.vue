@@ -17,7 +17,7 @@
       class="flex min-w-0 flex-1 flex-col gap-0.5 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
     >
       <span
-        class="truncate text-base leading-[1.15] font-medium text-ink-gray-8"
+        class="truncate text-base-medium text-ink-gray-8"
         v-html="article.title"
       />
       <span

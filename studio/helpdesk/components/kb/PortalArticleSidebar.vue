@@ -44,7 +44,7 @@
             :class="category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'"
           />
           <span
-            class="min-w-0 flex-1 truncate text-sm leading-tighter"
+            class="min-w-0 flex-1 truncate text-sm"
             :class="category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'"
           >
             {{ category.label }}
@@ -68,7 +68,7 @@
               :to="ROUTES.article(article.name)"
               :aria-current="article.name === activeName ? 'page' : undefined"
               :title="article.title"
-              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm leading-snug no-underline transition"
+              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm no-underline transition"
               :class="
                 article.name === activeName
                   ? 'bg-surface-gray-2 text-ink-gray-8'
@@ -171,7 +171,10 @@ const visibleCategories = computed(() => {
 const list = ref<HTMLElement | null>(null);
 let shownFor = "";
 watch(
-  () => [props.activeName || currentCategory.value, visibleCategories.value.length],
+  () => [
+    props.activeName || currentCategory.value,
+    visibleCategories.value.length,
+  ],
   async ([key]) => {
     if (!key || key === shownFor || !list.value) return;
     await nextTick();

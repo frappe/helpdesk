@@ -36,7 +36,9 @@
     class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto pb-10 text-base leading-relaxed [mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
   >
     <!-- The transparent rail keeps the label on the links' left edge. -->
-    <span class="border-l border-transparent pb-1 pl-4 font-medium text-ink-gray-8">
+    <span
+      class="border-l border-transparent pb-1 pl-4 font-medium text-ink-gray-8"
+    >
       {{ __("On this page") }}
     </span>
     <button
@@ -119,7 +121,10 @@ watch(activeId, async (id) => {
   const link = nav?.querySelector<HTMLElement>(`[data-toc-id="${id}"]`);
   if (!nav || !link) return;
   if (link.offsetTop < nav.scrollTop) nav.scrollTop = link.offsetTop;
-  else if (link.offsetTop + link.offsetHeight > nav.scrollTop + nav.clientHeight)
+  else if (
+    link.offsetTop + link.offsetHeight >
+    nav.scrollTop + nav.clientHeight
+  )
     nav.scrollTop = link.offsetTop + link.offsetHeight - nav.clientHeight;
 });
 
@@ -130,7 +135,8 @@ useEventListener(
   (event) => {
     // Only the scroller holding the article moves its headings; not the sidebars or this rail.
     const first = document.getElementById(props.items[0]?.id ?? "");
-    if (event.target instanceof Node && event.target.contains(first)) measure(event.target);
+    if (event.target instanceof Node && event.target.contains(first))
+      measure(event.target);
   },
   { capture: true, passive: true }
 );

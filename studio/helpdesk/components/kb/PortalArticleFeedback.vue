@@ -3,7 +3,7 @@
     class="flex w-full items-center justify-between gap-4 rounded-[12px] bg-surface-gray-1 px-4 py-4"
   >
     <div class="flex min-w-0 flex-col gap-1.5">
-      <span class="text-base leading-[1.15] text-ink-gray-8">
+      <span class="text-base text-ink-gray-8">
         {{ __("Was this article helpful?") }}
       </span>
       <span v-if="canRaiseTicket" class="text-p-base text-ink-gray-5">

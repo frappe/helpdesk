@@ -133,8 +133,7 @@
               {
                "classes": [
                 "font-medium",
-                "text-ink-gray-8",
-                "leading-[1.15]"
+                "text-ink-gray-8"
                ],
                "componentId": "TextBlock-help-create-title",
                "componentName": "TextBlock",
@@ -217,8 +216,7 @@
            "classes": [
             "mt-2",
             "font-medium",
-            "text-ink-gray-8",
-            "leading-[1.15]"
+            "text-ink-gray-8"
            ],
            "componentId": "TextBlock-help-empty-title",
            "componentName": "TextBlock",
@@ -313,7 +311,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 04:20:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "help",
  "owner": "Administrator",

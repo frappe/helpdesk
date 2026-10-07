@@ -202,8 +202,7 @@
           {
            "classes": [
             "text-ink-gray-7",
-            "font-semibold",
-            "leading-[1.15]"
+            "font-semibold"
            ],
            "componentId": "TextBlock-fbq9hffj6",
            "componentName": "TextBlock",
@@ -294,8 +293,7 @@
                  "blockName": "category-title",
                  "classes": [
                   "text-ink-gray-7",
-                  "font-semibold",
-                  "leading-[1.15]"
+                  "font-semibold"
                  ],
                  "componentId": "TextBlock-sn7kwi5gk",
                  "componentName": "TextBlock",
@@ -452,8 +450,7 @@
           {
            "classes": [
             "text-ink-gray-9",
-            "font-semibold",
-            "leading-[1.15]"
+            "font-semibold"
            ],
            "componentId": "TextBlock-category-picker-title",
            "componentName": "TextBlock",
@@ -573,7 +570,6 @@
                "classes": [
                 "text-ink-gray-9",
                 "font-semibold",
-                "leading-[1.15]",
                 "truncate"
                ],
                "componentId": "TextBlock-category-choice-name",
@@ -586,8 +582,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
+                "text-ink-gray-5"
                ],
                "componentId": "TextBlock-category-choice-count",
                "componentName": "TextBlock",
@@ -657,8 +652,7 @@
               {
                "classes": [
                 "text-ink-gray-9",
-                "font-semibold",
-                "leading-[1.15]"
+                "font-semibold"
                ],
                "componentId": "TextBlock-wq25lxphd",
                "componentName": "TextBlock",
@@ -671,8 +665,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
+                "text-ink-gray-5"
                ],
                "componentId": "TextBlock-focus-category-summary",
                "componentName": "TextBlock",
@@ -979,7 +972,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 22:00:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

@@ -182,8 +182,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
+                "text-ink-gray-5"
                ],
                "componentId": "TextBlock-bb34uxs9r",
                "componentName": "TextBlock",
@@ -195,8 +194,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-4",
-                "leading-[1.15]"
+                "text-ink-gray-4"
                ],
                "componentId": "TextBlock-zkf1kslsi",
                "componentName": "TextBlock",
@@ -208,8 +206,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-5",
-                "leading-[1.15]"
+                "text-ink-gray-5"
                ],
                "componentId": "TextBlock-6b11cqpq2",
                "componentName": "TextBlock",
@@ -221,8 +218,7 @@
               },
               {
                "classes": [
-                "text-ink-gray-4",
-                "leading-[1.15]"
+                "text-ink-gray-4"
                ],
                "componentId": "article-reading-dot",
                "componentName": "TextBlock",
@@ -245,9 +241,7 @@
                  }
                 },
                 {
-                 "classes": [
-                  "leading-[1.15]"
-                 ],
+                 "classes": [],
                  "componentId": "article-reading-label",
                  "componentName": "TextBlock",
                  "componentProps": {
@@ -270,7 +264,6 @@
               {
                "classes": [
                 "text-ink-gray-4",
-                "leading-[1.15]",
                 "max-sm:hidden"
                ],
                "componentId": "article-permalink-dot",
@@ -295,9 +288,7 @@
                  }
                 },
                 {
-                 "classes": [
-                  "leading-[1.15]"
-                 ],
+                 "classes": [],
                  "componentId": "TextBlock-copy-link",
                  "componentName": "TextBlock",
                  "componentProps": {
@@ -405,8 +396,7 @@
             {
              "classes": [
               "text-ink-gray-8",
-              "font-semibold",
-              "leading-[1.15]"
+              "font-semibold"
              ],
              "componentId": "TextBlock-kfxofctkr",
              "componentName": "TextBlock",
@@ -663,7 +653,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 01:30:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

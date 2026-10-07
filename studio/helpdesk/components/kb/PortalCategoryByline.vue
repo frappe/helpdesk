@@ -1,7 +1,7 @@
 <template>
   <span
     v-if="creators.length"
-    class="flex items-center gap-2 text-sm leading-[1.15] text-ink-gray-5"
+    class="flex items-center gap-2 text-sm text-ink-gray-5"
   >
     <span class="flex ps-1.5">
       <Avatar
