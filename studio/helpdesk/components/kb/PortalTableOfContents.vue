@@ -33,7 +33,7 @@
   <nav
     v-else-if="items.length"
     ref="rail"
-    class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto text-base leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto pb-10 text-base leading-relaxed [mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
   >
     <!-- The transparent rail keeps the label on the links' left edge. -->
     <span class="border-l border-transparent pb-1 pl-4 font-medium text-ink-gray-8">
