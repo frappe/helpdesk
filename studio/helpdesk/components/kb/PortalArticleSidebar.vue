@@ -26,6 +26,7 @@
     </div>
 
     <div
+      ref="list"
       class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4 pt-1"
     >
       <div v-for="category in visibleCategories" :key="category.name">
@@ -34,6 +35,7 @@
           class="flex h-9 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 md:h-7 text-left transition hover:bg-surface-gray-1"
           :aria-expanded="category.isOpen"
           :aria-controls="`kb-sidebar-${category.name}`"
+          :data-current="category.isCurrent || undefined"
           @click="toggle(category.name)"
         >
           <Icon
@@ -90,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import {
   Icon,
@@ -163,6 +165,29 @@ const visibleCategories = computed(() => {
     })
     .filter((category) => !searching || category.matches.length);
 });
+
+// A long list leaves the current category or article out of sight, so bring it into view once
+// per page, scrolling only the list.
+const list = ref<HTMLElement | null>(null);
+let shownFor = "";
+watch(
+  () => [props.activeName || currentCategory.value, visibleCategories.value.length],
+  async ([key]) => {
+    if (!key || key === shownFor || !list.value) return;
+    await nextTick();
+    const target =
+      list.value.querySelector('[aria-current="page"]') ||
+      list.value.querySelector("[data-current]");
+    if (!target) return;
+    shownFor = key as string;
+    const box = list.value.getBoundingClientRect();
+    const top = target.getBoundingClientRect().top - box.top;
+    if (top < 0 || top > box.height - 48) {
+      list.value.scrollTop += top - box.height / 3;
+    }
+  },
+  { flush: "post" }
+);
 
 const search = ref<InstanceType<typeof TextInput> | null>(null);
 useKeyboardShortcut({
