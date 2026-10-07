@@ -24,6 +24,9 @@ export default function setup(context) {
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
   const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
 
+  // Saving the knowledge base settings reloads the session; the pins come with the categories.
+  watch(config, (_, previous) => previous && categories.reload())
+
   // Only the pinned categories, unless none are.
   const homeCategories = computed(() => {
     const rows = categories.data || []
