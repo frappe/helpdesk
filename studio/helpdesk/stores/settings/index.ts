@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { useStorage } from '@vueuse/core'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
@@ -33,6 +34,14 @@ const themeOptions = computed(() => [
   { label: __('Light'), value: 'light' },
   { label: __('Dark'), value: 'dark' },
   { label: __('System'), value: 'system' },
+])
+
+// In the browser, not on the User doc: it describes this screen on this device.
+export const conversationLayout = useStorage('kb:conversation-layout', 'timeline')
+
+const conversationLayoutOptions = computed(() => [
+  { label: __('Timeline'), value: 'timeline' },
+  { label: __('Chat'), value: 'chat' },
 ])
 
 // Leaving the Knowledge Base tab with unsaved changes asks first, as the desk's settings do.
@@ -96,6 +105,8 @@ export const accountMenuOptions = computed(() =>
 const store = {
   themeOptions,
   theme,
+  conversationLayout,
+  conversationLayoutOptions,
   // Blocks bind `t`, not `__`.
   t: __,
   accountMenuOptions,

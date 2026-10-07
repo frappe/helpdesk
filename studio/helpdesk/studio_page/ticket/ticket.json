@@ -123,7 +123,8 @@
              "componentProps": {
               "extraActivities": "{{ threadExtras }}",
               "ticket": "{{ ticketId }}",
-              "version": "{{ ticket.data && ticket.data.modified }}"
+              "version": "{{ ticket.data && ticket.data.modified }}",
+              "communications": "{{ ticket.data && ticket.data.communications }}"
              },
              "isCustomVueComponent": true,
              "componentSlots": {
@@ -1122,7 +1123,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 21:00:00.000000",
+ "modified": "2026-10-08 07:10:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
