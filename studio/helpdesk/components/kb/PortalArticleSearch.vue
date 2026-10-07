@@ -75,7 +75,7 @@
         class="flex min-w-0 items-center gap-3"
       >
         <span
-          class="flex size-9 shrink-0 items-center justify-center rounded-5 bg-surface-gray-2 text-ink-gray-6"
+          class="flex size-9 shrink-0 items-center justify-center rounded-5 bg-[--outline-gray-2] text-ink-gray-6 dark:bg-[--outline-gray-3]"
         >
           <LucideSearch class="size-4" />
         </span>
