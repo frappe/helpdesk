@@ -45,17 +45,8 @@
                 class="text-p-xs font-normal text-ink-gray-5"
                 >{{ __("You") }}</span
               >
-              <Badge
-                v-if="member.pending"
-                :label="__('Pending')"
-                theme="amber"
-                variant="subtle"
-              />
             </div>
-            <div
-              v-if="!member.pending"
-              class="truncate text-p-sm text-ink-gray-5"
-            >
+            <div class="truncate text-p-sm text-ink-gray-5">
               {{ member.email }}
             </div>
           </div>
@@ -103,7 +94,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Avatar, Badge, Button, Dropdown, Select, TextInput } from "frappe-ui";
+import { Avatar, Button, Dropdown, Select, TextInput } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
@@ -117,14 +108,12 @@ const ROW =
 
 type Member = {
   contact?: string;
-  invitation?: string;
   full_name: string;
   email?: string;
   image?: string;
   last_seen?: string;
   role: RoleLabel;
   is_you?: boolean;
-  pending?: boolean;
 };
 
 // Owner is left out: there is one per organization, already first in the list.
@@ -141,13 +130,11 @@ const roleFilters = computed(() => [
 const props = withDefaults(
   defineProps<{
     members?: Member[];
-    canInvite?: boolean;
     canChangeRoles?: boolean;
     canRemoveMembers?: boolean;
   }>(),
   {
     members: () => [],
-    canInvite: false,
     canChangeRoles: false,
     canRemoveMembers: false,
   }
@@ -180,17 +167,6 @@ function lastSeen(member: Member) {
 // The owner's role is fixed, and changing yourself revokes the rights the call needs.
 function rowOptions(member: Member) {
   if (member.role === "Owner" || member.is_you) return [];
-  if (member.pending) {
-    return props.canInvite
-      ? [
-          {
-            label: __("Cancel invitation"),
-            icon: "lucide-x-circle",
-            onClick: () => emit("remove", member),
-          },
-        ]
-      : [];
-  }
   const next: RoleLabel = member.role === "Manager" ? "Member" : "Manager";
   return [
     props.canChangeRoles && {
@@ -207,6 +183,6 @@ function rowOptions(member: Member) {
 }
 
 function keyOf(member: Member) {
-  return member.contact || member.invitation || member.email;
+  return member.contact || member.email;
 }
 </script>

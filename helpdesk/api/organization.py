@@ -42,10 +42,11 @@ def get_settings() -> dict:
 
 @frappe.whitelist()
 def get_organization(customer: str) -> dict:
-    """One organization the caller belongs to, with everyone in it."""
+    """One organization the caller belongs to: its members and, for an inviter, its invites."""
     hd_customer = frappe.get_doc("HD Customer", customer)
     hd_customer.check_permission("read")
     is_manager = hd_customer.has_permission("write")
+    can_invite = is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING)
     return {
         "name": hd_customer.name,
         "customer_name": hd_customer.customer_name,
@@ -54,12 +55,13 @@ def get_organization(customer: str) -> dict:
         "email": hd_customer.email_id,
         "country": hd_customer.country,
         "is_manager": is_manager,
-        "can_invite": is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING),
+        "can_invite": can_invite,
         "can_change_roles": is_manager and _is_portal_setting_on(PORTAL_ROLES_SETTING),
         "can_remove_members": is_manager
         and _is_portal_setting_on(PORTAL_REMOVE_SETTING),
         "can_edit": is_manager and _is_portal_setting_on(PORTAL_EDIT_SETTING),
-        "members": _get_members(hd_customer) + _get_pending_members(hd_customer),
+        "members": _get_members(hd_customer),
+        "invites": _get_pending_invites(hd_customer) if can_invite else [],
     }
 
 
@@ -225,14 +227,12 @@ def _get_members(hd_customer) -> list[dict]:
     return members
 
 
-def _get_pending_members(hd_customer) -> list[dict]:
+def _get_pending_invites(hd_customer) -> list[dict]:
     return [
         {
             "invitation": invitation["name"],
-            "full_name": invitation["email"],
             "email": invitation["email"],
             "role": _get_role_label(False, MANAGER_ROLE in invitation["roles"]),
-            "pending": True,
         }
         for invitation in hd_customer.get_pending_invitations()
     ]
