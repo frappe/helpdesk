@@ -416,12 +416,6 @@
              }
             },
             {
-             "baseStyles": {
-              "display": "flex",
-              "flexDirection": "column",
-              "gap": "0px",
-              "width": "100%"
-             },
              "blockName": "related-repeater",
              "children": [
               {
@@ -491,7 +485,12 @@
                "originalElement": "div"
               }
              ],
-             "classes": [],
+             "classes": [
+              "w-full",
+              "!flex-col",
+              "!flex-nowrap",
+              "!gap-0"
+             ],
              "componentId": "Repeater-qufpavvce",
              "componentName": "Repeater",
              "componentProps": {
@@ -663,7 +662,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 01:00:00.000000",
+ "modified": "2026-10-08 01:30:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
