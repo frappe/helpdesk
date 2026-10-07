@@ -1,31 +1,10 @@
 import { computed } from 'vue'
 
 export function useTicketThread(ticket) {
-  const messages = computed(() =>
-    (ticket.data?.communications || []).map((message) => ({
-      name: message.name,
-      content: message.content,
-      creation: message.creation,
-      sender: message.user?.name || message.sender,
-      email: message.sender,
-      image: message.user?.image,
-      attachments: message.attachments || [],
-      // `sender` is an email and `raised_by` may not be, so direction is the only reliable side.
-      isAgentReply: message.sent_or_received === 'Sent',
-    })),
+  // `sender` is an email and `raised_by` may not be, so direction is the only reliable side.
+  const agentReplies = computed(() =>
+    (ticket.data?.communications || []).filter((message) => message.sent_or_received === 'Sent'),
   )
-
-  const activities = computed(() =>
-    messages.value.map((message) => ({
-      type: 'email',
-      key: message.name,
-      timestamp: message.creation,
-      author: { fullname: message.sender, image: message.image, email: message.email },
-      data: message,
-    })),
-  )
-
-  const agentReplies = computed(() => messages.value.filter((message) => message.isAgentReply))
   const lastAgentReply = computed(() => agentReplies.value.at(-1) || null)
   // Not `first_responded_on`: that is stamped on a status transition, not on the reply.
   const firstAgentReply = computed(() => agentReplies.value[0] || null)
@@ -50,7 +29,6 @@ export function useTicketThread(ticket) {
   }
 
   return {
-    activities,
     rating,
     lastAgentReply,
     firstAgentReply,
