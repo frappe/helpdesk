@@ -10,11 +10,18 @@
           class="w-full"
           size="md"
           :options="accessOptions"
+          :placeholder="__('Mixed')"
         />
+        <slot :access="access" />
       </div>
 
       <div class="flex justify-end">
-        <Button variant="solid" :label="__('Publish')" @click="publish" />
+        <Button
+          variant="solid"
+          :label="actionLabel || __('Publish')"
+          :disabled="!access || (requireChange && access === visibility)"
+          @click="publish"
+        />
       </div>
     </div>
   </Dialog>
@@ -25,7 +32,13 @@ import { Button, Dialog, Select } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
 
-const props = defineProps<{ title: string; visibility: string }>();
+// A null `visibility` is a category whose articles differ.
+const props = defineProps<{
+  title: string;
+  visibility: string | null;
+  actionLabel?: string;
+  requireChange?: boolean;
+}>();
 const emit = defineEmits<{ publish: [visibility: string] }>();
 const show = defineModel<boolean>({ default: false });
 
@@ -54,7 +67,7 @@ watch(show, (open) => {
 });
 
 function publish() {
-  emit("publish", access.value);
+  emit("publish", access.value!);
   show.value = false;
 }
 </script>

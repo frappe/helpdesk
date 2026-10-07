@@ -39,6 +39,20 @@
       v-model="mergeModal"
       @merge="handleMergeCategory"
     />
+    <ArticleSharingModal
+      v-model="sharingModal"
+      :title="category.title"
+      :visibility="categoryVisibility.data ?? null"
+      :action-label="__('Update access')"
+      require-change
+      @publish="updateCategoryAccess"
+    >
+      <template #default="{ access }">
+        <p class="text-p-sm text-ink-gray-7">
+          {{ categoryAccessNote(access) }}
+        </p>
+      </template>
+    </ArticleSharingModal>
   </div>
 </template>
 
@@ -46,6 +60,7 @@
 import Icon from "@/components/Icon.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
@@ -60,7 +75,6 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
 import {
   Badge,
   Button,
@@ -91,6 +105,7 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
+const sharingModal = ref(false);
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -165,15 +180,12 @@ const groupByActions = [
   },
   {
     label: __("Share"),
-    icon: "lucide-link",
+    icon: "lucide-share-2",
     onClick: async ({ group }) => {
-      const { label, value } = group;
-      const url = new URL(window.location.href);
-      url.pathname = `${CUSTOMER_PORTAL_ROOT}/category/${value}`;
-      await copyToClipboard(
-        url.toString(),
-        __("Category '{0}' link copied to clipboard", [label])
-      );
+      category.title = group.label;
+      category.id = group.value;
+      await categoryVisibility.submit({ category: group.value });
+      sharingModal.value = true;
     },
   },
   {
@@ -184,6 +196,67 @@ const groupByActions = [
     },
   },
 ];
+
+const categoryVisibility = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_visibility",
+});
+const setCategoryVisibility = createResource({
+  url: "helpdesk.api.knowledge_base.set_category_visibility",
+});
+
+function categoryAccessNote(access: string | null) {
+  const name = category.title;
+  if (!access) {
+    return __(
+      "Articles in {0} have different access. Choosing one applies it to every article.",
+      [name]
+    );
+  }
+  if (access === categoryVisibility.data) {
+    return {
+      Public: __(
+        "Anyone, including visitors who aren't logged in, can read the articles in {0}.",
+        [name]
+      ),
+      "Customers only": __(
+        "Only logged-in customers and agents can read the articles in {0}.",
+        [name]
+      ),
+      "Agents only": __(
+        "Only agents can read the articles in {0}. It doesn't appear on the customer portal.",
+        [name]
+      ),
+    }[access];
+  }
+  return {
+    Public: __(
+      "Every article in {0} will be readable by anyone, including visitors who aren't logged in.",
+      [name]
+    ),
+    "Customers only": __(
+      "Every article in {0} will be readable only by logged-in customers and agents.",
+      [name]
+    ),
+    "Agents only": __(
+      "Every article in {0} will be readable only by agents, and {0} will no longer appear on the customer portal.",
+      [name]
+    ),
+  }[access];
+}
+
+function updateCategoryAccess(visibility: string) {
+  setCategoryVisibility.submit(
+    { category: category.id, visibility },
+    {
+      onSuccess: () =>
+        toast.success(
+          __("Access updated for every article in {0}.", [category.title])
+        ),
+      onError: (error: Error) =>
+        toast.error(error?.messages?.[0] || error.message),
+    }
+  );
+}
 
 const listSelections = ref(new Set());
 const selectBannerActions = [

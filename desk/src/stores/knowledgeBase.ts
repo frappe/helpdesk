@@ -1,4 +1,6 @@
 import { createResource } from "frappe-ui";
+import { type Ref, watch } from "vue";
+import { __ } from "@/translation";
 
 // Title
 export const newArticle = createResource({
@@ -86,3 +88,27 @@ export const mergeCategory = createResource({
     if (!target) throw { message: "Target is required" };
   },
 });
+
+// The access every article in a category shares; `data` is null when they differ.
+export function useCategoryVisibility(
+  category: Ref<string | null | undefined>
+) {
+  const visibility = createResource({
+    url: "helpdesk.api.knowledge_base.get_category_visibility",
+  });
+  watch(
+    category,
+    (name) =>
+      name ? visibility.submit({ category: name }) : visibility.reset(),
+    { immediate: true }
+  );
+  return visibility;
+}
+
+export function visibleTo(visibility: string) {
+  return {
+    Public: __("everyone"),
+    "Customers only": __("customers only"),
+    "Agents only": __("agents only"),
+  }[visibility];
+}

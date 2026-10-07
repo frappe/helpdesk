@@ -133,12 +133,9 @@ def joining_values(category: str) -> dict:
 
 
 @frappe.whitelist()
-def get_category_access(category: str) -> dict:
+def get_category_visibility(category: str) -> str | None:
     frappe.has_permission("HD Article", "write", throw=True)
-    return {
-        "visibility": category_visibility(category),
-        "articles": frappe.db.count("HD Article", {"category": category}),
-    }
+    return category_visibility(category)
 
 
 @frappe.whitelist()

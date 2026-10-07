@@ -207,7 +207,21 @@
       :title="article.data.title"
       :visibility="article.data.visibility"
       @publish="publishArticle"
-    />
+    >
+      <template #default="{ access }">
+        <p
+          v-if="siblingsVisibility.data && access !== siblingsVisibility.data"
+          class="text-p-sm text-ink-gray-7"
+        >
+          {{
+            __("Other articles in {0} are visible to {1}.", [
+              article.data.category_name,
+              visibleTo(siblingsVisibility.data),
+            ])
+          }}
+        </p>
+      </template>
+    </ArticleSharingModal>
   </div>
 </template>
 
@@ -225,6 +239,8 @@ import {
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
+  useCategoryVisibility,
+  visibleTo,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -372,6 +388,9 @@ const togglePublished = debounce(
 );
 
 const showSharingModal = ref(false);
+const siblingsVisibility = useCategoryVisibility(
+  computed(() => (showSharingModal.value && article.data?.category_id) || null)
+);
 
 function publishArticle(visibility: string) {
   save(
