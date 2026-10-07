@@ -49,7 +49,7 @@
         class="recent-article flex min-w-0 flex-1 items-center gap-3"
       >
         <PortalArticleThumbnail
-          class="!size-4 !rounded-[4px] [&_svg]:!size-4 [&:is(img)]:border [&:is(img)]:border-outline-gray-2"
+          class="[&:is(img)]:border [&:is(img)]:border-outline-gray-2"
           :src="item.recentArticle.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -89,7 +89,10 @@
         v-else
         class="flex min-w-0 items-start gap-3 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
       >
-        <PortalArticleThumbnail class="mt-px" :src="item.article.image" />
+        <PortalArticleThumbnail
+          class="mt-px [&:is(img)]:border [&:is(img)]:border-outline-gray-2"
+          :src="item.article.image"
+        />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <span
             class="min-w-0 truncate text-base leading-[1.15] text-ink-gray-8"
