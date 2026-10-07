@@ -258,10 +258,14 @@ class HelpdeskArticleSearch(SQLiteSearch):
         return {"status": "Published"}
 
     def _prepare_fts_query(self, query: str) -> str:
-        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms."""
+        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms.
+
+        A query of only stopwords keeps them, or "how" typed into search finds nothing.
+        """
         quote = super()._prepare_fts_query
         stopwords = set(get_stopwords())
-        terms = [term for term in query.split() if term.lower() not in stopwords]
+        words = query.split()
+        terms = [term for term in words if term.lower() not in stopwords] or words
         return " OR ".join(quote(term) for term in terms)
 
     def _execute_search_query(self, fts_query, title_only, filters):

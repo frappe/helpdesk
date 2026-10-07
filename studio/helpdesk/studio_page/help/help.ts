@@ -5,9 +5,11 @@ import { useSettingsModal } from '@app/stores/settings'
 import { useKbHeader } from '@app/composables/useKbHeader'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
 
+const RESULT_LIMIT = 5
+
 export default function setup(context) {
   const query = ref(String(context.route.query.q || ''))
-  const results = useArticleSearch(query)
+  const results = useArticleSearch(query, { limit: RESULT_LIMIT })
 
   function createTicket() {
     const subject = query.value.trim()

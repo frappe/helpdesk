@@ -19,12 +19,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
-import LucideBookOpen from "~icons/lucide/book-open";
 import LucideInbox from "~icons/lucide/inbox";
+import PortalArticleIcon from "@app/components/kb/PortalArticleIcon.vue";
 
 const GLYPHS = {
   organization: LucideBuilding2,
-  article: LucideBookOpen,
+  article: PortalArticleIcon,
   ticket: LucideInbox,
 };
 

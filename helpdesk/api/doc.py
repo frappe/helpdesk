@@ -45,6 +45,7 @@ def get_list_data(
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
+    icon_field = view.get("icon_field") if view else None
 
     _list = get_controller(doctype)
     default_rows = []
@@ -187,6 +188,8 @@ def get_list_data(
                             label_field if label_field else group_by_field,
                         ),
                         "value": option,
+                        "icon": icon_field
+                        and frappe.db.get_value(label_doc, option, icon_field),
                     }
                     for option in options
                     if option

@@ -89,6 +89,12 @@ class HDArticle(Document):
                 "width": "10rem",
             },
             {
+                "label": "Visibility",
+                "type": "Select",
+                "key": "visibility",
+                "width": "10rem",
+            },
+            {
                 "label": "Author",
                 "type": "Link",
                 "key": "author",

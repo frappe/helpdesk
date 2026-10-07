@@ -73,6 +73,7 @@
       variant="subtle"
       icon-left="lucide-plus"
       :label="__('Add link')"
+      :disabled="rows.some((row) => !row.label?.trim() || !row.url?.trim())"
       @click="rows.push({ label: '', url: '', open_in_new_tab: false })"
     />
   </div>

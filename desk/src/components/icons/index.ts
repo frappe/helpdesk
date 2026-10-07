@@ -1,4 +1,5 @@
 export { default as ActivityIcon } from "./ActivityIcon.vue";
+export { default as ArticleIcon } from "./ArticleIcon.vue";
 export { default as AscendingIcon } from "./AscendingIcon.vue";
 export { default as AttachmentIcon } from "./AttachmentIcon.vue";
 export { default as ColumnsIcon } from "./ColumnsIcon.vue";

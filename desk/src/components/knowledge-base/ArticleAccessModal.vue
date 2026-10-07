@@ -29,7 +29,8 @@
 
 <script setup lang="ts">
 import { Button, Dialog, Select } from "frappe-ui";
-import { computed, ref, watch } from "vue";
+import { computed, markRaw, ref, watch } from "vue";
+import { OrganizationsIcon } from "@/components/icons";
 import { __ } from "@/translation";
 
 // A null `visibility` is a category whose articles differ.
@@ -51,7 +52,7 @@ const accessOptions = computed(() => [
   {
     value: "Customers only",
     label: __("Accessible to customers only"),
-    icon: "lucide-building-2",
+    icon: markRaw(OrganizationsIcon),
   },
   {
     value: "Public",

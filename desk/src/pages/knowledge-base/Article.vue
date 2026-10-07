@@ -198,14 +198,16 @@
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:icon="category.icon"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
-    <ArticleSharingModal
+    <ArticleAccessModal
       v-if="article.data"
-      v-model="showSharingModal"
-      :title="__('Sharing “{0}”', [article.data.title])"
+      v-model="showAccessModal"
+      :title="__('Access for “{0}”', [article.data.title])"
       :visibility="article.data.visibility"
+      :action-label="isPublished ? __('Update access') : __('Publish')"
       @publish="publishArticle"
     >
       <template #default="{ access }">
@@ -221,7 +223,7 @@
           }}
         </p>
       </template>
-    </ArticleSharingModal>
+    </ArticleAccessModal>
   </div>
 </template>
 
@@ -230,7 +232,7 @@ import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
-import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
+import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -245,7 +247,12 @@ import {
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import { ConfirmDelete, uploadFunction } from "@/utils";
+import {
+  ConfirmDelete,
+  copyToClipboard,
+  CUSTOMER_PORTAL_ROOT,
+  uploadFunction,
+} from "@/utils";
 import {
   Avatar,
   Badge,
@@ -287,6 +294,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      icon: category.icon,
     },
     {
       onSuccess: (data: any) => {
@@ -316,6 +324,7 @@ function handleCategoryCreate() {
 const category = reactive({
   title: "",
   id: "",
+  icon: "lucide-folder",
 });
 
 const router = useRouter();
@@ -387,9 +396,9 @@ const togglePublished = debounce(
   300
 );
 
-const showSharingModal = ref(false);
+const showAccessModal = ref(false);
 const siblingsVisibility = useCategoryVisibility(
-  computed(() => (showSharingModal.value && article.data?.category_id) || null)
+  computed(() => (showAccessModal.value && article.data?.category_id) || null)
 );
 
 function publishArticle(visibility: string) {
@@ -603,9 +612,18 @@ const articleActions = computed(() => [
         },
       ]),
   {
-    label: __("Share"),
-    icon: "lucide-share-2",
-    onClick: () => (showSharingModal.value = true),
+    label: __("Change access"),
+    icon: "lucide-lock",
+    onClick: () => (showAccessModal.value = true),
+  },
+  {
+    label: __("Copy link"),
+    icon: "lucide-link",
+    onClick: () =>
+      copyToClipboard(
+        `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/articles/${props.articleId}`,
+        __("Article link copied to clipboard.")
+      ),
   },
   {
     group: __("Danger"),

@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import { ArticleIcon, FrappeCloudIcon, InviteCustomer } from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
@@ -101,7 +101,6 @@ import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
-import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMoon from "~icons/lucide/moon";
@@ -305,7 +304,7 @@ const steps = [
     name: "first_article",
     title: __("Create an article"),
     completed: false,
-    icon: markRaw(FileText),
+    icon: markRaw(ArticleIcon),
     onClick: async () => {
       const generalCategory = await getGeneralCategory();
       router.push({

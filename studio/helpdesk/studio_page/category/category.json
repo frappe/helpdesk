@@ -342,10 +342,8 @@
                 },
                 {
                  "componentId": "category-row-icon",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "lucide-file-text"
-                 },
+                 "componentName": "PortalArticleIcon",
+                 "isCustomVueComponent": true,
                  "classes": [
                   "size-4",
                   "shrink-0",
@@ -467,7 +465,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:00:00.000000",
+ "modified": "2026-10-08 07:10:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

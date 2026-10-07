@@ -1,7 +1,7 @@
 <template>
   <RouterLink
     :to="ROUTES.article(article.name)"
-    class="flex items-start gap-3 px-2 py-3 text-left no-underline"
+    class="flex items-center gap-3 px-2 py-3 text-left no-underline"
     :class="
       isList
         ? 'relative rounded-4 transition-colors hover:bg-surface-gray-1 after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-[--outline-gray-1] hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0'
@@ -9,7 +9,6 @@
     "
   >
     <PortalArticleThumbnail
-      :class="{ 'mt-px': isList }"
       :src="isList ? article.image : null"
     />
     <!-- v-html: the server escapes the text and leaves only the search <mark> tags. -->

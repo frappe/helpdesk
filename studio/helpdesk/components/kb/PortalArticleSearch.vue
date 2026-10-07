@@ -1,5 +1,6 @@
 <template>
   <Combobox
+    ref="combobox"
     v-model:open="isOpen"
     v-model:query="query"
     class="w-full !border-outline-gray-1 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 focus-within:!outline-1 data-[state=open]:!outline-1"
@@ -49,7 +50,6 @@
         class="recent-article flex min-w-0 flex-1 items-center gap-3"
       >
         <PortalArticleThumbnail
-          class="[&:is(img)]:border [&:is(img)]:border-outline-gray-2"
           :src="item.recentArticle.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -75,7 +75,7 @@
         class="flex min-w-0 items-center gap-3"
       >
         <span
-          class="flex size-9 shrink-0 items-center justify-center rounded-5 bg-[--outline-gray-2] text-ink-gray-6 dark:bg-[--outline-gray-3]"
+          class="flex size-9 shrink-0 items-center justify-center text-ink-gray-6"
         >
           <LucideSearch class="size-4" />
         </span>
@@ -88,7 +88,7 @@
         class="flex min-w-0 items-start gap-3 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
       >
         <PortalArticleThumbnail
-          class="mt-px [&:is(img)]:border [&:is(img)]:border-outline-gray-2"
+          class="mt-px"
           :src="item.article.image"
         />
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -109,7 +109,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { Combobox } from "frappe-ui";
+import { Combobox, useKeyboardShortcut } from "frappe-ui";
 import LucideClock from "~icons/lucide/clock";
 import LucideSearch from "~icons/lucide/search";
 import LucideX from "~icons/lucide/x";
@@ -128,6 +128,7 @@ withDefaults(defineProps<{ placeholder?: string }>(), {
 });
 
 const router = useRouter();
+const combobox = ref<InstanceType<typeof Combobox> | null>(null);
 const query = ref("");
 const isOpen = ref(false);
 const {
@@ -141,6 +142,12 @@ const {
 const hasHistory = computed(
   () => recentSearches.value.length + recentArticles.value.length > 0
 );
+
+useKeyboardShortcut({
+  combo: "Slash",
+  description: __("Search articles"),
+  handler: () => combobox.value?.focus(),
+});
 
 const results = useArticleSearch(query, { limit: MAX_RESULTS, minLength: 1 });
 

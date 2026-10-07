@@ -120,8 +120,6 @@
               "shrink-0",
               "items-center",
               "justify-center",
-              "rounded-5",
-              "bg-[--outline-gray-2]",
               "text-ink-gray-6"
              ],
              "componentId": "container-help-create-icon",
@@ -239,6 +237,27 @@
             "tag": "p",
             "text": "{{ t(\"We couldn\\u2019t find any matching articles. Create a ticket and our team will get back to you.\") }}"
            }
+          },
+          {
+           "classes": [
+            "mt-3"
+           ],
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "createTicket()"
+            }
+           },
+           "componentId": "Button-help-empty-create",
+           "componentName": "Button",
+           "componentProps": {
+            "iconLeft": "lucide-plus",
+            "label": "{{ t(\"Create ticket\") }}",
+            "size": "md",
+            "theme": "gray",
+            "variant": "solid"
+           }
           }
          ],
          "classes": [
@@ -312,7 +331,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 04:00:00.000000",
+ "modified": "2026-10-08 07:50:00.000000",
  "modified_by": "Administrator",
  "name": "help",
  "owner": "Administrator",

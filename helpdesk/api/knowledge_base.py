@@ -99,14 +99,16 @@ def delete_articles(articles: list[str]):
 
 
 @frappe.whitelist()
-def create_category(title: str):
+def create_category(title: str, icon: str | None = None):
     if title.strip().lower() == "general":
         frappe.throw(
             _(
                 "General is a reserved category name. Please use a different name to proceed."
             )
         )
-    category = frappe.new_doc("HD Article Category", category_name=title).insert()
+    category = frappe.new_doc(
+        "HD Article Category", category_name=title, icon=icon
+    ).insert()
     article = frappe.new_doc(
         "HD Article", title="New Article", category=category.name
     ).insert()
@@ -190,6 +192,8 @@ CREATOR_LIMIT = 3
 EXCERPT_LENGTH = 140
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
+# Matches the article page's reading time.
+WORDS_PER_MINUTE = 200
 # A category past this many articles lists only the newest.
 LIST_LIMIT = 100
 
@@ -370,13 +374,18 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
             as_list=True,
         )
     )
+    bodies = {
+        row["name"]: BeautifulSoup(readable[row["name"]].content or "", "html.parser")
+        for row in hits
+    }
     return [
         {
             "name": row["name"],
             "title": escape_marked(row["title"]),
             "excerpt": escape_marked(row.get("content") or ""),
-            "image": first_image(
-                BeautifulSoup(readable[row["name"]].content or "", "html.parser")
+            "image": first_image(bodies[row["name"]]),
+            "minutes": max(
+                1, round(len(bodies[row["name"]].get_text().split()) / WORDS_PER_MINUTE)
             ),
             "category_name": labels.get(readable[row["name"]].category),
         }

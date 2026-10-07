@@ -29,6 +29,7 @@
       :edit="editTitle"
       v-model="showCategoryModal"
       v-model:title="category.title"
+      v-model:icon="category.icon"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
@@ -39,14 +40,14 @@
       v-model="mergeModal"
       @merge="handleMergeCategory"
     />
-    <ArticleSharingModal
-      v-model="sharing.open"
-      :title="sharing.title"
-      :visibility="sharing.visibility"
+    <ArticleAccessModal
+      v-model="accessDialog.open"
+      :title="accessDialog.title"
+      :visibility="accessDialog.visibility"
       :action-label="__('Update access')"
       require-change
       @publish="
-        sharing.forCategory
+        accessDialog.forCategory
           ? updateCategoryAccess($event)
           : updateArticlesAccess($event)
       "
@@ -54,21 +55,22 @@
       <template #default="{ access }">
         <p class="text-p-sm text-ink-gray-7">
           {{
-            sharing.forCategory
+            accessDialog.forCategory
               ? categoryAccessNote(access)
               : articlesAccessNote(access)
           }}
         </p>
       </template>
-    </ArticleSharingModal>
+    </ArticleAccessModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import Icon from "@/components/Icon.vue";
+import { ArticleIcon, OrganizationsIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
+import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
@@ -79,10 +81,11 @@ import {
   mergeCategory,
   moveToCategory,
   newCategory,
-  updateCategoryTitle,
+  updateCategory,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
+import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
 import {
   Badge,
   Button,
@@ -92,11 +95,10 @@ import {
   toast,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, onMounted, reactive, ref } from "vue";
+import { computed, h, markRaw, onMounted, reactive, ref } from "vue";
 import { __ } from "@/translation";
 import { useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
-import LucideBookOpen from "~icons/lucide/book-open";
 
 const router = useRouter();
 const { $dialog } = globalStore();
@@ -104,9 +106,9 @@ const { $dialog } = globalStore();
 const category = reactive({
   title: "",
   id: "",
+  icon: "lucide-folder",
 });
 
-const _title = ref("");
 const listViewRef = ref(null);
 const editTitle = ref(false);
 
@@ -115,7 +117,7 @@ const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
 // One dialog for a category's articles and for a selection of them.
-const sharing = reactive({
+const accessDialog = reactive({
   open: false,
   forCategory: true,
   title: "",
@@ -142,7 +144,7 @@ const headerOptions = [
   },
   {
     label: __("Article"),
-    icon: "lucide-file-text",
+    icon: markRaw(ArticleIcon),
     onClick: () => {
       router.push({
         name: "NewArticle",
@@ -174,14 +176,14 @@ const groupByActions = [
     },
   },
   {
-    label: __("Edit Title"),
+    label: __("Edit"),
     icon: "lucide-edit",
     onClick: (groupedRow) => {
       editTitle.value = true;
       showCategoryModal.value = true;
       category.title = groupedRow.group.label;
       category.id = groupedRow.group.value;
-      _title.value = groupedRow.group.label;
+      category.icon = groupedRow.group.icon || "lucide-folder";
     },
   },
   {
@@ -194,21 +196,30 @@ const groupByActions = [
     },
   },
   {
-    label: __("Share"),
-    icon: "lucide-share-2",
+    label: __("Change access"),
+    icon: "lucide-lock",
     onClick: async ({ group }) => {
       category.title = group.label;
       category.id = group.value;
       const visibility = await categoryVisibility.submit({
         category: group.value,
       });
-      Object.assign(sharing, {
+      Object.assign(accessDialog, {
         open: true,
         forCategory: true,
-        title: __("Sharing “{0}”", [group.label]),
+        title: __("Access for “{0}”", [group.label]),
         visibility,
       });
     },
+  },
+  {
+    label: __("Copy link"),
+    icon: "lucide-link",
+    onClick: ({ group }) =>
+      copyToClipboard(
+        `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/category/${group.value}`,
+        __("Category link copied to clipboard.")
+      ),
   },
   {
     label: __("Delete"),
@@ -234,7 +245,7 @@ function categoryAccessNote(access: string | null) {
       [name]
     );
   }
-  if (access === sharing.visibility) {
+  if (access === accessDialog.visibility) {
     return {
       Public: __(
         "Anyone, including visitors who aren't logged in, can read the articles in {0}.",
@@ -270,10 +281,12 @@ function updateCategoryAccess(visibility: string) {
   setCategoryVisibility.submit(
     { category: category.id, visibility },
     {
-      onSuccess: () =>
+      onSuccess: () => {
         toast.success(
           __("Access updated for every article in {0}.", [category.title])
-        ),
+        );
+        listViewRef.value?.reload();
+      },
       onError: (error: Error) =>
         toast.error(error?.messages?.[0] || error.message),
     }
@@ -286,7 +299,7 @@ function articlesAccessNote(access: string | null) {
       "The selected articles have different access. Choosing one applies it to all of them."
     );
   }
-  if (access === sharing.visibility) {
+  if (access === accessDialog.visibility) {
     return {
       Public: __(
         "Anyone, including visitors who aren't logged in, can read the selected articles."
@@ -308,7 +321,7 @@ function articlesAccessNote(access: string | null) {
   }[access];
 }
 
-async function shareArticles(selections: Set<string>) {
+async function changeArticlesAccess(selections: Set<string>) {
   listSelections.value = new Set(selections);
   const rows = await call("frappe.client.get_list", {
     doctype: "HD Article",
@@ -316,15 +329,15 @@ async function shareArticles(selections: Set<string>) {
     fields: ["visibility"],
     limit_page_length: 0,
   });
-  const shared = new Set(rows.map((row) => row.visibility));
-  Object.assign(sharing, {
+  const current = new Set(rows.map((row) => row.visibility));
+  Object.assign(accessDialog, {
     open: true,
     forCategory: false,
     title:
       selections.size === 1
-        ? __("Sharing 1 article")
-        : __("Sharing {0} articles", [selections.size]),
-    visibility: shared.size === 1 ? [...shared][0] : null,
+        ? __("Access for 1 article")
+        : __("Access for {0} articles", [selections.size]),
+    visibility: current.size === 1 ? [...current][0] : null,
   });
 }
 
@@ -350,8 +363,8 @@ const listSelections = ref(new Set());
 const selectBannerActions = [
   {
     label: __("Change access"),
-    icon: "lucide-share-2",
-    onClick: shareArticles,
+    icon: "lucide-lock",
+    onClick: changeArticlesAccess,
   },
   {
     label: __("Move To"),
@@ -413,6 +426,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      icon: category.icon,
     },
     {
       onSuccess: (data: any) => {
@@ -449,18 +463,11 @@ function handleCategoryCreate() {
 }
 
 function handleCategoryUpdate() {
-  // if same title do nothing
-  if (category.title === _title.value) {
-    showCategoryModal.value = false;
-    editTitle.value = false;
-    return;
-  }
-  updateCategoryTitle.submit(
+  updateCategory.submit(
     {
       doctype: "HD Article Category",
       name: category.id,
-      fieldname: "category_name",
-      value: category.title,
+      fieldname: { category_name: category.title, icon: category.icon },
     },
     {
       onSuccess: () => {
@@ -552,7 +559,7 @@ function handleMergeCategory(source: string, target: string) {
 function resetState() {
   category.title = "";
   category.id = "";
-  _title.value = "";
+  category.icon = "lucide-folder";
 }
 
 const options = computed(() => {
@@ -564,12 +571,12 @@ const options = computed(() => {
       group_by_field: "category",
       label_doc: "HD Article Category",
       label_field: "category_name",
+      icon_field: "icon",
     },
     columnConfig: {
       title: {
         prefix: () => {
-          return h(Icon, {
-            icon: "lucide-file-text",
+          return h(ArticleIcon, {
             class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });
         },
@@ -581,10 +588,20 @@ const options = computed(() => {
           });
         },
       },
+      visibility: {
+        custom: ({ item }) =>
+          h("div", { class: "flex items-center gap-1.5 text-ink-gray-7" }, [
+            h(Icon, {
+              icon: accessIcons[item],
+              class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+            }),
+            __(item?.replace(" only", "")),
+          ]),
+      },
     },
     emptyState: {
       title: "No articles found",
-      icon: h(LucideBookOpen, {
+      icon: h(ArticleIcon, {
         class: "h-10 w-10",
       }),
       description: hasActiveFilters.value
@@ -603,6 +620,12 @@ const options = computed(() => {
     default_page_length: 100,
   };
 });
+
+const accessIcons = {
+  "Agents only": "lucide-lock",
+  "Customers only": OrganizationsIcon,
+  Public: "lucide-globe",
+};
 
 const statusMap = {
   Published: {
