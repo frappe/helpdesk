@@ -121,7 +121,7 @@
               "items-center",
               "justify-center",
               "rounded-5",
-              "bg-surface-gray-2",
+              "bg-[--outline-gray-2]",
               "text-ink-gray-6"
              ],
              "componentId": "container-help-create-icon",
@@ -172,10 +172,11 @@
             "cursor-pointer",
             "items-start",
             "gap-3",
+            "rounded-4",
             "px-2",
             "py-3",
             "transition-colors",
-            "hover:bg-surface-gray-2"
+            "hover:bg-surface-gray-1"
            ],
            "componentEvents": {
             "click": {
@@ -311,7 +312,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:00:00.000000",
+ "modified": "2026-10-08 04:00:00.000000",
  "modified_by": "Administrator",
  "name": "help",
  "owner": "Administrator",
