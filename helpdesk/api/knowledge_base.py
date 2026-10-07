@@ -113,10 +113,50 @@ def create_category(title: str):
     return {"article": article.name, "category": category.name}
 
 
+def category_visibility(category: str) -> str | None:
+    """The access every article in `category` shares; None when they differ."""
+    values = frappe.get_all(
+        "HD Article",
+        filters={"category": category},
+        pluck="visibility",
+        distinct=True,
+    )
+    return values[0] if len(values) == 1 else None
+
+
+def joining_values(category: str) -> dict:
+    """An article joining a category whose articles share one access takes it."""
+    values = {"category": category}
+    if visibility := category_visibility(category):
+        values["visibility"] = visibility
+    return values
+
+
+@frappe.whitelist()
+def get_category_access(category: str) -> dict:
+    frappe.has_permission("HD Article", "write", throw=True)
+    return {
+        "visibility": category_visibility(category),
+        "articles": frappe.db.count("HD Article", {"category": category}),
+    }
+
+
+@frappe.whitelist()
+def set_category_visibility(category: str, visibility: str):
+    frappe.has_permission("HD Article", "write", throw=True)
+    options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
+    if visibility not in options:
+        frappe.throw(_("Invalid access: {0}").format(visibility))
+    frappe.db.set_value(
+        "HD Article", {"category": category}, "visibility", visibility
+    )
+
+
 @frappe.whitelist()
 def move_to_category(category: str, articles: list[str]):
     frappe.has_permission("HD Article", "write", throw=True)
 
+    values = joining_values(category)
     for article in articles:
         try:
             article_category = frappe.db.get_value("HD Article", article, "category")
@@ -128,7 +168,7 @@ def move_to_category(category: str, articles: list[str]):
                 return
             else:
                 frappe.db.set_value(
-                    "HD Article", article, "category", category, update_modified=False
+                    "HD Article", article, values, update_modified=False
                 )
         except Exception as e:
             frappe.db.rollback()
@@ -414,10 +454,9 @@ def merge_category(source: str, target: str):
         filters={"category": source},
         pluck="name",
     )
+    values = joining_values(target)
     for article in source_articles:
-        frappe.db.set_value(
-            "HD Article", article, "category", target, update_modified=False
-        )
+        frappe.db.set_value("HD Article", article, values, update_modified=False)
 
     frappe.delete_doc("HD Article Category", source)
 
