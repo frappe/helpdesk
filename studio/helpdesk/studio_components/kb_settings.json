@@ -1133,7 +1133,7 @@
               "componentId": "kb_settings-invite-row",
               "componentName": "SettingsRow",
               "componentProps": {
-               "description": "{{ t('Invited people will join as') }}",
+               "description": "{{ t('New users will be added to the team as') }}",
                "title": "{{ t('Invite by email') }}"
               },
               "componentSlots": {}
@@ -1334,7 +1334,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-07 09:00:00.000000",
+ "modified": "2026-10-08 02:20:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
