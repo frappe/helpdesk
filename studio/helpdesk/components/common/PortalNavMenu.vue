@@ -15,7 +15,7 @@
           class="size-6 shrink-0 rounded-2 object-contain"
         />
         <span
-          class="hidden truncate text-base-medium leading-tight text-ink-gray-9 sm:block"
+          class="hidden truncate text-base-medium text-ink-gray-9 sm:block"
         >
           {{ name }}
         </span>
