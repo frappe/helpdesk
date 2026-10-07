@@ -68,6 +68,8 @@ export default function setup(context) {
     () => article?.data?.name,
     (name) => {
       if (!name) return
+      // The article scrolls in its own panel, which keeps its place from one article to the next.
+      if (!location.hash) document.querySelector('[data-component-id="container-gi1caqqm1"]')?.scrollTo({ top: 0 })
       call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {})
       rememberArticle({
         name,
