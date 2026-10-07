@@ -65,3 +65,4 @@ helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
 helpdesk.patches.point_portal_home_to_studio
 helpdesk.patches.set_confirm_resolution_after_days
+helpdesk.patches.rebuild_guest_ticket_permissions

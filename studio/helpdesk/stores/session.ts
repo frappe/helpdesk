@@ -17,7 +17,9 @@ function createSessionStore() {
 
   // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
-  const canCreateTicket = computed(() => !isGuest.value)
+  const canCreateTicket = computed(
+    () => !isGuest.value || Boolean(config.value?.allow_anyone_to_create_tickets),
+  )
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
@@ -42,8 +44,12 @@ function createSessionStore() {
 
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
-    if (!isGuest.value || isPublicKnowledgeBase.value) return
+    if (!isGuest.value || isPublicKnowledgeBase.value || isNewTicketPage()) return
     signIn()
+  }
+
+  function isNewTicketPage() {
+    return window.location.pathname.replace(/\/$/, '') === ROUTES.appRoot + ROUTES.newTicket
   }
 
   function signIn() {
@@ -70,8 +76,8 @@ function createSessionStore() {
     brandLogo,
     brandName,
     isPhone,
-    signIn,
     loadSession,
+    signIn,
     reloadSession,
     signOut,
   }

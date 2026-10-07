@@ -10,6 +10,7 @@ from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.api.ticket import new_guest_ticket
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
 from helpdesk.utils import get_customers, is_frappe_version
@@ -198,6 +199,39 @@ def make_customer_ticket(case, raised_by: str, **values):
     ticket = make_ticket(raised_by=raised_by, **values)
     case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
     return ticket
+
+
+def enable_guest_tickets(enabled: bool | int = True):
+    """Toggle `allow_anyone_to_create_tickets` through the settings doc, so its perm rules follow."""
+    settings = frappe.get_single("HD Settings")
+    settings.allow_anyone_to_create_tickets = enabled
+    settings.save(ignore_permissions=True)
+
+
+def guest_ticket_rules() -> list[dict]:
+    return frappe.get_all(
+        "Custom DocPerm",
+        filters={"parent": "HD Ticket", "role": "Guest"},
+        fields=["read", "write", "create", "export", "if_owner"],
+    )
+
+
+def raise_guest_ticket(
+    case, raised_by: str, description: str = "From the web form"
+) -> str:
+    """Raise a ticket as an anonymous visitor, removed when the test ends."""
+    frappe.set_user("Guest")
+    ticket = frappe.get_doc(
+        {
+            "doctype": "HD Ticket",
+            "subject": "Guest ticket",
+            "description": description,
+            "raised_by": raised_by,
+        }
+    ).insert()
+    frappe.set_user("Administrator")
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket.name
 
 
 def make_form_script(
@@ -1058,3 +1092,45 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def submit_guest_form(case, email: str, **values) -> None:
+    case.addCleanup(clean_up_guest_requests, email.strip().lower())
+    frappe.set_user("Guest")
+    try:
+        new_guest_ticket(
+            subject=values.get("subject", "Printer offline"),
+            description=values.get("description", "<p>It stopped printing.</p>"),
+            email=email,
+            first_name=values.get("first_name"),
+        )
+    finally:
+        frappe.set_user("Administrator")
+
+
+def clean_up_guest_requests(email: str) -> None:
+    frappe.set_user("Administrator")
+    for name in frappe.get_all("HD Ticket", {"raised_by": email}, pluck="name"):
+        frappe.delete_doc("HD Ticket", name, force=True)
+    for name in frappe.get_all("Contact", {"email_id": email}, pluck="name"):
+        frappe.delete_doc("Contact", name, force=True)
+    delete_invitations(email)
+    if token := guest_draft_token(email):
+        frappe.cache.delete_value(f"hd_guest_draft:{token}")
+    frappe.cache.delete_value(
+        [
+            f"hd_guest_continue:{email}",
+            f"hd_guest_draft_token:{email}",
+            f"hd_guest_contact:{email}",
+        ]
+    )
+
+
+def guest_draft_token(email: str) -> str | None:
+    return frappe.cache.get_value(f"hd_guest_draft_token:{email}")
+
+
+def emails_queued_to(email: str) -> int:
+    return frappe.db.count(
+        "Email Queue", filters=[["Email Queue Recipient", "recipient", "=", email]]
+    )

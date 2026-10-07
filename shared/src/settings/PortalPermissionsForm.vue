@@ -39,6 +39,14 @@ const websiteSettings = createDocumentResource({
 // computed, so labels follow a translation load
 const toggles = computed(() => [
   {
+    settings: hdSettings,
+    fieldname: "allow_anyone_to_create_tickets",
+    label: __("Allow anyone to create tickets"),
+    description: __(
+      "Visitors will be able to raise tickets from the portal without logging in."
+    ),
+  },
+  {
     settings: websiteSettings,
     fieldname: "disable_signup",
     label: __("Disable signup"),

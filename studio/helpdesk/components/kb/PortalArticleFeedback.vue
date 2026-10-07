@@ -6,7 +6,7 @@
       <span class="text-base text-ink-gray-8">
         {{ __("Was this article helpful?") }}
       </span>
-      <span v-if="canRaiseTicket" class="text-p-base text-ink-gray-5">
+      <span class="text-p-base text-ink-gray-5">
         {{ __("If your issue isn't resolved, raise a support ticket") }}
         <RouterLink
           :to="ROUTES.newTicket"
@@ -80,6 +80,5 @@ const ANSWERS = [
 defineProps<{
   vote?: string;
   onVote?: (value: string) => void;
-  canRaiseTicket?: boolean;
 }>();
 </script>

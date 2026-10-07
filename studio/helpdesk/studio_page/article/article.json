@@ -384,8 +384,7 @@
            "componentName": "PortalArticleFeedback",
            "componentProps": {
             "vote": "{{ article.data.feedback }}",
-            "onVote": "{{ submitFeedback }}",
-            "canRaiseTicket": "{{ canCreateTicket }}"
+            "onVote": "{{ submitFeedback }}"
            },
            "isCustomVueComponent": true,
            "visibilityCondition": "{{ !isGuest || config?.allow_anonymous_article_voting }}"
