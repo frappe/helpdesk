@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:open="show" :title="__('Sharing “{0}”', [title])">
+  <Dialog v-model:open="show" :title="title">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <span class="text-p-sm text-ink-gray-6">
