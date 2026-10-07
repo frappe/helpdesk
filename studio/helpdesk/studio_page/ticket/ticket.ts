@@ -1,6 +1,8 @@
-import { computed, markRaw, ref, watch } from 'vue'
+import { computed, markRaw, onScopeDispose, ref, watch } from 'vue'
 import { createResource, dayjs, toast } from 'frappe-ui'
+import { subscribeToDoc } from '@framework/ui/socket'
 import LucideCircleCheck from '~icons/lucide/circle-check'
+import LucideRotateCcw from '~icons/lucide/rotate-ccw'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useDrawer } from '@app/composables/useDrawer'
@@ -64,6 +66,25 @@ export default function setup(context) {
 
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
+  // The thread refreshes its own emails; the status, closes and reply sides come with the ticket.
+  watch(
+    ticketId,
+    (name, _, onCleanup) => name && onCleanup(subscribeToDoc(context.socket, 'HD Ticket', name)),
+    { immediate: true },
+  )
+  function onTicketChange(payload) {
+    const doc = payload?.doc || payload
+    const doctype = doc?.reference_doctype || doc?.doctype
+    const name = doc?.reference_name || doc?.name
+    if (doctype === 'HD Ticket' && name === ticketId.value) ticket.fetch()
+  }
+  context.socket?.on('doc_update', onTicketChange)
+  context.socket?.on('docinfo_update', onTicketChange)
+  onScopeDispose(() => {
+    context.socket?.off('doc_update', onTicketChange)
+    context.socket?.off('docinfo_update', onTicketChange)
+  })
+
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
@@ -81,18 +102,27 @@ export default function setup(context) {
     (modified) => modified && timelineChanges.fetch(),
     { immediate: true },
   )
+  // Another ticket's closes would show until its own arrive.
+  watch(ticketId, () => timelineChanges.reset())
 
   const timelineEvents = computed(() =>
     (timelineChanges.data || [])
-      .filter((change) => change.field === 'status' && isClosedStatus(change.to))
-      .map((change) => ({
-        type: 'log',
-        key: `closed:${change.on}`,
-        timestamp: change.on,
-        author: { fullname: change.by.name, image: change.by.image },
-        icon: markRaw(LucideCircleCheck),
-        data: { name: `closed:${change.on}`, subtype: 'info', text: __('{0} closed the ticket', [change.by.name]) },
-      })),
+      .filter((change) => change.field === 'status' && isClosedStatus(change.to) !== isClosedStatus(change.from))
+      .map((change) => {
+        const closed = isClosedStatus(change.to)
+        const key = `${closed ? 'closed' : 'reopened'}:${change.on}`
+        const text = closed ? __('{0} closed the ticket', [change.by.name]) : __('{0} reopened the ticket', [change.by.name])
+        // The chat layout draws these as dividers, which read as a label rather than a sentence.
+        const divider = closed ? __('Closed by {0}', [change.by.name]) : __('Reopened by {0}', [change.by.name])
+        return {
+          type: 'log',
+          key,
+          timestamp: change.on,
+          author: { fullname: change.by.name, image: change.by.image },
+          icon: markRaw(closed ? LucideCircleCheck : LucideRotateCcw),
+          data: { name: key, subtype: 'info', text, divider },
+        }
+      }),
   )
 
   const relatedArticles = createResource({
@@ -169,8 +199,8 @@ export default function setup(context) {
 
   return {
     ...settings,
-    ...useTicketDetails(ticket, thread),
-    ...useReplyComposer(ticket),
+    ...useTicketDetails(ticket, thread, timelineChanges),
+    ...useReplyComposer(ticket, config),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),

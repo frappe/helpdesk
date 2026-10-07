@@ -88,6 +88,13 @@ def get_one(name: str):
     return {
         **ticket,
         "communications": get_communications(name),
+        # When, not to whom: customers cannot read assignees. Cancelled rows count, someone did pick it up.
+        "assigned_on": frappe.db.get_value(
+            "ToDo",
+            {"reference_type": "HD Ticket", "reference_name": name},
+            "creation",
+            order_by="creation asc",
+        ),
         "contact": contact,
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
@@ -140,10 +147,16 @@ def get_communications(ticket: str):
         .orderby(QBCommunication.creation, order=Order.asc)
         .run(as_dict=True)
     )
+    authors = {}
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
         c.user = get_user_info_for_avatar(user_id)
+        # The author's role, not the direction: an agent replying from the portal is still an agent.
+        if user_id not in authors:
+            user = frappe.db.get_value("User", {"email": user_id}) or user_id
+            authors[user_id] = bool(user) and is_agent(user)
+        c.is_agent = authors[user_id]
     return communications
 
 

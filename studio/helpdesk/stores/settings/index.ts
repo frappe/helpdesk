@@ -91,13 +91,13 @@ export const accountMenuOptions = computed(() =>
     : [
         { icon: 'lucide-home', label: __('Home'), onClick: () => navigateTo(ROUTES.home) },
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
-        { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         {
           icon: 'lucide-headphones',
           label: __('Agent portal'),
           condition: () => session.isAgent.value,
           onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
         },
+        { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
       ],
 )

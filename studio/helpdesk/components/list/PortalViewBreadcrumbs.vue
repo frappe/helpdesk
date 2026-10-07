@@ -1,7 +1,8 @@
 <template>
-  <div class="flex items-center">
-    <span class="pe-0.5 py-1 text-lg-medium text-ink-gray-5">{{ label }}</span>
-    <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+  <!-- Same box as frappe-ui's Breadcrumbs, so "Tickets" stays put between the list and a ticket. -->
+  <div class="flex items-center leading-tighter">
+    <span class="px-0.5 py-1 text-lg-medium leading-tighter text-ink-gray-5">{{ label }}</span>
+    <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true">/</span>
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button

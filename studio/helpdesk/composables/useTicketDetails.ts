@@ -2,14 +2,14 @@ import { computed } from 'vue'
 import { dayjs } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { twoUnitDuration } from '@helpdesk/shared/utils'
-import { isClosedStatus, statusMeta } from '@app/stores/ticketMeta'
+import { isClosedStatus, isResolvedStatus, statusMeta } from '@app/stores/ticketMeta'
 import { DATE_FORMATS } from '@app/utils'
 
 const MINUTE = 60
 // A reply inside this window reads as "someone was already there", not as a measured wait.
 const IMMEDIATE_SECONDS = 5 * MINUTE
 
-export function useTicketDetails(ticket, thread) {
+export function useTicketDetails(ticket, thread, statusChanges) {
   const data = computed(() => ticket.data || {})
 
   const identity = computed(() => ({
@@ -44,11 +44,20 @@ export function useTicketDetails(ticket, thread) {
   }
 
   const timeline = computed(() => {
-    const steps = [received(), assigned(), answered(), ...resolution(), ...closing()]
+    // A close's history decides its steps, so wait for it rather than redraw them when it lands.
+    if (isClosedStatus(data.value.status) && !statusChanges.data) return []
+    const steps = [received(), ...assigned(), ...answered(), ...resolution(), ...closing()]
     // Ring the first unmet step after the last one reached.
     const reached = steps.findLastIndex((step) => step.state === 'done' || step.state === 'closed')
     const next = steps.slice(reached + 1).find((step) => step.state === 'pending')
-    if (next) next.state = 'next'
+    if (next) {
+      next.state = 'next'
+      // A paused status stops the SLA clock, so no due date applies; it is not always the customer's turn.
+      if (data.value.status_category === 'Paused') {
+        next.subtitle = __('On hold')
+        next.late = false
+      }
+    }
     return steps
   })
 
@@ -57,57 +66,59 @@ export function useTicketDetails(ticket, thread) {
     return makeStep(__('Request received'), on ? dayjs(on).format(DATE_FORMATS.step) : '', 'done', on)
   }
 
-  // Assignment is agent-only data, so the first agent reply stands in for it.
   function assigned() {
-    const reply = thread.firstAgentReply.value
-    if (!reply) return makeStep(__('Assigned to agent'), __('Waiting to be assigned'), 'pending')
-    return makeStep(__('Assigned to agent'), elapsedPhrase(reply.creation), 'done', reply.creation)
+    const on = data.value.assigned_on
+    if (on) return [makeStep(__('Assigned to agent'), elapsedPhrase(on), 'done', on)]
+    // A reply or an ended ticket means it was handled without an assignment.
+    if (thread.firstAgentReply.value || data.value.status_category === 'Resolved') return []
+    return [makeStep(__('Assigned to agent'), '', 'pending')]
   }
 
   function answered() {
     const reply = thread.firstAgentReply.value
-    if (!reply) return awaiting(__('Awaiting first response'), data.value.response_by)
+    if (!reply) {
+      // Nothing is owed on a ticket that has ended.
+      if (data.value.status_category === 'Resolved') return []
+      return [awaiting(__('First response'), data.value.response_by)]
+    }
     const summary = durationSummary(reply.creation, __('Answered immediately'), (took) => __('Answered in {0}', [took]))
-    const late = secondsLate(reply.creation, data.value.response_by, data.value.first_response_failed_by)
-    return makeStep(__('First response'), withLateness(summary, late), 'done', reply.creation)
+    return [reachedStep(__('First response'), summary, secondsLate(reply.creation, data.value.response_by, data.value.first_response_failed_by), reply.creation)]
   }
 
-  // A ticket that ended without being resolved gets no resolved step; the close covers it.
+  // Closing straight from an open status stamps `resolution_date` too, so the close covers it alone.
   function resolution() {
     const on = data.value.resolution_date
-    if (!on) {
-      if (!thread.firstAgentReply.value) return [makeStep(__('Resolved'), '', 'pending')]
-      return [awaiting(__('Awaiting resolution'), data.value.resolution_by)]
-    }
-    if (!wasResolved()) return []
+    if (data.value.status_category !== 'Resolved') return [awaiting(__('Resolution'), data.value.resolution_by)]
+    if (!on || closedOutright()) return []
     const summary = durationSummary(on, __('Resolved immediately'), (took) => __('Resolved in {0}', [took]))
-    const late = secondsLate(on, data.value.resolution_by, data.value.resolution_failed_by)
-    return [makeStep(__('Resolved'), withLateness(summary, late), 'done', on)]
+    return [reachedStep(__('Resolution'), summary, secondsLate(on, data.value.resolution_by, data.value.resolution_failed_by), on)]
   }
 
-  // Closing outright stamps `resolution_date` too, so the date alone cannot tell.
-  function wasResolved() {
-    return !isClosedStatus(data.value.status) || Boolean(data.value.resolution_details)
+  const lastClose = computed(() =>
+    (statusChanges.data || []).findLast((change) => change.field === 'status' && isClosedStatus(change.to)),
+  )
+
+  function closedOutright() {
+    return isClosedStatus(data.value.status) && Boolean(lastClose.value) && !isResolvedStatus(lastClose.value.from)
   }
 
+  // `resolution_date` keeps the resolve's time through a close, so the status history dates it.
   function closing() {
     if (!isClosedStatus(data.value.status)) return []
-    // When resolved first, the date belongs to that step and nothing records the close itself.
-    if (wasResolved()) return [makeStep(__('Closed'), '', 'closed')]
-    const on = data.value.resolution_date
-    return [makeStep(__('Closed'), elapsedPhrase(on), 'closed', on)]
+    const on = lastClose.value?.on || data.value.resolution_date
+    return [makeStep(__('Closed'), on ? elapsedPhrase(on) : '', 'closed', on)]
   }
 
   function awaiting(title: string, due: string) {
-    if (!due) return makeStep(title, __('Pending'), 'pending')
+    if (!due) return makeStep(title, '', 'pending')
     if (dayjs().isAfter(dayjs(due))) {
-      return makeStep(title, __('Overdue by {0}', [formatMinutes(dayjs().diff(dayjs(due), 's'))]), 'pending')
+      return makeStep(title, __('Overdue by {0}', [formatMinutes(dayjs().diff(dayjs(due), 's'))]), 'pending', undefined, true)
     }
     return makeStep(title, __('Due {0}', [dueWording(due)]), 'pending')
   }
 
-  function makeStep(title: string, subtitle: string, state: string, on?: string) {
-    return { title, subtitle, state, fullDate: on ? dayjs(on).format(DATE_FORMATS.tooltip) : '' }
+  function makeStep(title: string, subtitle: string, state: string, on?: string, late = false) {
+    return { title, subtitle, state, late, fullDate: on ? dayjs(on).format(DATE_FORMATS.tooltip) : '' }
   }
 
   function durationSummary(on: string, immediate: string, tookWording: (took: string) => string) {
@@ -115,14 +126,16 @@ export function useTicketDetails(ticket, thread) {
     return seconds <= IMMEDIATE_SECONDS ? immediate : tookWording(formatMinutes(seconds))
   }
 
-  function withLateness(summary: string, seconds: number) {
-    return seconds >= MINUTE ? `${summary} · ${__('{0} late', [formatMinutes(seconds)])}` : summary
-  }
-
-  // The SLA's own figure counts business hours and is written only on an actual miss.
+  // The SLA's figure counts business hours, but it is written only once the SLA sees the milestone,
+  // and a reply an agent posts from the portal is not one it sees.
   function secondsLate(on: string, due: string, failedBy: number) {
     if (failedBy) return failedBy
     return due ? Math.max(dayjs(on).diff(dayjs(due), 's'), 0) : 0
+  }
+
+  function reachedStep(title: string, summary: string, late: number, on: string) {
+    if (late < MINUTE) return makeStep(title, summary, 'done', on)
+    return makeStep(title, `${summary} · ${__('{0} late', [formatMinutes(late)])}`, 'done', on, true)
   }
 
   function elapsedPhrase(on: string) {

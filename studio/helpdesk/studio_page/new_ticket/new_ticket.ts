@@ -1,5 +1,5 @@
 import { computed, reactive, ref, watch } from 'vue'
-import { toast, useFileUpload } from 'frappe-ui'
+import { useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import {
   handleLinkFieldUpdate,
@@ -13,7 +13,7 @@ import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
-import { runAction, scriptDialog } from '@app/utils'
+import { CUSTOMER_FILE_TYPES, runAction, scriptDialog } from '@app/utils'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 const DEFAULT_TEMPLATE = 'Default'
@@ -30,11 +30,17 @@ export default function setup(context) {
   const model = reactive({})
   const attachments = ref([])
   const isCreating = ref(false)
+  const uploading = ref(0)
 
   // The upload queue keeps only `file_url`; the server links attachments by File name.
   const uploadedByUrl = new Map()
 
+  const uploadRestrictions = computed(() =>
+    settings.config.value?.is_agent ? {} : { allowed_file_types: CUSTOMER_FILE_TYPES },
+  )
+
   function uploadPrivately(file, _args, { signal, onProgress }) {
+    uploading.value += 1
     return useFileUpload()
       .upload(file, {
         private: true,
@@ -46,6 +52,7 @@ export default function setup(context) {
         uploadedByUrl.set(doc.file_url, doc)
         return doc
       })
+      .finally(() => (uploading.value -= 1))
   }
 
   // Waits for the session: isGuest reads true until get_config answers.
@@ -144,26 +151,18 @@ export default function setup(context) {
     })),
   )
 
-  // Fields alternate between two columns, which would stack out of order on a phone.
-  const layout = computed(() => [
-    {
-      sections: [
-        {
-          hideLabel: true,
-          hideBorder: true,
-          columns: settings.isPhone.value
-            ? [{ fields: fields.value }]
-            : [
-                { fields: fields.value.filter((_, index) => index % 2 === 0) },
-                { fields: fields.value.filter((_, index) => index % 2 === 1) },
-              ],
-        },
-      ],
-    },
-  ])
+  // Visible fields alternate across up to three columns, which would stack out of order on a phone.
+  const layout = computed(() => {
+    const visible = fields.value.filter((field) => evaluateDependsOn(field.dependsOn, model))
+    const count = settings.isPhone.value ? 1 : Math.min(3, visible.length)
+    const columns = Array.from({ length: count }, (_, column) => ({
+      fields: visible.filter((_, index) => index % count === column),
+    }))
+    return [{ sections: [{ hideLabel: true, hideBorder: true, columns }] }]
+  })
 
   const canSubmit = computed(() => {
-    if (!subject.value || isContentEmpty(description.value)) return false
+    if (uploading.value || !subject.value || isContentEmpty(description.value)) return false
     return fields.value
       .filter((field) => evaluateDependsOn(field.dependsOn, model) && isRequired(field))
       .every((field) => model[field.fieldname])
@@ -175,11 +174,6 @@ export default function setup(context) {
 
   function createTicket() {
     if (!canSubmit.value) return
-    // The dialog's "Web link" source stores a URL without a File doc, which the server cannot link.
-    const uploaded = attachments.value.map((file) => uploadedByUrl.get(file.file_url))
-    if (uploaded.includes(undefined)) {
-      return toast.error(__('Web links cannot be attached; upload the file instead'))
-    }
     return runAction(
       async () => {
         const ticket = await newTicket.submit({
@@ -189,7 +183,7 @@ export default function setup(context) {
             template: DEFAULT_TEMPLATE,
             ...model,
           },
-          attachments: uploaded,
+          attachments: attachments.value.map((file) => uploadedByUrl.get(file.file_url)),
         })
         navigateTo(ROUTES.ticket(ticket.name))
       },
@@ -209,6 +203,7 @@ export default function setup(context) {
     canSubmit,
     attachments,
     uploadPrivately,
+    uploadRestrictions,
     isCreating,
     createTicket,
   }

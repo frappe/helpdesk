@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
-import { RouterLink } from "vue-router";
+import { computed, h } from "vue";
+import { RouterLink, useRoute } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
 import { ROUTES } from "@app/routes";
 
@@ -38,23 +38,30 @@ const props = defineProps<{
   name?: string;
 }>();
 
+const route = useRoute();
+const isTicketPage = computed(() =>
+  /^\/(customer-tickets|tickets)(\/|$)/.test(route.path)
+);
+
 function Brand() {
   return [
-    props.logo &&
-      h("img", {
-        src: props.logo,
-        alt: "",
-        "aria-hidden": "true",
-        class: "size-6 shrink-0 rounded-2 object-contain",
-      }),
-    h(
-      "span",
-      {
-        class:
-          "hidden truncate text-base-medium text-ink-gray-9 sm:block",
-      },
-      props.name
-    ),
+    props.logo
+      ? h("img", {
+          src: props.logo,
+          alt: "",
+          "aria-hidden": "true",
+          class: "size-6 shrink-0 rounded-2 object-contain",
+        })
+      : h("span", { class: "size-6 shrink-0" }),
+    !isTicketPage.value &&
+      h(
+        "span",
+        {
+          class:
+            "hidden truncate text-base-medium text-ink-gray-9 sm:block",
+        },
+        props.name
+      ),
   ];
 }
 </script>

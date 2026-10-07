@@ -4,7 +4,8 @@
     :ticket="ticket"
     :extra-activities="extraActivities"
     :version="version"
-    :agent-replies="isChat ? agentReplies : null"
+    :authors="isChat ? authors : null"
+    :reserve="reserve"
   >
     <template v-for="(_, name) in $slots" #[name]="scope">
       <slot :name="name" v-bind="scope || {}" />
@@ -20,6 +21,20 @@
       </div>
     </template>
     <template v-if="isChat" #icon-solve_prompt><span /></template>
+    <template v-if="isChat" #icon-log><span /></template>
+    <template v-if="isChat" #item-log="{ activity }">
+      <!-- Pulled across the avatar column, so the line centres on the whole thread. -->
+      <div class="relative z-20 -ms-[38px] flex flex-1 items-center gap-3 py-1 text-p-sm text-ink-gray-5">
+        <div class="flex-1 border-t border-outline-gray-2" />
+        <span class="shrink-0">
+          {{ activity.data.divider }} ·
+          <Tooltip :text="dayjs(activity.timestamp).format(DATE_FORMATS.tooltip)">
+            <span>{{ clockTime(activity.timestamp) }}</span>
+          </Tooltip>
+        </span>
+        <div class="flex-1 border-t border-outline-gray-2" />
+      </div>
+    </template>
     <template v-if="isChat" #item-email="{ activity }">
       <div
         class="portal-chat-message flex w-full flex-col gap-1"
@@ -67,13 +82,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, watch, type PropType } from "vue";
+import { computed, defineComponent, h, ref, watch, type PropType } from "vue";
 import { Avatar, Tooltip, dayjs } from "frappe-ui";
 import {
   ActivityTimeline,
   AttachmentChip,
   useActivityTimeline,
 } from "@framework/ui/components/ActivityTimeline";
+import { useSession } from "@app/stores/session";
 import { conversationLayout } from "@app/stores/settings";
 import { DATE_FORMATS } from "@app/utils";
 import PortalEmailContent from "./PortalEmailContent.vue";
@@ -90,18 +106,23 @@ const props = defineProps<{
   extraActivities?: Row[];
   // The ticket's `modified`, so a save reloads the emails.
   version?: string;
-  // The ticket's communications, which say who sent each email.
-  communications?: { name: string; sent_or_received: string }[];
+  // The ticket's communications, which say who wrote each email and whether they are an agent.
+  communications?: { name: string; is_agent: boolean; user?: { email?: string } }[];
+  // The composer's height, kept clear under the last message.
+  reserve?: number;
 }>();
 
 const isChat = computed(() => conversationLayout.value === "chat");
+const session = useSession();
 
-const agentReplies = computed(
+// By email name; the sender address alone can differ for one person, such as admin@ and Administrator.
+const authors = computed(
   () =>
-    new Set(
-      (props.communications || [])
-        .filter((message) => message.sent_or_received === "Sent")
-        .map((message) => message.name)
+    new Map(
+      (props.communications || []).map((message) => [
+        message.name,
+        { isAgent: message.is_agent, email: message.user?.email },
+      ])
     )
 );
 
@@ -119,7 +140,11 @@ const TicketEmails = defineComponent({
     extraActivities: { type: Array as PropType<Row[]>, default: () => [] },
     version: String,
     // Set only in the chat layout, where each email gets its side and grouping.
-    agentReplies: { type: Set as PropType<Set<string> | null>, default: null },
+    authors: {
+      type: Map as PropType<Map<string, { isAgent: boolean; email?: string }> | null>,
+      default: null,
+    },
+    reserve: { type: Number, default: 0 },
   },
   setup(props, { slots }) {
     const { activities, loading, paginate, reload } = useActivityTimeline(
@@ -133,6 +158,8 @@ const TicketEmails = defineComponent({
     );
     // A customer never sees who else an email went to.
     const rows = computed(() => {
+      // The page's rows wait for the emails, so a close never shows alone while the thread loads.
+      if (loading.value && !activities.value.length) return [];
       const sorted = [
         ...activities.value.map((row) => ({
           ...row,
@@ -143,37 +170,73 @@ const TicketEmails = defineComponent({
         (first, second) =>
           dayjs(first.timestamp).valueOf() - dayjs(second.timestamp).valueOf()
       );
-      if (!props.agentReplies) return sorted;
-      // Chat shows only the conversation; closes are timeline rows.
-      const chat = sorted.filter((row) => row.type !== "log");
-      return chat.map((row, index) =>
-        row.type === "email" ? { ...row, chat: chatPlacement(row, chat[index - 1]) } : row
+      if (!props.authors) return sorted;
+      return sorted.map((row, index) =>
+        row.type === "email" ? { ...row, chat: chatPlacement(row, sorted[index - 1]) } : row
       );
     });
 
-    // A pending reply is not a communication yet, so anything not sent by an agent is the reader's side.
     function chatPlacement(row: Row, previous?: Row) {
-      const isOwn = !props.agentReplies!.has(row.data.name);
+      const isOwn = !isAgent(row);
       const opensGroup = !(
         previous?.type === "email" &&
-        previous.author?.email === row.author?.email &&
-        !props.agentReplies!.has(previous.data.name) === isOwn &&
+        authorEmail(previous) === authorEmail(row) &&
+        !isAgent(previous) === isOwn &&
         dayjs(row.timestamp).diff(dayjs(previous.timestamp), "s") <= GROUP_SECONDS
       );
       return { isOwn, opensGroup, showAvatar: opensGroup && !isOwn };
     }
 
+    // An email the viewer just sent arrives before the ticket's communications reload
+    function isAgent(row: Row) {
+      const known = props.authors!.get(row.data.name);
+      if (known) return known.isAgent;
+      const viewer = session.config.value;
+      return row.author?.email === viewer?.session_user && Boolean(viewer?.is_agent);
+    }
+
+    function authorEmail(row: Row) {
+      return props.authors!.get(row.data.name)?.email || row.author?.email;
+    }
+
+    // When the reserve settles after a resize, scroll by the difference so the messages stay put.
+    const wrapper = ref<HTMLElement | null>(null);
+    watch(
+      () => props.reserve,
+      (height, previous) => {
+        if (!previous) return;
+        const scroller = wrapper.value?.querySelector<HTMLElement>(".activity-timeline");
+        if (scroller) scroller.scrollTop -= height - previous;
+      },
+      { flush: "post" }
+    );
+
+    // ActivityTimeline's root is a fragment, so the page's classes land on this wrapper instead.
     return () =>
-      h(
-        ActivityTimeline,
-        { activities: rows.value, loading: loading.value, paginate },
-        slots
-      );
+      h("div", { ref: wrapper, class: "portal-thread flex flex-col", style: { "--composer-reserve": `${props.reserve}px` } }, [
+        h(
+          ActivityTimeline,
+          { activities: rows.value, loading: loading.value, paginate },
+          slots
+        ),
+      ]);
   },
 });
 </script>
 
 <style>
+/* Bounded, so the timeline scrolls inside the thread instead of growing past it. */
+.portal-thread > .activity-timeline {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+/* Spacing inside the scroll, not on the wrapper: messages slide under the header and the composer instead of being cut short. */
+.portal-thread > .activity-timeline > div {
+  padding-top: 1rem;
+  padding-bottom: var(--composer-reserve, 0px);
+}
+
 /* Not scoped: ActivityTimeline's root is a fragment, so no class or scope id reaches it. */
 .activity-timeline:has(.portal-chat-message) .activity > div > div:first-child::after {
   display: none;

@@ -63,5 +63,6 @@ helpdesk.patches.mark_old_assignment_notifications_read
 helpdesk.patches.harden_hd_ticket_field_permissions
 helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
+helpdesk.patches.add_studio_app
 helpdesk.patches.point_portal_home_to_studio
 helpdesk.patches.set_confirm_resolution_after_days

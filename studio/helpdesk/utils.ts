@@ -5,6 +5,12 @@ import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/uti
 
 export const SEARCH_DEBOUNCE_MS = 300
 
+// Mirrors frappe.handler.ALLOWED_MIMETYPES, which the server enforces for users without desk access.
+export const CUSTOMER_FILE_TYPES = [
+  '.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.csv', '.mov', '.mp4',
+  '.doc', '.docx', '.xls', '.xlsx', '.odt', '.ods',
+]
+
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
   clock: 'h:mm A',

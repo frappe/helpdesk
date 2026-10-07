@@ -6,4 +6,12 @@ export const MILESTONE_DOT_CLASSES = {
   pending: 'size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--outline-gray-4)]',
 }
 
+// Overdue or missed: the same shape, in red.
+export const LATE_DOT_CLASSES = {
+  done: 'size-2 bg-[var(--ink-red-6)]',
+  closed: 'size-2 bg-[var(--ink-red-6)]',
+  next: 'size-2.5 bg-surface-base shadow-[inset_0_0_0_2px_var(--ink-red-6)]',
+  pending: 'size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--ink-red-6)]',
+}
+
 export type MilestoneState = keyof typeof MILESTONE_DOT_CLASSES

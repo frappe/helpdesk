@@ -3,19 +3,16 @@ import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty } from '@helpdesk/shared/utils'
 import { isClosedStatus } from '@app/stores/ticketMeta'
-import { runAction } from '@app/utils'
+import { CUSTOMER_FILE_TYPES, runAction } from '@app/utils'
 
-// The composer floats over the thread, so the thread reserves this much room for it.
-const PROMPT_TAIL = '96px'
-const EDITOR_TAIL = '208px'
-
-export function useReplyComposer(ticket) {
+export function useReplyComposer(ticket, config) {
   const isComposerOpen = ref(false)
   const reply = ref('')
   const isSending = ref(false)
+  // The composer sits over the thread; it reports its height and the thread keeps that much clear.
+  const composerReserve = ref(0)
 
   const canReply = computed(() => !isClosedStatus(ticket.data?.status))
-  const threadTailSpace = computed(() => (isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL))
 
   function openComposer() {
     isComposerOpen.value = true
@@ -29,6 +26,8 @@ export function useReplyComposer(ticket) {
       docname: ticket.data?.name,
     })
   }
+
+  const acceptedFileTypes = computed(() => (config.value?.is_agent ? undefined : CUSTOMER_FILE_TYPES.join(',')))
 
   function discard() {
     reply.value = ''
@@ -55,11 +54,12 @@ export function useReplyComposer(ticket) {
   return {
     canReply,
     isComposerOpen,
-    threadTailSpace,
+    composerReserve,
     openComposer,
     reply,
     isSending,
     uploadFile,
+    acceptedFileTypes,
     send,
   }
 }
