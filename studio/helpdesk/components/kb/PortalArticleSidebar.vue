@@ -31,7 +31,7 @@
       <div v-for="category in visibleCategories" :key="category.name">
         <button
           type="button"
-          class="flex h-9 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 md:h-7 text-left transition hover:bg-surface-gray-2"
+          class="flex h-9 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 md:h-7 text-left transition hover:bg-surface-gray-1"
           :aria-expanded="category.isOpen"
           :aria-controls="`kb-sidebar-${category.name}`"
           @click="toggle(category.name)"
@@ -70,7 +70,7 @@
               :class="
                 article.name === activeName
                   ? 'bg-surface-gray-2 text-ink-gray-8'
-                  : 'text-ink-gray-6 hover:bg-surface-gray-2'
+                  : 'text-ink-gray-6 hover:bg-surface-gray-1'
               "
             >
               <span class="min-w-0 truncate">{{ article.title }}</span>
