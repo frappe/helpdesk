@@ -153,7 +153,8 @@ class HelpdeskDashboard:
 
     def get_ticket_count(self):
         current, prev = self.get_metric_data(self.ticket.name, Count)
-        delta = ((current - prev) / prev * 100) if prev else 0
+        # no previous period to compare against: no delta, not a 0% change
+        delta = ((current - prev) / prev * 100) if prev else None
 
         return {
             "title": _("Tickets"),
@@ -187,7 +188,7 @@ class HelpdeskDashboard:
             "title": _("% SLA Fulfilled"),
             "value": current_pct,
             "suffix": "%",
-            "delta": current_pct - prev_pct,
+            "delta": (current_pct - prev_pct) if prev_total else None,
             "deltaSuffix": "%",
             "tooltip": _("% of tickets created that were resolved within SLA"),
         }
@@ -204,7 +205,7 @@ class HelpdeskDashboard:
             "title": _("Avg. First Response"),
             "value": current,
             "suffix": " " + _("hrs"),
-            "delta": current - prev,
+            "delta": (current - prev) if prev else None,
             "deltaSuffix": " " + _("hrs"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to first respond to a ticket"),
@@ -221,7 +222,7 @@ class HelpdeskDashboard:
             "title": _("Avg. Resolution"),
             "value": current,
             "suffix": " " + _("days"),
-            "delta": current - prev,
+            "delta": (current - prev) if prev else None,
             "deltaSuffix": " " + _("days"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to resolve a ticket"),
@@ -243,7 +244,7 @@ class HelpdeskDashboard:
             "title": _("Avg. Feedback Rating"),
             "value": current * 5,
             "suffix": "/5",
-            "delta": (current - prev) * 5,
+            "delta": (current - prev) * 5 if prev else None,
             "deltaSuffix": " " + _("stars"),
             "tooltip": _("Avg. feedback rating for tickets resolved in this period"),
         }
