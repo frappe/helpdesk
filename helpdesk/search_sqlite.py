@@ -4,6 +4,7 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
+from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
 # Most tickets to bind as an exact IN (...) prefilter; past this the prefilter is
@@ -239,6 +240,35 @@ class HelpdeskSearch(SQLiteSearch):
             "customers": customers,
             "doctypes": doctypes,
         }
+
+
+class HelpdeskArticleSearch(SQLiteSearch):
+    """Articles to suggest beside a ticket; its own index, since no article has a ticket to permit."""
+
+    INDEX_NAME = "helpdesk_article_search.db"
+    INDEX_SCHEMA = {"metadata_fields": ["status", "category"]}
+    # Every status: the index queue re-adds a changed article unfiltered, so a draft would linger.
+    INDEXABLE_DOCTYPES = {
+        "HD Article": {
+            "fields": ["name", "title", "content", "status", "category", "modified"]
+        },
+    }
+
+    def get_search_filters(self) -> dict:
+        return {"status": "Published"}
+
+    def _prepare_fts_query(self, query: str) -> str:
+        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms."""
+        quote = super()._prepare_fts_query
+        stopwords = set(get_stopwords())
+        terms = [term for term in query.split() if term.lower() not in stopwords]
+        return " OR ".join(quote(term) for term in terms)
+
+    def _execute_search_query(self, fts_query, title_only, filters):
+        # A stopwords-only query leaves an empty MATCH, which FTS5 rejects.
+        if not fts_query:
+            return []
+        return super()._execute_search_query(fts_query, title_only, filters)
 
 
 def build_index():

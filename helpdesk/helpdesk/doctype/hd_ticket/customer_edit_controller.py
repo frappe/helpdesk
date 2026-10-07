@@ -36,10 +36,9 @@ class CustomerEditController:
         # rating the ticket is the one thing a closing email asks the customer to do
         if self.flags.get("ignore_closed_ticket_guard"):
             return
-        is_closed = old_doc.status == "Closed"
-        is_rated = bool(old_doc.feedback)
-        if is_closed or is_rated:
-            text = _("Closed or rated tickets cannot be updated by non-agents")
+        # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
+        if old_doc.status == "Closed":
+            text = _("Closed tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
     def prevent_customer_edits(self):

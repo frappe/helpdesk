@@ -1,4 +1,5 @@
-import { dayjs, dayjsLocal } from "frappe-ui";
+import { twoUnitDuration } from "@helpdesk/shared/utils";
+import { dayjsLocal } from "frappe-ui";
 import { computed, type ComputedRef, type Ref } from "vue";
 
 export type SLAState = "due" | "fulfilled" | "overdue" | "failed" | "hold";
@@ -38,14 +39,6 @@ const inkClasses: Record<SLAMetric["color"], string> = {
 // only appears when something changed (fulfilled, overdue, failed, hold).
 export function slaTextColor(metric: SLAMetric): string {
   return metric.state === "due" ? "text-ink-gray-7" : inkClasses[metric.color];
-}
-
-/** Display text, e.g. "Fulfilled in 3h 20m", "Due in 2d 4h", "On Hold" */
-export function slaLabel(metric: SLAMetric): string {
-  if (metric.state !== "fulfilled") return metric.value;
-  return metric.fulfilledIn
-    ? `Fulfilled in ${metric.fulfilledIn}`
-    : "Fulfilled";
 }
 
 export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
@@ -212,29 +205,4 @@ function coarseDuration(date: string): string {
     .startOf("minute")
     .diff(dayjsLocal().startOf("minute"));
   return twoUnitDuration(Math.abs(diff));
-}
-
-/** Format a duration using its two most significant units, e.g. "1d 9h" */
-function twoUnitDuration(milliseconds: number): string {
-  const duration = dayjs.duration(milliseconds);
-
-  const years = duration.years();
-  const months = duration.months();
-  const days = duration.days();
-  const hours = duration.hours();
-  const minutes = duration.minutes();
-  const seconds = duration.seconds();
-
-  if (years > 0) {
-    return `${years}y ${months}mo`;
-  } else if (months > 0) {
-    return `${months}mo ${days}d`;
-  } else if (days > 0) {
-    return `${days}d ${hours}h`;
-  } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else if (minutes > 0) {
-    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-  }
-  return `${seconds}s`;
 }

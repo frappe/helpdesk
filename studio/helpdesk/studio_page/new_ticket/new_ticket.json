@@ -1,0 +1,368 @@
+{
+ "allow_guest": 0,
+ "blocks": [
+  {
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "topbar",
+     "children": [
+      {
+       "blockName": "Header",
+       "componentId": "header-topbar",
+       "componentName": "header",
+       "componentProps": {
+        "crumb": "New ticket",
+        "parentCrumb": "Tickets",
+        "parentRoute": "/customer-tickets"
+       },
+       "isStudioComponent": true
+      }
+     ],
+     "classes": [
+      "items-center",
+      "bg-surface-base",
+      "border-b",
+      "border-outline-gray-2",
+      "flex",
+      "flex-row",
+      "shrink-0",
+      "h-[43px]",
+      "py-0",
+      "px-5",
+      "w-full"
+     ],
+     "componentId": "container-topbar-nt",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "content",
+     "children": [
+      {
+       "blockName": "stack",
+       "children": [
+        {
+         "blockName": "title",
+         "classes": [
+          "font-semibold",
+          "mb-1",
+          "ml-0",
+          "mr-0",
+          "mt-0",
+          "text-ink-gray-8"
+         ],
+         "componentId": "title",
+         "componentName": "TextBlock",
+         "componentProps": {
+          "fontSize": "text-2xl",
+          "tag": "span",
+          "text": "{{ t('Create new ticket') }}"
+         }
+        },
+        {
+         "blockName": "about",
+         "classes": [
+          "prose-sm",
+          "max-w-none",
+          "text-ink-gray-7"
+         ],
+         "componentId": "about",
+         "componentName": "HTML",
+         "componentProps": {
+          "html": "{{ about }}"
+         },
+         "visibilityCondition": "{{ about }}"
+        },
+        {
+         "blockName": "f-subject",
+         "children": [
+          {
+           "blockName": "c-subject",
+           "classes": [
+            "w-full"
+           ],
+           "componentId": "c-subject",
+           "componentName": "FormControl",
+           "componentProps": {
+            "error": "",
+            "label": "Subject",
+            "modelValue": {
+             "$type": "variable",
+             "name": "subject"
+            },
+            "placeholder": "{{ t('A short description') }}",
+            "required": true,
+            "size": "sm",
+            "type": "text",
+            "variant": "subtle"
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
+         "componentId": "f-subject",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "f-desc",
+         "children": [
+          {
+           "blockName": "l-desc",
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
+           "componentId": "l-desc",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-p-sm",
+            "tag": "span",
+            "text": "Description"
+           }
+          },
+          {
+           "blockName": "c-desc",
+           "classes": [
+            "w-full"
+           ],
+           "componentEvents": {
+            "change": {
+             "action": "Run Script",
+             "event": "change",
+             "script": "setDescription(eventArgs[0])"
+            }
+           },
+           "componentId": "TextEditor-a63tnqrdh",
+           "componentName": "TextEditor",
+           "componentProps": {
+            "autofocus": false,
+            "bubbleMenuOptions": {},
+            "content": "{{ description }}",
+            "editable": true,
+            "editorClass": "prose-sm max-w-none min-h-32 max-h-60 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2",
+            "extensions": [],
+            "fixedMenu": true,
+            "mentions": null,
+            "placeholder": "{{ t('Describe your issue…') }}",
+            "tags": null
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
+         "componentId": "f-desc",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "fields",
+         "classes": [
+          "w-full"
+         ],
+         "componentId": "fields",
+         "componentName": "FormLayout",
+         "componentProps": {
+          "doc": "{{ model }}",
+          "layout": "{{ layout }}"
+         },
+         "visibilityCondition": "{{ fields.length }}"
+        },
+        {
+         "blockName": "f-attach",
+         "children": [
+          {
+           "blockName": "l-attach",
+           "classes": [
+            "text-ink-gray-5",
+            "block",
+            "mb-1.5"
+           ],
+           "componentId": "l-attach",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-p-sm",
+            "tag": "span",
+            "text": "Attachment"
+           }
+          },
+          {
+           "classes": [
+            "w-full"
+           ],
+           "componentId": "KbFileAttachment-attach",
+           "componentName": "AttachmentsList",
+           "componentProps": {
+            "modelValue": {
+             "$type": "variable",
+             "name": "attachments"
+            },
+            "transport": "{{ uploadPrivately }}"
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "w-full"
+         ],
+         "componentId": "f-attach",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "my-0",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[50px]",
+        "w-full"
+       ],
+       "componentId": "stack",
+       "componentName": "container",
+       "originalElement": "div"
+      },
+      {
+       "blockName": "container",
+       "children": [
+        {
+         "blockName": "submit",
+         "classes": [
+          "w-full"
+         ],
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "createTicket()"
+          }
+         },
+         "componentId": "submit",
+         "componentName": "Button",
+         "componentProps": {
+          "disabled": "{{ !canSubmit }}",
+          "label": "{{ t('Create ticket') }}",
+          "loading": "{{ isCreating }}",
+          "size": "md",
+          "theme": "gray",
+          "type": "submit",
+          "variant": "solid"
+         }
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "shrink",
+        "gap-5",
+        "h-fit",
+        "pb-0",
+        "pl-0",
+        "pr-0",
+        "pt-[39px]",
+        "w-full"
+       ],
+       "componentId": "container-pp0kzmif9",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "items-start",
+      "flex",
+      "flex-col",
+      "grow",
+      "shrink",
+      "justify-start",
+      "max-w-[552px]",
+      "overflow-y-auto"
+     ],
+     "componentId": "content",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base",
+    "items-center",
+    "flex",
+    "flex-col",
+    "h-full",
+    "justify-center",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
+   "componentId": "body",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-07-30 15:26:13.484982",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-07 04:20:00.000000",
+ "modified_by": "Administrator",
+ "name": "new_ticket",
+ "owner": "Administrator",
+ "page_name": "page-d05d82bf",
+ "page_title": "New ticket",
+ "published": 1,
+ "resources": [
+  {
+   "auto": 0,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "POST",
+   "params": "{}",
+   "resource_name": "newTicket",
+   "resource_type": "API Resource",
+   "url": "helpdesk.helpdesk.doctype.hd_ticket.api.new"
+  },
+  {
+   "auto": 0,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"name\": \"Default\"}",
+   "resource_name": "template",
+   "resource_type": "API Resource",
+   "url": "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one"
+  }
+ ],
+ "route": "/tickets/new",
+ "studio_app": "helpdesk",
+ "variables": [
+  {
+   "initial_value": "\"\"",
+   "variable_name": "subject",
+   "variable_type": "String"
+  },
+  {
+   "initial_value": "\"\"",
+   "variable_name": "description",
+   "variable_type": "String"
+  }
+ ]
+}

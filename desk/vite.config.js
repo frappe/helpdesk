@@ -149,7 +149,7 @@ export default defineConfig(async ({ mode }) => {
         "lowlight",
         "interactjs",
       ],
-      exclude: ["frappe-ui", "@framework/ui"],
+      exclude: ["frappe-ui", "@framework/ui", "@helpdesk/shared"],
     },
   };
   return config;

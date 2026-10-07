@@ -1,0 +1,260 @@
+import { ref, computed, watch } from 'vue'
+import { call, toast } from 'frappe-ui'
+import { __ } from '@helpdesk/shared/translation'
+import { askConfirm, countLabel, errorMessage } from '@app/utils'
+import { ROLES } from './roles'
+
+export function createOrganizationSettings(core) {
+  const selectedOrganizationName = ref(null)
+  const organization = ref(null)
+
+  const isManager = computed(() => Boolean(organization.value?.is_manager))
+  const canInvite = computed(() => Boolean(organization.value?.can_invite))
+  const canChangeRoles = computed(() => Boolean(organization.value?.can_change_roles))
+  const canRemoveMembers = computed(() => Boolean(organization.value?.can_remove_members))
+  const canEdit = computed(() => Boolean(organization.value?.can_edit))
+  const members = computed(() => organization.value?.members || [])
+  const invites = computed(() => organization.value?.invites || [])
+
+  const managesAnyOrganization = computed(() =>
+    core.organizations.value.some((row) => row.role !== 'Member'),
+  )
+  const organizationScreenTitle = computed(() =>
+    __(managesAnyOrganization.value ? 'Manage Organization' : 'View Organization'),
+  )
+  const organizationScreenDescription = computed(() =>
+    __(
+      managesAnyOrganization.value
+        ? 'Manage the organizations you belong to and their members.'
+        : 'View the organizations you belong to and their members.',
+    ),
+  )
+  const organizationDetailDescription = computed(() =>
+    __(
+      isManager.value
+        ? "Manage your organization's members and tickets."
+        : "View your organization's members and tickets.",
+    ),
+  )
+
+  const orgTab = ref('members')
+  const orgTabOptions = computed(() => [
+    { label: __('Members'), value: 'members' },
+    { label: __('Tickets'), value: 'tickets' },
+  ])
+
+  const inviteOpen = ref(false)
+  const inviteEmails = ref([])
+  const inviteRole = ref('Member') // 'Member' | 'Manager'
+  const inviteContacts = ref([])
+
+  core.afterLoad(() => {
+    if (selectedOrganizationName.value) return loadOrganization(selectedOrganizationName.value)
+  })
+
+  async function loadOrganization(name) {
+    try {
+      organization.value = await call('helpdesk.api.organization.get_organization', {
+        customer: name,
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error(errorMessage(error, __('Could not open organization')))
+      closeOrganization()
+    }
+  }
+
+  function openOrganization(name) {
+    selectedOrganizationName.value = name
+    organization.value = null
+    inviteOpen.value = false
+    orgTab.value = 'members'
+    return loadOrganization(name)
+  }
+
+  // A list of one is not a choice, however the reader reached the screen.
+  watch(
+    [core.settingsTab, core.organizations],
+    () => {
+      if (core.settingsTab.value !== 'members' || selectedOrganizationName.value) return
+      if (core.organizations.value.length === 1)
+        openOrganization(core.organizations.value[0].name)
+    },
+    { immediate: true },
+  )
+
+  const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
+
+  function closeOrganization() {
+    selectedOrganizationName.value = null
+    organization.value = null
+    inviteOpen.value = false
+  }
+
+  function openInvite() {
+    inviteEmails.value = []
+    inviteRole.value = 'Member'
+    inviteOpen.value = true
+  }
+
+  // Watched, not fetched in `openInvite`: the URL hash sets the flag without going through it.
+  watch(inviteOpen, (open) => open && loadInvitableContacts())
+
+  async function loadInvitableContacts() {
+    inviteContacts.value = []
+    try {
+      inviteContacts.value = await call('helpdesk.api.organization.get_invitable_contacts', {
+        customer: selectedOrganizationName.value,
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  function closeInvite() {
+    inviteOpen.value = false
+  }
+
+  function sendInvite() {
+    const emails = inviteEmails.value.map((email) => email.trim()).filter(Boolean)
+    if (!emails.length) return toast.error(__('Please enter an email address'))
+    return core.run(
+      async () => {
+        await call('helpdesk.api.organization.invite_members', {
+          customer: selectedOrganizationName.value,
+          emails,
+          role: ROLES[inviteRole.value].role,
+        })
+        inviteEmails.value = []
+      },
+      countLabel(emails.length, 'Invitation sent', 'Invitations sent'),
+      () => {
+        if (!emails.every((email) => invites.value.some((invite) => invite.email === email))) return null
+        inviteEmails.value = []
+        return countLabel(
+          emails.length,
+          'Invitation created, but the email could not be sent',
+          'Invitations created, but the emails could not be sent',
+        )
+      },
+    )
+  }
+
+  function setMemberRole(member, role) {
+    const isManager = role === 'Manager'
+    askConfirm({
+      title: isManager ? __('Grant manager access') : __('Revoke manager access'),
+      message: isManager
+        ? __('{0} will get access to tickets raised by everyone in the organization.', [member.full_name])
+        : __('{0} will only see their own tickets going forward.', [member.full_name]),
+      label: __('Confirm'),
+      action: () =>
+        core.run(
+          () =>
+            call('helpdesk.api.organization.update_member_role', {
+              customer: selectedOrganizationName.value,
+              contact: member.contact,
+              is_manager: isManager,
+            }),
+          __('Role updated'),
+        ),
+    })
+  }
+
+  function removeMember(member) {
+    askConfirm({
+      title: __('Remove member'),
+      message: __("{0} will lose access to this organization's tickets.", [member.full_name]),
+      label: __('Remove'),
+      theme: 'red',
+      action: () =>
+        core.run(
+          () =>
+            call('helpdesk.api.organization.remove_member', {
+              customer: selectedOrganizationName.value,
+              contact: member.contact,
+            }),
+          __('Member removed'),
+        ),
+    })
+  }
+
+  function cancelInvitation(invite) {
+    askConfirm({
+      title: __('Cancel invitation'),
+      message: __('The invitation sent to {0} will no longer be usable.', [invite.email]),
+      label: __('Cancel invitation'),
+      theme: 'red',
+      action: () =>
+        core.run(
+          () =>
+            call('helpdesk.api.organization.remove_member', {
+              customer: selectedOrganizationName.value,
+              invitation: invite.invitation,
+            }),
+          __('Invitation cancelled'),
+          () =>
+            invites.value.every((row) => row.invitation !== invite.invitation) &&
+            __('Invitation cancelled, but the notice could not be emailed'),
+        ),
+    })
+  }
+
+  function updateOrganization(values, successMessage) {
+    return core.run(async () => {
+      // Renaming returns the new docname, which is also the drill-in key.
+      selectedOrganizationName.value = await call('helpdesk.api.organization.update_organization', {
+        customer: selectedOrganizationName.value,
+        ...values,
+      })
+    }, successMessage)
+  }
+
+  function renameOrganization(value) {
+    const name = value.trim()
+    if (!name) return toast.error(__('Please enter an organization name'))
+    return updateOrganization({ customer_name: name }, __('Organization updated'))
+  }
+
+  // A Run Script handler calls functions rather than assigning to a binding.
+  function uploadOrgImage() {
+    core.pickImage((fileUrl) => updateOrganization({ image: fileUrl }, __('Logo updated')))
+  }
+
+  function removeOrgImage() {
+    return updateOrganization({ image: '' }, __('Logo removed'))
+  }
+
+  return {
+    // The blocks bind these two under their shorter names.
+    selectedOrg: selectedOrganizationName,
+    settingsOrg: organization,
+    canLeaveOrganization,
+    canInvite,
+    canChangeRoles,
+    canRemoveMembers,
+    canEdit,
+    orgMembers: members,
+    orgInvites: invites,
+    organizationScreenTitle,
+    organizationScreenDescription,
+    organizationDetailDescription,
+    orgTab,
+    orgTabOptions,
+    inviteOpen,
+    inviteEmails,
+    inviteRole,
+    inviteContacts,
+    openOrganization,
+    closeOrganization,
+    openInvite,
+    closeInvite,
+    sendInvite,
+    setMemberRole,
+    removeMember,
+    cancelInvitation,
+    renameOrganization,
+    uploadOrgImage,
+    removeOrgImage,
+  }
+}
