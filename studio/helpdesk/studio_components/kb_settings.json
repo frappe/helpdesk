@@ -943,7 +943,6 @@
                 "componentName": "PortalMemberList",
                 "componentProps": {
                  "canChangeRoles": "{{ canChangeRoles }}",
-                 "canInvite": "{{ canInvite }}",
                  "canRemoveMembers": "{{ canRemoveMembers }}",
                  "members": "{{ orgMembers }}",
                  "onRemove": "{{ removeMember }}",
@@ -1151,6 +1150,16 @@
               },
               "componentSlots": {},
               "isCustomVueComponent": true
+             },
+             {
+              "componentId": "kb_settings-pending-invites",
+              "componentName": "PortalPendingInvites",
+              "componentProps": {
+               "invites": "{{ orgInvites }}",
+               "onCancel": "{{ cancelInvitation }}"
+              },
+              "componentSlots": {},
+              "isCustomVueComponent": true
              }
             ],
             "classes": [
@@ -1334,7 +1343,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-08 02:20:00.000000",
+ "modified": "2026-10-08 03:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

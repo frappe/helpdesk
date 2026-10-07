@@ -180,6 +180,28 @@ class TestInvitations(IntegrationTestCase):
         roles = frappe.get_all("User Role", {"parent": invitation.name}, pluck="role")
         self.assertEqual(roles, ["HD Customer"])
 
+    def test_an_invitation_is_listed_apart_from_the_members(self) -> None:
+        invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+
+        organization = get_organization(self.customer.name)
+
+        self.assertEqual([row["email"] for row in organization["invites"]], [NEWCOMER])
+        self.assertNotIn(NEWCOMER, [row["email"] for row in organization["members"]])
+
+    def test_invitations_are_hidden_once_inviting_is_off(self) -> None:
+        invite_members(self.customer.name, [NEWCOMER], "HD Customer")
+        frappe.db.set_single_value(
+            "HD Settings", "allow_customer_managers_to_invite", 0
+        )
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_customer_managers_to_invite",
+            1,
+        )
+
+        self.assertEqual(get_organization(self.customer.name)["invites"], [])
+
     def test_a_manager_cannot_invite_into_another_organization(self) -> None:
         with self.assertRaises(frappe.PermissionError):
             invite_members(self.other_customer.name, [NEWCOMER], "HD Customer")

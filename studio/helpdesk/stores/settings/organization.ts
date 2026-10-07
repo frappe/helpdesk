@@ -14,6 +14,7 @@ export function createOrganizationSettings(core) {
   const canRemoveMembers = computed(() => Boolean(organization.value?.can_remove_members))
   const canEdit = computed(() => Boolean(organization.value?.can_edit))
   const members = computed(() => organization.value?.members || [])
+  const invites = computed(() => organization.value?.invites || [])
 
   const managesAnyOrganization = computed(() =>
     core.organizations.value.some((row) => row.role !== 'Member'),
@@ -124,12 +125,12 @@ export function createOrganizationSettings(core) {
           emails,
           role: ROLES[inviteRole.value].role,
         })
-        closeInviteForm()
+        inviteEmails.value = []
       },
       countLabel(emails.length, 'Invitation sent', 'Invitations sent'),
       () => {
-        if (!emails.every(isPendingMember)) return null
-        closeInviteForm()
+        if (!emails.every((email) => invites.value.some((invite) => invite.email === email))) return null
+        inviteEmails.value = []
         return countLabel(
           emails.length,
           'Invitation created, but the email could not be sent',
@@ -137,15 +138,6 @@ export function createOrganizationSettings(core) {
         )
       },
     )
-  }
-
-  function closeInviteForm() {
-    inviteEmails.value = []
-    inviteOpen.value = false
-  }
-
-  function isPendingMember(email) {
-    return members.value.some((member) => member.email === email && member.pending)
   }
 
   function setMemberRole(member, role) {
@@ -170,7 +162,6 @@ export function createOrganizationSettings(core) {
   }
 
   function removeMember(member) {
-    if (member.pending) return cancelInvitation(member)
     askConfirm({
       title: __('Remove member'),
       message: __("{0} will lose access to this organization's tickets.", [member.full_name]),
@@ -188,10 +179,10 @@ export function createOrganizationSettings(core) {
     })
   }
 
-  function cancelInvitation(member) {
+  function cancelInvitation(invite) {
     askConfirm({
       title: __('Cancel invitation'),
-      message: __('The invitation sent to {0} will no longer be usable.', [member.email]),
+      message: __('The invitation sent to {0} will no longer be usable.', [invite.email]),
       label: __('Cancel invitation'),
       theme: 'red',
       action: () =>
@@ -199,11 +190,11 @@ export function createOrganizationSettings(core) {
           () =>
             call('helpdesk.api.organization.remove_member', {
               customer: selectedOrganizationName.value,
-              invitation: member.invitation,
+              invitation: invite.invitation,
             }),
           __('Invitation cancelled'),
           () =>
-            members.value.every((row) => row.invitation !== member.invitation) &&
+            invites.value.every((row) => row.invitation !== invite.invitation) &&
             __('Invitation cancelled, but the notice could not be emailed'),
         ),
     })
@@ -244,6 +235,7 @@ export function createOrganizationSettings(core) {
     canRemoveMembers,
     canEdit,
     orgMembers: members,
+    orgInvites: invites,
     organizationScreenTitle,
     organizationScreenDescription,
     organizationDetailDescription,
@@ -260,6 +252,7 @@ export function createOrganizationSettings(core) {
     sendInvite,
     setMemberRole,
     removeMember,
+    cancelInvitation,
     renameOrganization,
     uploadOrgImage,
     removeOrgImage,
