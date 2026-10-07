@@ -114,26 +114,18 @@ export default function setup(context) {
   const promptAfterDays = computed(() => Number(config.value?.confirm_resolution_after_days ?? RESOLVED_PROMPT_DAYS))
 
   // Asked once, of the requester, under the latest agent reply, once the resolution has stood a while.
-  const solvePromptAt = computed(() => {
+  // It takes the reply's time, and the thread puts the page's rows after emails at the same time.
+  const solvePrompt = computed(() => {
     const data = ticket.data
-    if (!data || !isResolved.value || !data.resolution_date) return null
+    const reply = thread.lastAgentReply.value
+    if (!data || !reply || !isResolved.value || !data.resolution_date) return null
     if (dayjs().diff(dayjs(data.resolution_date), 'day') < promptAfterDays.value) return null
     const viewer = config.value?.session_user
     if (viewer && data.raised_by && viewer !== data.raised_by) return null
-    return thread.lastAgentReply.value?.name || null
+    return { type: 'solve_prompt', key: 'solve-prompt', timestamp: reply.communication_date || reply.creation, data: {} }
   })
 
-  const activities = computed(() =>
-    byTime([...thread.activities.value, ...timelineEvents.value], 'timestamp').flatMap((activity) =>
-      activity.key === solvePromptAt.value
-        ? [activity, { type: 'solve_prompt', key: 'solve-prompt', timestamp: activity.timestamp, data: {} }]
-        : [activity],
-    ),
-  )
-
-  function byTime(rows, key: string) {
-    return rows.sort((first, second) => dayjs(first[key]).valueOf() - dayjs(second[key]).valueOf())
-  }
+  const threadExtras = computed(() => [...timelineEvents.value, ...(solvePrompt.value ? [solvePrompt.value] : [])])
 
   // Where a rating is still owed, the feedback dialog is the only way past `validate_feedback`.
   function confirmSolved() {
@@ -185,7 +177,7 @@ export default function setup(context) {
     ticketId,
     ticket,
     rating: thread.rating,
-    activities,
+    threadExtras,
     customActions,
     // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
     pageActionLabel: computed(() => {
