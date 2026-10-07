@@ -191,6 +191,10 @@ function createDraft() {
     });
   }
 
+  function discard() {
+    draft.value = JSON.parse(JSON.stringify(saved.value));
+  }
+
   function preview() {
     const { banner_image, banner_preset, pinned, links } = normalize(
       draft.value!
@@ -207,6 +211,7 @@ function createDraft() {
     canPreview,
     saving,
     save,
+    discard,
     preview,
   };
 }
