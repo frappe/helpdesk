@@ -94,12 +94,12 @@ const emit = defineEmits<{
 }>();
 
 const swatch =
-  "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-2 outline-offset-2 transition-[outline-color]";
+  "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-[1.5px] outline-offset-2 transition-[outline-color]";
 
 function ring(selected: boolean) {
   return selected
-    ? "outline-[--ink-gray-9]"
-    : "outline-transparent hover:outline-[--outline-gray-3]";
+    ? "outline-[--outline-gray-5]"
+    : "outline-transparent hover:outline-[--outline-gray-2]";
 }
 
 const previewBackground = computed(() =>
