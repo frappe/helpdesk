@@ -23,6 +23,7 @@ export default function setup(context) {
     ...useSettingsModal(context),
     ...useKbHeader(context),
     drawer: useDrawer(route),
+    category,
     notFound,
     categoryName,
     categoryDescription,
