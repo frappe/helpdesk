@@ -84,6 +84,13 @@ function unitFor(suffix: string | undefined, rounded: string) {
   return suffix.replace(/(\w+)$/, (word) => SINGULAR[word] ?? word);
 }
 
+// Optional chart props reject an explicit undefined, so unset keys are dropped.
+function compact<T extends object>(obj: T) {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined)
+  ) as { [K in keyof T]?: Exclude<T[K], undefined> };
+}
+
 export function toNumberCardProps(
   config: NumberChartConfig,
   deltaCaption?: string
@@ -100,7 +107,7 @@ export function toNumberCardProps(
       : Number(deltaFormat(Math.abs(config.delta))) === 0
       ? 0
       : config.delta;
-  return {
+  return compact({
     ...props,
     format,
     deltaFormat,
@@ -112,17 +119,17 @@ export function toNumberCardProps(
         : unitFor(config.deltaSuffix, deltaFormat(Math.abs(delta))),
     delta,
     deltaCaption: delta === null ? undefined : deltaCaption,
-  };
+  }) as NumberCardProps;
 }
 
 export function toDonutChartProps(config: DonutChartConfig): DonutChartProps {
-  return {
+  return compact({
     title: config.title,
     subtitle: config.subtitle,
     data: config.data || [],
     category: config.categoryColumn,
     value: config.valueColumn,
-  };
+  }) as DonutChartProps;
 }
 
 export function getAxisChartKind(config: AxisChartConfig): AxisChartKind {
@@ -136,12 +143,13 @@ function toValueAxis(
   axis?: ValueAxisConfig
 ): ChartValueAxisOptions | undefined {
   return (
-    axis && {
+    axis &&
+    compact({
       title: axis.title,
       min: axis.yMin,
       max: axis.yMax,
       echartOptions: axis.echartOptions,
-    }
+    })
   );
 }
 
@@ -149,7 +157,7 @@ export function toAxisChartProps(config: AxisChartConfig): BarChartProps {
   const series = config.series || [];
   const seriesConfig: Record<string, SeriesStyle> = {};
   series.forEach((s) => {
-    seriesConfig[s.name] = {
+    seriesConfig[s.name] = compact({
       type: s.type,
       color: s.color,
       showDataLabels: s.showDataLabels,
@@ -157,7 +165,7 @@ export function toAxisChartProps(config: AxisChartConfig): BarChartProps {
       dashed: s.lineType === "dashed" || s.lineType === "dotted" || undefined,
       stackName: s.stackName,
       echartOptions: s.echartOptions,
-    };
+    });
   });
 
   const y2 = series.filter((s) => s.axis === "y2").map((s) => s.name);
@@ -170,10 +178,13 @@ export function toAxisChartProps(config: AxisChartConfig): BarChartProps {
 
   const primary = series.filter((s) => s.axis !== "y2").map((s) => s.name);
   const yAxis = toValueAxis(config.yAxis);
-  // The second axis aligns its ticks to the primary's. With a fixed y2 range
-  // (% SLA 0-100, rating 0-5) a primary of 0-7 leaves y2 on ticks like 0.7,
-  // 1.4, 2.1; capping the primary at a multiple of 5 keeps both on five steps.
-  if (y2.length && config.y2Axis?.yMax !== undefined && yAxis?.max === undefined) {
+  // y2 aligns its ticks to the primary axis; with a fixed y2 range (0-100, 0-5),
+  // capping the primary at a multiple of 5 keeps both axes on five clean steps.
+  if (
+    y2.length &&
+    config.y2Axis?.yMax !== undefined &&
+    yAxis?.max === undefined
+  ) {
     const peak = Math.max(
       0,
       ...data.map((row) => {
@@ -186,7 +197,7 @@ export function toAxisChartProps(config: AxisChartConfig): BarChartProps {
     Object.assign(yAxis ?? {}, { max: Math.max(5, Math.ceil(peak / 5) * 5) });
   }
 
-  return {
+  return compact({
     title: config.title,
     subtitle: config.subtitle,
     data,
@@ -195,16 +206,16 @@ export function toAxisChartProps(config: AxisChartConfig): BarChartProps {
     y2: y2.length ? y2 : undefined,
     seriesConfig,
     stacked: config.stacked,
-    xAxis: {
+    xAxis: compact({
       // a horizontal chart prints the category title under the value axis' 0
       title: horizontal ? undefined : config.xAxis?.title,
       type: config.xAxis?.type,
       timeGrain: config.xAxis?.timeGrain,
       echartOptions: config.xAxis?.echartOptions,
-    },
+    }),
     yAxis,
     y2Axis: toValueAxis(config.y2Axis),
     echartOptions: config.echartOptions,
     ...(horizontal && { horizontal: true }),
-  };
+  }) as BarChartProps;
 }
