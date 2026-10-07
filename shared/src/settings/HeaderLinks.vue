@@ -5,7 +5,11 @@
         {{ __("Quick links") }}
       </span>
       <span class="text-p-sm text-ink-gray-6">
-        {{ __("Appear at the top right of every knowledge base page.") }}
+        {{
+          __(
+            "Add links to your website, docs or social pages. They will appear at the top right of every knowledge base page."
+          )
+        }}
       </span>
     </div>
     <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
@@ -61,7 +65,7 @@
         </ListRows>
       </List>
       <div v-else class="p-4 text-center text-ink-gray-5">
-        {{ __("No links yet. Add one to show it in the portal header") }}
+        {{ __("No links added yet.") }}
       </div>
     </div>
     <Button
