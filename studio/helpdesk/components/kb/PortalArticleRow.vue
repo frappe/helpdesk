@@ -4,7 +4,7 @@
     class="flex items-start gap-3 px-2 py-3 text-left no-underline"
     :class="
       isList
-        ? 'border-b border-outline-gray-1 transition-colors hover:bg-surface-gray-1'
+        ? 'relative rounded-4 transition-colors hover:bg-surface-gray-1 after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-[--outline-gray-1] hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0'
         : 'border-outline-gray-1 [&:not(:last-child)]:border-b'
     "
   >
