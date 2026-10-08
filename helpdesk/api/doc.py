@@ -248,7 +248,6 @@ def get_list_data(
     }
 
 
-@frappe.whitelist()
 def _get_group_by_option_details(
     doctype: str, options: list[str], label_field: str, icon_field: str | None
 ) -> dict[str, dict]:
@@ -262,6 +261,7 @@ def _get_group_by_option_details(
     return {row.name: row for row in rows}
 
 
+@frappe.whitelist()
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
