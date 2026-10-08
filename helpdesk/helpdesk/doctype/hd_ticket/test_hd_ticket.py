@@ -2550,8 +2550,8 @@ class TestTicketTimelineChanges(IntegrationTestCase):
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
 
-    def close(self, **values):
-        ticket = make_ticket(raised_by="Administrator")
+    def close(self, raised_by: str = "Administrator", **values):
+        ticket = make_ticket(raised_by=raised_by)
         # Assignment rules write to it on insert.
         ticket.reload()
         ticket.update({"status": "Closed", **values})
@@ -2568,6 +2568,16 @@ class TestTicketTimelineChanges(IntegrationTestCase):
         self.assertEqual((change["from"], change["to"]), ("Open", "Closed"))
         self.assertEqual(change["by"]["name"], "Administrator")
         self.assertTrue(change["on"])
+
+    def test_the_ticket_s_own_customer_can_read_them(self) -> None:
+        customer = create_contact("Timeline Customer", "timeline.customer@example.com")
+        ticket = self.close(raised_by=customer["user"])
+        frappe.set_user(customer["user"])
+
+        [change] = get_timeline_changes(ticket.name)
+
+        self.assertEqual(change["to"], "Closed")
+        self.assertEqual(change["by"]["name"], "Administrator")
 
     def test_leaves_the_rating_out(self) -> None:
         ticket = self.close(feedback_rating=0.8)

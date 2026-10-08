@@ -341,6 +341,15 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
+def set_setting_for_test_class(test_class, fieldname: str, value) -> None:
+    """Set an HD Settings field for a test class, restoring the previous value when it ends."""
+    previous = frappe.db.get_single_value("HD Settings", fieldname)
+    frappe.db.set_single_value("HD Settings", fieldname, value)
+    test_class.addClassCleanup(
+        frappe.db.set_single_value, "HD Settings", fieldname, previous
+    )
+
+
 def enable_public_knowledge_base():
     frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
 
@@ -703,10 +712,10 @@ def get_organization_members(customer: str) -> dict:
 
 def get_organization_card(customer: str) -> dict:
     """The portal's card for one of the session user's organizations."""
-    from helpdesk.api.organization import get_settings
+    from helpdesk.api.organization import get_account
 
     return next(
-        org for org in get_settings()["organizations"] if org["name"] == customer
+        org for org in get_account()["organizations"] if org["name"] == customer
     )
 
 
@@ -1058,3 +1067,15 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    """Users sent the customer "ticket changed" ping, read off a patched `frappe.publish_realtime`."""
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }

@@ -4,6 +4,7 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
+from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_audiences
 from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
@@ -243,19 +244,33 @@ class HelpdeskSearch(SQLiteSearch):
 
 
 class HelpdeskArticleSearch(SQLiteSearch):
-    """Articles to suggest beside a ticket; its own index, since no article has a ticket to permit."""
+    """The knowledge base search, and the articles suggested beside a ticket; its own index,
+    since no article has a ticket to permit."""
 
     INDEX_NAME = "helpdesk_article_search.db"
-    INDEX_SCHEMA = {"metadata_fields": ["status", "category"]}
+    INDEX_SCHEMA = {"metadata_fields": ["status", "category", "visibility"]}
     # Every status: the index queue re-adds a changed article unfiltered, so a draft would linger.
     INDEXABLE_DOCTYPES = {
         "HD Article": {
-            "fields": ["name", "title", "content", "status", "category", "modified"]
+            "fields": [
+                "name",
+                "title",
+                "content",
+                "status",
+                "category",
+                "visibility",
+                "modified",
+            ]
         },
     }
 
     def get_search_filters(self) -> dict:
-        return {"status": "Published"}
+        """Published, and for a non-agent only their audiences, so the top hits are all readable."""
+        filters = {"status": "Published"}
+        audiences = readable_audiences()
+        if audiences is not None:
+            filters["visibility"] = audiences
+        return filters
 
     def _prepare_fts_query(self, query: str) -> str:
         """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms.

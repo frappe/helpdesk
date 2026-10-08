@@ -17,7 +17,6 @@ def get_config():
         "setup_complete",
         "skip_email_workflow",
         "is_feedback_mandatory",
-        "confirm_resolution_after_days",
         "restrict_tickets_by_agent_group",
         "assign_within_team",
         "disable_saved_replies_global_scope",
@@ -38,7 +37,7 @@ def get_config():
 
     # Form scripts for the knowledge base pages; a private one keeps them from guests.
     if res.public_knowledge_base or res.session_user != "Guest":
-        res.kb_form_scripts = frappe.get_all(
+        res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",
             filters={"enabled": 1, "apply_to_knowledge_base": 1},
             pluck="script",

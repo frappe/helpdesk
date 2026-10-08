@@ -19,7 +19,8 @@ from helpdesk.integrations.erpnext.utils import (
 )
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, get_customers, is_agent
 
-CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
+MANAGER_ROLE = "HD Customer Manager"
+CUSTOMER_ROLES = ("HD Customer", MANAGER_ROLE)
 
 
 class HDCustomer(Document):
@@ -117,13 +118,13 @@ class HDCustomer(Document):
             return
         user_doc = frappe.get_doc("User", user)
         if contact.is_manager:
-            user_doc.append_roles("HD Customer Manager", "HD Customer")
+            user_doc.append_roles(MANAGER_ROLE, "HD Customer")
         else:
             user_doc.append_roles("HD Customer")
             if not self.is_manager_in_other_customers(contact.contact_name):
                 user_doc.set(
                     "roles",
-                    [r for r in user_doc.roles if r.role != "HD Customer Manager"],
+                    [r for r in user_doc.roles if r.role != MANAGER_ROLE],
                 )
         user_doc.save(ignore_permissions=True)
 
@@ -295,7 +296,7 @@ class HDCustomer(Document):
             "contacts",
             {
                 "contact_name": contact_name,
-                "is_manager": role == "HD Customer Manager",
+                "is_manager": role == MANAGER_ROLE,
             },
         )
         return True
@@ -308,7 +309,7 @@ class HDCustomer(Document):
 
     def set_primary(self, contact_name: str) -> None:
         """Make a contact the primary contact, ensuring it is a manager member."""
-        self.add_contact(contact_name, "HD Customer Manager")
+        self.add_contact(contact_name, MANAGER_ROLE)
         self.primary_contact = contact_name
 
     def clear_primary(self) -> None:

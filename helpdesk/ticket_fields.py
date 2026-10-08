@@ -72,9 +72,11 @@ class TicketFields:
 
     @cached_property
     def visible_template_rows(self) -> list[frappe._dict]:
-        return [
-            row for row in self.template_rows if row.fieldname not in self.hidden_fields
-        ]
+        # customers always raise as themselves, so raised_by is never theirs to edit
+        hidden = (
+            self.hidden_fields if self.is_agent else self.hidden_fields | {"raised_by"}
+        )
+        return [row for row in self.template_rows if row.fieldname not in hidden]
 
     @cached_property
     def hidden_fields(self) -> set[str]:

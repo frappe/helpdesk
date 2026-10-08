@@ -2,17 +2,18 @@
 # For license information, please see license.txt
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
-from helpdesk.api.knowledge_base import (
-    PUBLIC,
-    category_visibility,
-    is_readable,
-    readable_audiences,
-)
-from helpdesk.utils import capture_event
+from helpdesk.utils import capture_event, is_agent
+
+PUBLIC = "Public"
+CUSTOMERS_ONLY = "Customers only"
+AGENTS_ONLY = "Agents only"
+# What a list row shows of the body.
+EXCERPT_LENGTH = 140
 
 
 class HDArticle(Document):
@@ -31,11 +32,14 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
-        # Public is also the default, so it yields to the access the category shares.
+        # Public is also the field's default, so an insert cannot tell a chosen Public from none:
+        # the category's shared access wins either way. An explicit choice is kept on later saves.
         if self.visibility == PUBLIC and self.category:
-            self.visibility = category_visibility(self.category) or PUBLIC
+            self.visibility = get_shared_visibility(self.category) or PUBLIC
 
     def before_save(self):
+        self.set_excerpt()
+
         # set published date of the hd_article
         if self.status == "Published" and not self.published_on:
             self.published_on = frappe.utils.now()
@@ -55,6 +59,9 @@ class HDArticle(Document):
                     {"category": self.category, "status": "Published"},
                 )
             )
+
+    def set_excerpt(self):
+        self.excerpt = get_excerpt(self.content)
 
     def after_insert(self):
         count = frappe.db.count("HD Article")
@@ -115,12 +122,12 @@ class HDArticle(Document):
         if value not in (0, 1, 2):
             frappe.throw(_("Invalid vote"))
         self.validate_voter(visitor_id)
-        owner = (
+        voter = (
             {"visitor_id": visitor_id}
             if frappe.session.user == "Guest"
             else {"user": frappe.session.user}
         )
-        self.save_feedback(owner, value)
+        self.save_feedback(voter, value)
 
     def validate_voter(self, visitor_id: str | None):
         if frappe.session.user != "Guest":
@@ -132,9 +139,9 @@ class HDArticle(Document):
         if not visitor_id:
             frappe.throw(_("Please enable cookies to vote"))
 
-    def save_feedback(self, owner: dict, value: int):
+    def save_feedback(self, voter: dict, value: int):
         feedback = frappe.db.exists(
-            "HD Article Feedback", {**owner, "article": self.name}
+            "HD Article Feedback", {**voter, "article": self.name}
         )
         if feedback:
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
@@ -145,7 +152,7 @@ class HDArticle(Document):
                 "doctype": "HD Article Feedback",
                 "article": self.name,
                 "feedback": value,
-                **owner,
+                **voter,
             }
         ).insert(ignore_permissions=True)
 
@@ -158,6 +165,53 @@ class HDArticle(Document):
         :return: Generated slug
         """
         return self.title.lower().replace(" ", "-")
+
+
+def get_excerpt(html: str | None) -> str:
+    """The first paragraph, read as a sentence: headings and table cells would run into it."""
+    soup = BeautifulSoup(html or "", "html.parser")
+    paragraph = next((p for p in soup.find_all("p") if p.get_text(strip=True)), soup)
+    return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
+
+
+def readable_audiences(user: str | None = None) -> list[str] | None:
+    """The audiences `user` may read; `None` for an agent, who reads them all."""
+    user = user or frappe.session.user
+    if is_agent(user):
+        return None
+    if user == "Guest":
+        return [PUBLIC]
+    return [PUBLIC, CUSTOMERS_ONLY]
+
+
+def readable_filters(**extra) -> dict:
+    """Published articles in the caller's audiences, as filters."""
+    filters = {"status": "Published", **extra}
+    audiences = readable_audiences()
+    if audiences is not None:
+        filters["visibility"] = ["in", audiences]
+    return filters
+
+
+def is_readable(article, user: str | None = None) -> bool:
+    """The same rule for one article already fetched."""
+    audiences = readable_audiences(user)
+    if audiences is None:
+        return True
+    return (
+        article.get("status") == "Published" and article.get("visibility") in audiences
+    )
+
+
+def get_shared_visibility(category: str) -> str | None:
+    """The access every article in `category` the user can read shares; None when they differ."""
+    values = frappe.get_list(
+        "HD Article",
+        filters={"category": category},
+        pluck="visibility",
+        distinct=True,
+    )
+    return values[0] if len(values) == 1 else None
 
 
 def permission_query(user: str | None = None) -> str | None:

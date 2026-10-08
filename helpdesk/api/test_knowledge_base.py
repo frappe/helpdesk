@@ -12,6 +12,7 @@ from helpdesk.api.knowledge_base import (
     get_article,
     get_article_markdown,
     get_categories,
+    get_category_visibility,
     get_public_article,
     get_public_article_titles,
     get_public_articles,
@@ -19,8 +20,13 @@ from helpdesk.api.knowledge_base import (
     merge_category,
     move_to_category,
     search_articles,
+    set_article_feedback,
     set_category_visibility,
-    vote_on_article,
+)
+from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    AGENTS_ONLY,
+    CUSTOMERS_ONLY,
+    PUBLIC,
 )
 from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.test_utils import (
@@ -70,7 +76,7 @@ class TestPublicReads(IntegrationTestCase):
             get_public_article_titles,
             get_article_markdown,
             get_categories,
-            vote_on_article,
+            set_article_feedback,
             increment_views,
         ):
             self.assertIn(endpoint, frappe.guest_methods)
@@ -108,7 +114,9 @@ class TestPublicReads(IntegrationTestCase):
         enable_anonymous_article_voting()
         frappe.set_user("Guest")
 
-        self.assertRaises(frappe.PermissionError, vote_on_article, self.published, 1)
+        self.assertRaises(
+            frappe.PermissionError, set_article_feedback, self.published, 1
+        )
 
     def test_an_article_carries_the_reader_s_own_vote(self) -> None:
         self.assertEqual(get_public_article(self.published)["feedback"], "0")
@@ -149,12 +157,15 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(article.excerpt, "Fixture published")
 
     def test_an_excerpt_is_the_first_paragraph(self) -> None:
+        """Kept on the article at save time, so a list page parses no bodies."""
         body = "<h2>Setup</h2><p></p><p>Open <b>Settings</b>.</p><table><td>Role</td></table>"
-        frappe.db.set_value("HD Article", self.published, "content", body)
+        article = frappe.get_doc("HD Article", self.published)
+        article.content = body
+        article.save()
 
-        [article] = get_public_articles(category=self.category.name)
+        [row] = get_public_articles(category=self.category.name)
 
-        self.assertEqual(article.excerpt, "Open Settings.")
+        self.assertEqual(row.excerpt, "Open Settings.")
 
     def test_popular_sorts_by_views(self) -> None:
         frappe.db.set_value("HD Article", self.published, "views", BASE_VIEWS)
@@ -173,8 +184,22 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(set(article.author), BYLINE_FIELDS)
         self.assertEqual(
             set(article),
-            {*PUBLIC_ARTICLE_FIELDS, "content", "category_name", "feedback"},
+            {
+                *PUBLIC_ARTICLE_FIELDS,
+                "status",
+                "visibility",
+                "content",
+                "category_name",
+                "feedback",
+            },
         )
+
+    def test_a_url_with_a_title_slug_reads_the_article(self) -> None:
+        for path_name in (
+            f"{self.published}-fixture-published",
+            f"{self.published}-a-renamed-title",
+        ):
+            self.assertEqual(get_public_article(path_name).name, self.published)
 
     def test_a_guest_cannot_read_a_draft(self) -> None:
         frappe.set_user("Guest")
@@ -258,8 +283,7 @@ class TestPublicReads(IntegrationTestCase):
     def test_a_draft_s_views_are_not_counted_for_a_guest(self) -> None:
         frappe.set_user("Guest")
 
-        increment_views(self.draft)
-
+        self.assertRaises(frappe.DoesNotExistError, increment_views, self.draft)
         self.assertEqual(frappe.db.get_value("HD Article", self.draft, "views"), 0)
 
 
@@ -268,9 +292,10 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def setUp(self) -> None:
         enable_public_knowledge_base()
+        self.customer = create_contact("Fixture Customer", CUSTOMER)["user"]
         self.category = make_article_category("Fixture Visibility")
-        self.public = self.make_article("Fixture open", "Public")
-        self.members = self.make_article("Fixture members", "Customers only")
+        self.public = self.make_article("Fixture open", PUBLIC)
+        self.members = self.make_article("Fixture members", CUSTOMERS_ONLY)
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
@@ -287,9 +312,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def test_defaults_to_public(self) -> None:
         name = make_article("Fixture default")
-        self.assertEqual(
-            frappe.db.get_value("HD Article", name, "visibility"), "Public"
-        )
+        self.assertEqual(frappe.db.get_value("HD Article", name, "visibility"), PUBLIC)
 
     def test_a_guest_is_shown_only_public_articles(self) -> None:
         frappe.set_user("Guest")
@@ -300,18 +323,18 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         self.assertEqual(sorted(self.titles()), ["Fixture members", "Fixture open"])
 
     def test_an_agents_only_article_is_shown_to_neither(self) -> None:
-        self.make_article("Fixture internal", "Agents only")
+        self.make_article("Fixture internal", AGENTS_ONLY)
         self.assertIn("Fixture internal", self.titles())
 
-        frappe.session.user = CUSTOMER
+        frappe.set_user(self.customer)
         self.assertNotIn("Fixture internal", self.titles())
 
         frappe.set_user("Guest")
         self.assertNotIn("Fixture internal", self.titles())
 
     def test_a_customer_cannot_open_an_agents_only_article(self) -> None:
-        internal = self.make_article("Fixture internal link", "Agents only")
-        frappe.session.user = CUSTOMER
+        internal = self.make_article("Fixture internal link", AGENTS_ONLY)
+        frappe.set_user(self.customer)
 
         self.assertRaises(frappe.DoesNotExistError, get_public_article, internal)
         self.assertRaises(frappe.PermissionError, get_article, internal)
@@ -345,7 +368,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         make_article(
             "Fixture members elsewhere",
             category=hidden.name,
-            visibility="Customers only",
+            visibility=CUSTOMERS_ONLY,
         )
         self.assertIn(hidden.name, [row["name"] for row in get_categories()])
 
@@ -358,13 +381,13 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         make_article(
             "Fixture internal elsewhere",
             category=internal.name,
-            visibility="Agents only",
+            visibility=AGENTS_ONLY,
         )
         drafts = make_article_category("Fixture Drafts Only")
         make_article("Fixture draft elsewhere", "Draft", category=drafts.name)
         self.assertIn(internal.name, [row["name"] for row in get_categories()])
 
-        frappe.session.user = CUSTOMER
+        frappe.set_user(self.customer)
 
         names = [row["name"] for row in get_categories()]
         self.assertNotIn(internal.name, names)
@@ -373,7 +396,9 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
     def test_a_guest_cannot_vote_on_one(self) -> None:
         frappe.set_user("Guest")
 
-        self.assertRaises(frappe.DoesNotExistError, vote_on_article, self.members, 1)
+        self.assertRaises(
+            frappe.DoesNotExistError, set_article_feedback, self.members, 1
+        )
 
 
 class TestArticlePermissions(IntegrationTestCase):
@@ -384,8 +409,8 @@ class TestArticlePermissions(IntegrationTestCase):
             "user"
         ]
         self.agent = make_agent("fixture.kb.agent@example.com")
-        self.members = make_article("Fixture perm members", visibility="Customers only")
-        self.internal = make_article("Fixture perm internal", visibility="Agents only")
+        self.members = make_article("Fixture perm members", visibility=CUSTOMERS_ONLY)
+        self.internal = make_article("Fixture perm internal", visibility=AGENTS_ONLY)
         self.draft = make_article("Fixture perm draft", status="Draft")
 
     def tearDown(self) -> None:
@@ -451,13 +476,13 @@ class TestCategoryAccess(IntegrationTestCase):
         return self.category.name in names
 
     def test_agents_only_hides_the_category_and_everything_in_it(self) -> None:
-        set_category_visibility(self.category.name, "Agents only")
+        set_category_visibility(self.category.name, AGENTS_ONLY)
 
-        self.assertEqual({self.visibility(a) for a in self.articles}, {"Agents only"})
+        self.assertEqual({self.visibility(a) for a in self.articles}, {AGENTS_ONLY})
         self.assertFalse(self.listed("Guest"))
         self.assertFalse(self.listed(self.customer))
 
-        set_category_visibility(self.category.name, "Public")
+        set_category_visibility(self.category.name, PUBLIC)
 
         self.assertTrue(self.listed("Guest"))
 
@@ -476,60 +501,98 @@ class TestCategoryAccess(IntegrationTestCase):
             frappe.PermissionError,
             set_category_visibility,
             self.category.name,
-            "Public",
+            PUBLIC,
         )
 
+    def test_a_customer_reads_only_the_access_of_articles_they_can_see(self) -> None:
+        set_category_visibility(self.category.name, AGENTS_ONLY)
+        frappe.set_user(self.customer)
+
+        self.assertIsNone(get_category_visibility(self.category.name))
+
     def test_a_new_article_takes_the_access_its_category_shares(self) -> None:
-        set_category_visibility(self.category.name, "Customers only")
+        set_category_visibility(self.category.name, CUSTOMERS_ONLY)
 
         new = make_article("Fixture access new", category=self.category.name)
 
-        self.assertEqual(self.visibility(new), "Customers only")
+        self.assertEqual(self.visibility(new), CUSTOMERS_ONLY)
 
     def test_a_new_article_in_a_mixed_category_starts_public(self) -> None:
-        frappe.db.set_value("HD Article", self.articles[0], "visibility", "Agents only")
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", AGENTS_ONLY)
 
         new = make_article("Fixture access mixed", category=self.category.name)
 
-        self.assertEqual(self.visibility(new), "Public")
+        self.assertEqual(self.visibility(new), PUBLIC)
 
     def test_an_explicit_access_is_kept(self) -> None:
         new = make_article(
             "Fixture access explicit",
             category=self.category.name,
-            visibility="Agents only",
+            visibility=AGENTS_ONLY,
         )
 
-        self.assertEqual(self.visibility(new), "Agents only")
+        self.assertEqual(self.visibility(new), AGENTS_ONLY)
+
+    def test_an_explicit_public_yields_to_the_access_the_category_shares(self) -> None:
+        """Public is the field's default too, so an insert cannot tell it from no choice."""
+        set_category_visibility(self.category.name, CUSTOMERS_ONLY)
+
+        new = make_article(
+            "Fixture access public",
+            category=self.category.name,
+            visibility=PUBLIC,
+        )
+
+        self.assertEqual(self.visibility(new), CUSTOMERS_ONLY)
+
+    def test_a_filter_in_place_of_a_category_is_refused(self) -> None:
+        """The framework refuses the type first; the name check stands on its own too."""
+        self.assertRaises(
+            (frappe.FrappeTypeError, frappe.DoesNotExistError),
+            set_category_visibility,
+            ["like", "%"],
+            AGENTS_ONLY,
+        )
+        self.assertRaises(
+            frappe.DoesNotExistError, set_category_visibility, "no-such-one", PUBLIC
+        )
+        self.assertEqual({self.visibility(a) for a in self.articles}, {PUBLIC})
 
     def test_moving_in_takes_the_access_the_category_shares(self) -> None:
-        set_category_visibility(self.category.name, "Agents only")
+        set_category_visibility(self.category.name, AGENTS_ONLY)
         other = make_article_category("Fixture Access Other")
         moved = make_article("Fixture access moved", category=other.name)
         make_article("Fixture access stays", category=other.name)
 
         move_to_category(self.category.name, [moved])
 
-        self.assertEqual(self.visibility(moved), "Agents only")
+        self.assertEqual(self.visibility(moved), AGENTS_ONLY)
 
     def test_moving_into_a_mixed_category_keeps_the_article_s_access(self) -> None:
-        frappe.db.set_value("HD Article", self.articles[0], "visibility", "Agents only")
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", AGENTS_ONLY)
         other = make_article_category("Fixture Access Other")
         moved = make_article("Fixture access moved", category=other.name)
         make_article("Fixture access stays", category=other.name)
 
         move_to_category(self.category.name, [moved])
 
-        self.assertEqual(self.visibility(moved), "Public")
+        self.assertEqual(self.visibility(moved), PUBLIC)
+
+    def test_moving_a_category_s_last_article_says_why_it_cannot(self) -> None:
+        other = make_article_category("Fixture Access Other")
+        last = make_article("Fixture access last", category=other.name)
+
+        with self.assertRaisesRegex(frappe.ValidationError, "atleast one article"):
+            move_to_category(self.category.name, [last])
 
     def test_merging_in_takes_the_access_the_category_shares(self) -> None:
-        set_category_visibility(self.category.name, "Agents only")
+        set_category_visibility(self.category.name, AGENTS_ONLY)
         other = make_article_category("Fixture Access Merged")
         merged = make_article("Fixture access merged", category=other.name)
 
         merge_category(other.name, self.category.name)
 
-        self.assertEqual(self.visibility(merged), "Agents only")
+        self.assertEqual(self.visibility(merged), AGENTS_ONLY)
 
 
 class TestSearch(IntegrationTestCase):
@@ -559,7 +622,7 @@ class TestSearch(IntegrationTestCase):
             "Fixture zebra members",
             category=category,
             content=body,
-            visibility="Customers only",
+            visibility=CUSTOMERS_ONLY,
         )
         self.draft = make_article(
             "Fixture zebra draft", "Draft", category=category, content=body
@@ -598,6 +661,15 @@ class TestSearch(IntegrationTestCase):
         self.assertIn(self.public, self.names())
         self.assertNotIn(self.members, self.names())
 
+    def test_the_index_itself_keeps_to_the_reader_s_audience(self) -> None:
+        """Filtered in the index, so the top hits are readable, not filtered down to nothing."""
+        frappe.set_user("Guest")
+
+        names = [row["name"] for row in self.search.search("zebra")["results"]]
+
+        self.assertIn(self.public, names)
+        self.assertNotIn(self.members, names)
+
     def test_a_private_knowledge_base_refuses_a_guest(self) -> None:
         disable_public_knowledge_base()
         frappe.set_user("Guest")
@@ -614,12 +686,15 @@ class TestSearch(IntegrationTestCase):
         internal = make_article(
             "Fixture zebra internal",
             content="<p>zebra</p>",
-            visibility="Agents only",
+            visibility=AGENTS_ONLY,
         )
         self.search.index_documents_by_name("HD Article", [internal])
         self.assertIn(internal, self.related())
 
-        frappe.session.user = CUSTOMER
+        self.addCleanup(frappe.set_user, "Administrator")
+        frappe.set_user(
+            create_contact("Fixture Searcher", "fixture.searcher@example.com")["user"]
+        )
 
         self.assertNotIn(internal, self.related())
 

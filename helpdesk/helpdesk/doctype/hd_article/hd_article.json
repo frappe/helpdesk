@@ -17,7 +17,8 @@
   "author",
   "title_slug",
   "content_section",
-  "content"
+  "content",
+  "excerpt"
  ],
  "fields": [
   {
@@ -47,6 +48,13 @@
    "fieldname": "content",
    "fieldtype": "Text Editor",
    "label": "Content"
+  },
+  {
+   "fieldname": "excerpt",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Excerpt",
+   "read_only": 1
   },
   {
    "depends_on": "author",

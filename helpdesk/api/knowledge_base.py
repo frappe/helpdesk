@@ -11,11 +11,44 @@ from frappe.utils import (
 )
 from markdownify import markdownify
 
+from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    get_shared_visibility,
+    is_readable,
+    readable_filters,
+)
 from helpdesk.search_sqlite import HelpdeskArticleSearch
-from helpdesk.utils import is_agent
 
-PUBLIC = "Public"
-CUSTOMERS_ONLY = "Customers only"
+PUBLIC_ARTICLE_FIELDS = [
+    "name",
+    "title",
+    "author",
+    "category",
+    "published_on",
+    "modified",
+    "views",
+]
+PUBLIC_CATEGORY_FIELDS = [
+    "name",
+    "category_name",
+    "description",
+    "icon",
+    "pinned",
+    "pinned_order",
+]
+# Avatars in a category page's byline.
+CREATOR_LIMIT = 3
+SEARCH_LIMIT = 10
+SEARCH_QUERY_LENGTH = 200
+# Matches the article page's reading time.
+WORDS_PER_MINUTE = 200
+# A category past this many articles lists only the newest.
+LIST_LIMIT = 100
+# The sidebar's tree and search read these in one go; past this many, the oldest are left out.
+TITLES_LIMIT = 1000
+
+VISITOR_COOKIE = "hd_visitor"
+VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
+VIEW_WINDOW = 60 * 60
 
 
 def validate_public_access():
@@ -28,57 +61,16 @@ def validate_public_access():
         )
 
 
-def readable_audiences(user: str | None = None) -> list[str] | None:
-    """The audiences `user` may read; `None` for an agent, who reads them all."""
-    user = user or frappe.session.user
-    if is_agent(user):
-        return None
-    if user == "Guest":
-        return [PUBLIC]
-    return [PUBLIC, CUSTOMERS_ONLY]
-
-
-def readable_filters(**extra) -> dict:
-    """Published articles in the caller's audiences, as filters."""
-    filters = {"status": "Published", **extra}
-    audiences = readable_audiences()
-    if audiences is not None:
-        filters["visibility"] = ["in", audiences]
-    return filters
-
-
-def is_readable(article, user: str | None = None) -> bool:
-    """The same rule for one article already fetched."""
-    audiences = readable_audiences(user)
-    if audiences is None:
-        return True
-    return (
-        article.get("status") == "Published" and article.get("visibility") in audiences
-    )
-
-
 @frappe.whitelist()
 def get_article(name: str):
-    article = frappe.get_doc("HD Article", name).as_dict()
-
-    if not is_readable(article):
-        frappe.throw(_("Access denied"), frappe.PermissionError)
-
-    author = get_user_info_for_avatar(article["author"])
-    feedback = (
-        frappe.db.get_value(
-            "HD Article Feedback",
-            {"article": name, "user": frappe.session.user},
-            "feedback",
-        )
-        or 0
-    )
+    article = frappe.get_doc("HD Article", name)
+    article.check_permission("read")
 
     return {
         "name": article.name,
         "title": article.title,
         "content": article.content,
-        "author": author,
+        "author": get_user_info_for_avatar(article.author),
         "creation": article.creation,
         "status": article.status,
         "published_on": article.published_on,
@@ -88,17 +80,17 @@ def get_article(name: str):
         ),
         "category_id": article.category,
         "visibility": article.visibility,
-        "feedback": int(feedback),
+        "feedback": int(_get_own_feedback(name)),
     }
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def delete_articles(articles: list[str]):
     for article in articles:
         frappe.delete_doc("HD Article", article)
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def create_category(title: str, icon: str | None = None):
     if title.strip().lower() == "general":
         frappe.throw(
@@ -115,91 +107,56 @@ def create_category(title: str, icon: str | None = None):
     return {"article": article.name, "category": category.name}
 
 
-def category_visibility(category: str) -> str | None:
-    """The access every article in `category` shares; None when they differ."""
-    values = frappe.get_all(
-        "HD Article",
-        filters={"category": category},
-        pluck="visibility",
-        distinct=True,
-    )
-    return values[0] if len(values) == 1 else None
+def _validate_category(category: str) -> None:
+    """A name, not a filter: `set_value` would take a list as one and touch every article."""
+    if not isinstance(category, str) or not frappe.db.exists(
+        "HD Article Category", category
+    ):
+        frappe.throw(_("Category not found"), frappe.DoesNotExistError)
 
 
-def joining_values(category: str) -> dict:
+def _get_joining_values(category: str) -> dict:
     """An article joining a category whose articles share one access takes it."""
     values = {"category": category}
-    if visibility := category_visibility(category):
+    if visibility := get_shared_visibility(category):
         values["visibility"] = visibility
     return values
 
 
 @frappe.whitelist()
 def get_category_visibility(category: str) -> str | None:
-    frappe.has_permission("HD Article", "write", throw=True)
-    return category_visibility(category)
+    frappe.has_permission("HD Article", "read", throw=True)
+    _validate_category(category)
+    return get_shared_visibility(category)
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def set_category_visibility(category: str, visibility: str):
     frappe.has_permission("HD Article", "write", throw=True)
+    _validate_category(category)
     options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
     frappe.db.set_value(
-        "HD Article", {"category": category}, "visibility", visibility
+        "HD Article",
+        {"category": category},
+        "visibility",
+        visibility,
+        update_modified=False,
     )
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def move_to_category(category: str, articles: list[str]):
     frappe.has_permission("HD Article", "write", throw=True)
+    _validate_category(category)
 
-    values = joining_values(category)
+    values = _get_joining_values(category)
     for article in articles:
-        try:
-            article_category = frappe.db.get_value("HD Article", article, "category")
-            category_existing_articles = frappe.db.count(
-                "HD Article", {"category": article_category}
-            )
-            if category_existing_articles == 1:
-                frappe.throw(_("Category must have atleast one article"))
-                return
-            else:
-                frappe.db.set_value(
-                    "HD Article", article, values, update_modified=False
-                )
-        except Exception as e:
-            frappe.db.rollback()
-            frappe.throw(_("Error moving article to category"))
-
-
-# Fixed fields and no status parameter: guests read through these, so they cannot widen them.
-PUBLIC_ARTICLE_FIELDS = [
-    "name",
-    "title",
-    "author",
-    "category",
-    "status",
-    "visibility",
-    "published_on",
-    "modified",
-    "views",
-]
-PUBLIC_CATEGORY_FIELDS = ["name", "category_name", "description", "icon", "pinned"]
-# Avatars in a category page's byline.
-CREATOR_LIMIT = 3
-EXCERPT_LENGTH = 140
-SEARCH_LIMIT = 10
-SEARCH_QUERY_LENGTH = 200
-# Matches the article page's reading time.
-WORDS_PER_MINUTE = 200
-# A category past this many articles lists only the newest.
-LIST_LIMIT = 100
-
-VISITOR_COOKIE = "hd_visitor"
-VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
-VIEW_WINDOW = 60 * 60
+        current = frappe.db.get_value("HD Article", article, "category")
+        if frappe.db.count("HD Article", {"category": current}) == 1:
+            frappe.throw(_("Category must have atleast one article"))
+        frappe.db.set_value("HD Article", article, values, update_modified=False)
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -211,33 +168,22 @@ def get_public_articles(
     filters = readable_filters()
     if category:
         filters["category"] = category
-    articles = frappe.get_all(
+    return frappe.get_all(
         "HD Article",
         filters=filters,
-        fields=["name", "title", "content"],
+        fields=["name", "title", "excerpt"],
         order_by="views desc" if sort == "popular" else "published_on desc",
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
-    for article in articles:
-        article.excerpt = excerpt(
-            BeautifulSoup(article.pop("content") or "", "html.parser")
-        )
-    return articles
 
 
-def byline(user: str) -> dict:
+def _get_byline(user: str) -> dict:
     """What a byline shows; never the email, which guests could harvest."""
     info = get_user_info_for_avatar(user)
     return {"name": info["name"], "image": info["image"]}
 
 
-def excerpt(soup: BeautifulSoup) -> str:
-    """The first paragraph, read as a sentence: headings and table cells would run into it."""
-    paragraph = next((p for p in soup.find_all("p") if p.get_text(strip=True)), soup)
-    return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
-
-
-def first_image(soup: BeautifulSoup) -> str | None:
+def _get_first_image(soup: BeautifulSoup) -> str | None:
     """HD Article has no cover field; the body's first image stands in for one."""
     image = soup.find("img")
     return image.get("src") if image else None
@@ -245,32 +191,34 @@ def first_image(soup: BeautifulSoup) -> str | None:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_article_titles() -> list[dict]:
-    """Every article the reader may see, as just its name, title and category."""
+    """The newest articles the reader may see, as just name, title and category."""
     validate_public_access()
     return frappe.get_all(
         "HD Article",
         filters=readable_filters(),
         fields=["name", "title", "category"],
         order_by="published_on desc",
+        limit_page_length=TITLES_LIMIT,
     )
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_public_article(name: str) -> dict:
     """One article, published — or any article to an agent previewing a draft."""
-    article = get_readable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
-    article.author = byline(article.author)
+    name = _get_article_name(name)
+    article = _get_readable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
+    article.author = _get_byline(article.author)
     article.category_name = frappe.db.get_value(
         "HD Article Category", article.category, "category_name"
     )
-    article.feedback = get_own_vote(name)
+    article.feedback = _get_own_feedback(name)
     return article
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
 def get_article_markdown(name: str) -> None:
     """The article as a Markdown page, to paste into an LLM or point one at."""
-    article = get_readable_article(name, ["title", "content", "status", "visibility"])
+    article = _get_readable_article(name, ["title", "content"])
     body = markdownify(
         expand_relative_urls(article.content or ""), heading_style="ATX", bullets="-"
     )
@@ -283,10 +231,21 @@ def get_article_markdown(name: str) -> None:
     )
 
 
-def get_readable_article(name: str, fields: list[str]) -> frappe._dict:
-    """`fields` must carry `status` and `visibility`: they decide who may read it."""
+def _get_article_name(path_name: str) -> str:
+    """URLs read `<name>-<title slug>`; a name may hold hyphens too, so the longest match wins."""
+    parts = path_name.split("-")
+    candidates = ["-".join(parts[:i]) for i in range(len(parts), 0, -1)]
+    found = set(
+        frappe.get_all("HD Article", filters={"name": ["in", candidates]}, pluck="name")
+    )
+    return next((candidate for candidate in candidates if candidate in found), path_name)
+
+
+def _get_readable_article(name: str, fields: list[str] | None = None) -> frappe._dict:
     validate_public_access()
-    article = frappe.db.get_value("HD Article", name, fields, as_dict=True)
+    article = frappe.db.get_value(
+        "HD Article", name, ["status", "visibility", *(fields or [])], as_dict=True
+    )
     if not article or not is_readable(article):
         frappe.throw(_("Article not found"), frappe.DoesNotExistError)
     return article
@@ -297,7 +256,17 @@ def get_categories(with_creators: bool = False) -> list[dict]:
     """Only those with an article the reader may see, each with `article_count`,
     and with `with_creators`, its first few authors and how many there are."""
     validate_public_access()
-    counts = readable_article_counts()
+    counts, authors = {}, {}
+    for category, author, total in frappe.get_all(
+        "HD Article",
+        filters=readable_filters(category=["is", "set"]),
+        fields=["category", "author", {"COUNT": "*", "as": "total"}],
+        group_by="category, author",
+        order_by="total desc",
+        as_list=True,
+    ):
+        counts[category] = counts.get(category, 0) + total
+        authors.setdefault(category, []).append(author)
     if not counts:
         return []
     categories = frappe.get_all(
@@ -306,42 +275,14 @@ def get_categories(with_creators: bool = False) -> list[dict]:
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
     )
-    authors = readable_authors() if cint(with_creators) else None
+    with_creators = cint(with_creators)
     for category in categories:
         category.article_count = counts[category.name]
-        if authors is not None:
-            names = authors.get(category.name, [])
-            category.creators = [byline(name) for name in names[:CREATOR_LIMIT]]
+        if with_creators:
+            names = authors[category.name]
+            category.creators = [_get_byline(name) for name in names[:CREATOR_LIMIT]]
             category.creator_count = len(names)
     return categories
-
-
-def readable_authors() -> dict[str, list[str]]:
-    """Each category's authors of readable articles, the most prolific first."""
-    rows = frappe.get_all(
-        "HD Article",
-        filters=readable_filters(category=["is", "set"]),
-        fields=["category", "author", {"COUNT": "*", "as": "total"}],
-        group_by="category, author",
-        order_by="total desc",
-        as_list=True,
-    )
-    authors = {}
-    for category, author, _total in rows:
-        authors.setdefault(category, []).append(author)
-    return authors
-
-
-def readable_article_counts() -> dict[str, int]:
-    return dict(
-        frappe.get_all(
-            "HD Article",
-            filters=readable_filters(category=["is", "set"]),
-            fields=["category", {"COUNT": "*", "as": "total"}],
-            group_by="category",
-            as_list=True,
-        )
-    )
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -353,44 +294,31 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     search = HelpdeskArticleSearch()
     if not query or not search.index_exists():
         return []
-    results = search.search(query)["results"]
-    if not results:
+    # The index filters on status and audience, so its top hits are all readable.
+    hits = search.search(query)["results"][: cint(limit)]
+    if not hits:
         return []
-    # The index knows status, not audience, so the audience gate is one bounded query.
-    readable = {
+    articles = {
         article.name: article
         for article in frappe.get_all(
             "HD Article",
-            filters=readable_filters(name=["in", [row["name"] for row in results]]),
-            fields=["name", "content", "category"],
+            filters={"name": ["in", [row["name"] for row in hits]]},
+            fields=["name", "content", "category.category_name as category_name"],
         )
     }
-    hits = [row for row in results if row["name"] in readable][: cint(limit)]
-    labels = dict(
-        frappe.get_all(
-            "HD Article Category",
-            filters={"name": ["in", [readable[row["name"]].category for row in hits]]},
-            fields=["name", "category_name"],
-            as_list=True,
-        )
-    )
-    bodies = {
-        row["name"]: BeautifulSoup(readable[row["name"]].content or "", "html.parser")
-        for row in hits
+    return [_get_search_hit(row, articles[row["name"]]) for row in hits]
+
+
+def _get_search_hit(row: dict, article: frappe._dict) -> dict:
+    body = BeautifulSoup(article.content or "", "html.parser")
+    return {
+        "name": row["name"],
+        "title": escape_marked(row["title"]),
+        "excerpt": escape_marked(row.get("content") or ""),
+        "image": _get_first_image(body),
+        "minutes": max(1, round(len(body.get_text().split()) / WORDS_PER_MINUTE)),
+        "category_name": article.category_name,
     }
-    return [
-        {
-            "name": row["name"],
-            "title": escape_marked(row["title"]),
-            "excerpt": escape_marked(row.get("content") or ""),
-            "image": first_image(bodies[row["name"]]),
-            "minutes": max(
-                1, round(len(bodies[row["name"]].get_text().split()) / WORDS_PER_MINUTE)
-            ),
-            "category_name": labels.get(readable[row["name"]].category),
-        }
-        for row in hits
-    ]
 
 
 def escape_marked(text: str) -> str:
@@ -404,17 +332,15 @@ def escape_marked(text: str) -> str:
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 @rate_limit(key="article", limit=5, seconds=60 * 60)
-def vote_on_article(article: str, value: int) -> None:
-    """Vote on a published article, signed in or not."""
-    validate_public_access()
-    doc = frappe.get_doc("HD Article", article)
-    if not is_readable(doc):
-        frappe.throw(_("Article not found"), frappe.DoesNotExistError)
-
-    doc.set_feedback(cint(value), visitor_id=get_visitor_id(create=True))
+def set_article_feedback(article: str, value: int) -> None:
+    """Give feedback on a published article, signed in or not."""
+    _get_readable_article(article)
+    frappe.get_doc("HD Article", article).set_feedback(
+        cint(value), visitor_id=_get_visitor_id(create=True)
+    )
 
 
-def get_visitor_id(create: bool = False) -> str | None:
+def _get_visitor_id(create: bool = False) -> str | None:
     """A cookie that tells one `Guest` voter from another; only voting mints it."""
     if frappe.session.user != "Guest":
         return None
@@ -430,40 +356,38 @@ def get_visitor_id(create: bool = False) -> str | None:
     return key
 
 
-def get_own_vote(article: str) -> str:
-    """The caller's own vote on an article — "0" when they have not cast one."""
+def _get_own_feedback(article: str) -> str:
+    """The caller's own feedback on an article — "0" when they have given none."""
     if frappe.session.user != "Guest":
         voter = {"user": frappe.session.user}
-    elif visitor_id := get_visitor_id():
+    elif visitor_id := _get_visitor_id():
         voter = {"visitor_id": visitor_id}
     else:
         # A null visitor id would match every signed-in reader's row.
         return "0"
 
-    vote = frappe.db.get_value(
+    feedback = frappe.db.get_value(
         "HD Article Feedback", {**voter, "article": article}, "feedback"
     )
-    return str(vote or "0")
+    return str(feedback or "0")
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def merge_category(source: str, target: str):
     frappe.has_permission("HD Article Category", "delete", throw=True)
 
     if source == target:
         frappe.throw(_("Source and target category cannot be same"))
-    general_category = get_general_category()
-    if source == general_category:
+    _validate_category(source)
+    _validate_category(target)
+    if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
-    source_articles = frappe.get_all(
+    frappe.db.set_value(
         "HD Article",
-        filters={"category": source},
-        pluck="name",
+        {"category": source},
+        _get_joining_values(target),
+        update_modified=False,
     )
-    values = joining_values(target)
-    for article in source_articles:
-        frappe.db.set_value("HD Article", article, values, update_modified=False)
-
     frappe.delete_doc("HD Article Category", source)
 
 
@@ -477,12 +401,7 @@ def get_general_category():
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 def increment_views(article: str):
     """Count a reader once per article an hour; a re-read inside that window is no new view."""
-    validate_public_access()
-    row = frappe.db.get_value(
-        "HD Article", article, ["status", "visibility"], as_dict=True
-    )
-    if not row or not is_readable(row):
-        return
+    _get_readable_article(article)
     reader = (
         frappe.local.request_ip
         if frappe.session.user == "Guest"

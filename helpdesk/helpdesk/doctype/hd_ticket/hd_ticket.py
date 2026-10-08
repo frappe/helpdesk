@@ -69,6 +69,11 @@ class HDTicket(Document, CustomerEditController):
         publish_event(
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
+        publish_to_portal_readers(self)
+
+    def on_trash(self):
+        # Readers are worked out now; once the row is gone there is no one to ask about.
+        publish_to_portal_readers(self)
 
     def autoname(self):
         return self.name
@@ -804,7 +809,10 @@ class HDTicket(Document, CustomerEditController):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(
-        self, message: str, attachments: list[dict] = [], new_ticket: bool = False
+        self,
+        message: str,
+        attachments: list[dict] | None = None,
+        new_ticket: bool = False,
     ):
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
@@ -839,9 +847,21 @@ class HDTicket(Document, CustomerEditController):
             return
         QBFile = frappe.qb.DocType("File")
         condition_name = [QBFile.name == i["name"] for i in _attachments]
+        unattached_or_this_ticket = (
+            QBFile.attached_to_name.isnull()
+            | (QBFile.attached_to_name == "")
+            | (
+                (QBFile.attached_to_doctype == "HD Ticket")
+                & (QBFile.attached_to_name == self.name)
+            )
+        )
         frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
             QBFile.attached_to_doctype, "Communication"
-        ).where(Criterion.any(condition_name)).run()
+        ).where(Criterion.any(condition_name)).where(
+            QBFile.owner == frappe.session.user
+        ).where(
+            unattached_or_this_ticket
+        ).run()
 
         # attach files to ticket
         file_urls = frappe.get_all(
@@ -1078,6 +1098,8 @@ class HDTicket(Document, CustomerEditController):
         if c.sent_or_received == "Sent":
             # Ignore system notifications
             if c.communication_type and c.communication_type == "Automated Message":
+                # No save follows, so nothing else tells open pages about it.
+                self.publish_update()
                 return
             # Set first response date if not set already
             self.first_responded_on = (
@@ -1319,6 +1341,52 @@ class HDTicket(Document, CustomerEditController):
             if f["name"] in customer_not_allowed_fields:
                 fields.remove(f)
         return fields
+
+
+def publish_to_portal_readers(doc):
+    """Customers are kept out of the ticket's room, so each reader gets a bare ping on their own channel."""
+    for user in get_portal_readers(doc):
+        frappe.publish_realtime(
+            "helpdesk:ticket-update",
+            {"ticket_id": doc.name},
+            user=user,
+            after_commit=True,
+        )
+
+
+def get_portal_readers(doc) -> set[str]:
+    """Non-agents who may read `doc`; the author and agents already refetch, so they are left out."""
+    candidates = {doc.raised_by, doc.owner}
+    contacts = [doc.contact] if doc.contact else []
+    if doc.customer:
+        contacts += frappe.get_all(
+            "HD Customer Member",
+            filters={"parent": doc.customer, "is_manager": 1},
+            pluck="contact_name",
+        )
+    if contacts:
+        candidates.update(
+            frappe.get_all(
+                "Contact",
+                filters={"name": ["in", contacts], "user": ["is", "set"]},
+                pluck="user",
+            )
+        )
+    candidates -= {None, "", "Guest", frappe.session.user}
+    if not candidates:
+        return set()
+    users = frappe.get_all(
+        "User", filters={"name": ["in", list(candidates)], "enabled": 1}, pluck="name"
+    )
+    return {u for u in users if not is_agent(u) and has_permission(doc, u)}
+
+
+def publish_assignment_update(todo, method=None):
+    """Assigning writes `_assign` without saving the ticket, so `on_update` never runs."""
+    if todo.reference_type != "HD Ticket" or not todo.reference_name:
+        return
+    if ticket := frappe.db.exists("HD Ticket", todo.reference_name):
+        publish_to_portal_readers(frappe.get_cached_doc("HD Ticket", ticket))
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

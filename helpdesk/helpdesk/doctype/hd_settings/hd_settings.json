@@ -30,7 +30,6 @@
   "column_break_zxek",
   "feedback_section",
   "is_feedback_mandatory",
-  "confirm_resolution_after_days",
   "column_break_kegb",
   "comments_section",
   "enable_comment_reactions",
@@ -363,13 +362,6 @@
    "label": "Enable feedback for Customer Portal"
   },
   {
-   "default": "5",
-   "description": "Customers will be asked to confirm a resolved ticket after this many days. Set to 0 to ask right away.",
-   "fieldname": "confirm_resolution_after_days",
-   "fieldtype": "Int",
-   "label": "Ask to confirm resolution after (Days)"
-  },
-  {
    "fieldname": "column_break_iarl",
    "fieldtype": "Column Break"
   },
@@ -624,7 +616,7 @@
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to edit organization details",
-   "description": "If enabled, customer managers can change their organization's name and logo."
+   "description": "If enabled, customer managers can change their organization's logo."
   }
  ],
  "grid_page_length": 50,
