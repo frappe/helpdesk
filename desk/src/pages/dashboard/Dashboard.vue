@@ -547,7 +547,11 @@ const deltaCaption = computed(() => {
   const [from, to] = (filters.period || "").split(",");
   if (!from || !to) return undefined;
   const days = dayjs(to).diff(dayjs(from), "day");
-  if (days <= 0) return __("vs yesterday");
+  if (days <= 0) {
+    return dayjs(to).isSame(dayjs(), "day")
+      ? __("vs yesterday")
+      : __("vs prev. day");
+  }
   return __("vs prev. {0} days", [days]);
 });
 
