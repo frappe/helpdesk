@@ -21,7 +21,7 @@
       <div
         v-for="organization in matches"
         :key="organization.name"
-        class="cursor-pointer rounded-[10px] border border-outline-gray-2 p-4 transition-[box-shadow,border-color] duration-150 hover:border-outline-gray-3 hover:shadow-sm"
+        class="cursor-pointer rounded-[10px] border border-outline-gray-2 p-4 transition-colors duration-150 hover:bg-surface-gray-2 focus-visible:focus-ring"
         role="button"
         tabindex="0"
         @click="emit('select', organization.name)"

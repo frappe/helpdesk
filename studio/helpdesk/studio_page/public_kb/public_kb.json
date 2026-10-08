@@ -385,6 +385,7 @@
             "grid-cols-1",
             "sm:grid-cols-2",
             "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
+            "sm:auto-rows-fr",
             "content-start"
            ],
            "componentId": "Repeater-sxfnpzbam",
@@ -1193,6 +1194,7 @@
             "grid-cols-1",
             "sm:grid-cols-2",
             "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
+            "sm:auto-rows-fr",
             "content-start"
            ],
            "componentId": "Repeater-sxfnpzbam",
@@ -1625,7 +1627,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 03:34:39.874568",
+ "modified": "2026-10-09 03:55:52.804006",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
