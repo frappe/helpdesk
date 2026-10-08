@@ -140,7 +140,8 @@ class HelpdeskDashboard:
             current_expr.as_("current"), prev_expr.as_("prev")
         )
         result = query.run(as_dict=True)
-        return result[0].current or 0, result[0].prev or 0
+        # prev stays None when the earlier period has no samples, unlike a real 0 average
+        return result[0].current or 0, result[0].prev
 
     def get_number_card_data(self):
         return [
@@ -205,7 +206,7 @@ class HelpdeskDashboard:
             "title": _("Avg. First Response"),
             "value": current,
             "suffix": " " + _("hrs"),
-            "delta": (current - prev) if prev else None,
+            "delta": (current - prev) if prev is not None else None,
             "deltaSuffix": " " + _("hrs"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to first respond to a ticket"),
@@ -222,7 +223,7 @@ class HelpdeskDashboard:
             "title": _("Avg. Resolution"),
             "value": current,
             "suffix": " " + _("days"),
-            "delta": (current - prev) if prev else None,
+            "delta": (current - prev) if prev is not None else None,
             "deltaSuffix": " " + _("days"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to resolve a ticket"),
@@ -244,7 +245,7 @@ class HelpdeskDashboard:
             "title": _("Avg. Feedback Rating"),
             "value": current * 5,
             "suffix": "/5",
-            "delta": (current - prev) * 5 if prev else None,
+            "delta": (current - prev) * 5 if prev is not None else None,
             "deltaSuffix": " " + _("stars"),
             "tooltip": _("Avg. feedback rating for tickets resolved in this period"),
         }

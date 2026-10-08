@@ -100,6 +100,19 @@ class TestNumberCardDelta(IntegrationTestCase):
         self.assertEqual(tickets["value"], 2)
         self.assertEqual(tickets["delta"], 100)
 
+    def test_zero_hour_previous_average_still_compares(self):
+        with self.freeze_time("2031-07-09 10:00:00"):
+            earlier = make_assigned_ticket(self.agent, "Answered at once")
+        with self.freeze_time("2031-07-10 10:00:00"):
+            later = make_assigned_ticket(self.agent, "Answered later")
+        frappe.db.set_value("HD Ticket", earlier.name, "first_response_time", 0)
+        frappe.db.set_value("HD Ticket", later.name, "first_response_time", 7200)
+
+        [_, _, first_response, *_] = get_number_cards(
+            self.agent, "2031-07-10", "2031-07-10"
+        )
+        self.assertEqual(first_response["delta"], 2)
+
 
 class TestTagDashboard(IntegrationTestCase):
     """Tag charts reached through `get_dashboard_data("tags", ...)`."""
