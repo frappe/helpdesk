@@ -41,13 +41,14 @@
         <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
       </div>
       <CommentComposer
+        ref="composer"
         :model-value="modelValue"
         :placeholder="placeholder"
         :submit-label="submitLabel"
         :submitting="submitting"
         :upload-function="uploadFunction"
         @update:model-value="emit('update:modelValue', $event)"
-        @submit="emit('submit', $event)"
+        @submit="emit('submit', { ...$event, reset: () => composer?.reset() })"
       />
     </div>
   </div>
@@ -55,7 +56,12 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from "vue";
-import { useElementSize, useEventListener, useStorage, useWindowSize } from "@vueuse/core";
+import {
+  useElementSize,
+  useEventListener,
+  useStorage,
+  useWindowSize,
+} from "@vueuse/core";
 import { Avatar } from "frappe-ui";
 import { CommentComposer } from "@framework/ui/components/Composer";
 import { __ } from "@helpdesk/shared/translation";
@@ -89,10 +95,13 @@ const emit = defineEmits<{
 }>();
 
 const root = ref<HTMLElement | null>(null);
+const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
 
 // CommentComposer has no prop for this, so it goes straight onto its hidden file input.
 watchEffect(() => {
-  const input = root.value?.querySelector<HTMLInputElement>('[aria-label="Attach file"] + input[type="file"]');
+  const input = root.value?.querySelector<HTMLInputElement>(
+    '[aria-label="Attach file"] + input[type="file"]'
+  );
   if (props.accept) input?.setAttribute("accept", props.accept);
   else input?.removeAttribute("accept");
 });
@@ -100,28 +109,41 @@ watchEffect(() => {
 const height = useStorage("kb:composer-height", 0);
 const { height: viewportHeight } = useWindowSize();
 
-const resizing = ref<{ startY: number; startHeight: number; minY: number; closed: boolean } | null>(null);
+const resizing = ref<{
+  startY: number;
+  startHeight: number;
+  minY: number;
+  closed: boolean;
+} | null>(null);
 const isResizing = computed(() => resizing.value !== null);
 
 // Held while the drag grows the composer, so it slides over the thread instead of pushing it up;
 // a shrinking composer hands the room straight back, or the thread would end above a blank band.
-const { height: composerHeight } = useElementSize(root, undefined, { box: "border-box" });
+const { height: composerHeight } = useElementSize(root, undefined, {
+  box: "border-box",
+});
 watch(
   [composerHeight, () => resizing.value],
   ([value, drag]) => {
-    if (!drag || value < (props.reserve ?? 0)) emit("update:reserve", Math.round(value));
+    if (!drag || value < (props.reserve ?? 0))
+      emit("update:reserve", Math.round(value));
   },
   { immediate: true }
 );
 
 // Clamped on read too, so a height saved on a taller window still fits this one.
 const bodyStyle = computed(() =>
-  height.value > 0 ? { "--composer-body-height": `${clamp(height.value)}px` } : undefined
+  height.value > 0
+    ? { "--composer-body-height": `${clamp(height.value)}px` }
+    : undefined
 );
 
 function clamp(value: number) {
   const floor = isResizing.value ? 0 : MIN_BODY_HEIGHT;
-  return Math.min(Math.max(value, floor), Math.round(viewportHeight.value * MAX_VIEWPORT_SHARE));
+  return Math.min(
+    Math.max(value, floor),
+    Math.round(viewportHeight.value * MAX_VIEWPORT_SHARE)
+  );
 }
 
 function startResize(event: PointerEvent) {
@@ -145,7 +167,9 @@ function threadTop() {
 
 function currentHeight() {
   if (height.value) return clamp(height.value);
-  return root.value?.querySelector<HTMLElement>(".composer-body")?.offsetHeight ?? 0;
+  return (
+    root.value?.querySelector<HTMLElement>(".composer-body")?.offsetHeight ?? 0
+  );
 }
 
 function resizeBy(delta: number) {

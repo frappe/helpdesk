@@ -15,6 +15,7 @@ import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
 import { CUSTOMER_FILE_TYPES, runAction, scriptDialog } from '@app/utils'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
+import { usePageTitle } from '@app/stores/session'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
@@ -23,6 +24,7 @@ const SUGGESTION_LIMIT = 3
 export default function setup(context) {
   const { subject, description, template, newTicket, route } = context
   const settings = useSettingsModal(context)
+  usePageTitle(() => __('New Ticket'))
 
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
@@ -55,16 +57,8 @@ export default function setup(context) {
       .finally(() => (uploading.value -= 1))
   }
 
-  // Waits for the session: isGuest reads true until get_config answers.
-  watch(
-    settings.isGuest,
-    (isGuest) => {
-      if (isGuest) return
-      template.fetch()
-      loadTicketMeta()
-    },
-    { immediate: true },
-  )
+  template.fetch()
+  loadTicketMeta()
 
   const customActions = ref([])
   // The template's own fields, for `applyFilters` to restore once a filter is lifted.
@@ -185,7 +179,7 @@ export default function setup(context) {
           },
           attachments: attachments.value.map((file) => uploadedByUrl.get(file.file_url)),
         })
-        navigateTo(ROUTES.ticket(ticket.name))
+        await navigateTo(ROUTES.ticket(ticket.name))
       },
       { busy: isCreating, fallback: __('Could not create the ticket') },
     )

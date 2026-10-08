@@ -1,6 +1,6 @@
 // Ported from the desk's list cells, which Studio cannot import (they live under `@/`).
 import { h } from 'vue'
-import { Badge, Rating, Tooltip, dayjs } from 'frappe-ui'
+import { Badge, Rating, Tooltip, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
 import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
@@ -60,10 +60,10 @@ function badge(label: string, theme: string) {
 
 function slaBadge(metOn: string | undefined, due: string) {
   if (metOn) {
-    return dayjs(metOn).isBefore(dayjs(due)) ? badge(__('Fulfilled'), 'gray') : badge(__('Failed'), 'red')
+    return dayjsLocal(metOn).isBefore(dayjsLocal(due)) ? badge(__('Fulfilled'), 'gray') : badge(__('Failed'), 'red')
   }
-  if (dayjs(due).isBefore(dayjs())) return badge(__('Failed'), 'red')
-  return h(Tooltip, { text: dayjs(due).format('LLLL') }, () => badge(shortDuration(due), 'amber'))
+  if (dayjsLocal(due).isBefore(dayjsLocal())) return badge(__('Failed'), 'red')
+  return h(Tooltip, { text: dayjsLocal(due).format('LLLL') }, () => badge(shortDuration(due), 'amber'))
 }
 
 export function responseCell({ row, item }: any) {

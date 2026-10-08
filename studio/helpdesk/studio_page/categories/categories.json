@@ -162,7 +162,8 @@
               "max-sm:items-start",
               "max-sm:gap-3",
               "max-sm:px-4",
-              "max-sm:py-3.5"
+              "max-sm:py-3.5",
+              "focus-visible:focus-ring"
              ],
              "componentEvents": {
               "click": {
@@ -170,11 +171,20 @@
                "event": "click",
                "oldEvent": "click",
                "script": "router.push({ path: `/category/${dataItem.name}` })\n"
+              },
+              "keydown.enter": {
+               "action": "Run Script",
+               "event": "keydown.enter",
+               "script": "router.push({ path: `/category/${dataItem.name}` })\n"
               }
              },
              "componentId": "container-fvud8e41t-all",
              "componentName": "container",
-             "originalElement": "div"
+             "originalElement": "div",
+             "componentProps": {
+              "role": "link",
+              "tabindex": "0"
+             }
             }
            ],
            "classes": [
@@ -255,13 +265,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-10-07 18:00:00.000000",
+ "creation": "2026-10-07 13:53:30.898956",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:00:00.000000",
+ "modified": "2026-10-09 00:04:42.959652",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",

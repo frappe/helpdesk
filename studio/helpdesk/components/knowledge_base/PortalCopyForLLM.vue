@@ -6,6 +6,8 @@
       class="rounded-e-none"
       :label="__('Copy for LLM')"
       icon-left="lucide-copy"
+      @pointerdown="load"
+      @focus="load"
       @click="copyMarkdown"
     />
     <Dropdown :options="options" align="end">
@@ -16,6 +18,8 @@
           class="-ms-px rounded-s-none"
           icon="lucide-chevron-down"
           :aria-label="__('More ways to use this article with an LLM')"
+          @pointerdown="load"
+          @focus="load"
         />
       </template>
       <template #item-suffix="{ item }">
@@ -48,7 +52,8 @@ const props = withDefaults(
 // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
 const { copy } = useClipboard({ legacy: true });
 
-// Prefetched: Safari drops a clipboard write that waits on the network.
+// Fetched on the press or focus before the click, not on every article open: Safari drops a
+// clipboard write that waits on the network, and most readers never copy.
 const markdown = ref("");
 let request: Promise<void> | null = null;
 const markdownUrl = computed(
@@ -63,13 +68,12 @@ watch(
   () => {
     markdown.value = "";
     request = null;
-    if (props.name) load();
-  },
-  { immediate: true }
+  }
 );
 
 function load() {
   const name = props.name;
+  if (!name) return Promise.resolve();
   request ||= fetch(markdownUrl.value)
     .then(async (response) => {
       if (!response.ok) return;

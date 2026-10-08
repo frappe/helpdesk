@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-1">
-      <span class="text-base-medium text-ink-gray-8">{{
-        __("Banner")
-      }}</span>
+      <span class="text-base-medium text-ink-gray-8">{{ __("Banner") }}</span>
       <span class="text-p-sm text-ink-gray-6">{{
         __(
           "Choose a color, pattern or image to show behind the search bar to customize your knowledge base home page. For custom images recommended image size is minimum 1440x240 px in PNG or JPG."
@@ -82,7 +80,7 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { BANNER_PRESETS, findBannerPreset } from "../kbBanner";
+import { BANNER_PRESETS, findBannerPreset } from "../knowledgeBaseBanner";
 import { Button, FileUploader, Tooltip } from "frappe-ui";
 import { computed } from "vue";
 import LucideBan from "~icons/lucide/ban";

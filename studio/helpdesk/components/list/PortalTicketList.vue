@@ -4,7 +4,7 @@
       v-if="loading && !rows.length"
       class="flex h-full w-full items-center justify-center"
     >
-      <LoadingIndicator :scale="8" />
+      <LoadingIndicator class="size-6 text-ink-gray-4" />
     </div>
 
     <!-- One stacked row per ticket on a phone, where table columns leave the subject no room. -->

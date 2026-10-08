@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import PortalArticleIcon from "@app/components/kb/PortalArticleIcon.vue";
+import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
 
 withDefaults(defineProps<{ src?: string | null }>(), { src: null });
 

@@ -641,7 +641,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrg }}"
+          "visibilityCondition": "{{ !selectedOrganization }}"
          },
          {
           "children": [
@@ -671,7 +671,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrg }}"
+          "visibilityCondition": "{{ !selectedOrganization }}"
          },
          {
           "children": [
@@ -852,7 +852,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.email }}"
+                     "text": "{{ settingsOrganization.email }}"
                     },
                     "componentSlots": {}
                    }
@@ -867,7 +867,7 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.email }}"
+                  "visibilityCondition": "{{ settingsOrganization.email }}"
                  },
                  {
                   "classes": [
@@ -880,7 +880,7 @@
                    "text": "\u2022"
                   },
                   "componentSlots": {},
-                  "visibilityCondition": "{{ settingsOrg.email && settingsOrg.domain }}"
+                  "visibilityCondition": "{{ settingsOrganization.email && settingsOrganization.domain }}"
                  },
                  {
                   "children": [
@@ -905,7 +905,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.domain }}"
+                     "text": "{{ settingsOrganization.domain }}"
                     },
                     "componentSlots": {}
                    }
@@ -920,7 +920,7 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.domain }}"
+                  "visibilityCondition": "{{ settingsOrganization.domain }}"
                  },
                  {
                   "classes": [
@@ -933,7 +933,7 @@
                    "text": "\u2022"
                   },
                   "componentSlots": {},
-                  "visibilityCondition": "{{ (settingsOrg.email || settingsOrg.domain) && settingsOrg.country }}"
+                  "visibilityCondition": "{{ (settingsOrganization.email || settingsOrganization.domain) && settingsOrganization.country }}"
                  },
                  {
                   "children": [
@@ -958,7 +958,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.country }}"
+                     "text": "{{ settingsOrganization.country }}"
                     },
                     "componentSlots": {}
                    }
@@ -973,7 +973,7 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.country }}"
+                  "visibilityCondition": "{{ settingsOrganization.country }}"
                  }
                 ],
                 "classes": [
@@ -994,17 +994,12 @@
                "remove": {
                 "action": "Run Script",
                 "event": "remove",
-                "script": "removeOrgImage()"
-               },
-               "rename": {
-                "action": "Run Script",
-                "event": "rename",
-                "script": "function handleEvent(value) { renameOrganization(value) }"
+                "script": "removeOrganizationImage()"
                },
                "upload": {
                 "action": "Run Script",
                 "event": "upload",
-                "script": "uploadOrgImage()"
+                "script": "uploadOrganizationImage()"
                }
               },
               "componentId": "kb_settings-organization-identity",
@@ -1012,9 +1007,9 @@
               "componentProps": {
                "busy": "{{ isSettingsBusy }}",
                "editable": "{{ canEdit }}",
-               "image": "{{ settingsOrg.image }}",
-               "maxLength": 34,
-               "name": "{{ settingsOrg.customer_name }}",
+               "image": "{{ settingsOrganization.image }}",
+               "name": "{{ settingsOrganization.customer_name }}",
+               "renameable": false,
                "shape": "square",
                "subtitle": ""
               },
@@ -1031,11 +1026,11 @@
               "componentProps": {
                "modelValue": {
                 "$type": "variable",
-                "name": "orgTab"
+                "name": "organizationTab"
                },
                "tabs": {
                 "$type": "variable",
-                "name": "orgTabOptions"
+                "name": "organizationTabOptions"
                }
               }
              },
@@ -1051,7 +1046,9 @@
                 "componentProps": {
                  "canChangeRoles": "{{ canChangeRoles }}",
                  "canRemoveMembers": "{{ canRemoveMembers }}",
-                 "members": "{{ orgMembers }}",
+                 "invites": "{{ organizationInvites }}",
+                 "members": "{{ organizationMembers }}",
+                 "onCancel": "{{ cancelInvitation }}",
                  "onRemove": "{{ removeMember }}",
                  "onSetRole": "{{ setMemberRole }}"
                 },
@@ -1067,19 +1064,19 @@
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div",
-              "visibilityCondition": "{{ orgTab === 'members' && orgMembers.length }}"
+              "visibilityCondition": "{{ organizationTab === 'members' && organizationMembers.length }}"
              },
              {
               "classes": [
                "mt-4"
               ],
               "componentId": "kb_settings-organization-tickets",
-              "componentName": "PortalOrgTickets",
+              "componentName": "PortalOrganizationTickets",
               "componentProps": {
-               "customer": "{{ selectedOrg }}"
+               "customer": "{{ selectedOrganization }}"
               },
               "isCustomVueComponent": true,
-              "visibilityCondition": "{{ orgTab === 'tickets' }}"
+              "visibilityCondition": "{{ organizationTab === 'tickets' }}"
              }
             ],
             "componentId": "kb_settings-organization-detail",
@@ -1267,16 +1264,6 @@
               },
               "componentSlots": {},
               "isCustomVueComponent": true
-             },
-             {
-              "componentId": "kb_settings-pending-invites",
-              "componentName": "PortalPendingInvites",
-              "componentProps": {
-               "invites": "{{ orgInvites }}",
-               "onCancel": "{{ cancelInvitation }}"
-              },
-              "componentSlots": {},
-              "isCustomVueComponent": true
              }
             ],
             "classes": [
@@ -1349,7 +1336,7 @@
                  "variant": "subtle"
                 },
                 "componentSlots": {},
-                "visibilityCondition": "{{ kbIsDirty }}"
+                "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
                }
               ],
               "classes": [
@@ -1407,7 +1394,7 @@
                "label": "{{ t('Preview') }}"
               },
               "componentSlots": {},
-              "visibilityCondition": "{{ kbCanPreview }}"
+              "visibilityCondition": "{{ knowledgeBaseCanPreview }}"
              },
              {
               "componentEvents": {
@@ -1421,7 +1408,7 @@
               "componentName": "Button",
               "componentProps": {
                "label": "{{ t('Save') }}",
-               "loading": "{{ kbSaving }}",
+               "loading": "{{ knowledgeBaseSaving }}",
                "variant": "solid"
               },
               "componentSlots": {}
@@ -1438,7 +1425,7 @@
             "componentProps": {},
             "componentSlots": {},
             "originalElement": "div",
-            "visibilityCondition": "{{ kbIsDirty }}"
+            "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
            }
           ],
           "classes": [
@@ -1634,12 +1621,12 @@
  },
  "component_id": "kb_settings",
  "component_name": "KB Settings",
- "creation": "2026-10-01 16:19:30.705430",
+ "creation": "2026-10-09 03:16:06.119607",
  "docstatus": 0,
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-08 07:10:00.000000",
+ "modified": "2026-10-09 03:15:38.086100",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

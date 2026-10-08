@@ -1,7 +1,7 @@
 import { computed, effectScope, ref, watch } from 'vue'
-import { toast, useColorScheme } from 'frappe-ui'
+import { toast } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
-import { readKbPreview } from '@helpdesk/shared/kbPreview'
+import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { isSafeLink } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions } from '@app/stores/settings'
@@ -23,9 +23,6 @@ const SERVICE_ICONS = {
 }
 
 const session = useSession()
-
-const { resolvedColorScheme, toggleColorScheme } = useColorScheme()
-const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 
 const customActions = ref([])
 const headerLinks = ref([])
@@ -55,25 +52,26 @@ async function runScripts(scripts: string[]) {
   await setupCustomizations(data, scriptContext)
   customActions.value = data._customActions || []
   // Settings' Preview shows its unsaved quick links in place of the saved ones, until a save clears it.
-  headerLinks.value = (readKbPreview()?.links || data._customLinks || [])
+  headerLinks.value = (readKnowledgeBasePreview()?.links || data._customLinks || [])
     .filter((link) => link?.label && isSafeLink(link.url))
     .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 }
 
 // The knowledge base header: form scripts with "Apply to knowledge base", quick links among them,
-// whose context is the ticket pages' minus the field helpers.
-export function useKbHeader(context) {
+// whose context is the ticket pages' minus the field helpers. Only the knowledge base pages spread
+// this; the ticket pages keep their own actions and take the theme toggle from the settings store.
+export function useKnowledgeBaseHeader(context) {
   if (!scriptContext) {
     scriptContext = { call: context.call, router: context.router, toast, createToast, $dialog: scriptDialog }
     // Detached from the page, so the scripts run once a visit: an announcement dialog does not reopen on each page.
     // They rerun when the list changes, as when quick links are saved.
     effectScope(true).run(() =>
       watch(
-        () => JSON.stringify(session.config.value?.kb_form_scripts || []),
+        () => JSON.stringify(session.config.value?.knowledge_base_form_scripts || []),
         (scripts) => runScripts(JSON.parse(scripts)),
         { immediate: true },
       ),
     )
   }
-  return { customActions, headerLinks, accountMenuOptions: menuOptions, themeIcon, toggleTheme: toggleColorScheme }
+  return { customActions, headerLinks, accountMenuOptions: menuOptions }
 }

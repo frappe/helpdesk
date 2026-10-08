@@ -141,7 +141,7 @@
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
-            "placeholder": "{{ t('Describe your issue…') }}",
+            "placeholder": "{{ t('Describe your issue\u2026') }}",
             "tags": null
            }
           }
@@ -219,7 +219,6 @@
        "children": [
         {
          "blockName": "submit",
-         "classes": [],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -272,7 +271,8 @@
      ],
      "componentId": "content",
      "componentName": "container",
-     "originalElement": "div"
+     "originalElement": "div",
+     "visibilityCondition": "{{ template.data || template.error }}"
     },
     {
      "blockName": "KB Settings",
@@ -287,7 +287,6 @@
     "flex",
     "flex-col",
     "h-full",
-    "justify-center",
     "overflow-x-hidden",
     "w-[inherit]"
    ],
@@ -296,13 +295,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-10-01 15:56:40.168008",
+ "creation": "2026-10-07 15:18:21.023020",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 07:40:00.000000",
+ "modified": "2026-10-09 00:38:00.184119",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

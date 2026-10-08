@@ -1,10 +1,12 @@
 import { computed, watch } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { call, dayjs, toast } from 'frappe-ui'
+import { call, dayjsLocal, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
+import { ROUTES } from '@app/routes'
 import { useRecent } from '@app/stores/recent'
+import { usePageTitle } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
-import { useKbHeader } from '@app/composables/useKbHeader'
+import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { countLabel, DATE_FORMATS, runAction } from '@app/utils'
 import { useDrawer } from '@app/composables/useDrawer'
 
@@ -13,8 +15,9 @@ const RELATED_LIMIT = 6
 
 export default function setup(context) {
   // `article` is absent on the builder canvas, where the route has no name.
-  const { article, articles } = context
+  const { article, articles, router } = context
   const settings = useSettingsModal(context)
+  usePageTitle(() => (article?.error ? __('Article not found') : article?.data?.title))
 
   const parsed = computed(() => {
     const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')
@@ -31,7 +34,7 @@ export default function setup(context) {
 
   const publishedOn = computed(() => {
     const date = article?.data?.published_on
-    return date ? dayjs(date).format(DATE_FORMATS.short) : ''
+    return date ? dayjsLocal(date).format(DATE_FORMATS.short) : ''
   })
 
   const isPublicArticle = computed(
@@ -44,11 +47,17 @@ export default function setup(context) {
       .slice(0, RELATED_LIMIT),
   )
 
-  // `get_public_article` answers with the reader's own vote: '1' like, '2' dislike, '0' none.
+  // The route's name is `<name>-<title slug>`, or the bare name in links from before slugs.
+  function isCurrentArticle(routeName) {
+    const name = article?.data?.name
+    return Boolean(name) && (routeName === name || routeName?.startsWith(`${name}-`))
+  }
+
+  // `get_public_article` answers with the reader's own feedback: '1' like, '2' dislike, '0' none.
   function submitFeedback(value) {
     return runAction(
       async () => {
-        await call('helpdesk.api.knowledge_base.vote_on_article', { article: article.data.name, value })
+        await call('helpdesk.api.knowledge_base.set_article_feedback', { article: article.data.name, value })
         article.data.feedback = value
       },
       { success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
@@ -68,6 +77,9 @@ export default function setup(context) {
     () => article?.data?.name,
     (name) => {
       if (!name) return
+      // Resolved, so a slug in another script compares in the router's own encoding.
+      const path = router.resolve(ROUTES.article(article.data)).path
+      if (router.currentRoute.value.path !== path) router.replace({ path, hash: location.hash })
       // The article scrolls in its own panel, which keeps its place from one article to the next.
       if (!location.hash) document.querySelector('[data-component-id="container-gi1caqqm1"]')?.scrollTo({ top: 0 })
       call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {})
@@ -84,7 +96,7 @@ export default function setup(context) {
 
   return {
     ...settings,
-    ...useKbHeader(context),
+    ...useKnowledgeBaseHeader(context),
     drawer: useDrawer(context.route),
     parsed,
     readingTime,
@@ -93,5 +105,7 @@ export default function setup(context) {
     submitFeedback,
     copyLink,
     isPublicArticle,
+    isCurrentArticle,
+    articleRoute: ROUTES.article,
   }
 }

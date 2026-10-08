@@ -129,7 +129,9 @@
             "flex",
             "flex-col",
             "shrink",
-            "relative"
+            "relative",
+            "self-center",
+            "max-w-[531px]"
            ],
            "componentId": "container-8bzxv8zav",
            "componentName": "container",
@@ -168,7 +170,7 @@
           "shrink",
           "relative",
           "w-full",
-          "max-w-[531px]"
+          "max-w-[640px]"
          ],
          "componentId": "container-dm3g8lv9a",
          "componentName": "container",
@@ -187,7 +189,9 @@
         "pt-12",
         "sm:pt-[84px]",
         "pb-12",
-        "sm:pb-20"
+        "sm:pb-20",
+        "sm:min-h-[369px]",
+        "sm:justify-center"
        ],
        "componentId": "container-leo7uctqp",
        "componentName": "container",
@@ -214,22 +218,19 @@
           },
           {
            "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
+            "-mr-2"
            ],
            "componentEvents": {
             "click": {
              "action": "Run Script",
              "event": "click",
-             "script": "router.push({ path: '/categories' })"
+             "script": "toggleAllCategories()"
             }
            },
            "componentId": "Button-view-all-categories",
            "componentName": "Button",
            "componentProps": {
-            "label": "{{ t('View all') }}",
+            "label": "{{ showAllCategories ? t('Show less') : t('View all') }}",
             "variant": "ghost"
            },
            "visibilityCondition": "{{ hasHiddenCategories }}"
@@ -250,6 +251,7 @@
          "children": [
           {
            "baseStyles": {
+            "--category-columns": "{{ homeCategories.length === 2 ? 2 : 3 }}",
             "display": "grid",
             "gap": "10px",
             "gridAutoColumns": "minmax(0, 1fr)",
@@ -262,8 +264,10 @@
              "children": [
               {
                "classes": [
-                "size-6",
-                "text-ink-gray-8"
+                "size-5",
+                "text-ink-gray-6",
+                "transition-colors",
+                "group-hover:text-ink-gray-8"
                ],
                "componentId": "Icon-category-card",
                "componentName": "Icon",
@@ -292,13 +296,12 @@
                 {
                  "blockName": "category-title",
                  "classes": [
-                  "text-ink-gray-7",
-                  "font-semibold"
+                  "text-ink-gray-9"
                  ],
                  "componentId": "TextBlock-sn7kwi5gk",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-lg",
+                  "fontSize": "text-lg-semibold",
                   "tag": "h3",
                   "text": "{{ dataItem.category_name }}"
                  }
@@ -307,13 +310,13 @@
                  "blockName": "category-description",
                  "classes": [
                   "line-clamp-2",
-                  "text-ink-gray-5",
-                  "grow-0"
+                  "grow-0",
+                  "text-ink-gray-6"
                  ],
                  "componentId": "TextBlock-2jee9t8sl",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-p-base",
+                  "fontSize": "text-p-sm",
                   "tag": "p",
                   "text": "{{ dataItem.description || t('Browse articles in this category') }}"
                  }
@@ -343,20 +346,18 @@
               "cursor-pointer",
               "flex",
               "flex-col",
-              "gap-2.5",
-              "justify-center",
+              "justify-start",
               "overflow-hidden",
-              "pb-4",
-              "pl-5",
-              "pr-5",
-              "pt-4",
               "w-full",
-              "sm:min-h-[132px]",
               "max-sm:flex-row",
               "max-sm:items-start",
               "max-sm:gap-3",
               "max-sm:px-4",
-              "max-sm:py-3.5"
+              "max-sm:py-3.5",
+              "group",
+              "gap-4",
+              "p-5",
+              "focus-visible:focus-ring"
              ],
              "componentEvents": {
               "click": {
@@ -364,22 +365,32 @@
                "event": "click",
                "oldEvent": "click",
                "script": "router.push({ path: `/category/${dataItem.name}` })\n"
+              },
+              "keydown.enter": {
+               "action": "Run Script",
+               "event": "keydown.enter",
+               "script": "router.push({ path: `/category/${dataItem.name}` })\n"
               }
              },
              "componentId": "container-fvud8e41t",
              "componentName": "container",
-             "originalElement": "div"
+             "originalElement": "div",
+             "componentProps": {
+              "role": "link",
+              "tabindex": "0"
+             }
             }
            ],
            "classes": [
             "grid-cols-1",
             "sm:grid-cols-2",
-            "lg:grid-cols-3"
+            "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
+            "content-start"
            ],
            "componentId": "Repeater-sxfnpzbam",
            "componentName": "Repeater",
            "componentProps": {
-            "data": "{{ homeCategories }}",
+            "data": "{{ gridCategories }}",
             "dataKey": "name"
            },
            "visibilityCondition": "{{ homeCategories.length }}"
@@ -410,7 +421,7 @@
           "title": "{{ t(\"No categories yet\") }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ !categories.data || categories.data.length === 0 }}"
+         "visibilityCondition": "{{ categories.data && !categories.data.length }}"
         }
        ],
        "classes": [
@@ -418,216 +429,28 @@
         "flex-col",
         "gap-5",
         "mx-auto",
-        "max-w-[700px]",
+        "max-w-[832px]",
         "pb-2",
         "sm:pb-4",
         "w-full",
         "px-4",
-        "md:px-0",
         "pt-8",
         "sm:pt-[41px]"
        ],
        "componentId": "container-a9wzslqxz",
        "componentName": "container",
        "originalElement": "div",
-       "visibilityCondition": "{{ !focusCategory }}"
+       "visibilityCondition": "{{ categories.data && !focusCategory }}"
       },
       {
        "blockName": "articles-section",
        "children": [
-        {
-         "blockName": "category-picker-heading",
-         "children": [
-          {
-           "classes": [
-            "text-ink-gray-9",
-            "font-semibold"
-           ],
-           "componentId": "TextBlock-category-picker-title",
-           "componentName": "TextBlock",
-           "componentProps": {
-            "fontSize": "text-lg",
-            "tag": "h2",
-            "text": "{{ t(\"What do you need help with?\") }}"
-           }
-          },
-          {
-           "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
-           ],
-           "componentEvents": {
-            "click": {
-             "action": "Run Script",
-             "event": "click",
-             "script": "router.push({ path: '/categories' })"
-            }
-           },
-           "componentId": "Button-view-all-categories-picker",
-           "componentName": "Button",
-           "componentProps": {
-            "label": "{{ t('View all') }}",
-            "variant": "ghost"
-           },
-           "visibilityCondition": "{{ hasHiddenCategories }}"
-          }
-         ],
-         "classes": [
-          "flex",
-          "items-center",
-          "justify-between",
-          "gap-4"
-         ],
-         "componentId": "container-category-picker-heading",
-         "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": "{{ hasCategoryPicker }}"
-        },
-        {
-         "children": [
-          {
-           "baseStyles": {
-            "background": "{{ focusCategory && focusCategory.name === dataItem.name ? 'var(--surface-base)' : 'var(--surface-gray-1)' }}",
-            "borderColor": "{{ focusCategory && focusCategory.name === dataItem.name ? 'var(--outline-gray-4)' : 'var(--outline-gray-2)' }}"
-           },
-           "blockName": "category-choice",
-           "children": [
-            {
-             "blockName": "category-choice-icon",
-             "children": [
-              {
-               "classes": [
-                "size-5",
-                "text-ink-gray-7"
-               ],
-               "componentId": "Icon-category-choice",
-               "componentName": "Icon",
-               "componentProps": {
-                "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-               }
-              }
-             ],
-             "classes": [
-              "flex",
-              "shrink-0"
-             ],
-             "componentId": "container-category-choice-icon",
-             "componentName": "container",
-             "originalElement": "div"
-            },
-            {
-             "blockName": "category-choice-text",
-             "children": [
-              {
-               "classes": [
-                "text-ink-gray-9",
-                "font-semibold",
-                "truncate"
-               ],
-               "componentId": "TextBlock-category-choice-name",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "span",
-                "text": "{{ dataItem.category_name }}"
-               }
-              },
-              {
-               "classes": [
-                "text-ink-gray-5"
-               ],
-               "componentId": "TextBlock-category-choice-count",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-sm",
-                "tag": "span",
-                "text": "{{ articleCount(dataItem) }}"
-               }
-              }
-             ],
-             "classes": [
-              "flex",
-              "flex-col",
-              "gap-1",
-              "flex-1",
-              "min-w-0"
-             ],
-             "componentId": "container-category-choice-text",
-             "componentName": "container",
-             "originalElement": "div"
-            }
-           ],
-           "classes": [
-            "flex",
-            "items-center",
-            "gap-3",
-            "rounded-5",
-            "border",
-            "p-4",
-            "cursor-pointer",
-            "transition-colors",
-            "min-w-0"
-           ],
-           "componentEvents": {
-            "click": {
-             "action": "Run Script",
-             "event": "click",
-             "script": "pickCategory(dataItem.name)"
-            }
-           },
-           "componentId": "container-category-choice",
-           "componentName": "container",
-           "originalElement": "div"
-          }
-         ],
-         "classes": [
-          "grid",
-          "grid-cols-1",
-          "sm:grid-cols-2",
-          "gap-3",
-          "w-full",
-          "mb-2"
-         ],
-         "componentId": "Repeater-category-picker",
-         "componentName": "Repeater",
-         "componentProps": {
-          "data": "{{ homeCategories }}",
-          "dataKey": "name"
-         },
-         "visibilityCondition": "{{ hasCategoryPicker }}"
-        },
         {
          "blockName": "articles-header",
          "children": [
           {
            "blockName": "articles-heading",
            "children": [
-            {
-             "blockName": "lone-category-icon",
-             "children": [
-              {
-               "classes": [
-                "size-5",
-                "text-ink-gray-7"
-               ],
-               "componentId": "Icon-lone-category",
-               "componentName": "Icon",
-               "componentProps": {
-                "icon": "{{ (focusCategory && focusCategory.icon) || 'lucide-folder' }}"
-               }
-              }
-             ],
-             "classes": [
-              "flex",
-              "shrink-0"
-             ],
-             "componentId": "container-lone-category-icon",
-             "componentName": "container",
-             "originalElement": "div",
-             "visibilityCondition": "{{ isLoneCategory }}"
-            },
             {
              "blockName": "articles-heading-text",
              "children": [
@@ -642,8 +465,7 @@
                 "fontSize": "{{ focusCategory ? 'text-lg' : 'text-base' }}",
                 "tag": "h2",
                 "text": "{{ focusCategory ? focusCategory.category_name : t('Articles') }}"
-               },
-               "visibilityCondition": "{{ !hasCategoryPicker }}"
+               }
               },
               {
                "classes": [
@@ -699,10 +521,8 @@
           },
           {
            "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
+            "-mr-2",
+            "shrink-0"
            ],
            "componentEvents": {
             "click": {
@@ -714,7 +534,7 @@
            "componentId": "Button-view-all-categories-lone",
            "componentName": "Button",
            "componentProps": {
-            "label": "{{ t('View all') }}",
+            "label": "{{ t('View all categories') }}",
             "variant": "ghost"
            },
            "visibilityCondition": "{{ isLoneCategory && hasHiddenCategories }}"
@@ -726,9 +546,7 @@
           "flex-row",
           "justify-between",
           "w-full",
-          "gap-4",
-          "flex-wrap",
-          "gap-y-3"
+          "gap-4"
          ],
          "componentId": "container-yihf8crlt",
          "componentName": "container",
@@ -764,7 +582,8 @@
                    },
                    "classes": [
                     "size-4",
-                    "text-ink-gray-6"
+                    "text-ink-gray-6",
+                    "mt-px"
                    ],
                    "componentId": "HTML-home-article-icon",
                    "componentName": "HTML",
@@ -838,19 +657,30 @@
               "w-full",
               "border-t",
               "border-outline-gray-2",
-              "-mt-px"
+              "-mt-px",
+              "focus-visible:focus-ring",
+              "focus-visible:-outline-offset-2"
              ],
              "componentEvents": {
               "click": {
                "action": "Run Script",
                "event": "click",
                "oldEvent": "click",
-               "script": "router.push({ path: `/articles/${dataItem.name}` })\n"
+               "script": "router.push(articleRoute(dataItem))\n"
+              },
+              "keydown.enter": {
+               "action": "Run Script",
+               "event": "keydown.enter",
+               "script": "router.push(articleRoute(dataItem))\n"
               }
              },
              "componentId": "container-ijrf3qvaj",
              "componentName": "container",
-             "originalElement": "div"
+             "originalElement": "div",
+             "componentProps": {
+              "role": "link",
+              "tabindex": "0"
+             }
             }
            ],
            "componentId": "Repeater-9o4hxaycp",
@@ -859,10 +689,10 @@
             "data": "{{ articles.data }}",
             "dataKey": "name"
            },
+           "visibilityCondition": "{{ articles.data && articles.data.length }}",
            "rawStyles": {
             "overflow": "hidden"
-           },
-           "visibilityCondition": "{{ articles.data && articles.data.length }}"
+           }
           }
          ],
          "classes": [
@@ -875,8 +705,7 @@
           "pr-0",
           "pt-0",
           "w-full",
-          "pb-16",
-          "sm:pb-[190px]"
+          "pb-20"
          ],
          "componentId": "container-njr6t61bb",
          "componentName": "container",
@@ -896,7 +725,7 @@
           "title": "{{ t(\"No articles yet\") }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ !articles.data || articles.data.length === 0 }}"
+         "visibilityCondition": "{{ articles.data && !articles.data.length }}"
         }
        ],
        "classes": [
@@ -904,17 +733,17 @@
         "flex-col",
         "gap-4",
         "mx-auto",
-        "max-w-[700px]",
+        "max-w-[832px]",
         "pb-0",
         "w-full",
         "px-4",
-        "md:px-0",
         "pt-8",
         "sm:pt-[41px]"
        ],
        "componentId": "container-yi3s1zcyy",
        "componentName": "container",
-       "originalElement": "div"
+       "originalElement": "div",
+       "visibilityCondition": "{{ categories.data }}"
       }
      ],
      "classes": [
@@ -1087,7 +916,9 @@
             "flex",
             "flex-col",
             "shrink",
-            "relative"
+            "relative",
+            "self-center",
+            "max-w-[531px]"
            ],
            "componentId": "container-8bzxv8zav",
            "componentName": "container",
@@ -1131,7 +962,7 @@
           "shrink",
           "relative",
           "w-full",
-          "max-w-[531px]"
+          "max-w-[640px]"
          ],
          "componentId": "container-dm3g8lv9a",
          "componentName": "container",
@@ -1152,7 +983,9 @@
         "pt-12",
         "sm:pt-[84px]",
         "pb-12",
-        "sm:pb-20"
+        "sm:pb-20",
+        "sm:min-h-[369px]",
+        "sm:justify-center"
        ],
        "componentId": "container-leo7uctqp",
        "componentName": "container",
@@ -1182,22 +1015,19 @@
           },
           {
            "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
+            "-mr-2"
            ],
            "componentEvents": {
             "click": {
              "action": "Run Script",
              "event": "click",
-             "script": "router.push({ path: '/categories' })"
+             "script": "toggleAllCategories()"
             }
            },
            "componentId": "Button-view-all-categories",
            "componentName": "Button",
            "componentProps": {
-            "label": "{{ t('View all') }}",
+            "label": "{{ showAllCategories ? t('Show less') : t('View all') }}",
             "variant": "ghost"
            },
            "componentSlots": {},
@@ -1221,6 +1051,7 @@
          "children": [
           {
            "baseStyles": {
+            "--category-columns": "{{ homeCategories.length === 2 ? 2 : 3 }}",
             "display": "grid",
             "gap": "10px",
             "gridAutoColumns": "minmax(0, 1fr)",
@@ -1233,8 +1064,10 @@
              "children": [
               {
                "classes": [
-                "size-6",
-                "text-ink-gray-8"
+                "size-5",
+                "text-ink-gray-6",
+                "transition-colors",
+                "group-hover:text-ink-gray-8"
                ],
                "componentId": "Icon-category-card",
                "componentName": "Icon",
@@ -1266,13 +1099,12 @@
                 {
                  "blockName": "category-title",
                  "classes": [
-                  "text-ink-gray-7",
-                  "font-semibold"
+                  "text-ink-gray-9"
                  ],
                  "componentId": "TextBlock-sn7kwi5gk",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-lg",
+                  "fontSize": "text-lg-semibold",
                   "tag": "h3",
                   "text": "{{ dataItem.category_name }}"
                  },
@@ -1282,13 +1114,13 @@
                  "blockName": "category-description",
                  "classes": [
                   "line-clamp-2",
-                  "text-ink-gray-5",
-                  "grow-0"
+                  "grow-0",
+                  "text-ink-gray-6"
                  ],
                  "componentId": "TextBlock-2jee9t8sl",
                  "componentName": "TextBlock",
                  "componentProps": {
-                  "fontSize": "text-p-base",
+                  "fontSize": "text-p-sm",
                   "tag": "p",
                   "text": "{{ dataItem.description || t('Browse articles in this category') }}"
                  },
@@ -1321,20 +1153,18 @@
               "cursor-pointer",
               "flex",
               "flex-col",
-              "gap-2.5",
-              "justify-center",
+              "justify-start",
               "overflow-hidden",
-              "pb-4",
-              "pl-5",
-              "pr-5",
-              "pt-4",
               "w-full",
-              "sm:min-h-[132px]",
               "max-sm:flex-row",
               "max-sm:items-start",
               "max-sm:gap-3",
               "max-sm:px-4",
-              "max-sm:py-3.5"
+              "max-sm:py-3.5",
+              "group",
+              "gap-4",
+              "p-5",
+              "focus-visible:focus-ring"
              ],
              "componentEvents": {
               "click": {
@@ -1342,11 +1172,19 @@
                "event": "click",
                "oldEvent": "click",
                "script": "router.push({ path: `/category/${dataItem.name}` })\n"
+              },
+              "keydown.enter": {
+               "action": "Run Script",
+               "event": "keydown.enter",
+               "script": "router.push({ path: `/category/${dataItem.name}` })\n"
               }
              },
              "componentId": "container-fvud8e41t",
              "componentName": "container",
-             "componentProps": {},
+             "componentProps": {
+              "role": "link",
+              "tabindex": "0"
+             },
              "componentSlots": {},
              "originalElement": "div"
             }
@@ -1354,12 +1192,13 @@
            "classes": [
             "grid-cols-1",
             "sm:grid-cols-2",
-            "lg:grid-cols-3"
+            "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
+            "content-start"
            ],
            "componentId": "Repeater-sxfnpzbam",
            "componentName": "Repeater",
            "componentProps": {
-            "data": "{{ homeCategories }}",
+            "data": "{{ gridCategories }}",
             "dataKey": "name"
            },
            "componentSlots": {},
@@ -1394,7 +1233,7 @@
          },
          "componentSlots": {},
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ !categories.data || categories.data.length === 0 }}"
+         "visibilityCondition": "{{ categories.data && !categories.data.length }}"
         }
        ],
        "classes": [
@@ -1402,12 +1241,11 @@
         "flex-col",
         "gap-5",
         "mx-auto",
-        "max-w-[700px]",
+        "max-w-[832px]",
         "pb-2",
         "sm:pb-4",
         "w-full",
         "px-4",
-        "md:px-0",
         "pt-8",
         "sm:pt-[41px]"
        ],
@@ -1416,221 +1254,17 @@
        "componentProps": {},
        "componentSlots": {},
        "originalElement": "div",
-       "visibilityCondition": "{{ !focusCategory }}"
+       "visibilityCondition": "{{ categories.data && !focusCategory }}"
       },
       {
        "blockName": "articles-section",
        "children": [
-        {
-         "blockName": "category-picker-heading",
-         "children": [
-          {
-           "classes": [
-            "text-ink-gray-9",
-            "font-semibold"
-           ],
-           "componentId": "TextBlock-category-picker-title",
-           "componentName": "TextBlock",
-           "componentProps": {
-            "fontSize": "text-lg",
-            "tag": "h2",
-            "text": "{{ t(\"What do you need help with?\") }}"
-           },
-           "componentSlots": {}
-          },
-          {
-           "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
-           ],
-           "componentEvents": {
-            "click": {
-             "action": "Run Script",
-             "event": "click",
-             "script": "router.push({ path: '/categories' })"
-            }
-           },
-           "componentId": "Button-view-all-categories-picker",
-           "componentName": "Button",
-           "componentProps": {
-            "label": "{{ t('View all') }}",
-            "variant": "ghost"
-           },
-           "componentSlots": {},
-           "visibilityCondition": "{{ hasHiddenCategories }}"
-          }
-         ],
-         "classes": [
-          "flex",
-          "items-center",
-          "justify-between",
-          "gap-4"
-         ],
-         "componentId": "container-category-picker-heading",
-         "componentName": "container",
-         "componentProps": {},
-         "componentSlots": {},
-         "originalElement": "div",
-         "visibilityCondition": "{{ hasCategoryPicker }}"
-        },
-        {
-         "children": [
-          {
-           "baseStyles": {
-            "background": "{{ focusCategory && focusCategory.name === dataItem.name ? 'var(--surface-base)' : 'var(--surface-gray-1)' }}",
-            "borderColor": "{{ focusCategory && focusCategory.name === dataItem.name ? 'var(--outline-gray-4)' : 'var(--outline-gray-2)' }}"
-           },
-           "blockName": "category-choice",
-           "children": [
-            {
-             "blockName": "category-choice-icon",
-             "children": [
-              {
-               "classes": [
-                "size-5",
-                "text-ink-gray-7"
-               ],
-               "componentId": "Icon-category-choice",
-               "componentName": "Icon",
-               "componentProps": {
-                "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-               },
-               "componentSlots": {}
-              }
-             ],
-             "classes": [
-              "flex",
-              "shrink-0"
-             ],
-             "componentId": "container-category-choice-icon",
-             "componentName": "container",
-             "componentProps": {},
-             "componentSlots": {},
-             "originalElement": "div"
-            },
-            {
-             "blockName": "category-choice-text",
-             "children": [
-              {
-               "classes": [
-                "text-ink-gray-9",
-                "font-semibold",
-                "truncate"
-               ],
-               "componentId": "TextBlock-category-choice-name",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-base",
-                "tag": "span",
-                "text": "{{ dataItem.category_name }}"
-               },
-               "componentSlots": {}
-              },
-              {
-               "classes": [
-                "text-ink-gray-5"
-               ],
-               "componentId": "TextBlock-category-choice-count",
-               "componentName": "TextBlock",
-               "componentProps": {
-                "fontSize": "text-sm",
-                "tag": "span",
-                "text": "{{ articleCount(dataItem) }}"
-               },
-               "componentSlots": {}
-              }
-             ],
-             "classes": [
-              "flex",
-              "flex-col",
-              "gap-1",
-              "flex-1",
-              "min-w-0"
-             ],
-             "componentId": "container-category-choice-text",
-             "componentName": "container",
-             "componentProps": {},
-             "componentSlots": {},
-             "originalElement": "div"
-            }
-           ],
-           "classes": [
-            "flex",
-            "items-center",
-            "gap-3",
-            "rounded-5",
-            "border",
-            "p-4",
-            "cursor-pointer",
-            "transition-colors",
-            "min-w-0"
-           ],
-           "componentEvents": {
-            "click": {
-             "action": "Run Script",
-             "event": "click",
-             "script": "pickCategory(dataItem.name)"
-            }
-           },
-           "componentId": "container-category-choice",
-           "componentName": "container",
-           "componentProps": {},
-           "componentSlots": {},
-           "originalElement": "div"
-          }
-         ],
-         "classes": [
-          "grid",
-          "grid-cols-1",
-          "sm:grid-cols-2",
-          "gap-3",
-          "w-full",
-          "mb-2"
-         ],
-         "componentId": "Repeater-category-picker",
-         "componentName": "Repeater",
-         "componentProps": {
-          "data": "{{ homeCategories }}",
-          "dataKey": "name"
-         },
-         "componentSlots": {},
-         "visibilityCondition": "{{ hasCategoryPicker }}"
-        },
         {
          "blockName": "articles-header",
          "children": [
           {
            "blockName": "articles-heading",
            "children": [
-            {
-             "blockName": "lone-category-icon",
-             "children": [
-              {
-               "classes": [
-                "size-5",
-                "text-ink-gray-7"
-               ],
-               "componentId": "Icon-lone-category",
-               "componentName": "Icon",
-               "componentProps": {
-                "icon": "{{ (focusCategory && focusCategory.icon) || 'lucide-folder' }}"
-               },
-               "componentSlots": {}
-              }
-             ],
-             "classes": [
-              "flex",
-              "shrink-0"
-             ],
-             "componentId": "container-lone-category-icon",
-             "componentName": "container",
-             "componentProps": {},
-             "componentSlots": {},
-             "originalElement": "div",
-             "visibilityCondition": "{{ isLoneCategory }}"
-            },
             {
              "blockName": "articles-heading-text",
              "children": [
@@ -1646,8 +1280,7 @@
                 "tag": "h2",
                 "text": "{{ focusCategory ? focusCategory.category_name : t('Articles') }}"
                },
-               "componentSlots": {},
-               "visibilityCondition": "{{ !hasCategoryPicker }}"
+               "componentSlots": {}
               },
               {
                "classes": [
@@ -1709,10 +1342,8 @@
           },
           {
            "classes": [
-            "!bg-transparent",
-            "!px-0",
-            "hover:underline",
-            "underline-offset-2"
+            "-mr-2",
+            "shrink-0"
            ],
            "componentEvents": {
             "click": {
@@ -1724,7 +1355,7 @@
            "componentId": "Button-view-all-categories-lone",
            "componentName": "Button",
            "componentProps": {
-            "label": "{{ t('View all') }}",
+            "label": "{{ t('View all categories') }}",
             "variant": "ghost"
            },
            "componentSlots": {},
@@ -1737,9 +1368,7 @@
           "flex-row",
           "justify-between",
           "w-full",
-          "gap-4",
-          "flex-wrap",
-          "gap-y-3"
+          "gap-4"
          ],
          "componentId": "container-yihf8crlt",
          "componentName": "container",
@@ -1778,7 +1407,8 @@
                    },
                    "classes": [
                     "size-4",
-                    "text-ink-gray-6"
+                    "text-ink-gray-6",
+                    "mt-px"
                    ],
                    "componentId": "HTML-home-article-icon",
                    "componentName": "HTML",
@@ -1859,19 +1489,29 @@
               "w-full",
               "border-t",
               "border-outline-gray-2",
-              "-mt-px"
+              "-mt-px",
+              "focus-visible:focus-ring",
+              "focus-visible:-outline-offset-2"
              ],
              "componentEvents": {
               "click": {
                "action": "Run Script",
                "event": "click",
                "oldEvent": "click",
-               "script": "router.push({ path: `/articles/${dataItem.name}` })\n"
+               "script": "router.push(articleRoute(dataItem))\n"
+              },
+              "keydown.enter": {
+               "action": "Run Script",
+               "event": "keydown.enter",
+               "script": "router.push(articleRoute(dataItem))\n"
               }
              },
              "componentId": "container-ijrf3qvaj",
              "componentName": "container",
-             "componentProps": {},
+             "componentProps": {
+              "role": "link",
+              "tabindex": "0"
+             },
              "componentSlots": {},
              "originalElement": "div"
             }
@@ -1883,7 +1523,10 @@
             "dataKey": "name"
            },
            "componentSlots": {},
-           "visibilityCondition": "{{ articles.data && articles.data.length }}"
+           "visibilityCondition": "{{ articles.data && articles.data.length }}",
+           "rawStyles": {
+            "overflow": "hidden"
+           }
           }
          ],
          "classes": [
@@ -1896,8 +1539,7 @@
           "pr-0",
           "pt-0",
           "w-full",
-          "pb-16",
-          "sm:pb-[190px]"
+          "pb-20"
          ],
          "componentId": "container-njr6t61bb",
          "componentName": "container",
@@ -1920,7 +1562,7 @@
          },
          "componentSlots": {},
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ !articles.data || articles.data.length === 0 }}"
+         "visibilityCondition": "{{ articles.data && !articles.data.length }}"
         }
        ],
        "classes": [
@@ -1928,11 +1570,10 @@
         "flex-col",
         "gap-4",
         "mx-auto",
-        "max-w-[700px]",
+        "max-w-[832px]",
         "pb-0",
         "w-full",
         "px-4",
-        "md:px-0",
         "pt-8",
         "sm:pt-[41px]"
        ],
@@ -1940,7 +1581,8 @@
        "componentName": "container",
        "componentProps": {},
        "componentSlots": {},
-       "originalElement": "div"
+       "originalElement": "div",
+       "visibilityCondition": "{{ categories.data }}"
       }
      ],
      "classes": [
@@ -1983,7 +1625,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:43:23.167083",
+ "modified": "2026-10-09 03:34:39.874568",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

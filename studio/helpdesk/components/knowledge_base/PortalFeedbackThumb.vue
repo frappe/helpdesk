@@ -10,7 +10,10 @@
   >
     <path :d="PATHS[answer].thumb" />
     <!-- The cuff line, drawn in the background's colour once filled so it still reads. -->
-    <path :d="PATHS[answer].cuff" :stroke="filled ? background : 'currentColor'" />
+    <path
+      :d="PATHS[answer].cuff"
+      :stroke="filled ? background : 'currentColor'"
+    />
   </svg>
 </template>
 

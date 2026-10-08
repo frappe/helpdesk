@@ -23,12 +23,15 @@ const dialog = createSettingsDialog(core, organization)
 const session = useSession()
 
 // Here, not in the dialog, so the saved theme applies on load rather than on open.
-const { colorScheme, setColorScheme } = useColorScheme()
+const { colorScheme, setColorScheme, resolvedColorScheme, toggleColorScheme } = useColorScheme()
 
 const theme = computed({
   get: () => colorScheme.value,
   set: setColorScheme,
 })
+
+// The header's toggle, on every page: the knowledge base scripts are not what carries it.
+const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 
 const themeOptions = computed(() => [
   { label: __('Light'), value: 'light' },
@@ -76,9 +79,9 @@ const isSettingsOpen = computed({
 
 // The Knowledge Base panel's header buttons; the panel's form makes the draft.
 const knowledgeBase = {
-  kbIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
-  kbCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
-  kbSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
+  knowledgeBaseIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
+  knowledgeBaseCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
+  knowledgeBaseSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
   previewKnowledgeBase: () => knowledgeBaseDraft.value?.preview(),
   saveKnowledgeBase: async () => {
     if (await knowledgeBaseDraft.value?.save()) session.reloadSession()
@@ -114,6 +117,8 @@ const store = {
   customActions: [],
   // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
+  themeIcon,
+  toggleTheme: toggleColorScheme,
   isSettingsOpen,
   settingsTab,
   isSettingsBusy: core.isSettingsBusy,

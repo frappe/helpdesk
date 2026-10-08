@@ -46,7 +46,7 @@ type HeaderLink = {
   icon?: string | null;
 };
 
-// From the quick links form script; useKbHeader drops any unsafe URL.
+// From the quick links form script; useKnowledgeBaseHeader drops any unsafe URL.
 const props = defineProps<{ links?: HeaderLink[] }>();
 
 const textLinks = computed(() => (props.links || []).filter((l) => !l.icon));

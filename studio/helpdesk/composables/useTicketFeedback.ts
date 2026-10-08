@@ -4,6 +4,9 @@ import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
 import { runAction, updateTicket } from '@app/utils'
 
+// A handful exist per rating; one page well past any real count holds them all.
+const FEEDBACK_OPTION_LIMIT = 100
+
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
   // In stars, as the Rating component counts; HD Ticket stores a fraction.
@@ -15,7 +18,7 @@ export function useTicketFeedback(ticket) {
   const options = createListResource({
     doctype: 'HD Ticket Feedback Option',
     fields: ['name', 'label'],
-    pageLength: 99999,
+    pageLength: FEEDBACK_OPTION_LIMIT,
   })
 
   const feedbackOptions = computed(() =>

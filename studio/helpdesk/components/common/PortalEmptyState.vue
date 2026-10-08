@@ -20,7 +20,7 @@
 import { computed } from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideInbox from "~icons/lucide/inbox";
-import PortalArticleIcon from "@app/components/kb/PortalArticleIcon.vue";
+import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
 
 const GLYPHS = {
   organization: LucideBuilding2,

@@ -10,6 +10,7 @@ import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
+import { usePageTitle } from '@app/stores/session'
 
 // HD Ticket's permission_query already scopes the rows to what the requester may see.
 const DOCTYPE = 'HD Ticket'
@@ -37,14 +38,9 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'name', width: 'auto' },
   { fieldname: 'subject', width: '25rem' },
   { fieldname: 'status', width: '8rem' },
+  { fieldname: 'priority', width: '10rem' },
   { fieldname: 'response_by', width: '8rem' },
   { fieldname: 'resolution_by', width: '8rem' },
-  { fieldname: 'customer', width: '8rem' },
-  { fieldname: 'priority', width: '10rem' },
-  { fieldname: 'ticket_type', width: '11rem' },
-  { fieldname: 'agent_group', width: '10rem' },
-  { fieldname: 'contact', width: '8rem' },
-  { fieldname: 'feedback_rating', width: '10rem' },
   { fieldname: 'creation', width: '8rem' },
 ]
 
@@ -82,6 +78,7 @@ function withLabel(column) {
 export default function setup(context) {
   const settings = useSettingsModal(context)
   settings.loadSettings()
+  usePageTitle(() => __('Tickets'))
 
   // Seeded before `useListData`, which fetches on creation.
   const view = useListView(DOCTYPE)

@@ -52,14 +52,14 @@
           "sm:shrink-0"
          ],
          "componentId": "KbOrgSwitcher-tickets",
-         "componentName": "PortalOrgSwitcher",
+         "componentName": "PortalOrganizationSwitcher",
          "componentProps": {
           "onSelect": "(customers) => selectOrganization(customers)",
           "organizations": "{{ organizations }}",
           "selectedOrganizations": "{{ selectedOrganizations }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ organizations.length }}"
+         "visibilityCondition": "{{ organizations.length > 1 }}"
         },
         {
          "children": [
@@ -126,6 +126,9 @@
        "children": [
         {
          "blockName": "tickets-reload",
+         "classes": [
+          "max-sm:hidden"
+         ],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -139,10 +142,7 @@
           "iconLeft": "lucide-refresh-cw",
           "label": "Refresh",
           "variant": "subtle"
-         },
-         "classes": [
-          "max-sm:hidden"
-         ]
+         }
         },
         {
          "componentId": "KbFilter-tickets-filter",
@@ -181,8 +181,7 @@
              "$type": "variable",
              "name": "columns"
             }
-           },
-           "classes": []
+           }
           }
          ],
          "classes": [
@@ -194,6 +193,10 @@
         },
         {
          "blockName": "tickets-reload",
+         "classes": [
+          "sm:hidden",
+          "ml-auto"
+         ],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -204,14 +207,10 @@
          "componentId": "Button-tickets-reload-icon",
          "componentName": "Button",
          "componentProps": {
+          "aria-label": "{{ t('Refresh') }}",
           "icon": "lucide-refresh-cw",
-          "variant": "subtle",
-          "aria-label": "{{ t('Refresh') }}"
-         },
-         "classes": [
-          "sm:hidden",
-          "ml-auto"
-         ]
+          "variant": "subtle"
+         }
         }
        ],
        "classes": [
@@ -259,6 +258,7 @@
        "componentName": "PortalTicketList",
        "componentProps": {
         "columns": "{{ listColumns }}",
+        "compact": "{{ isPhone }}",
         "emptyState": "{{ emptyState }}",
         "loading": "{{ listLoading }}",
         "onColumnResize": "(payload) => resizeColumn(payload)",
@@ -271,8 +271,7 @@
         "pageLengthOptions": "{{ pageLengthOptions }}",
         "rowCount": "{{ rowCount }}",
         "rows": "{{ rows }}",
-        "totalCount": "{{ totalCount }}",
-        "compact": "{{ isPhone }}"
+        "totalCount": "{{ totalCount }}"
        },
        "isCustomVueComponent": true
       }
@@ -334,13 +333,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-08-13 19:05:47.233327",
+ "creation": "2026-10-06 18:20:01.916600",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 04:30:00.000000",
+ "modified": "2026-10-09 03:12:50.163996",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

@@ -6,13 +6,16 @@ import {
   toast,
 } from "frappe-ui";
 import { computed, ref, shallowRef, watch } from "vue";
-import { KB_PREVIEW_KEY, type KbPreview } from "../kbPreview";
+import {
+  KNOWLEDGE_BASE_PREVIEW_KEY,
+  type KnowledgeBasePreview,
+} from "../knowledgeBasePreview";
 import { __ } from "../translation";
 import { CUSTOMER_PORTAL_ROOT, getErrorMessage, isSafeLink } from "../utils";
 
-type Link = KbPreview["links"][number];
+type Link = KnowledgeBasePreview["links"][number];
 
-type Draft = KbPreview & {
+type Draft = KnowledgeBasePreview & {
   public_knowledge_base: boolean;
   allow_anonymous_article_voting: boolean;
 };
@@ -26,7 +29,8 @@ const SETTINGS_FIELDS = [
 
 const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
 
-// Quick links live in a knowledge base form script, the way field dependencies do; its last line holds the rows.
+// Quick links live in a knowledge base form script, the way field dependencies do: every
+// customization is one kind of document, with no settings table of its own. Its last line holds the rows.
 const LINKS_SCRIPT = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
 
@@ -47,9 +51,15 @@ function createDraft() {
   });
   const categories = createListResource({
     doctype: "HD Article Category",
-    fields: ["name", "category_name", "pinned"],
+    fields: ["name", "category_name", "icon", "pinned", "pinned_order"],
     orderBy: "category_name asc",
     pageLength: 999,
+    auto: true,
+  });
+  // Published article counts for the pinned list.
+  const counts = createResource({
+    url: "helpdesk.api.knowledge_base.get_categories",
+    method: "GET",
     auto: true,
   });
   const linksScript = createResource({
@@ -74,6 +84,7 @@ function createDraft() {
       banner_preset: settings.doc.banner_preset || "",
       pinned: categories.data
         .filter((row) => row.pinned)
+        .sort((a, b) => a.pinned_order - b.pinned_order)
         .map((row) => row.name),
       links: script.includes(JSON_MARKER)
         ? JSON.parse(script.split(JSON_MARKER).pop()!)
@@ -88,12 +99,17 @@ function createDraft() {
     { immediate: true }
   );
 
-  const categoryOptions = computed(() =>
-    (categories.data || []).map((row) => ({
+  const categoryOptions = computed(() => {
+    const articleCounts = Object.fromEntries(
+      (counts.data || []).map((row) => [row.name, row.article_count])
+    );
+    return (categories.data || []).map((row) => ({
       label: row.category_name,
       value: row.name,
-    }))
-  );
+      icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
+      count: articleCounts[row.name] || 0,
+    }));
+  });
 
   const changed = computed(() => {
     if (!draft.value || !saved.value) return [];
@@ -152,16 +168,20 @@ function createDraft() {
     }
   }
 
+  // A pin's position counts from 1; unpinned categories go back to 0.
   async function savePinned(pinned: string[]) {
-    const before = saved.value!.pinned;
     const { failed_docs } = await call("frappe.client.bulk_update", {
-      docs: categoryOptions.value
-        .map(({ value }) => value)
-        .filter((name) => pinned.includes(name) !== before.includes(name))
-        .map((name) => ({
+      docs: categories.data
+        .map((row) => ({ row, order: pinned.indexOf(row.name) + 1 }))
+        .filter(
+          ({ row, order }) =>
+            Boolean(row.pinned) !== order > 0 || row.pinned_order !== order
+        )
+        .map(({ row, order }) => ({
           doctype: "HD Article Category",
-          docname: name,
-          pinned: pinned.includes(name) ? 1 : 0,
+          docname: row.name,
+          pinned: order > 0 ? 1 : 0,
+          pinned_order: order,
         })),
     });
     if (failed_docs.length) {
@@ -199,7 +219,7 @@ function createDraft() {
   // Preview tabs read the stored look until it's gone, so a save must not leave them on the old draft.
   function clearPreview() {
     try {
-      localStorage.removeItem(KB_PREVIEW_KEY);
+      localStorage.removeItem(KNOWLEDGE_BASE_PREVIEW_KEY);
     } catch {}
   }
 
@@ -207,8 +227,13 @@ function createDraft() {
     const { banner_image, banner_preset, pinned, links } = normalize(
       draft.value!
     );
-    const look: KbPreview = { banner_image, banner_preset, pinned, links };
-    localStorage.setItem(KB_PREVIEW_KEY, JSON.stringify(look));
+    const look: KnowledgeBasePreview = {
+      banner_image,
+      banner_preset,
+      pinned,
+      links,
+    };
+    localStorage.setItem(KNOWLEDGE_BASE_PREVIEW_KEY, JSON.stringify(look));
     window.open(`${CUSTOMER_PORTAL_ROOT}?preview=1`, "_blank");
   }
 
@@ -224,11 +249,10 @@ function createDraft() {
   };
 }
 
-// Trimmed, empty link rows dropped and pins sorted, so neither typing nor pick order counts as an edit.
+// Trimmed and empty link rows dropped, so typing alone doesn't count as an edit. Pin order does.
 function normalize(draft: Draft): Draft {
   return {
     ...draft,
-    pinned: [...draft.pinned].sort(),
     links: draft.links
       .map(({ label, url, open_in_new_tab }) => ({
         label: label?.trim() || "",

@@ -34,7 +34,7 @@ export function useReplyComposer(ticket, config) {
     isComposerOpen.value = false
   }
 
-  function send({ body, attachments }) {
+  function send({ body, attachments, reset }) {
     if (isContentEmpty(body)) return
     return runAction(
       async () => {
@@ -44,6 +44,7 @@ export function useReplyComposer(ticket, config) {
           method: 'create_communication_via_contact',
           args: { message: body, attachments },
         })
+        reset()
         discard()
         await ticket.fetch()
       },

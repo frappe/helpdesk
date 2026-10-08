@@ -13,11 +13,11 @@ import { errorMessage } from '@app/utils'
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
   const settingsTab = ref<'profile' | 'members' | 'knowledge-base' | 'portal-permissions'>('profile')
-  const settingsData = ref(null)
+  const account = ref(null)
   const isSettingsBusy = ref(false)
 
-  const settingsUser = computed(() => settingsData.value?.user || {})
-  const organizations = computed(() => settingsData.value?.organizations || [])
+  const settingsUser = computed(() => account.value?.user || {})
+  const organizations = computed(() => account.value?.organizations || [])
 
   const reloadHooks = []
   function afterLoad(hook) {
@@ -26,7 +26,7 @@ export function createSettingsCore() {
 
   async function loadSettings() {
     try {
-      settingsData.value = await call('helpdesk.api.organization.get_settings')
+      account.value = await call('helpdesk.api.organization.get_account')
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)
@@ -98,7 +98,7 @@ export function createSettingsDialog(core, organization) {
 
   // At module load, not in watchRoute: Studio stops the page's effect scope on navigation.
   watch(
-    [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
+    [core.isSettingsOpen, core.settingsTab, organization.selectedOrganization, organization.inviteOpen],
     () => pushHash(),
   )
 
@@ -124,15 +124,15 @@ export function createSettingsDialog(core, organization) {
 
   function applyOrganizationHash(org, invite) {
     if (!org) return organization.closeOrganization()
-    if (org !== organization.selectedOrg.value) organization.openOrganization(org)
+    if (org !== organization.selectedOrganization.value) organization.openOrganization(org)
     organization.inviteOpen.value = invite
   }
 
   function settingsHash() {
     if (!core.isSettingsOpen.value) return ''
     const parts = [HASH_ROOT, core.settingsTab.value]
-    if (organization.selectedOrg.value) parts.push(organization.selectedOrg.value)
-    if (organization.selectedOrg.value && organization.inviteOpen.value) parts.push('invite')
+    if (organization.selectedOrganization.value) parts.push(organization.selectedOrganization.value)
+    if (organization.selectedOrganization.value && organization.inviteOpen.value) parts.push('invite')
     return `#${parts.join('/')}`
   }
 

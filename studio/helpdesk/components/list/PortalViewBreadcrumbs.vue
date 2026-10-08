@@ -1,13 +1,20 @@
 <template>
   <!-- Same box as frappe-ui's Breadcrumbs, so "Tickets" stays put between the list and a ticket. -->
-  <div class="flex items-center leading-tighter">
-    <span class="px-0.5 py-1 text-lg-medium leading-tighter text-ink-gray-5">{{ label }}</span>
-    <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true">/</span>
+  <div class="flex min-w-0 items-center leading-tighter">
+    <span
+      class="px-0.5 py-1 text-lg-medium leading-tighter text-ink-gray-5 shrink-0 max-sm:hidden"
+      >{{ label }}</span
+    >
+    <span
+      class="mx-0.5 text-base text-ink-gray-4 max-sm:hidden"
+      aria-hidden="true"
+      >/</span
+    >
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
+          class="min-w-0 max-w-[200px] !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
           :class="open && '!bg-surface-gray-3'"
         >
           <span class="text-lg-medium text-nowrap truncate">

@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { dayjs } from 'frappe-ui'
+import { dayjs, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { twoUnitDuration } from '@helpdesk/shared/utils'
 import { isClosedStatus, isResolvedStatus, statusMeta } from '@app/stores/ticketMeta'
@@ -39,7 +39,7 @@ export function useTicketDetails(ticket, thread, statusChanges) {
   function formatValue(field, value) {
     if (!value) return value
     if (field.fieldtype === 'Date') return dayjs(value).format(DATE_FORMATS.date)
-    if (field.fieldtype === 'Datetime') return dayjs(value).format(DATE_FORMATS.tooltip)
+    if (field.fieldtype === 'Datetime') return dayjsLocal(value).format(DATE_FORMATS.tooltip)
     return value
   }
 
@@ -63,7 +63,7 @@ export function useTicketDetails(ticket, thread, statusChanges) {
 
   function received() {
     const on = data.value.creation
-    return makeStep(__('Request received'), on ? dayjs(on).format(DATE_FORMATS.step) : '', 'done', on)
+    return makeStep(__('Request received'), on ? dayjsLocal(on).format(DATE_FORMATS.step) : '', 'done', on)
   }
 
   function assigned() {
@@ -106,19 +106,21 @@ export function useTicketDetails(ticket, thread, statusChanges) {
   function closing() {
     if (!isClosedStatus(data.value.status)) return []
     const on = lastClose.value?.on || data.value.resolution_date
-    return [makeStep(__('Closed'), on ? elapsedPhrase(on) : '', 'closed', on)]
+    const late = secondsLate(data.value.resolution_date || on, data.value.resolution_by, data.value.resolution_failed_by) >= MINUTE
+    const subtitle = [on && elapsedPhrase(on), late && __('SLA failed')].filter(Boolean).join(' · ')
+    return [makeStep(__('Closed'), subtitle, 'done', on, late)]
   }
 
   function awaiting(title: string, due: string) {
     if (!due) return makeStep(title, '', 'pending')
-    if (dayjs().isAfter(dayjs(due))) {
-      return makeStep(title, __('Overdue by {0}', [formatMinutes(dayjs().diff(dayjs(due), 's'))]), 'pending', undefined, true)
+    if (dayjsLocal().isAfter(dayjsLocal(due))) {
+      return makeStep(title, __('Overdue by {0}', [formatMinutes(dayjsLocal().diff(dayjsLocal(due), 's'))]), 'pending', undefined, true)
     }
     return makeStep(title, __('Due {0}', [dueWording(due)]), 'pending')
   }
 
   function makeStep(title: string, subtitle: string, state: string, on?: string, late = false) {
-    return { title, subtitle, state, late, fullDate: on ? dayjs(on).format(DATE_FORMATS.tooltip) : '' }
+    return { title, subtitle, state, late, fullDate: on ? dayjsLocal(on).format(DATE_FORMATS.tooltip) : '' }
   }
 
   function durationSummary(on: string, immediate: string, tookWording: (took: string) => string) {
@@ -148,10 +150,10 @@ export function useTicketDetails(ticket, thread, statusChanges) {
   }
 
   function dueWording(target: string) {
-    const due = dayjs(target)
+    const due = dayjsLocal(target)
     const clock = due.format(DATE_FORMATS.clock)
-    if (due.isSame(dayjs(), 'day')) return __('{0} today', [clock])
-    if (due.isSame(dayjs().add(1, 'day'), 'day')) return __('{0} tomorrow', [clock])
+    if (due.isSame(dayjsLocal(), 'day')) return __('{0} today', [clock])
+    if (due.isSame(dayjsLocal().add(1, 'day'), 'day')) return __('{0} tomorrow', [clock])
     return due.format(DATE_FORMATS.step)
   }
 

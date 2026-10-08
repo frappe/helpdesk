@@ -86,6 +86,6 @@
 
 <script setup lang="ts">
 // Brand marks from Frappe Wiki (MIT), X's from Simple Icons (CC0): lucide 1.x dropped its brand icons.
-// `name` is one of helpdesk/api/config.py's SERVICE_ICONS values.
+// `name` is one of the SERVICE_ICONS values in composables/useKnowledgeBaseHeader.ts.
 defineProps<{ name: string }>();
 </script>

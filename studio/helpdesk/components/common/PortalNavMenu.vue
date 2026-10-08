@@ -4,7 +4,7 @@
       <button
         type="button"
         :aria-label="name"
-        class="-ms-2 flex h-8 min-w-0 max-w-[15rem] cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
+        class="-ms-2 flex h-8 min-w-0 max-w-[15rem] shrink-0 cursor-pointer items-center gap-2 rounded-5 px-2 transition-colors duration-300 ease-in-out"
         :class="open ? 'bg-surface-gray-3' : 'hover:bg-surface-gray-3'"
       >
         <Brand />
@@ -20,7 +20,7 @@
     v-else
     :to="ROUTES.home"
     :aria-label="name"
-    class="flex h-8 min-w-0 max-w-[15rem] items-center gap-2"
+    class="flex h-8 min-w-0 max-w-[15rem] shrink-0 items-center gap-2"
   >
     <Brand />
   </RouterLink>
@@ -57,8 +57,7 @@ function Brand() {
       h(
         "span",
         {
-          class:
-            "hidden truncate text-base-medium text-ink-gray-9 sm:block",
+          class: "hidden truncate text-base-medium text-ink-gray-9 sm:block",
         },
         props.name
       ),

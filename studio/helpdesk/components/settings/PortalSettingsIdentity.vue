@@ -40,7 +40,7 @@
             name
           }}</span>
           <Button
-            v-if="editable"
+            v-if="editable && renameable"
             class="relative !h-5 shrink-0 !px-1 before:absolute before:-inset-1.5 before:content-['']"
             variant="ghost"
             :aria-label="__('Edit name')"
@@ -87,8 +87,9 @@ const props = withDefaults(
     maxLength?: number;
     busy?: boolean;
     editable?: boolean;
+    renameable?: boolean;
   }>(),
-  { shape: "circle", editable: true }
+  { shape: "circle", editable: true, renameable: true }
 );
 
 const emit = defineEmits<{

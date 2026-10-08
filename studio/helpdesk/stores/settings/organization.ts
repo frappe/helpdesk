@@ -36,8 +36,8 @@ export function createOrganizationSettings(core) {
       : __("View your organization's members and tickets."),
   )
 
-  const orgTab = ref('members')
-  const orgTabOptions = computed(() => [
+  const organizationTab = ref('members')
+  const organizationTabOptions = computed(() => [
     { label: __('Members'), value: 'members' },
     { label: __('Tickets'), value: 'tickets' },
   ])
@@ -69,7 +69,7 @@ export function createOrganizationSettings(core) {
     selectedOrganizationName.value = name
     organization.value = null
     inviteOpen.value = false
-    orgTab.value = 'members'
+    organizationTab.value = 'members'
     return loadOrganization(name)
   }
 
@@ -115,15 +115,17 @@ export function createOrganizationSettings(core) {
   function sendInvite() {
     const emails = inviteEmails.value.map((email) => email.trim()).filter(Boolean)
     if (!emails.length) return toast.error(__('Please enter an email address'))
+    const pending = new Set(invites.value.map((invite) => invite.email))
     return core.run(
       async () => {
         await callOrganization('invite_members', { emails, role: ROLES[inviteRole.value].role })
-        inviteEmails.value = []
+        closeInvite()
       },
       countLabel(emails.length, __('Invitation sent'), __('Invitations sent')),
       () => {
+        if (emails.some((email) => pending.has(email))) return null
         if (!emails.every((email) => invites.value.some((invite) => invite.email === email))) return null
-        inviteEmails.value = []
+        closeInvite()
         return countLabel(
           emails.length,
           __('Invitation created, but the email could not be sent'),
@@ -173,7 +175,7 @@ export function createOrganizationSettings(core) {
         label: __('Cancel invitation'),
         theme: 'red',
       },
-      () => callOrganization('remove_member', { invitation: invite.invitation }),
+      () => callOrganization('cancel_invitation', { invitation: invite.invitation }),
       __('Invitation cancelled'),
       () =>
         invites.value.every((row) => row.invitation !== invite.invitation) &&
@@ -181,43 +183,34 @@ export function createOrganizationSettings(core) {
     )
   }
 
-  function updateOrganization(values, successMessage) {
-    return core.run(async () => {
-      // Renaming returns the new docname, which is also the drill-in key.
-      selectedOrganizationName.value = await callOrganization('update_organization', values)
-    }, successMessage)
+  function updateOrganizationImage(image: string, successMessage: string) {
+    return core.run(() => callOrganization('update_organization_image', { image }), successMessage)
   }
 
-  function renameOrganization(value) {
-    const name = value.trim()
-    if (!name) return toast.error(__('Please enter an organization name'))
-    return updateOrganization({ customer_name: name }, __('Organization updated'))
+  function uploadOrganizationImage() {
+    core.pickImage((fileUrl) => updateOrganizationImage(fileUrl, __('Logo updated')))
   }
 
-  function uploadOrgImage() {
-    core.pickImage((fileUrl) => updateOrganization({ image: fileUrl }, __('Logo updated')))
-  }
-
-  function removeOrgImage() {
-    return updateOrganization({ image: '' }, __('Logo removed'))
+  function removeOrganizationImage() {
+    return updateOrganizationImage('', __('Logo removed'))
   }
 
   return {
-    // The blocks bind these two under their shorter names.
-    selectedOrg: selectedOrganizationName,
-    settingsOrg: organization,
+    // Bound by the blocks under these names.
+    selectedOrganization: selectedOrganizationName,
+    settingsOrganization: organization,
     canLeaveOrganization,
     canInvite,
     canChangeRoles,
     canRemoveMembers,
     canEdit,
-    orgMembers: members,
-    orgInvites: invites,
+    organizationMembers: members,
+    organizationInvites: invites,
     organizationScreenTitle,
     organizationScreenDescription,
     organizationDetailDescription,
-    orgTab,
-    orgTabOptions,
+    organizationTab,
+    organizationTabOptions,
     inviteOpen,
     inviteEmails,
     inviteRole,
@@ -230,8 +223,7 @@ export function createOrganizationSettings(core) {
     setMemberRole,
     removeMember,
     cancelInvitation,
-    renameOrganization,
-    uploadOrgImage,
-    removeOrgImage,
+    uploadOrganizationImage,
+    removeOrganizationImage,
   }
 }

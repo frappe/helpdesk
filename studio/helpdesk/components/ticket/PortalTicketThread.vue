@@ -20,15 +20,18 @@
         />
       </div>
     </template>
-    <template v-if="isChat" #icon-solve_prompt><span /></template>
     <template v-if="isChat" #icon-log><span /></template>
     <template v-if="isChat" #item-log="{ activity }">
       <!-- Pulled across the avatar column, so the line centres on the whole thread. -->
-      <div class="relative z-20 -ms-[38px] flex flex-1 items-center gap-3 py-1 text-p-sm text-ink-gray-5">
+      <div
+        class="relative z-20 -ms-[38px] flex flex-1 items-center gap-3 py-1 text-p-sm text-ink-gray-5"
+      >
         <div class="flex-1 border-t border-outline-gray-2" />
         <span class="shrink-0">
           {{ activity.data.divider }} ·
-          <Tooltip :text="dayjs(activity.timestamp).format(DATE_FORMATS.tooltip)">
+          <Tooltip
+            :text="dayjsLocal(activity.timestamp).format(DATE_FORMATS.tooltip)"
+          >
             <span>{{ clockTime(activity.timestamp) }}</span>
           </Tooltip>
         </span>
@@ -51,8 +54,12 @@
             {{ activity.author?.fullname }}
           </span>
           <span class="text-ink-gray-4">·</span>
-          <Tooltip :text="dayjs(activity.timestamp).format(DATE_FORMATS.tooltip)">
-            <span class="text-ink-gray-5">{{ clockTime(activity.timestamp) }}</span>
+          <Tooltip
+            :text="dayjsLocal(activity.timestamp).format(DATE_FORMATS.tooltip)"
+          >
+            <span class="text-ink-gray-5">{{
+              clockTime(activity.timestamp)
+            }}</span>
           </Tooltip>
         </div>
         <div
@@ -83,7 +90,7 @@
 
 <script setup lang="ts">
 import { computed, defineComponent, h, ref, watch, type PropType } from "vue";
-import { Avatar, Tooltip, dayjs } from "frappe-ui";
+import { Avatar, Tooltip, dayjs, dayjsLocal } from "frappe-ui";
 import {
   ActivityTimeline,
   AttachmentChip,
@@ -94,7 +101,12 @@ import { conversationLayout } from "@app/stores/settings";
 import { DATE_FORMATS } from "@app/utils";
 import PortalEmailContent from "./PortalEmailContent.vue";
 
-type Row = { type?: string; timestamp?: string; author?: { email?: string }; data?: any };
+type Row = {
+  type?: string;
+  timestamp?: string;
+  author?: { email?: string };
+  data?: any;
+};
 
 // Messages from one side within this window read as one turn.
 const GROUP_SECONDS = 5 * 60;
@@ -107,7 +119,11 @@ const props = defineProps<{
   // The ticket's `modified`, so a save reloads the emails.
   version?: string;
   // The ticket's communications, which say who wrote each email and whether they are an agent.
-  communications?: { name: string; is_agent: boolean; user?: { email?: string } }[];
+  communications?: {
+    name: string;
+    is_agent: boolean;
+    user?: { email?: string };
+  }[];
   // The composer's height, kept clear under the last message.
   reserve?: number;
 }>();
@@ -127,9 +143,9 @@ const authors = computed(
 );
 
 function clockTime(value: string) {
-  const at = dayjs(value);
-  if (at.isSame(dayjs(), "day")) return at.format(DATE_FORMATS.clock);
-  const day = at.isSame(dayjs(), "year") ? "D MMMM" : "D MMMM YYYY";
+  const at = dayjsLocal(value);
+  if (at.isSame(dayjsLocal(), "day")) return at.format(DATE_FORMATS.clock);
+  const day = at.isSame(dayjsLocal(), "year") ? "D MMMM" : "D MMMM YYYY";
   return at.format(`${day} [at] ${DATE_FORMATS.clock}`);
 }
 
@@ -141,7 +157,10 @@ const TicketEmails = defineComponent({
     version: String,
     // Set only in the chat layout, where each email gets its side and grouping.
     authors: {
-      type: Map as PropType<Map<string, { isAgent: boolean; email?: string }> | null>,
+      type: Map as PropType<Map<
+        string,
+        { isAgent: boolean; email?: string }
+      > | null>,
       default: null,
     },
     reserve: { type: Number, default: 0 },
@@ -171,10 +190,23 @@ const TicketEmails = defineComponent({
           dayjs(first.timestamp).valueOf() - dayjs(second.timestamp).valueOf()
       );
       if (!props.authors) return sorted;
-      return sorted.map((row, index) =>
-        row.type === "email" ? { ...row, chat: chatPlacement(row, sorted[index - 1]) } : row
+      const placed = sorted.filter(
+        (row) => row.type !== "email" || isPlaceable(row)
+      );
+      return placed.map((row, index) =>
+        row.type === "email"
+          ? { ...row, chat: chatPlacement(row, placed[index - 1]) }
+          : row
       );
     });
+
+    // Guessing an unknown sender's side drew agent replies right, then left; wait for the ticket to say.
+    function isPlaceable(row: Row) {
+      return (
+        props.authors!.has(row.data.name) ||
+        row.author?.email === session.config.value?.session_user
+      );
+    }
 
     function chatPlacement(row: Row, previous?: Row) {
       const isOwn = !isAgent(row);
@@ -182,7 +214,8 @@ const TicketEmails = defineComponent({
         previous?.type === "email" &&
         authorEmail(previous) === authorEmail(row) &&
         !isAgent(previous) === isOwn &&
-        dayjs(row.timestamp).diff(dayjs(previous.timestamp), "s") <= GROUP_SECONDS
+        dayjs(row.timestamp).diff(dayjs(previous.timestamp), "s") <=
+          GROUP_SECONDS
       );
       return { isOwn, opensGroup, showAvatar: opensGroup && !isOwn };
     }
@@ -192,7 +225,9 @@ const TicketEmails = defineComponent({
       const known = props.authors!.get(row.data.name);
       if (known) return known.isAgent;
       const viewer = session.config.value;
-      return row.author?.email === viewer?.session_user && Boolean(viewer?.is_agent);
+      return (
+        row.author?.email === viewer?.session_user && Boolean(viewer?.is_agent)
+      );
     }
 
     function authorEmail(row: Row) {
@@ -205,7 +240,8 @@ const TicketEmails = defineComponent({
       () => props.reserve,
       (height, previous) => {
         if (!previous) return;
-        const scroller = wrapper.value?.querySelector<HTMLElement>(".activity-timeline");
+        const scroller =
+          wrapper.value?.querySelector<HTMLElement>(".activity-timeline");
         if (scroller) scroller.scrollTop -= height - previous;
       },
       { flush: "post" }
@@ -213,13 +249,21 @@ const TicketEmails = defineComponent({
 
     // ActivityTimeline's root is a fragment, so the page's classes land on this wrapper instead.
     return () =>
-      h("div", { ref: wrapper, class: "portal-thread flex flex-col", style: { "--composer-reserve": `${props.reserve}px` } }, [
-        h(
-          ActivityTimeline,
-          { activities: rows.value, loading: loading.value, paginate },
-          slots
-        ),
-      ]);
+      h(
+        "div",
+        {
+          ref: wrapper,
+          class: "portal-thread flex flex-col",
+          style: { "--composer-reserve": `${props.reserve}px` },
+        },
+        [
+          h(
+            ActivityTimeline,
+            { activities: rows.value, loading: loading.value, paginate },
+            slots
+          ),
+        ]
+      );
   },
 });
 </script>
@@ -238,7 +282,10 @@ const TicketEmails = defineComponent({
 }
 
 /* Not scoped: ActivityTimeline's root is a fragment, so no class or scope id reaches it. */
-.activity-timeline:has(.portal-chat-message) .activity > div > div:first-child::after {
+.activity-timeline:has(.portal-chat-message)
+  .activity
+  > div
+  > div:first-child::after {
   display: none;
 }
 </style>

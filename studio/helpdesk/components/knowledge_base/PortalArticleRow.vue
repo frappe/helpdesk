@@ -1,6 +1,6 @@
 <template>
   <RouterLink
-    :to="ROUTES.article(article.name)"
+    :to="ROUTES.article(article)"
     class="flex items-center gap-3 px-2 py-3 text-left no-underline"
     :class="
       isList
@@ -8,9 +8,7 @@
         : 'border-outline-gray-1 [&:not(:last-child)]:border-b'
     "
   >
-    <PortalArticleThumbnail
-      :src="isList ? article.image : null"
-    />
+    <PortalArticleThumbnail :src="isList ? article.image : null" />
     <!-- v-html: the server escapes the text and leaves only the search <mark> tags. -->
     <span
       class="flex min-w-0 flex-1 flex-col gap-0.5 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
@@ -38,7 +36,7 @@
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { __ } from "@helpdesk/shared/translation";
-import PortalArticleThumbnail from "@app/components/kb/PortalArticleThumbnail.vue";
+import PortalArticleThumbnail from "@app/components/knowledge_base/PortalArticleThumbnail.vue";
 import { ROUTES } from "@app/routes";
 
 const props = withDefaults(

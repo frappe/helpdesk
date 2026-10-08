@@ -50,7 +50,9 @@
     </div>
 
     <p
-      v-if="!tickets.loading && !tickets.data?.length"
+      v-if="
+        tickets.list.fetched && !tickets.list.loading && !tickets.data?.length
+      "
       class="py-4 text-p-base text-ink-gray-5"
     >
       {{

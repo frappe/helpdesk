@@ -22,10 +22,9 @@ const QUOTE_SELECTORS = [
   "p.reply-to-content",
 ];
 
-const props = withDefaults(
-  defineProps<{ content?: string }>(),
-  { content: "" }
-);
+const props = withDefaults(defineProps<{ content?: string }>(), {
+  content: "",
+});
 
 const frame = ref<HTMLIFrameElement | null>(null);
 
@@ -152,7 +151,10 @@ watch(
 
 onBeforeUnmount(() => observer?.disconnect());
 
-watch(srcdoc, () => frame.value && requestAnimationFrame(() => resize(frame.value!)));
+watch(
+  srcdoc,
+  () => frame.value && requestAnimationFrame(() => resize(frame.value!))
+);
 
 function resize(element: HTMLIFrameElement) {
   const root = element.contentDocument?.documentElement;
@@ -162,6 +164,7 @@ function resize(element: HTMLIFrameElement) {
     element.style.height = `${root.offsetHeight + 1}px`;
   };
   fit();
+  element.contentDocument?.fonts?.ready.then(fit);
   element.contentDocument
     ?.querySelectorAll('input[type="checkbox"]')
     .forEach((toggle) => toggle.addEventListener("change", fit));
@@ -186,6 +189,9 @@ function fitFrameToContent(element: HTMLIFrameElement) {
 }
 
 watch(dataTheme, (theme) =>
-  frame.value?.contentDocument?.documentElement.setAttribute("data-theme", theme)
+  frame.value?.contentDocument?.documentElement.setAttribute(
+    "data-theme",
+    theme
+  )
 );
 </script>

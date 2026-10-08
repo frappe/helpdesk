@@ -1,7 +1,9 @@
 <template>
-  <nav
+  <Sidebar
+    :collapsible="false"
+    width="100%"
     :aria-label="__('Knowledge base')"
-    class="flex h-full flex-col border-r border-outline-gray-1 bg-surface-base"
+    class="border-r border-outline-gray-1 !bg-surface-base"
   >
     <div class="px-3 pb-2 pt-4">
       <TextInput
@@ -27,33 +29,38 @@
 
     <div
       ref="list"
-      class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4 pt-1"
+      class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4 pt-2"
     >
       <div v-for="category in visibleCategories" :key="category.name">
-        <button
-          type="button"
-          class="flex h-9 w-full items-center gap-2 rounded-4 pl-2 pr-1.5 md:h-7 text-left transition hover:bg-surface-gray-1"
+        <SidebarItem
+          class="max-md:h-9"
+          :active="false"
           :aria-expanded="category.isOpen"
           :aria-controls="`kb-sidebar-${category.name}`"
           :data-current="category.isCurrent || undefined"
           @click="toggle(category.name)"
         >
-          <Icon
-            :icon="category.icon || 'lucide-folder'"
-            class="size-4 shrink-0"
-            :class="category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'"
-          />
+          <template #prefix>
+            <Icon
+              :icon="category.icon || 'lucide-folder'"
+              class="size-4"
+              :class="
+                category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
+              "
+            />
+          </template>
           <span
             class="min-w-0 flex-1 truncate text-sm"
             :class="category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'"
           >
             {{ category.label }}
           </span>
+          <!-- In the label, not #suffix: only the button takes the click. -->
           <span
-            class="lucide-chevron-right size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
+            class="lucide-chevron-right mr-1.5 size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
             :class="category.isOpen && 'rotate-90'"
           />
-        </button>
+        </SidebarItem>
 
         <PortalCollapse
           :id="`kb-sidebar-${category.name}`"
@@ -62,41 +69,41 @@
           <div
             class="mb-1.5 ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-outline-gray-2 pl-2 pr-1"
           >
-            <RouterLink
+            <SidebarItem
               v-for="article in category.matches"
               :key="article.name"
-              :to="ROUTES.article(article.name)"
-              :aria-current="article.name === activeName ? 'page' : undefined"
+              :route="ROUTES.article(article)"
+              :active="article.name === activeName"
               :title="article.title"
-              class="flex min-h-9 items-center rounded-4 px-2 py-1.5 md:min-h-7 text-sm no-underline transition"
-              :class="
-                article.name === activeName
-                  ? 'bg-surface-gray-2 text-ink-gray-8'
-                  : 'text-ink-gray-6 hover:bg-surface-gray-1'
-              "
+              class="max-md:h-9 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
             >
-              <span class="min-w-0 truncate">{{ article.title }}</span>
-            </RouterLink>
+              <template #prefix />
+              <!-- -ml-2 takes back the gap SidebarItem leaves for an icon. -->
+              <span class="-ml-2 min-w-0 truncate text-sm">{{
+                article.title
+              }}</span>
+            </SidebarItem>
           </div>
         </PortalCollapse>
       </div>
 
       <p
         v-if="query.trim() && !visibleCategories.length"
-        class="px-2 py-4 text-sm text-ink-gray-5"
+        class="break-words px-2 py-4 text-sm text-ink-gray-5"
       >
         {{ __("No articles match “{0}”.", [query.trim()]) }}
       </p>
     </div>
-  </nav>
+  </Sidebar>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
-import { RouterLink } from "vue-router";
 import {
   Icon,
   KeyboardShortcut,
+  Sidebar,
+  SidebarItem,
   TextInput,
   useKeyboardShortcut,
 } from "frappe-ui";

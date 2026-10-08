@@ -16,27 +16,12 @@
         </div>
         <Switch v-model="draft[toggle.fieldname]" />
       </div>
-      <div class="flex items-center justify-between gap-6">
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">
-            {{ __("Pinned categories") }}
-          </span>
-          <span class="text-p-sm text-ink-gray-6">
-            {{
-              __(
-                "Select the categories you want on your knowledge base home page. Leave empty or select all to show all of them."
-              )
-            }}
-          </span>
-        </div>
-        <MultiSelect
-          v-model="draft.pinned"
-          class="w-48 shrink-0"
-          :options="categoryOptions"
-          :placeholder="__('All categories')"
-        />
-      </div>
     </div>
+    <PinnedCategories
+      v-model="draft.pinned"
+      class="mt-8"
+      :categories="categoryOptions"
+    />
     <BannerPicker
       class="mt-8"
       :image="draft.banner_image"
@@ -49,10 +34,11 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { MultiSelect, Switch } from "frappe-ui";
+import { Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
+import PinnedCategories from "./PinnedCategories.vue";
 import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
 // Changes wait for the host's Save button; see knowledgeBaseDraft.ts.

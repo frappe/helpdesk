@@ -75,7 +75,7 @@ const toggles = computed(() => [
     fieldname: "allow_customer_managers_to_edit_organization",
     label: __("Allow organization edits"),
     description: __(
-      "Customer managers will be able to change their organization's name and logo."
+      "Customer managers will be able to change their organization's logo."
     ),
   },
 ]);

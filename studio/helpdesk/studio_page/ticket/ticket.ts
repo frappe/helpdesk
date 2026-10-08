@@ -1,5 +1,6 @@
 import { computed, markRaw, onScopeDispose, ref, watch } from 'vue'
-import { createResource, dayjs, toast } from 'frappe-ui'
+import { useDocumentVisibility } from '@vueuse/core'
+import { createResource, toast } from 'frappe-ui'
 import { subscribeToDoc } from '@framework/ui/socket'
 import LucideCircleCheck from '~icons/lucide/circle-check'
 import LucideRotateCcw from '~icons/lucide/rotate-ccw'
@@ -14,12 +15,9 @@ import { useTicketThread } from '@app/composables/useTicketThread'
 import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
+import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
 import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
-
-// Used when HD Settings has no `confirm_resolution_after_days`.
-const RESOLVED_PROMPT_DAYS = 5
-const REOPENED_STATUS = 'Open'
+import { usePageTitle } from '@app/stores/session'
 
 export default function setup(context) {
   const { route } = context
@@ -38,6 +36,7 @@ export default function setup(context) {
     makeParams: () => ({ name: ticketId.value }),
     onSuccess: runFormScripts,
   })
+  usePageTitle(() => ticket.data?.subject)
 
   // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
   async function runFormScripts(data) {
@@ -66,7 +65,23 @@ export default function setup(context) {
 
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
-  // The thread refreshes its own emails; the status, closes and reply sides come with the ticket.
+  // A burst of pings, or a ping during the page's own refetch, ends in one trailing fetch.
+  let refetchQueued = false
+  function refresh() {
+    if (!ticketId.value) return
+    if (ticket.loading) refetchQueued = true
+    else ticket.fetch()
+  }
+  watch(
+    () => ticket.loading,
+    (loading) => {
+      if (loading || !refetchQueued) return
+      refetchQueued = false
+      ticket.fetch()
+    },
+  )
+
+  // Agents hear the ticket's room; customers are kept out of it and get a bare ping on their own channel.
   watch(
     ticketId,
     (name, _, onCleanup) => name && onCleanup(subscribeToDoc(context.socket, 'HD Ticket', name)),
@@ -76,19 +91,39 @@ export default function setup(context) {
     const doc = payload?.doc || payload
     const doctype = doc?.reference_doctype || doc?.doctype
     const name = doc?.reference_name || doc?.name
-    if (doctype === 'HD Ticket' && name === ticketId.value) ticket.fetch()
+    if (doctype === 'HD Ticket' && name === ticketId.value) refresh()
   }
-  context.socket?.on('doc_update', onTicketChange)
-  context.socket?.on('docinfo_update', onTicketChange)
+  function onTicketPing(payload) {
+    if (payload?.ticket_id === ticketId.value) refresh()
+  }
+  // Nothing replays what was sent while the socket was down or the tab asleep.
+  let wasDisconnected = false
+  function onDisconnect() {
+    wasDisconnected = true
+  }
+  function onConnect() {
+    if (!wasDisconnected) return
+    wasDisconnected = false
+    refresh()
+  }
+  const listeners = {
+    doc_update: onTicketChange,
+    docinfo_update: onTicketChange,
+    'helpdesk:ticket-update': onTicketPing,
+    disconnect: onDisconnect,
+    connect: onConnect,
+  }
+  for (const [event, handler] of Object.entries(listeners)) context.socket?.on(event, handler)
+  // By handler: the socket is shared, and a bare `off(event)` would drop other pages' listeners too.
   onScopeDispose(() => {
-    context.socket?.off('doc_update', onTicketChange)
-    context.socket?.off('docinfo_update', onTicketChange)
+    for (const [event, handler] of Object.entries(listeners)) context.socket?.off(event, handler)
   })
+  const visibility = useDocumentVisibility()
+  watch(visibility, (state, before) => state === 'visible' && before === 'hidden' && refresh())
 
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
-  const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
 
   // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
@@ -141,36 +176,6 @@ export default function setup(context) {
   // Where a rating is required, the status cannot be written without it.
   const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
 
-  const promptAfterDays = computed(() => Number(config.value?.confirm_resolution_after_days ?? RESOLVED_PROMPT_DAYS))
-
-  // Asked once, of the requester, under the latest agent reply, once the resolution has stood a while.
-  // It takes the reply's time, and the thread puts the page's rows after emails at the same time.
-  const solvePrompt = computed(() => {
-    const data = ticket.data
-    const reply = thread.lastAgentReply.value
-    if (!data || !reply || !isResolved.value || !data.resolution_date) return null
-    if (dayjs().diff(dayjs(data.resolution_date), 'day') < promptAfterDays.value) return null
-    const viewer = config.value?.session_user
-    if (viewer && data.raised_by && viewer !== data.raised_by) return null
-    return { type: 'solve_prompt', key: 'solve-prompt', timestamp: reply.communication_date || reply.creation, data: {} }
-  })
-
-  const threadExtras = computed(() => [...timelineEvents.value, ...(solvePrompt.value ? [solvePrompt.value] : [])])
-
-  // Where a rating is still owed, the feedback dialog is the only way past `validate_feedback`.
-  function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback()
-    return closeTicket()
-  }
-
-  // An agent reply leaves the ticket "Replied", so No puts it back in the queue.
-  function reopenTicket() {
-    return setStatus(REOPENED_STATUS, {
-      success: __('Reopened, we will take another look'),
-      fallback: __('Could not reopen this ticket'),
-    })
-  }
-
   function onPageAction() {
     if (isClosed.value) return navigateTo(ROUTES.newTicket)
     if (wantsFeedback.value) return feedback.openFeedback()
@@ -207,18 +212,20 @@ export default function setup(context) {
     ticketId,
     ticket,
     rating: thread.rating,
-    threadExtras,
+    timelineEvents,
     customActions,
     // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
     pageActionLabel: computed(() => {
+      if (!ticket.data) return ''
       if (!isClosed.value) return __('Close')
       return settings.canCreateTicket.value ? __('Raise a ticket') : ''
     }),
-    pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
+    pageActionIcon: computed(() => {
+      if (!ticket.data) return ''
+      return isClosed.value ? 'lucide-plus' : 'lucide-check'
+    }),
     onPageAction,
-    confirmSolved,
-    reopenTicket,
     suggestedArticles,
-    openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
+    openHelpArticle: (article) => navigateTo(ROUTES.article(article)),
   }
 }

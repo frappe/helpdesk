@@ -40,12 +40,18 @@ import { computed } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
 import { ScriptIcon } from "@helpdesk/shared/formScripts";
 import { __ } from "@helpdesk/shared/translation";
+import { useMediaQuery } from "@vueuse/core";
 
 // Header actions from HD Form Scripts: a plain action is a button, `group` with
 // `buttonLabel` a labelled menu, and `group` alone goes under "…".
 const props = defineProps<{ actions?: any[] }>();
+const isNarrow = useMediaQuery("(max-width: 767px)");
 
-const buttons = computed(() => (props.actions || []).filter((a) => !a.group));
+const plainActions = computed(() =>
+  (props.actions || []).filter((a) => !a.group)
+);
+// Below md the header has no room for buttons beside the logo, crumbs and sign-in.
+const buttons = computed(() => (isNarrow.value ? [] : plainActions.value));
 
 const labelledGroups = computed(() => {
   const groups = new Map<string, any[]>();
@@ -59,7 +65,8 @@ const labelledGroups = computed(() => {
   return [...groups].map(([label, options]) => ({ label, options }));
 });
 
-const moreOptions = computed(() =>
-  (props.actions || []).filter((a) => a.group && !a.buttonLabel)
-);
+const moreOptions = computed(() => [
+  ...(isNarrow.value ? plainActions.value : []),
+  ...(props.actions || []).filter((a) => a.group && !a.buttonLabel),
+]);
 </script>
