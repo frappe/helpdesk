@@ -17,7 +17,7 @@
         v-if="rows.length"
         :columns="columns"
         :row-height="44"
-        class="[--list-gap:1rem] [--list-row-padding-x:0.5rem]"
+        :style="{ '--list-gap': '1rem', '--list-row-padding-x': '0.5rem' }"
       >
         <ListHeader>
           <ListHeaderCell class="ms-2">{{ __("Label") }}</ListHeaderCell>

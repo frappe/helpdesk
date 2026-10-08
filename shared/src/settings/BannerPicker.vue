@@ -11,7 +11,7 @@
       }}</span>
     </div>
     <div
-      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 px-4"
+      class="banner-preview flex items-center justify-center rounded-6 border border-outline-gray-1 px-4"
       :style="{ background: previewBackground }"
     >
       <div
@@ -29,7 +29,7 @@
             role="radio"
             :aria-label="__('None')"
             :aria-checked="!image && !preset"
-            :class="[swatch, ring(!image && !preset)]"
+            :class="swatch"
             class="flex items-center justify-center bg-surface-base text-ink-gray-4"
             @click="save('', '')"
           >
@@ -46,7 +46,7 @@
             role="radio"
             :aria-label="presetLabel(option.name)"
             :aria-checked="!image && preset === option.name"
-            :class="[swatch, ring(!image && preset === option.name)]"
+            :class="swatch"
             :style="{ background: option.background }"
             @click="save('', option.name)"
           />
@@ -56,7 +56,7 @@
             role="radio"
             :aria-label="__('Custom image')"
             aria-checked="true"
-            :class="[swatch, ring(true)]"
+            :class="swatch"
             :style="{ background: imageBackground(image) }"
           />
         </Tooltip>
@@ -69,7 +69,7 @@
         <template #default="{ progress, uploading, openFileSelector }">
           <Button
             variant="subtle"
-            icon-left="lucide-image-up"
+            :icon-left="ImageUpIcon"
             :label="uploadLabel(uploading, progress)"
             :loading="uploading"
             @click="openFileSelector"
@@ -86,6 +86,7 @@ import { BANNER_PRESETS, findBannerPreset } from "../kbBanner";
 import { Button, FileUploader, Tooltip } from "frappe-ui";
 import { computed } from "vue";
 import LucideBan from "~icons/lucide/ban";
+import ImageUpIcon from "~icons/lucide/image-up";
 import LucideSearch from "~icons/lucide/search";
 
 const props = defineProps<{ image: string; preset: string }>();
@@ -93,14 +94,7 @@ const emit = defineEmits<{
   change: [value: { banner_image: string; banner_preset: string }];
 }>();
 
-const swatch =
-  "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-[1.5px] outline-offset-2 transition-[outline-color]";
-
-function ring(selected: boolean) {
-  return selected
-    ? "outline-[--outline-gray-5]"
-    : "outline-transparent hover:outline-[--outline-gray-2]";
-}
+const swatch = "banner-swatch size-8 shrink-0 border border-outline-gray-2";
 
 const previewBackground = computed(() =>
   props.image
@@ -131,3 +125,23 @@ function save(image: string, preset: string) {
   emit("change", { banner_image: image, banner_preset: preset });
 }
 </script>
+
+<style scoped>
+/* Plain CSS: the Studio portal build doesn't scan shared/, so Tailwind classes used only here never get generated. */
+.banner-preview {
+  height: 7rem;
+}
+.banner-swatch {
+  --banner-pattern-scale: 0.4;
+  border-radius: 8px;
+  outline: 1.5px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 150ms;
+}
+.banner-swatch:hover {
+  outline-color: var(--outline-gray-2);
+}
+.banner-swatch[aria-checked="true"] {
+  outline-color: var(--outline-gray-5);
+}
+</style>
