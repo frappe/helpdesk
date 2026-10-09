@@ -3,7 +3,7 @@
     ref="combobox"
     v-model:open="isOpen"
     v-model:query="query"
-    class="w-full !border-outline-gray-1 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 focus-within:!outline-1 data-[state=open]:!outline-1"
+    class="min-h-[42px] w-full !gap-1.5 !rounded-6 !border-outline-gray-2 !px-3.5 shadow-lg hover:!border-outline-gray-3 focus-within:!border-outline-gray-4 focus-within:!outline-0 data-[state=open]:!border-outline-gray-4 data-[state=open]:!outline-0 [&_input]:!text-base"
     trigger="input"
     variant="outline"
     size="lg"
@@ -17,8 +17,7 @@
     @blur="isFocused = false"
   >
     <template #prefix>
-      <!-- On the axis of a result's thumbnail: the trigger's own padding lands it 9px short. -->
-      <LucideSearch class="ml-[9px] size-4 text-ink-gray-4" />
+      <LucideSearch class="size-4.5 text-ink-gray-5" />
     </template>
     <template #suffix>
       <LoadingIndicator v-if="results.loading" class="size-4 text-ink-gray-4" />
@@ -31,57 +30,22 @@
       <span v-else />
     </template>
 
-    <template #group-label="{ group }">
-      <span class="flex min-w-0 flex-1 items-center justify-between">
-        {{ group.group }}
-        <button
-          v-if="group.key === RECENT_SEARCHES"
-          type="button"
-          class="text-sm text-ink-gray-5 hover:text-ink-gray-7"
-          @pointerdown.prevent
-          @click="clearSearches"
-        >
-          {{ __("Clear") }}
-        </button>
-      </span>
-    </template>
     <template #item="{ item }">
-      <div
-        class="flex min-w-0 flex-1 items-center gap-3"
-        :class="{ 'recent-search': item.recentSearch }"
-      >
-        <span
-          v-if="item.recentSearch"
-          class="flex w-9 shrink-0 justify-center text-ink-gray-4"
-        >
-          <LucideClock class="size-4" />
-        </span>
-        <span
-          v-else
-          class="article-tile flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-surface-gray-2 text-ink-gray-6"
-        >
-          <LucideFileText class="size-4" />
-        </span>
-
-        <span
-          v-if="item.recentSearch"
-          class="min-w-0 flex-1 truncate text-base text-ink-gray-8"
-        >
-          {{ item.recentSearch }}
-        </span>
-        <div
-          v-else
-          class="flex min-w-0 flex-1 flex-col gap-0.5 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
-        >
+      <div class="flex min-w-0 flex-1 items-start gap-3">
+        <PortalArticleIcon class="mt-0.5 size-4 shrink-0 text-ink-gray-4" />
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
           <span
             v-if="item.article"
-            class="truncate text-base text-ink-gray-8"
+            class="truncate text-base text-ink-gray-8 [&_mark]:rounded-[2px] [&_mark]:bg-surface-amber-2 [&_mark]:text-ink-gray-9"
             v-html="item.article.title"
           />
           <span v-else class="truncate text-base text-ink-gray-8">
             {{ item.recentArticle.title }}
           </span>
-          <span v-if="item.article" class="truncate text-p-sm text-ink-gray-5">
+          <span
+            v-if="item.article"
+            class="truncate text-p-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:text-ink-gray-5"
+          >
             <template v-if="item.article.category_name">
               {{ item.article.category_name }} ·
             </template>
@@ -92,7 +56,7 @@
           </span>
         </div>
 
-        <span class="flex size-8 shrink-0 items-center justify-center">
+        <span class="flex size-6 shrink-0 items-center justify-center self-center">
           <button
             v-if="item.onRemove"
             type="button"
@@ -103,7 +67,7 @@
           >
             <LucideX class="size-3.5" />
           </button>
-          <KeyboardShortcut class="row-enter" combo="Enter" bg />
+          <LucideCornerDownLeft class="row-enter size-4 text-ink-gray-5" />
         </span>
       </div>
     </template>
@@ -119,8 +83,7 @@
         </span>
         <Button
           class="mt-2"
-          variant="solid"
-          theme="gray"
+          variant="subtle"
           size="sm"
           icon-left="lucide-plus"
           :label="__('Create a ticket')"
@@ -132,7 +95,7 @@
 
     <template v-if="!isEmpty" #footer>
       <div
-        class="flex h-11 items-center justify-between gap-3 border-t border-outline-gray-1 px-3 text-sm text-ink-gray-5"
+        class="flex h-11 items-center justify-between gap-3 border-t border-outline-gray-2 px-3 text-sm text-ink-gray-5"
         @pointerdown.prevent
       >
         <div class="search-hints flex items-center gap-4">
@@ -178,18 +141,18 @@ import {
   LoadingIndicator,
   useKeyboardShortcut,
 } from "frappe-ui";
-import LucideClock from "~icons/lucide/clock";
-import LucideFileText from "~icons/lucide/file-text";
+import LucideCornerDownLeft from "~icons/lucide/corner-down-left";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
 import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
+import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
 import { ROUTES } from "@app/routes";
 import { useArticleSearch } from "@app/composables/useArticleSearch";
 import { useRecent, type RecentArticle } from "@app/stores/recent";
+import { countLabel } from "@app/utils";
 
 const MAX_RESULTS = 6;
-const RECENT_SEARCHES = "recent-searches";
 const KEY_HINTS = [
   { keys: ["↑", "↓"], label: __("Navigate") },
   { keys: ["↵"], label: __("Open") },
@@ -205,18 +168,9 @@ const combobox = ref<InstanceType<typeof Combobox> | null>(null);
 const query = ref("");
 const isOpen = ref(false);
 const isFocused = ref(false);
-const {
-  recentSearches,
-  recentArticles,
-  rememberSearch,
-  forgetSearch,
-  clearSearches,
-  forgetArticle,
-} = useRecent();
+const { recentArticles, forgetArticle } = useRecent();
 
-const hasHistory = computed(
-  () => recentSearches.value.length + recentArticles.value.length > 0
-);
+const hasHistory = computed(() => recentArticles.value.length > 0);
 
 useKeyboardShortcut({
   combo: "Slash",
@@ -226,7 +180,6 @@ useKeyboardShortcut({
 
 const results = useArticleSearch(query, { limit: MAX_RESULTS, minLength: 1 });
 
-// Ours, not the slot's `query`: that stays empty when a recent search filled the box.
 const searchText = computed(() => query.value.trim());
 const isTyping = computed(() => searchText.value.length > 0);
 
@@ -242,11 +195,6 @@ function onFocus() {
   isOpen.value = hasHistory.value;
 }
 
-function openArticle(article: { name: string; title: string }) {
-  rememberSearch(query.value);
-  router.push(ROUTES.article(article));
-}
-
 function createTicket() {
   const subject = searchText.value;
   router.push({ path: ROUTES.newTicket, query: subject ? { subject } : {} });
@@ -259,33 +207,22 @@ function articleMeta(article: RecentArticle) {
 }
 
 const historyOptions = computed(() =>
-  [
-    {
-      key: RECENT_SEARCHES,
-      group: __("Recent searches"),
-      options: recentSearches.value.map((text) => ({
-        type: "custom",
-        key: `search:${text}`,
-        label: text,
-        recentSearch: text,
-        keepOpen: true,
-        onClick: () => (query.value = text),
-        onRemove: () => forgetSearch(text),
-      })),
-    },
-    {
-      key: "recently-viewed",
-      group: __("Recently viewed"),
-      options: recentArticles.value.map((article) => ({
-        type: "custom",
-        key: `article:${article.name}`,
-        label: article.title,
-        recentArticle: article,
-        onClick: () => router.push(ROUTES.article(article)),
-        onRemove: () => forgetArticle(article.name),
-      })),
-    },
-  ].filter((group) => group.options.length)
+  hasHistory.value
+    ? [
+        {
+          key: "recently-viewed",
+          group: __("Recently viewed"),
+          options: recentArticles.value.map((article) => ({
+            type: "custom",
+            key: `article:${article.name}`,
+            label: article.title,
+            recentArticle: article,
+            onClick: () => router.push(ROUTES.article(article)),
+            onRemove: () => forgetArticle(article.name),
+          })),
+        },
+      ]
+    : []
 );
 
 // `params` changes when a fetch starts, so this is false from the keystroke until its answer lands.
@@ -301,15 +238,23 @@ const isEmpty = computed(
 );
 
 const resultOptions = computed(() =>
-  (results.data || []).map((article) => ({
-    type: "custom",
-    key: article.name,
-    label: article.title,
-    article,
-    // The previous query's rows stay in view, but Enter must not open one.
-    disabled: !isCurrent.value,
-    onClick: () => openArticle(article),
-  }))
+  hasResults.value
+    ? [
+        {
+          key: "results",
+          group: countLabel(results.data.length, __("1 article"), __("{0} articles")),
+          options: results.data.map((article) => ({
+            type: "custom",
+            key: article.name,
+            label: article.title,
+            article,
+            // The previous query's rows stay in view, but Enter must not open one.
+            disabled: !isCurrent.value,
+            onClick: () => router.push(ROUTES.article(article)),
+          })),
+        },
+      ]
+    : []
 );
 
 const options = computed(() =>
@@ -343,29 +288,20 @@ const options = computed(() =>
   [data-slot="footer"] {
   flex-shrink: 0;
 }
-/* On an 8px grid: 40px search rows, 52px article rows, icons on the labels' edge. */
+/* On an 8px grid: 52px article rows, icons on the labels' edge. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="group-label"] {
   height: auto;
-  padding: 8px 8px 4px;
+  padding: 8px;
 }
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="item"] {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-height: 52px;
   height: auto;
   padding: 8px;
   border-radius: 8px;
-}
-[data-slot="content"][data-variant="outline"][data-size="lg"]
-  [data-slot="item"]:has(.recent-search) {
-  min-height: 40px;
-  height: 40px;
-  padding: 0 8px;
-}
-[data-slot="item"][data-highlighted] .article-tile {
-  background-color: var(--surface-gray-3);
 }
 /* The list highlights its first row on open, so ↵ marks Enter's target; a hovered history row offers X instead. */
 .history-remove,
