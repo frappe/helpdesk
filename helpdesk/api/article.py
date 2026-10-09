@@ -114,10 +114,7 @@ def search(query: str) -> list:
 
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
-    """Published articles the reader may see that match free text, best first, as plain titles.
-
-    The ticket page shows them as text; `search_articles` is the one with `<mark>` highlights.
-    """
+    """Published articles the reader may see that match free text, best first, as plain titles."""
     search = HelpdeskArticleSearch()
     if not search.index_exists():
         return []

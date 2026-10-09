@@ -29,13 +29,11 @@ const SETTINGS_FIELDS = [
 
 const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
 
-// Quick links live in a knowledge base form script, the way field dependencies do: every
-// customization is one kind of document, with no settings table of its own. Its last line holds the rows.
+// Quick links live in a knowledge base form script whose last line holds the rows as JSON.
 const LINKS_SCRIPT = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
 
-// One draft for the desk and the portal settings, made on first use: the portal's header buttons read it
-// before the form exists, and readers who never open the settings never load it.
+// Shared by the desk and portal settings, and made on first use so readers never load it.
 export const knowledgeBaseDraft = shallowRef<ReturnType<
   typeof createDraft
 > | null>(null);

@@ -16,7 +16,7 @@
       />
     </button>
     <PortalCollapse :open="isOpen">
-      <nav class="flex flex-col px-3 pb-3 text-base leading-relaxed">
+      <nav class="flex flex-col px-3 pb-3 text-base">
         <button
           v-for="item in items"
           :key="item.id"
@@ -33,7 +33,7 @@
   <nav
     v-else-if="items.length"
     ref="rail"
-    class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto pb-10 text-base leading-relaxed [mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    class="flex max-h-[calc(100vh-8rem)] flex-col overflow-y-auto pb-10 text-base [mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
   >
     <!-- The transparent rail keeps the label on the links' left edge. -->
     <span

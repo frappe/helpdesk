@@ -31,10 +31,7 @@ def new(doc: dict, attachments: list[dict] = []):
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status changes, oldest first, with who made them: readers of a ticket can't read Version.
-
-    Naming the agent is deliberate: the thread already names whoever replied. What `get_one`
-    keeps from customers is the assignment, which may be someone else."""
+    """Status changes, oldest first, with who made them, since ticket readers can't read Version."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",

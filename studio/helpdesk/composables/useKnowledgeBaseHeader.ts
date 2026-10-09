@@ -57,14 +57,11 @@ async function runScripts(scripts: string[]) {
     .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 }
 
-// The knowledge base header: form scripts with "Apply to knowledge base", quick links among them,
-// whose context is the ticket pages' minus the field helpers. Only the knowledge base pages spread
-// this; the ticket pages keep their own actions and take the theme toggle from the settings store.
+// Runs the "Apply to knowledge base" form scripts; only the knowledge base pages use this header.
 export function useKnowledgeBaseHeader(context) {
   if (!scriptContext) {
     scriptContext = { call: context.call, router: context.router, toast, createToast, $dialog: scriptDialog }
-    // Detached from the page, so the scripts run once a visit: an announcement dialog does not reopen on each page.
-    // They rerun when the list changes, as when quick links are saved.
+    // Detached from the page so scripts run once a visit, and again only when the list changes.
     effectScope(true).run(() =>
       watch(
         () => JSON.stringify(session.config.value?.knowledge_base_form_scripts || []),
