@@ -66,7 +66,7 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   const request = page.waitForRequest(
     (request) =>
       request.url().includes("get_dashboard_data") &&
-      request.postData()!.includes(daysAgo(7))
+      request.postData()!.includes(daysAgo(6))
   );
   await page.getByRole("menuitem", { name: "Last 7 Days" }).click();
   await request;
@@ -101,8 +101,8 @@ test.describe("dashboard charts", () => {
       .getByText("Tickets", { exact: true })
       .locator("xpath=ancestor::div[contains(@class, 'flex-col')][1]");
     await expect(tickets).toContainText(/Tickets\s*\d+/);
+    const chart = page.locator("[_echarts_instance_]");
     for (const title of ["Ticket Trend", "Tickets by Team", "Tickets by Priority"]) {
-      const chart = page.locator("[_echarts_instance_]");
       const card = page
         .locator("div", { has: page.getByText(title, { exact: true }) })
         .filter({ has: chart })

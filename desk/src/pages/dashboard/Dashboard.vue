@@ -97,13 +97,11 @@
         v-if="!numberCards.loading"
       >
         <Tooltip
-          v-for="(config, index) in numberCards.data"
-          :text="config.tooltip"
+          v-for="({ tooltip, ...card }, index) in numberCards.data"
+          :key="index"
+          :text="tooltip"
         >
-          <NumberCard
-            :key="index"
-            v-bind="toNumberCardProps(config, deltaCaption)"
-          />
+          <NumberCard v-bind="card" />
         </Tooltip>
       </div>
       <div
@@ -225,38 +223,15 @@ import {
   dayjs,
   usePageMeta,
 } from "frappe-ui";
-import {
-  AreaChart,
-  BarChart,
-  ChartCard,
-  DonutChart,
-  LineChart,
-  NumberCard,
-} from "frappe-ui/charts";
-import {
-  type AxisChartConfig,
-  type AxisChartKind,
-  getAxisChartKind,
-  toAxisChartProps,
-  toDonutChartProps,
-  toNumberCardProps,
-} from "./dashboardCharts";
-import {
-  type Component,
-  computed,
-  h,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-} from "vue";
+import { BarChart, ChartCard, DonutChart, NumberCard } from "frappe-ui/charts";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
 const { isMobileView } = useScreenSize();
 
 interface NumberCardData {
   title: string;
-  value: number;
+  value: number | null;
   delta: number | null;
   deltaSuffix: string;
   suffix?: string;
@@ -279,7 +254,7 @@ const filters = reactive<Filters>({
 interface ChartData {
   data: ChartValues[];
   title: string;
-  type: "axis" | "pie";
+  type: "bar" | "donut";
 }
 
 interface ChartValues {
@@ -404,7 +379,7 @@ const hasAppliedFilter = computed(() =>
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
   return (
-    (numberCards.data as NumberCardData[]).every((d) => d.value === 0) &&
+    (numberCards.data as NumberCardData[]).every((d) => !d.value) &&
     (trendData.data as ChartData[]).every((d) => !d.data?.length) &&
     (masterData.data as ChartData[]).every((d) => !d.data?.length)
   );
@@ -516,44 +491,21 @@ const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
 
-const axisChartComponents: Record<AxisChartKind, Component> = {
-  line: LineChart,
-  area: AreaChart,
-  bar: BarChart,
-};
-
-function getChartType(chart: any) {
-  if (chart["type"] === "axis") {
-    const component = axisChartComponents[getAxisChartKind(chart)];
-    return h(component, toAxisChartProps(chart as AxisChartConfig));
-  }
-  if (chart["type"] === "pie") {
-    return h(DonutChart, toDonutChartProps(chart));
-  }
+// The API sends each chart's frappe-ui props, plus its `type` and `key`.
+function getChartType({ type, key, ...props }: any) {
+  return h(type === "donut" ? DonutChart : BarChart, props);
 }
 
+// Counts today, so "Last 7 Days" is today and the 6 days before it.
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
 
-  lastXDate.setDate(today.getDate() - range);
+  lastXDate.setDate(today.getDate() - (range - 1));
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
   )}`;
 }
-
-// The API compares against the period of the same length just before this one.
-const deltaCaption = computed(() => {
-  const [from, to] = (filters.period || "").split(",");
-  if (!from || !to) return undefined;
-  const days = dayjs(to).diff(dayjs(from), "day");
-  if (days <= 0) {
-    return dayjs(to).isSame(dayjs(), "day")
-      ? __("vs yesterday")
-      : __("vs prev. day");
-  }
-  return __("vs prev. {0} days", [days]);
-});
 
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
@@ -588,7 +540,7 @@ const options = computed(() => [
         label: __("Today"),
         onClick: () => {
           preset.value = __("Today");
-          filters.period = getLastXDays(0);
+          filters.period = getLastXDays(1);
         },
       },
       {

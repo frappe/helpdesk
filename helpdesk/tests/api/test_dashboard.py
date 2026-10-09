@@ -1,6 +1,7 @@
 import json
 
 import frappe
+from frappe import _
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_days, getdate, now_datetime, nowdate
 
@@ -86,7 +87,19 @@ class TestNumberCardDelta(IntegrationTestCase):
         with self.freeze_time("2031-05-10 10:00:00"):
             make_assigned_ticket(self.agent, "Only ticket", status="Closed")
 
-        for card in get_number_cards(self.agent, "2031-05-10", "2031-05-10"):
+        for card in get_number_cards(self.agent, "2031-05-10", "2031-05-10").values():
+            self.assertIsNone(card["delta"], card["title"])
+
+    def test_averages_show_no_data_for_an_empty_period(self):
+        with self.freeze_time("2031-08-09 10:00:00"):
+            make_assigned_ticket(self.agent, "Only yesterday", status="Closed")
+
+        cards = get_number_cards(self.agent, "2031-08-10", "2031-08-10")
+        tickets = cards.pop(_("Tickets"))
+        self.assertEqual(tickets["value"], 0)
+        self.assertEqual(tickets["delta"], -100)
+        for card in cards.values():
+            self.assertIsNone(card["value"], card["title"])
             self.assertIsNone(card["delta"], card["title"])
 
     def test_ticket_count_changes_against_the_previous_period(self):
@@ -96,9 +109,21 @@ class TestNumberCardDelta(IntegrationTestCase):
             make_assigned_ticket(self.agent, "Today")
             make_assigned_ticket(self.agent, "Today again")
 
-        [tickets, *_] = get_number_cards(self.agent, "2031-06-10", "2031-06-10")
+        cards = get_number_cards(self.agent, "2031-06-10", "2031-06-10")
+        tickets = cards[_("Tickets")]
         self.assertEqual(tickets["value"], 2)
         self.assertEqual(tickets["delta"], 100)
+
+    def test_previous_period_has_as_many_days_as_this_one(self):
+        # this period is Sep 8-9, so the previous one is Sep 6-7, not just Sep 7
+        for day in ("2031-09-06", "2031-09-07", "2031-09-08"):
+            with self.freeze_time(f"{day} 10:00:00"):
+                make_assigned_ticket(self.agent, f"Raised {day}")
+
+        cards = get_number_cards(self.agent, "2031-09-08", "2031-09-09")
+        tickets = cards[_("Tickets")]
+        self.assertEqual(tickets["value"], 1)
+        self.assertEqual(tickets["delta"], -50)
 
     def test_zero_hour_previous_average_still_compares(self):
         with self.freeze_time("2031-07-09 10:00:00"):
@@ -108,10 +133,8 @@ class TestNumberCardDelta(IntegrationTestCase):
         frappe.db.set_value("HD Ticket", earlier.name, "first_response_time", 0)
         frappe.db.set_value("HD Ticket", later.name, "first_response_time", 7200)
 
-        [_, _, first_response, *_] = get_number_cards(
-            self.agent, "2031-07-10", "2031-07-10"
-        )
-        self.assertEqual(first_response["delta"], 2)
+        cards = get_number_cards(self.agent, "2031-07-10", "2031-07-10")
+        self.assertEqual(cards[_("Avg. First Response")]["delta"], 2)
 
 
 class TestTagDashboard(IntegrationTestCase):
@@ -138,9 +161,9 @@ class TestTagDashboard(IntegrationTestCase):
         make_tagged_ticket(self.team, "2031-03-11 11:00:00")
 
         top_tags = self.get_charts("2031-03-10", "2031-03-11")["top_tags"]["data"]
-        # ascending, so the chart draws the biggest bar on top
+        # busiest first, the chart draws the first row on top
         self.assertEqual(
-            top_tags, [{"tag": refund, "Tickets": 1}, {"tag": billing, "Tickets": 2}]
+            top_tags, [{"tag": billing, "Tickets": 2}, {"tag": refund, "Tickets": 1}]
         )
 
     def test_date_range_includes_whole_first_and_last_day(self) -> None:
@@ -167,9 +190,7 @@ class TestTagDashboard(IntegrationTestCase):
                 {"date": getdate("2031-05-03"), billing: 0, refund: 1},
             ],
         )
-        self.assertEqual(
-            [series["name"] for series in trend["series"]], [billing, refund]
-        )
+        self.assertEqual(trend["y"], [billing, refund])
 
     def test_charts_keep_only_the_busiest_tags(self) -> None:
         # tag i sits on i + 1 tickets, so the ranking has no ties
@@ -179,9 +200,8 @@ class TestTagDashboard(IntegrationTestCase):
 
         charts = self.get_charts("2031-06-01", "2031-06-01")
         top_tags = [row["tag"] for row in charts["top_tags"]["data"]]
-        trend_tags = [series["name"] for series in charts["tag_trend"]["series"]]
-        self.assertEqual(top_tags, tags[1:])
-        self.assertEqual(trend_tags, tags[:5:-1])
+        self.assertEqual(top_tags, tags[:0:-1])
+        self.assertEqual(charts["tag_trend"]["y"], tags[:5:-1])
 
     def test_untagged_tickets_give_empty_charts(self) -> None:
         make_tagged_ticket(self.team, "2031-07-01 10:00:00")
@@ -189,7 +209,7 @@ class TestTagDashboard(IntegrationTestCase):
         charts = self.get_charts("2031-07-01", "2031-07-01")
         self.assertEqual(charts["top_tags"]["data"], [])
         self.assertEqual(charts["tag_trend"]["data"], [])
-        self.assertEqual(charts["tag_trend"]["series"], [])
+        self.assertEqual(charts["tag_trend"]["y"], [])
 
     def test_other_teams_tickets_are_not_counted(self) -> None:
         billing = self.tag("billing")

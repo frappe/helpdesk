@@ -40,15 +40,17 @@ class TagDashboard(HelpdeskDashboard):
             tag_row[tickets] = tag_row.pop("count")
 
         return get_bar_chart_config(
-            # bars are drawn bottom-up, so ascending puts the biggest on top
-            top_tag_data[::-1],
+            top_tag_data,
             "top_tags",
             _("Top Tags"),
             _("Most used tags in this period"),
-            {"key": "tag", "type": "category", "title": _("Tag")},
+            "tag",
+            # no axis title: on a horizontal chart it prints under the 0 of the value axis
+            {"type": "category"},
             _("Tickets"),
-            [{"name": tickets, "type": "bar", "showDataLabels": True}],
-            swapXY=True,
+            tickets,
+            seriesConfig={tickets: {"showDataLabels": True}},
+            horizontal=True,
         )
 
     def get_tag_trend_chart(self) -> dict[str, any]:
@@ -71,9 +73,10 @@ class TagDashboard(HelpdeskDashboard):
             "tag_trend",
             _("Tag Trend"),
             _("Daily volume of the top {0} tags").format(TREND_TAG_COUNT),
-            {"key": "date", "type": "time", "title": _("Date"), "timeGrain": "day"},
+            "date",
+            {"type": "time", "title": _("Date"), "timeGrain": "day"},
             _("Tickets"),
-            [{"name": tag, "type": "bar", "stackName": "tags"} for tag in tags],
+            tags,
             stacked=True,
         )
 

@@ -1006,7 +1006,9 @@ def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
     return ticket
 
 
-def get_number_cards(agent: str, from_date: str, to_date: str) -> list[dict]:
-    """The dashboard number cards for tickets assigned to `agent` in the date range."""
+def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
+    """The dashboard number cards for tickets assigned to `agent` in the date
+    range, keyed by title."""
     filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
-    return HelpdeskDashboard(filters).get_number_card_data()
+    cards = HelpdeskDashboard(filters).get_number_card_data()
+    return {card["title"]: card for card in cards}

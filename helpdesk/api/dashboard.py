@@ -1,3 +1,4 @@
+import math
 import operator
 from functools import reduce
 
@@ -47,7 +48,7 @@ def get_dashboard_data(
         agent = frappe.session.user
 
     if not from_date:
-        from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+        from_date = frappe.utils.add_days(frappe.utils.nowdate(), -29)
     if not to_date:
         to_date = frappe.utils.nowdate()
 
@@ -88,10 +89,10 @@ class HelpdeskDashboard:
             reduce(operator.and_, self.qb_conds) if self.qb_conds else None
         )
 
-        self.diff = frappe.utils.date_diff(self.to_date, self.from_date)
-        if self.diff == 0:
-            self.diff = 1
-        self.prev_from_date = frappe.utils.add_days(self.from_date, -self.diff)
+        # both ends are inclusive, so the period is one day longer than the gap;
+        # the previous period gets the same number of days
+        self.period_days = frappe.utils.date_diff(self.to_date, self.from_date) + 1
+        self.prev_from_date = frappe.utils.add_days(self.from_date, -self.period_days)
         self.to_date_next = frappe.utils.add_days(self.to_date, 1)
 
         self.open_statuses = frappe.get_all(
@@ -140,22 +141,43 @@ class HelpdeskDashboard:
             current_expr.as_("current"), prev_expr.as_("prev")
         )
         result = query.run(as_dict=True)
-        # prev stays None when the earlier period has no samples, unlike a real 0 average
-        return result[0].current or 0, result[0].prev
+        # an average over a period with no tickets is None, not a real 0 average
+        return result[0].current, result[0].prev
+
+    def round_or_none(self, value, digits=1):
+        return None if value is None else round(value, digits)
+
+    def get_change(self, current, prev, digits=1):
+        # an empty period on either side leaves nothing to compare
+        if current is None or prev is None:
+            return None
+        return round(current - prev, digits)
 
     def get_number_card_data(self):
-        return [
+        cards = [
             self.get_ticket_count(),
             self.get_sla_fulfilled_count(),
             self.get_avg_first_response_time(),
             self.get_avg_resolution_time(),
             self.get_avg_feedback_score(),
         ]
+        caption = self.get_delta_caption()
+        for card in cards:
+            if card["delta"] is not None:
+                card["deltaCaption"] = caption
+        return cards
+
+    def get_delta_caption(self):
+        if self.period_days > 1:
+            return _("vs prev. {0} days").format(self.period_days)
+        if frappe.utils.getdate(self.to_date) == frappe.utils.getdate():
+            return _("vs yesterday")
+        return _("vs prev. day")
 
     def get_ticket_count(self):
         current, prev = self.get_metric_data(self.ticket.name, Count)
         # no previous period to compare against: no delta, not a 0% change
-        delta = ((current - prev) / prev * 100) if prev else None
+        delta = round((current - prev) / prev * 100) if prev else None
 
         return {
             "title": _("Tickets"),
@@ -182,14 +204,17 @@ class HelpdeskDashboard:
             self.ticket.name, Count, status_cond
         )
 
-        current_pct = (current_fulfilled / current_total * 100) if current_total else 0
-        prev_pct = (prev_fulfilled / prev_total * 100) if prev_total else 0
+        # no resolved tickets means no SLA to measure, not 0% fulfilled
+        current_pct = (
+            (current_fulfilled / current_total * 100) if current_total else None
+        )
+        prev_pct = (prev_fulfilled / prev_total * 100) if prev_total else None
 
         return {
             "title": _("% SLA Fulfilled"),
-            "value": current_pct,
+            "value": self.round_or_none(current_pct, 0),
             "suffix": "%",
-            "delta": (current_pct - prev_pct) if prev_total else None,
+            "delta": self.get_change(current_pct, prev_pct, 0),
             "deltaSuffix": "%",
             "tooltip": _("% of tickets created that were resolved within SLA"),
         }
@@ -204,9 +229,9 @@ class HelpdeskDashboard:
 
         return {
             "title": _("Avg. First Response"),
-            "value": current,
+            "value": self.round_or_none(current),
             "suffix": " " + _("hrs"),
-            "delta": (current - prev) if prev is not None else None,
+            "delta": self.get_change(current, prev),
             "deltaSuffix": " " + _("hrs"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to first respond to a ticket"),
@@ -221,9 +246,9 @@ class HelpdeskDashboard:
 
         return {
             "title": _("Avg. Resolution"),
-            "value": current,
+            "value": self.round_or_none(current),
             "suffix": " " + _("days"),
-            "delta": (current - prev) if prev is not None else None,
+            "delta": self.get_change(current, prev),
             "deltaSuffix": " " + _("days"),
             "negativeIsBetter": True,
             "tooltip": _("Avg. time taken to resolve a ticket"),
@@ -235,7 +260,7 @@ class HelpdeskDashboard:
         # regardless of its creation date.
         extra_cond = self.ticket.feedback_rating > 0
         current, prev = self.get_metric_data(
-            self.ticket.feedback_rating,
+            self.ticket.feedback_rating * 5,
             Avg,
             extra_cond,
             date_field=self.ticket.resolution_date,
@@ -243,9 +268,9 @@ class HelpdeskDashboard:
 
         return {
             "title": _("Avg. Feedback Rating"),
-            "value": current * 5,
+            "value": self.round_or_none(current),
             "suffix": "/5",
-            "delta": (current - prev) * 5 if prev is not None else None,
+            "delta": self.get_change(current, prev),
             "deltaSuffix": " " + _("stars"),
             "tooltip": _("Avg. feedback rating for tickets resolved in this period"),
         }
@@ -319,20 +344,16 @@ class HelpdeskDashboard:
             "ticket_trend",
             _("Ticket Trend"),
             subtitle,
-            {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
+            "date",
+            {"type": "time", "title": "Date", "timeGrain": "day"},
             _("Tickets"),
-            [
-                {"name": closed_status, "type": "bar"},
-                {"name": open_status, "type": "bar"},
-                {
-                    "name": sla_fulfilled_status,
-                    "type": "line",
-                    "showDataPoints": True,
-                    "axis": "y2",
-                },
-            ],
+            [closed_status, open_status],
+            y2=sla_fulfilled_status,
+            seriesConfig={
+                sla_fulfilled_status: {"type": "line", "showDataPoints": True}
+            },
             stacked=True,
-            y2Axis={"title": "% SLA", "yMin": 0, "yMax": 100},
+            y2Axis={"title": "% SLA", "min": 0, "max": 100},
         )
 
     def get_feedback_trend_data(self):
@@ -401,19 +422,15 @@ class HelpdeskDashboard:
             "feedback_trend",
             _("Feedback Trend"),
             subtitle,
-            {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
+            "date",
+            {"type": "time", "title": "Date", "timeGrain": "day"},
             _("Rated Tickets"),
-            [
-                {"name": rated_tickets, "type": "bar"},
-                {
-                    "name": rating,
-                    "type": "line",
-                    "showDataPoints": True,
-                    "axis": "y2",
-                    "color": "#48BB74",
-                },
-            ],
-            y2Axis={"title": _("Rating"), "yMin": 0, "yMax": 5},
+            rated_tickets,
+            y2=rating,
+            seriesConfig={
+                rating: {"type": "line", "showDataPoints": True, "color": "#48BB74"}
+            },
+            y2Axis={"title": _("Rating"), "min": 0, "max": 5},
         )
 
     def get_avg_tickets_per_day(self):
@@ -488,9 +505,10 @@ def get_team_chart_data(
             "tickets_by_team",
             _("Tickets by Team"),
             _("Total tickets by team"),
-            {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
+            "team",
+            {"type": "category", "title": "Team"},
             "Tickets",
-            [{"name": "count", "type": "bar"}],
+            "count",
         )
 
 
@@ -523,9 +541,10 @@ def get_ticket_type_chart_data(
             "tickets_by_type",
             _("Tickets by Type"),
             _("Total tickets by type"),
-            {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
+            "type",
+            {"type": "category", "title": "Type"},
             "Tickets",
-            [{"name": "count", "type": "bar"}],
+            "count",
         )
 
 
@@ -558,14 +577,10 @@ def get_ticket_priority_chart_data(
             "tickets_by_priority",
             _("Tickets by Priority"),
             _("Total tickets by priority"),
-            {
-                "key": "priority",
-                "type": "category",
-                "title": "Priority",
-                "timeGrain": "day",
-            },
+            "priority",
+            {"type": "category", "title": "Priority"},
             "Tickets",
-            [{"name": "count", "type": "bar"}],
+            "count",
         )
 
 
@@ -605,14 +620,14 @@ def get_pie_chart_config(
     value_column: str,
 ) -> dict[str, any]:
     return {
-        "type": "pie",
+        "type": "donut",
         "data": data,
         # stable identifier for the client, `title` is translated and cannot be matched on
         "key": key,
         "title": title,
         "subtitle": subtitle,
-        "categoryColumn": category_column,
-        "valueColumn": value_column,
+        "category": category_column,
+        "value": value_column,
     }
 
 
@@ -621,23 +636,40 @@ def get_bar_chart_config(
     key: str,
     title: str,
     subtitle: str,
-    x_axis_config: dict[str, any],
+    x: str,
+    x_axis: dict[str, any],
     y_axis_title: str,
-    series: list,
+    y: str | list[str],
     **kwargs: dict[str, any],
 ) -> dict[str, any]:
-    return {
-        "type": "axis",
+    """Props for frappe-ui's BarChart, plus `type` and `key` for the client."""
+    chart = {
+        "type": "bar",
         "data": data,
         # stable identifier for the client, `title` is translated and cannot be matched on
         "key": key,
         "title": title,
         "subtitle": subtitle,
-        "xAxis": x_axis_config,
+        "x": x,
+        "y": y,
+        "xAxis": x_axis,
         # every bar chart here counts tickets, so keep the value axis on whole
         # steps; half a ticket is not a thing. y2 axes (% SLA, rating) are
         # fractional and are left alone.
         "yAxis": {"title": y_axis_title, "echartOptions": {"minInterval": 1}},
-        "series": series,
         **kwargs,
     }
+    if "y2Axis" in kwargs:
+        chart["yAxis"]["max"] = get_y_axis_max(data, y, kwargs.get("stacked"))
+    return chart
+
+
+def get_y_axis_max(data: list[dict[str, any]], y: str | list[str], stacked: bool):
+    """The y2 axis has a fixed range (0-100, 0-5) and lines its ticks up with the
+    y axis, so a y axis max on a multiple of 5 keeps both on five clean steps."""
+    columns = [y] if isinstance(y, str) else y
+    combine = sum if stacked else max
+    peak = max(
+        (combine(row[column] or 0 for column in columns) for row in data), default=0
+    )
+    return max(5, math.ceil(peak / 5) * 5)
