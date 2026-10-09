@@ -97,14 +97,11 @@
         v-if="!numberCards.loading"
       >
         <Tooltip
-          v-for="(config, index) in numberCards.data"
-          :text="config.tooltip"
+          v-for="({ tooltip, ...card }, index) in numberCards.data"
+          :key="index"
+          :text="tooltip"
         >
-          <NumberChart
-            :key="index"
-            class="border rounded-5 min-h-[114px]"
-            :config="config"
-          />
+          <NumberCard v-bind="card" />
         </Tooltip>
       </div>
       <div
@@ -118,9 +115,9 @@
         >
           <template v-for="(chart, index) in trendData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -139,9 +136,9 @@
         >
           <template v-for="(chart, index) in masterData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -161,9 +158,9 @@
         >
           <template v-for="(chart, index) in tagData.data" :key="index">
             <!-- has data -->
-            <div v-if="!isChartEmpty(chart)" class="border rounded-5 min-h-80">
+            <ChartCard v-if="!isChartEmpty(chart)" class="h-80">
               <component :is="getChartType(chart)" />
-            </div>
+            </ChartCard>
 
             <!-- chart with no data -->
             <SkeletonLoader
@@ -226,7 +223,7 @@ import {
   dayjs,
   usePageMeta,
 } from "frappe-ui";
-import { AxisChart, DonutChart, NumberChart } from "frappe-ui/experimental";
+import { BarChart, ChartCard, DonutChart, NumberCard } from "frappe-ui/charts";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import LucideBuilding2 from "~icons/lucide/building-2";
 import LucideUser from "~icons/lucide/user";
@@ -234,7 +231,7 @@ const { isMobileView } = useScreenSize();
 
 interface NumberCardData {
   title: string;
-  value: number;
+  value: number | null;
   delta: number | null;
   deltaSuffix: string;
   suffix?: string;
@@ -257,7 +254,7 @@ const filters = reactive<Filters>({
 interface ChartData {
   data: ChartValues[];
   title: string;
-  type: "axis" | "pie";
+  type: "bar" | "donut";
 }
 
 interface ChartValues {
@@ -272,18 +269,6 @@ const dashboardTitle = computed(() => {
   return viewMyStats.value ? __("My Dashboard") : __("Organization Dashboard");
 });
 
-const colors = [
-  "#318AD8",
-  "#F683AE",
-  "#48BB74",
-  "#F56B6B",
-  "#FACF7A",
-  "#44427B",
-  "#5FD8C4",
-  "#F8814F",
-  "#15CCEF",
-  "#A6B1B9",
-];
 interface ChartEmptyState {
   // header of the card, shown untranslated only when the chart itself is missing
   chartTitle: string;
@@ -394,7 +379,7 @@ const hasAppliedFilter = computed(() =>
 const isEmpty = computed(() => {
   if (!numberCards.data || !trendData.data || !masterData.data) return false;
   return (
-    (numberCards.data as NumberCardData[]).every((d) => d.value === 0) &&
+    (numberCards.data as NumberCardData[]).every((d) => !d.value) &&
     (trendData.data as ChartData[]).every((d) => !d.data?.length) &&
     (masterData.data as ChartData[]).every((d) => !d.data?.length)
   );
@@ -506,25 +491,17 @@ const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
 
-function getChartType(chart: any) {
-  chart.colors = colors;
-  if (chart["type"] === "axis") {
-    return h(AxisChart, {
-      config: chart,
-    });
-  }
-  if (chart["type"] === "pie") {
-    return h(DonutChart, {
-      config: chart,
-    });
-  }
+// api already sends the frappe-ui props for each chart
+function getChartType({ type, key, ...props }: any) {
+  return h(type === "donut" ? DonutChart : BarChart, props);
 }
 
+// include today, so last 7 days is today and the 6 days before
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);
 
-  lastXDate.setDate(today.getDate() - range);
+  lastXDate.setDate(today.getDate() - (range - 1));
   return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
   )}`;
@@ -563,7 +540,7 @@ const options = computed(() => [
         label: __("Today"),
         onClick: () => {
           preset.value = __("Today");
-          filters.period = getLastXDays(0);
+          filters.period = getLastXDays(1);
         },
       },
       {

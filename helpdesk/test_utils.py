@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -6,9 +7,10 @@ import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
 from frappe.tests.classes.context_managers import freeze_time
-from frappe.utils import add_to_date, getdate
+from frappe.utils import add_to_date, getdate, now_datetime
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
+from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
@@ -989,3 +991,23 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
+    """A ticket that has been responded to and is assigned to `agent`, so dashboard
+    queries filtered by that agent only see the tickets a test creates."""
+    ticket = make_ticket(subject=subject)
+    ticket.reload()
+    ticket.first_responded_on = now_datetime()
+    if status:
+        ticket.status = status
+    ticket.save()
+    frappe.db.set_value("HD Ticket", ticket.name, "_assign", json.dumps([agent]))
+    return ticket
+
+
+def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
+    """dashboard number cards for tickets assigned to `agent`, keyed by title"""
+    filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
+    cards = HelpdeskDashboard(filters).get_number_card_data()
+    return {card["title"]: card for card in cards}
