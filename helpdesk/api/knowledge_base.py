@@ -125,7 +125,7 @@ def _get_joining_values(category: str) -> dict:
 
 @frappe.whitelist()
 def get_category_visibility(category: str) -> str | None:
-    frappe.has_permission("HD Article", "read", throw=True)
+    frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
     return get_shared_visibility(category)
 
