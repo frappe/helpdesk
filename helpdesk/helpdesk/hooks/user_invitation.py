@@ -65,6 +65,8 @@ def link_to_customer(
             if is_manager and not row.is_manager:
                 row.is_manager = True
                 doc.save(ignore_permissions=True)
+            else:
+                doc.sync_contact_role(row)
             return
     doc.append("contacts", {"contact_name": contact, "is_manager": is_manager})
     doc.save(ignore_permissions=True)
