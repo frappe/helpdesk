@@ -4,8 +4,10 @@
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.desk.reportview import get_filters_cond
 from frappe.model.document import Document
-from frappe.utils import cint
+from frappe.types.filter import Filters
+from frappe.utils import cint, evaluate_filters
 
 from helpdesk.utils import capture_event, is_agent
 
@@ -32,10 +34,7 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
-        # Public is also the field's default, so an insert cannot tell a chosen Public from none:
-        # the category's shared access wins either way. An explicit choice is kept on later saves.
-        if self.visibility == PUBLIC and self.category:
-            self.visibility = get_shared_visibility(self.category) or PUBLIC
+        self.set_category_visibility()
 
     def before_save(self):
         self.set_excerpt()
@@ -59,6 +58,11 @@ class HDArticle(Document):
                     {"category": self.category, "status": "Published"},
                 )
             )
+
+    def set_category_visibility(self):
+        # Public is also the default, so an insert takes the category's shared access over it.
+        if self.visibility == PUBLIC and self.category:
+            self.visibility = get_shared_visibility(self.category) or PUBLIC
 
     def set_excerpt(self):
         self.excerpt = get_excerpt(self.content)
@@ -184,22 +188,21 @@ def readable_audiences(user: str | None = None) -> list[str] | None:
     return [PUBLIC, CUSTOMERS_ONLY]
 
 
-def readable_filters(**extra) -> dict:
-    """Published articles in the caller's audiences, as filters."""
+def readable_filters(user: str | None = None, **extra) -> dict:
+    """Published articles in the user's audiences, as filters: the one rule for who reads what."""
     filters = {"status": "Published", **extra}
-    audiences = readable_audiences()
+    audiences = readable_audiences(user)
     if audiences is not None:
         filters["visibility"] = ["in", audiences]
     return filters
 
 
 def is_readable(article, user: str | None = None) -> bool:
-    """The same rule for one article already fetched."""
-    audiences = readable_audiences(user)
-    if audiences is None:
+    """The same rule for one article already fetched; an agent reads drafts too."""
+    if readable_audiences(user) is None:
         return True
-    return (
-        article.get("status") == "Published" and article.get("visibility") in audiences
+    return evaluate_filters(
+        article, Filters(readable_filters(user), doctype="HD Article")
     )
 
 
@@ -216,11 +219,12 @@ def get_shared_visibility(category: str) -> str | None:
 
 def permission_query(user: str | None = None) -> str | None:
     """Non-agents list only the published articles in their audiences, as on the portal."""
-    audiences = readable_audiences(user)
-    if audiences is None:
+    if readable_audiences(user) is None:
         return None
-    values = ", ".join(frappe.db.escape(audience) for audience in audiences)
-    return f"`tabHD Article`.status = 'Published' and `tabHD Article`.visibility in ({values})"
+    conditions = get_filters_cond(
+        "HD Article", readable_filters(user), [], ignore_permissions=True
+    )
+    return conditions.removeprefix(" and ")
 
 
 def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:

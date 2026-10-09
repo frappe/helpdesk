@@ -4,7 +4,7 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
-from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_audiences
+from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_filters
 from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
@@ -268,18 +268,14 @@ class HelpdeskArticleSearch(SQLiteSearch):
 
     def get_search_filters(self) -> dict:
         """Published, and for a non-agent only their audiences, so the top hits are all readable."""
-        filters = {"status": "Published"}
-        audiences = readable_audiences()
-        if audiences is not None:
-            filters["visibility"] = audiences
+        filters = readable_filters()
+        if visibility := filters.get("visibility"):
+            # the index takes a bare list for IN, not frappe's ["in", values]
+            filters["visibility"] = visibility[1]
         return filters
 
     def _prepare_fts_query(self, query: str) -> str:
-        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms.
-
-        A query of only stopwords keeps them, or "how" typed into search finds nothing.
-        Words match as prefixes from three letters, where search starts, so "wha" finds "What".
-        """
+        """OR the words, stopwords dropped unless that leaves none; three letters match as a prefix."""
         stopwords = set(get_stopwords())
         words = query.split()
         terms = [term for term in words if term.lower() not in stopwords] or words
