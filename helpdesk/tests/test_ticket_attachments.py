@@ -3,24 +3,15 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from helpdesk.test_utils import (
-    create_contact,
-    make_ticket,
-    unique_email,
-    upload_test_file,
-)
+from helpdesk.test_utils import make_contact, make_ticket, upload_test_file
 
 
 class TestTicketAttachments(FrappeTestCase):
     def setUp(self):
-        self.owner = self.make_customer_user()
-        self.other = self.make_customer_user()
+        self.owner = make_contact("attachment-customer")["user"]
+        self.other = make_contact("attachment-customer")["user"]
         self.owner_ticket = make_ticket(raised_by=self.owner)
         self.other_ticket = make_ticket(raised_by=self.other)
-
-    def make_customer_user(self):
-        email = unique_email("attachment-customer")
-        return create_contact(email.split("@")[0], email)["user"]
 
     def upload_as(self, user, ticket=None):
         with self.set_user(user):

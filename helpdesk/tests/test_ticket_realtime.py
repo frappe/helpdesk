@@ -6,9 +6,9 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.test_utils import (
-    create_contact,
     create_customer,
     make_agent,
+    make_contact,
     make_ticket,
     make_todo,
     ticket_pings,
@@ -20,9 +20,9 @@ from helpdesk.test_utils import (
 class TestTicketRealtime(FrappeTestCase):
     def setUp(self):
         self.agent = make_agent(unique_email("realtime-agent"))
-        self.requester = self.make_member()
-        self.manager = self.make_member()
-        self.colleague = self.make_member()
+        self.requester = make_contact("realtime-customer")
+        self.manager = make_contact("realtime-customer")
+        self.colleague = make_contact("realtime-customer")
         self.customer = create_customer(
             unique_name("Realtime Org"),
             contacts=[
@@ -31,7 +31,7 @@ class TestTicketRealtime(FrappeTestCase):
                 {"contact_name": self.colleague["contact"], "is_manager": 0},
             ],
         ).name
-        self.outsider = self.make_member()
+        self.outsider = make_contact("realtime-customer")
         create_customer(
             unique_name("Other Org"),
             contacts=[{"contact_name": self.outsider["contact"], "is_manager": 1}],
@@ -39,10 +39,6 @@ class TestTicketRealtime(FrappeTestCase):
         self.ticket = make_ticket(
             raised_by=self.requester["user"], customer=self.customer
         )
-
-    def make_member(self):
-        email = unique_email("realtime-customer")
-        return create_contact(email.split("@")[0], email)
 
     def pings_for(self, change):
         with patch("frappe.publish_realtime") as publish_realtime:

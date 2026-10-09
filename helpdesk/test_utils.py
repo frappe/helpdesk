@@ -666,6 +666,12 @@ def create_contact(name, email, user=True, role="HD Customer"):
     return result
 
 
+def make_contact(prefix: str = "customer") -> dict:
+    """A contact with a portal user under a unique email, as `create_contact` returns it."""
+    email = unique_email(prefix)
+    return create_contact(email.split("@")[0], email)
+
+
 def create_customer(name, contacts=[]):
     if frappe.db.exists("HD Customer", name):
         frappe.delete_doc("HD Customer", name, force=True)
