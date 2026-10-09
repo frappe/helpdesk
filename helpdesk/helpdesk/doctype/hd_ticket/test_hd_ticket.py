@@ -2914,6 +2914,19 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         with self.assertRaises(frappe.PermissionError):
             client_set_value("HD Ticket", ticket.name, "feedback", other.name)
 
+    def test_customer_cannot_rerate_a_resolved_ticket(self):
+        """The closed-ticket lock never covered this: only a Closed ticket was frozen."""
+        option, other = frappe.get_all(
+            "HD Ticket Feedback Option", fields=["name"], limit=2
+        )
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.db.set_value(
+            "HD Ticket", ticket.name, {"status": "Resolved", "feedback": option.name}
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "feedback", other.name)
+
     def test_customer_cannot_read_form_scripts(self):
         """Agent form scripts carry internal URLs and method names."""
         frappe.set_user(PERMS_CUSTOMER)

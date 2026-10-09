@@ -18,7 +18,9 @@
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ __("Name") }}</span>
         <span>{{ __("Role") }}</span>
-        <span class="max-sm:hidden">{{ __("Last seen") }}</span>
+        <span v-if="showLastSeen" class="max-sm:hidden">{{
+          __("Last seen")
+        }}</span>
         <span />
       </div>
 
@@ -73,7 +75,7 @@
           }}</span>
         </div>
 
-        <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
+        <div v-if="showLastSeen" class="text-p-sm text-ink-gray-5 max-sm:hidden">
           {{ lastSeen(member) }}
         </div>
 
@@ -120,7 +122,7 @@
           roleLabel(invite.role)
         }}</span>
 
-        <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
+        <div v-if="showLastSeen" class="text-p-sm text-ink-gray-5 max-sm:hidden">
           {{ __("Pending") }}
         </div>
 
@@ -165,9 +167,12 @@ import { timeAgo } from "@helpdesk/shared/utils";
 import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
-// A phone drops "Last seen", so the name keeps its width.
-const ROW =
-  "grid grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px] items-center gap-3 py-2";
+// A phone drops "Last seen", so the name keeps its width; only managers get it at all.
+const ROW = computed(() =>
+  props.showLastSeen
+    ? "grid grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px] items-center gap-3 py-2"
+    : "grid grid-cols-[minmax(0,1fr)_104px_32px] items-center gap-3 py-2"
+);
 
 type Member = {
   contact?: string;
@@ -208,6 +213,7 @@ const props = withDefaults(
     invites?: Invite[];
     canChangeRoles?: boolean;
     canRemoveMembers?: boolean;
+    showLastSeen?: boolean;
   }>(),
   {
     members: () => [],

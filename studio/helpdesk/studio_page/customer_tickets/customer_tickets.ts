@@ -45,7 +45,7 @@ const DEFAULT_COLUMNS = [
 
 // Always fetched: the phone rows, SLA badges and unread subjects read them whatever the columns.
 const PHONE_FIELDS = ['subject', 'creation', 'status', 'name']
-const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen', ...PHONE_FIELDS]
+const SUPPORT_FIELDS = ['sla', 'first_responded_on', 'resolution_date', '_seen', ...PHONE_FIELDS]
 
 // `creation`/`modified` are keyed, not left to the type fallback: neither is a docfield.
 const CELLS = {

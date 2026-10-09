@@ -1046,6 +1046,7 @@
                 "componentProps": {
                  "canChangeRoles": "{{ canChangeRoles }}",
                  "canRemoveMembers": "{{ canRemoveMembers }}",
+                 "showLastSeen": "{{ showLastSeen }}",
                  "invites": "{{ organizationInvites }}",
                  "members": "{{ organizationMembers }}",
                  "onCancel": "{{ cancelInvitation }}",

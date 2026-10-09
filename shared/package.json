@@ -8,6 +8,7 @@
 		"./formScripts": "./src/formScripts.ts",
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts",
+		"./ticketCells": "./src/ticketCells.ts",
 		"./tiptap": "./src/tiptap.ts",
 		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
 		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",

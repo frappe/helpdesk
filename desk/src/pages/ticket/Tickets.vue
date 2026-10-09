@@ -84,8 +84,9 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { isCustomerPortal, shortDuration } from "@/utils";
-import { Badge, dayjsLocal, Tooltip, usePageMeta } from "frappe-ui";
+import { isCustomerPortal } from "@/utils";
+import { resolutionBadge, responseBadge } from "@helpdesk/shared/ticketCells";
+import { Badge, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -211,10 +212,15 @@ const options = computed(() => ({
       },
     },
     response_by: {
-      custom: ({ row, item }) => handleResponseByField(row, item),
+      custom: ({ row, item }) => responseBadge(row, item),
     },
     resolution_by: {
-      custom: ({ row, item }) => handleResolutionByField(row, item),
+      custom: ({ row, item }) =>
+        resolutionBadge(
+          row,
+          item,
+          getStatus(row.status)?.category === "Paused"
+        ),
     },
   },
   isCustomerPortal: isCustomerPortal.value,
@@ -243,69 +249,6 @@ const options = computed(() => ({
   },
   hideColumnSetting: false,
 }));
-
-function handleResponseByField(row: any, item: string) {
-  if (!row.sla) return null; // nothing promised, so nothing to report against
-  if (row.first_responded_on) {
-    // no target means it was never breached, so responding at all fulfils it
-    const fulfilled =
-      !item || dayjsLocal(row.first_responded_on).isBefore(dayjsLocal(item));
-    return slaOutcomeBadge(fulfilled);
-  }
-  if (!item) return null;
-  if (dayjsLocal(item).isBefore(dayjsLocal())) return slaOutcomeBadge(false);
-  return h(
-    Tooltip,
-    {
-      text: dayjsLocal(item).format("LLLL"),
-    },
-    h(Badge, {
-      label: shortDuration(item),
-      variant: "subtle",
-      theme: "amber",
-    })
-  );
-}
-
-function slaOutcomeBadge(fulfilled: boolean) {
-  return h(Badge, {
-    label: fulfilled ? __("Fulfilled") : __("Failed"),
-    theme: fulfilled ? "gray" : "red",
-    variant: "subtle",
-  });
-}
-
-function handleResolutionByField(row: any, item: string) {
-  if (!row.sla) return null;
-  const status = getStatus(row.status) || {};
-  if (status.category === "Paused") {
-    return h(Badge, {
-      label: __("Paused"),
-      theme: "blue",
-      variant: "subtle",
-    });
-  }
-  if (row.resolution_date) {
-    const fulfilled =
-      !item || dayjsLocal(row.resolution_date).isBefore(dayjsLocal(item));
-    return slaOutcomeBadge(fulfilled);
-  }
-  if (!item) return null;
-  // In progress but the resolution deadline has already passed.
-  if (dayjsLocal(item).isBefore(dayjsLocal())) return slaOutcomeBadge(false);
-  // In progress with a future deadline: show the live countdown.
-  return h(
-    Tooltip,
-    {
-      text: dayjsLocal(item).format("LLLL"),
-    },
-    h(Badge, {
-      label: shortDuration(item),
-      variant: "subtle",
-      theme: "violet",
-    })
-  );
-}
 
 async function exportRows(
   export_type: "CSV" | "Excel" = "Excel",

@@ -10,6 +10,8 @@ from helpdesk.consts import (
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import is_agent
 
+FEEDBACK_FIELDS = ("feedback", "feedback_rating", "feedback_extra")
+
 
 class CustomerEditController:
     """What a customer may fill on insert and change after it; mixed into HDTicket."""
@@ -33,12 +35,22 @@ class CustomerEditController:
         old_doc = self.get_doc_before_save()
         if not old_doc or is_agent():
             return
+        # before the email flag below, so the feedback link cannot re-rate either
+        self.check_feedback_is_final(old_doc)
         # rating the ticket is the one thing a closing email asks the customer to do
         if self.flags.get("ignore_closed_ticket_guard"):
             return
         # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
         if old_doc.status == "Closed":
             text = _("Closed tickets cannot be updated by non-agents")
+            frappe.throw(text, frappe.PermissionError)
+
+    def check_feedback_is_final(self, old_doc):
+        """A customer rates a ticket once, whatever its status."""
+        if not (old_doc.feedback or old_doc.feedback_rating):
+            return
+        if any(self.get(f) != old_doc.get(f) for f in FEEDBACK_FIELDS):
+            text = _("Feedback cannot be changed once given")
             frappe.throw(text, frappe.PermissionError)
 
     def prevent_customer_edits(self):

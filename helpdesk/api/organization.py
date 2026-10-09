@@ -95,7 +95,8 @@ def get_organization(customer: str) -> dict:
         "can_remove_members": is_manager
         and _is_portal_setting_on(PORTAL_REMOVE_SETTING),
         "can_edit": is_manager and _is_portal_setting_on(PORTAL_EDIT_SETTING),
-        "members": _get_members(hd_customer),
+        # when each colleague last signed in is a manager's business, not every member's
+        "members": _get_members(hd_customer, with_last_seen=is_manager),
         "invites": _get_pending_invites(hd_customer) if can_invite else [],
     }
 
@@ -240,11 +241,15 @@ def _get_organizations() -> list[dict]:
     return organizations
 
 
-def _get_members(hd_customer) -> list[dict]:
+def _get_members(hd_customer, with_last_seen: bool) -> list[dict]:
     contact_names = [row.contact_name for row in hd_customer.contacts]
     details = hd_customer.get_contact_details(contact_names)
-    last_active = hd_customer.get_last_active(
-        [contact.user for contact in details.values() if contact.user]
+    last_active = (
+        hd_customer.get_last_active(
+            [contact.user for contact in details.values() if contact.user]
+        )
+        if with_last_seen
+        else {}
     )
     session_contact = _get_session_contact()
     members = []
@@ -253,17 +258,17 @@ def _get_members(hd_customer) -> list[dict]:
         if not contact:
             continue
         is_owner = row.contact_name == hd_customer.primary_contact
-        members.append(
-            {
-                "contact": row.contact_name,
-                "full_name": contact.full_name,
-                "email": contact.email_id,
-                "image": contact.image,
-                "role": _get_role_label(is_owner, row.is_manager),
-                "is_you": row.contact_name == session_contact,
-                "last_seen": last_active.get(contact.user),
-            }
-        )
+        member = {
+            "contact": row.contact_name,
+            "full_name": contact.full_name,
+            "email": contact.email_id,
+            "image": contact.image,
+            "role": _get_role_label(is_owner, row.is_manager),
+            "is_you": row.contact_name == session_contact,
+        }
+        if with_last_seen:
+            member["last_seen"] = last_active.get(contact.user)
+        members.append(member)
     members.sort(
         key=lambda member: (
             ROLE_ORDER[member["role"]],

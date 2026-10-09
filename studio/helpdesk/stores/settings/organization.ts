@@ -203,6 +203,7 @@ export function createOrganizationSettings(core) {
     canInvite,
     canChangeRoles,
     canRemoveMembers,
+    showLastSeen: isManager,
     canEdit,
     organizationMembers: members,
     organizationInvites: invites,

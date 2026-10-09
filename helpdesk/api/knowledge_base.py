@@ -399,6 +399,7 @@ def get_general_category():
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
+@rate_limit(key="article", limit=5, seconds=VIEW_WINDOW, user_based=True)
 def increment_views(article: str):
     """Count a reader once per article an hour; a re-read inside that window is no new view."""
     _get_readable_article(article)

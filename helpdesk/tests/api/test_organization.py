@@ -72,6 +72,14 @@ class TestOrganizationMembers(IntegrationTestCase):
         frappe.db.set_value("User", self.member["user"], "last_active", None)
         self.assertIsNone(self.members()[self.member["contact"]]["last_seen"])
 
+    def test_a_plain_member_does_not_see_when_colleagues_last_signed_in(self) -> None:
+        frappe.db.set_value(
+            "User", self.manager["user"], "last_active", "2026-08-01 09:30:00"
+        )
+        with self.set_user(self.member["user"]):
+            members = get_organization_members(self.customer.name)
+        self.assertNotIn("last_seen", members[self.manager["contact"]])
+
     def test_roles_describe_the_membership(self) -> None:
         members = self.members()
         self.assertEqual(members[self.owner["contact"]]["role"], "Owner")
