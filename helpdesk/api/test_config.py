@@ -15,7 +15,6 @@ class TestConfig(IntegrationTestCase):
         self.assertEqual(config.session_user, "Guest")
         self.assertFalse(config.is_agent)
         self.assertFalse(config.can_edit_settings)
-        self.assertIn("confirm_resolution_after_days", config)
         self.assertTrue(config.date_format)
 
     def test_only_those_who_can_write_hd_settings_may_edit_them(self) -> None:

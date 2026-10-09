@@ -88,70 +88,6 @@
              "componentProps": {
               "activities": "{{ activities }}",
               "loading": "{{ ticket.loading }}"
-             },
-             "componentSlots": {
-              "item-solve_prompt": {
-               "parentBlockId": "ActivityTimeline-ticket-thread",
-               "slotContent": [
-                {
-                 "children": [
-                  {
-                   "classes": [
-                    "text-ink-gray-5"
-                   ],
-                   "componentId": "TextBlock-ticket-solve-ask",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-base",
-                    "tag": "span",
-                    "text": "{{ t('Did this solve your issue?') }}"
-                   }
-                  },
-                  {
-                   "componentEvents": {
-                    "click": {
-                     "action": "Run Script",
-                     "script": "confirmSolved()"
-                    }
-                   },
-                   "componentId": "KbDotAction-ticket-solve-yes",
-                   "componentName": "PortalDotAction",
-                   "componentProps": {
-                    "label": "{{ t(\"Yes, it's fixed\") }}",
-                    "state": "done"
-                   },
-                   "isCustomVueComponent": true
-                  },
-                  {
-                   "componentEvents": {
-                    "click": {
-                     "action": "Run Script",
-                     "script": "reopenTicket()"
-                    }
-                   },
-                   "componentId": "KbDotAction-ticket-solve-no",
-                   "componentName": "PortalDotAction",
-                   "componentProps": {
-                    "label": "{{ t('No, still an issue') }}",
-                    "state": "next"
-                   },
-                   "isCustomVueComponent": true
-                  }
-                 ],
-                 "classes": [
-                  "items-center",
-                  "flex",
-                  "flex-wrap",
-                  "gap-2"
-                 ],
-                 "componentId": "container-ticket-solve-prompt",
-                 "componentName": "container",
-                 "originalElement": "div"
-                }
-               ],
-               "slotId": "ActivityTimeline-ticket-thread:item-solve_prompt",
-               "slotName": "item-solve_prompt"
-              }
              }
             }
            ],
@@ -1072,7 +1008,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 05:00:00.000000",
+ "modified": "2026-10-09 15:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

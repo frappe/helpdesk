@@ -1,5 +1,5 @@
 import { computed, ref, watch } from 'vue'
-import { createResource, dayjs, toast } from 'frappe-ui'
+import { createResource, toast } from 'frappe-ui'
 import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
@@ -13,14 +13,9 @@ import { useSettingsModal } from '@app/stores/settings'
 import {
   CLOSED_STATUS,
   isClosedStatus,
-  isResolvedStatus,
   loadTicketMeta,
 } from '@app/stores/ticketMeta'
 import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
-
-// Fallback for `confirm_resolution_after_days`; HD Settings owns the real value.
-const RESOLVED_PROMPT_DAYS = 5
-const REOPENED_STATUS = 'Open'
 
 export default function setup(context) {
   const { route } = context
@@ -70,7 +65,6 @@ export default function setup(context) {
   const feedback = useTicketFeedback(ticket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
-  const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
 
   const relatedArticles = createResource({
@@ -101,50 +95,6 @@ export default function setup(context) {
 
   // Where a rating is required the status cannot be written without it.
   const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
-
-  // Asked once, under the latest agent reply, and only after the resolution has stood a while.
-  const solvePromptAt = computed(() => {
-    const data = ticket.data
-    if (!data || !isResolved.value) return null
-    if (!settledFor(promptAfterDays.value)) return null
-    const viewer = config.value?.session_user
-    if (viewer && data.raised_by && viewer !== data.raised_by) return null
-    return thread.lastAgentReply.value?.name || null
-  })
-
-  // A Single omits a field it was never given, so a missing key falls back, not to zero.
-  const promptAfterDays = computed(() => {
-    const days = config.value?.confirm_resolution_after_days
-    return days === undefined || days === null ? RESOLVED_PROMPT_DAYS : Number(days)
-  })
-
-  function settledFor(days: number) {
-    const resolvedOn = ticket.data?.resolution_date
-    return Boolean(resolvedOn) && dayjs().diff(dayjs(resolvedOn), 'day') >= days
-  }
-
-  // The prompt is a row of its own, drawn by the timeline's `item-solve_prompt` slot.
-  const activities = computed(() =>
-    thread.activities.value.flatMap((activity) =>
-      activity.key === solvePromptAt.value
-        ? [activity, { type: 'solve_prompt', key: 'solve-prompt', timestamp: activity.timestamp, data: {} }]
-        : [activity],
-    ),
-  )
-
-  // Where a rating is still owed, the dialog's save is the only way past `validate_feedback`.
-  function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback()
-    return closeTicket()
-  }
-
-  // An agent reply leaves the ticket "Replied", so No puts it back in the queue.
-  function reopenTicket() {
-    return setStatus(REOPENED_STATUS, {
-      success: __('Reopened, we will take another look'),
-      fallback: __('Could not reopen this ticket'),
-    })
-  }
 
   function onPageAction() {
     if (isClosed.value) return navigateTo(ROUTES.newTicket)
@@ -181,13 +131,10 @@ export default function setup(context) {
     ...feedback,
     ticketId,
     ticket,
-    activities,
     customActions,
     pageActionLabel,
     pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
     onPageAction,
-    confirmSolved,
-    reopenTicket,
     suggestedArticles,
     openHelpArticle: (article) => (window.location.href = article.url),
   }

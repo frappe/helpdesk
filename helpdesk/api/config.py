@@ -14,7 +14,6 @@ def get_config():
         "setup_complete",
         "skip_email_workflow",
         "is_feedback_mandatory",
-        "confirm_resolution_after_days",
         "restrict_tickets_by_agent_group",
         "assign_within_team",
         "disable_saved_replies_global_scope",
