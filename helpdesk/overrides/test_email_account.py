@@ -1,7 +1,11 @@
 import unittest
 from email import message_from_string
+from unittest.mock import patch
 
 import frappe
+
+# a module import: importing the TestCase itself makes the loader run its tests here
+from frappe.email.doctype.email_account import test_email_account as frappe_email_tests
 from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.overrides.email_account import _failed_recipient, auto_generated_reason
@@ -198,6 +202,34 @@ class TestParkedMailTicketComment(FrappeTestCase):
         self.notify(GMAIL_BOUNCE)
 
         self.assertEqual(self.ticket_comments(), [])
+
+    def test_refetched_bounce_is_recorded_once(self):
+        """IMAP "ALL" sync resumes after the newest Communication uid, which a
+        parked mail never creates, so every pull fetches it again."""
+        self.account.enable_incoming = 1
+        self.account.use_imap = 1
+        self.account.email_sync_option = "ALL"
+        self.account.set(
+            "imap_folder", [{"folder_name": "INBOX", "append_to": "HD Ticket"}]
+        )
+        bounce_id = f"bounce-{self.ticket.name}@googlemail.com"
+        raw = (
+            f"Message-ID: <{bounce_id}>\nIn-Reply-To: <{self.message_id}>\n"
+            + GMAIL_BOUNCE
+        )
+
+        messages = {'"INBOX"': {"latest_messages": [raw.encode()], "uid_list": [b"7"]}}
+        # handle_bad_emails commits; keep the class rollback able to undo it
+        with patch.object(frappe.db, "commit"):
+            for _pull in range(3):
+                frappe_email_tests.TestEmailAccount.mocked_get_inbound_mails(
+                    self.account, messages
+                )
+
+        self.assertEqual(
+            frappe.db.count("Unhandled Email", {"message_id": f"<{bounce_id}>"}), 1
+        )
+        self.assertEqual(len(self.ticket_comments()), 1)
 
 
 @unittest.skipUnless(
