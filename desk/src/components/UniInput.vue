@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import PhoneControl from "@/components/frappe-ui/PhoneControl/PhoneControl.vue";
 import { APIOptions, Field } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
@@ -89,8 +90,25 @@ function optionControl(options: Option[]) {
   return options.length > SEARCHABLE_FROM ? picker(options) : select(options);
 }
 
+function isPhoneField(field: Field) {
+  const ft = field?.fieldtype;
+  const opt = field?.options;
+  const fn = field?.fieldname?.toLowerCase() || "";
+  const lbl = field?.label?.toLowerCase() || "";
+  return (
+    ft === "Phone" ||
+    opt === "Phone" ||
+    fn.includes("phone") ||
+    fn.includes("mobile") ||
+    lbl.includes("phone") ||
+    lbl.includes("mobile")
+  );
+}
+
 const component = computed(() => {
-  if (props.field.url_method) {
+  if (isPhoneField(props.field)) {
+    return PhoneControl;
+  } else if (props.field.url_method) {
     return picker(apiOptions.data || []);
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     // title keeps the saved value readable until search_link returns it

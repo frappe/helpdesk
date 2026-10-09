@@ -22,8 +22,10 @@
 </template>
 
 <script setup lang="ts">
+import { Autocomplete } from "@/components";
 import FieldLabel from "@/components/FieldLabel.vue";
 import TicketPriority from "@/components/TicketPriority.vue";
+import PhoneControl from "@/components/frappe-ui/PhoneControl/PhoneControl.vue";
 import { APIOptions, Field, FieldValue } from "@/types";
 import { parseApiOptions } from "@/utils";
 import { Link } from "@framework/ui";
@@ -33,10 +35,10 @@ import {
   DatePicker,
   DateTimePicker,
   dayjs,
+  FormControl,
   Select,
-  TextInput,
 } from "frappe-ui";
-import { computed, h, nextTick } from "vue";
+import { computed, h, ref, watch } from "vue";
 
 interface P {
   field: Field;
@@ -100,34 +102,12 @@ const emptyLabel = computed(
   () => props.field.placeholder || `Add ${props.field.label}`
 );
 
-const usesCombobox = computed(
-  () => !!props.field.url_method || isSearchableSelect.value
-);
-
 const placeholder = computed(() =>
-  usesCombobox.value ? "" : emptyLabel.value
+  isSearchableSelect.value ? "" : emptyLabel.value
 );
 
 function select(options: Option[]) {
   return h(Select, { ...ghostControl, options });
-}
-
-// ghost opts out of the focus outline, and `class` lands on TextInput's
-// wrapper, so the ring has to be re-applied to the input itself
-function textInput() {
-  return h(TextInput, {
-    variant: "ghost" as const,
-    class: "[&_input:focus]:focus-ring",
-  });
-}
-
-// the trigger renders a matched option's label, so an unlisted value needs one
-function withSavedValue(options: Option[]): Option[] {
-  const value = props.value;
-  if (!value || options.some((option) => option.value === value)) {
-    return options;
-  }
-  return [{ label: String(value), value: value as string }, ...options];
 }
 
 // trigger: "button" keeps the search inside the popover, so the row still
@@ -138,7 +118,7 @@ function combobox(options: Option[]) {
     {
       ...ghostControl,
       trigger: "button",
-      options: withSavedValue(options),
+      options,
     },
     {
       prefix: () =>
@@ -147,9 +127,28 @@ function combobox(options: Option[]) {
   );
 }
 
+function isPhoneField(field: Field) {
+  const ft = field?.fieldtype;
+  const opt = field?.options;
+  const fn = field?.fieldname?.toLowerCase() || "";
+  const lbl = field?.label?.toLowerCase() || "";
+  return (
+    ft === "Phone" ||
+    opt === "Phone" ||
+    fn.includes("phone") ||
+    fn.includes("mobile") ||
+    lbl.includes("phone") ||
+    lbl.includes("mobile")
+  );
+}
+
 const component = computed(() => {
-  if (props.field.url_method) {
-    return combobox(apiOptions.data || []);
+  if (isPhoneField(props.field)) {
+    return PhoneControl;
+  } else if (props.field.url_method) {
+    return h(Autocomplete, {
+      options: apiOptions.data,
+    });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     const linkProps = {
       doctype: props.field.options,
@@ -185,7 +184,9 @@ const component = computed(() => {
       { label: "No", value: 0 },
     ]);
   } else if (textFields.includes(props.field.fieldtype)) {
-    return textInput();
+    return h(FormControl, {
+      type: "text",
+    });
   } else if (props.field.fieldtype === "Datetime") {
     return h(DateTimePicker, {
       format: `${window.date_format.toUpperCase()} ${window.time_format}`,
@@ -201,16 +202,51 @@ const component = computed(() => {
   //   return h(DurationField, { showSeconds: false });
   // }
   else {
-    return textInput();
+    return h(FormControl);
   }
 });
 
-// the Link nulls its model when the input is emptied, so an empty commit
-// waits for the picker to close still empty
 let linkPickerOpen = false;
 let linkModel: FieldValue = null;
 
+const phoneValueRef = ref<string>(String(props.value || ""));
+
+watch(
+  () => props.value,
+  (val) => {
+    phoneValueRef.value = String(val || "");
+  },
+  { immediate: true }
+);
+
+function isValidPhoneNumber(phone: string) {
+  if (!phone) return true;
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 7 && digits.length <= 15;
+}
+
 const listeners = computed(() => {
+  if (isPhoneField(props.field)) {
+    return {
+      "update:modelValue": (value: any) => {
+        const val =
+          typeof value === "string"
+            ? value
+            : value?.value || value?.target?.value || "";
+        phoneValueRef.value = val;
+      },
+      blur: () => {
+        const val = phoneValueRef.value;
+        const currentPropsValue = String(props.value || "");
+        if (
+          val !== currentPropsValue &&
+          (val === "" || isValidPhoneNumber(val))
+        ) {
+          emitUpdate(props.field.fieldname, val);
+        }
+      },
+    };
+  }
   const fieldtype = props.field.fieldtype;
   if ([...textFields, ...numberFields].includes(fieldtype)) {
     return {
@@ -224,26 +260,20 @@ const listeners = computed(() => {
   if (fieldtype === "Link") {
     return {
       "update:modelValue": (value: FieldValue) => {
-        linkModel = value;
+        if (linkPickerOpen) linkModel = value;
         // only the clear (x) button nulls the model while the picker is closed
-        if (!linkPickerOpen && !value) emitUpdate(props.field.fieldname, "");
+        else if (!value) emitUpdate(props.field.fieldname, "");
       },
       "update:selectedOption": (option: { value: string } | null) => {
         if (!option) return;
-        linkModel = option.value;
         emitUpdate(props.field.fieldname, option.value);
         // a mouse commit blurs the input already, a keyboard one doesn't
         (document.activeElement as HTMLElement | null)?.blur();
       },
       "update:open": (open: boolean) => {
         linkPickerOpen = open;
-        if (open) {
-          linkModel = props.value ?? null;
-          return;
-        }
-        // picking closes the picker before it commits, so the clear waits a
-        // tick for the pick to land
-        nextTick(() => !linkModel && emitUpdate(props.field.fieldname, ""));
+        if (open) linkModel = props.value ?? null;
+        else if (!linkModel) emitUpdate(props.field.fieldname, "");
       },
       // Escape keeps focus on the input; blur so it deselects like a commit
       keydown: (event: KeyboardEvent) => {
@@ -291,21 +321,7 @@ function handleRedirect(value: string) {
 }
 </script>
 <style scoped>
-/* a read-only row still reads as plain text: TextInput swaps ghost for its
-   filled disabled variant, and the pickers stay flat, so match them */
-:deep(.form-control input[data-slot="control"]:disabled) {
-  border-color: transparent;
-  background: var(--surface-base);
-}
-
-/* PickerShell keeps its chevron on a disabled picker, and the chevron opens
-   the popover on its own mousedown, so hide the whole suffix */
-:deep(.form-control input[data-slot="control"]:disabled ~ div) {
-  display: none;
-}
-
-/* TextInput brings its own variant; only the picker inputs get flattened */
-:deep(.form-control input:not([type="checkbox"]):not([data-slot="control"])),
+:deep(.form-control input:not([type="checkbox"])),
 :deep(.form-control select),
 :deep(.form-control textarea),
 :deep(.form-control button) {
