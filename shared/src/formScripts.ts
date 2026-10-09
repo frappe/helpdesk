@@ -8,8 +8,7 @@ type ToastType = "success" | "error" | "warning" | "info";
 
 let spriteLoad: Promise<unknown> | undefined;
 
-// Scripts name any lucide icon, so it comes from frappe-ui's sprite: the desk
-// installs it at boot, the portal fetches it the first time a script asks.
+// Any lucide icon, from frappe-ui's sprite; the portal fetches it on first use.
 export function ScriptIcon({ icon }: { icon: string }) {
   if (!document.getElementById("lucide-sprite")) {
     spriteLoad ??= import("frappe-ui/experimental").then(({ spritePlugin }) =>
@@ -32,8 +31,7 @@ export function ScriptIcon({ icon }: { icon: string }) {
   );
 }
 
-// vue-sonner renders the icon through `<component :is>`, so the three shapes
-// beta.24's toast.create took have to arrive as components.
+// vue-sonner renders icons via `<component :is>`, so each legacy shape becomes a component.
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
   if (typeof icon === "string") {
@@ -45,10 +43,7 @@ function resolveIcon(icon: unknown): Component | undefined {
   return icon as Component;
 }
 
-/**
- * `toast.create({ message, ... })` shape kept alive for customer-written form
- * scripts. frappe-ui v1 dropped `toast.create` for `toast(message, options)`.
- */
+// Keeps frappe-ui's pre-v1 `toast.create({ message, ... })` alive for form scripts.
 export function createToast({
   message,
   type,
@@ -96,8 +91,7 @@ export async function setupCustomizations(doc, obj) {
   }
 }
 
-// Form scripts written before frappe-ui v1 name a group's children `items`,
-// which the menu no longer reads, so the whole group goes missing.
+// Pre-v1 form scripts name a group's children `items`, which the menu no longer reads.
 function withLegacyGroupOptions(actions: any[]) {
   return actions.map((action) =>
     action.items && !action.options
