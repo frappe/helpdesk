@@ -69,11 +69,11 @@ class HDTicket(Document, CustomerEditController):
         publish_event(
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
-        publish_to_portal_readers(self)
+        self.publish_to_portal_readers()
 
     def on_trash(self):
         # Readers are worked out now; once the row is gone there is no one to ask about.
-        publish_to_portal_readers(self)
+        self.publish_to_portal_readers()
 
     def autoname(self):
         return self.name
@@ -1342,43 +1342,43 @@ class HDTicket(Document, CustomerEditController):
                 fields.remove(f)
         return fields
 
-
-def publish_to_portal_readers(doc):
-    """Customers are kept out of the ticket's room, so each reader gets a bare ping on their own channel."""
-    for user in get_portal_readers(doc):
-        frappe.publish_realtime(
-            "helpdesk:ticket-update",
-            {"ticket_id": doc.name},
-            user=user,
-            after_commit=True,
-        )
-
-
-def get_portal_readers(doc) -> set[str]:
-    """Non-agents who may read `doc`; the author and agents already refetch, so they are left out."""
-    candidates = {doc.raised_by, doc.owner}
-    contacts = [doc.contact] if doc.contact else []
-    if doc.customer:
-        contacts += frappe.get_all(
-            "HD Customer Member",
-            filters={"parent": doc.customer, "is_manager": 1},
-            pluck="contact_name",
-        )
-    if contacts:
-        candidates.update(
-            frappe.get_all(
-                "Contact",
-                filters={"name": ["in", contacts], "user": ["is", "set"]},
-                pluck="user",
+    def publish_to_portal_readers(self):
+        """Customers are kept out of the ticket's room, so each reader gets a bare ping on their own channel."""
+        for user in self.get_portal_readers():
+            frappe.publish_realtime(
+                "helpdesk:ticket-update",
+                {"ticket_id": self.name},
+                user=user,
+                after_commit=True,
             )
+
+    def get_portal_readers(self) -> set[str]:
+        """Non-agents who may read the ticket; the author and agents already refetch, so they are left out."""
+        candidates = {self.raised_by, self.owner}
+        contacts = [self.contact] if self.contact else []
+        if self.customer:
+            contacts += frappe.get_all(
+                "HD Customer Member",
+                filters={"parent": self.customer, "is_manager": 1},
+                pluck="contact_name",
+            )
+        if contacts:
+            candidates.update(
+                frappe.get_all(
+                    "Contact",
+                    filters={"name": ["in", contacts], "user": ["is", "set"]},
+                    pluck="user",
+                )
+            )
+        candidates -= {None, "", "Guest", frappe.session.user}
+        if not candidates:
+            return set()
+        users = frappe.get_all(
+            "User",
+            filters={"name": ["in", list(candidates)], "enabled": 1},
+            pluck="name",
         )
-    candidates -= {None, "", "Guest", frappe.session.user}
-    if not candidates:
-        return set()
-    users = frappe.get_all(
-        "User", filters={"name": ["in", list(candidates)], "enabled": 1}, pluck="name"
-    )
-    return {u for u in users if not is_agent(u) and has_permission(doc, u)}
+        return {u for u in users if not is_agent(u) and has_permission(self, u)}
 
 
 def publish_assignment_update(todo, method=None):
@@ -1386,7 +1386,7 @@ def publish_assignment_update(todo, method=None):
     if todo.reference_type != "HD Ticket" or not todo.reference_name:
         return
     if ticket := frappe.db.exists("HD Ticket", todo.reference_name):
-        publish_to_portal_readers(frappe.get_cached_doc("HD Ticket", ticket))
+        frappe.get_cached_doc("HD Ticket", ticket).publish_to_portal_readers()
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
