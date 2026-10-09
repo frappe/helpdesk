@@ -5,13 +5,12 @@ from email.utils import parseaddr
 import frappe
 from bs4 import BeautifulSoup, Comment
 from frappe import _
-from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
-from frappe.permissions import add_permission, update_permission_property
+from frappe.permissions import setup_custom_perms
 from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
 from frappe.utils.html_utils import sanitize_html
 from pypika.functions import Count
@@ -220,6 +219,8 @@ class HDTicket(Document, CustomerEditController):
         from helpdesk.api.tags import FIRST_TICKET_TAG, FIRST_TICKET_TAG_COLOR
 
         if not self.raised_by:
+            return
+        if frappe.session.user == "Guest":
             return
         earlier_ticket = frappe.db.exists(
             "HD Ticket", {"raised_by": self.raised_by, "name": ["!=", self.name]}
@@ -824,7 +825,10 @@ class HDTicket(Document, CustomerEditController):
         c.sent_or_received = "Received"
         c.email_status = "Open"
         c.subject = f"Re: {self.subject}"
-        c.sender = frappe.session.user
+        # a guest is only "Guest" here; the email they gave is who it's from
+        c.sender = (
+            self.raised_by if frappe.session.user == "Guest" else frappe.session.user
+        )
         c.content = message
         c.status = "Linked"
         c.reference_doctype = "HD Ticket"
@@ -869,7 +873,7 @@ class HDTicket(Document, CustomerEditController):
                 doc = frappe.get_doc("File", file)
                 doc.attached_to_doctype = "HD Ticket"
                 doc.attached_to_name = self.name
-                doc.save()
+                doc.save(ignore_permissions=True)
 
     def send_reply_email_to_agent(
         self, message: str = "Please check the latest update on the portal."
@@ -1104,6 +1108,8 @@ class HDTicket(Document, CustomerEditController):
         # portal replies save as the customer; the reset must keep server-set fields
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
         self.flags.ignore_customer_edit_guard = True
+        if frappe.session.user == "Guest":
+            self.flags.ignore_permissions = True
         # Save the ticket, allowing for hooks to run.
         self.save()
 
@@ -1326,10 +1332,13 @@ class HDTicket(Document, CustomerEditController):
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
-def has_permission(doc, user=None):
+def has_permission(doc, user: str | None = None, ptype: str | None = None):
     user = user or frappe.session.user
     if is_admin(user):
         return True
+    if user == "Guest":
+        # return create ptype, diffrentiation not possible
+        return ptype == "create"
     if user in (doc.contact, doc.raised_by, doc.owner):
         return True
     if _is_customer_manager(doc.customer, user):
@@ -1379,6 +1388,8 @@ def permission_query(user: str | None = None):
     user = user or frappe.session.user
     if is_admin(user):
         return
+    if user == "Guest":
+        return "false"
     if not is_agent(user):
         return _customer_query(user)
     return _agent_query(user)
@@ -1447,23 +1458,30 @@ def _build_in_clause(field: str, values: list[str]) -> str:
 
 
 def set_guest_ticket_creation_permission():
-    doctype = "HD Ticket"
-    add_permission(doctype, "Guest", 0)
-
-    role = "Guest"
-    permlevel = 0
-    ptype = ["read", "write", "create", "if_owner"]
-
-    for p in ptype:
-        # update permissions
-        update_permission_property(doctype, role, permlevel, p, 1)
+    remove_guest_ticket_creation_permission()
+    # fw method to setup custom docperm for doctype passed if they dont exist
+    setup_custom_perms("HD Ticket")
+    frappe.get_doc(
+        {
+            "doctype": "Custom DocPerm",
+            "parent": "HD Ticket",
+            "parenttype": "DocType",
+            "parentfield": "permissions",
+            "role": "Guest",
+            "read": 0,
+            "export": 0,
+            "create": 1,
+        }
+    ).insert(ignore_permissions=True)
 
 
 def remove_guest_ticket_creation_permission():
-    doctype = "HD Ticket"
-    role = "Guest"
-    permlevel = 0
-    remove(doctype, role, permlevel, 1)
+    # use delete_doc instead of remove as remove() as remove gates on only_if_creator which is 0 now
+    for name in frappe.get_all(
+        "Custom DocPerm", {"parent": "HD Ticket", "role": "Guest"}, pluck="name"
+    ):
+        frappe.delete_doc("Custom DocPerm", name, ignore_permissions=True, force=True)
+    frappe.clear_cache(doctype="HD Ticket")
 
 
 def close_tickets_after_n_days():
