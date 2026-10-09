@@ -3,14 +3,10 @@ from email import message_from_string
 from unittest.mock import patch
 
 import frappe
-<<<<<<< HEAD
-from frappe.tests.utils import FrappeTestCase
-=======
 
 # a module import: importing the TestCase itself makes the loader run its tests here
 from frappe.email.doctype.email_account import test_email_account as frappe_email_tests
-from frappe.tests import IntegrationTestCase
->>>>>>> 5c3d2c1 (test(email): reuse frappe's inbound mail mock)
+from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.overrides.email_account import _failed_recipient, auto_generated_reason
 from helpdesk.test_utils import make_ticket
