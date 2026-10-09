@@ -1,8 +1,11 @@
 import unittest
 from email import message_from_string
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import frappe
+
+# a module import: importing the TestCase itself makes the loader run its tests here
+from frappe.email.doctype.email_account import test_email_account as frappe_email_tests
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.overrides.email_account import _failed_recipient, auto_generated_reason
@@ -204,23 +207,6 @@ class TestParkedMailTicketComment(IntegrationTestCase):
 
         self.assertEqual(self.ticket_comments(), [])
 
-    def pull(self, raw):
-        server = MagicMock()
-        server.select_imap_folder.return_value = True
-        server.get_messages.return_value = {
-            "latest_messages": [raw.encode()],
-            "uid_list": [b"7"],
-            "seen_status": {},
-        }
-        # handle_bad_emails commits; keep the class rollback able to undo it
-        with (
-            patch.object(
-                type(self.account), "get_incoming_server", return_value=server
-            ),
-            patch.object(frappe.db, "commit"),
-        ):
-            return self.account.get_inbound_mails()
-
     def test_refetched_bounce_is_recorded_once(self):
         """IMAP "ALL" sync resumes after the newest Communication uid, which a
         parked mail never creates, so every pull fetches it again."""
@@ -236,8 +222,13 @@ class TestParkedMailTicketComment(IntegrationTestCase):
             + GMAIL_BOUNCE
         )
 
-        for _pull in range(3):
-            self.assertEqual(self.pull(raw), [])
+        messages = {'"INBOX"': {"latest_messages": [raw.encode()], "uid_list": [b"7"]}}
+        # handle_bad_emails commits; keep the class rollback able to undo it
+        with patch.object(frappe.db, "commit"):
+            for _pull in range(3):
+                frappe_email_tests.TestEmailAccount.mocked_get_inbound_mails(
+                    self.account, messages
+                )
 
         self.assertEqual(
             frappe.db.count("Unhandled Email", {"message_id": f"<{bounce_id}>"}), 1
