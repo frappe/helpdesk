@@ -62,8 +62,10 @@ def sanitize_query(query: str) -> str:
 
 @frappe.whitelist()
 def get_article_stats(article_name: str):
+    if not frappe.db.exists("HD Article", article_name):
+        raise frappe.PermissionError
     frappe.has_permission("HD Article", "read", article_name, throw=True)
-    views = frappe.db.get_value("HD Article", article_name, "views")
+    views =frappe.db.get_value("HD Article", article_name, "views")
 
     likes = frappe.db.count(
         "HD Article Feedback",
