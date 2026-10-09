@@ -341,15 +341,6 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
-def set_setting_for_test_class(test_class, fieldname: str, value) -> None:
-    """Set an HD Settings field for a test class, restoring the previous value when it ends."""
-    previous = frappe.db.get_single_value("HD Settings", fieldname)
-    frappe.db.set_single_value("HD Settings", fieldname, value)
-    test_class.addClassCleanup(
-        frappe.db.set_single_value, "HD Settings", fieldname, previous
-    )
-
-
 def enable_public_knowledge_base():
     frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
 
@@ -726,6 +717,7 @@ def get_organization_card(customer: str) -> dict:
 
 
 def get_invitable_emails(customer: str) -> list[str]:
+    """The emails the portal suggests for a customer's invite screen."""
     from helpdesk.api.organization import get_invitable_contacts
 
     return [row["email"] for row in get_invitable_contacts(customer)]

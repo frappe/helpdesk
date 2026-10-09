@@ -42,9 +42,7 @@
             variant="subtle"
           />
         </div>
-        <div
-          class="truncate text-[15px] font-semibold leading-5 text-ink-gray-9"
-        >
+        <div class="truncate text-base font-semibold text-ink-gray-9">
           {{ organization.customer_name }}
         </div>
         <div class="mt-0.5 truncate text-p-base text-ink-gray-5">

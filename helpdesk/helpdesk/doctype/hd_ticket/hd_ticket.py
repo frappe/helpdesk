@@ -921,7 +921,6 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                # Queued, not sent inline: an unreachable mail server must not fail the reply already saved.
             )
         except Exception:
             self.log_error("Could not queue the reply notification to agents")
