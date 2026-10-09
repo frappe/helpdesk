@@ -4,7 +4,6 @@ import { call, dayjsLocal, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@app/routes'
 import { useRecent } from '@app/stores/recent'
-import { usePageTitle } from '@app/stores/session'
 import { useSettingsModal } from '@app/stores/settings'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { countLabel, DATE_FORMATS, runAction } from '@app/utils'
@@ -17,7 +16,6 @@ export default function setup(context) {
   // `article` is absent on the builder canvas, where the route has no name.
   const { article, articles, router } = context
   const settings = useSettingsModal(context)
-  usePageTitle(() => (article?.error ? __('Article not found') : article?.data?.title))
 
   const parsed = computed(() => {
     const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')

@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
 import { call, setConfig } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
@@ -12,31 +12,6 @@ const store = createSessionStore()
 export function useSession() {
   store.loadSession()
   return store
-}
-
-// Studio's page shell titles the tab with the page's own name after the page script runs,
-// so one observer puts the latest page's title back; one, so two pages never trade writes.
-const pageTitle = ref('')
-let titleObserver: MutationObserver | null = null
-
-export function usePageTitle(title: () => string | undefined) {
-  const { brandName } = useSession()
-  if (!titleObserver) {
-    titleObserver = new MutationObserver(applyPageTitle)
-    titleObserver.observe(document.head, { childList: true, subtree: true, characterData: true })
-  }
-  watch(
-    () => [title(), brandName.value].filter(Boolean).join(' | '),
-    (value) => {
-      pageTitle.value = value
-      applyPageTitle()
-    },
-    { immediate: true },
-  )
-}
-
-function applyPageTitle() {
-  if (pageTitle.value && document.title !== pageTitle.value) document.title = pageTitle.value
 }
 
 function createSessionStore() {

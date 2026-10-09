@@ -17,7 +17,6 @@ import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
 import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
-import { usePageTitle } from '@app/stores/session'
 
 export default function setup(context) {
   const { route } = context
@@ -36,7 +35,6 @@ export default function setup(context) {
     makeParams: () => ({ name: ticketId.value }),
     onSuccess: runFormScripts,
   })
-  usePageTitle(() => ticket.data?.subject)
 
   // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
   async function runFormScripts(data) {

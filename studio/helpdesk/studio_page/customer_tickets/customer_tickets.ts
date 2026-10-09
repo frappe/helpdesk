@@ -10,7 +10,6 @@ import { ROUTES } from '@app/routes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
-import { usePageTitle } from '@app/stores/session'
 
 // HD Ticket's permission_query already scopes the rows to what the requester may see.
 const DOCTYPE = 'HD Ticket'
@@ -78,7 +77,6 @@ function withLabel(column) {
 export default function setup(context) {
   const settings = useSettingsModal(context)
   settings.loadSettings()
-  usePageTitle(() => __('Tickets'))
 
   // Seeded before `useListData`, which fetches on creation.
   const view = useListView(DOCTYPE)

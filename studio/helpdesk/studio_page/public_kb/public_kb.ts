@@ -4,7 +4,6 @@ import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useSettingsModal } from '@app/stores/settings'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
-import { usePageTitle } from '@app/stores/session'
 import { ROUTES } from '@app/routes'
 
 const ARTICLE_LIMIT = 5
@@ -15,7 +14,6 @@ export default function setup(context) {
   const { articles, categories } = context
   const settings = useSettingsModal(context)
   const { config } = settings
-  usePageTitle(() => __('Knowledge Base'))
 
   // Settings' Preview shows its unsaved banner and pins in place of the saved ones.
   // Read again with each session reload: saving the settings clears a stored preview.

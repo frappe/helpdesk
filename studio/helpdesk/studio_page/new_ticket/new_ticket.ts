@@ -15,7 +15,6 @@ import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
 import { CUSTOMER_FILE_TYPES, runAction, scriptDialog } from '@app/utils'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
-import { usePageTitle } from '@app/stores/session'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
@@ -24,7 +23,6 @@ const SUGGESTION_LIMIT = 3
 export default function setup(context) {
   const { subject, description, template, newTicket, route } = context
   const settings = useSettingsModal(context)
-  usePageTitle(() => __('New Ticket'))
 
   const searched = String(route?.query?.subject || '').trim()
   if (searched && !subject.value) subject.value = searched
