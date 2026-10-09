@@ -115,7 +115,7 @@ class TestNumberCardDelta(IntegrationTestCase):
         self.assertEqual(tickets["delta"], 100)
 
     def test_previous_period_has_as_many_days_as_this_one(self):
-        # this period is Sep 8-9, so the previous one is Sep 6-7, not just Sep 7
+        # sep 8-9 should be compared with sep 6-7
         for day in ("2031-09-06", "2031-09-07", "2031-09-08"):
             with self.freeze_time(f"{day} 10:00:00"):
                 make_assigned_ticket(self.agent, f"Raised {day}")
@@ -161,7 +161,7 @@ class TestTagDashboard(IntegrationTestCase):
         make_tagged_ticket(self.team, "2031-03-11 11:00:00")
 
         top_tags = self.get_charts("2031-03-10", "2031-03-11")["top_tags"]["data"]
-        # busiest first, the chart draws the first row on top
+        # busiest tag first so it shows at the top
         self.assertEqual(
             top_tags, [{"tag": billing, "Tickets": 2}, {"tag": refund, "Tickets": 1}]
         )

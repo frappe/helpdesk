@@ -491,12 +491,12 @@ const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
 
-// The API sends each chart's frappe-ui props, plus its `type` and `key`.
+// api already sends the frappe-ui props for each chart
 function getChartType({ type, key, ...props }: any) {
   return h(type === "donut" ? DonutChart : BarChart, props);
 }
 
-// Counts today, so "Last 7 Days" is today and the 6 days before it.
+// include today, so last 7 days is today and the 6 days before
 function getLastXDays(range: number = 30): string {
   const today = new Date();
   const lastXDate = new Date(today);

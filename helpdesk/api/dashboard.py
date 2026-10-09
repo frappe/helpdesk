@@ -89,8 +89,7 @@ class HelpdeskDashboard:
             reduce(operator.and_, self.qb_conds) if self.qb_conds else None
         )
 
-        # both ends are inclusive, so the period is one day longer than the gap;
-        # the previous period gets the same number of days
+        # compare with the same number of days right before this period
         self.period_days = frappe.utils.date_diff(self.to_date, self.from_date) + 1
         self.prev_from_date = frappe.utils.add_days(self.from_date, -self.period_days)
         self.to_date_next = frappe.utils.add_days(self.to_date, 1)
@@ -141,7 +140,7 @@ class HelpdeskDashboard:
             current_expr.as_("current"), prev_expr.as_("prev")
         )
         result = query.run(as_dict=True)
-        # an average over a period with no tickets is None, not a real 0 average
+        # average stays None when the period has no tickets
         return result[0].current, result[0].prev
 
     def round_or_none(self, value, digits=1):
@@ -204,7 +203,7 @@ class HelpdeskDashboard:
             self.ticket.name, Count, status_cond
         )
 
-        # no resolved tickets means no SLA to measure, not 0% fulfilled
+        # no resolved tickets means there is no SLA % to show
         current_pct = (
             (current_fulfilled / current_total * 100) if current_total else None
         )
@@ -642,7 +641,7 @@ def get_bar_chart_config(
     y: str | list[str],
     **kwargs: dict[str, any],
 ) -> dict[str, any]:
-    """Props for frappe-ui's BarChart, plus `type` and `key` for the client."""
+    """frappe-ui BarChart props for a dashboard chart"""
     chart = {
         "type": "bar",
         "data": data,
@@ -653,9 +652,7 @@ def get_bar_chart_config(
         "x": x,
         "y": y,
         "xAxis": x_axis,
-        # every bar chart here counts tickets, so keep the value axis on whole
-        # steps; half a ticket is not a thing. y2 axes (% SLA, rating) are
-        # fractional and are left alone.
+        # ticket counts are whole numbers so keep the axis on whole steps
         "yAxis": {"title": y_axis_title, "echartOptions": {"minInterval": 1}},
         **kwargs,
     }
@@ -665,8 +662,7 @@ def get_bar_chart_config(
 
 
 def get_y_axis_max(data: list[dict[str, any]], y: str | list[str], stacked: bool):
-    """The y2 axis has a fixed range (0-100, 0-5) and lines its ticks up with the
-    y axis, so a y axis max on a multiple of 5 keeps both on five clean steps."""
+    """round the peak up to a multiple of 5 so the y2 axis gets clean steps"""
     columns = [y] if isinstance(y, str) else y
     combine = sum if stacked else max
     peak = max(

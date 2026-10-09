@@ -45,7 +45,7 @@ class TagDashboard(HelpdeskDashboard):
             _("Top Tags"),
             _("Most used tags in this period"),
             "tag",
-            # no axis title: on a horizontal chart it prints under the 0 of the value axis
+            # skip the axis title, on horizontal bars it shows up under the 0
             {"type": "category"},
             _("Tickets"),
             tickets,
