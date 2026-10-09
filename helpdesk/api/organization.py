@@ -3,24 +3,58 @@
 import frappe
 from frappe import _
 from frappe.rate_limiter import rate_limit
-from frappe.utils import sbool
+from frappe.utils import get_fullname, sbool
 
 from helpdesk.api.auth import validate_uploaded_image
 from helpdesk.api.dashboard import COUNT_NAME
-from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
+    CUSTOMER_ROLES,
+    MANAGER_ROLE,
+)
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
 
-MANAGER_ROLE = "HD Customer Manager"
 PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
 PORTAL_ROLES_SETTING = "allow_customer_managers_to_change_roles"
 PORTAL_REMOVE_SETTING = "allow_customer_managers_to_remove_members"
 PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 MAX_INVITES = 20
+MAX_SUGGESTIONS = 50
+PUBLIC_EMAIL_DOMAINS = frozenset(
+    {
+        "gmail.com",
+        "googlemail.com",
+        "yahoo.com",
+        "ymail.com",
+        "outlook.com",
+        "hotmail.com",
+        "live.com",
+        "msn.com",
+        "icloud.com",
+        "me.com",
+        "mac.com",
+        "aol.com",
+        "protonmail.com",
+        "proton.me",
+        "pm.me",
+        "gmx.com",
+        "gmx.de",
+        "mail.com",
+        "yandex.com",
+        "yandex.ru",
+        "zoho.com",
+        "fastmail.com",
+        "hey.com",
+        "qq.com",
+        "163.com",
+        "126.com",
+        "rediffmail.com",
+    }
+)
 
 
 @frappe.whitelist()
-def get_settings() -> dict:
+def get_account() -> dict:
     """The session user's profile plus every organization they belong to."""
     user = frappe.db.get_value(
         "User",
@@ -67,23 +101,29 @@ def get_organization(customer: str) -> dict:
 
 @frappe.whitelist()
 def get_invitable_contacts(customer: str) -> list[dict]:
-    """Login-holding contacts on the org's domain, minus agents, members and invitees."""
+    """Login-holding contacts on the org's domain, minus agents, members and invitees.
+
+    A shared mail provider is nobody's organization, so those domains suggest no one."""
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
-    if not hd_customer.domain:
+    domain = (hd_customer.domain or "").lower()
+    if not domain or domain in PUBLIC_EMAIL_DOMAINS:
         return []
-    excluded_emails = [row["email"] for row in hd_customer.get_pending_invitations()]
-    excluded_emails += frappe.get_all("HD Agent", pluck="name")
-    return frappe.get_all(
-        "Contact",
-        filters=[
-            ["user", "is", "set"],
-            ["email_id", "like", f"%@{hd_customer.domain}"],
-            ["email_id", "not in", excluded_emails],
-            ["name", "not in", [row.contact_name for row in hd_customer.contacts]],
-        ],
-        fields=["full_name", "email_id as email", "image"],
-        order_by="full_name asc",
+    Contact = frappe.qb.DocType("Contact")
+    Agent = frappe.qb.DocType("HD Agent")
+    query = (
+        frappe.qb.from_(Contact)
+        .select(Contact.full_name, Contact.email_id.as_("email"), Contact.image)
+        .where(Contact.user.isnotnull() & (Contact.user != ""))
+        .where(Contact.email_id.like(f"%@{domain}"))
+        .where(Contact.user.notin(frappe.qb.from_(Agent).select(Agent.name)))
+        .orderby(Contact.full_name)
+        .limit(MAX_SUGGESTIONS)
     )
+    if members := [row.contact_name for row in hd_customer.contacts]:
+        query = query.where(Contact.name.notin(members))
+    if invited := [row["email"] for row in hd_customer.get_pending_invitations()]:
+        query = query.where(Contact.email_id.notin(invited))
+    return query.run(as_dict=True)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -93,6 +133,10 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
     if role not in CUSTOMER_ROLES:
         frappe.throw(_("Invalid role {0}").format(role))
+    if not isinstance(emails, list) or not all(
+        isinstance(email, str) for email in emails
+    ):
+        frappe.throw(_("Please enter the email addresses as a list"))
     if len(emails) > MAX_INVITES:
         frappe.throw(_("You can invite up to {0} people at a time").format(MAX_INVITES))
     contacts = dict(
@@ -117,12 +161,12 @@ def invite_members(customer: str, emails: list[str], role: str) -> None:
     ]
     # Each insert mails at once, so a later refusal must not follow mails already sent.
     for invitation in invitations:
-        invitation._validate_invite()
+        invitation.validate_invite()
     for invitation in invitations:
         invitation.insert(ignore_permissions=True)
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
     hd_customer = _get_managed_customer(customer, PORTAL_ROLES_SETTING)
     member = _get_editable_member(hd_customer, contact)
@@ -130,34 +174,35 @@ def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
     hd_customer.save()
 
 
-@frappe.whitelist()
-def remove_member(
-    customer: str, contact: str | None = None, invitation: str | None = None
-) -> None:
-    """Drop a member, or cancel the invitation of someone who has not joined yet."""
-    hd_customer = _get_managed_customer(
-        customer, PORTAL_INVITE_SETTING if invitation else PORTAL_REMOVE_SETTING
-    )
-    if invitation:
-        return _cancel_invitation(hd_customer, invitation)
+@frappe.whitelist(methods=["POST"])
+def remove_member(customer: str, contact: str) -> None:
+    hd_customer = _get_managed_customer(customer, PORTAL_REMOVE_SETTING)
     _get_editable_member(hd_customer, contact)
     hd_customer.remove_contact(contact)
     hd_customer.save()
 
 
-@frappe.whitelist()
-def update_organization(
-    customer: str, customer_name: str | None = None, image: str | None = None
-) -> str:
-    """Rename or re-logo an organization you manage; answers with its current docname."""
+@frappe.whitelist(methods=["POST"])
+def cancel_invitation(customer: str, invitation: str) -> None:
+    """Withdraw an invitation that has not been accepted yet."""
+    hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
+    user_invitation = frappe.get_doc("User Invitation", invitation)
+    if user_invitation.customer != hd_customer.name:
+        frappe.throw(
+            _("This invitation does not belong to your organization"),
+            frappe.PermissionError,
+        )
+    user_invitation.flags.ignore_permissions = True
+    user_invitation.cancel_invite()
+
+
+@frappe.whitelist(methods=["POST"])
+def update_organization_image(customer: str, image: str) -> None:
+    """Change or clear the logo of an organization you manage."""
     hd_customer = _get_managed_customer(customer, PORTAL_EDIT_SETTING)
     validate_uploaded_image(image)
-    if image is not None:
-        hd_customer.image = image or None
-        hd_customer.save()
-    if customer_name and customer_name != hd_customer.name:
-        return frappe.rename_doc("HD Customer", hd_customer.name, customer_name)
-    return hd_customer.name
+    hd_customer.image = image or None
+    hd_customer.save()
 
 
 def _get_organizations() -> list[dict]:
@@ -233,6 +278,9 @@ def _get_pending_invites(hd_customer) -> list[dict]:
             "invitation": invitation["name"],
             "email": invitation["email"],
             "role": _get_role_label(False, MANAGER_ROLE in invitation["roles"]),
+            "invited_by": get_fullname(invitation["invited_by"]),
+            "invited_by_you": invitation["invited_by"] == frappe.session.user,
+            "invited_on": invitation["invited_on"],
         }
         for invitation in hd_customer.get_pending_invitations()
     ]
@@ -276,7 +324,7 @@ def _get_managed_customer(customer: str, setting: str):
                 "Your helpdesk does not allow customers to remove members"
             ),
             PORTAL_EDIT_SETTING: _(
-                "Your helpdesk does not allow customers to edit their organization"
+                "Your helpdesk does not allow customers to change their organization's logo"
             ),
         }
         frappe.throw(refusals[setting], frappe.PermissionError)
@@ -297,14 +345,3 @@ def _get_editable_member(hd_customer, contact: str):
     if not member:
         frappe.throw(_("{0} is not a member of {1}").format(contact, hd_customer.name))
     return member
-
-
-def _cancel_invitation(hd_customer, invitation: str) -> None:
-    user_invitation = frappe.get_doc("User Invitation", invitation)
-    if user_invitation.customer != hd_customer.name:
-        frappe.throw(
-            _("This invitation does not belong to your organization"),
-            frappe.PermissionError,
-        )
-    user_invitation.flags.ignore_permissions = True
-    user_invitation.cancel_invite()

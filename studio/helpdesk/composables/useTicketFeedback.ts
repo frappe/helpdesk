@@ -4,9 +4,12 @@ import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
 import { runAction, updateTicket } from '@app/utils'
 
+// A handful exist per rating; one page well past any real count holds them all.
+const FEEDBACK_OPTION_LIMIT = 100
+
 export function useTicketFeedback(ticket) {
   const isFeedbackOpen = ref(false)
-  // In stars, the way the Rating component counts; HD Ticket stores a fraction.
+  // In stars, as the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
   const feedbackText = ref('')
@@ -15,7 +18,7 @@ export function useTicketFeedback(ticket) {
   const options = createListResource({
     doctype: 'HD Ticket Feedback Option',
     fields: ['name', 'label'],
-    pageLength: 99999,
+    pageLength: FEEDBACK_OPTION_LIMIT,
   })
 
   const feedbackOptions = computed(() =>
@@ -42,7 +45,7 @@ export function useTicketFeedback(ticket) {
     feedbackText.value = ''
   }
 
-  // `validate_feedback` blocks a non-agent from the Resolved category without a rating.
+  // The status is saved with the rating: `validate_feedback` refuses a customer's close without one.
   function openFeedback() {
     isFeedbackOpen.value = true
   }

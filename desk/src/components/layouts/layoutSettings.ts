@@ -70,6 +70,6 @@ export const customerPortalSidebarOptions: SidebarOption[] = [
   {
     label: __("Knowledge Base"),
     icon: LucideBookOpen,
-    to: "CustomerKnowledgeBase",
+    url: CUSTOMER_PORTAL_ROOT,
   },
 ];

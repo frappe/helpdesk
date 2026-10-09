@@ -45,6 +45,7 @@ def get_list_data(
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
+    icon_field = view.get("icon_field") if view else None
 
     _list = get_controller(doctype)
     default_rows = []
@@ -179,14 +180,17 @@ def get_list_data(
                 options = list(set([d.get(group_by_field) for d in data]))
                 options = [u for u in options if u]
                 options = [category_name for category_name in options if category_name]
+                details = _get_group_by_option_details(
+                    label_doc or doctype,
+                    options,
+                    label_field or group_by_field,
+                    icon_field,
+                )
                 options = [
                     {
-                        "label": frappe.db.get_value(
-                            label_doc if label_doc else doctype,
-                            option,
-                            label_field if label_field else group_by_field,
-                        ),
+                        "label": details.get(option, {}).get("label"),
                         "value": option,
+                        "icon": details.get(option, {}).get("icon"),
                     }
                     for option in options
                     if option
@@ -242,6 +246,19 @@ def get_list_data(
         "group_by_field": group_by_field,
         "view_type": view_type,
     }
+
+
+def _get_group_by_option_details(
+    doctype: str, options: list[str], label_field: str, icon_field: str | None
+) -> dict[str, dict]:
+    """Label and icon per group-by option in one query, not a `get_value` per option."""
+    if not options:
+        return {}
+    fields = ["name", f"{label_field} as label"]
+    if icon_field:
+        fields.append(f"{icon_field} as icon")
+    rows = frappe.get_all(doctype, filters={"name": ["in", options]}, fields=fields)
+    return {row.name: row for row in rows}
 
 
 @frappe.whitelist()

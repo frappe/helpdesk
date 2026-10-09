@@ -10,7 +10,10 @@ def get_config():
         "brand_name",
         "brand_logo",
         "favicon",
-        "prefer_knowledge_base",
+        "public_knowledge_base",
+        "allow_anonymous_article_voting",
+        "banner_image",
+        "banner_preset",
         "setup_complete",
         "skip_email_workflow",
         "is_feedback_mandatory",
@@ -31,6 +34,14 @@ def get_config():
     res.can_edit_settings = frappe.has_permission("HD Settings", "write")
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
+
+    # Form scripts for the knowledge base pages; a private one keeps them from guests.
+    if res.public_knowledge_base or res.session_user != "Guest":
+        res.knowledge_base_form_scripts = frappe.get_all(
+            "HD Form Script",
+            filters={"enabled": 1, "apply_to_knowledge_base": 1},
+            pluck="script",
+        )
 
     res.favicon = (
         res.favicon

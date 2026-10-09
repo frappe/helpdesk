@@ -1,0 +1,57 @@
+<template>
+  <RouterLink
+    :to="ROUTES.article(article)"
+    class="flex items-center gap-3 px-2 py-3 text-left no-underline"
+    :class="
+      isList
+        ? 'relative rounded-4 transition-colors hover:bg-surface-gray-1 after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-[--outline-gray-1] hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0'
+        : 'border-outline-gray-1 [&:not(:last-child)]:border-b'
+    "
+  >
+    <PortalArticleThumbnail :src="isList ? article.image : null" />
+    <!-- v-html: the server escapes the text and leaves only the search <mark> tags. -->
+    <span
+      class="flex min-w-0 flex-1 flex-col gap-0.5 [&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:text-ink-gray-9"
+    >
+      <span
+        class="truncate text-base-medium text-ink-gray-8"
+        v-html="article.title"
+      />
+      <span
+        class="line-clamp-1 text-p-sm"
+        :class="isList ? 'text-ink-gray-6' : 'text-ink-gray-5'"
+        v-html="article.excerpt"
+      />
+      <span v-if="isList" class="truncate text-p-xs text-ink-gray-4">
+        {{ __("Knowledge base") }}
+        <template v-if="article.category_name">
+          / {{ article.category_name }}
+        </template>
+      </span>
+    </span>
+  </RouterLink>
+</template>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { RouterLink } from "vue-router";
+import { __ } from "@helpdesk/shared/translation";
+import PortalArticleThumbnail from "@app/components/knowledge_base/PortalArticleThumbnail.vue";
+import { ROUTES } from "@app/routes";
+
+const props = withDefaults(
+  defineProps<{
+    article: {
+      name: string;
+      title: string;
+      excerpt?: string;
+      image?: string | null;
+      category_name?: string;
+    };
+    variant?: "list" | "suggestion";
+  }>(),
+  { variant: "list" }
+);
+
+const isList = computed(() => props.variant === "list");
+</script>

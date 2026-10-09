@@ -8,15 +8,12 @@ import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
-
-import {
-  CUSTOMER_PORTAL_ROOT,
-  isContentEmpty,
-  isEmoji,
-} from "@helpdesk/shared/utils";
+import { isEmoji } from "@helpdesk/shared/utils";
 
 export {
+  ConfirmDelete,
   CUSTOMER_PORTAL_ROOT,
+  getErrorMessage,
   isContentEmpty,
   isEmoji,
   parseApiOptions,
@@ -600,37 +597,6 @@ export function getFieldDependencyLabel(name: string) {
   return `${parent} → ${child}`;
 }
 
-/**
- * @param {Object} config - Configuration object
- * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
- * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
- * @returns {Array} Array of option objects for use in dropdowns
- */
-export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
-  return [
-    {
-      label: "Delete",
-      icon: "lucide-trash-2",
-      // preventDefault keeps the menu open so the confirm row can replace this one
-      onClick: (event) => {
-        event.preventDefault();
-        isConfirmingDelete.value = true;
-      },
-      condition: () => !isConfirmingDelete.value,
-    },
-    {
-      label: "Confirm Delete",
-      icon: "lucide-trash-2",
-      theme: "red",
-      onClick: () => {
-        onConfirmDelete();
-        isConfirmingDelete.value = false;
-      },
-      condition: () => isConfirmingDelete.value,
-    },
-  ];
-}
-
 export function getRandom(len = 4) {
   let text = "";
   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -688,18 +654,6 @@ export function hasPermission() {
   return authStore.isAdmin || authStore.isManager;
 }
 
-export function getErrorMessage(
-  error: any,
-  showToast: boolean = false
-): string {
-  const msg = error.exc_type
-    ? (error.messages || error.message || []).join(", ")
-    : error.message;
-  if (showToast) {
-    toast.error(msg);
-  }
-  return msg;
-}
 const emailsToStr = (emails: readonly string[]) => emails.join(", ");
 
 export function handleInviteUserSuccess(

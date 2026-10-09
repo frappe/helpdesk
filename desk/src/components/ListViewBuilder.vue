@@ -479,7 +479,7 @@ function getGroupedByRows(listRows, groupByField) {
       collapsed: false,
       rows: filteredRows,
       icon: h(SpriteIcon, {
-        name: "folder",
+        name: option.icon?.replace(/^lucide-/, "") || "folder",
         class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
       }),
     };

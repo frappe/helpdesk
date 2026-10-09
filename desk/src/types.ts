@@ -356,13 +356,11 @@ export interface Article {
   article_image: string | null;
   _user_tags: string | null;
   status: string;
+  visibility: string;
   creation: string;
   content: string;
   modified: string;
-  feedback: FeedbackAction;
 }
-
-export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface Author {
   name: string;
@@ -564,7 +562,6 @@ export interface HDSettings {
   isFeedbackMandatory: boolean;
   allowAnyoneToCreateTickets: boolean;
   defaultTicketType: string;
-  preferKnowledgeBase: boolean;
   skipEmailWorkflow: boolean;
   disableSavedRepliesGlobalScope: boolean;
   enableOutsideHoursBanner: boolean;

@@ -11,14 +11,7 @@
     <PortalEmptyState
       v-if="!matches.length"
       icon="organization"
-      :title="search ? __('No organizations found') : __('No organizations')"
-      :description="
-        search
-          ? __('Change your search terms.')
-          : __(
-              `You'll see your organization here once someone adds you to one.`
-            )
-      "
+      v-bind="emptyState"
     />
 
     <div
@@ -28,7 +21,7 @@
       <div
         v-for="organization in matches"
         :key="organization.name"
-        class="cursor-pointer rounded-[10px] border border-outline-gray-1 p-4 transition-[box-shadow,border-color] duration-150 hover:border-transparent hover:bg-surface-elevation-1 hover:shadow-[var(--elevation-sm)]"
+        class="cursor-pointer rounded-[10px] border border-outline-gray-2 p-4 transition-colors duration-150 hover:bg-surface-gray-2 focus-visible:focus-ring"
         role="button"
         tabindex="0"
         @click="emit('select', organization.name)"
@@ -36,6 +29,7 @@
       >
         <div class="mb-3 flex items-start justify-between gap-2">
           <Avatar
+            class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
             shape="square"
             size="3xl"
             :image="organization.image"
@@ -43,9 +37,9 @@
           />
           <Badge
             v-if="organization.role"
-            :label="organization.role"
+            :label="roleLabel(organization.role)"
             :theme="ROLES[organization.role]?.theme || 'gray'"
-            variant="outline"
+            variant="subtle"
           />
         </div>
         <div
@@ -64,8 +58,8 @@
             {{
               countLabel(
                 organization.ticket_count || 0,
-                "1 ticket",
-                "{0} tickets"
+                __("1 ticket"),
+                __("{0} tickets")
               )
             }}
           </span>
@@ -75,8 +69,8 @@
             {{
               countLabel(
                 organization.member_count || 0,
-                "1 member",
-                "{0} members"
+                __("1 member"),
+                __("{0} members")
               )
             }}
           </span>
@@ -94,7 +88,7 @@ import LucideSquareUser from "~icons/lucide/square-user";
 import LucideTicket from "~icons/lucide/ticket";
 import { __ } from "@helpdesk/shared/translation";
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
-import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
 import { countLabel, matchesQuery } from "@app/utils";
 
 type Organization = {
@@ -113,6 +107,20 @@ const props = withDefaults(defineProps<{ organizations?: Organization[] }>(), {
 const emit = defineEmits<{ select: [name: string] }>();
 
 const search = ref("");
+
+const emptyState = computed(() =>
+  search.value
+    ? {
+        title: __("No organizations found"),
+        description: __("Change your search terms."),
+      }
+    : {
+        title: __("No organizations"),
+        description: __(
+          "You'll see your organization here once someone adds you to one."
+        ),
+      }
+);
 
 const matches = computed(() =>
   props.organizations.filter((organization) =>

@@ -15,6 +15,8 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_ms
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
+TIMELINE_FIELDS = ("status",)
+
 
 @frappe.whitelist()
 # flake8: noqa
@@ -27,6 +29,36 @@ def new(doc: dict, attachments: list[dict] = []):
     return TicketFields().strip_hidden_fields(d.as_dict())
 
 
+@frappe.whitelist(methods=["GET"])
+def get_timeline_changes(name: str) -> list[dict]:
+    """Status changes, oldest first, with who made them: readers of a ticket can't read Version.
+
+    Naming the agent is deliberate: the thread already names whoever replied. What `get_one`
+    keeps from customers is the assignment, which may be someone else."""
+    frappe.has_permission("HD Ticket", "read", name, throw=True)
+    versions = frappe.get_all(
+        "Version",
+        filters={"ref_doctype": "HD Ticket", "docname": name},
+        or_filters=[["data", "like", f'%"{field}"%'] for field in TIMELINE_FIELDS],
+        fields=["owner", "creation", "data"],
+        order_by="creation asc",
+    )
+    changes = []
+    for version in versions:
+        for field, old, new in frappe.parse_json(version.data).get("changed", []):
+            if field in TIMELINE_FIELDS:
+                changes.append(
+                    {
+                        "field": field,
+                        "from": old,
+                        "to": new,
+                        "by": get_user_info_for_avatar(version.owner),
+                        "on": version.creation,
+                    }
+                )
+    return changes
+
+
 @frappe.whitelist()
 def get_one(name: str):
     """The customer portal's ticket page: the ticket as this user may read it,
@@ -35,6 +67,7 @@ def get_one(name: str):
     fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
+    outside_hours_banner = get_outside_hours_banner(doc)
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
     ticket = fields.strip_hidden_fields(doc.as_dict())
@@ -58,7 +91,15 @@ def get_one(name: str):
     return {
         **ticket,
         "communications": get_communications(name),
+        # When, not to whom: customers cannot read assignees. Cancelled rows count, someone did pick it up.
+        "assigned_on": frappe.db.get_value(
+            "ToDo",
+            {"reference_type": "HD Ticket", "reference_name": name},
+            "creation",
+            order_by="creation asc",
+        ),
         "contact": contact,
+        "outside_hours_banner": outside_hours_banner,
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=not fields.is_agent
@@ -111,10 +152,43 @@ def get_communications(ticket: str):
         .run(as_dict=True)
     )
     for c in communications:
+        c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+    agents = _get_agent_senders({c.author_id for c in communications})
+    for c in communications:
         c.attachments = get_attachments("Communication", c.name)
-        user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
-        c.user = get_user_info_for_avatar(user_id)
+        c.user = get_user_info_for_avatar(c.author_id)
+        # The author's role, not the direction: an agent replying from the portal is still an agent.
+        c.is_agent = c.pop("author_id") in agents
     return communications
+
+
+def _get_agent_senders(senders: set[str]) -> set[str]:
+    """The senders who are agents, resolved in two queries rather than one per author."""
+    senders.discard(None)
+    if not senders:
+        return set()
+    users = dict(
+        frappe.get_all(
+            "User",
+            filters={"email": ["in", list(senders)]},
+            fields=["email", "name"],
+            as_list=True,
+        )
+    )
+    user_of = {sender: users.get(sender) or sender for sender in senders}
+    active = dict(
+        frappe.get_all(
+            "HD Agent",
+            filters={"name": ["in", list(set(user_of.values()))]},
+            fields=["name", "is_active"],
+            as_list=True,
+        )
+    )
+    return {
+        sender
+        for sender, user in user_of.items()
+        if (bool(active[user]) if user in active else is_agent(user))
+    }
 
 
 def get_call_logs(ticket: str):
@@ -602,20 +676,24 @@ def show_banner_next_day(ticket):
 
 @frappe.whitelist()
 def show_outside_hours_banner(ticket_name: str):
+    frappe.has_permission("HD Ticket", "read", ticket_name, throw=True)
+    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))
+
+
+def get_outside_hours_banner(ticket) -> dict:
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"
     )
     if not show_banner_settings:
         return {"show": False}
 
-    ticket = frappe.get_doc("HD Ticket", ticket_name)
     is_currently_outside = (
         ticket.is_currently_outside_working_hours()
         and ticket.raised_outside_working_hours
         and show_banner_next_day(ticket)
     )
     if is_currently_outside and not ticket.has_agent_replied:
-        banner_data = get_rendered_banner_msg(ticket_name)
+        banner_data = get_rendered_banner_msg(ticket.name)
 
         return {"msg": banner_data.get("banner_msg"), "show": True}
 

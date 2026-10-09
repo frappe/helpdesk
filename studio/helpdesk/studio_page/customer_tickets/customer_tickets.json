@@ -30,8 +30,9 @@
       "h-[43px]",
       "justify-between",
       "py-0",
-      "px-5",
-      "w-full"
+      "w-full",
+      "px-3",
+      "sm:px-5"
      ],
      "componentId": "container-suug88a18",
      "componentName": "container",
@@ -46,17 +47,19 @@
         {
          "blockName": "tickets-org-switcher",
          "classes": [
-          "shrink-0"
+          "max-sm:flex-1",
+          "min-w-0",
+          "sm:shrink-0"
          ],
          "componentId": "KbOrgSwitcher-tickets",
-         "componentName": "PortalOrgSwitcher",
+         "componentName": "PortalOrganizationSwitcher",
          "componentProps": {
           "onSelect": "(customers) => selectOrganization(customers)",
           "organizations": "{{ organizations }}",
           "selectedOrganizations": "{{ selectedOrganizations }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ organizations.length }}"
+         "visibilityCondition": "{{ organizations.length > 1 }}"
         },
         {
          "children": [
@@ -84,7 +87,8 @@
          "classes": [
           "block",
           "flex-1",
-          "min-w-0"
+          "min-w-0",
+          "max-lg:hidden"
          ],
          "componentId": "container-toolbar-quickfilter",
          "componentName": "container",
@@ -96,7 +100,8 @@
         "flex",
         "flex-1",
         "gap-2",
-        "min-w-0"
+        "min-w-0",
+        "max-sm:basis-full"
        ],
        "componentId": "container-toolbar-left",
        "componentName": "container",
@@ -109,7 +114,8 @@
         "border-outline-gray-2",
         "shrink-0",
         "h-5",
-        "-ml-2"
+        "-ml-2",
+        "max-lg:hidden"
        ],
        "componentId": "container-toolbar-divider",
        "componentName": "container",
@@ -120,6 +126,9 @@
        "children": [
         {
          "blockName": "tickets-reload",
+         "classes": [
+          "max-sm:hidden"
+         ],
          "componentEvents": {
           "click": {
            "action": "Run Script",
@@ -160,16 +169,47 @@
          }
         },
         {
-         "blockName": "tickets-columns",
-         "componentId": "ColumnSettings-tickets-columns",
-         "componentName": "ColumnSettings",
-         "componentProps": {
-          "canReset": false,
-          "doctype": "HD Ticket",
-          "modelValue": {
-           "$type": "variable",
-           "name": "columns"
+         "children": [
+          {
+           "blockName": "tickets-columns",
+           "componentId": "ColumnSettings-tickets-columns",
+           "componentName": "ColumnSettings",
+           "componentProps": {
+            "canReset": false,
+            "doctype": "HD Ticket",
+            "modelValue": {
+             "$type": "variable",
+             "name": "columns"
+            }
+           }
           }
+         ],
+         "classes": [
+          "max-sm:hidden"
+         ],
+         "componentId": "container-toolbar-columns",
+         "componentName": "container",
+         "originalElement": "div"
+        },
+        {
+         "blockName": "tickets-reload",
+         "classes": [
+          "sm:hidden",
+          "ml-auto"
+         ],
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "reload()"
+          }
+         },
+         "componentId": "Button-tickets-reload-icon",
+         "componentName": "Button",
+         "componentProps": {
+          "aria-label": "{{ t('Refresh') }}",
+          "icon": "lucide-refresh-cw",
+          "variant": "subtle"
          }
         }
        ],
@@ -177,7 +217,8 @@
         "items-center",
         "flex",
         "shrink-0",
-        "gap-2"
+        "gap-2",
+        "max-sm:basis-full"
        ],
        "componentId": "container-toolbar-right",
        "componentName": "container",
@@ -190,9 +231,13 @@
       "shrink-0",
       "gap-2",
       "justify-between",
-      "py-4",
-      "px-5",
-      "w-full"
+      "w-full",
+      "flex-wrap",
+      "gap-y-3",
+      "px-4",
+      "sm:px-5",
+      "py-3",
+      "sm:py-4"
      ],
      "componentId": "container-xrv76su96",
      "componentName": "container",
@@ -213,6 +258,7 @@
        "componentName": "PortalTicketList",
        "componentProps": {
         "columns": "{{ listColumns }}",
+        "compact": "{{ isPhone }}",
         "emptyState": "{{ emptyState }}",
         "loading": "{{ listLoading }}",
         "onColumnResize": "(payload) => resizeColumn(payload)",
@@ -287,13 +333,13 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-08-13 19:05:47.233327",
+ "creation": "2026-10-06 18:20:01.916600",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-07 04:30:00.000000",
+ "modified": "2026-10-09 03:12:50.163996",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

@@ -1,4 +1,5 @@
 export { default as ActivityIcon } from "./ActivityIcon.vue";
+export { default as ArticleIcon } from "./ArticleIcon.vue";
 export { default as AscendingIcon } from "./AscendingIcon.vue";
 export { default as AttachmentIcon } from "./AttachmentIcon.vue";
 export { default as ColumnsIcon } from "./ColumnsIcon.vue";
@@ -31,9 +32,7 @@ export { default as ReplyIcon } from "./ReplyIcon.vue";
 export { default as SelectIcon } from "./SelectIcon.vue";
 export { default as SlidersIcon } from "./SlidersIcon.vue";
 export { default as SortIcon } from "./SortIcon.vue";
-export { default as ThumbsDownFilledIcon } from "./ThumbsDownFilledIcon.vue";
 export { default as ThumbsDownIcon } from "./ThumbsDownIcon.vue";
-export { default as ThumbsUpFilledIcon } from "./ThumbsUpFilledIcon.vue";
 export { default as ThumbsUpIcon } from "./ThumbsUpIcon.vue";
 export { default as TicketIcon } from "./TicketIcon.vue";
 export { default as UnpinIcon } from "./UnpinIcon.vue";

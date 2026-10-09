@@ -9,6 +9,7 @@
  "field_order": [
   "title",
   "status",
+  "visibility",
   "published_on",
   "views",
   "column_break_7",
@@ -16,7 +17,8 @@
   "author",
   "title_slug",
   "content_section",
-  "content"
+  "content",
+  "excerpt"
  ],
  "fields": [
   {
@@ -48,6 +50,13 @@
    "label": "Content"
   },
   {
+   "fieldname": "excerpt",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Excerpt",
+   "read_only": 1
+  },
+  {
    "depends_on": "author",
    "fieldname": "author",
    "fieldtype": "Link",
@@ -75,6 +84,13 @@
    "options": "Published\nDraft\nArchived"
   },
   {
+   "default": "Public",
+   "fieldname": "visibility",
+   "fieldtype": "Select",
+   "label": "Visibility",
+   "options": "Public\nCustomers only\nAgents only"
+  },
+  {
    "fieldname": "title_slug",
    "fieldtype": "Data",
    "is_virtual": 1,
@@ -90,7 +106,7 @@
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2026-06-28 13:55:21.075010",
+ "modified": "2026-10-05 02:23:21.495108",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

@@ -63,6 +63,13 @@ class TestGetArticleStats(IntegrationTestCase):
                 with self.assertRaises(frappe.PermissionError):
                     get_article_stats(article)
 
+    def test_customer_cannot_read_stats_of_an_agents_only_article(self) -> None:
+        internal = make_article(visibility="Agents only")
+        customer = create_contact("Article Customer", unique_email("article-customer"))
+
+        with self.set_user(customer["user"]), self.assertRaises(frappe.PermissionError):
+            get_article_stats(internal)
+
     def test_inactive_agent_cannot_read_stats_of_draft(self) -> None:
         agent = create_agent(unique_email("article-agent")).name
         frappe.db.set_value("HD Agent", agent, "is_active", 0)

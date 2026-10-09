@@ -8,7 +8,8 @@
       >
         <Avatar
           v-if="props.image"
-          size="3xl"
+          shape="square"
+          class="size-16"
           :image="props.image"
           :label="props.title"
         />
@@ -20,8 +21,10 @@
       </div>
     </div>
     <div>
+      <!-- Public: logos and banners are served to signed-out portal visitors. -->
       <FileUploader
         :fileTypes="['image/*']"
+        :private="false"
         @success="
           (file) => {
             emit('onUpload', file.file_url);

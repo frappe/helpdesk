@@ -4,6 +4,7 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
+from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_audiences
 from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
@@ -11,6 +12,8 @@ from helpdesk.utils import is_agent
 # skipped and results are permission-checked after the search instead, since an
 # unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
+# The portal searches from three letters, below frappe's four-letter prefix minimum.
+ARTICLE_PREFIX_LENGTH = 3
 
 
 class HelpdeskSearch(SQLiteSearch):
@@ -243,32 +246,55 @@ class HelpdeskSearch(SQLiteSearch):
 
 
 class HelpdeskArticleSearch(SQLiteSearch):
-    """Articles to suggest beside a ticket; its own index, since no article has a ticket to permit."""
+    """The knowledge base search, and the articles suggested beside a ticket; its own index,
+    since no article has a ticket to permit."""
 
     INDEX_NAME = "helpdesk_article_search.db"
-    INDEX_SCHEMA = {"metadata_fields": ["status", "category"]}
+    INDEX_SCHEMA = {"metadata_fields": ["status", "category", "visibility"]}
     # Every status: the index queue re-adds a changed article unfiltered, so a draft would linger.
     INDEXABLE_DOCTYPES = {
         "HD Article": {
-            "fields": ["name", "title", "content", "status", "category", "modified"]
+            "fields": [
+                "name",
+                "title",
+                "content",
+                "status",
+                "category",
+                "visibility",
+                "modified",
+            ]
         },
     }
 
     def get_search_filters(self) -> dict:
-        return {"status": "Published"}
+        """Published, and for a non-agent only their audiences, so the top hits are all readable."""
+        filters = {"status": "Published"}
+        audiences = readable_audiences()
+        if audiences is not None:
+            filters["visibility"] = audiences
+        return filters
 
     def _prepare_fts_query(self, query: str) -> str:
-        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms."""
-        quote = super()._prepare_fts_query
+        """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms.
+
+        A query of only stopwords keeps them, or "how" typed into search finds nothing.
+        Words match as prefixes from three letters, where search starts, so "wha" finds "What".
+        """
         stopwords = set(get_stopwords())
-        terms = [term for term in query.split() if term.lower() not in stopwords]
-        return " OR ".join(quote(term) for term in terms)
+        words = query.split()
+        terms = [term for term in words if term.lower() not in stopwords] or words
+        return " OR ".join(_quote_fts_term(term) for term in terms)
 
     def _execute_search_query(self, fts_query, title_only, filters):
         # A stopwords-only query leaves an empty MATCH, which FTS5 rejects.
         if not fts_query:
             return []
         return super()._execute_search_query(fts_query, title_only, filters)
+
+
+def _quote_fts_term(term: str) -> str:
+    quoted = '"{}"'.format(term.replace('"', '""'))
+    return f"{quoted}*" if len(term) >= ARTICLE_PREFIX_LENGTH else quoted
 
 
 def build_index():

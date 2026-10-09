@@ -11,14 +11,14 @@
           <LucideSearch class="size-4 text-ink-gray-5" />
         </template>
       </TextInput>
-      <Select v-model="role" :options="ROLE_FILTERS" size="sm" />
+      <Select v-model="role" :options="roleFilters" size="sm" />
     </div>
 
     <div>
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
-        <span>{{ __("Members") }}</span>
-        <span>{{ __("Last seen") }}</span>
+        <span>{{ __("Name") }}</span>
         <span>{{ __("Role") }}</span>
+        <span class="max-sm:hidden">{{ __("Last seen") }}</span>
         <span />
       </div>
 
@@ -29,6 +29,7 @@
       >
         <div class="flex min-w-0 items-center gap-2">
           <Avatar
+            class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
             shape="circle"
             size="lg"
             :image="member.image"
@@ -51,19 +52,35 @@
           </div>
         </div>
 
-        <div class="text-p-sm text-ink-gray-5">{{ lastSeen(member) }}</div>
+        <div>
+          <Dropdown
+            v-if="canEditRole(member)"
+            :options="roleOptions(member)"
+            align="start"
+          >
+            <template #trigger>
+              <button
+                type="button"
+                class="flex cursor-pointer items-center gap-1 text-base text-ink-gray-8 hover:text-ink-gray-9"
+              >
+                {{ roleLabel(member.role) }}
+                <LucideChevronDown class="size-3.5 text-ink-gray-5" />
+              </button>
+            </template>
+          </Dropdown>
+          <span v-else class="text-base text-ink-gray-8">{{
+            roleLabel(member.role)
+          }}</span>
+        </div>
 
-        <span
-          class="inline-flex items-center gap-1.5 text-p-base text-ink-gray-7"
-        >
-          <component :is="ROLES[member.role].icon" class="size-4" />
-          {{ member.role }}
-        </span>
+        <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
+          {{ lastSeen(member) }}
+        </div>
 
         <div class="flex justify-end">
           <Dropdown
-            v-if="rowOptions(member).length"
-            :options="rowOptions(member)"
+            v-if="canRemove(member)"
+            :options="removeOptions(member)"
             align="end"
           >
             <template #trigger="{ open }">
@@ -79,7 +96,48 @@
       </div>
 
       <div
-        v-if="!matches.length"
+        v-for="invite in matchingInvites"
+        :key="invite.invitation"
+        :class="[ROW, 'min-h-13']"
+      >
+        <div class="flex min-w-0 items-center gap-2">
+          <div
+            class="flex size-7 shrink-0 items-center justify-center rounded-full border border-dashed border-outline-gray-3"
+          >
+            <LucideMail class="size-3.5 text-ink-gray-5" />
+          </div>
+          <div class="min-w-0">
+            <div class="truncate text-base-medium text-ink-gray-8">
+              {{ invite.email }}
+            </div>
+            <div class="truncate text-p-sm text-ink-gray-5">
+              {{ invitedLabel(invite) }}
+            </div>
+          </div>
+        </div>
+
+        <span class="text-base text-ink-gray-5">{{
+          roleLabel(invite.role)
+        }}</span>
+
+        <div class="text-p-sm text-ink-gray-5 max-sm:hidden">
+          {{ __("Pending") }}
+        </div>
+
+        <div class="flex justify-end">
+          <Tooltip :text="__('Cancel invitation')">
+            <Button
+              variant="ghost"
+              icon="lucide-x"
+              :aria-label="__('Cancel invitation')"
+              @click="emit('cancel', invite)"
+            />
+          </Tooltip>
+        </div>
+      </div>
+
+      <div
+        v-if="!matches.length && !matchingInvites.length"
         class="py-6 text-center text-p-sm text-ink-gray-5"
       >
         {{ __("No members match this filter.") }}
@@ -90,16 +148,26 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Avatar, Button, Dropdown, Select, TextInput } from "frappe-ui";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  Select,
+  TextInput,
+  Tooltip,
+} from "frappe-ui";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideMail from "~icons/lucide/mail";
 import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
-import { ROLES, type RoleLabel } from "@app/stores/settings/roles";
+import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
+// A phone drops "Last seen", so the name keeps its width.
 const ROW =
-  "grid grid-cols-[minmax(0,1fr)_120px_132px_32px] items-center gap-3 border-b border-outline-gray-1 py-2 last:border-b-0";
+  "grid grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px] items-center gap-3 py-2";
 
 type Member = {
   contact?: string;
@@ -111,25 +179,39 @@ type Member = {
   is_you?: boolean;
 };
 
+type Invite = {
+  invitation: string;
+  email: string;
+  role: RoleLabel;
+  invited_by?: string;
+  invited_by_you?: boolean;
+  invited_on?: string;
+};
+
 // Owner is left out: there is one per organization, already first in the list.
 const FILTERABLE_ROLES: RoleLabel[] = ["Manager", "Member"];
-const ROLE_FILTERS = [
-  { label: "All", value: "All", icon: LucideUsers },
-  ...FILTERABLE_ROLES.map((label) => ({
-    label,
-    value: label,
-    icon: ROLES[label].icon,
+const roleFilters = computed(() => [
+  { label: __("All"), value: "All", icon: LucideUsers },
+  ...FILTERABLE_ROLES.map((role) => ({
+    label: roleLabel(role),
+    value: role,
+    icon: ROLES[role].icon,
   })),
-];
+  ...(props.invites.length
+    ? [{ label: __("Invited"), value: "Invited", icon: LucideMail }]
+    : []),
+]);
 
 const props = withDefaults(
   defineProps<{
     members?: Member[];
+    invites?: Invite[];
     canChangeRoles?: boolean;
     canRemoveMembers?: boolean;
   }>(),
   {
     members: () => [],
+    invites: () => [],
     canChangeRoles: false,
     canRemoveMembers: false,
   }
@@ -138,6 +220,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   setRole: [member: Member, role: RoleLabel];
   remove: [member: Member];
+  cancel: [invite: Invite];
 }>();
 
 const role = ref("All");
@@ -145,6 +228,12 @@ const search = ref("");
 
 const matches = computed(() =>
   props.members.filter((member) => matchesRole(member) && matchesSearch(member))
+);
+
+const matchingInvites = computed(() =>
+  ["All", "Invited"].includes(role.value)
+    ? props.invites.filter((invite) => matchesQuery(search.value, invite.email))
+    : []
 );
 
 function matchesRole(member: Member) {
@@ -159,22 +248,38 @@ function lastSeen(member: Member) {
   return member.last_seen ? timeAgo(member.last_seen) : __("Never");
 }
 
+function invitedLabel(invite: Invite) {
+  const when = timeAgo(invite.invited_on);
+  return invite.invited_by_you
+    ? __("Invited {0} by you", [when])
+    : __("Invited {0} by {1}", [when, invite.invited_by]);
+}
+
 // The owner's role is fixed, and changing yourself revokes the rights the call needs.
-function rowOptions(member: Member) {
-  if (member.role === "Owner" || member.is_you) return [];
-  const next: RoleLabel = member.role === "Manager" ? "Member" : "Manager";
+function canEditRole(member: Member) {
+  return props.canChangeRoles && member.role !== "Owner" && !member.is_you;
+}
+
+function canRemove(member: Member) {
+  return props.canRemoveMembers && member.role !== "Owner" && !member.is_you;
+}
+
+function roleOptions(member: Member) {
+  return (["Manager", "Member"] as RoleLabel[]).map((role) => ({
+    label: roleLabel(role),
+    selected: member.role === role,
+    onClick: () => member.role !== role && emit("setRole", member, role),
+  }));
+}
+
+function removeOptions(member: Member) {
   return [
-    props.canChangeRoles && {
-      label: next === "Manager" ? __("Make manager") : __("Make member"),
-      icon: ROLES[next].icon,
-      onClick: () => emit("setRole", member, next),
-    },
-    props.canRemoveMembers && {
+    {
       label: __("Remove from organization"),
       icon: "lucide-user-minus",
       onClick: () => emit("remove", member),
     },
-  ].filter(Boolean);
+  ];
 }
 
 function keyOf(member: Member) {

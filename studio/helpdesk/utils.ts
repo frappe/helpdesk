@@ -3,9 +3,18 @@ import { call, dialog, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { dateTooltipFormat } from '@framework/ui/components/ActivityTimeline/utils'
 
+export const SEARCH_DEBOUNCE_MS = 300
+
+// Mirrors frappe.handler.ALLOWED_MIMETYPES, which the server enforces for users without desk access.
+export const CUSTOMER_FILE_TYPES = [
+  '.png', '.jpg', '.jpeg', '.gif', '.pdf', '.txt', '.csv', '.mov', '.mp4',
+  '.doc', '.docx', '.xls', '.xlsx', '.odt', '.ods',
+]
+
 export const DATE_FORMATS = {
   tooltip: dateTooltipFormat,
   clock: 'h:mm A',
+  short: 'D MMM YYYY',
   step: 'ddd D MMM, h:mm A',
   date: 'DD-MM-YYYY',
 }
@@ -41,6 +50,10 @@ export async function runAction(action: () => Promise<unknown>, options: ActionO
   }
 }
 
+export function setValues(doctype: string, name: string, values: Record<string, unknown>) {
+  return call('frappe.client.set_value', { doctype, name, fieldname: values })
+}
+
 // `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
 export function scriptDialog({ title, message, size, icon, actions }) {
   return dialog.confirm({
@@ -60,11 +73,12 @@ export function askConfirm({ title, message, label, theme, action }) {
 }
 
 export function updateTicket(name: string, values: Record<string, unknown>) {
-  return call('frappe.client.set_value', { doctype: 'HD Ticket', name, fieldname: values })
+  return setValues('HD Ticket', name, values)
 }
 
+// Takes strings already passed through `__()`, so the extractor sees the literals.
 export function countLabel(count: number, singular: string, plural: string) {
-  return count === 1 ? __(singular) : __(plural, [count])
+  return count === 1 ? singular : plural.replace('{0}', String(count))
 }
 
 export function matchesQuery(query: string, ...fields: (string | undefined)[]) {

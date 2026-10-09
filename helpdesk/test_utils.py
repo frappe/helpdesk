@@ -206,6 +206,7 @@ def make_form_script(
     body: str,
     apply_to_customer_portal: bool = False,
     apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
 ):
     """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
     frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
@@ -218,6 +219,7 @@ def make_form_script(
             "enabled": 1,
             "apply_to_customer_portal": int(apply_to_customer_portal),
             "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
             "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()
@@ -331,6 +333,37 @@ def get_customer_ticket(email: str):
     ticket = make_ticket(raised_by=email)
     frappe.set_user(email)
     return frappe.get_doc("HD Ticket", ticket.name)
+
+
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
+
+
+def set_setting_for_test_class(test_class, fieldname: str, value) -> None:
+    """Set an HD Settings field for a test class, restoring the previous value when it ends."""
+    previous = frappe.db.get_single_value("HD Settings", fieldname)
+    frappe.db.set_single_value("HD Settings", fieldname, value)
+    test_class.addClassCleanup(
+        frappe.db.set_single_value, "HD Settings", fieldname, previous
+    )
+
+
+def enable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+
+
+def disable_public_knowledge_base():
+    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+
+
+def enable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+
+
+def disable_anonymous_article_voting():
+    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 0)
 
 
 def create_agent(
@@ -679,10 +712,10 @@ def get_organization_members(customer: str) -> dict:
 
 def get_organization_card(customer: str) -> dict:
     """The portal's card for one of the session user's organizations."""
-    from helpdesk.api.organization import get_settings
+    from helpdesk.api.organization import get_account
 
     return next(
-        org for org in get_settings()["organizations"] if org["name"] == customer
+        org for org in get_account()["organizations"] if org["name"] == customer
     )
 
 
@@ -864,16 +897,19 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    **values,
 ) -> str:
     """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
             {
                 "doctype": "HD Article",
-                "title": title or unique_name("Test Article"),
-                "content": "<p>Open settings and click reset.</p>",
+                "title": title,
+                "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                **values,
             }
         )
         .insert(ignore_permissions=True)
@@ -1031,3 +1067,15 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    """Users sent the customer "ticket changed" ping, read off a patched `frappe.publish_realtime`."""
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }

@@ -9,6 +9,10 @@ from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
 
 
 class HelpdeskUserInvitation(UserInvitation):
+    def validate_invite(self) -> None:
+        """What `insert` checks before it mails, so a batch can refuse before any mail goes out."""
+        self._validate_invite()
+
     def _get_allowed_roles(self):
         allowed_roles = super()._get_allowed_roles()
         if self.app_name == "helpdesk" and self._is_from_a_customer_manager():

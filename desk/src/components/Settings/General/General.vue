@@ -32,7 +32,7 @@
         <hr class="my-8" />
         <TicketSettings />
         <hr class="my-8" />
-        <WorkflowKnowledgebaseSettings />
+        <WorkflowSettings />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -54,7 +54,7 @@ import { provide, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
-import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
+import WorkflowSettings from "./components/WorkflowSettings.vue";
 
 const configStore = useConfigStore();
 
@@ -76,7 +76,6 @@ const settingsData = ref({
   enableCommentReactions: false,
   allowAnyoneToCreateTickets: false,
   defaultTicketType: "",
-  preferKnowledgeBase: false,
   skipEmailWorkflow: false,
   disableSavedRepliesGlobalScope: false,
   enableOutsideHoursBanner: false,
@@ -121,7 +120,6 @@ const saveSettingsResource = createResource({
         allow_anyone_to_create_tickets:
           settingsData.value.allowAnyoneToCreateTickets,
         default_ticket_type: settingsData.value.defaultTicketType,
-        prefer_knowledge_base: settingsData.value.preferKnowledgeBase,
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
         disable_saved_replies_global_scope:
           settingsData.value.disableSavedRepliesGlobalScope,
@@ -159,7 +157,6 @@ const transformData = (data: any) => {
     enableCommentReactions: Boolean(data.enable_comment_reactions),
     allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),
     defaultTicketType: data.default_ticket_type,
-    preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
     disableSavedRepliesGlobalScope: Boolean(
       data.disable_saved_replies_global_scope
@@ -196,7 +193,6 @@ const toggleFieldnames = {
   enableCommentReactions: "enable_comment_reactions",
   disableSavedRepliesGlobalScope: "disable_saved_replies_global_scope",
   allowAnyoneToCreateTickets: "allow_anyone_to_create_tickets",
-  preferKnowledgeBase: "prefer_knowledge_base",
   skipEmailWorkflow: "skip_email_workflow",
 } as const;
 const toggleFields = Object.keys(toggleFieldnames) as Array<

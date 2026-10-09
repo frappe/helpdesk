@@ -3,6 +3,11 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.test_utils import (
+    disable_anonymous_article_voting,
+    enable_anonymous_article_voting,
+)
+
 
 class TestHDArticleFeedback(IntegrationTestCase):
     def setUp(self):
@@ -16,6 +21,7 @@ class TestHDArticleFeedback(IntegrationTestCase):
         ).insert()
 
     def tearDown(self):
+        frappe.set_user("Administrator")
         frappe.db.delete("HD Article Feedback", {"article": self.article.name})
         frappe.delete_doc("HD Article", self.article.name, force=True)
 
@@ -29,6 +35,40 @@ class TestHDArticleFeedback(IntegrationTestCase):
             filters={"article": self.article.name, "feedback": 2},
         )
         return likes, dislikes
+
+    def test_anonymous_vote_is_refused_by_default(self):
+        disable_anonymous_article_voting()
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.PermissionError, self.article.set_feedback, 1)
+        self.assertEqual(self.get_counts(), (0, 0))
+
+    def test_anonymous_readers_are_counted_separately(self):
+        enable_anonymous_article_voting()
+        frappe.set_user("Guest")
+
+        self.article.set_feedback(1, visitor_id="visitor-one")
+        self.article.set_feedback(1, visitor_id="visitor-two")
+
+        self.assertEqual(self.get_counts(), (2, 0))
+
+    def test_an_anonymous_reader_holds_one_vote(self):
+        enable_anonymous_article_voting()
+        frappe.set_user("Guest")
+
+        self.article.set_feedback(1, visitor_id="visitor-one")
+        self.article.set_feedback(2, visitor_id="visitor-one")
+
+        self.assertEqual(self.get_counts(), (0, 1))
+
+    def test_an_unidentified_reader_cannot_vote(self):
+        enable_anonymous_article_voting()
+        frappe.set_user("Guest")
+
+        self.assertRaises(frappe.ValidationError, self.article.set_feedback, 1)
+
+    def test_an_invalid_vote_is_refused(self):
+        self.assertRaises(frappe.ValidationError, self.article.set_feedback, 7)
 
     def test_like_increases_like_count(self):
         self.article.set_feedback(1)
@@ -89,3 +129,7 @@ class TestHDArticleFeedback(IntegrationTestCase):
             },
         )
         self.assertEqual(total, 1)
+
+    def test_feedback_goes_through_set_article_feedback_only(self):
+        # A whitelisted doc method would skip its readability check and rate limit.
+        self.assertNotIn(type(self.article).set_feedback, frappe.whitelisted)

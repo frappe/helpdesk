@@ -132,37 +132,6 @@ const portalRoutes = [
     component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
-  // Customer Portal Routes
-  {
-    path: "/kb-public",
-    name: "CustomerKnowledgeBase",
-    component: () => import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/kb-public/:categoryId",
-    name: "Articles",
-    component: () => import("@/pages/knowledge-base/Articles.vue"),
-    props: true,
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/kb-public/articles/:articleId",
-    name: "ArticlePublic",
-    component: () => import("@/pages/knowledge-base/Article.vue"),
-    props: true,
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-
   // Additonal routes
   {
     path: "/:pathMatch(.*)*",

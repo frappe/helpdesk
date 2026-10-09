@@ -1,12 +1,20 @@
 <template>
-  <div class="flex items-center">
-    <span class="pe-0.5 py-1 text-lg-medium text-ink-gray-5">{{ label }}</span>
-    <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
+  <!-- Same box as frappe-ui's Breadcrumbs, so "Tickets" stays put between the list and a ticket. -->
+  <div class="flex min-w-0 items-center leading-tighter">
+    <span
+      class="px-0.5 py-1 text-lg-medium leading-tighter text-ink-gray-5 shrink-0 max-sm:hidden"
+      >{{ label }}</span
+    >
+    <span
+      class="mx-0.5 text-base text-ink-gray-4 max-sm:hidden"
+      aria-hidden="true"
+      >/</span
+    >
     <Dropdown :options="options">
       <template #default="{ open }">
         <Button
           variant="ghost"
-          class="max-w-[200px] sm:max-w-none !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
+          class="min-w-0 max-w-[200px] !bg-transparent hover:!bg-surface-gray-3 focus-visible:!ring-0"
           :class="open && '!bg-surface-gray-3'"
         >
           <span class="text-lg-medium text-nowrap truncate">
@@ -38,11 +46,12 @@
             icon="lucide-check"
             class="size-4 text-ink-gray-7"
           />
+          <!-- Always shown on touch, where no row is hovered. -->
           <Dropdown side="right" align="start" :options="viewActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block"
+                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block [@media(hover:none)]:!block [@media(hover:none)]:!size-6"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 :aria-label="__('View actions')"
@@ -63,11 +72,10 @@ import { Icon as SpriteIcon } from "frappe-ui/experimental";
 import { __ } from "@helpdesk/shared/translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 
-const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
-// lucide names this glyph `text-align-justify`; `align-justify` is not in the sprite.
 const DEFAULT_ICON = "text-align-justify";
+const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 
-// The sprite, not the mask class: a stored name may be one the build never saw.
+// The sprite, not a mask class: a stored name may be one the build never saw.
 function ViewIcon(props: { icon?: string }) {
   const icon = props.icon || DEFAULT_ICON;
   if (isEmoji(icon))
@@ -82,18 +90,11 @@ function ViewIcon(props: { icon?: string }) {
   });
 }
 
-withDefaults(
-  defineProps<{
-    label?: string;
-    currentView?: { name?: string; label: string; icon: string };
-    options?: any[];
-    viewActions?: (item: any) => any[];
-  }>(),
-  {
-    label: "Tickets",
-    currentView: () => ({ label: "List", icon: DEFAULT_ICON }),
-    options: () => [],
-    viewActions: () => () => [],
-  }
-);
+// The header renders this only when a page hands it a view, so every prop arrives set.
+defineProps<{
+  label: string;
+  currentView: { name?: string; label: string; icon: string };
+  options: any[];
+  viewActions: (item: any) => any[];
+}>();
 </script>

@@ -79,7 +79,7 @@ def get_user():
     }
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def update_profile(
     first_name: str | None = None,
     last_name: str | None = None,

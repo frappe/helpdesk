@@ -22,7 +22,7 @@
     <div class="mt-4">
       <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Icon") }}</div>
       <div class="flex items-center gap-2">
-        <!-- The icon list cannot show an emoji, which is what the desk's picker wrote. -->
+        <!-- The icon list cannot show the emoji the desk's picker stored. -->
         <div
           v-if="isEmojiIcon"
           class="grid size-7 shrink-0 place-items-center rounded-4 bg-surface-gray-3 text-base leading-none"

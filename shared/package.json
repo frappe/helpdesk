@@ -8,10 +8,14 @@
 		"./formScripts": "./src/formScripts.ts",
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts",
+		"./tiptap": "./src/tiptap.ts",
+		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
+		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",
 		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
 		"./settings/*": "./src/settings/*"
 	},
 	"peerDependencies": {
+		"@tiptap/core": "*",
 		"frappe-ui": "*",
 		"vue": "*"
 	}
