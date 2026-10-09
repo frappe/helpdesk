@@ -817,7 +817,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
          },
          {
           "children": [
@@ -1101,7 +1101,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
          },
          {
           "blockName": "Invite header",
@@ -1626,7 +1626,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-09 03:15:38.086100",
+ "modified": "2026-10-09 11:53:02.759167",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"
