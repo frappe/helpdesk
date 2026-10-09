@@ -148,7 +148,10 @@ import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
 import { ROUTES } from "@app/routes";
-import { useArticleSearch } from "@app/composables/useArticleSearch";
+import {
+  MIN_QUERY_LENGTH,
+  useArticleSearch,
+} from "@app/composables/useArticleSearch";
 import { useRecent, type RecentArticle } from "@app/stores/recent";
 import { countLabel } from "@app/utils";
 
@@ -178,16 +181,18 @@ useKeyboardShortcut({
   handler: () => combobox.value?.focus(),
 });
 
-const results = useArticleSearch(query, { limit: MAX_RESULTS, minLength: 1 });
+const results = useArticleSearch(query, { limit: MAX_RESULTS });
 
 const searchText = computed(() => query.value.trim());
-const isTyping = computed(() => searchText.value.length > 0);
+const canSearch = computed(
+  () => searchText.value.length >= MIN_QUERY_LENGTH
+);
 
-watch(query, () => (isOpen.value = isTyping.value || hasHistory.value));
+watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
 
 // Emptied from inside the open list, it closes rather than show nothing.
 watch(hasHistory, (value) => {
-  if (!value && !isTyping.value) isOpen.value = false;
+  if (!value && !canSearch.value) isOpen.value = false;
 });
 
 function onFocus() {
@@ -231,10 +236,10 @@ const isCurrent = computed(
 );
 const hasResults = computed(() => Boolean(results.data?.length));
 const isSearching = computed(
-  () => isTyping.value && !isCurrent.value && !hasResults.value
+  () => canSearch.value && !isCurrent.value && !hasResults.value
 );
 const isEmpty = computed(
-  () => isTyping.value && isCurrent.value && !hasResults.value
+  () => canSearch.value && isCurrent.value && !hasResults.value
 );
 
 const resultOptions = computed(() =>
@@ -258,7 +263,7 @@ const resultOptions = computed(() =>
 );
 
 const options = computed(() =>
-  isTyping.value ? resultOptions.value : historyOptions.value
+  canSearch.value ? resultOptions.value : historyOptions.value
 );
 </script>
 

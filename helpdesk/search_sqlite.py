@@ -12,6 +12,8 @@ from helpdesk.utils import is_agent
 # skipped and results are permission-checked after the search instead, since an
 # unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
+# The portal searches from three letters, below frappe's four-letter prefix minimum.
+ARTICLE_PREFIX_LENGTH = 3
 
 
 class HelpdeskSearch(SQLiteSearch):
@@ -276,18 +278,23 @@ class HelpdeskArticleSearch(SQLiteSearch):
         """OR the words: a ticket subject is a sentence, and FTS5 ANDs bare terms.
 
         A query of only stopwords keeps them, or "how" typed into search finds nothing.
+        Words match as prefixes from three letters, where search starts, so "wha" finds "What".
         """
-        quote = super()._prepare_fts_query
         stopwords = set(get_stopwords())
         words = query.split()
         terms = [term for term in words if term.lower() not in stopwords] or words
-        return " OR ".join(quote(term) for term in terms)
+        return " OR ".join(_quote_fts_term(term) for term in terms)
 
     def _execute_search_query(self, fts_query, title_only, filters):
         # A stopwords-only query leaves an empty MATCH, which FTS5 rejects.
         if not fts_query:
             return []
         return super()._execute_search_query(fts_query, title_only, filters)
+
+
+def _quote_fts_term(term: str) -> str:
+    quoted = '"{}"'.format(term.replace('"', '""'))
+    return f"{quoted}*" if len(term) >= ARTICLE_PREFIX_LENGTH else quoted
 
 
 def build_index():

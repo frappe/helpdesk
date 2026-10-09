@@ -31,6 +31,11 @@ export default function setup(context) {
   })
   const minutes = computed(() => Math.max(1, Math.round(parsed.value.words / WORDS_PER_MINUTE)))
   const readingTime = computed(() => countLabel(minutes.value, __('1 minute to read'), __('{0} minutes to read')))
+  const eyebrow = computed(() =>
+    [article?.data?.category_name, countLabel(minutes.value, __('1 min read'), __('{0} min read'))]
+      .filter(Boolean)
+      .join(' · '),
+  )
 
   const publishedOn = computed(() => {
     const date = article?.data?.published_on
@@ -100,6 +105,7 @@ export default function setup(context) {
     drawer: useDrawer(context.route),
     parsed,
     readingTime,
+    eyebrow,
     publishedOn,
     relatedArticles,
     submitFeedback,

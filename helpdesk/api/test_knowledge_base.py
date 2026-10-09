@@ -676,6 +676,9 @@ class TestSearch(IntegrationTestCase):
 
         self.assertRaises(frappe.PermissionError, search_articles, "zebra")
 
+    def test_three_letters_match_the_start_of_a_word(self) -> None:
+        self.assertIn(self.public, [row["name"] for row in search_articles("zeb")])
+
     def test_a_blank_query_matches_nothing(self) -> None:
         self.assertEqual(search_articles("  "), [])
 

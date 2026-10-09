@@ -123,6 +123,19 @@
            "blockName": "container",
            "children": [
             {
+             "classes": [
+              "sm:hidden",
+              "text-ink-gray-5"
+             ],
+             "componentId": "TextBlock-article-eyebrow",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-sm-medium",
+              "tag": "p",
+              "text": "{{ eyebrow }}"
+             }
+            },
+            {
              "blockName": "title-row",
              "children": [
               {
@@ -146,7 +159,10 @@
                 "isPublic": "{{ isPublicArticle }}",
                 "name": "{{ article.data.name }}"
                },
-               "isCustomVueComponent": true
+               "isCustomVueComponent": true,
+               "classes": [
+                "max-sm:hidden"
+               ]
               }
              ],
              "classes": [
@@ -182,7 +198,10 @@
               },
               {
                "classes": [
-                "text-ink-gray-5"
+                "text-ink-gray-5",
+                "min-w-0",
+                "truncate",
+                "max-sm:text-ink-gray-8"
                ],
                "componentId": "TextBlock-bb34uxs9r",
                "componentName": "TextBlock",
@@ -206,7 +225,9 @@
               },
               {
                "classes": [
-                "text-ink-gray-5"
+                "text-ink-gray-5",
+                "shrink-0",
+                "whitespace-nowrap"
                ],
                "componentId": "TextBlock-6b11cqpq2",
                "componentName": "TextBlock",
@@ -218,7 +239,8 @@
               },
               {
                "classes": [
-                "text-ink-gray-4"
+                "text-ink-gray-4",
+                "max-sm:hidden"
                ],
                "componentId": "article-reading-dot",
                "componentName": "TextBlock",
@@ -254,7 +276,8 @@
                 "flex",
                 "items-center",
                 "gap-1",
-                "text-ink-gray-5"
+                "text-ink-gray-5",
+                "max-sm:hidden"
                ],
                "componentId": "article-reading-time",
                "componentName": "container",
@@ -304,7 +327,7 @@
                 "text-ink-gray-5",
                 "transition-colors",
                 "hover:text-ink-gray-7",
-                "max-sm:basis-full"
+                "max-sm:hidden"
                ],
                "componentEvents": {
                 "click": {
@@ -316,6 +339,21 @@
                "componentId": "container-copy-link",
                "componentName": "container",
                "originalElement": "div"
+              },
+              {
+               "classes": [
+                "sm:hidden",
+                "ms-auto",
+                "-me-2"
+               ],
+               "componentId": "PortalCopyForLLM-article-compact",
+               "componentName": "PortalCopyForLLM",
+               "componentProps": {
+                "compact": true,
+                "isPublic": "{{ isPublicArticle }}",
+                "name": "{{ article.data.name }}"
+               },
+               "isCustomVueComponent": true
               }
              ],
              "classes": [
@@ -325,7 +363,8 @@
               "gap-2",
               "justify-start",
               "flex-wrap",
-              "gap-y-1"
+              "gap-y-1",
+              "max-sm:flex-nowrap"
              ],
              "componentId": "container-7rc7b7a0k",
              "componentName": "container",
@@ -656,7 +695,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 03:34:39.874568",
+ "modified": "2026-10-09 14:34:22.696508",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

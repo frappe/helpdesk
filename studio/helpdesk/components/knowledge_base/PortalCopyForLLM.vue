@@ -1,5 +1,24 @@
 <template>
-  <div class="flex shrink-0 items-center">
+  <div v-if="compact" class="flex shrink-0">
+    <Dropdown :options="compactOptions" align="end">
+      <template #trigger>
+        <Button
+          variant="ghost"
+          icon="lucide-more-horizontal"
+          :aria-label="__('Article actions')"
+          @pointerdown="load"
+          @focus="load"
+        />
+      </template>
+      <template #item-suffix="{ item }">
+        <span
+          v-if="item.external"
+          class="lucide-arrow-up-right size-3.5 shrink-0 text-ink-gray-5"
+        />
+      </template>
+    </Dropdown>
+  </div>
+  <div v-else class="flex shrink-0 items-center">
     <Button
       size="xs"
       variant="outline"
@@ -45,8 +64,9 @@ const props = withDefaults(
   defineProps<{
     name: string;
     isPublic?: boolean;
+    compact?: boolean;
   }>(),
-  { isPublic: false }
+  { isPublic: false, compact: false }
 );
 
 // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
@@ -103,12 +123,12 @@ function openInAssistant(baseUrl: string) {
   window.open(`${baseUrl}${encodeURIComponent(prompt)}`, "_blank", "noopener");
 }
 
-const options = computed(() => [
-  {
-    label: __("Copy as Markdown"),
-    icon: "lucide-copy",
-    onClick: copyMarkdown,
-  },
+async function copyLink() {
+  await copy(window.location.href);
+  toast.success(__("Link copied"));
+}
+
+const viewOptions = computed(() => [
   {
     label: __("View as Markdown"),
     icon: "lucide-file-text",
@@ -129,5 +149,22 @@ const options = computed(() => [
     condition: () => props.isPublic,
     onClick: () => openInAssistant("https://claude.ai/new?q="),
   },
+]);
+
+const options = computed(() => [
+  { label: __("Copy as Markdown"), icon: "lucide-copy", onClick: copyMarkdown },
+  ...viewOptions.value,
+]);
+
+const compactOptions = computed(() => [
+  {
+    group: "Copy",
+    hideLabel: true,
+    options: [
+      { label: __("Copy for LLM"), icon: "lucide-copy", onClick: copyMarkdown },
+      { label: __("Copy link"), icon: "lucide-link", onClick: copyLink },
+    ],
+  },
+  { group: "Open", hideLabel: true, options: viewOptions.value },
 ]);
 </script>
