@@ -687,6 +687,7 @@ def get_organization_card(customer: str) -> dict:
 
 
 def get_invitable_emails(customer: str) -> list[str]:
+    """The emails the portal suggests for a customer's invite screen."""
     from helpdesk.api.organization import get_invitable_contacts
 
     return [row["email"] for row in get_invitable_contacts(customer)]
