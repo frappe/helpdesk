@@ -1,5 +1,5 @@
 // Ported from the desk's list cells, which Studio cannot import (they live under `@/`).
-import { Badge, Rating, Tooltip, dayjs } from 'frappe-ui'
+import { Badge, Rating, Tooltip, dayjsLocal } from 'frappe-ui'
 import { parseJson } from '@app/utils'
 import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
 import { shortDuration, timeAgo } from '@helpdesk/shared/utils'
@@ -58,16 +58,16 @@ function badge(label: string, theme: string) {
 }
 
 function countdownBadge(deadline: string) {
-  return h(Tooltip, { text: dayjs(deadline).format('LLLL') }, () =>
+  return h(Tooltip, { text: dayjsLocal(deadline).format('LLLL') }, () =>
     h(Badge, { label: shortDuration(deadline), theme: 'amber', variant: 'subtle' }),
   )
 }
 
 export function responseCell({ row, item }: any) {
   if (!item) return null
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) return badge('Failed', 'red')
+  if (!row.first_responded_on && dayjsLocal(item).isBefore(dayjsLocal())) return badge('Failed', 'red')
   if (!row.first_responded_on) return countdownBadge(item)
-  return dayjs(row.first_responded_on).isBefore(item)
+  return dayjsLocal(row.first_responded_on).isBefore(dayjsLocal(item))
     ? badge('Fulfilled', 'gray')
     : badge('Failed', 'red')
 }
@@ -75,11 +75,11 @@ export function responseCell({ row, item }: any) {
 export function resolutionCell({ row, item }: any) {
   if (getStatus(row.status)?.category === 'Paused') return badge('Paused', 'blue')
   if (row.resolution_date) {
-    const fulfilled = dayjs(row.resolution_date).isBefore(dayjs(item))
+    const fulfilled = dayjsLocal(row.resolution_date).isBefore(dayjsLocal(item))
     return badge(fulfilled ? 'Fulfilled' : 'Failed', fulfilled ? 'gray' : 'red')
   }
   if (!item) return null
-  return dayjs(item).isBefore(dayjs()) ? badge('Failed', 'red') : countdownBadge(item)
+  return dayjsLocal(item).isBefore(dayjsLocal()) ? badge('Failed', 'red') : countdownBadge(item)
 }
 
 export function datetimeCell({ item }: any) {

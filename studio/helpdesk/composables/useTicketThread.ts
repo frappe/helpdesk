@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { dayjs } from 'frappe-ui'
+import { dayjsLocal } from 'frappe-ui'
 import { timeAgo } from '@helpdesk/shared/utils'
 import { DATE_FORMATS } from '@app/utils'
 
@@ -45,7 +45,7 @@ export function useTicketThread(ticket) {
       tags: feedbackTags(data.feedback),
       comment: data.feedback_extra ? `“${data.feedback_extra}”` : '',
       timeAgo: timeAgo(when),
-      fullDate: dayjs(when).format(DATE_FORMATS.tooltip),
+      fullDate: dayjsLocal(when).format(DATE_FORMATS.tooltip),
     }
   })
 

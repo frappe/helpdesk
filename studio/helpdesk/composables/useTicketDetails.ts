@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { dayjs } from 'frappe-ui'
+import { dayjs, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { twoUnitDuration } from '@helpdesk/shared/utils'
 import { isClosedStatus, statusMeta } from '@app/stores/ticketMeta'
@@ -48,7 +48,7 @@ export function useTicketDetails(ticket, thread) {
   function formatValue(field, value) {
     if (!value) return value
     if (field.fieldtype === 'Date') return dayjs(value).format(DATE_FORMATS.date)
-    if (field.fieldtype === 'Datetime') return dayjs(value).format(DATE_FORMATS.tooltip)
+    if (field.fieldtype === 'Datetime') return dayjsLocal(value).format(DATE_FORMATS.tooltip)
     return value
   }
 
@@ -141,13 +141,13 @@ export function useTicketDetails(ticket, thread) {
 
   function awaiting(title: string, due: string) {
     if (!due) return makeStep(title, __('Pending'), 'pending')
-    if (dayjs().isAfter(dayjs(due)))
+    if (dayjsLocal().isAfter(dayjsLocal(due)))
       return makeStep(title, __('Overdue by {0}', [formatTimeUntil(due)]), 'pending')
     return makeStep(title, __('Due {0}', [dueWording(due)]), 'pending')
   }
 
   function makeStep(title: string, subtitle: string, state: string, on?: string) {
-    return { title, subtitle, state, fullDate: on ? dayjs(on).format(DATE_FORMATS.tooltip) : '' }
+    return { title, subtitle, state, fullDate: on ? dayjsLocal(on).format(DATE_FORMATS.tooltip) : '' }
   }
 
   function elapsedPhrase(on: string) {
@@ -162,19 +162,19 @@ export function useTicketDetails(ticket, thread) {
   }
 
   function formatStepDate(value: string) {
-    return value ? dayjs(value).format(DATE_FORMATS.step) : ''
+    return value ? dayjsLocal(value).format(DATE_FORMATS.step) : ''
   }
 
   function dueWording(target: string) {
-    const due = dayjs(target)
-    if (due.isSame(dayjs(), 'day')) return __('{0} today', [due.format(DATE_FORMATS.clock)])
-    if (due.isSame(dayjs().add(1, 'day'), 'day'))
+    const due = dayjsLocal(target)
+    if (due.isSame(dayjsLocal(), 'day')) return __('{0} today', [due.format(DATE_FORMATS.clock)])
+    if (due.isSame(dayjsLocal().add(1, 'day'), 'day'))
       return __('{0} tomorrow', [due.format(DATE_FORMATS.clock)])
     return due.format(DATE_FORMATS.step)
   }
 
   function formatTimeUntil(target: string) {
-    return formatMinutes(Math.abs(dayjs(target).diff(dayjs(), 's')))
+    return formatMinutes(Math.abs(dayjsLocal(target).diff(dayjsLocal(), 's')))
   }
 
   // Whole minutes: the sidebar re-renders only on load, and seconds would read as a stopped clock.

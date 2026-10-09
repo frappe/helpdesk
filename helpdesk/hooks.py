@@ -106,6 +106,8 @@ user_invitation = {
     "extra_invite_params": ["customer", "contact"],
 }
 
+studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+
 doc_events = {
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",

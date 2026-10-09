@@ -1,8 +1,11 @@
 import { computed, ref } from 'vue'
-import { call } from 'frappe-ui'
+import { call, setConfig } from 'frappe-ui'
 import { ROUTES } from '@app/routes'
 
-// A published Studio app has no boot payload; `get_config` is the one call guests may make.
+// From boot, not `get_config`: it must be set before the first date renders.
+setConfig('systemTimezone', window.boot?.system_timezone)
+
+// `get_config` is the one call guests may make.
 
 const store = createSessionStore()
 
