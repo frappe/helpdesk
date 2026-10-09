@@ -88,7 +88,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { isCustomerPortal, shortDuration } from "@/utils";
-import { Badge, dayjs, Tooltip, usePageMeta } from "frappe-ui";
+import { Badge, dayjsLocal, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -251,15 +251,16 @@ function handleResponseByField(row: any, item: string) {
   if (!row.sla) return null; // nothing promised, so nothing to report against
   if (row.first_responded_on) {
     // no target means it was never breached, so responding at all fulfils it
-    const fulfilled = !item || dayjs(row.first_responded_on).isBefore(item);
+    const fulfilled =
+      !item || dayjsLocal(row.first_responded_on).isBefore(dayjsLocal(item));
     return slaOutcomeBadge(fulfilled);
   }
   if (!item) return null;
-  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
+  if (dayjsLocal(item).isBefore(dayjsLocal())) return slaOutcomeBadge(false);
   return h(
     Tooltip,
     {
-      text: dayjs(item).format("LLLL"),
+      text: dayjsLocal(item).format("LLLL"),
     },
     h(Badge, {
       label: shortDuration(item),
@@ -288,17 +289,18 @@ function handleResolutionByField(row: any, item: string) {
     });
   }
   if (row.resolution_date) {
-    const fulfilled = !item || dayjs(row.resolution_date).isBefore(dayjs(item));
+    const fulfilled =
+      !item || dayjsLocal(row.resolution_date).isBefore(dayjsLocal(item));
     return slaOutcomeBadge(fulfilled);
   }
   if (!item) return null;
   // In progress but the resolution deadline has already passed.
-  if (dayjs(item).isBefore(dayjs())) return slaOutcomeBadge(false);
+  if (dayjsLocal(item).isBefore(dayjsLocal())) return slaOutcomeBadge(false);
   // In progress with a future deadline: show the live countdown.
   return h(
     Tooltip,
     {
-      text: dayjs(item).format("LLLL"),
+      text: dayjsLocal(item).format("LLLL"),
     },
     h(Badge, {
       label: shortDuration(item),
