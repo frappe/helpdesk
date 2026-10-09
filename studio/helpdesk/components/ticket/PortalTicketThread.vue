@@ -288,4 +288,9 @@ const TicketEmails = defineComponent({
   > div:first-child::after {
   display: none;
 }
+
+/* Email frames copy the page's sheets, whose :root paints the canvas; only a frame holds .email-content. */
+:root:has(.email-content) {
+  background: transparent;
+}
 </style>
