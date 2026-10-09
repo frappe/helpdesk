@@ -4,10 +4,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
-    has_permission,
-    permission_query,
-)
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import permission_query
 from helpdesk.helpdesk.hooks.user_invitation import after_accept
 from helpdesk.test_utils import (
     add_contact_in_customer,
@@ -15,7 +12,9 @@ from helpdesk.test_utils import (
     create_customer,
     create_user,
     get_invitation,
+    make_contact,
     make_ticket,
+    unique_name,
     update_role_in_customer,
 )
 
@@ -388,8 +387,8 @@ class TestHDCustomer(IntegrationTestCase):
         ).insert(ignore_permissions=True)
         return contact_doc, customer, ticket, invitation
 
-    def test_has_permission_member_reads_manager_writes(self) -> None:
-        # Members may read their customer; only managers may write it.
+    def test_has_permission_members_read_and_never_write(self) -> None:
+        # Managers change their customer through helpdesk.api.organization only.
         customer = create_customer("Perm Member Manager")
         member = create_contact("PermMember", "perm-member@example.com")
         manager = create_contact("PermManager", "perm-manager@example.com")
@@ -397,12 +396,26 @@ class TestHDCustomer(IntegrationTestCase):
         add_contact_in_customer(customer, manager["contact"], is_manager=True)
         name = customer.name
 
-        frappe.set_user(member["user"])
-        self.assertTrue(frappe.has_permission("HD Customer", "read", name))
-        self.assertFalse(frappe.has_permission("HD Customer", "write", name))
-        frappe.set_user(manager["user"])
-        self.assertTrue(frappe.has_permission("HD Customer", "read", name))
-        self.assertTrue(frappe.has_permission("HD Customer", "write", name))
+        for user in (member["user"], manager["user"]):
+            with self.set_user(user):
+                self.assertTrue(frappe.has_permission("HD Customer", "read", name))
+                self.assertFalse(frappe.has_permission("HD Customer", "write", name))
+                self.assertFalse(frappe.has_permission("HD Customer", "delete", name))
+
+    def test_a_customer_manager_cannot_save_it_directly(self) -> None:
+        manager = make_contact("perm-direct-manager")
+        customer = create_customer(
+            unique_name("Perm Direct Save"),
+            contacts=[{"contact_name": manager["contact"], "is_manager": 1}],
+        )
+        customer.domain = "renamed.example.com"
+
+        with self.set_user(manager["user"]), self.assertRaises(frappe.PermissionError):
+            customer.save()
+        self.assertNotEqual(
+            frappe.db.get_value("HD Customer", customer.name, "domain"),
+            "renamed.example.com",
+        )
 
     def test_has_permission_denies_non_member(self) -> None:
         # A portal user who is not a member is denied read and write (IDOR guard).
@@ -413,27 +426,6 @@ class TestHDCustomer(IntegrationTestCase):
         frappe.set_user(outsider["user"])
         self.assertFalse(frappe.has_permission("HD Customer", "read", name))
         self.assertFalse(frappe.has_permission("HD Customer", "write", name))
-
-    def test_has_permission_per_record_role(self) -> None:
-        # Manager of one customer who is only a member of another can write the
-        # first but not the second; the role is bound per record, not per user.
-        customer_a = create_customer("Perm Record A")
-        customer_b = create_customer("Perm Record B")
-        contact_in_dual_customers = create_contact("PermDual", "perm-dual@example.com")
-        add_contact_in_customer(
-            customer_a, contact_in_dual_customers["contact"], is_manager=True
-        )
-        add_contact_in_customer(
-            customer_b, contact_in_dual_customers["contact"], is_manager=False
-        )
-        user = contact_in_dual_customers["user"]
-
-        frappe.set_user(user)
-        self.assertTrue(has_permission(customer_a, "read", user))
-        self.assertTrue(has_permission(customer_a, "write", user))
-
-        self.assertTrue(has_permission(customer_b, "read", user))
-        self.assertFalse(has_permission(customer_b, "write", user))
 
     def test_permission_query_scopes_list(self) -> None:
         # Agents are unrestricted, members see only their customers, others none.
@@ -454,23 +446,6 @@ class TestHDCustomer(IntegrationTestCase):
         frappe.set_user("Administrator")
         self.assertIn(mine.name, names)
         self.assertNotIn(other.name, names)
-
-    def test_has_permission_follows_live_role_change(self) -> None:
-        # Write access tracks the live is_manager flag, not a cached role.
-        # update_role_in_customer()
-        customer = create_customer("Perm Live Change")
-        member = create_contact("PermLive", "perm-live@example.com")
-        add_contact_in_customer(customer, member["contact"], is_manager=False)
-        user = member["user"]
-
-        frappe.set_user(user)
-        self.assertFalse(has_permission(customer, "write", user))
-        update_role_in_customer(customer, member["contact"], "HD Customer Manager")
-        frappe.set_user(user)
-        self.assertTrue(has_permission(customer, "write", user))
-        update_role_in_customer(customer, member["contact"], "HD Customer")
-        frappe.set_user(user)
-        self.assertFalse(has_permission(customer, "write", user))
 
     def test_primary_contact_must_be_a_listed_contact(self) -> None:
         customer = create_customer("Test Customer Primary Validate")

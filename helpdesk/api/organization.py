@@ -10,6 +10,7 @@ from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
     CUSTOMER_ROLES,
     MANAGER_ROLE,
+    get_customer_membership,
 )
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
 
@@ -79,7 +80,7 @@ def get_organization(customer: str) -> dict:
     """One organization the caller belongs to: its members and, for an inviter, its invites."""
     hd_customer = frappe.get_doc("HD Customer", customer)
     hd_customer.check_permission("read")
-    is_manager = hd_customer.has_permission("write")
+    is_manager = _is_manager(hd_customer)
     can_invite = is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING)
     return {
         "name": hd_customer.name,
@@ -171,7 +172,7 @@ def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
     hd_customer = _get_managed_customer(customer, PORTAL_ROLES_SETTING)
     member = _get_editable_member(hd_customer, contact)
     member.is_manager = int(sbool(is_manager))
-    hd_customer.save()
+    hd_customer.save(ignore_permissions=True)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -179,7 +180,7 @@ def remove_member(customer: str, contact: str) -> None:
     hd_customer = _get_managed_customer(customer, PORTAL_REMOVE_SETTING)
     _get_editable_member(hd_customer, contact)
     hd_customer.remove_contact(contact)
-    hd_customer.save()
+    hd_customer.save(ignore_permissions=True)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -202,7 +203,7 @@ def update_organization_image(customer: str, image: str) -> None:
     hd_customer = _get_managed_customer(customer, PORTAL_EDIT_SETTING)
     validate_uploaded_image(image)
     hd_customer.image = image or None
-    hd_customer.save()
+    hd_customer.save(ignore_permissions=True)
 
 
 def _get_organizations() -> list[dict]:
@@ -329,8 +330,20 @@ def _get_managed_customer(customer: str, setting: str):
         }
         frappe.throw(refusals[setting], frappe.PermissionError)
     hd_customer = frappe.get_doc("HD Customer", customer)
-    hd_customer.check_permission("write")
+    if not _is_manager(hd_customer):
+        frappe.throw(
+            _("Only a manager of {0} can do this").format(hd_customer.customer_name),
+            frappe.PermissionError,
+        )
     return hd_customer
+
+
+def _is_manager(hd_customer) -> bool:
+    """An agent who may write it, or a customer manager, who can change it only here."""
+    if hd_customer.has_permission("write"):
+        return True
+    membership = get_customer_membership(hd_customer.name, frappe.session.user)
+    return bool(membership and membership.get("is_manager"))
 
 
 def _get_editable_member(hd_customer, contact: str):

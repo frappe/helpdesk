@@ -481,20 +481,12 @@ def permission_query(user: str) -> str:
 
 
 def has_permission(doc: Document, ptype: str, user: str) -> bool:
-    """Per-record access for HD Customer.
-
-    Members of a customer can read it; only managers can write or delete it.
-    Agents are unrestricted; non-members are denied.
-    """
+    """Agents are unrestricted; members may read, and change it only through `helpdesk.api.organization`."""
     if is_agent(user):
         return True
-
-    membership = get_customer_membership(doc.name, user)
-    if not membership:
-        return False
     if ptype in ("write", "delete"):
-        return bool(membership.get("is_manager"))
-    return True
+        return False
+    return bool(get_customer_membership(doc.name, user))
 
 
 def get_customer_membership(customer: str, user: str) -> dict | None:
