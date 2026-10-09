@@ -51,7 +51,7 @@ export default function setup(context) {
     return [...homeCategories.value, ...rest]
   })
 
-  // Animates the grid's height and the extra cards; the cards fade out before the grid shrinks.
+  // Animates the grid's height and the extra cards, which rise in from below and sink out before the grid shrinks.
   let isToggling = false
   async function toggleAllCategories() {
     const grid = document.querySelector<HTMLElement>(CATEGORY_GRID)
@@ -63,24 +63,27 @@ export default function setup(context) {
     isToggling = true
     const extraCards = () => [...grid.children].slice(homeCategories.value.length)
     if (showAllCategories.value) {
-      const fades = extraCards().map((card) => card.animate({ opacity: [1, 0] }, { duration: 150, easing: EASE, fill: 'forwards' }))
+      const fades = extraCards().map((card) => card.animate({ opacity: [1, 0], transform: ['none', 'translateY(8px)'] }, { duration: 150, easing: EASE, fill: 'forwards' }))
       await Promise.all(fades.map((fade) => fade.finished))
     }
     const from = grid.offsetHeight
     showAllCategories.value = !showAllCategories.value
     await nextTick()
+    // Equal-height rows share the grid's height, so a height animation would squeeze every card.
+    grid.style.gridAutoRows = `${grid.firstElementChild?.getBoundingClientRect().height}px`
     grid.style.overflow = 'hidden'
     const resize = grid.animate({ height: [`${from}px`, `${grid.offsetHeight}px`] }, { duration: 300, easing: EASE })
     if (showAllCategories.value) {
       extraCards().forEach((card, index) =>
         card.animate(
-          { opacity: [0, 1], transform: ['translateY(-6px)', 'none'] },
+          { opacity: [0, 1], transform: ['translateY(12px)', 'none'] },
           { duration: 300, delay: 60 + Math.min(index, 8) * 30, easing: EASE, fill: 'backwards' },
         ),
       )
     }
     await resize.finished
     grid.style.overflow = ''
+    grid.style.gridAutoRows = ''
     isToggling = false
   }
 
