@@ -553,10 +553,11 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (columnConfig && columnConfig[column.key]?.custom) {
     return columnConfig[column.key]?.custom({ column, row, item, idx });
   }
+  const displayValue = row?.[`${column.key}_display`] ?? item;
   if (idx === 0) {
     return h("span", {
       class: "truncate text-base text-ink-gray-6",
-      textContent: item,
+      textContent: displayValue,
     });
   }
   if (column.type === "Datetime") {
@@ -580,7 +581,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   return h("span", {
     class: "truncate flex-1",
-    textContent: item,
+    textContent: displayValue,
   });
 }
 

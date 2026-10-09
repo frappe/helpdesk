@@ -133,6 +133,28 @@ def get_list_data(
     if doctype == "TP Call Log":
         data = parse_call_logs(data)
 
+    meta = frappe.get_meta(doctype)
+    contact_field = meta.get_field("contact")
+    if contact_field and contact_field.fieldtype == "Link" and contact_field.options == "Contact":
+        contact_ids = list({d.get("contact") for d in data if d.get("contact")})
+        contact_display_map = {}
+        if contact_ids:
+            contacts = frappe.get_all(
+                "Contact",
+                filters={"name": ["in", contact_ids]},
+                fields=["name", "full_name"],
+            )
+            for c in contacts:
+                contact_display_map[c.name] = c.full_name or c.name
+
+        for d in data:
+            if "contact" in d:
+                contact_id = d.get("contact")
+                if contact_id:
+                    d["contact_display"] = contact_display_map.get(contact_id, contact_id)
+                else:
+                    d["contact_display"] = ""
+
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
