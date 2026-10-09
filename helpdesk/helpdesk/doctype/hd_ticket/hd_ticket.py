@@ -30,6 +30,7 @@ from helpdesk.helpdesk.utils.email import (
 from helpdesk.notifications import clear as clear_notifications
 from helpdesk.notifications import notify_ticket_reopened
 from helpdesk.utils import (
+    CUSTOMER_PORTAL_ROOT,
     agent_only,
     capture_event,
     get_agents_team,
@@ -606,7 +607,7 @@ class HDTicket(Document, CustomerEditController):
     @property
     def portal_uri(self):
         root_uri = frappe.utils.get_url()
-        return f"{root_uri}/helpdesk/my-tickets/{self.name}"
+        return f"{root_uri}{CUSTOMER_PORTAL_ROOT}/tickets/{self.name}"
 
     @frappe.whitelist()
     def new_comment(self, content: str, attachments: list[str] = []):
@@ -900,10 +901,10 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                # Queued, not sent inline: an unreachable mail server must not fail the reply already saved.
             )
-        except Exception as e:
-            frappe.throw(_(e))
+        except Exception:
+            self.log_error("Could not queue the reply notification to agents")
 
     def send_acknowledgement_email(self):
         acknowledgement_email_content = frappe.db.get_single_value(
@@ -923,14 +924,11 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
             )
-        except Exception as e:
-            frappe.throw(
-                _("Could not send an acknowledgement email due to: {0}").format(e)
-            )
+        except Exception:
+            self.log_error("Could not queue the acknowledgement email")
 
     @frappe.whitelist()
     def mark_seen(self):

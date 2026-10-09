@@ -27,9 +27,6 @@ export const useConfigStore = defineStore("config", () => {
   const skipEmailWorkflow: ComputedRef<boolean> = computed(
     () => !!parseInt(config.value.skip_email_workflow)
   );
-  const preferKnowledgeBase = computed(
-    () => !!parseInt(config.value.prefer_knowledge_base)
-  );
   const isFeedbackMandatory = computed(
     () => !!parseInt(config.value.is_feedback_mandatory)
   );
@@ -45,7 +42,6 @@ export const useConfigStore = defineStore("config", () => {
     brandLogo,
     favicon,
     config,
-    preferKnowledgeBase,
     skipEmailWorkflow,
     isFeedbackMandatory,
     teamRestrictionApplied,

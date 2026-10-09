@@ -85,7 +85,11 @@
   "reply_email_to_agent_content",
   "reply_from_agent_section",
   "enable_reply_email_via_agent",
-  "reply_via_agent_email_content"
+  "reply_via_agent_email_content",
+  "allow_customer_managers_to_invite",
+  "allow_customer_managers_to_change_roles",
+  "allow_customer_managers_to_remove_members",
+  "allow_customer_managers_to_edit_organization"
  ],
  "fields": [
   {
@@ -560,12 +564,40 @@
    "fieldname": "auto_set_customer_from_contact",
    "fieldtype": "Check",
    "label": "Auto-set customer from contact"
+  },
+  {
+   "fieldname": "allow_customer_managers_to_invite",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to invite members",
+   "description": "If enabled, customer managers can invite people to their organization from the portal. Invited people get a portal login."
+  },
+  {
+   "fieldname": "allow_customer_managers_to_change_roles",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to change member roles",
+   "description": "If enabled, customer managers can promote members of their organization to managers, or demote them back."
+  },
+  {
+   "fieldname": "allow_customer_managers_to_remove_members",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to remove members",
+   "description": "If enabled, customer managers can remove people from their organization."
+  },
+  {
+   "fieldname": "allow_customer_managers_to_edit_organization",
+   "fieldtype": "Check",
+   "default": "0",
+   "label": "Allow customer managers to edit organization details",
+   "description": "If enabled, customer managers can change their organization's name and logo."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-30 18:00:00.000000",
+ "modified": "2026-10-09 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

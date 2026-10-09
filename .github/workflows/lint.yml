@@ -20,9 +20,11 @@ jobs:
           node-version: 24
           check-latest: true
       - name: Check commit titles
+        # Installed outside the repo: npm rejects the root package.json's yarn `link:` dependency.
         run: |
-          npm install @commitlint/cli @commitlint/config-conventional
-          npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+          cp commitlint.config.mjs "$RUNNER_TEMP/"
+          (cd "$RUNNER_TEMP" && npm install @commitlint/cli @commitlint/config-conventional)
+          "$RUNNER_TEMP/node_modules/.bin/commitlint" --config "$RUNNER_TEMP/commitlint.config.mjs" --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
   linter:
     name: 'Frappe Linter'

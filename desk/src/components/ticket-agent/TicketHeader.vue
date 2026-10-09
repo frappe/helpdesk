@@ -90,6 +90,7 @@ import {
 } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
+import { reloadTicketFeed } from "@/composables/useTicket";
 import { useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
@@ -150,7 +151,10 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit({ status: o.label_agent });
+      ticket.value.setValue.submit(
+        { status: o.label_agent },
+        { onSuccess: () => reloadTicketFeed(ticket.value.name) }
+      );
     },
     icon: () =>
       h(IndicatorIcon, {

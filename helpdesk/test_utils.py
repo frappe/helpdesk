@@ -176,6 +176,12 @@ def make_ticket(
     return ticket
 
 
+def make_feedback_option(label: str, rating: float = 1.0):
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Feedback Option", "label": label, "rating": rating}
+    ).insert()
+
+
 def close_emailed_ticket(raised_by: str) -> str:
     """Only a ticket that arrived by email is ever sent a feedback link."""
     ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
@@ -658,6 +664,42 @@ def get_invitation(email: str):
         ["name", "customer", "contact"],
         as_dict=True,
     )
+
+
+def get_organization_members(customer: str) -> dict:
+    """The portal's member rows for a customer, keyed by contact name."""
+    from helpdesk.api.organization import get_organization
+
+    return {
+        member["contact"]: member
+        for member in get_organization(customer)["members"]
+        if member.get("contact")
+    }
+
+
+def get_organization_card(customer: str) -> dict:
+    """The portal's card for one of the session user's organizations."""
+    from helpdesk.api.organization import get_settings
+
+    return next(
+        org for org in get_settings()["organizations"] if org["name"] == customer
+    )
+
+
+def get_invitable_emails(customer: str) -> list[str]:
+    from helpdesk.api.organization import get_invitable_contacts
+
+    return [row["email"] for row in get_invitable_contacts(customer)]
+
+
+def delete_invitations(email: str) -> None:
+    """Remove every helpdesk invitation raised for an email, whoever the session user is."""
+    frappe.set_user("Administrator")
+    names = frappe.get_all(
+        "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
+    )
+    for name in names:
+        frappe.delete_doc("User Invitation", name, force=True)
 
 
 def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
