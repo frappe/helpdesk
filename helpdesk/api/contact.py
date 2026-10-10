@@ -109,6 +109,10 @@ def create_contact(doc: dict, invite: bool = False) -> str:
             customer=doc.get("customer"),
         )
         contact_doc.reload()
+    elif customer := doc.get("customer"):
+        customer_doc = frappe.get_doc("HD Customer", customer)
+        customer_doc.add_contact(contact_doc.name)
+        customer_doc.save()
 
     return contact_doc.get("name")
 
