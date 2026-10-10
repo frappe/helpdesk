@@ -20,6 +20,7 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     make_customer_ticket,
+    make_template,
     reply_from_the_portal,
     set_default_template_visibility,
 )
@@ -143,6 +144,32 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         unlisted = [f for f in CORE_TICKET_FIELDS if f not in form]
         self.assertIn("priority", form)
         self.assertEqual(details, form + unlisted)
+
+    def test_agent_customizations_follow_the_ticket_template(self):
+        """The details tab must use the opened ticket's template, not Default."""
+        self.addCleanup(set_default_template_visibility("priority", "Everyone"))
+        template = make_template(
+            f"Agent Customizations {frappe.generate_hash(length=6)}",
+            [
+                {
+                    "fieldname": "summary",
+                    "visible_to": "Agents",
+                    "required": 1,
+                    "placeholder": "Summarize the issue",
+                }
+            ],
+        )
+        ticket = make_customer_ticket(
+            self, CUSTOMER_EMAIL, template=template.name, summary="A custom summary"
+        )
+        frappe.set_user(AGENT_EMAIL)
+
+        rows = get_ticket_customizations(ticket=ticket.name)["fields"]
+
+        self.assertEqual(rows[0].fieldname, "summary")
+        self.assertEqual(rows[0].required, 1)
+        self.assertEqual(rows[0].placeholder, "Summarize the issue")
+        self.assertEqual(get_ticket_customizations()["fields"][0].fieldname, "priority")
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""

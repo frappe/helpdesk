@@ -271,6 +271,7 @@ import {
   PropType,
   provide,
   ref,
+  watch,
   watchEffect,
 } from "vue";
 
@@ -353,7 +354,9 @@ const contact = computed(() => ticketComposable.value.contact);
 
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
-  cache: ["HD Ticket", "customizations"],
+  makeParams: () => ({
+    ticket: props.ticketId,
+  }),
   auto: true,
 });
 
@@ -564,6 +567,15 @@ onMounted(() => {
   // in place (mobile has no live socket refresh to keep the cache current).
   revalidateTicket(props.ticketId);
 });
+
+watch(
+  () => props.ticketId,
+  (newTicketId, oldTicketId) => {
+    if (newTicketId === oldTicketId) return;
+    customizations.reload();
+    revalidateTicket(newTicketId);
+  }
+);
 
 onUnmounted(() => {
   document.title = "Helpdesk";
