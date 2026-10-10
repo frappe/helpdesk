@@ -106,22 +106,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
-import { call } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import PortalFeedbackThumb from "@app/components/knowledge_base/PortalFeedbackThumb.vue";
-import { ROUTES } from "@app/routes";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { useSession } from "@app/stores/session";
-import { runAction } from "@app/utils";
+import {
+  feedbackAnswers,
+  saveArticleFeedback,
+} from "@app/components/knowledge_base/articleFeedback";
 import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 
-// Values match HD Article Feedback: 1 like, 2 dislike; 0 clears, sent by a second click.
-const ANSWERS = [
-  { value: 1, label: __("Yes, it was helpful") },
-  { value: 2, label: __("No, it wasn't helpful") },
-] as const;
+const ANSWERS = feedbackAnswers();
 
 defineProps<{
   articles?:
@@ -130,30 +128,16 @@ defineProps<{
 }>();
 
 const router = useRouter();
-const session = useSession();
-// As on the article page: a guest's feedback only counts when anonymous voting is on.
-const canGiveFeedback = computed(
-  () =>
-    !session.isGuest.value ||
-    Boolean(session.config.value?.allow_anonymous_article_voting)
-);
+const { canGiveFeedback } = useSession();
 const open = ref<string | null>(null);
 const feedbackByArticle = reactive<Record<string, number>>({});
 
 function giveFeedback(article: string, answer: number) {
-  const value = feedbackByArticle[article] === answer ? 0 : answer;
-  return runAction(
-    async () => {
-      await call("helpdesk.api.knowledge_base.set_article_feedback", {
-        article,
-        value,
-      });
-      feedbackByArticle[article] = value;
-    },
-    {
-      success: __("Thanks for your feedback!"),
-      fallback: __("Could not submit feedback"),
-    }
+  return saveArticleFeedback(
+    article,
+    feedbackByArticle[article],
+    answer,
+    (value) => (feedbackByArticle[article] = value)
   );
 }
 </script>

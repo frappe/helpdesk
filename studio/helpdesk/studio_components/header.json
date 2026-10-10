@@ -3,11 +3,11 @@
   "baseStyles": {
    "alignItems": "center",
    "display": "flex",
-   "height": "fit-content",
    "justifyContent": "space-between",
    "width": "100%",
    "minWidth": "0",
-   "gap": "12px"
+   "gap": "12px",
+   "flexShrink": 0
   },
   "children": [
    {
@@ -25,11 +25,41 @@
     "blockName": "container",
     "children": [
      {
-      "componentId": "topbar_logo-1k0b8u75h",
-      "componentName": "topbar_logo",
-      "componentProps": {},
+      "classes": [
+       "md:hidden",
+       "shrink-0"
+      ],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "drawer.toggle()"
+       }
+      },
+      "componentId": "Button-drawer-start",
+      "componentName": "Button",
+      "componentProps": {
+       "aria-label": "{{ inputs.drawerLabel }}",
+       "icon": "lucide-menu",
+       "variant": "ghost"
+      },
+      "visibilityCondition": "{{ inputs.drawerToggle === 'start' }}"
+     },
+     {
+      "baseStyles": {
+       "display": "flex",
+       "width": "fit-content"
+      },
+      "blockName": "topbar-left",
+      "componentId": "KbNavMenu-topbar",
+      "componentName": "PortalNavMenu",
+      "componentProps": {
+       "logo": "{{ brandLogo }}",
+       "name": "{{ brandName }}",
+       "options": "{{ accountMenuOptions }}"
+      },
       "componentSlots": {},
-      "isStudioComponent": true
+      "isCustomVueComponent": true
      },
      {
       "baseStyles": {
@@ -55,7 +85,7 @@
       "componentName": "PortalViewBreadcrumbs",
       "componentProps": {
        "currentView": "{{ inputs.currentView }}",
-       "label": "{{ inputs.viewLabel || 'Tickets' }}",
+       "label": "{{ inputs.viewLabel || t('Tickets') }}",
        "options": "{{ inputs.viewOptions }}",
        "viewActions": "{{ inputs.viewActions }}"
       },
@@ -164,6 +194,27 @@
       },
       "componentSlots": {},
       "visibilityCondition": "{{ pageActionLabel }}"
+     },
+     {
+      "classes": [
+       "lg:hidden",
+       "shrink-0"
+      ],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "drawer.toggle()"
+       }
+      },
+      "componentId": "Button-drawer-end",
+      "componentName": "Button",
+      "componentProps": {
+       "aria-label": "{{ inputs.drawerLabel }}",
+       "icon": "lucide-panel-right",
+       "variant": "ghost"
+      },
+      "visibilityCondition": "{{ inputs.drawerToggle === 'end' }}"
      }
     ],
     "componentId": "container-header-right",
@@ -175,7 +226,15 @@
   "componentName": "container",
   "componentProps": {},
   "componentSlots": {},
-  "originalElement": "div"
+  "originalElement": "div",
+  "classes": [
+   "h-[43px]",
+   "bg-surface-base",
+   "border-b",
+   "border-outline-gray-2",
+   "px-3",
+   "sm:px-5"
+  ]
  },
  "component_id": "header",
  "component_name": "Header",
@@ -218,10 +277,20 @@
    "input_name": "viewLabel",
    "required": 0,
    "type": "Data"
+  },
+  {
+   "input_name": "drawerToggle",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "drawerLabel",
+   "required": 0,
+   "type": "Data"
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-07 06:30:00.000000",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

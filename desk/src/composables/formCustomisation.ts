@@ -1,9 +1,7 @@
 import { parseLinkFilters } from "@helpdesk/shared/utils";
 
 export {
-  createToast,
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
+  applyFieldFilters,
   setupCustomizations,
 } from "@helpdesk/shared/formScripts";
 

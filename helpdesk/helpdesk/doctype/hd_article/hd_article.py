@@ -25,8 +25,7 @@ class HDArticle(Document):
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
-            old_category = self.get_doc_before_save().get("category")
-            self.check_category_length(old_category)
+            check_category_length(self.get_doc_before_save().get("category"))
 
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
@@ -74,15 +73,7 @@ class HDArticle(Document):
         capture_event("article_created")
 
     def on_trash(self):
-        self.check_category_length()
-
-    def check_category_length(self, category=None):
-        category = category or self.get("category")
-        if not category:
-            return
-        category_articles = frappe.db.count("HD Article", {"category": category})
-        if category_articles == 1:
-            frappe.throw(_("Category must have at least one article"))
+        check_category_length(self.category)
 
     @staticmethod
     def default_list_data():
@@ -126,12 +117,7 @@ class HDArticle(Document):
         if value not in (0, 1, 2):
             frappe.throw(_("Invalid vote"))
         self.validate_voter(visitor_id)
-        voter = (
-            {"visitor_id": visitor_id}
-            if frappe.session.user == "Guest"
-            else {"user": frappe.session.user}
-        )
-        self.save_feedback(voter, value)
+        self.save_feedback(get_voter(visitor_id), value)
 
     def validate_voter(self, visitor_id: str | None):
         if frappe.session.user != "Guest":
@@ -215,6 +201,38 @@ def get_shared_visibility(category: str) -> str | None:
         distinct=True,
     )
     return values[0] if len(values) == 1 else None
+
+
+def get_joining_values(category: str) -> dict:
+    """An article joining a category whose articles share one access takes it."""
+    values = {"category": category}
+    if visibility := get_shared_visibility(category):
+        values["visibility"] = visibility
+    return values
+
+
+def update_articles(filters: dict, values: dict) -> None:
+    """Bulk `set_value` skips the hook that reindexes, so this reindexes what it touched."""
+    # search_sqlite imports this module
+    from helpdesk.search_sqlite import reindex_articles
+
+    names = frappe.get_all("HD Article", filters=filters, pluck="name")
+    if not names:
+        return
+    frappe.db.set_value("HD Article", filters, values, update_modified=False)
+    reindex_articles(names)
+
+
+def check_category_length(category: str | None) -> None:
+    if category and frappe.db.count("HD Article", {"category": category}) == 1:
+        frappe.throw(_("Category must have at least one article"))
+
+
+def get_voter(visitor_id: str | None) -> dict | None:
+    """Who a vote belongs to: the user, or a guest by cookie; None for a guest without one."""
+    if frappe.session.user != "Guest":
+        return {"user": frappe.session.user}
+    return {"visitor_id": visitor_id} if visitor_id else None
 
 
 def permission_query(user: str | None = None) -> str | None:

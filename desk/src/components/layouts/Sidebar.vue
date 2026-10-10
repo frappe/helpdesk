@@ -8,7 +8,7 @@
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
         <TrialBanner
-          v-if="isFCSite && !isCustomerPortal"
+          v-if="isFCSite"
           :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
@@ -16,19 +16,17 @@
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <template v-if="!isCustomerPortal">
-          <CustomerPortalPermissionBanner
-            v-if="isBannerVisible('customer_portal_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-          <TicketFieldPermissionBanner
-            v-if="isBannerVisible('ticket_field_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-        </template>
+        <CustomerPortalPermissionBanner
+          v-if="isBannerVisible('customer_portal_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
+        <TicketFieldPermissionBanner
+          v-if="isBannerVisible('ticket_field_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        v-if="isOnboardingStepsCompleted"
         :label="__('Help')"
         :icon="HelpIcon"
         :on-click="
@@ -81,7 +79,7 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
-import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
   GettingStartedBanner,
@@ -99,7 +97,7 @@ import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
@@ -134,21 +132,6 @@ const themeMenuItem = computed(() => ({
 }));
 
 const isFCSite = ref(window.is_fc_site);
-
-const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    options: [
-      {
-        label: __("Log out"),
-        icon: "lucide-log-out",
-        onClick: () => authStore.logout(),
-      },
-    ],
-  },
-]);
 
 const agentPortalDropdown = computed(() => [
   appsMenuOption.value,
@@ -196,11 +179,7 @@ const agentPortalDropdown = computed(() => [
   },
 ]);
 
-const profileSettings = computed(() => {
-  return isCustomerPortal.value
-    ? customerPortalDropdown.value
-    : agentPortalDropdown.value;
-});
+const profileSettings = agentPortalDropdown;
 
 const logo = h(
   HDLogo,
@@ -212,7 +191,6 @@ const logo = h(
 
 const showOnboardingBanner = computed(() => {
   return (
-    !isCustomerPortal.value &&
     !isOnboardingStepsCompleted?.value &&
     authStore.isManager
   );
@@ -486,7 +464,6 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
-  if (isCustomerPortal.value) return;
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });

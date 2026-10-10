@@ -56,49 +56,36 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Static rules outrank frappe's /kb/<category>; add one per single-segment Studio page.
-    {
-        "from_route": "/kb/customer-tickets",
-        "to_route": "kb",
-    },
-    {
-        "from_route": "/kb/categories",
-        "to_route": "kb",
-    },
 ]
 
 # The old customer portal's URLs keep working through these.
 website_redirects = [
     {
         "source": "/helpdesk/my-tickets/new",
-        "target": "/kb/tickets/new",
+        "target": "/help/tickets/new",
         "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/my-tickets",
-        "target": "/kb/customer-tickets",
+        "target": "/help/customer-tickets",
         "forward_query_parameters": True,
     },
     {
         "source": r"/helpdesk/my-tickets/(.*)",
-        "target": r"/kb/tickets/\1",
+        "target": r"/help/tickets/\1",
         "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/kb-public",
-        "target": "/kb",
-    },
-    {
-        "source": "/kb/help",
-        "target": "/kb",
+        "target": "/help",
     },
     {
         "source": r"/helpdesk/kb-public/articles/(.*)",
-        "target": r"/kb/articles/\1",
+        "target": r"/help/articles/\1",
     },
     {
         "source": r"/helpdesk/kb-public/(.*)",
-        "target": r"/kb/category/\1",
+        "target": r"/help/category/\1",
     },
 ]
 

@@ -12,6 +12,7 @@ from pypika import Order
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
+from helpdesk.helpdesk.doctype.hd_ticket.origin import ORIGIN_FIELDS
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
@@ -20,12 +21,18 @@ TIMELINE_FIELDS = ("status",)
 
 @frappe.whitelist()
 # flake8: noqa
-def new(doc: dict, attachments: list[dict] = []):
+def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
-    d = frappe.get_doc(doc).insert()
+    # an agent can write these fields, so only the resolved origin may set them
+    for fieldname in ORIGIN_FIELDS:
+        doc.pop(fieldname, None)
+    d = frappe.get_doc(doc)
+    # only the portal sends an origin; the agent desk's tickets keep the fields empty
+    d.flags.origin = origin
+    d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
 
 
@@ -64,6 +71,8 @@ def get_one(name: str):
     fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
+    # The desk's getdoc marks it seen; this is the portal's, or the list keeps it bold.
+    doc.add_seen()
     outside_hours_banner = get_outside_hours_banner(doc)
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
@@ -150,42 +159,14 @@ def get_communications(ticket: str):
     )
     for c in communications:
         c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
-    agents = _get_agent_senders({c.author_id for c in communications})
+    authors = {c.author_id for c in communications if c.author_id}
+    agents = {author for author in authors if is_agent(author)}
     for c in communications:
         c.attachments = get_attachments("Communication", c.name)
         c.user = get_user_info_for_avatar(c.author_id)
         # The author's role, not the direction: an agent replying from the portal is still an agent.
         c.is_agent = c.pop("author_id") in agents
     return communications
-
-
-def _get_agent_senders(senders: set[str]) -> set[str]:
-    """The senders who are agents, resolved in two queries rather than one per author."""
-    senders.discard(None)
-    if not senders:
-        return set()
-    users = dict(
-        frappe.get_all(
-            "User",
-            filters={"email": ["in", list(senders)]},
-            fields=["email", "name"],
-            as_list=True,
-        )
-    )
-    user_of = {sender: users.get(sender) or sender for sender in senders}
-    active = dict(
-        frappe.get_all(
-            "HD Agent",
-            filters={"name": ["in", list(set(user_of.values()))]},
-            fields=["name", "is_active"],
-            as_list=True,
-        )
-    )
-    return {
-        sender
-        for sender, user in user_of.items()
-        if (bool(active[user]) if user in active else is_agent(user))
-    }
 
 
 def get_call_logs(ticket: str):
@@ -669,12 +650,6 @@ def show_banner_next_day(ticket):
     """Show the banner until the first working day after the ticket was raised begins."""
     next_start = ticket.get_sla().get_next_working_day_start(ticket.creation)
     return next_start is None or now_datetime() <= next_start
-
-
-@frappe.whitelist()
-def show_outside_hours_banner(ticket_name: str):
-    frappe.has_permission("HD Ticket", "read", ticket_name, throw=True)
-    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))
 
 
 def get_outside_hours_banner(ticket) -> dict:

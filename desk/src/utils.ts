@@ -1,6 +1,5 @@
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
-import { useClipboard } from "@vueuse/core";
 import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
 import zod from "zod";
@@ -18,36 +17,8 @@ export {
   isEmoji,
   parseApiOptions,
   prettyDate,
-  shortDuration,
   timeAgo,
 } from "@helpdesk/shared/utils";
-
-/**
- * Wrapper to create toasts, supplied with default options.
- * https://frappeui.com/components/toast.html
- * @param options - `Toast` options
- */
-
-/**
- * Copy a string to clipboard, and create a toast
- * @param s - String to copy
- */
-export async function copy(s: string) {
-  const { copy: c } = useClipboard();
-  c(s).then(() => toast.success(__("Copied to clipboard.")));
-}
-
-/**
- * Get assigned user from `_assign` string. The return value is a `string`,
- * not a `User` object.
- * @param s - `_assign` string (JSON)
- * @returns user id
- */
-export function getAssign(s: string): string | undefined {
-  const assignJson = JSON.parse(s);
-  const arr = Array.isArray(assignJson) ? assignJson : [];
-  return arr.slice(-1).pop();
-}
 
 export function extractEmail(input: string) {
   const match = input.match(/<([^>]+)>$/); // grabs the part inside <>
@@ -75,10 +46,6 @@ export function dateFormat(date, format?: string) {
   if (!date) return "";
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
-}
-
-export function errorMessage(title, message) {
-  toast.error(message);
 }
 
 export function formatTime(
@@ -130,26 +97,6 @@ export function formatTime(
   const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
   return limited.join(" ").trim();
 }
-
-export function getTimeInSeconds(time: string) {
-  // time in the format 1h 2m 3s
-  let timeParts = time.split(" ");
-  let seconds = 0;
-  timeParts.forEach((part) => {
-    if (part.endsWith("d")) {
-      seconds += parseInt(part) * 24 * 60 * 60; // days
-    } else if (part.endsWith("h")) {
-      seconds += parseInt(part) * 60 * 60; // hours
-    } else if (part.endsWith("m")) {
-      seconds += parseInt(part) * 60; // minutes
-    } else if (part.endsWith("s")) {
-      seconds += parseInt(part); // seconds
-    }
-  });
-  return seconds;
-}
-
-export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
@@ -268,26 +215,6 @@ export function getIcon(icon) {
   }
   return icon;
 }
-export function formatTimeShort(date: string) {
-  const now = dayjsLocal();
-  const inputDate = dayjsLocal(date);
-  const diffSeconds = now.diff(inputDate, "second");
-  const diffMinutes = now.diff(inputDate, "minute");
-  const diffHours = now.diff(inputDate, "hour");
-  const diffDays = now.diff(inputDate, "day");
-  const diffWeeks = now.diff(inputDate, "week");
-  const diffMonths = now.diff(inputDate, "month");
-  const diffYears = now.diff(inputDate, "year");
-
-  if (diffSeconds < 60) return `${diffSeconds} s`;
-  if (diffMinutes < 60) return `${diffMinutes} m`;
-  if (diffHours < 24) return `${diffHours} h`;
-  if (diffDays < 7) return `${diffDays} d`;
-  if (diffWeeks < 4) return `${diffWeeks} w`;
-  if (diffMonths < 12) return `${diffMonths} M`;
-  return `${diffYears}Y`;
-}
-
 function hasArabicContent(content: string) {
   const arabicRegex = /[\u0600-\u06FF]/;
   return arabicRegex.test(content);
@@ -341,41 +268,6 @@ export function getFormattedDate(date) {
   if (!dateObj.isValid()) return "";
 
   return dateObj.format(getDateFormat());
-}
-
-export function TemplateOption({ active, option, variant, icon, onClick }) {
-  return h(
-    "button",
-    {
-      class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-8",
-        "group flex w-full gap-2 items-center rounded-5 px-2 py-2 text-base hover:bg-surface-gray-3",
-        variant == "danger" ? "text-ink-red-6 hover:bg-surface-red-1" : "",
-      ],
-      onClick: onClick,
-    },
-    [renderOptionIcon(icon), h("span", { class: "whitespace-nowrap" }, option)]
-  );
-}
-
-/**
- * Renders an option icon: icon-name strings through the lucide sprite,
- * components as-is.
- */
-export function renderOptionIcon(
-  icon: string | object | null,
-  classes: string[] = ["h-4 w-4 shrink-0"]
-) {
-  if (!icon) return null;
-  // `lucide-*` renders as a Tailwind mask class; the sprite only carries
-  // canonical names, so aliases like `trash-2` exist there but not in it.
-  if (typeof icon === "string" && icon.startsWith("lucide-")) {
-    return h("span", { class: [icon, ...classes], "aria-hidden": true });
-  }
-  if (typeof icon === "string") {
-    return h(Icon, { name: icon, class: classes, "aria-hidden": true });
-  }
-  return h(icon, { class: classes, "aria-hidden": true });
 }
 
 export function getGridTemplateColumnsForTable(columns) {

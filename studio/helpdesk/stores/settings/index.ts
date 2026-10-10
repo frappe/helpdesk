@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { bindRouter, navigateTo } from '@app/stores/router'
 import { askConfirm } from '@app/utils'
 import { useSession } from '@app/stores/session'
@@ -19,8 +19,8 @@ fetchTranslations()
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
-const dialog = createSettingsDialog(core, organization)
 const session = useSession()
+const dialog = createSettingsDialog(core, organization, session)
 
 // Here, not in the dialog, so the saved theme applies on load rather than on open.
 const { colorScheme, setColorScheme, resolvedColorScheme, toggleColorScheme } = useColorScheme()
@@ -112,6 +112,8 @@ const store = {
   conversationLayoutOptions,
   // Blocks bind `t`, not `__`.
   t: __,
+  // Blocks bind `routes.*`, not hand-written paths.
+  routes: ROUTES,
   accountMenuOptions,
   // HD Form Script header actions; the ticket pages fill them.
   customActions: [],

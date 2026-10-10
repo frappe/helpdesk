@@ -3,7 +3,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { getIcon, isCustomerPortal } from "@/utils";
+import { getIcon } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
 import {
   call,
@@ -12,7 +12,7 @@ import {
   toast,
 } from "frappe-ui";
 import { Icon } from "frappe-ui/experimental";
-import { computed, h, ref, watch } from "vue";
+import { computed, h, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const debouncedSetValue = useDebounceFn(
@@ -52,20 +52,15 @@ export function useView(dt: string = null) {
     if (
       (views.filters?.dt === dt && views.data?.length > 0) ||
       views.list?.promise
-      // views.isCustomerPortal === isCustomerPortal.value
     ) {
       return;
     }
     const filters = {
-      is_customer_portal: isCustomerPortal.value,
+      is_customer_portal: false,
     };
     if (dt) {
       filters["dt"] = dt;
     }
-    if (isCustomerPortal.value) {
-      filters["user"] = auth.userId;
-    }
-    views.isCustomerPortal = isCustomerPortal.value;
     views.update({ filters });
     views.fetch();
   }
@@ -158,7 +153,7 @@ export function useView(dt: string = null) {
     const defaultView = views.data?.find(
       (v: View) => v.is_default && v.user === auth.userId && v.dt === view.dt
     );
-    view.is_customer_portal = isCustomerPortal.value;
+    view.is_customer_portal = false;
     if (defaultView) {
       delete view["name"];
 
@@ -247,7 +242,7 @@ export function useView(dt: string = null) {
         });
       }
       if (!_view.is_standard) {
-        if (auth.isManager && !isCustomerPortal.value) {
+        if (auth.isManager) {
           actions[0].options.push({
             label: _view?.public ? __("Make Private") : __("Make Public"),
             icon: h(Icon, {
@@ -392,7 +387,7 @@ export function useView(dt: string = null) {
         rows: JSON.stringify(list?.data?.rows),
         pinned: viewInfo.pinned ?? false,
         public: viewInfo.public ?? false,
-        is_customer_portal: isCustomerPortal.value,
+        is_customer_portal: false,
       };
     }
 
@@ -424,14 +419,6 @@ export function useView(dt: string = null) {
     viewDialogConfig.view.name = "";
     viewDialogConfig.mode = null;
   }
-
-  watch(
-    () => isCustomerPortal.value,
-    (newVal) => {
-      views.isCustomerPortal = newVal;
-      callGetViews();
-    }
-  );
 
   return {
     views,

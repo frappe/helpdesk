@@ -1,10 +1,9 @@
 import { computed, markRaw, onScopeDispose, ref, watch } from 'vue'
 import { useDocumentVisibility } from '@vueuse/core'
-import { createResource, toast } from 'frappe-ui'
+import { createResource } from 'frappe-ui'
 import { subscribeToDoc } from '@framework/ui/socket'
 import LucideCircleCheck from '~icons/lucide/circle-check'
 import LucideRotateCcw from '~icons/lucide/rotate-ccw'
-import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { useDrawer } from '@app/composables/useDrawer'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
@@ -12,11 +11,11 @@ import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
+import { askConfirm, runAction, runFormScripts, updateTicket, type ActionOptions } from '@app/utils'
 
 export default function setup(context) {
   const { route } = context
@@ -33,29 +32,21 @@ export default function setup(context) {
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
-    onSuccess: runFormScripts,
+    onSuccess: async (data) => {
+      customActions.value = await runFormScripts(data, context, { doc: data, updateField })
+    },
   })
 
-  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
-  async function runFormScripts(data) {
-    await setupCustomizations(data, {
-      doc: data,
-      call: context.call,
-      router: context.router,
-      toast,
-      createToast,
-      $dialog: scriptDialog,
-      updateField,
-    })
-    customActions.value = data._customActions || []
+  function saveTicket(values: Record<string, unknown>, options: ActionOptions) {
+    return runAction(async () => {
+      await updateTicket(ticketId.value, values)
+      ticket.fetch()
+    }, options)
   }
 
   function updateField(fieldname: string, value: unknown, callback = () => {}) {
-    runAction(
-      async () => {
-        await updateTicket(ticketId.value, { [fieldname]: value })
-        ticket.fetch()
-      },
+    saveTicket(
+      { [fieldname]: value },
       { success: __('Ticket updated successfully.'), fallback: __('Could not update this ticket') },
     )
     callback()
@@ -119,7 +110,7 @@ export default function setup(context) {
   const visibility = useDocumentVisibility()
   watch(visibility, (state, before) => state === 'visible' && before === 'hidden' && refresh())
 
-  const feedback = useTicketFeedback(ticket)
+  const feedback = useTicketFeedback(saveTicket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
   const isUpdatingStatus = ref(false)
@@ -171,11 +162,13 @@ export default function setup(context) {
   const suggestedArticles = computed(() => relatedArticles.data || [])
 
   const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
-  // Where a rating is required, the status cannot be written without it.
-  const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
+  // Where a rating is required, the status cannot be written without it; agents are not asked, as on the server.
+  const wantsFeedback = computed(
+    () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !config.value?.is_agent,
+  )
 
   function onPageAction() {
-    if (isClosed.value) return navigateTo(ROUTES.newTicket)
+    if (isClosed.value) return navigateTo(ROUTES.newTicket({ from: 'closed-ticket' }))
     if (wantsFeedback.value) return feedback.openFeedback()
     askConfirm({
       title: __('Close ticket'),
@@ -187,23 +180,13 @@ export default function setup(context) {
   }
 
   function closeTicket() {
-    return setStatus(CLOSED_STATUS, { fallback: __('Could not close this ticket') })
-  }
-
-  function setStatus(status: string, messages: { success?: string; fallback: string }) {
-    return runAction(
-      async () => {
-        await updateTicket(ticketId.value, { status })
-        ticket.fetch()
-      },
-      { busy: isUpdatingStatus, ...messages },
-    )
+    return saveTicket({ status: CLOSED_STATUS }, { busy: isUpdatingStatus, fallback: __('Could not close this ticket') })
   }
 
   return {
     ...settings,
     ...useTicketDetails(ticket, thread, timelineChanges),
-    ...useReplyComposer(ticket, config),
+    ...useReplyComposer(ticket, { isClosed, isAgent: settings.isAgent }),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),

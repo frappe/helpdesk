@@ -210,7 +210,7 @@
 <script setup lang="ts">
 import { LayoutHeader } from "@/components";
 import SearchMultiSelect from "@/components/SearchMultiSelect.vue";
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
 import {
   Breadcrumbs,

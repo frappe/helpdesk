@@ -19,7 +19,6 @@ import { createDialog } from "./components/dialogs";
 import "./index.css";
 import { router } from "./router";
 import { telemetryPlugin } from "@framework/ui";
-import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
 import CircleAlert from "~icons/lucide/circle-alert";
 import { initSocket } from "./socket";
@@ -42,9 +41,6 @@ setConfig("resourceFetcher", (options) =>
 );
 
 function showServerMessages(msgs) {
-  if (isCustomerPortal.value) {
-    return;
-  }
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
     // `alert` is frappe's own flag for throwaway desk chatter ("Document

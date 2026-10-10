@@ -13,28 +13,7 @@
             v-model="view.label"
           />
         </div>
-        <div>
-          <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Icon") }}</div>
-          <div class="flex items-center gap-2">
-            <div
-              v-if="currentIsEmoji"
-              class="grid size-7 shrink-0 place-items-center rounded-4 bg-surface-gray-3 text-base leading-none"
-              :title="__('Current icon')"
-            >
-              {{ view.icon }}
-            </div>
-            <IconPicker
-              v-model="pickerIcon"
-              :max-icons="1000"
-              class="flex-1"
-              :placeholder="
-                currentIsEmoji
-                  ? __('Replace with an icon...')
-                  : __('Select an icon...')
-              "
-            />
-          </div>
-        </div>
+        <ViewIconField v-model="view.icon" />
         <!-- A view is either pinned (private, in "Private Views") or public (in
         "Public Views") - never both - so checking one disables the other. -->
         <div v-if="isCreateMode" class="grid grid-cols-2 gap-2">
@@ -69,9 +48,8 @@
 <script setup>
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import { isCustomerPortal, isEmoji } from "@/utils";
+import ViewIconField from "@helpdesk/shared/ViewIconField.vue";
 import { Dialog } from "frappe-ui";
-import { IconPicker } from "frappe-ui/experimental";
 import { computed, ref } from "vue";
 
 let viewDialogConfig = defineModel();
@@ -90,27 +68,10 @@ const view = ref({
   public: false,
 });
 
-// frappe-ui's IconPicker is lucide-only. Legacy views may store an emoji, which
-// the picker would otherwise echo as raw text. Hide non-lucide values from the
-// picker (showing the placeholder) while keeping the stored icon intact, so a
-// no-op edit preserves the emoji and picking a lucide icon migrates it.
-const currentIsEmoji = computed(() => isEmoji(view.value.icon));
-
-const pickerIcon = computed({
-  get: () => {
-    const icon = view.value.icon;
-    if (!icon || isEmoji(icon)) return "";
-    return icon;
-  },
-  set: (value) => {
-    view.value.icon = value || "";
-  },
-});
-
 const isCreateMode = computed(() => modalInfo.value.action === "create");
 
-// Only managers can publish views, and the customer portal has no public views.
-const canMakePublic = computed(() => isManager && !isCustomerPortal.value);
+// Only managers can publish views.
+const canMakePublic = computed(() => isManager);
 
 const modalInfo = computed(() => {
   return {

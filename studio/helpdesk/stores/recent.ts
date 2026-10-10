@@ -8,7 +8,6 @@ export type RecentArticle = {
   name: string
   title: string
   categoryName?: string
-  image?: string | null
   minutes?: number
 }
 

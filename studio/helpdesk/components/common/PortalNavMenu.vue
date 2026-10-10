@@ -30,7 +30,7 @@
 import { computed, h } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
-import { ROUTES } from "@app/routes";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 
 const props = defineProps<{
   options?: unknown[];
@@ -39,8 +39,9 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const isTicketPage = computed(() =>
-  /^\/(customer-tickets|tickets)(\/|$)/.test(route.path)
+const isTicketPage = computed(
+  () =>
+    route.path === ROUTES.ticketList || route.path.startsWith(ROUTES.ticket(""))
 );
 
 function Brand() {

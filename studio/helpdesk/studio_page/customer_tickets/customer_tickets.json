@@ -5,38 +5,16 @@
    "blockName": "body",
    "children": [
     {
-     "blockName": "navbar",
-     "children": [
-      {
-       "blockName": "Header",
-       "componentId": "header-topbar",
-       "componentName": "header",
-       "componentProps": {
-        "currentView": "{{ currentView }}",
-        "viewActions": "{{ viewActions }}",
-        "viewLabel": "Tickets",
-        "viewOptions": "{{ viewOptions }}"
-       },
-       "isStudioComponent": true
-      }
-     ],
-     "classes": [
-      "items-center",
-      "bg-surface-base",
-      "border-b",
-      "border-outline-gray-2",
-      "flex",
-      "shrink-0",
-      "h-[43px]",
-      "justify-between",
-      "py-0",
-      "w-full",
-      "px-3",
-      "sm:px-5"
-     ],
-     "componentId": "container-suug88a18",
-     "componentName": "container",
-     "originalElement": "div"
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "currentView": "{{ currentView }}",
+      "viewActions": "{{ viewActions }}",
+      "viewLabel": "{{ t('Tickets') }}",
+      "viewOptions": "{{ viewOptions }}"
+     },
+     "isStudioComponent": true
     },
     {
      "blockName": "toolbar",
@@ -139,22 +117,23 @@
          "componentId": "Button-tickets-reload",
          "componentName": "Button",
          "componentProps": {
-          "iconLeft": "lucide-refresh-cw",
-          "label": "Refresh",
+          "icon": "lucide-refresh-cw",
+          "label": "{{ t('Refresh') }}",
+          "loading": "{{ listLoading }}",
           "variant": "subtle"
          }
         },
         {
          "componentId": "KbFilter-tickets-filter",
-         "componentName": "Filter",
+         "componentName": "PortalFilter",
          "componentProps": {
-          "doctype": "HD Ticket",
           "fields": "{{ filterFields }}",
           "modelValue": {
            "$type": "variable",
            "name": "filters"
           }
-         }
+         },
+         "isCustomVueComponent": true
         },
         {
          "blockName": "tickets-sort",
@@ -207,8 +186,9 @@
          "componentId": "Button-tickets-reload-icon",
          "componentName": "Button",
          "componentProps": {
-          "aria-label": "{{ t('Refresh') }}",
           "icon": "lucide-refresh-cw",
+          "label": "{{ t('Refresh') }}",
+          "loading": "{{ listLoading }}",
           "variant": "subtle"
          }
         }
@@ -339,7 +319,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 03:12:50.163996",
+ "modified": "2026-10-11 01:05:00.000000",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

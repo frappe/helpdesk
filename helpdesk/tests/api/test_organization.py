@@ -24,6 +24,8 @@ from helpdesk.test_utils import (
     get_invitable_emails,
     get_organization_card,
     get_organization_members,
+    make_invitation,
+    make_organization,
     make_ticket,
     unique_email,
     unique_name,
@@ -38,20 +40,8 @@ class TestOrganizationMembers(IntegrationTestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         frappe.set_user("Administrator")
-        cls.owner = create_contact("Org Owner", unique_email("org-owner"))
-        cls.manager = create_contact("Org Manager", unique_email("org-manager"))
-        cls.member = create_contact("Org Member", unique_email("org-member"))
+        cls.customer, cls.owner, cls.manager, cls.member = make_organization("Org")
         cls.outsider = create_contact("Org Outsider", unique_email("org-outsider"))
-        cls.customer = create_customer(
-            unique_name("Test Member List"),
-            [
-                {"contact_name": cls.owner["contact"]},
-                {"contact_name": cls.manager["contact"], "is_manager": 1},
-                {"contact_name": cls.member["contact"]},
-            ],
-        )
-        cls.customer.primary_contact = cls.owner["contact"]
-        cls.customer.save()
         cls.enterClassContext(
             change_settings(
                 "HD Settings", {"allow_customer_managers_to_change_roles": 1}
@@ -221,14 +211,7 @@ class TestInvitations(IntegrationTestCase):
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.ValidationError),
         ):
-            frappe.get_doc(
-                doctype="User Invitation",
-                email=self.newcomer,
-                roles=[{"role": "HD Customer"}],
-                app_name="helpdesk",
-                redirect_to_path=CUSTOMER_PORTAL_ROOT,
-                customer=self.other_customer.name,
-            ).insert(ignore_permissions=True)
+            make_invitation(self.newcomer, self.other_customer.name)
 
     def test_a_manager_cannot_list_the_helpdesk_invitations(self) -> None:
         with (
@@ -289,19 +272,7 @@ class TestMemberRemoval(IntegrationTestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         frappe.set_user("Administrator")
-        cls.owner = create_contact("Removal Owner", unique_email("removal-owner"))
-        cls.manager = create_contact("Removal Manager", unique_email("removal-manager"))
-        cls.member = create_contact("Removal Member", unique_email("removal-member"))
-        cls.customer = create_customer(
-            unique_name("Test Member Removal"),
-            [
-                {"contact_name": cls.owner["contact"]},
-                {"contact_name": cls.manager["contact"], "is_manager": 1},
-                {"contact_name": cls.member["contact"]},
-            ],
-        )
-        cls.customer.primary_contact = cls.owner["contact"]
-        cls.customer.save()
+        cls.customer, cls.owner, cls.manager, cls.member = make_organization("Removal")
         cls.other_customer = create_customer(unique_name("Test Other Removal"))
         # Removing needs its own setting; cancelling an invitation needs the invite one.
         cls.enterClassContext(
@@ -374,14 +345,7 @@ class TestMemberRemoval(IntegrationTestCase):
 
     def test_another_organizations_invitation_is_refused(self) -> None:
         newcomer = unique_email("newcomer")
-        invitation = frappe.get_doc(
-            doctype="User Invitation",
-            email=newcomer,
-            roles=[{"role": "HD Customer"}],
-            app_name="helpdesk",
-            redirect_to_path=CUSTOMER_PORTAL_ROOT,
-            customer=self.other_customer.name,
-        ).insert()
+        invitation = make_invitation(newcomer, self.other_customer.name)
         self.addCleanup(delete_invitations, newcomer)
 
         with (

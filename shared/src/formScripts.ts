@@ -80,7 +80,7 @@ export async function setupCustomizations(doc, obj) {
   let links = [];
   let onChangeFieldMap = {};
   for (const script of scripts) {
-    const parsed = await parseScript(script, obj);
+    const parsed = await parseScript(script, { toast, createToast, ...obj });
     actions = actions.concat(parsed.actions);
     links = links.concat(parsed.links);
     if (parsed.onChange) {
@@ -129,7 +129,7 @@ async function parseScript(script, obj) {
   }
 }
 
-export function handleSelectFieldUpdate(
+function handleSelectFieldUpdate(
   f: any,
   fieldname: string,
   filters: any,
@@ -147,7 +147,7 @@ export function handleSelectFieldUpdate(
   doc[fieldname] = "";
 }
 
-export function handleLinkFieldUpdate(
+function handleLinkFieldUpdate(
   f: any,
   fieldname: string,
   filters: any,
@@ -164,4 +164,33 @@ export function handleLinkFieldUpdate(
 
   // reset dependent field
   doc[fieldname] = "";
+}
+
+// Backs a form script's `applyFilters(fieldname, values)` on the new ticket form.
+export function applyFieldFilters(
+  fields: any[],
+  fieldname: string,
+  filters: any,
+  doc: any,
+  oldFields: any[]
+) {
+  const f = fields.find((f) => f.fieldname === fieldname);
+  if (f?.fieldtype === "Select") {
+    handleSelectFieldUpdate(f, fieldname, filters, doc, oldFields);
+  } else if (f?.fieldtype === "Link") {
+    handleLinkFieldUpdate(f, fieldname, filters, doc, oldFields);
+  }
+}
+
+// Callable context so form scripts written for `onClick(close)` keep working
+// alongside frappe-ui v1's `onClick({ close })`.
+export function withLegacyCloseContext(actions) {
+  return actions?.map((action) =>
+    action.onClick
+      ? {
+          ...action,
+          onClick: ({ close }) => action.onClick(Object.assign(() => close(), { close })),
+        }
+      : action
+  );
 }

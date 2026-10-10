@@ -1,11 +1,9 @@
 import { computed, effectScope, ref, watch } from 'vue'
-import { toast } from 'frappe-ui'
-import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { isSafeLink } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
-import { accountMenuOptions } from '@app/stores/settings'
-import { scriptDialog } from '@app/utils'
+import { accountMenuOptions, useSettingsModal } from '@app/stores/settings'
+import { runFormScripts } from '@app/utils'
 
 // A quick link to one of these shows as its icon, as on Frappe Wiki.
 const SERVICE_ICONS = {
@@ -49,8 +47,7 @@ let scriptContext = null
 
 async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
-  await setupCustomizations(data, scriptContext)
-  customActions.value = data._customActions || []
+  customActions.value = await runFormScripts(data, scriptContext)
   // Settings' Preview shows its unsaved quick links in place of the saved ones, until a save clears it.
   headerLinks.value = (readKnowledgeBasePreview()?.links || data._customLinks || [])
     .filter((link) => link?.label && isSafeLink(link.url))
@@ -58,9 +55,11 @@ async function runScripts(scripts: string[]) {
 }
 
 // Runs the "Apply to knowledge base" form scripts; only the knowledge base pages use this header.
+// Returns the settings, with this header's actions, links and menu in place of theirs.
 export function useKnowledgeBaseHeader(context) {
   if (!scriptContext) {
-    scriptContext = { call: context.call, router: context.router, toast, createToast, $dialog: scriptDialog }
+    // Not the whole context: the first page's resources would outlive it.
+    scriptContext = { call: context.call, router: context.router }
     // Detached from the page so scripts run once a visit, and again only when the list changes.
     effectScope(true).run(() =>
       watch(
@@ -70,5 +69,5 @@ export function useKnowledgeBaseHeader(context) {
       ),
     )
   }
-  return { customActions, headerLinks, accountMenuOptions: menuOptions }
+  return { ...useSettingsModal(context), customActions, headerLinks, accountMenuOptions: menuOptions }
 }

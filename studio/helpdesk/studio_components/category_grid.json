@@ -1,0 +1,172 @@
+{
+ "block": {
+  "blockName": "categories-grid",
+  "children": [
+   {
+    "baseStyles": {
+     "--category-columns": "{{ inputs.columns || 3 }}",
+     "display": "grid",
+     "gap": "10px",
+     "gridAutoColumns": "minmax(0, 1fr)",
+     "height": "auto",
+     "width": "100%"
+    },
+    "children": [
+     {
+      "blockName": "category-card",
+      "children": [
+       {
+        "classes": [
+         "size-5",
+         "text-ink-gray-6",
+         "transition-colors",
+         "group-hover:text-ink-gray-8"
+        ],
+        "componentId": "category-grid-icon",
+        "componentName": "Icon",
+        "componentProps": {
+         "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+        }
+       },
+       {
+        "blockName": "container",
+        "children": [
+         {
+          "blockName": "category-title",
+          "classes": [
+           "text-ink-gray-9"
+          ],
+          "componentId": "category-grid-title",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-base-semibold",
+           "tag": "h3",
+           "text": "{{ dataItem.category_name }}"
+          }
+         },
+         {
+          "blockName": "category-description",
+          "classes": [
+           "line-clamp-2",
+           "grow-0",
+           "text-ink-gray-6"
+          ],
+          "componentId": "category-grid-description",
+          "componentName": "TextBlock",
+          "componentProps": {
+           "fontSize": "text-p-sm",
+           "tag": "p",
+           "text": "{{ dataItem.description || t('Browse articles in this category') }}"
+          }
+         }
+        ],
+        "classes": [
+         "flex",
+         "flex-col",
+         "shrink",
+         "gap-1",
+         "h-fit",
+         "min-w-0",
+         "w-full"
+        ],
+        "componentId": "category-grid-text",
+        "componentName": "container",
+        "originalElement": "div"
+       }
+      ],
+      "classes": [
+       "transition",
+       "hover:bg-surface-gray-1",
+       "items-start",
+       "border-outline-gray-2",
+       "rounded-5",
+       "border",
+       "cursor-pointer",
+       "flex",
+       "flex-col",
+       "justify-start",
+       "overflow-hidden",
+       "w-full",
+       "max-sm:flex-row",
+       "max-sm:items-start",
+       "max-sm:gap-3",
+       "max-sm:px-4",
+       "max-sm:py-3.5",
+       "group",
+       "gap-4",
+       "p-5",
+       "focus-visible:focus-ring"
+      ],
+      "componentEvents": {
+       "click": {
+        "action": "Run Script",
+        "event": "click",
+        "script": "router.push(routes.category(dataItem.name))\n"
+       },
+       "keydown.enter": {
+        "action": "Run Script",
+        "event": "keydown.enter",
+        "script": "router.push(routes.category(dataItem.name))\n"
+       }
+      },
+      "componentId": "category-grid-card",
+      "componentName": "container",
+      "originalElement": "div",
+      "componentProps": {
+       "role": "link",
+       "tabindex": "0"
+      }
+     }
+    ],
+    "classes": [
+     "grid-cols-1",
+     "sm:grid-cols-2",
+     "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
+     "sm:auto-rows-fr",
+     "content-start"
+    ],
+    "componentId": "category-grid-repeater",
+    "componentName": "Repeater",
+    "componentProps": {
+     "data": "{{ inputs.categories || [] }}",
+     "dataKey": "name"
+    },
+    "visibilityCondition": "{{ inputs.categories && inputs.categories.length }}"
+   }
+  ],
+  "classes": [
+   "items-stretch",
+   "grid",
+   "gap-3",
+   "grid-cols-1",
+   "justify-stretch",
+   "w-auto"
+  ],
+  "componentId": "category-grid",
+  "componentName": "container",
+  "originalElement": "div"
+ },
+ "component_id": "category_grid",
+ "component_name": "Category Grid",
+ "creation": "2026-10-10 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Studio Component",
+ "idx": 0,
+ "inputs": [
+  {
+   "input_name": "categories",
+   "required": 0,
+   "type": "Data"
+  },
+  {
+   "input_name": "columns",
+   "required": 0,
+   "type": "Data"
+  }
+ ],
+ "is_disabled": 0,
+ "modified": "2026-10-10 20:51:47.071215",
+ "modified_by": "Administrator",
+ "name": "category_grid",
+ "owner": "Administrator"
+}

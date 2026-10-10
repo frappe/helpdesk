@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { ArticleIcon, OrganizationsIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
@@ -86,6 +86,7 @@ import {
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
 import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import {
   Badge,
   Button,
@@ -217,7 +218,7 @@ const groupByActions = [
     icon: "lucide-link",
     onClick: ({ group }) =>
       copyToClipboard(
-        `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/category/${group.value}`,
+        window.location.origin + CUSTOMER_PORTAL_ROOT + ROUTES.category(group.value),
         __("Category link copied to clipboard.")
       ),
   },

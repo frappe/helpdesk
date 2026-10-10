@@ -34,6 +34,14 @@ repos:
       - id: isort
         args: [--profile, black]
 
+  - repo: local
+    hooks:
+      - id: studio-json-modified
+        name: Studio JSON bumps modified
+        entry: python3 .github/helpers/check_studio_modified.py
+        language: system
+        files: ^studio/.*\.json$
+
 ci:
   autoupdate_schedule: weekly
   skip: []

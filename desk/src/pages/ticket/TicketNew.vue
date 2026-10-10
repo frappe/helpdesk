@@ -74,8 +74,7 @@
         </div>
       </div>
 
-      <!-- for agent portal -->
-      <div v-if="!isCustomerPortal">
+      <div>
         <TicketTextEditor
           ref="editor"
           v-model:attachments="attachments"
@@ -110,9 +109,9 @@
 
 <script setup lang="ts">
 import { LayoutHeader, UniInput } from "@/components";
+import CustomActions from "@helpdesk/shared/CustomActions.vue";
 import {
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
+  applyFieldFilters,
   parseField,
   setupCustomizations,
 } from "@/composables/formCustomisation";
@@ -122,7 +121,7 @@ import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Field } from "@/types";
 import { useUploadTracker } from "@/composables/useUploadTracker";
-import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { isContentEmpty, uploadFunction } from "@/utils";
 import { useOnboarding } from "@framework/ui";
 import {
   Breadcrumbs,
@@ -207,13 +206,7 @@ const ticketPriorityResource = createListResource({
 let oldFields = [];
 
 function applyFilters(fieldname: string, filters: any = null) {
-  const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
-  if (!f) return;
-  if (f.fieldtype === "Select") {
-    handleSelectFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  } else if (f.fieldtype === "Link") {
-    handleLinkFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  }
+  applyFieldFilters(template.data.fields, fieldname, filters, templateFields, oldFields);
 }
 
 const customOnChange = computed(() => template.data?._customOnChange);

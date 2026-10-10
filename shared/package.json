@@ -12,11 +12,22 @@
 		"./tiptap": "./src/tiptap.ts",
 		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
 		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",
+		"./portalRoutes": "./src/portalRoutes.ts",
+		"./categoryIcons": "./src/categoryIcons.ts",
+		"./Icon.vue": "./src/Icon.vue",
+		"./CustomActions.vue": "./src/CustomActions.vue",
+		"./ViewIconField.vue": "./src/ViewIconField.vue",
+		"./filter": "./src/filter/index.ts",
+		"./shortcuts": "./src/shortcuts.ts",
+		"./device": "./src/device.ts",
+		"./ShortcutKey.vue": "./src/ShortcutKey.vue",
+		"./FilterIcon.vue": "./src/FilterIcon.vue",
 		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
 		"./settings/*": "./src/settings/*"
 	},
 	"peerDependencies": {
 		"@tiptap/core": "*",
+		"@vueuse/core": "*",
 		"frappe-ui": "*",
 		"vue": "*"
 	}

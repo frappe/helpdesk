@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Combobox, Dialog } from "frappe-ui";
-import { CATEGORY_ICONS } from "../../../../studio/helpdesk/categoryIcons";
+import { CATEGORY_ICONS } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
 import { ref } from "vue";
 import { watch } from "vue";

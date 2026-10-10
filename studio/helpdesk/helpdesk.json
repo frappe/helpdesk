@@ -8,9 +8,9 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 14:35:41.809971",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "helpdesk",
  "owner": "Administrator",
- "route": "kb"
+ "route": "help"
 }

@@ -1,10 +1,8 @@
 import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
-import { useSettingsModal } from '@app/stores/settings'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useDrawer } from '@app/composables/useDrawer'
 import { countLabel } from '@app/utils'
-import { ROUTES } from '@app/routes'
 
 export default function setup(context) {
   const { categories, route } = context
@@ -20,7 +18,6 @@ export default function setup(context) {
   const articleCount = computed(() => countLabel(category.value?.article_count, __('1 article'), __('{0} articles')))
 
   return {
-    ...useSettingsModal(context),
     ...useKnowledgeBaseHeader(context),
     drawer: useDrawer(route),
     category,
@@ -28,6 +25,5 @@ export default function setup(context) {
     categoryName,
     categoryDescription,
     articleCount,
-    articleRoute: ROUTES.article,
   }
 }

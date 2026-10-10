@@ -9,7 +9,7 @@
       <span v-if="canRaiseTicket" class="text-p-base text-ink-gray-5">
         {{ __("If your issue isn't resolved, raise a support ticket") }}
         <RouterLink
-          :to="ROUTES.newTicket"
+          :to="ROUTES.newTicket({ from: 'article', article })"
           class="text-ink-gray-5 underline underline-offset-2 hover:text-ink-gray-8"
         >
           {{ __("here") }}
@@ -23,7 +23,7 @@
         variant="ghost"
         :label="answer.label"
         :aria-pressed="feedback === answer.value"
-        @click="onFeedback?.(feedback === answer.value ? 0 : answer.value)"
+        @click="onFeedback?.(answer.value)"
       >
         <template #icon>
           <PortalFeedbackThumb
@@ -43,15 +43,14 @@ import { RouterLink } from "vue-router";
 import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import PortalFeedbackThumb from "@app/components/knowledge_base/PortalFeedbackThumb.vue";
-import { ROUTES } from "@app/routes";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { feedbackAnswers } from "@app/components/knowledge_base/articleFeedback";
 
-// Values match HD Article Feedback: 1 like, 2 dislike; 0 clears, sent by a second click.
-const ANSWERS = [
-  { value: 1, label: __("Yes, it was helpful") },
-  { value: 2, label: __("No, it wasn't helpful") },
-];
+const ANSWERS = feedbackAnswers();
 
 defineProps<{
+  // The article's name, sent as the origin of a ticket raised from here.
+  article?: string;
   feedback?: number;
   onFeedback?: (value: number) => void;
   canRaiseTicket?: boolean;

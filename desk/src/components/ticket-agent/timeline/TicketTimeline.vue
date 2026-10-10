@@ -144,6 +144,7 @@ import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { TicketSymbol } from "@/types";
 import { copyActivityLink } from "@/utils";
+import { plainTextToHtml } from "@helpdesk/shared/utils";
 import {
   ActivityTimeline,
   EmailItem,
@@ -335,14 +336,8 @@ function withEmailFixups(activity: EmailActivity): EmailActivity {
   const data = { ...activity.data };
   // portal tickets have no real delivery pipeline; hide the badge
   if (ticket.value?.doc?.via_customer_portal) delete data.deliveryStatus;
-  if (isPlainText(data.content)) {
-    data.content = data.content.replace(/\n/g, "<br>");
-  }
+  data.content = plainTextToHtml(data.content);
   return { ...activity, data };
-}
-
-function isPlainText(content: string): boolean {
-  return !/<[a-z][\s\S]*>/i.test(content ?? "");
 }
 
 function isFirstEmail(activity: EmailActivity): boolean {
@@ -496,23 +491,22 @@ function reloadPinsOnChange(payload: unknown) {
     extras.reload();
 }
 
+function onReactionUpdate(data: { ticket_id: string }) {
+  if (data.ticket_id === props.ticketId) extras.reload();
+}
+
 let unregisterFeed: () => void;
 
 onMounted(() => {
   unregisterFeed = registerTicketFeed(props.ticketId, refreshAndScroll);
-  $socket.on(
-    "helpdesk:comment-reaction-update",
-    (data: { ticket_id: string }) => {
-      if (data.ticket_id === props.ticketId) extras.reload();
-    }
-  );
+  $socket.on("helpdesk:comment-reaction-update", onReactionUpdate);
   $socket.on("docinfo_update", enrichLiveComment);
   $socket.on("docinfo_update", reloadPinsOnChange);
 });
 
 onBeforeUnmount(() => {
   unregisterFeed?.();
-  $socket.off("helpdesk:comment-reaction-update");
+  $socket.off("helpdesk:comment-reaction-update", onReactionUpdate);
   $socket.off("docinfo_update", enrichLiveComment);
   $socket.off("docinfo_update", reloadPinsOnChange);
 });

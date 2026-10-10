@@ -21,6 +21,10 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, get_customers, is_a
 
 MANAGER_ROLE = "HD Customer Manager"
 CUSTOMER_ROLES = ("HD Customer", MANAGER_ROLE)
+PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
+PORTAL_ROLES_SETTING = "allow_customer_managers_to_change_roles"
+PORTAL_REMOVE_SETTING = "allow_customer_managers_to_remove_members"
+PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 
 
 class HDCustomer(Document):
@@ -269,8 +273,7 @@ class HDCustomer(Document):
         return {"added": added, "invite_result": self.invite_contacts(to_invite, role)}
 
     def validate_contact_update_permission(self, role: str) -> None:
-        if role not in CUSTOMER_ROLES:
-            frappe.throw(_("Invalid role {0}").format(role))
+        validate_customer_role(role)
         roles = frappe.get_roles()
         if "System Manager" not in roles and "Agent Manager" not in roles:
             frappe.throw(
@@ -495,3 +498,20 @@ def get_customer_membership(customer: str, user: str) -> dict | None:
         if member.get("name") == customer:
             return member
     return None
+
+
+def is_customer_manager(customer: str | None, user: str | None = None) -> bool:
+    """Whether `user` is a manager member of `customer`; agent access is checked apart."""
+    if not customer:
+        return False
+    membership = get_customer_membership(customer, user or frappe.session.user)
+    return bool(membership and membership.get("is_manager"))
+
+
+def is_portal_setting_on(setting: str) -> bool:
+    return bool(frappe.db.get_single_value("HD Settings", setting))
+
+
+def validate_customer_role(role: str) -> None:
+    if role not in CUSTOMER_ROLES:
+        frappe.throw(_("Invalid role {0}").format(role))

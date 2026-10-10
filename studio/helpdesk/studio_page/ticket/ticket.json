@@ -5,62 +5,17 @@
    "blockName": "body",
    "children": [
     {
-     "blockName": "navbar",
-     "children": [
-      {
-       "blockName": "Header",
-       "classes": [
-        "min-w-0",
-        "flex-1"
-       ],
-       "componentId": "header-topbar",
-       "componentName": "header",
-       "componentProps": {
-        "crumb": "{{ ticket.data && ticket.data.subject }}",
-        "parentCrumb": "Tickets",
-        "parentRoute": "/customer-tickets"
-       },
-       "isStudioComponent": true
-      },
-      {
-       "classes": [
-        "lg:hidden",
-        "shrink-0"
-       ],
-       "componentEvents": {
-        "click": {
-         "action": "Run Script",
-         "event": "click",
-         "script": "drawer.toggle()"
-        }
-       },
-       "componentId": "Button-ticket-details",
-       "componentName": "Button",
-       "componentProps": {
-        "aria-label": "{{ t('Ticket details') }}",
-        "icon": "lucide-panel-right",
-        "variant": "ghost"
-       }
-      }
-     ],
-     "classes": [
-      "items-center",
-      "bg-surface-base",
-      "border-b",
-      "border-outline-gray-2",
-      "flex",
-      "shrink-0",
-      "h-[43px]",
-      "justify-between",
-      "py-0",
-      "w-full",
-      "gap-2",
-      "px-3",
-      "sm:px-5"
-     ],
-     "componentId": "container-ticket-navbar",
-     "componentName": "container",
-     "originalElement": "div"
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "crumb": "{{ ticket.data && ticket.data.subject }}",
+      "parentCrumb": "{{ t('Tickets') }}",
+      "parentRoute": "{{ routes.ticketList }}",
+      "drawerToggle": "end",
+      "drawerLabel": "{{ t('Ticket details') }}"
+     },
+     "isStudioComponent": true
     },
     {
      "blockName": "content",
@@ -784,7 +739,7 @@
        "$type": "variable",
        "name": "isFeedbackOpen"
       },
-      "title": "Rate this ticket"
+      "title": "{{ t('Rate this ticket') }}"
      },
      "componentSlots": {
       "actions": {
@@ -805,7 +760,7 @@
          "componentName": "Button",
          "componentProps": {
           "disabled": "{{ !canSubmitFeedback }}",
-          "label": "Submit",
+          "label": "{{ t('Submit') }}",
           "loading": "{{ isFeedbackSaving }}",
           "variant": "solid"
          },
@@ -830,7 +785,7 @@
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
-                "text": "Select a rating"
+                "text": "{{ t('Select a rating') }}"
                },
                "componentSlots": {}
               },
@@ -892,7 +847,7 @@
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
-                "text": "Pick an option"
+                "text": "{{ t('Pick an option') }}"
                },
                "componentSlots": {}
               },
@@ -979,7 +934,7 @@
                "componentProps": {
                 "fontSize": "text-base",
                 "tag": "span",
-                "text": "Other"
+                "text": "{{ t('Other') }}"
                },
                "componentSlots": {}
               }
@@ -1084,7 +1039,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 02:39:41.714002",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

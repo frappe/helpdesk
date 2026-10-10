@@ -98,7 +98,7 @@
       </div>
     </div>
   </Sidebar>
-  <CommandPalette v-if="!mobile && isPaletteAvailable" />
+  <CommandPalette v-if="!mobile" />
   <ViewModal
     v-if="viewDialogConfig.show"
     v-model="viewDialogConfig"
@@ -108,10 +108,7 @@
 
 <script setup lang="ts">
 import CommandPalette from "@/components/command-palette/CommandPalette.vue";
-import {
-  isPaletteAvailable,
-  openPalette,
-} from "@/components/command-palette/useCommandPalette";
+import { openPalette } from "@/components/command-palette/useCommandPalette";
 import UserMenu from "@/components/UserMenu.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
@@ -120,7 +117,7 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { useTelephonyStore } from "@/stores/telephony";
 import { __ } from "@/translation";
-import { getIcon, isCustomerPortal } from "@/utils";
+import { getIcon } from "@/utils";
 import {
   Badge,
   Button,
@@ -137,10 +134,7 @@ import type { RouteLocationRaw } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
 import LucideSearch from "~icons/lucide/search";
-import {
-  agentPortalSidebarOptions,
-  customerPortalSidebarOptions,
-} from "./layoutSettings";
+import { agentPortalSidebarOptions } from "./layoutSettings";
 
 const props = defineProps<{
   profileSettings: any[];
@@ -198,10 +192,7 @@ function selectItem(key: string, to: RouteLocationRaw, onSelect?: () => void) {
 }
 
 const navItems = computed(() => {
-  const options = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
-  return options
+  return agentPortalSidebarOptions
     .filter((item) => isCallingEnabled.value || item.label !== __("Call Logs"))
     .map((option, index) => ({
       label: option.label,
@@ -212,7 +203,7 @@ const navItems = computed(() => {
           ? window.location.assign(option.url)
           : selectItem(option.to, { name: option.to }),
       // Separate the nav group from the search/notification tools above it.
-      spacedTop: index === 0 && !isCustomerPortal.value,
+      spacedTop: index === 0,
       key: option.label,
     }));
 });
@@ -249,7 +240,6 @@ const notificationItem = computed(() =>
 );
 
 const mainItems = computed(() => {
-  if (isCustomerPortal.value) return navItems.value;
   const top = props.mobile
     ? [notificationItem.value]
     : [searchItem.value, notificationItem.value];
@@ -258,7 +248,7 @@ const mainItems = computed(() => {
 
 const sections = computed(() => {
   const result = [{ label: "", items: mainItems.value, collapsible: false }];
-  if (publicViews.value?.length && !isCustomerPortal.value) {
+  if (publicViews.value?.length) {
     result.push({
       label: __("Public Views"),
       items: parseViews(publicViews.value),

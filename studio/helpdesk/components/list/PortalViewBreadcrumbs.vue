@@ -10,7 +10,7 @@
       aria-hidden="true"
       >/</span
     >
-    <Dropdown :options="options">
+    <Dropdown v-model:open="isOpen" :options="options">
       <template #default="{ open }">
         <Button
           variant="ghost"
@@ -47,7 +47,7 @@
             class="size-4 text-ink-gray-7"
           />
           <!-- Always shown on touch, where no row is hovered. -->
-          <Dropdown side="right" align="start" :options="viewActions(item)">
+          <Dropdown side="right" align="start" :options="closingActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
@@ -66,35 +66,38 @@
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
+import { h, ref } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
-import { Icon as SpriteIcon } from "frappe-ui/experimental";
+import StoredIcon from "@helpdesk/shared/Icon.vue";
 import { __ } from "@helpdesk/shared/translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 
 const DEFAULT_ICON = "text-align-justify";
 const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 
-// The sprite, not a mask class: a stored name may be one the build never saw.
 function ViewIcon(props: { icon?: string }) {
   const icon = props.icon || DEFAULT_ICON;
-  if (isEmoji(icon))
-    return h(
-      "div",
-      { class: [ICON_CLASS, "flex items-center justify-center leading-none"] },
-      icon
-    );
-  return h(SpriteIcon, {
-    name: icon.replace(/^lucide-/, ""),
-    class: ICON_CLASS,
-  });
+  const centre = isEmoji(icon) && "flex items-center justify-center leading-none";
+  return h(StoredIcon, { icon, class: [ICON_CLASS, centre] });
 }
 
 // The header renders this only when a page hands it a view, so every prop arrives set.
-defineProps<{
+const props = defineProps<{
   label: string;
   currentView: { name?: string; label: string; icon: string };
   options: any[];
   viewActions: (item: any) => any[];
 }>();
+
+const isOpen = ref(false);
+
+// Popovers paint above dialogs, so the menu closes itself before an action opens one, as on the desk.
+const closingActions = (item) =>
+  props.viewActions(item).map((option) => ({
+    ...option,
+    onClick: () => {
+      isOpen.value = false;
+      option.onClick?.();
+    },
+  }));
 </script>

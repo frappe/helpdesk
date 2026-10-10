@@ -214,18 +214,8 @@ onMounted(() => {
   ticketsToNavigate.reload();
   ticket.value.markSeen.reload();
 
-  $socket.on("ticket_update", (data: TicketUpdateData) => {
-    if (data.ticket_id === ticket.value?.name) {
-      // Notify the user about the update
-      toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
-    }
-  });
-
-  $socket.on("helpdesk:ticket-update", (data: { ticket_id: string }) => {
-    if (data.ticket_id == props.ticketId) {
-      reloadTicket(props.ticketId);
-    }
-  });
+  $socket.on("ticket_update", onTicketUpdate);
+  $socket.on("helpdesk:ticket-update", onHelpdeskTicketUpdate);
 });
 
 onBeforeUnmount(() => {
@@ -233,9 +223,21 @@ onBeforeUnmount(() => {
   showEmailBox.value = false;
   showCommentBox.value = false;
 
-  $socket.off("ticket_update");
-  $socket.off("helpdesk:ticket-update");
+  $socket.off("ticket_update", onTicketUpdate);
+  $socket.off("helpdesk:ticket-update", onHelpdeskTicketUpdate);
 });
+
+function onTicketUpdate(data: TicketUpdateData) {
+  if (data.ticket_id === ticket.value?.name) {
+    toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
+  }
+}
+
+function onHelpdeskTicketUpdate(data: { ticket_id: string }) {
+  if (data.ticket_id == props.ticketId) {
+    reloadTicket(props.ticketId);
+  }
+}
 usePageMeta(() => {
   if (!ticket.value?.doc?.name) {
     return { title: props.ticketId };

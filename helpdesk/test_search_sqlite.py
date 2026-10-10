@@ -6,7 +6,7 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.api import article as article_api
 from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskArticleSearch, HelpdeskSearch
-from helpdesk.test_utils import create_user, make_article, make_ticket
+from helpdesk.test_utils import create_user, make_article, make_ticket, use_test_index
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
 
@@ -79,18 +79,13 @@ class TestSearchIndexRelabel(FrappeTestCase):
     TEST_INDEX = "test_relabel_search.db"
 
     def setUp(self):
-        self.search = HelpdeskSearch(db_name=self.TEST_INDEX)
-        self.search.drop_index()
+        self.search = use_test_index(
+            self, HelpdeskSearch, self.TEST_INDEX, relabel_comment_search_index
+        )
         self.search._ensure_fts_table()
-        self.addCleanup(self.search.drop_index)
 
     def run_patch(self) -> None:
-        with patch.object(
-            relabel_comment_search_index,
-            "HelpdeskSearch",
-            lambda: HelpdeskSearch(db_name=self.TEST_INDEX),
-        ):
-            relabel_comment_search_index.execute()
+        relabel_comment_search_index.execute()
 
     def insert_row(self, doc_id: str, doctype: str, name: str, ticket) -> None:
         self.search.sql(
@@ -162,17 +157,12 @@ class TestRelatedArticles(FrappeTestCase):
         cls.draft = make_article("Zephyrine webhook draft notes", "Draft")
 
     def setUp(self):
-        self.search = HelpdeskArticleSearch(db_name=self.TEST_INDEX)
-        self.search.drop_index()
-        self.addCleanup(self.search.drop_index)
+        self.search = use_test_index(
+            self, HelpdeskArticleSearch, self.TEST_INDEX, article_api
+        )
 
     def related(self, query: str) -> list[dict]:
-        with patch.object(
-            article_api,
-            "HelpdeskArticleSearch",
-            lambda: HelpdeskArticleSearch(db_name=self.TEST_INDEX),
-        ):
-            return article_api.get_related(query)
+        return article_api.get_related(query)
 
     def test_a_ticket_subject_finds_published_articles_only(self):
         self.search.build_index()

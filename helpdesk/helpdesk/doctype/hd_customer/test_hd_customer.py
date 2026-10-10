@@ -13,6 +13,7 @@ from helpdesk.test_utils import (
     create_user,
     get_invitation,
     make_contact,
+    make_invitation,
     make_ticket,
     unique_name,
     update_role_in_customer,
@@ -374,17 +375,7 @@ class TestHDCustomer(IntegrationTestCase):
             customer_name, [{"contact_name": contact_doc["contact"]}]
         )
         ticket = make_ticket(customer=customer.name, contact=contact_doc["contact"])
-        invitation = frappe.get_doc(
-            {
-                "doctype": "User Invitation",
-                "email": email,
-                "app_name": "helpdesk",
-                "redirect_to_path": "/helpdesk",
-                "roles": [{"role": "HD Customer"}],
-                "customer": customer.name,
-                "contact": contact_doc["contact"],
-            }
-        ).insert(ignore_permissions=True)
+        invitation = make_invitation(email, customer.name, contact_doc["contact"])
         return contact_doc, customer, ticket, invitation
 
     def test_has_permission_members_read_and_never_write(self) -> None:

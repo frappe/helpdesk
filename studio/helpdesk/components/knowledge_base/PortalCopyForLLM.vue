@@ -56,6 +56,7 @@ import { computed, ref, watch } from "vue";
 import { useClipboard } from "@vueuse/core";
 import { Button, Dropdown, toast } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
+import { copyPageLink } from "@app/utils";
 
 const MARKDOWN_METHOD =
   "/api/method/helpdesk.api.knowledge_base.get_article_markdown";
@@ -123,11 +124,6 @@ function openInAssistant(baseUrl: string) {
   window.open(`${baseUrl}${encodeURIComponent(prompt)}`, "_blank", "noopener");
 }
 
-async function copyLink() {
-  await copy(window.location.href);
-  toast.success(__("Link copied"));
-}
-
 const viewOptions = computed(() => [
   {
     label: __("View as Markdown"),
@@ -162,7 +158,7 @@ const compactOptions = computed(() => [
     hideLabel: true,
     options: [
       { label: __("Copy for LLM"), icon: "lucide-copy", onClick: copyMarkdown },
-      { label: __("Copy link"), icon: "lucide-link", onClick: copyLink },
+      { label: __("Copy link"), icon: "lucide-link", onClick: copyPageLink },
     ],
   },
   { group: "Open", hideLabel: true, options: viewOptions.value },

@@ -16,7 +16,7 @@ from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
 from pypika.functions import Replace
 
-CUSTOMER_PORTAL_ROOT = "/kb"
+CUSTOMER_PORTAL_ROOT = "/help"
 
 
 def check_permissions(doctype, parent, doc=None):

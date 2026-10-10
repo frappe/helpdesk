@@ -5,37 +5,15 @@
    "blockName": "body",
    "children": [
     {
-     "blockName": "topbar",
-     "children": [
-      {
-       "blockName": "Header",
-       "componentId": "header-topbar",
-       "componentName": "header",
-       "componentProps": {
-        "crumb": "New ticket",
-        "parentCrumb": "Tickets",
-        "parentRoute": "/customer-tickets"
-       },
-       "isStudioComponent": true
-      }
-     ],
-     "classes": [
-      "items-center",
-      "bg-surface-base",
-      "border-b",
-      "border-outline-gray-2",
-      "flex",
-      "flex-row",
-      "shrink-0",
-      "h-[43px]",
-      "py-0",
-      "w-full",
-      "px-3",
-      "sm:px-5"
-     ],
-     "componentId": "container-topbar-nt",
-     "componentName": "container",
-     "originalElement": "div"
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "crumb": "{{ t('New ticket') }}",
+      "parentCrumb": "{{ t('Tickets') }}",
+      "parentRoute": "{{ routes.ticketList }}"
+     },
+     "isStudioComponent": true
     },
     {
      "blockName": "content",
@@ -69,7 +47,7 @@
            "componentName": "FormControl",
            "componentProps": {
             "error": "",
-            "label": "Subject",
+            "label": "{{ t('Subject') }}",
             "modelValue": {
              "$type": "variable",
              "name": "subject"
@@ -115,7 +93,7 @@
            "componentProps": {
             "fontSize": "text-p-sm",
             "tag": "span",
-            "text": "Description"
+            "text": "{{ t('Description') }}"
            }
           },
           {
@@ -141,7 +119,7 @@
             "extensions": [],
             "fixedMenu": true,
             "mentions": null,
-            "placeholder": "{{ t('Describe your issue\u2026') }}",
+            "placeholder": "{{ t('Describe your issue…') }}",
             "uploadFunction": "{{ uploadInline }}",
             "tags": null
            }
@@ -302,7 +280,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 00:38:00.184119",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

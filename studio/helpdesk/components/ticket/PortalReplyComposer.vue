@@ -97,6 +97,13 @@ const emit = defineEmits<{
 const root = ref<HTMLElement | null>(null);
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
 
+// Keyed on the editor too: the composer can mount open before its editor exists.
+watch(
+  () => props.open && composer.value?.editor,
+  (editor) => editor && composer.value?.focus(),
+  { immediate: true, flush: "post" }
+);
+
 // CommentComposer has no prop for this, so it goes straight onto its hidden file input.
 watchEffect(() => {
   const input = root.value?.querySelector<HTMLInputElement>(

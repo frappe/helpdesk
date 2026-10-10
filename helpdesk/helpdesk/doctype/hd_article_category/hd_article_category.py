@@ -5,7 +5,11 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from helpdesk.search_sqlite import reindex_articles
+from helpdesk.api.knowledge_base import get_general_category
+from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    get_joining_values,
+    update_articles,
+)
 
 
 class HDArticleCategory(Document):
@@ -38,23 +42,15 @@ class HDArticleCategory(Document):
             frappe.throw(_("General category name can't be changed"))
 
     def on_trash(self):
+        self.validate_general_category_delete()
+        self.move_articles_to_general()
+
+    def validate_general_category_delete(self):
         if self.category_name == "General":
             frappe.throw(_("General category can't be deleted"))
-            return
 
-        articles = frappe.get_all(
-            "HD Article", filters={"category": self.name}, pluck="name"
-        )
-
-        general_category = frappe.db.get_value(
-            "HD Article Category", {"category_name": "General"}, "name"
-        )
-        if not general_category:
-            return
-
-        try:
-            for article in articles:
-                frappe.db.set_value("HD Article", article, "category", general_category)
-            reindex_articles(articles)
-        except Exception as e:
-            frappe.db.rollback()
+    def move_articles_to_general(self):
+        if general_category := get_general_category():
+            update_articles(
+                {"category": self.name}, get_joining_values(general_category)
+            )

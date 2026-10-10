@@ -1,7 +1,7 @@
 import { Badge, Tooltip, dayjsLocal } from "frappe-ui";
 import { h } from "vue";
 import { __ } from "./translation";
-import { shortDuration } from "./utils";
+import { isSlaMissed, shortDuration } from "./utils";
 
 /** Tallest bars faded per level: High is fully solid, Low nearly empty. */
 const FADED_BARS: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
@@ -56,7 +56,7 @@ function levelBars(level: string) {
 
 function slaBadge(metOn: string | undefined, due: string | undefined, countdownTheme: string) {
   // No target means it was never breached, so meeting it at all fulfils it.
-  if (metOn) return outcomeBadge(!due || dayjsLocal(metOn).isBefore(dayjsLocal(due)));
+  if (metOn) return outcomeBadge(!isSlaMissed(metOn, due));
   if (!due) return null;
   if (dayjsLocal(due).isBefore(dayjsLocal())) return outcomeBadge(false);
   return h(Tooltip, { text: dayjsLocal(due).format("LLLL") }, () =>

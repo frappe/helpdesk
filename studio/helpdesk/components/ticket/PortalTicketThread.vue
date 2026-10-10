@@ -29,9 +29,7 @@
         <div class="flex-1 border-t border-outline-gray-2" />
         <span class="shrink-0">
           {{ activity.data.divider }} ·
-          <Tooltip
-            :text="dayjsLocal(activity.timestamp).format(DATE_FORMATS.tooltip)"
-          >
+          <Tooltip :text="dateFormat(activity.timestamp)">
             <span>{{ clockTime(activity.timestamp) }}</span>
           </Tooltip>
         </span>
@@ -54,9 +52,7 @@
             {{ activity.author?.fullname }}
           </span>
           <span class="text-ink-gray-4">·</span>
-          <Tooltip
-            :text="dayjsLocal(activity.timestamp).format(DATE_FORMATS.tooltip)"
-          >
+          <Tooltip :text="dateFormat(activity.timestamp)">
             <span class="text-ink-gray-5">{{
               clockTime(activity.timestamp)
             }}</span>
@@ -97,6 +93,8 @@ import {
   AttachmentChip,
   useActivityTimeline,
 } from "@framework/ui/components/ActivityTimeline";
+import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
+import { plainTextToHtml } from "@helpdesk/shared/utils";
 import { useSession } from "@app/stores/session";
 import { conversationLayout } from "@app/stores/settings";
 import { DATE_FORMATS } from "@app/utils";
@@ -183,7 +181,13 @@ const TicketEmails = defineComponent({
       const sorted = [
         ...activities.value.map((row) => ({
           ...row,
-          data: { ...row.data, to: "", cc: "", bcc: "" },
+          data: {
+            ...row.data,
+            content: plainTextToHtml(row.data.content),
+            to: "",
+            cc: "",
+            bcc: "",
+          },
         })),
         ...props.extraActivities,
       ].sort(
@@ -210,15 +214,20 @@ const TicketEmails = defineComponent({
     }
 
     function chatPlacement(row: Row, previous?: Row) {
-      const isOwn = !isAgent(row);
+      const isOwn = isViewerSide(row);
       const opensGroup = !(
         previous?.type === "email" &&
         authorEmail(previous) === authorEmail(row) &&
-        !isAgent(previous) === isOwn &&
+        isViewerSide(previous) === isOwn &&
         dayjs(row.timestamp).diff(dayjs(previous.timestamp), "s") <=
           GROUP_SECONDS
       );
       return { isOwn, opensGroup, showAvatar: opensGroup && !isOwn };
+    }
+
+    // The viewer's side goes right: the customer's for a customer, the team's for an agent.
+    function isViewerSide(row: Row) {
+      return isAgent(row) === Boolean(session.config.value?.is_agent);
     }
 
     // An email the viewer just sent arrives before the ticket's communications reload

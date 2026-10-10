@@ -13,105 +13,36 @@
    "blockName": "body",
    "children": [
     {
-     "blockName": "top-bar",
-     "children": [
-      {
-       "classes": [
-        "md:hidden",
-        "shrink-0"
-       ],
-       "componentEvents": {
-        "click": {
-         "action": "Run Script",
-         "event": "click",
-         "script": "drawer.toggle()"
-        }
-       },
-       "componentId": "category-menu",
-       "componentName": "Button",
-       "componentProps": {
-        "aria-label": "{{ t('Browse articles') }}",
-        "icon": "lucide-menu",
-        "variant": "ghost"
-       }
-      },
-      {
-       "blockName": "Header",
-       "classes": [
-        "min-w-0",
-        "flex-1"
-       ],
-       "componentId": "header-topbar",
-       "componentName": "header",
-       "componentProps": {},
-       "isStudioComponent": true
-      }
-     ],
-     "classes": [
-      "items-center",
-      "bg-surface-base",
-      "border-b",
-      "border-outline-gray-2",
-      "flex",
-      "flex-row",
-      "shrink-0",
-      "h-[43px]",
-      "justify-between",
-      "py-0",
-      "w-full",
-      "gap-2",
-      "px-3",
-      "sm:px-5"
-     ],
-     "componentId": "container-7gbdjfb3o",
-     "componentName": "container",
-     "originalElement": "div"
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "drawerToggle": "start",
+      "drawerLabel": "{{ t('Browse articles') }}"
+     },
+     "isStudioComponent": true
     },
     {
      "blockName": "page-wrapper",
      "children": [
       {
-       "baseStyles": {
-        "transform": "{{ drawer.open ? 'none' : '' }}",
-        "visibility": "{{ drawer.open ? 'visible' : '' }}"
-       },
        "blockName": "sidebar",
-       "children": [
-        {
-         "componentId": "PortalArticleSidebar-category",
-         "componentName": "PortalArticleSidebar",
-         "componentProps": {
-          "activeCategory": "{{ route.params.category }}",
-          "articles": "{{ articleTitles.data || [] }}",
-          "categories": "{{ categories.data || [] }}"
-         },
-         "isCustomVueComponent": true
+       "componentEvents": {
+        "close": {
+         "action": "Run Script",
+         "event": "close",
+         "script": "drawer.close()"
         }
-       ],
-       "classes": [
-        "flex",
-        "flex-col",
-        "shrink-0",
-        "h-full",
-        "w-[239px]",
-        "max-md:fixed",
-        "max-md:inset-y-0",
-        "max-md:start-0",
-        "max-md:z-40",
-        "max-md:w-[min(320px,85vw)]",
-        "max-md:bg-surface-base",
-        "max-md:shadow-2xl",
-        "max-md:-translate-x-full",
-        "max-md:invisible",
-        "transition-[transform,visibility]",
-        "duration-200",
-        "ease-out",
-        "motion-reduce:transition-none",
-        "max-md:rtl:translate-x-full"
-       ],
-       "componentId": "container-category-sidebar",
-       "componentName": "container",
-       "originalElement": "div"
+       },
+       "componentId": "PortalArticleSidebar-category",
+       "componentName": "PortalArticleSidebar",
+       "componentProps": {
+        "activeCategory": "{{ route.params.category }}",
+        "articles": "{{ articleTitles.data || [] }}",
+        "categories": "{{ categories.data || [] }}",
+        "open": "{{ drawer.open }}"
+       },
+       "isCustomVueComponent": true
       },
       {
        "blockName": "main-layout",
@@ -290,12 +221,12 @@
                 "click": {
                  "action": "Run Script",
                  "event": "click",
-                 "script": "router.push(articleRoute(dataItem))"
+                 "script": "router.push(routes.article(dataItem))"
                 },
                 "keydown.enter": {
                  "action": "Run Script",
                  "event": "keydown.enter",
-                 "script": "router.push(articleRoute(dataItem))"
+                 "script": "router.push(routes.article(dataItem))"
                 }
                },
                "componentId": "container-jpuhf5mpa",
@@ -439,26 +370,6 @@
      "componentId": "kb_settings-ref",
      "componentName": "kb_settings",
      "isStudioComponent": true
-    },
-    {
-     "classes": [
-      "fixed",
-      "inset-0",
-      "z-30",
-      "bg-black-overlay-500",
-      "md:hidden"
-     ],
-     "componentEvents": {
-      "click": {
-       "action": "Run Script",
-       "event": "click",
-       "script": "drawer.close()"
-      }
-     },
-     "componentId": "category-drawer-backdrop",
-     "componentName": "container",
-     "originalElement": "div",
-     "visibilityCondition": "{{ drawer.open }}"
     }
    ],
    "classes": [
@@ -475,7 +386,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-09 03:34:39.874568",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

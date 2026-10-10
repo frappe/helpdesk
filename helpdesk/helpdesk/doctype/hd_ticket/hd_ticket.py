@@ -19,6 +19,7 @@ from pypika.queries import Query
 from pypika.terms import Criterion
 
 from helpdesk.consts import SERVER_COMPUTED_FIELDS
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import is_customer_manager
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
     is_email_content_empty,
@@ -43,6 +44,7 @@ from helpdesk.utils import (
 
 from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
+from .origin import resolve_origin
 
 customer_not_allowed_fields = ["customer"]
 
@@ -102,6 +104,7 @@ class HDTicket(Document, CustomerEditController):
         self.validate_portal_contact()
         self.set_contact()
         self.set_customer()
+        self.set_origin()
 
     def validate(self):
         self.validate_feedback()
@@ -276,6 +279,12 @@ class HDTicket(Document, CustomerEditController):
         if self.raised_by:
             return
         self.raised_by = frappe.session.user
+
+    def set_origin(self):
+        # after the permlevel reset, which would wipe these for a customer
+        if not self.is_new() or self.flags.origin is None:
+            return
+        self.update(resolve_origin(self.flags.origin))
 
     def validate_portal_contact(self) -> None:
         """Block non-agent users from attributing a ticket to another contact.
@@ -1397,18 +1406,11 @@ def has_permission(doc, user=None):
         return True
     if user in (doc.contact, doc.raised_by, doc.owner):
         return True
-    if _is_customer_manager(doc.customer, user):
+    if is_customer_manager(doc.customer, user):
         return True
     if not is_agent(user):
         return False
     return _agent_has_permission(doc, user)
-
-
-def _is_customer_manager(customer: str, user: str) -> bool:
-    return any(
-        c.get("name") == customer and c.get("is_manager")
-        for c in get_customers(user, get_roles=True)
-    )
 
 
 def _agent_has_permission(doc, user: str) -> bool:

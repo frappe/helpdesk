@@ -193,7 +193,7 @@
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
-      :exclude-category="article.data?.category_id"
+      :exclude-category="article.data?.category"
     />
     <CategoryModal
       :edit="editTitle"
@@ -253,6 +253,8 @@ import {
   CUSTOMER_PORTAL_ROOT,
   uploadFunction,
 } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { addHeadingIds } from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
@@ -359,7 +361,8 @@ const categories = createResource({
 });
 
 const article: Resource<Article> = createResource({
-  url: "helpdesk.api.knowledge_base.get_article",
+  url: "helpdesk.api.knowledge_base.get_public_article",
+  method: "GET",
   params: {
     name: props.articleId,
   },
@@ -369,9 +372,11 @@ const article: Resource<Article> = createResource({
     title.value = data.title;
   },
   onError: (err: Error) => {
-    if (err.exc_type === "PermissionError") {
-      router.replace({ name: "AgentKnowledgeBase" });
+    if (!["DoesNotExistError", "PermissionError"].includes(err.exc_type)) {
+      return;
     }
+    toast.error(__("Article not found"));
+    router.replace({ name: "AgentKnowledgeBase" });
   },
 });
 
@@ -398,7 +403,7 @@ const togglePublished = debounce(
 
 const showAccessModal = ref(false);
 const siblingsVisibility = useCategoryVisibility(
-  computed(() => (showAccessModal.value && article.data?.category_id) || null)
+  computed(() => (showAccessModal.value && article.data?.category) || null)
 );
 
 function publishArticle(visibility: string) {
@@ -454,7 +459,7 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
-  const original = addLinksToHeadings(article.data.content);
+  const original = addHeadingIds(article.data.content).html;
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
@@ -531,23 +536,12 @@ watch(
   () => article.data?.content,
   (newContent) => {
     if (newContent) {
-      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+      textEditorContentWithIDs.value = addHeadingIds(newContent).html;
     }
   },
   { immediate: true }
 );
 
-function addLinksToHeadings(content: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
-  headings.forEach((heading) => {
-    const text = heading.textContent.trim();
-    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
-    heading.setAttribute("id", id);
-  });
-  return doc.body.innerHTML;
-}
 function scrollToHeading() {
   const articleHeading = window.location.hash;
   if (!articleHeading) return;
@@ -621,7 +615,9 @@ const articleActions = computed(() => [
     icon: "lucide-link",
     onClick: () =>
       copyToClipboard(
-        `${window.location.origin}${CUSTOMER_PORTAL_ROOT}/articles/${props.articleId}`,
+        window.location.origin +
+          CUSTOMER_PORTAL_ROOT +
+          ROUTES.article({ name: props.articleId, title: article.data?.title }),
         __("Article link copied to clipboard.")
       ),
   },

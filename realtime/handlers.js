@@ -30,7 +30,6 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("ticket_get_viewers", (ticket_id) => {
-    if (!ticket_id) return;
     if (!in_ticket_room(socket, ticket_id)) return;
     // Send current viewers list to the requesting user only
     notify_ticket_viewers({
@@ -54,7 +53,6 @@ function helpdesk_handlers(socket) {
 
   // Typing indicators
   socket.on("helpdesk_ticket_typing", (ticket_id) => {
-    if (!ticket_id) return;
     if (!in_ticket_room(socket, ticket_id)) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 
@@ -66,7 +64,6 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("helpdesk_ticket_typing_stopped", (ticket_id) => {
-    if (!ticket_id) return;
     if (!in_ticket_room(socket, ticket_id)) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 

@@ -181,7 +181,7 @@ import {
 } from "reka-ui";
 import { computed, nextTick, ref, watch } from "vue";
 
-import ShortcutKey from "@/components/ShortcutKey.vue";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import LucideChevronRight from "~icons/lucide/chevron-right";
 import LucideLoaderCircle from "~icons/lucide/loader-circle";
 import LucideSearch from "~icons/lucide/search";
@@ -199,7 +199,6 @@ import {
   groups,
   isLoading,
   isOpen,
-  isPaletteAvailable,
   onQueryChange,
   openPalette,
   query,
@@ -418,9 +417,7 @@ useKeyboardShortcut({
   group: __("General"),
   allowInInput: true,
   allowInDialog: true,
-  enabled: () =>
-    isPaletteAvailable.value &&
-    !document.activeElement?.closest?.(".ProseMirror"),
+  enabled: () => !document.activeElement?.closest?.(".ProseMirror"),
   handler: () => (isOpen.value ? closePalette() : openPalette()),
 });
 </script>

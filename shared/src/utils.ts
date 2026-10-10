@@ -9,7 +9,7 @@ const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
 // The studio-built customer portal, served outside the desk SPA.
-export const CUSTOMER_PORTAL_ROOT = "/kb";
+export const CUSTOMER_PORTAL_ROOT = "/help";
 
 /**
  * @param {Object} config - Configuration object
@@ -47,13 +47,7 @@ export function isSafeLink(url: unknown) {
   return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
 }
 
-export function validateEmail(email) {
-  const regExp =
-    /^((?:"[\p{L}\p{M}\d .,_%+-]+"|[\p{L}\d._%+-]+)\s)?<([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})>$|^([\p{L}\d._%+-]+@[\p{L}\d.-]+\.[\p{L}]{2,})$/u;
-  return regExp.test(email);
-}
-
-export function prettyDate(date, mini = false) {
+export function prettyDate(date) {
   if (!date) return "";
 
   if (typeof date == "string") {
@@ -72,91 +66,54 @@ export function prettyDate(date, mini = false) {
 
   if (isNaN(dayDiff)) return "";
 
-  if (mini) {
-    // Return short format of time difference
-    if (absDiff < 86400) {
-      // Within a day — show sub-day granularity (past or future).
-      if (absDiff < 60) return __("Now");
-      if (absDiff < 3600) {
-        const minutes = Math.floor(absDiff / 60);
-        return diff >= 0 ? __("{0} m", [minutes]) : __("in {0} m", [minutes]);
-      }
-      const hours = Math.floor(absDiff / 3600);
-      return diff >= 0 ? __("{0} h", [hours]) : __("in {0} h", [hours]);
-    } else if (diff < 0) {
-      const ahead = -dayDiff;
-      if (ahead === 1) {
-        return __("Tomorrow");
-      } else if (ahead < 7) {
-        return __("in {0} d", [ahead]);
-      } else if (ahead < 31) {
-        return __("in {0} w", [Math.floor(ahead / 7)]);
-      } else if (ahead < 365) {
-        return __("in {0} M", [Math.floor(ahead / 30)]);
-      } else {
-        return __("in {0} y", [Math.floor(ahead / 365)]);
-      }
+  // Return long format of time difference
+  if (absDiff < 86400) {
+    // Within a day — show sub-day granularity (past or future).
+    if (absDiff < 60) return __("Just now");
+    if (diff >= 0) {
+      if (absDiff < 120) return __("1 minute ago");
+      if (absDiff < 3600)
+        return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
+      if (absDiff < 7200) return __("1 hour ago");
+      return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
+    }
+    if (absDiff < 120) return __("In 1 minute");
+    if (absDiff < 3600)
+      return __("In {0} minutes", [Math.floor(absDiff / 60)]);
+    if (absDiff < 7200) return __("In 1 hour");
+    return __("In {0} hours", [Math.floor(absDiff / 3600)]);
+  } else if (diff < 0) {
+    const ahead = -dayDiff;
+    if (ahead === 1) {
+      return __("Tomorrow");
+    } else if (ahead < 7) {
+      return __("In {0} days", [ahead]);
+    } else if (ahead < 31) {
+      return __("In {0} weeks", [Math.floor(ahead / 7)]);
+    } else if (ahead < 365) {
+      return __("In {0} months", [Math.floor(ahead / 30)]);
+    } else if (ahead < 730) {
+      return __("In 1 year");
     } else {
-      if (dayDiff < 7) {
-        return __("{0} d", [dayDiff]);
-      } else if (dayDiff < 31) {
-        return __("{0} w", [Math.floor(dayDiff / 7)]);
-      } else if (dayDiff < 365) {
-        return __("{0} M", [Math.floor(dayDiff / 30)]);
-      } else {
-        return __("{0} y", [Math.floor(dayDiff / 365)]);
-      }
+      return __("In {0} years", [Math.floor(ahead / 365)]);
     }
   } else {
-    // Return long format of time difference
-    if (absDiff < 86400) {
-      // Within a day — show sub-day granularity (past or future).
-      if (absDiff < 60) return __("Just now");
-      if (diff >= 0) {
-        if (absDiff < 120) return __("1 minute ago");
-        if (absDiff < 3600)
-          return __("{0} minutes ago", [Math.floor(absDiff / 60)]);
-        if (absDiff < 7200) return __("1 hour ago");
-        return __("{0} hours ago", [Math.floor(absDiff / 3600)]);
-      }
-      if (absDiff < 120) return __("In 1 minute");
-      if (absDiff < 3600)
-        return __("In {0} minutes", [Math.floor(absDiff / 60)]);
-      if (absDiff < 7200) return __("In 1 hour");
-      return __("In {0} hours", [Math.floor(absDiff / 3600)]);
-    } else if (diff < 0) {
-      const ahead = -dayDiff;
-      if (ahead === 1) {
-        return __("Tomorrow");
-      } else if (ahead < 7) {
-        return __("In {0} days", [ahead]);
-      } else if (ahead < 31) {
-        return __("In {0} weeks", [Math.floor(ahead / 7)]);
-      } else if (ahead < 365) {
-        return __("In {0} months", [Math.floor(ahead / 30)]);
-      } else if (ahead < 730) {
-        return __("In 1 year");
-      } else {
-        return __("In {0} years", [Math.floor(ahead / 365)]);
-      }
+    if (dayDiff === 1) {
+      return __("Yesterday");
+    } else if (dayDiff < 7) {
+      return __("{0} days ago", [dayDiff]);
+    } else if (dayDiff < 14) {
+      return __("1 week ago");
+    } else if (dayDiff < 31) {
+      return __("{0} weeks ago", [Math.floor(dayDiff / 7)]);
+    } else if (dayDiff < 62) {
+      return __("1 month ago");
+    } else if (dayDiff < 365) {
+      return __("{0} months ago", [Math.floor(dayDiff / 30)]);
+    } else if (dayDiff < 730) {
+      return __("1 year ago");
     } else {
-      if (dayDiff === 1) {
-        return __("Yesterday");
-      } else if (dayDiff < 7) {
-        return __("{0} days ago", [dayDiff]);
-      } else if (dayDiff < 14) {
-        return __("1 week ago");
-      } else if (dayDiff < 31) {
-        return __("{0} weeks ago", [Math.floor(dayDiff / 7)]);
-      } else if (dayDiff < 62) {
-        return __("1 month ago");
-      } else if (dayDiff < 365) {
-        return __("{0} months ago", [Math.floor(dayDiff / 30)]);
-      } else if (dayDiff < 730) {
-        return __("1 year ago");
-      } else {
-        return __("{0} years ago", [Math.floor(dayDiff / 365)]);
-      }
+      return __("{0} years ago", [Math.floor(dayDiff / 365)]);
     }
   }
 }
@@ -166,6 +123,11 @@ export function timeAgo(date) {
 }
 
 /** Format a duration using its two most significant units, e.g. "1d 9h" */
+// The server's rule (HD Service Level Agreement): a milestone fails only when met after its due time.
+export function isSlaMissed(metOn: string, due?: string | null) {
+  return Boolean(due) && dayjsLocal(metOn).isAfter(dayjsLocal(due));
+}
+
 export function twoUnitDuration(milliseconds: number): string {
   const duration = dayjs.duration(milliseconds);
 
@@ -202,8 +164,44 @@ export function isContentEmpty(content: string) {
   return !doc.body.textContent?.trim();
 }
 
+// Plain-text mail has no markup, so its newlines would collapse into one paragraph.
+export function plainTextToHtml(content: string) {
+  const doc = new DOMParser().parseFromString(content || "", "text/html");
+  if (doc.body.children.length) return content;
+  return `<div class="whitespace-pre-wrap">${doc.body.innerHTML}</div>`;
+}
+
 // Lucide names are plain ASCII, so any emoji-presentation or pictographic
 // character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
+export function slugify(text = "") {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFC")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// One id per article heading, the same on the desk and the portal, so a `#heading` link works on both.
+// An id the editor already saved wins, so existing links keep working; repeats are numbered.
+export function addHeadingIds(html: string) {
+  const doc = new DOMParser().parseFromString(html || "", "text/html");
+  const used = new Set<string>();
+  const headings = Array.from(
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6")
+  ).map((heading) => {
+    const text = heading.textContent?.trim() || "";
+    const base = heading.id || slugify(text) || "section";
+    let id = base;
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+    used.add(id);
+    heading.id = id;
+    return { id, text, level: Number(heading.tagName[1]) };
+  });
+  return { html: doc.body.innerHTML, headings };
+}
+
 export function isEmoji(str: string): boolean {
   return /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\uFE0F/u.test(str);
 }
@@ -283,11 +281,10 @@ export function parseApiOptions(
 
 export function getErrorMessage(
   error: any,
-  showToast: boolean = false
+  showToast: boolean = false,
+  fallback: string = ""
 ): string {
-  const msg = error.exc_type
-    ? (error.messages || error.message || []).join(", ")
-    : error.message;
+  const msg = error?.messages?.join(", ") || error?.message || fallback;
   if (showToast) {
     toast.error(msg);
   }

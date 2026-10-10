@@ -1,19 +1,15 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
-import {
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
-  setupCustomizations,
-} from '@helpdesk/shared/formScripts'
+import { applyFieldFilters } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
 import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
-import { CUSTOMER_FILE_TYPES, runAction, scriptDialog } from '@app/utils'
+import { runAction, runFormScripts, uploadableFileTypes } from '@app/utils'
 import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 const DEFAULT_TEMPLATE = 'Default'
@@ -24,8 +20,10 @@ export default function setup(context) {
   const { subject, description, template, newTicket, route } = context
   const settings = useSettingsModal(context)
 
-  const searched = String(route?.query?.subject || '').trim()
-  if (searched && !subject.value) subject.value = searched
+  // A ticket raised from search starts from what was searched.
+  const searched = String(route?.query?.q || '').trim()
+  // The subject holds 140 characters; a longer search would leave a form that can't be sent.
+  if (searched && !subject.value) subject.value = searched.slice(0, 140)
 
   const model = reactive({})
   const attachments = ref([])
@@ -35,9 +33,7 @@ export default function setup(context) {
   // The upload queue keeps only `file_url`; the server links attachments by File name.
   const uploadedByUrl = new Map()
 
-  const uploadRestrictions = computed(() =>
-    settings.config.value?.is_agent ? {} : { allowed_file_types: CUSTOMER_FILE_TYPES },
-  )
+  const uploadRestrictions = computed(() => ({ allowed_file_types: uploadableFileTypes(settings.isAgent.value) }))
 
   function uploadPrivately(file, _args, { signal, onProgress }) {
     uploading.value += 1
@@ -70,7 +66,6 @@ export default function setup(context) {
   // The template's own fields, for `applyFilters` to restore once a filter is lifted.
   let oldFields = []
 
-  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
   watch(
     () => template.data,
     async (data) => {
@@ -81,22 +76,13 @@ export default function setup(context) {
       oldFields = JSON.parse(JSON.stringify(data.fields || []))
       // Field dependency rules compare with '' (`doc.priority != ''`), which undefined passes.
       for (const row of data.fields || []) model[row.fieldname] ??= ''
-      await setupCustomizations(data, {
-        doc: model,
-        call: context.call,
-        router: context.router,
-        $dialog: scriptDialog,
-        applyFilters,
-      })
-      customActions.value = data._customActions || []
+      customActions.value = await runFormScripts(data, context, { doc: model, applyFilters })
     },
     { immediate: true },
   )
 
   function applyFilters(fieldname: string, filters: any = null) {
-    const field = template.data.fields.find((row) => row.fieldname === fieldname)
-    if (field?.fieldtype === 'Select') handleSelectFieldUpdate(field, fieldname, filters, model, oldFields)
-    else if (field?.fieldtype === 'Link') handleLinkFieldUpdate(field, fieldname, filters, model, oldFields)
+    applyFieldFilters(template.data.fields, fieldname, filters, model, oldFields)
   }
 
   // A script's `onChange` handlers for a field, run when its value is committed.
@@ -115,7 +101,7 @@ export default function setup(context) {
     description.value = html
   }
 
-  const dateFormat = computed(() => settings.config.value?.date_format?.toUpperCase())
+  const { dateFormat } = settings
   const timeFormat = computed(() => settings.config.value?.time_format)
 
   // As on the desk's form, only priority shows its description.
@@ -172,6 +158,12 @@ export default function setup(context) {
     return field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model))
   }
 
+  // Sent even when empty: an origin marks a portal ticket, and no `from` is a Direct visit.
+  function currentOrigin() {
+    const { from, article, q } = route?.query || {}
+    return { from, article, q }
+  }
+
   function createTicket() {
     if (!canSubmit.value) return
     return runAction(
@@ -184,6 +176,7 @@ export default function setup(context) {
             ...model,
           },
           attachments: attachments.value.map((file) => uploadedByUrl.get(file.file_url)),
+          origin: currentOrigin(),
         })
         await navigateTo(ROUTES.ticket(ticket.name))
       },

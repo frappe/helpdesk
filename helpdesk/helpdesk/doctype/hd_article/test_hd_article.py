@@ -2,11 +2,7 @@
 # See license.txt
 import frappe
 from frappe.tests import IntegrationTestCase
-
-from helpdesk.test_utils import (
-    disable_anonymous_article_voting,
-    enable_anonymous_article_voting,
-)
+from frappe.tests.utils import change_settings
 
 
 class TestHDArticleFeedback(IntegrationTestCase):
@@ -37,14 +33,18 @@ class TestHDArticleFeedback(IntegrationTestCase):
         return likes, dislikes
 
     def test_anonymous_vote_is_refused_by_default(self):
-        disable_anonymous_article_voting()
+        self.enterContext(
+            change_settings("HD Settings", allow_anonymous_article_voting=0)
+        )
         frappe.set_user("Guest")
 
         self.assertRaises(frappe.PermissionError, self.article.set_feedback, 1)
         self.assertEqual(self.get_counts(), (0, 0))
 
     def test_anonymous_readers_are_counted_separately(self):
-        enable_anonymous_article_voting()
+        self.enterContext(
+            change_settings("HD Settings", allow_anonymous_article_voting=1)
+        )
         frappe.set_user("Guest")
 
         self.article.set_feedback(1, visitor_id="visitor-one")
@@ -53,7 +53,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
         self.assertEqual(self.get_counts(), (2, 0))
 
     def test_an_anonymous_reader_holds_one_vote(self):
-        enable_anonymous_article_voting()
+        self.enterContext(
+            change_settings("HD Settings", allow_anonymous_article_voting=1)
+        )
         frappe.set_user("Guest")
 
         self.article.set_feedback(1, visitor_id="visitor-one")
@@ -62,7 +64,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
         self.assertEqual(self.get_counts(), (0, 1))
 
     def test_an_unidentified_reader_cannot_vote(self):
-        enable_anonymous_article_voting()
+        self.enterContext(
+            change_settings("HD Settings", allow_anonymous_article_voting=1)
+        )
         frappe.set_user("Guest")
 
         self.assertRaises(frappe.ValidationError, self.article.set_feedback, 1)

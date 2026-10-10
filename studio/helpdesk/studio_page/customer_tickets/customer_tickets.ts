@@ -6,7 +6,7 @@ import {
   datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
@@ -175,7 +175,7 @@ export default function setup(context) {
     openTicket,
     pageActionLabel: computed(() => (settings.canCreateTicket.value ? __('Raise a ticket') : '')),
     pageActionIcon: 'lucide-plus',
-    onPageAction: () => navigateTo(ROUTES.newTicket),
+    onPageAction: () => navigateTo(ROUTES.newTicket({ from: 'ticket-list' })),
     rows: data.rows,
     listLoading: data.loading,
     rowCount: data.rowCount,

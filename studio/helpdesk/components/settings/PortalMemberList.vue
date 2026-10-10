@@ -164,7 +164,12 @@ import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
-import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
+import {
+  ASSIGNABLE_ROLES,
+  ROLES,
+  roleLabel,
+  type RoleLabel,
+} from "@app/stores/settings/roles";
 import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width; only managers get it at all.
@@ -194,10 +199,9 @@ type Invite = {
 };
 
 // Owner is left out: there is one per organization, already first in the list.
-const FILTERABLE_ROLES: RoleLabel[] = ["Manager", "Member"];
 const roleFilters = computed(() => [
   { label: __("All"), value: "All", icon: LucideUsers },
-  ...FILTERABLE_ROLES.map((role) => ({
+  ...ASSIGNABLE_ROLES.map((role) => ({
     label: roleLabel(role),
     value: role,
     icon: ROLES[role].icon,
@@ -271,7 +275,7 @@ function canRemove(member: Member) {
 }
 
 function roleOptions(member: Member) {
-  return (["Manager", "Member"] as RoleLabel[]).map((role) => ({
+  return ASSIGNABLE_ROLES.map((role) => ({
     label: roleLabel(role),
     selected: member.role === role,
     onClick: () => member.role !== role && emit("setRole", member, role),

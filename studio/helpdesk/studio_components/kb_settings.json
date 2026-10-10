@@ -1225,16 +1225,7 @@
                   "$type": "variable",
                   "name": "inviteRole"
                  },
-                 "options": [
-                  {
-                   "label": "Member",
-                   "value": "Member"
-                  },
-                  {
-                   "label": "Manager",
-                   "value": "Manager"
-                  }
-                 ]
+                 "options": "{{ inviteRoleOptions }}"
                 },
                 "componentSlots": {}
                }
@@ -1603,7 +1594,7 @@
         "componentName": "TextBlock",
         "componentProps": {
          "tag": "span",
-         "text": "Settings"
+         "text": "{{ t('Settings') }}"
         },
         "componentSlots": {}
        }
@@ -1627,7 +1618,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-09 11:53:02.759167",
+ "modified": "2026-10-10 20:51:47.071215",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

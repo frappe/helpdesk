@@ -4,10 +4,11 @@
     <div
       v-for="(step, index) in steps"
       :key="step.title"
-      class="group grid grid-cols-[16px_minmax(0,1fr)] gap-3"
+      class="group relative grid grid-cols-[16px_minmax(0,1fr)] gap-3"
       :style="{ '--step': index }"
     >
-      <div class="relative flex justify-center">
+      <!-- Not positioned, so the hover area and the line measure against the row. -->
+      <div class="flex justify-center">
         <Tooltip
           :text="step.fullDate"
           :disabled="!step.fullDate"
@@ -16,12 +17,18 @@
         >
           <span
             :class="[
-              'timeline-dot',
-              DOT_BASE,
-              (step.late ? LATE_DOT_CLASSES : MILESTONE_DOT_CLASSES)[step.state],
+              HOVER_AREA,
               step.state === 'next' ? 'mt-[5px]' : 'mt-1.5',
             ]"
-          />
+          >
+            <span
+              :class="[
+                'timeline-dot',
+                DOT_BASE,
+                (step.late ? LATE_DOT_CLASSES : MILESTONE_DOT_CLASSES)[step.state],
+              ]"
+            />
+          </span>
         </Tooltip>
         <span
           v-if="index < steps.length - 1"
@@ -48,7 +55,25 @@
 <script setup lang="ts">
 import { inject, ref, watch, type Ref } from "vue";
 import { Tooltip } from "frappe-ui";
-import { LATE_DOT_CLASSES, MILESTONE_DOT_CLASSES, type MilestoneState } from "./milestoneDots";
+
+// Full literal strings: Tailwind's scanner cannot see interpolation.
+const MILESTONE_DOT_CLASSES = {
+  done: "size-2 bg-[var(--ink-green-6)]",
+  closed: "size-2 bg-[var(--outline-gray-4)]",
+  next: "size-2.5 bg-surface-base shadow-[inset_0_0_0_2px_var(--ink-amber-7)]",
+  pending:
+    "size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--outline-gray-4)]",
+};
+
+// Overdue or missed: the same shape, in red.
+const LATE_DOT_CLASSES = {
+  done: "size-2 bg-[var(--ink-red-6)]",
+  closed: "size-2 bg-[var(--ink-red-6)]",
+  next: "size-2.5 bg-surface-base shadow-[inset_0_0_0_2px_var(--ink-red-6)]",
+  pending: "size-2 bg-surface-base shadow-[inset_0_0_0_1.5px_var(--ink-red-6)]",
+};
+
+type MilestoneState = keyof typeof MILESTONE_DOT_CLASSES;
 
 interface TimelineStep {
   title: string;
@@ -60,9 +85,13 @@ interface TimelineStep {
   late?: boolean;
 }
 
-// The ::after pads an 8px target out to 24px without moving or resizing the mark.
-const DOT_BASE =
-  "relative shrink-0 rounded-full after:absolute after:-inset-2 after:rounded-full after:content-['']";
+const DOT_BASE = "shrink-0 rounded-full";
+
+// Wraps the dot, so the tooltip points at it, while the ::after stretches over the row so hovering any
+// part of the step opens it. Kept off the animated dot: a transform would shrink the ::after back to the
+// dot, and z-[1] keeps it above the text while the text's fade-in transform stacks the text on top.
+const HOVER_AREA =
+  "flex shrink-0 self-start after:absolute after:inset-0 after:z-[1] after:content-['']";
 
 const LINE_BASE = "absolute bottom-0 top-[18px] w-[0.05rem] rounded-full";
 

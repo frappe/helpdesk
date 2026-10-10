@@ -114,7 +114,8 @@ def _sync_contact(user) -> None:
     contact_name = frappe.db.get_value("Contact", {"user": user.name})
     if not contact_name:
         return
-    contact = frappe.get_doc("Contact", contact_name)
+    # Locked: the User's own after-commit job saves this Contact too, and a quick second change would race it.
+    contact = frappe.get_doc("Contact", contact_name, for_update=True)
     contact.update(
         {
             "first_name": user.first_name,

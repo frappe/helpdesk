@@ -12,7 +12,7 @@ from helpdesk.api.banners import BANNERS, dismiss_banner
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
-from helpdesk.utils import get_customers, is_frappe_version
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -341,20 +341,40 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
-def enable_public_knowledge_base():
-    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+def category_row(name: str, with_creators: bool = False) -> frappe._dict:
+    """The public knowledge base's row for one category, as the session user sees it."""
+    from helpdesk.api.knowledge_base import get_categories
+
+    return next(row for row in get_categories(with_creators) if row.name == name)
 
 
-def disable_public_knowledge_base():
-    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+def category_names() -> list[str]:
+    """The categories the public knowledge base lists for the session user."""
+    from helpdesk.api.knowledge_base import get_categories
+
+    return [row.name for row in get_categories()]
 
 
-def enable_anonymous_article_voting():
-    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+def use_test_index(case, search_class, db_name: str, *modules):
+    """A throwaway `search_class` index for one test, so the site's real one is never touched.
+
+    Each of `modules` gets it in place of its own `search_class`."""
+    search = search_class(db_name=db_name)
+    search.drop_index()
+    case.addCleanup(search.drop_index)
+    for module in modules:
+        case.enterContext(
+            patch.object(
+                module, search_class.__name__, lambda: search_class(db_name=db_name)
+            )
+        )
+    return search
 
 
-def disable_anonymous_article_voting():
-    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 0)
+def is_outside_hours_banner_shown(ticket_name: str) -> bool:
+    from helpdesk.helpdesk.doctype.hd_ticket.api import get_outside_hours_banner
+
+    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))["show"]
 
 
 def create_agent(
@@ -663,11 +683,17 @@ def make_contact(prefix: str = "customer") -> dict:
     return create_contact(email.split("@")[0], email)
 
 
-def create_customer(name, contacts=[]):
+def create_customer(name, contacts=[], primary_contact=None):
     if frappe.db.exists("HD Customer", name):
         frappe.delete_doc("HD Customer", name, force=True)
 
-    customer = frappe.get_doc({"doctype": "HD Customer", "customer_name": name})
+    customer = frappe.get_doc(
+        {
+            "doctype": "HD Customer",
+            "customer_name": name,
+            "primary_contact": primary_contact,
+        }
+    )
 
     for c in contacts:
         customer.append("contacts", c)
@@ -683,6 +709,40 @@ def create_user(email: str):
         email=email,
         first_name=email.split("@")[0],
         send_welcome_email=0,
+    ).insert(ignore_permissions=True)
+
+
+def make_organization(label: str) -> tuple:
+    """An HD Customer with an owner, a manager and a plain member, each a contact with a portal user.
+
+    Returns `(customer, owner, manager, member)`."""
+    prefix = label.lower().replace(" ", "-")
+    owner, manager, member = (
+        create_contact(f"{label} {role}", unique_email(f"{prefix}-{role.lower()}"))
+        for role in ("Owner", "Manager", "Member")
+    )
+    customer = create_customer(
+        unique_name(f"Test {label}"),
+        [
+            {"contact_name": owner["contact"]},
+            {"contact_name": manager["contact"], "is_manager": 1},
+            {"contact_name": member["contact"]},
+        ],
+        primary_contact=owner["contact"],
+    )
+    return customer, owner, manager, member
+
+
+def make_invitation(email: str, customer: str, contact: str | None = None):
+    """A helpdesk User Invitation into `customer`, inserted without permission checks."""
+    return frappe.get_doc(
+        doctype="User Invitation",
+        email=email,
+        roles=[{"role": "HD Customer"}],
+        app_name="helpdesk",
+        redirect_to_path=CUSTOMER_PORTAL_ROOT,
+        customer=customer,
+        contact=contact,
     ).insert(ignore_permissions=True)
 
 

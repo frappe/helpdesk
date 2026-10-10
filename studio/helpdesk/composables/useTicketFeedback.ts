@@ -2,12 +2,12 @@ import { computed, ref, watch } from 'vue'
 import { createListResource } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
-import { runAction, updateTicket } from '@app/utils'
 
 // A handful exist per rating; one page well past any real count holds them all.
 const FEEDBACK_OPTION_LIMIT = 100
 
-export function useTicketFeedback(ticket) {
+// `saveTicket` writes the ticket and refetches it; it resolves true once saved.
+export function useTicketFeedback(saveTicket) {
   const isFeedbackOpen = ref(false)
   // In stars, as the Rating component counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
@@ -54,20 +54,13 @@ export function useTicketFeedback(ticket) {
     feedbackOption.value = name
   }
 
-  function submitFeedback() {
+  async function submitFeedback() {
     if (!feedbackOption.value) return
-    return runAction(
-      async () => {
-        await updateTicket(ticket.data.name, {
-          status: CLOSED_STATUS,
-          feedback: feedbackOption.value,
-          feedback_extra: feedbackText.value,
-        })
-        isFeedbackOpen.value = false
-        ticket.fetch()
-      },
+    const saved = await saveTicket(
+      { status: CLOSED_STATUS, feedback: feedbackOption.value, feedback_extra: feedbackText.value },
       { busy: isFeedbackSaving, fallback: __('Could not save the feedback') },
     )
+    if (saved) isFeedbackOpen.value = false
   }
 
   return {

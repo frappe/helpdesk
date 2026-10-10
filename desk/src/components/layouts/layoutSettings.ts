@@ -7,7 +7,6 @@ import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
-import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 
 /**
  * Shared rather than local to Sidebar.vue: the command palette opens it too, and
@@ -58,18 +57,5 @@ export const agentPortalSidebarOptions: SidebarOption[] = [
     label: __("Call Logs"),
     icon: PhoneIcon,
     to: "CallLogs",
-  },
-];
-
-export const customerPortalSidebarOptions: SidebarOption[] = [
-  {
-    label: __("Tickets"),
-    icon: LucideTicket,
-    url: CUSTOMER_PORTAL_ROOT,
-  },
-  {
-    label: __("Knowledge Base"),
-    icon: LucideBookOpen,
-    url: CUSTOMER_PORTAL_ROOT,
   },
 ];

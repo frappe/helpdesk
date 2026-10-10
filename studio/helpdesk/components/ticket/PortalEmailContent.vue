@@ -15,6 +15,7 @@ import {
   stripEmailColors,
   useDataTheme,
 } from "@framework/ui/components/ActivityTimeline/utils";
+import { plainTextToHtml } from "@helpdesk/shared/utils";
 
 const QUOTE_SELECTORS = [
   "div.gmail_quote",
@@ -29,15 +30,8 @@ const props = withDefaults(defineProps<{ content?: string }>(), {
 const frame = ref<HTMLIFrameElement | null>(null);
 
 const body = computed(() =>
-  collapseQuotes(asHtml(stripEmailColors(props.content || "")))
+  collapseQuotes(plainTextToHtml(stripEmailColors(props.content || "")))
 );
-
-// Plain-text mail has no markup, so its newlines would collapse into one paragraph.
-function asHtml(content: string) {
-  const doc = new DOMParser().parseFromString(content, "text/html");
-  if (doc.body.children.length) return content;
-  return `<div class="whitespace-pre-wrap">${doc.body.innerHTML}</div>`;
-}
 
 function collapseQuotes(html: string) {
   const doc = new DOMParser().parseFromString(html, "text/html");

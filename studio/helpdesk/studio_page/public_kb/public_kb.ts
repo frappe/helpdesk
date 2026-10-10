@@ -1,18 +1,15 @@
 import { computed, nextTick, ref, watch } from 'vue'
-import { __ } from '@helpdesk/shared/translation'
 import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
-import { useSettingsModal } from '@app/stores/settings'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
-import { ROUTES } from '@app/routes'
 
 const ARTICLE_LIMIT = 5
-const CATEGORY_GRID = '[data-component-id="Repeater-sxfnpzbam"]'
+const CATEGORY_GRID = '[data-component-id="category-grid-repeater"]'
 const EASE = 'cubic-bezier(0.2, 0, 0, 1)'
 
 export default function setup(context) {
   const { articles, categories } = context
-  const settings = useSettingsModal(context)
+  const settings = useKnowledgeBaseHeader(context)
   const { config } = settings
 
   // Settings' Preview shows its unsaved banner and pins in place of the saved ones.
@@ -103,7 +100,6 @@ export default function setup(context) {
 
   return {
     ...settings,
-    ...useKnowledgeBaseHeader(context),
     bannerImage,
     bannerBackground,
     bannerTextColor,
@@ -115,6 +111,5 @@ export default function setup(context) {
     sort,
     focusCategory,
     isLoneCategory,
-    articleRoute: ROUTES.article,
   }
 }

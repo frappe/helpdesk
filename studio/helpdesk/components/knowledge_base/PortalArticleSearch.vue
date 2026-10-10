@@ -52,7 +52,12 @@
             <span v-html="item.article.excerpt" />
           </span>
           <span v-else class="truncate text-p-sm text-ink-gray-5">
-            {{ articleMeta(item.recentArticle) }}
+            {{
+              articleMeta(
+                item.recentArticle.categoryName,
+                item.recentArticle.minutes
+              )
+            }}
           </span>
         </div>
 
@@ -147,13 +152,13 @@ import LucideSearchX from "~icons/lucide/search-x";
 import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
-import { ROUTES } from "@app/routes";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import {
   MIN_QUERY_LENGTH,
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
-import { useRecent, type RecentArticle } from "@app/stores/recent";
-import { countLabel } from "@app/utils";
+import { useRecent } from "@app/stores/recent";
+import { articleMeta, countLabel } from "@app/utils";
 
 const MAX_RESULTS = 6;
 const KEY_HINTS = [
@@ -201,14 +206,7 @@ function onFocus() {
 }
 
 function createTicket() {
-  const subject = searchText.value;
-  router.push({ path: ROUTES.newTicket, query: subject ? { subject } : {} });
-}
-
-function articleMeta(article: RecentArticle) {
-  const parts = [article.categoryName];
-  if (article.minutes) parts.push(__("{0} min read", [article.minutes]));
-  return parts.filter(Boolean).join(" · ");
+  router.push(ROUTES.newTicket({ from: "search", q: searchText.value }));
 }
 
 const historyOptions = computed(() =>

@@ -8,16 +8,17 @@ from frappe.utils import get_fullname, sbool
 from helpdesk.api.auth import validate_uploaded_image
 from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
-    CUSTOMER_ROLES,
     MANAGER_ROLE,
-    get_customer_membership,
+    PORTAL_EDIT_SETTING,
+    PORTAL_INVITE_SETTING,
+    PORTAL_REMOVE_SETTING,
+    PORTAL_ROLES_SETTING,
+    is_customer_manager,
+    is_portal_setting_on,
+    validate_customer_role,
 )
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers
 
-PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
-PORTAL_ROLES_SETTING = "allow_customer_managers_to_change_roles"
-PORTAL_REMOVE_SETTING = "allow_customer_managers_to_remove_members"
-PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 MAX_INVITES = 20
 MAX_SUGGESTIONS = 50
@@ -81,7 +82,7 @@ def get_organization(customer: str) -> dict:
     hd_customer = frappe.get_doc("HD Customer", customer)
     hd_customer.check_permission("read")
     is_manager = _is_manager(hd_customer)
-    can_invite = is_manager and _is_portal_setting_on(PORTAL_INVITE_SETTING)
+    can_invite = is_manager and is_portal_setting_on(PORTAL_INVITE_SETTING)
     return {
         "name": hd_customer.name,
         "customer_name": hd_customer.customer_name,
@@ -91,10 +92,10 @@ def get_organization(customer: str) -> dict:
         "country": hd_customer.country,
         "is_manager": is_manager,
         "can_invite": can_invite,
-        "can_change_roles": is_manager and _is_portal_setting_on(PORTAL_ROLES_SETTING),
+        "can_change_roles": is_manager and is_portal_setting_on(PORTAL_ROLES_SETTING),
         "can_remove_members": is_manager
-        and _is_portal_setting_on(PORTAL_REMOVE_SETTING),
-        "can_edit": is_manager and _is_portal_setting_on(PORTAL_EDIT_SETTING),
+        and is_portal_setting_on(PORTAL_REMOVE_SETTING),
+        "can_edit": is_manager and is_portal_setting_on(PORTAL_EDIT_SETTING),
         # when each colleague last signed in is a manager's business, not every member's
         "members": _get_members(hd_customer, with_last_seen=is_manager),
         "invites": _get_pending_invites(hd_customer) if can_invite else [],
@@ -133,12 +134,7 @@ def get_invitable_contacts(customer: str) -> list[dict]:
 def invite_members(customer: str, emails: list[str], role: str) -> None:
     """Ignores permissions managers lack; `HelpdeskUserInvitation` checks the customer."""
     hd_customer = _get_managed_customer(customer, PORTAL_INVITE_SETTING)
-    if role not in CUSTOMER_ROLES:
-        frappe.throw(_("Invalid role {0}").format(role))
-    if not isinstance(emails, list) or not all(
-        isinstance(email, str) for email in emails
-    ):
-        frappe.throw(_("Please enter the email addresses as a list"))
+    validate_customer_role(role)
     if len(emails) > MAX_INVITES:
         frappe.throw(_("You can invite up to {0} people at a time").format(MAX_INVITES))
     contacts = dict(
@@ -208,12 +204,16 @@ def update_organization_image(customer: str, image: str) -> None:
 
 
 def _get_organizations() -> list[dict]:
+    session_contact = _get_session_contact()
+    if not session_contact:
+        return []
     memberships = {
-        row["name"]: row["is_manager"] for row in get_customers(get_roles=True)
+        row["name"]: row["is_manager"]
+        for row in get_customers(contact=session_contact, get_roles=True)
     }
     if not memberships:
         return []
-    session_contact = _get_session_contact()
+    can_write = frappe.has_permission("HD Customer", "write")
     member_counts = _count_rows_by("HD Customer Member", "parent", list(memberships))
     ticket_counts = _count_rows_by("HD Ticket", "customer", list(memberships))
     rows = frappe.get_all(
@@ -227,8 +227,10 @@ def _get_organizations() -> list[dict]:
             "customer_name": row.customer_name,
             "image": row.image,
             "domain": row.domain,
+            # An agent who may write it manages it too, as `_is_manager` lets them.
             "role": _get_role_label(
-                row.primary_contact == session_contact, memberships[row.name]
+                row.primary_contact == session_contact,
+                memberships[row.name] or can_write,
             ),
             "member_count": member_counts.get(row.name, 0),
             "ticket_count": ticket_counts.get(row.name, 0),
@@ -312,13 +314,9 @@ def _get_session_contact() -> str | None:
     return frappe.db.get_value("Contact", {"user": frappe.session.user})
 
 
-def _is_portal_setting_on(setting: str) -> bool:
-    return bool(frappe.db.get_single_value("HD Settings", setting))
-
-
 def _get_managed_customer(customer: str, setting: str):
     """The HD Customer, once the helpdesk allows the action and the caller manages it."""
-    if not _is_portal_setting_on(setting):
+    if not is_portal_setting_on(setting):
         refusals = {
             PORTAL_INVITE_SETTING: _(
                 "Your helpdesk does not allow customers to invite members"
@@ -345,10 +343,7 @@ def _get_managed_customer(customer: str, setting: str):
 
 def _is_manager(hd_customer) -> bool:
     """An agent who may write it, or a customer manager, who can change it only here."""
-    if hd_customer.has_permission("write"):
-        return True
-    membership = get_customer_membership(hd_customer.name, frappe.session.user)
-    return bool(membership and membership.get("is_manager"))
+    return hd_customer.has_permission("write") or is_customer_manager(hd_customer.name)
 
 
 def _get_editable_member(hd_customer, contact: str):

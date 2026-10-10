@@ -72,7 +72,7 @@ import LucideSearch from "~icons/lucide/search";
 import { __ } from "@helpdesk/shared/translation";
 import { timeAgo } from "@helpdesk/shared/utils";
 import PortalStatusPill from "@app/components/ticket/PortalStatusPill.vue";
-import { ROUTES } from "@app/routes";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { statusMeta } from "@app/stores/ticketMeta";
 import { SEARCH_DEBOUNCE_MS } from "@app/utils";
 

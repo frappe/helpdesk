@@ -60,6 +60,11 @@
   "email_account",
   "column_break_16",
   "via_customer_portal",
+  "origin_section",
+  "entry_point",
+  "source_article",
+  "column_break_origin",
+  "source_search",
   "split_and_merge_section",
   "is_merged",
   "merged_with",
@@ -432,6 +437,43 @@
    "permlevel": 8
   },
   {
+   "collapsible": 1,
+   "fieldname": "origin_section",
+   "fieldtype": "Section Break",
+   "label": "Origin"
+  },
+  {
+   "description": "Where the customer started when they raised this ticket in the portal. Empty for tickets from outside the portal.",
+   "fieldname": "entry_point",
+   "fieldtype": "Select",
+   "label": "Entry Point",
+   "options": "\nArticle\nSearch\nTicket List\nClosed Ticket\nDirect",
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.entry_point=='Article'",
+   "fieldname": "source_article",
+   "fieldtype": "Link",
+   "label": "Source Article",
+   "options": "HD Article",
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_origin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.entry_point=='Search'",
+   "fieldname": "source_search",
+   "fieldtype": "Data",
+   "label": "Source Search",
+   "length": 140,
+   "permlevel": 8,
+   "read_only": 1
+  },
+  {
    "fieldname": "split_and_merge_section",
    "fieldtype": "Section Break",
    "label": "Split and Merge"
@@ -513,7 +555,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-10-02 23:31:10.544493",
+ "modified": "2026-10-10 17:20:16.064570",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

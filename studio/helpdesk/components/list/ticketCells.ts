@@ -3,15 +3,12 @@ import { h } from 'vue'
 import { Rating } from 'frappe-ui'
 import { PriorityIcon, resolutionBadge, responseBadge } from '@helpdesk/shared/ticketCells'
 import { timeAgo } from '@helpdesk/shared/utils'
-import { STATUS_DOT_CLASSES, getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
+import { getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
 import { parseJson } from '@app/utils'
+import PortalStatusPill from '@app/components/ticket/PortalStatusPill.vue'
 
 export function statusCell({ item }: any) {
-  const status = statusMeta(item)
-  return h('div', { class: 'flex w-full items-center justify-start gap-1.5' }, [
-    h('span', { class: ['size-[7px] shrink-0 rounded-full', STATUS_DOT_CLASSES[status.color]] }),
-    h('span', { class: 'flex-1 truncate text-base' }, status.label),
-  ])
+  return h(PortalStatusPill, { ...statusMeta(item), size: 'sm', class: 'w-full' })
 }
 
 export function priorityCell({ item }: any) {

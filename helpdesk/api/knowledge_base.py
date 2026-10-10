@@ -12,9 +12,13 @@ from frappe.utils import (
 from markdownify import markdownify
 
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    check_category_length,
+    get_joining_values,
     get_shared_visibility,
+    get_voter,
     is_readable,
     readable_filters,
+    update_articles,
 )
 from helpdesk.search_sqlite import HelpdeskArticleSearch, reindex_articles
 
@@ -61,29 +65,6 @@ def validate_public_access():
         )
 
 
-@frappe.whitelist()
-def get_article(name: str):
-    article = frappe.get_doc("HD Article", name)
-    article.check_permission("read")
-
-    return {
-        "name": article.name,
-        "title": article.title,
-        "content": article.content,
-        "author": get_user_info_for_avatar(article.author),
-        "creation": article.creation,
-        "status": article.status,
-        "published_on": article.published_on,
-        "modified": article.modified,
-        "category_name": frappe.db.get_value(
-            "HD Article Category", article.category, "category_name"
-        ),
-        "category_id": article.category,
-        "visibility": article.visibility,
-        "feedback": _get_own_feedback(name),
-    }
-
-
 @frappe.whitelist(methods=["POST"])
 def delete_articles(articles: list[str]):
     for article in articles:
@@ -115,14 +96,6 @@ def _validate_category(category: str) -> None:
         frappe.throw(_("Category not found"), frappe.DoesNotExistError)
 
 
-def _get_joining_values(category: str) -> dict:
-    """An article joining a category whose articles share one access takes it."""
-    values = {"category": category}
-    if visibility := get_shared_visibility(category):
-        values["visibility"] = visibility
-    return values
-
-
 @frappe.whitelist()
 def get_category_visibility(category: str) -> str | None:
     frappe.has_permission("HD Article", "write", throw=True)
@@ -137,15 +110,7 @@ def set_category_visibility(category: str, visibility: str):
     options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
-    articles = frappe.get_all("HD Article", {"category": category}, pluck="name")
-    frappe.db.set_value(
-        "HD Article",
-        {"category": category},
-        "visibility",
-        visibility,
-        update_modified=False,
-    )
-    reindex_articles(articles)
+    update_articles({"category": category}, {"visibility": visibility})
 
 
 @frappe.whitelist(methods=["POST"])
@@ -153,11 +118,9 @@ def move_to_category(category: str, articles: list[str]):
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
 
-    values = _get_joining_values(category)
+    values = get_joining_values(category)
     for article in articles:
-        current = frappe.db.get_value("HD Article", article, "category")
-        if frappe.db.count("HD Article", {"category": current}) == 1:
-            frappe.throw(_("Category must have at least one article"))
+        check_category_length(frappe.db.get_value("HD Article", article, "category"))
         frappe.db.set_value("HD Article", article, values, update_modified=False)
     reindex_articles(articles)
 
@@ -215,6 +178,9 @@ def get_public_article(name: str) -> dict:
         "HD Article Category", article.category, "category_name"
     )
     article.feedback = _get_own_feedback(name)
+    article.minutes = _get_reading_minutes(
+        BeautifulSoup(article.content or "", "html.parser")
+    )
     return article
 
 
@@ -319,9 +285,13 @@ def _get_search_hit(row: dict, article: frappe._dict) -> dict:
         "title": escape_marked(row["title"]),
         "excerpt": escape_marked(row.get("content") or ""),
         "image": _get_first_image(body),
-        "minutes": max(1, round(len(body.get_text().split()) / WORDS_PER_MINUTE)),
+        "minutes": _get_reading_minutes(body),
         "category_name": article.category_name,
     }
+
+
+def _get_reading_minutes(body: BeautifulSoup) -> int:
+    return max(1, round(len(body.get_text().split()) / WORDS_PER_MINUTE))
 
 
 def escape_marked(text: str) -> str:
@@ -339,7 +309,7 @@ def set_article_feedback(article: str, value: int) -> None:
     """Give feedback on a published article, signed in or not."""
     _get_readable_article(article)
     frappe.get_doc("HD Article", article).set_feedback(
-        cint(value), visitor_id=_get_visitor_id(create=True)
+        value, visitor_id=_get_visitor_id(create=True)
     )
 
 
@@ -361,14 +331,9 @@ def _get_visitor_id(create: bool = False) -> str | None:
 
 def _get_own_feedback(article: str) -> int:
     """The caller's own feedback on an article — 0 when they have given none."""
-    if frappe.session.user != "Guest":
-        voter = {"user": frappe.session.user}
-    elif visitor_id := _get_visitor_id():
-        voter = {"visitor_id": visitor_id}
-    else:
-        # A null visitor id would match every signed-in reader's row.
+    # A null visitor id would match every signed-in reader's row.
+    if not (voter := get_voter(_get_visitor_id())):
         return 0
-
     feedback = frappe.db.get_value(
         "HD Article Feedback", {**voter, "article": article}, "feedback"
     )
@@ -385,14 +350,7 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
-    articles = frappe.get_all("HD Article", {"category": source}, pluck="name")
-    frappe.db.set_value(
-        "HD Article",
-        {"category": source},
-        _get_joining_values(target),
-        update_modified=False,
-    )
-    reindex_articles(articles)
+    update_articles({"category": source}, get_joining_values(target))
     frappe.delete_doc("HD Article Category", source)
 
 

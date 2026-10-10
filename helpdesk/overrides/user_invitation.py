@@ -4,7 +4,9 @@ from frappe.core.doctype.user_invitation.user_invitation import UserInvitation
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
     CUSTOMER_ROLES,
-    get_customer_membership,
+    PORTAL_INVITE_SETTING,
+    is_customer_manager,
+    is_portal_setting_on,
 )
 
 
@@ -20,12 +22,9 @@ class HelpdeskUserInvitation(UserInvitation):
         return allowed_roles
 
     def _is_from_a_customer_manager(self) -> bool:
-        if not self.customer or not frappe.db.get_single_value(
-            "HD Settings", "allow_customer_managers_to_invite"
-        ):
-            return False
-        membership = get_customer_membership(self.customer, frappe.session.user)
-        return bool(membership and membership.get("is_manager"))
+        return is_portal_setting_on(PORTAL_INVITE_SETTING) and is_customer_manager(
+            self.customer
+        )
 
     def _get_email_title(self):
         # Use the org's brand name (set during onboarding) in the invitation

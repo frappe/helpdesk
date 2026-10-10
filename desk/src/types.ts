@@ -349,7 +349,7 @@ export interface Article {
   name: string;
   title: string;
   category_name: string;
-  category_id: string;
+  category: string;
   published_on: string;
   author: Author;
   subtitle: string;

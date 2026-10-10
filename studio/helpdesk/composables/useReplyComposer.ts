@@ -2,17 +2,17 @@ import { computed, ref } from 'vue'
 import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty } from '@helpdesk/shared/utils'
-import { isClosedStatus } from '@app/stores/ticketMeta'
-import { CUSTOMER_FILE_TYPES, runAction } from '@app/utils'
+import { runAction, uploadableFileTypes } from '@app/utils'
 
-export function useReplyComposer(ticket, config) {
-  const isComposerOpen = ref(false)
+export function useReplyComposer(ticket, { isClosed, isAgent }) {
+  // Open on arrival, so the customer can start typing their reply straight away.
+  const isComposerOpen = ref(true)
   const reply = ref('')
   const isSending = ref(false)
   // The composer sits over the thread; it reports its height and the thread keeps that much clear.
   const composerReserve = ref(0)
 
-  const canReply = computed(() => !isClosedStatus(ticket.data?.status))
+  const canReply = computed(() => !isClosed.value)
 
   function openComposer() {
     isComposerOpen.value = true
@@ -27,7 +27,7 @@ export function useReplyComposer(ticket, config) {
     })
   }
 
-  const acceptedFileTypes = computed(() => (config.value?.is_agent ? undefined : CUSTOMER_FILE_TYPES.join(',')))
+  const acceptedFileTypes = computed(() => uploadableFileTypes(isAgent.value)?.join(','))
 
   function discard() {
     reply.value = ''

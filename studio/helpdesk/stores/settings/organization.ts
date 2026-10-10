@@ -1,8 +1,9 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { askConfirm, countLabel, errorMessage } from '@app/utils'
-import { ROLES } from './roles'
+import { askConfirm, countLabel } from '@app/utils'
+import { getErrorMessage } from '@helpdesk/shared/utils'
+import { ASSIGNABLE_ROLES, ROLES, roleLabel, type RoleLabel } from './roles'
 
 const API = 'helpdesk.api.organization'
 
@@ -44,7 +45,8 @@ export function createOrganizationSettings(core) {
 
   const inviteOpen = ref(false)
   const inviteEmails = ref([])
-  const inviteRole = ref<'Member' | 'Manager'>('Member')
+  const inviteRole = ref<RoleLabel>('Member')
+  const inviteRoleOptions = computed(() => ASSIGNABLE_ROLES.map((role) => ({ label: roleLabel(role), value: role })))
   const inviteContacts = ref([])
 
   core.afterLoad(() => {
@@ -60,7 +62,7 @@ export function createOrganizationSettings(core) {
       organization.value = await call(`${API}.get_organization`, { customer: name })
     } catch (error) {
       console.error(error)
-      toast.error(errorMessage(error, __('Could not open organization')))
+      getErrorMessage(error, true, __('Could not open organization'))
       closeOrganization()
     }
   }
@@ -215,6 +217,7 @@ export function createOrganizationSettings(core) {
     inviteOpen,
     inviteEmails,
     inviteRole,
+    inviteRoleOptions,
     inviteContacts,
     openOrganization,
     closeOrganization,

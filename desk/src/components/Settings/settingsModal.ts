@@ -194,6 +194,7 @@ type TabName =
   | "Email Notifications"
   | "General"
   | "Knowledge Base"
+  | "Portal Permissions"
   | "Agents"
   | "Invite Agents"
   | "Teams"

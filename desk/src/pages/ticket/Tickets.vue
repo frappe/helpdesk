@@ -76,7 +76,7 @@ import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
-import { normalizeFilters } from "@/components/view-controls/filter";
+import { normalizeFilters } from "@helpdesk/shared/filter";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
@@ -84,7 +84,6 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { View } from "@/types";
-import { isCustomerPortal } from "@/utils";
 import { resolutionBadge, responseBadge } from "@helpdesk/shared/ticketCells";
 import { Badge, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
@@ -123,15 +122,11 @@ const showBulkReplyModal = ref(false);
 const showBulkEditModal = ref(false);
 const showBulkAssignModal = ref(false);
 
-// Replying, assigning and editing in bulk are agent-side actions only.
-const agentOnly = () => !isCustomerPortal.value;
-
 const selectBannerActions = [
   {
     label: __("Reply"),
     icon: "lucide-corner-up-left",
     inline: true,
-    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkReplyModal.value = true;
@@ -141,7 +136,6 @@ const selectBannerActions = [
     label: __("Assign"),
     icon: "lucide-user-plus",
     inline: true,
-    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkAssignModal.value = true;
@@ -158,7 +152,6 @@ const selectBannerActions = [
   {
     label: __("Edit"),
     icon: "lucide-pencil",
-    condition: agentOnly,
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
       showBulkEditModal.value = true;
@@ -185,9 +178,7 @@ const options = computed(() => ({
     status: {
       custom: ({ item }) => {
         const status = getStatus(item);
-        const label = isCustomerPortal.value
-          ? status?.["label_customer"]
-          : status?.["label_agent"];
+        const label = status?.["label_agent"];
         return h(
           "div",
           { class: "flex items-center gap-1.5 justify-start w-full" },
@@ -223,7 +214,6 @@ const options = computed(() => ({
         ),
     },
   },
-  isCustomerPortal: isCustomerPortal.value,
   selectable: true,
   showSelectBanner: true,
   selectBannerActions,
@@ -405,18 +395,16 @@ onMounted(() => {
       icon: LucideAlignJustify,
     };
   }
-  if (!isCustomerPortal.value) {
-    $socket.on("helpdesk:new-ticket", () => {
-      listViewRef.value?.reload();
-    });
-  }
+  $socket.on("helpdesk:new-ticket", reloadList);
 });
 
 onUnmounted(() => {
-  if (!isCustomerPortal.value) {
-    $socket.off("helpdesk:new-ticket");
-  }
+  $socket.off("helpdesk:new-ticket", reloadList);
 });
+
+function reloadList() {
+  listViewRef.value?.reload();
+}
 
 usePageMeta(() => {
   return {

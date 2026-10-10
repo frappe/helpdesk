@@ -8,7 +8,7 @@ import {
   navigateTo,
   previousLocation,
 } from '@app/stores/router'
-import { errorMessage } from '@app/utils'
+import { getErrorMessage } from '@helpdesk/shared/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
@@ -47,7 +47,7 @@ export function createSettingsCore() {
       await loadSettings()
       const partial = landed?.()
       if (partial) toast.warning(partial)
-      else toast.error(errorMessage(error, __('Something went wrong')))
+      else getErrorMessage(error, true, __('Something went wrong'))
     } finally {
       isSettingsBusy.value = false
     }
@@ -62,7 +62,9 @@ export function createSettingsCore() {
       if (!file) return
       const uploaded = await new FileUploadHandler()
         .upload(file, { private: false, optimize: true })
-        .catch(() => toast.error(__('Could not upload the image')))
+        .catch(() => {
+          toast.error(__('Could not upload the image'))
+        })
       if (uploaded) await onUploaded(uploaded.file_url)
     }
     input.click()
@@ -84,7 +86,11 @@ export function createSettingsCore() {
 // One hash segment per screen, so the device back button steps through the dialog.
 const HASH_ROOT = 'settings'
 
-export function createSettingsDialog(core, organization) {
+// Tabs only settings editors get; any other tab outside the list falls back to Profile.
+const EDITOR_TABS = ['knowledge-base', 'portal-permissions']
+const TABS = ['profile', 'members', ...EDITOR_TABS]
+
+export function createSettingsDialog(core, organization, session) {
   function openSettings(tab) {
     core.settingsTab.value = tab || 'profile'
     core.isSettingsOpen.value = true
@@ -112,10 +118,15 @@ export function createSettingsDialog(core, organization) {
     afterEachRoute((to) => applyHash(to.hash))
   }
 
-  function applyHash(hash) {
-    const [root, tab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
+  async function applyHash(hash) {
+    const [root, hashTab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
     if (root !== HASH_ROOT) return closeSettings()
-    if (core.isSettingsOpen.value) core.settingsTab.value = tab || 'profile'
+    // A guest has no account to show, and a tab the user can't see would open blank.
+    await session.loadSession()
+    if (session.isGuest.value) return closeSettings()
+    const allowed = TABS.includes(hashTab) && (!EDITOR_TABS.includes(hashTab) || session.canEditSettings.value)
+    const tab = allowed ? hashTab : 'profile'
+    if (core.isSettingsOpen.value) core.settingsTab.value = tab
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()

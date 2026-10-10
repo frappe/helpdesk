@@ -165,8 +165,8 @@
 </template>
 
 <script setup lang="ts">
-import ShortcutKey from "@/components/ShortcutKey.vue";
-import { useShortcut } from "@/composables/shortcuts";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { useAgentStatusStore } from "@/stores/agentStatus.ts";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
