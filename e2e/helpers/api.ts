@@ -28,6 +28,11 @@ export class Api {
     return body.message;
   }
 
+  /** For whitelisted methods that only accept GET. */
+  async callGet<T = any>(method: string, args: Record<string, string> = {}): Promise<T> {
+    return (await this.send("get", `/api/method/${method}?${new URLSearchParams(args)}`)).message;
+  }
+
   async get<T = Doc>(doctype: string, name: string): Promise<T> {
     return (await this.send("get", this.path(doctype, name))).data;
   }
@@ -78,6 +83,14 @@ export class Api {
     }
     return response.json();
   }
+}
+
+/** Run a scheduled job now; it is enqueued, so callers poll for its effect. */
+export async function runScheduledJob(api: Api, method: string) {
+  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
+  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
+    doc: JSON.stringify({ name: job.name }),
+  });
 }
 
 /** Assert a raw request was refused for lack of permission. */

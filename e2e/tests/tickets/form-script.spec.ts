@@ -27,7 +27,7 @@ test("a flat action fires exactly once on each page", async ({ pageAs, ticket })
 
   const surfaces = [
     { persona: "agent", url: `/helpdesk/tickets/${ticket.name}`, label: "E2E Agent Ticket" },
-    { persona: "customer", url: `/kb/tickets/${ticket.name}`, label: "E2E Portal Ticket" },
+    { persona: "customer", url: `/help/tickets/${ticket.name}`, label: "E2E Portal Ticket" },
     { persona: "agent", url: "/helpdesk/tickets/new", label: "E2E Agent New" },
   ] as const;
   for (const surface of surfaces) {
@@ -171,7 +171,7 @@ test.describe("scoping", () => {
     await expect(agent.getByRole("button", { name: "E2E Portal Only" })).toHaveCount(0);
 
     const customer = await pageAs("customer");
-    await customer.goto(`/kb/tickets/${ticket.name}`);
+    await customer.goto(`/help/tickets/${ticket.name}`);
     await expect(customer.getByRole("button", { name: "E2E Portal Only" })).toBeVisible();
     await expect(customer.getByRole("button", { name: "E2E Agent Only" })).toHaveCount(0);
   });
@@ -197,7 +197,7 @@ test.describe("scoping", () => {
     await scripts.create(countingAction("E2E Portal New Only"), { newPage: true, portal: true });
 
     const customer = await pageAs("customer");
-    await customer.goto("/kb/tickets/new");
+    await customer.goto("/help/tickets/new");
     await expect(customer.getByRole("button", { name: "E2E Portal New Only" })).toBeVisible();
     await expect(customer.getByRole("button", { name: "E2E Agent New Only" })).toHaveCount(0);
   });
@@ -215,5 +215,5 @@ async function pick(page: Page, label: string, option: string) {
 }
 
 async function openMoreMenu(page: Page) {
-  await page.getByRole("banner").getByRole("button").last().click();
+  await page.getByRole("banner").getByRole("button", { name: "More actions" }).click();
 }

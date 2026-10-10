@@ -54,7 +54,7 @@ test.describe("field permission notice", () => {
   test("agents and customers never see it", async ({ pageAs }) => {
     for (const [persona, url] of [
       ["agent", "/helpdesk/tickets"],
-      ["customer", "/kb/customer-tickets"],
+      ["customer", "/help/customer-tickets"],
     ] as const) {
       const page = await pageAs(persona);
       await page.goto(url);
@@ -83,11 +83,11 @@ test.describe("Default template rows", () => {
     await api.update("HD Ticket", ticket.name, { priority: "High", ticket_type: "Bug" });
 
     const customer = await pageAs("customer");
-    await customer.goto("/kb/tickets/new");
+    await customer.goto("/help/tickets/new");
     await expect(customer.getByText("Priority", { exact: true })).toBeVisible();
     await expect(customer.getByText("Ticket Type", { exact: true })).toHaveCount(0);
 
-    await customer.goto(`/kb/tickets/${ticket.name}`);
+    await customer.goto(`/help/tickets/${ticket.name}`);
     await expect(customer.getByText("High", { exact: true })).toBeVisible();
     await expect(customer.getByText("Bug", { exact: true })).toHaveCount(0);
 
@@ -118,7 +118,7 @@ test.describe("Default template rows", () => {
     );
     try {
       const page = await pageAs("customer");
-      await page.goto(`/kb/tickets/${ticket.name}`);
+      await page.goto(`/help/tickets/${ticket.name}`);
       await page.getByRole("button", { name: "E2E Set Priority" }).click();
       await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).priority).toBe("Low");
 

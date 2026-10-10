@@ -1,7 +1,7 @@
 import type { Page, Route } from "@playwright/test";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { personas } from "../../../helpers/personas";
-import { createArticle, createCategory } from "../../../helpers/portal";
+import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 
 const PIXEL = "e2e/fixtures/pixel.png";
 
@@ -15,7 +15,7 @@ test.describe("raising a ticket", () => {
     });
     try {
       const subject = `E2E portal ${uid()}`;
-      await page.goto("/kb/tickets/new");
+      await page.goto("/help/tickets/new");
       await page.getByRole("combobox", { name: "Ticket Type" }).click();
       await page.getByRole("option", { name: "Question" }).click();
       await page.getByPlaceholder("A short description").fill(subject);
@@ -23,7 +23,7 @@ test.describe("raising a ticket", () => {
       await attachImage(page);
       await page.getByRole("button", { name: "Create ticket" }).click();
 
-      await expect(page).toHaveURL(/\/kb\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", {
         filters: { subject },
         fields: ["description", "ticket_type", "raised_by"],
@@ -37,7 +37,7 @@ test.describe("raising a ticket", () => {
   });
 
   test("accepts a description that is only an image", async ({ page }) => {
-    await page.goto("/kb/tickets/new");
+    await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(`E2E image only ${uid()}`);
     await attachImage(page);
     await expect(page.getByRole("button", { name: "Create ticket" })).toBeEnabled();
@@ -51,7 +51,7 @@ test.describe("raising a ticket", () => {
       await route.continue();
     });
 
-    await page.goto("/kb/tickets/new");
+    await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(`E2E upload ${uid()}`);
     await page.locator(".ProseMirror").fill("See the screenshot");
     const submit = page.getByRole("button", { name: "Create ticket" });
@@ -64,16 +64,14 @@ test.describe("raising a ticket", () => {
     await expect(submit).toBeEnabled();
   });
 
-  test("suggests matching knowledge base articles", async ({ page, api, apiAs }) => {
-    const probe = await (await apiAs("customer")).raw("helpdesk.api.article.search", { query: "probe" });
-    test.skip(!probe.ok(), "article search needs RediSearch (redis-stack) on redis_cache");
-
+  test("suggests matching knowledge base articles", async ({ page, api }) => {
     const category = await createCategory(api);
     const title = `Rotate ${uid()} credentials`;
     await createArticle(api, category.name, { title });
-    await page.goto("/kb/tickets/new");
+    await indexArticles(api, title);
+    await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
-    await expect(page.getByText("These articles may already cover")).toBeVisible();
+    await expect(page.getByText("You may find the solution to your problem")).toBeVisible();
     await expect(page.getByText(title).last()).toBeVisible();
   });
 });

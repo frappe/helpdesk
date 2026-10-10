@@ -11,10 +11,10 @@ test("public knowledge base: browse, rate an article, then raise a ticket from i
   const category = await createCategory(api);
   const article = await createArticle(api, category.name);
 
-  await page.goto("/kb");
+  await page.goto("/help");
   await page.getByText(category.category_name).first().click();
   await page.getByText(article.title, { exact: true }).first().click();
-  await expect(page).toHaveURL(new RegExp(`/kb/articles/${article.name}`));
+  await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}`));
 
   await page.getByRole("button", { name: "Yes, it was helpful" }).click();
   await expect(page.getByText("Thanks for your feedback!")).toBeVisible();
@@ -27,6 +27,6 @@ test("public knowledge base: browse, rate an article, then raise a ticket from i
       return row?.feedback;
     })
     .toBe("1");
-  await page.getByRole("link", { name: "here" }).click();
-  await expect(page).toHaveURL(/\/kb\/tickets\/new/);
+  await page.getByRole("link", { name: "here", exact: true }).click();
+  await expect(page).toHaveURL(/\/help\/tickets\/new/);
 });

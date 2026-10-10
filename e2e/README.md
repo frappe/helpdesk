@@ -20,10 +20,10 @@ Set `ADMIN_PASSWORD` if the site's Administrator password is not `admin`.
 - `global.setup.ts` seeds the personas and saves a logged-in session for each.
 - `helpers/` holds the REST client, personas, fixtures and data factories.
 - `tests/` groups the specs by page, so a change to a page runs the folder that mirrors it:
-  - `tickets/list/`: `Tickets.vue` (`/tickets`) and the Studio portal's `customer_tickets` page (`/kb/customer-tickets`)
+  - `tickets/list/`: `Tickets.vue` (`/tickets`) and the Studio portal's `customer_tickets` page (`/help/customer-tickets`)
   - `tickets/agent/`: `TicketAgent.vue` (`/tickets/:id`)
-  - `tickets/customer/`: the Studio portal's `ticket` page (`/kb/tickets/:id`)
-  - `tickets/new/`: `TicketNew.vue` (`/tickets/new`) and the Studio portal's `new_ticket` page (`/kb/tickets/new`)
+  - `tickets/customer/`: the Studio portal's `ticket` page (`/help/tickets/:id`)
+  - `tickets/new/`: `TicketNew.vue` (`/tickets/new`) and the Studio portal's `new_ticket` page (`/help/tickets/new`)
   - `knowledge-base/`, `customer-management/` and `settings/`: one spec per page or settings tab
   - A feature spanning several pages, like `tickets/form-script.spec.ts`, keeps one file.
   - App wide specs (`auth`, `onboarding`, `permissions`, `navigation`) sit at the top of `tests/`.
