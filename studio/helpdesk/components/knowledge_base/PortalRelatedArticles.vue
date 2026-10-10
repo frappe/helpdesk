@@ -117,10 +117,10 @@ import { runAction } from "@app/utils";
 import LucideArrowUpRight from "~icons/lucide/arrow-up-right";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 
-// Values match HD Article Feedback: 1 like, 2 dislike; "0" clears, sent by a second click.
+// Values match HD Article Feedback: 1 like, 2 dislike; 0 clears, sent by a second click.
 const ANSWERS = [
-  { value: "1", label: __("Yes, it was helpful") },
-  { value: "2", label: __("No, it wasn't helpful") },
+  { value: 1, label: __("Yes, it was helpful") },
+  { value: 2, label: __("No, it wasn't helpful") },
 ] as const;
 
 defineProps<{
@@ -138,10 +138,10 @@ const canGiveFeedback = computed(
     Boolean(session.config.value?.allow_anonymous_article_voting)
 );
 const open = ref<string | null>(null);
-const feedbackByArticle = reactive<Record<string, string>>({});
+const feedbackByArticle = reactive<Record<string, number>>({});
 
-function giveFeedback(article: string, answer: string) {
-  const value = feedbackByArticle[article] === answer ? "0" : answer;
+function giveFeedback(article: string, answer: number) {
+  const value = feedbackByArticle[article] === answer ? 0 : answer;
   return runAction(
     async () => {
       await call("helpdesk.api.knowledge_base.set_article_feedback", {

@@ -23,7 +23,12 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { createDocumentResource, Switch, toast } from "frappe-ui";
+import {
+  createDocumentResource,
+  createResource,
+  Switch,
+  toast,
+} from "frappe-ui";
 import { computed } from "vue";
 
 const hdSettings = createDocumentResource({
@@ -36,16 +41,32 @@ const websiteSettings = createDocumentResource({
   name: "Website Settings",
 });
 
+// Website Settings is readable by all but writable by admins only, so an Agent Manager
+// would see the switch and get a PermissionError on toggling it.
+const canEditSignup = createResource({
+  url: "frappe.client.has_permission",
+  params: {
+    doctype: "Website Settings",
+    docname: "Website Settings",
+    perm_type: "write",
+  },
+  auto: true,
+});
+
 // computed, so labels follow a translation load
 const toggles = computed(() => [
-  {
-    settings: websiteSettings,
-    fieldname: "disable_signup",
-    label: __("Disable signup"),
-    description: __(
-      "New users will have to be manually registered by system managers."
-    ),
-  },
+  ...(canEditSignup.data?.has_permission
+    ? [
+        {
+          settings: websiteSettings,
+          fieldname: "disable_signup",
+          label: __("Disable signup"),
+          description: __(
+            "New users will have to be manually registered by system managers."
+          ),
+        },
+      ]
+    : []),
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_invite",

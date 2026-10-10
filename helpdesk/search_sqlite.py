@@ -297,3 +297,12 @@ def build_index():
     """Build search index - can be called from console."""
     search = HelpdeskSearch()
     search.build_index()
+
+
+def reindex_articles(names: list[str]) -> None:
+    """Queue articles changed by `frappe.db.set_value`, which skips the hook that reindexes them."""
+    search = HelpdeskArticleSearch()
+    if not (search.is_search_enabled() and search.index_exists()):
+        return
+    for name in names:
+        search.index_doc("HD Article", name)

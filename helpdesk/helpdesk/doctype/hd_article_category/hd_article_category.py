@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
+from helpdesk.search_sqlite import reindex_articles
+
 
 class HDArticleCategory(Document):
     def validate(self):
@@ -53,5 +55,6 @@ class HDArticleCategory(Document):
         try:
             for article in articles:
                 frappe.db.set_value("HD Article", article, "category", general_category)
+            reindex_articles(articles)
         except Exception as e:
             frappe.db.rollback()

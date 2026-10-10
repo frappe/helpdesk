@@ -113,16 +113,16 @@ class TestPublicReads(IntegrationTestCase):
             )
 
     def test_an_article_carries_the_reader_s_own_vote(self) -> None:
-        self.assertEqual(get_public_article(self.published)["feedback"], "0")
+        self.assertEqual(get_public_article(self.published)["feedback"], 0)
 
         frappe.get_doc("HD Article", self.published).set_feedback(1)
 
-        self.assertEqual(get_public_article(self.published)["feedback"], "1")
+        self.assertEqual(get_public_article(self.published)["feedback"], 1)
 
     def test_a_cookieless_guest_is_shown_no_vote(self) -> None:
         frappe.get_doc("HD Article", self.published).set_feedback(1)
         with self.set_user("Guest"):
-            self.assertEqual(get_public_article(self.published)["feedback"], "0")
+            self.assertEqual(get_public_article(self.published)["feedback"], 0)
 
     def test_lists_only_published_articles(self) -> None:
         self.assertEqual(self.titles(), ["Fixture published"])
@@ -453,6 +453,13 @@ class TestCategoryAccess(IntegrationTestCase):
 
         self.assertTrue(self.listed("Guest"))
 
+    def test_changing_access_reindexes_every_article(self) -> None:
+        """`set_value` skips the hook that reindexes, so search kept the old access."""
+        with patch.object(knowledge_base, "reindex_articles") as reindex:
+            set_category_visibility(self.category.name, AGENTS_ONLY)
+
+        self.assertCountEqual(reindex.call_args.args[0], self.articles)
+
     def test_an_unknown_access_is_refused(self) -> None:
         self.assertRaises(
             frappe.ValidationError,
@@ -545,7 +552,7 @@ class TestCategoryAccess(IntegrationTestCase):
         other = make_article_category("Fixture Access Other")
         last = make_article("Fixture access last", category=other.name)
 
-        with self.assertRaisesRegex(frappe.ValidationError, "atleast one article"):
+        with self.assertRaisesRegex(frappe.ValidationError, "at least one article"):
             move_to_category(self.category.name, [last])
 
     def test_merging_in_takes_the_access_the_category_shares(self) -> None:

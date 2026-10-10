@@ -56,7 +56,7 @@ export default function setup(context) {
     return Boolean(name) && (routeName === name || routeName?.startsWith(`${name}-`))
   }
 
-  // `get_public_article` answers with the reader's own feedback: '1' like, '2' dislike, '0' none.
+  // `get_public_article` answers with the reader's own feedback: 1 like, 2 dislike, 0 none.
   function submitFeedback(value) {
     return runAction(
       async () => {

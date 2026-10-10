@@ -33,5 +33,5 @@ const PATHS = {
   },
 };
 
-defineProps<{ answer: "1" | "2"; filled?: boolean; background: string }>();
+defineProps<{ answer: 1 | 2; filled?: boolean; background: string }>();
 </script>

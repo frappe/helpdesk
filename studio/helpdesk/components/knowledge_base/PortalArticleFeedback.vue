@@ -23,7 +23,7 @@
         variant="ghost"
         :label="answer.label"
         :aria-pressed="feedback === answer.value"
-        @click="onFeedback?.(feedback === answer.value ? '0' : answer.value)"
+        @click="onFeedback?.(feedback === answer.value ? 0 : answer.value)"
       >
         <template #icon>
           <PortalFeedbackThumb
@@ -45,15 +45,15 @@ import { __ } from "@helpdesk/shared/translation";
 import PortalFeedbackThumb from "@app/components/knowledge_base/PortalFeedbackThumb.vue";
 import { ROUTES } from "@app/routes";
 
-// Values match HD Article Feedback: 1 like, 2 dislike; "0" clears, sent by a second click.
+// Values match HD Article Feedback: 1 like, 2 dislike; 0 clears, sent by a second click.
 const ANSWERS = [
-  { value: "1", label: __("Yes, it was helpful") },
-  { value: "2", label: __("No, it wasn't helpful") },
+  { value: 1, label: __("Yes, it was helpful") },
+  { value: 2, label: __("No, it wasn't helpful") },
 ];
 
 defineProps<{
-  feedback?: string;
-  onFeedback?: (value: string) => void;
+  feedback?: number;
+  onFeedback?: (value: number) => void;
   canRaiseTicket?: boolean;
 }>();
 </script>

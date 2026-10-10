@@ -82,7 +82,7 @@ class HDArticle(Document):
             return
         category_articles = frappe.db.count("HD Article", {"category": category})
         if category_articles == 1:
-            frappe.throw(_("Category must have atleast one article"))
+            frappe.throw(_("Category must have at least one article"))
 
     @staticmethod
     def default_list_data():
@@ -228,4 +228,7 @@ def permission_query(user: str | None = None) -> str | None:
 
 
 def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    """Gates whatever shows the article; writing it is left to role permissions."""
+    if ptype in ("write", "create", "delete"):
+        return True
     return is_readable(doc, user)

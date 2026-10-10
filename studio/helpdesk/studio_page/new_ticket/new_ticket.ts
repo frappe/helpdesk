@@ -55,6 +55,14 @@ export default function setup(context) {
       .finally(() => (uploading.value -= 1))
   }
 
+  // The editor's own default, counted, so a ticket is never created around a half-uploaded image.
+  function uploadInline(file) {
+    uploading.value += 1
+    return useFileUpload()
+      .upload(file, { private: true })
+      .finally(() => (uploading.value -= 1))
+  }
+
   template.fetch()
   loadTicketMeta()
 
@@ -195,6 +203,7 @@ export default function setup(context) {
     canSubmit,
     attachments,
     uploadPrivately,
+    uploadInline,
     uploadRestrictions,
     isCreating,
     createTicket,

@@ -16,7 +16,7 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     is_readable,
     readable_filters,
 )
-from helpdesk.search_sqlite import HelpdeskArticleSearch
+from helpdesk.search_sqlite import HelpdeskArticleSearch, reindex_articles
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -80,7 +80,7 @@ def get_article(name: str):
         ),
         "category_id": article.category,
         "visibility": article.visibility,
-        "feedback": int(_get_own_feedback(name)),
+        "feedback": _get_own_feedback(name),
     }
 
 
@@ -137,6 +137,7 @@ def set_category_visibility(category: str, visibility: str):
     options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
+    articles = frappe.get_all("HD Article", {"category": category}, pluck="name")
     frappe.db.set_value(
         "HD Article",
         {"category": category},
@@ -144,6 +145,7 @@ def set_category_visibility(category: str, visibility: str):
         visibility,
         update_modified=False,
     )
+    reindex_articles(articles)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -155,8 +157,9 @@ def move_to_category(category: str, articles: list[str]):
     for article in articles:
         current = frappe.db.get_value("HD Article", article, "category")
         if frappe.db.count("HD Article", {"category": current}) == 1:
-            frappe.throw(_("Category must have atleast one article"))
+            frappe.throw(_("Category must have at least one article"))
         frappe.db.set_value("HD Article", article, values, update_modified=False)
+    reindex_articles(articles)
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
@@ -295,7 +298,7 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     if not query or not search.index_exists():
         return []
     # The index filters on status and audience, so its top hits are all readable.
-    hits = search.search(query)["results"][: cint(limit)]
+    hits = search.search(query)["results"][: min(cint(limit) or SEARCH_LIMIT, SEARCH_LIMIT)]
     if not hits:
         return []
     articles = {
@@ -356,20 +359,20 @@ def _get_visitor_id(create: bool = False) -> str | None:
     return key
 
 
-def _get_own_feedback(article: str) -> str:
-    """The caller's own feedback on an article — "0" when they have given none."""
+def _get_own_feedback(article: str) -> int:
+    """The caller's own feedback on an article — 0 when they have given none."""
     if frappe.session.user != "Guest":
         voter = {"user": frappe.session.user}
     elif visitor_id := _get_visitor_id():
         voter = {"visitor_id": visitor_id}
     else:
         # A null visitor id would match every signed-in reader's row.
-        return "0"
+        return 0
 
     feedback = frappe.db.get_value(
         "HD Article Feedback", {**voter, "article": article}, "feedback"
     )
-    return str(feedback or "0")
+    return cint(feedback)
 
 
 @frappe.whitelist(methods=["POST"])
@@ -382,12 +385,14 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
+    articles = frappe.get_all("HD Article", {"category": source}, pluck="name")
     frappe.db.set_value(
         "HD Article",
         {"category": source},
         _get_joining_values(target),
         update_modified=False,
     )
+    reindex_articles(articles)
     frappe.delete_doc("HD Article Category", source)
 
 

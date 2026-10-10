@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import { computed, defineComponent, h, ref, watch, type PropType } from "vue";
 import { Avatar, Tooltip, dayjs, dayjsLocal } from "frappe-ui";
+import { __ } from "@helpdesk/shared/translation";
 import {
   ActivityTimeline,
   AttachmentChip,
@@ -146,7 +147,7 @@ function clockTime(value: string) {
   const at = dayjsLocal(value);
   if (at.isSame(dayjsLocal(), "day")) return at.format(DATE_FORMATS.clock);
   const day = at.isSame(dayjsLocal(), "year") ? "D MMMM" : "D MMMM YYYY";
-  return at.format(`${day} [at] ${DATE_FORMATS.clock}`);
+  return __("{0} at {1}", [at.format(day), at.format(DATE_FORMATS.clock)]);
 }
 
 // Keyed by the ticket above: the composable reads its ticket once, so another ticket remounts it.

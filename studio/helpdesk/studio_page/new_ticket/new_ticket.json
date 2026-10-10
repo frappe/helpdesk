@@ -142,6 +142,7 @@
             "fixedMenu": true,
             "mentions": null,
             "placeholder": "{{ t('Describe your issue\u2026') }}",
+            "uploadFunction": "{{ uploadInline }}",
             "tags": null
            }
           }
