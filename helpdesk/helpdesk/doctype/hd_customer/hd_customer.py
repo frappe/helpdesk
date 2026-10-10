@@ -17,7 +17,7 @@ from helpdesk.integrations.erpnext.utils import (
     sync_related_fields,
     validate_rename_conflict,
 )
-from helpdesk.utils import agent_only, get_customers, is_agent
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, get_customers, is_agent
 
 CUSTOMER_ROLES = ("HD Customer", "HD Customer Manager")
 
@@ -202,7 +202,15 @@ class HDCustomer(Document):
         rows = frappe.get_all(
             "Contact",
             filters={"name": ["in", contact_names]},
-            fields=["name", "email_id", "mobile_no", "phone", "image", "user"],
+            fields=[
+                "name",
+                "full_name",
+                "email_id",
+                "mobile_no",
+                "phone",
+                "image",
+                "user",
+            ],
         )
         return {row.name: row for row in rows}
 
@@ -323,7 +331,7 @@ class HDCustomer(Document):
             response = invite_by_email(
                 item["email"],
                 roles=[role],
-                redirect_to_path="/helpdesk",
+                redirect_to_path=CUSTOMER_PORTAL_ROOT,
                 app_name="helpdesk",
                 **params,
             )
@@ -338,6 +346,9 @@ class HDCustomer(Document):
                 _("You do not have permission to access this resource"),
                 frappe.PermissionError,
             )
+        return self.get_pending_invitations()
+
+    def get_pending_invitations(self) -> list[dict]:
         pending_invites = frappe.db.get_all(
             "User Invitation",
             filters={

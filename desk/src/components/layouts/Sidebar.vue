@@ -81,7 +81,7 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
-import { isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
   GettingStartedBanner,
@@ -156,10 +156,7 @@ const agentPortalDropdown = computed(() => [
   {
     label: __("Customer portal"),
     icon: "lucide-users",
-    onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
-    },
+    onClick: () => window.open(CUSTOMER_PORTAL_ROOT),
   },
   {
     icon: "lucide-life-buoy",
@@ -347,7 +344,7 @@ const steps = [
     completed: false,
     icon: markRaw(Globe),
     onClick: () => {
-      window.open("/helpdesk/my-tickets", "_blank");
+      window.open(CUSTOMER_PORTAL_ROOT, "_blank");
       updateOnboardingStep?.("explore_customer_portal");
       minimize.value = true;
     },

@@ -4,17 +4,14 @@
       <template #left-header>
         <ViewBreadcrumbs
           :label="__('Tickets')"
-          :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
+          route-name="TicketsAgent"
           :options="dropdownOptions"
           :dropdown-actions="(view) => viewActions(view, viewDialogConfig)"
           :current-view="currentView"
         />
       </template>
       <template #right-header>
-        <RouterLink
-          class="inline-flex"
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
-        >
+        <RouterLink class="inline-flex" :to="{ name: 'TicketAgentNew' }">
           <Button
             class="rtl:flex-row-reverse"
             :label="__('Create')"
@@ -34,7 +31,7 @@
       @row-click="
         (row) =>
           $router.push({
-            name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
+            name: 'TicketAgent',
             params: { ticketId: row },
           })
       "
@@ -241,7 +238,7 @@ const options = computed(() => ({
         : undefined,
   },
   rowRoute: {
-    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    name: "TicketAgent",
     prop: "ticketId",
   },
   hideColumnSetting: false,
@@ -381,7 +378,7 @@ const dropdownOptions = computed(() => {
           icon: "lucide-align-justify",
           onClick: () =>
             router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+              name: "TicketsAgent",
             }),
         },
       ],

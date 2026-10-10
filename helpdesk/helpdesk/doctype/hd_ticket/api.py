@@ -44,7 +44,12 @@ def get_one(name: str):
     QBContact = frappe.qb.DocType("Contact")
     contact = (
         frappe.qb.from_(QBContact)
-        .select(QBContact.name, QBContact.email_id, QBContact.image)
+        .select(
+            QBContact.email_id,
+            QBContact.full_name,
+            QBContact.image,
+            QBContact.name,
+        )
         .where(QBContact.name == ticket.contact)
         .run(as_dict=True)
     )

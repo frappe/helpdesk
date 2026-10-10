@@ -62,12 +62,11 @@
 import LockKeyhole from "~icons/lucide/lock-keyhole";
 import { createResource, Dialog, Password, toast } from "frappe-ui";
 import { ref, watch } from "vue";
-import { __ } from "@/translation";
-import { useAuthStore } from "@/stores/auth";
+import { __ } from "./translation";
+
+const props = defineProps<{ user: string }>();
 
 const show = defineModel<boolean>();
-
-const auth = useAuthStore();
 
 const newPassword = ref("");
 const confirmPassword = ref("");
@@ -78,7 +77,7 @@ const updatePassword = createResource({
   makeParams() {
     return {
       doctype: "User",
-      name: auth?.user,
+      name: props.user,
       fieldname: "new_password",
       value: newPassword.value,
     };

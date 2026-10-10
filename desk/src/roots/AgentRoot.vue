@@ -7,11 +7,10 @@
 <script setup lang="ts">
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { computed, defineAsyncComponent, onBeforeMount } from "vue";
-import { useRouter } from "vue-router";
 
 import { useScreenSize } from "@/composables/screen";
-const router = useRouter();
 const authStore = useAuthStore();
 // eager: subscribes the availability socket handler and runs the login
 // greeting at boot instead of on first ticket open. Guarded because a
@@ -39,7 +38,7 @@ const Layout = computed(() => {
 
 onBeforeMount(() => {
   if (!authStore.hasDeskAccess) {
-    router.replace({ name: "TicketsCustomer" });
+    window.location.replace(CUSTOMER_PORTAL_ROOT);
   }
 });
 </script>
