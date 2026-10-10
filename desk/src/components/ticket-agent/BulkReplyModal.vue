@@ -9,7 +9,6 @@
             v-model:attachments="attachments"
             :show-signature="true"
             :show-attachments="true"
-            :type="'Email'"
             :placeholder="__('Write your reply...')"
             :min-height="'min-h-[200px]'"
             :max-height="'max-h-[300px]'"

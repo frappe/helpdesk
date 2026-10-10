@@ -108,7 +108,7 @@
       class="flex flex-wrap gap-x-4 gap-y-1 px-4 pb-4 text-xs text-ink-gray-5"
     >
       <span
-        v-for="item in LEGEND"
+        v-for="item in legend"
         :key="item.label"
         class="flex items-center gap-1.5"
       >
@@ -149,13 +149,6 @@ const OVERDUE =
   "bg-[repeating-linear-gradient(90deg,var(--ink-red-6)_0_5px,transparent_5px_11px)]";
 const TODAY =
   "bg-[var(--surface-base)] border-[1.5px] border-[var(--outline-gray-4)]";
-
-const LEGEND = [
-  { colorClass: GREEN, label: __("SLA met") },
-  { colorClass: RED, label: __("SLA missed / longest wait") },
-  { colorClass: CUSTOMER, label: __("Customer message") },
-  { colorClass: BLUE, label: __("Agent reply") },
-];
 
 const props = defineProps<{
   timeline: TimelineNode[];
@@ -262,6 +255,28 @@ const segments = computed<RailSegment[]>(() => {
   hideRepeatedDates(result);
   preventLabelOverlap(result);
   return result;
+});
+
+// only the colors actually drawn on the rail get a legend entry
+const legend = computed(() => {
+  const labels: Record<string, string> = {
+    [GREEN]: __("SLA met"),
+    [RED]: redLabel.value,
+    [CUSTOMER]: __("Customer message"),
+    [BLUE]: __("Agent reply"),
+    [PENDING]: __("Pending"),
+  };
+  const drawn = new Set(segments.value.map((segment) => segment.colorClass));
+  return Object.entries(labels)
+    .filter(([colorClass]) => drawn.has(colorClass))
+    .map(([colorClass, label]) => ({ colorClass, label }));
+});
+
+// red marks a breach and the longest wait, so it is named after whichever is on the rail
+const redLabel = computed(() => {
+  const isMissed = props.timeline.some((node) => node.state === "breach");
+  if (isMissed && longestWait.value) return __("SLA missed / longest wait");
+  return isMissed ? __("SLA missed") : __("Longest wait");
 });
 
 function getFirstResponseSegments(node: TimelineNode): RailSegment[] {
