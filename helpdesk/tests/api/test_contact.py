@@ -4,6 +4,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from helpdesk.api.contact import create_contact as create_contact_api
 from helpdesk.api.contact import delete_contact
 from helpdesk.test_utils import create_contact, create_customer, make_ticket
 
@@ -82,3 +83,27 @@ class TestDeleteContact(IntegrationTestCase):
             }
         ).insert(ignore_permissions=True)
         return contact, customer, ticket, invitation
+
+
+class TestCreateContact(IntegrationTestCase):
+    def setUp(self) -> None:
+        frappe.set_user("Administrator")
+
+    def test_create_contact_without_invite_links_customer(self) -> None:
+        email = "create-contact-no-invite@example.com"
+        for c in frappe.db.get_all("Contact", {"email_id": email}, pluck="name"):
+            frappe.delete_doc("Contact", c, force=True)
+        customer = create_customer("Test Customer No Invite")
+
+        contact = create_contact_api(
+            {"first_name": "NoInvite", "email": email, "customer": customer.name},
+            invite=False,
+        )
+
+        self.assertTrue(
+            frappe.db.exists(
+                "HD Customer Member",
+                {"parent": customer.name, "contact_name": contact},
+            )
+        )
+        self.assertFalse(frappe.db.exists("User Invitation", {"email": email}))
