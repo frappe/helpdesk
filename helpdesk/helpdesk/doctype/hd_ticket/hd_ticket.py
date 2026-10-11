@@ -933,12 +933,12 @@ class HDTicket(Document, CustomerEditController):
             )
 
     @frappe.whitelist()
-    def mark_seen(self):
+    def mark_seen(self) -> int:
         self.add_viewed(
             unique_views=True, force=True
         )  # Document class method, no way to add unique_views via document settings, hence used force and unique_views=True
         self.add_seen()
-        clear_notifications(ticket=self.name)
+        return clear_notifications(ticket=self.name)
 
     def is_valid_status_transition(self) -> bool:
         """Closing an already-resolved ticket wraps up an outcome, it is not a new one."""
