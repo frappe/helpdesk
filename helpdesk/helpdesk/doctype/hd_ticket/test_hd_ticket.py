@@ -42,6 +42,7 @@ from helpdesk.test_utils import (
     get_priority_response_resolution_time,
     make_agent,
     make_form_script,
+    make_notification_log,
     make_priority,
     make_sla,
     make_status,
@@ -238,6 +239,14 @@ class TestHDTicket(IntegrationTestCase):
         ticket.status = "Closed"
         ticket.save()
         self.assertTrue(ticket)
+
+    def test_mark_seen_returns_cleared_count(self):
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        for name in ("markseen1", "markseen2"):
+            make_notification_log(name, ticket.name, "Administrator", app="helpdesk")
+
+        self.assertEqual(ticket.mark_seen(), 2)
+        self.assertEqual(ticket.mark_seen(), 0, "nothing left to clear")
 
     # Working hours default to 10:00 to 18:00 from Monday to Friday
     # And priorities default to

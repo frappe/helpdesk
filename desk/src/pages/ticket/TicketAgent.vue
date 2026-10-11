@@ -169,7 +169,6 @@ watch(
 
     if (oldTicketId) stopViewing(oldTicketId as string);
     startViewing(newTicketId as string);
-    useTicket(newTicketId as string).ticket.markSeen.reload();
 
     // Switching to an already-visited ticket: show its cached conversation and
     // refresh it in the background in case it changed while we were elsewhere.
@@ -177,6 +176,8 @@ watch(
   },
   { immediate: true }
 );
+
+watch(ticket, (ticket) => ticket.markSeen.reload(), { immediate: true });
 
 // immediate so a store fetched earlier in the session opens the gate right away
 watch(

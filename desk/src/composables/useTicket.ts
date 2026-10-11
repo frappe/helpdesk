@@ -48,7 +48,8 @@ export const useTicket = (ticketId: string): MapValue => {
         whitelistedMethods: {
           markSeen: {
             method: "mark_seen",
-            onSuccess: () => useNotificationStore().controller.reload(),
+            onSuccess: (cleared: number) =>
+              cleared && useNotificationStore().controller.reload(),
           },
         },
         setValue: {

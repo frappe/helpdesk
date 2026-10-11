@@ -82,7 +82,7 @@ def notify_reaction(comment, reacting_user: str) -> None:
 
 
 @frappe.whitelist()
-def clear(ticket: str | None = None, comment: str | None = None) -> None:
+def clear(ticket: str | None = None, comment: str | None = None) -> int:
     """Mark the session user's helpdesk notifications as read.
 
     Every helpdesk notification references the ticket, so clearing one covers
@@ -90,17 +90,24 @@ def clear(ticket: str | None = None, comment: str | None = None) -> None:
     """
     filters = {"for_user": frappe.session.user, "read": 0, "app": HELPDESK_APP}
     if comment:
-        mark_read({**filters, "source_doctype": "Comment", "source_name": comment})
-        return
+        return mark_read(
+            {**filters, "source_doctype": "Comment", "source_name": comment}
+        )
     if ticket:
-        mark_read({**filters, "document_type": "HD Ticket", "document_name": ticket})
-        return
-    mark_read(filters)
+        return mark_read(
+            {**filters, "document_type": "HD Ticket", "document_name": ticket}
+        )
+    return mark_read(filters)
 
 
-def mark_read(filters: dict) -> None:
-    frappe.db.set_value("Notification Log", filters, "read", 1, update_modified=False)
-    frappe.publish_realtime("indicator_hide", user=frappe.session.user)
+def mark_read(filters: dict) -> int:
+    unread = frappe.db.count("Notification Log", filters)
+    if unread:
+        frappe.db.set_value(
+            "Notification Log", filters, "read", 1, update_modified=False
+        )
+        frappe.publish_realtime("indicator_hide", user=frappe.session.user)
+    return unread
 
 
 def notify_ticket_reopened(
