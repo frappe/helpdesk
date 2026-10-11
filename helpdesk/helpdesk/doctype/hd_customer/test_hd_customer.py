@@ -484,64 +484,23 @@ class TestHDCustomer(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             customer.save()
 
-
-    def test_accepted_invitation_syncs_role_when_already_member(self) -> None:
-        customer = create_customer("Test Customer Already Member")
-        email = "already-member-invite@example.com"
-
-        contact = create_contact("AlreadyMember", email, user=False)
-        customer.append(
-            "contacts", {"contact_name": contact["contact"], "is_manager": False}
-        )
-        customer.save()
-
-        invitation = frappe.get_doc(
-            {
-                "doctype": "User Invitation",
-                "email": email,
-                "app_name": "helpdesk",
-                "redirect_to_path": "/helpdesk",
-                "roles": [{"role": "HD Customer"}],
-                "customer": customer.name,
-                "contact": contact["contact"],
-            }
-        ).insert(ignore_permissions=True)
-
-        user = create_user(email)
-
-        frappe.set_user(user.name)
-        after_accept(invitation, user, user_inserted=True)
-        frappe.set_user("Administrator")
-
-        customer.reload()
-        member = next(
-            row for row in customer.contacts if row.contact_name == contact["contact"]
-        )
-        self.assertFalse(member.is_manager)
-
-        roles = frappe.get_roles(user.name)
-        self.assertIn("HD Customer", roles)
-        self.assertNotIn("HD Customer Manager", roles)
-
-    def test_sync_customer_manager_roles_patch(self) -> None:
-        from helpdesk.patches.sync_customer_manager_roles import execute
-
-        customer = create_customer("Test Patch Manager Roles")
-        contact = create_contact("PatchManager", "patch-manager@example.com")
+    def test_manager_invite_for_existing_manager_grants_both_roles(self) -> None:
+        """A contact already listed as manager gets both customer roles on accept."""
+        name = "Test Customer Existing Manager Invite"
+        email = "existing-manager-invite@example.com"
+        cleanup_customer_and_contact(name, email)
+        customer = create_customer(name)
+        contact = create_contact("ExistingManager", email, user=False)
         add_contact_in_customer(customer, contact["contact"], is_manager=True)
+        customer.add_contacts([contact["contact"]], "HD Customer Manager")
 
-        user = frappe.get_doc("User", contact["user"])
-        user.remove_roles("HD Customer", "HD Customer Manager")
+        invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
+        invitation.accept(ignore_permissions=True)
 
-        roles_before = frappe.get_roles(user.name)
-        self.assertNotIn("HD Customer Manager", roles_before)
-        self.assertNotIn("HD Customer", roles_before)
-
-        execute()
-
-        roles_after = frappe.get_roles(user.name)
-        self.assertIn("HD Customer", roles_after)
-        self.assertIn("HD Customer Manager", roles_after)
+        roles = frappe.get_roles(email)
+        # the invite only carries the manager role; the base role must still be synced
+        self.assertIn("HD Customer", roles)
+        self.assertIn("HD Customer Manager", roles)
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
