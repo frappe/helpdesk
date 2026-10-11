@@ -132,6 +132,7 @@ import {
   Tabs,
   toast,
   Tooltip,
+  type FrappeResourceError,
 } from "frappe-ui";
 import {
   computed,
@@ -177,8 +178,12 @@ const ticket = createResource({
       createToast,
     });
   },
-  onError: () => {
-    toast.error(__("Ticket not found."));
+  onError: (err: FrappeResourceError) => {
+    if (err.exc_type === "DoesNotExistError") {
+      toast.error(__("Ticket not found."));
+    } else {
+      toast.error(err.messages?.[0] || __("Could not load the ticket."));
+    }
     router.replace("/my-tickets");
   },
 });
