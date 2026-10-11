@@ -196,6 +196,39 @@ def make_customer_ticket(case, raised_by: str, **values):
     return ticket
 
 
+def enable_guest_tickets(enabled: bool | int = True):
+    """Toggle `allow_anyone_to_create_tickets` through the settings doc, so its perm rules follow."""
+    settings = frappe.get_single("HD Settings")
+    settings.allow_anyone_to_create_tickets = enabled
+    settings.save(ignore_permissions=True)
+
+
+def guest_ticket_rules() -> list[dict]:
+    return frappe.get_all(
+        "Custom DocPerm",
+        filters={"parent": "HD Ticket", "role": "Guest"},
+        fields=["read", "write", "create", "export", "if_owner"],
+    )
+
+
+def raise_guest_ticket(
+    case, raised_by: str, description: str = "From the web form"
+) -> str:
+    """Raise a ticket as an anonymous visitor, removed when the test ends."""
+    frappe.set_user("Guest")
+    ticket = frappe.get_doc(
+        {
+            "doctype": "HD Ticket",
+            "subject": "Guest ticket",
+            "description": description,
+            "raised_by": raised_by,
+        }
+    ).insert()
+    frappe.set_user("Administrator")
+    case.addCleanup(frappe.delete_doc, "HD Ticket", ticket.name, force=True)
+    return ticket.name
+
+
 def make_form_script(
     case,
     name: str,
