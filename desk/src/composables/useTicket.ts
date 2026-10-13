@@ -20,9 +20,20 @@ interface MapValue {
   analytics: Resource<TicketAnalytics>;
   // shared by every timeline tab instance, fetched once per ticket
   calls: Resource<Record<string, any>[]>;
-  commentExtras: Resource<Record<string, CommentExtras>>;
+  commentExtras: Resource<TicketCommentExtras>;
   // lent by the mounted timeline; see registerTicketFeed
   reloadFeed?: () => void;
+}
+
+export interface TicketCommentExtras {
+  comments: Record<string, CommentExtras>;
+  // oldest first, so a pin's position is its "N:" in the pinned bar
+  pinned_comments: string[];
+}
+
+export interface PinnedComment {
+  name: string;
+  content: string;
 }
 
 const ticketMap: Record<string, MapValue> = reactive({});

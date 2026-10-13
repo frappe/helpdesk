@@ -363,7 +363,7 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
 
         frappe.set_user(AGENT_ONE)
         self.assertTrue(frappe.has_permission("Comment", "read", by_admin.name))
-        extras = get_comment_extras(ticket.name)
+        extras = get_comment_extras(ticket.name)["comments"]
         self.assertIn(mine.name, extras)
         self.assertIn(by_admin.name, extras)
 
