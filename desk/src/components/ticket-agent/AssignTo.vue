@@ -186,7 +186,6 @@ import {
   Popover,
   TextInput,
   Tooltip,
-  call,
   createListResource,
   createResource,
   dayjsLocal,
@@ -513,16 +512,6 @@ watch(searchText, () => {
   highlightedIndex.value = 0;
 });
 
-async function logActivity(action: string) {
-  await call("frappe.client.insert", {
-    doc: {
-      doctype: "HD Ticket Activity",
-      ticket: ticket?.value?.name,
-      action,
-    },
-  });
-}
-
 // triggered when the popover is closed
 const addAssigneesResource = createResource({
   url: "frappe.desk.form.assign_to.add",
@@ -587,11 +576,7 @@ async function saveAssignees(added: string[], removed: string[]) {
       if (addResult?.exc) throw new Error(addResult.exc);
     }
 
-    // Log activity only after API calls succeed
-    const logParts: string[] = [];
-    if (added.length) logParts.push(`assigned ${added.join(", ")}`);
-    if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
-    await logActivity(logParts.join(" & "));
+    // core assign_to writes the timeline entry itself
 
     // Delay the success toast when warnings were shown so they land first.
     const successDelay = hasUnavailable ? 1000 : 0;

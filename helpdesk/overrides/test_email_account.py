@@ -172,8 +172,12 @@ class TestParkedMailTicketComment(FrappeTestCase):
 
     def ticket_comments(self):
         return frappe.get_all(
-            "HD Ticket Comment",
-            filters={"reference_ticket": self.ticket.name},
+            "Comment",
+            filters={
+                "reference_doctype": "HD Ticket",
+                "reference_name": self.ticket.name,
+                "comment_type": "Comment",
+            },
             pluck="content",
         )
 

@@ -45,7 +45,7 @@
                   <component :is="item.icon" class="size-4" />
                   <span
                     v-if="item.key === 'notifications' && item.badge"
-                    class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-surface-blue-5"
+                    class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-surface-gray-9"
                   />
                 </span>
               </template>
