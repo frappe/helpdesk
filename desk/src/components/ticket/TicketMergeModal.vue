@@ -105,6 +105,7 @@ import LucideInfo from "~icons/lucide/info";
 import { Link } from "@/components";
 import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
+import { getErrorMessage } from "@/utils";
 import {
   createListResource,
   createResource,
@@ -205,6 +206,15 @@ const mergeTicket = createResource({
     );
     targetTicket.value = null;
   },
+  onError: (error: any) => {
+    // A lost response (e.g. a proxy timeout) has no exc_type, yet the merge may have landed.
+    toast.error(
+      error.exc_type
+        ? getErrorMessage(error)
+        : __("Could not confirm the merge. Reloading the ticket.")
+    );
+    emit("update");
+  },
 });
 
 const getTicketSubject = createListResource({
@@ -220,6 +230,13 @@ const getTicketSubject = createListResource({
   },
 });
 
+function handleTicketMerge() {
+  mergeTicket.submit({
+    source: props.ticket.name,
+    target: targetTicket.value,
+  });
+}
+
 watch(
   () => targetTicket.value,
   (newValue) => {
@@ -234,12 +251,12 @@ watch(
   }
 );
 
-function handleTicketMerge() {
-  mergeTicket.submit({
-    source: props.ticket.name,
-    target: targetTicket.value,
-  });
-}
+watch(
+  () => props.ticket.is_merged,
+  (isMerged) => {
+    if (isMerged) showDialog.value = false;
+  }
+);
 </script>
 
 <style scoped></style>

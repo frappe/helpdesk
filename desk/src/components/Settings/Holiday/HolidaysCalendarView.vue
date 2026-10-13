@@ -101,7 +101,7 @@
 </template>
 <script setup lang="ts">
 import LucideCheck from "~icons/lucide/check";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
 import { holidayData } from "@/stores/holidayList";
 import { Button, dayjs, Popover } from "frappe-ui";
@@ -146,17 +146,14 @@ const goToToday = () => {
 watch(
   () => [holidayData.value.from_date, holidayData.value.to_date],
   ([fromDate, toDate]) => {
-    fromDate = dayjs(fromDate);
-    toDate = dayjs(toDate);
+    fromDate = dayjs(fromDate || dayjs());
+    toDate = dayjs(toDate || dayjs());
     startYear.value = fromDate.year();
     endYear.value = toDate.year();
     currentYear.value = fromDate.year();
     visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
-  }
+  },
+  // The list is loaded before this view mounts, so a change-only watch never fires.
+  { immediate: true }
 );
-
-onMounted(() => {
-  const fromDate = dayjs(holidayData.value.from_date || dayjs());
-  visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
-});
 </script>

@@ -29,8 +29,17 @@ export function createToast({
   icon?: unknown;
   [key: string]: unknown;
 }) {
-  const data = icon ? { ...options, icon: resolveIcon(icon) } : options;
+  const data: Record<string, unknown> = { ...options };
+  if (icon) data.icon = resolveIcon(icon);
+  if (typeof options.duration === "number") {
+    data.duration = toMilliseconds(options.duration);
+  }
   return type ? toast[type](message, data) : toast(message, data);
+}
+
+// The old API took seconds, with 0 meaning stay open.
+function toMilliseconds(seconds: number) {
+  return seconds === 0 ? Infinity : seconds * 1000;
 }
 
 export async function setupCustomizations(doc, obj) {

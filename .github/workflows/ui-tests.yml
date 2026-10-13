@@ -1,0 +1,148 @@
+name: UI Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "desk/**"
+      - "e2e/**"
+      - "playwright.config.ts"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/ui-tests.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ui-tests-helpdesk-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  FRAPPE_BRANCH: develop
+  SITE: helpdesk.test
+
+jobs:
+  ui-tests:
+    name: Playwright E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+      redis-cache:
+        image: redis/redis-stack-server:latest
+        ports:
+          - 13000:6379
+      redis-queue:
+        image: redis:alpine
+        ports:
+          - 11000:6379
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Cache yarn
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-ui-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-ui-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('yarn.lock') }}
+
+      - name: Install MariaDB Client
+        run: |
+          sudo apt update
+          sudo apt install -y mariadb-client
+
+      - name: Setup Bench
+        run: |
+          pip install frappe-bench
+          bench init --skip-redis-config-generation --skip-assets --frappe-branch "$FRAPPE_BRANCH" --python "$(which python)" ~/frappe-bench
+          mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
+          mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
+
+      - name: Install Helpdesk
+        working-directory: /home/runner/frappe-bench
+        run: |
+          bench get-app telephony
+          bench get-app helpdesk $GITHUB_WORKSPACE
+          bench setup requirements --dev
+          bench new-site --db-root-password root --admin-password admin --install-app helpdesk $SITE
+          bench use $SITE
+          bench --site $SITE set-config host_name "http://localhost:8000"
+          bench build --apps frappe,helpdesk
+        env:
+          CI: "Yes"
+
+      - name: Start Frappe Server
+        working-directory: /home/runner/frappe-bench
+        run: |
+          sed -i 's/^watch:/# watch:/g' Procfile
+          sed -i 's/^schedule:/# schedule:/g' Procfile
+          bench start &> bench_start.log &
+          timeout 120 bash -c "until curl -s http://localhost:8000 > /dev/null; do sleep 2; done"
+
+      - name: Install Playwright
+        run: |
+          yarn install --frozen-lockfile --ignore-scripts
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+        env:
+          # localhost is a secure context, which crypto.randomUUID in frappe/ui needs.
+          BASE_URL: http://localhost:8000
+          ADMIN_PASSWORD: admin
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Show Bench Logs on Failure
+        if: failure()
+        working-directory: /home/runner/frappe-bench
+        run: |
+          cat bench_start.log || true
+          cat logs/*.log || true

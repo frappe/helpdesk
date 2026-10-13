@@ -167,7 +167,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import {
   createResource,
-  dayjs,
+  dayjsLocal,
   Dropdown,
   frappeRequest,
   LoadingIndicator,
