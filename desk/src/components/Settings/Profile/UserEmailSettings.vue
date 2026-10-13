@@ -10,7 +10,7 @@
           <Button
             variant="solid"
             :label="__('Update')"
-            :loading="user?.save?.loading"
+            :loading="user.save.loading || saveEmailAccountsResource.loading"
             @click="update"
           /></div
       ></Transition>
@@ -51,7 +51,7 @@
         </div>
         <div>
           <div
-            v-if="user.doc.user_emails?.length"
+            v-if="linkedEmails.length"
             class="w-full border rounded-5 mb-2 border-outline-elevation-2"
           >
             <div
@@ -62,8 +62,8 @@
               <span></span>
             </div>
             <div
-              v-for="e in user.doc.user_emails"
-              :key="e.name"
+              v-for="e in linkedEmails"
+              :key="e.email_account"
               class="grid grid-cols-[4fr_4fr_0.3fr] gap-2 group items-center px-4 py-2.5 text-base border-b border-outline-elevation-2 last:border-b-0"
             >
               <span class="text-ink-gray-8 font-medium truncate">
@@ -134,7 +134,13 @@ import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
 import { normalize, uploadFunction } from "@/utils";
-import { Button, Combobox, createDocumentResource, toast } from "frappe-ui";
+import {
+  Button,
+  Combobox,
+  createDocumentResource,
+  createResource,
+  toast,
+} from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 
@@ -144,16 +150,41 @@ const emit = defineEmits(["updateStep"]);
 
 const currentUserEmailInfo = getUserEmailInfo();
 
+// user_emails is System Manager-only, so the User doc never carries it for
+// agents; the list comes from the email info API and is saved through it
+const linkedEmails = ref([]);
+watch(
+  () => currentUserEmailInfo.data?.outgoing_emails,
+  (emails, previousEmails) => {
+    // the info is shared with the composer; a reload from there must not
+    // wipe unsaved edits here
+    if (
+      sortedAccountNames(linkedEmails.value) !==
+      sortedAccountNames(previousEmails)
+    )
+      return;
+    linkedEmails.value = [...(emails || [])];
+  },
+  { immediate: true }
+);
+
+const saveEmailAccountsResource = createResource({
+  url: "helpdesk.api.auth.set_user_email_accounts",
+  makeParams: () => ({
+    email_accounts: linkedAccountNames(linkedEmails.value),
+  }),
+});
+
 const filteredEmails = computed(() => {
   if (!currentUserEmailInfo.data?.available_emails) return [];
-  const linkedEmails = user.doc.user_emails?.map((e) => e.email_id) || [];
+  const linkedAccounts = linkedAccountNames(linkedEmails.value);
   return currentUserEmailInfo.data.available_emails
     .map((doc) => ({
       label: doc.name,
       value: doc.name,
       email: doc.email_id,
     }))
-    .filter((e) => !linkedEmails.includes(e.email));
+    .filter((e) => !linkedAccounts.includes(e.value));
 });
 
 const isSignatureDirty = computed(() => {
@@ -164,10 +195,9 @@ const isSignatureDirty = computed(() => {
 });
 
 const isUserEmailListDirty = computed(() => {
-  const emailIds = (list = []) => list.map((e) => e.email_id).sort();
   return (
-    JSON.stringify(emailIds(currentUserEmailInfo.data?.outgoing_emails)) !==
-    JSON.stringify(emailIds(user.doc.user_emails))
+    sortedAccountNames(currentUserEmailInfo.data?.outgoing_emails) !==
+    sortedAccountNames(linkedEmails.value)
   );
 });
 
@@ -181,28 +211,39 @@ if (isDirty.value) {
   disableSettingModalOutsideClick.value = false;
 }
 
+function linkedAccountNames(list = []) {
+  return list.map((e) => e.email_account);
+}
+
+function sortedAccountNames(list) {
+  return linkedAccountNames(list).sort().join();
+}
+
 function addEmail(email) {
-  if (!user.doc.user_emails) user.doc.user_emails = [];
-  user.doc.user_emails.push({
-    email_account: email.label,
+  linkedEmails.value.push({
+    email_account: email.value,
     email_id: email.email,
   });
 }
 
 function removeEmail(email) {
-  user.doc.user_emails = user.doc.user_emails.filter(
-    (e) => e.email_id !== email.email_id
+  linkedEmails.value = linkedEmails.value.filter(
+    (e) => e.email_account !== email.email_account
   );
 }
 
-function update() {
-  user.save.submit(null, {
-    onSuccess: () => {
-      toast.success(__("Email settings updated successfully."));
-      currentUserEmailInfo.reload();
-      user.reload();
-    },
-  });
+async function update() {
+  // one after the other, since both save the same User doc
+  try {
+    if (isSignatureDirty.value) await user.save.submit();
+    if (isUserEmailListDirty.value) await saveEmailAccountsResource.submit();
+  } catch {
+    return; // the fallback error handler already showed a toast
+  }
+  toast.success(__("Email settings updated successfully."));
+  user.reload();
+  await currentUserEmailInfo.reload();
+  linkedEmails.value = [...currentUserEmailInfo.data.outgoing_emails];
 }
 
 watch(isDirty, (val) => {

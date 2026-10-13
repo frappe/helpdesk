@@ -91,21 +91,16 @@ def get_current_user_email_info():
         filters={"parent": user},
         fields=["email_account", "email_id"],
     )
-    outgoing_account_names = frappe.db.get_all(
-        "Email Account",
-        filters={"enable_outgoing": 1},
-        pluck="name",
-    )
-
-    outgoing_emails = [
-        row for row in user_emails if row.email_account in outgoing_account_names
-    ]
-
     available_emails = frappe.db.get_all(
         "Email Account",
         filters={"enable_outgoing": 1},
         fields=["name", "email_id"],
     )
+
+    outgoing_account_names = {account.name for account in available_emails}
+    outgoing_emails = [
+        row for row in user_emails if row.email_account in outgoing_account_names
+    ]
 
     return {
         "email_signature": email_signature,
@@ -113,3 +108,36 @@ def get_current_user_email_info():
         "outgoing_emails": outgoing_emails,
         "available_emails": available_emails,
     }
+
+
+@frappe.whitelist(methods=["POST"])
+@agent_only
+def set_user_email_accounts(email_accounts: list[str]):
+    """Link the given outgoing email accounts to the current user.
+
+    User Emails is a System Manager-only table, so an agent can neither read
+    nor save it through their User document. Links to accounts without
+    outgoing email are kept.
+    """
+    outgoing_accounts = dict(
+        frappe.get_all(
+            "Email Account",
+            filters={"enable_outgoing": 1},
+            fields=["name", "email_id"],
+            as_list=True,
+        )
+    )
+    user = frappe.get_doc("User", frappe.session.user)
+    rows = {row.email_account: row for row in user.user_emails}
+    kept_links = [
+        row for row in user.user_emails if row.email_account not in outgoing_accounts
+    ]
+    agent_links = [
+        rows.get(account)
+        or {"email_account": account, "email_id": outgoing_accounts[account]}
+        for account in dict.fromkeys(email_accounts)
+        if account in outgoing_accounts
+    ]
+    user.set("user_emails", kept_links + agent_links)
+    user.flags.ignore_permlevel_for_fields = ["user_emails"]
+    user.save()
