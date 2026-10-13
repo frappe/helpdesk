@@ -3,6 +3,13 @@ from typing import Any
 import frappe
 from frappe import _
 
+# the UI names these providers differently from the Email Account service options
+FRAPPE_SERVICE_NAMES = {
+    "Outlook": "Outlook.com",
+    "Yahoo": "Yahoo Mail",
+    "Yandex": "Yandex.Mail",
+}
+
 
 @frappe.whitelist()
 def create_email_account(data: dict[str, Any]):
@@ -19,7 +26,7 @@ def create_email_account(data: dict[str, Any]):
                 "doctype": "Email Account",
                 "email_id": data.get("email_id"),
                 "email_account_name": data.get("email_account_name"),
-                "service": service,
+                "service": FRAPPE_SERVICE_NAMES.get(service, service),
                 "enable_incoming": data.get("enable_incoming"),
                 "enable_outgoing": data.get("enable_outgoing"),
                 "default_incoming": data.get("default_incoming"),
@@ -61,8 +68,9 @@ def create_email_account(data: dict[str, Any]):
                 "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
             )
             email_doc.password = data.get("password")
-            # validate whether the credentials are correct
-            email_doc.get_incoming_server()
+            # validate the credentials, except for outgoing-only services
+            if service == "Custom" or email_doc.email_server:
+                email_doc.get_incoming_server()
 
         # if correct credentials, save the email account
         email_doc.save()

@@ -237,6 +237,10 @@ export const emailIcon: Record<EmailServiceName, string> = {
   SparkPost: LogoSparkpost,
   Yahoo: LogoYahoo,
   Yandex: LogoYandex,
+  // service names Frappe stores for these providers
+  "Outlook.com": LogoOutlook,
+  "Yahoo Mail": LogoYahoo,
+  "Yandex.Mail": LogoYandex,
   "Frappe Mail": LogoFrappeMail,
   Custom: "",
 };

@@ -67,6 +67,13 @@ export class TicketList {
     await this.page.getByRole("menuitem", { name: action }).click();
   }
 
+  /** Clear every filter from the Filter popover, the way an agent resets the list. */
+  async clearFilters() {
+    await this.page.getByRole("button", { name: "Filter" }).click();
+    await this.page.getByRole("dialog", { name: "Filter" }).getByRole("button", { name: "Clear all" }).click();
+    await this.page.keyboard.press("Escape");
+  }
+
   async addFilter(field: string, value: string) {
     await this.page.getByRole("button", { name: "Filter" }).click();
     const popover = this.page.getByRole("dialog", { name: "Filter" });
@@ -85,5 +92,10 @@ export async function resetDefaultTicketView(api: Api, user: string) {
     filters: { user, dt: "HD Ticket", is_default: 1 },
   });
   views.push(...(await api.list("HD View", { filters: { label: ["like", "E2E view %"] } })));
-  for (const view of views) await api.delete("HD View", view.name);
+  // the list may still be auto saving the default view, which locks it for a moment
+  for (const view of views) {
+    await expect(async () => {
+      if (await api.exists("HD View", { name: view.name })) await api.delete("HD View", view.name);
+    }).toPass();
+  }
 }
