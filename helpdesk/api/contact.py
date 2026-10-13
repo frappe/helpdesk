@@ -194,7 +194,7 @@ def get_customers_with_image(name: str) -> list[dict]:
 def get_invitation(name: str, email: str | None) -> dict | None:
     if not email:
         return None
-    return frappe.db.get_value(
+    invitation = frappe.db.get_value(
         "User Invitation",
         {
             "contact": name,
@@ -206,3 +206,7 @@ def get_invitation(name: str, email: str | None) -> dict | None:
         as_dict=True,
         order_by="creation desc",
     )
+    # Check the latest record so an older expired invitation is not revived.
+    if invitation and invitation.status == "Cancelled":
+        return None
+    return invitation
