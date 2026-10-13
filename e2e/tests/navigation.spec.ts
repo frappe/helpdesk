@@ -66,7 +66,7 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   const request = page.waitForRequest(
     (request) =>
       request.url().includes("get_dashboard_data") &&
-      request.postData()!.includes(daysAgo(7))
+      request.postData()!.includes(daysAgo(6))
   );
   await page.getByRole("menuitem", { name: "Last 7 Days" }).click();
   await request;
@@ -85,6 +85,31 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   await cells.nth(8).click();
   await cells.nth(10).click();
   await expect(page.getByText(/^\w{3} \d+ to \w{3} \d+$/)).toBeVisible();
+});
+
+test.describe("dashboard charts", () => {
+  usePersona("manager");
+
+  test("number cards show this period and every chart draws", async ({ page, ticket }) => {
+    expect(ticket.name).toBeTruthy();
+    await page.goto("/helpdesk/dashboard");
+    const cards = page
+      .locator("div", { has: page.getByText("% SLA Fulfilled", { exact: true }) })
+      .filter({ has: page.getByText("Avg. Resolution", { exact: true }) })
+      .last();
+    const tickets = cards
+      .getByText("Tickets", { exact: true })
+      .locator("xpath=ancestor::div[contains(@class, 'flex-col')][1]");
+    await expect(tickets).toContainText(/Tickets\s*\d+/);
+    const chart = page.locator("[_echarts_instance_]");
+    for (const title of ["Ticket Trend", "Tickets by Team", "Tickets by Priority"]) {
+      const card = page
+        .locator("div", { has: page.getByText(title, { exact: true }) })
+        .filter({ has: chart })
+        .last();
+      await expect(card.locator("[_echarts_instance_] svg")).toBeVisible();
+    }
+  });
 });
 
 test("the command palette finds a ticket and opens it", async ({ page, api, apiAs }) => {
