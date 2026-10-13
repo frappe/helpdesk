@@ -544,16 +544,17 @@ function submitMail() {
       ? `<p class="reply-to-content"></p><blockquote>${quotedContentRef.value.innerHTML}</blockquote>`
       : "");
   const sender = selectedFromEmail.value?.email_id ?? authStore.userId;
+  const ownEmail = getUser(authStore.userId).email;
 
   pendingRow?.drop();
   pendingRow = addPendingActivity(props.doctype, props.ticketId, {
     type: "email",
     timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     author: {
-      email: getUser(authStore.userId).email,
+      email: sender,
       // the users list may still be a stub with a guessed name and no avatar
       fullname: authStore.userName,
-      image: authStore.userImage,
+      image: sender === ownEmail ? authStore.userImage : undefined,
     },
     data: {
       name: "",
