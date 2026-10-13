@@ -39,22 +39,7 @@
             @click="close"
           />
         </div>
-        <div class="flex items-center justify-between gap-2 px-4 py-2">
-          <TabButtons
-            v-model="notificationStore.readFilter"
-            :options="readOptions"
-          />
-          <Dropdown :options="categoryOptions" align="end">
-            <Button :label="categoryLabel">
-              <template #prefix>
-                <LucideList class="h-4 w-4" />
-              </template>
-              <template #suffix>
-                <LucideChevronDown class="h-4 w-4" />
-              </template>
-            </Button>
-          </Dropdown>
-        </div>
+        <NotificationFilters />
       </template>
     </NotificationPanel>
   </span>
@@ -65,14 +50,13 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import { __ } from "@/translation";
 import { NotificationLog, NotificationPanel } from "@framework/ui";
-import { onClickOutside } from "@vueuse/core";
-import { Button, Dropdown, TabButtons } from "frappe-ui";
-import { computed, ref } from "vue";
+import { onClickOutside, useEventListener } from "@vueuse/core";
+import { Button } from "frappe-ui";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideCheckCheck from "~icons/lucide/check-check";
-import LucideChevronDown from "~icons/lucide/chevron-down";
-import LucideList from "~icons/lucide/list";
 import LucideX from "~icons/lucide/x";
+import NotificationFilters from "./NotificationFilters.vue";
 
 const notificationStore = useNotificationStore();
 const controller = notificationStore.controller;
@@ -80,37 +64,27 @@ const sidebarStore = useSidebarStore();
 const router = useRouter();
 const target = ref(null);
 
-const readOptions = [
-  { label: __("All"), value: "all" },
-  { label: __("Unread"), value: "unread" },
-];
-
-// Notification Log types helpdesk produces; core writes Mention and Assignment
-const categories = [
-  { label: __("All categories"), value: "" },
-  { label: __("Mentions"), value: "Mention" },
-  { label: __("Assignments"), value: "Assignment" },
-  { label: __("Reactions"), value: "Reaction" },
-  { label: __("Reopened tickets"), value: "Ticket Reopened" },
-];
-const categoryOptions = categories.map((c) => ({
-  label: c.label,
-  onClick: () => (notificationStore.category = c.value),
-}));
-const categoryLabel = computed(
-  () => categories.find((c) => c.value === notificationStore.category)?.label
+// An open category menu makes the page inert, so the click that dismisses it
+// or picks an item lands outside the panel. The menu is gone by the time that
+// click fires, so note it on pointerdown and let the click close only the menu.
+let menuWasOpen = false;
+useEventListener(
+  window,
+  "pointerdown",
+  () => (menuWasOpen = !!document.querySelector("[role='menu']")),
+  { capture: true }
 );
 
 onClickOutside(
   target,
   () => {
+    if (menuWasOpen) return;
     if (notificationStore.visible) {
       notificationStore.toggle();
     }
   },
   {
-    // the category menu renders in a portal outside the panel
-    ignore: ["#notifications-btn", "[role='menu']"],
+    ignore: ["#notifications-btn"],
   }
 );
 

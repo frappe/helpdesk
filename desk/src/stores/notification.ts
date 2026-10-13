@@ -24,13 +24,14 @@ export const useNotificationStore = defineStore("notification", () => {
 
   function toggle() {
     visible.value = !visible.value;
-    if (visible.value) {
-      controller.markSeen();
-    } else {
-      // the filters also scope the bell's unread count, so drop them on close
-      readFilter.value = "all";
-      category.value = "";
-    }
+    if (visible.value) controller.markSeen();
+    else resetFilters();
+  }
+
+  // the filters also scope the bell's unread count, so drop them on leaving
+  function resetFilters() {
+    readFilter.value = "all";
+    category.value = "";
   }
 
   // Every helpdesk notification references the ticket; the ones about a
@@ -65,6 +66,7 @@ export const useNotificationStore = defineStore("notification", () => {
     routeFor,
     unread,
     readFilter,
+    resetFilters,
     visible,
   };
 });
