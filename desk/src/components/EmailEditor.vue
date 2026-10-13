@@ -5,7 +5,10 @@
     :placeholder="placeholder"
     :editable="editable"
     :extensions="extensions"
-    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :upload-function="
+      (file: any, options: any) =>
+        track(uploadFunction(file, doctype, ticketId, true, options))
+    "
   >
     <template #default>
       <div @keydown.capture="handleKeydown">
@@ -147,11 +150,9 @@
           <div class="flex items-center overflow-x-auto w-[60%]">
             <div class="inline-flex items-center gap-1.5 p-1">
               <FileUploader
-                :upload-args="{
-                  doctype: doctype,
-                  docname: ticketId,
-                  private: true,
-                }"
+                :doctype="doctype"
+                :docname="ticketId"
+                private
                 @success="
                   (f) => {
                     attachments.push(f);
@@ -159,10 +160,10 @@
                 "
               >
                 <template #default="{ openFileSelector, uploading }">
-                  {{ void (isUploading = uploading) }}
+                  {{ void (attachmentUploading = uploading) }}
                   <Tooltip :text="__('Attach file')">
                     <button
-                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                      class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
@@ -178,7 +179,7 @@
               </FileUploader>
               <Tooltip :text="__('Saved replies')">
                 <button
-                  class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                  class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                   @click="showSavedRepliesSelectorModal = true"
                 >
                   <ZapIcon class="h-4 w-4" />
@@ -187,20 +188,29 @@
               <div class="h-4 w-[2px] border-s ml-1" />
             </div>
             <EditorFixedMenu :items="fullToolbar" />
+            <EditorTableMenu />
           </div>
           <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
             <Button label="Discard" @click="handleDiscard" />
-            <Button
-              variant="solid"
-              :disabled="isDisabled"
-              :loading="sendMail.loading"
-              :label="label"
-              @click="
-                () => {
-                  submitMail();
-                }
-              "
-            />
+            <!-- A disabled button fires no pointer events, so the span
+                 carries the hover for the tooltip -->
+            <Tooltip
+              :text="isUploading ? __('Please wait, media is uploading') : ''"
+            >
+              <span class="inline-flex">
+                <Button
+                  variant="solid"
+                  :disabled="isDisabled"
+                  :loading="sendMail.loading"
+                  :label="label"
+                  @click="
+                    () => {
+                      submitMail();
+                    }
+                  "
+                />
+              </span>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -223,6 +233,7 @@ import { AttachmentIcon } from "@/components/icons";
 import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.vue";
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
@@ -243,8 +254,13 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
-import { useOnboarding } from "frappe-ui/frappe";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
+import { useOnboarding } from "@framework/ui";
 import {
   computed,
   nextTick,
@@ -293,7 +309,7 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "discard"]);
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager } = useAuthStore();
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
@@ -390,7 +406,13 @@ const from = computed(() => {
 const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 
 const attachments = ref([]);
-const isUploading = ref(false);
+const attachmentUploading = ref(false);
+const { isUploading: editorUploading, track } = useUploadTracker();
+
+// The paperclip and the editor's own media buttons upload by different routes
+const isUploading = computed(
+  () => attachmentUploading.value || editorUploading.value
+);
 
 async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
@@ -467,7 +489,7 @@ const sendMail = createResource({
     emit("submit");
 
     if (isManager) {
-      updateOnboardingStep("reply_on_ticket");
+      updateOnboardingStep?.("reply_on_ticket");
     }
   },
   debounce: 300,
@@ -486,6 +508,8 @@ function submitMail() {
   if (isContentEmpty(newEmail.value) && isContentEmpty(quotedContent.value)) {
     return false;
   }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (isUploading.value) return false;
   if (
     !toEmailsClone.value.length &&
     !ccEmailsClone.value.length &&
@@ -570,6 +594,9 @@ function handleSelectAll(e: KeyboardEvent) {
   if (!editorDom.contains(active) && !(quotedEl && quotedEl.contains(active))) {
     return;
   }
+  // after the focus check: select-all from a recipient field must not unfold
+  // the quoted reply
+  isQuoteExpanded.value = true;
   e.preventDefault();
   editorContext?.commands.selectAll();
   sel.removeAllRanges();
@@ -611,7 +638,6 @@ function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
 
   if ((e.metaKey || e.ctrlKey) && key === "a") {
-    isQuoteExpanded.value = true;
     handleSelectAll(e);
     return;
   }
@@ -693,6 +719,7 @@ onBeforeUnmount(() => {
 defineExpose({
   addToReply,
   editor,
+  isUploading,
   submitMail,
 });
 </script>

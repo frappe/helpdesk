@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col w-full h-full rounded-md p-4"
+    class="flex flex-col w-full h-full rounded-5 p-4"
     :class="[orientation == 'horizontal' && 'pt-3']"
   >
     <slot name="title">
@@ -15,7 +15,7 @@
       <div class="flex items-end w-full gap-2">
         <slot name="text">
           <div
-            class="text-3xl-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-2xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </div>
@@ -33,14 +33,15 @@
             <div
               class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
             >
-              <div class="rtl:flex rtl:gap-1">
-                <span>vs</span> <span>{{ currentDuration.toLowerCase() }}</span>
+              <div class="flex gap-1">
+                <span>vs</span>
+                <span>{{ __(currentDuration).toLowerCase() }}</span>
               </div>
-              <FeatherIcon name="chevron-down" class="size-4" />
+              <LucideChevronDown class="size-4" />
             </div>
             <template #item-label="{ item }">
               <div
-                class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+                class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded-4 px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
               >
                 <span>
                   {{ item.label }}
@@ -48,9 +49,8 @@
               </div>
             </template>
             <template #item-suffix="{ item }">
-              <FeatherIcon
+              <LucideCheck
                 v-if="item.label == __(currentDuration)"
-                name="check"
                 class="size-4"
               />
             </template>
@@ -67,7 +67,7 @@
       <div class="flex items-end w-full gap-2 justify-between flex-1">
         <slot name="text">
           <span
-            class="text-3xl-medium text-center text-ink-gray-8 whitespace-nowrap"
+            class="text-2xl-medium text-center text-ink-gray-8 whitespace-nowrap"
           >
             {{ text }}
           </span>
@@ -91,12 +91,12 @@
           <div
             class="flex items-center gap-0.5 text-ink-gray-5 hover:text-ink-gray-6 cursor-pointer shrink-0"
           >
-            vs {{ currentDuration.toLowerCase() }}
-            <FeatherIcon name="chevron-down" class="size-4" />
+            vs {{ __(currentDuration).toLowerCase() }}
+            <LucideChevronDown class="size-4" />
           </div>
           <template #item-label="{ item }">
             <div
-              class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
+              class="data-[disabled]:cursor-not-allowed group flex w-full items-center rounded-4 px-2 text-base focus:outline-none focus:bg-surface-gray-3 data-[highlighted]:bg-surface-gray-3 data-[state=open]:bg-surface-gray-3 whitespace-nowrap text-ink-gray-7 cursor-pointer justify-between"
             >
               <span>
                 {{ item.label }}
@@ -104,9 +104,8 @@
             </div>
           </template>
           <template #item-suffix="{ item }">
-            <FeatherIcon
+            <LucideCheck
               v-if="item.label == __(currentDuration)"
-              name="check"
               class="size-4"
             />
           </template>
@@ -117,9 +116,12 @@
 </template>
 
 <script setup lang="ts">
+import LucideCheck from "~icons/lucide/check";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import { __ } from "@/translation";
 import { EChartsOption } from "echarts";
-import { Dropdown, ECharts, FeatherIcon } from "frappe-ui";
+import { Dropdown } from "frappe-ui";
+import { ECharts } from "frappe-ui/experimental";
 import { computed, type PropType } from "vue";
 
 const props = defineProps({
@@ -158,27 +160,14 @@ const currentDuration = computed(() => props.currentDuration);
 
 const emit = defineEmits(["changeDuration"]);
 
-const durationOptions = [
-  {
-    label: __("Last week"),
-    onClick: () => {
-      if (currentDuration.value == __("Last week")) return;
-      emit("changeDuration", __("Last week"));
-    },
+// the emitted value is the untranslated key: it travels to the API as the
+// period, so only the label goes through __()
+const DURATIONS = ["Last week", "Last month", "Last 3 months"];
+
+const durationOptions = DURATIONS.map((duration) => ({
+  label: __(duration),
+  onClick: () => {
+    if (currentDuration.value !== duration) emit("changeDuration", duration);
   },
-  {
-    label: __("Last month"),
-    onClick: () => {
-      if (currentDuration.value == __("Last month")) return;
-      emit("changeDuration", __("Last month"));
-    },
-  },
-  {
-    label: __("Last 3 months"),
-    onClick: () => {
-      if (currentDuration.value == __("Last 3 months")) return;
-      emit("changeDuration", __("Last 3 months"));
-    },
-  },
-];
+}));
 </script>

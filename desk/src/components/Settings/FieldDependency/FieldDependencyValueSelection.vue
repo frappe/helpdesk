@@ -7,7 +7,7 @@
       <span class="block text-xs text-ink-gray-5">
         Select parent field value
       </span>
-      <div class="border flex-1 border-e-0 rounded-s p-2 flex flex-col gap-2">
+      <div class="border flex-1 border-e-0 rounded-s-4 p-2 flex flex-col gap-2">
         <template v-if="state.selectedParentField">
           <FormControl
             v-model="state.parentSearch"
@@ -24,7 +24,7 @@
               <li
                 v-for="value in filteredParentFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
                 :class="{
                   'bg-surface-gray-2 hover:bg-surface-gray-3':
                     state.currentParentSelection === value,
@@ -66,7 +66,7 @@
       <span class="block text-xs text-ink-gray-5 ps-1.5">
         Select child field value
       </span>
-      <div class="border flex-1 rounded-e p-2 flex flex-col gap-2">
+      <div class="border flex-1 rounded-e-4 p-2 flex flex-col gap-2">
         <template
           v-if="state.selectedChildField && state.currentParentSelection"
         >
@@ -83,7 +83,7 @@
           <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
             <!-- Master Check box -->
             <li
-              class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+              class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
               @click="handleSelectAllChildValues(!toggleAllChildValues)"
             >
               <FormControl
@@ -99,7 +99,7 @@
               <li
                 v-for="value in filteredChildFieldValues"
                 :key="value"
-                class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1 max-w-full truncate"
+                class="py-2 mb-1 px-2.5 cursor-pointer rounded-4 flex items-center hover:bg-surface-gray-1 max-w-full truncate"
                 @click="handleChildValueClick(value)"
               >
                 <FormControl

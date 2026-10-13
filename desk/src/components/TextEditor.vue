@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded p-3 shadow-sm w-full">
+  <div class="rounded-4 p-3 shadow-sm w-full">
     <Editor
       ref="inner"
       v-model="content"
@@ -81,7 +81,7 @@ import {
 interface P {
   modelValue: string;
   autofocus?: boolean;
-  uploadFunction?: (file: any) => Promise<any>;
+  uploadFunction?: (file: any, options?: any) => Promise<any>;
 }
 
 interface E {

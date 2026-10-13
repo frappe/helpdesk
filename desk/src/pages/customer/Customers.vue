@@ -20,7 +20,7 @@
         </Button>
       </template>
     </LayoutHeader>
-    <ListViewBuilder :options="options" />
+    <ListViewBuilder ref="listViewRef" :options="options" />
     <NewCustomerDialog v-model="isDialogVisible" />
   </div>
 </template>

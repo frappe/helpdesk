@@ -9,9 +9,9 @@ import {
   call,
   createListResource,
   createResource,
-  FeatherIcon,
   toast,
 } from "frappe-ui";
+import { Icon } from "frappe-ui/experimental";
 import { computed, h, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -203,10 +203,10 @@ export function useView(dt: string = null) {
       {
         group: __("Default Views"),
         hideLabel: true,
-        items: [
+        options: [
           {
             label: __("Duplicate"),
-            icon: h(FeatherIcon, { name: "copy" }),
+            icon: h(Icon, { name: "copy" }),
             onClick: () => {
               viewDialogConfig.view.label = _view.label + " (New)";
               viewDialogConfig.view.icon = _view.icon;
@@ -221,7 +221,7 @@ export function useView(dt: string = null) {
 
     if (!_view.public || auth.isManager) {
       if (!_view.public && !_view.is_standard) {
-        actions[0].items.push({
+        actions[0].options.push({
           label: _view?.pinned ? __("Unpin View") : __("Pin View"),
           icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
           onClick: () =>
@@ -229,11 +229,11 @@ export function useView(dt: string = null) {
         });
       }
       if (_view?.is_standard && auth.isManager) {
-        actions[0].items.push({
+        actions[0].options.push({
           label: _view?.public
             ? __("Hide from sidebar")
             : __("Show in sidebar"),
-          icon: h(FeatherIcon, {
+          icon: h(Icon, {
             name: _view?.public ? "eye-off" : "eye",
             class: "h-4 w-4",
           }),
@@ -250,10 +250,10 @@ export function useView(dt: string = null) {
       }
       if (!_view.is_standard) {
         if (auth.isManager && !isCustomerPortal.value) {
-          actions[0].items.push({
+          actions[0].options.push({
             label: _view?.public ? __("Make Private") : __("Make Public"),
-            icon: h(FeatherIcon, {
-              name: _view?.public ? "lock" : "unlock",
+            icon: h(Icon, {
+              name: _view?.public ? "lock" : "lock-open",
               class: "h-4 w-4",
             }),
             onClick: () =>
@@ -267,7 +267,7 @@ export function useView(dt: string = null) {
               ),
           });
         }
-        actions[0].items.push({
+        actions[0].options.push({
           label: __("Edit"),
           icon: h(EditIcon, { class: "h-4 w-4" }),
           onClick: () => {
@@ -281,7 +281,7 @@ export function useView(dt: string = null) {
         actions.push({
           group: __("Delete View"),
           hideLabel: true,
-          items: [
+          options: [
             {
               label: __("Delete"),
               icon: "lucide-trash-2",
@@ -307,7 +307,7 @@ export function useView(dt: string = null) {
         {
           label: __("Confirm"),
           variant: "solid",
-          iconLeft: "trash-2",
+          iconLeft: "lucide-trash-2",
           theme: "red",
           onClick({ close }: any) {
             if (route.query.view === _view.name) {

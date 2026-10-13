@@ -16,7 +16,7 @@
         <Button
           variant="solid"
           theme="red"
-          icon-left="trash-2"
+          icon-left="lucide-trash-2"
           :label="__('Delete')"
           :loading="isDeleting"
           @click="confirmDelete"
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Button, Checkbox, createListResource, Dialog } from "frappe-ui";
+import { Button, Checkbox, createResource, Dialog } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
@@ -45,16 +45,18 @@ const props = defineProps<{
 
 const open = defineModel<boolean>({ default: false });
 
-const resource = createListResource({
-  doctype: "HD Ticket",
-  filters: { [props.linkField]: props.name },
-  fields: ["name"],
-  limit: 99999, // We just want the count
+const resource = createResource({
+  url: "frappe.client.get_count",
+  params: {
+    doctype: "HD Ticket",
+    filters: { [props.linkField]: props.name },
+  },
+  auto: true,
 });
 
 const count = computed<number>(() => {
   if (resource.loading) return 0;
-  return resource.data?.length ?? 0;
+  return resource.data ?? 0;
 });
 
 const deleteLinkedTickets = ref(false);

@@ -17,7 +17,7 @@ import {
   createResource,
   toast,
 } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, ComputedRef, h, markRaw, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
@@ -365,7 +365,8 @@ export function useContactState(
       state.phone = "";
       state.timezone = "";
       state.customer = "";
-      state.invite = false;
+      // back to the initial state: the dialog opens with the invite on
+      state.invite = true;
     }
 
     return { state, resetState };
@@ -475,7 +476,7 @@ function getContactFieldConfig(newDoc: boolean = false): FieldConfigRow[] {
 export function useContactInvite() {
   const isLoading = ref(false);
   // @ts-expect-error
-  const { updateOnboardingStep } = useOnboarding("helpdesk");
+  const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
   async function resendInvite(
     invitationName: string,
     status: string | undefined,
@@ -492,7 +493,7 @@ export function useContactInvite() {
         app_name: "helpdesk",
       });
       toast.success(__("Invitation email resent successfully"));
-      updateOnboardingStep("add_invite_contact");
+      updateOnboardingStep?.("add_invite_contact");
     } catch (error: unknown) {
       isLoading.value = false;
       const parser = new DOMParser();
@@ -525,7 +526,7 @@ export function useContactInvite() {
         contact: contactName,
       });
       toast.success(__("Invitation sent"));
-      updateOnboardingStep("add_invite_contact");
+      updateOnboardingStep?.("add_invite_contact");
     } catch (error: unknown) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(

@@ -3,7 +3,7 @@
     <div class="flex items-center gap-4">
       <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Status</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
+        class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
         {{ ticket.data.status }}
       </span>
@@ -12,7 +12,7 @@
     <div class="flex items-center gap-4">
       <span class="w-[150px] shrink-0 text-p-sm text-ink-gray-5">Priority</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
+        class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm text-ink-gray-9"
       >
         {{ ticket.data.priority }}
       </span>
@@ -42,7 +42,7 @@
         field.label
       }}</span>
       <span
-        class="flex-1 truncate rounded border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm"
+        class="flex-1 truncate rounded-4 border border-outline-gray-2 bg-surface-base px-2 py-1 text-p-sm"
         :class="
           ticket.data[field.fieldname] ? 'text-ink-gray-9' : 'text-ink-gray-4'
         "

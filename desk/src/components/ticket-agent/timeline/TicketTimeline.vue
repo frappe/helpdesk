@@ -51,7 +51,7 @@
                 ><ReplyAllIcon class="text-ink-gray-7"
               /></template>
             </Button>
-            <Dropdown placement="right" :options="emailOptions(activity)">
+            <Dropdown align="end" :options="emailOptions(activity)">
               <Button
                 icon="lucide-more-horizontal"
                 class="!text-ink-gray-7"

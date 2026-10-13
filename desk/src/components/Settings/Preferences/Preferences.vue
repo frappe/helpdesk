@@ -2,7 +2,7 @@
   <SettingsLayoutBase :description="__('Manage your personal preferences.')">
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("Preferences") }}
         </h1>
         <UnsavedBadge :show="isDirty" />

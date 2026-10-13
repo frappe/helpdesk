@@ -1,15 +1,18 @@
 <template>
-  <Popover placement="bottom-end">
-    <template #target="{ togglePopover, open }">
-      <div :ref="() => (openPopoverFn = open)" class="w-fit">
+  <Popover bare side="bottom" align="end">
+    <template #trigger="{ toggle: togglePopover }">
+      <div
+        :ref="() => (openPopoverFn = () => togglePopover(true))"
+        class="w-fit"
+      >
         <FilterTrigger
           :count="activeFilters.length"
-          @toggle="openPopover(togglePopover)"
+          @toggle="resetSteps()"
           @clear="clearFilters()"
         />
       </div>
     </template>
-    <template #body>
+    <template #default>
       <!-- Dedicated high-z layer the operator dropdown teleports into. Both this
            and the frappe-ui Popover panel land in <body>; the popover panel is
            z-[100], so a body-mounted menu (z-auto) renders behind it. This layer
@@ -19,7 +22,7 @@
         <div ref="operatorMenuLayer" class="relative z-[101]" />
       </Teleport>
       <div
-        class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
+        class="my-2 w-80 rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="relative overflow-clip rounded-[inherit]">
           <Transition
@@ -43,7 +46,7 @@
                     <div
                       v-for="filter in activeFilters"
                       :key="filter.index"
-                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2 pl-0"
+                      class="group flex h-8 w-full items-center gap-2 rounded-4 px-1.5 hover:bg-surface-gray-2 pl-0"
                     >
                       <Button
                         variant="ghost"
@@ -219,11 +222,6 @@ useShortcut("f", () => {
   resetSteps();
   openPopoverFn?.();
 });
-
-function openPopover(toggle: () => void) {
-  resetSteps();
-  toggle();
-}
 
 // The popover auto-focuses its first focusable element on open, which would put
 // a focus ring on the first filter row. Pull focus to the (non-tabbable) header

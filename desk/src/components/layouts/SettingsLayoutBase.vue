@@ -15,7 +15,7 @@
               />
               <UnsavedBadge :show="Boolean(dirty)" />
             </div>
-            <h1 v-else class="text-lg-semibold text-ink-gray-8">
+            <h1 v-else class="text-md-semibold text-ink-gray-8">
               {{ title }}
             </h1>
           </slot>

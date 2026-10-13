@@ -1,11 +1,11 @@
 <template>
   <Popover
-    class="flex w-full"
-    placement="bottom-start"
-    :matchTargetWidth="true"
-    v-model:show="popoverIsOpen"
+    side="bottom"
+    align="start"
+    :matchTriggerWidth="true"
+    v-model:open="popoverIsOpen"
   >
-    <template #target="{ togglePopover }">
+    <template #trigger>
       <div class="flex flex-col gap-1.5 w-full">
         <span v-if="!hideLabel" class="block text-base text-ink-gray-5">
           {{ __("Assignee") }}
@@ -17,14 +17,13 @@
           :class="
             ghost
               ? [
-                  '!h-7 !rounded !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
+                  '!h-7 !rounded-4 !border !border-transparent !bg-surface-base !px-2 hover:!bg-surface-base focus:focus-ring',
                   // Hold the ring while the dropdown is open, mirroring the Link
                   // field's data-[state=open]:focus-ring (focus lives in the popover).
                   popoverIsOpen && 'focus-ring',
                 ]
               : 'hover:shadow-sm'
           "
-          @click="togglePopover()"
         >
           <div class="flex items-center min-h-5 gap-2 w-full min-w-0">
             <template v-if="localAssignees.length > 0">
@@ -68,8 +67,8 @@
     </template>
     <!-- body-main (not body) so the shared PopoverPanel supplies the shell
          chrome and the combobox's scale-from-trigger open animation. -->
-    <template #body-main="{ isOpen }">
-      <!-- Pin to the trigger width. matchTargetWidth only sets min-width, so the
+    <template #default="{ open: isOpen }">
+      <!-- Pin to the trigger width. matchTriggerWidth only sets min-width, so the
            panel is otherwise shrink-to-fit and grows to the widest agent name
            (then collapses as you filter) -> width jitter. Fixing the width lets
            the rows' min-w-0 truncate instead. -->
@@ -111,7 +110,7 @@
                 v-for="(agent, index) in sortedAgentOptions"
                 :key="agent.value"
                 :ref="(el) => setOptionRef(index, el as Element)"
-                class="group flex h-7 w-full items-center rounded px-2 text-base text-ink-gray-6 gap-2"
+                class="group flex h-7 w-full items-center rounded-4 px-2 text-base text-ink-gray-6 gap-2"
                 :class="
                   index === highlightedIndex
                     ? 'bg-surface-gray-3'
@@ -125,7 +124,7 @@
                 />
                 <div class="relative flex-shrink-0">
                   <Tooltip
-                    placement="top"
+                    side="top"
                     :text="
                       availabilitySubtitle(
                         agent.availability,
@@ -273,7 +272,7 @@ watch(popoverIsOpen, (isOpen) => {
     searchText.value = "";
     highlightedIndex.value = 0;
     nextTick(() => {
-      inputRef.value?.el?.focus();
+      inputRef.value?.focus();
     });
   } else if (hasBeenOpened.value) {
     // Closing after a real open: compute diff and save

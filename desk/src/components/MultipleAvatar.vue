@@ -50,8 +50,10 @@ import { Avatar, Tooltip } from "frappe-ui";
 import { computed } from "vue";
 
 const props = defineProps({
+  // Frappe hands `_assign` over as a JSON string; callers with the list
+  // already parsed pass the array itself.
   avatars: {
-    type: String,
+    type: [String, Array],
   },
   size: {
     type: String,

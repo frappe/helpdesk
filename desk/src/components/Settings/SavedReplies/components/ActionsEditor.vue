@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-3">
     <div class="flex flex-col gap-1">
-      <span class="text-lg-medium text-ink-gray-8">{{ __("Actions") }}</span>
+      <span class="text-md-medium text-ink-gray-8">{{ __("Actions") }}</span>
       <span class="text-p-base text-ink-gray-6">
         {{ __("Applied to the ticket when this reply is sent") }}
       </span>
     </div>
-    <div class="rounded-md border border-outline-gray-2 px-1 text-sm">
+    <div class="rounded-5 border border-outline-gray-2 px-1 text-sm">
       <template v-if="rows.length">
         <div
           class="grid items-center gap-6 p-2"
@@ -47,12 +47,11 @@
                 :model-value="row.value"
                 :options="valueOptions(row.action_type)"
                 @update:model-value="row.value = $event"
-                @search="search(row.action_type, $event)"
               />
             </div>
             <div class="flex min-h-8 items-center justify-end">
               <Dropdown
-                placement="right"
+                align="end"
                 :options="[
                   {
                     label: __('Delete'),
@@ -122,11 +121,8 @@ defineProps<{
 
 const actions = defineModel<SavedReplyAction[]>({ required: true });
 
-const {
-  valueOptions: sharedValueOptions,
-  tagOptions,
-  search,
-} = useSavedReplyActionOptions();
+const { valueOptions: sharedValueOptions, tagOptions } =
+  useSavedReplyActionOptions();
 
 const columns = [
   { key: "action_type", label: __("Action"), width: "190px" },

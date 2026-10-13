@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md border p-1 border-outline-gray-2 text-sm">
+  <div class="rounded-5 border p-1 border-outline-gray-2 text-sm">
     <div
       class="grid p-2 items-center"
       :style="{
@@ -32,12 +32,12 @@
           <div v-else>{{ holiday[column.key] }}</div>
         </div>
         <div class="flex justify-end">
-          <Dropdown placement="right" :options="dropdownOptions(holiday)">
-            <Button
-              icon="lucide-more-horizontal"
-              variant="ghost"
-              @click="isConfirmingDelete = false"
-            />
+          <Dropdown
+            align="end"
+            :options="dropdownOptions(holiday)"
+            @update:open="(open) => open && (isConfirmingDelete = false)"
+          >
+            <Button icon="lucide-more-horizontal" variant="ghost" />
           </Dropdown>
         </div>
       </div>
@@ -71,7 +71,7 @@
       </div>
       <div v-else class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Day" required size="md" />
+          <FormLabel label="Day" required />
           <Select
             :options="availableWorkDays"
             v-model="recurringHolidayData.day"
@@ -79,7 +79,7 @@
           />
         </div>
         <div class="flex flex-col gap-1.5">
-          <FormLabel label="Repetition" required size="md" />
+          <FormLabel label="Repetition" required />
           <div class="grid grid-cols-2 gap-2 mt-2">
             <Checkbox
               v-model="recurringHolidayData.repetition.all"

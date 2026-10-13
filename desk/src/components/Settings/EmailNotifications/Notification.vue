@@ -13,7 +13,7 @@
             <span class="sr-only">{{ __("back to email event list") }}</span>
             <LucideChevronLeft class="w-4.5 h-4.5 rtl:rotate-180" />
           </button>
-          <h1 class="text-2xl-semibold">
+          <h1 class="text-xl-semibold">
             {{ props.title }}
           </h1>
         </div>
@@ -62,7 +62,9 @@
               :required="true"
               :rows="10"
               v-model="content"
-              :oninput="() => setUnsavedChanges()"
+              @update:model-value="
+                (value) => setUnsavedChanges(undefined, value)
+              "
             />
             <div class="flex gap-x-1 items-start justify-between">
               <p class="text-sm text-ink-gray-7 leading-5">
@@ -151,6 +153,7 @@ const content = defineModel<string>("content", { required: true });
 const enabled = defineModel<boolean>("enabled", { required: true });
 
 const unsavedChanges = ref(false);
+const slotFieldChanged = ref(false);
 const showUnsavedConfirm = ref(false);
 const showContentChangeConfirm = ref(false);
 
@@ -169,15 +172,25 @@ function setUnsavedChanges(
   newContent = content.value
 ) {
   unsavedChanges.value =
+    slotFieldChanged.value ||
     newEnabled !== notificationDataResource.data.enabled ||
     newContent !== notificationDataResource.data.content;
 }
+
+/** For fields a notification adds through `#formFields`, which this component
+ *  cannot diff itself. */
+function markUnsavedChanges() {
+  slotFieldChanged.value = true;
+  unsavedChanges.value = true;
+}
+
 function resetUnsavedChanges() {
   notificationDataResource.data = {
     ...notificationDataResource.data,
     enabled: enabled.value,
     content: content.value,
   };
+  slotFieldChanged.value = false;
   unsavedChanges.value = false;
 }
 function resetContent() {
@@ -209,6 +222,7 @@ watch(
 
 defineExpose({
   setUnsavedChanges,
+  markUnsavedChanges,
   resetUnsavedChanges,
 });
 </script>

@@ -22,10 +22,12 @@
     "@twilio/voice-sdk": "^2.15.0",
     "@vee-validate/zod": "^4.8.2",
     "@vitejs/plugin-vue": "^4.2.3",
-    "@vueuse/core": "^13.8.0",
-    "@vueuse/integrations": "^13.8.0",
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/integrations": "^14.1.0",
     "dayjs": "^1.11.7",
-    "frappe-ui": "1.0.0-beta.24",
+    "echarts": "^6.1.0",
+    "grid-layout-plus": "^1.1.0",
+    "frappe-ui": "1.0.0-beta.63",
     "mime": "^3.0.0",
     "pinia": "^2.0.33",
     "sanitize-html": "^2.10.0",
@@ -50,6 +52,9 @@
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12",
-    "prosemirror-model": "1.25.4"
+    "prosemirror-model": "1.25.9",
+    "prosemirror-state": "1.4.4",
+    "prosemirror-view": "1.41.9",
+    "prosemirror-transform": "1.12.0"
   }
 }
