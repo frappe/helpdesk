@@ -178,7 +178,7 @@ const options = computed(() => ({
         return h(
           "span",
           {
-            class: ["truncate flex-1", !isSeen && "font-medium"],
+            class: ["truncate flex-1", !isSeen && "font-semibold"],
           },
           item
         );
