@@ -89,12 +89,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
-import {
-  ActivitiesSymbol,
-  CustomizationSymbol,
-  TicketSymbol,
-  View,
-} from "@/types";
+import { CustomizationSymbol, TicketSymbol, View } from "@/types";
 import { HDTicketStatus } from "@/types/doctypes";
 import { getIcon } from "@/utils";
 import {
@@ -137,7 +132,6 @@ const ticketStatusStore = useTicketStatusStore();
 
 const ticket = inject(TicketSymbol)!;
 const customizations = inject(CustomizationSymbol)!;
-const activities = inject(ActivitiesSymbol)!;
 const showSubjectDialog = ref(false);
 
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
@@ -150,14 +144,7 @@ const statusDropdown = computed(() => {
     onClick: () => {
       notifyTicketUpdate("Status", o.label_agent);
       if (ticket.value.doc.status === o.label_agent) return;
-      ticket.value.setValue.submit(
-        { status: o.label_agent },
-        {
-          onSuccess() {
-            activities.value.reload();
-          },
-        }
-      );
+      ticket.value.setValue.submit({ status: o.label_agent });
     },
     icon: () =>
       h(IndicatorIcon, {

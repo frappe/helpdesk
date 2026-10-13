@@ -598,15 +598,14 @@ ACTIVITY_SOURCES = [
         "replied",
         {"reference_doctype": "HD Ticket", "sent_or_received": "Sent"},
     ),
-    ("HD Ticket Comment", "commented_by", "reference_ticket", "commented", {}),
-    # SLA changes are automated noise, not something the agent chose to do.
     (
-        "HD Ticket Activity",
-        "owner",
-        "ticket",
-        "updated",
-        {"action": ["not like", "%SLA%"]},
+        "Comment",
+        "comment_email",
+        "reference_name",
+        "commented",
+        {"reference_doctype": "HD Ticket", "comment_type": "Comment"},
     ),
+    ("Version", "owner", "docname", "updated", {"ref_doctype": "HD Ticket"}),
     (
         "View Log",
         "viewed_by",
@@ -685,12 +684,12 @@ def _activity_events(
     ticket. Deduping to one row per ticket happens in get_recent_activity."""
     fields = [f"{ticket_field} as ticket", "creation"]
     if activity_type == "updated":
-        fields.append("action")
+        fields.append("data")
     return [
         {
             "ticket": row.ticket,
             "type": activity_type,
-            "text": _updated_label(row.action) if activity_type == "updated" else None,
+            "text": _updated_label(row.data) if activity_type == "updated" else None,
             "creation": row.creation,
         }
         for row in frappe.get_all(doctype, filters=filters, fields=fields)
@@ -698,6 +697,27 @@ def _activity_events(
     ]
 
 
-def _updated_label(action: str) -> str | None:
-    """HD Ticket Activity action text ('set status to Resolved') with a capital first letter."""
-    return action[:1].upper() + action[1:] if action else None
+# significance order decides which change to show, not the DocType field order
+FEED_FIELD_LABELS = {
+    "status": "status",
+    "priority": "priority",
+    "agent_group": "team",
+    "ticket_type": "type",
+}
+
+
+def _updated_label(data: str | None) -> str | None:
+    """Most significant tracked field change in a Version row as display text
+    ('Set status to Resolved')."""
+    try:
+        changes = json.loads(data).get("changed") or []
+    except (ValueError, TypeError):
+        return None
+    changed = {field: new for field, _old, new in changes}
+    for field, label in FEED_FIELD_LABELS.items():
+        if field not in changed:
+            continue
+        new = changed[field]
+        text = f"set {label} to {new}" if new else f"cleared {label}"
+        return text[:1].upper() + text[1:]
+    return None

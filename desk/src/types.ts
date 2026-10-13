@@ -313,18 +313,8 @@ export interface RenderField {
   description?: string;
 }
 
-export type EmailServiceName =
-  | "GMail"
-  | "Outlook"
-  | "Sendgrid"
-  | "SparkPost"
-  | "Yahoo"
-  | "Yandex"
-  | "Frappe Mail"
-  | "Custom";
-
 export interface EmailService {
-  name: EmailServiceName;
+  name: string;
   icon: string;
   info: string;
   link: string;
@@ -334,16 +324,6 @@ export interface EmailService {
 export type EmailStep = "email-list" | "email-add" | "email-edit";
 
 export interface EmailAccount {
-  smtp_server: string;
-  incoming_port: string;
-  smtp_port: string;
-  use_ssl: boolean;
-  use_starttls: boolean;
-  use_tls: boolean;
-  use_ssl_for_outgoing: boolean;
-  validate_ssl_certificate: boolean;
-  email_server: string;
-  domain: string;
   email_account_name: string;
   email_id: string;
   service: string;
@@ -355,7 +335,6 @@ export interface EmailAccount {
   enable_incoming?: boolean;
   default_outgoing?: boolean;
   default_incoming?: boolean;
-  validate_ssl_certificate_for_outgoing: boolean;
 }
 
 export type TicketTab =
@@ -445,70 +424,6 @@ export interface Breadcrumb {
   };
 }
 
-// Activity Types
-interface BaseActivity {
-  type: string;
-  key: string;
-  creation: string;
-  content: string;
-}
-
-interface HistoryActivity extends BaseActivity {
-  type: "history";
-  user: string;
-  relatedActivities: HistoryActivity[];
-}
-
-export interface EmailActivity extends BaseActivity {
-  type: "email";
-  attachments: FileAttachment;
-  bcc: string;
-  cc: string;
-  name: string;
-  sender: { full_name: string; name: string };
-  subject: string;
-  to: string;
-  isFirstEmail: boolean;
-}
-
-export interface CommentActivity extends BaseActivity {
-  type: "comment";
-  name: string;
-  commenter: string;
-  commentedBy: string;
-  attachments: FileAttachment[];
-}
-
-export interface CallActivity extends BaseActivity {
-  type: "call";
-  name: string;
-  caller: string;
-  calledBy: string;
-  attachments: FileAttachment[];
-  call_type: "Incoming" | "Outgoing";
-}
-
-export interface FeedbackActivity {
-  type: "feedback";
-  feedback_rating: number;
-  feedback: string; // option seletor
-  feedback_extra?: string; // free flow text
-  sender: { name: string; full_name: string };
-  key: string;
-}
-
-export type TicketActivity =
-  | HistoryActivity
-  | EmailActivity
-  | CommentActivity
-  | CallActivity
-  | FeedbackActivity;
-
-interface FileAttachment {
-  name: string;
-  file_name: string;
-  file_url: string;
-}
 
 export interface FieldCriteriaState {
   selectedParentField: string;
@@ -646,14 +561,6 @@ export interface RecentSimilarTicket {
   similar_tickets: SimilarTicket[];
 }
 
-export interface TicketActivities {
-  comments: Comment[];
-  communications: Communication[];
-  history: Activity[];
-  views: ViewLog[];
-}
-
-
 export interface HDSettings {
   brandName: string;
   brandLogo: string;
@@ -768,10 +675,6 @@ export const TicketContactSymbol: InjectionKey<
 export const RecentSimilarTicketsSymbol: InjectionKey<
   ComputedRef<Resource<RecentSimilarTicket>>
 > = Symbol("recentSimilarTickets");
-
-export const ActivitiesSymbol: InjectionKey<
-  ComputedRef<Resource<TicketActivities>>
-> = Symbol("activities");
 
 export const AssignmentRuleListResourceSymbol: InjectionKey<
   Resource<AssignmentRule[]>

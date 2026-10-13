@@ -30,15 +30,23 @@ def search(
         except json.JSONDecodeError:
             _filters = {}
 
-    from helpdesk.search_sqlite import HelpdeskSearch, HelpdeskSearchIndexMissingError
+    from frappe.search.sqlite_search import SQLiteSearchIndexMissingError
+
+    from helpdesk.search_sqlite import HelpdeskSearch
 
     search = HelpdeskSearch()
 
     try:
         result = search.search(query, filters=_filters, title_only=title_only)
         return result
-    except HelpdeskSearchIndexMissingError:
-        frappe.throw(_("Search index not available. Please contact administrator."))
+    except SQLiteSearchIndexMissingError:
+        if "System Manager" in frappe.get_roles():
+            frappe.throw(
+                _(
+                    "Search index not available. Build it by running helpdesk.search_sqlite.build_index."
+                )
+            )
+        frappe.throw(_("Search is temporarily unavailable. Please try again later."))
 
 
 @frappe.whitelist()

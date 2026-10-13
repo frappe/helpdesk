@@ -1,9 +1,8 @@
 import { useAuthStore } from "@/stores/auth";
-import { ListResource, Notification } from "@/types";
-import { isCustomerPortal } from "@/utils";
-import { createListResource, createResource } from "frappe-ui";
+import { NotificationLog, useNotifications } from "@framework/ui";
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
+import { RouteLocationRaw } from "vue-router";
 import { globalStore } from "./globalStore";
 
 export const useNotificationStore = defineStore("notification", () => {
@@ -11,69 +10,42 @@ export const useNotificationStore = defineStore("notification", () => {
   const { $socket } = globalStore();
 
   const visible = ref(false);
-  const resource: ListResource<Notification> = createListResource({
-    doctype: "HD Notification",
-    cache: "Notifications",
-    fields: [
-      "creation",
-      "message",
-      "name",
-      "notification_type",
-      "read",
-      "reference_comment",
-      "reference_ticket",
-      "user_from",
-      "user_to",
-    ],
-    orderBy: "modified desc",
-  });
-  const clear = createResource({
-    url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
-    auto: false,
-    onSuccess: () => resource.reload(),
+  const controller = useNotifications({
+    appName: "helpdesk",
+    currentUser: authStore.userId,
+    socket: $socket,
   });
 
-  const read = (ticket: string) => {
-    createResource({
-      url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
-      auto: true,
-      params: {
-        ticket,
-      },
-      onSuccess: () => resource.reload(),
-    });
-  };
-
-  const data = computed(() => resource.data || []);
-  const unread = computed(() => data.value.filter((d) => !d.read).length);
+  const unread = computed(() => controller.unreadCount);
 
   function toggle() {
     visible.value = !visible.value;
+    if (visible.value) controller.markSeen();
   }
 
-  watch(
-    () => authStore.hasDeskAccess,
-    (newVal) => {
-      if (!newVal) return;
-      resource.filters = {
-        user_to: ["=", authStore.userId],
-      };
-      resource.reload();
-    },
-    { immediate: true }
-  );
-  $socket.on("helpdesk:comment-reaction-update", () => {
-    if (isCustomerPortal.value) return;
-    resource.reload();
-  });
+  // Every helpdesk notification references the ticket; the ones about a
+  // comment carry it as the source, which is the deep-link target.
+  function routeFor(n: NotificationLog): RouteLocationRaw | null {
+    if (n.document_type !== "HD Ticket" || !n.document_name) return null;
+    const route = {
+      name: "TicketAgent",
+      params: { ticketId: n.document_name },
+    };
+    if (n.source_doctype !== "Comment" || !n.source_name) return route;
+    return {
+      ...route,
+      // ?highlight is the activity deep-link target (element id); the hash
+      // only selects the tab
+      hash: "#activity",
+      query: { highlight: "comment-" + n.source_name },
+    };
+  }
 
   return {
-    clear,
-    data,
+    controller,
     toggle,
-    read,
+    routeFor,
     unread,
     visible,
-    resource,
   };
 });
