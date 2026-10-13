@@ -936,30 +936,29 @@ def make_tagged_ticket(team: str, created_on: str, *tags: str):
     return ticket
 
 
-def make_email_account_data(service: str | None, **overrides: Any) -> dict[str, Any]:
-    """The payload EmailAdd.vue sends, with a unique name and address."""
-    suffix = frappe.generate_hash(length=6)
-    return {
-        "email_account_name": f"Support {suffix}",
-        "email_id": f"support-{suffix}@example.com",
-        "service": service,
-        "password": "app-password",
-        "enable_incoming": 1,
-        "enable_outgoing": 1,
-        "default_incoming": 0,
-        "default_outgoing": 0,
-        **overrides,
-    }
+def make_email_account(**overrides: Any) -> str:
+    """An Email Account on example.com's servers, with a unique name and address.
 
-
-def make_email_account(service: str, **overrides: Any) -> str:
-    """An Email Account saved through the helpdesk settings API.
-
-    Patch EmailServer first, or it tries to log in to the provider.
+    Patch EmailServer first, or it tries to log in to the mail server.
     """
-    from helpdesk.api.settings.email import create_email_account
-
-    return create_email_account(make_email_account_data(service, **overrides))
+    suffix = frappe.generate_hash(length=6)
+    account = frappe.get_doc(
+        {
+            "doctype": "Email Account",
+            "email_account_name": f"Support {suffix}",
+            "email_id": f"support-{suffix}@example.com",
+            "password": "app-password",
+            "email_server": "imap.example.com",
+            "smtp_server": "smtp.example.com",
+            "use_imap": 1,
+            "use_ssl": 1,
+            "imap_folder": [{"folder_name": "INBOX", "append_to": "HD Ticket"}],
+            "enable_incoming": 1,
+            "enable_outgoing": 1,
+            **overrides,
+        }
+    )
+    return account.insert().name
 
 
 def get_linked_email_accounts(user: str) -> set[str]:

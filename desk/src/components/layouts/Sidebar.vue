@@ -494,5 +494,10 @@ onMounted(() => {
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });
+  // back from provider sign-in: the Email Accounts panel reads ?email_oauth itself
+  if (router.currentRoute.value.query.email_oauth) {
+    setActiveSettingsTab("Email Accounts");
+    showSettingsModal.value = true;
+  }
 });
 </script>
