@@ -5,6 +5,7 @@ from typing import Any
 import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
+
 try:
     from frappe.tests.classes.context_managers import freeze_time
 except ImportError:  # frappe v15
@@ -12,6 +13,7 @@ except ImportError:  # frappe v15
 
     def freeze_time(time_to_freeze, *args, **kwargs):
         return FrappeTestCase.freeze_time(None, time_to_freeze, *args, **kwargs)
+
 
 from frappe.utils import add_to_date, getdate, now_datetime
 

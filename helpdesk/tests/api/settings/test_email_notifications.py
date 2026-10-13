@@ -1,8 +1,7 @@
 from collections.abc import Callable
 
 import frappe
-from frappe.tests.utils import FrappeTestCase
-from frappe.tests.utils import change_settings
+from frappe.tests.utils import FrappeTestCase, change_settings
 
 from helpdesk.api.settings.email_notifications import (
     get_data,
