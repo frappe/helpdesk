@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { NotificationLog, useNotifications } from "@framework/ui";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { RouteLocationRaw } from "vue-router";
 import { globalStore } from "./globalStore";
 
@@ -18,9 +18,19 @@ export const useNotificationStore = defineStore("notification", () => {
 
   const unread = computed(() => controller.unreadCount);
 
+  const readFilter = ref<"all" | "unread">("all");
+  // a Notification Log `type`; empty for all categories
+  const category = ref("");
+
   function toggle() {
     visible.value = !visible.value;
-    if (visible.value) controller.markSeen();
+    if (visible.value) {
+      controller.markSeen();
+    } else {
+      // the filters also scope the bell's unread count, so drop them on close
+      readFilter.value = "all";
+      category.value = "";
+    }
   }
 
   // Every helpdesk notification references the ticket; the ones about a
@@ -41,11 +51,20 @@ export const useNotificationStore = defineStore("notification", () => {
     };
   }
 
+  watch([readFilter, category], () => {
+    const filters: Record<string, unknown> = {};
+    if (readFilter.value === "unread") filters.read = 0;
+    if (category.value) filters.type = category.value;
+    controller.setFilters(filters);
+  });
+
   return {
+    category,
     controller,
     toggle,
     routeFor,
     unread,
+    readFilter,
     visible,
   };
 });
