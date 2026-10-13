@@ -357,8 +357,16 @@ function chartEmptyState(chart: any) {
 const tabButtons = computed(() => {
   if (isMobileView.value) {
     return [
-      { value: "organization", icon: h(LucideBuilding2, { class: "size-4" }) },
-      { value: "my_stats", icon: h(LucideUser, { class: "size-4" }) },
+      {
+        value: "organization",
+        label: __("My Organization"),
+        icon: h(LucideBuilding2, { class: "size-4" }),
+      },
+      {
+        value: "my_stats",
+        label: __("My Stats"),
+        icon: h(LucideUser, { class: "size-4" }),
+      },
     ];
   }
   return [

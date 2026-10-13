@@ -91,7 +91,7 @@
           >
             <Checkbox
               :modelValue="props.modelValue.includes(option.value)"
-              class="me-2 flex-shrink-0"
+              class="me-4 flex-shrink-0"
             />
 
             <component v-if="option.icon" :is="renderIcon(option.icon)" />
@@ -136,7 +136,7 @@
           >
             <Checkbox
               :modelValue="props.modelValue.includes(option.value)"
-              class="me-2 flex-shrink-0"
+              class="me-4 flex-shrink-0"
             />
 
             <component v-if="option.icon" :is="renderIcon(option.icon)" />

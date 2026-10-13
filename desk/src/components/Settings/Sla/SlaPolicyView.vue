@@ -107,7 +107,7 @@
               <div
                 v-if="isOldSla && slaActiveScreen.data && !slaData.default_sla"
               >
-                <HoverCard :hoverDelay="0.25" side="top" align="end">
+                <HoverCard :hoverDelay="250" side="top" align="end">
                   <template #trigger>
                     <div
                       class="text-sm text-ink-gray-6 flex gap-1 cursor-default"

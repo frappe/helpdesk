@@ -7,7 +7,9 @@
       <span class="block text-xs text-ink-gray-5">
         Select parent field value
       </span>
-      <div class="border flex-1 border-e-0 rounded-s-4 p-2 flex flex-col gap-2">
+      <div
+        class="border border-outline-elevation-2 flex-1 border-e-0 rounded-s-4 p-2 flex flex-col gap-2"
+      >
         <template v-if="state.selectedParentField">
           <FormControl
             v-model="state.parentSearch"
@@ -66,7 +68,9 @@
       <span class="block text-xs text-ink-gray-5 ps-1.5">
         Select child field value
       </span>
-      <div class="border flex-1 rounded-e-4 p-2 flex flex-col gap-2">
+      <div
+        class="border border-outline-elevation-2 flex-1 rounded-e-4 p-2 flex flex-col gap-2"
+      >
         <template
           v-if="state.selectedChildField && state.currentParentSelection"
         >
@@ -89,7 +93,7 @@
               <FormControl
                 type="checkbox"
                 :model-value="toggleAllChildValues"
-                class="me-2"
+                class="me-4"
               />
               <span class="text-base-medium text-ink-gray-8">
                 {{ toggleCheckboxLabel }}
@@ -105,7 +109,7 @@
                 <FormControl
                   type="checkbox"
                   :model-value="isChildValueSelected(value)"
-                  class="me-2"
+                  class="me-4"
                 />
                 <span class="text-base text-ink-gray-6">{{ value }}</span>
               </li>

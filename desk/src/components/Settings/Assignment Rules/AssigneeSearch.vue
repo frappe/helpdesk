@@ -9,7 +9,7 @@
           class="rtl:flex-row-reverse"
         />
       </template>
-      <template #default="{ toggle: togglePopover }">
+      <template #default>
         <div
           class="mt-1 rounded-6 bg-surface-base py-1 text-base shadow-2xl w-60"
         >

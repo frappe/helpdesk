@@ -1,6 +1,6 @@
 <template>
   <Popover>
-    <template #trigger="{ close, toggle }">
+    <template #trigger="{ close, setOpen }">
       <!--
         Typing opens this, not clicking. reka turns the trigger's root into the
         toggle, so the field stops its own click before it reaches that root.
@@ -16,7 +16,7 @@
             @update:model-value="
               (e: string) => {
                 if (e.length >= 3) {
-                  toggle(true);
+                  setOpen(true);
                 } else {
                   close();
                 }

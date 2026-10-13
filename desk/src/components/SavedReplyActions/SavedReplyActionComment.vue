@@ -75,10 +75,6 @@ const isEdited = computed(
 // Same editor the Comment tab uses: rich text with @-mentions
 const { dropdown: agentDropdown } = storeToRefs(useAgentStore());
 const extensions = buildEditorExtensions({
-  mentions: () =>
-    (agentDropdown.value ?? []).map((a: { label: string; value: string }) => ({
-      id: a.value,
-      label: a.label,
-    })),
+  mentions: () => agentDropdown.value ?? [],
 });
 </script>

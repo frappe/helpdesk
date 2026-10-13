@@ -145,9 +145,9 @@
         />
         <!-- Fixed Menu -->
         <div
-          class="flex justify-between overflow-scroll px-4 py-2.5 items-center border-t"
+          class="flex justify-between gap-2 overflow-scroll px-4 py-2.5 items-center border-t"
         >
-          <div class="flex items-center overflow-x-auto w-[60%]">
+          <div class="flex min-w-0 flex-1 items-center overflow-x-auto">
             <div class="inline-flex items-center gap-1.5 p-1">
               <FileUploader
                 :doctype="doctype"
@@ -190,7 +190,7 @@
             <EditorFixedMenu :items="fullToolbar" />
             <EditorTableMenu />
           </div>
-          <div class="flex items-center justify-end gap-x-2 sm:mt-0 w-[40%]">
+          <div class="flex shrink-0 items-center justify-end gap-x-2">
             <Button label="Discard" @click="handleDiscard" />
             <!-- A disabled button fires no pointer events, so the span
                  carries the hover for the tooltip -->
