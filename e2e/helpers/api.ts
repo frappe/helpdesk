@@ -1,4 +1,4 @@
-import { request, type APIRequestContext } from "@playwright/test";
+import { expect, request, type APIRequestContext, type APIResponse } from "@playwright/test";
 import { siteHeader } from "./site";
 
 type Doc = Record<string, any>;
@@ -78,4 +78,12 @@ export class Api {
     }
     return response.json();
   }
+}
+
+/** Assert a raw request was refused for lack of permission. */
+export async function expectDenied(pending: Promise<APIResponse>) {
+  const response = await pending;
+  const body = await response.text();
+  expect(response.ok(), body).toBeFalsy();
+  expect(body).toMatch(/PermissionError|not permitted|Insufficient Permission/i);
 }
