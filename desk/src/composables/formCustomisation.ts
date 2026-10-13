@@ -55,10 +55,20 @@ export async function setupCustomizations(doc, obj) {
       parseOnChangeFn(onChangeFieldMap, parsed.onChange);
     }
   }
-  data._customActions = actions;
+  data._customActions = withLegacyGroupOptions(actions);
   if (Object.keys(onChangeFieldMap).length) {
     data._customOnChange = onChangeFieldMap;
   }
+}
+
+// Form scripts written before frappe-ui v1 name a group's children `items`,
+// which the menu no longer reads, so the whole group goes missing.
+function withLegacyGroupOptions(actions: any[]) {
+  return actions.map((action) =>
+    action.items && !action.options
+      ? { ...action, options: action.items }
+      : action
+  );
 }
 
 function parseOnChangeFn(fieldMap: object, currentField: object) {
