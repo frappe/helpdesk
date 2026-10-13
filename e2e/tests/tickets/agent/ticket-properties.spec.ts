@@ -1,14 +1,14 @@
 import type { Page } from "@playwright/test";
-import type { Api } from "../../helpers/api";
-import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { personas } from "../../helpers/personas";
+import type { Api } from "../../../helpers/api";
+import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
+import { personas } from "../../../helpers/personas";
 import {
   composer,
   createTeam,
   openTicket,
   recordCalls,
   setHelpdeskSetting,
-} from "../../helpers/ticket";
+} from "../../../helpers/ticket";
 
 usePersona("agent");
 

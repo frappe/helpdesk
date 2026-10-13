@@ -1,9 +1,9 @@
 import type { Page } from "@playwright/test";
-import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { raiseTicket } from "../../helpers/factories";
-import { PASSWORD, personas } from "../../helpers/personas";
-import { expectDenied, type Api } from "../../helpers/api";
-import { loginContext, openTicketInList } from "../../helpers/portal";
+import { expect, test, uid, usePersona } from "../helpers/fixtures";
+import { raiseTicket } from "../helpers/factories";
+import { PASSWORD, personas } from "../helpers/personas";
+import { expectDenied, type Api } from "../helpers/api";
+import { loginContext, openTicketInList } from "../helpers/portal";
 
 test.describe("plain agent", () => {
   usePersona("agent");

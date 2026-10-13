@@ -1,9 +1,9 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../../helpers/api";
-import { raiseTicket } from "../../helpers/factories";
-import { expect, test, uid, usePersona } from "../../helpers/fixtures";
-import { TicketList } from "../../helpers/list";
-import { personas } from "../../helpers/personas";
+import type { Api } from "../helpers/api";
+import { raiseTicket } from "../helpers/factories";
+import { expect, test, uid, usePersona } from "../helpers/fixtures";
+import { TicketList } from "../helpers/list";
+import { personas } from "../helpers/personas";
 
 usePersona("agent2");
 

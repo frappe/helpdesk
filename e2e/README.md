@@ -19,8 +19,16 @@ Set `ADMIN_PASSWORD` if the site's Administrator password is not `admin`.
 
 - `global.setup.ts` seeds the personas and saves a logged-in session for each.
 - `helpers/` holds the REST client, personas, fixtures and data factories.
-- `tests/` groups the specs by who uses the screen: `agent/`, `settings/`, `customer/` and `admin/`.
-  Each spec creates its own data with unique names.
+- `tests/` groups the specs by page, so a change to a page runs the folder that mirrors it:
+  - `tickets/list/`: `Tickets.vue` (`/tickets`, `/my-tickets`)
+  - `tickets/agent/`: `TicketAgent.vue` (`/tickets/:id`)
+  - `tickets/customer/`: `TicketCustomer.vue` (`/my-tickets/:id`)
+  - `tickets/new/`: `TicketNew.vue` (`/tickets/new`, `/my-tickets/new`)
+  - `knowledge-base/`, `customer-management/` and `settings/`: one spec per page or settings tab
+  - A feature spanning several pages, like `tickets/form-script.spec.ts`, keeps one file.
+  - App wide specs (`auth`, `onboarding`, `permissions`, `navigation`) sit at the top of `tests/`.
+
+  Every role that touches a page is tested in its spec. Each spec creates its own data with unique names.
 - `fixtures/` holds files the specs upload.
 
 ## Writing a spec
