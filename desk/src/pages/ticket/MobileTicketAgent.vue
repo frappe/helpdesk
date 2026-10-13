@@ -577,6 +577,8 @@ watch(
   }
 );
 
+watch(ticket, (ticket) => ticket.markSeen.reload(), { immediate: true });
+
 onUnmounted(() => {
   document.title = "Helpdesk";
 });

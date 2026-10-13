@@ -182,6 +182,8 @@ watch(
   { immediate: true }
 );
 
+watch(ticket, (ticket) => ticket.markSeen.reload(), { immediate: true });
+
 // immediate so a store fetched earlier in the session opens the gate right away
 watch(
   feedLoading,
@@ -217,7 +219,6 @@ onMounted(() => {
     },
   });
   ticketsToNavigate.reload();
-  ticket.value.markSeen.reload();
 
   $socket.on("ticket_update", (data: TicketUpdateData) => {
     if (data.ticket_id === ticket.value?.name) {
