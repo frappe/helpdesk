@@ -249,10 +249,8 @@ test("the shortcuts modal opens from the keyboard", async ({ page }) => {
   await expect(modal.getByText("Open reply box")).toBeVisible();
 });
 
-/**
- * Give agent2 a read and an unread assignment and an unread mention, each on
- * its own ticket, so a filter's effect shows up as rows coming and going.
- */
+/** Give agent2 a read and an unread assignment and an unread mention, each on
+ *  its own ticket, so a filter's effect shows up as rows coming and going. */
 async function seedFilterNotifications(api: Api, apiAs: (key: PersonaKey) => Promise<Api>) {
   const customer = await apiAs("customer");
   const read = await raiseTicket(customer);

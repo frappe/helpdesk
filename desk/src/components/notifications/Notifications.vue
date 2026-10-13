@@ -64,9 +64,8 @@ const sidebarStore = useSidebarStore();
 const router = useRouter();
 const target = ref(null);
 
-// An open category menu makes the page inert, so the click that dismisses it
-// or picks an item lands outside the panel. The menu is gone by the time that
-// click fires, so note it on pointerdown and let the click close only the menu.
+// An open menu makes the page inert, so its dismiss click lands outside the
+// panel; the menu is gone by click time, so note it on pointerdown.
 let menuWasOpen = false;
 useEventListener(
   window,
