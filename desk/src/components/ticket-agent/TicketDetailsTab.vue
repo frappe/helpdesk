@@ -100,13 +100,16 @@
         <!-- Recent / Similar Tickets -->
         <template v-if="showRecentSimilarTickets">
           <div v-for="section in sections" :key="section.label">
+            <!-- rows carry py-3 for their hover background, so the header and
+                 list give that space back to match the other sections -->
             <Section
               :label="section.label"
               :tooltip="section.tooltipMessage"
               :hideLabel="section.hideLabel"
+              header-class="pb-2.5"
               v-model:opened="openedSections[section.key]"
             >
-              <ul class="divide-y divide-outline-gray-1 pb-4 pt-0">
+              <ul class="divide-y divide-outline-gray-1">
                 <li
                   v-for="t in section.tickets"
                   :key="t.name"

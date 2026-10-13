@@ -332,6 +332,8 @@ function removeLastValue() {
   }
 }
 
+// TODO: use single contact component. This refocus also fires when focus has
+// already moved on, so a click elsewhere within 200ms is pulled back here.
 function setFocus() {
   setTimeout(() => {
     search.value?.$el?.focus();
