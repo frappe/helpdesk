@@ -1,5 +1,4 @@
 import frappe
-from frappe.realtime import has_permission as frappe_has_permission
 
 from helpdesk.utils import is_agent
 
@@ -14,4 +13,11 @@ def has_permission(doctype: str, name: str, ptype: str = "read") -> bool:
     """
     if doctype == "HD Ticket" and not is_agent():
         return False
-    return frappe_has_permission(doctype, name, ptype)
+    frappe.has_permission(doctype, ptype, doc=name, throw=True)
+    return True
+
+
+@frappe.whitelist()
+def can_subscribe_doc(doctype: str, docname: str) -> bool:
+    """Frappe v15 socket server calls this instead of has_permission."""
+    return has_permission(doctype, docname)

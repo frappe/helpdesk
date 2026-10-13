@@ -125,6 +125,7 @@ has_permission = {
 
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.realtime.can_subscribe_doc": "helpdesk.overrides.realtime.can_subscribe_doc",
 }
 
 

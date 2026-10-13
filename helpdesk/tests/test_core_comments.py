@@ -374,6 +374,7 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
         frappe.set_user(CUSTOMER)
         self.assertTrue(frappe.has_permission("HD Ticket", doc=ticket.name))
         self.assertFalse(realtime.has_permission("HD Ticket", ticket.name))
+        self.assertFalse(realtime.can_subscribe_doc("HD Ticket", ticket.name))
 
     def test_agent_can_join_ticket_room(self):
         ticket = make_ticket(raised_by=CUSTOMER)
