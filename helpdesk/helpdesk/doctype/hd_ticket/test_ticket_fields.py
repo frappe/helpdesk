@@ -169,7 +169,10 @@ class TestTicketFieldVisibility(IntegrationTestCase):
         self.assertEqual(rows[0].fieldname, "summary")
         self.assertEqual(rows[0].required, 1)
         self.assertEqual(rows[0].placeholder, "Summarize the issue")
-        self.assertEqual(get_ticket_customizations()["fields"][0].fieldname, "priority")
+        self.assertEqual(
+            get_ticket_customizations()["fields"],
+            TicketFields(DEFAULT_TICKET_TEMPLATE).get_layout(),
+        )
 
     def test_agent_workflow_columns_hidden_from_customers(self):
         """_user_tags and friends bypass permission levels and must never reach the portal."""
