@@ -81,17 +81,17 @@
               v-else-if="!total && statusColor(column, row[column.key])"
               :class="statusColor(column, row[column.key])"
             />
-            <template v-if="ratingStars(column, row[column.key]) !== null">
+            <Tooltip
+              v-if="ratingStars(column, row[column.key]) !== null"
+              :text="formatRating(Number(row[column.key]), column.options)"
+            >
               <Rating
                 :model-value="ratingStars(column, row[column.key])"
                 :max="Number(column.options) || 5"
                 :step="0.5"
                 disabled
               />
-              <span v-if="column.kind === 'aggregate'">{{
-                starsFormat.format(ratingStars(column, row[column.key]))
-              }}</span>
-            </template>
+            </Tooltip>
             <span v-else class="truncate">{{
               groupCellText(row, column, value)
             }}</span>
@@ -232,7 +232,12 @@ import { MultipleAvatar, StarRating } from "@/components";
 import { IndicatorIcon } from "@/components/icons";
 import { useGroupedList } from "@/composables/useGroupedList";
 import { useUserStore } from "@/stores/user";
-import { GroupBy, GroupByTable, parseGroupBy } from "@framework/ui/GroupBy";
+import {
+  formatRating,
+  GroupBy,
+  GroupByTable,
+  parseGroupBy,
+} from "@framework/ui/GroupBy";
 import type { GroupByColumn, GroupBySettings } from "@framework/ui/GroupBy";
 import {
   ColumnSettings,
@@ -265,6 +270,7 @@ import {
   Rating,
   TabButtons,
   toast,
+  Tooltip,
 } from "frappe-ui";
 import {
   Icon as SpriteIcon,
@@ -781,10 +787,6 @@ function statusColor(column: GroupByColumn, value: unknown): string {
     return "";
   return value ? getStatus(String(value))?.parsed_color ?? "" : "";
 }
-
-const starsFormat = new Intl.NumberFormat(undefined, {
-  maximumFractionDigits: 1,
-});
 
 // a Rating is stored as a fraction of its stars (0.6 of 5 is 3 stars)
 function ratingStars(column: GroupByColumn, value: unknown): number | null {
