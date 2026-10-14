@@ -264,6 +264,7 @@
    "bold": 1,
    "fieldname": "avg_response_time",
    "fieldtype": "Duration",
+   "hidden": 1,
    "label": "Average Response Time",
    "permlevel": 8,
    "read_only": 1
@@ -512,7 +513,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-09-30 12:00:00.000000",
+ "modified": "2026-10-14 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
