@@ -30,8 +30,9 @@ const theme = computed({
   set: setColorScheme,
 })
 
-// The header's toggle, on every page: the knowledge base scripts are not what carries it.
-const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
+// The header's toggle; only the knowledge base pages show it.
+export const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
+export const toggleTheme = toggleColorScheme
 
 const themeOptions = computed(() => [
   { label: __('Light'), value: 'light' },
@@ -119,8 +120,8 @@ const store = {
   customActions: [],
   // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
-  themeIcon,
-  toggleTheme: toggleColorScheme,
+  // The theme toggle; the knowledge base pages fill it.
+  themeIcon: '',
   isSettingsOpen,
   settingsTab,
   isSettingsBusy: core.isSettingsBusy,

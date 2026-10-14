@@ -100,37 +100,25 @@
 
     <template v-if="!isEmpty" #footer>
       <div
-        class="flex h-11 items-center justify-between gap-3 border-t border-outline-gray-2 px-3 text-sm text-ink-gray-5"
+        class="search-hints flex h-11 items-center gap-4 border-t border-outline-gray-2 px-3 text-sm text-ink-gray-5"
         @pointerdown.prevent
       >
-        <div class="search-hints flex items-center gap-4">
-          <span
-            v-for="hint in KEY_HINTS"
-            :key="hint.label"
-            class="flex items-center gap-1.5"
-          >
-            <span class="flex gap-1">
-              <kbd
-                v-for="key in hint.keys"
-                :key="key"
-                class="flex h-5 min-w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-base px-1 pt-px text-xs text-ink-gray-5"
-              >
-                {{ key }}
-              </kbd>
-            </span>
-            {{ hint.label }}
+        <span
+          v-for="hint in KEY_HINTS"
+          :key="hint.label"
+          class="flex items-center gap-1.5 last:ml-auto"
+        >
+          <span class="flex gap-1">
+            <kbd
+              v-for="key in hint.keys"
+              :key="key"
+              class="flex h-5 min-w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-base px-1 pt-px text-xs text-ink-gray-5"
+            >
+              {{ key }}
+            </kbd>
           </span>
-        </div>
-        <div class="search-ticket flex items-center gap-2">
-          {{ __("Can’t find it?") }}
-          <Button
-            variant="ghost"
-            size="sm"
-            icon-left="lucide-plus"
-            :label="__('Create a ticket')"
-            @click="createTicket"
-          />
-        </div>
+          {{ hint.label }}
+        </span>
       </div>
     </template>
   </Combobox>
@@ -334,10 +322,6 @@ const options = computed(() =>
 @media (max-width: 639px), (pointer: coarse) {
   .search-hints {
     display: none;
-  }
-  .search-ticket {
-    flex: 1;
-    justify-content: space-between;
   }
 }
 /* The rule between the sections runs edge to edge, through the panel's padding. */

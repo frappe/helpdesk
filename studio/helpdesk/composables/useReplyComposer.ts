@@ -5,8 +5,8 @@ import { isContentEmpty } from '@helpdesk/shared/utils'
 import { runAction, uploadableFileTypes } from '@app/utils'
 
 export function useReplyComposer(ticket, { isClosed, isAgent }) {
-  // Open on arrival, so the customer can start typing their reply straight away.
-  const isComposerOpen = ref(true)
+  // Closed on arrival, so the thread gets the room; the bar opens it.
+  const isComposerOpen = ref(false)
   const reply = ref('')
   const isSending = ref(false)
   // The composer sits over the thread; it reports its height and the thread keeps that much clear.

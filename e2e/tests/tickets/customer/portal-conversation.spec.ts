@@ -28,7 +28,8 @@ test("conversation: customer and agent replies both show, internal comments neve
 
   await page.goto(`/help/tickets/${ticket.name}`);
   await expectInConversation(page, agentReply);
-  // the composer opens with the cursor in it, so the customer can type straight away
+  // closed on arrival; its bar opens it with the cursor in it
+  await page.getByText("Type a message").click();
   await expect(page.locator(".portal-reply-composer .ProseMirror")).toBeFocused();
   await page.locator(".ProseMirror").fill(customerReply);
   await page.getByRole("button", { name: "Send" }).click();

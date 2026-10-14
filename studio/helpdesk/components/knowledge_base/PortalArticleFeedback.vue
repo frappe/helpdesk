@@ -1,16 +1,16 @@
 <template>
   <div
-    class="flex w-full items-center justify-between gap-4 border-t border-outline-gray-1 pt-6"
+    class="flex w-full items-center justify-between gap-4 border-t border-outline-gray-1 pt-3.5"
   >
     <div class="flex min-w-0 flex-col gap-1.5">
       <span class="text-base text-ink-gray-8">
         {{ __("Was this article helpful?") }}
       </span>
-      <span v-if="canRaiseTicket" class="text-p-base text-ink-gray-5">
+      <span v-if="canRaiseTicket" class="text-p-base text-ink-gray-6">
         {{ __("If your issue isn't resolved, raise a support ticket") }}
         <RouterLink
           :to="ROUTES.newTicket({ from: 'article', article })"
-          class="text-ink-gray-5 underline underline-offset-2 hover:text-ink-gray-8"
+          class="text-ink-gray-6 underline underline-offset-2 hover:text-ink-gray-8"
         >
           {{ __("here") }}
         </RouterLink>

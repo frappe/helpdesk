@@ -416,8 +416,6 @@ test.describe("knowledge base home", () => {
     await searchBox(page).fill(word);
     await expect(page.getByText("1 article")).toBeVisible();
     await expect(page.locator("mark", { hasText: word }).first()).toBeVisible();
-    // K5: the footer offers a ticket.
-    await expect(page.getByText("Can’t find it?")).toBeVisible();
     // K3: arrows and Enter open the hit.
     await searchBox(page).press("ArrowDown");
     await searchBox(page).press("Enter");

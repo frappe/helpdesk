@@ -45,6 +45,12 @@ function composer(page: Page) {
   return page.locator(".portal-reply-composer .ProseMirror");
 }
 
+// Closed on arrival; its bar opens it.
+async function openComposer(page: Page) {
+  await page.getByText("Type a message").click();
+  return composer(page);
+}
+
 async function communication(api: Api, ticket: string, text: string) {
   const rows = await api.list("Communication", {
     filters: { reference_doctype: "HD Ticket", reference_name: ticket },
@@ -78,7 +84,7 @@ test.describe("access", () => {
     await expect(page.getByRole("button", { name: colleague.subject })).toBeVisible();
 
     const reply = `Manager note ${uid()}`;
-    await composer(page).fill(reply);
+    await (await openComposer(page)).fill(reply);
     await page.getByRole("button", { name: "Send" }).click();
     await frameWith(page, reply);
     await expect
@@ -133,7 +139,7 @@ test.describe("conversation", () => {
 
   test("whitespace alone cannot be sent", async ({ page, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
-    await composer(page).fill("   ");
+    await (await openComposer(page)).fill("   ");
     await expect(page.getByRole("button", { name: "Send" })).toBeDisabled();
   });
 
@@ -142,7 +148,7 @@ test.describe("conversation", () => {
     await page.goto(`/help/tickets/${ticket.name}`);
     await expect(page.getByRole("button", { name: /Reopen/ })).toHaveCount(0);
     const reply = `Still broken ${uid()}`;
-    await composer(page).fill(reply);
+    await (await openComposer(page)).fill(reply);
     await page.getByRole("button", { name: "Send" }).click();
     await frameWith(page, reply);
     await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).status).toBe("Open");
@@ -150,6 +156,7 @@ test.describe("conversation", () => {
 
   test("a reply carries an attached file", async ({ page, api, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
+    await openComposer(page);
     const chooser = page.waitForEvent("filechooser");
     await page.getByRole("button", { name: "Attach file" }).click();
     await (await chooser).setFiles({ name: "log.txt", mimeType: "text/plain", buffer: Buffer.from("trace") });
@@ -173,7 +180,7 @@ test.describe("conversation", () => {
   test("the composer collapses after sending and reopens from its bar", async ({ page, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
     const reply = `Collapse ${uid()}`;
-    await composer(page).fill(reply);
+    await (await openComposer(page)).fill(reply);
     await page.getByRole("button", { name: "Send" }).click();
     await frameWith(page, reply);
     await expect(composer(page)).toBeHidden();
@@ -184,6 +191,7 @@ test.describe("conversation", () => {
 
   test("the composer resizes from the keyboard and keeps its height", async ({ page, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
+    await openComposer(page);
     const handle = page.getByRole("separator", { name: "Resize composer" });
     await handle.focus();
     await page.keyboard.press("ArrowUp");
@@ -191,6 +199,7 @@ test.describe("conversation", () => {
     const stored = await page.evaluate(() => localStorage.getItem("kb:composer-height"));
     expect(Number(stored)).toBeGreaterThan(0);
     await page.reload();
+    await openComposer(page);
     await expect(page.getByRole("separator", { name: "Resize composer" })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("kb:composer-height"))).toBe(stored);
   });

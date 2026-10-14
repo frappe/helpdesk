@@ -2,7 +2,7 @@ import { computed, effectScope, ref, watch } from 'vue'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { isSafeLink } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
-import { accountMenuOptions, useSettingsModal } from '@app/stores/settings'
+import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
 import { runFormScripts } from '@app/utils'
 
 // A quick link to one of these shows as its icon, as on Frappe Wiki.
@@ -55,7 +55,7 @@ async function runScripts(scripts: string[]) {
 }
 
 // Runs the "Apply to knowledge base" form scripts; only the knowledge base pages use this header.
-// Returns the settings, with this header's actions, links and menu in place of theirs.
+// Returns the settings, with this header's actions, links, menu and theme toggle in place of theirs.
 export function useKnowledgeBaseHeader(context) {
   if (!scriptContext) {
     // Not the whole context: the first page's resources would outlive it.
@@ -69,5 +69,12 @@ export function useKnowledgeBaseHeader(context) {
       ),
     )
   }
-  return { ...useSettingsModal(context), customActions, headerLinks, accountMenuOptions: menuOptions }
+  return {
+    ...useSettingsModal(context),
+    customActions,
+    headerLinks,
+    accountMenuOptions: menuOptions,
+    themeIcon,
+    toggleTheme,
+  }
 }

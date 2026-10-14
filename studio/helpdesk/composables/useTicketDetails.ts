@@ -74,7 +74,7 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     if (on) return [makeStep(__('Assigned to agent'), elapsedPhrase(on), 'done', on)]
     // A reply or an ended ticket means it was handled without an assignment.
     if (thread.firstAgentReply.value || data.value.status_category === 'Resolved') return []
-    return [makeStep(__('Assigned to agent'), '', 'pending')]
+    return [makeStep(__('Awaiting assignment'), '', 'pending')]
   }
 
   function answered() {

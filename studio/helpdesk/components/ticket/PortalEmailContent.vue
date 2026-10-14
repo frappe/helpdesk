@@ -36,6 +36,7 @@ const body = computed(() =>
 function collapseQuotes(html: string) {
   const doc = new DOMParser().parseFromString(html, "text/html");
   stripActiveContent(doc);
+  trimEmptyEdges(doc);
   const selector = QUOTE_SELECTORS.find((s) => doc.querySelector(s));
   if (!selector) return doc.body.innerHTML;
 
@@ -56,6 +57,19 @@ function stripActiveContent(doc: Document) {
         element.removeAttribute(attribute.name);
     }
   });
+}
+
+// The editor leaves an empty paragraph after the text, which pads a one-word message into a tall bubble.
+function trimEmptyEdges(doc: Document) {
+  const isEmpty = (node: ChildNode | null) =>
+    !!node &&
+    (node.nodeType === Node.TEXT_NODE
+      ? !node.textContent?.trim()
+      : ["P", "BR", "DIV"].includes(node.nodeName) &&
+        !(node as Element).querySelector("img, video, iframe") &&
+        !node.textContent?.trim());
+  while (isEmpty(doc.body.lastChild)) doc.body.lastChild!.remove();
+  while (isEmpty(doc.body.firstChild)) doc.body.firstChild!.remove();
 }
 
 // Folding leaves the matched marker in the document, so skip what is already folded.
