@@ -2,6 +2,7 @@
 # See license.txt
 
 import frappe
+from frappe.permissions import rights
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
@@ -501,6 +502,17 @@ class TestHDCustomer(IntegrationTestCase):
         # the invite only carries the manager role; the base role must still be synced
         self.assertIn("HD Customer", roles)
         self.assertIn("HD Customer Manager", roles)
+
+    def test_manager_role_covers_customer_permissions(self) -> None:
+        """A user with only the manager role can do everything a customer can."""
+
+        def granted(role: str) -> set[tuple]:
+            perms = frappe.get_all(
+                "DocPerm", {"role": role}, ["parent", "permlevel", *rights]
+            )
+            return {(p.parent, p.permlevel, r) for p in perms for r in rights if p[r]}
+
+        self.assertFalse(granted("HD Customer") - granted("HD Customer Manager"))
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
