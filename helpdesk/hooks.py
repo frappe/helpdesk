@@ -6,7 +6,8 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony", "frappe/studio"]
+# As org/app, so `bench get-app helpdesk` fetches whichever is missing.
+required_apps = ["frappe/telephony", "frappe/studio"]
 require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
@@ -55,33 +56,28 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Static rules outrank frappe's /kb/<category>; add one per single-segment Studio page.
-    {
-        "from_route": "/kb/customer-tickets",
-        "to_route": "kb",
-    },
 ]
 
 # The old customer portal's ticket URLs keep working through these.
 website_redirects = [
     # The app root will be the knowledge base once its pages land.
     {
-        "source": "/kb",
-        "target": "/kb/customer-tickets",
+        "source": "/help",
+        "target": "/help/customer-tickets",
     },
     {
         "source": "/helpdesk/my-tickets/new",
-        "target": "/kb/tickets/new",
+        "target": "/help/tickets/new",
         "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/my-tickets",
-        "target": "/kb/customer-tickets",
+        "target": "/help/customer-tickets",
         "forward_query_parameters": True,
     },
     {
         "source": r"/helpdesk/my-tickets/(.*)",
-        "target": r"/kb/tickets/\1",
+        "target": r"/help/tickets/\1",
         "forward_query_parameters": True,
     },
 ]
@@ -139,6 +135,9 @@ doc_events = {
         "before_insert": "helpdesk.extends.comment.before_insert",
         "validate": "helpdesk.extends.comment.validate",
         "on_trash": "helpdesk.extends.comment.on_trash",
+    },
+    "ToDo": {
+        "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
     },
 }
 
