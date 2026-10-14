@@ -10,10 +10,10 @@
       <slot name="prefix" />
     </template>
     <template #suffix>
-      <Tooltip>
-        <template #body>
+      <Tooltip bare>
+        <template #content>
           <div
-            class="rounded bg-surface-gray-10 py-1.5 px-2 text-xs text-ink-base shadow-xl"
+            class="rounded-4 bg-surface-gray-10 py-1.5 px-2 text-xs text-ink-base shadow-xl"
           >
             <span class="flex items-center gap-1">
               {{ show ? "Hide Password" : "Show Password" }}

@@ -6,7 +6,7 @@
     >
       <div
         v-for="(chartData, key) in analytics.data"
-        class="h-full w-full rounded border border-outline-gray-1"
+        class="h-full w-full rounded-4 border border-outline-gray-1"
       >
         <BarChartCard
           v-if="key === 'feedback_received'"
@@ -24,7 +24,7 @@
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <LucideStar class="size-4 fill-ink-amber-5 text-ink-amber-5" />
-                <span class="text-3xl-medium text-ink-gray-8">
+                <span class="text-2xl-medium text-ink-gray-8">
                   {{ text }}
                 </span>
               </div>

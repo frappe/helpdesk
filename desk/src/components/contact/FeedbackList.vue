@@ -7,14 +7,14 @@
       </h4>
       <TabButtons
         v-model="activeSort"
-        :buttons="sortOptions"
+        :options="sortOptions"
         @update:modelValue="onSortChange"
       />
     </div>
 
     <!-- Loading -->
     <div v-if="feedbackListResource.loading" class="flex justify-center py-10">
-      <LoadingIndicator :scale="10" />
+      <LoadingIndicator class="size-10" />
     </div>
 
     <!-- Empty state -->
@@ -24,7 +24,7 @@
     >
       <LucideMessageSquare class="h-10 w-10 text-ink-gray-4" />
       <div>
-        <p class="text-lg-medium text-ink-gray-7">
+        <p class="text-md-medium text-ink-gray-7">
           {{ __("No reviews found") }}
         </p>
       </div>
@@ -34,13 +34,13 @@
     <div v-else class="flex flex-col gap-2 max-h-[65vh] overflow-y-auto">
       <template v-for="ticket in feedbackListResource.data" :key="ticket.name">
         <div
-          class="flex cursor-pointer flex-col gap-2 rounded-md border border-outline-gray-1 bg-surface-base p-2.5 hover:bg-surface-gray-1"
+          class="flex cursor-pointer flex-col gap-2 rounded-5 border border-outline-gray-1 bg-surface-base p-2.5 hover:bg-surface-gray-1"
           @click="goToTicket(ticket.name)"
         >
           <!-- Rating badge + ticket name -->
           <div class="flex items-center gap-2">
             <span
-              class="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-1 text-sm"
+              class="inline-flex shrink-0 items-center gap-1 rounded-1 px-1.5 py-1 text-sm"
               :class="ratingBadgeClass(ticket.feedback_rating)"
             >
               <LucideStar class="size-3 fill-current" />
@@ -79,7 +79,7 @@
         <Button
           :loading="feedbackListResource.loading"
           :label="__('Load More')"
-          icon-left="refresh-cw"
+          icon-left="lucide-refresh-cw"
           @click="feedbackListResource.next()"
         />
       </div>

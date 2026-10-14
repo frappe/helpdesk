@@ -28,6 +28,7 @@ def restore_ticket_access() -> None:
         job_id="promote_all_contacts_to_managers",
         deduplicate=True,
     )
+    disable_notice()
 
 
 def disable_notice() -> None:

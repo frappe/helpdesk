@@ -64,7 +64,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-02 19:00:00.000000",
+ "modified": "2026-09-28 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
@@ -83,7 +83,6 @@
    "write": 1
   },
   {
-   "create": 1,
    "delete": 1,
    "email": 1,
    "export": 1,

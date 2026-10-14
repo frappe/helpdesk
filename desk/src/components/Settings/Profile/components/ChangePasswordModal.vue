@@ -60,7 +60,7 @@
 </template>
 <script setup lang="ts">
 import LockKeyhole from "~icons/lucide/lock-keyhole";
-import { Dialog, toast, createResource } from "frappe-ui";
+import { createResource, Dialog, Password, toast } from "frappe-ui";
 import { ref, watch } from "vue";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";

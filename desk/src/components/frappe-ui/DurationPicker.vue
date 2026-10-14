@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-2 border border-outline-gray-2 rounded w-fit min-w-max px-4 select-none shadow-sm"
+    class="flex gap-2 border border-outline-gray-2 rounded-4 w-fit min-w-max px-4 select-none shadow-sm"
   >
     <div
       v-if="displayOptions.hours"
@@ -13,11 +13,11 @@
           type="number"
           min="0"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('hours')"
+          @blur="validateAndUpdateTime('hours', $event)"
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
+          class="flex flex-col group-hover:opacity-100 [@media(hover:none)]:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('hours'))"
@@ -26,9 +26,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('hours'))"
@@ -37,9 +37,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -57,11 +57,11 @@
           min="0"
           max="59"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('minutes')"
+          @blur="validateAndUpdateTime('minutes', $event)"
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
+          class="flex flex-col group-hover:opacity-100 [@media(hover:none)]:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('minutes'))"
@@ -70,9 +70,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('minutes'))"
@@ -81,9 +81,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -101,11 +101,11 @@
           min="0"
           max="59"
           class="w-8 text-sm bg-transparent border-0 p-0 text-center focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          @blur="validateAndUpdateTime('seconds')"
+          @blur="validateAndUpdateTime('seconds', $event)"
           @keyup.enter="handleEnter"
         />
         <div
-          class="flex flex-col group-hover:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
+          class="flex flex-col group-hover:opacity-100 [@media(hover:none)]:opacity-100 opacity-0 absolute top-1/2 -translate-y-1/2 -end-3"
         >
           <button
             @mousedown="startAction(() => increment('seconds'))"
@@ -114,9 +114,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-up" class="size-3.5" />
+            <LucideChevronUp class="size-3.5" />
           </button>
           <button
             @mousedown="startAction(() => decrement('seconds'))"
@@ -125,9 +125,9 @@
             @mouseleave="clearActiveInterval"
             @touchend="clearActiveInterval"
             @touchcancel="clearActiveInterval"
-            class="hover:bg-surface-gray-2 rounded-sm select-none"
+            class="hover:bg-surface-gray-2 rounded-1 select-none"
           >
-            <FeatherIcon name="chevron-down" class="size-3.5" />
+            <LucideChevronDown class="size-3.5" />
           </button>
         </div>
       </div>
@@ -137,6 +137,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideChevronUp from "~icons/lucide/chevron-up";
 import { ref, computed, watch, onUnmounted } from "vue";
 
 interface Options {
@@ -298,18 +300,18 @@ function updateTime(newTime: number, emitEvent = true) {
   }
 }
 
-function validateAndUpdateTime(unit: "hours" | "minutes" | "seconds") {
-  switch (unit) {
-    case "hours":
-      hoursValue.value = hoursValue.value;
-      break;
-    case "minutes":
-      minutesValue.value = minutesValue.value;
-      break;
-    case "seconds":
-      secondsValue.value = secondsValue.value;
-      break;
-  }
+/** Writes the model back into the field: a rejected or cleared entry leaves
+ *  the model untouched, so nothing re-renders and the bad text would stay. */
+function validateAndUpdateTime(
+  unit: "hours" | "minutes" | "seconds",
+  event: FocusEvent
+) {
+  const current = {
+    hours: hoursValue,
+    minutes: minutesValue,
+    seconds: secondsValue,
+  }[unit];
+  (event.target as HTMLInputElement).value = current.value;
 }
 
 function handleEnter(e: KeyboardEvent) {

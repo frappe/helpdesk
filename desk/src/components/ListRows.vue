@@ -57,14 +57,13 @@
 </template>
 
 <script setup>
+import { Button, Dropdown } from "frappe-ui";
 import {
-  Button,
-  Dropdown,
   ListGroupHeader,
   ListGroupRows,
   ListRow,
   ListRows,
-} from "frappe-ui";
+} from "frappe-ui/experimental";
 import { computed, ref, watch } from "vue";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";

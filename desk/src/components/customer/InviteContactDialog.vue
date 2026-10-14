@@ -4,7 +4,7 @@
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
           <div
-            class="p-1 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded w-full"
+            class="p-1 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded-4 w-full"
           >
             <EmailMultiSelect
               ref="emailMultiSelect"

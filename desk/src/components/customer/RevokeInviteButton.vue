@@ -6,8 +6,8 @@
     <Button
       :variant="confirming ? 'subtle' : 'ghost'"
       :theme="confirming ? 'red' : 'gray'"
-      :icon="!confirming && 'trash-2'"
-      :icon-left="confirming && 'trash-2'"
+      :icon="!confirming && 'lucide-trash-2'"
+      :icon-left="confirming && 'lucide-trash-2'"
       :label="confirming && __('Confirm')"
       :tooltip="__('Revoke Invite')"
       :loading="cancelInviteResource.loading"

@@ -53,7 +53,7 @@
         <hr class="mx-2 mt-2" />
         <div v-for="(team, index) in teams.data" :key="team.name">
           <div
-            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
+            class="flex items-center cursor-pointer hover:bg-surface-sidebar rounded-4 h-12.5"
           >
             <div
               class="w-full py-3 ps-2 flex gap-1 items-center"
@@ -66,12 +66,12 @@
             </div>
             <div class="flex justify-between items-center pe-2">
               <div>
-                <Dropdown placement="right" :options="dropdownOptions(team)">
-                  <Button
-                    icon="lucide-more-horizontal"
-                    variant="ghost"
-                    @click="isConfirmingDelete = false"
-                  />
+                <Dropdown
+                  align="end"
+                  :options="dropdownOptions(team)"
+                  @update:open="(open) => open && (isConfirmingDelete = false)"
+                >
+                  <Button icon="lucide-more-horizontal" variant="ghost" />
                 </Dropdown>
               </div>
             </div>
@@ -99,7 +99,7 @@
           :loading="teams.loading"
           variant="ghost"
           class="w-full"
-          size="2xl"
+          size="lg"
         />
       </div>
       <!-- Empty State -->

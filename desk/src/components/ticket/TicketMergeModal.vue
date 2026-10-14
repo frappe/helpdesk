@@ -10,19 +10,16 @@
           }}
           <span class="whitespace-nowrap font-semibold">
             #{{ ticket.name
-            }}<Popover
-              trigger="hover"
-              :hoverDelay="0.25"
-              :placement="isRtl ? 'left' : 'right'"
-              class="!inline-flex align-middle ms-1 -mt-1"
-            >
-              <template #target>
-                <FeatherIcon name="info" class="size-4 cursor-pointer" />
+            }}<HoverCard :hoverDelay="250" :side="isRtl ? 'left' : 'right'">
+              <template #trigger>
+                <LucideInfo
+                  class="size-4 cursor-pointer !inline-flex align-middle ms-1 -mt-1"
+                />
               </template>
 
-              <template #body-main>
+              <template #default>
                 <div
-                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-md max-w-[30rem] whitespace-pre-wrap leading-5"
+                  class="text-sm text-ink-gray-6 p-2.5 bg-surface-base rounded-5 max-w-[30rem] whitespace-pre-wrap leading-5"
                 >
                   <span class="text-p-base">
                     {{
@@ -52,7 +49,7 @@
                   </ul>
                 </div>
               </template>
-            </Popover>
+            </HoverCard>
           </span>
         </p>
 
@@ -76,7 +73,7 @@
         />
         <!-- banner -->
         <div
-          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
+          class="flex items-center gap-2 rounded-5 p-2 ring-1 ring-outline-elevation-2"
         >
           <TriangleAlert
             class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-yellow-5"
@@ -104,14 +101,16 @@
 </template>
 
 <script setup lang="ts">
+import LucideInfo from "~icons/lucide/info";
 import { Link } from "@/components";
 import { __ } from "@/translation";
 import { HDTicket } from "@/types/doctypes";
+import { getErrorMessage } from "@/utils";
 import {
-  Dialog,
   createListResource,
   createResource,
-  Popover,
+  Dialog,
+  HoverCard,
   toast,
 } from "frappe-ui";
 import { ref, watch } from "vue";
@@ -207,6 +206,15 @@ const mergeTicket = createResource({
     );
     targetTicket.value = null;
   },
+  onError: (error: any) => {
+    // A lost response (e.g. a proxy timeout) has no exc_type, yet the merge may have landed.
+    toast.error(
+      error.exc_type
+        ? getErrorMessage(error)
+        : __("Could not confirm the merge. Reloading the ticket.")
+    );
+    emit("update");
+  },
 });
 
 const getTicketSubject = createListResource({
@@ -222,6 +230,13 @@ const getTicketSubject = createListResource({
   },
 });
 
+function handleTicketMerge() {
+  mergeTicket.submit({
+    source: props.ticket.name,
+    target: targetTicket.value,
+  });
+}
+
 watch(
   () => targetTicket.value,
   (newValue) => {
@@ -236,12 +251,12 @@ watch(
   }
 );
 
-function handleTicketMerge() {
-  mergeTicket.submit({
-    source: props.ticket.name,
-    target: targetTicket.value,
-  });
-}
+watch(
+  () => props.ticket.is_merged,
+  (isMerged) => {
+    if (isMerged) showDialog.value = false;
+  }
+);
 </script>
 
 <style scoped></style>

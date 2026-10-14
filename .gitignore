@@ -43,3 +43,7 @@ helpdesk/public/node_modules
 helpdesk/www/helpdesk/index.html
 desk/components.d.ts
 desk/stats.html
+# Playwright
+e2e/.auth
+playwright-report
+test-results

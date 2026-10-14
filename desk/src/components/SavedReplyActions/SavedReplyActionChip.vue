@@ -1,12 +1,11 @@
 <template>
-  <Combobox
-    trigger="button"
+  <component
+    :is="config.doctype ? Link : Combobox"
+    v-bind="controlProps"
     :disabled="!isEditable"
     :model-value="action.value"
-    :options="pickerOptions"
     :placeholder="__('Select {0}', label.toLowerCase())"
-    @update:model-value="pick($event as string)"
-    @update:query="search(action.action_type, $event)"
+    @update:model-value="pick(($event ?? '') as string)"
   >
     <template #trigger="{ setOpen }">
       <!-- The anchor forwards its click to this element, so it has to be a plain
@@ -44,7 +43,7 @@
               <button
                 type="button"
                 :aria-label="__('Remove {0}', label)"
-                class="flex items-center rounded-sm text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
+                class="flex items-center rounded-1 text-ink-gray-6 transition-colors hover:text-ink-gray-9 focus-visible:ring-2 focus-visible:ring-outline-gray-3 mt-[1px]"
                 @click.stop="emit('remove')"
                 @pointerdown.stop
               >
@@ -55,12 +54,13 @@
         </Tooltip>
       </div>
     </template>
-  </Combobox>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { ACTION_TYPES } from "@/components/Settings/SavedReplies/components/actionTypes";
 import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
+import { Link } from "@framework/ui";
 import { __ } from "@/translation";
 import { SavedReplyAction } from "@/types";
 import { Badge, Combobox, Tooltip } from "frappe-ui";
@@ -78,17 +78,19 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const { valueOptions, search } = useSavedReplyActionOptions();
+const { valueOptions, linkFilters } = useSavedReplyActionOptions();
 
 const config = computed(() => ACTION_TYPES[props.action.action_type]);
 const label = computed(() => config.value.chipLabel);
 // Empty for no-value actions like "Assign to Me"; the noun then stands alone
 const value = computed(() => props.action.label || props.action.value);
 
-// A tag chip holds one tag, so it picks like the rest; no-value actions have
-// nothing to pick
-const isEditable = computed(() =>
-  ["select", "combobox", "multiselect"].includes(config.value.control)
+// A tag chip holds one tag, so it picks like the rest. Excluded rather than
+// listed, so a new control type is editable by default instead of silently
+// read-only: no-value actions have nothing to pick, and a comment is too long
+// for a chip.
+const isEditable = computed(
+  () => !["none", "editor"].includes(config.value.control)
 );
 
 // Combobox takes string values; the shared options allow numbers too
@@ -101,8 +103,26 @@ const pickerOptions = computed(() =>
     }))
 );
 
+// A #trigger slot puts Combobox in button mode, and Link forwards that slot,
+// so the badge below serves both controls.
+const controlProps = computed(() =>
+  config.value.doctype
+    ? {
+        doctype: config.value.doctype,
+        filters: linkFilters(props.action.action_type),
+        title: value.value,
+      }
+    : { options: pickerOptions.value }
+);
+
 /** `label` carries the display name (an agent's, not their id), so both move. */
 function pick(picked: string) {
+  // A link picker offers no option list to read a label from; for these
+  // doctypes the record name is the label.
+  if (config.value.doctype) {
+    emit("update", { ...props.action, value: picked, label: picked });
+    return;
+  }
   const option = pickerOptions.value.find(
     (candidate) => candidate.value === picked
   );

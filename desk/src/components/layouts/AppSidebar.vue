@@ -1,7 +1,7 @@
 <template>
   <Sidebar
     v-model:collapsed="collapsed"
-    :disable-collapse="mobile"
+    :collapsible="!mobile"
     class="border-e border-outline-gray-1"
     :class="{ '!bg-surface-base': mobile }"
   >
@@ -44,8 +44,10 @@
                 >
                   <component :is="item.icon" class="size-4" />
                   <span
-                    v-if="item.key === 'notifications' && item.badge"
-                    class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-surface-blue-5"
+                    v-if="
+                      isCollapsed && item.key === 'notifications' && item.badge
+                    "
+                    class="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-surface-gray-9"
                   />
                 </span>
               </template>
@@ -74,7 +76,7 @@
                     <Button
                       variant="ghost"
                       icon="lucide-more-horizontal"
-                      class="me-1 !size-6 rounded !text-ink-gray-7"
+                      class="me-1 !size-6 rounded-4 !text-ink-gray-7"
                       :class="
                         open
                           ? 'opacity-100'
@@ -168,8 +170,7 @@ const collapsed = computed({
   set: (value) => sidebarStore.toggleExpanded(!value),
 });
 
-// The mobile drawer pins the sidebar open (disable-collapse), so it is never
-// visually collapsed even when the store says so.
+// The mobile drawer is never collapsed.
 const isCollapsed = computed(() => collapsed.value && !props.mobile);
 
 // Expanded/folded state of the collapsible view sections, keyed by label.
