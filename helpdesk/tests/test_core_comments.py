@@ -7,7 +7,7 @@ set-based data patches (idempotency, name preservation, collisions).
 
 import frappe
 from frappe.desk.form import activity, load
-from frappe.tests.utils import FrappeTestCase
+from frappe.tests.utils import FrappeTestCase, change_settings
 
 from helpdesk.api.comment import get_reactions, toggle_reaction
 from helpdesk.api.tags import update_tags
@@ -102,6 +102,8 @@ class CoreCommentsTestCase(FrappeTestCase):
 
     def setUp(self):
         frappe.set_user("Administrator")
+        # these tests read tickets as agents outside any team
+        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 0)
 
     def tearDown(self):
         frappe.set_user("Administrator")
@@ -392,20 +394,14 @@ class TestCommentTrustBoundary(CoreCommentsTestCase):
     def test_team_restricted_agent_is_still_denied(self):
         """Agents delegate to core, so team restrictions keep applying."""
         team = make_team("Realtime Gate Team", [AGENT_TWO])
-        # rollback restores rows but not the singles cache; restore explicitly
-        for field in (
-            "restrict_tickets_by_agent_group",
-            "do_not_restrict_tickets_without_an_agent_group",
-        ):
-            self.addCleanup(
-                frappe.db.set_single_value,
+        # v15 commits mid-test, so restore with a commit
+        self.enterContext(
+            change_settings(
                 "HD Settings",
-                field,
-                frappe.db.get_single_value("HD Settings", field) or 0,
+                restrict_tickets_by_agent_group=1,
+                do_not_restrict_tickets_without_an_agent_group=0,
+                commit=True,
             )
-        frappe.db.set_single_value("HD Settings", "restrict_tickets_by_agent_group", 1)
-        frappe.db.set_single_value(
-            "HD Settings", "do_not_restrict_tickets_without_an_agent_group", 0
         )
         ticket = make_ticket(raised_by=CUSTOMER, agent_group=team.name)
 
