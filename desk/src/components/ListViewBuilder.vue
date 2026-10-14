@@ -97,17 +97,18 @@
             }}</span>
           </div>
         </template>
+        <template v-if="groups.error.value" #empty>
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <span class="text-base text-ink-gray-7">{{
+              __("Couldn't load the groups")
+            }}</span>
+            <Button :label="__('Retry')" @click="groups.reload" />
+          </div>
+        </template>
       </GroupByTable>
     </div>
     <div v-if="groups.rowCount.value" class="border-t sm:px-5 px-3 py-2">
-      <ListFooter
-        :options="{
-          rowCount: groups.rowCount.value,
-          totalCount: groups.totalCount.value,
-        }"
-        v-model="groups.pageLength.value"
-        @loadMore="groups.loadMore"
-      >
+      <ListFooter v-model="groups.pageLength.value">
         <template #left>
           <TabButtons
             :model-value="groups.pageLength.value"
@@ -116,6 +117,25 @@
             "
             @update:model-value="(count) => (groups.pageLength.value = count)"
           />
+        </template>
+        <!-- groups are counted up to a cap, so the total can be a floor -->
+        <template #right>
+          <div class="flex items-center">
+            <template v-if="groups.hasNextPage.value">
+              <Button :label="__('Load More')" @click="groups.loadMore" />
+              <div class="mx-3 h-[80%] border-l" />
+            </template>
+            <div class="text-base text-ink-gray-5">
+              {{
+                __("{0} of {1}", [
+                  groups.rowCount.value,
+                  groups.totalCapped.value
+                    ? `${groups.totalCount.value}+`
+                    : groups.totalCount.value,
+                ])
+              }}
+            </div>
+          </div>
         </template>
       </ListFooter>
     </div>
@@ -837,6 +857,7 @@ function reload(reset: boolean = false) {
     defaultParams.is_default = true;
   }
   list.reload({ ...defaultParams });
+  groups.reload();
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {

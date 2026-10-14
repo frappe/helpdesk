@@ -87,20 +87,38 @@ export function useGroupedList(
     { immediate: true, deep: true }
   );
 
+  const error = computed(
+    () =>
+      groups.error ||
+      groupKeys.error ||
+      (wantsTotals(toValue(groupBy)) && totals.error) ||
+      null
+  );
+  // after a failed fetch, show the error rather than the previous groups
   const rows = computed<Record<string, unknown>[]>(() =>
-    toValue(groupBy) ? groups.data ?? [] : []
+    toValue(groupBy) && !error.value ? groups.data ?? [] : []
   );
   const totalCount = computed<number>(() => groupKeys.data?.length ?? 0);
+  const totalCapped = computed(() => totalCount.value >= COUNT_CAP);
 
   return {
     rows,
     totals: computed(() =>
-      wantsTotals(toValue(groupBy)) ? totals.data?.[0] ?? null : null
+      wantsTotals(toValue(groupBy)) && !error.value
+        ? totals.data?.[0] ?? null
+        : null
     ),
     loading: computed(() => Boolean(groups.loading)),
+    error,
     rowCount: computed(() => rows.value.length),
     totalCount,
-    totalCapped: computed(() => totalCount.value >= COUNT_CAP),
+    totalCapped,
+    // past a capped total, a full page is the only sign more groups exist
+    hasNextPage: computed(() =>
+      totalCapped.value
+        ? rows.value.length >= limit.value
+        : rows.value.length < totalCount.value
+    ),
     pageLength,
     loadMore,
     reload,
