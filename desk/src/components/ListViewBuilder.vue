@@ -20,7 +20,15 @@
       />
       <Reload @click="handleReload" :loading="list.loading" />
       <Filter />
-      <SortBy :hide-label="isMobileView" />
+      <!-- a grouped list sorts from its column headers instead -->
+      <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+      <GroupBy
+        v-if="options.groupBy"
+        :modelValue="groupBy"
+        :doctype="options.doctype"
+        :exclude="options.groupByExclude"
+        @update:modelValue="updateGroupBy"
+      />
       <ColumnSettings
         :hide-label="isMobileView"
         v-if="!options.hideColumnSetting"
@@ -30,14 +38,80 @@
       <Filter />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
-        <SortBy :hide-label="isMobileView" />
+        <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+        <GroupBy
+          v-if="options.groupBy"
+          :modelValue="groupBy"
+          :doctype="options.doctype"
+          :exclude="options.groupByExclude"
+          hideLabel
+          @update:modelValue="updateGroupBy"
+        />
       </div>
     </div>
   </div>
 
+  <!-- Group By summary: one row per group instead of the records -->
+  <template v-if="groupBy">
+    <div class="flex min-h-0 flex-1 flex-col px-3 sm:px-5">
+      <GroupByTable
+        class="[&_[data-slot=list-header-border]]:hidden [&_[data-slot=list-header]]:mb-2 [&_[data-slot=list-header]]:rounded [&_[data-slot=list-header]]:bg-surface-gray-2"
+        :doctype="options.doctype"
+        :groupBy="groupBy"
+        :rows="groups.rows.value"
+        :totals="groups.totals.value"
+        :loading="groups.loading.value"
+        @update:groupBy="updateGroupBy"
+      >
+        <template #cell="{ row, column, value, total }">
+          <div
+            class="flex items-center gap-2 truncate text-base"
+            :class="[
+              column.align === 'right' ? 'tabular-nums' : '',
+              total ? 'font-medium text-ink-gray-9' : 'text-ink-gray-8',
+            ]"
+          >
+            <Avatar
+              v-if="!total && column.options === 'User' && row[column.key]"
+              size="sm"
+              :label="getUser(row[column.key]).full_name"
+              :image="getUser(row[column.key]).user_image"
+            />
+            <IndicatorIcon
+              v-else-if="!total && statusColor(column, row[column.key])"
+              :class="statusColor(column, row[column.key])"
+            />
+            <span class="truncate">{{
+              groupCellText(row, column, value)
+            }}</span>
+          </div>
+        </template>
+      </GroupByTable>
+    </div>
+    <div v-if="groups.rowCount.value" class="border-t sm:px-5 px-3 py-2">
+      <ListFooter
+        :options="{
+          rowCount: groups.rowCount.value,
+          totalCount: groups.totalCount.value,
+        }"
+        v-model="groups.pageLength.value"
+        @loadMore="groups.loadMore"
+      >
+        <template #left>
+          <TabButtons
+            :model-value="groups.pageLength.value"
+            :options="
+              [20, 50, 100].map((o) => ({ label: String(o), value: o }))
+            "
+            @update:model-value="(count) => (groups.pageLength.value = count)"
+          />
+        </template>
+      </ListFooter>
+    </div>
+  </template>
   <!-- Loading State -->
   <div
-    v-if="list.loading && !list.data?.data?.length"
+    v-else-if="list.loading && !list.data?.data?.length"
     class="flex items-center justify-center h-full w-full absolute top-0 z-100"
   >
     <LoadingIndicator class="size-6 text-ink-gray-4" />
@@ -106,7 +180,7 @@
   <!-- List Footer -->
   <div
     class="p-20 border-t sm:px-5 px-3 py-2"
-    v-if="list.data?.data.length > 0"
+    v-if="!groupBy && list.data?.data.length > 0"
   >
     <ListFooter
       :options="{
@@ -135,7 +209,7 @@
   </div>
   <!-- Empty State -->
   <EmptyState
-    v-else-if="!list.loading"
+    v-else-if="!groupBy && !list.loading"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -144,6 +218,11 @@
 
 <script setup lang="ts">
 import { MultipleAvatar, StarRating } from "@/components";
+import { IndicatorIcon } from "@/components/icons";
+import { useGroupedList } from "@/composables/useGroupedList";
+import { useUserStore } from "@/stores/user";
+import { GroupBy, GroupByTable, parseGroupBy } from "@framework/ui/GroupBy";
+import type { GroupByColumn, GroupBySettings } from "@framework/ui/GroupBy";
 import {
   ColumnSettings,
   QuickFilters,
@@ -166,6 +245,7 @@ import { View, ViewType } from "@/types";
 import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
+  Avatar,
   createResource,
   dayjsLocal,
   Dropdown,
@@ -663,6 +743,43 @@ function applyFilters(filters) {
   isViewUpdated.value = false;
 }
 
+// Group By: the list turns into one summary row per group, saved with the view like
+// sort and filters. A resize or header sort comes back through here too.
+const groupBy = ref<GroupBySettings | null>(null);
+const groups = useGroupedList(
+  () => options.value.doctype,
+  groupBy,
+  () => defaultParams.filters
+);
+// read by useView's create flow, which only gets the list resource
+list.groupBy = groupBy;
+
+function updateGroupBy(value: GroupBySettings | null) {
+  isViewUpdated.value = true;
+  groupBy.value = value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
+}
+
+const { getUser } = useUserStore();
+
+function statusColor(column: GroupByColumn, value: unknown): string {
+  if (options.value.doctype !== "HD Ticket" || column.key !== "status")
+    return "";
+  return value ? getStatus(String(value))?.parsed_color ?? "" : "";
+}
+
+function groupCellText(
+  row: Record<string, unknown>,
+  column: GroupByColumn,
+  value: string
+): string {
+  const raw = row[column.key];
+  if (column.options === "User" && raw) return getUser(String(raw)).full_name;
+  return value;
+}
+
 function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
@@ -722,6 +839,7 @@ function handleViewUpdate() {
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
     order_by: defaultParams.order_by,
+    group_by_settings: groupBy.value ? JSON.stringify(groupBy.value) : "",
     name: (route.query.view as string) || "default",
     dt: options.value.doctype,
     route_name: route.name,
@@ -797,6 +915,9 @@ function switchToView(view: string): boolean {
     defaultParams.order_by = currentView.order_by || "modified desc";
     defaultParams.columns = currentView.columns;
     defaultParams.rows = currentView.rows;
+    groupBy.value = options.value.groupBy
+      ? parseGroupBy(currentView.group_by_settings)
+      : null;
     return true;
   }
   if (view) {
@@ -811,6 +932,7 @@ function switchToView(view: string): boolean {
   defaultParams.order_by = "modified desc";
   defaultParams.columns = [];
   defaultParams.rows = [];
+  groupBy.value = null;
   defaultParams.is_default = true;
   headerView.value.label = __("List");
   headerView.value.icon = LucideAlignJustify;
