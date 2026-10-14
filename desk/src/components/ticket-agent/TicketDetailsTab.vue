@@ -152,7 +152,7 @@
 <script setup lang="ts">
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { getMeta } from "@/stores/meta";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation.ts";

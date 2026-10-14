@@ -63,6 +63,8 @@ const typeRating = ["Rating"];
 // works. It matches substrings too: "VIP" also finds tickets tagged "VIP Customer"
 export const multiValueFields = ["_assign", "_user_tags"];
 
+// The host list provides `listViewData` ({ list, filterableFields } resources)
+// and `listViewActions.applyFilters`; on the desk that is ListViewBuilder.
 export function useFilter(): Filter {
   const listViewData = inject<any>("listViewData");
   const listViewActions = inject<any>("listViewActions");

@@ -1,4 +1,4 @@
-import { useDevice } from "@/composables";
+import { useDevice } from "./device";
 import { useEventListener } from "@vueuse/core";
 import { ref } from "vue";
 

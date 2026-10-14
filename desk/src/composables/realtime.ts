@@ -61,31 +61,27 @@ export function useTyping(ticketId: string) {
   let timeout: any = null;
 
   // Listen for typing events from other users
-  $socket.on(
-    "helpdesk_ticket_typing",
-    (data: { ticket_id: string; user: string }) => {
-      if (data.ticket_id === ticketId && data.user !== userId) {
-        // Add user to typing list if not already present
-        if (!typingUsers.includes(data.user)) {
-          typingUsers.push(data.user);
-        }
+  const onTyping = (data: { ticket_id: string; user: string }) => {
+    if (data.ticket_id === ticketId && data.user !== userId) {
+      // Add user to typing list if not already present
+      if (!typingUsers.includes(data.user)) {
+        typingUsers.push(data.user);
       }
     }
-  );
+  };
+  $socket.on("helpdesk_ticket_typing", onTyping);
 
   // Listen for typing stopped events
-  $socket.on(
-    "helpdesk_ticket_typing_stopped",
-    (data: { ticket_id: string; user: string }) => {
-      if (data.ticket_id === ticketId) {
-        // Remove user from typing list
-        const index = typingUsers.indexOf(data.user);
-        if (index > -1) {
-          typingUsers.splice(index, 1);
-        }
+  const onTypingStopped = (data: { ticket_id: string; user: string }) => {
+    if (data.ticket_id === ticketId) {
+      // Remove user from typing list
+      const index = typingUsers.indexOf(data.user);
+      if (index > -1) {
+        typingUsers.splice(index, 1);
       }
     }
-  );
+  };
+  $socket.on("helpdesk_ticket_typing_stopped", onTypingStopped);
 
   const emitStartTyping = () => {
     $socket?.emit("helpdesk_ticket_typing", ticketId);
@@ -134,8 +130,8 @@ export function useTyping(ticketId: string) {
       clearTimeout(timeout);
     }
     // Remove socket listeners
-    $socket.off("helpdesk_ticket_typing");
-    $socket.off("helpdesk_ticket_typing_stopped");
+    $socket.off("helpdesk_ticket_typing", onTyping);
+    $socket.off("helpdesk_ticket_typing_stopped", onTypingStopped);
   };
 
   return {

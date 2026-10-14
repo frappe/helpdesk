@@ -146,9 +146,9 @@
 </template>
 
 <script setup lang="ts">
-import BackButton from "@/components/BackButton.vue";
-import { useShortcut } from "@/composables/shortcuts";
-import { __ } from "@/translation";
+import BackButton from "./BackButton.vue";
+import { useShortcut } from "../shortcuts";
+import { __ } from "../translation";
 import { useEventListener } from "@vueuse/core";
 import { Button, Popover } from "frappe-ui";
 import { computed, nextTick, ref, watch } from "vue";

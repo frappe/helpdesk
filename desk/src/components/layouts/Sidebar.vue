@@ -99,7 +99,7 @@ import { useRouter } from "vue-router";
 import AppSidebar from "./AppSidebar.vue";
 import { showShortcutsModal } from "./layoutSettings";
 
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";

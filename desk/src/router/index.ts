@@ -3,6 +3,7 @@ import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
@@ -213,7 +214,7 @@ router.beforeEach(async (to, _, next) => {
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
     window.location.replace(
-      `${CUSTOMER_PORTAL_ROOT}/tickets/${to.params.ticketId}`
+      CUSTOMER_PORTAL_ROOT + ROUTES.ticket(to.params.ticketId as string)
     );
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     window.location.replace(CUSTOMER_PORTAL_ROOT);
