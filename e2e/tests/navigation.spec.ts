@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../helpers/api";
+import { runScheduledJob, type Api } from "../helpers/api";
 import { raiseTicket } from "../helpers/factories";
 import { expect, test, uid, usePersona } from "../helpers/fixtures";
 import { TicketList } from "../helpers/list";
@@ -215,13 +215,6 @@ async function indexForSearch(api: Api, token: string) {
       { timeout: 30_000, intervals: [1_000] }
     )
     .toBeGreaterThan(0);
-}
-
-async function runScheduledJob(api: Api, method: string) {
-  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
-  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
-    doc: JSON.stringify({ name: job.name }),
-  });
 }
 
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.

@@ -26,9 +26,11 @@ test("conversation: customer and agent replies both show, internal comments neve
     args: { content: `<p>${note}</p>` },
   });
 
-  await page.goto(`/helpdesk/my-tickets/${ticket.name}`);
+  await page.goto(`/help/tickets/${ticket.name}`);
   await expectInConversation(page, agentReply);
+  // closed on arrival; its bar opens it with the cursor in it
   await page.getByText("Type a message").click();
+  await expect(page.locator(".portal-reply-composer .ProseMirror")).toBeFocused();
   await page.locator(".ProseMirror").fill(customerReply);
   await page.getByRole("button", { name: "Send" }).click();
   await expectInConversation(page, customerReply);
@@ -54,7 +56,7 @@ test("closing after an agent reply asks for a rating when feedback is mandatory"
   const mandatory = (await api.get("HD Settings", "HD Settings")).is_feedback_mandatory;
   await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: 1 });
   try {
-    await page.goto(`/helpdesk/my-tickets/${ticket.name}`);
+    await page.goto(`/help/tickets/${ticket.name}`);
     await page.getByRole("button", { name: "Close" }).click();
     const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
     await dialog.getByRole("radio").nth(4).click();
