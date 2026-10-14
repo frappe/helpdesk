@@ -81,7 +81,18 @@
               v-else-if="!total && statusColor(column, row[column.key])"
               :class="statusColor(column, row[column.key])"
             />
-            <span class="truncate">{{
+            <template v-if="ratingStars(column, row[column.key]) !== null">
+              <Rating
+                :model-value="ratingStars(column, row[column.key])"
+                :max="Number(column.options) || 5"
+                :step="0.5"
+                disabled
+              />
+              <span v-if="column.kind === 'aggregate'">{{
+                starsFormat.format(ratingStars(column, row[column.key]))
+              }}</span>
+            </template>
+            <span v-else class="truncate">{{
               groupCellText(row, column, value)
             }}</span>
           </div>
@@ -251,6 +262,7 @@ import {
   Dropdown,
   frappeRequest,
   LoadingIndicator,
+  Rating,
   TabButtons,
   toast,
 } from "frappe-ui";
@@ -768,6 +780,16 @@ function statusColor(column: GroupByColumn, value: unknown): string {
   if (options.value.doctype !== "HD Ticket" || column.key !== "status")
     return "";
   return value ? getStatus(String(value))?.parsed_color ?? "" : "";
+}
+
+const starsFormat = new Intl.NumberFormat(undefined, {
+  maximumFractionDigits: 1,
+});
+
+// a Rating is stored as a fraction of its stars (0.6 of 5 is 3 stars)
+function ratingStars(column: GroupByColumn, value: unknown): number | null {
+  if (column.fieldtype !== "Rating" || typeof value !== "number") return null;
+  return value * (Number(column.options) || 5);
 }
 
 function groupCellText(
