@@ -321,15 +321,17 @@ const dropdownActions = computed(() => {
   ];
 });
 
-const breadcrumbs = [
+const contactLabel = computed(() => contact.doc?.full_name || props.id);
+
+const breadcrumbs = computed(() => [
   {
     label: __("Contacts"),
     route: { name: "ContactList" },
   },
   {
-    label: props.id,
+    label: contactLabel.value,
   },
-];
+]);
 
 onMounted(() => {
   ticketsListResource.update({
@@ -343,7 +345,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: `Contact: ${props.id}`,
+    title: `Contact: ${contactLabel.value}`,
   };
 });
 </script>
