@@ -8,16 +8,16 @@ import {
   navigateTo,
   previousLocation,
 } from '@app/stores/router'
-import { errorMessage } from '@app/utils'
+import { getErrorMessage } from '@helpdesk/shared/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
-  const settingsTab = ref('profile') // 'profile' | 'members' | 'organization' | 'portal-permissions'
-  const settingsData = ref(null)
+  const settingsTab = ref<'profile' | 'members' | 'portal-permissions'>('profile')
+  const account = ref(null)
   const isSettingsBusy = ref(false)
 
-  const settingsUser = computed(() => settingsData.value?.user || {})
-  const organizations = computed(() => settingsData.value?.organizations || [])
+  const settingsUser = computed(() => account.value?.user || {})
+  const organizations = computed(() => account.value?.organizations || [])
 
   const reloadHooks = []
   function afterLoad(hook) {
@@ -26,7 +26,7 @@ export function createSettingsCore() {
 
   async function loadSettings() {
     try {
-      settingsData.value = await call('helpdesk.api.organization.get_settings')
+      account.value = await call('helpdesk.api.organization.get_account')
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)
@@ -47,7 +47,7 @@ export function createSettingsCore() {
       await loadSettings()
       const partial = landed?.()
       if (partial) toast.warning(partial)
-      else toast.error(errorMessage(error, __('Something went wrong')))
+      else getErrorMessage(error, true, __('Something went wrong'))
     } finally {
       isSettingsBusy.value = false
     }
@@ -58,11 +58,13 @@ export function createSettingsCore() {
     input.type = 'file'
     input.accept = 'image/*'
     input.onchange = async () => {
-      const file = input.files && input.files[0]
+      const file = input.files?.[0]
       if (!file) return
       const uploaded = await new FileUploadHandler()
         .upload(file, { private: false, optimize: true })
-        .catch(() => toast.error(__('Could not upload the image')))
+        .catch(() => {
+          toast.error(__('Could not upload the image'))
+        })
       if (uploaded) await onUploaded(uploaded.file_url)
     }
     input.click()
@@ -81,11 +83,14 @@ export function createSettingsCore() {
   }
 }
 
-// The dialog lives in the hash, a segment per screen, so the device back button steps through it.
-
+// One hash segment per screen, so the device back button steps through the dialog.
 const HASH_ROOT = 'settings'
 
-export function createSettingsDialog(core, organization) {
+// Tabs only settings editors get; any other tab outside the list falls back to Profile.
+const EDITOR_TABS = ['portal-permissions']
+const TABS = ['profile', 'members', ...EDITOR_TABS]
+
+export function createSettingsDialog(core, organization, session) {
   function openSettings(tab) {
     core.settingsTab.value = tab || 'profile'
     core.isSettingsOpen.value = true
@@ -99,7 +104,7 @@ export function createSettingsDialog(core, organization) {
 
   // At module load, not in watchRoute: Studio stops the page's effect scope on navigation.
   watch(
-    [core.isSettingsOpen, core.settingsTab, organization.selectedOrg, organization.inviteOpen],
+    [core.isSettingsOpen, core.settingsTab, organization.selectedOrganization, organization.inviteOpen],
     () => pushHash(),
   )
 
@@ -113,10 +118,15 @@ export function createSettingsDialog(core, organization) {
     afterEachRoute((to) => applyHash(to.hash))
   }
 
-  function applyHash(hash) {
-    const [root, tab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
+  async function applyHash(hash) {
+    const [root, hashTab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
     if (root !== HASH_ROOT) return closeSettings()
-    if (core.isSettingsOpen.value) core.settingsTab.value = tab || 'profile'
+    // A guest has no account to show, and a tab the user can't see would open blank.
+    await session.loadSession()
+    if (session.isGuest.value) return closeSettings()
+    const allowed = TABS.includes(hashTab) && (!EDITOR_TABS.includes(hashTab) || session.canEditSettings.value)
+    const tab = allowed ? hashTab : 'profile'
+    if (core.isSettingsOpen.value) core.settingsTab.value = tab
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
@@ -125,15 +135,15 @@ export function createSettingsDialog(core, organization) {
 
   function applyOrganizationHash(org, invite) {
     if (!org) return organization.closeOrganization()
-    if (org !== organization.selectedOrg.value) organization.openOrganization(org)
+    if (org !== organization.selectedOrganization.value) organization.openOrganization(org)
     organization.inviteOpen.value = invite
   }
 
   function settingsHash() {
     if (!core.isSettingsOpen.value) return ''
     const parts = [HASH_ROOT, core.settingsTab.value]
-    if (organization.selectedOrg.value) parts.push(organization.selectedOrg.value)
-    if (organization.selectedOrg.value && organization.inviteOpen.value) parts.push('invite')
+    if (organization.selectedOrganization.value) parts.push(organization.selectedOrganization.value)
+    if (organization.selectedOrganization.value && organization.inviteOpen.value) parts.push('invite')
     return `#${parts.join('/')}`
   }
 
@@ -141,7 +151,7 @@ export function createSettingsDialog(core, organization) {
   function readHash(hash) {
     try {
       return decodeURIComponent(String(hash || ''))
-    } catch (error) {
+    } catch {
       return String(hash || '')
     }
   }

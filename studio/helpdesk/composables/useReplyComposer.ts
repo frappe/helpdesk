@@ -2,26 +2,23 @@ import { computed, ref } from 'vue'
 import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty } from '@helpdesk/shared/utils'
-import { isClosedStatus } from '@app/stores/ticketMeta'
-import { runAction } from '@app/utils'
+import { runAction, uploadableFileTypes } from '@app/utils'
 
-// The composer floats over the thread, so the thread reserves this much room for it.
-const PROMPT_TAIL = '96px'
-const EDITOR_TAIL = '208px'
-
-export function useReplyComposer(ticket) {
+export function useReplyComposer(ticket, { isClosed, isAgent }) {
+  // Closed on arrival, so the thread gets the room; the bar opens it.
   const isComposerOpen = ref(false)
   const reply = ref('')
   const isSending = ref(false)
+  // The composer sits over the thread; it reports its height and the thread keeps that much clear.
+  const composerReserve = ref(0)
 
-  const canReply = computed(() => !isClosedStatus(ticket.data?.status))
-  const threadTailSpace = computed(() => (isComposerOpen.value ? EDITOR_TAIL : PROMPT_TAIL))
+  const canReply = computed(() => !isClosed.value)
 
   function openComposer() {
     isComposerOpen.value = true
   }
 
-  // Inline images and attachments alike; the File doc it resolves carries the `name` the send links on.
+  // Inline images and attachments alike; the send links each by its File `name`.
   function uploadFile(file: File) {
     return useFileUpload().upload(file, {
       private: true,
@@ -30,12 +27,14 @@ export function useReplyComposer(ticket) {
     })
   }
 
+  const acceptedFileTypes = computed(() => uploadableFileTypes(isAgent.value)?.join(','))
+
   function discard() {
     reply.value = ''
     isComposerOpen.value = false
   }
 
-  function send({ body, attachments }) {
+  function send({ body, attachments, reset }) {
     if (isContentEmpty(body)) return
     return runAction(
       async () => {
@@ -45,6 +44,7 @@ export function useReplyComposer(ticket) {
           method: 'create_communication_via_contact',
           args: { message: body, attachments },
         })
+        reset()
         discard()
         await ticket.fetch()
       },
@@ -55,11 +55,12 @@ export function useReplyComposer(ticket) {
   return {
     canReply,
     isComposerOpen,
-    threadTailSpace,
+    composerReserve,
     openComposer,
     reply,
     isSending,
     uploadFile,
+    acceptedFileTypes,
     send,
   }
 }

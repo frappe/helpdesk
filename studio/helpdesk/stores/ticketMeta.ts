@@ -1,10 +1,10 @@
 import { createListResource } from 'frappe-ui'
 
-// The category that both "Resolved" and "Closed" belong to; the name tells them apart.
+// "Resolved" and "Closed" share this category; only the name tells them apart.
 const RESOLVED_CATEGORY = 'Resolved'
 export const CLOSED_STATUS = 'Closed'
 
-// Full literal classes: one built from data is invisible to Tailwind's scanner.
+// Full literals: Tailwind's scanner cannot see classes built from data.
 export const STATUS_DOT_CLASSES = {
   amber: 'bg-[var(--ink-amber-6)]',
   blue: 'bg-[var(--ink-blue-6)]',
@@ -38,7 +38,7 @@ const priorities = createListResource({
   pageLength: 1000,
 })
 
-// On mount, not at import: a signed-out visitor cannot call `frappe.client.get_list`.
+// Not at import: a signed-out visitor cannot call `frappe.client.get_list`.
 export function loadTicketMeta() {
   statuses.fetch()
   priorities.fetch()

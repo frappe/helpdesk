@@ -30,6 +30,10 @@
            "prefix": {
             "slotContent": [
              {
+              "classes": [
+               "has-[>div:first-child]:border",
+               "has-[>div:first-child]:border-outline-gray-2"
+              ],
               "componentId": "kb_settings-nav-profile-avatar",
               "componentName": "Avatar",
               "componentProps": {
@@ -210,8 +214,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-profile-header",
           "componentName": "container",
@@ -292,7 +298,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-language",
                     "componentName": "Combobox",
@@ -307,6 +314,11 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-language",
                   "componentName": "SettingsRow",
                   "componentProps": {
@@ -319,7 +331,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-40"
+                     "w-40",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-time_zone",
                     "componentName": "Combobox",
@@ -334,6 +347,11 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-time_zone",
                   "componentName": "SettingsRow",
                   "componentProps": {
@@ -346,7 +364,8 @@
                   "children": [
                    {
                     "classes": [
-                     "w-32"
+                     "w-32",
+                     "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-theme",
                     "componentName": "Select",
@@ -363,11 +382,51 @@
                     "componentSlots": {}
                    }
                   ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
                   "componentId": "kb_settings-row-theme",
                   "componentName": "SettingsRow",
                   "componentProps": {
                    "description": "{{ t('Switch between light, dark, or system theme.') }}",
                    "title": "{{ t('Theme') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "children": [
+                   {
+                    "classes": [
+                     "w-32",
+                     "max-sm:!w-full"
+                    ],
+                    "componentId": "kb_settings-select-layout",
+                    "componentName": "Select",
+                    "componentProps": {
+                     "modelValue": {
+                      "$type": "variable",
+                      "name": "conversationLayout"
+                     },
+                     "options": {
+                      "$type": "variable",
+                      "name": "conversationLayoutOptions"
+                     }
+                    },
+                    "componentSlots": {}
+                   }
+                  ],
+                  "classes": [
+                   "max-sm:!flex-col",
+                   "max-sm:!items-stretch",
+                   "max-sm:!gap-2.5"
+                  ],
+                  "componentId": "kb_settings-row-layout",
+                  "componentName": "SettingsRow",
+                  "componentProps": {
+                   "description": "{{ t('Replies will show as a timeline, or as a chat with your own messages on the right.') }}",
+                   "title": "{{ t('Conversation layout') }}"
                   },
                   "componentSlots": {}
                  }
@@ -464,8 +523,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-profile-body",
           "componentName": "container",
@@ -532,15 +593,17 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-list-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrg }}"
+          "visibilityCondition": "{{ !selectedOrganization }}"
          },
          {
           "children": [
@@ -560,15 +623,17 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-list-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrg }}"
+          "visibilityCondition": "{{ !selectedOrganization }}"
          },
          {
           "children": [
@@ -704,15 +769,17 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-organization-detail-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
          },
          {
           "children": [
@@ -747,7 +814,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.email }}"
+                     "text": "{{ settingsOrganization.email }}"
                     },
                     "componentSlots": {}
                    }
@@ -762,7 +829,7 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.email }}"
+                  "visibilityCondition": "{{ settingsOrganization.email }}"
                  },
                  {
                   "classes": [
@@ -775,7 +842,7 @@
                    "text": "\u2022"
                   },
                   "componentSlots": {},
-                  "visibilityCondition": "{{ settingsOrg.email && settingsOrg.domain }}"
+                  "visibilityCondition": "{{ settingsOrganization.email && settingsOrganization.domain }}"
                  },
                  {
                   "children": [
@@ -800,7 +867,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.domain }}"
+                     "text": "{{ settingsOrganization.domain }}"
                     },
                     "componentSlots": {}
                    }
@@ -815,7 +882,7 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.domain }}"
+                  "visibilityCondition": "{{ settingsOrganization.domain }}"
                  },
                  {
                   "classes": [
@@ -828,7 +895,7 @@
                    "text": "\u2022"
                   },
                   "componentSlots": {},
-                  "visibilityCondition": "{{ (settingsOrg.email || settingsOrg.domain) && settingsOrg.country }}"
+                  "visibilityCondition": "{{ (settingsOrganization.email || settingsOrganization.domain) && settingsOrganization.country }}"
                  },
                  {
                   "children": [
@@ -853,7 +920,7 @@
                     "componentName": "TextBlock",
                     "componentProps": {
                      "tag": "span",
-                     "text": "{{ settingsOrg.country }}"
+                     "text": "{{ settingsOrganization.country }}"
                     },
                     "componentSlots": {}
                    }
@@ -868,13 +935,15 @@
                   "componentProps": {},
                   "componentSlots": {},
                   "originalElement": "div",
-                  "visibilityCondition": "{{ settingsOrg.country }}"
+                  "visibilityCondition": "{{ settingsOrganization.country }}"
                  }
                 ],
                 "classes": [
                  "flex",
                  "items-center",
-                 "gap-x-1.5"
+                 "gap-x-1.5",
+                 "flex-wrap",
+                 "gap-y-0.5"
                 ],
                 "componentId": "kb_settings-organization-meta",
                 "componentName": "container",
@@ -887,17 +956,12 @@
                "remove": {
                 "action": "Run Script",
                 "event": "remove",
-                "script": "removeOrgImage()"
-               },
-               "rename": {
-                "action": "Run Script",
-                "event": "rename",
-                "script": "function handleEvent(value) { renameOrganization(value) }"
+                "script": "removeOrganizationImage()"
                },
                "upload": {
                 "action": "Run Script",
                 "event": "upload",
-                "script": "uploadOrgImage()"
+                "script": "uploadOrganizationImage()"
                }
               },
               "componentId": "kb_settings-organization-identity",
@@ -905,9 +969,9 @@
               "componentProps": {
                "busy": "{{ isSettingsBusy }}",
                "editable": "{{ canEdit }}",
-               "image": "{{ settingsOrg.image }}",
-               "maxLength": 34,
-               "name": "{{ settingsOrg.customer_name }}",
+               "image": "{{ settingsOrganization.image }}",
+               "name": "{{ settingsOrganization.customer_name }}",
+               "renameable": false,
                "shape": "square",
                "subtitle": ""
               },
@@ -924,11 +988,11 @@
               "componentProps": {
                "modelValue": {
                 "$type": "variable",
-                "name": "orgTab"
+                "name": "organizationTab"
                },
                "tabs": {
                 "$type": "variable",
-                "name": "orgTabOptions"
+                "name": "organizationTabOptions"
                }
               }
              },
@@ -944,7 +1008,10 @@
                 "componentProps": {
                  "canChangeRoles": "{{ canChangeRoles }}",
                  "canRemoveMembers": "{{ canRemoveMembers }}",
-                 "members": "{{ orgMembers }}",
+                 "showLastSeen": "{{ showLastSeen }}",
+                 "invites": "{{ organizationInvites }}",
+                 "members": "{{ organizationMembers }}",
+                 "onCancel": "{{ cancelInvitation }}",
                  "onRemove": "{{ removeMember }}",
                  "onSetRole": "{{ setMemberRole }}"
                 },
@@ -960,19 +1027,19 @@
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div",
-              "visibilityCondition": "{{ orgTab === 'members' && orgMembers.length }}"
+              "visibilityCondition": "{{ organizationTab === 'members' && organizationMembers.length }}"
              },
              {
               "classes": [
                "mt-4"
               ],
               "componentId": "kb_settings-organization-tickets",
-              "componentName": "PortalOrgTickets",
+              "componentName": "PortalOrganizationTickets",
               "componentProps": {
-               "customer": "{{ selectedOrg }}"
+               "customer": "{{ selectedOrganization }}"
               },
               "isCustomVueComponent": true,
-              "visibilityCondition": "{{ orgTab === 'tickets' }}"
+              "visibilityCondition": "{{ organizationTab === 'tickets' }}"
              }
             ],
             "componentId": "kb_settings-organization-detail",
@@ -987,15 +1054,17 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-organization-detail-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ selectedOrg && !inviteOpen }}"
+          "visibilityCondition": "{{ selectedOrganization && !inviteOpen }}"
          },
          {
           "blockName": "Invite header",
@@ -1087,8 +1156,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-invite-header",
           "componentName": "container",
@@ -1106,7 +1177,8 @@
               "children": [
                {
                 "classes": [
-                 "w-32"
+                 "w-32",
+                 "max-sm:!w-full"
                 ],
                 "componentId": "kb_settings-invite-role",
                 "componentName": "Select",
@@ -1115,19 +1187,15 @@
                   "$type": "variable",
                   "name": "inviteRole"
                  },
-                 "options": [
-                  {
-                   "label": "Member",
-                   "value": "Member"
-                  },
-                  {
-                   "label": "Manager",
-                   "value": "Manager"
-                  }
-                 ]
+                 "options": "{{ inviteRoleOptions }}"
                 },
                 "componentSlots": {}
                }
+              ],
+              "classes": [
+               "max-sm:!flex-col",
+               "max-sm:!items-stretch",
+               "max-sm:!gap-2.5"
               ],
               "componentId": "kb_settings-invite-row",
               "componentName": "SettingsRow",
@@ -1150,16 +1218,6 @@
               },
               "componentSlots": {},
               "isCustomVueComponent": true
-             },
-             {
-              "componentId": "kb_settings-pending-invites",
-              "componentName": "PortalPendingInvites",
-              "componentProps": {
-               "invites": "{{ orgInvites }}",
-               "onCancel": "{{ cancelInvitation }}"
-              },
-              "componentSlots": {},
-              "isCustomVueComponent": true
              }
             ],
             "classes": [
@@ -1179,8 +1237,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-invite-body",
           "componentName": "container",
@@ -1319,7 +1379,7 @@
         "componentName": "TextBlock",
         "componentProps": {
          "tag": "span",
-         "text": "Settings"
+         "text": "{{ t('Settings') }}"
         },
         "componentSlots": {}
        }
@@ -1338,12 +1398,12 @@
  },
  "component_id": "kb_settings",
  "component_name": "KB Settings",
- "creation": "2026-10-01 16:19:30.705430",
+ "creation": "2026-10-09 03:16:06.119607",
  "docstatus": 0,
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-08 03:00:00.000000",
+ "modified": "2026-10-10 20:40:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

@@ -13,8 +13,7 @@
 <script setup lang="ts">
 // `experimental/` is not in Studio's palette, so it reaches the block tree through this.
 import { computed, ref } from "vue";
-import { MultiEmailInput } from "frappe-ui/experimental";
-import { validateEmail } from "@helpdesk/shared/utils";
+import { isValidEmail, MultiEmailInput } from "frappe-ui/experimental";
 import { matchesQuery } from "@app/utils";
 
 const props = withDefaults(
@@ -22,7 +21,7 @@ const props = withDefaults(
     contacts?: { full_name: string; email: string; image?: string }[];
     placeholder?: string;
   }>(),
-  { contacts: () => [], placeholder: "Add email…" }
+  { contacts: () => [] }
 );
 
 const emails = defineModel<string[]>({ default: () => [] });
@@ -48,7 +47,7 @@ function onKeydown(event: KeyboardEvent) {
   if (!(input instanceof HTMLInputElement)) return;
 
   const email = input.value.trim().replace(/[,;]+$/, "");
-  if (!email || !validateEmail(email)) return;
+  if (!email || !isValidEmail(email)) return;
   event.preventDefault();
 
   if (

@@ -21,10 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { provide, ref } from "vue";
 import PortalCollapse from "@app/components/common/PortalCollapse.vue";
 
 defineProps<{ label: string }>();
 
 const opened = ref(true);
+// Content stays mounted while collapsed, so anything that animates in needs to know when it is shown again.
+provide("portalSectionOpen", opened);
 </script>

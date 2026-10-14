@@ -1,11 +1,8 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { call, createResource } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 
 export function createProfileSettings(core) {
-  const profileFirstName = ref('')
-  const profileLastName = ref('')
-
   const languages = createResource({
     url: 'frappe.client.get_list',
     params: {
@@ -23,45 +20,31 @@ export function createProfileSettings(core) {
   })
 
   core.afterLoad(() => {
-    profileFirstName.value = core.settingsUser.value.first_name || ''
-    profileLastName.value = core.settingsUser.value.last_name || ''
     if (!languages.fetched) languages.fetch()
     if (!timezones.fetched) timezones.fetch()
   })
 
-  function setPreference(field, value) {
-    if (!value || value === core.settingsUser.value[field]) return
-    return core
-      .run(() => call('helpdesk.api.auth.update_profile', { [field]: value }), __('Preferences updated successfully.'))
-      .then(fetchTranslations)
+  function updateProfile(values, successMessage) {
+    return core.run(() => call('helpdesk.api.auth.update_profile', values), successMessage)
   }
 
-  function saveProfile() {
-    return core.run(
-      () => call('helpdesk.api.auth.update_profile', {
-        first_name: profileFirstName.value,
-        last_name: profileLastName.value,
-      }),
-      'Profile updated'
-    )
+  function setPreference(field, value) {
+    if (!value || value === core.settingsUser.value[field]) return
+    return updateProfile({ [field]: value }, __('Preferences updated')).then(fetchTranslations)
   }
 
   // One field, two stored names: everything after the first space is the last name.
   function renameProfile(value) {
-    const [first, ...rest] = value.split(/\s+/)
-    profileFirstName.value = first
-    profileLastName.value = rest.join(' ')
-    return saveProfile()
+    const [firstName, ...rest] = value.split(/\s+/)
+    return updateProfile({ first_name: firstName, last_name: rest.join(' ') }, __('Profile updated'))
   }
 
   function uploadProfileImage() {
-    core.pickImage((fileUrl) =>
-      core.run(() => call('helpdesk.api.auth.update_profile', { image: fileUrl }), 'Photo updated')
-    )
+    core.pickImage((fileUrl) => updateProfile({ image: fileUrl }, __('Photo updated')))
   }
 
   function removeProfileImage() {
-    return core.run(() => call('helpdesk.api.auth.update_profile', { image: '' }), 'Photo removed')
+    return updateProfile({ image: '' }, __('Photo removed'))
   }
 
   return {
