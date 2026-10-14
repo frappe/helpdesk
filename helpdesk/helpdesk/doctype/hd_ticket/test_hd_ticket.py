@@ -15,10 +15,11 @@ from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 from helpdesk.api.ticket import bulk_reply
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
+    get_communications,
     get_one,
+    get_timeline_changes,
     merge_ticket,
     new,
-    show_outside_hours_banner,
     split_ticket,
 )
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
@@ -32,6 +33,8 @@ from helpdesk.test_utils import (
     add_comment,
     add_contact_in_customer,
     add_holiday,
+    add_message,
+    create_agent,
     create_contact,
     create_customer,
     default_template_rows,
@@ -40,6 +43,7 @@ from helpdesk.test_utils import (
     get_customer_ticket,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    is_outside_hours_banner_shown,
     make_agent,
     make_feedback_option,
     make_form_script,
@@ -55,6 +59,7 @@ from helpdesk.test_utils import (
     set_default_template_rows,
     set_ticket_status_and_communication_date,
     ticket_field_permlevel,
+    unique_email,
     update_role_in_customer,
     upload_test_file,
 )
@@ -152,30 +157,39 @@ class TestHDTicket(IntegrationTestCase):
         self.addCleanup(
             frappe.delete_doc, feedback_option.doctype, feedback_option.name, force=True
         )
-        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
-        ticket.insert()
-        ticket.db_set("feedback", feedback_option.name)
-        ticket.db_set("status", "Open")
-
-        frappe.set_user(non_agent)
-        self.addCleanup(frappe.set_user, "Administrator")
-        reopened = frappe.get_doc("HD Ticket", ticket.name)
-        reopened.subject = "Reopened and still rated"
-        reopened.load_doc_before_save()
+        reopened = self._edit_as_customer("Open", feedback=feedback_option.name)
         reopened.check_update_perms()
 
     def test_update_perms_blocked_on_a_closed_ticket(self):
-        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
-        ticket.insert()
-        ticket.db_set("status", "Closed")
+        with self.assertRaises(frappe.PermissionError):
+            self._edit_as_customer("Closed").check_update_perms()
 
+    def _edit_as_customer(self, status: str, **values):
+        """A portal ticket set to `status`, reloaded as the customer with its subject edited."""
+        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1}).insert()
+        ticket.db_set({"status": status, **values})
         frappe.set_user(non_agent)
         self.addCleanup(frappe.set_user, "Administrator")
-        closed = frappe.get_doc("HD Ticket", ticket.name)
-        closed.subject = "Should not be editable"
-        closed.load_doc_before_save()
-        with self.assertRaises(frappe.PermissionError):
-            closed.check_update_perms()
+        edited = frappe.get_doc("HD Ticket", ticket.name)
+        edited.subject = "Edited by the customer"
+        edited.load_doc_before_save()
+        return edited
+
+    def test_a_message_is_marked_by_its_author_s_role(self):
+        """A deactivated agent keeps the role, so the HD Agent record decides."""
+        # Its own agent: deactivating the shared one would leak into later tests.
+        sender = create_agent(unique_email("marked-agent")).name
+        ticket = make_ticket()
+        add_message(ticket.name, "Received", sender)
+        add_message(ticket.name, "Received", non_agent)
+
+        self.assertEqual(self.agent_senders(ticket.name) & {sender, non_agent}, {sender})
+
+        frappe.db.set_value("HD Agent", sender, "is_active", 0)
+        self.assertNotIn(sender, self.agent_senders(ticket.name))
+
+    def agent_senders(self, ticket_name: str) -> set[str]:
+        return {c.sender for c in get_communications(ticket_name) if c.is_agent}
 
     def test_parse_content_strips_html_comments(self):
         ticket = frappe.get_doc(get_ticket_obj())
@@ -993,19 +1007,19 @@ class TestHDTicket(IntegrationTestCase):
             # Ticket created inside working hours
             ticket = make_ticket(priority="High")
             self.assertFalse(ticket.raised_outside_working_hours)
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertFalse(banner_shown)
 
         ticket.reload()
         with self.freeze_time(get_current_week_monday(hours=20)):
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertFalse(banner_shown)
 
     def test_ticket_outside_working_hours(self):
         outside_working_hour = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertTrue(banner_shown)
 
@@ -1013,14 +1027,14 @@ class TestHDTicket(IntegrationTestCase):
         outside_working_hours = get_current_week_monday(hours=8)
         with self.freeze_time(outside_working_hours):
             ticket = make_ticket(priority="High")
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertTrue(banner_shown)
 
         ticket.reload()
         newtime = add_to_date(get_current_week_monday(hours=14), days=1)
         with self.freeze_time(newtime):
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertFalse(banner_shown)
             self.assertTrue(ticket.raised_outside_working_hours)
 
@@ -1028,7 +1042,7 @@ class TestHDTicket(IntegrationTestCase):
         weekend = add_to_date(get_current_week_monday(), days=5, hours=14)
         with self.freeze_time(weekend):
             ticket = make_ticket(priority="High")
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertTrue(banner_shown)
 
@@ -1037,7 +1051,7 @@ class TestHDTicket(IntegrationTestCase):
         with self.freeze_time(outside_working_hour):
             ticket = make_ticket(priority="High")
             ticket.reply_via_agent(message="Test reply to split")
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertTrue(ticket.raised_outside_working_hours)
             self.assertFalse(banner_shown)
 
@@ -1049,7 +1063,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket.reload()
         next_working_day = add_to_date(get_current_week_monday(hours=20), days=1)
         with self.freeze_time(next_working_day):
-            banner_shown = show_outside_hours_banner(ticket.name)["show"]
+            banner_shown = is_outside_hours_banner_shown(ticket.name)
             self.assertFalse(banner_shown)
 
     def test_ticket_outside_working_hours_next_day_holiday(self):
@@ -1064,11 +1078,11 @@ class TestHDTicket(IntegrationTestCase):
         ticket.reload()
         with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=1)):
             # Tuesday is a holiday, so the banner stays up
-            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+            self.assertTrue(is_outside_hours_banner_shown(ticket.name))
 
         with self.freeze_time(add_to_date(get_current_week_monday(hours=14), days=2)):
             # Wednesday is the next working day
-            self.assertFalse(show_outside_hours_banner(ticket.name)["show"])
+            self.assertFalse(is_outside_hours_banner_shown(ticket.name))
 
     def test_ticket_raised_on_holiday(self):
         tuesday_afternoon = add_to_date(get_current_week_monday(hours=14), days=1)
@@ -1078,7 +1092,7 @@ class TestHDTicket(IntegrationTestCase):
         with self.freeze_time(tuesday_afternoon):
             ticket = make_ticket(priority="High")
             self.assertTrue(ticket.raised_outside_working_hours)
-            self.assertTrue(show_outside_hours_banner(ticket.name)["show"])
+            self.assertTrue(is_outside_hours_banner_shown(ticket.name))
 
     def test_contact_ticket_visibility(self):
         """
@@ -2543,6 +2557,55 @@ class TestHDTicket(IntegrationTestCase):
         frappe.delete_doc("HD Ticket Status", "New", force=True)
 
 
+class TestTicketTimelineChanges(IntegrationTestCase):
+    """The portal draws "closed the ticket" and the rating from these, so a reader gets them without Version."""
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def close(self, raised_by: str = "Administrator", **values):
+        ticket = make_ticket(raised_by=raised_by)
+        # Assignment rules write to it on insert.
+        ticket.reload()
+        ticket.update({"status": "Closed", **values})
+        # Tests skip Version by default; this endpoint reads nothing else.
+        ticket.save(ignore_permissions=True, ignore_version=False)
+        return ticket
+
+    def test_lists_a_status_change_with_its_author(self) -> None:
+        ticket = self.close()
+
+        [change] = get_timeline_changes(ticket.name)
+
+        self.assertEqual(change["field"], "status")
+        self.assertEqual((change["from"], change["to"]), ("Open", "Closed"))
+        self.assertEqual(change["by"]["name"], "Administrator")
+        self.assertTrue(change["on"])
+
+    def test_the_ticket_s_own_customer_can_read_them(self) -> None:
+        customer = create_contact("Timeline Customer", "timeline.customer@example.com")
+        ticket = self.close(raised_by=customer["user"])
+        frappe.set_user(customer["user"])
+
+        [change] = get_timeline_changes(ticket.name)
+
+        self.assertEqual(change["to"], "Closed")
+        self.assertEqual(change["by"]["name"], "Administrator")
+
+    def test_leaves_the_rating_out(self) -> None:
+        ticket = self.close(feedback_rating=0.8)
+
+        fields = [change["field"] for change in get_timeline_changes(ticket.name)]
+
+        self.assertEqual(fields, ["status"])
+
+    def test_a_stranger_cannot_read_them(self) -> None:
+        ticket = make_ticket(raised_by="Administrator")
+        frappe.set_user(non_agent)
+
+        self.assertRaises(frappe.PermissionError, get_timeline_changes, ticket.name)
+
+
 PERMS_CUSTOMER = "perms.customer@example.com"
 PERMS_OTHER_CUSTOMER = "perms.other@example.com"
 PERMS_AGENT = "perms.agent@example.com"
@@ -2859,6 +2922,19 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
                 "feedback": option.name,
                 "via_customer_portal": 0,
             },
+        )
+        frappe.set_user(PERMS_CUSTOMER)
+        with self.assertRaises(frappe.PermissionError):
+            client_set_value("HD Ticket", ticket.name, "feedback", other.name)
+
+    def test_customer_cannot_rerate_a_resolved_ticket(self):
+        """The closed-ticket lock never covered this: only a Closed ticket was frozen."""
+        option, other = frappe.get_all(
+            "HD Ticket Feedback Option", fields=["name"], limit=2
+        )
+        ticket = make_ticket(raised_by=PERMS_CUSTOMER)
+        frappe.db.set_value(
+            "HD Ticket", ticket.name, {"status": "Resolved", "feedback": option.name}
         )
         frappe.set_user(PERMS_CUSTOMER)
         with self.assertRaises(frappe.PermissionError):

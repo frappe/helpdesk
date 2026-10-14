@@ -5,6 +5,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
 from helpdesk.utils import CUSTOMER_PORTAL_ROOT
@@ -215,8 +216,7 @@ def add_agent_manager_permissions():
 
 
 def setup_customer_role(fresh_install=True):
-    customer_roles = ["HD Customer", "HD Customer Manager"]
-    for role_name in customer_roles:
+    for role_name in CUSTOMER_ROLES:
         if frappe.db.exists("Role", role_name):
             role_doc = frappe.get_doc("Role", role_name)
         else:

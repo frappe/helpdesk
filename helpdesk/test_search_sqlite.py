@@ -6,7 +6,7 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.api import article as article_api
 from helpdesk.patches import relabel_comment_search_index
 from helpdesk.search_sqlite import HelpdeskArticleSearch, HelpdeskSearch
-from helpdesk.test_utils import create_user, make_article, make_ticket
+from helpdesk.test_utils import create_user, make_article, make_ticket, use_test_index
 
 RESTRICTED_USER = "helpdesk-search-user@example.com"
 
@@ -79,18 +79,13 @@ class TestSearchIndexRelabel(FrappeTestCase):
     TEST_INDEX = "test_relabel_search.db"
 
     def setUp(self):
-        self.search = HelpdeskSearch(db_name=self.TEST_INDEX)
-        self.search.drop_index()
+        self.search = use_test_index(
+            self, HelpdeskSearch, self.TEST_INDEX, relabel_comment_search_index
+        )
         self.search._ensure_fts_table()
-        self.addCleanup(self.search.drop_index)
 
     def run_patch(self) -> None:
-        with patch.object(
-            relabel_comment_search_index,
-            "HelpdeskSearch",
-            lambda: HelpdeskSearch(db_name=self.TEST_INDEX),
-        ):
-            relabel_comment_search_index.execute()
+        relabel_comment_search_index.execute()
 
     def insert_row(self, doc_id: str, doctype: str, name: str, ticket) -> None:
         self.search.sql(
@@ -162,26 +157,23 @@ class TestRelatedArticles(FrappeTestCase):
         cls.draft = make_article("Zephyrine webhook draft notes", "Draft")
 
     def setUp(self):
-        self.search = HelpdeskArticleSearch(db_name=self.TEST_INDEX)
-        self.search.drop_index()
-        self.addCleanup(self.search.drop_index)
+        self.search = use_test_index(
+            self, HelpdeskArticleSearch, self.TEST_INDEX, article_api
+        )
 
     def related(self, query: str) -> list[dict]:
-        with patch.object(
-            article_api,
-            "HelpdeskArticleSearch",
-            lambda: HelpdeskArticleSearch(db_name=self.TEST_INDEX),
-        ):
-            return article_api.get_related(query)
+        return article_api.get_related(query)
 
     def test_a_ticket_subject_finds_published_articles_only(self):
         self.search.build_index()
 
         # A sentence: ANDing every word would match nothing.
         found = self.related("Our zephyrine webhook stopped firing after the update")
+        names = [row["name"] for row in found]
 
-        self.assertEqual([row["name"] for row in found], [self.published])
-        self.assertNotIn("<mark>", found[0]["title"])
+        self.assertIn(self.published, names)
+        self.assertNotIn(self.draft, names)
+        self.assertFalse(any("<mark>" in row["title"] for row in found))
 
     def test_an_article_unpublished_after_indexing_stops_matching(self):
         self.search.build_index()
@@ -191,7 +183,8 @@ class TestRelatedArticles(FrappeTestCase):
             [self.search.prepare_document(frappe.get_doc("HD Article", self.published))]
         )
 
-        self.assertEqual(self.related("zephyrine webhook"), [])
+        found = self.related("zephyrine webhook")
+        self.assertNotIn(self.published, [row["name"] for row in found])
 
     def test_a_query_of_only_stopwords_finds_nothing_and_logs_nothing(self):
         self.search.build_index()

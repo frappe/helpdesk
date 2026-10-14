@@ -86,6 +86,7 @@
   "reply_from_agent_section",
   "enable_reply_email_via_agent",
   "reply_via_agent_email_content",
+  "customer_managers_section",
   "allow_customer_managers_to_invite",
   "allow_customer_managers_to_change_roles",
   "allow_customer_managers_to_remove_members",
@@ -566,6 +567,11 @@
    "label": "Auto-set customer from contact"
   },
   {
+   "fieldname": "customer_managers_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Managers"
+  },
+  {
    "fieldname": "allow_customer_managers_to_invite",
    "fieldtype": "Check",
    "default": "0",
@@ -591,13 +597,13 @@
    "fieldtype": "Check",
    "default": "0",
    "label": "Allow customer managers to edit organization details",
-   "description": "If enabled, customer managers can change their organization's name and logo."
+   "description": "If enabled, customer managers can change their organization's logo."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-09 15:00:00.000000",
+ "modified": "2026-10-10 04:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
