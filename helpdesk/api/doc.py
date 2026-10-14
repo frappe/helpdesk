@@ -529,6 +529,30 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     return [columns, rows]
 
 
+@frappe.whitelist()
+def get_grouped_list(
+    doctype: str,
+    fields: str | list,
+    filters: str | list | dict | None = None,
+    group_by: str | None = None,
+    order_by: str | None = None,
+    limit_page_length: int = 20,
+):
+    """`frappe.client.get_list` for the Group By summary, with the same `@me` and
+    assigned-on filter handling as `get_list_data`, so the groups match the list."""
+    filters = frappe.parse_json(filters) or []
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
+    return frappe.get_list(
+        doctype,
+        fields=frappe.parse_json(fields),
+        filters=filters,
+        group_by=group_by,
+        order_by=order_by,
+        limit_page_length=limit_page_length,
+    )
+
+
 def handle_at_me_support(filters):
     # Converts @me in filters to current user
     if isinstance(filters, dict):

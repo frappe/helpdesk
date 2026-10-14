@@ -170,6 +170,10 @@ const selectBannerActions = [
 
 const options = computed(() => ({
   doctype: "HD Ticket",
+  // agents only for now; customers keep the plain list
+  groupBy: !isCustomerPortal.value,
+  // never filled in by Helpdesk, so grouping on it only ever shows blanks
+  groupByExclude: ["avg_response_time"],
   columnConfig: {
     subject: {
       custom: ({ row, item }) => {
