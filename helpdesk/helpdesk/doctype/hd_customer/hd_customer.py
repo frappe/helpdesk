@@ -116,6 +116,7 @@ class HDCustomer(Document):
         if not user:
             return
         user_doc = frappe.get_doc("User", user)
+        roles_before = {r.role for r in user_doc.roles}
         if contact.is_manager:
             user_doc.append_roles("HD Customer Manager", "HD Customer")
         else:
@@ -125,7 +126,9 @@ class HDCustomer(Document):
                     "roles",
                     [r for r in user_doc.roles if r.role != "HD Customer Manager"],
                 )
-        user_doc.save(ignore_permissions=True)
+        # skip the costly user save when roles are already in sync
+        if {r.role for r in user_doc.roles} != roles_before:
+            user_doc.save(ignore_permissions=True)
 
     def is_manager_in_other_customers(self, contact_name: str) -> bool:
         """Whether the contact manages a customer other than this one. If yes, dont demote the role, just remove the is_manager check."""
@@ -395,7 +398,13 @@ class HDCustomer(Document):
         )
         erp_doc.flags.ignore_erpnext_sync = True
         erp_doc.insert(ignore_permissions=True)
-        frappe.db.set_value("HD Customer", self.name, "erpnext_customer", erp_doc.name)
+        frappe.db.set_value(
+            "HD Customer",
+            self.name,
+            "erpnext_customer",
+            erp_doc.name,
+            update_modified=False,
+        )
 
     def on_update(self):
         if not should_sync_with_erpnext() or self.flags.get("ignore_erpnext_sync"):

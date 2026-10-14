@@ -5,6 +5,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import frappe
+from frappe.desk.form.utils import add_comment as desk_add_comment
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
@@ -30,6 +31,8 @@ from helpdesk.test_utils import (
     get_current_week_monday,
     get_latest_ticket_communication,
     get_priority_response_resolution_time,
+    make_agent,
+    make_notification_log,
     make_priority,
     make_sla,
     make_status,
@@ -147,12 +150,14 @@ class TestHDTicket(FrappeTestCase):
         ticket.assign_agent(agent)
         ticket.assign_agent(agent2)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -165,12 +170,14 @@ class TestHDTicket(FrappeTestCase):
         self.assertTrue(ticket)
 
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Reaction",
-                "user_to": ["in", [agent, agent2]],
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Ticket Reopened",
+                "app": "helpdesk",
+                "for_user": ["in", [agent, agent2]],
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 2)
@@ -189,12 +196,14 @@ class TestHDTicket(FrappeTestCase):
 
         ticket.assign_agent(non_agent)
         notification = frappe.get_all(
-            "HD Notification",
+            "Notification Log",
             filters={
-                "reference_ticket": ticket.name,
-                "notification_type": "Assignment",
-                "user_to": non_agent,
-                "user_from": "Administrator",
+                "document_type": "HD Ticket",
+                "document_name": ticket.name,
+                "type": "Assignment",
+                "app": "helpdesk",
+                "for_user": non_agent,
+                "from_user": "Administrator",
             },
         )
         self.assertEqual(len(notification), 1)
@@ -215,6 +224,14 @@ class TestHDTicket(FrappeTestCase):
         ticket.status = "Closed"
         ticket.save()
         self.assertTrue(ticket)
+
+    def test_mark_seen_returns_cleared_count(self):
+        ticket = frappe.get_doc(get_ticket_obj()).insert()
+        for name in ("markseen1", "markseen2"):
+            make_notification_log(name, ticket.name, "Administrator", app="helpdesk")
+
+        self.assertEqual(ticket.mark_seen(), 2)
+        self.assertEqual(ticket.mark_seen(), 0, "nothing left to clear")
 
     # Working hours default to 10:00 to 18:00 from Monday to Friday
     # And priorities default to
@@ -523,6 +540,40 @@ class TestHDTicket(FrappeTestCase):
             # 2h30m elapsed, 2h of it on hold, leaving the 30m before the pause
             self.assertEqual(ticket.resolution_time, 30 * 60)
 
+    def test_agreement_status_stays_paused_past_the_deadlines(self):
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.status = "Replied"
+            ticket.save()
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, days=7)):
+            ticket.subject = "Edited while on hold"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Paused")
+
+    def test_agreement_status_keeps_a_breach_from_before_the_hold(self):
+        date = get_current_week_monday(hours=12)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, minutes=10)):
+            ticket.first_responded_on = get_datetime()
+            ticket.save()
+
+        # Urgent resolves in 2h, so the hold at 3h starts after the breach.
+        ticket.reload()
+        with self.freeze_time(add_to_date(date, hours=3)):
+            ticket.status = "Replied"
+            ticket.save()
+            self.assertEqual(ticket.agreement_status, "Failed")
+            self.assertLess(ticket.first_responded_on, ticket.response_by)
+
     def test_resolution_time_kept_when_closed_ticket_set_back_to_resolved(self):
         # Moving between resolved statuses is not a reopen, so the time spent
         # resolved must not be counted as hold.
@@ -708,6 +759,8 @@ class TestHDTicket(FrappeTestCase):
         add_comment(ticket2.name, "First comment on ticket 2")
 
         merge_ticket(source=ticket1.name, target=ticket2.name)
+        with self.assertRaises(frappe.ValidationError):
+            merge_ticket(source=ticket1.name, target=ticket2.name)
         ticket1.reload()
         self.assertEqual(ticket1.status, "Closed")
         self.assertTrue(ticket1.is_merged)
@@ -715,15 +768,53 @@ class TestHDTicket(FrappeTestCase):
 
         ticket2.reload()
         comments = frappe.get_all(
-            "HD Ticket Comment",
+            "Comment",
             filters={
-                "reference_ticket": ticket2.name,
+                "reference_doctype": "HD Ticket",
+                "reference_name": ticket2.name,
+                "comment_type": "Comment",
             },
             fields=["content", "name"],
         )
         self.assertEqual(
             len(comments), 3
         )  # 2 original comments + 1 merge comment (Ticket 1 merged into Ticket 2)
+
+    def test_agent_merge_moves_emails_and_every_attachment(self):
+        source = make_ticket(description="Agent merge source")
+        target = make_ticket(description="Agent merge target")
+        for index in range(2):
+            frappe.get_doc(
+                {
+                    "doctype": "File",
+                    "file_name": f"merge-{index}.txt",
+                    "content": f"attachment {index}",
+                    "attached_to_doctype": "HD Ticket",
+                    "attached_to_name": source.name,
+                }
+            ).insert(ignore_permissions=True)
+
+        frappe.set_user(make_agent("merge-agent@example.com"))
+        try:
+            merge_ticket(source=source.name, target=target.name)
+        finally:
+            frappe.set_user("Administrator")
+
+        contents = frappe.get_list(
+            "Communication",
+            filters={"reference_doctype": "HD Ticket", "reference_name": target.name},
+            pluck="content",
+        )
+        self.assertTrue(any("Agent merge source" in c for c in contents))
+        files = frappe.get_list(
+            "File",
+            filters={
+                "attached_to_doctype": "HD Ticket",
+                "attached_to_name": target.name,
+            },
+            pluck="file_name",
+        )
+        self.assertTrue({"merge-0.txt", "merge-1.txt"} <= set(files))
 
     def test_reply_to_merged_ticket_redirects_to_target(self):
         source = make_ticket(description="Merged source")
@@ -1730,6 +1821,7 @@ class TestHDTicket(FrappeTestCase):
         )
         self.assertEqual(comm.sender, email_account.email_id)
         self.assertEqual(comm.email_account, email_account.name)
+        self.assertEqual(comm.sender_full_name, frappe.utils.get_fullname(agent))
 
     def test_reply_via_agent_with_invalid_from_email_account(self):
         """If `from_email.email_account` does not exist, reply_via_agent should throw."""
@@ -1800,11 +1892,11 @@ class TestHDTicket(FrappeTestCase):
         self.assertEqual(communication_attachments, 4)
         self.assertEqual(ticket_attachments, 4)
 
-        # delete all files
         files = frappe.get_all(
             "File",
             filters={
                 "attached_to_doctype": ["in", ["Communication", "HD Ticket"]],
+                "attached_to_name": ["in", communications + ticket_ids],
             },
             pluck="name",
         )
@@ -2374,6 +2466,42 @@ class TestHDTicket(FrappeTestCase):
         self.assertTrue(has_permission(ticket, user=agent2))
         self.assertFalse(has_permission(ticket, user=agent))
         self.assertNotIn("Team B", permission_query(agent))
+
+    def test_only_managers_can_delete_a_ticket(self):
+        manager = make_agent("ticket_manager@test.com", first_name="Ticket Manager")
+        frappe.get_doc("User", manager).add_roles("Agent Manager")
+        ticket = make_ticket(raised_by=non_agent)
+
+        frappe.set_user(agent)
+        with self.assertRaises(frappe.PermissionError):
+            frappe.delete_doc("HD Ticket", ticket.name)
+
+        frappe.set_user(manager)
+        frappe.delete_doc("HD Ticket", ticket.name)
+        self.assertFalse(frappe.db.exists("HD Ticket", ticket.name))
+        frappe.set_user("Administrator")
+
+    def test_only_agents_can_comment_on_a_ticket(self):
+        contact = create_contact("Commenter", "commenter@test.com")
+        customer = contact.get("user")
+        ticket = make_ticket(raised_by=customer, via_customer_portal=1)
+
+        frappe.set_user(customer)
+        self.assertTrue(frappe.has_permission("HD Ticket", "read", doc=ticket.name))
+        with self.assertRaises(frappe.PermissionError):
+            desk_add_comment("HD Ticket", ticket.name, "sneaky", customer, "Commenter")
+
+        frappe.set_user(agent)
+        comment = desk_add_comment("HD Ticket", ticket.name, "internal", agent, "agent")
+        self.assertTrue(frappe.db.exists("Comment", comment.name))
+
+        # system comments carry no author intent, so the session user is irrelevant
+        frappe.set_user(customer)
+        assigned = frappe.get_doc("HD Ticket", ticket.name).add_comment(
+            "Assigned", "assigned to agent"
+        )
+        self.assertTrue(frappe.db.exists("Comment", assigned.name))
+        frappe.set_user("Administrator")
 
     def tearDown(self):
         frappe.set_user("Administrator")

@@ -4,7 +4,7 @@
   >
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("ERPNext") }}
         </h1>
         <Badge
@@ -72,7 +72,7 @@
         <!-- Enabled & in sync -->
         <div
           v-else-if="erpnextIntegrationEnabled && inSync"
-          class="flex items-center gap-3 rounded-lg bg-surface-green-1 p-3"
+          class="flex items-center gap-3 rounded-6 bg-surface-green-1 p-3"
         >
           <div class="grid size-7 shrink-0 place-items-center text-ink-green-6">
             <LucideCheck class="h-4 w-4" />
@@ -94,7 +94,7 @@
         <!-- Enabled & not in sync -->
         <div
           v-else-if="erpnextIntegrationEnabled"
-          class="flex items-center gap-3 rounded-lg bg-surface-amber-1 p-3"
+          class="flex items-center gap-3 rounded-6 bg-surface-amber-1 p-3"
         >
           <div class="grid size-7 shrink-0 place-items-center text-ink-amber-6">
             <LucideTriangleAlert class="h-4 w-4" />

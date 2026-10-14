@@ -26,13 +26,13 @@
         <img
           v-if="preview === 'image'"
           :src="url"
-          class="m-auto rounded border"
+          class="m-auto rounded-4 border"
         />
         <video
           v-if="preview === 'video'"
           :src="url"
           controls
-          class="m-auto max-h-[70vh] rounded border"
+          class="m-auto max-h-[70vh] rounded-4 border"
         />
       </template>
     </Dialog>

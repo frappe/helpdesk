@@ -3,11 +3,13 @@ from frappe import _
 from frappe.desk.form.assign_to import set_status
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
+from frappe.query_builder.functions import Date
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
 from helpdesk.api.dashboard import COUNT_NAME
 from helpdesk.utils import (
+    agent_only,
     call_log_default_columns,
     check_permissions,
     contact_default_columns,
@@ -44,9 +46,6 @@ def get_list_data(
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
-
-    handle_at_me_support(filters)
-    handle_assigned_on_filter(filters, doctype)
 
     _list = get_controller(doctype)
     default_rows = []
@@ -100,6 +99,9 @@ def get_list_data(
                         filters.append([key, value[0], value[1]])
                     else:
                         filters.append([key, "=", value])
+
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
 
     if rows is None:
         rows = []
@@ -244,13 +246,23 @@ def get_list_data(
 
 
 @frappe.whitelist()
-@redis_cache()
 def get_filterable_fields(
     doctype: str,
     show_customer_portal_fields: bool = False,
     ignore_team_restrictions: bool = False,
 ):
     check_permissions(doctype, None)
+    return _get_filterable_fields(
+        doctype, show_customer_portal_fields, ignore_team_restrictions
+    )
+
+
+@redis_cache()
+def _get_filterable_fields(
+    doctype: str,
+    show_customer_portal_fields: bool = False,
+    ignore_team_restrictions: bool = False,
+):
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
     allowed_fieldtypes = [
@@ -549,12 +561,8 @@ def handle_at_me_support(filters):
 def _replace_at_me(container, key):
     value = container[key]
     if isinstance(value, list):
-        if "@me" in value:
-            value[value.index("@me")] = frappe.session.user
-        elif "%@me%" in value:
-            index = [i for i, v in enumerate(value) if v == "%@me%"]
-            for i in index:
-                value[i] = "%" + frappe.session.user + "%"
+        for index in range(len(value)):
+            _replace_at_me(value, index)
     elif value == "@me":
         container[key] = frappe.session.user
     elif value == "%@me%":
@@ -581,8 +589,8 @@ def handle_assigned_on_filter(filters, doctype):
         .where(ToDo.status == "Open")
     )
 
-    # Apply date filter based on operator
-    query = apply_datetime_filter(query, ToDo.creation, assigned_on_filter)
+    # "Assigned on" is a Date filter, so compare whole days
+    query = apply_datetime_filter(query, Date(ToDo.creation), assigned_on_filter)
 
     ticket_names = [row[0] for row in query.run()]
     # No matching tickets results in an impossible filter
@@ -676,6 +684,7 @@ def apply_datetime_filter(query, field, filter_value):
 
 
 @frappe.whitelist()
+@agent_only
 def remove_assignments(doctype: str, name: str, assignees: list[str]):
     assignees = frappe.parse_json(assignees)
 

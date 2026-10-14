@@ -2,7 +2,7 @@
   <SettingsLayoutBase>
     <template #title>
       <div class="flex items-center gap-2">
-        <h1 class="text-lg-semibold text-ink-gray-8">
+        <h1 class="text-md-semibold text-ink-gray-8">
           {{ __("Field Dependencies") }}
         </h1>
       </div>
@@ -39,7 +39,7 @@
           v-if="fieldDependenciesList.loading"
           class="flex items-center justify-center py-4"
         >
-          <LoadingIndicator :scale="5" />
+          <LoadingIndicator class="size-5" />
         </div>
 
         <!-- Empty State -->
@@ -75,7 +75,7 @@
               :key="row.name"
             >
               <div
-                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded h-12.5"
+                class="grid grid-cols-11 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded-4 h-12.5"
               >
                 <div
                   @click.stop="$emit('update:step', 'fd', row.name)"
@@ -100,7 +100,13 @@
                     />
                   </div>
                   <div>
-                    <Dropdown placement="right" :options="getOptions(row.name)">
+                    <Dropdown
+                      align="end"
+                      :options="getOptions(row.name)"
+                      @update:open="
+                        (open) => open && (isConfirmingDelete = false)
+                      "
+                    >
                       <Button
                         variant="ghost"
                         @click.stop="

@@ -7,7 +7,7 @@
       {{ isMobileView ? "..." : label }}
     </router-link>
     <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
-    <Dropdown :options="options">
+    <Dropdown v-model:open="isOpen" :options="options">
       <template #default="{ open }">
         <Button
           variant="ghost"
@@ -24,8 +24,8 @@
             />
           </template>
           <template #suffix>
-            <FeatherIcon
-              :name="open ? 'chevron-up' : 'chevron-down'"
+            <component
+              :is="open ? LucideChevronUp : LucideChevronDown"
               class="h-4 text-ink-gray-8"
             />
           </template>
@@ -57,16 +57,17 @@
           v-if="item.name"
           class="flex items-center justify-end gap-2 min-w-11"
         >
-          <FeatherIcon
+          <LucideCheck
             v-if="isCurrentView(item)"
-            name="check"
             class="size-4 text-ink-gray-7"
           />
-          <Dropdown side="right" align="start" :options="dropdownActions(item)">
+          <!-- -my-0.5: at its full height the button would make the row 4px
+               taller than the rows without one -->
+          <Dropdown side="right" align="start" :options="viewActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="kebab-btn !size-4 ms-0 rounded-sm"
+                class="kebab-btn !-my-0.5 !size-5 ms-0 !rounded-2"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 @click.stop
@@ -80,9 +81,13 @@
 </template>
 
 <script setup>
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideCheck from "~icons/lucide/check";
 import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
-import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
+import { Badge, Dropdown } from "frappe-ui";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 
 const props = defineProps({
@@ -110,6 +115,22 @@ const props = defineProps({
 
 const route = useRoute();
 const { isMobileView } = useScreenSize();
+const isOpen = ref(false);
+
+// Every kebab action opens a dialog, and popovers paint above dialogs, so this
+// menu has to close itself first or it covers what it just opened.
+const viewActions = (item) =>
+  props.dropdownActions(item).map((group) => ({
+    ...group,
+    options: group.options.map((option) => ({
+      ...option,
+      onClick: () => {
+        isOpen.value = false;
+        option.onClick?.();
+      },
+    })),
+  }));
+
 const isCurrentView = (item) => {
   if (!route.query.view) return false;
   return item.name === route.query.view;
@@ -117,9 +138,10 @@ const isCurrentView = (item) => {
 </script>
 
 <style>
+/* inline-flex, not block: the button centres its icon with flex */
 [data-slot="item"][data-highlighted] .kebab-btn,
 [data-slot="item"][data-state="checked"] .kebab-btn {
-  display: block;
+  display: inline-flex;
 }
 
 /* --fade-top / --fade-bottom + scroll-fade keyframes live in src/index.css */

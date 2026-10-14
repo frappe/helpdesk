@@ -5,7 +5,15 @@
   >
     <div class="text-ink-gray-7 font-medium">{{ data.day }}</div>
     <div class="flex justify-start">
-      <Switch v-model="data.active" @update:model-value="toggleDay" />
+      <Switch
+        :model-value="Boolean(data.active)"
+        @update:model-value="
+          (value) => {
+            data.active = value;
+            toggleDay(value);
+          }
+        "
+      />
     </div>
   </div>
   <hr v-if="!isLast" />

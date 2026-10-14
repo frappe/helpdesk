@@ -21,7 +21,7 @@ interface AvailabilityEvent {
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
-  black: "bg-ink-gray-9",
+  black: "bg-surface-gray-9",
   gray: "bg-surface-gray-6",
   blue: "bg-surface-blue-6",
   green: "bg-surface-green-6",

@@ -23,7 +23,7 @@
                 />
                 <div
                   v-if="agentStatusStore.myStatus"
-                  class="absolute -bottom-0.5 rounded-full bg-surface-elevation-2 p-1"
+                  class="absolute -bottom-0.5 end-0 rounded-full bg-surface-elevation-2 p-1"
                 >
                   <div
                     class="size-3.5 rounded-full"
@@ -32,26 +32,24 @@
                     "
                   />
                 </div>
-                <Tooltip
-                  :hoverDelay="0"
-                  placement="bottom"
-                  :text="profileTooltipText"
-                >
+                <!-- one Tooltip each: it wires only its first child -->
+                <Tooltip :hoverDelay="0" side="bottom" :text="uploadTooltip">
                   <div
                     class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-16"
                     @click.stop="openFileSelector"
                   />
+                </Tooltip>
+                <Tooltip
+                  v-if="user.doc?.user_image"
+                  :hoverDelay="0"
+                  side="bottom"
+                  :text="__('Remove Photo')"
+                >
                   <div
-                    v-if="user.doc?.user_image"
-                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
+                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
                     @click.stop="updateImage()"
-                    @mouseenter="isHoveringRemove = true"
-                    @mouseleave="isHoveringRemove = false"
                   >
-                    <FeatherIcon
-                      name="x"
-                      class="size-3.5 cursor-pointer text-ink-gray-4"
-                    />
+                    <LucideX class="size-3.5 cursor-pointer text-ink-gray-4" />
                   </div>
                 </Tooltip>
                 <div
@@ -139,6 +137,7 @@
 </template>
 
 <script setup lang="ts">
+import LucideX from "~icons/lucide/x";
 import {
   Avatar,
   Button,
@@ -166,13 +165,11 @@ const showChangePasswordModal = ref(false);
 const { userId, hasAgentRecord } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
-const isHoveringRemove = ref(false);
 const editName = ref(false);
 
-const profileTooltipText = computed(() => {
-  if (isHoveringRemove.value) return __("Remove Photo");
-  return user.doc?.user_image ? __("Change Photo") : __("Upload Photo");
-});
+const uploadTooltip = computed(() =>
+  user.doc?.user_image ? __("Change Photo") : __("Upload Photo")
+);
 
 const fullNameRef = useTemplateRef("fullNameRef");
 const fullName = computed({
@@ -187,7 +184,7 @@ const fullName = computed({
 
 function editFullName() {
   editName.value = true;
-  nextTick(() => fullNameRef.value?.el?.focus());
+  nextTick(() => fullNameRef.value?.focus());
 }
 
 const isNameDirty = computed(() => {
@@ -210,7 +207,6 @@ function save() {
 }
 
 function updateImage(fileUrl = "") {
-  isHoveringRemove.value = false;
   user.doc.user_image = fileUrl;
   save();
 }
