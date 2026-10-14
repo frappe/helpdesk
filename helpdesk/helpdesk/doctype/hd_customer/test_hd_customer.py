@@ -2,7 +2,6 @@
 # See license.txt
 
 import frappe
-from frappe.permissions import rights
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
@@ -15,6 +14,7 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     create_user,
+    get_granted_rights,
     get_invitation,
     make_ticket,
     update_role_in_customer,
@@ -505,14 +505,10 @@ class TestHDCustomer(IntegrationTestCase):
 
     def test_manager_role_covers_customer_permissions(self) -> None:
         """A user with only the manager role can do everything a customer can."""
-
-        def granted(role: str) -> set[tuple]:
-            perms = frappe.get_all(
-                "DocPerm", {"role": role}, ["parent", "permlevel", *rights]
-            )
-            return {(p.parent, p.permlevel, r) for p in perms for r in rights if p[r]}
-
-        self.assertFalse(granted("HD Customer") - granted("HD Customer Manager"))
+        manager = get_granted_rights("HD Customer Manager")
+        # an unrestricted grant also covers the own-records-only one
+        manager |= {(*p[:3], 1) for p in manager}
+        self.assertFalse(get_granted_rights("HD Customer") - manager)
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:

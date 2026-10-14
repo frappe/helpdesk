@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.permissions import rights
 from frappe.tests.classes.context_managers import freeze_time
 from frappe.utils import add_to_date, getdate, now_datetime
 
@@ -973,6 +974,16 @@ def get_user_roles(user: str) -> list[str]:
     return frappe.get_all(
         "Has Role", filters={"parent": user, "parenttype": "User"}, pluck="role"
     )
+
+
+def get_granted_rights(role: str) -> set[tuple]:
+    """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
+    perms = frappe.get_all(
+        "DocPerm", {"role": role}, ["parent", "permlevel", "if_owner", *rights]
+    )
+    return {
+        (p.parent, p.permlevel, r, p.if_owner) for p in perms for r in rights if p[r]
+    }
 
 
 def show_only_banners(*banners: str):
