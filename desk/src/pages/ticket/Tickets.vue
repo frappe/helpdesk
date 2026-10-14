@@ -172,8 +172,8 @@ const options = computed(() => ({
   doctype: "HD Ticket",
   // agents only for now; customers keep the plain list
   groupBy: !isCustomerPortal.value,
-  // never filled in by Helpdesk, so grouping on it only ever shows blanks
-  groupByExclude: ["avg_response_time"],
+  // two fields Helpdesk never fills in, and the per-ticket feedback-link token
+  groupByExclude: ["avg_response_time", "user_resolution_time", "key"],
   columnConfig: {
     subject: {
       custom: ({ row, item }) => {
