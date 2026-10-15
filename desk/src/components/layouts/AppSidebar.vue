@@ -193,8 +193,8 @@ function currentRouteKey(): string | null {
 }
 
 /** A nav item opens its route's default list; a view item opens the view. */
-function selectItem(key: string, routeName: string, view?: string) {
-  activeItem.value = key;
+function selectItem(routeName: string, view?: string) {
+  activeItem.value = view ?? routeName;
   // The list may not navigate (only the stored view changes), so close here.
   if (props.mobile) mobileSidebarOpened.value = false;
   openView(routeName, view);
@@ -210,7 +210,7 @@ const navItems = computed(() => {
       label: option.label,
       icon: option.icon,
       isActive: activeItem.value === option.to,
-      onClick: () => selectItem(option.to, option.to),
+      onClick: () => selectItem(option.to),
       // Separate the nav group from the search/notification tools above it.
       spacedTop: index === 0 && !isCustomerPortal.value,
       key: option.label,
@@ -233,7 +233,7 @@ const notificationItem = computed(() =>
         label: __("Notifications"),
         icon: LucideBell,
         isActive: activeItem.value === "Notifications",
-        onClick: () => selectItem("Notifications", "Notifications"),
+        onClick: () => selectItem("Notifications"),
         badge: notificationStore.unread,
         key: "notifications",
         id: "notifications-btn",
@@ -282,7 +282,7 @@ function parseViews(views: any[]) {
     isActive: activeItem.value === view.name,
     onClick: () => {
       currentView.value = { label: view.label, icon: view.icon };
-      selectItem(view.name, view.route_name, view.name);
+      selectItem(view.route_name, view.name);
     },
     key: view.name,
     view,
