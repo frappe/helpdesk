@@ -2,7 +2,7 @@ import {
   applyListFilters,
   type FilterCondition,
 } from "@/components/listViewFilters";
-import { getActiveView, openView } from "@/composables/useActiveView";
+import { getActiveView, openViewWith } from "@/composables/useActiveView";
 import { views } from "@/composables/useView";
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
@@ -104,7 +104,7 @@ function viewChildren(): Command[] {
       group: "Switch view",
       icon: LucideLayoutList,
       checked: !currentView,
-      perform: () => openView(router, "TicketsAgent"),
+      perform: () => openViewWith(router, "TicketsAgent"),
     },
     ...ticketViews.map((view: View) => ({
       id: `list-view-${view.name}`,
@@ -114,7 +114,7 @@ function viewChildren(): Command[] {
       // Same resolver as the sidebar: emoji, lucide name, or the ticket default.
       icon: () => getIcon(view.icon),
       checked: view.name === currentView,
-      perform: () => openView(router, "TicketsAgent", view.name),
+      perform: () => openViewWith(router, "TicketsAgent", view.name),
     })),
   ];
 }

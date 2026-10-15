@@ -1,8 +1,8 @@
 import { EditIcon, PinIcon, UnpinIcon } from "@/components/icons";
 import {
   getActiveView,
-  openView,
   setActiveView,
+  useActiveView,
 } from "@/composables/useActiveView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
@@ -46,6 +46,7 @@ export const currentView = ref({
 export function useView(dt: string = null) {
   const auth = useAuthStore();
   const router = useRouter();
+  const { openView } = useActiveView();
   const { $dialog } = globalStore();
   function callGetViews() {
     if (
@@ -399,7 +400,6 @@ export function useView(dt: string = null) {
         icon: getIcon(d.icon),
       };
       openView(
-        router,
         isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
         d.name
       );

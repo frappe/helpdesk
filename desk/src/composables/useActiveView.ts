@@ -44,7 +44,7 @@ export function listRouteOf(route: RouteLocationNormalizedLoaded): string {
 
 /** Opens `view` on a list route, or its default list when `view` is omitted.
  * The view is set once the route lands, so the list reloads once, not twice. */
-export function openView(router: Router, listRoute: string, view?: string) {
+export function openViewWith(router: Router, listRoute: string, view?: string) {
   const { name, query } = router.currentRoute.value;
   if (name === listRoute && !Object.keys(query).length) {
     setActiveView(listRoute, view);
@@ -57,13 +57,14 @@ export function openView(router: Router, listRoute: string, view?: string) {
   router.push({ name: listRoute });
 }
 
-/** Active view of the current page's list, plus `openView` bound to the router. */
+/** Active view of the current page's list, plus `openView`: `openViewWith`
+ * bound to this component's router. */
 export function useActiveView() {
   const route = useRoute();
   const router = useRouter();
   return {
     activeViewName: computed(() => getActiveView(listRouteOf(route))),
     openView: (listRoute: string, view?: string) =>
-      openView(router, listRoute, view),
+      openViewWith(router, listRoute, view),
   };
 }
