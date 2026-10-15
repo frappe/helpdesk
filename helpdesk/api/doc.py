@@ -553,6 +553,19 @@ def get_grouped_list(
     )
 
 
+@frappe.whitelist()
+@frappe.read_only()
+def export_grouped_list(doctype: str, filters: str | list | dict | None = None):
+    """`export_query` for the Group By summary, with the filters resolved as in `get_grouped_list`."""
+    from frappe.desk.reportview import export_query
+
+    filters = frappe.parse_json(filters) or []
+    handle_at_me_support(filters)
+    handle_assigned_on_filter(filters, doctype)
+    frappe.form_dict.update(doctype=doctype, filters=filters)
+    return export_query()
+
+
 def handle_at_me_support(filters):
     # Converts @me in filters to current user
     if isinstance(filters, dict):

@@ -29,6 +29,9 @@
         :exclude="options.groupByExclude"
         @update:modelValue="updateGroupBy"
       />
+      <Dropdown v-if="groupBy" :options="exportGroupOptions">
+        <Button :label="__('Export')" icon-left="lucide-download" />
+      </Dropdown>
       <ColumnSettings
         :hide-label="isMobileView"
         v-if="!options.hideColumnSetting"
@@ -47,6 +50,9 @@
           hideLabel
           @update:modelValue="updateGroupBy"
         />
+        <Dropdown v-if="groupBy" :options="exportGroupOptions">
+          <Button :tooltip="__('Export')" icon="lucide-download" />
+        </Dropdown>
       </div>
     </div>
   </div>
@@ -257,6 +263,7 @@ import {
   GroupBy,
   GroupByTable,
   parseGroupBy,
+  serializeGroupBy,
 } from "@framework/ui/GroupBy";
 import type { GroupByColumn, GroupBySettings } from "@framework/ui/GroupBy";
 import {
@@ -801,6 +808,27 @@ function updateGroupBy(value: GroupBySettings | null) {
 }
 
 const { getUser } = useUserStore();
+
+// downloads the groups on screen, through the same filter handling as the grouped list
+function exportGroups(fileFormat: "Excel" | "CSV") {
+  const grouped = serializeGroupBy(groupBy.value!);
+  const params = new URLSearchParams({
+    doctype: options.value.doctype,
+    title: options.value.doctype,
+    file_format_type: fileFormat,
+    fields: JSON.stringify(grouped.fields),
+    filters: JSON.stringify(defaultParams.filters),
+    group_by: grouped.group_by,
+    order_by: grouped.order_by,
+    view: "Report",
+  });
+  window.location.href = `/api/method/helpdesk.api.doc.export_grouped_list?${params}`;
+}
+
+const exportGroupOptions = [
+  { label: __("Excel"), onClick: () => exportGroups("Excel") },
+  { label: __("CSV"), onClick: () => exportGroups("CSV") },
+];
 
 function statusColor(column: GroupByColumn, value: unknown): string {
   if (options.value.doctype !== "HD Ticket" || column.key !== "status")
