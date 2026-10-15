@@ -2,7 +2,10 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_ticket.api import new
-from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS, SEARCH_LENGTH
+from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import (
+    SEARCH_LENGTH,
+    TICKET_ORIGIN_FIELDS,
+)
 from helpdesk.test_utils import make_agent, make_article, make_contact, unique_email
 
 
@@ -19,10 +22,14 @@ class TestTicketOrigin(IntegrationTestCase):
 
     def raise_ticket(self, user: str, origin=None, **doc) -> dict:
         frappe.set_user(user)
-        ticket = new({"subject": "Origin", "description": "<p>Origin</p>", **doc}, [], origin)
+        ticket = new(
+            {"subject": "Origin", "description": "<p>Origin</p>", **doc}, [], origin
+        )
         frappe.set_user("Administrator")
         self.addCleanup(frappe.delete_doc, "HD Ticket", ticket["name"], force=True)
-        return frappe.db.get_value("HD Ticket", ticket["name"], TICKET_ORIGIN_FIELDS, as_dict=True)
+        return frappe.db.get_value(
+            "HD Ticket", ticket["name"], TICKET_ORIGIN_FIELDS, as_dict=True
+        )
 
     def test_each_portal_link_is_stored_as_its_entry_point(self):
         cases = {
@@ -40,7 +47,9 @@ class TestTicketOrigin(IntegrationTestCase):
         # a non-dict origin never gets here: the whitelist's type check refuses it first
         for origin in ({}, {"from": None}, {"from": "banner"}, {"from": ["article"]}):
             with self.subTest(origin=origin):
-                self.assertEqual(self.raise_ticket(self.customer, origin).entry_point, "Direct")
+                self.assertEqual(
+                    self.raise_ticket(self.customer, origin).entry_point, "Direct"
+                )
 
     def test_no_origin_leaves_the_fields_empty(self):
         """The agent desk calls the same endpoint without an origin; its tickets are not Direct."""
@@ -51,14 +60,18 @@ class TestTicketOrigin(IntegrationTestCase):
                 self.assertFalse(any(origin.values()))
 
     def test_a_readable_article_is_kept(self):
-        origin = self.raise_ticket(self.customer, {"from": "article", "article": self.article})
+        origin = self.raise_ticket(
+            self.customer, {"from": "article", "article": self.article}
+        )
         self.assertEqual(origin.source_article, self.article)
 
     def test_an_article_the_customer_cannot_read_is_dropped(self):
         draft = make_article(status="Draft")
         for article in (draft, "no-such-article", ["list"]):
             with self.subTest(article=article):
-                origin = self.raise_ticket(self.customer, {"from": "article", "article": article})
+                origin = self.raise_ticket(
+                    self.customer, {"from": "article", "article": article}
+                )
                 # the entry point still counts, only the unknown detail goes
                 self.assertEqual(origin.entry_point, "Article")
                 self.assertIsNone(origin.source_article)

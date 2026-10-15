@@ -11,6 +11,7 @@ from frappe.utils import (
     get_user_info_for_avatar,
 )
 from frappe.website.utils import find_first_image
+
 from helpdesk.api.article import search_readable
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     check_category_length,
@@ -198,7 +199,9 @@ def _get_article_name(path_name: str) -> str:
     found = set(
         frappe.get_all("HD Article", filters={"name": ["in", candidates]}, pluck="name")
     )
-    return next((candidate for candidate in candidates if candidate in found), path_name)
+    return next(
+        (candidate for candidate in candidates if candidate in found), path_name
+    )
 
 
 def _get_readable_article(name: str, fields: list[str] | None = None) -> frappe._dict:
@@ -264,7 +267,11 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
             fields=["name", "content", "category.category_name as category_name"],
         )
     }
-    return [_get_search_hit(row, articles[row["name"]]) for row in hits if row["name"] in articles]
+    return [
+        _get_search_hit(row, articles[row["name"]])
+        for row in hits
+        if row["name"] in articles
+    ]
 
 
 def _get_search_hit(row: dict, article: frappe._dict) -> dict:

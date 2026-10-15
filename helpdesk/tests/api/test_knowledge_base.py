@@ -1,22 +1,21 @@
 from unittest.mock import patch
 
-from redis.exceptions import ResponseError
-
 import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
+from redis.exceptions import ResponseError
 
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
+    get_article,
     get_article_markdown,
+    get_article_titles,
+    get_articles,
     get_categories,
     get_category_visibility,
     get_general_category,
-    get_article,
-    get_article_titles,
-    get_articles,
     increment_views,
     merge_category,
     move_to_category,
@@ -62,8 +61,7 @@ class TestPublicReads(IntegrationTestCase):
 
     def titles(self, **kwargs) -> list[str]:
         return [
-            row["title"]
-            for row in get_articles(category=self.category.name, **kwargs)
+            row["title"] for row in get_articles(category=self.category.name, **kwargs)
         ]
 
     def test_every_endpoint_is_reachable_without_a_session(self) -> None:
@@ -202,9 +200,7 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(get_article(self.draft).title, "Fixture draft")
 
     def test_an_unknown_article_is_not_found(self) -> None:
-        self.assertRaises(
-            frappe.DoesNotExistError, get_article, "no-such-article"
-        )
+        self.assertRaises(frappe.DoesNotExistError, get_article, "no-such-article")
 
     def test_an_article_reads_as_markdown(self) -> None:
         name = self.make_article(
@@ -284,9 +280,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
         )
 
     def titles(self) -> list[str]:
-        return [
-            row["title"] for row in get_articles(category=self.category.name)
-        ]
+        return [row["title"] for row in get_articles(category=self.category.name)]
 
     def test_defaults_to_public(self) -> None:
         name = make_article("Fixture default")
@@ -316,9 +310,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def test_a_guest_cannot_open_one_by_name(self) -> None:
         with self.set_user("Guest"):
-            self.assertRaises(
-                frappe.DoesNotExistError, get_article, self.members
-            )
+            self.assertRaises(frappe.DoesNotExistError, get_article, self.members)
 
     def test_a_guest_does_not_count_it(self) -> None:
         self.assertEqual(self.count(), 2)
@@ -566,7 +558,9 @@ class TestSearch(IntegrationTestCase):
     def setUp(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
         self.enterContext(patch("helpdesk.api.article.get_nouns", return_value=[]))
-        self.enterContext(patch("helpdesk.api.article.get_noun_phrases", return_value=[]))
+        self.enterContext(
+            patch("helpdesk.api.article.get_noun_phrases", return_value=[])
+        )
         self.hd_search = self.enterContext(patch("helpdesk.api.article.hd_search"))
         category = make_article_category("Fixture Search").name
         self.public = make_article("Fixture zebra crossing", category=category)

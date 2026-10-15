@@ -86,7 +86,9 @@
             </a>
           </HoverCard>
           <!-- Outside the link so the comma isn't underlined with it. -->
-          <span v-if="i < articles.length - 1" class="text-p-sm text-ink-gray-5">,</span>
+          <span v-if="i < articles.length - 1" class="text-p-sm text-ink-gray-5"
+            >,</span
+          >
         </li>
       </ul>
     </section>

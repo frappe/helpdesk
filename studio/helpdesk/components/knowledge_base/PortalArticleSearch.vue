@@ -61,7 +61,9 @@
           </span>
         </div>
 
-        <span class="flex size-6 shrink-0 items-center justify-center self-center">
+        <span
+          class="flex size-6 shrink-0 items-center justify-center self-center"
+        >
           <button
             v-if="item.onRemove"
             type="button"
@@ -177,9 +179,7 @@ useKeyboardShortcut({
 const results = useArticleSearch(query, { limit: MAX_RESULTS });
 
 const searchText = computed(() => query.value.trim());
-const canSearch = computed(
-  () => searchText.value.length >= MIN_QUERY_LENGTH
-);
+const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
 watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
 
@@ -233,7 +233,11 @@ const resultOptions = computed(() =>
     ? [
         {
           key: "results",
-          group: countLabel(results.data.length, __("1 article"), __("{0} articles")),
+          group: countLabel(
+            results.data.length,
+            __("1 article"),
+            __("{0} articles")
+          ),
           options: results.data.map((article) => ({
             type: "custom",
             key: article.name,

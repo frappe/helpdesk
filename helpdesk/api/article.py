@@ -2,10 +2,9 @@ import re
 
 import frappe
 from frappe.utils import strip_html_tags
+from redis.exceptions import ResponseError
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
-
-from redis.exceptions import ResponseError
 
 from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_filters
 from helpdesk.search import NUM_RESULTS

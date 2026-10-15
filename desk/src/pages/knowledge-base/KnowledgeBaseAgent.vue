@@ -218,7 +218,9 @@ const groupByActions = [
     icon: "lucide-link",
     onClick: ({ group }) =>
       copyToClipboard(
-        window.location.origin + CUSTOMER_PORTAL_ROOT + ROUTES.category(group.value),
+        window.location.origin +
+          CUSTOMER_PORTAL_ROOT +
+          ROUTES.category(group.value),
         __("Category link copied to clipboard.")
       ),
   },

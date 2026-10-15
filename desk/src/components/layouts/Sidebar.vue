@@ -7,10 +7,7 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
-        <TrialBanner
-          v-if="isFCSite"
-          :isSidebarCollapsed="isCollapsed"
-        />
+        <TrialBanner v-if="isFCSite" :isSidebarCollapsed="isCollapsed" />
         <GettingStartedBanner
           v-if="showOnboardingBanner"
           :isSidebarCollapsed="isCollapsed"
@@ -62,7 +59,11 @@
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { ArticleIcon, FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import {
+  ArticleIcon,
+  FrappeCloudIcon,
+  InviteCustomer,
+} from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
@@ -190,10 +191,7 @@ const logo = h(
 );
 
 const showOnboardingBanner = computed(() => {
-  return (
-    !isOnboardingStepsCompleted?.value &&
-    authStore.isManager
-  );
+  return !isOnboardingStepsCompleted?.value && authStore.isManager;
 });
 
 const steps = [
