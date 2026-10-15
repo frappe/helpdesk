@@ -2,6 +2,7 @@ import {
   applyListFilters,
   type FilterCondition,
 } from "@/components/listViewFilters";
+import { getActiveView, openView } from "@/composables/useActiveView";
 import { views } from "@/composables/useView";
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
@@ -91,8 +92,8 @@ function priorityFilterChildren(): Command[] {
 }
 
 function viewChildren(): Command[] {
-  // The active view travels in the route query; absent means the default list.
-  const currentView = String(router.currentRoute.value.query.view ?? "");
+  // Empty means the default list.
+  const currentView = getActiveView("TicketsAgent");
   const ticketViews = (views.data ?? []).filter(
     (view: View) => view.dt === "HD Ticket"
   );
@@ -103,7 +104,7 @@ function viewChildren(): Command[] {
       group: "Switch view",
       icon: LucideLayoutList,
       checked: !currentView,
-      perform: () => router.push({ name: "TicketsAgent" }),
+      perform: () => openView(router, "TicketsAgent"),
     },
     ...ticketViews.map((view: View) => ({
       id: `list-view-${view.name}`,
@@ -113,8 +114,7 @@ function viewChildren(): Command[] {
       // Same resolver as the sidebar: emoji, lucide name, or the ticket default.
       icon: () => getIcon(view.icon),
       checked: view.name === currentView,
-      perform: () =>
-        router.push({ name: "TicketsAgent", query: { view: view.name } }),
+      perform: () => openView(router, "TicketsAgent", view.name),
     })),
   ];
 }
@@ -129,17 +129,9 @@ function viewScope(view: View): string {
  * is mounted — the popover never reads the URL back. */
 function applyFilter(conditions: FilterCondition[]): void {
   if (applyListFilters(conditions)) return;
+  // The active view is in storage, so the filters still layer onto it.
   router.push({
     name: "TicketsAgent",
-    query: {
-      ...currentViewQuery(),
-      filters: JSON.stringify(conditions),
-    },
+    query: { filters: JSON.stringify(conditions) },
   });
-}
-
-/** Keep the active view when filtering, so filters layer onto it. */
-function currentViewQuery(): Record<string, string> {
-  const view = router.currentRoute.value.query.view;
-  return view ? { view: String(view) } : {};
 }

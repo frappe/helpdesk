@@ -81,6 +81,7 @@ import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import { normalizeFilters } from "@/components/view-controls/filter";
 import ViewModal from "@/components/ViewModal.vue";
+import { useActiveView } from "@/composables/useActiveView";
 import { currentView, useView } from "@/composables/useView";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
@@ -90,10 +91,6 @@ import { View } from "@/types";
 import { isCustomerPortal, shortDuration } from "@/utils";
 import { Badge, dayjsLocal, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
-const router = useRouter();
-const route = useRoute();
 
 const {
   getCurrentUserViews,
@@ -106,7 +103,8 @@ const {
   resetViewDialog,
 } = useView("HD Ticket");
 
-const activeView = computed(() => findView(route.query.view as string).value);
+const { activeViewName, openView } = useActiveView();
+const activeView = computed(() => findView(activeViewName.value).value);
 const hasActiveFilters = computed(
   () => Object.keys(listViewRef.value?.list?.params?.filters || {}).length > 0
 );
@@ -380,9 +378,9 @@ const dropdownOptions = computed(() => {
           label: __("List View"),
           icon: "lucide-align-justify",
           onClick: () =>
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            }),
+            openView(
+              isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent"
+            ),
         },
       ],
     },
@@ -443,12 +441,7 @@ function parseViews(views: View[]) {
           label: view.label,
           icon: view.icon,
         };
-        router.push({
-          name: view.route_name,
-          query: {
-            view: view.name,
-          },
-        });
+        openView(view.route_name, view.name);
       },
     };
   });
@@ -459,7 +452,7 @@ function onViewModalUpdate(viewInfo: any, action: string) {
 }
 
 onMounted(() => {
-  if (!route.query.view) {
+  if (!activeViewName.value) {
     currentView.value = {
       label: __("List"),
       icon: LucideAlignJustify,

@@ -56,7 +56,6 @@
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
-        query: { view: route.query?.view },
       }),
       emptyState,
     }"
@@ -153,6 +152,11 @@ import {
 import { Filter, normalizeFilters } from "@/components/view-controls/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
+  listRouteOf,
+  setActiveView,
+  useActiveView,
+} from "@/composables/useActiveView";
+import {
   currentView as headerView,
   useView,
   views,
@@ -194,7 +198,7 @@ import {
   VNode,
   watch,
 } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 import EmptyState from "./EmptyState.vue";
 import { listFilters } from "./listViewFilters";
@@ -230,10 +234,10 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 const route = useRoute();
-const router = useRouter();
 const { isManager } = useAuthStore();
 const { $dialog, $socket } = globalStore();
 const { getStatus } = useTicketStatusStore();
+const { activeViewName } = useActiveView();
 
 const listSelections = ref(new Set());
 const defaultOptions = reactive({
@@ -243,7 +247,7 @@ const defaultOptions = reactive({
   view: {
     view_type: "list",
     group_by_field: "owner",
-    name: route.query.view,
+    name: activeViewName.value,
   },
   groupByActions: [],
   default_page_length: 20,
@@ -722,12 +726,12 @@ function handleViewUpdate() {
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
     order_by: defaultParams.order_by,
-    name: (route.query.view as string) || "default",
+    name: activeViewName.value || "default",
     dt: options.value.doctype,
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
   };
-  const currentView = findView(route.query.view as string).value;
+  const currentView = findView(activeViewName.value).value;
   if (currentView && currentView.public) {
     $dialog({
       title: __("Confirm Changes"),
@@ -764,7 +768,7 @@ function handleViewUpdate() {
 const { findView, updateView, defaultView } = useView(options.value.doctype);
 
 const canSaveView = computed(() => {
-  let currentView: View = findView(route.query.view as string).value;
+  let currentView: View = findView(activeViewName.value).value;
   if (currentView?.is_standard) return false;
   if (!currentView || !currentView.public) return true;
   if (currentView.public && isManager) {
@@ -779,7 +783,7 @@ function handleReload() {
 }
 
 function handleViewChanges() {
-  if (!switchToView(route.query.view as string)) return;
+  if (!switchToView(activeViewName.value)) return;
   applyUrlFilters();
   list.submit({ ...defaultParams });
 }
@@ -787,7 +791,7 @@ function handleViewChanges() {
 /** Base for URL filters, so repeated pushes layer on the view, not each other. */
 let viewFilters = [];
 
-/** Owns sort, columns and rows. False means a redirect is in flight. */
+/** Owns sort, columns and rows. False means the view was reset to the default. */
 function switchToView(view: string): boolean {
   defaultParams.view.name = view;
   const currentView: View = findCurrentView();
@@ -800,11 +804,8 @@ function switchToView(view: string): boolean {
     return true;
   }
   if (view) {
-    // Stale ?view: drop it but keep the filters, unlike a push to the bare route.
-    router.replace({
-      name: route.name,
-      query: { ...route.query, view: undefined },
-    });
+    // Stale view: drop it but keep the filters; the watcher loads the default.
+    setActiveView(listRouteOf(route));
     return false;
   }
   viewFilters = normalizeFilters(options.value.defaultFilters);
@@ -843,8 +844,8 @@ function parseUrlFilters() {
 
 function findCurrentView() {
   let currentView: View;
-  if (route.query.view) {
-    currentView = findView(route.query.view as string).value;
+  if (activeViewName.value) {
+    currentView = findView(activeViewName.value).value;
     defaultParams.is_default = false;
   } else if (defaultView.value) {
     currentView = defaultView.value;
@@ -856,7 +857,7 @@ function findCurrentView() {
 // The view is re-read only when it changes; re-reading it on every filter
 // change is what let a filter silently reset the sort.
 watch(
-  [() => route.query.view as string, () => route.query.filters as string],
+  [activeViewName, () => route.query.filters as string],
   ([view], [previousView]) => {
     if (view !== previousView && !switchToView(view)) return;
     applyUrlFilters();
@@ -899,8 +900,8 @@ onMounted(async () => {
     await views.list.promise;
     handleViewChanges();
   }
-  if (route.query.view || defaultView.value) {
-    if (route.query.view) {
+  if (activeViewName.value || defaultView.value) {
+    if (activeViewName.value) {
       const currentView = findCurrentView();
       if (!currentView) return;
       headerView.value.label = currentView.label || __("List");
