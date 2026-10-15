@@ -26,7 +26,7 @@ export function createSettingsCore() {
 
   async function loadSettings() {
     try {
-      account.value = await call('helpdesk.api.organization.get_account')
+      account.value = await call('helpdesk.api.customer.get_portal_account')
       for (const hook of reloadHooks) await hook()
     } catch (error) {
       console.error(error)

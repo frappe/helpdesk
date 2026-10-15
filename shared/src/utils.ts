@@ -225,3 +225,26 @@ export function getErrorMessage(
   }
   return msg;
 }
+
+/** Toasts who `invite_by_email`, or a call answering in its shape, invited and skipped. */
+export function handleInviteUserSuccess(
+  data: Record<
+    | "disabled_user_emails"
+    | "accepted_invite_emails"
+    | "pending_invite_emails"
+    | "invited_emails",
+    string[]
+  >
+) {
+  const list = (emails: string[]) => emails.join(", ");
+  if (data.invited_emails.length)
+    toast.success(__("{0} invited successfully", list(data.invited_emails)));
+  if (data.disabled_user_emails.length)
+    toast.info(
+      __("{0} already present and disabled", list(data.disabled_user_emails))
+    );
+  if (data.pending_invite_emails.length)
+    toast.info(__("{0} already invited", list(data.pending_invite_emails)));
+  if (data.accepted_invite_emails.length)
+    toast.info(__("{0} already present", list(data.accepted_invite_emails)));
+}

@@ -1,43 +1,17 @@
 import { toast } from "frappe-ui";
 import { h, isVNode, type Component } from "vue";
+import StoredIcon from "./Icon.vue";
 import { __ } from "./translation";
 
 // HD Form Script runtime, shared by the desk and the Studio portal.
 
 type ToastType = "success" | "error" | "warning" | "info";
 
-let spriteLoad: Promise<unknown> | undefined;
-
-// Any lucide icon, from frappe-ui's sprite; the portal fetches it on first use.
-export function ScriptIcon({ icon }: { icon: string }) {
-  if (!document.getElementById("lucide-sprite")) {
-    spriteLoad ??= import("frappe-ui/experimental").then(({ spritePlugin }) =>
-      spritePlugin.install()
-    );
-  }
-  return h(
-    "svg",
-    {
-      class: "size-4",
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      "stroke-width": 1.5,
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      "aria-hidden": "true",
-    },
-    [h("use", { href: `#${icon.replace("lucide-", "")}` })]
-  );
-}
-
 // vue-sonner renders icons via `<component :is>`, so each legacy shape becomes a component.
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
   if (typeof icon === "string") {
-    // Anything but an icon name, such as an emoji, shows as text.
-    if (!/^[\w-]+$/.test(icon)) return () => h("span", icon);
-    return () => h(ScriptIcon, { icon });
+    return () => h(StoredIcon, { icon, class: "size-4" });
   }
   if (isVNode(icon)) return () => icon;
   return icon as Component;

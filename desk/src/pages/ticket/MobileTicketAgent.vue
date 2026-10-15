@@ -290,10 +290,8 @@ import AssignTo from "@/components/ticket-agent/AssignTo.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
-import {
-  parseField,
-  setupCustomizations,
-} from "@/composables/formCustomisation";
+import { parseField } from "@/composables/fieldDependsOn";
+import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useScreenSize } from "@/composables/screen";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import {

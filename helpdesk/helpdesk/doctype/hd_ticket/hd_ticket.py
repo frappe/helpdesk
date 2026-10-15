@@ -37,6 +37,7 @@ from helpdesk.utils import (
     get_agents_team,
     get_customers,
     get_doc_room,
+    get_user_contact,
     is_admin,
     is_agent,
     publish_event,
@@ -70,11 +71,11 @@ class HDTicket(Document, CustomerEditController):
         publish_event(
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
-        self.publish_to_portal_readers()
+        self.notify_customers()
 
     def on_trash(self):
-        # Readers are worked out now; once the row is gone there is no one to ask about.
-        self.publish_to_portal_readers()
+        # Customers are worked out now; once the row is gone there is no one to ask about.
+        self.notify_customers()
 
     def autoname(self):
         return self.name
@@ -305,7 +306,7 @@ class HDTicket(Document, CustomerEditController):
         already linked to a different user, so an unrelated record that merely
         shares the email can never satisfy the ownership check.
         """
-        contact = frappe.db.get_value("Contact", {"user": frappe.session.user})
+        contact = get_user_contact()
         if contact:
             return contact
 
@@ -922,9 +923,10 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
+                now=True,
             )
-        except Exception:
-            self.log_error("Could not queue the reply notification to agents")
+        except Exception as e:
+            frappe.throw(_(e))
 
     def send_acknowledgement_email(self):
         acknowledgement_email_content = frappe.db.get_single_value(
@@ -944,11 +946,14 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
+                now=True,
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
             )
-        except Exception:
-            self.log_error("Could not queue the acknowledgement email")
+        except Exception as e:
+            frappe.throw(
+                _("Could not send an acknowledgement email due to: {0}").format(e)
+            )
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -1342,9 +1347,9 @@ class HDTicket(Document, CustomerEditController):
                 fields.remove(f)
         return fields
 
-    def publish_to_portal_readers(self):
-        """Customers are kept out of the ticket's room, so each reader gets a bare ping on their own channel."""
-        for user in self.get_portal_readers():
+    def notify_customers(self):
+        """Customers are kept out of the ticket's room, so each one gets a bare ping on their own channel."""
+        for user in self.get_customers_to_notify():
             frappe.publish_realtime(
                 "helpdesk:ticket-update",
                 {"ticket_id": self.name},
@@ -1352,8 +1357,8 @@ class HDTicket(Document, CustomerEditController):
                 after_commit=True,
             )
 
-    def get_portal_readers(self) -> set[str]:
-        """Non-agents who may read the ticket; the author and agents already refetch, so they are left out."""
+    def get_customers_to_notify(self) -> set[str]:
+        """Customers who may read the ticket; the author and agents already refetch, so they are left out."""
         candidates = {self.raised_by, self.owner}
         contacts = [self.contact] if self.contact else []
         if self.customer:
@@ -1386,7 +1391,7 @@ def publish_assignment_update(todo, method=None):
     if todo.reference_type != "HD Ticket" or not todo.reference_name:
         return
     if ticket := frappe.db.exists("HD Ticket", todo.reference_name):
-        frappe.get_cached_doc("HD Ticket", ticket).publish_to_portal_readers()
+        frappe.get_cached_doc("HD Ticket", ticket).notify_customers()
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

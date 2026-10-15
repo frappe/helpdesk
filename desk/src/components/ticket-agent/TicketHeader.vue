@@ -87,7 +87,7 @@ import { MultipleAvatar } from "@/components";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import TicketMergeModal from "@/components/ticket/TicketMergeModal.vue";
 import { showMergeModal } from "@/pages/ticket/modalStates";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { reloadTicketFeed } from "@/composables/useTicket";

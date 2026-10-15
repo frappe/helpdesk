@@ -82,6 +82,7 @@ const store = {
 
 export function useSettingsModal(context) {
   bindRouter(context?.router)
+  session.reloadOnSettingsUpdate(context?.socket)
   dialog.watchRoute()
   return { ...store, ...session }
 }

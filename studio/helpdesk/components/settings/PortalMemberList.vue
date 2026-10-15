@@ -18,7 +18,7 @@
       <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
         <span>{{ __("Name") }}</span>
         <span>{{ __("Role") }}</span>
-        <span v-if="showLastSeen" class="max-sm:hidden">{{
+        <span v-if="showLastActive" class="max-sm:hidden">{{
           __("Last seen")
         }}</span>
         <span />
@@ -75,8 +75,11 @@
           }}</span>
         </div>
 
-        <div v-if="showLastSeen" class="text-p-sm text-ink-gray-5 max-sm:hidden">
-          {{ lastSeen(member) }}
+        <div
+          v-if="showLastActive"
+          class="text-p-sm text-ink-gray-5 max-sm:hidden"
+        >
+          {{ lastActive(member) }}
         </div>
 
         <div class="flex justify-end">
@@ -98,8 +101,8 @@
       </div>
 
       <div
-        v-for="invite in matchingInvites"
-        :key="invite.invitation"
+        v-for="invitation in matchingInvitations"
+        :key="invitation.name"
         :class="[ROW, 'min-h-13']"
       >
         <div class="flex min-w-0 items-center gap-2">
@@ -110,19 +113,22 @@
           </div>
           <div class="min-w-0">
             <div class="truncate text-base-medium text-ink-gray-8">
-              {{ invite.email }}
+              {{ invitation.email }}
             </div>
             <div class="truncate text-p-sm text-ink-gray-5">
-              {{ invitedLabel(invite) }}
+              {{ invitedLabel(invitation) }}
             </div>
           </div>
         </div>
 
         <span class="text-base text-ink-gray-5">{{
-          roleLabel(invite.role)
+          roleLabel(invitation.role)
         }}</span>
 
-        <div v-if="showLastSeen" class="text-p-sm text-ink-gray-5 max-sm:hidden">
+        <div
+          v-if="showLastActive"
+          class="text-p-sm text-ink-gray-5 max-sm:hidden"
+        >
           {{ __("Pending") }}
         </div>
 
@@ -132,14 +138,14 @@
               variant="ghost"
               icon="lucide-x"
               :aria-label="__('Cancel invitation')"
-              @click="emit('cancel', invite)"
+              @click="emit('cancel', invitation)"
             />
           </Tooltip>
         </div>
       </div>
 
       <div
-        v-if="!matches.length && !matchingInvites.length"
+        v-if="!matches.length && !matchingInvitations.length"
         class="py-6 text-center text-p-sm text-ink-gray-5"
       >
         {{ __("No members match this filter.") }}
@@ -174,7 +180,7 @@ import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width; only managers get it at all.
 const ROW = computed(() =>
-  props.showLastSeen
+  props.showLastActive
     ? "grid grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px] items-center gap-3 py-2"
     : "grid grid-cols-[minmax(0,1fr)_104px_32px] items-center gap-3 py-2"
 );
@@ -184,13 +190,13 @@ type Member = {
   full_name: string;
   email?: string;
   image?: string;
-  last_seen?: string;
+  last_active?: string;
   role: RoleLabel;
   is_you?: boolean;
 };
 
-type Invite = {
-  invitation: string;
+type Invitation = {
+  name: string;
   email: string;
   role: RoleLabel;
   invited_by?: string;
@@ -206,7 +212,7 @@ const roleFilters = computed(() => [
     value: role,
     icon: ROLES[role].icon,
   })),
-  ...(props.invites.length
+  ...(props.invitations.length
     ? [{ label: __("Invited"), value: "Invited", icon: LucideMail }]
     : []),
 ]);
@@ -214,14 +220,14 @@ const roleFilters = computed(() => [
 const props = withDefaults(
   defineProps<{
     members?: Member[];
-    invites?: Invite[];
+    invitations?: Invitation[];
     canChangeRoles?: boolean;
     canRemoveMembers?: boolean;
-    showLastSeen?: boolean;
+    showLastActive?: boolean;
   }>(),
   {
     members: () => [],
-    invites: () => [],
+    invitations: () => [],
     canChangeRoles: false,
     canRemoveMembers: false,
   }
@@ -230,7 +236,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   setRole: [member: Member, role: RoleLabel];
   remove: [member: Member];
-  cancel: [invite: Invite];
+  cancel: [invitation: Invitation];
 }>();
 
 const role = ref("All");
@@ -240,9 +246,11 @@ const matches = computed(() =>
   props.members.filter((member) => matchesRole(member) && matchesSearch(member))
 );
 
-const matchingInvites = computed(() =>
+const matchingInvitations = computed(() =>
   ["All", "Invited"].includes(role.value)
-    ? props.invites.filter((invite) => matchesQuery(search.value, invite.email))
+    ? props.invitations.filter((invitation) =>
+        matchesQuery(search.value, invitation.email)
+      )
     : []
 );
 
@@ -254,15 +262,15 @@ function matchesSearch(member: Member) {
   return matchesQuery(search.value, member.full_name, member.email);
 }
 
-function lastSeen(member: Member) {
-  return member.last_seen ? timeAgo(member.last_seen) : __("Never");
+function lastActive(member: Member) {
+  return member.last_active ? timeAgo(member.last_active) : __("Never");
 }
 
-function invitedLabel(invite: Invite) {
-  const when = timeAgo(invite.invited_on);
-  return invite.invited_by_you
+function invitedLabel(invitation: Invitation) {
+  const when = timeAgo(invitation.invited_on);
+  return invitation.invited_by_you
     ? __("Invited {0} by you", [when])
-    : __("Invited {0} by {1}", [when, invite.invited_by]);
+    : __("Invited {0} by {1}", [when, invitation.invited_by]);
 }
 
 // The owner's role is fixed, and changing yourself revokes the rights the call needs.

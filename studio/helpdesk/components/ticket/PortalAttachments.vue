@@ -83,10 +83,7 @@
         @click="picker?.click()"
       >
         <LucidePaperclip class="size-4" />
-        <span>
-          <span class="font-medium text-ink-gray-8">{{ __('Add a file') }}</span>
-          {{ __('or drop files here') }}
-        </span>
+        <span>{{ __('Drag or paste files here, or click to browse') }}</span>
       </button>
     </div>
 

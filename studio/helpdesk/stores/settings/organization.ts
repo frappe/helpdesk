@@ -2,23 +2,41 @@ import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { askConfirm, countLabel } from '@app/utils'
-import { getErrorMessage } from '@helpdesk/shared/utils'
-import { ASSIGNABLE_ROLES, ROLES, roleLabel, type RoleLabel } from './roles'
+import { getErrorMessage, handleInviteUserSuccess } from '@helpdesk/shared/utils'
+import { useSession } from '@app/stores/session'
+import { ASSIGNABLE_ROLES, roleLabel, type RoleLabel } from './roles'
 
-const API = 'helpdesk.api.organization'
+const API = 'helpdesk.api.customer'
 
 export function createOrganizationSettings(core) {
   const selectedOrganizationName = ref(null)
   const organization = ref(null)
 
-  const isManager = computed(() => Boolean(organization.value?.is_manager))
-  const canInvite = computed(() => Boolean(organization.value?.can_invite))
-  const canChangeRoles = computed(() => Boolean(organization.value?.can_change_roles))
-  const canRemoveMembers = computed(() => Boolean(organization.value?.can_remove_members))
-  const canEdit = computed(() => Boolean(organization.value?.can_edit))
+  const { config } = useSession()
+
+  // The account's card holds name, logo, domain and role; `get_organization` adds the rest.
+  const organizationCard = computed(() =>
+    core.organizations.value.find((row) => row.name === selectedOrganizationName.value),
+  )
+  const settingsOrganization = computed(() => ({ ...organizationCard.value, ...organization.value }))
+
+  // Each needs the manager role and the helpdesk's switch; the API refuses the rest anyway.
+  const canManage = computed(() => Boolean(organizationCard.value && organizationCard.value.role !== 'Member'))
+  const canInvite = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_invite),
+  )
+  const canChangeRoles = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_change_roles),
+  )
+  const canRemoveMembers = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_remove_members),
+  )
+  const canEdit = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_edit_organization),
+  )
   const members = computed(() => organization.value?.members || [])
   const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
-  const invites = computed(() => organization.value?.invites || [])
+  const invitations = computed(() => organization.value?.invitations || [])
 
   const managesAnyOrganization = computed(() =>
     core.organizations.value.some((row) => row.role !== 'Member'),
@@ -32,7 +50,7 @@ export function createOrganizationSettings(core) {
       : __('View the organizations you belong to and their members.'),
   )
   const organizationDetailDescription = computed(() =>
-    isManager.value
+    canManage.value
       ? __("Manage your organization's members and tickets.")
       : __("View your organization's members and tickets."),
   )
@@ -47,11 +65,14 @@ export function createOrganizationSettings(core) {
   const inviteEmails = ref([])
   const inviteRole = ref<RoleLabel>('Member')
   const inviteRoleOptions = computed(() => ASSIGNABLE_ROLES.map((role) => ({ label: roleLabel(role), value: role })))
-  const inviteContacts = ref([])
 
   core.afterLoad(() => {
     if (selectedOrganizationName.value) return loadOrganization(selectedOrganizationName.value)
   })
+
+  function searchInviteContacts(query: string) {
+    return callOrganization('get_invitable_contacts', { query })
+  }
 
   function callOrganization(method: string, args: Record<string, unknown> = {}) {
     return call(`${API}.${method}`, { customer: selectedOrganizationName.value, ...args })
@@ -102,31 +123,20 @@ export function createOrganizationSettings(core) {
     inviteOpen.value = false
   }
 
-  // Watched, not fetched in `openInvite`: the URL hash opens the form without going through it.
-  watch(inviteOpen, (open) => open && loadInvitableContacts())
-
-  async function loadInvitableContacts() {
-    inviteContacts.value = []
-    try {
-      inviteContacts.value = await callOrganization('get_invitable_contacts')
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   function sendInvite() {
     const emails = inviteEmails.value.map((email) => email.trim()).filter(Boolean)
     if (!emails.length) return toast.error(__('Please enter an email address'))
-    const pending = new Set(invites.value.map((invite) => invite.email))
+    const pending = new Set(invitations.value.map((invitation) => invitation.email))
     return core.run(
       async () => {
-        await callOrganization('invite_members', { emails, role: ROLES[inviteRole.value].role })
+        const result = await callOrganization('invite_members', { emails, is_manager: inviteRole.value === 'Manager' })
         closeInvite()
+        handleInviteUserSuccess(result)
       },
-      countLabel(emails.length, __('Invitation sent'), __('Invitations sent')),
+      null,
       () => {
         if (emails.some((email) => pending.has(email))) return null
-        if (!emails.every((email) => invites.value.some((invite) => invite.email === email))) return null
+        if (!emails.every((email) => invitations.value.some((invitation) => invitation.email === email))) return null
         closeInvite()
         return countLabel(
           emails.length,
@@ -169,18 +179,18 @@ export function createOrganizationSettings(core) {
     )
   }
 
-  function cancelInvitation(invite) {
+  function cancelInvitation(invitation) {
     confirmAndRun(
       {
         title: __('Cancel invitation'),
-        message: __('The invitation sent to {0} will no longer be usable.', [invite.email]),
+        message: __('The invitation sent to {0} will no longer be usable.', [invitation.email]),
         label: __('Cancel invitation'),
         theme: 'red',
       },
-      () => callOrganization('cancel_invitation', { invitation: invite.invitation }),
+      () => callOrganization('cancel_invitation', { invitation: invitation.name }),
       __('Invitation cancelled'),
       () =>
-        invites.value.every((row) => row.invitation !== invite.invitation) &&
+        invitations.value.every((row) => row.name !== invitation.name) &&
         __('Invitation cancelled, but the notice could not be emailed'),
     )
   }
@@ -200,15 +210,15 @@ export function createOrganizationSettings(core) {
   return {
     // Bound by the blocks under these names.
     selectedOrganization: selectedOrganizationName,
-    settingsOrganization: organization,
+    settingsOrganization,
     canLeaveOrganization,
     canInvite,
     canChangeRoles,
     canRemoveMembers,
-    showLastSeen: isManager,
+    showLastActive: canManage,
     canEdit,
     organizationMembers: members,
-    organizationInvites: invites,
+    organizationInvitations: invitations,
     organizationScreenTitle,
     organizationScreenDescription,
     organizationDetailDescription,
@@ -218,7 +228,7 @@ export function createOrganizationSettings(core) {
     inviteEmails,
     inviteRole,
     inviteRoleOptions,
-    inviteContacts,
+    searchInviteContacts,
     openOrganization,
     closeOrganization,
     openInvite,

@@ -256,7 +256,7 @@ test.describe("attachments", () => {
 
   test("files can be dropped or pasted onto the page", async ({ page }) => {
     await page.goto("/help/tickets/new");
-    const dropZone = page.getByRole("button", { name: "Add a file or drop files here" });
+    const dropZone = page.getByRole("button", { name: "Drag or paste files here, or click to browse" });
     const transfer = await page.evaluateHandle(() => {
       const data = new DataTransfer();
       data.items.add(new File(["dropped"], "dropped.txt", { type: "text/plain" }));

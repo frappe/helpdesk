@@ -6,8 +6,8 @@
       :key="action.label"
       v-bind="{ ...action, icon: undefined }"
     >
-      <template v-if="typeof action.icon === 'string'" #prefix>
-        <ScriptIcon :icon="action.icon" />
+      <template v-if="action.icon" #prefix>
+        <StoredIcon :icon="action.icon" class="size-4" />
       </template>
     </Button>
     <Dropdown
@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
-import { ScriptIcon } from "./formScripts";
+import StoredIcon from "./Icon.vue";
 import { __ } from "./translation";
 import { useMediaQuery } from "@vueuse/core";
 
