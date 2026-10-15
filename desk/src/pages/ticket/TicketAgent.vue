@@ -56,7 +56,7 @@ import TicketHeader from "@/components/ticket-agent/TicketHeader.vue";
 import TicketSidebar from "@/components/ticket-agent/TicketSidebar.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import { useActiveViewers } from "@/composables/realtime";
-import { getActiveView } from "@/composables/useActiveView";
+import { getActiveView, listRouteOf } from "@/composables/useActiveView";
 import {
   reloadTicket,
   revalidateTicket,
@@ -211,7 +211,7 @@ onMounted(() => {
   ticketsToNavigate.update({
     params: {
       ticket: props.ticketId,
-      current_view: getActiveView("TicketsAgent"),
+      current_view: getActiveView(listRouteOf(route)),
     },
   });
   ticketsToNavigate.reload();
