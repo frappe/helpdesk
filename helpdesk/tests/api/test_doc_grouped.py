@@ -22,10 +22,8 @@ class TestGroupedList(IntegrationTestCase):
             make_todo(make_ticket(subject=subject).name, cls.agent)
         # same subject, but not assigned to the agent
         make_ticket(subject=cls.subject_a)
-
-    def filters(self) -> list:
-        return [
-            ["subject", "in", [self.subject_a, self.subject_b]],
+        cls.filters = [
+            ["subject", "in", [cls.subject_a, cls.subject_b]],
             ["__assigned_on", "is", "set"],
         ]
 
@@ -34,7 +32,7 @@ class TestGroupedList(IntegrationTestCase):
             rows = get_grouped_list(
                 "HD Ticket",
                 fields=["subject", {"COUNT": "name", "as": "count"}],
-                filters=self.filters(),
+                filters=self.filters,
                 group_by="subject",
             )
 
@@ -51,7 +49,7 @@ class TestGroupedList(IntegrationTestCase):
                 order_by="subject asc",
                 view="Report",
             )
-            export_grouped_list("HD Ticket", filters=json.dumps(self.filters()))
+            export_grouped_list("HD Ticket", filters=json.dumps(self.filters))
 
         content = frappe.response["filecontent"]
         if isinstance(content, bytes):
