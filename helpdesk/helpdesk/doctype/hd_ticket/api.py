@@ -12,7 +12,6 @@ from pypika import Order
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
-from helpdesk.helpdesk.doctype.hd_ticket.origin import ORIGIN_FIELDS
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
@@ -26,19 +25,16 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
-    # an agent can write these fields, so only the resolved origin may set them
-    for fieldname in ORIGIN_FIELDS:
-        doc.pop(fieldname, None)
     d = frappe.get_doc(doc)
     # only the portal sends an origin; the agent desk's tickets keep the fields empty
-    d.flags.origin = origin
+    d.flags.ticket_origin = origin
     d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
 
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status changes, oldest first, with who made them, since ticket readers can't read Version."""
+    """Status changes, oldest first, with who made them specifically for customer portal."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",

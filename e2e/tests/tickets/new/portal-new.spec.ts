@@ -71,7 +71,7 @@ test.describe("raising a ticket", () => {
     await indexArticles(api, title);
     await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
-    await expect(page.getByText("You may find the solution to your problem")).toBeVisible();
+    await expect(page.getByText("Related articles:")).toBeVisible();
     await expect(page.getByText(title).last()).toBeVisible();
   });
 });

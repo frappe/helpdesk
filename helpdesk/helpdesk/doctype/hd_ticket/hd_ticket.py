@@ -45,7 +45,7 @@ from helpdesk.utils import (
 
 from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
-from .origin import resolve_origin
+from .ticket_origin import resolve_ticket_origin
 
 customer_not_allowed_fields = ["customer"]
 
@@ -105,7 +105,7 @@ class HDTicket(Document, CustomerEditController):
         self.validate_portal_contact()
         self.set_contact()
         self.set_customer()
-        self.set_origin()
+        self.set_ticket_origin()
 
     def validate(self):
         self.validate_feedback()
@@ -281,11 +281,11 @@ class HDTicket(Document, CustomerEditController):
             return
         self.raised_by = frappe.session.user
 
-    def set_origin(self):
+    def set_ticket_origin(self):
         # after the permlevel reset, which would wipe these for a customer
-        if not self.is_new() or self.flags.origin is None:
+        if not self.is_new() or self.flags.ticket_origin is None:
             return
-        self.update(resolve_origin(self.flags.origin))
+        self.update(resolve_ticket_origin(self.flags.ticket_origin))
 
     def validate_portal_contact(self) -> None:
         """Block non-agent users from attributing a ticket to another contact.

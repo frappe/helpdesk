@@ -206,7 +206,7 @@ test.describe("template", () => {
 });
 
 test.describe("article suggestions", () => {
-  test("expand, rate and open a suggestion", async ({ page, api, context }) => {
+  test("preview a suggestion on hover and open it", async ({ page, api, context }) => {
     const category = await createCategory(api);
     // One word, so suggestions left by earlier runs can't outrank it.
     const title = `Reset${uid()}`;
@@ -215,28 +215,12 @@ test.describe("article suggestions", () => {
 
     await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
-    const suggestion = page.getByRole("button", { name: `${title} 1 min read` });
-    await expect(suggestion).toBeVisible();
-    await expect(suggestion).toHaveAttribute("aria-expanded", "false");
-    await suggestion.click();
-    await expect(suggestion).toHaveAttribute("aria-expanded", "true");
-    await suggestion.click();
-    await expect(suggestion).toHaveAttribute("aria-expanded", "false");
-    await suggestion.click();
-
-    // the first suggestion is the exact match
-    const helpful = page.getByRole("button", { name: "Yes, it was helpful" }).first();
-    await helpful.click();
-    await expect(page.getByText("Thanks for your feedback!").first()).toBeVisible();
-    await expect(helpful).toHaveAttribute("aria-pressed", "true");
-    const feedback = () =>
-      api.list("HD Article Feedback", { filters: { article: article.name }, fields: ["feedback"] });
-    await expect.poll(async () => (await feedback())[0]?.feedback).toBe("1");
-    await helpful.click();
-    await expect.poll(async () => (await feedback())[0]?.feedback ?? "0").toBe("0");
+    const suggestion = page.getByRole("link", { name: title, exact: true });
+    await suggestion.hover();
+    await expect(page.getByText("Open article")).toBeVisible();
 
     const popup = context.waitForEvent("page");
-    await page.getByRole("link", { name: "Read full article" }).first().click();
+    await suggestion.click();
     const opened = await popup;
     await expect(opened).toHaveURL(new RegExp(`/help/articles/${article.name}-reset`));
     await expect(opened.getByRole("heading", { name: title }).first()).toBeVisible();
@@ -249,7 +233,7 @@ test.describe("article suggestions", () => {
     await indexArticles(api, title);
     await page.goto("/help/tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
-    await expect(page.getByRole("link", { name: "Read full article" }).first()).toHaveAttribute(
+    await expect(page.getByRole("link", { name: title, exact: true })).toHaveAttribute(
       "href",
       new RegExp(`/help/articles/${article.name}-rotate[a-z0-9]+$`)
     );

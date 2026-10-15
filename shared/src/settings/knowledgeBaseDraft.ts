@@ -15,17 +15,9 @@ import { CUSTOMER_PORTAL_ROOT, getErrorMessage, isSafeLink } from "../utils";
 
 type Link = KnowledgeBasePreview["links"][number];
 
-type Draft = KnowledgeBasePreview & {
-  public_knowledge_base: boolean;
-  allow_anonymous_article_voting: boolean;
-};
+type Draft = KnowledgeBasePreview;
 
-const SETTINGS_FIELDS = [
-  "public_knowledge_base",
-  "allow_anonymous_article_voting",
-  "banner_image",
-  "banner_preset",
-] as const;
+const SETTINGS_FIELDS = ["banner_image", "banner_preset"] as const;
 
 const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
 
@@ -74,10 +66,6 @@ function createDraft() {
     if (!settings.doc || !categories.data || !linksScript.data) return null;
     const script: string = linksScript.data.script || "";
     return {
-      public_knowledge_base: Boolean(settings.doc.public_knowledge_base),
-      allow_anonymous_article_voting: Boolean(
-        settings.doc.allow_anonymous_article_voting
-      ),
       banner_image: settings.doc.banner_image || "",
       banner_preset: settings.doc.banner_preset || "",
       pinned: categories.data
@@ -210,6 +198,14 @@ function createDraft() {
     });
   }
 
+  // Switches save as they flip, outside the draft: the reload leaves `saved` and so the draft alone.
+  function setToggle(fieldname: string, value: boolean) {
+    settings.setValue.submit(
+      { [fieldname]: value },
+      { onSuccess: () => toast.success(__("Settings updated")) }
+    );
+  }
+
   function discard() {
     draft.value = JSON.parse(JSON.stringify(saved.value));
   }
@@ -237,6 +233,8 @@ function createDraft() {
 
   return {
     draft,
+    settings,
+    setToggle,
     categoryOptions,
     isDirty,
     canPreview,

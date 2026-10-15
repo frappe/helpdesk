@@ -14,7 +14,10 @@
             {{ toggle.description }}
           </span>
         </div>
-        <Switch v-model="draft[toggle.fieldname]" />
+        <Switch
+          :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+          @update:model-value="(value) => setToggle(toggle.fieldname, value)"
+        />
       </div>
     </div>
     <PinnedCategories
@@ -41,8 +44,8 @@ import HeaderLinks from "./HeaderLinks.vue";
 import PinnedCategories from "./PinnedCategories.vue";
 import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
-// Changes wait for the host's Save button; see knowledgeBaseDraft.ts.
-const { draft, categoryOptions } = useKnowledgeBaseDraft();
+// Switches save at once; the rest waits for the host's Save button. See knowledgeBaseDraft.ts.
+const { draft, settings, setToggle, categoryOptions } = useKnowledgeBaseDraft();
 
 // computed, so labels follow a translation load
 const toggles = computed(

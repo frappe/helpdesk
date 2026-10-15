@@ -54,13 +54,13 @@ export default function setup(context) {
     else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
   }
 
-  // `get_public_article` answers with the reader's own feedback: 1 like, 2 dislike, 0 none.
+  // `get_article` answers with the reader's own feedback: 1 like, 2 dislike, 0 none.
   function submitFeedback(answer) {
     const { name, feedback } = article.data
     return saveArticleFeedback(name, feedback, answer, (value) => (article.data.feedback = value))
   }
 
-  // Counted here, not on read: the endpoint is rate limited per article and reader.
+  // Counted here, not on read: the endpoint counts a reader once per article an hour.
   const { rememberArticle } = useRecent()
   watch(
     () => article?.data?.name,

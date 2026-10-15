@@ -5,9 +5,11 @@ from frappe.utils import strip_html_tags
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
+from redis.exceptions import ResponseError
+
+from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_filters
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
-from helpdesk.search_sqlite import HelpdeskArticleSearch
 
 RELATED_LIMIT = 3
 
@@ -38,13 +40,13 @@ def search_with_enough_results(
 
 
 def filter_public_articles(articles: list) -> list:
-    """Drop hits whose article is no longer published, the index can be stale."""
+    """Drop hits the reader may not read: the index can be stale, and holds every audience."""
     names = {article["name"].split("#")[0] for article in articles}
     if not names:
         return []
-    published = frappe.get_list(
+    published = frappe.get_all(
         "HD Article",
-        filters={"name": ("in", list(names)), "status": "Published"},
+        filters=readable_filters(name=("in", list(names))),
         pluck="name",
     )
     return [
@@ -117,11 +119,31 @@ def search(query: str) -> list:
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
     """Published articles the reader may see that match free text, best first, as plain titles."""
-    search = HelpdeskArticleSearch()
-    if not search.index_exists():
-        return []
-    # The index filters on status and audience, so its top hits are all readable.
     return [
         {"name": row["name"], "title": strip_html_tags(row["title"])}
-        for row in search.search(query)["results"][:RELATED_LIMIT]
+        for row in search_readable(query)[:RELATED_LIMIT]
     ]
+
+
+def search_readable(query: str) -> list[dict]:
+    """`search`, one hit per article, its highlights as `<mark>`; nothing without RediSearch or its index."""
+    try:
+        hits = search(query)
+    except ResponseError:
+        return []
+    articles = {}
+    for hit in hits:
+        name = hit["name"].split("#")[0]
+        articles.setdefault(
+            name,
+            {
+                "name": name,
+                "title": _as_mark(hit.get("subject")),
+                "excerpt": _as_mark(hit.get("description")),
+            },
+        )
+    return list(articles.values())
+
+
+def _as_mark(text: str | None) -> str:
+    return (text or "").replace("<b>", "<mark>").replace("</b>", "</mark>")

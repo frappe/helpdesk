@@ -603,7 +603,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-12 13:15:00.000000",
+ "modified": "2026-10-15 12:03:16.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
@@ -619,7 +619,7 @@
    "params": "{\"name\": \"{{ route.params.name }}\"}",
    "resource_name": "article",
    "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_public_article"
+   "url": "helpdesk.api.knowledge_base.get_article"
   },
   {
    "auto": 1,
@@ -629,7 +629,7 @@
    "params": "{}",
    "resource_name": "articles",
    "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_public_article_titles"
+   "url": "helpdesk.api.knowledge_base.get_article_titles"
   },
   {
    "auto": 1,

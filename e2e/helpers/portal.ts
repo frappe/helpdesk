@@ -1,5 +1,5 @@
 import { expect, request, type Page } from "@playwright/test";
-import { runScheduledJob, type Api } from "./api";
+import { type Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
 
@@ -23,12 +23,12 @@ export async function createArticle(
 }
 
 /** Pick an option in a frappe-ui Combobox-backed Link field. */
-/** New articles reach the search index only through a scheduled job; run it until `query` finds one. */
+/** New articles reach the RediSearch index only when it is rebuilt; rebuild until `query` finds one. */
 export async function indexArticles(api: Api, query: string) {
   await expect
     .poll(
       async () => {
-        await runScheduledJob(api, "frappe.search.sqlite_search.index_docs_in_queue");
+        await api.call("helpdesk.search.build_index");
         const hits = await api.callGet("helpdesk.api.knowledge_base.search_articles", { query });
         return hits.length;
       },

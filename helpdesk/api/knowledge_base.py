@@ -1,6 +1,7 @@
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.core.utils import html2text
 from frappe.query_builder.functions import Coalesce
 from frappe.rate_limiter import rate_limit
 from frappe.utils import (
@@ -9,8 +10,8 @@ from frappe.utils import (
     expand_relative_urls,
     get_user_info_for_avatar,
 )
-from markdownify import markdownify
-
+from frappe.website.utils import find_first_image
+from helpdesk.api.article import search_readable
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     check_category_length,
     get_joining_values,
@@ -20,7 +21,6 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     readable_filters,
     update_articles,
 )
-from helpdesk.search_sqlite import HelpdeskArticleSearch, reindex_articles
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -40,7 +40,7 @@ PUBLIC_CATEGORY_FIELDS = [
     "pinned_order",
 ]
 # Avatars in a category page's byline.
-CREATOR_LIMIT = 3
+CREATOR_LIMIT = 32
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
 # Matches the article page's reading time.
@@ -122,11 +122,10 @@ def move_to_category(category: str, articles: list[str]):
     for article in articles:
         check_category_length(frappe.db.get_value("HD Article", article, "category"))
         frappe.db.set_value("HD Article", article, values, update_modified=False)
-    reindex_articles(articles)
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_articles(
+def get_articles(
     category: str | None = None, limit: int | None = None, sort: str = "latest"
 ) -> list[dict]:
     """Published articles the reader may see, with what a list row shows and no body."""
@@ -149,14 +148,8 @@ def _get_byline(user: str) -> dict:
     return {"name": info["name"], "image": info["image"]}
 
 
-def _get_first_image(soup: BeautifulSoup) -> str | None:
-    """HD Article has no cover field; the body's first image stands in for one."""
-    image = soup.find("img")
-    return image.get("src") if image else None
-
-
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_article_titles() -> list[dict]:
+def get_article_titles() -> list[dict]:
     """The newest articles the reader may see, as just name, title and category."""
     validate_public_access()
     return frappe.get_all(
@@ -169,7 +162,7 @@ def get_public_article_titles() -> list[dict]:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])
-def get_public_article(name: str) -> dict:
+def get_article(name: str) -> dict:
     """One article, published — or any article to an agent previewing a draft."""
     name = _get_article_name(name)
     article = _get_readable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
@@ -188,9 +181,7 @@ def get_public_article(name: str) -> dict:
 def get_article_markdown(name: str) -> None:
     """The article as a Markdown page, to paste into an LLM or point one at."""
     article = _get_readable_article(name, ["title", "content"])
-    body = markdownify(
-        expand_relative_urls(article.content or ""), heading_style="ATX", bullets="-"
-    )
+    body = html2text(expand_relative_urls(article.content or ""), wrap=False)
     frappe.response.update(
         type="download",
         filename=f"{name}.md",
@@ -260,11 +251,9 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
     """Full-text matches the reader may see, best first, with `<mark>` around the hits."""
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
-    search = HelpdeskArticleSearch()
-    if not query or not search.index_exists():
+    if not query:
         return []
-    # The index filters on status and audience, so its top hits are all readable.
-    hits = search.search(query)["results"][: min(cint(limit) or SEARCH_LIMIT, SEARCH_LIMIT)]
+    hits = search_readable(query)[: min(cint(limit) or SEARCH_LIMIT, SEARCH_LIMIT)]
     if not hits:
         return []
     articles = {
@@ -275,17 +264,18 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
             fields=["name", "content", "category.category_name as category_name"],
         )
     }
-    return [_get_search_hit(row, articles[row["name"]]) for row in hits]
+    return [_get_search_hit(row, articles[row["name"]]) for row in hits if row["name"] in articles]
 
 
 def _get_search_hit(row: dict, article: frappe._dict) -> dict:
-    body = BeautifulSoup(article.content or "", "html.parser")
+    content = article.content or ""
     return {
         "name": row["name"],
         "title": escape_marked(row["title"]),
-        "excerpt": escape_marked(row.get("content") or ""),
-        "image": _get_first_image(body),
-        "minutes": _get_reading_minutes(body),
+        "excerpt": escape_marked(row["excerpt"]),
+        # HD Article has no cover field; the body's first image stands in for one.
+        "image": find_first_image(content),
+        "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
     }
 
@@ -362,7 +352,6 @@ def get_general_category():
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
-@rate_limit(key="article", limit=5, seconds=VIEW_WINDOW, user_based=True)
 def increment_views(article: str):
     """Count a reader once per article an hour; a re-read inside that window is no new view."""
     _get_readable_article(article)

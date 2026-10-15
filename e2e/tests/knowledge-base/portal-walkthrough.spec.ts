@@ -826,9 +826,12 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("tab", { name: "Knowledge Base", exact: true }).click();
       await expect(page).toHaveURL(/#settings\/knowledge-base$/);
 
+      // Switches save as they flip, without the Save button.
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
-      await expect(dialog.getByText("Unsaved")).toBeVisible();
+      await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
+      await expect(dialog.getByText("Unsaved")).toBeHidden();
       await dialog.getByRole("radio", { name: "Blue" }).click();
+      await expect(dialog.getByText("Unsaved")).toBeVisible();
       await dialog.getByRole("button", { name: "Choose categories" }).click();
       await page.getByRole("combobox").last().fill(category.category_name);
       await page.getByRole("option", { name: new RegExp(category.category_name) }).click();
@@ -852,7 +855,6 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("button", { name: "Save" }).click();
       await expect(dialog.getByText("Unsaved")).toBeHidden();
       const settings = await api.get("HD Settings", "HD Settings");
-      expect(settings.allow_anonymous_article_voting).toBe(1);
       expect(settings.banner_preset).toBe("Blue");
       expect((await api.get("HD Article Category", category.name)).pinned).toBe(1);
       expect((await api.get("HD Form Script", QUICK_LINKS)).script).toContain(label);

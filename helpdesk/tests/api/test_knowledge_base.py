@@ -1,11 +1,11 @@
 from unittest.mock import patch
 
+from redis.exceptions import ResponseError
+
 import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.tests.utils import change_settings
 
-from helpdesk.api import article as article_api
-from helpdesk.api import knowledge_base
 from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
@@ -14,9 +14,9 @@ from helpdesk.api.knowledge_base import (
     get_categories,
     get_category_visibility,
     get_general_category,
-    get_public_article,
-    get_public_article_titles,
-    get_public_articles,
+    get_article,
+    get_article_titles,
+    get_articles,
     increment_views,
     merge_category,
     move_to_category,
@@ -29,7 +29,6 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
     CUSTOMERS_ONLY,
     PUBLIC,
 )
-from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.test_utils import (
     category_names,
     category_row,
@@ -37,14 +36,14 @@ from helpdesk.test_utils import (
     make_article,
     make_article_category,
     make_contact,
+    make_search_hit,
+    make_search_page,
     unique_email,
-    use_test_index,
 )
 
 LIST_ROW_FIELDS = {"name", "title", "excerpt"}
 BASE_VIEWS = 1_000_000
 BYLINE_FIELDS = {"name", "image"}
-TEST_INDEX = "test_knowledge_base_search.db"
 
 
 class TestPublicReads(IntegrationTestCase):
@@ -64,14 +63,14 @@ class TestPublicReads(IntegrationTestCase):
     def titles(self, **kwargs) -> list[str]:
         return [
             row["title"]
-            for row in get_public_articles(category=self.category.name, **kwargs)
+            for row in get_articles(category=self.category.name, **kwargs)
         ]
 
     def test_every_endpoint_is_reachable_without_a_session(self) -> None:
         for endpoint in (
-            get_public_articles,
-            get_public_article,
-            get_public_article_titles,
+            get_articles,
+            get_article,
+            get_article_titles,
             get_article_markdown,
             get_categories,
             set_article_feedback,
@@ -83,10 +82,10 @@ class TestPublicReads(IntegrationTestCase):
         self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
         with self.set_user("Guest"):
             for endpoint, args in (
-                (get_public_articles, ()),
-                (get_public_article_titles, ()),
+                (get_articles, ()),
+                (get_article_titles, ()),
                 (get_categories, ()),
-                (get_public_article, (self.published,)),
+                (get_article, (self.published,)),
                 (get_article_markdown, (self.published,)),
                 (increment_views, (self.published,)),
             ):
@@ -95,12 +94,12 @@ class TestPublicReads(IntegrationTestCase):
 
     def test_a_public_knowledge_base_answers_a_guest(self) -> None:
         with self.set_user("Guest"):
-            self.assertEqual(get_public_article(self.published)["name"], self.published)
+            self.assertEqual(get_article(self.published)["name"], self.published)
 
     def test_a_signed_in_reader_is_unaffected(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
 
-        self.assertEqual(get_public_article(self.published)["name"], self.published)
+        self.assertEqual(get_article(self.published)["name"], self.published)
 
     def test_a_private_knowledge_base_refuses_anonymous_votes(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
@@ -113,16 +112,16 @@ class TestPublicReads(IntegrationTestCase):
             )
 
     def test_an_article_carries_the_reader_s_own_vote(self) -> None:
-        self.assertEqual(get_public_article(self.published)["feedback"], 0)
+        self.assertEqual(get_article(self.published)["feedback"], 0)
 
         frappe.get_doc("HD Article", self.published).set_feedback(1)
 
-        self.assertEqual(get_public_article(self.published)["feedback"], 1)
+        self.assertEqual(get_article(self.published)["feedback"], 1)
 
     def test_a_cookieless_guest_is_shown_no_vote(self) -> None:
         frappe.get_doc("HD Article", self.published).set_feedback(1)
         with self.set_user("Guest"):
-            self.assertEqual(get_public_article(self.published)["feedback"], 0)
+            self.assertEqual(get_article(self.published)["feedback"], 0)
 
     def test_lists_only_published_articles(self) -> None:
         self.assertEqual(self.titles(), ["Fixture published"])
@@ -143,7 +142,7 @@ class TestPublicReads(IntegrationTestCase):
         self.assertEqual(len(self.titles(limit=1)), 1)
 
     def test_a_row_carries_what_the_list_shows(self) -> None:
-        [article] = get_public_articles(category=self.category.name)
+        [article] = get_articles(category=self.category.name)
 
         self.assertEqual(set(article), LIST_ROW_FIELDS)
         self.assertEqual(article.excerpt, "Fixture published")
@@ -155,7 +154,7 @@ class TestPublicReads(IntegrationTestCase):
         article.content = body
         article.save()
 
-        [row] = get_public_articles(category=self.category.name)
+        [row] = get_articles(category=self.category.name)
 
         self.assertEqual(row.excerpt, "Open Settings.")
 
@@ -168,7 +167,7 @@ class TestPublicReads(IntegrationTestCase):
         )
 
     def test_reads_one_published_article(self) -> None:
-        article = get_public_article(self.published)
+        article = get_article(self.published)
 
         self.assertEqual(article.content, "<p>Fixture published</p>")
         self.assertEqual(article.category_name, "Fixture Public")
@@ -193,18 +192,18 @@ class TestPublicReads(IntegrationTestCase):
             f"{self.published}-fixture-published",
             f"{self.published}-a-renamed-title",
         ):
-            self.assertEqual(get_public_article(path_name).name, self.published)
+            self.assertEqual(get_article(path_name).name, self.published)
 
     def test_a_guest_cannot_read_a_draft(self) -> None:
         with self.set_user("Guest"):
-            self.assertRaises(frappe.DoesNotExistError, get_public_article, self.draft)
+            self.assertRaises(frappe.DoesNotExistError, get_article, self.draft)
 
     def test_an_agent_can_preview_a_draft(self) -> None:
-        self.assertEqual(get_public_article(self.draft).title, "Fixture draft")
+        self.assertEqual(get_article(self.draft).title, "Fixture draft")
 
     def test_an_unknown_article_is_not_found(self) -> None:
         self.assertRaises(
-            frappe.DoesNotExistError, get_public_article, "no-such-article"
+            frappe.DoesNotExistError, get_article, "no-such-article"
         )
 
     def test_an_article_reads_as_markdown(self) -> None:
@@ -286,7 +285,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def titles(self) -> list[str]:
         return [
-            row["title"] for row in get_public_articles(category=self.category.name)
+            row["title"] for row in get_articles(category=self.category.name)
         ]
 
     def test_defaults_to_public(self) -> None:
@@ -313,12 +312,12 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
     def test_a_customer_cannot_open_an_agents_only_article(self) -> None:
         internal = self.make_article("Fixture internal link", AGENTS_ONLY)
         with self.set_user(self.customer):
-            self.assertRaises(frappe.DoesNotExistError, get_public_article, internal)
+            self.assertRaises(frappe.DoesNotExistError, get_article, internal)
 
     def test_a_guest_cannot_open_one_by_name(self) -> None:
         with self.set_user("Guest"):
             self.assertRaises(
-                frappe.DoesNotExistError, get_public_article, self.members
+                frappe.DoesNotExistError, get_article, self.members
             )
 
     def test_a_guest_does_not_count_it(self) -> None:
@@ -329,7 +328,7 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
 
     def test_a_guest_does_not_see_its_title(self) -> None:
         with self.set_user("Guest"):
-            names = [row["name"] for row in get_public_article_titles()]
+            names = [row["name"] for row in get_article_titles()]
             self.assertIn(self.public, names)
             self.assertNotIn(self.members, names)
 
@@ -440,13 +439,6 @@ class TestCategoryAccess(IntegrationTestCase):
         set_category_visibility(self.category.name, PUBLIC)
 
         self.assertTrue(self.listed("Guest"))
-
-    def test_changing_access_reindexes_every_article(self) -> None:
-        """`set_value` skips the hook that reindexes, so search kept the old access."""
-        with patch("helpdesk.search_sqlite.reindex_articles") as reindex:
-            set_category_visibility(self.category.name, AGENTS_ONLY)
-
-        self.assertCountEqual(reindex.call_args.args[0], self.articles)
 
     def test_an_unknown_access_is_refused(self) -> None:
         self.assertRaises(
@@ -569,34 +561,34 @@ class TestCategoryAccess(IntegrationTestCase):
 
 
 class TestSearch(IntegrationTestCase):
-    """The index answers; the audience gate filters what it found."""
+    """RediSearch answers; the audience rule filters what it found."""
 
     def setUp(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("helpdesk.api.article.get_nouns", return_value=[]))
+        self.enterContext(patch("helpdesk.api.article.get_noun_phrases", return_value=[]))
+        self.hd_search = self.enterContext(patch("helpdesk.api.article.hd_search"))
         category = make_article_category("Fixture Search").name
-        self.search = use_test_index(
-            self, HelpdeskArticleSearch, TEST_INDEX, knowledge_base, article_api
-        )
-        self.search._ensure_fts_table()
-        body = "<p>Where the <b>zebra</b> crosses & how</p>"
-        self.public = make_article(
-            "Fixture zebra crossing", category=category, content=body
-        )
+        self.public = make_article("Fixture zebra crossing", category=category)
         self.members = make_article(
-            "Fixture zebra members",
-            category=category,
-            content=body,
-            visibility=CUSTOMERS_ONLY,
+            "Fixture zebra members", category=category, visibility=CUSTOMERS_ONLY
         )
-        self.draft = make_article(
-            "Fixture zebra draft", "Draft", category=category, content=body
+        self.internal = make_article(
+            "Fixture zebra internal", category=category, visibility=AGENTS_ONLY
         )
-        self.search.index_documents_by_name(
-            "HD Article", [self.public, self.members, self.draft]
+        self.draft = make_article("Fixture zebra draft", "Draft", category=category)
+        self.found(self.public, self.members, self.internal, self.draft)
+
+    def found(self, *articles: str) -> None:
+        self.hd_search.return_value = make_search_page(
+            *[make_search_hit(article) for article in articles]
         )
 
     def names(self) -> list[str]:
         return [row["name"] for row in search_articles("zebra")]
+
+    def related(self) -> list[str]:
+        return [row["name"] for row in get_related("zebra")]
 
     def test_is_reachable_without_a_session(self) -> None:
         self.assertIn(search_articles, frappe.guest_methods)
@@ -606,13 +598,27 @@ class TestSearch(IntegrationTestCase):
         self.assertNotIn(self.draft, self.names())
 
     def test_marks_the_hit_in_escaped_text(self) -> None:
-        [row] = [row for row in search_articles("zebra") if row["name"] == self.public]
+        hit = make_search_hit(self.public)
+        hit.update(
+            subject="Fixture <b>zebra</b> crossing",
+            description="Where the <b>zebra</b> crosses & how",
+        )
+        self.hd_search.return_value = make_search_page(hit)
+
+        [row] = search_articles("zebra")
 
         self.assertIn("<mark>zebra</mark>", row["title"])
         self.assertIn("&amp;", row["excerpt"])
         self.assertNotIn("<b>", row["excerpt"])
         self.assertEqual(row["category_name"], "Fixture Search")
-        self.assertIsNone(row["image"])
+
+    def test_an_article_found_in_two_sections_is_listed_once(self) -> None:
+        self.hd_search.return_value = make_search_page(
+            make_search_hit(self.public, "intro"),
+            make_search_hit(self.public, "setup"),
+        )
+
+        self.assertEqual(self.names(), [self.public])
 
     def test_a_guest_is_shown_only_public_articles(self) -> None:
         self.assertIn(self.members, self.names())
@@ -620,40 +626,29 @@ class TestSearch(IntegrationTestCase):
         with self.set_user("Guest"):
             self.assertIn(self.public, self.names())
             self.assertNotIn(self.members, self.names())
-
-    def test_the_index_itself_keeps_to_the_reader_s_audience(self) -> None:
-        """Filtered in the index, so the top hits are readable, not filtered down to nothing."""
-        with self.set_user("Guest"):
-            names = [row["name"] for row in self.search.search("zebra")["results"]]
-
-            self.assertIn(self.public, names)
-            self.assertNotIn(self.members, names)
+            self.assertNotIn(self.internal, self.names())
 
     def test_a_private_knowledge_base_refuses_a_guest(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
         with self.set_user("Guest"):
             self.assertRaises(frappe.PermissionError, search_articles, "zebra")
 
-    def test_three_letters_match_the_start_of_a_word(self) -> None:
-        self.assertIn(self.public, [row["name"] for row in search_articles("zeb")])
-
     def test_a_blank_query_matches_nothing(self) -> None:
         self.assertEqual(search_articles("  "), [])
+        self.hd_search.assert_not_called()
 
     def test_limit_caps_the_list(self) -> None:
         self.assertEqual(len(search_articles("zebra", limit=1)), 1)
 
+    def test_a_site_without_redisearch_finds_nothing(self) -> None:
+        self.hd_search.side_effect = ResponseError("unknown command 'FT.SEARCH'")
+
+        self.assertEqual(search_articles("zebra"), [])
+        self.assertEqual(get_related("zebra"), [])
+
     def test_related_help_keeps_to_the_reader_s_audience(self) -> None:
-        internal = make_article(
-            "Fixture zebra internal",
-            content="<p>zebra</p>",
-            visibility=AGENTS_ONLY,
-        )
-        self.search.index_documents_by_name("HD Article", [internal])
-        self.assertIn(internal, self.related())
+        self.assertIn(self.internal, self.related())
 
         with self.set_user(make_contact("kb-searcher")["user"]):
-            self.assertNotIn(internal, self.related())
-
-    def related(self) -> list[str]:
-        return [row["name"] for row in get_related("zebra")]
+            self.assertNotIn(self.internal, self.related())
+            self.assertIn(self.members, self.related())

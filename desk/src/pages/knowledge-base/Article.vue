@@ -361,7 +361,7 @@ const categories = createResource({
 });
 
 const article: Resource<Article> = createResource({
-  url: "helpdesk.api.knowledge_base.get_public_article",
+  url: "helpdesk.api.knowledge_base.get_article",
   method: "GET",
   params: {
     name: props.articleId,

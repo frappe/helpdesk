@@ -6,7 +6,7 @@ Only the server turns it into field values, since the query is whatever the brow
 
 import frappe
 
-ORIGIN_FIELDS = ("entry_point", "source_article", "source_search")
+TICKET_ORIGIN_FIELDS = ("entry_point", "source_article", "source_search")
 
 ENTRY_POINTS = {
     "article": "Article",
@@ -18,7 +18,7 @@ DIRECT = "Direct"
 SEARCH_LENGTH = 140
 
 
-def resolve_origin(origin: dict) -> dict:
+def resolve_ticket_origin(origin: dict) -> dict:
     """Field values for a portal ticket; a bad origin degrades to Direct, never an error."""
     origin = origin if isinstance(origin, dict) else {}
     # str() so an unhashable value from the request falls through to Direct

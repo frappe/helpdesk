@@ -648,8 +648,8 @@ test.describe("app settings", () => {
     const before = await api.get("HD Settings", "HD Settings");
     const page = await pageAs("admin");
     const dialog = await openSettingsAt(page, "settings/knowledge-base");
-    const row = dialog.locator("div").filter({ hasText: /^Allow guests to vote/ }).last();
-    await dialog.getByRole("switch").nth(1).click();
+    // Switches save at once, so the banner makes the edit.
+    await dialog.getByRole("radio", { name: before.banner_preset === "Blue" ? "None" : "Blue" }).click();
     await expect(dialog.getByText("Unsaved", { exact: true })).toBeVisible();
     // closing is blocked while dirty
     await page.keyboard.press("Escape");
@@ -660,9 +660,7 @@ test.describe("app settings", () => {
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     const after = await api.get("HD Settings", "HD Settings");
-    expect(after.allow_anonymous_article_voting).toBe(before.allow_anonymous_article_voting);
-    expect(after.public_knowledge_base).toBe(before.public_knowledge_base);
-    void row;
+    expect(after.banner_preset).toBe(before.banner_preset);
   });
 
   test("S37 an agent in an organization sees it and counts as its manager", async ({ api, browser, baseURL }) => {

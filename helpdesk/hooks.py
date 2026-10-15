@@ -34,7 +34,6 @@ after_migrate = [
 
 sqlite_search = [
     "helpdesk.search_sqlite.HelpdeskSearch",
-    "helpdesk.search_sqlite.HelpdeskArticleSearch",
 ]
 
 scheduler_events = {

@@ -2,7 +2,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_ticket.api import new
-from helpdesk.helpdesk.doctype.hd_ticket.origin import ORIGIN_FIELDS, SEARCH_LENGTH
+from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS, SEARCH_LENGTH
 from helpdesk.test_utils import make_agent, make_article, make_contact, unique_email
 
 
@@ -22,7 +22,7 @@ class TestTicketOrigin(IntegrationTestCase):
         ticket = new({"subject": "Origin", "description": "<p>Origin</p>", **doc}, [], origin)
         frappe.set_user("Administrator")
         self.addCleanup(frappe.delete_doc, "HD Ticket", ticket["name"], force=True)
-        return frappe.db.get_value("HD Ticket", ticket["name"], ORIGIN_FIELDS, as_dict=True)
+        return frappe.db.get_value("HD Ticket", ticket["name"], TICKET_ORIGIN_FIELDS, as_dict=True)
 
     def test_each_portal_link_is_stored_as_its_entry_point(self):
         cases = {

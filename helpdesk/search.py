@@ -156,10 +156,11 @@ class Search:
         page_length=NUM_RESULTS,
         highlight=False,
     ):
-        query = self.clean_query(query)
+        # `search` cleans the reader's words before adding `*`, `%` and `|`; cleaning again stripped them
         query = Query(query).paging(start, page_length)
         if highlight:
-            query = query.highlight()
+            # Bare HIGHLIGHT covers only the SUMMARIZE fields, which left titles unmarked
+            query = query.highlight(fields=["subject", "description"])
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
@@ -334,7 +335,8 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
         if part in get_stopwords():
             continue
         if len(part) > 3:
-            query += f"{sep}%{part}%"
+            # fuzzy for a typo in a whole word, prefix for one still being typed
+            query += f"{sep}(%{part}%|{part}*)"
         else:
             query += f"{sep}{part}*"
 
@@ -357,6 +359,8 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
 @frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=1)
 def build_index():
+    # Whitelisted for the HD Settings button; anyone else would rebuild it in their request.
+    frappe.has_permission("HD Settings", "write", throw=True)
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
     search = HelpdeskSearch()
     search.build_index()

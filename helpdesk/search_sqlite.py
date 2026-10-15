@@ -4,16 +4,12 @@
 import frappe
 from frappe.search.sqlite_search import SQLiteSearch
 
-from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_filters
-from helpdesk.search import get_stopwords
 from helpdesk.utils import is_agent
 
 # Most tickets to bind as an exact IN (...) prefilter; past this the prefilter is
 # skipped and results are permission-checked after the search instead, since an
 # unbounded IN list hits SQLite's bound-variable ceiling.
 PREFILTER_LIMIT = 500
-# The portal searches from three letters, below frappe's four-letter prefix minimum.
-ARTICLE_PREFIX_LENGTH = 3
 
 
 class HelpdeskSearch(SQLiteSearch):
@@ -245,64 +241,7 @@ class HelpdeskSearch(SQLiteSearch):
         }
 
 
-class HelpdeskArticleSearch(SQLiteSearch):
-    """The knowledge base search, and the articles suggested beside a ticket; its own index,
-    since no article has a ticket to permit."""
-
-    INDEX_NAME = "helpdesk_article_search.db"
-    INDEX_SCHEMA = {"metadata_fields": ["status", "category", "visibility"]}
-    # Every status: the index queue re-adds a changed article unfiltered, so a draft would linger.
-    INDEXABLE_DOCTYPES = {
-        "HD Article": {
-            "fields": [
-                "name",
-                "title",
-                "content",
-                "status",
-                "category",
-                "visibility",
-                "modified",
-            ]
-        },
-    }
-
-    def get_search_filters(self) -> dict:
-        """Published, and for a non-agent only their audiences, so the top hits are all readable."""
-        filters = readable_filters()
-        if visibility := filters.get("visibility"):
-            # the index takes a bare list for IN, not frappe's ["in", values]
-            filters["visibility"] = visibility[1]
-        return filters
-
-    def _prepare_fts_query(self, query: str) -> str:
-        """OR the words, stopwords dropped unless that leaves none; three letters match as a prefix."""
-        stopwords = set(get_stopwords())
-        words = query.split()
-        terms = [term for term in words if term.lower() not in stopwords] or words
-        return " OR ".join(_quote_fts_term(term) for term in terms)
-
-    def _execute_search_query(self, fts_query, title_only, filters):
-        # A stopwords-only query leaves an empty MATCH, which FTS5 rejects.
-        if not fts_query:
-            return []
-        return super()._execute_search_query(fts_query, title_only, filters)
-
-
-def _quote_fts_term(term: str) -> str:
-    quoted = '"{}"'.format(term.replace('"', '""'))
-    return f"{quoted}*" if len(term) >= ARTICLE_PREFIX_LENGTH else quoted
-
-
 def build_index():
     """Build search index - can be called from console."""
     search = HelpdeskSearch()
     search.build_index()
-
-
-def reindex_articles(names: list[str]) -> None:
-    """Queue articles changed by `frappe.db.set_value`, which skips the hook that reindexes them."""
-    search = HelpdeskArticleSearch()
-    if not (search.is_search_enabled() and search.index_exists()):
-        return
-    for name in names:
-        search.index_doc("HD Article", name)

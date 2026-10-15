@@ -251,14 +251,27 @@ def get_list_data(
 def _get_group_by_option_details(
     doctype: str, options: list[str], label_field: str, icon_field: str | None
 ) -> dict[str, dict]:
-    """Label and icon per group-by option in one query, not a `get_value` per option."""
-    if not options:
-        return {}
-    fields = ["name", f"{label_field} as label"]
-    if icon_field:
+    """Label and icon per group-by option in one query, not a `get_value` per option.
+
+    The view comes from the client, so both fields must exist on the doctype and
+    `get_list` keeps the read to rows and fields the user may see."""
+    meta = frappe.get_meta(doctype)
+    fields = ["name"]
+    if _is_plain_field(meta, label_field):
+        fields.append(f"{label_field} as label")
+    if icon_field and _is_plain_field(meta, icon_field):
         fields.append(f"{icon_field} as icon")
-    rows = frappe.get_all(doctype, filters={"name": ["in", options]}, fields=fields)
+    if not options or len(fields) == 1:
+        return {}
+    rows = frappe.get_list(doctype, filters={"name": ["in", options]}, fields=fields)
     return {row.name: row for row in rows}
+
+
+def _is_plain_field(meta, fieldname: str) -> bool:
+    if fieldname == "name":
+        return True
+    field = meta.get_field(fieldname)
+    return bool(field) and field.fieldtype not in frappe.model.table_fields
 
 
 @frappe.whitelist()

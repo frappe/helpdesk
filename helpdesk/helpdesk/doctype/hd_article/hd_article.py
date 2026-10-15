@@ -14,7 +14,7 @@ from helpdesk.utils import capture_event, is_agent
 PUBLIC = "Public"
 CUSTOMERS_ONLY = "Customers only"
 AGENTS_ONLY = "Agents only"
-# What a list row shows of the body.
+# What a list row shows of the body maxed so entire conent is not loaded.
 EXCERPT_LENGTH = 140
 
 
@@ -212,15 +212,7 @@ def get_joining_values(category: str) -> dict:
 
 
 def update_articles(filters: dict, values: dict) -> None:
-    """Bulk `set_value` skips the hook that reindexes, so this reindexes what it touched."""
-    # search_sqlite imports this module
-    from helpdesk.search_sqlite import reindex_articles
-
-    names = frappe.get_all("HD Article", filters=filters, pluck="name")
-    if not names:
-        return
     frappe.db.set_value("HD Article", filters, values, update_modified=False)
-    reindex_articles(names)
 
 
 def check_category_length(category: str | None) -> None:
