@@ -1,8 +1,8 @@
 import { useStorage, type UseStorageOptions } from "@vueuse/core";
 
-/** localStorage scoped to the signed-in agent, so nothing personal survives a
- * shift handover. Reads the session cookie, not the auth store — this runs at
- * module load, before pinia exists. */
+/** localStorage scoped to the signed-in user, so nothing personal survives a
+ * shift handover. Reads the session cookie, not the auth store — callers may run
+ * at module load, before pinia exists. */
 export function userStorage<T>(
   key: string,
   fallback: T,
