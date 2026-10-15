@@ -9,11 +9,7 @@ import { computed, MaybeRefOrGetter, ref, toValue, watch } from "vue";
 // Most group keys fetched to count the groups; past it the total is a floor.
 const COUNT_CAP = 1000;
 
-/**
- * Grouped rows for the Group By summary, like `useGroupByData` from @framework/ui
- * but through `get_grouped_list`, which handles `@me` and the assigned-on filter the
- * way the list does. Refetches from the first page on any query change.
- */
+// useGroupByData through get_grouped_list, so @me and assigned-on filters match the list
 export function useGroupedList(
   doctype: MaybeRefOrGetter<string>,
   groupBy: MaybeRefOrGetter<GroupBySettings | null>,
