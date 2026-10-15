@@ -1,8 +1,6 @@
 import type { Ref } from "vue";
 import { computed, effectScope } from "vue";
 import {
-  isNavigationFailure,
-  NavigationFailureType,
   useRoute,
   useRouter,
   type RouteLocationNormalizedLoaded,
@@ -53,8 +51,6 @@ export function openView(router: Router, listRoute: string, view?: string) {
     return;
   }
   const stop = router.afterEach((to, _from, failure) => {
-    // A router-link to the same list can supersede this push; wait for it.
-    if (isNavigationFailure(failure, NavigationFailureType.cancelled)) return;
     stop();
     if (!failure && to.name === listRoute) setActiveView(listRoute, view);
   });

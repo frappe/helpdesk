@@ -162,7 +162,7 @@ const breadcrumbs = computed(() => {
   let items = [
     {
       label: __("Tickets"),
-      route: { name: "TicketsAgent" },
+      href: router.resolve({ name: "TicketsAgent" }).href,
       onClick: () => openView("TicketsAgent"),
     },
   ];
