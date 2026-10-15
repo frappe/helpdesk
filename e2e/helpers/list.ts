@@ -115,10 +115,13 @@ export class TicketList {
   }
 }
 
+/** Every view a spec creates is labelled with this, so `resetDefaultTicketView` can drop it. */
+const E2E_VIEW_PREFIX = "E2E view ";
+
 /** A private ticket view pinned to `user`'s sidebar, listing subjects that contain `subject`. */
 export async function createPinnedTicketView(api: Api, user: string, subject: string) {
   return api.insert("HD View", {
-    label: `E2E view ${uid()}`,
+    label: `${E2E_VIEW_PREFIX}${uid()}`,
     user,
     dt: "HD Ticket",
     type: "list",
@@ -139,7 +142,7 @@ export async function resetDefaultTicketView(api: Api, user: string) {
   const views = await api.list("HD View", {
     filters: { user, dt: "HD Ticket", is_default: 1 },
   });
-  views.push(...(await api.list("HD View", { filters: { label: ["like", "E2E view %"] } })));
+  views.push(...(await api.list("HD View", { filters: { label: ["like", `${E2E_VIEW_PREFIX}%`] } })));
   // the list may still be auto saving the default view, which locks it for a moment
   for (const view of views) {
     await expect(async () => {
