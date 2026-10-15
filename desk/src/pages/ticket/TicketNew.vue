@@ -110,11 +110,11 @@
 <script setup lang="ts">
 import { LayoutHeader, UniInput } from "@/components";
 import CustomActions from "@helpdesk/shared/CustomActions.vue";
+import { parseField } from "@/composables/fieldDependsOn";
 import {
   applyFieldFilters,
-  parseField,
   setupCustomizations,
-} from "@/composables/formCustomisation";
+} from "@helpdesk/shared/formScripts";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";

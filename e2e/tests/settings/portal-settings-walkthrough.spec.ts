@@ -350,8 +350,8 @@ test.describe("organization", () => {
     let dialog = await openOrgScreen(managerPage, org.name);
     await expect(dialog.getByRole("button", { name: "Upload photo" })).toHaveCount(0);
     const managerApi = await loginContext(baseURL!, org.manager.email, PASSWORD);
-    const refused = await managerApi.post("/api/method/helpdesk.api.organization.update_organization_image", { data: { customer: org.name, image: "" } });
-    expect(await refused.text()).toContain("does not allow customers to change their organization");
+    const refused = await managerApi.post("/api/method/helpdesk.api.customer.update_organization_image", { data: { customer: org.name, image: "" } });
+    expect(await refused.text()).toContain("You are not permitted to change the organization's logo");
 
     await setToggles(api, true);
     dialog = await openOrgScreen(managerPage, org.name);
@@ -366,8 +366,8 @@ test.describe("organization", () => {
     await expect.poll(async () => (await api.get("HD Customer", org.name)).image).toBeFalsy();
 
     const memberApi = await loginContext(baseURL!, org.member.email, PASSWORD);
-    const notManager = await memberApi.post("/api/method/helpdesk.api.organization.update_organization_image", { data: { customer: org.name, image: "" } });
-    expect(await notManager.text()).toContain(`Only a manager of ${org.name} can do this`);
+    const notManager = await memberApi.post("/api/method/helpdesk.api.customer.update_organization_image", { data: { customer: org.name, image: "" } });
+    expect(await notManager.text()).toContain(`You are not permitted to manage ${org.name}`);
     const memberDialog = await openOrgScreen(await pageOf(browser, baseURL!, org.member.email), org.name);
     await expect(memberDialog.getByRole("button", { name: "Upload photo" })).toHaveCount(0);
   });
@@ -422,12 +422,12 @@ test.describe("organization", () => {
     await expect(memberDialog.locator("button").filter({ hasText: /^Manager$/ })).toHaveCount(0);
     const memberApi = await loginContext(baseURL!, org.member.email, PASSWORD);
     for (const [method, args] of [
-      ["invite_members", { emails: [`x-${uid()}@${org.domain}`], role: "HD Customer" }],
+      ["invite_members", { emails: [`x-${uid()}@${org.domain}`], is_manager: false }],
       ["update_member_role", { contact: org.manager.contact, is_manager: 0 }],
       ["remove_member", { contact: org.manager.contact }],
     ] as const) {
-      const response = await memberApi.post(`/api/method/helpdesk.api.organization.${method}`, { data: { customer: org.name, ...args } });
-      expect(await response.text(), method).toContain(`Only a manager of ${org.name} can do this`);
+      const response = await memberApi.post(`/api/method/helpdesk.api.customer.${method}`, { data: { customer: org.name, ...args } });
+      expect(await response.text(), method).toContain(`You are not permitted to manage ${org.name}`);
     }
   });
 
@@ -461,7 +461,7 @@ test.describe("organization", () => {
 
     const managerApi = await loginContext(baseURL!, org.manager.email, PASSWORD);
     for (const contact of [org.owner.contact, org.manager.contact]) {
-      const response = await managerApi.post("/api/method/helpdesk.api.organization.remove_member", { data: { customer: org.name, contact } });
+      const response = await managerApi.post("/api/method/helpdesk.api.customer.remove_member", { data: { customer: org.name, contact } });
       expect(response.ok(), contact).toBeFalsy();
     }
 
@@ -474,10 +474,8 @@ test.describe("organization", () => {
     expect(contacts).not.toContain(org.member.contact);
   });
 
-  test("S22–S26 invites: screen, suggestions, errors, pending rows, cancel", async ({ api, browser, baseURL }) => {
+  test("S22–S26 invites: screen, errors, pending rows, cancel", async ({ api, browser, baseURL }) => {
     const org = await newOrg(api);
-    // S23 a login-holding contact on the domain who is not a member
-    const outsider = await newPerson(api, org.domain, ["HD Customer"], "Outsider");
     await setToggles(api, true);
     const page = await pageOf(browser, baseURL!, org.manager.email);
     const dialog = await openOrgScreen(page, org.name);
@@ -488,12 +486,8 @@ test.describe("organization", () => {
     // S24 no emails
     await dialog.getByRole("button", { name: "Send Invite" }).click();
     await expect(toast(page, "Please enter an email address")).toBeVisible();
-    // S23 suggestion
     const input = dialog.getByPlaceholder("Separate multiple emails with commas");
     await input.click();
-    await input.pressSequentially("Outsider");
-    await expect(page.getByRole("option", { name: new RegExp(outsider.fullName) })).toBeVisible();
-    await input.fill("");
     // S22 comma and semicolon split into chips
     const first = `invitee-a-${uid()}@${org.domain}`;
     const second = `invitee-b-${uid()}@${org.domain}`;
@@ -503,7 +497,7 @@ test.describe("organization", () => {
     await expect(dialog.getByText(second)).toBeVisible();
     await choose(page, dialog.locator('[data-component-id="kb_settings-invite-role"]'), "Manager");
     await dialog.getByRole("button", { name: "Send Invite" }).click();
-    await expect(page.getByText(/Invitations sent|Invitations created, but the emails could not be sent/).first()).toBeVisible();
+    await expect(page.getByText(/invited successfully|Invitations created, but the emails could not be sent/).first()).toBeVisible();
     const invitations = await api.list("User Invitation", { filters: { customer: org.name }, fields: ["email", "status"] });
     expect(invitations.map((row) => row.email).sort()).toEqual([first, second].sort());
     await expect(page).not.toHaveURL(/\/invite$/);
@@ -513,6 +507,13 @@ test.describe("organization", () => {
     await expect(row).toContainText("by you");
     await expect(row).toContainText("Pending");
     await expect(row).toContainText("Manager");
+    // S22 an already invited email is skipped, not refused
+    await dialog.getByRole("button", { name: "Invite people" }).click();
+    await input.click();
+    await input.pressSequentially(`${first},`);
+    await dialog.getByRole("button", { name: "Send Invite" }).click();
+    await expect(toast(page, `${first} already invited`)).toBeVisible();
+    await expect(page).not.toHaveURL(/\/invite$/);
     // S26 no resend
     await expect(dialog.getByRole("button", { name: /resend/i })).toHaveCount(0);
     await dialog.getByRole("combobox").last().click();
@@ -532,15 +533,10 @@ test.describe("organization", () => {
     // S24 more than 20
     const managerApi = await loginContext(baseURL!, org.manager.email, PASSWORD);
     const tooMany = Array.from({ length: 21 }, (_, n) => `many-${n}-${uid()}@${org.domain}`);
-    const response = await managerApi.post("/api/method/helpdesk.api.organization.invite_members", {
-      data: { customer: org.name, emails: tooMany, role: "HD Customer" },
+    const response = await managerApi.post("/api/method/helpdesk.api.customer.invite_members", {
+      data: { customer: org.name, emails: tooMany, is_manager: false },
     });
     expect(await response.text()).toContain("You can invite up to 20 people at a time");
-
-    // S23 a shared mail domain suggests no one
-    await api.update("HD Customer", org.name, { domain: "gmail.com" });
-    const suggestions = await managerApi.get(`/api/method/helpdesk.api.organization.get_invitable_contacts?customer=${encodeURIComponent(org.name)}`);
-    expect((await suggestions.json()).message).toEqual([]);
   });
 
   test("S2 a deep link opens the invite screen", async ({ api, browser, baseURL }) => {
@@ -559,8 +555,8 @@ test.describe("organization", () => {
     const managerApi = await loginContext(baseURL!, org.manager.email, PASSWORD);
     const statuses: number[] = [];
     for (let n = 0; n < 11; n++) {
-      const response = await managerApi.post("/api/method/helpdesk.api.organization.invite_members", {
-        data: { customer: org.name, emails: [`rate-${n}-${uid()}@${org.domain}`], role: "HD Customer" },
+      const response = await managerApi.post("/api/method/helpdesk.api.customer.invite_members", {
+        data: { customer: org.name, emails: [`rate-${n}-${uid()}@${org.domain}`], is_manager: false },
       });
       statuses.push(response.status());
     }

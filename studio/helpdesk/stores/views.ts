@@ -1,15 +1,11 @@
 import { computed, nextTick, ref, shallowRef, toRaw, watch } from 'vue'
 import { StorageSerializers, useStorage } from '@vueuse/core'
 import { call, createListResource, toast } from 'frappe-ui'
-import { spritePlugin } from 'frappe-ui/experimental'
 import { parseOrderBy } from '@framework/ui/SortBy'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { parseJson, runAction, setValues } from '@app/utils'
-
-// View icons are any lucide name stored per view, which Studio's build-time classes cannot cover.
-if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 const DOCTYPE = 'HD Ticket'
 

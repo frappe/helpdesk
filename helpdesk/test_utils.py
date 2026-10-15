@@ -758,7 +758,7 @@ def get_invitation(email: str):
 
 def get_organization_members(customer: str) -> dict:
     """The portal's member rows for a customer, keyed by contact name."""
-    from helpdesk.api.organization import get_organization
+    from helpdesk.api.customer import get_organization
 
     return {
         member["contact"]: member
@@ -769,18 +769,13 @@ def get_organization_members(customer: str) -> dict:
 
 def get_organization_card(customer: str) -> dict:
     """The portal's card for one of the session user's organizations."""
-    from helpdesk.api.organization import get_account
+    from helpdesk.api.customer import get_portal_account
 
     return next(
-        org for org in get_account()["organizations"] if org["name"] == customer
+        organization
+        for organization in get_portal_account()["organizations"]
+        if organization["name"] == customer
     )
-
-
-def get_invitable_emails(customer: str) -> list[str]:
-    """The emails the portal suggests for a customer's invite screen."""
-    from helpdesk.api.organization import get_invitable_contacts
-
-    return [row["email"] for row in get_invitable_contacts(customer)]
 
 
 def delete_invitations(email: str) -> None:

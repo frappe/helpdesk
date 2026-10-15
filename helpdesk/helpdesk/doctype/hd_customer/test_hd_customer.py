@@ -379,7 +379,7 @@ class TestHDCustomer(IntegrationTestCase):
         return contact_doc, customer, ticket, invitation
 
     def test_has_permission_members_read_and_never_write(self) -> None:
-        # Managers change their customer through helpdesk.api.organization only.
+        # Managers change their customer through helpdesk.api.customer only.
         customer = create_customer("Perm Member Manager")
         member = create_contact("PermMember", "perm-member@example.com")
         manager = create_contact("PermManager", "perm-manager@example.com")

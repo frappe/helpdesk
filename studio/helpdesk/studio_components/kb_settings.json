@@ -1046,8 +1046,8 @@
                 "componentProps": {
                  "canChangeRoles": "{{ canChangeRoles }}",
                  "canRemoveMembers": "{{ canRemoveMembers }}",
-                 "showLastSeen": "{{ showLastSeen }}",
-                 "invites": "{{ organizationInvites }}",
+                 "showLastActive": "{{ showLastActive }}",
+                 "invitations": "{{ organizationInvitations }}",
                  "members": "{{ organizationMembers }}",
                  "onCancel": "{{ cancelInvitation }}",
                  "onRemove": "{{ removeMember }}",
@@ -1247,7 +1247,7 @@
               "componentId": "kb_settings-invite-emails",
               "componentName": "PortalEmailInput",
               "componentProps": {
-               "contacts": "{{ inviteContacts }}",
+               "searchContacts": "{{ searchInviteContacts }}",
                "modelValue": {
                 "$type": "variable",
                 "name": "inviteEmails"
@@ -1618,7 +1618,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-10 20:51:47.071215",
+ "modified": "2026-10-15 21:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

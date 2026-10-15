@@ -12,32 +12,42 @@
 
 <script setup lang="ts">
 // `experimental/` is not in Studio's palette, so it reaches the block tree through this.
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { debounce } from "frappe-ui";
 import { isValidEmail, MultiEmailInput } from "frappe-ui/experimental";
-import { matchesQuery } from "@app/utils";
+import { SEARCH_DEBOUNCE_MS } from "@app/utils";
 
-const props = withDefaults(
-  defineProps<{
-    contacts?: { full_name: string; email: string; image?: string }[];
-    placeholder?: string;
-  }>(),
-  { contacts: () => [] }
-);
+type Contact = { full_name: string; email: string; image?: string };
+
+const props = defineProps<{
+  // Matched on the server: there are too many contacts to send them all.
+  searchContacts?: (query: string) => Promise<Contact[]>;
+  placeholder?: string;
+}>();
 
 const emails = defineModel<string[]>({ default: () => [] });
 
 const query = ref("");
+const contacts = ref<Contact[]>([]);
+
+const search = debounce(async () => {
+  const asked = query.value;
+  try {
+    const found = (await props.searchContacts?.(asked)) || [];
+    // A slower, older answer must not replace a newer one.
+    if (asked === query.value) contacts.value = found;
+  } catch (error) {
+    console.error(error);
+  }
+}, SEARCH_DEBOUNCE_MS);
+watch(query, search, { immediate: true });
 
 const options = computed(() =>
-  props.contacts
-    .filter((contact) =>
-      matchesQuery(query.value, contact.full_name, contact.email)
-    )
-    .map((contact) => ({
-      label: contact.full_name,
-      value: contact.email,
-      avatar: contact.image,
-    }))
+  contacts.value.map((contact) => ({
+    label: contact.full_name,
+    value: contact.email,
+    avatar: contact.image,
+  }))
 );
 
 // It only splits on paste, but the placeholder promises commas.

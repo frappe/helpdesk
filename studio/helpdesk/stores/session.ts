@@ -1,10 +1,14 @@
 import { computed, ref } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
 import { call, setConfig } from 'frappe-ui'
+import { spritePlugin } from 'frappe-ui/experimental'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 
 // From boot, not `get_config`: it must be set before the first date renders.
 setConfig('systemTimezone', window.boot?.system_timezone)
+
+// Stored icons (views, form scripts) can be any lucide name, which Studio's build-time classes cannot cover.
+if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
 // `get_config` is the one call guests may make.
 const store = createSessionStore()
@@ -47,6 +51,14 @@ function createSessionStore() {
     return loadSession()
   }
 
+  // Once per app: every page passes the same socket. The desk's config store does the same.
+  let listeningForSettings = false
+  function reloadOnSettingsUpdate(socket) {
+    if (listeningForSettings || !socket) return
+    listeningForSettings = true
+    socket.on('helpdesk:settings-updated', reloadSession)
+  }
+
   // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value) return
@@ -69,6 +81,7 @@ function createSessionStore() {
 
   return {
     config,
+    reloadOnSettingsUpdate,
     isGuest,
     isPublicKnowledgeBase,
     canCreateTicket,

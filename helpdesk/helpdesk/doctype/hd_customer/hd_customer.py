@@ -17,14 +17,16 @@ from helpdesk.integrations.erpnext.utils import (
     sync_related_fields,
     validate_rename_conflict,
 )
-from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, get_customers, is_agent
+from helpdesk.utils import (
+    CUSTOMER_PORTAL_ROOT,
+    agent_manager_only,
+    agent_only,
+    get_customers,
+    is_agent,
+)
 
 MANAGER_ROLE = "HD Customer Manager"
 CUSTOMER_ROLES = ("HD Customer", MANAGER_ROLE)
-PORTAL_INVITE_SETTING = "allow_customer_managers_to_invite"
-PORTAL_ROLES_SETTING = "allow_customer_managers_to_change_roles"
-PORTAL_REMOVE_SETTING = "allow_customer_managers_to_remove_members"
-PORTAL_EDIT_SETTING = "allow_customer_managers_to_edit_organization"
 
 
 class HDCustomer(Document):
@@ -344,15 +346,11 @@ class HDCustomer(Document):
         return result
 
     @frappe.whitelist()
+    @agent_manager_only
     def get_pending_invites(self):
-        if "Agent Manager" not in frappe.get_roles():
-            frappe.throw(
-                _("You do not have permission to access this resource"),
-                frappe.PermissionError,
-            )
-        return self.get_pending_invitations()
+        return self.list_pending_invitations()
 
-    def get_pending_invitations(self) -> list[dict]:
+    def list_pending_invitations(self) -> list[dict]:
         pending_invites = frappe.db.get_all(
             "User Invitation",
             filters={
@@ -367,23 +365,27 @@ class HDCustomer(Document):
                 "creation",
             ],
         )
-        res = []
-        for pending_invitation in pending_invites:
-            roles = frappe.db.get_all(
+        roles = {invitation.name: [] for invitation in pending_invites}
+        if roles:
+            for row in frappe.db.get_all(
                 "User Role",
-                fields=["role"],
-                filters={"parent": pending_invitation.name},
-            )
-            res.append(
-                {
-                    "name": pending_invitation.name,
-                    "email": pending_invitation.email,
-                    "invited_by": pending_invitation.invited_by,
-                    "invited_on": pending_invitation.creation,
-                    "roles": [r.role for r in roles],
-                }
-            )
-        return res
+                fields=["parent", "role"],
+                filters={
+                    "parenttype": "User Invitation",
+                    "parent": ["in", list(roles)],
+                },
+            ):
+                roles[row.parent].append(row.role)
+        return [
+            {
+                "name": invitation.name,
+                "email": invitation.email,
+                "invited_by": invitation.invited_by,
+                "invited_on": invitation.creation,
+                "roles": roles[invitation.name],
+            }
+            for invitation in pending_invites
+        ]
 
     def after_insert(self):
         if should_sync_with_erpnext() and not self.flags.get("ignore_erpnext_sync"):
@@ -484,7 +486,7 @@ def permission_query(user: str) -> str:
 
 
 def has_permission(doc: Document, ptype: str, user: str) -> bool:
-    """Agents are unrestricted; members may read, and change it only through `helpdesk.api.organization`."""
+    """Agents are unrestricted; members may only read. Managers change it through `helpdesk.api.customer`, never here."""
     if is_agent(user):
         return True
     if ptype in ("write", "delete"):
@@ -506,10 +508,6 @@ def is_customer_manager(customer: str | None, user: str | None = None) -> bool:
         return False
     membership = get_customer_membership(customer, user or frappe.session.user)
     return bool(membership and membership.get("is_manager"))
-
-
-def is_portal_setting_on(setting: str) -> bool:
-    return bool(frappe.db.get_single_value("HD Settings", setting))
 
 
 def validate_customer_role(role: str) -> None:

@@ -1,7 +1,12 @@
 import frappe
 from frappe import _
 
-from helpdesk.utils import agent_only, get_agent_name, get_agents_team
+from helpdesk.utils import (
+    agent_only,
+    get_agent_name,
+    get_agents_team,
+    get_user_contact,
+)
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -111,7 +116,7 @@ def validate_uploaded_image(image: str | None) -> None:
 
 def _sync_contact(user) -> None:
     # Frappe mirrors the User onto its Contact after commit, too late for the reload that follows.
-    contact_name = frappe.db.get_value("Contact", {"user": user.name})
+    contact_name = get_user_contact(user.name)
     if not contact_name:
         return
     # Locked: the User's own after-commit job saves this Contact too, and a quick second change would race it.

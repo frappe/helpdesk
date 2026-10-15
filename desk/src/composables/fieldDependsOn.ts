@@ -1,11 +1,6 @@
 import { parseLinkFilters } from "@helpdesk/shared/utils";
 
-export {
-  applyFieldFilters,
-  setupCustomizations,
-} from "@helpdesk/shared/formScripts";
-
-//
+// ps: used to be form customizations but now is formScripts is extracted to shared module in formScripts.ts
 export function parseField(field, doc) {
   return {
     display_via_depends_on: evaluateDependsOnValue(field?.depends_on, doc),

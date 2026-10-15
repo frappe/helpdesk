@@ -21,6 +21,10 @@ def get_config():
         "assign_within_team",
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
+        "allow_customer_managers_to_invite",
+        "allow_customer_managers_to_change_roles",
+        "allow_customer_managers_to_remove_members",
+        "allow_customer_managers_to_edit_organization",
     ]
     # A Single omits fields never set; every requested key is answered so the portal reads null.
     values = (
