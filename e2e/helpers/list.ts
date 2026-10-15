@@ -7,7 +7,7 @@ export class TicketList {
 
   async goto() {
     await this.page.goto("/helpdesk/tickets");
-    await expect(this.page.getByRole("button", { name: "Filter" })).toBeVisible();
+    await expect(this.page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
   }
 
   rows() {
@@ -69,20 +69,34 @@ export class TicketList {
 
   /** Clear every filter from the Filter popover, the way an agent resets the list. */
   async clearFilters() {
-    await this.page.getByRole("button", { name: "Filter" }).click();
+    await this.page.getByRole("button", { name: "Filter", exact: true }).click();
     await this.page.getByRole("dialog", { name: "Filter" }).getByRole("button", { name: "Clear all" }).click();
     await this.page.keyboard.press("Escape");
   }
 
   async addFilter(field: string, value: string) {
-    await this.page.getByRole("button", { name: "Filter" }).click();
-    const popover = this.page.getByRole("dialog", { name: "Filter" });
+    await this.chooseFilterField(field);
+    await this.page.getByRole("option", { name: value, exact: true }).click();
+  }
+
+  filterPopover() {
+    return this.page.getByRole("dialog", { name: "Filter" });
+  }
+
+  /** Open the Filter popover and pick a field, leaving its value editor open. */
+  async chooseFilterField(field: string) {
+    await this.page.getByRole("button", { name: "Filter", exact: true }).click();
+    const popover = this.filterPopover();
     await expect(popover).toBeVisible();
     const addFilter = popover.getByRole("button", { name: "Add filter" });
     if (await addFilter.isVisible()) await addFilter.click();
     await popover.getByRole("textbox").fill(field);
     await this.page.getByRole("option", { name: field, exact: true }).click();
-    await this.page.getByRole("option", { name: value, exact: true }).click();
+  }
+
+  async chooseFilterOperator(operator: string) {
+    await this.filterPopover().locator("button[aria-haspopup]").click();
+    await this.page.getByRole("menuitem", { name: operator, exact: true }).click();
   }
 }
 

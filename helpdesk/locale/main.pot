@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Helpdesk VERSION\n"
 "Report-Msgid-Bugs-To: hello@frappe.io\n"
-"POT-Creation-Date: 2026-10-04 15:27+0000\n"
-"PO-Revision-Date: 2026-10-04 15:27+0000\n"
+"POT-Creation-Date: 2026-10-11 16:22+0000\n"
+"PO-Revision-Date: 2026-10-11 16:22+0000\n"
 "Last-Translator: hello@frappe.io\n"
 "Language-Team: hello@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.16.0\n"
 
-#: helpdesk/api/dashboard.py:187
+#: helpdesk/api/dashboard.py:213
 msgid "% SLA Fulfilled"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:192
+#: helpdesk/api/dashboard.py:218
 #, python-format
 msgid "% of tickets created that were resolved within SLA"
 msgstr ""
@@ -195,8 +195,8 @@ msgid ""
 "Unavailable: The agent is off and unavailable."
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:530
-#: desk/src/pages/ticket/TicketCustomer.vue:207
+#: desk/src/pages/ticket/MobileTicketAgent.vue:531
+#: desk/src/pages/ticket/TicketCustomer.vue:212
 msgid "Activity"
 msgstr ""
 
@@ -373,7 +373,7 @@ msgstr ""
 msgid "Agent Configuration"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:271
+#: desk/src/pages/dashboard/Dashboard.vue:268
 msgid "Agent Dashboard"
 msgstr ""
 
@@ -579,7 +579,7 @@ msgstr ""
 msgid "Are you sure you want to change tabs? Unsaved changes will be lost."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:338
+#: desk/src/pages/ticket/TicketCustomer.vue:343
 msgid "Are you sure you want to close this ticket?"
 msgstr ""
 
@@ -611,7 +611,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:105
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:72
 #: desk/src/components/Settings/Holiday/HolidayView.vue:194
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:223
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:264
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:299
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:383
 #: desk/src/components/Settings/Teams/NewTeam.vue:109
@@ -835,7 +835,7 @@ msgstr ""
 msgid "Auto-generated from the portal view — do not edit directly unless you know what you're doing! "
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:140
+#: helpdesk/overrides/email_account.py:150
 msgid "Auto-reply received from {0}."
 msgstr ""
 
@@ -886,7 +886,7 @@ msgstr ""
 msgid "Average Response Time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:380
+#: helpdesk/api/dashboard.py:415
 msgid "Average feedback rating per day is around {0} stars"
 msgstr ""
 
@@ -894,7 +894,7 @@ msgstr ""
 msgid "Average response and resolution metrics not available"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:298
+#: helpdesk/api/dashboard.py:337
 msgid "Average tickets per day is around {0}"
 msgstr ""
 
@@ -906,7 +906,7 @@ msgstr ""
 msgid "Average time to reply after a customer message"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:243
+#: helpdesk/api/dashboard.py:269
 msgid "Avg. Feedback Rating"
 msgstr ""
 
@@ -914,7 +914,8 @@ msgstr ""
 msgid "Avg. Feedback Received"
 msgstr ""
 
-#: desk/src/pages/home/components/ChartItem.vue:6 helpdesk/api/dashboard.py:204
+#: desk/src/pages/home/components/ChartItem.vue:6 helpdesk/api/dashboard.py:230
+#: helpdesk/tests/api/test_dashboard.py:137
 msgid "Avg. First Response"
 msgstr ""
 
@@ -924,7 +925,7 @@ msgid "Avg. First Response Time"
 msgstr ""
 
 #: desk/src/pages/home/components/ChartItem.vue:16
-#: helpdesk/api/dashboard.py:221
+#: helpdesk/api/dashboard.py:247
 msgid "Avg. Resolution"
 msgstr ""
 
@@ -946,7 +947,7 @@ msgstr ""
 msgid "Avg. customer response gap"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:248
+#: helpdesk/api/dashboard.py:274
 msgid "Avg. feedback rating for tickets resolved in this period"
 msgstr ""
 
@@ -960,11 +961,11 @@ msgstr ""
 msgid "Avg. resolution time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:210
+#: helpdesk/api/dashboard.py:236
 msgid "Avg. time taken to first respond to a ticket"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:227
+#: helpdesk/api/dashboard.py:253
 msgid "Avg. time taken to resolve a ticket"
 msgstr ""
 
@@ -1088,7 +1089,7 @@ msgstr ""
 msgid "Caller"
 msgstr ""
 
-#: desk/src/pages/ticket/MobileTicketAgent.vue:548
+#: desk/src/pages/ticket/MobileTicketAgent.vue:549
 msgid "Calls"
 msgstr ""
 
@@ -1225,7 +1226,7 @@ msgstr ""
 msgid "Change language of the application."
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:182
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:206
 msgid "Change operator ({0})"
 msgstr ""
 
@@ -1266,7 +1267,7 @@ msgstr ""
 msgid "Child field"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/Filter.vue:202
+#: desk/src/components/view-controls/filter/Filter.vue:204
 msgid "Choose a field"
 msgstr ""
 
@@ -1315,6 +1316,10 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:107
+msgid "Clear All"
+msgstr ""
+
 #: desk/src/components/view-controls/SortBy.vue:155
 msgid "Clear Sort"
 msgstr ""
@@ -1329,6 +1334,7 @@ msgid "Clear all"
 msgstr ""
 
 #: desk/src/components/view-controls/filter/FilterTrigger.vue:17
+#: desk/src/components/view-controls/filter/FilterTrigger.vue:22
 msgid "Clear all Filter"
 msgstr ""
 
@@ -1359,7 +1365,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:337
+#: desk/src/pages/ticket/TicketCustomer.vue:342
 msgid "Close Ticket"
 msgstr ""
 
@@ -1392,7 +1398,7 @@ msgstr ""
 msgid "Comma separated emails to invite."
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:113
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:134
 msgid "Comma separated values"
 msgstr ""
 
@@ -1430,7 +1436,7 @@ msgstr ""
 
 #. Label of the comments_section (Section Break) field in DocType 'HD Settings'
 #: desk/src/pages/SearchAgent.vue:353
-#: desk/src/pages/ticket/MobileTicketAgent.vue:540
+#: desk/src/pages/ticket/MobileTicketAgent.vue:541
 #: helpdesk/helpdesk/doctype/hd_settings/hd_settings.json
 msgid "Comments"
 msgstr ""
@@ -1491,7 +1497,7 @@ msgstr ""
 #: desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue:327
 #: desk/src/pages/knowledge-base/NewArticle.vue:157
 #: desk/src/pages/ticket/MobileTicketAgent.vue:233
-#: desk/src/pages/ticket/TicketCustomer.vue:341
+#: desk/src/pages/ticket/TicketCustomer.vue:346
 #: helpdesk/helpdesk/doctype/erpnext_hd_settings/erpnext_hd_settings.js:27
 msgid "Confirm"
 msgstr ""
@@ -1542,7 +1548,7 @@ msgstr ""
 msgid "Contact updated successfully."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:277
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:280
 msgid "Contact {0} has no email address"
 msgstr ""
 
@@ -1608,11 +1614,15 @@ msgstr ""
 msgid "Could not find the `name` column in tabHD Ticket"
 msgstr ""
 
+#: desk/src/pages/ticket/TicketCustomer.vue:185
+msgid "Could not load the ticket."
+msgstr ""
+
 #: helpdesk/patches/move_contact_dynamic_link_to_hd_customer.py:74
 msgid "Could not migrate contacts for {0} customer(s): {1}. Fix the underlying data and re-run the patch."
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:185
+#: helpdesk/overrides/email_account.py:198
 msgid "Could not note parked mail on ticket"
 msgstr ""
 
@@ -1724,8 +1734,8 @@ msgstr ""
 msgid "Custom Outside Working Hours Message"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:600
-#: desk/src/pages/dashboard/Dashboard.vue:606
+#: desk/src/pages/dashboard/Dashboard.vue:577
+#: desk/src/pages/dashboard/Dashboard.vue:583
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:173
 #: desk/src/pages/home/components/AvgTimeMetrics.vue:194
 #: desk/src/pages/home/components/RecentFeedback.vue:371
@@ -1845,7 +1855,7 @@ msgstr ""
 msgid "Cyan"
 msgstr ""
 
-#: helpdesk/api/dashboard_tags.py:73
+#: helpdesk/api/dashboard_tags.py:75
 msgid "Daily volume of the top {0} tags"
 msgstr ""
 
@@ -1857,7 +1867,7 @@ msgstr ""
 msgid "Danger"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:660
+#: desk/src/pages/dashboard/Dashboard.vue:637
 msgid "Dashboard"
 msgstr ""
 
@@ -1866,7 +1876,7 @@ msgid "Dashboard saved"
 msgstr ""
 
 #. Label of the holiday_date (Date) field in DocType 'HD Holiday'
-#: helpdesk/api/dashboard_tags.py:74
+#: helpdesk/api/dashboard_tags.py:77
 #: helpdesk/helpdesk/doctype/hd_holiday/hd_holiday.json
 #: helpdesk/helpdesk/report/support_hour_distribution/support_hour_distribution.py:77
 msgid "Date"
@@ -1999,11 +2009,11 @@ msgstr ""
 msgid "Deleting comment"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:146
+#: helpdesk/overrides/email_account.py:156
 msgid "Delivery failed: the reply to this ticket could not be delivered to {0}."
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:150
+#: helpdesk/overrides/email_account.py:160
 msgid "Delivery failed: the reply to this ticket could not be delivered."
 msgstr ""
 
@@ -2053,8 +2063,8 @@ msgstr ""
 #. Notification'
 #. Label of the sb_details (Section Break) field in DocType 'HD Ticket'
 #: desk/src/pages/ticket/MobileTicketAgent.vue:164
-#: desk/src/pages/ticket/MobileTicketAgent.vue:524
-#: desk/src/pages/ticket/TicketCustomer.vue:208
+#: desk/src/pages/ticket/MobileTicketAgent.vue:525
+#: desk/src/pages/ticket/TicketCustomer.vue:213
 #: helpdesk/helpdesk/doctype/hd_notification/hd_notification.json
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 msgid "Details"
@@ -2355,13 +2365,13 @@ msgstr ""
 msgid "Email address of the primary contact"
 msgstr ""
 
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:201
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:243
 msgid "Email settings updated successfully."
 msgstr ""
 
 #: desk/src/components/Settings/Profile/UserEmailSettings.vue:42
 #: desk/src/pages/SearchAgent.vue:352
-#: desk/src/pages/ticket/MobileTicketAgent.vue:535
+#: desk/src/pages/ticket/MobileTicketAgent.vue:536
 msgid "Emails"
 msgstr ""
 
@@ -2470,11 +2480,11 @@ msgstr ""
 msgid "Error moving article to category"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:203
+#: helpdesk/overrides/email_account.py:216
 msgid "Error processing email at index {0}, message: {1}"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:252
+#: helpdesk/overrides/email_account.py:265
 msgid "Error while connecting to email account {0}"
 msgstr ""
 
@@ -2654,7 +2664,7 @@ msgstr ""
 msgid "Feedback Rating"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:387
+#: helpdesk/api/dashboard.py:422
 msgid "Feedback Trend"
 msgstr ""
 
@@ -2732,7 +2742,7 @@ msgstr ""
 
 #. Label of the filters_tab (Tab Break) field in DocType 'HD View'
 #. Label of the filters (Code) field in DocType 'HD View'
-#: desk/src/components/view-controls/filter/Filter.vue:201
+#: desk/src/components/view-controls/filter/Filter.vue:203
 #: helpdesk/helpdesk/doctype/hd_view/hd_view.json
 msgid "Filters"
 msgstr ""
@@ -3442,7 +3452,7 @@ msgstr ""
 msgid "Invalid phone number"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:264
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:267
 msgid "Invalid role {0}"
 msgstr ""
 
@@ -3634,25 +3644,25 @@ msgstr ""
 msgid "Last 3 Months"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:535
-#: desk/src/pages/dashboard/Dashboard.vue:577
-#: desk/src/pages/dashboard/Dashboard.vue:579
-#: desk/src/pages/dashboard/Dashboard.vue:615
+#: desk/src/pages/dashboard/Dashboard.vue:512
+#: desk/src/pages/dashboard/Dashboard.vue:554
+#: desk/src/pages/dashboard/Dashboard.vue:556
+#: desk/src/pages/dashboard/Dashboard.vue:592
 msgid "Last 30 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:584
-#: desk/src/pages/dashboard/Dashboard.vue:586
+#: desk/src/pages/dashboard/Dashboard.vue:561
+#: desk/src/pages/dashboard/Dashboard.vue:563
 msgid "Last 60 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:570
-#: desk/src/pages/dashboard/Dashboard.vue:572
+#: desk/src/pages/dashboard/Dashboard.vue:547
+#: desk/src/pages/dashboard/Dashboard.vue:549
 msgid "Last 7 Days"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:591
-#: desk/src/pages/dashboard/Dashboard.vue:593
+#: desk/src/pages/dashboard/Dashboard.vue:568
+#: desk/src/pages/dashboard/Dashboard.vue:570
 msgid "Last 90 Days"
 msgstr ""
 
@@ -3958,7 +3968,7 @@ msgstr ""
 msgid "More Details"
 msgstr ""
 
-#: helpdesk/api/dashboard_tags.py:47
+#: helpdesk/api/dashboard_tags.py:46
 msgid "Most used tags in this period"
 msgstr ""
 
@@ -3967,12 +3977,12 @@ msgstr ""
 msgid "Move To"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:272
+#: desk/src/pages/dashboard/Dashboard.vue:269
 msgid "My Dashboard"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:362
-#: desk/src/pages/dashboard/Dashboard.vue:376
+#: desk/src/pages/dashboard/Dashboard.vue:347
+#: desk/src/pages/dashboard/Dashboard.vue:361
 msgid "My Organization"
 msgstr ""
 
@@ -3981,8 +3991,8 @@ msgstr ""
 msgid "My Recent Activity"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:367
-#: desk/src/pages/dashboard/Dashboard.vue:381
+#: desk/src/pages/dashboard/Dashboard.vue:352
+#: desk/src/pages/dashboard/Dashboard.vue:366
 msgid "My Stats"
 msgstr ""
 
@@ -4182,7 +4192,7 @@ msgstr ""
 msgid "No SLA found"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:459
+#: helpdesk/api/dashboard.py:490
 msgid "No Team"
 msgstr ""
 
@@ -4244,7 +4254,7 @@ msgstr ""
 msgid "No contacts found for the applied filters. Try adjusting or clearing your filters."
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:247
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:250
 msgid "No contacts to add"
 msgstr ""
 
@@ -4304,7 +4314,7 @@ msgstr ""
 msgid "No recently assigned tickets"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:87
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:97
 #: desk/src/pages/dashboard/Dashboard.vue:87
 msgid "No results"
 msgstr ""
@@ -4352,7 +4362,7 @@ msgstr ""
 msgid "No tickets selected"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:166
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:169
 msgid "No user linked to contact {0}"
 msgstr ""
 
@@ -4372,7 +4382,7 @@ msgstr ""
 msgid "Not Saved"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:233
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:257
 msgid "Not Set"
 msgstr ""
 
@@ -4524,7 +4534,7 @@ msgstr ""
 msgid "Order By"
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:272
+#: desk/src/pages/dashboard/Dashboard.vue:269
 msgid "Organization Dashboard"
 msgstr ""
 
@@ -4624,19 +4634,19 @@ msgstr ""
 msgid "Pending Tickets"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:578
+#: helpdesk/api/dashboard.py:607
 msgid "Percentage of total tickets by channel"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:536
+#: helpdesk/api/dashboard.py:569
 msgid "Percentage of total tickets by priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:466
+#: helpdesk/api/dashboard.py:497
 msgid "Percentage of total tickets by team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:501
+#: helpdesk/api/dashboard.py:533
 msgid "Percentage of total tickets by type"
 msgstr ""
 
@@ -4811,7 +4821,7 @@ msgstr ""
 msgid "Preferences updated successfully."
 msgstr ""
 
-#: desk/src/pages/dashboard/Dashboard.vue:559
+#: desk/src/pages/dashboard/Dashboard.vue:536
 msgid "Presets"
 msgstr ""
 
@@ -4978,14 +4988,14 @@ msgstr ""
 msgid "Rate this ticket"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:390
+#: helpdesk/api/dashboard.py:426
 msgid "Rated Tickets"
 msgstr ""
 
 #. Label of the feedback_rating (Rating) field in DocType 'HD Ticket'
 #. Label of the rating (Rating) field in DocType 'HD Ticket Feedback Option'
 #: desk/src/pages/home/components/RecentFeedback.vue:313
-#: helpdesk/api/dashboard.py:401
+#: helpdesk/api/dashboard.py:432
 #: helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.json
 #: helpdesk/helpdesk/doctype/hd_ticket_feedback_option/hd_ticket_feedback_option.json
 msgid "Rating"
@@ -5657,7 +5667,7 @@ msgstr ""
 msgid "Search tickets, comments, and communications..."
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:37
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:38
 msgid "Search..."
 msgstr ""
 
@@ -5665,7 +5675,7 @@ msgstr ""
 msgid "Searched for:"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:81
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:91
 #: desk/src/pages/SearchAgent.vue:111
 msgid "Searching..."
 msgstr ""
@@ -5846,7 +5856,7 @@ msgstr ""
 msgid "Service not supported"
 msgstr ""
 
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:232
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:256
 msgid "Set"
 msgstr ""
 
@@ -6361,11 +6371,7 @@ msgstr ""
 msgid "System types can not be deleted"
 msgstr ""
 
-#: helpdesk/api/dashboard_tags.py:48
-msgid "Tag"
-msgstr ""
-
-#: helpdesk/api/dashboard_tags.py:72
+#: helpdesk/api/dashboard_tags.py:74
 msgid "Tag Trend"
 msgstr ""
 
@@ -6586,7 +6592,7 @@ msgstr ""
 msgid "This contact will become the primary point of contact and will be able to view tickets raised by all other contacts in the organisation."
 msgstr ""
 
-#: desk/src/components/ticket/TicketCustomerSidebar.vue:75
+#: desk/src/components/ticket/TicketCustomerSidebar.vue:77
 msgid "This date is calculated based on configured SLAs, working hours, and holidays."
 msgstr ""
 
@@ -6743,7 +6749,7 @@ msgstr ""
 msgid "Ticket Timeline"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:305
+#: helpdesk/api/dashboard.py:344
 msgid "Ticket Trend"
 msgstr ""
 
@@ -6760,7 +6766,7 @@ msgstr ""
 msgid "Ticket Type"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:349
+#: desk/src/pages/ticket/TicketCustomer.vue:354
 msgid "Ticket closed successfully."
 msgstr ""
 
@@ -6800,7 +6806,7 @@ msgstr ""
 msgid "Ticket not found for the provided key."
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:181
+#: desk/src/pages/ticket/TicketCustomer.vue:183
 msgid "Ticket not found."
 msgstr ""
 
@@ -6822,7 +6828,7 @@ msgstr ""
 msgid "Ticket to merged with is required"
 msgstr ""
 
-#: desk/src/pages/ticket/TicketCustomer.vue:322
+#: desk/src/pages/ticket/TicketCustomer.vue:327
 msgid "Ticket updated successfully."
 msgstr ""
 
@@ -6840,12 +6846,14 @@ msgstr ""
 #: desk/src/pages/contact/Contact.vue:172
 #: desk/src/pages/customer/Customer.vue:65
 #: desk/src/pages/customer/Customer.vue:144
-#: desk/src/pages/ticket/MobileTicketAgent.vue:498
-#: desk/src/pages/ticket/TicketCustomer.vue:378
+#: desk/src/pages/ticket/MobileTicketAgent.vue:499
+#: desk/src/pages/ticket/TicketCustomer.vue:383
 #: desk/src/pages/ticket/TicketNew.vue:326 desk/src/pages/ticket/Tickets.vue:6
-#: desk/src/pages/ticket/Tickets.vue:483 helpdesk/api/dashboard.py:159
-#: helpdesk/api/dashboard.py:308 helpdesk/api/dashboard_tags.py:49
-#: helpdesk/api/dashboard_tags.py:75
+#: desk/src/pages/ticket/Tickets.vue:483 helpdesk/api/dashboard.py:182
+#: helpdesk/api/dashboard.py:348 helpdesk/api/dashboard_tags.py:50
+#: helpdesk/api/dashboard_tags.py:78 helpdesk/tests/api/test_dashboard.py:98
+#: helpdesk/tests/api/test_dashboard.py:113
+#: helpdesk/tests/api/test_dashboard.py:124
 msgid "Tickets"
 msgstr ""
 
@@ -6857,19 +6865,19 @@ msgstr ""
 msgid "Tickets assigned to you in the last 7 days"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:577
+#: helpdesk/api/dashboard.py:606
 msgid "Tickets by Channel"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:535 helpdesk/api/dashboard.py:544
+#: helpdesk/api/dashboard.py:568 helpdesk/api/dashboard.py:577
 msgid "Tickets by Priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:465 helpdesk/api/dashboard.py:474
+#: helpdesk/api/dashboard.py:496 helpdesk/api/dashboard.py:505
 msgid "Tickets by Team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:500 helpdesk/api/dashboard.py:509
+#: helpdesk/api/dashboard.py:532 helpdesk/api/dashboard.py:541
 msgid "Tickets by Type"
 msgstr ""
 
@@ -6962,8 +6970,8 @@ msgid "To know more about setting up email accounts, click"
 msgstr ""
 
 #: desk/src/components/ticket-agent/analytics/TicketTimeline.vue:398
-#: desk/src/pages/dashboard/Dashboard.vue:563
-#: desk/src/pages/dashboard/Dashboard.vue:565
+#: desk/src/pages/dashboard/Dashboard.vue:540
+#: desk/src/pages/dashboard/Dashboard.vue:542
 msgid "Today"
 msgstr ""
 
@@ -6976,7 +6984,7 @@ msgstr ""
 msgid "Top Result"
 msgstr ""
 
-#: helpdesk/api/dashboard_tags.py:46
+#: helpdesk/api/dashboard_tags.py:45
 msgid "Top Tags"
 msgstr ""
 
@@ -7002,19 +7010,19 @@ msgstr ""
 msgid "Total hold time"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:164
+#: helpdesk/api/dashboard.py:187
 msgid "Total number of tickets created"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:545
+#: helpdesk/api/dashboard.py:578
 msgid "Total tickets by priority"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:475
+#: helpdesk/api/dashboard.py:506
 msgid "Total tickets by team"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:510
+#: helpdesk/api/dashboard.py:542
 msgid "Total tickets by type"
 msgstr ""
 
@@ -7107,7 +7115,7 @@ msgstr ""
 #: desk/src/components/Settings/EmailNotifications/Notification.vue:103
 #: desk/src/components/Settings/FieldDependency/FieldDependency.vue:70
 #: desk/src/components/Settings/Holiday/HolidayView.vue:192
-#: desk/src/components/Settings/Profile/UserEmailSettings.vue:222
+#: desk/src/components/Settings/Profile/UserEmailSettings.vue:263
 #: desk/src/components/Settings/SavedReplies/SavedReplyView.vue:298
 #: desk/src/components/Settings/SettingsModal.vue:72
 #: desk/src/components/Settings/Sla/SlaPolicyView.vue:382
@@ -7227,7 +7235,7 @@ msgstr ""
 
 #: desk/src/components/Settings/SavedReplies/components/ActionsEditor.vue:129
 #: desk/src/components/ticket-agent/BulkEditModal.vue:114
-#: desk/src/components/view-controls/filter/FilterValueEditor.vue:113
+#: desk/src/components/view-controls/filter/FilterValueEditor.vue:134
 msgid "Value"
 msgstr ""
 
@@ -7449,7 +7457,7 @@ msgstr ""
 msgid "You are not allowed to view another agent's stats."
 msgstr ""
 
-#: helpdesk/api/dashboard.py:36
+#: helpdesk/api/dashboard.py:37
 msgid "You are not allowed to view this dashboard data."
 msgstr ""
 
@@ -7494,7 +7502,7 @@ msgstr ""
 msgid "You do not have permission to access Assignment Rules"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:338
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:341
 msgid "You do not have permission to access this resource"
 msgstr ""
 
@@ -7502,7 +7510,7 @@ msgstr ""
 msgid "You do not have permission to change {0}"
 msgstr ""
 
-#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:268
+#: helpdesk/helpdesk/doctype/hd_customer/hd_customer.py:271
 msgid "You do not have permission to update contacts"
 msgstr ""
 
@@ -7582,7 +7590,7 @@ msgstr ""
 msgid "customize {0}"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:223 helpdesk/api/dashboard.py:225
+#: helpdesk/api/dashboard.py:249 helpdesk/api/dashboard.py:251
 msgid "days"
 msgstr ""
 
@@ -7638,7 +7646,7 @@ msgstr ""
 msgid "here."
 msgstr ""
 
-#: helpdesk/api/dashboard.py:206 helpdesk/api/dashboard.py:208
+#: helpdesk/api/dashboard.py:232 helpdesk/api/dashboard.py:234
 msgid "hrs"
 msgstr ""
 
@@ -7691,7 +7699,7 @@ msgstr ""
 msgid "since {0}"
 msgstr ""
 
-#: helpdesk/api/dashboard.py:247
+#: helpdesk/api/dashboard.py:273
 msgid "stars"
 msgstr ""
 
@@ -7700,7 +7708,7 @@ msgstr ""
 msgid "synonym"
 msgstr ""
 
-#: helpdesk/overrides/email_account.py:141
+#: helpdesk/overrides/email_account.py:151
 msgid "the customer"
 msgstr ""
 
@@ -7722,6 +7730,18 @@ msgstr ""
 
 #: desk/src/pages/knowledge-base/Article.vue:85
 msgid "views"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:174
+msgid "vs prev. day"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:171
+msgid "vs prev. {0} days"
+msgstr ""
+
+#: helpdesk/api/dashboard.py:173
+msgid "vs yesterday"
 msgstr ""
 
 #: desk/src/components/contact/ContactCustomers.vue:69
@@ -7812,7 +7832,7 @@ msgstr ""
 msgid "{0} people reacted to your comment"
 msgstr ""
 
-#: helpdesk/notifications.py:123
+#: helpdesk/notifications.py:130
 msgid "{0} reopened ticket #{1}"
 msgstr ""
 
