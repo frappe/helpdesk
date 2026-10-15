@@ -3,7 +3,9 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute inset-x-0',
+      groupBy || list.loading || list?.data?.data?.length > 0
+        ? 'relative'
+        : 'absolute inset-x-0',
     ]"
     v-if="showViewControls"
   >
@@ -61,7 +63,7 @@
   <template v-if="groupBy">
     <div class="flex min-h-0 flex-1 flex-col px-3 sm:px-5">
       <GroupByTable
-        class="[&_[data-slot=list-header-border]]:hidden [&_[data-slot=list-header]]:mb-2 [&_[data-slot=list-header]]:rounded [&_[data-slot=list-header]]:bg-surface-gray-2"
+        class="[&_[data-slot=list-header-border]]:hidden [&_[data-slot=list-header]]:mb-2 [&_[data-slot=list-header]]:rounded-4 [&_[data-slot=list-header]]:bg-surface-gray-2"
         :doctype="options.doctype"
         :groupBy="groupBy"
         :rows="groups.rows.value"
@@ -146,12 +148,19 @@
       </ListFooter>
     </div>
   </template>
-  <!-- Loading State -->
+  <!-- Loading State: header and placeholder rows, like the grouped table -->
   <div
     v-else-if="list.loading && !list.data?.data?.length"
-    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+    class="flex-1 overflow-hidden"
   >
-    <LoadingIndicator class="size-6 text-ink-gray-4" />
+    <div class="mb-2 h-[34px] rounded-4 bg-surface-gray-2 sm:mx-5 mx-3" />
+    <div
+      v-for="i in 8"
+      :key="i"
+      class="flex h-10 items-center gap-4 border-b px-2 sm:mx-5 mx-3"
+    >
+      <Skeleton v-for="j in 4" :key="j" class="h-3 flex-1 rounded-1" />
+    </div>
   </div>
   <!-- List View -->
   <ListView
@@ -293,8 +302,8 @@ import {
   dayjsLocal,
   Dropdown,
   frappeRequest,
-  LoadingIndicator,
   Rating,
+  Skeleton,
   TabButtons,
   toast,
   Tooltip,
