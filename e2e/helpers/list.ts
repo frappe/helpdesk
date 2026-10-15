@@ -50,7 +50,9 @@ export class TicketList {
     const dialog = this.page.getByRole("dialog", { name: "Create View" });
     await dialog.getByRole("textbox").first().fill(label);
     await dialog.getByRole("button", { name: "Create" }).click();
-    await expect(this.page).toHaveURL(/\?view=/);
+    await expect(
+      this.page.getByRole("banner").getByRole("button", { name: label })
+    ).toBeVisible();
     await expect.poll(() => api.exists("HD View", { label })).toBeTruthy();
     return (await api.exists("HD View", { label }))!;
   }
