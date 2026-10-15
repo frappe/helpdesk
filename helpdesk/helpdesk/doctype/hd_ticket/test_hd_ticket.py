@@ -184,7 +184,9 @@ class TestHDTicket(IntegrationTestCase):
         add_message(ticket.name, "Received", sender)
         add_message(ticket.name, "Received", non_agent)
 
-        self.assertEqual(self.agent_senders(ticket.name) & {sender, non_agent}, {sender})
+        self.assertEqual(
+            self.agent_senders(ticket.name) & {sender, non_agent}, {sender}
+        )
 
         frappe.db.set_value("HD Agent", sender, "is_active", 0)
         self.assertNotIn(sender, self.agent_senders(ticket.name))

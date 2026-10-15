@@ -1,4 +1,4 @@
-import { __ } from "@/translation";
+import { __ } from "../translation";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import { computed, inject, Component, ComputedRef } from "vue";

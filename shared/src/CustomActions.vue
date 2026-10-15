@@ -66,7 +66,9 @@ const groupsByLabel = computed(() => {
 });
 
 // Below md labelled menus fold into "…" as well, or they push the logo menu off a phone screen.
-const labelledGroups = computed(() => (isNarrow.value ? [] : groupsByLabel.value));
+const labelledGroups = computed(() =>
+  isNarrow.value ? [] : groupsByLabel.value
+);
 
 const moreOptions = computed(() => [
   // A grouped action is itself a menu group, so a labelled menu's entries drop in as they are.

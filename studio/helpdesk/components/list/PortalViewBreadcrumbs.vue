@@ -77,7 +77,8 @@ const ICON_CLASS = "size-4 shrink-0 text-ink-gray-7";
 
 function ViewIcon(props: { icon?: string }) {
   const icon = props.icon || DEFAULT_ICON;
-  const centre = isEmoji(icon) && "flex items-center justify-center leading-none";
+  const centre =
+    isEmoji(icon) && "flex items-center justify-center leading-none";
   return h(StoredIcon, { icon, class: [ICON_CLASS, centre] });
 }
 

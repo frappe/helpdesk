@@ -1,12 +1,7 @@
 import frappe
 from frappe import _
 
-from helpdesk.utils import (
-    agent_only,
-    get_agent_name,
-    get_agents_team,
-    get_user_contact,
-)
+from helpdesk.utils import agent_only, get_agent_name, get_agents_team, get_user_contact
 from helpdesk.utils import is_agent as _is_agent
 
 

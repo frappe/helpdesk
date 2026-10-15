@@ -44,12 +44,7 @@ import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { HDSettings, HDSettingsSymbol } from "@/types";
-import {
-  Button,
-  createResource,
-  LoadingIndicator,
-  toast,
-} from "frappe-ui";
+import { Button, createResource, LoadingIndicator, toast } from "frappe-ui";
 import { provide, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
