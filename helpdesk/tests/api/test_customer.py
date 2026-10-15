@@ -465,7 +465,9 @@ class TestInvitableContacts(IntegrationTestCase):
 
     def emails(self, query: str = "") -> list[str]:
         with self.set_user(self.manager["user"]):
-            return [row.email for row in get_invitable_contacts(self.customer.name, query)]
+            return [
+                row.email for row in get_invitable_contacts(self.customer.name, query)
+            ]
 
     def test_suggests_matching_contacts_from_any_domain(self) -> None:
         self.assertIn(self.outsider["user"], self.emails(self.outsider["user"]))

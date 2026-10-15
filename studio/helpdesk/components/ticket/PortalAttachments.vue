@@ -1,12 +1,16 @@
 <template>
   <div class="flex flex-col gap-1.5">
-    <span class="text-p-sm text-ink-gray-5">{{ __('Attachments') }}</span>
+    <span class="text-p-sm text-ink-gray-5">{{ __("Attachments") }}</span>
 
     <div
       class="flex flex-col rounded-6 border transition-colors"
       :class="[
-        uploader.items.length ? 'divide-y divide-outline-gray-1' : 'border-dashed',
-        dragging ? 'border-outline-gray-4 bg-surface-gray-1' : 'border-outline-gray-2',
+        uploader.items.length
+          ? 'divide-y divide-outline-gray-1'
+          : 'border-dashed',
+        dragging
+          ? 'border-outline-gray-4 bg-surface-gray-1'
+          : 'border-outline-gray-2',
       ]"
       @dragenter.prevent="dragging = true"
       @dragover.prevent="dragging = true"
@@ -22,7 +26,10 @@
           class="grid size-9 shrink-0 place-items-center overflow-hidden rounded-4 border border-outline-gray-1 bg-surface-gray-1"
         >
           <Spinner v-if="isBusy(item)" size="md" class="text-ink-gray-5" />
-          <LucideCircleAlert v-else-if="item.status === 'error'" class="size-4 text-ink-red-4" />
+          <LucideCircleAlert
+            v-else-if="item.status === 'error'"
+            class="size-4 text-ink-red-4"
+          />
           <img
             v-else-if="isImage(item.name)"
             :src="item.fileUrl"
@@ -41,10 +48,14 @@
           >
             {{ item.name }}
           </a>
-          <span v-else class="truncate text-p-sm text-ink-gray-8">{{ item.name }}</span>
+          <span v-else class="truncate text-p-sm text-ink-gray-8">{{
+            item.name
+          }}</span>
           <span
             class="text-p-xs"
-            :class="item.status === 'error' ? 'text-ink-red-4' : 'text-ink-gray-5'"
+            :class="
+              item.status === 'error' ? 'text-ink-red-4' : 'text-ink-gray-5'
+            "
           >
             {{ meta(item) }}
           </span>
@@ -70,9 +81,14 @@
         >
           <LucidePlus class="size-4" />
         </span>
-        <span class="flex-1 text-p-sm text-ink-gray-6 group-hover:text-ink-gray-8">{{ __('Add more') }}</span>
-        <span class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex">
-          {{ __('drop, browse or') }}
+        <span
+          class="flex-1 text-p-sm text-ink-gray-6 group-hover:text-ink-gray-8"
+          >{{ __("Add more") }}</span
+        >
+        <span
+          class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex"
+        >
+          {{ __("drop, browse or") }}
           <KeyboardShortcut bg combo="Mod+V" />
         </span>
       </button>
@@ -83,13 +99,24 @@
         @click="picker?.click()"
       >
         <LucidePaperclip class="size-4" />
-        <span>{{ __('Drag or paste files here, or click to browse') }}</span>
+        <span>{{ __("Drag or paste files here, or click to browse") }}</span>
       </button>
     </div>
 
-    <input ref="picker" type="file" multiple class="sr-only" :accept="accept" @change="onPick" />
+    <input
+      ref="picker"
+      type="file"
+      multiple
+      class="sr-only"
+      :accept="accept"
+      @change="onPick"
+    />
 
-    <p v-for="error in uploader.errors.value" :key="error" class="text-p-xs text-ink-red-4">
+    <p
+      v-for="error in uploader.errors.value"
+      :key="error"
+      class="text-p-xs text-ink-red-4"
+    >
       {{ error }}
     </p>
   </div>
@@ -99,7 +126,12 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { KeyboardShortcut, Spinner } from "frappe-ui";
 import { useUploader } from "@framework/ui/FileUpload";
-import type { Restrictions, UploadItem, UploadResult, UploadTransport } from "@framework/ui/FileUpload";
+import type {
+  Restrictions,
+  UploadItem,
+  UploadResult,
+  UploadTransport,
+} from "@framework/ui/FileUpload";
 import { __ } from "@helpdesk/shared/translation";
 import LucideCircleAlert from "~icons/lucide/circle-alert";
 import LucideFile from "~icons/lucide/file";
@@ -122,7 +154,9 @@ const uploader = useUploader({
   multiple: true,
 });
 
-const accept = computed(() => props.restrictions?.allowed_file_types?.join(","));
+const accept = computed(() =>
+  props.restrictions?.allowed_file_types?.join(",")
+);
 const dragging = ref(false);
 const picker = ref<HTMLInputElement>();
 let running = false;
@@ -182,7 +216,11 @@ function emitDone() {
     "update:modelValue",
     uploader.items
       .filter((item) => item.status === "done")
-      .map((item) => ({ file_url: item.fileUrl!, file_name: item.name, is_private: item.isPrivate }))
+      .map((item) => ({
+        file_url: item.fileUrl!,
+        file_name: item.name,
+        is_private: item.isPrivate,
+      }))
   );
 }
 
@@ -192,7 +230,8 @@ function isBusy(item: UploadItem) {
 
 function meta(item: UploadItem) {
   if (item.status === "error") return item.error;
-  if (isBusy(item)) return __("Uploading… {0}%", [Math.round(item.progress * 100)]);
+  if (isBusy(item))
+    return __("Uploading… {0}%", [Math.round(item.progress * 100)]);
   return formatSize(item.size ?? 0);
 }
 

@@ -16,16 +16,15 @@
           side="left"
         >
           <span
-            :class="[
-              HOVER_AREA,
-              step.state === 'next' ? 'mt-[5px]' : 'mt-1.5',
-            ]"
+            :class="[HOVER_AREA, step.state === 'next' ? 'mt-[5px]' : 'mt-1.5']"
           >
             <span
               :class="[
                 'timeline-dot',
                 DOT_BASE,
-                (step.late ? LATE_DOT_CLASSES : MILESTONE_DOT_CLASSES)[step.state],
+                (step.late ? LATE_DOT_CLASSES : MILESTONE_DOT_CLASSES)[
+                  step.state
+                ],
               ]"
             />
           </span>

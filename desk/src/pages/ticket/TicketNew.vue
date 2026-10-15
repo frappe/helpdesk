@@ -206,7 +206,13 @@ const ticketPriorityResource = createListResource({
 let oldFields = [];
 
 function applyFilters(fieldname: string, filters: any = null) {
-  applyFieldFilters(template.data.fields, fieldname, filters, templateFields, oldFields);
+  applyFieldFilters(
+    template.data.fields,
+    fieldname,
+    filters,
+    templateFields,
+    oldFields
+  );
 }
 
 const customOnChange = computed(() => template.data?._customOnChange);
