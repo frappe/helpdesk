@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import { computed } from "vue";
+import { computed, effectScope } from "vue";
 import {
   isNavigationFailure,
   NavigationFailureType,
@@ -17,10 +17,13 @@ const storedViews = new Map<string, Ref<string | null>>();
 function viewRef(listRoute: string) {
   let view = storedViews.get(listRoute);
   if (!view) {
-    view = userStorage<string | null>(`active_view:${listRoute}`, null, {
-      listenToStorageChanges: false,
-      writeDefaults: false,
-    });
+    // Detached, or the write-back watcher stops with the first caller's component.
+    view = effectScope(true).run(() =>
+      userStorage<string | null>(`active_view:${listRoute}`, null, {
+        listenToStorageChanges: false,
+        writeDefaults: false,
+      })
+    )!;
     storedViews.set(listRoute, view);
   }
   return view;
