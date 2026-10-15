@@ -115,6 +115,7 @@ import {
 import UserMenu from "@/components/UserMenu.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useDevice } from "@/composables";
+import { mobileSidebarOpened } from "@/composables/mobile";
 import { useActiveView } from "@/composables/useActiveView";
 import { currentView, useView } from "@/composables/useView";
 import { useNotificationStore } from "@/stores/notification";
@@ -194,6 +195,8 @@ function currentRouteKey(): string | null {
 /** A nav item opens its route's default list; a view item opens the view. */
 function selectItem(key: string, routeName: string, view?: string) {
   activeItem.value = key;
+  // The list may not navigate (only the stored view changes), so close here.
+  if (props.mobile) mobileSidebarOpened.value = false;
   openView(routeName, view);
 }
 
