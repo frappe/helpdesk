@@ -797,8 +797,7 @@ function applyFilters(filters) {
   isViewUpdated.value = false;
 }
 
-// Group By: the list turns into one summary row per group, saved with the view like
-// sort and filters. A resize or header sort comes back through here too.
+// one summary row per group, saved with the view like sort and filters
 const groupBy = ref<GroupBySettings | null>(null);
 const groups = useGroupedList(
   () => options.value.doctype,

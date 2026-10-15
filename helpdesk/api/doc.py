@@ -538,8 +538,7 @@ def get_grouped_list(
     order_by: str | None = None,
     limit_page_length: int = 20,
 ):
-    """`frappe.client.get_list` for the Group By summary, with the same `@me` and
-    assigned-on filter handling as `get_list_data`, so the groups match the list."""
+    """`get_list` for Group By, with `@me` and assigned-on filters handled like `get_list_data`."""
     filters = frappe.parse_json(filters) or []
     handle_at_me_support(filters)
     handle_assigned_on_filter(filters, doctype)
