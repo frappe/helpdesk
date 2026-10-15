@@ -1,6 +1,10 @@
 import { raiseTicket } from "../../../helpers/factories";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
-import { TicketList, resetDefaultTicketView } from "../../../helpers/list";
+import {
+  TicketList,
+  createPinnedTicketView,
+  resetDefaultTicketView,
+} from "../../../helpers/list";
 import { personas } from "../../../helpers/personas";
 
 usePersona("manager");
@@ -137,4 +141,110 @@ test("a standard view can be hidden from and shown in the sidebar", async ({ pag
   } finally {
     await api.update("HD View", standard.name, { public: 1 });
   }
+});
+
+test.describe("the open view is kept in the browser, not the URL", () => {
+  let ticket: Record<string, any>;
+  let view: Record<string, any>;
+
+  test.beforeEach(async ({ api, apiAs }) => {
+    ticket = await raiseTicket(await apiAs("customer"));
+    view = await createPinnedTicketView(api, personas.manager.email, ticket.subject);
+  });
+
+  test("a view chosen in the sidebar opens without ?view and stays open after a reload", async ({
+    page,
+  }) => {
+    const list = new TicketList(page);
+    await list.goto();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: view.label }).click();
+    await expect(page.getByRole("banner").getByRole("button", { name: view.label })).toBeVisible();
+    await expect(list.rows()).toHaveCount(1);
+    await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
+
+    await page.reload();
+    await expect(page.getByRole("banner").getByRole("button", { name: view.label })).toBeVisible();
+    await expect(list.row(ticket.subject)).toBeVisible();
+    await expect(list.rows()).toHaveCount(1);
+  });
+
+  test("the ticket page breadcrumb shows the open view and Tickets goes back to the default list", async ({
+    page,
+  }) => {
+    const list = new TicketList(page);
+    await list.goto();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: view.label }).click();
+    await list.row(ticket.subject).click();
+    await expect(page.getByRole("tab", { name: "Activity" })).toBeVisible();
+    const crumbs = page.getByRole("banner");
+    await expect(crumbs.getByRole("link", { name: view.label })).toBeVisible();
+
+    await crumbs.getByRole("link", { name: "Tickets", exact: true }).click();
+    const defaultList = page.getByRole("banner").getByRole("button", { name: "List", exact: true });
+    await expect(defaultList).toBeVisible();
+    await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
+    // the header reads "List" until the views load, so wait for the list before checking
+    const listLoaded = page.waitForResponse(/get_list_data/);
+    await page.reload();
+    await listLoaded;
+    await expect(defaultList).toBeVisible();
+    await expect(crumbs.getByRole("button", { name: view.label })).toHaveCount(0);
+  });
+
+  test("an old ?view link opens the view and drops view from the URL", async ({ page }) => {
+    const list = new TicketList(page);
+    await page.goto(`/helpdesk/tickets?view=${view.name}`);
+    await expect(page.getByRole("banner").getByRole("button", { name: view.label })).toBeVisible();
+    await expect(list.row(ticket.subject)).toBeVisible();
+    await expect(list.rows()).toHaveCount(1);
+    await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
+  });
+
+  test("Tickets in the sidebar and deleting the open view fall back to the default list", async ({
+    page,
+    api,
+  }) => {
+    const list = new TicketList(page);
+    const sidebar = page.getByRole("navigation", { name: "Main" });
+    const header = page.getByRole("banner");
+    await list.goto();
+    await sidebar.getByRole("button", { name: view.label }).click();
+    await expect(header.getByRole("button", { name: view.label })).toBeVisible();
+    await sidebar.getByRole("button", { name: "Tickets", exact: true }).click();
+    await expect(header.getByRole("button", { name: "List", exact: true })).toBeVisible();
+
+    await sidebar.getByRole("button", { name: view.label }).click();
+    await expect(header.getByRole("button", { name: view.label })).toBeVisible();
+    await list.viewAction(view.label, "Delete");
+    await page.getByRole("dialog").getByRole("button", { name: "Confirm" }).click();
+    await expect.poll(() => api.exists("HD View", { name: view.name })).toBeUndefined();
+    await expect(header.getByRole("button", { name: "List", exact: true })).toBeVisible();
+    await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
+  });
+
+  test.describe("on a phone", () => {
+    test.use({ viewport: { width: 390, height: 844 } });
+
+    test("a view picked from the drawer is still reset by the breadcrumb once the drawer closes", async ({
+      page,
+    }) => {
+      const header = page.getByRole("banner");
+      await page.goto(`/helpdesk/tickets/${ticket.name}`);
+      // the drawer toggle is an unlabelled icon button left of the page header
+      await page.locator("div:has(+ #app-header) button").click();
+      const drawer = page.getByRole("navigation", { name: "Main" });
+      await drawer.getByRole("button", { name: view.label }).click();
+      await expect(header.getByRole("button", { name: view.label })).toBeVisible();
+      await expect(drawer).toBeHidden();
+
+      await header.getByRole("link", { name: "..." }).click();
+      await expect(header.getByRole("button", { name: "List", exact: true })).toBeVisible();
+      // the header reads "List" until the views load, so wait for the list before checking
+      const listLoaded = page.waitForResponse(/get_list_data/);
+      await page.reload();
+      await listLoaded;
+      await expect(header.getByRole("button", { name: "List", exact: true })).toBeVisible();
+      await expect(header.getByRole("button", { name: view.label })).toHaveCount(0);
+    });
+  });
 });

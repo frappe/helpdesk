@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import type { Api } from "./api";
+import { uid } from "./factories";
 
 /** The agent ticket list at /helpdesk/tickets. */
 export class TicketList {
@@ -100,6 +101,25 @@ export class TicketList {
     await this.filterPopover().locator("button[aria-haspopup]").click();
     await this.page.getByRole("menuitem", { name: operator, exact: true }).click();
   }
+}
+
+/** A private ticket view pinned to `user`'s sidebar, listing subjects that contain `subject`. */
+export async function createPinnedTicketView(api: Api, user: string, subject: string) {
+  return api.insert("HD View", {
+    label: `E2E view ${uid()}`,
+    user,
+    dt: "HD Ticket",
+    type: "list",
+    route_name: "TicketsAgent",
+    pinned: 1,
+    filters: JSON.stringify({ subject: ["like", `%${subject}%`] }),
+    order_by: "modified desc",
+    columns: JSON.stringify([
+      { label: "ID", type: "Int", key: "name", width: "5rem" },
+      { label: "Subject", type: "Data", key: "subject", width: "25rem" },
+    ]),
+    rows: JSON.stringify(["name", "subject", "status", "modified", "_assign"]),
+  });
 }
 
 /** Drop the auto saved default view and any view a spec left behind. */
