@@ -1,6 +1,8 @@
 import type { Ref } from "vue";
 import { computed, effectScope } from "vue";
 import {
+  isNavigationFailure,
+  NavigationFailureType,
   useRoute,
   useRouter,
   type RouteLocationNormalizedLoaded,
@@ -51,6 +53,9 @@ export function openViewWith(router: Router, listRoute: string, view?: string) {
     return;
   }
   const stop = router.afterEach((to, _from, failure) => {
+    // A newer push cancelled this one; wait for it to land. Listeners run in
+    // the order they were added, so the latest pick is set last and wins.
+    if (isNavigationFailure(failure, NavigationFailureType.cancelled)) return;
     stop();
     if (!failure && to.name === listRoute) setActiveView(listRoute, view);
   });

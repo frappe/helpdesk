@@ -191,6 +191,30 @@ test.describe("the open view is kept in the browser, not the URL", () => {
     await expect(crumbs.getByRole("button", { name: view.label })).toHaveCount(0);
   });
 
+  test("the later of two quick view picks on a ticket page stays open after a reload", async ({
+    page,
+    api,
+  }) => {
+    const later = await createPinnedTicketView(api, personas.manager.email, ticket.subject);
+    const list = new TicketList(page);
+    await page.goto(`/helpdesk/tickets/${ticket.name}`);
+    await expect(page.getByRole("tab", { name: "Activity" })).toBeVisible();
+    const sidebar = page.getByRole("navigation", { name: "Main" });
+    // click both in one task, so the second push cancels the first before it lands
+    await sidebar.getByRole("button", { name: view.label }).evaluate(
+      (first, second) => {
+        first.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        second.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      },
+      await sidebar.getByRole("button", { name: later.label }).elementHandle()
+    );
+    await expect(list.viewButton(later.label)).toBeVisible();
+
+    await list.reload();
+    await expect(list.viewButton(later.label)).toBeVisible();
+    await expect(list.row(ticket.subject)).toBeVisible();
+  });
+
   test("an old ?view link opens the view and drops view from the URL", async ({ page }) => {
     const list = new TicketList(page);
     await page.goto(`/helpdesk/tickets?view=${view.name}`);

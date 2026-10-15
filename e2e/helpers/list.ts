@@ -11,6 +11,18 @@ export class TicketList {
     await expect(this.page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
   }
 
+  /** Reload and wait for the rows; the header reads "List" until the views load. */
+  async reload() {
+    const loaded = this.page.waitForResponse(/get_list_data/);
+    await this.page.reload();
+    await loaded;
+  }
+
+  /** The header's view dropdown, labelled with the open view or "List". */
+  viewButton(label: string) {
+    return this.page.getByRole("banner").getByRole("button", { name: label, exact: true });
+  }
+
   rows() {
     return this.page.locator("#list-rows a");
   }
