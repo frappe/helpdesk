@@ -7,6 +7,7 @@ from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.auth import get_current_user_email_info, set_user_email_accounts
 from helpdesk.api.settings.email import create_email_account
+from helpdesk.helpdesk.utils.email import default_ticket_outgoing_email_account
 from helpdesk.test_utils import (
     create_agent,
     create_user,
@@ -14,10 +15,57 @@ from helpdesk.test_utils import (
     make_agent_manager,
     make_email_account,
     make_email_account_data,
+    make_ticket,
     unique_email,
 )
 
 EMAIL_ACCOUNT_MODULE = "frappe.email.doctype.email_account.email_account"
+
+
+class TestTicketOutgoingEmailAccount(IntegrationTestCase):
+    def setUp(self) -> None:
+        frappe.set_user("Administrator")
+        self.enterContext(patch(f"{EMAIL_ACCOUNT_MODULE}.EmailServer"))
+        frappe.db.set_value(
+            "Email Account",
+            {},
+            {"enable_incoming": 0, "enable_outgoing": 0, "default_outgoing": 0},
+        )
+        self.billing = make_email_account(
+            "Sendgrid", enable_incoming=0, default_outgoing=1
+        )
+        billing = frappe.get_doc("Email Account", self.billing)
+        billing.imap_folder[0].append_to = "ToDo"
+        billing.save()
+
+    def test_ticket_account_is_used_without_being_the_global_default(self) -> None:
+        support = make_email_account("GMail")
+
+        self.assertEqual(make_ticket().sender_email().name, support)
+        self.assertEqual(default_ticket_outgoing_email_account().name, support)
+
+    def test_disabled_ticket_accounts_fall_back_to_global_default(self) -> None:
+        for field in ("enable_incoming", "enable_outgoing"):
+            with self.subTest(disabled=field):
+                account = make_email_account("GMail", **{field: 0})
+                self.assertIsNone(default_ticket_outgoing_email_account())
+                self.assertEqual(make_ticket().sender_email().name, self.billing)
+                frappe.db.set_value("Email Account", account, "enable_outgoing", 0)
+
+    def test_unrelated_inbox_does_not_supply_the_ticket_sender(self) -> None:
+        account = frappe.get_doc("Email Account", make_email_account("GMail"))
+        account.imap_folder[0].append_to = "ToDo"
+        account.save()
+
+        self.assertIsNone(default_ticket_outgoing_email_account())
+        self.assertEqual(make_ticket().sender_email().name, self.billing)
+
+    def test_existing_default_ticket_account_keeps_precedence(self) -> None:
+        make_email_account("GMail")
+        preferred = make_email_account("GMail", default_outgoing=1)
+
+        self.assertEqual(default_ticket_outgoing_email_account().name, preferred)
+        self.assertEqual(make_ticket().sender_email().name, preferred)
 
 
 class TestCreateEmailAccount(IntegrationTestCase):
