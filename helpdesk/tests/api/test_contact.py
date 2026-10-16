@@ -1,11 +1,20 @@
 # Copyright (c) 2022, Frappe Technologies and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.api.contact import delete_contact
-from helpdesk.test_utils import create_contact, create_customer, make_ticket
+from helpdesk.api.contact import delete_contact, get_contact_info
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    create_customer,
+    make_contact_invitation,
+    make_ticket,
+    unique_email,
+)
 
 
 class TestDeleteContact(IntegrationTestCase):
@@ -82,3 +91,53 @@ class TestDeleteContact(IntegrationTestCase):
             }
         ).insert(ignore_permissions=True)
         return contact, customer, ticket, invitation
+
+
+class TestContactInvitations(IntegrationTestCase):
+    def setUp(self) -> None:
+        frappe.set_user("Administrator")
+        self.enterContext(self.freeze_time("2026-01-05 10:00:00.123456"))
+        self.enterContext(patch("frappe.sendmail"))
+        self.email = unique_email("contact-invitation")
+        self.contact = create_contact("Invitation Contact", self.email, user=False)[
+            "contact"
+        ]
+        self.agent = create_agent(unique_email("contact-invitation-agent")).name
+        self.invitation = make_contact_invitation(self.contact, self.email)
+
+    def test_cancelled_invitation_is_omitted_from_contact_info(self) -> None:
+        self.assertTrue(self.invitation.cancel_invite())
+        self.invitation.reload()
+        self.assertEqual(self.invitation.status, "Cancelled")
+
+        with self.set_user(self.agent):
+            self.assertNotIn("invitation", get_contact_info(self.contact))
+
+    def test_pending_and_expired_invitations_remain_visible(self) -> None:
+        for status in ("Pending", "Expired"):
+            with self.subTest(status=status):
+                if status == "Expired":
+                    self.invitation.expire()
+                with self.set_user(self.agent):
+                    invitation = get_contact_info(self.contact)["invitation"]
+                self.assertEqual(invitation.name, self.invitation.name)
+                self.assertEqual(invitation.status, status)
+
+    def test_cancellation_does_not_revive_an_older_expired_invitation(self) -> None:
+        self.invitation.expire()
+        with self.freeze_time("2026-01-05 10:01:00.123456"):
+            invitation = make_contact_invitation(self.contact, self.email)
+            self.assertTrue(invitation.cancel_invite())
+
+        with self.set_user(self.agent):
+            self.assertNotIn("invitation", get_contact_info(self.contact))
+
+    def test_new_invitation_is_visible_after_cancellation(self) -> None:
+        self.assertTrue(self.invitation.cancel_invite())
+        with self.freeze_time("2026-01-05 10:01:00.123456"):
+            new_invitation = make_contact_invitation(self.contact, self.email)
+
+        with self.set_user(self.agent):
+            invitation = get_contact_info(self.contact)["invitation"]
+        self.assertEqual(invitation.name, new_invitation.name)
+        self.assertEqual(invitation.status, "Pending")
