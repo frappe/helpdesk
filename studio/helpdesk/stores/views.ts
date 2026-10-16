@@ -1,0 +1,265 @@
+import { computed, nextTick, ref, shallowRef, toRaw, watch } from 'vue'
+import { StorageSerializers, useStorage } from '@vueuse/core'
+import { call, createListResource, toast } from 'frappe-ui'
+import { parseOrderBy } from '@framework/ui/SortBy'
+import { __ } from '@helpdesk/shared/translation'
+import { currentRoute, navigateTo } from '@app/stores/router'
+import { useSession } from '@app/stores/session'
+import { parseJson, runAction, setValues } from '@app/utils'
+
+const DOCTYPE = 'HD Ticket'
+
+const DEFAULT_VIEW = { name: '', icon: 'text-align-justify' }
+
+// Storage, not the URL: every way back into this list pushes a bare route.
+const MEMORY_PREFIX = 'kb:list'
+
+const store = createViewsStore()
+
+export function useViews(listView) {
+  store.attachListView(listView)
+  return store.bindings
+}
+
+function sessionUser() {
+  return useSession().config.value?.session_user || ''
+}
+
+function createViewsStore() {
+  const list = createListResource({
+    doctype: 'HD View',
+    fields: [
+      'name', 'label', 'icon', 'dt', 'route_name', 'pinned', 'public',
+      'is_default', 'is_standard', 'filters', 'order_by', 'columns', 'user',
+    ],
+    filters: { dt: DOCTYPE, is_customer_portal: 1 },
+    pageLength: 1000,
+  })
+
+  const views = computed(() => list.data || [])
+
+  const listView = shallowRef(null) // the page's useListView
+  let hasAttached = false
+  let defaultSnapshot = null
+  let isRestoring = false
+
+  const isViewModalOpen = ref(false)
+  const viewModalMode = ref<'create' | 'rename'>('create')
+  const viewModalLabel = ref('')
+  const viewModalIcon = ref('')
+  const viewModalName = ref('')
+
+  const activeName = computed(() => currentRoute().query?.view || '')
+
+  const activeView = computed(
+    () => views.value.find((view) => view.name === activeName.value) || null,
+  )
+
+  const currentView = computed(() =>
+    activeView.value
+      ? { ...activeView.value, icon: activeView.value.icon || DEFAULT_VIEW.icon }
+      : { ...DEFAULT_VIEW, label: __('List') },
+  )
+
+  const rememberedLayout = useStorage(
+    () => `${MEMORY_PREFIX}:${DOCTYPE}:${activeName.value}`,
+    null,
+    localStorage,
+    { serializer: StorageSerializers.object, writeDefaults: false },
+  )
+
+  // Here, not in attachListView: Studio stops the page's effect scope on navigation.
+  // On route change, not on click, so a shared URL lands on the same view.
+  watch(() => [activeName.value, list.data], () => applyActiveView())
+  watch(
+    () => listView.value && [listView.value.filters.conditions.value, listView.value.sort.by.value],
+    () => rememberLayout(),
+    { deep: true },
+  )
+
+  function attachListView(view) {
+    // This store outlives the page, so never hold the first mount's `useListView`.
+    listView.value = view
+    // On every mount: the watch above fires on neither a same-view return nor a remount.
+    applyActiveView()
+    if (hasAttached) return
+    hasAttached = true
+    // Restored by the unnamed "List" view, which has no saved columns of its own.
+    defaultSnapshot = snapshotOf(view)
+    // `if_owner` does not cover agents, so filter by owner once the session names them.
+    useSession()
+      .loadSession()
+      .then(() => {
+        list.update({ filters: { ...list.filters, owner: sessionUser() } })
+        return list.reload()
+      })
+  }
+
+  function rememberLayout() {
+    const view = listView.value
+    if (isRestoring || !view) return
+    rememberedLayout.value = {
+      filters: view.filters.conditions.value,
+      sort: view.sort.by.value,
+    }
+  }
+
+  function applyActiveView() {
+    const view = listView.value
+    if (!view) return
+    isRestoring = true
+    const row = activeView.value
+    if (!row) {
+      if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
+    } else {
+      view.restore({
+        filters: parseJson(row.filters, []),
+        sort: parseOrderBy(row.order_by || ''),
+        columns: parseJson(row.columns, []),
+      })
+    }
+    // The remembered layout refines the view; an empty sort was never chosen.
+    const remembered = rememberedLayout.value
+    if (remembered) {
+      view.restore({
+        filters: remembered.filters,
+        ...(remembered.sort?.length ? { sort: remembered.sort } : {}),
+      })
+    }
+    // Next tick, so the restore's own writes are not remembered.
+    nextTick(() => (isRestoring = false))
+  }
+
+  function currentPayload() {
+    const view = listView.value
+    return {
+      filters: JSON.stringify(view.filters.conditions.value),
+      order_by: view.sort.orderBy.value,
+      columns: JSON.stringify(view.columns.shown.value),
+    }
+  }
+
+  async function createView(label, icon) {
+    const doc = await call('frappe.client.insert', {
+      doc: {
+        doctype: 'HD View',
+        label,
+        dt: DOCTYPE,
+        type: 'list',
+        is_customer_portal: 1,
+        icon: icon || DEFAULT_VIEW.icon,
+        user: sessionUser(),
+        ...currentPayload(),
+      },
+    })
+    await list.reload()
+    openView(doc.name)
+    toast.success(__('View "{0}" created', [label]))
+  }
+
+  async function renameView(name, label, icon) {
+    await setValues('HD View', name, { label, icon: icon || DEFAULT_VIEW.icon })
+    await list.reload()
+  }
+
+  function saveCurrentView(name) {
+    return runAction(
+      async () => {
+        await setValues('HD View', name, currentPayload())
+        await list.reload()
+      },
+      { success: __('View updated'), fallback: __('Could not update the view') },
+    )
+  }
+
+  function deleteView(name) {
+    return runAction(
+      async () => {
+        await call('frappe.client.delete', { doctype: 'HD View', name })
+        await list.reload()
+        if (activeName.value === name) openView('')
+      },
+      { fallback: __('Could not delete the view') },
+    )
+  }
+
+  function openView(name) {
+    navigateTo({ query: name ? { view: name } : {} })
+  }
+
+  function openViewModal(mode, view = DEFAULT_VIEW) {
+    viewModalMode.value = mode
+    viewModalLabel.value = mode === 'rename' ? view.label : ''
+    viewModalIcon.value = mode === 'rename' ? view.icon : ''
+    viewModalName.value = view.name
+    isViewModalOpen.value = true
+  }
+
+  const viewOptions = computed(() => [
+    {
+      group: 'Views',
+      hideLabel: true,
+      options: [
+        { label: __('List'), icon: DEFAULT_VIEW.icon, onClick: () => openView('') },
+        ...views.value.map((view) => ({
+          name: view.name,
+          label: view.label || __('Untitled view'),
+          icon: view.icon || DEFAULT_VIEW.icon,
+          onClick: () => openView(view.name),
+        })),
+      ],
+    },
+    {
+      group: 'Actions',
+      hideLabel: true,
+      options: [
+        { label: __('Save as new view'), icon: 'lucide-plus', onClick: () => openViewModal('create') },
+      ],
+    },
+  ])
+
+  function viewActions(item) {
+    if (!item?.name) return []
+    return [
+      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView(item.name) },
+      { label: __('Rename'), icon: 'lucide-edit-2', onClick: () => openViewModal('rename', item) },
+      { label: __('Delete'), icon: 'lucide-trash-2', onClick: () => deleteView(item.name) },
+    ]
+  }
+
+  function submitViewModal() {
+    const label = viewModalLabel.value.trim()
+    if (!label) return
+    const isRename = viewModalMode.value === 'rename'
+    return runAction(
+      async () => {
+        if (isRename) await renameView(viewModalName.value, label, viewModalIcon.value)
+        else await createView(label, viewModalIcon.value)
+        isViewModalOpen.value = false
+      },
+      { fallback: isRename ? __('Could not rename the view') : __('Could not create the view') },
+    )
+  }
+
+  const bindings = {
+    currentView,
+    viewOptions,
+    viewActions,
+    isViewModalOpen,
+    viewModalMode,
+    viewModalLabel,
+    viewModalIcon,
+    submitViewModal,
+  }
+
+  return { attachListView, bindings }
+}
+
+// Cloned, so a restore cannot alias the stored default into live refs.
+function snapshotOf(listView) {
+  return structuredClone({
+    filters: toRaw(listView.filters.conditions.value),
+    sort: toRaw(listView.sort.by.value),
+    columns: toRaw(listView.columns.shown.value),
+  })
+}

@@ -84,7 +84,7 @@
 import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideCheck from "~icons/lucide/check";
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
 import { Badge, Dropdown } from "frappe-ui";
 import { ref } from "vue";

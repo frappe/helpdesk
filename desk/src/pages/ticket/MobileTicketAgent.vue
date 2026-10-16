@@ -260,7 +260,6 @@ import {
   TabPanel,
   Tabs,
   TabTrigger,
-  toast,
 } from "frappe-ui";
 import {
   computed,
@@ -287,16 +286,13 @@ import {
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
-import CustomActions from "@/components/CustomActions.vue";
+import CustomActions from "@helpdesk/shared/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
-import {
-  createToast,
-  parseField,
-  setupCustomizations,
-} from "@/composables/formCustomisation";
+import { parseField } from "@/composables/fieldDependsOn";
+import { setupCustomizations } from "@helpdesk/shared/formScripts";
 import { useScreenSize } from "@/composables/screen";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import {
@@ -369,10 +365,8 @@ const customizationCtx = computed(() => ({
   doc: ticket.value?.doc,
   call,
   router,
-  toast,
   $dialog,
   updateField,
-  createToast,
 }));
 
 watchEffect(async () => {

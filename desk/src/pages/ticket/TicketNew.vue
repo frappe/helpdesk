@@ -72,53 +72,9 @@
             maxlength="140"
           />
         </div>
-        <SearchArticles
-          v-if="isCustomerPortal"
-          :query="subject"
-          class="shadow-sm"
-        />
-        <div v-if="isCustomerPortal">
-          <h4
-            v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-ink-gray-4 ms-1"
-          >
-            {{ __("Please enter a subject to continue") }}
-          </h4>
-          <TicketTextEditor
-            v-show="subject.length > 2 || description.length > 0"
-            ref="editor"
-            v-model:attachments="attachments"
-            v-model:content="description"
-            :placeholder="__('Detailed explanation')"
-            expand
-            :uploadFunction="
-              (file: any, options: any) =>
-                track(uploadFunction(file, null, null, true, options))
-            "
-          >
-            <template #bottom-right>
-              <!-- A disabled button fires no pointer events, so the span
-                   carries the hover for the tooltip -->
-              <Tooltip
-                :text="isUploading ? __('Please wait, media is uploading') : ''"
-              >
-                <span class="inline-flex">
-                  <Button
-                    :label="__('Submit')"
-                    theme="gray"
-                    variant="solid"
-                    :disabled="!canSubmit"
-                    @click="() => ticket.submit()"
-                  />
-                </span>
-              </Tooltip>
-            </template>
-          </TicketTextEditor>
-        </div>
       </div>
 
-      <!-- for agent portal -->
-      <div v-if="!isCustomerPortal">
+      <div>
         <TicketTextEditor
           ref="editor"
           v-model:attachments="attachments"
@@ -153,19 +109,19 @@
 
 <script setup lang="ts">
 import { LayoutHeader, UniInput } from "@/components";
+import CustomActions from "@helpdesk/shared/CustomActions.vue";
+import { parseField } from "@/composables/fieldDependsOn";
 import {
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
-  parseField,
+  applyFieldFilters,
   setupCustomizations,
-} from "@/composables/formCustomisation";
+} from "@helpdesk/shared/formScripts";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Field } from "@/types";
 import { useUploadTracker } from "@/composables/useUploadTracker";
-import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import { isContentEmpty, uploadFunction } from "@/utils";
 import { useOnboarding } from "@framework/ui";
 import {
   Breadcrumbs,
@@ -179,7 +135,6 @@ import {
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import SearchArticles from "../../components/SearchArticles.vue";
 
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
@@ -251,13 +206,13 @@ const ticketPriorityResource = createListResource({
 let oldFields = [];
 
 function applyFilters(fieldname: string, filters: any = null) {
-  const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
-  if (!f) return;
-  if (f.fieldtype === "Select") {
-    handleSelectFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  } else if (f.fieldtype === "Link") {
-    handleLinkFieldUpdate(f, fieldname, filters, templateFields, oldFields);
-  }
+  applyFieldFilters(
+    template.data.fields,
+    fieldname,
+    filters,
+    templateFields,
+    oldFields
+  );
 }
 
 const customOnChange = computed(() => template.data?._customOnChange);
@@ -301,7 +256,7 @@ const ticket = createResource({
   },
   onSuccess: (data) => {
     router.push({
-      name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+      name: "TicketAgent",
       params: {
         ticketId: data.name,
       },
@@ -325,13 +280,13 @@ const breadcrumbs = computed(() => {
     {
       label: __("Tickets"),
       route: {
-        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        name: "TicketsAgent",
       },
     },
     {
       label: __("New Ticket"),
       route: {
-        name: "TicketNew",
+        name: "TicketAgentNew",
       },
     },
   ];

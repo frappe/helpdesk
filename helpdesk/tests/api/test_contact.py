@@ -5,7 +5,12 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.contact import delete_contact
-from helpdesk.test_utils import create_contact, create_customer, make_ticket
+from helpdesk.test_utils import (
+    create_contact,
+    create_customer,
+    make_invitation,
+    make_ticket,
+)
 
 
 class TestDeleteContact(IntegrationTestCase):
@@ -70,15 +75,5 @@ class TestDeleteContact(IntegrationTestCase):
             customer_name, [{"contact_name": contact["contact"]}]
         )
         ticket = make_ticket(customer=customer.name, contact=contact["contact"])
-        invitation = frappe.get_doc(
-            {
-                "doctype": "User Invitation",
-                "email": email,
-                "app_name": "helpdesk",
-                "redirect_to_path": "/helpdesk",
-                "roles": [{"role": "HD Customer"}],
-                "customer": customer.name,
-                "contact": contact["contact"],
-            }
-        ).insert(ignore_permissions=True)
+        invitation = make_invitation(email, customer.name, contact["contact"])
         return contact, customer, ticket, invitation
