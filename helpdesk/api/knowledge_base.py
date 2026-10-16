@@ -286,6 +286,7 @@ def _get_search_hit(row: dict, article: frappe._dict) -> dict:
     return {
         "name": row["name"],
         "title": escape_marked(row["title"]),
+        "title_slug": row["title_slug"],
         "excerpt": escape_marked(row["excerpt"]),
         # HD Article has no cover field; the body's first image stands in for one.
         "image": find_first_image(content),

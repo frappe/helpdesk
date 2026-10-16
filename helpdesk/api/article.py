@@ -119,14 +119,13 @@ def search(query: str) -> list:
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
     """Published articles the reader may see that match free text, best first, as plain titles."""
-    titles = [
-        (row["name"], strip_html_tags(row["title"]))
-        for row in search_accessible_articles(query)[:RELATED_LIMIT]
-    ]
-    # the portal links to /articles/<name>-<slug>, as everywhere else
     return [
-        {"name": name, "title": title, "title_slug": cleanup_page_name(title)}
-        for name, title in titles
+        {
+            "name": row["name"],
+            "title": strip_html_tags(row["title"]),
+            "title_slug": row["title_slug"],
+        }
+        for row in search_accessible_articles(query)[:RELATED_LIMIT]
     ]
 
 
@@ -144,6 +143,10 @@ def search_accessible_articles(query: str) -> list[dict]:
             {
                 "name": name,
                 "title": _as_mark(hit.get("subject")),
+                # portal links are /articles/<name>-<slug>; the slug skips the hit marks
+                "title_slug": cleanup_page_name(
+                    strip_html_tags(hit.get("subject") or "")
+                ),
                 "excerpt": _as_mark(hit.get("description")),
             },
         )

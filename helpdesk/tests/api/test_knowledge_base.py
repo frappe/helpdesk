@@ -647,6 +647,7 @@ class TestSearch(IntegrationTestCase):
         [row] = search_articles("zebra")
 
         self.assertIn("<mark>zebra</mark>", row["title"])
+        self.assertEqual(row["title_slug"], "fixture-zebra-crossing")
         self.assertIn("&amp;", row["excerpt"])
         self.assertNotIn("<b>", row["excerpt"])
         self.assertEqual(row["category_name"], "Fixture Search")
