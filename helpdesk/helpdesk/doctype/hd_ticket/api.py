@@ -10,6 +10,7 @@ from frappe.utils.caching import redis_cache
 from pypika import Order
 
 from helpdesk.api.doc import handle_at_me_support
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.ticket_fields import TicketFields
@@ -389,10 +390,18 @@ def duplicate_ticket(ticket_doc, subject):
 
 @frappe.whitelist()
 @agent_only
-def get_ticket_customizations():
+def get_ticket_customizations(ticket: str | None = None):
     """Every field the agent details tab may show, as this user may see it."""
+    template = DEFAULT_TICKET_TEMPLATE
+    if ticket:
+        frappe.has_permission("HD Ticket", "read", ticket, throw=True)
+        template = (
+            frappe.db.get_value("HD Ticket", ticket, "template")
+            or DEFAULT_TICKET_TEMPLATE
+        )
+
     return {
-        "fields": TicketFields().get_layout(),
+        "fields": TicketFields(template).get_layout(),
         "_form_script": get_form_script("HD Ticket"),
     }
 
