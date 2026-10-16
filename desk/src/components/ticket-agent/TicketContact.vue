@@ -1,18 +1,14 @@
 <template>
   <div class="flex items-center gap-3">
-    <Avatar
-      :label="contact.data?.name ?? ''"
-      :image="contactImage"
-      size="3xl"
-    />
+    <Avatar :label="displayName" :image="contactImage" size="3xl" />
     <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-      <Tooltip :text="contact.data?.name || contact.data?.email_id">
+      <Tooltip :text="displayName || contact.data?.email_id">
         <div class="flex min-w-0 items-center gap-1.5 w-fit max-w-[65%]">
           <p
             class="min-h-[1lh] cursor-pointer truncate text-md font-medium text-ink-gray-7 hover:text-ink-gray-9"
             @click="openContact(contact.data?.name)"
           >
-            {{ contact.data?.name || contact.data?.email_id }}
+            {{ displayName || contact.data?.email_id }}
           </p>
         </div>
       </Tooltip>
@@ -70,6 +66,10 @@ const showPhoneModal = ref(false);
 const ticket = inject(TicketSymbol)!;
 
 const contact = inject(TicketContactSymbol)!;
+// `name` is the Contact's ID; show its full name when it has one
+const displayName = computed(
+  () => contact.value?.data?.full_name || contact.value?.data?.name || ""
+);
 const contactImage = computed(() => {
   if (!contact.value?.data) return "";
   const email = contact.value?.data?.email_id ?? "";

@@ -16,6 +16,7 @@ from helpdesk.api.ticket import bulk_reply
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
     get_one,
+    get_ticket_contact,
     merge_ticket,
     new,
     show_outside_hours_banner,
@@ -765,6 +766,18 @@ class TestHDTicket(IntegrationTestCase):
             ticket.status = "Closed"
             ticket.save()
             self.assertEqual(ticket.resolution_time, 30 * 60)
+
+    def test_ticket_contact_includes_full_name(self):
+        email = "ticket.contact.full.name@example.com"
+        contact = create_contact("Jane", email, user=False)["contact"]
+        ticket = make_ticket(raised_by=email)
+        self.assertEqual(ticket.contact, contact)
+
+        data = get_ticket_contact(ticket.name)
+        self.assertEqual(data.name, contact)
+        self.assertEqual(
+            data.full_name, frappe.db.get_value("Contact", contact, "full_name")
+        )
 
     def test_ticket_merge(self):
         ticket1 = make_ticket(description="Test Desc 1")

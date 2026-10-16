@@ -1,14 +1,14 @@
 <template>
   <div class="flex items-center justify-start gap-5 border-b p-5">
-    <Avatar size="3xl" :image="contact.image" :label="contact.name" />
+    <Avatar size="3xl" :image="contact.image" :label="displayName" />
     <div class="flex items-center justify-between flex-1">
-      <Tooltip :text="contact.name">
+      <Tooltip :text="displayName">
         <div class="w-full truncate text-2xl-medium">
-          {{ contact.name }}
+          {{ displayName }}
         </div>
       </Tooltip>
       <div class="flex gap-1.5">
-        <Tooltip :text="`Call ${contact.name}`" v-if="isCallingEnabled">
+        <Tooltip :text="`Call ${displayName}`" v-if="isCallingEnabled">
           <Button @click="callContact">
             <template #icon>
               <PhoneIcon class="size-4" />
@@ -58,7 +58,7 @@ import { useTelephonyStore } from "@/stores/telephony";
 import { Avatar, Tooltip, Button } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import SetContactPhoneModal from "./SetContactPhoneModal.vue";
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
@@ -75,6 +75,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+// `name` is the Contact's ID; show its full name when it has one
+const displayName = computed(
+  () => props.contact.full_name || props.contact.name
+);
 
 const callContact = () => {
   if (!props.contact.mobile_no && !props.contact.phone) {

@@ -513,6 +513,7 @@ export interface Customizations {
 
 export interface TicketContact {
   name: string;
+  full_name?: string;
   email_id: string;
   phone: string;
   mobile_no: string;
