@@ -920,7 +920,7 @@ function handleViewUpdate() {
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
     order_by: defaultParams.order_by,
-    group_by_settings: groupBy.value ? JSON.stringify(groupBy.value) : "",
+    list_group_by: groupBy.value ? JSON.stringify(groupBy.value) : "",
     name: (route.query.view as string) || "default",
     dt: options.value.doctype,
     route_name: route.name,
@@ -997,7 +997,7 @@ function switchToView(view: string): boolean {
     defaultParams.columns = currentView.columns;
     defaultParams.rows = currentView.rows;
     groupBy.value = options.value.groupBy
-      ? parseGroupBy(currentView.group_by_settings)
+      ? parseGroupBy(currentView.list_group_by)
       : null;
     return true;
   }

@@ -393,7 +393,7 @@ export function useView(dt: string = null) {
         columns: JSON.stringify(list?.data.columns),
         rows: JSON.stringify(list?.data?.rows),
         // a reactive list unwraps the grouping ref, so read it either way
-        group_by_settings: unref(list?.groupBy)
+        list_group_by: unref(list?.groupBy)
           ? JSON.stringify(unref(list.groupBy))
           : "",
         pinned: viewInfo.pinned ?? false,
