@@ -94,10 +94,9 @@ import {
   useActivityTimeline,
 } from "@framework/ui/components/ActivityTimeline";
 import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
-import { plainTextToHtml } from "@helpdesk/shared/utils";
+import { DATE_FORMATS, plainTextToHtml } from "@helpdesk/shared/utils";
 import { useSession } from "@app/stores/session";
 import { conversationLayout } from "@app/stores/settings";
-import { DATE_FORMATS } from "@app/utils";
 import PortalEmailContent from "./PortalEmailContent.vue";
 
 type Row = {

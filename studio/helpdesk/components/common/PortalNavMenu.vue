@@ -16,24 +16,33 @@
       </button>
     </template>
   </Dropdown>
-  <div
+  <RouterLink
     v-else
+    :to="ROUTES.home"
     :aria-label="name"
     class="flex h-8 min-w-0 max-w-[15rem] shrink-0 items-center gap-2"
   >
     <Brand />
-  </div>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
+import { computed, h } from "vue";
+import { RouterLink, useRoute } from "vue-router";
 import { Dropdown, Icon } from "frappe-ui";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 
 const props = defineProps<{
   options?: unknown[];
   logo?: string;
   name?: string;
 }>();
+
+const route = useRoute();
+const isTicketPage = computed(
+  () =>
+    route.path === ROUTES.ticketList || route.path.startsWith(ROUTES.ticket(""))
+);
 
 function Brand() {
   return [
@@ -45,11 +54,14 @@ function Brand() {
           class: "size-6 shrink-0 rounded-2 object-contain",
         })
       : h("span", { class: "size-6 shrink-0" }),
-    h(
-      "span",
-      { class: "hidden truncate text-base-medium text-ink-gray-9 sm:block" },
-      props.name
-    ),
+    !isTicketPage.value &&
+      h(
+        "span",
+        {
+          class: "hidden truncate text-base-medium text-ink-gray-9 sm:block",
+        },
+        props.name
+      ),
   ];
 }
 </script>

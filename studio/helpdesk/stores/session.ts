@@ -25,6 +25,9 @@ function createSessionStore() {
   // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
   const canCreateTicket = computed(() => !isGuest.value)
+  // A guest's article feedback only counts when anonymous voting is on.
+  const canGiveFeedback = computed(() => !isGuest.value || Boolean(config.value?.allow_anonymous_article_voting))
+  const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
@@ -56,9 +59,9 @@ function createSessionStore() {
     socket.on('helpdesk:settings-updated', reloadSession)
   }
 
-  // A guest 403s on every call, so sign in beats an unfillable shell.
+  // A private knowledge base 403s every call, so sign in beats an unfillable shell.
   function sendGuestToLogin() {
-    if (!isGuest.value) return
+    if (!isGuest.value || isPublicKnowledgeBase.value) return
     signIn()
   }
 
@@ -80,7 +83,9 @@ function createSessionStore() {
     config,
     reloadOnSettingsUpdate,
     isGuest,
+    isPublicKnowledgeBase,
     canCreateTicket,
+    canGiveFeedback,
     isAgent,
     canEditSettings,
     brandLogo,

@@ -1,5 +1,8 @@
-import { dayjs, dayjsLocal, toast } from "frappe-ui";
+import { useClipboard } from "@vueuse/core";
+import { call, dayjs, dayjsLocal, dialog, toast } from "frappe-ui";
+import type { Ref } from "vue";
 
+import { setupCustomizations, withLegacyCloseContext } from "./formScripts";
 import { __ } from "./translation";
 
 const MINUTE = 60;
@@ -10,6 +13,42 @@ const YEAR = 365 * DAY;
 
 // The studio-built customer portal, served outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/help";
+
+/**
+ * @param {Object} config - Configuration object
+ * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
+ * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
+ * @returns {Array} Array of option objects for use in dropdowns
+ */
+export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
+  return [
+    {
+      label: "Delete",
+      icon: "lucide-trash-2",
+      // preventDefault keeps the menu open so the confirm row can replace this one
+      onClick: (event) => {
+        event.preventDefault();
+        isConfirmingDelete.value = true;
+      },
+      condition: () => !isConfirmingDelete.value,
+    },
+    {
+      label: "Confirm Delete",
+      icon: "lucide-trash-2",
+      theme: "red",
+      onClick: () => {
+        onConfirmDelete();
+        isConfirmingDelete.value = false;
+      },
+      condition: () => isConfirmingDelete.value,
+    },
+  ];
+}
+
+// Quick links reach guests, so only site paths, web and mail addresses are allowed.
+export function isSafeLink(url: unknown) {
+  return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
+}
 
 export function prettyDate(date) {
   if (!date) return "";
@@ -135,6 +174,36 @@ export function plainTextToHtml(content: string) {
   return `<div class="whitespace-pre-wrap">${doc.body.innerHTML}</div>`;
 }
 
+// Heading ids only; article URLs take the server's `title_slug`.
+function slugify(text = "") {
+  return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFC")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}]+/gu, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// One id per article heading, the same on the desk and the portal, so a `#heading` link works on both.
+// An id the editor already saved wins, so existing links keep working; repeats are numbered.
+export function addHeadingIds(html: string) {
+  const doc = new DOMParser().parseFromString(html || "", "text/html");
+  const used = new Set<string>();
+  const headings = Array.from(
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6")
+  ).map((heading) => {
+    const text = heading.textContent?.trim() || "";
+    const base = heading.id || slugify(text) || "section";
+    let id = base;
+    for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+    used.add(id);
+    heading.id = id;
+    return { id, text, level: Number(heading.tagName[1]) };
+  });
+  return { html: doc.body.innerHTML, headings };
+}
+
 // Lucide names are plain ASCII, so any emoji-presentation or pictographic
 // character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
 export function isEmoji(str: string): boolean {
@@ -247,4 +316,144 @@ export function handleInviteUserSuccess(
     toast.info(__("{0} already invited", list(data.pending_invite_emails)));
   if (data.accepted_invite_emails.length)
     toast.info(__("{0} already present", list(data.accepted_invite_emails)));
+}
+
+export const SEARCH_DEBOUNCE_MS = 300;
+
+// Mirrors frappe.handler.ALLOWED_MIMETYPES, which the server enforces for users without desk access.
+const CUSTOMER_FILE_TYPES = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".pdf",
+  ".txt",
+  ".csv",
+  ".mov",
+  ".mp4",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".odt",
+  ".ods",
+];
+
+// Undefined for agents, who may upload anything.
+export function uploadableFileTypes(isAgent: boolean) {
+  return isAgent ? undefined : CUSTOMER_FILE_TYPES;
+}
+
+export const DATE_FORMATS = {
+  clock: "h:mm A",
+  short: "D MMM YYYY",
+  step: "ddd D MMM, h:mm A",
+};
+
+export function parseJson(value: unknown, fallback: any = undefined) {
+  if (!value) return fallback;
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export type ActionOptions = {
+  busy?: Ref<boolean>;
+  success?: string;
+  fallback: string;
+};
+
+export async function runAction(
+  action: () => Promise<unknown>,
+  options: ActionOptions
+) {
+  const { busy, success, fallback } = options;
+  if (busy?.value) return;
+  if (busy) busy.value = true;
+  try {
+    await action();
+    if (success) toast.success(success);
+    return true;
+  } catch (error) {
+    console.error(error);
+    getErrorMessage(error, true, fallback);
+  } finally {
+    if (busy) busy.value = false;
+  }
+}
+
+export function setValues(
+  doctype: string,
+  name: string,
+  values: Record<string, unknown>
+) {
+  return call("frappe.client.set_value", { doctype, name, fieldname: values });
+}
+
+// `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
+function scriptDialog({ title, message, size, icon, actions }) {
+  return dialog.confirm({
+    title,
+    message,
+    size,
+    icon,
+    actions: withLegacyCloseContext(actions),
+  });
+}
+
+// HD Form Scripts get the desk portal's context, so scripts written for it keep working.
+export async function runFormScripts(
+  data,
+  context,
+  extra: Record<string, unknown> = {}
+) {
+  await setupCustomizations(data, {
+    call: context.call,
+    router: context.router,
+    $dialog: scriptDialog,
+    ...extra,
+  });
+  return data._customActions || [];
+}
+
+export function askConfirm({ title, message, label, theme, action }) {
+  return dialog.confirm({
+    title,
+    message,
+    theme,
+    confirmLabel: label,
+    cancelLabel: __("Cancel"),
+    onConfirm: action,
+  });
+}
+
+export function updateTicket(name: string, values: Record<string, unknown>) {
+  return setValues("HD Ticket", name, values);
+}
+
+// Takes strings already passed through `__()`, so the extractor sees the literals.
+export function countLabel(count: number, singular: string, plural: string) {
+  return count === 1 ? singular : plural.replace("{0}", String(count));
+}
+
+// "Category · 3 min read"; either part may be missing.
+export function articleMeta(categoryName?: string, minutes?: number) {
+  const readTime = minutes
+    ? countLabel(minutes, __("1 min read"), __("{0} min read"))
+    : "";
+  return [categoryName, readTime].filter(Boolean).join(" · ");
+}
+
+// `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
+export async function copyPageLink() {
+  await useClipboard({ legacy: true }).copy(window.location.href);
+  toast.success(__("Link copied"));
+}
+
+export function matchesQuery(query: string, ...fields: (string | undefined)[]) {
+  const needle = query.trim().toLowerCase();
+  return !needle || fields.join(" ").toLowerCase().includes(needle);
 }

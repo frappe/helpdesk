@@ -58,13 +58,21 @@
             "type": "text",
             "variant": "subtle"
            }
+          },
+          {
+           "componentId": "PortalRelatedArticles-nt",
+           "componentName": "PortalRelatedArticles",
+           "componentProps": {
+            "articles": "{{ suggestions.data }}"
+           },
+           "isCustomVueComponent": true
           }
          ],
          "classes": [
           "flex",
           "flex-col",
           "w-full",
-          "gap-6"
+          "gap-2"
          ],
          "componentId": "f-subject",
          "componentName": "container",
@@ -272,7 +280,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-10 20:40:00.000000",
+ "modified": "2026-10-15 20:00:00",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

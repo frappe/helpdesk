@@ -49,7 +49,7 @@ class TestTicketRealtime(FrappeTestCase):
         def change():
             with self.set_user(user):
                 doc = frappe.get_doc("HD Ticket", self.ticket.name)
-                doc.priority = doc.priority
+                doc.feedback_extra = "edited"  # one field a customer may change
                 doc.save(ignore_permissions=True)
 
         return change

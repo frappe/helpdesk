@@ -9,7 +9,11 @@
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts",
 		"./ticketCells": "./src/ticketCells.ts",
+		"./tiptap": "./src/tiptap.ts",
+		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
+		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",
 		"./portalRoutes": "./src/portalRoutes.ts",
+		"./categoryIcons": "./src/categoryIcons.ts",
 		"./Icon.vue": "./src/Icon.vue",
 		"./CustomActions.vue": "./src/CustomActions.vue",
 		"./ViewIconField.vue": "./src/ViewIconField.vue",
@@ -22,6 +26,7 @@
 		"./settings/*": "./src/settings/*"
 	},
 	"peerDependencies": {
+		"@tiptap/core": "*",
 		"@vueuse/core": "*",
 		"frappe-ui": "*",
 		"vue": "*"

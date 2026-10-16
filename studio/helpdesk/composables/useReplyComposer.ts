@@ -1,8 +1,7 @@
 import { computed, ref } from 'vue'
 import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { isContentEmpty } from '@helpdesk/shared/utils'
-import { runAction, uploadableFileTypes } from '@app/utils'
+import { isContentEmpty, runAction, uploadableFileTypes } from '@helpdesk/shared/utils'
 
 export function useReplyComposer(ticket, { isClosed, isAgent }) {
   // Closed on arrival, so the thread gets the room; the bar opens it.

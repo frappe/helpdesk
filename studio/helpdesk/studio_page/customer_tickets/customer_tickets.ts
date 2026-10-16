@@ -175,7 +175,7 @@ export default function setup(context) {
     openTicket,
     pageActionLabel: computed(() => (settings.canCreateTicket.value ? __('Raise a ticket') : '')),
     pageActionIcon: 'lucide-plus',
-    onPageAction: () => navigateTo(ROUTES.newTicket),
+    onPageAction: () => navigateTo(ROUTES.newTicket({ from: 'ticket-list' })),
     rows: data.rows,
     listLoading: data.loading,
     rowCount: data.rowCount,

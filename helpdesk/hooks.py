@@ -34,7 +34,6 @@ after_migrate = [
 
 sqlite_search = [
     "helpdesk.search_sqlite.HelpdeskSearch",
-    "helpdesk.search_sqlite.HelpdeskArticleSearch",
 ]
 
 scheduler_events = {
@@ -58,13 +57,8 @@ website_route_rules = [
     },
 ]
 
-# The old customer portal's ticket URLs keep working through these.
+# The old customer portal's URLs keep working through these.
 website_redirects = [
-    # The app root will be the knowledge base once its pages land.
-    {
-        "source": "/help",
-        "target": "/help/customer-tickets",
-    },
     {
         "source": "/helpdesk/my-tickets/new",
         "target": "/help/tickets/new",
@@ -72,13 +66,25 @@ website_redirects = [
     },
     {
         "source": "/helpdesk/my-tickets",
-        "target": "/help/customer-tickets",
+        "target": "/help/my-tickets",
         "forward_query_parameters": True,
     },
     {
         "source": r"/helpdesk/my-tickets/(.*)",
         "target": r"/help/tickets/\1",
         "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/kb-public",
+        "target": "/help",
+    },
+    {
+        "source": r"/helpdesk/kb-public/articles/(.*)",
+        "target": r"/help/articles/\1",
+    },
+    {
+        "source": r"/helpdesk/kb-public/(.*)",
+        "target": r"/help/category/\1",
     },
 ]
 
@@ -144,6 +150,7 @@ doc_events = {
 # For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
@@ -152,6 +159,7 @@ permission_query_conditions = {
 has_permission = {
     "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
     "Comment": "helpdesk.extends.comment.has_permission",
@@ -159,6 +167,8 @@ has_permission = {
 
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
+    "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
 }
 
 

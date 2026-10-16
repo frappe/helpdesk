@@ -13,15 +13,13 @@
           >
         </div>
       </template>
-      <template #right-header v-if="!isCustomerPortal">
+      <template #right-header>
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable && !article.loading">
           <Button
-            :label="
-              article.data?.status === 'Draft' ? __('Publish') : __('Unpublish')
-            "
-            :iconLeft="article.data?.status !== 'Published' && 'lucide-globe'"
-            @click="toggleStatus()"
+            :label="isPublished ? __('Unpublish') : __('Publish')"
+            :iconLeft="isPublished ? undefined : 'lucide-globe'"
+            @click="togglePublished()"
           />
         </div>
       </template>
@@ -53,33 +51,7 @@
                 :disabled="!editable"
               />
               <div
-                v-if="!editable && isCustomerPortal"
-                class="flex gap-1 items-center pt-1.5"
-              >
-                <!-- Avatar -->
-                <div class="flex gap-2 pb-1.5 items-center justify-center">
-                  <Avatar
-                    :image="article.data.author.image"
-                    :label="article.data.author.name"
-                    size="md"
-                  />
-                  <div class="flex gap-1 items-end">
-                    <p class="truncate capitalize text-base text-ink-gray-7">
-                      {{ article.data.author.name }}
-                    </p>
-                    <IconDot class="h-4 w-4 text-ink-gray-5" />
-                    <div class="text-base text-ink-gray-7">
-                      {{
-                        dayjsLocal(article.data.modified).format(
-                          "MMM D, h:mm A"
-                        )
-                      }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="!editable && !isCustomerPortal && !isMobileView"
+                v-if="!editable && !isMobileView"
                 class="text-p-sm text-ink-gray-4 items-center"
               >
                 <span>{{ views }} {{ __("views") }}</span>
@@ -87,42 +59,31 @@
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
               <div class="flex gap-4 text-p-sm items-center">
-                <div
-                  class="flex items-center gap-2"
-                  v-if="!editable && !isCustomerPortal"
-                >
+                <div class="flex items-center gap-2" v-if="!editable">
                   <Button
                     variant="ghost"
                     size="md"
                     class="flex shrink-0 !w-auto"
-                    :disabled="!isCustomerPortal"
+                    disabled
                   >
                     <template #suffix>
                       {{ likes }}
                     </template>
                     <template #icon>
-                      <ThumbsUpFilledIcon
-                        v-if="feedback === 1 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsUpIcon v-else class="size-4" />
+                      <ThumbsUpIcon class="size-4" />
                     </template>
                   </Button>
                   <Button
                     variant="ghost"
                     size="md"
                     class="flex shrink-0 !w-auto"
-                    :disabled="!isCustomerPortal"
+                    disabled
                   >
                     <template #suffix>
                       {{ dislikes }}
                     </template>
                     <template #icon>
-                      <ThumbsDownFilledIcon
-                        v-if="feedback === 2 && isCustomerPortal"
-                        class="size-4"
-                      />
-                      <ThumbsDownIcon v-else class="size-4" />
+                      <ThumbsDownIcon class="size-4" />
                     </template>
                   </Button>
                 </div>
@@ -130,7 +91,7 @@
               <div class="flex gap-1 items-start justify-between">
                 <Dropdown
                   :options="articleActions"
-                  v-if="!editable && !isCustomerPortal"
+                  v-if="!editable"
                   @update:open="
                     (open) => open && (isConfirmingDeleteArticle = false)
                   "
@@ -187,10 +148,7 @@
             <EditorTableMenu v-if="editable" />
           </template>
         </Editor>
-        <div
-          v-if="!editable && !isCustomerPortal"
-          class="flex gap-1 items-center pt-1.5 mt-4"
-        >
+        <div v-if="!editable" class="flex gap-1 items-center pt-1.5 mt-4">
           <!-- Avatar -->
           <div class="flex gap-2 items-center justify-center">
             <Avatar
@@ -211,24 +169,18 @@
                     dayjsLocal(article.data.modified).format("MMM D, h:mm A")
                   }}
                 </span>
-                <IconDot
-                  v-if="!editable && !isCustomerPortal && isMobileView"
-                  class="h-4 w-4 text-ink-gray-5"
-                />
+                <IconDot v-if="isMobileView" class="h-4 w-4 text-ink-gray-5" />
 
                 <span
-                  v-if="!editable && !isCustomerPortal && isMobileView"
+                  v-if="isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
-                  >{{ views }} views</span
                 >
+                  {{ __("{0} views", [views]) }}
+                </span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="p-4" v-if="isCustomerPortal">
-        <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>
     <!-- Loading State -->
@@ -241,14 +193,37 @@
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
-      :exclude-category="article.data?.category_id"
+      :exclude-category="article.data?.category"
     />
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:icon="category.icon"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
+    <ArticleAccessModal
+      v-if="article.data"
+      v-model="showAccessModal"
+      :title="__('Access for “{0}”', [article.data.title])"
+      :visibility="article.data.visibility"
+      :action-label="isPublished ? __('Update access') : __('Publish')"
+      @publish="publishArticle"
+    >
+      <template #default="{ access }">
+        <p
+          v-if="siblingsVisibility.data && access !== siblingsVisibility.data"
+          class="text-p-sm text-ink-gray-7"
+        >
+          {{
+            __("Other articles in {0} are visible to {1}.", [
+              article.data.category_name,
+              visibleTo(siblingsVisibility.data),
+            ])
+          }}
+        </p>
+      </template>
+    </ArticleAccessModal>
   </div>
 </template>
 
@@ -256,33 +231,30 @@
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
-import {
-  ThumbsDownFilledIcon,
-  ThumbsDownIcon,
-  ThumbsUpFilledIcon,
-  ThumbsUpIcon,
-} from "@/components/icons";
-import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
+import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
-import { useAuthStore } from "@/stores/auth";
 import {
   deleteRes as deleteArticle,
-  incrementView,
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
+  useCategoryVisibility,
+  visibleTo,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
+import { Article, Breadcrumb, Error, Resource } from "@/types";
 import {
   ConfirmDelete,
   copyToClipboard,
-  isCustomerPortal,
+  CUSTOMER_PORTAL_ROOT,
   uploadFunction,
 } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { addHeadingIds } from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
@@ -324,6 +296,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      icon: category.icon,
     },
     {
       onSuccess: (data: any) => {
@@ -353,11 +326,11 @@ function handleCategoryCreate() {
 const category = reactive({
   title: "",
   id: "",
+  icon: "lucide-folder",
 });
 
 const router = useRouter();
 const route = useRoute();
-const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
@@ -366,7 +339,6 @@ const dislikes = ref(0);
 const views = ref(0);
 const content = ref("");
 const title = ref("");
-const feedback = ref<FeedbackAction>();
 
 const titleRef = ref(null);
 watch(
@@ -390,6 +362,7 @@ const categories = createResource({
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.api.knowledge_base.get_article",
+  method: "GET",
   params: {
     name: props.articleId,
   },
@@ -397,24 +370,13 @@ const article: Resource<Article> = createResource({
   onSuccess: (data: Article) => {
     content.value = data.content;
     title.value = data.title;
-    feedback.value = data.feedback;
-    if (isCustomerPortal.value) {
-      capture("article_viewed", {
-        data: {
-          user: authStore.userId,
-          article: data.name,
-          title: data.title,
-        },
-      });
-      incrementArticleViews(data.name);
-    }
   },
   onError: (err: Error) => {
-    if (err.exc_type === "PermissionError") {
-      router.replace({
-        name: "CustomerKnowledgeBase",
-      });
+    if (!["DoesNotExistError", "PermissionError"].includes(err.exc_type)) {
+      return;
     }
+    toast.error(__("Article not found"));
+    router.replace({ name: "AgentKnowledgeBase" });
   },
 });
 
@@ -429,40 +391,39 @@ const articleStats = createResource({
   auto: true,
 });
 
-function incrementArticleViews(articleId: string) {
-  incrementView.submit(
-    {
-      article: articleId,
-    },
-    {
-      onError: (err: Error) => {
-        if (err.exc_type === "RateLimitExceededError") {
-          return;
-        }
-      },
-    }
+const isPublished = computed(() => article.data?.status === "Published");
+
+const togglePublished = debounce(
+  () =>
+    isPublished.value
+      ? save({ status: "Draft" }, __("Article unpublished."))
+      : save({ status: "Published" }, __("Article published.")),
+  300
+);
+
+const showAccessModal = ref(false);
+const siblingsVisibility = useCategoryVisibility(
+  computed(() => (showAccessModal.value && article.data?.category) || null)
+);
+
+function publishArticle(visibility: string) {
+  save(
+    { status: "Published", visibility },
+    isPublished.value ? __("Access updated.") : __("Article published.")
   );
 }
 
-const toggleStatus = debounce(() => {
-  const status = article.data?.status === "Published" ? "Draft" : "Published";
+function save(values: Record<string, string>, message: string) {
   updateArticle.submit(
-    {
-      doctype: "HD Article",
-      name: article.data.name,
-      fieldname: "status",
-      value: status,
-    },
+    { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
       onSuccess: () => {
-        if (status === "Published")
-          toast.success("Article published successfully.");
-        else toast.success("Article unpublished successfully.");
+        toast.success(message);
         article.reload();
       },
     }
   );
-}, 300);
+}
 const isDirty = ref(false);
 
 const moveToModal = ref(false);
@@ -498,7 +459,7 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
-  const original = addLinksToHeadings(article.data.content);
+  const original = addHeadingIds(article.data.content).html;
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
@@ -575,23 +536,12 @@ watch(
   () => article.data?.content,
   (newContent) => {
     if (newContent) {
-      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+      textEditorContentWithIDs.value = addHeadingIds(newContent).html;
     }
   },
   { immediate: true }
 );
 
-function addLinksToHeadings(content: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
-  headings.forEach((heading) => {
-    const text = heading.textContent.trim();
-    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
-    heading.setAttribute("id", id);
-  });
-  return doc.body.innerHTML;
-}
 function scrollToHeading() {
   const articleHeading = window.location.hash;
   if (!articleHeading) return;
@@ -656,13 +606,23 @@ const articleActions = computed(() => [
         },
       ]),
   {
-    label: __("Share"),
+    label: __("Change access"),
+    icon: "lucide-lock",
+    onClick: () => (showAccessModal.value = true),
+  },
+  {
+    label: __("Copy link"),
     icon: "lucide-link",
-    onClick: () => {
-      const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.toString(), __("Article link copied to clipboard"));
-    },
+    onClick: () =>
+      copyToClipboard(
+        window.location.origin +
+          CUSTOMER_PORTAL_ROOT +
+          ROUTES.article({
+            name: props.articleId,
+            title_slug: article.data?.title_slug,
+          }),
+        __("Article link copied to clipboard.")
+      ),
   },
   {
     group: __("Danger"),
@@ -680,30 +640,14 @@ const breadcrumbs = computed(() => {
   const items: Breadcrumb[] = [
     {
       label: isMobileView.value ? __("KB") : __("Knowledge Base"),
-      route: {
-        name: isCustomerPortal.value
-          ? "CustomerKnowledgeBase"
-          : "AgentKnowledgeBase",
-      },
+      route: { name: "AgentKnowledgeBase" },
     },
   ];
   if (article.data?.category_name) {
-    let item = {
+    items.push({
       label: article.data?.category_name,
-    };
-    if (isCustomerPortal.value) {
-      item["route"] = {
-        name: "Articles",
-        params: {
-          categoryId: article.data?.category_id,
-        },
-      };
-    } else {
-      item["route"] = {
-        name: "AgentKnowledgeBase",
-      };
-    }
-    items.push(item);
+      route: { name: "AgentKnowledgeBase" },
+    });
   }
   if (article.data?.title) {
     items.push({

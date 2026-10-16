@@ -2,10 +2,9 @@ import { computed } from 'vue'
 import { dayjs, dayjsLocal } from 'frappe-ui'
 import { dateFormat } from '@framework/ui/components/ActivityTimeline/utils'
 import { __ } from '@helpdesk/shared/translation'
-import { isSlaMissed, twoUnitDuration } from '@helpdesk/shared/utils'
+import { DATE_FORMATS, isSlaMissed, twoUnitDuration } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { isClosedStatus, isResolvedStatus, statusMeta } from '@app/stores/ticketMeta'
-import { DATE_FORMATS } from '@app/utils'
 
 const MINUTE = 60
 // A reply inside this window reads as "someone was already there", not as a measured wait.
@@ -82,7 +81,7 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     if (!reply) {
       // Nothing is owed on a ticket that has ended.
       if (data.value.status_category === 'Resolved') return []
-      return [awaiting(__('First response'), data.value.response_by)]
+      return [awaiting(__('First response'), data.value.response_by, data.value.overdue_by?.response)]
     }
     const summary = durationSummary(reply.creation, __('Answered immediately'), (took) => __('Answered in {0}', [took]))
     return [reachedStep(__('First response'), summary, reply.creation, data.value.response_by, data.value.first_response_failed_by)]
@@ -91,7 +90,7 @@ export function useTicketDetails(ticket, thread, statusChanges) {
   // Closing straight from an open status stamps `resolution_date` too, so the close covers it alone.
   function resolution() {
     const on = data.value.resolution_date
-    if (data.value.status_category !== 'Resolved') return [awaiting(__('Resolution'), data.value.resolution_by)]
+    if (data.value.status_category !== 'Resolved') return [awaiting(__('Resolution'), data.value.resolution_by, data.value.overdue_by?.resolution)]
     if (!on || closedOutright()) return []
     const summary = durationSummary(on, __('Resolved immediately'), (took) => __('Resolved in {0}', [took]))
     return [reachedStep(__('Resolution'), summary, on, data.value.resolution_by, data.value.resolution_failed_by)]
@@ -114,10 +113,11 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     return [makeStep(__('Closed'), subtitle, 'done', on, late)]
   }
 
-  function awaiting(title: string, due: string) {
+  // `overdueBy` is in business hours, from the server: only it knows the SLA's working hours and holidays.
+  function awaiting(title: string, due: string, overdueBy?: number | null) {
     if (!due) return makeStep(title, '', 'pending')
-    if (dayjsLocal().isAfter(dayjsLocal(due))) {
-      return makeStep(title, __('Overdue by {0}', [formatMinutes(dayjsLocal().diff(dayjsLocal(due), 's'))]), 'pending', undefined, true)
+    if (overdueBy != null) {
+      return makeStep(title, __('Overdue by {0}', [formatMinutes(Math.max(overdueBy, MINUTE))]), 'pending', undefined, true)
     }
     return makeStep(title, __('Due {0}', [dueWording(due)]), 'pending')
   }
@@ -131,17 +131,11 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     return seconds <= IMMEDIATE_SECONDS ? immediate : tookWording(formatMinutes(seconds))
   }
 
-  // The SLA's figure counts business hours, but it is written only once the SLA sees the milestone,
-  // and a reply an agent posts from the portal is not one it sees.
-  function secondsLate(on: string, due: string, failedBy: number) {
-    if (failedBy) return failedBy
-    return due ? Math.max(dayjs(on).diff(dayjs(due), 's'), 0) : 0
-  }
-
-  // Late by the server's rule, the same one the desk shows: any time past due.
+  // Late by the server's rule, the same one the desk shows: any time past due. `failedBy` is the
+  // server's business-hours figure, re-measured on every save against the current SLA.
   function reachedStep(title: string, summary: string, on: string, due: string, failedBy: number) {
     if (!isSlaMissed(on, due)) return makeStep(title, summary, 'done', on)
-    const late = Math.max(secondsLate(on, due, failedBy), 1)
+    const late = Math.max(failedBy || 0, 1)
     const lateBy = late < MINUTE ? twoUnitDuration(late * 1000) : formatMinutes(late)
     return makeStep(title, `${summary} · ${__('{0} late', [lateBy])}`, 'done', on, true)
   }

@@ -2,11 +2,26 @@
 # For license information, please see license.txt
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
+from frappe.desk.reportview import get_filters_cond
 from frappe.model.document import Document
-from frappe.utils import cint
+from frappe.types.filter import Filters
+from frappe.utils import cint, evaluate_filters
+from frappe.website.utils import cleanup_page_name
 
-from helpdesk.utils import capture_event
+from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    check_category_length,
+    get_category_visibility,
+)
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.utils import capture_event, is_agent
+
+PUBLIC = "Public"
+CUSTOMERS = "Customers"
+PRIVATE = "Private"
+# What a list row shows of the body maxed so entire conent is not loaded.
+EXCERPT_LENGTH = 140
 
 
 class HDArticle(Document):
@@ -16,8 +31,7 @@ class HDArticle(Document):
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
-            old_category = self.get_doc_before_save().get("category")
-            self.check_category_length(old_category)
+            check_category_length(self.get_doc_before_save().get("category"))
 
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
@@ -25,8 +39,11 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
+        self.inherit_category_visibility()
 
     def before_save(self):
+        self.set_excerpt()
+
         # set published date of the hd_article
         if self.status == "Published" and not self.published_on:
             self.published_on = frappe.utils.now()
@@ -47,6 +64,18 @@ class HDArticle(Document):
                 )
             )
 
+    def inherit_category_visibility(self):
+        # If the category is private (all articles private), the new article is too.
+        if (
+            self.visibility == CUSTOMERS
+            and self.category
+            and get_category_visibility(self.category) == PRIVATE
+        ):
+            self.visibility = PRIVATE
+
+    def set_excerpt(self):
+        self.excerpt = get_excerpt(self.content)
+
     def after_insert(self):
         count = frappe.db.count("HD Article")
         if count == 1:
@@ -54,15 +83,7 @@ class HDArticle(Document):
         capture_event("article_created")
 
     def on_trash(self):
-        self.check_category_length()
-
-    def check_category_length(self, category=None):
-        category = category or self.get("category")
-        if not category:
-            return
-        category_articles = frappe.db.count("HD Article", {"category": category})
-        if category_articles == 1:
-            frappe.throw(_("Category must have atleast one article"))
+        check_category_length(self.category)
 
     @staticmethod
     def default_list_data():
@@ -80,6 +101,12 @@ class HDArticle(Document):
                 "width": "10rem",
             },
             {
+                "label": "Visibility",
+                "type": "Select",
+                "key": "visibility",
+                "width": "10rem",
+            },
+            {
                 "label": "Author",
                 "type": "Link",
                 "key": "author",
@@ -94,33 +121,100 @@ class HDArticle(Document):
         ]
         return {"columns": columns}
 
-    @frappe.whitelist()
-    def set_feedback(self, value: int):
-        # 0 empty, 1 like, 2 dislike
-        user = frappe.session.user
+    def set_feedback(self, value: int, visitor_id: str | None = None):
+        """Record one vote: 0 none, 1 like, 2 dislike; a guest's is kept by `visitor_id`."""
+        value = cint(value)
+        if value not in (0, 1, 2):
+            frappe.throw(_("Invalid vote"))
+        self.validate_voter(visitor_id)
+        self.save_feedback(get_voter(visitor_id), value)
 
+    def validate_voter(self, visitor_id: str | None):
+        if frappe.session.user != "Guest":
+            return
+        if not frappe.db.get_single_value(
+            "HD Settings", "allow_anonymous_article_voting"
+        ):
+            frappe.throw(_("Voting requires an account"), frappe.PermissionError)
+        if not visitor_id:
+            frappe.throw(_("Please enable cookies to vote"))
+
+    def save_feedback(self, voter: dict, value: int):
         feedback = frappe.db.exists(
-            "HD Article Feedback", {"user": user, "article": self.name}
+            "HD Article Feedback", {**voter, "article": self.name}
         )
         if feedback:
-            current_value = frappe.db.get_value(
-                "HD Article Feedback", feedback, "feedback"
-            )
-            if int(current_value) == value:
-                return
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-        else:
-            frappe.new_doc(
-                "HD Article Feedback", user=user, article=self.name, feedback=value
-            ).insert()
+            return
+        # A guest holds no create permission; `validate_voter` is the gate.
+        frappe.get_doc(
+            {
+                "doctype": "HD Article Feedback",
+                "article": self.name,
+                "feedback": value,
+                **voter,
+            }
+        ).insert(ignore_permissions=True)
 
     @property
     def title_slug(self) -> str:
-        """
-        Generate slug from article title.
-        Example: "Introduction to Frappe Helpdesk" -> "introduction-to-frappe-helpdesk"
+        """Readable only: portal URLs make their own slug, and the server ignores it."""
+        return cleanup_page_name(self.title)
 
-        :return: Generated slug
-        """
-        return self.title.lower().replace(" ", "-")
+
+def get_excerpt(html: str | None) -> str:
+    """The first paragraph, read as a sentence: headings and table cells would run into it."""
+    soup = BeautifulSoup(html or "", "html.parser")
+    paragraph = next((p for p in soup.find_all("p") if p.get_text(strip=True)), soup)
+    return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
+
+
+def can_view_article(user: str, article) -> bool:
+    """Agents view every article, drafts too; anyone else what make_article_filters allows."""
+    if is_agent(user):
+        return True
+    return evaluate_filters(
+        article, Filters(make_article_filters(user), doctype="HD Article")
+    )
+
+
+def make_article_filters(user: str | None = None, **extra) -> dict:
+    """Published articles the caller may read: agents every visibility, helpdesk customers
+    Public and Customers, anyone else (guests, other apps' users) Public only."""
+    user = user or frappe.session.user
+    filters = {"status": "Published", **extra}
+    if not is_agent(user):
+        filters["visibility"] = ["in", get_readable_visibilities(user)]
+    return filters
+
+
+def get_readable_visibilities(user: str) -> list[str]:
+    """Customers articles need a helpdesk customer role; a signed-in user of another app has none."""
+    if set(CUSTOMER_ROLES) & set(frappe.get_roles(user)):
+        return [PUBLIC, CUSTOMERS]
+    return [PUBLIC]
+
+
+def get_voter(visitor_id: str | None) -> dict | None:
+    """Who a vote belongs to: the user, or a guest by cookie; None for a guest without one."""
+    if frappe.session.user != "Guest":
+        return {"user": frappe.session.user}
+    return {"visitor_id": visitor_id} if visitor_id else None
+
+
+def permission_query(user: str | None = None) -> str | None:
+    """Non-agents list only the articles they can view, as on the portal."""
+    user = user or frappe.session.user
+    if is_agent(user):
+        return None
+    conditions = get_filters_cond(
+        "HD Article", make_article_filters(user), [], ignore_permissions=True
+    )
+    return conditions.removeprefix(" and ")
+
+
+def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    """Gates whatever shows the article; writing it is left to role permissions."""
+    if ptype in ("write", "create", "delete"):
+        return True
+    return can_view_article(user or frappe.session.user, doc)

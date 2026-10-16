@@ -209,6 +209,7 @@ def make_form_script(
     body: str,
     apply_to_customer_portal: bool = False,
     apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
 ):
     """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
     frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
@@ -221,6 +222,7 @@ def make_form_script(
             "enabled": 1,
             "apply_to_customer_portal": int(apply_to_customer_portal),
             "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
             "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()
@@ -334,6 +336,26 @@ def get_customer_ticket(email: str):
     ticket = make_ticket(raised_by=email)
     frappe.set_user(email)
     return frappe.get_doc("HD Ticket", ticket.name)
+
+
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
+
+
+def category_row(name: str, with_creators: bool = False) -> frappe._dict:
+    """The public knowledge base's row for one category, as the session user sees it."""
+    from helpdesk.api.knowledge_base import get_categories
+
+    return next(row for row in get_categories(with_creators) if row.name == name)
+
+
+def category_names() -> list[str]:
+    """The categories the public knowledge base lists for the session user."""
+    from helpdesk.api.knowledge_base import get_categories
+
+    return [row.name for row in get_categories()]
 
 
 def use_test_index(case, search_class, db_name: str, *modules):
@@ -931,16 +953,22 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    visibility: str | None = "Public",
+    **values,
 ) -> str:
-    """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    """Insert an HD Article, titled uniquely unless `title` is given, and return its name.
+    Public so guests read it too; pass `visibility=None` for the field's own default."""
+    title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
             {
                 "doctype": "HD Article",
-                "title": title or unique_name("Test Article"),
-                "content": "<p>Open settings and click reset.</p>",
+                "title": title,
+                "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                "visibility": visibility,
+                **values,
             }
         )
         .insert(ignore_permissions=True)

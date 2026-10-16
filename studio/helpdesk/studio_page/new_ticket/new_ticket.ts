@@ -3,20 +3,26 @@ import { useFileUpload } from 'frappe-ui'
 import { evaluateDependsOn } from '@framework/ui/FormLayout'
 import { applyFieldFilters } from '@helpdesk/shared/formScripts'
 import { __ } from '@helpdesk/shared/translation'
-import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
+import { isContentEmpty, parseLinkFilters, runAction, runFormScripts, uploadableFileTypes } from '@helpdesk/shared/utils'
 import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
-import { runAction, runFormScripts, uploadableFileTypes } from '@app/utils'
+import { useArticleSearch } from '@app/composables/useArticleSearch'
 
 const DEFAULT_TEMPLATE = 'Default'
 const UPLOAD_FOLDER = 'Home/Helpdesk'
+const SUGGESTION_LIMIT = 3
 
 export default function setup(context) {
-  const { subject, description, template, newTicket } = context
+  const { subject, description, template, newTicket, route } = context
   const settings = useSettingsModal(context)
+
+  // A ticket raised from search starts from what was searched.
+  const searched = String(route?.query?.q || '').trim()
+  // The subject holds 140 characters; a longer search would leave a form that can't be sent.
+  if (searched && !subject.value) subject.value = searched.slice(0, 140)
 
   const model = reactive({})
   const attachments = ref([])
@@ -87,6 +93,8 @@ export default function setup(context) {
 
   const about = computed(() => template.data?.about || '')
 
+  const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT })
+
   // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
   function setDescription(html) {
     description.value = html
@@ -149,6 +157,12 @@ export default function setup(context) {
     return field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model))
   }
 
+  // Sent even when empty: an origin marks a portal ticket, and no `from` is a Direct visit.
+  function currentOrigin() {
+    const { from, article, q } = route?.query || {}
+    return { from, article, q }
+  }
+
   function createTicket() {
     if (!canSubmit.value) return
     return runAction(
@@ -161,6 +175,7 @@ export default function setup(context) {
             ...model,
           },
           attachments: attachments.value.map((file) => uploadedByUrl.get(file.file_url)),
+          origin: currentOrigin(),
         })
         await navigateTo(ROUTES.ticket(ticket.name))
       },
@@ -172,6 +187,7 @@ export default function setup(context) {
     ...settings,
     customActions,
     about,
+    suggestions,
     fields,
     layout,
     model,

@@ -5,6 +5,7 @@ from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
+from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
 from helpdesk.utils import get_agent_name
 
 no_cache = 1
@@ -31,6 +32,7 @@ def get_boot():
     return frappe._dict(
         {
             "default_route": get_default_route(),
+            "customer_home_page": get_customer_home_page(),
             "site_name": frappe.local.site,
             "read_only_mode": frappe.flags.read_only,
             "csrf_token": frappe.sessions.get_csrf_token(),

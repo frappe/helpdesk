@@ -2,8 +2,9 @@ import type { Page } from "@playwright/test";
 import type { Api } from "../../../helpers/api";
 import { FormScripts, ensureTemplate } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
+import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 
-// Every customer action on /help/tickets/new, past what portal-new covers.
+// Every customer action on /help/tickets/new, past what portal-new and portal-origin cover.
 usePersona("customer");
 
 const PIXEL = "e2e/fixtures/pixel.png";
@@ -204,6 +205,41 @@ test.describe("template", () => {
   });
 });
 
+test.describe("article suggestions", () => {
+  test("preview a suggestion on hover and open it", async ({ page, api, context }) => {
+    const category = await createCategory(api);
+    // One word, so suggestions left by earlier runs can't outrank it.
+    const title = `Reset${uid()}`;
+    const article = await createArticle(api, category.name, { title });
+    await indexArticles(api, title);
+
+    await page.goto("/help/tickets/new");
+    await page.getByPlaceholder("A short description").fill(title);
+    const suggestion = page.getByRole("link", { name: title, exact: true });
+    await suggestion.hover();
+    await expect(page.getByText("Open article")).toBeVisible();
+
+    const popup = context.waitForEvent("page");
+    await suggestion.click();
+    const opened = await popup;
+    await expect(opened).toHaveURL(new RegExp(`/help/articles/${article.name}-reset`));
+    await expect(opened.getByRole("heading", { name: title }).first()).toBeVisible();
+  });
+
+  test("article links carry a clean slug, not the search highlight", async ({ page, api }) => {
+    const category = await createCategory(api);
+    const title = `Rotate${uid()}`;
+    const article = await createArticle(api, category.name, { title });
+    await indexArticles(api, title);
+    await page.goto("/help/tickets/new");
+    await page.getByPlaceholder("A short description").fill(title);
+    await expect(page.getByRole("link", { name: title, exact: true })).toHaveAttribute(
+      "href",
+      new RegExp(`/help/articles/${article.name}-rotate[a-z0-9]+$`)
+    );
+  });
+});
+
 test.describe("attachments", () => {
   async function attach(page: Page, files: string | { name: string; mimeType: string; buffer: Buffer }) {
     await page.locator("input[type=file].sr-only").setInputFiles(files);
@@ -288,5 +324,48 @@ test.describe("submit", () => {
     await expect(page.getByText("E2E refused").first()).toBeVisible();
     await expect(page).toHaveURL(/\/help\/tickets\/new/);
     await expect(createButton(page)).toBeEnabled();
+  });
+
+  test("odd origins fall back safely", async ({ page, api }) => {
+    const longQuery = "q".repeat(200);
+    await page.goto(`/help/tickets/new?from=bogus&article=no-such-article&q=${longQuery}`);
+    const subjectField = page.getByPlaceholder("A short description");
+    await subjectField.fill(`E2E origin ${uid()}`);
+    const subject = await subjectField.inputValue();
+    await page.locator(".ProseMirror").fill("Where from?");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    const [ticket] = await api.list("HD Ticket", {
+      filters: { subject },
+      fields: ["entry_point", "source_article", "source_search"],
+    });
+    expect(ticket.entry_point).toBe("Direct");
+    expect(ticket.source_article).toBeNull();
+  });
+
+  test("search text over 140 characters is cut", async ({ page, api }) => {
+    const longQuery = `${uid()} ${"q".repeat(200)}`;
+    await page.goto(`/help/tickets/new?from=search&q=${longQuery}`);
+    // the subject starts from the query, cut to the 140 characters a subject holds
+    const subjectField = page.getByPlaceholder("A short description");
+    await expect(subjectField).toHaveValue(longQuery.slice(0, 140));
+    const subject = `E2E long search ${uid()}`;
+    await subjectField.fill(subject);
+    await page.locator(".ProseMirror").fill("Long search");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    const [ticket] = await api.list("HD Ticket", {
+      filters: { subject },
+      fields: ["entry_point", "source_search"],
+    });
+    expect(ticket.entry_point).toBe("Search");
+    expect(ticket.source_search).toBe(longQuery.slice(0, 140));
+  });
+
+  test("a long search can still be raised as it is", async ({ page }) => {
+    await page.goto(`/help/tickets/new?from=search&q=${"q".repeat(200)}`);
+    await page.locator(".ProseMirror").fill("Long search");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/, { timeout: 5_000 });
   });
 });

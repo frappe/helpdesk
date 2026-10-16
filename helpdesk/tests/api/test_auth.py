@@ -1,9 +1,16 @@
 import frappe
 from frappe.tests import IntegrationTestCase
+from frappe.tests.utils import change_settings
 
 from helpdesk.api.auth import update_profile
 from helpdesk.api.config import get_config
-from helpdesk.test_utils import create_agent, create_contact, unique_email
+from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.test_utils import (
+    create_agent,
+    create_contact,
+    make_form_script,
+    unique_email,
+)
 
 
 class TestUpdateProfile(IntegrationTestCase):
@@ -56,6 +63,29 @@ class TestConfig(IntegrationTestCase):
         self.assertFalse(config.is_agent)
         self.assertFalse(config.can_edit_settings)
         self.assertTrue(config.date_format)
+
+    def test_knowledge_base_scripts_reach_guests_only_on_a_public_kb(self) -> None:
+        make_form_script(self, "Test KB Script", "kb", apply_to_knowledge_base=True)
+        make_form_script(
+            self, "Test Portal Script", "portal", apply_to_customer_portal=True
+        )
+
+        with change_settings("HD Settings", {"public_knowledge_base": 1}):
+            with self.set_user("Guest"):
+                scripts = get_config().knowledge_base_form_scripts
+            self.assertTrue(any(script.endswith("// kb") for script in scripts))
+            self.assertFalse(any(script.endswith("// portal") for script in scripts))
+
+        with change_settings("HD Settings", {"public_knowledge_base": 0}):
+            with self.set_user("Guest"):
+                self.assertNotIn("knowledge_base_form_scripts", get_config())
+            self.assertIn("knowledge_base_form_scripts", get_config())
+
+    def test_knowledge_base_scripts_stay_off_the_ticket_pages(self) -> None:
+        make_form_script(self, "Test KB Script", "kb", apply_to_knowledge_base=True)
+        for portal in (False, True):
+            scripts = get_form_script("HD Ticket", is_customer_portal=portal) or []
+            self.assertFalse(any(script.endswith("// kb") for script in scripts))
 
     def test_only_those_who_can_write_hd_settings_may_edit_them(self) -> None:
         self.assertTrue(get_config().can_edit_settings)

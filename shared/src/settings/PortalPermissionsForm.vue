@@ -55,18 +55,14 @@ const canEditSignup = createResource({
 
 // computed, so labels follow a translation load
 const toggles = computed(() => [
-  ...(canEditSignup.data?.has_permission
-    ? [
-        {
-          settings: websiteSettings,
-          fieldname: "disable_signup",
-          label: __("Disable signup"),
-          description: __(
-            "New users will have to be manually registered by system managers."
-          ),
-        },
-      ]
-    : []),
+  {
+    settings: hdSettings,
+    fieldname: "prefer_knowledge_base",
+    label: __("Prefer knowledge base"),
+    description: __(
+      "Customers will land on the knowledge base when they open the portal, instead of their tickets."
+    ),
+  },
   {
     settings: hdSettings,
     fieldname: "allow_customer_managers_to_invite",
@@ -99,6 +95,18 @@ const toggles = computed(() => [
       "Customer managers will be able to change their organization's logo."
     ),
   },
+  ...(canEditSignup.data?.has_permission
+    ? [
+        {
+          settings: websiteSettings,
+          fieldname: "disable_signup",
+          label: __("Disable signup"),
+          description: __(
+            "New users will have to be manually registered by system managers."
+          ),
+        },
+      ]
+    : []),
 ]);
 
 function save(toggle, value: boolean) {

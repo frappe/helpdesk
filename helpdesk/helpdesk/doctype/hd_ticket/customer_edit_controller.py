@@ -40,9 +40,9 @@ class CustomerEditController:
         # rating the ticket is the one thing a closing email asks the customer to do
         if self.flags.get("ignore_closed_ticket_guard"):
             return
-        # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
-        if old_doc.status == "Closed":
-            text = _("Closed tickets cannot be updated by non-agents")
+        # `feedback` is never cleared, so a rated ticket stays frozen even after an agent reopens it
+        if old_doc.status == "Closed" or old_doc.feedback:
+            text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
     def check_feedback_is_final(self, old_doc):

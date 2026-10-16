@@ -18,7 +18,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import SERVER_COMPUTED_FIELDS
+from helpdesk.consts import SERVER_COMPUTED_FIELDS, TICKET_INTERNAL_FIELD_PERMLEVEL
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import is_customer_manager
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     get_default_email_content,
@@ -45,6 +45,7 @@ from helpdesk.utils import (
 
 from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
+from .ticket_origin import resolve_ticket_origin
 
 customer_not_allowed_fields = ["customer"]
 
@@ -71,7 +72,17 @@ class HDTicket(Document, CustomerEditController):
         publish_event(
             "helpdesk:ticket-update", room=room, data={"ticket_id": self.name}
         )
-        self.notify_customers()
+        if self.has_customer_visible_change():
+            self.notify_customers()
+
+    def has_customer_visible_change(self) -> bool:
+        """Customers never read internal fields, so a change to only those leaves their page as it was."""
+        before = self.get_doc_before_save()
+        return not before or any(
+            self.get(df.fieldname) != before.get(df.fieldname)
+            for df in self.meta.fields
+            if df.permlevel < TICKET_INTERNAL_FIELD_PERMLEVEL
+        )
 
     def on_trash(self):
         # Customers are worked out now; once the row is gone there is no one to ask about.
@@ -104,6 +115,7 @@ class HDTicket(Document, CustomerEditController):
         self.validate_portal_contact()
         self.set_contact()
         self.set_customer()
+        self.set_ticket_origin()
 
     def validate(self):
         self.validate_feedback()
@@ -278,6 +290,12 @@ class HDTicket(Document, CustomerEditController):
         if self.raised_by:
             return
         self.raised_by = frappe.session.user
+
+    def set_ticket_origin(self):
+        # after the permlevel reset, which would wipe these for a customer
+        if not self.is_new() or self.flags.ticket_origin is None:
+            return
+        self.update(resolve_ticket_origin(self.flags.ticket_origin))
 
     def validate_portal_contact(self) -> None:
         """Block non-agent users from attributing a ticket to another contact.
@@ -1021,6 +1039,25 @@ class HDTicket(Document, CustomerEditController):
         if not self.sla:
             return None
         return frappe.get_doc("HD Service Level Agreement", self.sla)
+
+    def get_overdue_by(self) -> dict:
+        """Business seconds each unmet target is overdue by; a paused ticket's clock is stopped."""
+        sla = self.get_sla()
+        if not sla or self.status_category == "Paused":
+            return {}
+        now = now_datetime()
+        return {
+            "response": (
+                None
+                if self.first_responded_on
+                else sla.get_time_past(self.response_by, now)
+            ),
+            "resolution": (
+                None
+                if self.resolution_date
+                else sla.get_time_past(self.resolution_by, now)
+            ),
+        }
 
     def is_currently_outside_working_hours(self):
         """Return True if today is a holiday or now is outside this SLA's working hours."""

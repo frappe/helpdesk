@@ -169,14 +169,13 @@ import LucideMail from "~icons/lucide/mail";
 import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
 import { __ } from "@helpdesk/shared/translation";
-import { timeAgo } from "@helpdesk/shared/utils";
+import { matchesQuery, timeAgo } from "@helpdesk/shared/utils";
 import {
   ASSIGNABLE_ROLES,
   ROLES,
   roleLabel,
   type RoleLabel,
 } from "@app/stores/settings/roles";
-import { matchesQuery } from "@app/utils";
 
 // A phone drops "Last seen", so the name keeps its width; only managers get it at all.
 const ROW = computed(() =>

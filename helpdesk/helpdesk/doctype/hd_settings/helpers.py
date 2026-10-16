@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import get_datetime
 
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT
+
 
 def is_email_content_empty(content: str | None) -> bool:
     return content is None or content.strip() == ""
@@ -140,3 +142,35 @@ def get_rendered_banner_msg(ticket_id):
     return {
         "banner_msg": rendered,
     }
+
+
+KNOWLEDGE_BASE_HOME = CUSTOMER_PORTAL_ROOT
+TICKETS_HOME = f"{CUSTOMER_PORTAL_ROOT}/my-tickets"
+CUSTOMER_HOME_PAGES = [KNOWLEDGE_BASE_HOME, TICKETS_HOME]
+
+
+def get_customer_home_page() -> str:
+    """Where a customer lands on opening the portal: the knowledge base, or their tickets."""
+    if frappe.db.get_single_value("HD Settings", "prefer_knowledge_base"):
+        return KNOWLEDGE_BASE_HOME
+    return TICKETS_HOME
+
+
+def set_customer_home_page(replace: list[str]) -> None:
+    """Point the customer roles and the portal default still on one of `replace` at the customer
+    home page; a home page an admin set by hand is kept.
+
+    db writes, not save: a stale Portal Settings menu row would fail the save."""
+    from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+
+    home_page = get_customer_home_page()
+    if frappe.db.get_single_value("Portal Settings", "default_portal_home") in replace:
+        frappe.db.set_single_value("Portal Settings", "default_portal_home", home_page)
+    frappe.db.set_value(
+        "Role",
+        {"name": ["in", CUSTOMER_ROLES], "home_page": ["in", replace]},
+        "home_page",
+        home_page,
+    )
+    # frappe caches each user's home page
+    frappe.cache.delete_value("home_page")

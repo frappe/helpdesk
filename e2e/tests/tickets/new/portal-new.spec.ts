@@ -1,6 +1,7 @@
 import type { Page, Route } from "@playwright/test";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { personas } from "../../../helpers/personas";
+import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 
 const PIXEL = "e2e/fixtures/pixel.png";
 
@@ -61,6 +62,17 @@ test.describe("raising a ticket", () => {
     release();
     await expect(uploadedImage(page)).toBeVisible();
     await expect(submit).toBeEnabled();
+  });
+
+  test("suggests matching knowledge base articles", async ({ page, api }) => {
+    const category = await createCategory(api);
+    const title = `Rotate ${uid()} credentials`;
+    await createArticle(api, category.name, { title });
+    await indexArticles(api, title);
+    await page.goto("/help/tickets/new");
+    await page.getByPlaceholder("A short description").fill(title);
+    await expect(page.getByText("Related articles:")).toBeVisible();
+    await expect(page.getByText(title).last()).toBeVisible();
   });
 });
 

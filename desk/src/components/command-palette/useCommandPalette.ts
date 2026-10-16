@@ -2,7 +2,6 @@ import { useTicket } from "@/composables/useTicket";
 import { router } from "@/router";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { isCustomerPortal } from "@/utils";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource, toast } from "frappe-ui";
 import { computed, ref, shallowRef } from "vue";
@@ -43,9 +42,6 @@ export const breadcrumb = computed(() =>
 );
 export const depth = computed(() => stack.value.length);
 
-/** Agent-only; AppSidebar is shared with the customer portal, so the gate lives here. */
-export const isPaletteAvailable = computed(() => !isCustomerPortal.value);
-
 // --- context -------------------------------------------------------------
 
 const contextDismissed = ref(false);
@@ -71,7 +67,6 @@ export function dismissContext(): void {
 }
 
 export function openPalette(): void {
-  if (!isPaletteAvailable.value) return;
   isOpen.value = true;
   // Every open path routes through here, Cmd+K included, so the count is honest.
   capture("command_palette_opened", {

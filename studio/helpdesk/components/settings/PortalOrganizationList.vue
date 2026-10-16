@@ -87,7 +87,7 @@ import LucideTicket from "~icons/lucide/ticket";
 import { __ } from "@helpdesk/shared/translation";
 import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
 import { ROLES, roleLabel, type RoleLabel } from "@app/stores/settings/roles";
-import { countLabel, matchesQuery } from "@app/utils";
+import { countLabel, matchesQuery } from "@helpdesk/shared/utils";
 
 type Organization = {
   name: string;

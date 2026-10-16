@@ -15,7 +15,7 @@
 import { computed, ref, watch } from "vue";
 import { debounce } from "frappe-ui";
 import { isValidEmail, MultiEmailInput } from "frappe-ui/experimental";
-import { SEARCH_DEBOUNCE_MS } from "@app/utils";
+import { SEARCH_DEBOUNCE_MS } from "@helpdesk/shared/utils";
 
 type Contact = { full_name: string; email: string; image?: string };
 

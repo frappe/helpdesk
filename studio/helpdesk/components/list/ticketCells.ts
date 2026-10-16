@@ -2,9 +2,8 @@
 import { h } from 'vue'
 import { Rating } from 'frappe-ui'
 import { PriorityIcon, resolutionBadge, responseBadge } from '@helpdesk/shared/ticketCells'
-import { timeAgo } from '@helpdesk/shared/utils'
+import { parseJson, timeAgo } from '@helpdesk/shared/utils'
 import { getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
-import { parseJson } from '@app/utils'
 import PortalStatusPill from '@app/components/ticket/PortalStatusPill.vue'
 
 export function statusCell({ item }: any) {

@@ -5,7 +5,7 @@ import { parseOrderBy } from '@framework/ui/SortBy'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
-import { parseJson, runAction, setValues } from '@app/utils'
+import { parseJson, runAction, setValues } from '@helpdesk/shared/utils'
 
 const DOCTYPE = 'HD Ticket'
 

@@ -9,7 +9,10 @@ import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 
+// TODO: after #3846/#3847 merge, import these from `@helpdesk/shared/utils` directly in the
+// desk files that use `@/utils`, and delete this re-export.
 export {
+  ConfirmDelete,
   CUSTOMER_PORTAL_ROOT,
   getErrorMessage,
   handleInviteUserSuccess,
@@ -97,8 +100,6 @@ export function formatTime(
   const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
   return limited.join(" ").trim();
 }
-
-export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(
   msg: string = "",
@@ -489,37 +490,6 @@ export function getFieldDependencyLabel(name: string) {
   parent = getField(parent)?.label || parent;
   child = getField(child)?.label || child;
   return `${parent} → ${child}`;
-}
-
-/**
- * @param {Object} config - Configuration object
- * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
- * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
- * @returns {Array} Array of option objects for use in dropdowns
- */
-export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
-  return [
-    {
-      label: "Delete",
-      icon: "lucide-trash-2",
-      // preventDefault keeps the menu open so the confirm row can replace this one
-      onClick: (event) => {
-        event.preventDefault();
-        isConfirmingDelete.value = true;
-      },
-      condition: () => !isConfirmingDelete.value,
-    },
-    {
-      label: "Confirm Delete",
-      icon: "lucide-trash-2",
-      theme: "red",
-      onClick: () => {
-        onConfirmDelete();
-        isConfirmingDelete.value = false;
-      },
-      condition: () => isConfirmingDelete.value,
-    },
-  ];
 }
 
 export function getRandom(len = 4) {

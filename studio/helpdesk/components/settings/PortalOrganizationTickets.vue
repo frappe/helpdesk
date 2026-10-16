@@ -70,11 +70,10 @@ import { RouterLink } from "vue-router";
 import { TextInput, createListResource, debounce } from "frappe-ui";
 import LucideSearch from "~icons/lucide/search";
 import { __ } from "@helpdesk/shared/translation";
-import { timeAgo } from "@helpdesk/shared/utils";
+import { SEARCH_DEBOUNCE_MS, timeAgo } from "@helpdesk/shared/utils";
 import PortalStatusPill from "@app/components/ticket/PortalStatusPill.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { statusMeta } from "@app/stores/ticketMeta";
-import { SEARCH_DEBOUNCE_MS } from "@app/utils";
 
 const RECENT_TICKET_LIMIT = 10;
 

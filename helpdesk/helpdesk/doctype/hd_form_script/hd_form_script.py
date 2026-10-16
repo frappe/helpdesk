@@ -74,6 +74,7 @@ def get_form_script(
         .where(FormScript.enabled == 1)
         .where(FormScript.apply_on_new_page == apply_on_new_page)
         .where(FormScript.apply_to_customer_portal == is_customer_portal)
+        .where(FormScript.apply_to_knowledge_base == 0)
     )
 
     doc = query.run(as_dict=True)

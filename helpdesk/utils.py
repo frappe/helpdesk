@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder import Order
-from frappe.realtime import get_website_room
+from frappe.realtime import get_site_room
 from frappe.utils import floor
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
@@ -84,13 +84,14 @@ def publish_event(
     user: str | None = None,
 ):
     """
-    Publish `event` to a room with `data`
+    Publish `event` to a room with `data`; without a room, to desk users only. The website
+    room would reach every portal socket, guests included, and these events can name agents.
 
     :param event: Event name. Example: "refetch_resource"
     :param data: Data to be sent with the event
     :param user: User to send the event to, defaults to current user
     """
-    room = room or get_website_room()
+    room = room or get_site_room()
     user = user or frappe.session.user
     frappe.publish_realtime(
         event, message=data, room=room, after_commit=True, user=user

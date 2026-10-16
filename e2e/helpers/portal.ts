@@ -1,5 +1,5 @@
-import { request, type Page } from "@playwright/test";
-import type { Api } from "./api";
+import { expect, request, type Page } from "@playwright/test";
+import { type Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
 
@@ -18,11 +18,27 @@ export async function createArticle(
     category,
     content: `<p>${title} body</p>`,
     status: "Published",
+    // New articles default to Customers.
+    visibility: "Public",
     ...fields,
   });
 }
 
 /** Pick an option in a frappe-ui Combobox-backed Link field. */
+/** New articles reach the RediSearch index only when it is rebuilt; rebuild until `query` finds one. */
+export async function indexArticles(api: Api, query: string) {
+  await expect
+    .poll(
+      async () => {
+        await api.call("helpdesk.search.build_index");
+        const hits = await api.callGet("helpdesk.api.knowledge_base.search_articles", { query });
+        return hits.length;
+      },
+      { timeout: 30_000, intervals: [1_000] }
+    )
+    .toBeGreaterThan(0);
+}
+
 export async function pickOption(
   page: Page,
   trigger: string,

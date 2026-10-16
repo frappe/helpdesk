@@ -36,22 +36,45 @@ class HDArticleCategory(Document):
             frappe.throw(_("General category name can't be changed"))
 
     def on_trash(self):
+        self.validate_general_category_delete()
+        self.move_articles_to_general()
+
+    def validate_general_category_delete(self):
         if self.category_name == "General":
             frappe.throw(_("General category can't be deleted"))
-            return
 
-        articles = frappe.get_all(
-            "HD Article", filters={"category": self.name}, pluck="name"
-        )
+    def move_articles_to_general(self):
+        # Imported here: the API module imports the article controller, which imports this one.
+        from helpdesk.api.knowledge_base import get_general_category
 
-        general_category = frappe.db.get_value(
-            "HD Article Category", {"category_name": "General"}, "name"
-        )
-        if not general_category:
-            return
+        if general_category := get_general_category():
+            frappe.db.set_value(
+                "HD Article",
+                {"category": self.name},
+                get_values_for_category(general_category),
+                update_modified=False,
+            )
 
-        try:
-            for article in articles:
-                frappe.db.set_value("HD Article", article, "category", general_category)
-        except Exception as e:
-            frappe.db.rollback()
+
+def get_category_visibility(category: str) -> str | None:
+    """The access every article in `category` the user can read shares; None when they differ."""
+    values = frappe.get_list(
+        "HD Article",
+        filters={"category": category},
+        pluck="visibility",
+        distinct=True,
+    )
+    return values[0] if len(values) == 1 else None
+
+
+def get_values_for_category(category: str) -> dict:
+    """An article joining a category whose articles share one access takes it."""
+    values = {"category": category}
+    if visibility := get_category_visibility(category):
+        values["visibility"] = visibility
+    return values
+
+
+def check_category_length(category: str | None) -> None:
+    if category and frappe.db.count("HD Article", {"category": category}) == 1:
+        frappe.throw(_("Category must have at least one article"))

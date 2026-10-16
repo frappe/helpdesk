@@ -253,8 +253,10 @@ class TestInvitations(IntegrationTestCase):
             invite_members(self.customer.name, [invitee], False)
             result = invite_members(self.customer.name, [self.newcomer, invitee], False)
 
-        self.assertEqual(result["invited_emails"], [self.newcomer])
-        self.assertEqual(result["pending_invite_emails"], [invitee])
+        # no reason per email: the checks cover every organization on the site
+        self.assertEqual(
+            result, {"invited_emails": [self.newcomer], "skipped_emails": [invitee]}
+        )
 
     def test_frappes_invite_endpoint_refuses_a_manager(self) -> None:
         """Managers stay out of the `user_invitation` hook, which also guards Frappe's cancel and resend."""
@@ -321,6 +323,22 @@ class TestMemberRemoval(IntegrationTestCase):
         self.addCleanup(self.readd_member)
 
         self.assertNotIn(self.member["contact"], self.member_contacts())
+
+    def test_a_removed_manager_loses_the_manager_role(self) -> None:
+        with self.set_user(self.owner["user"]):
+            remove_member(self.customer.name, self.manager["contact"])
+        self.addCleanup(self.readd_manager)
+
+        roles = frappe.get_roles(self.manager["user"])
+        self.assertNotIn("HD Customer Manager", roles)
+        self.assertIn("HD Customer", roles)
+
+    def readd_manager(self) -> None:
+        customer = frappe.get_doc("HD Customer", self.customer.name)
+        customer.append(
+            "contacts", {"contact_name": self.manager["contact"], "is_manager": 1}
+        )
+        customer.save()
 
     def test_the_owner_cannot_be_removed(self) -> None:
         with (

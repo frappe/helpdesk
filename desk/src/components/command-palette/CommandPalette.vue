@@ -199,7 +199,6 @@ import {
   groups,
   isLoading,
   isOpen,
-  isPaletteAvailable,
   onQueryChange,
   openPalette,
   query,
@@ -418,9 +417,7 @@ useKeyboardShortcut({
   group: __("General"),
   allowInInput: true,
   allowInDialog: true,
-  enabled: () =>
-    isPaletteAvailable.value &&
-    !document.activeElement?.closest?.(".ProseMirror"),
+  enabled: () => !document.activeElement?.closest?.(".ProseMirror"),
   handler: () => (isOpen.value ? closePalette() : openPalette()),
 });
 </script>

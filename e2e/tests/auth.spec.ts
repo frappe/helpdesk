@@ -35,7 +35,7 @@ test.describe("customer", () => {
 
   test("lands on the portal and is kept out of agent routes", async ({ page, ticket }) => {
     await page.goto("/helpdesk");
-    await expect(page).toHaveURL(/\/help\/customer-tickets$/);
+    await expect(page).toHaveURL(/\/help\/?$/);
     await expect(page.getByRole("button", { name: "Customers" })).toHaveCount(0);
 
     await page.goto(`/helpdesk/tickets/${ticket.name}`);

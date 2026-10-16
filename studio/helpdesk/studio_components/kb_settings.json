@@ -111,19 +111,19 @@
          {
           "children": [
            {
-            "componentId": "kb_settings-nav-portal-permissions-label",
+            "componentId": "kb_settings-nav-knowledge-base-label",
             "componentName": "TextBlock",
             "componentProps": {
              "tag": "span",
-             "text": "{{ t('Portal Permissions') }}"
+             "text": "{{ t('Knowledge Base') }}"
             },
             "componentSlots": {}
            }
           ],
-          "componentId": "kb_settings-nav-portal-permissions",
+          "componentId": "kb_settings-nav-knowledge-base",
           "componentName": "SettingsNavItem",
           "componentProps": {
-           "value": "portal-permissions"
+           "value": "knowledge-base"
           },
           "componentSlots": {
            "prefix": {
@@ -133,7 +133,45 @@
                "h-4",
                "w-4"
               ],
-              "componentId": "kb_settings-nav-portal-permissions-icon",
+              "componentId": "kb_settings-nav-knowledge-base-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-book-open"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-knowledge-base-prefix",
+            "slotName": "prefix"
+           }
+          }
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-portal-settings-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Portal Settings') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-portal-settings",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "portal-settings"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-portal-settings-icon",
               "componentName": "Icon",
               "componentProps": {
                "icon": "lucide-user-cog"
@@ -141,7 +179,7 @@
               "componentSlots": {}
              }
             ],
-            "slotId": "kb_settings-slot-portal-permissions-prefix",
+            "slotId": "kb_settings-slot-portal-settings-prefix",
             "slotName": "prefix"
            }
           }
@@ -1258,7 +1296,184 @@
         "componentSlots": {}
        },
        {
-        "blockName": "Portal Permissions",
+        "blockName": "Knowledge Base",
+        "children": [
+         {
+          "children": [
+           {
+            "children": [
+             {
+              "children": [
+               {
+                "classes": [
+                 "text-ink-gray-8",
+                 "font-semibold"
+                ],
+                "componentId": "kb_settings-knowledge-base-header-title",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-lg",
+                 "tag": "h2",
+                 "text": "{{ t('Knowledge Base') }}"
+                },
+                "componentSlots": {}
+               },
+               {
+                "componentId": "kb_settings-knowledge-base-unsaved",
+                "componentName": "Badge",
+                "componentProps": {
+                 "label": "{{ t('Unsaved') }}",
+                 "size": "sm",
+                 "theme": "amber",
+                 "variant": "subtle"
+                },
+                "componentSlots": {},
+                "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
+               }
+              ],
+              "classes": [
+               "flex",
+               "items-center",
+               "gap-2"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-title-row",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
+             },
+             {
+              "classes": [
+               "text-ink-gray-6",
+               "max-w-[28rem]"
+              ],
+              "componentId": "kb_settings-knowledge-base-header-description",
+              "componentName": "TextBlock",
+              "componentProps": {
+               "fontSize": "text-base",
+               "tag": "p",
+               "text": "{{ t('Manage who can read your knowledge base and how it looks.') }}"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "flex-col",
+             "gap-1",
+             "min-w-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-header-headings",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div"
+           },
+           {
+            "children": [
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "previewKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-preview",
+              "componentName": "Button",
+              "componentProps": {
+               "iconLeft": "lucide-external-link",
+               "label": "{{ t('Preview') }}"
+              },
+              "componentSlots": {},
+              "visibilityCondition": "{{ knowledgeBaseCanPreview }}"
+             },
+             {
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "saveKnowledgeBase()"
+               }
+              },
+              "componentId": "kb_settings-knowledge-base-save",
+              "componentName": "Button",
+              "componentProps": {
+               "label": "{{ t('Save') }}",
+               "loading": "{{ knowledgeBaseSaving }}",
+               "variant": "solid"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "classes": [
+             "flex",
+             "items-center",
+             "gap-2",
+             "shrink-0"
+            ],
+            "componentId": "kb_settings-knowledge-base-actions",
+            "componentName": "container",
+            "componentProps": {},
+            "componentSlots": {},
+            "originalElement": "div",
+            "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
+           }
+          ],
+          "classes": [
+           "flex",
+           "items-start",
+           "justify-between",
+           "gap-4",
+           "shrink-0",
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-header",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-knowledge-base-form",
+            "componentName": "KnowledgeBasePanel",
+            "componentProps": {},
+            "componentSlots": {},
+            "isCustomVueComponent": true
+           }
+          ],
+          "classes": [
+           "flex-1",
+           "min-h-0",
+           "overflow-y-auto",
+           "pt-0",
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
+          ],
+          "componentId": "kb_settings-knowledge-base-body",
+          "componentName": "container",
+          "componentProps": {},
+          "componentSlots": {},
+          "originalElement": "div"
+         }
+        ],
+        "componentId": "kb_settings-knowledge-base-panel",
+        "componentName": "SettingsPanel",
+        "componentProps": {
+         "value": "knowledge-base"
+        },
+        "componentSlots": {},
+        "visibilityCondition": "{{ canEditSettings }}"
+       },
+       {
+        "blockName": "Portal Settings",
         "children": [
          {
           "children": [
@@ -1269,12 +1484,12 @@
                "text-ink-gray-8",
                "font-semibold"
               ],
-              "componentId": "kb_settings-portal-permissions-header-title",
+              "componentId": "kb_settings-portal-settings-header-title",
               "componentName": "TextBlock",
               "componentProps": {
                "fontSize": "text-lg",
                "tag": "h2",
-               "text": "{{ t('Portal Permissions') }}"
+               "text": "{{ t('Portal Settings') }}"
               },
               "componentSlots": {}
              },
@@ -1283,7 +1498,7 @@
                "text-ink-gray-6",
                "max-w-[28rem]"
               ],
-              "componentId": "kb_settings-portal-permissions-header-description",
+              "componentId": "kb_settings-portal-settings-header-description",
               "componentName": "TextBlock",
               "componentProps": {
                "fontSize": "text-base",
@@ -1299,7 +1514,7 @@
              "gap-1",
              "min-w-0"
             ],
-            "componentId": "kb_settings-portal-permissions-header-headings",
+            "componentId": "kb_settings-portal-settings-header-headings",
             "componentName": "container",
             "componentProps": {},
             "componentSlots": {},
@@ -1311,7 +1526,7 @@
            "py-8",
            "px-10"
           ],
-          "componentId": "kb_settings-portal-permissions-header",
+          "componentId": "kb_settings-portal-settings-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
@@ -1320,7 +1535,7 @@
          {
           "children": [
            {
-            "componentId": "kb_settings-portal-permissions-form",
+            "componentId": "kb_settings-portal-settings-form",
             "componentName": "PortalPermissionsPanel",
             "componentProps": {},
             "componentSlots": {},
@@ -1335,17 +1550,17 @@
            "px-10",
            "pb-8"
           ],
-          "componentId": "kb_settings-portal-permissions-body",
+          "componentId": "kb_settings-portal-settings-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div"
          }
         ],
-        "componentId": "kb_settings-portal-permissions-panel",
+        "componentId": "kb_settings-portal-settings-panel",
         "componentName": "SettingsPanel",
         "componentProps": {
-         "value": "portal-permissions"
+         "value": "portal-settings"
         },
         "componentSlots": {},
         "visibilityCondition": "{{ canEditSettings }}"
@@ -1403,7 +1618,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-15 21:00:00.000000",
+ "modified": "2026-10-16 23:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

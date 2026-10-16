@@ -1,8 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { askConfirm, countLabel } from '@app/utils'
-import { getErrorMessage, handleInviteUserSuccess } from '@helpdesk/shared/utils'
+import { askConfirm, countLabel, getErrorMessage } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { ASSIGNABLE_ROLES, roleLabel, type RoleLabel } from './roles'
 
@@ -131,7 +130,11 @@ export function createOrganizationSettings(core) {
       async () => {
         const result = await callOrganization('invite_members', { emails, is_manager: inviteRole.value === 'Manager' })
         closeInvite()
-        handleInviteUserSuccess(result)
+        const list = (emails: string[]) => emails.join(', ')
+        if (result.invited_emails.length) toast.success(__('{0} invited successfully', list(result.invited_emails)))
+        // The server does not say why, so another organization's people stay private.
+        if (result.skipped_emails.length)
+          toast.info(__('{0} not invited: already invited, already has an account, or disabled', list(result.skipped_emails)))
       },
       null,
       () => {
