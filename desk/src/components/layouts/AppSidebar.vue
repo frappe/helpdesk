@@ -35,6 +35,7 @@
               :id="item.id"
               :label="__(item.label)"
               :active="item.isActive"
+              :route="item.route"
               :class="item.spacedTop && 'mt-4'"
               @click="item.onClick && item.onClick()"
             >
@@ -133,8 +134,7 @@ import {
 } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
-import type { RouteLocationRaw } from "vue-router";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import LucideBell from "~icons/lucide/bell";
 import LucideSearch from "~icons/lucide/search";
 import {
@@ -148,7 +148,6 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const router = useRouter();
 const device = useDevice();
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
@@ -191,10 +190,11 @@ function currentRouteKey(): string | null {
   return (route.query.view as string) || (route.name as string) || null;
 }
 
-function selectItem(key: string, to: RouteLocationRaw, onSelect?: () => void) {
+// Items with a `route` render as router links, so this only highlights the
+// item before the route settles and runs the caller's hook.
+function selectItem(key: string, onSelect?: () => void) {
   activeItem.value = key;
   onSelect?.();
-  router.push(to);
 }
 
 const navItems = computed(() => {
@@ -207,7 +207,8 @@ const navItems = computed(() => {
       label: option.label,
       icon: option.icon,
       isActive: activeItem.value === option.to,
-      onClick: () => selectItem(option.to, { name: option.to }),
+      route: { name: option.to },
+      onClick: () => selectItem(option.to),
       // Separate the nav group from the search/notification tools above it.
       spacedTop: index === 0 && !isCustomerPortal.value,
       key: option.label,
@@ -230,7 +231,8 @@ const notificationItem = computed(() =>
         label: __("Notifications"),
         icon: LucideBell,
         isActive: activeItem.value === "Notifications",
-        onClick: () => selectItem("Notifications", { name: "Notifications" }),
+        route: { name: "Notifications" },
+        onClick: () => selectItem("Notifications"),
         badge: notificationStore.unread,
         key: "notifications",
         id: "notifications-btn",
@@ -277,14 +279,11 @@ function parseViews(views: any[]) {
     label: view.label,
     icon: getIcon(view.icon),
     isActive: activeItem.value === view.name,
+    route: { name: view.route_name, query: { view: view.name } },
     onClick: () =>
-      selectItem(
-        view.name,
-        { name: view.route_name, query: { view: view.name } },
-        () => {
-          currentView.value = { label: view.label, icon: view.icon };
-        }
-      ),
+      selectItem(view.name, () => {
+        currentView.value = { label: view.label, icon: view.icon };
+      }),
     key: view.name,
     view,
   }));
