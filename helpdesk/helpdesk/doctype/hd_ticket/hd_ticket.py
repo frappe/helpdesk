@@ -168,7 +168,7 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                now=self.instantly_send_email(),
                 in_reply_to=last_communication.name if last_communication else None,
                 email_headers={"X-Auto-Generated": "hd-email-feedback"},
             )
@@ -900,7 +900,7 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                now=self.instantly_send_email(),
             )
         except Exception as e:
             frappe.throw(_(e))
@@ -923,7 +923,7 @@ class HDTicket(Document, CustomerEditController):
                 ),
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
-                now=True,
+                now=self.instantly_send_email(),
                 expose_recipients="header",
                 email_headers={"X-Auto-Generated": "hd-acknowledgement"},
             )
