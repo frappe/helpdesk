@@ -4,10 +4,10 @@
       <div class="px-4 pt-5 bg-surface-elevation-2 sm:px-6">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-2">
-            <h3 class="text-3xl-semibold leading-6 text-ink-gray-9">
+            <h3 class="text-2xl-semibold leading-6 text-ink-gray-9">
               {{ __(dialogOptions.title) || __("Untitled") }}
             </h3>
-            <Badge v-if="isDirty" :label="__('Not Saved')" theme="orange" />
+            <Badge v-if="isDirty" :label="__('Not Saved')" theme="amber" />
           </div>
           <div class="flex items-center gap-1">
             <Button
@@ -21,7 +21,7 @@
         <div class="flex flex-col gap-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Type')" required size="md" />
+              <FormLabel :label="__('Type')" required />
               <Select
                 v-model="callLog.type"
                 :options="callLogTypeOptions"
@@ -30,7 +30,7 @@
               <ErrorMessage :message="errors.type" />
             </div>
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('To')" required size="md" />
+              <FormLabel :label="__('To')" required />
               <FormControl
                 v-model="callLog.to"
                 type="text"
@@ -41,7 +41,7 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('From')" required size="md" />
+              <FormLabel :label="__('From')" required />
               <FormControl
                 v-model="callLog.from"
                 type="text"
@@ -50,7 +50,7 @@
               <ErrorMessage :message="errors.from" />
             </div>
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Status')" required size="md" />
+              <FormLabel :label="__('Status')" required />
               <Select
                 v-model="callLog.status"
                 :options="callLogStatusOptions"
@@ -61,7 +61,7 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="flex flex-col gap-1.5">
-              <FormLabel :label="__('Duration')" required size="md" />
+              <FormLabel :label="__('Duration')" required />
               <FormControl
                 v-model="callLog.duration"
                 type="number"
@@ -134,7 +134,8 @@ import {
   FormLabel,
   Select,
   toast,
-  type DialogProps,
+  type DialogAction,
+  type DialogSize,
 } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import { __ } from "@/translation";
@@ -217,7 +218,11 @@ const callLogStatusOptions = [
   { label: __("In Progress"), value: "In Progress" },
 ];
 
-const dialogOptions = computed<DialogProps["options"]>(() => ({
+const dialogOptions = computed<{
+  title: string;
+  size: DialogSize;
+  actions: DialogAction[];
+}>(() => ({
   title: !editMode.value ? __("New Call Log") : __("Edit Call Log"),
   size: "xl",
   actions: [

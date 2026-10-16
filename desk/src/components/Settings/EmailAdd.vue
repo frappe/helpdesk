@@ -27,7 +27,7 @@
             <!-- email service provider info -->
             <div>
               <div
-                class="flex items-center gap-2 rounded-md p-2 ring-1 ring-outline-elevation-2"
+                class="flex items-center gap-2 rounded-5 p-2 ring-1 ring-outline-elevation-2"
               >
                 <CircleAlert
                   class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-5"
@@ -167,7 +167,7 @@ import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { call, createResource, toast } from "frappe-ui";
-import { useOnboarding } from "frappe-ui/frappe";
+import { useOnboarding } from "@framework/ui";
 import { computed, reactive, Ref, ref, watch } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import {
@@ -222,7 +222,7 @@ interface E {
 
 const emit = defineEmits<E>();
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 const state = reactive<EmailAccountProviderAuthState>({
   service: "",
@@ -308,7 +308,7 @@ const addEmailRes = createResource({
   onSuccess: () => {
     toast.success(__("Email account created"));
     emit("update:step", "email-list");
-    updateOnboardingStep("setup_email_account");
+    updateOnboardingStep?.("setup_email_account");
     capture("email_account_created", { data: { service: state.service } });
   },
   onError: () => {

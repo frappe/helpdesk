@@ -5,17 +5,22 @@
     :extensions="extensions"
     :editable="editable"
     :placeholder="placeholder"
-    :upload-function="(file:any)=>uploadFunction(file, doctype, ticketId)"
+    :upload-function="
+      (file: any, options: any) =>
+        track(uploadFunction(file, doctype, ticketId, true, options))
+    "
   >
     <template #default="{ isEmpty }">
-      <EditorContent
-        :class="[
-          'prose-sm max-w-none',
-          editable &&
-            'min-h-[7rem] mx-5 max-h-[44vh] overflow-y-auto border-t py-3',
-          getFontFamily(newComment),
-        ]"
-      />
+      <!-- Scroll here so selected nodes aren't clipped. -->
+      <div :class="editable && 'max-h-[44vh] overflow-y-auto'">
+        <EditorContent
+          :class="[
+            'prose-sm max-w-none',
+            editable && 'min-h-[7rem] mx-5 border-t py-3',
+            getFontFamily(newComment),
+          ]"
+        />
+      </div>
       <!-- Attachments -->
       <AttachmentList
         class="my-2 ms-5"
@@ -25,21 +30,19 @@
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
-          <div class="flex justify-between overflow-hidden py-2.5">
-            <div class="flex items-center overflow-x-auto w-[60%]">
+          <div class="flex justify-between gap-2 overflow-hidden py-2.5">
+            <div class="flex min-w-0 flex-1 items-center overflow-x-auto">
               <div class="inline-flex items-center gap-1.5 p-1">
                 <FileUploader
-                  :upload-args="{
-                    doctype: doctype,
-                    docname: ticketId,
-                    private: true,
-                  }"
+                  :doctype="doctype"
+                  :docname="ticketId"
+                  private
                   @success="(f) => attachments.push(f)"
                 >
                   <template #default="{ openFileSelector, uploading }">
                     {{ void (loading = uploading) }}
                     <button
-                      class="flex rounded p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
+                      class="flex rounded-4 p-1 text-ink-gray-8 transition-colors focus-within:ring-0 hover:bg-surface-gray-3"
                       @click="openFileSelector()"
                       :disabled="uploading"
                     >
@@ -55,31 +58,35 @@
                 <div class="h-4 w-[2px] border-s ml-1" />
               </div>
               <EditorFixedMenu :items="fullToolbar" />
+              <EditorTableMenu />
             </div>
-            <div class="flex items-center justify-end gap-x-2 w-[40%]">
+            <div class="flex shrink-0 items-center justify-end gap-x-2">
               <Button
                 label="Discard"
                 @click="
                   () => {
                     newComment = '';
                     attachments = [];
+                    dropUnused(null);
                     emit('discard');
                   }
                 "
               />
-              <Button
-                variant="solid"
-                :label="label"
-                :disabled="isDisabled"
-                :loading="loading"
-                @click="
-                  () => {
-                    loading = true;
-                    submitComment();
-                    newComment = '';
-                  }
-                "
-              />
+              <!-- A disabled button fires no pointer events, so the span
+                   carries the hover for the tooltip -->
+              <Tooltip
+                :text="isUploading ? __('Please wait, media is uploading') : ''"
+              >
+                <span class="inline-flex">
+                  <Button
+                    variant="solid"
+                    :label="label"
+                    :disabled="isDisabled"
+                    :loading="loading"
+                    @click="submitComment()"
+                  />
+                </span>
+              </Tooltip>
             </div>
           </div>
         </div>
@@ -88,17 +95,34 @@
   </Editor>
 </template>
 <script setup lang="ts">
-import { FileUploader, LoadingIndicator, createResource } from "frappe-ui";
-import { Editor, EditorContent, EditorFixedMenu } from "frappe-ui/editor";
-import { useOnboarding } from "frappe-ui/frappe";
+import {
+  FileUploader,
+  LoadingIndicator,
+  Tooltip,
+  createResource,
+  dayjs,
+  toast,
+} from "frappe-ui";
+import {
+  Editor,
+  EditorContent,
+  EditorFixedMenu,
+  EditorTableMenu,
+} from "frappe-ui/editor";
+import { addPendingActivity } from "@framework/ui/ActivityTimeline";
+import { useOnboarding } from "@framework/ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { AttachmentList } from "@/components/";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
+import { useUploadTracker } from "@/composables/useUploadTracker";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
+import { capture } from "@/telemetry";
 import {
   getFontFamily,
   isContentEmpty,
@@ -108,9 +132,11 @@ import {
 import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
-const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { agents: agentsList, dropdown } = storeToRefs(useAgentStore());
-const { isManager } = useAuthStore();
+const authStore = useAuthStore();
+const { isManager } = authStore;
+const { getUser } = useUserStore();
 
 const props = defineProps({
   ticketId: {
@@ -135,25 +161,22 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "discard"]);
+const emit = defineEmits(["submit", "discard", "sending", "restore"]);
 
 const newComment = useStorage("commentBoxContent" + props.ticketId, null);
 
 // Mentions as a reactive getter so the `@` list stays in sync as agents load.
 const extensions = buildEditorExtensions({
-  mentions: () =>
-    (dropdown.value ?? []).map((a: { label: string; value: string }) => ({
-      id: a.value,
-      label: a.label,
-    })),
+  mentions: () => dropdown.value ?? [],
 });
 
 // Initialize typing composable
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
+const { isUploading, track, dropUnused } = useUploadTracker();
 const isDisabled = computed(() => {
-  return isContentEmpty(newComment.value) || loading.value;
+  return isContentEmpty(newComment.value) || loading.value || isUploading.value;
 });
 const loading = ref(false);
 
@@ -166,28 +189,58 @@ async function submitComment() {
   if (isContentEmpty(newComment.value)) {
     return false;
   }
+  // The keyboard shortcut reaches here without passing the disabled button
+  if (isUploading.value || loading.value) return false;
+
+  const content = newComment.value;
+  const sentAttachments = attachments.value;
+  const pendingRow = addPendingActivity(props.doctype, props.ticketId, {
+    type: "comment",
+    timestamp: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    author: {
+      email: getUser(authStore.userId).email,
+      // the users list may still be a stub with a guessed name and no avatar
+      fullname: authStore.userName,
+      image: authStore.userImage,
+    },
+    data: { name: "", content, attachments: sentAttachments },
+  });
+
+  // drop before clearing, or an unmount mid-send deletes what the comment carries
+  dropUnused(content);
+  newComment.value = null;
+  attachments.value = [];
+  loading.value = true;
+  emit("sending");
+
   const comment = createResource({
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
       dn: props.ticketId,
       method: "new_comment",
-      args: {
-        content: newComment.value,
-        attachments: attachments.value,
-      },
+      args: { content, attachments: sentAttachments },
     }),
-    onSuccess: () => {
+    onSuccess: (res: { message?: string } | string) => {
+      // run_doc_method answers with the whole body, since it always carries `docs`
+      const name = typeof res === "string" ? res : res?.message;
+      // the real row replaces the pending one the moment it arrives; unkeyed,
+      // it would outlive it
+      name ? pendingRow.resolve(`comment:${name}`) : pendingRow.drop();
+      capture("comment_added");
       if (isManager) {
-        updateOnboardingStep("comment_on_ticket");
+        updateOnboardingStep?.("comment_on_ticket");
       }
       emit("submit");
       loading.value = false;
-      attachments.value = [];
-      newComment.value = null;
     },
     onError: () => {
+      toast.error(__("Could not add the comment"));
+      pendingRow.drop();
+      newComment.value = content;
+      attachments.value = sentAttachments;
       loading.value = false;
+      emit("restore");
     },
   });
 
@@ -217,6 +270,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cleanup();
+  // the saved draft still references what it shows, so only what it dropped goes
+  dropUnused(newComment.value);
   if (isContentEmpty(newComment.value)) {
     localStorage.removeItem("commentBoxContent" + props.ticketId);
   }

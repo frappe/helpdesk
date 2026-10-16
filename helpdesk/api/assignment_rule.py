@@ -11,6 +11,7 @@ def get_assignment_rules_list():
 
     assignment_rules = frappe.get_list(
         "Assignment Rule",
+        filters={"document_type": "HD Ticket"},
         fields=["name", "description", "disabled", "priority"],
         order_by="modified desc",
     )

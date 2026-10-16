@@ -1,14 +1,14 @@
 <template>
   <div class="flex gap-5 w-full">
     <FormControl
-      type="autocomplete"
+      type="combobox"
       label="Default ticket status"
       :options="openStatuses"
       class="flex-1"
       v-model="slaData.default_ticket_status"
     />
     <FormControl
-      type="autocomplete"
+      type="combobox"
       label="Ticket reopen status"
       :options="openStatuses"
       class="flex-1"

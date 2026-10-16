@@ -12,6 +12,7 @@ import { Tooltip } from "frappe-ui";
 
 defineProps<{
   label: string;
-  required?: boolean;
+  // Frappe fields carry 1 / 0, not true / false
+  required?: boolean | number;
 }>();
 </script>

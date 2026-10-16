@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded p-3 shadow-sm w-full">
+  <div class="rounded-4 p-3 shadow-sm w-full">
     <Editor
       ref="inner"
       v-model="content"
@@ -22,12 +22,12 @@
         </span>
 
         <EditorBubbleMenu :items="commentToolbar" />
-        <EditorContent
-          :class="[
-            'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]',
-            getFontFamily(content),
-          ]"
-        />
+        <!-- Scroll here so selected nodes aren't clipped. -->
+        <div class="-mx-3 px-3 max-h-64 overflow-auto my-4">
+          <EditorContent
+            :class="['prose-f max-w-none min-h-[5rem]', getFontFamily(content)]"
+          />
+        </div>
 
         <div class="flex flex-col gap-2">
           <slot name="bottom-top" />
@@ -81,7 +81,7 @@ import {
 interface P {
   modelValue: string;
   autofocus?: boolean;
-  uploadFunction?: (file: any) => Promise<any>;
+  uploadFunction?: (file: any, options?: any) => Promise<any>;
 }
 
 interface E {

@@ -36,7 +36,7 @@ const FADE_MS = 300;
 const TEAM_SIZE_UNSPECIFIED = "prefer_not_to_say";
 
 // The last question's "first goal" answer maps to a settings tab; other goals
-// route directly (create ticket, explore) or fall through to Home.
+// route directly (create ticket, explore).
 const settingsTabForGoal: Record<
   string,
   "Email Accounts" | "Invite Agents" | "General"
@@ -60,14 +60,15 @@ async function finishOnboarding(answers: Record<string, string | string[]>) {
   }
 }
 
-// Send the admin to their first goal: new ticket, the seeded welcome ticket,
-// a settings tab over Home, or Home.
+// Send the admin to their first goal: new ticket, a settings tab over
+// Tickets, or the seeded welcome ticket. Skipping leaves no goal, so it lands
+// on the welcome ticket like "explore".
 async function routeToGoal(goal?: string | string[]) {
   if (goal === "create_ticket") {
     await router.push({ name: "TicketAgentNew" });
     return;
   }
-  if (goal === "explore") {
+  if (!goal || goal === "explore") {
     const ticket = await call(
       "helpdesk.api.onboarding.get_welcome_ticket"
     ).catch(() => null);
@@ -78,7 +79,7 @@ async function routeToGoal(goal?: string | string[]) {
     );
     return;
   }
-  await router.push({ name: "Home" });
+  await router.push({ name: "TicketsAgent" });
   const tab = typeof goal === "string" ? settingsTabForGoal[goal] : undefined;
   if (tab) {
     setActiveSettingsTab(tab);

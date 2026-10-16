@@ -2,7 +2,7 @@
   <div class="flex w-[382px] flex-col border-s gap-4">
     <!-- Ticket ID -->
     <div class="flex items-center justify-between border-b px-5 py-3">
-      <span class="cursor-copy text-lg-semibold">Ticket details</span>
+      <span class="cursor-copy text-md-semibold">Ticket details</span>
     </div>
     <!-- user info and sla info -->
     <div class="flex flex-col gap-4 pt-0 px-5 py-3 border-b">
@@ -15,7 +15,7 @@
         />
         <div class="flex items-center justify-between">
           <Tooltip :text="ticket.data.contact.name">
-            <div class="w-[242px] truncate text-3xl-medium">
+            <div class="w-[242px] truncate text-2xl-medium">
               {{ ticket.data.contact.name }}
             </div>
           </Tooltip>
@@ -41,7 +41,9 @@
         class="flex items-center text-base leading-5"
         v-for="field in ticketBasicInfo"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{
+          __(field.label)
+        }}</span>
         <span
           class="text-base text-ink-gray-8 flex-1"
           :class="!field.value && 'text-ink-gray-4'"
@@ -68,7 +70,7 @@
           <!-- SLA explanation icon -->
           <Tooltip
             v-if="
-              dayjs(data.value).diff(dayjs(), 'day', true) > 4 &&
+              dayjsLocal(data.value).diff(dayjsLocal(), 'day', true) > 4 &&
               data.title === 'Resolution'
             "
             :text="
@@ -96,24 +98,14 @@
         v-for="field in ticketAdditionalInfo"
         :key="field.fieldname"
       >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <span
-          class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
-        >
-          <template
-            v-if="
-              field.value &&
-              (field.fieldtype === 'Date' || field.fieldtype === 'Datetime') &&
-              dayjs(field.value).isValid()
-            "
-          >
-            {{ dateFormat(field.value, dateTooltipFormat) }}
-          </template>
-          <template v-else>
-            {{ field.value || "—" }}
-          </template>
-        </span>
+        <span class="w-[126px] text-sm text-ink-gray-5">{{
+          __(field.label)
+        }}</span>
+        <Tooltip :disabled="!storedStamp(field)" :text="storedStamp(field)">
+          <span class="text-base text-ink-gray-8 flex-1">{{
+            field.value
+          }}</span>
+        </Tooltip>
       </div>
     </div>
   </div>
@@ -129,7 +121,7 @@ import {
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
 import { dateFormat, dateTooltipFormat } from "@/utils";
-import { Avatar, dayjs, Tooltip } from "frappe-ui";
+import { Avatar, dayjs, dayjsLocal, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);
@@ -180,6 +172,14 @@ const ticketBasicInfo = computed(() => [
   },
 ]);
 
+function storedStamp(field) {
+  if (field.fieldtype === "Date")
+    return dayjs(field.raw).format("ddd, MMM D, YYYY");
+  if (field.fieldtype === "Datetime")
+    return dayjs(field.raw).format(dateTooltipFormat);
+  return "";
+}
+
 const ticketAdditionalInfo = computed(() => {
   const fields = [
     {
@@ -190,7 +190,7 @@ const ticketAdditionalInfo = computed(() => {
     {
       fieldname: "team",
       label: "Team",
-      value: ticket.data.agent_group || "-",
+      value: ticket.data.agent_group,
     },
     {
       fieldname: "priority",
@@ -201,13 +201,17 @@ const ticketAdditionalInfo = computed(() => {
   const custom_fields = ticket.data.template.fields
     .filter(
       (field: Field) =>
-        !field.hide_from_customer &&
-        ["subject", "team", "priority"].indexOf(field.fieldname) === -1
+        ["subject", "team", "priority"].indexOf(field.fieldname) === -1 &&
+        ticket.data[field.fieldname] != null &&
+        ticket.data[field.fieldname] !== ""
     )
     .map((field: Field) => {
       const option = {
+        fieldname: field.fieldname,
+        fieldtype: field.fieldtype,
         label: field.label,
         value: ticket.data[field.fieldname],
+        raw: ticket.data[field.fieldname],
       };
       if (field.fieldtype === "Date") {
         option.value = dayjs(option.value).format(
@@ -223,7 +227,10 @@ const ticketAdditionalInfo = computed(() => {
       return option;
     });
 
-  return [...fields, ...custom_fields];
+  // return only fields with values for customers
+  return [...fields, ...custom_fields].filter(
+    (field) => field.value != null && field.value !== ""
+  );
 });
 </script>
 

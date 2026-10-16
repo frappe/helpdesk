@@ -51,10 +51,15 @@
             :to-emails="toEmails"
             :cc-emails="ccEmails"
             :bcc-emails="bccEmails"
-            @submit="
+            @sending="
               () => {
                 showEmailBox = false;
-                emit('update');
+              }
+            "
+            @submit="() => emit('update')"
+            @restore="
+              () => {
+                showEmailBox = true;
               }
             "
             @discard="
@@ -88,10 +93,15 @@
             :editable="showCommentBox"
             :doctype="doctype"
             placeholder="@John could you please look into this?"
-            @submit="
+            @sending="
               () => {
                 showCommentBox = false;
-                emit('update');
+              }
+            "
+            @submit="() => emit('update')"
+            @restore="
+              () => {
+                showCommentBox = true;
               }
             "
             @discard="
@@ -141,16 +151,14 @@ function toggleCommentBox() {
   showCommentBox.value = !showCommentBox.value;
 }
 
+// the editors emit `submit` once the write lands; reloading here too would
+// fetch twice, and the guards' `false` never reaches this side anyway
 function submitEmail() {
-  if (emailEditorRef.value.submitMail()) {
-    emit("update");
-  }
+  emailEditorRef.value.submitMail();
 }
 
 function submitComment() {
-  if (commentTextEditorRef.value.submitComment()) {
-    emit("update");
-  }
+  commentTextEditorRef.value.submitComment();
 }
 
 function splitIfString(str: string | string[]) {

@@ -1,4 +1,4 @@
-import { dayjs } from "frappe-ui";
+import { dayjs, dayjsLocal } from "frappe-ui";
 import { computed, type ComputedRef, type Ref } from "vue";
 
 export type SLAState = "due" | "fulfilled" | "overdue" | "failed" | "hold";
@@ -67,7 +67,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (d.first_responded_on) {
       const inTime =
         !d.response_by ||
-        dayjs(d.first_responded_on).isBefore(dayjs(d.response_by));
+        dayjsLocal(d.first_responded_on).isBefore(dayjsLocal(d.response_by));
       if (inTime) {
         return {
           ...metric("fulfilled", "", "green", {
@@ -97,7 +97,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
 
     if (!d.response_by) return null;
 
-    if (dayjs().isBefore(dayjs(d.response_by))) {
+    if (dayjsLocal().isBefore(dayjsLocal(d.response_by))) {
       return metric(
         "due",
         `Due in ${coarseDuration(d.response_by)}`,
@@ -123,7 +123,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
 
     const pausedBeforeBreach =
       !d.resolution_by ||
-      dayjs(d.resolution_by).isAfter(dayjs(d.on_hold_since));
+      dayjsLocal(d.resolution_by).isAfter(dayjsLocal(d.on_hold_since));
     if (
       d.status_category === "Paused" &&
       d.on_hold_since &&
@@ -135,7 +135,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
     if (d.resolution_date) {
       const inTime =
         !d.resolution_by ||
-        dayjs(d.resolution_date).isBefore(dayjs(d.resolution_by));
+        dayjsLocal(d.resolution_date).isBefore(dayjsLocal(d.resolution_by));
       if (inTime) {
         return {
           ...metric("fulfilled", "", "green", {
@@ -165,7 +165,7 @@ export function useSLA(ticket: Ref<TicketLike | null | undefined>): {
 
     if (!d.resolution_by) return null;
 
-    if (dayjs().isBefore(dayjs(d.resolution_by))) {
+    if (dayjsLocal().isBefore(dayjsLocal(d.resolution_by))) {
       return metric(
         "due",
         `Due in ${coarseDuration(d.resolution_by)}`,
@@ -200,16 +200,17 @@ function metric(
 }
 
 function shortDuration(date: string, end?: string): string {
-  if (!end) {
-    end = dayjs().toString();
-  }
-  return twoUnitDuration(dayjs(date).diff(dayjs(end)));
+  return twoUnitDuration(
+    dayjsLocal(date).diff(end ? dayjsLocal(end) : dayjsLocal())
+  );
 }
 
 /** Distance from now in whole minutes. Countdown values ("Due in",
  * "Overdue by") don't tick, so seconds would read as a frozen timer. */
 function coarseDuration(date: string): string {
-  const diff = dayjs(date).startOf("minute").diff(dayjs().startOf("minute"));
+  const diff = dayjsLocal(date)
+    .startOf("minute")
+    .diff(dayjsLocal().startOf("minute"));
   return twoUnitDuration(Math.abs(diff));
 }
 

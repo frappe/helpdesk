@@ -9,7 +9,7 @@
       <template #suffix>
         <LucideX
           class="size-3.5 cursor-pointer text-ink-gray-6 transition-colors hover:text-ink-gray-9"
-          @click.stop="emit('remove', attachment)"
+          @click.stop.prevent="emit('remove', attachment)"
         />
       </template>
     </AttachmentItem>

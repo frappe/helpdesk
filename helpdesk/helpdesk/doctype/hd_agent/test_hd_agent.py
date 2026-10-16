@@ -10,6 +10,7 @@ from frappe.tests.utils import FrappeTestCase
 from helpdesk.api.auth import get_user
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
 from helpdesk.test_utils import (
+    create_user,
     make_agent,
     make_team,
     make_ticket,
@@ -60,6 +61,18 @@ class TestHDAgent(FrappeTestCase):
 
         with self.assertRaises(frappe.PermissionError):
             update_agent_role(self.test_user, "System Manager")
+
+    # saving an HD Agent grants its user the Agent role, so only managers may create one
+    def test_agent_cannot_make_another_user_an_agent(self):
+        user = create_user("not_an_agent@test.com").name
+        frappe.set_user(self.test_user)
+
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc(
+                {"doctype": "HD Agent", "user": user, "agent_name": "x"}
+            ).insert()
+
+        self.assertNotIn("Agent", frappe.get_roles(user))
 
     # the frontend now writes this straight through frappe.client.set_value, so a
     # plain agent must be able to save their own record without elevated rights

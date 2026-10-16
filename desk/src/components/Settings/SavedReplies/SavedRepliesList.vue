@@ -39,12 +39,16 @@
             class="absolute end-1 top-1/2 -translate-y-1/2"
           />
         </div>
-        <Dropdown :options="filterOptions" placement="right">
+        <Dropdown
+          :options="filterOptions"
+          align="end"
+          @update:open="(open) => open && (isConfirmingDelete = false)"
+        >
           <template #default="{ open }">
             <Button :label="activeFilterLabel">
               <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
+                <component
+                  :is="open ? LucideChevronUp : LucideChevronDown"
                   class="h-4"
                 />
               </template>
@@ -90,7 +94,7 @@
           :key="savedReply.name"
         >
           <div
-            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded"
+            class="grid grid-cols-12 items-center gap-4 cursor-pointer hover:bg-surface-sidebar rounded-4"
           >
             <div
               @click="
@@ -130,14 +134,15 @@
                 />
                 {{ savedReply.scope }}
               </div>
+              <!-- the confirm state is shared, so each menu clears it on open -->
               <Dropdown
-                placement="right"
+                align="end"
                 :options="dropdownOptions(savedReply)"
+                @update:open="(open) => open && (isConfirmingDelete = false)"
               >
                 <Button
                   icon="lucide-more-horizontal"
                   variant="ghost"
-                  @click="isConfirmingDelete = false"
                   class="me-2"
                 />
               </Dropdown>
@@ -178,6 +183,8 @@
 </template>
 
 <script setup lang="ts">
+import LucideChevronUp from "~icons/lucide/chevron-up";
+import LucideChevronDown from "~icons/lucide/chevron-down";
 import EmptyState from "@/components/EmptyState.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
@@ -187,7 +194,6 @@ import {
   Button,
   call,
   Dropdown,
-  FeatherIcon,
   LoadingIndicator,
   TextInput,
   toast,

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border flex-1 px-3 pt-2.5 mb-4 border-transparent bg-surface-base rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+    class="border flex-1 px-3 pt-2.5 mb-4 border-transparent bg-surface-base rounded-5 shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
@@ -57,12 +57,13 @@ function sanitize(html: string) {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "video"]),
     allowedAttributes: {
+      "*": ["style", "align", "valign", "width", "height", "bgcolor"],
       a: ["href"],
       video: ["src", "controls"],
-      img: ["src", "width", "height"],
-      table: ["border", "cellpadding", "cellspacing", "width", "data-type"],
-      td: ["colspan", "rowspan", "width", "align", "valign"],
-      th: ["colspan", "rowspan", "width", "align", "valign"],
+      img: ["src"],
+      table: ["border", "cellpadding", "cellspacing", "data-type"],
+      td: ["colspan", "rowspan"],
+      th: ["colspan", "rowspan"],
     },
   });
 }

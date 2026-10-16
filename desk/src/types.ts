@@ -247,7 +247,6 @@ export interface AutoCompleteItem {
 export interface Field {
   fieldname: string;
   fieldtype: string;
-  hide_from_customer?: 0 | 1;
   label: string;
   options: string;
   required: 0 | 1;
@@ -286,17 +285,6 @@ export type File = {
   attached_to_doctype?: string;
   attached_to_field?: string;
   attached_to_name?: string;
-};
-
-export type Notification = {
-  creation: string;
-  name: string;
-  notification_type: string;
-  read: boolean;
-  reference_comment: string;
-  reference_ticket: string;
-  user_from: UserInfo;
-  user_to: UserInfo;
 };
 
 export type UserInfo = {
@@ -346,9 +334,9 @@ export type TicketTab =
   | "analytics";
 
 export interface TabObject {
-  name: TicketTab;
+  value: TicketTab;
   label: string;
-  icon: Component;
+  iconLeft: Component;
   condition?: () => boolean;
 }
 
@@ -424,70 +412,6 @@ export interface Breadcrumb {
   };
 }
 
-// Activity Types
-interface BaseActivity {
-  type: string;
-  key: string;
-  creation: string;
-  content: string;
-}
-
-interface HistoryActivity extends BaseActivity {
-  type: "history";
-  user: string;
-  relatedActivities: HistoryActivity[];
-}
-
-export interface EmailActivity extends BaseActivity {
-  type: "email";
-  attachments: FileAttachment;
-  bcc: string;
-  cc: string;
-  name: string;
-  sender: { full_name: string; name: string };
-  subject: string;
-  to: string;
-  isFirstEmail: boolean;
-}
-
-export interface CommentActivity extends BaseActivity {
-  type: "comment";
-  name: string;
-  commenter: string;
-  commentedBy: string;
-  attachments: FileAttachment[];
-}
-
-export interface CallActivity extends BaseActivity {
-  type: "call";
-  name: string;
-  caller: string;
-  calledBy: string;
-  attachments: FileAttachment[];
-  call_type: "Incoming" | "Outgoing";
-}
-
-export interface FeedbackActivity {
-  type: "feedback";
-  feedback_rating: number;
-  feedback: string; // option seletor
-  feedback_extra?: string; // free flow text
-  sender: { name: string; full_name: string };
-  key: string;
-}
-
-export type TicketActivity =
-  | HistoryActivity
-  | EmailActivity
-  | CommentActivity
-  | CallActivity
-  | FeedbackActivity;
-
-interface FileAttachment {
-  name: string;
-  file_name: string;
-  file_url: string;
-}
 
 export interface FieldCriteriaState {
   selectedParentField: string;
@@ -576,11 +500,11 @@ export interface DocumentResource<T = unknown> {
 }
 
 export interface Customizations {
-  custom_fields: {
+  fields: {
     fieldname: string;
-    required: number;
-    placeholder: string;
-    url_method: string;
+    required?: number;
+    placeholder?: string;
+    url_method?: string;
   }[];
   _form_script: string[];
   _customActions?: any;
@@ -623,13 +547,6 @@ export type SimilarTicket = Record<
 export interface RecentSimilarTicket {
   recent_tickets: RecentTicket[];
   similar_tickets: SimilarTicket[];
-}
-
-export interface TicketActivities {
-  comments: Comment[];
-  communications: Communication[];
-  history: Activity[];
-  views: ViewLog[];
 }
 
 export interface HDSettings {
@@ -746,10 +663,6 @@ export const TicketContactSymbol: InjectionKey<
 export const RecentSimilarTicketsSymbol: InjectionKey<
   ComputedRef<Resource<RecentSimilarTicket>>
 > = Symbol("recentSimilarTickets");
-
-export const ActivitiesSymbol: InjectionKey<
-  ComputedRef<Resource<TicketActivities>>
-> = Symbol("activities");
 
 export const AssignmentRuleListResourceSymbol: InjectionKey<
   Resource<AssignmentRule[]>

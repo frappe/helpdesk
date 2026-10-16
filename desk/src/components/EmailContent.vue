@@ -18,7 +18,11 @@ const props = defineProps({
 });
 
 const iframeRef = ref<HTMLIFrameElement | null>(null);
-const _content = ref(stripEmailColors(props.content));
+const _content = ref(props.content);
+
+const themedContent = computed(() =>
+  dataTheme.value === "dark" ? stripEmailColors(_content.value) : _content.value
+);
 
 // Get CSS path - in dev Vite serves it directly, in prod we need the built path
 const cssHref = computed(() => {
@@ -201,7 +205,7 @@ const htmlContent = computed(
     </style>
   </head>
   <body>
-    <div class="email-content prose-f">${_content.value}</div>
+    <div class="email-content prose-f">${themedContent.value}</div>
   </body>
   </html>
   `

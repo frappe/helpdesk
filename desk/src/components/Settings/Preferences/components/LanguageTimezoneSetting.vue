@@ -13,6 +13,10 @@
         :model-value="user.doc?.language"
         doctype="Language"
         class="w-40"
+        side="top"
+        align="end"
+        :placeholder="__('Select language')"
+        hide-clear-button
         @update:model-value="updateLanguage"
       />
     </div>
@@ -25,11 +29,8 @@
           {{ __("Change timezone of the application.") }}
         </span>
       </div>
-      <Autocomplete
+      <TimezoneControl
         :model-value="user.doc?.time_zone"
-        :options="timezoneOptions"
-        :placeholder="__('Select Timezone')"
-        size="sm"
         class="w-40"
         @update:model-value="updateTimezone"
       />
@@ -38,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { createResource } from "frappe-ui";
+import Link from "@/components/frappe-ui/Link.vue";
+import TimezoneControl from "@/components/TimezoneControl.vue";
 import { __ } from "@/translation";
 
 const props = defineProps<{ user: any }>();
@@ -49,20 +50,8 @@ function updateLanguage(value: string | null) {
   props.user.doc.language = value || props.user.originalDoc?.language;
 }
 
-function updateTimezone(value: { label: string; value: string } | null) {
+function updateTimezone(value: string | null) {
   if (!props.user.doc) return;
-  props.user.doc.time_zone = value?.value || props.user.originalDoc?.time_zone;
+  props.user.doc.time_zone = value || props.user.originalDoc?.time_zone;
 }
-
-const timezoneOptions = ref<{ label: string; value: string }[]>([]);
-createResource({
-  url: "frappe.core.doctype.user.user.get_timezones",
-  auto: true,
-  onSuccess(data: { timezones: string[] }) {
-    timezoneOptions.value = data.timezones.map((tz) => ({
-      label: tz,
-      value: tz,
-    }));
-  },
-});
 </script>

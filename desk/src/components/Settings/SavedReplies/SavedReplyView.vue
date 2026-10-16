@@ -67,12 +67,11 @@
             </Select>
             <FormLabel
               :label="__('Choose who can view and use this response.')"
-              size="md"
             />
           </div>
         </div>
         <div v-if="savedReplyData.scope === 'Team'" class="space-y-1.5">
-          <FormLabel :label="__('Teams')" required size="md" />
+          <FormLabel :label="__('Teams')" required />
           <MultiSelect
             :options="teamsList"
             v-model="savedReplyData.teams"
@@ -87,7 +86,7 @@
         </div>
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
-            <FormLabel :label="__('Response')" required size="md" />
+            <FormLabel :label="__('Response')" required />
             <DocumentationButton
               url="https://docs.frappe.io/helpdesk/saved-replies"
             />
@@ -96,6 +95,16 @@
           <CompactEditor
             ref="content"
             v-model="savedReplyData.message"
+            :upload-fn="
+              (file: any, options: any) =>
+                uploadFunction(
+                  file,
+                  'HD Saved Reply',
+                  savedReplyData.name,
+                  false,
+                  options
+                )
+            "
             :extensions="[FieldAutocomplete]"
             :placeholder="
               __(
@@ -129,6 +138,7 @@ import DocumentationButton from "@/components/DocumentationButton.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
+import { uploadFunction } from "@/utils";
 import {
   Button,
   createListResource,

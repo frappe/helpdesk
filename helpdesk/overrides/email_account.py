@@ -128,6 +128,16 @@ class CustomEmailAccount(EmailAccount):
         # keep the record even if a later mail in this batch fails
         frappe.db.commit()  # nosemgrep
 
+    def is_parked(self, message_id: str | None) -> bool:
+        """A mail without a Message-ID cannot be matched, so it is parked again."""
+        return bool(
+            message_id
+            and frappe.db.exists(
+                "Unhandled Email",
+                {"email_account": self.name, "message_id": message_id},
+            )
+        )
+
     def notify_ticket_of_parked_mail(self, message, msg, reason):
         """Parked mail never shows on the ticket, so leave a comment
         there -- agents must know their reply bounced."""
@@ -152,12 +162,9 @@ class CustomEmailAccount(EmailAccount):
                 )
             )
 
-        comment = frappe.new_doc("HD Ticket Comment")
+        ticket = frappe.get_doc("HD Ticket", communication.reference_name)
         # a system note, not the pulling user's
-        comment.commented_by = "Administrator"
-        comment.reference_ticket = communication.reference_name
-        comment.content = content
-        comment.save(ignore_permissions=True)
+        ticket.add_comment("Comment", content, comment_email="Administrator")
 
     def get_inbound_mails(self) -> list[InboundMail]:
         """retrive and return inbound mails."""
@@ -178,6 +185,9 @@ class CustomEmailAccount(EmailAccount):
 
                     # machine mail starts loops -- park it, with a trace
                     if reason := auto_generated_reason(_msg):
+                        # IMAP "ALL" sync fetches parked mail again on every pull
+                        if self.is_parked(_msg.get("Message-ID")):
+                            continue
                         self.handle_bad_emails(uid, message, reason)
                         # our own looped-back ack is not news for agents
                         if reason != "X-Auto-Generated":

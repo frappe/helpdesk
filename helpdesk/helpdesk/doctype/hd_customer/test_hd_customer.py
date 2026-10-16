@@ -14,6 +14,7 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     create_user,
+    get_granted_rights,
     get_invitation,
     make_ticket,
     update_role_in_customer,
@@ -483,6 +484,31 @@ class TestHDCustomer(IntegrationTestCase):
 
         with self.assertRaises(frappe.ValidationError):
             customer.save()
+
+    def test_manager_invite_for_existing_manager_grants_both_roles(self) -> None:
+        """A contact already listed as manager gets both customer roles on accept."""
+        name = "Test Customer Existing Manager Invite"
+        email = "existing-manager-invite@example.com"
+        cleanup_customer_and_contact(name, email)
+        customer = create_customer(name)
+        contact = create_contact("ExistingManager", email, user=False)
+        add_contact_in_customer(customer, contact["contact"], is_manager=True)
+        customer.add_contacts([contact["contact"]], "HD Customer Manager")
+
+        invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
+        invitation.accept(ignore_permissions=True)
+
+        roles = frappe.get_roles(email)
+        # the invite only carries the manager role; the base role must still be synced
+        self.assertIn("HD Customer", roles)
+        self.assertIn("HD Customer Manager", roles)
+
+    def test_manager_role_covers_customer_permissions(self) -> None:
+        """A user with only the manager role can do everything a customer can."""
+        manager = get_granted_rights("HD Customer Manager")
+        # an unrestricted grant also covers the own-records-only one
+        manager |= {(*p[:3], 1) for p in manager}
+        self.assertFalse(get_granted_rights("HD Customer") - manager)
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:

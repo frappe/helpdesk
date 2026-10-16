@@ -1,15 +1,15 @@
 <template>
-  <Popover placement="bottom-end">
-    <template #target="{ togglePopover, open }">
-      <div :ref="() => (openPopoverFn = open)" class="w-fit">
+  <Popover ref="popover" bare side="bottom" align="end">
+    <template #trigger>
+      <div class="w-fit">
         <FilterTrigger
           :count="activeFilters.length"
-          @toggle="openPopover(togglePopover)"
-          @clear="clearFilters()"
+          @toggle="resetSteps()"
+          @clear="clearAllAndClose"
         />
       </div>
     </template>
-    <template #body>
+    <template #default>
       <!-- Dedicated high-z layer the operator dropdown teleports into. Both this
            and the frappe-ui Popover panel land in <body>; the popover panel is
            z-[100], so a body-mounted menu (z-auto) renders behind it. This layer
@@ -19,7 +19,7 @@
         <div ref="operatorMenuLayer" class="relative z-[101]" />
       </Teleport>
       <div
-        class="my-2 w-80 rounded-lg border border-outline-gray-1 bg-surface-base shadow-xl"
+        class="my-2 w-80 rounded-6 border border-outline-gray-1 bg-surface-base shadow-xl"
       >
         <div class="relative overflow-clip rounded-[inherit]">
           <Transition
@@ -43,7 +43,7 @@
                     <div
                       v-for="filter in activeFilters"
                       :key="filter.index"
-                      class="group flex h-8 w-full items-center gap-2 rounded px-1.5 hover:bg-surface-gray-2 pl-0"
+                      class="group flex h-8 w-full items-center gap-2 rounded-4 px-1.5 hover:bg-surface-gray-2 pl-0"
                     >
                       <Button
                         variant="ghost"
@@ -128,6 +128,7 @@
               <!-- Step: value — pick operator + value (renders its own header) -->
               <FilterValueEditor
                 v-else-if="step === 'value' && selectedField"
+                ref="valueEditor"
                 :key="editSession"
                 :field="selectedField"
                 :filter="editingFilter"
@@ -187,7 +188,8 @@ const overviewHeader = ref<HTMLElement | null>(null);
 // The high-z layer the operator dropdown teleports into (see #body), so its menu
 // sits above the filter popover panel instead of behind it.
 const operatorMenuLayer = ref<HTMLElement | null>(null);
-let openPopoverFn: (() => void) | null = null;
+const popover = ref<InstanceType<typeof Popover> | null>(null);
+const valueEditor = ref<InstanceType<typeof FilterValueEditor> | null>(null);
 
 // Row actions stay out of the way until the row is hovered or focused.
 const revealOnRowActivity =
@@ -217,13 +219,8 @@ const editingFilter = computed<ActiveFilter | null>(() => {
 
 useShortcut("f", () => {
   resetSteps();
-  openPopoverFn?.();
+  popover.value?.open();
 });
-
-function openPopover(toggle: () => void) {
-  resetSteps();
-  toggle();
-}
 
 // The popover auto-focuses its first focusable element on open, which would put
 // a focus ring on the first filter row. Pull focus to the (non-tabbable) header
@@ -282,6 +279,12 @@ function applyFilter(operator: string, value: any) {
     editingIndex.value = targetIndex;
   }
   replacingIndex.value = null;
+}
+
+function clearAllAndClose() {
+  valueEditor.value?.discardPendingText();
+  clearFilters();
+  popover.value?.close();
 }
 
 function clearCurrentFilter() {
