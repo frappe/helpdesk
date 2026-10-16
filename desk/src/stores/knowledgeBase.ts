@@ -109,7 +109,7 @@ export function useCategoryVisibility(
 export function visibleTo(visibility: string) {
   return {
     Public: __("everyone"),
-    "Customers only": __("customers only"),
-    "Agents only": __("agents only"),
+    "Customers": __("customers only"),
+    "Private": __("agents only"),
   }[visibility];
 }

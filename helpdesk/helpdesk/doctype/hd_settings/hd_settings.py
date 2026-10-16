@@ -11,6 +11,10 @@ from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    CUSTOMER_HOME_PAGES,
+    set_customer_home_page,
+)
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
@@ -97,6 +101,9 @@ class HDSettings(Document):
         self.update_ticket_permissions()
 
     def on_update(self):
+        if self.has_value_changed("prefer_knowledge_base"):
+            set_customer_home_page(CUSTOMER_HOME_PAGES)
+
         event = "helpdesk:settings-updated"
         room = get_website_room()
 

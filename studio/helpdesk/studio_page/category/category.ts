@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useDrawer } from '@app/composables/useDrawer'
-import { countLabel } from '@app/utils'
+import { countLabel } from '@helpdesk/shared/utils'
 
 export default function setup(context) {
   const { categories, route } = context

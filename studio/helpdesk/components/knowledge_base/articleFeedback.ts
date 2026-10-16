@@ -1,6 +1,6 @@
 import { call } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
-import { runAction } from '@app/utils'
+import { runAction } from '@helpdesk/shared/utils'
 
 // Values match HD Article Feedback: 1 like, 2 dislike; 0 clears.
 // A function, not a constant, so the labels are translated after translations load.

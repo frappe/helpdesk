@@ -70,6 +70,7 @@ def get_one(name: str):
     # The desk's getdoc marks it seen; this is the portal's, or the list keeps it bold.
     doc.add_seen()
     outside_hours_banner = get_outside_hours_banner(doc)
+    overdue_by = doc.get_overdue_by()
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
     ticket = fields.strip_hidden_fields(doc.as_dict())
@@ -102,6 +103,7 @@ def get_one(name: str):
         ),
         "contact": contact,
         "outside_hours_banner": outside_hours_banner,
+        "overdue_by": overdue_by,
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=not fields.is_agent
@@ -157,7 +159,13 @@ def get_communications(ticket: str):
         c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
     authors = {c.author_id for c in communications if c.author_id}
     agents = {author for author in authors if is_agent(author)}
+    viewer_is_agent = is_agent()
     for c in communications:
+        if not viewer_is_agent:
+            # who else an email went to; the portal never shows it, so it is not sent either
+            c.pop("recipients")
+            c.pop("cc")
+            c.pop("bcc")
         c.attachments = get_attachments("Communication", c.name)
         c.user = get_user_info_for_avatar(c.author_id)
         # The author's role, not the direction: an agent replying from the portal is still an agent.

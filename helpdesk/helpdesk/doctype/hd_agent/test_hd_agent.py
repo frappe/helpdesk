@@ -76,6 +76,19 @@ class TestHDAgent(FrappeTestCase):
 
     # the frontend now writes this straight through frappe.client.set_value, so a
     # plain agent must be able to save their own record without elevated rights
+    def test_availability_reaches_desk_users_only(self):
+        # The event names agents; the website room would hand it to every portal socket.
+        agent = frappe.get_doc("HD Agent", self.test_user)
+        agent.availability = "Away"
+        with patch("frappe.publish_realtime") as publish:
+            agent.save()
+        rooms = [
+            call.kwargs["room"]
+            for call in publish.call_args_list
+            if call.args[0] == "agent_availability_updated"
+        ]
+        self.assertEqual(rooms, ["all"])
+
     def test_agent_can_set_own_availability(self):
         frappe.set_user(self.test_user)
 

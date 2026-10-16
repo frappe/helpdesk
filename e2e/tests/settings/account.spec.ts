@@ -168,8 +168,8 @@ test("the brand logo uploads and removes, and signup can be disabled", async ({ 
     await page.getByRole("dialog", { name: "Remove Logo" }).getByRole("button", { name: "Confirm" }).click();
     await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).brand_logo).toBeFalsy();
 
-    // Signup lives under Portal Permissions and saves as soon as it is toggled.
-    await dialog.getByRole("button", { name: "Portal Permissions", exact: true }).click();
+    // Signup lives under Portal Settings and saves as soon as it is toggled.
+    await dialog.getByRole("button", { name: "Portal Settings", exact: true }).click();
     await settingRow(dialog, "Disable signup").getByRole("switch").click();
     await expect
       .poll(async () => (await api.get("Website Settings", "Website Settings")).disable_signup)

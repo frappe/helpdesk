@@ -56,7 +56,7 @@ import { computed, ref, watch } from "vue";
 import { useClipboard } from "@vueuse/core";
 import { Button, Dropdown, toast } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
-import { copyPageLink } from "@app/utils";
+import { copyPageLink } from "@helpdesk/shared/utils";
 
 const MARKDOWN_METHOD =
   "/api/method/helpdesk.api.knowledge_base.get_article_markdown";

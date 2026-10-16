@@ -1,9 +1,11 @@
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import frappe
 from frappe.tests import IntegrationTestCase
+from textblob import TextBlob
+from textblob.exceptions import MissingCorpusError
 
-from helpdesk.api.article import get_article_stats, search
+from helpdesk.api.article import get_article_stats, get_noun_phrases, get_nouns, search
 from helpdesk.search import NUM_RESULTS
 from helpdesk.test_utils import (
     create_agent,
@@ -63,8 +65,8 @@ class TestGetArticleStats(IntegrationTestCase):
                 with self.assertRaises(frappe.PermissionError):
                     get_article_stats(article)
 
-    def test_customer_cannot_read_stats_of_an_agents_only_article(self) -> None:
-        internal = make_article(visibility="Agents only")
+    def test_customer_cannot_read_stats_of_an_private_article(self) -> None:
+        internal = make_article(visibility="Private")
         customer = create_contact("Article Customer", unique_email("article-customer"))
 
         with self.set_user(customer["user"]), self.assertRaises(frappe.PermissionError):
@@ -129,3 +131,18 @@ class TestSearchArticles(IntegrationTestCase):
             result = search("reset password")
 
         self.assertEqual(result, [published])
+
+
+class TestMissingCorpus(IntegrationTestCase):
+    def test_search_without_nltk_data_finds_no_nouns(self):
+        # a site without the NLTK corpora must not fail the search
+        blob = TextBlob("reset my password")
+        with (
+            patch.object(TextBlob, "pos_tags", new_callable=PropertyMock) as pos_tags,
+            patch.object(
+                TextBlob, "noun_phrases", new_callable=PropertyMock
+            ) as noun_phrases,
+        ):
+            pos_tags.side_effect = noun_phrases.side_effect = MissingCorpusError()
+            self.assertEqual(get_nouns(blob), [])
+            self.assertEqual(get_noun_phrases(blob), [])

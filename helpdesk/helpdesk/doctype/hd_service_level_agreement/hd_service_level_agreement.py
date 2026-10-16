@@ -191,6 +191,7 @@ class HDServiceLevelAgreement(Document):
         self.start_clock(doc)
         self.handle_doc_status(doc)
         self.handle_targets(doc)
+        self.set_failed_by(doc)
         self.handle_agreement_status(doc)
 
     def set_default_priority(self, doc: Document):
@@ -216,12 +217,6 @@ class HDServiceLevelAgreement(Document):
             return
         doc.first_response_time = self.calc_elapsed_time(start_at, end_at)
 
-        # if first response is failed calculate by how much time it is failed
-        if get_datetime(doc.first_responded_on) > get_datetime(doc.response_by):
-            doc.first_response_failed_by = self.calc_elapsed_time(
-                doc.response_by, end_at
-            )
-
     def set_resolution_time(self, doc: Document):
         """Business-hours duration to resolve. The date itself is stamped by the
         ticket, which does not need an SLA to know when it was resolved."""
@@ -233,11 +228,6 @@ class HDServiceLevelAgreement(Document):
         time_hold = doc.total_hold_time or 0
         time_took_effective = max(time_took - time_hold, 0)
         doc.resolution_time = time_took_effective
-
-        # if resolution is failed calculate by how much time it is failed in business hours
-        if get_datetime(doc.resolution_date) > get_datetime(doc.resolution_by):
-            start_at = doc.resolution_by
-            doc.resolution_failed_by = self.calc_elapsed_time(start_at, end_at)
 
     def set_hold_time(self, doc: Document):
         paused_statuses = (
@@ -277,6 +267,22 @@ class HDServiceLevelAgreement(Document):
     def handle_targets(self, doc: Document):
         self.set_response_by(doc)
         self.set_resolution_by(doc)
+
+    def set_failed_by(self, doc: Document):
+        """Business hours each reached milestone ran past its target, measured against the
+        targets as they stand now, so changing the SLA re-measures them too."""
+        doc.first_response_failed_by = self.get_time_past(
+            doc.response_by, doc.first_responded_on
+        )
+        doc.resolution_failed_by = self.get_time_past(
+            doc.resolution_by, doc.resolution_date
+        )
+
+    def get_time_past(self, due, end) -> int | None:
+        """Business seconds from `due` to `end`; None when either is unset or `end` is on time."""
+        if not (due and end) or get_datetime(end) <= get_datetime(due):
+            return None
+        return self.calc_elapsed_time(due, end)
 
     def set_response_by(self, doc: Document):
         doc.response_by = self.calc_time(

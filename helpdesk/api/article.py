@@ -2,11 +2,12 @@ import re
 
 import frappe
 from frappe.utils import strip_html_tags
+from frappe.website.utils import cleanup_page_name
 from redis.exceptions import ResponseError
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
-from helpdesk.helpdesk.doctype.hd_article.hd_article import readable_filters
+from helpdesk.helpdesk.doctype.hd_article.hd_article import make_article_filters
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
 
@@ -16,7 +17,7 @@ RELATED_LIMIT = 3
 def get_nouns(blob: TextBlob):
     try:
         return [word for word, pos in blob.pos_tags if pos[0] == "N"]
-    except LookupError:
+    except (LookupError, MissingCorpusError):
         return []
 
 
@@ -33,19 +34,19 @@ def search_with_enough_results(
     out = hd_search(query, qtype=qtype)
     if not out:
         return prev_res, len(prev_res) == NUM_RESULTS
-    items = prev_res + filter_public_articles(out[0].get("items", []))
+    items = prev_res + filter_accessible_articles(out[0].get("items", []))
     items = list({v["id"]: v for v in items}.values())[:NUM_RESULTS]  # unique results
     return items, len(items) == NUM_RESULTS
 
 
-def filter_public_articles(articles: list) -> list:
-    """Drop hits the reader may not read: the index can be stale, and holds every audience."""
+def filter_accessible_articles(articles: list) -> list:
+    """Drop hits the reader can't view: the index can be stale, and holds every visibility."""
     names = {article["name"].split("#")[0] for article in articles}
     if not names:
         return []
     published = frappe.get_all(
         "HD Article",
-        filters=readable_filters(name=("in", list(names))),
+        filters=make_article_filters(name=("in", list(names))),
         pluck="name",
     )
     return [
@@ -118,13 +119,18 @@ def search(query: str) -> list:
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
     """Published articles the reader may see that match free text, best first, as plain titles."""
+    titles = [
+        (row["name"], strip_html_tags(row["title"]))
+        for row in search_accessible_articles(query)[:RELATED_LIMIT]
+    ]
+    # the portal links to /articles/<name>-<slug>, as everywhere else
     return [
-        {"name": row["name"], "title": strip_html_tags(row["title"])}
-        for row in search_readable(query)[:RELATED_LIMIT]
+        {"name": name, "title": title, "title_slug": cleanup_page_name(title)}
+        for name, title in titles
     ]
 
 
-def search_readable(query: str) -> list[dict]:
+def search_accessible_articles(query: str) -> list[dict]:
     """`search`, one hit per article, its highlights as `<mark>`; nothing without RediSearch or its index."""
     try:
         hits = search(query)

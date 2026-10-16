@@ -25,6 +25,18 @@ const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
 const LINKS_SCRIPT = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
 
+// The marker starts the last line; a label or URL may contain it too, and a hand-edited script may not parse.
+function parseLinks(script: string): Link[] {
+  const lastLine = script.trimEnd().split("\n").pop() || "";
+  if (!lastLine.startsWith(JSON_MARKER)) return [];
+  try {
+    const links = JSON.parse(lastLine.slice(JSON_MARKER.length));
+    return Array.isArray(links) ? links : [];
+  } catch {
+    return [];
+  }
+}
+
 // Shared by the desk and portal settings, and made on first use so readers never load it.
 export const knowledgeBaseDraft = shallowRef<ReturnType<
   typeof createDraft
@@ -72,9 +84,7 @@ function createDraft() {
         .filter((row) => row.pinned)
         .sort((a, b) => a.pinned_order - b.pinned_order)
         .map((row) => row.name),
-      links: script.includes(JSON_MARKER)
-        ? JSON.parse(script.split(JSON_MARKER).pop()!)
-        : [],
+      links: parseLinks(script),
     };
   });
 

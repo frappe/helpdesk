@@ -185,7 +185,7 @@ router.beforeEach(async (to, _, next) => {
       CUSTOMER_PORTAL_ROOT + ROUTES.ticket(to.params.ticketId as string)
     );
   } else if (!authStore.hasDeskAccess) {
-    window.location.replace(CUSTOMER_PORTAL_ROOT);
+    window.location.replace(window.customer_home_page);
   } else {
     next();
   }

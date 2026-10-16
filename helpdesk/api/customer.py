@@ -165,7 +165,8 @@ def get_invitable_contacts(customer: str, query: str = "") -> list[dict]:
 @frappe.whitelist(methods=["POST"])
 @rate_limit(limit=10, seconds=60 * 60, ip_based=False, user_based=True)
 def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
-    """Skips emails `invite_by_email` would skip, and answers in its shape.
+    """Skips emails `invite_by_email` would skip, without saying why: the checks
+    cover every user and invitation on the site, not only this organization's.
 
     Inserts with `ignore_permissions`: `invite_by_email` needs the manager in the
     `user_invitation` hook, which would also open Frappe's list, cancel and resend
@@ -187,15 +188,17 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         )
     )
     emails = list(dict.fromkeys(emails))
-    result = {
-        "disabled_user_emails": frappe.get_all(
+    skipped = {
+        *frappe.get_all(
             "User", filters={"email": ["in", emails], "enabled": 0}, pluck="email"
         ),
-        "accepted_invite_emails": _get_invited_emails(emails, "Accepted"),
-        "pending_invite_emails": _get_invited_emails(emails, "Pending"),
+        *_get_invited_emails(emails, "Accepted"),
+        *_get_invited_emails(emails, "Pending"),
     }
-    skipped = {email for skipped_emails in result.values() for email in skipped_emails}
-    result["invited_emails"] = [email for email in emails if email not in skipped]
+    result = {
+        "invited_emails": [email for email in emails if email not in skipped],
+        "skipped_emails": [email for email in emails if email in skipped],
+    }
     role = MANAGER_ROLE if sbool(is_manager) else "HD Customer"
     invitations = [
         frappe.get_doc(

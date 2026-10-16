@@ -45,12 +45,12 @@ const show = defineModel<boolean>({ default: false });
 
 const accessOptions = computed(() => [
   {
-    value: "Agents only",
-    label: __("Accessible to agents only"),
+    value: "Private",
+    label: __("Private, agents only"),
     icon: "lucide-lock",
   },
   {
-    value: "Customers only",
+    value: "Customers",
     label: __("Accessible to customers only"),
     icon: markRaw(OrganizationsIcon),
   },

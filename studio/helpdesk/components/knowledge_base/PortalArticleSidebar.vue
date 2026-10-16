@@ -37,9 +37,14 @@
         </TextInput>
       </div>
 
+      <!-- Once scrolled, rows fade out under the search box instead of being cut off. -->
       <div
         ref="list"
         class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4 pt-2"
+        :class="
+          !arrivedState.top &&
+          '[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)]'
+        "
       >
         <div v-for="category in visibleCategories" :key="category.name">
           <SidebarItem
@@ -67,9 +72,10 @@
             >
               {{ category.label }}
             </span>
-            <!-- In the label, not #suffix: only the button takes the click. -->
+            <!-- In the label, not #suffix: only the button takes the click. The glyph sits
+                 inset in its box; 3px puts its tip under the search box's shortcut hint. -->
             <span
-              class="lucide-chevron-right mr-1.5 size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
+              class="lucide-chevron-right mr-[3px] size-4 shrink-0 text-ink-gray-5 transition-transform duration-150"
               :class="category.isOpen && 'rotate-90'"
             />
           </SidebarItem>
@@ -116,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import { useScroll } from "@vueuse/core";
 import { computed, nextTick, ref, watch } from "vue";
 import {
   Icon,
@@ -128,7 +135,7 @@ import {
 import { __ } from "@helpdesk/shared/translation";
 import PortalCollapse from "@app/components/common/PortalCollapse.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { matchesQuery } from "@app/utils";
+import { matchesQuery } from "@helpdesk/shared/utils";
 
 type Category = { name: string; category_name?: string; icon?: string | null };
 type ArticleTitle = { name: string; title: string; category?: string | null };
@@ -204,6 +211,7 @@ const visibleCategories = computed(() => {
 // A long list leaves the current category or article out of sight, so bring it into view once
 // per page, scrolling only the list.
 const list = ref<HTMLElement | null>(null);
+const { arrivedState } = useScroll(list);
 let shownFor = "";
 watch(
   () => [

@@ -5,12 +5,6 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from helpdesk.api.knowledge_base import get_general_category
-from helpdesk.helpdesk.doctype.hd_article.hd_article import (
-    get_joining_values,
-    update_articles,
-)
-
 
 class HDArticleCategory(Document):
     def validate(self):
@@ -50,7 +44,37 @@ class HDArticleCategory(Document):
             frappe.throw(_("General category can't be deleted"))
 
     def move_articles_to_general(self):
+        # Imported here: the API module imports the article controller, which imports this one.
+        from helpdesk.api.knowledge_base import get_general_category
+
         if general_category := get_general_category():
-            update_articles(
-                {"category": self.name}, get_joining_values(general_category)
+            frappe.db.set_value(
+                "HD Article",
+                {"category": self.name},
+                get_values_for_category(general_category),
+                update_modified=False,
             )
+
+
+def get_category_visibility(category: str) -> str | None:
+    """The access every article in `category` the user can read shares; None when they differ."""
+    values = frappe.get_list(
+        "HD Article",
+        filters={"category": category},
+        pluck="visibility",
+        distinct=True,
+    )
+    return values[0] if len(values) == 1 else None
+
+
+def get_values_for_category(category: str) -> dict:
+    """An article joining a category whose articles share one access takes it."""
+    values = {"category": category}
+    if visibility := get_category_visibility(category):
+        values["visibility"] = visibility
+    return values
+
+
+def check_category_length(category: str | None) -> None:
+    if category and frappe.db.count("HD Article", {"category": category}) == 1:
+        frappe.throw(_("Category must have at least one article"))

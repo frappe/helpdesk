@@ -319,13 +319,13 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-11 01:05:00.000000",
+ "modified": "2026-10-16 23:00:00.000000",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",
  "page_name": "page-e0f4b5bc",
  "page_title": "Customer tickets",
  "published": 1,
- "route": "/customer-tickets",
+ "route": "/my-tickets",
  "studio_app": "helpdesk"
 }

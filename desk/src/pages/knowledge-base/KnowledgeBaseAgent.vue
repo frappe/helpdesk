@@ -254,11 +254,11 @@ function categoryAccessNote(access: string | null) {
         "Anyone, including visitors who aren't logged in, can read the articles in {0}.",
         [name]
       ),
-      "Customers only": __(
+      Customers: __(
         "Only logged-in customers and agents can read the articles in {0}.",
         [name]
       ),
-      "Agents only": __(
+      Private: __(
         "Only agents can read the articles in {0}. It doesn't appear on the customer portal.",
         [name]
       ),
@@ -269,11 +269,11 @@ function categoryAccessNote(access: string | null) {
       "Every article in {0} will be readable by anyone, including visitors who aren't logged in.",
       [name]
     ),
-    "Customers only": __(
+    Customers: __(
       "Every article in {0} will be readable only by logged-in customers and agents.",
       [name]
     ),
-    "Agents only": __(
+    Private: __(
       "Every article in {0} will be readable only by agents, and {0} will no longer appear on the customer portal.",
       [name]
     ),
@@ -307,20 +307,20 @@ function articlesAccessNote(access: string | null) {
       Public: __(
         "Anyone, including visitors who aren't logged in, can read the selected articles."
       ),
-      "Customers only": __(
+      Customers: __(
         "Only logged-in customers and agents can read the selected articles."
       ),
-      "Agents only": __("Only agents can read the selected articles."),
+      Private: __("Only agents can read the selected articles."),
     }[access];
   }
   return {
     Public: __(
       "The selected articles will be readable by anyone, including visitors who aren't logged in."
     ),
-    "Customers only": __(
+    Customers: __(
       "The selected articles will be readable only by logged-in customers and agents."
     ),
-    "Agents only": __("The selected articles will be readable only by agents."),
+    Private: __("The selected articles will be readable only by agents."),
   }[access];
 }
 
@@ -625,8 +625,8 @@ const options = computed(() => {
 });
 
 const accessIcons = {
-  "Agents only": "lucide-lock",
-  "Customers only": OrganizationsIcon,
+  Private: "lucide-lock",
+  Customers: OrganizationsIcon,
   Public: "lucide-globe",
 };
 

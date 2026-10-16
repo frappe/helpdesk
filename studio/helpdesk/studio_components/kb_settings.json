@@ -149,19 +149,19 @@
          {
           "children": [
            {
-            "componentId": "kb_settings-nav-portal-permissions-label",
+            "componentId": "kb_settings-nav-portal-settings-label",
             "componentName": "TextBlock",
             "componentProps": {
              "tag": "span",
-             "text": "{{ t('Portal Permissions') }}"
+             "text": "{{ t('Portal Settings') }}"
             },
             "componentSlots": {}
            }
           ],
-          "componentId": "kb_settings-nav-portal-permissions",
+          "componentId": "kb_settings-nav-portal-settings",
           "componentName": "SettingsNavItem",
           "componentProps": {
-           "value": "portal-permissions"
+           "value": "portal-settings"
           },
           "componentSlots": {
            "prefix": {
@@ -171,7 +171,7 @@
                "h-4",
                "w-4"
               ],
-              "componentId": "kb_settings-nav-portal-permissions-icon",
+              "componentId": "kb_settings-nav-portal-settings-icon",
               "componentName": "Icon",
               "componentProps": {
                "icon": "lucide-user-cog"
@@ -179,7 +179,7 @@
               "componentSlots": {}
              }
             ],
-            "slotId": "kb_settings-slot-portal-permissions-prefix",
+            "slotId": "kb_settings-slot-portal-settings-prefix",
             "slotName": "prefix"
            }
           }
@@ -1473,7 +1473,7 @@
         "visibilityCondition": "{{ canEditSettings }}"
        },
        {
-        "blockName": "Portal Permissions",
+        "blockName": "Portal Settings",
         "children": [
          {
           "children": [
@@ -1484,12 +1484,12 @@
                "text-ink-gray-8",
                "font-semibold"
               ],
-              "componentId": "kb_settings-portal-permissions-header-title",
+              "componentId": "kb_settings-portal-settings-header-title",
               "componentName": "TextBlock",
               "componentProps": {
                "fontSize": "text-lg",
                "tag": "h2",
-               "text": "{{ t('Portal Permissions') }}"
+               "text": "{{ t('Portal Settings') }}"
               },
               "componentSlots": {}
              },
@@ -1498,7 +1498,7 @@
                "text-ink-gray-6",
                "max-w-[28rem]"
               ],
-              "componentId": "kb_settings-portal-permissions-header-description",
+              "componentId": "kb_settings-portal-settings-header-description",
               "componentName": "TextBlock",
               "componentProps": {
                "fontSize": "text-base",
@@ -1514,7 +1514,7 @@
              "gap-1",
              "min-w-0"
             ],
-            "componentId": "kb_settings-portal-permissions-header-headings",
+            "componentId": "kb_settings-portal-settings-header-headings",
             "componentName": "container",
             "componentProps": {},
             "componentSlots": {},
@@ -1526,7 +1526,7 @@
            "py-8",
            "px-10"
           ],
-          "componentId": "kb_settings-portal-permissions-header",
+          "componentId": "kb_settings-portal-settings-header",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
@@ -1535,7 +1535,7 @@
          {
           "children": [
            {
-            "componentId": "kb_settings-portal-permissions-form",
+            "componentId": "kb_settings-portal-settings-form",
             "componentName": "PortalPermissionsPanel",
             "componentProps": {},
             "componentSlots": {},
@@ -1550,17 +1550,17 @@
            "px-10",
            "pb-8"
           ],
-          "componentId": "kb_settings-portal-permissions-body",
+          "componentId": "kb_settings-portal-settings-body",
           "componentName": "container",
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div"
          }
         ],
-        "componentId": "kb_settings-portal-permissions-panel",
+        "componentId": "kb_settings-portal-settings-panel",
         "componentName": "SettingsPanel",
         "componentProps": {
-         "value": "portal-permissions"
+         "value": "portal-settings"
         },
         "componentSlots": {},
         "visibilityCondition": "{{ canEditSettings }}"
@@ -1618,7 +1618,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-15 21:00:00.000000",
+ "modified": "2026-10-16 23:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

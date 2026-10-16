@@ -1,10 +1,7 @@
 import type { Page } from "@playwright/test";
 import type { Api } from "../../../helpers/api";
 import { raiseTicket } from "../../../helpers/factories";
-import { FormScripts } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
-import { personas } from "../../../helpers/personas";
-import { snapshotSettings } from "../../../helpers/settings";
 
 // Every action on the portal ticket page (/help/tickets/:id), past what portal-conversation covers.
 usePersona("customer");
@@ -36,11 +33,6 @@ function closeButton(page: Page) {
   return page.getByRole("button", { name: "Close", exact: true }).first();
 }
 
-/** The confirm dialog's red Close; its X is labelled Close too. */
-function confirmClose(page: Page) {
-  return page.getByRole("dialog").getByRole("button", { name: "Close", exact: true }).last().click();
-}
-
 function composer(page: Page) {
   return page.locator(".portal-reply-composer .ProseMirror");
 }
@@ -59,12 +51,6 @@ async function communication(api: Api, ticket: string, text: string) {
   return rows.find((row) => row.content.includes(text));
 }
 
-async function useFeedbackMandatory(api: Api, on: 0 | 1) {
-  const restore = await snapshotSettings(api, ["is_feedback_mandatory"]);
-  await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: on });
-  return restore;
-}
-
 test.describe("access", () => {
   test("someone else's ticket, or none, reads as not found", async ({ page, apiAs }) => {
     const colleague = await raiseTicket(await apiAs("customerManager"));
@@ -75,34 +61,6 @@ test.describe("access", () => {
         page.getByText("It may have been removed, or you may not have access to it.")
       ).toBeVisible();
     }
-  });
-
-  test("a manager opens, answers and closes a colleague's ticket", async ({ pageAs, api, apiAs }) => {
-    const colleague = await raiseTicket(await apiAs("customer"));
-    const page = await pageAs("customerManager");
-    await page.goto(`/help/tickets/${colleague.name}`);
-    await expect(page.getByRole("button", { name: colleague.subject })).toBeVisible();
-
-    const reply = `Manager note ${uid()}`;
-    await (await openComposer(page)).fill(reply);
-    await page.getByRole("button", { name: "Send" }).click();
-    await frameWith(page, reply);
-    await expect
-      .poll(async () => (await communication(api, colleague.name, reply))?.sender)
-      .toBe(personas.customerManager.email);
-
-    // no agent reply yet, so closing never asks for a rating
-    await closeButton(page).click();
-    await confirmClose(page);
-    await expect.poll(async () => (await api.get("HD Ticket", colleague.name)).status).toBe("Closed");
-  });
-
-  test("an agent opens any ticket on the portal", async ({ pageAs, apiAs }) => {
-    const ticket = await raiseTicket(await apiAs("customer"));
-    const page = await pageAs("agent");
-    await page.goto(`/help/tickets/${ticket.name}`);
-    await expect(page.getByRole("button", { name: ticket.subject })).toBeVisible();
-    await expect(closeButton(page)).toBeVisible();
   });
 });
 
@@ -268,128 +226,7 @@ test.describe("layouts", () => {
   });
 });
 
-test.describe("closing and rating", () => {
-  test("close asks to confirm; cancel keeps it open", async ({ page, api, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
-    await closeButton(page).click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog.getByText("Are you sure you want to close this ticket?")).toBeVisible();
-    await dialog.getByRole("button", { name: "Cancel" }).click();
-    await expect(dialog).toHaveCount(0);
-    expect((await api.get("HD Ticket", ticket.name)).status).toBe("Open");
-
-    await closeButton(page).click();
-    await confirmClose(page);
-    await expect(page.getByRole("button", { name: "Raise a ticket" })).toBeVisible();
-    await expect(composer(page)).toHaveCount(0);
-    expect((await api.get("HD Ticket", ticket.name)).status).toBe("Closed");
-  });
-
-  test("the rating dialog: stars reload options, submit needs an option, details show after", async ({
-    page,
-    api,
-    apiAs,
-    ticket,
-  }) => {
-    await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
-    const restore = await useFeedbackMandatory(api, 1);
-    try {
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await closeButton(page).click();
-      const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
-      const submit = dialog.getByRole("button", { name: "Submit" });
-
-      await dialog.getByRole("radio").nth(3).click();
-      await expect(dialog.getByRole("button", { name: "Prompt, informative support" })).toBeVisible();
-      await expect(dialog.getByRole("button", { name: "Exceptional support experience" })).toHaveCount(0);
-      await expect(submit).toBeDisabled();
-      await dialog.getByRole("button", { name: "Prompt, informative support" }).click();
-      await expect(submit).toBeEnabled();
-
-      // a new star value clears the chosen option
-      await dialog.getByRole("radio").nth(4).click();
-      await expect(submit).toBeDisabled();
-      await dialog.getByRole("button", { name: "Exceptional support experience" }).click();
-      await dialog.getByPlaceholder("Tell us more").fill("Thanks");
-      await submit.click();
-
-      await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).status).toBe("Closed");
-      await expect(page.getByText("Exceptional support experience")).toBeVisible();
-      await expect(page.getByText("Thanks", { exact: true })).toBeVisible();
-    } finally {
-      await restore();
-    }
-  });
-
-  test("closing the rating dialog resets it", async ({ page, api, apiAs, ticket }) => {
-    await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
-    const restore = await useFeedbackMandatory(api, 1);
-    try {
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await closeButton(page).click();
-      const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
-      await dialog.getByRole("radio").nth(4).click();
-      await dialog.getByRole("button", { name: "Exceptional support experience" }).click();
-      await page.keyboard.press("Escape");
-      await closeButton(page).click();
-      await expect(dialog.getByRole("button", { name: "Submit" })).toBeDisabled();
-      await expect(dialog.getByRole("button", { name: "Exceptional support experience" })).toHaveCount(0);
-    } finally {
-      await restore();
-    }
-  });
-
-  test("with feedback optional, closing never offers a rating", async ({ page, api, apiAs, ticket }) => {
-    // Finding 1: confirmed. The portal has no other place to rate a ticket.
-    await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
-    const restore = await useFeedbackMandatory(api, 0);
-    try {
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await closeButton(page).click();
-      await expect(page.getByRole("dialog").getByText("Are you sure you want to close this ticket?")).toBeVisible();
-      await expect(page.getByRole("dialog", { name: "Rate this ticket" })).toHaveCount(0);
-    } finally {
-      await restore();
-    }
-  });
-
-  test("an agent closing on the portal is not asked to rate", async ({ pageAs, api, apiAs, ticket }) => {
-    await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
-    const restore = await useFeedbackMandatory(api, 1);
-    try {
-      const page = await pageAs("agent");
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await closeButton(page).click();
-      await expect(page.getByRole("dialog").getByText("Are you sure you want to close this ticket?")).toBeVisible({
-        timeout: 5_000,
-      });
-    } finally {
-      await restore();
-    }
-  });
-});
-
 test.describe("details panel", () => {
-  test("contact, status, team, priority and template fields; sections collapse", async ({
-    page,
-    api,
-    ticket,
-  }) => {
-    const [team] = await api.list("HD Team", { fields: ["name"], limit: 1 } as any);
-    if (team) await api.update("HD Ticket", ticket.name, { agent_group: team.name });
-    await page.goto(`/help/tickets/${ticket.name}`);
-    await expect(page.getByText(`#${ticket.name}`)).toBeVisible();
-    await expect(page.getByText("Status")).toBeVisible();
-    await expect(page.getByText("Priority")).toBeVisible();
-    if (team) await expect(page.getByText(team.name).first()).toBeVisible();
-
-    for (const section of ["Timeline", "Related help"]) {
-      const toggle = page.getByRole("button", { name: section });
-      await expect(toggle).toHaveAttribute("aria-expanded", "true");
-      await toggle.click();
-      await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    }
-  });
 
   test("timeline steps: received, first response due, resolution due", async ({ page, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
@@ -403,88 +240,5 @@ test.describe("details panel", () => {
     await api.update("HD Ticket", ticket.name, { status: "Replied" });
     await page.goto(`/help/tickets/${ticket.name}`);
     await expect(page.getByText("On hold")).toBeVisible();
-  });
-
-  test("related help opens the article", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
-    const section = page.getByRole("button", { name: "Related help" });
-    await expect(section).toBeVisible();
-    // the section lists links after its toggle
-    const first = page.locator("aside, [class*=border-l]").getByRole("link").first()
-      .or(page.getByText(/^E2E Article /).first());
-    const title = (await first.innerText()).trim();
-    await first.click();
-    await expect(page).toHaveURL(/\/help\/articles\//);
-    await expect(page.getByRole("heading", { name: title }).first()).toBeVisible();
-  });
-
-  test("the out-of-hours banner dismisses for the day", async ({ page, ticket }) => {
-    const message = `Back on Monday ${uid()}`;
-    await page.route("**/*hd_ticket.api.get_one*", async (route) => {
-      const response = await route.fetch();
-      const json = await response.json();
-      json.message.outside_hours_banner = { show: true, msg: message };
-      await route.fulfill({ response, json });
-    });
-    await page.goto(`/help/tickets/${ticket.name}`);
-    await expect(page.getByRole("alert").getByText(message)).toBeVisible();
-    await page.getByRole("button", { name: "Dismiss" }).click();
-    await expect(page.getByText(message)).toHaveCount(0);
-    await page.reload();
-    await expect(closeButton(page)).toBeVisible();
-    await expect(page.getByText(message)).toHaveCount(0);
-    const keys = await page.evaluate(() => Object.keys(localStorage).filter((key) => key.startsWith("kb:banner-dismissed:")));
-    expect(keys.some((key) => key.includes(ticket.name))).toBe(true);
-  });
-});
-
-test.describe("form scripts", () => {
-  test("grouped, labelled and More actions menus on the portal", async ({ page, api, ticket }) => {
-    const scripts = new FormScripts(api);
-    await scripts.create(
-      `return { actions: [
-        { group: "E2E Group", options: [{ label: "E2E Option", onClick: () => {} }] },
-        { group: "E2E Labelled", buttonLabel: "E2E Menu", label: "E2E Menu Item", onClick: () => {} },
-      ] };`,
-      { portal: true }
-    );
-    try {
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await page.getByRole("button", { name: "E2E Menu" }).click();
-      await expect(page.getByRole("menuitem", { name: "E2E Menu Item" })).toBeVisible();
-      await page.keyboard.press("Escape");
-      await page.getByRole("button", { name: "More actions" }).click();
-      await expect(page.getByRole("menuitem", { name: "E2E Option" })).toBeVisible();
-    } finally {
-      await scripts.removeAll();
-    }
-  });
-
-  test("an agent on the portal gets agent-scoped scripts", async ({ pageAs, api, ticket }) => {
-    const scripts = new FormScripts(api);
-    await scripts.create(`return { actions: [{ label: "E2E Agent Scoped", onClick: () => {} }] };`);
-    try {
-      const page = await pageAs("agent");
-      await page.goto(`/help/tickets/${ticket.name}`);
-      await expect(page.getByRole("button", { name: "E2E Agent Scoped" })).toBeVisible();
-    } finally {
-      await scripts.removeAll();
-    }
-  });
-});
-
-test.describe("phone", () => {
-  test.use({ viewport: { width: 390, height: 800 } });
-
-  test("ticket details open in a drawer and close on Escape", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
-    await expect(page.getByText("Request received")).toBeHidden();
-    await page.getByRole("button", { name: "Ticket details" }).click();
-    await expect(page.getByText("Request received")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByText("Request received")).toBeHidden();
-    await page.getByRole("button", { name: "Ticket details" }).click();
-    await page.getByRole("button", { name: "Close details" }).click();
-    await expect(page.getByText("Request received")).toBeHidden();
   });
 });

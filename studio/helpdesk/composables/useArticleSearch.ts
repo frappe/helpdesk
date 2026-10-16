@@ -1,6 +1,6 @@
 import { watch, type Ref } from 'vue'
 import { createResource, debounce } from 'frappe-ui'
-import { SEARCH_DEBOUNCE_MS } from '@app/utils'
+import { SEARCH_DEBOUNCE_MS } from '@helpdesk/shared/utils'
 
 export const MIN_QUERY_LENGTH = 3
 

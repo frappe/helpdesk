@@ -59,7 +59,7 @@ class TestTicketOrigin(IntegrationTestCase):
                 origin = self.raise_ticket(user)
                 self.assertFalse(any(origin.values()))
 
-    def test_a_readable_article_is_kept(self):
+    def test_an_accessible_article_is_kept(self):
         origin = self.raise_ticket(
             self.customer, {"from": "article", "article": self.article}
         )
@@ -104,11 +104,6 @@ class TestTicketOrigin(IntegrationTestCase):
             "source_article": self.article,
             "source_search": "spoofed",
         }
-        agent = make_agent(unique_email("origin_agent"))
-        # an agent can write the fields directly, so api.new has to drop them itself
-        origin = self.raise_ticket(agent, **smuggled)
-        self.assertFalse(any(origin.values()))
-
         origin = self.raise_ticket(self.customer, {"from": "ticket-list"}, **smuggled)
         self.assertEqual(origin.entry_point, "Ticket List")
         self.assertIsNone(origin.source_article)

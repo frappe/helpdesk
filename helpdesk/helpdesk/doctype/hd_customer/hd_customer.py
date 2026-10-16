@@ -116,6 +116,13 @@ class HDCustomer(Document):
             if contact.is_manager == was_manager.get(contact.contact_name):
                 continue
             self.sync_contact_role(contact)
+        # a removed manager is demoted like one whose flag was cleared
+        remaining = {contact.contact_name for contact in self.contacts}
+        for contact_name, is_manager in was_manager.items():
+            if is_manager and contact_name not in remaining:
+                self.sync_contact_role(
+                    frappe._dict(contact_name=contact_name, is_manager=0)
+                )
 
     def sync_contact_role(self, contact):
         """Grant the manager/member role to a single contact's user in one save."""

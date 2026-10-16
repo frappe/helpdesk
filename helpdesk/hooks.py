@@ -66,7 +66,7 @@ website_redirects = [
     },
     {
         "source": "/helpdesk/my-tickets",
-        "target": "/help/customer-tickets",
+        "target": "/help/my-tickets",
         "forward_query_parameters": True,
     },
     {
@@ -167,6 +167,8 @@ has_permission = {
 
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
+    "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
 }
 
 

@@ -953,9 +953,11 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    visibility: str | None = "Public",
     **values,
 ) -> str:
-    """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    """Insert an HD Article, titled uniquely unless `title` is given, and return its name.
+    Public so guests read it too; pass `visibility=None` for the field's own default."""
     title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
@@ -965,6 +967,7 @@ def make_article(
                 "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                "visibility": visibility,
                 **values,
             }
         )

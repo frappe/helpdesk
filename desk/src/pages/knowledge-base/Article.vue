@@ -617,7 +617,10 @@ const articleActions = computed(() => [
       copyToClipboard(
         window.location.origin +
           CUSTOMER_PORTAL_ROOT +
-          ROUTES.article({ name: props.articleId, title: article.data?.title }),
+          ROUTES.article({
+            name: props.articleId,
+            title_slug: article.data?.title_slug,
+          }),
         __("Article link copied to clipboard.")
       ),
   },

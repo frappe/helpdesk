@@ -2,10 +2,9 @@ import { computed, watch } from 'vue'
 import { call, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
-import { addHeadingIds } from '@helpdesk/shared/utils'
+import { addHeadingIds, articleMeta, copyPageLink, countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
-import { articleMeta, copyPageLink, countLabel, DATE_FORMATS } from '@app/utils'
 import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
 import { useDrawer } from '@app/composables/useDrawer'
 
@@ -77,6 +76,7 @@ export default function setup(context) {
       rememberArticle({
         name,
         title: article.data.title,
+        title_slug: article.data.title_slug,
         categoryName: article.data.category_name,
         minutes: minutes.value,
       })

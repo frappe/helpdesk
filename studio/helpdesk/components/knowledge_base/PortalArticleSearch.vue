@@ -148,7 +148,7 @@ import {
   useArticleSearch,
 } from "@app/composables/useArticleSearch";
 import { useRecent } from "@app/stores/recent";
-import { articleMeta, countLabel } from "@app/utils";
+import { articleMeta, countLabel } from "@helpdesk/shared/utils";
 
 const MAX_RESULTS = 6;
 const KEY_HINTS = [

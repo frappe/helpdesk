@@ -7,6 +7,7 @@ const ARTICLE_LIMIT = 3
 export type RecentArticle = {
   name: string
   title: string
+  title_slug?: string
   categoryName?: string
   minutes?: number
 }

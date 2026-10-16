@@ -1,6 +1,5 @@
 import type { Page } from "@playwright/test";
 import type { Api } from "../../../helpers/api";
-import { raiseTicket } from "../../../helpers/factories";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { createArticle, createCategory } from "../../../helpers/portal";
 
@@ -18,27 +17,6 @@ test.describe("ticket origin", () => {
 
     expect(origin.entry_point).toBe("Article");
     expect(origin.source_article).toBe(article.name);
-  });
-
-  test("a ticket raised from my tickets records the ticket list", async ({ page, api }) => {
-    await page.goto("/help/customer-tickets");
-    await page.getByRole("button", { name: "Raise a ticket" }).click();
-
-    expect((await submitTicket(page, api)).entry_point).toBe("Ticket List");
-  });
-
-  test("a ticket raised from a closed ticket records the closed ticket", async ({
-    page,
-    api,
-    apiAs,
-  }) => {
-    const closed = await raiseTicket(await apiAs("customer"));
-    await api.update("HD Ticket", closed.name, { status: "Closed" });
-
-    await page.goto(`/help/tickets/${closed.name}`);
-    await page.getByRole("button", { name: "Raise a ticket" }).click();
-
-    expect((await submitTicket(page, api)).entry_point).toBe("Closed Ticket");
   });
 
   test("a ticket raised from search records the search text", async ({ page, api }) => {

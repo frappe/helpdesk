@@ -8,12 +8,18 @@ from frappe.desk.reportview import get_filters_cond
 from frappe.model.document import Document
 from frappe.types.filter import Filters
 from frappe.utils import cint, evaluate_filters
+from frappe.website.utils import cleanup_page_name
 
+from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    check_category_length,
+    get_category_visibility,
+)
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import capture_event, is_agent
 
 PUBLIC = "Public"
-CUSTOMERS_ONLY = "Customers only"
-AGENTS_ONLY = "Agents only"
+CUSTOMERS = "Customers"
+PRIVATE = "Private"
 # What a list row shows of the body maxed so entire conent is not loaded.
 EXCERPT_LENGTH = 140
 
@@ -33,7 +39,7 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
-        self.set_category_visibility()
+        self.inherit_category_visibility()
 
     def before_save(self):
         self.set_excerpt()
@@ -58,10 +64,14 @@ class HDArticle(Document):
                 )
             )
 
-    def set_category_visibility(self):
-        # Public is also the default, so an insert takes the category's shared access over it.
-        if self.visibility == PUBLIC and self.category:
-            self.visibility = get_shared_visibility(self.category) or PUBLIC
+    def inherit_category_visibility(self):
+        # If the category is private (all articles private), the new article is too.
+        if (
+            self.visibility == CUSTOMERS
+            and self.category
+            and get_category_visibility(self.category) == PRIVATE
+        ):
+            self.visibility = PRIVATE
 
     def set_excerpt(self):
         self.excerpt = get_excerpt(self.content)
@@ -148,13 +158,8 @@ class HDArticle(Document):
 
     @property
     def title_slug(self) -> str:
-        """
-        Generate slug from article title.
-        Example: "Introduction to Frappe Helpdesk" -> "introduction-to-frappe-helpdesk"
-
-        :return: Generated slug
-        """
-        return self.title.lower().replace(" ", "-")
+        """Readable only: portal URLs make their own slug, and the server ignores it."""
+        return cleanup_page_name(self.title)
 
 
 def get_excerpt(html: str | None) -> str:
@@ -164,60 +169,30 @@ def get_excerpt(html: str | None) -> str:
     return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
 
 
-def readable_audiences(user: str | None = None) -> list[str] | None:
-    """The audiences `user` may read; `None` for an agent, who reads them all."""
-    user = user or frappe.session.user
+def can_view_article(user: str, article) -> bool:
+    """Agents view every article, drafts too; anyone else what make_article_filters allows."""
     if is_agent(user):
-        return None
-    if user == "Guest":
-        return [PUBLIC]
-    return [PUBLIC, CUSTOMERS_ONLY]
+        return True
+    return evaluate_filters(
+        article, Filters(make_article_filters(user), doctype="HD Article")
+    )
 
 
-def readable_filters(user: str | None = None, **extra) -> dict:
-    """Published articles in the user's audiences, as filters: the one rule for who reads what."""
+def make_article_filters(user: str | None = None, **extra) -> dict:
+    """Published articles the caller may read: agents every visibility, helpdesk customers
+    Public and Customers, anyone else (guests, other apps' users) Public only."""
+    user = user or frappe.session.user
     filters = {"status": "Published", **extra}
-    audiences = readable_audiences(user)
-    if audiences is not None:
-        filters["visibility"] = ["in", audiences]
+    if not is_agent(user):
+        filters["visibility"] = ["in", get_readable_visibilities(user)]
     return filters
 
 
-def is_readable(article, user: str | None = None) -> bool:
-    """The same rule for one article already fetched; an agent reads drafts too."""
-    if readable_audiences(user) is None:
-        return True
-    return evaluate_filters(
-        article, Filters(readable_filters(user), doctype="HD Article")
-    )
-
-
-def get_shared_visibility(category: str) -> str | None:
-    """The access every article in `category` the user can read shares; None when they differ."""
-    values = frappe.get_list(
-        "HD Article",
-        filters={"category": category},
-        pluck="visibility",
-        distinct=True,
-    )
-    return values[0] if len(values) == 1 else None
-
-
-def get_joining_values(category: str) -> dict:
-    """An article joining a category whose articles share one access takes it."""
-    values = {"category": category}
-    if visibility := get_shared_visibility(category):
-        values["visibility"] = visibility
-    return values
-
-
-def update_articles(filters: dict, values: dict) -> None:
-    frappe.db.set_value("HD Article", filters, values, update_modified=False)
-
-
-def check_category_length(category: str | None) -> None:
-    if category and frappe.db.count("HD Article", {"category": category}) == 1:
-        frappe.throw(_("Category must have at least one article"))
+def get_readable_visibilities(user: str) -> list[str]:
+    """Customers articles need a helpdesk customer role; a signed-in user of another app has none."""
+    if set(CUSTOMER_ROLES) & set(frappe.get_roles(user)):
+        return [PUBLIC, CUSTOMERS]
+    return [PUBLIC]
 
 
 def get_voter(visitor_id: str | None) -> dict | None:
@@ -228,11 +203,12 @@ def get_voter(visitor_id: str | None) -> dict | None:
 
 
 def permission_query(user: str | None = None) -> str | None:
-    """Non-agents list only the published articles in their audiences, as on the portal."""
-    if readable_audiences(user) is None:
+    """Non-agents list only the articles they can view, as on the portal."""
+    user = user or frappe.session.user
+    if is_agent(user):
         return None
     conditions = get_filters_cond(
-        "HD Article", readable_filters(user), [], ignore_permissions=True
+        "HD Article", make_article_filters(user), [], ignore_permissions=True
     )
     return conditions.removeprefix(" and ")
 
@@ -241,4 +217,4 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
     """Gates whatever shows the article; writing it is left to role permissions."""
     if ptype in ("write", "create", "delete"):
         return True
-    return is_readable(doc, user)
+    return can_view_article(user or frappe.session.user, doc)

@@ -12,7 +12,7 @@ import { getErrorMessage } from '@helpdesk/shared/utils'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
-  const settingsTab = ref<'profile' | 'members' | 'knowledge-base' | 'portal-permissions'>('profile')
+  const settingsTab = ref<'profile' | 'members' | 'knowledge-base' | 'portal-settings'>('profile')
   const account = ref(null)
   const isSettingsBusy = ref(false)
 
@@ -87,7 +87,7 @@ export function createSettingsCore() {
 const HASH_ROOT = 'settings'
 
 // Tabs only settings editors get; any other tab outside the list falls back to Profile.
-const EDITOR_TABS = ['knowledge-base', 'portal-permissions']
+const EDITOR_TABS = ['knowledge-base', 'portal-settings']
 const TABS = ['profile', 'members', ...EDITOR_TABS]
 
 export function createSettingsDialog(core, organization, session) {

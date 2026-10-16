@@ -25,13 +25,13 @@ def resolve_ticket_origin(origin: dict) -> dict:
     entry_point = ENTRY_POINTS.get(str(origin.get("from")), DIRECT)
     values = {"entry_point": entry_point}
     if entry_point == "Article":
-        values["source_article"] = _readable_article(origin.get("article"))
+        values["source_article"] = _accessible_article(origin.get("article"))
     if entry_point == "Search":
         values["source_search"] = _search_text(origin.get("q"))
     return values
 
 
-def _readable_article(article) -> str | None:
+def _accessible_article(article) -> str | None:
     # has_permission raises on a missing name, so existence is checked first
     if not isinstance(article, str) or not frappe.db.exists("HD Article", article):
         return None

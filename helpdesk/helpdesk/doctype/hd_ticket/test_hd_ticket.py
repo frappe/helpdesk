@@ -152,14 +152,14 @@ class TestHDTicket(IntegrationTestCase):
         ticket.check_update_perms()
         frappe.set_user("Administrator")
 
-    def test_update_perms_allowed_on_a_reopened_rated_ticket(self):
-        # `feedback` is never cleared, so a rating must not freeze a ticket an agent reopened.
+    def test_update_perms_blocked_on_a_reopened_rated_ticket(self):
         feedback_option = make_feedback_option("Reopened rating")
         self.addCleanup(
             frappe.delete_doc, feedback_option.doctype, feedback_option.name, force=True
         )
         reopened = self._edit_as_customer("Open", feedback=feedback_option.name)
-        reopened.check_update_perms()
+        with self.assertRaises(frappe.PermissionError):
+            reopened.check_update_perms()
 
     def test_update_perms_blocked_on_a_closed_ticket(self):
         with self.assertRaises(frappe.PermissionError):
@@ -1835,6 +1835,44 @@ class TestHDTicket(IntegrationTestCase):
             # resolution_failed_by should be 15 minutes (in business hours seconds)
             self.assertEqual(ticket.resolution_failed_by, 15 * 60)
 
+    def test_failed_by_follows_a_target_change(self):
+        # A reply at T+39min misses Urgent's 30 minutes by 9 and meets High's hour;
+        # the figure is measured against the target as it stands, not as it was.
+        date = get_current_week_monday(hours=10)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=39)):
+            frappe.set_user(agent)
+            ticket.reply_via_agent(message="Late reply")
+            frappe.set_user("Administrator")
+            ticket.reload()
+            self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+
+        with self.freeze_time(add_to_date(date, minutes=40)):
+            ticket.reload()
+            ticket.priority = "High"
+            ticket.save()
+            self.assertIsNone(ticket.first_response_failed_by)
+
+        with self.freeze_time(add_to_date(date, minutes=41)):
+            ticket.reload()
+            ticket.priority = "Urgent"
+            ticket.save()
+            self.assertEqual(ticket.first_response_failed_by, 9 * 60)
+
+    def test_overdue_by_counts_business_hours(self):
+        # Urgent's response is due at 17:30 on Monday; at 17:40 it is 10 business minutes overdue,
+        # and the two-hour resolution target, which runs into Tuesday, is not due yet.
+        date = get_current_week_monday(hours=17)
+        with self.freeze_time(date):
+            ticket = make_ticket(priority="Urgent")
+
+        with self.freeze_time(add_to_date(date, minutes=40)):
+            self.assertEqual(
+                ticket.get_overdue_by(), {"response": 10 * 60, "resolution": None}
+            )
+
     def test_reply_via_agent_default_sender(self):
         """Without `from_email`, sender on the Communication is the session user."""
         ticket = make_ticket()
@@ -2566,6 +2604,73 @@ class TestHDTicket(IntegrationTestCase):
         remove_holidays()
         frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
         frappe.delete_doc("HD Ticket Status", "New", force=True)
+
+
+class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
+    """A customer reads the thread, never who else each email went to."""
+
+    def setUp(self) -> None:
+        self.customer = create_contact(
+            "Recipients Customer", "recipients-customer@example.com"
+        )["user"]
+        self.ticket = make_ticket(raised_by=self.customer)
+        frappe.get_doc(
+            {
+                "doctype": "Communication",
+                "communication_type": "Communication",
+                "sent_or_received": "Sent",
+                "subject": "Re: ticket",
+                "content": "Our reply",
+                "sender": "agent@test.com",
+                "recipients": self.customer,
+                "cc": "colleague@example.com",
+                "bcc": "boss@example.com",
+                "reference_doctype": "HD Ticket",
+                "reference_name": self.ticket.name,
+            }
+        ).insert(ignore_permissions=True)
+
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def timeline_emails(self) -> list[dict]:
+        result = frappe.call(
+            "helpdesk.overrides.activity.get_activity_timeline",
+            doctype="HD Ticket",
+            name=self.ticket.name,
+            visible_types=["email"],
+        )
+        return [row["data"] for row in result["activities"]]
+
+    def test_a_customer_gets_no_recipients(self) -> None:
+        frappe.set_user(self.customer)
+        for email in self.timeline_emails():
+            self.assertFalse({"to", "cc", "bcc"} & email.keys())
+        for communication in get_communications(self.ticket.name):
+            self.assertFalse({"recipients", "cc", "bcc"} & communication.keys())
+
+    def test_an_agent_still_gets_them(self) -> None:
+        frappe.set_user(make_agent("recipients-agent@example.com"))
+        bccs = [email.get("bcc") for email in self.timeline_emails()]
+        self.assertIn("boss@example.com", bccs)
+
+
+class TestCustomerPing(IntegrationTestCase):
+    """Customers are pinged to refetch only when a field they can read changed."""
+
+    def save_and_count_pings(self, **values) -> int:
+        ticket = make_ticket()
+        ticket.reload()
+        ticket.update(values)
+        with patch.object(type(ticket), "notify_customers") as notify:
+            ticket.save(ignore_permissions=True)
+        return notify.call_count
+
+    def test_an_internal_field_change_sends_no_ping(self) -> None:
+        self.assertEqual(self.save_and_count_pings(resolution_details="notes"), 0)
+
+    def test_a_visible_field_change_pings(self) -> None:
+        self.assertEqual(self.save_and_count_pings(subject="New subject"), 1)
 
 
 class TestTicketTimelineChanges(IntegrationTestCase):

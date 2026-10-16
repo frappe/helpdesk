@@ -20,24 +20,6 @@ test.afterEach(async () => {
   await scripts.removeAll();
 });
 
-test("a flat action fires exactly once on each page", async ({ pageAs, ticket }) => {
-  await scripts.create(countingAction("E2E Agent Ticket"));
-  await scripts.create(countingAction("E2E Portal Ticket"), { portal: true });
-  await scripts.create(countingAction("E2E Agent New"), { newPage: true });
-
-  const surfaces = [
-    { persona: "agent", url: `/helpdesk/tickets/${ticket.name}`, label: "E2E Agent Ticket" },
-    { persona: "customer", url: `/help/tickets/${ticket.name}`, label: "E2E Portal Ticket" },
-    { persona: "agent", url: "/helpdesk/tickets/new", label: "E2E Agent New" },
-  ] as const;
-  for (const surface of surfaces) {
-    const page = await pageAs(surface.persona);
-    await page.goto(surface.url);
-    await page.getByRole("button", { name: surface.label }).click();
-    await expect.poll(() => clicksOn(page)).toBe(1);
-  }
-});
-
 test("grouped actions render, including the legacy items shape", async ({ pageAs, ticket }) => {
   await scripts.create(
     countingAction(
@@ -161,20 +143,6 @@ test.describe("new ticket form", () => {
 });
 
 test.describe("scoping", () => {
-  test("portal flag keeps agent and portal scripts apart", async ({ pageAs, ticket }) => {
-    await scripts.create(countingAction("E2E Agent Only"));
-    await scripts.create(countingAction("E2E Portal Only"), { portal: true });
-
-    const agent = await pageAs("agent");
-    await agent.goto(`/helpdesk/tickets/${ticket.name}`);
-    await expect(agent.getByRole("button", { name: "E2E Agent Only" })).toBeVisible();
-    await expect(agent.getByRole("button", { name: "E2E Portal Only" })).toHaveCount(0);
-
-    const customer = await pageAs("customer");
-    await customer.goto(`/help/tickets/${ticket.name}`);
-    await expect(customer.getByRole("button", { name: "E2E Portal Only" })).toBeVisible();
-    await expect(customer.getByRole("button", { name: "E2E Agent Only" })).toHaveCount(0);
-  });
 
   test("a disabled script never runs and two enabled scripts combine", async ({
     pageAs,

@@ -15,7 +15,7 @@ import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { askConfirm, runAction, runFormScripts, updateTicket, type ActionOptions } from '@app/utils'
+import { askConfirm, runAction, runFormScripts, updateTicket, type ActionOptions } from '@helpdesk/shared/utils'
 
 export default function setup(context) {
   const { route } = context
@@ -113,6 +113,8 @@ export default function setup(context) {
   const feedback = useTicketFeedback(saveTicket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
+  // As on the server, a customer cannot touch a closed or rated ticket, even one an agent reopened.
+  const isLocked = computed(() => isClosed.value || (!settings.isAgent.value && Boolean(ticket.data?.feedback)))
   const isUpdatingStatus = ref(false)
 
   // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
@@ -168,7 +170,7 @@ export default function setup(context) {
   )
 
   function onPageAction() {
-    if (isClosed.value) return navigateTo(ROUTES.newTicket({ from: 'closed-ticket' }))
+    if (isLocked.value) return navigateTo(ROUTES.newTicket({ from: 'closed-ticket' }))
     if (wantsFeedback.value) return feedback.openFeedback()
     askConfirm({
       title: __('Close ticket'),
@@ -186,7 +188,7 @@ export default function setup(context) {
   return {
     ...settings,
     ...useTicketDetails(ticket, thread, timelineChanges),
-    ...useReplyComposer(ticket, { isClosed, isAgent: settings.isAgent }),
+    ...useReplyComposer(ticket, { isClosed: isLocked, isAgent: settings.isAgent }),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),
@@ -195,15 +197,15 @@ export default function setup(context) {
     rating: thread.rating,
     timelineEvents,
     customActions,
-    // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
+    // Empty hides the header button; an open ticket can be closed, a closed or rated one leads to a new ticket.
     pageActionLabel: computed(() => {
       if (!ticket.data) return ''
-      if (!isClosed.value) return __('Close')
+      if (!isLocked.value) return __('Close')
       return settings.canCreateTicket.value ? __('Raise a ticket') : ''
     }),
     pageActionIcon: computed(() => {
       if (!ticket.data) return ''
-      return isClosed.value ? 'lucide-plus' : 'lucide-check'
+      return isLocked.value ? 'lucide-plus' : 'lucide-check'
     }),
     onPageAction,
     suggestedArticles,

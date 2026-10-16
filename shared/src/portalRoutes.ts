@@ -1,14 +1,14 @@
-import { CUSTOMER_PORTAL_ROOT, slugify } from './utils'
+import { CUSTOMER_PORTAL_ROOT } from './utils'
 
 // Block JSONs repeat these paths.
 export const ROUTES = {
   home: '/',
   categories: '/categories',
-  // Search results mark matches in the title, which are not part of the slug.
-  article: ({ name, title }: { name: string; title?: string }) =>
-    `/articles/${[name, slugify(title?.replace(/<[^>]*>/g, ''))].filter(Boolean).join('-')}`,
+  // Lists link the bare name; the article page then adds the slug `get_article` sends.
+  article: ({ name, title_slug }: { name: string; title_slug?: string }) =>
+    `/articles/${[name, title_slug].filter(Boolean).join('-')}`,
   category: (name: string) => `/category/${name}`,
-  ticketList: '/customer-tickets',
+  ticketList: '/my-tickets',
   newTicket: (origin?: TicketOrigin) => ({ path: '/tickets/new', query: originQuery(origin) }),
   ticket: (name: string) => `/tickets/${name}`,
   appRoot: CUSTOMER_PORTAL_ROOT,

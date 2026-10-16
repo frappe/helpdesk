@@ -1,9 +1,8 @@
 import { computed, effectScope, ref, watch } from 'vue'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
-import { isSafeLink } from '@helpdesk/shared/utils'
+import { isSafeLink, runFormScripts } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
-import { runFormScripts } from '@app/utils'
 
 // A quick link to one of these shows as its icon, as on Frappe Wiki.
 const SERVICE_ICONS = {
