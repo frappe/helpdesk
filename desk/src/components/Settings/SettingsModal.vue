@@ -106,6 +106,7 @@ const show: ModelRef<boolean> = defineModel();
 const showConfirmDialog = ref(false);
 
 function onTabChange(tab) {
+  if (tab.label === activeTab.value?.label) return;
   if (!disableSettingModalOutsideClick.value) {
     activeTab.value = tab;
     return;
