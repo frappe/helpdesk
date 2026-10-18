@@ -7,9 +7,6 @@
     :authors="isChat ? authors : null"
     :reserve="reserve"
   >
-    <template v-for="(_, name) in $slots" #[name]="scope">
-      <slot :name="name" v-bind="scope || {}" />
-    </template>
     <template v-if="isChat" #icon-email="{ activity }">
       <div class="flex h-10 items-start">
         <Avatar
@@ -22,7 +19,7 @@
     </template>
     <template v-if="isChat" #icon-log><span /></template>
     <template v-if="isChat" #item-log="{ activity }">
-      <!-- Pulled across the avatar column, so the line centres on the whole thread. -->
+      <!-- Pulled over the avatar column to centre on the thread. -->
       <div
         class="relative z-20 -ms-[38px] flex flex-1 items-center gap-3 py-1 text-p-sm text-ink-gray-5"
       >
@@ -98,6 +95,7 @@ import { DATE_FORMATS, plainTextToHtml } from "@helpdesk/shared/utils";
 import { useSession } from "@app/stores/session";
 import { conversationLayout } from "@app/stores/settings";
 import PortalEmailContent from "./PortalEmailContent.vue";
+import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 
 type Row = {
   type?: string;
@@ -106,30 +104,25 @@ type Row = {
   data?: any;
 };
 
-// Messages from one side within this window read as one turn.
 const GROUP_SECONDS = 5 * 60;
 
-// A component, not the page script: the composable needs a component's setup.
 const props = defineProps<{
   ticket: string;
-  // The page's own rows, such as closes; merged in by time.
   extraActivities?: Row[];
-  // The ticket's `modified`, so a save reloads the emails.
+  // Changes on save, reloading the emails.
   version?: string;
-  // The ticket's communications, which say who wrote each email and whether they are an agent.
   communications?: {
     name: string;
     is_agent: boolean;
     user?: { email?: string };
   }[];
-  // The composer's height, kept clear under the last message.
   reserve?: number;
 }>();
 
 const isChat = computed(() => conversationLayout.value === "chat");
 const session = useSession();
 
-// By email name; the sender address alone can differ for one person, such as admin@ and Administrator.
+// By email name: one person can send from several addresses.
 const authors = computed(
   () =>
     new Map(
@@ -147,13 +140,12 @@ function clockTime(value: string) {
   return __("{0} at {1}", [at.format(day), at.format(DATE_FORMATS.clock)]);
 }
 
-// Keyed by the ticket above: the composable reads its ticket once, so another ticket remounts it.
+// Keyed by ticket: the composable reads its ticket once.
 const TicketEmails = defineComponent({
   props: {
     ticket: { type: String, required: true },
     extraActivities: { type: Array as PropType<Row[]>, default: () => [] },
     version: String,
-    // Set only in the chat layout, where each email gets its side and grouping.
     authors: {
       type: Map as PropType<Map<
         string,
@@ -173,9 +165,9 @@ const TicketEmails = defineComponent({
       () => props.version,
       (_, before) => before && reload()
     );
-    // A customer never sees who else an email went to.
+    // Customers never see other recipients.
     const rows = computed(() => {
-      // The page's rows wait for the emails, so a close never shows alone while the thread loads.
+      // Wait for emails so a close never shows alone.
       if (loading.value && !activities.value.length) return [];
       const sorted = [
         ...activities.value.map((row) => ({
@@ -204,7 +196,7 @@ const TicketEmails = defineComponent({
       );
     });
 
-    // Guessing an unknown sender's side drew agent replies right, then left; wait for the ticket to say.
+    // Unknown sender: wait for the ticket rather than guess a side.
     function isPlaceable(row: Row) {
       return (
         props.authors!.has(row.data.name) ||
@@ -224,12 +216,11 @@ const TicketEmails = defineComponent({
       return { isOwn, opensGroup, showAvatar: opensGroup && !isOwn };
     }
 
-    // The viewer's side goes right: the customer's for a customer, the team's for an agent.
     function isViewerSide(row: Row) {
       return isAgent(row) === Boolean(session.config.value?.is_agent);
     }
 
-    // An email the viewer just sent arrives before the ticket's communications reload
+    // The viewer's just-sent email precedes the communications reload.
     function isAgent(row: Row) {
       const known = props.authors!.get(row.data.name);
       if (known) return known.isAgent;
@@ -243,7 +234,7 @@ const TicketEmails = defineComponent({
       return props.authors!.get(row.data.name)?.email || row.author?.email;
     }
 
-    // When the reserve settles after a resize, scroll by the difference so the messages stay put.
+    // Offset scroll by the reserve change so messages stay put.
     const wrapper = ref<HTMLElement | null>(null);
     watch(
       () => props.reserve,
@@ -256,21 +247,37 @@ const TicketEmails = defineComponent({
       { flush: "post" }
     );
 
-    // ActivityTimeline's root is a fragment, so the page's classes land on this wrapper instead.
+    // Fade in only when replacing the skeleton.
+    const isFirstLoad = computed(
+      () => loading.value && !activities.value.length
+    );
+    const revealed = ref(false);
+    watch(isFirstLoad, (first) => !first && (revealed.value = true));
+
+    // ActivityTimeline's root is a fragment; classes go on this wrapper.
     return () =>
       h(
         "div",
         {
           ref: wrapper,
-          class: "portal-thread flex flex-col",
+          class: [
+            "portal-thread flex flex-col",
+            revealed.value && "portal-reveal",
+          ],
           style: { "--composer-reserve": `${props.reserve}px` },
         },
         [
-          h(
-            ActivityTimeline,
-            { activities: rows.value, loading: loading.value, paginate },
-            slots
-          ),
+          isFirstLoad.value
+            ? h(PortalSkeleton, {
+                variant: "thread",
+                instant: true,
+                class: "flex-1 overflow-hidden",
+              })
+            : h(
+                ActivityTimeline,
+                { activities: rows.value, loading: loading.value, paginate },
+                slots
+              ),
         ]
       );
   },
@@ -278,19 +285,18 @@ const TicketEmails = defineComponent({
 </script>
 
 <style>
-/* Bounded, so the timeline scrolls inside the thread instead of growing past it. */
 .portal-thread > .activity-timeline {
   flex: 1 1 0%;
   min-height: 0;
 }
 
-/* Spacing inside the scroll, not on the wrapper: messages slide under the header and the composer instead of being cut short. */
+/* Padding inside the scroller so messages slide under header and composer. */
 .portal-thread > .activity-timeline > div {
   padding-top: 1rem;
   padding-bottom: var(--composer-reserve, 0px);
 }
 
-/* Not scoped: ActivityTimeline's root is a fragment, so no class or scope id reaches it. */
+/* Unscoped: no scope id reaches ActivityTimeline's fragment root. */
 .activity-timeline:has(.portal-chat-message)
   .activity
   > div
@@ -298,7 +304,7 @@ const TicketEmails = defineComponent({
   display: none;
 }
 
-/* Email frames copy the page's sheets, whose :root paints the canvas; only a frame holds .email-content. */
+/* Email frames copy page sheets; keep their :root transparent. */
 :root:has(.email-content) {
   background: transparent;
 }

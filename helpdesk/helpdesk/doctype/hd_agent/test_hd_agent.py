@@ -9,6 +9,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.auth import get_user
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
+from helpdesk.utils import is_agent_manager
 from helpdesk.test_utils import (
     create_user,
     make_agent,
@@ -49,6 +50,12 @@ class TestHDAgent(FrappeTestCase):
         )
 
     # a new agent starts on the default from HD Settings
+    def test_a_deactivated_agent_record_keeps_administrator_a_manager(self):
+        make_agent("Administrator")
+        frappe.db.set_value("HD Agent", "Administrator", "is_active", 0)
+
+        self.assertTrue(is_agent_manager("Administrator"))
+
     def test_new_agent_defaults_to_configured_status(self):
         agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
 
@@ -77,7 +84,7 @@ class TestHDAgent(FrappeTestCase):
     # the frontend now writes this straight through frappe.client.set_value, so a
     # plain agent must be able to save their own record without elevated rights
     def test_availability_reaches_desk_users_only(self):
-        # The event names agents; the website room would hand it to every portal socket.
+        # the event names agents; the website room reaches portal sockets
         agent = frappe.get_doc("HD Agent", self.test_user)
         agent.availability = "Away"
         with patch("frappe.publish_realtime") as publish:

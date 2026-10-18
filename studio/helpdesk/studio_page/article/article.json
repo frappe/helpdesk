@@ -38,15 +38,37 @@
        "componentName": "PortalArticleSidebar",
        "componentProps": {
         "activeName": "{{ article.data.name }}",
-        "articles": "{{ articles.data || [] }}",
-        "categories": "{{ categories.data || [] }}",
-        "open": "{{ drawer.open }}"
+        "categories": "{{ sidebar.data || [] }}",
+        "open": "{{ drawer.open }}",
+        "loading": "{{ !sidebar.data || !article.data }}"
        },
        "isCustomVueComponent": true
       },
       {
        "blockName": "main-layout",
        "children": [
+        {
+         "componentId": "PortalSkeleton-article",
+         "componentName": "PortalSkeleton",
+         "isCustomVueComponent": true,
+         "componentProps": {
+          "variant": "article"
+         },
+         "visibilityCondition": "{{ !isCurrentArticle(route.params.name) && !article?.error }}",
+         "classes": [
+          "flex",
+          "flex-col",
+          "mt-0",
+          "max-w-[700px]",
+          "min-w-0",
+          "w-full",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "xl:px-0",
+          "xl:col-start-2"
+         ]
+        },
         {
          "blockName": "article-column",
          "children": [
@@ -113,10 +135,6 @@
              "blockName": "meta-row",
              "children": [
               {
-               "classes": [
-                "has-[>div:first-child]:border",
-                "has-[>div:first-child]:border-outline-gray-2"
-               ],
                "componentId": "Avatar-jsgl5l2bo",
                "componentName": "Avatar",
                "componentProps": {
@@ -345,7 +363,6 @@
           {
            "blockName": "feedback-box",
            "classes": [
-            "mt-6",
             "w-full"
            ],
            "componentId": "PortalArticleFeedback-fb7k2qd",
@@ -422,24 +439,18 @@
                 "focus-visible:focus-ring"
                ],
                "componentEvents": {
-                "click": {
+                "mouseenter": {
                  "action": "Run Script",
-                 "event": "click",
-                 "script": "router.push(routes.article(dataItem))"
-                },
-                "keydown.enter": {
-                 "action": "Run Script",
-                 "event": "keydown.enter",
-                 "script": "router.push(routes.article(dataItem))"
+                 "event": "mouseenter",
+                 "script": "prefetchOnHover(dataItem.name)"
                 }
                },
                "componentId": "container-2cad4s6qq",
-               "componentName": "container",
-               "originalElement": "div",
+               "componentName": "PortalLink",
                "componentProps": {
-                "role": "link",
-                "tabindex": "0"
-               }
+                "to": "{{ routes.article(dataItem) }}"
+               },
+               "isCustomVueComponent": true
               }
              ],
              "classes": [
@@ -461,7 +472,8 @@
             "flex-col",
             "gap-3",
             "mt-6",
-            "w-full"
+            "w-full",
+            "portal-reveal"
            ],
            "componentId": "container-oyv4vjmm0",
            "componentName": "container",
@@ -490,7 +502,8 @@
           "xl:px-0",
           "xl:col-start-2",
           "pb-16",
-          "min-h-full"
+          "min-h-full",
+          "portal-reveal"
          ],
          "componentId": "container-rr220ojgc",
          "componentName": "container",
@@ -533,7 +546,6 @@
           "flex-col",
           "pb-4",
           "pr-3",
-          "pt-px",
           "sticky",
           "top-0",
           "w-[300px]",
@@ -603,45 +615,15 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-15 12:03:16.000000",
+ "modified": "2026-10-19 02:59:37.432603",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",
  "page_name": "page-d252dcea",
  "page_title": "Article",
  "published": 1,
- "resources": [
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{\"name\": \"{{ route.params.name }}\"}",
-   "resource_name": "article",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_article"
-  },
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{}",
-   "resource_name": "articles",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_article_titles"
-  },
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{}",
-   "resource_name": "categories",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_categories"
-  }
- ],
+ "resources": [],
  "route": "/articles/:name",
- "studio_app": "helpdesk"
+ "studio_app": "helpdesk",
+ "tab_title": "{{ article.data ? article.data.title + ' | ' + brandName : brandName }}"
 }

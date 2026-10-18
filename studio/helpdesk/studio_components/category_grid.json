@@ -97,25 +97,12 @@
        "p-5",
        "focus-visible:focus-ring"
       ],
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "router.push(routes.category(dataItem.name))\n"
-       },
-       "keydown.enter": {
-        "action": "Run Script",
-        "event": "keydown.enter",
-        "script": "router.push(routes.category(dataItem.name))\n"
-       }
-      },
       "componentId": "category-grid-card",
-      "componentName": "container",
-      "originalElement": "div",
+      "componentName": "PortalLink",
       "componentProps": {
-       "role": "link",
-       "tabindex": "0"
-      }
+       "to": "{{ routes.category(dataItem.name) }}"
+      },
+      "isCustomVueComponent": true
      }
     ],
     "classes": [
@@ -123,7 +110,8 @@
      "sm:grid-cols-2",
      "lg:grid-cols-[repeat(var(--category-columns),minmax(0,1fr))]",
      "sm:auto-rows-fr",
-     "content-start"
+     "content-start",
+     "portal-reveal"
     ],
     "componentId": "category-grid-repeater",
     "componentName": "Repeater",
@@ -165,7 +153,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-10 20:51:47.071215",
+ "modified": "2026-10-19 02:59:37.432603",
  "modified_by": "Administrator",
  "name": "category_grid",
  "owner": "Administrator"

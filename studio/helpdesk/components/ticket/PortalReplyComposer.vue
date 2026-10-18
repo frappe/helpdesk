@@ -13,15 +13,10 @@
       @keydown.enter.prevent="emit('update:open', true)"
       @keydown.space.prevent="emit('update:open', true)"
     >
-      <Avatar
-        :image="avatar?.image"
-        :label="avatar?.label"
-        size="sm"
-        class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
-      />
+      <Avatar :image="avatar?.image" :label="avatar?.label" size="sm" />
       <span class="text-base text-ink-gray-7">{{ placeholder }}</span>
     </div>
-    <!-- Hidden, not unmounted: a drag that closes the editor can reopen it in the same gesture. -->
+    <!-- v-show: a drag that closes it can reopen it mid-gesture. -->
     <div
       v-show="open"
       class="portal-reply-composer group/composer relative rounded-6 border border-outline-gray-2 bg-surface-elevation-1 px-3"
@@ -39,6 +34,12 @@
         @keydown.down.prevent="resizeBy(-KEY_STEP)"
       >
         <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
+      </div>
+      <div v-if="avatar?.label" class="flex items-center gap-2 pt-3">
+        <Avatar :image="avatar.image" :label="avatar.label" size="md" />
+        <span class="truncate text-base-medium text-ink-gray-9">{{
+          avatar.label
+        }}</span>
       </div>
       <CommentComposer
         ref="composer"
@@ -66,10 +67,10 @@ import { Avatar } from "frappe-ui";
 import { CommentComposer } from "@framework/ui/components/Composer";
 import { __ } from "@helpdesk/shared/translation";
 
-// Below this the editor is too short to type in, so letting go there closes it.
+// Releasing below this closes the editor.
 const MIN_BODY_HEIGHT = 80;
 const MAX_VIEWPORT_SHARE = 0.7;
-// The drag stops this far below the top of the thread, so some of it stays in view.
+// Drag stops this far below the thread top, keeping some in view.
 const THREAD_PEEK = 64;
 const KEY_STEP = 16;
 
@@ -80,10 +81,8 @@ const props = defineProps<{
   submitLabel?: string;
   submitting?: boolean;
   uploadFunction?: (file: File) => Promise<unknown>;
-  // File types the attach button offers; empty allows any.
   accept?: string;
   avatar?: { image?: string; label?: string };
-  // The room the thread keeps clear under the composer.
   reserve?: number;
 }>();
 
@@ -97,14 +96,14 @@ const emit = defineEmits<{
 const root = ref<HTMLElement | null>(null);
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
 
-// Keyed on the editor too: the composer can mount open before its editor exists.
+// Keyed on the editor too: it can mount open before the editor exists.
 watch(
   () => props.open && composer.value?.editor,
   (editor) => editor && composer.value?.focus(),
   { immediate: true, flush: "post" }
 );
 
-// CommentComposer has no prop for this, so it goes straight onto its hidden file input.
+// CommentComposer has no `accept` prop; set it on the file input.
 watchEffect(() => {
   const input = root.value?.querySelector<HTMLInputElement>(
     '[aria-label="Attach file"] + input[type="file"]'
@@ -112,7 +111,7 @@ watchEffect(() => {
   if (props.accept) input?.setAttribute("accept", props.accept);
   else input?.removeAttribute("accept");
 });
-// Per browser, like the desk's; 0 leaves the editor at its natural height.
+// 0 = natural height.
 const height = useStorage("kb:composer-height", 0);
 const { height: viewportHeight } = useWindowSize();
 
@@ -124,8 +123,7 @@ const resizing = ref<{
 } | null>(null);
 const isResizing = computed(() => resizing.value !== null);
 
-// Held while the drag grows the composer, so it slides over the thread instead of pushing it up;
-// a shrinking composer hands the room straight back, or the thread would end above a blank band.
+// Reserve holds while dragging up (composer overlays); shrinking returns it at once.
 const { height: composerHeight } = useElementSize(root, undefined, {
   box: "border-box",
 });
@@ -138,7 +136,7 @@ watch(
   { immediate: true }
 );
 
-// Clamped on read too, so a height saved on a taller window still fits this one.
+// Clamped on read: a saved height may not fit this window.
 const bodyStyle = computed(() =>
   height.value > 0
     ? { "--composer-body-height": `${clamp(height.value)}px` }
@@ -161,7 +159,7 @@ function startResize(event: PointerEvent) {
     minY: threadTop() + (event.clientY - handle.getBoundingClientRect().top),
     closed: false,
   };
-  // Captured on the root, so the drag keeps its cursor and events off the handle and the window.
+  // Capture on root so the drag keeps its cursor and events.
   try {
     (root.value ?? handle).setPointerCapture(event.pointerId);
   } catch {}

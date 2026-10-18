@@ -1,13 +1,13 @@
 import { shallowRef } from 'vue'
 
-// Each page hands over its router: the app's own one, or a readonly proxy in the editor.
+// Pages pass their router; the editor passes a readonly proxy.
 const router = shallowRef<any>(null)
 
 export function bindRouter(value: unknown) {
   if (value) router.value = value
 }
 
-// A page script's router proxy unwraps refs, so `currentRoute` is the route itself there.
+// A page script's router proxy unwraps refs.
 export function currentRoute() {
   return router.value?.currentRoute?.value || router.value?.currentRoute || {}
 }

@@ -3,23 +3,27 @@ import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useDrawer } from '@app/composables/useDrawer'
 import { countLabel } from '@helpdesk/shared/utils'
+import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 export default function setup(context) {
-  const { categories, route } = context
+  const { route } = context
+  const { sidebar } = useKnowledgeBase()
 
-  const category = computed(() => categories.data?.find((row) => row.name === route.params.category))
-  // The list holds only categories with an article this reader may see.
-  const notFound = computed(() => Boolean(categories.data) && !category.value)
+  const category = computed(() => sidebar.data?.find((row) => row.name === route.params.category))
+  // The sidebar omits categories this reader cannot see.
+  const notFound = computed(() => Boolean(sidebar.data) && !category.value)
   const categoryName = computed(() => category.value?.category_name)
   const categoryDescription = computed(
     () => category.value?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
-  // `articles` is capped server side; the categories list carries the full count.
+  // `articles` is capped server side.
   const articleCount = computed(() => countLabel(category.value?.article_count, __('1 article'), __('{0} articles')))
 
   return {
     ...useKnowledgeBaseHeader(context),
     drawer: useDrawer(route),
+    sidebar,
+    prefetchOnHover,
     category,
     notFound,
     categoryName,

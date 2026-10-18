@@ -20,7 +20,7 @@ test("agent raises a ticket from the new ticket form", async ({ page, api }) => 
   await page.getByPlaceholder("A short description").fill(subject);
   await composer(page).click();
   await composer(page).pressSequentially("Printer is on fire");
-  await page.getByRole("button", { name: "Submit" }).click();
+  await page.getByRole("button", { name: "Create ticket" }).click();
 
   await expect(page).toHaveURL(/\/helpdesk\/tickets\/\d+$/);
   await expect(page.getByRole("banner").getByRole("button", { name: subject })).toBeVisible();

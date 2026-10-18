@@ -1,6 +1,6 @@
 <template>
   <div v-if="actions?.length" class="flex items-center gap-2">
-    <!-- onClick rides along in `action`; `icon` would make it an icon-only button -->
+    <!-- `icon` would make it icon-only, so it goes in the prefix -->
     <Button
       v-for="action in buttons"
       :key="action.label"
@@ -38,19 +38,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Button, Dropdown, Icon } from "frappe-ui";
-import StoredIcon from "./Icon.vue";
-import { __ } from "./translation";
+import StoredIcon from "@helpdesk/shared/Icon.vue";
+import { __ } from "@helpdesk/shared/translation";
 import { useMediaQuery } from "@vueuse/core";
 
-// Header actions from HD Form Scripts, on the desk and the portal: a plain action is a button, `group` with
-// `buttonLabel` a labelled menu, and `group` alone goes under "…".
 const props = defineProps<{ actions?: any[] }>();
 const isNarrow = useMediaQuery("(max-width: 767px)");
 
 const plainActions = computed(() =>
   (props.actions || []).filter((a) => !a.group)
 );
-// Below md the header has no room for buttons beside the logo, crumbs and sign-in.
+// Narrow screens fold buttons and labelled menus into "…".
 const buttons = computed(() => (isNarrow.value ? [] : plainActions.value));
 
 const groupsByLabel = computed(() => {
@@ -65,13 +63,12 @@ const groupsByLabel = computed(() => {
   return [...groups].map(([label, options]) => ({ label, options }));
 });
 
-// Below md labelled menus fold into "…" as well, or they push the logo menu off a phone screen.
 const labelledGroups = computed(() =>
   isNarrow.value ? [] : groupsByLabel.value
 );
 
 const moreOptions = computed(() => [
-  // A grouped action is itself a menu group, so a labelled menu's entries drop in as they are.
+  // Grouped actions are already menu groups, so they nest as-is.
   ...(isNarrow.value
     ? [...plainActions.value, ...groupsByLabel.value.flatMap((g) => g.options)]
     : []),

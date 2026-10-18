@@ -28,7 +28,7 @@ test("conversation: customer and agent replies both show, internal comments neve
 
   await page.goto(`/help/tickets/${ticket.name}`);
   await expectInConversation(page, agentReply);
-  // closed on arrival; its bar opens it with the cursor in it
+  // closed on arrival; its bar opens it
   await page.getByText("Type a message").click();
   await expect(page.locator(".portal-reply-composer .ProseMirror")).toBeFocused();
   await page.locator(".ProseMirror").fill(customerReply);
@@ -39,6 +39,41 @@ test("conversation: customer and agent replies both show, internal comments neve
   const agentPage = await pageAs("agent");
   await agentPage.goto(`/helpdesk/tickets/${ticket.name}`);
   await expectInConversation(agentPage, customerReply);
+});
+
+test("closing after an agent reply asks for a rating when feedback is mandatory", async ({
+  page,
+  api,
+  apiAs,
+  ticket,
+}) => {
+  await (await apiAs("agent")).call("run_doc_method", {
+    dt: "HD Ticket",
+    dn: ticket.name,
+    method: "reply_via_agent",
+    args: { message: "<p>Fixed on our side</p>" },
+  });
+  const mandatory = (await api.get("HD Settings", "HD Settings")).is_feedback_mandatory;
+  await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: 1 });
+  try {
+    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.getByRole("button", { name: "Close" }).click();
+    const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
+    await dialog.getByRole("radio").nth(4).click();
+    await dialog.getByRole("button", { name: "Exceptional support experience" }).click();
+    await dialog.getByPlaceholder("Tell us more").fill("Quick turnaround");
+    await dialog.getByRole("button", { name: "Submit" }).click();
+
+    await expect
+      .poll(async () => {
+        const doc = await api.get("HD Ticket", ticket.name);
+        return [doc.status, doc.feedback, doc.feedback_extra];
+      })
+      .toEqual(["Closed", "Exceptional support experience", "Quick turnaround"]);
+    await expect(page.getByRole("button", { name: "Close" })).toHaveCount(0);
+  } finally {
+    await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: mandatory });
+  }
 });
 
 /** Email bodies render inside iframes, so wait until any frame shows the text. */

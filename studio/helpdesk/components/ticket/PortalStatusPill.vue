@@ -2,12 +2,11 @@
   <span class="inline-flex min-w-0 items-center gap-1.5">
     <span
       :class="[
-        'shrink-0 rounded-full',
+        'shrink-0 rounded-full bg-current',
         size === 'sm' ? 'size-[7px]' : 'size-2',
-        STATUS_DOT_CLASSES[color],
+        statusDotClass(color),
       ]"
     />
-    <!-- `sm` is the list's: it truncates, in the row's own text colour. -->
     <span
       :class="
         size === 'sm'
@@ -21,13 +20,13 @@
 </template>
 
 <script setup lang="ts">
-import { STATUS_DOT_CLASSES, type StatusColor } from "@app/stores/ticketMeta";
+import { statusDotClass } from "@helpdesk/shared/ticketStatus";
 
 withDefaults(
-  defineProps<{ label?: string; color?: StatusColor; size?: "sm" | "md" }>(),
+  defineProps<{ label?: string; color?: string; size?: "sm" | "md" }>(),
   {
     label: "",
-    color: "gray",
+    color: "Gray",
     size: "md",
   }
 );

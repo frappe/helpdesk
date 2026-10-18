@@ -18,8 +18,7 @@
           :key="article.name"
           class="flex min-w-0 items-center"
         >
-          <!-- Rests before opening so the pointer can cross the list without a card flashing per row. -->
-          <!-- Below, not beside: on one line a card to the side would cover the next link. -->
+          <!-- Hover delay stops cards flashing; below so it won't cover the next link. -->
           <HoverCard
             side="bottom"
             align="start"
@@ -34,7 +33,7 @@
                 target="_blank"
                 rel="noopener"
               >
-                <!-- v-html: the server escapes the text and leaves only the search <mark> tags. -->
+                <!-- v-html: server escapes all but the search <mark> tags. -->
                 <span
                   class="truncate underline-offset-2 group-hover:underline group-data-[state=open]:underline"
                   v-html="article.title"
@@ -85,7 +84,7 @@
               </div>
             </a>
           </HoverCard>
-          <!-- Outside the link so the comma isn't underlined with it. -->
+          <!-- Outside the link so the comma isn't underlined. -->
           <span v-if="i < articles.length - 1" class="text-p-sm text-ink-gray-5"
             >,</span
           >

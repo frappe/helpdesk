@@ -1,5 +1,4 @@
 import { computed } from 'vue'
-import { useStorage } from '@vueuse/core'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
@@ -10,19 +9,20 @@ import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
+import { conversationLayout } from '@app/stores/conversationLayout'
 
 const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 
-// One instance for the whole app, or each page's copy would go stale on the others.
+// One shared instance, or each page's copy goes stale.
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
 const session = useSession()
 const dialog = createSettingsDialog(core, organization, session)
 
-// Here, not in the dialog, so the saved theme applies on load rather than on open.
+// Here, so the saved theme applies on load, not on dialog open.
 const { colorScheme, setColorScheme, resolvedColorScheme, toggleColorScheme } = useColorScheme()
 
 const theme = computed({
@@ -30,7 +30,6 @@ const theme = computed({
   set: setColorScheme,
 })
 
-// The header's toggle; only the knowledge base pages show it.
 export const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
 export const toggleTheme = toggleColorScheme
 
@@ -40,15 +39,14 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-// In the browser, not on the User doc: it describes this screen on this device.
-export const conversationLayout = useStorage('kb:conversation-layout', 'timeline')
+export { conversationLayout }
 
 const conversationLayoutOptions = computed(() => [
-  { label: __('Timeline'), value: 'timeline' },
-  { label: __('Chat'), value: 'chat' },
+  { label: __('Timeline'), value: 'timeline', icon: 'lucide-list' },
+  { label: __('Chat'), value: 'chat', icon: 'lucide-messages-square' },
 ])
 
-// Leaving the Knowledge Base tab with unsaved changes asks first, as the desk's settings do.
+// Leaving a dirty Knowledge Base tab asks first, as the desk does.
 const settingsTab = computed({
   get: () => core.settingsTab.value,
   set: (tab) => {
@@ -70,7 +68,7 @@ const settingsTab = computed({
   },
 })
 
-// Like the desk's, the dialog stays open while the Knowledge Base tab has unsaved changes.
+// Stays open while the Knowledge Base tab is dirty, as the desk does.
 const isSettingsOpen = computed({
   get: () => core.isSettingsOpen.value,
   set: (open) => {
@@ -78,7 +76,6 @@ const isSettingsOpen = computed({
   },
 })
 
-// The Knowledge Base panel's header buttons; the panel's form makes the draft.
 const knowledgeBase = {
   knowledgeBaseIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
   knowledgeBaseCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
@@ -101,7 +98,13 @@ export const accountMenuOptions = computed(() =>
           condition: () => session.isAgent.value,
           onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
         },
-        { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
+        {
+          icon: 'lucide-settings',
+          label: __('Settings'),
+          // As in the desk: the settings dialog is desktop-only.
+          condition: () => !session.isPhone.value,
+          onClick: () => dialog.openSettings('profile'),
+        },
         { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
       ],
 )
@@ -111,23 +114,21 @@ const store = {
   theme,
   conversationLayout,
   conversationLayoutOptions,
-  // Blocks bind `t`, not `__`.
   t: __,
-  // Blocks bind `routes.*`, not hand-written paths.
   routes: ROUTES,
   accountMenuOptions,
-  // HD Form Script header actions; the ticket pages fill them.
+  // Placeholders the pages override.
   customActions: [],
-  // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
-  // The theme toggle; the knowledge base pages fill it.
   themeIcon: '',
   isSettingsOpen,
   settingsTab,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
+  settingsLoaded: core.settingsLoaded,
   loadSettings: core.loadSettings,
+  ensureSettings: core.ensureSettings,
   ...organization,
   ...profile,
   ...knowledgeBase,

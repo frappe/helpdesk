@@ -54,7 +54,7 @@
                 v-if="!editable && !isMobileView"
                 class="text-p-sm text-ink-gray-4 items-center"
               >
-                <span>{{ views }} {{ __("views") }}</span>
+                <span>{{ viewsLabel }}</span>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -138,7 +138,10 @@
           <template #default>
             <!-- Scroll here so selected nodes aren't clipped. -->
             <div :class="editorScrollClass">
-              <EditorContent class="rounded-b-6 max-w-[unset] prose-sm" />
+              <EditorContent
+                class="rounded-b-6 max-w-[unset] prose-sm"
+                :class="ARTICLE_IMAGE_CLASSES"
+              />
             </div>
             <EditorFixedMenu
               v-if="editable"
@@ -175,7 +178,7 @@
                   v-if="isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
                 >
-                  {{ __("{0} views", [views]) }}
+                  {{ viewsLabel }}
                 </span>
               </div>
             </div>
@@ -215,12 +218,7 @@
           v-if="siblingsVisibility.data && access !== siblingsVisibility.data"
           class="text-p-sm text-ink-gray-7"
         >
-          {{
-            __("Other articles in {0} are visible to {1}.", [
-              article.data.category_name,
-              visibleTo(siblingsVisibility.data),
-            ])
-          }}
+          {{ siblingsNote }}
         </p>
       </template>
     </ArticleAccessModal>
@@ -231,6 +229,7 @@
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
@@ -242,7 +241,6 @@ import {
   newCategory,
   updateRes as updateArticle,
   useCategoryVisibility,
-  visibleTo,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -254,7 +252,7 @@ import {
   uploadFunction,
 } from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { addHeadingIds } from "@helpdesk/shared/utils";
+import { addHeadingIds, countLabel } from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
@@ -337,6 +335,9 @@ const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
 const views = ref(0);
+const viewsLabel = computed(() =>
+  countLabel(views.value, __("1 view"), __("{0} views"))
+);
 const content = ref("");
 const title = ref("");
 
@@ -405,6 +406,14 @@ const showAccessModal = ref(false);
 const siblingsVisibility = useCategoryVisibility(
   computed(() => (showAccessModal.value && article.data?.category) || null)
 );
+const siblingsNote = computed(() => {
+  const category = article.data?.category_name;
+  return {
+    Public: __("Other articles in {0} are visible to everyone.", [category]),
+    Customers: __("Other articles in {0} are visible to customers only.", [category]),
+    Private: __("Other articles in {0} are visible to agents only.", [category]),
+  }[siblingsVisibility.data];
+});
 
 function publishArticle(visibility: string) {
   save(

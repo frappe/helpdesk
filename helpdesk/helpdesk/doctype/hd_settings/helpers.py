@@ -150,22 +150,16 @@ CUSTOMER_HOME_PAGES = [KNOWLEDGE_BASE_HOME, TICKETS_HOME]
 
 
 def get_customer_home_page() -> str:
-    """Where a customer lands on opening the portal: the knowledge base, or their tickets."""
     if frappe.db.get_single_value("HD Settings", "prefer_knowledge_base"):
         return KNOWLEDGE_BASE_HOME
     return TICKETS_HOME
 
 
 def set_customer_home_page(replace: list[str]) -> None:
-    """Point the customer roles and the portal default still on one of `replace` at the customer
-    home page; a home page an admin set by hand is kept.
-
-    db writes, not save: a stale Portal Settings menu row would fail the save."""
+    """Keeps hand-set home pages. Roles only: the portal default is also agents' home."""
     from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 
     home_page = get_customer_home_page()
-    if frappe.db.get_single_value("Portal Settings", "default_portal_home") in replace:
-        frappe.db.set_single_value("Portal Settings", "default_portal_home", home_page)
     frappe.db.set_value(
         "Role",
         {"name": ["in", CUSTOMER_ROLES], "home_page": ["in", replace]},

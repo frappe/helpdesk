@@ -1,11 +1,11 @@
 import type { Page } from "@playwright/test";
 import type { Api } from "../../../helpers/api";
+import { raiseTicket } from "../../../helpers/factories";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { createArticle, createCategory } from "../../../helpers/portal";
 
 usePersona("customer");
 
-// Each "raise a ticket" link carries its origin; the server stores it on the ticket.
 test.describe("ticket origin", () => {
   test("a ticket raised from an article records that article", async ({ page, api }) => {
     const category = await createCategory(api);
@@ -19,11 +19,31 @@ test.describe("ticket origin", () => {
     expect(origin.source_article).toBe(article.name);
   });
 
+  test("a ticket raised from my tickets records the ticket list", async ({ page, api }) => {
+    await page.goto("/help/my-tickets");
+    await page.getByRole("button", { name: "Raise a ticket" }).click();
+
+    expect((await submitTicket(page, api)).entry_point).toBe("Ticket List");
+  });
+
+  test("a ticket raised from a closed ticket records the closed ticket", async ({
+    page,
+    api,
+    apiAs,
+  }) => {
+    const closed = await raiseTicket(await apiAs("customer"));
+    await api.update("HD Ticket", closed.name, { status: "Closed" });
+
+    await page.goto(`/help/tickets/${closed.name}`);
+    await page.getByRole("button", { name: "Raise a ticket" }).click();
+
+    expect((await submitTicket(page, api)).entry_point).toBe("Closed Ticket");
+  });
+
   test("a ticket raised from search records the search text", async ({ page, api }) => {
     const query = `nothing matches ${uid()}`;
 
     await page.goto(`/help/tickets/new?from=search&q=${encodeURIComponent(query)}`);
-    // the search text also starts the subject
     await expect(page.getByPlaceholder("A short description")).toHaveValue(query);
     const origin = await submitTicket(page, api, { keepSubject: true });
 

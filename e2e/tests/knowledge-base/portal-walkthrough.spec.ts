@@ -4,16 +4,15 @@ import { raiseTicket } from "../../helpers/factories";
 import { PASSWORD, personas } from "../../helpers/personas";
 import { createArticle, createCategory, indexArticles } from "../../helpers/portal";
 import { snapshotSettings } from "../../helpers/settings";
+import { siteHeader } from "../../helpers/site";
 
-// Every route and control a reader meets on the Studio portal's knowledge base, per persona.
-// The ids in the titles (R1, H9, K2, ...) follow the portal walkthrough checklist.
+// Title ids (R1, H9, K2, ...) follow the portal walkthrough checklist.
 
 const KB_SETTINGS = ["public_knowledge_base", "allow_anonymous_article_voting", "banner_preset"];
 const QUICK_LINKS = "Knowledge Base Quick Links";
 const GUEST = { storageState: { cookies: [], origins: [] } };
 const PHONE = { width: 390, height: 844 };
 
-/** `kb(values)` sets the knowledge base settings for one test; they are put back after it. */
 const test = base.extend<{ kb: (values: Record<string, any>) => Promise<void> }>({
   kb: async ({ api }, use) => {
     const restore = await snapshotSettings(api, KB_SETTINGS);
@@ -22,7 +21,6 @@ const test = base.extend<{ kb: (values: Record<string, any>) => Promise<void> }>
   },
 });
 
-/** A category holding one article per audience, plus a draft. */
 async function seedAudiences(api) {
   const category = await createCategory(api);
   const make = (visibility: string, status = "Published") =>
@@ -62,6 +60,21 @@ test.describe("routing", () => {
   test.describe("guest, public knowledge base", () => {
     test.use(GUEST);
 
+    test("R2 knowledge base pages render signed out", async ({ page, api, kb }) => {
+      await kb({ public_knowledge_base: 1 });
+      const category = await createCategory(api);
+      const article = await createArticle(api, category.name);
+      await page.goto("/help");
+      await expect(page.getByRole("heading", { name: "Here's what might help" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Log in" })).toBeVisible();
+      await page.goto("/help/categories");
+      await expect(page.getByRole("heading", { name: "All categories" })).toBeVisible();
+      await page.goto(`/help/category/${category.name}`);
+      await expect(page.getByRole("heading", { name: category.category_name, level: 1 })).toBeVisible();
+      await page.goto(`/help/articles/${article.name}`);
+      await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
+    });
+
     test("R3 ticket pages send a guest to login with the query kept", async ({ page, kb, apiAs }) => {
       await kb({ public_knowledge_base: 1 });
       const ticket = await raiseTicket(await apiAs("customer"));
@@ -71,7 +84,7 @@ test.describe("routing", () => {
       }
     });
 
-    test("R4 an unknown path sends a public guest to login, not a 404 (finding 3)", async ({ page, kb }) => {
+    test("R4 an unknown path sends a public guest to login, not a 404", async ({ page, kb }) => {
       await kb({ public_knowledge_base: 1 });
       await page.goto("/help/no-such-page");
       await expect(page).toHaveURL(/\/login\?redirect-to=%2Fhelp%2Fno-such-page/);
@@ -119,6 +132,224 @@ test.describe("routing", () => {
 });
 
 test.describe("header", () => {
+  test.describe("guest", () => {
+    test.use(GUEST);
+
+    test("H1 H8 logo links home, Log in returns to the page", async ({ page, kb }) => {
+      await kb({ public_knowledge_base: 1 });
+      await page.goto("/help/categories?a=1");
+      await expect(page.getByRole("link", { name: "Helpdesk" })).toHaveAttribute("href", "/help/");
+      await expect(accountMenu(page)).toHaveCount(0);
+      await page.getByRole("button", { name: "Log in" }).click();
+      await expect(page).toHaveURL(/\/login\?redirect-to=%2Fhelp%2Fcategories%3Fa%3D1/);
+    });
+  });
+
+  test.describe("guest on a phone", () => {
+    test.use({ ...GUEST, viewport: PHONE });
+
+    test("H10 a guest's logo menu holds only the text links", async ({ page, api, kb }) => {
+      await kb({ public_knowledge_base: 1 });
+      await saveQuickLinks(api, [{ label: "E2E Guest link", url: "https://example.com/guest", open_in_new_tab: 0 }]);
+      try {
+        await page.goto("/help");
+        await accountMenu(page).click();
+        await expect(page.getByRole("menuitem")).toHaveText(["E2E Guest link"]);
+      } finally {
+        await api.delete("HD Form Script", QUICK_LINKS);
+      }
+    });
+  });
+
+  test.describe("customer", () => {
+    usePersona("customer");
+
+    test("H2–H4 account menu goes home, to my tickets and to settings", async ({ page }) => {
+      await page.goto("/help/categories");
+      await accountMenu(page).click();
+      await expect(page.getByRole("menuitem", { name: "Agent portal" })).toHaveCount(0);
+      await page.getByRole("menuitem", { name: "My tickets" }).click();
+      await expect(page).toHaveURL(/\/help\/my-tickets/);
+      await accountMenu(page).click();
+      await page.getByRole("menuitem", { name: "Home" }).click();
+      await expect(page).toHaveURL(/\/help\/?$/);
+      await accountMenu(page).click();
+      await page.getByRole("menuitem", { name: "Settings" }).click();
+      await expect(page).toHaveURL(/#settings\/profile$/);
+      await expect(page.getByRole("dialog")).toBeVisible();
+    });
+
+    test("H7 theme toggle switches at once and survives a reload", async ({ page }) => {
+      await page.goto("/help");
+      const theme = () => page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+      const before = await theme();
+      await page.getByRole("button", { name: "Toggle theme" }).click();
+      const after = await theme();
+      expect(after).not.toBe(before);
+      await page.reload();
+      await expect.poll(theme).toBe(after);
+      await page.getByRole("button", { name: "Toggle theme" }).click();
+    });
+
+    test("H12 ticket breadcrumbs lead back to the list", async ({ page, apiAs }) => {
+      const ticket = await raiseTicket(await apiAs("customer"));
+      await page.goto("/help/tickets/new");
+      await expect(page.getByText("New ticket").first()).toBeVisible();
+      await page.goto(`/help/tickets/${ticket.name}`);
+      await expect(page.getByText(ticket.subject).first()).toBeVisible();
+      await page.getByRole("link", { name: "Tickets" }).first().click();
+      await expect(page).toHaveURL(/\/help\/my-tickets/);
+    });
+
+    test("H5 Log out signs out and lands on the home page", async ({ browser, baseURL }) => {
+      // Own session: logging out would end the shared stored one.
+      const context = await browser.newContext({ baseURL, extraHTTPHeaders: siteHeader() });
+      const page = await context.newPage();
+      await page.request.post("/api/method/login", { form: { usr: personas.customer.email, pwd: PASSWORD } });
+      await page.goto("/help/categories");
+      await accountMenu(page).click();
+      await page.getByRole("menuitem", { name: "Log out" }).click();
+      await expect(page).toHaveURL(/\/(help\/?|login.*)$/);
+      const user = await page.request.get("/api/method/frappe.auth.get_logged_user");
+      expect(user.status()).not.toBe(200);
+      await context.close();
+    });
+  });
+
+  test.describe("agent", () => {
+    usePersona("agent");
+
+    test("H6 agents also get Agent portal", async ({ page }) => {
+      await page.goto("/help");
+      await accountMenu(page).click();
+      await page.getByRole("menuitem", { name: "Agent portal" }).click();
+      await expect(page).toHaveURL(/\/helpdesk/);
+    });
+  });
+
+  test.describe("quick links and custom actions", () => {
+    usePersona("customer");
+
+    test("H9 H11 quick links and knowledge base actions show on knowledge base pages only", async ({ page, api }) => {
+      const links = [
+        { label: "E2E Docs", url: "https://docs.example.com", open_in_new_tab: 1 },
+        { label: "E2E Same tab", url: "https://example.com/same", open_in_new_tab: 0 },
+        { label: "E2E GitHub", url: "https://github.com/frappe/helpdesk", open_in_new_tab: 1 },
+        { label: "E2E Unsafe", url: "javascript:alert(1)", open_in_new_tab: 0 },
+      ];
+      // Short labels: long ones overflow the phone header onto the logo menu.
+      const action = "E2E";
+      await saveQuickLinks(api, links);
+      const scriptName = `E2E KB Script ${uid()}`;
+      await api.insert("HD Form Script", {
+        __newname: scriptName,
+        dt: "HD Ticket",
+        apply_to: "Form",
+        enabled: 1,
+        apply_to_knowledge_base: 1,
+        script: `function setupForm() { return { actions: [
+          { label: "${action} plain", onClick: () => {} },
+          { group: "${action} grp", buttonLabel: "${action} labelled", options: [{ label: "${action} inside", onClick: () => {} }] },
+          { group: "${action} hidden", options: [{ label: "${action} in more", onClick: () => {} }] },
+        ] } }`,
+      });
+      try {
+        await page.goto("/help");
+        const docs = page.getByRole("link", { name: "E2E Docs" });
+        await expect(docs).toHaveAttribute("href", "https://docs.example.com");
+        await expect(docs).toHaveAttribute("target", "_blank");
+        await expect(docs).toHaveAttribute("rel", /noopener/);
+        await expect(page.getByRole("link", { name: "E2E Same tab" })).not.toHaveAttribute("target", "_blank");
+        await expect(page.getByRole("link", { name: "E2E GitHub" })).toBeVisible();
+        await expect(page.getByRole("link", { name: "E2E GitHub" })).not.toHaveText("E2E GitHub");
+        await expect(page.getByText("E2E Unsafe")).toHaveCount(0);
+
+        await expect(page.getByRole("button", { name: `${action} plain` })).toBeVisible();
+        await page.getByRole("button", { name: `${action} labelled` }).click();
+        await expect(page.getByRole("menuitem", { name: `${action} inside` })).toBeVisible();
+        await page.keyboard.press("Escape");
+        await page.getByRole("button", { name: "More actions" }).click();
+        await expect(page.getByRole("menuitem", { name: `${action} in more` })).toBeVisible();
+        await page.keyboard.press("Escape");
+
+        await page.goto("/help/my-tickets");
+        await expect(page.getByRole("button", { name: "Raise a ticket" })).toBeVisible();
+        await expect(page.getByRole("link", { name: "E2E Docs" })).toHaveCount(0);
+        await expect(page.getByRole("button", { name: `${action} plain` })).toHaveCount(0);
+
+        // H10: on a phone text links move into the logo menu.
+        await page.setViewportSize(PHONE);
+        await page.goto("/help");
+        await expect(page.getByRole("link", { name: "E2E GitHub" })).toBeVisible();
+        await expect(page.getByRole("link", { name: "E2E Docs" })).toHaveCount(0);
+        await accountMenu(page).click();
+        await expect(page.getByRole("menuitem", { name: "E2E Docs" })).toBeVisible();
+      } finally {
+        await api.delete("HD Form Script", scriptName);
+        await api.delete("HD Form Script", QUICK_LINKS);
+      }
+    });
+  });
+
+  test.describe("custom actions on a phone", () => {
+    usePersona("customer");
+    test.use({ viewport: PHONE });
+
+    test("H11 a labelled action menu folds into More actions on a phone", async ({ page, api }) => {
+      const scriptName = `E2E KB Script ${uid()}`;
+      await api.insert("HD Form Script", {
+        __newname: scriptName,
+        dt: "HD Ticket",
+        apply_to: "Form",
+        enabled: 1,
+        apply_to_knowledge_base: 1,
+        script: `function setupForm() { return { actions: [
+          { group: "Help", buttonLabel: "Contact our support team", options: [{ label: "Email us", onClick: () => {} }] },
+          { group: "Other", options: [{ label: "Status page", onClick: () => {} }] },
+        ] } }`,
+      });
+      await saveQuickLinks(api, [{ label: "GitHub", url: "https://github.com/frappe/helpdesk", open_in_new_tab: 1 }]);
+      try {
+        await page.goto("/help");
+        await expect(page.getByRole("link", { name: "GitHub" })).toBeVisible();
+        await expect(page.getByRole("button", { name: "Contact our support team" })).toHaveCount(0);
+        await expect(accountMenu(page)).toBeInViewport({ ratio: 1 });
+        await page.getByRole("button", { name: "More actions" }).click();
+        await expect(page.getByRole("menuitem", { name: "Email us" })).toBeVisible();
+        await expect(page.getByRole("menuitem", { name: "Status page" })).toBeVisible();
+      } finally {
+        await api.delete("HD Form Script", QUICK_LINKS);
+        await api.delete("HD Form Script", scriptName);
+      }
+    });
+  });
+
+  test.describe("drawers on a phone", () => {
+    usePersona("customer");
+    test.use({ viewport: PHONE });
+
+    test("H13 Browse articles opens the sidebar drawer; Esc closes it", async ({ page, api }) => {
+      const category = await createCategory(api);
+      const article = await createArticle(api, category.name);
+      await page.goto(`/help/articles/${article.name}`);
+      const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
+      await expect(sidebar).not.toBeInViewport();
+      await page.getByRole("button", { name: "Browse articles" }).click();
+      await expect(sidebar).toBeInViewport();
+      await page.keyboard.press("Escape");
+      await expect(sidebar).not.toBeInViewport();
+    });
+
+    test("H14 Ticket details opens the details drawer; Close details closes it", async ({ page, apiAs }) => {
+      const ticket = await raiseTicket(await apiAs("customer"));
+      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.getByRole("button", { name: "Ticket details" }).click();
+      const close = page.getByRole("button", { name: "Close details" });
+      await expect(close).toBeInViewport();
+      await close.click();
+      await expect(close).not.toBeInViewport();
+    });
+  });
 
   test.describe("admin preview", () => {
     usePersona("admin");
@@ -216,8 +447,36 @@ test.describe("knowledge base home", () => {
       Object.fromEntries(Object.keys(localStorage).filter((key) => key.startsWith("helpdesk-kb-recent")).map((key) => [key, JSON.parse(localStorage.getItem(key) || "[]")]))
     );
     expect(lists[`helpdesk-kb-recent-articles:${personas.customer.email}`][0].name).toBe(article.name);
-    // The guest's list, written while the session loads, must not get the customer's reading.
+    // The guest list, written during session load, must stay empty.
     expect.soft(lists["helpdesk-kb-recent-articles:Guest"] || []).toEqual([]);
+  });
+
+  test("K10 K12 pinned categories, View all and Show less", async ({ page, api }) => {
+    const pinned = [await createCategory(api), await createCategory(api)];
+    for (const category of pinned) await createArticle(api, category.name);
+    try {
+      for (const [index, category] of pinned.entries()) {
+        await api.update("HD Article Category", category.name, { pinned: 1, pinned_order: index + 1 });
+      }
+      await page.goto("/help");
+      const grid = page.locator('[data-component-id="category-grid-repeater"]');
+      await expect(grid.getByRole("link")).toHaveCount(2);
+      await expect(grid.getByRole("link").first()).toContainText(pinned[0].category_name);
+      // K12: two cards take two columns.
+      const columns = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+      expect(columns).toBe(2);
+      await page.getByRole("button", { name: "View all" }).click();
+      await expect.poll(() => grid.getByRole("link").count()).toBeGreaterThan(2);
+      // Clicks during the 300ms animation are dropped.
+      await page.waitForTimeout(600);
+      await page.getByRole("button", { name: "Show less" }).click();
+      await expect(grid.getByRole("link")).toHaveCount(2);
+      // K11: a card opens its category.
+      await grid.getByRole("link").first().click();
+      await expect(page).toHaveURL(new RegExp(`/help/category/${pinned[0].name}$`));
+    } finally {
+      for (const category of pinned) await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
+    }
   });
 
   test("K15 a lone pinned category gets its own layout", async ({ page, api }) => {
@@ -276,8 +535,8 @@ test.describe("audiences", () => {
       await expect(page.getByRole("heading", { name: seeded.public.title, level: 1 })).toBeVisible();
       await expect(page.getByRole("button", { name: "Yes, it was helpful" })).toHaveCount(0);
       await expect(page.getByRole("link", { name: "here", exact: true })).toHaveCount(0);
-      const vote = await page.request.post("/api/method/helpdesk.api.knowledge_base.set_article_feedback", {
-        form: { article: seeded.public.name, value: "1" },
+      const vote = await page.request.post("/api/method/helpdesk.api.knowledge_base.vote_on_article", {
+        form: { article: seeded.public.name, vote: "1" },
       });
       expect(vote.status()).toBe(403);
     });
@@ -336,6 +595,14 @@ test.describe("audiences", () => {
 test.describe("categories and category pages", () => {
   usePersona("customer");
 
+  test("CA1 All categories lists a readable category and opens it", async ({ page, api }) => {
+    const category = await createCategory(api);
+    await createArticle(api, category.name);
+    await page.goto("/help/categories");
+    await page.getByRole("link", { name: category.category_name }).click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
+  });
+
   test("CT2–CT5 article list, sidebar toggle and sidebar search", async ({ page, api }) => {
     const category = await createCategory(api);
     const other = await createCategory(api);
@@ -353,8 +620,7 @@ test.describe("categories and category pages", () => {
     await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "false");
     await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
 
-    // The test browser reports Windows, so the shortcut is Ctrl+K.
-    await page.locator("body").press("Control+k");
+    await page.locator("body").press("/");
     const search = sidebar.getByRole("textbox", { name: "Search articles" });
     await expect(search).toBeFocused();
     await search.fill(article.title);
@@ -386,7 +652,7 @@ test.describe("article page", () => {
     await expect(page).toHaveURL(`/help/articles/${article.name}-${slug}`);
   });
 
-  test("AR3 a heading link opens at that heading (finding 2)", async ({ page, api }) => {
+  test("AR3 a heading link opens at that heading", async ({ page, api }) => {
     const category = await createCategory(api);
     const filler = "<p>" + "word ".repeat(600) + "</p>";
     const article = await createArticle(api, category.name, {
@@ -395,7 +661,19 @@ test.describe("article page", () => {
     await page.goto(`/help/articles/${article.name}#deep-part`);
     const heading = page.getByRole("heading", { name: "Deep part" });
     await expect(heading).toBeVisible();
-    await page.waitForTimeout(1000);
+    await expect(heading, "the page should scroll to the linked heading").toBeInViewport({ timeout: 2000 });
+  });
+
+  test("AR3 a heading link from the old knowledge base still opens at that heading", async ({ page, api }) => {
+    const category = await createCategory(api);
+    const filler = "<p>" + "word ".repeat(600) + "</p>";
+    const article = await createArticle(api, category.name, {
+      content: `<h2>First part</h2>${filler}<h2>What's new?</h2>${filler}`,
+    });
+    // The old desk kept the trailing dash; the portal's own id is `what-s-new`.
+    await page.goto(`/help/articles/${article.name}#what-s-new-`);
+    const heading = page.getByRole("heading", { name: "What's new?" });
+    await expect(heading).toBeVisible();
     await expect(heading, "the page should scroll to the linked heading").toBeInViewport({ timeout: 2000 });
   });
 
@@ -425,10 +703,10 @@ test.describe("article page", () => {
     await expect(markdown.locator("body")).toContainText(`# ${article.title}`);
     await markdown.close();
 
-    // AR7: a second visit within the hour adds no view.
+    // AR7: no second view within the hour; wait for the request first.
+    const counted = page.waitForResponse((response) => response.url().includes("increment_views"));
     await page.reload();
-    await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
-    await page.waitForTimeout(500);
+    await counted;
     expect((await api.get("HD Article", article.name)).views).toBe(1);
   });
 
@@ -454,7 +732,7 @@ test.describe("article page", () => {
     // The sixth vote on one article within an hour is refused.
     await expect.poll(feedback).toBe("1");
     const refused = page.waitForResponse(
-      (response) => response.url().includes("set_article_feedback") && /"value":\s*2/.test(response.request().postData() || "")
+      (response) => response.url().includes("vote_on_article") && /"vote":\s*2/.test(response.request().postData() || "")
     );
     await no.click();
     expect((await refused).status()).toBe(429);
@@ -475,14 +753,14 @@ test.describe("article page", () => {
     await expect(page.getByRole("heading", { name: "Gamma part" })).toBeInViewport();
   });
 
-  test("AR15 at xl a single heading still gets the side contents (finding 4)", async ({ page, api }) => {
+  test("AR15 at xl a single heading still gets the side contents", async ({ page, api }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const category = await createCategory(api);
     const article = await createArticle(api, category.name, { content: "<h2>Only part</h2><p>Body</p>" });
     await page.goto(`/help/articles/${article.name}`);
     await expect(page.getByRole("heading", { name: "Only part" })).toBeVisible();
     const toc = page.getByRole("navigation").filter({ hasText: "On this page" });
-    await expect.soft(toc.getByRole("button", { name: "Only part" }), "finding 4: one heading still shows the xl TOC").toBeVisible();
+    await expect.soft(toc.getByRole("button", { name: "Only part" }), "one heading still shows the xl TOC").toBeVisible();
   });
 
   test("AR25 AR27 related articles open and reset the article scroll", async ({ page, api }) => {
@@ -491,10 +769,9 @@ test.describe("article page", () => {
     const created = [];
     for (let i = 0; i < 8; i++) created.push(await createArticle(api, category.name, { title: `Related ${i} ${uid()}`, content: filler }));
     await page.goto(`/help/articles/${created[0].name}`);
-    const related = page.getByText("Related articles").locator("xpath=..");
     await expect(page.getByText("Related articles")).toBeVisible();
     const rows = page.locator('[data-component-id="container-gi1caqqm1"]').getByRole("link", { name: /^Related \d/ });
-    await expect(rows).toHaveCount(6);
+    await expect(rows).toHaveCount(5);
     const panel = page.locator('[data-component-id="container-gi1caqqm1"]');
     await panel.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
     const target = rows.first();
@@ -502,7 +779,6 @@ test.describe("article page", () => {
     await target.click();
     await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
     await expect.poll(() => panel.evaluate((el) => el.scrollTop)).toBe(0);
-    void related;
   });
 
   test.describe("phone", () => {
@@ -555,16 +831,19 @@ test.describe("knowledge base settings", () => {
       await dialog.getByRole("tab", { name: "Knowledge Base", exact: true }).click();
       await expect(page).toHaveURL(/#settings\/knowledge-base$/);
 
-      // Switches save as they flip, without the Save button.
+      // Switches save without the Save button.
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
       await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).allow_anonymous_article_voting).toBe(1);
       await expect(dialog.getByText("Unsaved")).toBeHidden();
       await dialog.getByRole("radio", { name: "Blue" }).click();
       await expect(dialog.getByText("Unsaved")).toBeVisible();
-      await dialog.getByRole("button", { name: "Choose categories" }).click();
-      await page.getByRole("combobox").last().fill(category.category_name);
-      await page.getByRole("option", { name: new RegExp(category.category_name) }).click();
-      await page.keyboard.press("Escape");
+      // Pins save from their own dialog, apart from the draft.
+      await dialog.getByRole("button", { name: "Customize" }).click();
+      const pins = page.getByRole("dialog", { name: "Pinned categories" });
+      await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();
+      await pins.getByRole("button", { name: "Save" }).click();
+      await expect(pins).toBeHidden();
+      await expect.poll(async () => (await api.get("HD Article Category", category.name)).pinned).toBe(1);
       await dialog.getByRole("button", { name: "Add link" }).click();
       await dialog.getByPlaceholder("Contact sales").fill(label);
       // S33: an unsafe address is refused on Save.
@@ -593,4 +872,16 @@ test.describe("knowledge base settings", () => {
     }
   });
 });
+
+async function saveQuickLinks(api, links: Record<string, any>[]) {
+  const json = JSON.stringify(links);
+  await api.insert("HD Form Script", {
+    __newname: QUICK_LINKS,
+    dt: "HD Ticket",
+    apply_to: "Form",
+    enabled: 1,
+    apply_to_knowledge_base: 1,
+    script: `function setupForm() {\n  return { links: ${json} };\n}`,
+  });
+}
 

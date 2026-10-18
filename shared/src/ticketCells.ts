@@ -6,7 +6,7 @@ import { isSlaMissed, shortDuration } from "./utils";
 /** Tallest bars faded per level: High is fully solid, Low nearly empty. */
 const FADED_BARS: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
 
-// Shortest first, so a bar's index from the top counts down.
+// Shortest first; fading counts from the tallest.
 const BARS = [
   { x: 0, y: 8, height: 4 },
   { x: 4, y: 4, height: 8 },
@@ -18,7 +18,7 @@ export function PriorityIcon({ level }: { level: string }) {
 }
 PriorityIcon.props = ["level"];
 
-// No SLA means nothing was promised, so there is nothing to report against.
+// No SLA: nothing promised.
 export function responseBadge(row: any, due?: string) {
   if (!row.sla) return null;
   return slaBadge(row.first_responded_on, due, "amber");
@@ -55,7 +55,7 @@ function levelBars(level: string) {
 }
 
 function slaBadge(metOn: string | undefined, due: string | undefined, countdownTheme: string) {
-  // No target means it was never breached, so meeting it at all fulfils it.
+  // No due date: any met time counts as fulfilled.
   if (metOn) return outcomeBadge(!isSlaMissed(metOn, due));
   if (!due) return null;
   if (dayjsLocal(due).isBefore(dayjsLocal())) return outcomeBadge(false);

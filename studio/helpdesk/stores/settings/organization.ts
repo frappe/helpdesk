@@ -13,27 +13,23 @@ export function createOrganizationSettings(core) {
 
   const { config } = useSession()
 
-  // The account's card holds name, logo, domain and role; `get_organization` adds the rest.
   const organizationCard = computed(() =>
     core.organizations.value.find((row) => row.name === selectedOrganizationName.value),
   )
   const settingsOrganization = computed(() => ({ ...organizationCard.value, ...organization.value }))
 
-  // Each needs the manager role and the helpdesk's switch; the API refuses the rest anyway.
   const canManage = computed(() => Boolean(organizationCard.value && organizationCard.value.role !== 'Member'))
   const canInvite = computed(
     () => canManage.value && Boolean(config.value?.allow_customer_managers_to_invite),
   )
-  const canChangeRoles = computed(
-    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_change_roles),
-  )
-  const canRemoveMembers = computed(
-    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_remove_members),
+  const canManageMembers = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_manage_members),
   )
   const canEdit = computed(
     () => canManage.value && Boolean(config.value?.allow_customer_managers_to_edit_organization),
   )
   const members = computed(() => organization.value?.members || [])
+  const organizationLoading = computed(() => Boolean(selectedOrganizationName.value) && !organization.value)
   const canLeaveOrganization = computed(() => core.organizations.value.length > 1)
   const invitations = computed(() => organization.value?.invitations || [])
 
@@ -64,6 +60,11 @@ export function createOrganizationSettings(core) {
   const inviteEmails = ref([])
   const inviteRole = ref<RoleLabel>('Member')
   const inviteRoleOptions = computed(() => ASSIGNABLE_ROLES.map((role) => ({ label: roleLabel(role), value: role })))
+  const inviteRoleDescription = computed(() =>
+    inviteRole.value === 'Manager'
+      ? __('Can see tickets raised by everyone in the organization.')
+      : __('Can raise tickets and see their own tickets.'),
+  )
 
   core.afterLoad(() => {
     if (selectedOrganizationName.value) return loadOrganization(selectedOrganizationName.value)
@@ -87,6 +88,11 @@ export function createOrganizationSettings(core) {
     }
   }
 
+  // Member changes don't touch the account.
+  function reloadOrganization() {
+    return loadOrganization(selectedOrganizationName.value)
+  }
+
   function openOrganization(name) {
     selectedOrganizationName.value = name
     organization.value = null
@@ -101,7 +107,7 @@ export function createOrganizationSettings(core) {
     inviteOpen.value = false
   }
 
-  // A list of one is not a choice, however the reader reached the screen.
+  // A lone organization opens directly.
   watch(
     [core.settingsTab, core.organizations],
     () => {
@@ -132,9 +138,11 @@ export function createOrganizationSettings(core) {
         closeInvite()
         const list = (emails: string[]) => emails.join(', ')
         if (result.invited_emails.length) toast.success(__('{0} invited successfully', list(result.invited_emails)))
-        // The server does not say why, so another organization's people stay private.
+        // The server hides why, so other organizations' people stay private.
         if (result.skipped_emails.length)
-          toast.info(__('{0} not invited: already invited, already has an account, or disabled', list(result.skipped_emails)))
+          toast.info(__('Could not invite {0}. They may already be a member or have a pending invite.', list(result.skipped_emails)))
+        if (result.disabled_emails.length)
+          toast.info(__('Could not invite {0}. Their account is disabled.', list(result.disabled_emails)))
       },
       null,
       () => {
@@ -147,11 +155,12 @@ export function createOrganizationSettings(core) {
           __('Invitations created, but the emails could not be sent'),
         )
       },
+      reloadOrganization,
     )
   }
 
   function confirmAndRun(dialog, request, successMessage, landed?) {
-    askConfirm({ ...dialog, action: () => core.run(request, successMessage, landed) })
+    askConfirm({ ...dialog, action: () => core.run(request, successMessage, landed, reloadOrganization) })
   }
 
   function setMemberRole(member, role) {
@@ -202,8 +211,8 @@ export function createOrganizationSettings(core) {
     return core.run(() => callOrganization('update_organization_image', { image }), successMessage)
   }
 
-  function uploadOrganizationImage() {
-    core.pickImage((fileUrl) => updateOrganizationImage(fileUrl, __('Logo updated')))
+  function uploadOrganizationImage(fileUrl: string) {
+    return updateOrganizationImage(fileUrl, __('Logo updated'))
   }
 
   function removeOrganizationImage() {
@@ -211,16 +220,16 @@ export function createOrganizationSettings(core) {
   }
 
   return {
-    // Bound by the blocks under these names.
+    // Bound by name from the blocks.
     selectedOrganization: selectedOrganizationName,
     settingsOrganization,
     canLeaveOrganization,
     canInvite,
-    canChangeRoles,
-    canRemoveMembers,
+    canManageMembers,
     showLastActive: canManage,
     canEdit,
     organizationMembers: members,
+    organizationLoading,
     organizationInvitations: invitations,
     organizationScreenTitle,
     organizationScreenDescription,
@@ -231,6 +240,7 @@ export function createOrganizationSettings(core) {
     inviteEmails,
     inviteRole,
     inviteRoleOptions,
+    inviteRoleDescription,
     searchInviteContacts,
     openOrganization,
     closeOrganization,

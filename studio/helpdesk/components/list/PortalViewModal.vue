@@ -1,7 +1,7 @@
 <template>
   <Dialog
     v-model:open="open"
-    :title="isRename ? __('Rename view') : __('Save as new view')"
+    :title="isRename ? __('Rename view') : __('Create View')"
     :actions="[
       {
         label: isRename ? __('Save') : __('Create'),

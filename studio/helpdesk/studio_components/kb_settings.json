@@ -30,10 +30,6 @@
            "prefix": {
             "slotContent": [
              {
-              "classes": [
-               "has-[>div:first-child]:border",
-               "has-[>div:first-child]:border-outline-gray-2"
-              ],
               "componentId": "kb_settings-nav-profile-avatar",
               "componentName": "Avatar",
               "componentProps": {
@@ -104,7 +100,10 @@
          "label": "{{ t('Organization') }}"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ organizations.length }}"
+        "visibilityCondition": "{{ settingsLoaded && organizations.length }}",
+        "classes": [
+         "portal-reveal"
+        ]
        },
        {
         "children": [
@@ -191,7 +190,10 @@
          "label": "{{ t('App Settings') }}"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ canEditSettings }}"
+        "visibilityCondition": "{{ settingsLoaded && canEditSettings }}",
+        "classes": [
+         "portal-reveal"
+        ]
        }
       ],
       "componentId": "kb_settings-sidebar",
@@ -268,6 +270,15 @@
            {
             "children": [
              {
+              "componentId": "PortalSkeleton-profile",
+              "componentName": "PortalSkeleton",
+              "isCustomVueComponent": true,
+              "componentProps": {
+               "variant": "profile"
+              },
+              "visibilityCondition": "{{ !settingsLoaded }}"
+             },
+             {
               "blockName": "Profile identity",
               "componentEvents": {
                "remove": {
@@ -283,7 +294,7 @@
                "upload": {
                 "action": "Run Script",
                 "event": "upload",
-                "script": "uploadProfileImage()"
+                "script": "function handleEvent(fileUrl) { uploadProfileImage(fileUrl) }"
                }
               },
               "componentId": "kb_settings-profile-identity",
@@ -296,7 +307,11 @@
                "subtitle": "{{ settingsUser.email }}"
               },
               "componentSlots": {},
-              "isCustomVueComponent": true
+              "isCustomVueComponent": true,
+              "visibilityCondition": "{{ settingsLoaded }}",
+              "classes": [
+               "portal-reveal"
+              ]
              },
              {
               "blockName": "Preferences",
@@ -406,7 +421,7 @@
                      "max-sm:!w-full"
                     ],
                     "componentId": "kb_settings-select-theme",
-                    "componentName": "Select",
+                    "componentName": "PortalThemeSelect",
                     "componentProps": {
                      "modelValue": {
                       "$type": "variable",
@@ -417,7 +432,8 @@
                       "name": "themeOptions"
                      }
                     },
-                    "componentSlots": {}
+                    "componentSlots": {},
+                    "isCustomVueComponent": true
                    }
                   ],
                   "classes": [
@@ -480,14 +496,15 @@
                }
               ],
               "classes": [
-               "mt-8"
+               "mt-8",
+               "portal-reveal"
               ],
               "componentId": "kb_settings-preferences",
               "componentName": "container",
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div",
-              "visibilityCondition": "{{ settingsUser.email }}"
+              "visibilityCondition": "{{ settingsLoaded && settingsUser.email }}"
              },
              {
               "blockName": "Security",
@@ -539,14 +556,15 @@
                }
               ],
               "classes": [
-               "mt-4"
+               "mt-4",
+               "portal-reveal"
               ],
               "componentId": "kb_settings-security",
               "componentName": "container",
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div",
-              "visibilityCondition": "{{ settingsUser.email }}"
+              "visibilityCondition": "{{ settingsLoaded && settingsUser.email }}"
              }
             ],
             "componentId": "kb_settings-profile-content",
@@ -578,7 +596,10 @@
         "componentProps": {
          "value": "profile"
         },
-        "componentSlots": {}
+        "componentSlots": {},
+        "classes": [
+         "min-w-0"
+        ]
        },
        {
         "blockName": "Manage organization",
@@ -650,7 +671,8 @@
             "componentName": "PortalOrganizationList",
             "componentProps": {
              "onSelect": "{{ openOrganization }}",
-             "organizations": "{{ organizations }}"
+             "organizations": "{{ organizations }}",
+             "loading": "{{ !settingsLoaded }}"
             },
             "componentSlots": {},
             "isCustomVueComponent": true
@@ -981,7 +1003,8 @@
                  "items-center",
                  "gap-x-1.5",
                  "flex-wrap",
-                 "gap-y-0.5"
+                 "gap-y-0.5",
+                 "shrink-0"
                 ],
                 "componentId": "kb_settings-organization-meta",
                 "componentName": "container",
@@ -999,7 +1022,7 @@
                "upload": {
                 "action": "Run Script",
                 "event": "upload",
-                "script": "uploadOrganizationImage()"
+                "script": "function handleEvent(fileUrl) { uploadOrganizationImage(fileUrl) }"
                }
               },
               "componentId": "kb_settings-organization-identity",
@@ -1014,12 +1037,16 @@
                "subtitle": ""
               },
               "componentSlots": {},
-              "isCustomVueComponent": true
+              "isCustomVueComponent": true,
+              "classes": [
+               "shrink-0"
+              ]
              },
              {
               "classes": [
                "mt-5",
-               "w-full"
+               "w-full",
+               "shrink-0"
               ],
               "componentId": "kb_settings-organization-tabs",
               "componentName": "Tabs",
@@ -1039,37 +1066,45 @@
               "children": [
                {
                 "classes": [
-                 "mt-3"
+                 "mt-3",
+                 "flex-1",
+                 "min-h-0"
                 ],
                 "componentId": "kb_settings-members-list",
                 "componentName": "PortalMemberList",
                 "componentProps": {
-                 "canChangeRoles": "{{ canChangeRoles }}",
-                 "canRemoveMembers": "{{ canRemoveMembers }}",
+                 "canManageMembers": "{{ canManageMembers }}",
                  "showLastActive": "{{ showLastActive }}",
                  "invitations": "{{ organizationInvitations }}",
                  "members": "{{ organizationMembers }}",
                  "onCancel": "{{ cancelInvitation }}",
                  "onRemove": "{{ removeMember }}",
-                 "onSetRole": "{{ setMemberRole }}"
+                 "onSetRole": "{{ setMemberRole }}",
+                 "loading": "{{ organizationLoading }}"
                 },
                 "componentSlots": {},
                 "isCustomVueComponent": true
                }
               ],
               "classes": [
-               "mt-4"
+               "mt-4",
+               "flex",
+               "flex-col",
+               "flex-1",
+               "min-h-0"
               ],
               "componentId": "kb_settings-members",
               "componentName": "container",
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div",
-              "visibilityCondition": "{{ organizationTab === 'members' && organizationMembers.length }}"
+              "visibilityCondition": "{{ organizationTab === 'members' && (organizationLoading || organizationMembers.length) }}"
              },
              {
               "classes": [
-               "mt-4"
+               "mt-4",
+               "flex-1",
+               "min-h-0"
               ],
               "componentId": "kb_settings-organization-tickets",
               "componentName": "PortalOrganizationTickets",
@@ -1084,13 +1119,20 @@
             "componentName": "container",
             "componentProps": {},
             "componentSlots": {},
-            "originalElement": "div"
+            "originalElement": "div",
+            "classes": [
+             "flex",
+             "flex-1",
+             "flex-col",
+             "min-h-0"
+            ]
            }
           ],
           "classes": [
+           "flex",
+           "flex-col",
            "flex-1",
            "min-h-0",
-           "overflow-y-auto",
            "pt-0",
            "px-4",
            "sm:px-10",
@@ -1112,71 +1154,83 @@
              {
               "children": [
                {
-                "classes": [
-                 "size-4.5"
+                "children": [
+                 {
+                  "classes": [
+                   "size-4.5"
+                  ],
+                  "componentId": "kb_settings-invite-back-icon",
+                  "componentName": "Icon",
+                  "componentProps": {
+                   "icon": "lucide-chevron-left"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "classes": [
+                   "font-semibold"
+                  ],
+                  "componentId": "kb_settings-invite-back-label",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-lg",
+                   "tag": "h1",
+                   "text": "{{ t('Invite people') }}"
+                  },
+                  "componentSlots": {}
+                 }
                 ],
-                "componentId": "kb_settings-invite-back-icon",
-                "componentName": "Icon",
-                "componentProps": {
-                 "icon": "lucide-chevron-left"
+                "classes": [
+                 "cursor-pointer",
+                 "select-none",
+                 "hover:opacity-80",
+                 "items-center",
+                 "text-ink-gray-8",
+                 "flex",
+                 "gap-2",
+                 "-ml-1.5",
+                 "min-h-8",
+                 "pr-2"
+                ],
+                "componentEvents": {
+                 "click": {
+                  "action": "Run Script",
+                  "event": "click",
+                  "script": "closeInvite()"
+                 }
                 },
-                "componentSlots": {}
+                "componentId": "kb_settings-invite-back",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
                },
                {
                 "classes": [
-                 "font-semibold"
+                 "text-ink-gray-6",
+                 "max-w-[28rem]"
                 ],
-                "componentId": "kb_settings-invite-back-label",
+                "componentId": "kb_settings-invite-description",
                 "componentName": "TextBlock",
                 "componentProps": {
-                 "fontSize": "text-lg",
-                 "tag": "h1",
-                 "text": "{{ t('Invite people') }}"
+                 "fontSize": "text-base",
+                 "tag": "p",
+                 "text": "{{ t('Invite people to your organization.') }}"
                 },
                 "componentSlots": {}
                }
               ],
               "classes": [
-               "cursor-pointer",
-               "select-none",
-               "hover:opacity-80",
-               "items-center",
-               "text-ink-gray-8",
                "flex",
-               "gap-2",
-               "-ml-1.5",
-               "min-h-8",
-               "pr-2"
+               "flex-col",
+               "gap-1",
+               "min-w-0"
               ],
-              "componentEvents": {
-               "click": {
-                "action": "Run Script",
-                "event": "click",
-                "script": "closeInvite()"
-               }
-              },
-              "componentId": "kb_settings-invite-back",
+              "componentId": "kb_settings-invite-heading-stack",
               "componentName": "container",
               "componentProps": {},
               "componentSlots": {},
               "originalElement": "div"
-             },
-             {
-              "componentEvents": {
-               "click": {
-                "action": "Run Script",
-                "event": "click",
-                "script": "sendInvite()"
-               }
-              },
-              "componentId": "kb_settings-invite-send",
-              "componentName": "Button",
-              "componentProps": {
-               "label": "{{ t('Send Invite') }}",
-               "loading": "{{ isSettingsBusy }}",
-               "variant": "subtle"
-              },
-              "componentSlots": {}
              }
             ],
             "classes": [
@@ -1214,9 +1268,129 @@
              {
               "children": [
                {
+                "children": [
+                 {
+                  "classes": [
+                   "text-ink-gray-5"
+                  ],
+                  "componentId": "kb_settings-invite-email-label-text",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-base",
+                   "tag": "span",
+                   "text": "{{ t('Invite by email') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "classes": [
+                   "text-ink-red-6",
+                   "select-none"
+                  ],
+                  "componentId": "kb_settings-invite-email-label-required",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-base",
+                   "tag": "span",
+                   "text": "*"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
                 "classes": [
-                 "w-32",
-                 "max-sm:!w-full"
+                 "flex",
+                 "gap-1"
+                ],
+                "componentId": "kb_settings-invite-email-label",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               },
+               {
+                "componentId": "kb_settings-invite-emails",
+                "componentName": "PortalEmailInput",
+                "componentProps": {
+                 "searchContacts": "{{ searchInviteContacts }}",
+                 "modelValue": {
+                  "$type": "variable",
+                  "name": "inviteEmails"
+                 },
+                 "placeholder": "user1@example.com, user2@example.com, ..."
+                },
+                "componentSlots": {},
+                "isCustomVueComponent": true
+               },
+               {
+                "classes": [
+                 "text-ink-gray-5"
+                ],
+                "componentId": "kb_settings-invite-email-hint",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-p-xs",
+                 "tag": "p",
+                 "text": "{{ t('Comma separated emails to invite.') }}"
+                },
+                "componentSlots": {}
+               }
+              ],
+              "classes": [
+               "flex",
+               "flex-col",
+               "gap-1.5"
+              ],
+              "componentId": "kb_settings-invite-email-field",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
+             },
+             {
+              "children": [
+               {
+                "children": [
+                 {
+                  "classes": [
+                   "text-ink-gray-5"
+                  ],
+                  "componentId": "kb_settings-invite-role-label-text",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-base",
+                   "tag": "span",
+                   "text": "{{ t('Role') }}"
+                  },
+                  "componentSlots": {}
+                 },
+                 {
+                  "classes": [
+                   "text-ink-red-6",
+                   "select-none"
+                  ],
+                  "componentId": "kb_settings-invite-role-label-required",
+                  "componentName": "TextBlock",
+                  "componentProps": {
+                   "fontSize": "text-base",
+                   "tag": "span",
+                   "text": "*"
+                  },
+                  "componentSlots": {}
+                 }
+                ],
+                "classes": [
+                 "flex",
+                 "gap-1"
+                ],
+                "componentId": "kb_settings-invite-role-label",
+                "componentName": "container",
+                "componentProps": {},
+                "componentSlots": {},
+                "originalElement": "div"
+               },
+               {
+                "classes": [
+                 "w-full"
                 ],
                 "componentId": "kb_settings-invite-role",
                 "componentName": "Select",
@@ -1228,40 +1402,59 @@
                  "options": "{{ inviteRoleOptions }}"
                 },
                 "componentSlots": {}
+               },
+               {
+                "classes": [
+                 "text-ink-gray-5"
+                ],
+                "componentId": "kb_settings-invite-role-hint",
+                "componentName": "TextBlock",
+                "componentProps": {
+                 "fontSize": "text-p-xs",
+                 "tag": "p",
+                 "text": "{{ inviteRoleDescription }}"
+                },
+                "componentSlots": {}
                }
               ],
               "classes": [
-               "max-sm:!flex-col",
-               "max-sm:!items-stretch",
-               "max-sm:!gap-2.5"
+               "flex",
+               "flex-col",
+               "gap-1.5"
               ],
-              "componentId": "kb_settings-invite-row",
-              "componentName": "SettingsRow",
-              "componentProps": {
-               "description": "{{ t('New users will be added to the team as') }}",
-               "title": "{{ t('Invite by email') }}"
-              },
-              "componentSlots": {}
+              "componentId": "kb_settings-invite-role-field",
+              "componentName": "container",
+              "componentProps": {},
+              "componentSlots": {},
+              "originalElement": "div"
              },
              {
-              "componentId": "kb_settings-invite-emails",
-              "componentName": "PortalEmailInput",
+              "componentEvents": {
+               "click": {
+                "action": "Run Script",
+                "event": "click",
+                "script": "sendInvite()"
+               }
+              },
+              "componentId": "kb_settings-invite-send",
+              "componentName": "Button",
               "componentProps": {
-               "searchContacts": "{{ searchInviteContacts }}",
-               "modelValue": {
-                "$type": "variable",
-                "name": "inviteEmails"
-               },
-               "placeholder": "{{ t('Separate multiple emails with commas') }}"
+               "label": "{{ t('Send Invites') }}",
+               "loading": "{{ isSettingsBusy }}",
+               "disabled": "{{ !inviteEmails.length }}",
+               "variant": "solid"
               },
               "componentSlots": {},
-              "isCustomVueComponent": true
+              "classes": [
+               "w-fit",
+               "mt-1"
+              ]
              }
             ],
             "classes": [
              "flex",
              "flex-col",
-             "gap-3"
+             "gap-5"
             ],
             "componentId": "kb_settings-invite-content",
             "componentName": "container",
@@ -1293,7 +1486,10 @@
         "componentProps": {
          "value": "members"
         },
-        "componentSlots": {}
+        "componentSlots": {},
+        "classes": [
+         "min-w-0"
+        ]
        },
        {
         "blockName": "Knowledge Base",
@@ -1470,7 +1666,10 @@
          "value": "knowledge-base"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ canEditSettings }}"
+        "visibilityCondition": "{{ canEditSettings }}",
+        "classes": [
+         "min-w-0"
+        ]
        },
        {
         "blockName": "Portal Settings",
@@ -1563,13 +1762,19 @@
          "value": "portal-settings"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ canEditSettings }}"
+        "visibilityCondition": "{{ canEditSettings }}",
+        "classes": [
+         "min-w-0"
+        ]
        }
       ],
       "componentId": "kb_settings-content",
       "componentName": "SettingsContent",
       "componentProps": {},
-      "componentSlots": {}
+      "componentSlots": {},
+      "classes": [
+       "min-w-0"
+      ]
      }
     ],
     "componentId": "kb_settings-dialog",
@@ -1618,7 +1823,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-16 23:00:00.000000",
+ "modified": "2026-10-19 03:50:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

@@ -1,4 +1,4 @@
-// The portal build only ships icons whose names appear in these files, so category icons come from this list.
+// The portal build ships only icons named in source, hence this list.
 export const CATEGORY_ICONS = [
   'lucide-folder',
   'lucide-book-open',

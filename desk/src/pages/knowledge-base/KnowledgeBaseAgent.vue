@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import Icon from "@helpdesk/shared/Icon.vue";
-import { ArticleIcon, OrganizationsIcon } from "@/components/icons";
+import { ArticleIcon } from "@/components/icons";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
@@ -87,6 +87,7 @@ import { capture } from "@/telemetry";
 import { Error } from "@/types";
 import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import {
   Badge,
   Button,
@@ -117,7 +118,6 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
-// One dialog for a category's articles and for a selection of them.
 const accessDialog = reactive({
   open: false,
   forCategory: true,
@@ -345,13 +345,20 @@ async function changeArticlesAccess(selections: Set<string>) {
 }
 
 async function updateArticlesAccess(visibility: string) {
-  const { failed_docs } = await call("frappe.client.bulk_update", {
-    docs: Array.from(listSelections.value).map((docname) => ({
-      doctype: "HD Article",
-      docname,
-      visibility,
-    })),
-  });
+  let failed_docs;
+  try {
+    ({ failed_docs } = await call("frappe.client.bulk_update", {
+      docs: Array.from(listSelections.value).map((docname) => ({
+        doctype: "HD Article",
+        docname,
+        visibility,
+      })),
+    }));
+  } catch {
+    // per-article failures come back in `failed_docs`
+    toast.error(__("Could not update access"));
+    return;
+  }
   if (failed_docs.length) {
     toast.error(__("Could not update access for some articles."));
   } else {
@@ -595,10 +602,10 @@ const options = computed(() => {
         custom: ({ item }) =>
           h("div", { class: "flex items-center gap-1.5 text-ink-gray-7" }, [
             h(Icon, {
-              icon: accessIcons[item],
+              icon: categoryAccess()[item]?.icon,
               class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
             }),
-            __(item?.replace(" only", "")),
+            categoryAccess()[item]?.label,
           ]),
       },
     },
@@ -623,12 +630,6 @@ const options = computed(() => {
     default_page_length: 100,
   };
 });
-
-const accessIcons = {
-  Private: "lucide-lock",
-  Customers: OrganizationsIcon,
-  Public: "lucide-globe",
-};
 
 const statusMap = {
   Published: {

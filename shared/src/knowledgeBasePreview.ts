@@ -1,5 +1,4 @@
-// The knowledge base settings' Preview stores the unsaved look here and opens the portal with
-// ?preview=1. The tab remembers it, so the draft stays on as the reader moves between pages.
+// Settings Preview stores the unsaved look here; `?preview=1` enables it per tab.
 export const KNOWLEDGE_BASE_PREVIEW_KEY = "kb:preview";
 
 export type KnowledgeBasePreview = {

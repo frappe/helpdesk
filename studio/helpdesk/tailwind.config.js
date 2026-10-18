@@ -1,4 +1,4 @@
-// The portal imports @helpdesk/shared, which lives outside this folder, so Studio's Tailwind scan needs it listed.
+// Studio's Tailwind scan must include @helpdesk/shared, outside this folder.
 export default {
   content: ["../../shared/src/**/*.{vue,ts}"],
 };

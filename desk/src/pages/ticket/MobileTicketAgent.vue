@@ -286,7 +286,8 @@ import {
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
-import CustomActions from "@helpdesk/shared/CustomActions.vue";
+// Lives in studio/ so Studio pages can use it as a block too.
+import CustomActions from "../../../../studio/helpdesk/components/header/CustomActions.vue";
 import AssignTo from "@/components/ticket-agent/AssignTo.vue";
 import SetContactPhoneModal from "@/components/ticket/SetContactPhoneModal.vue";
 import TicketSLA from "@/components/ticket-agent/TicketSLA.vue";

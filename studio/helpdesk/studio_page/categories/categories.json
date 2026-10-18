@@ -37,7 +37,18 @@
          "componentProps": {
           "categories": "{{ categories.data }}"
          },
-         "isStudioComponent": true
+         "isStudioComponent": true,
+         "visibilityCondition": "{{ categories.data }}"
+        },
+        {
+         "componentId": "PortalSkeleton-categories",
+         "componentName": "PortalSkeleton",
+         "isCustomVueComponent": true,
+         "componentProps": {
+          "variant": "category-grid",
+          "count": 9
+         },
+         "visibilityCondition": "{{ !categories.data }}"
         }
        ],
        "classes": [
@@ -97,7 +108,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-10 20:51:47.071215",
+ "modified": "2026-10-18 03:34:29.865314",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",
@@ -117,5 +128,6 @@
   }
  ],
  "route": "/categories",
- "studio_app": "helpdesk"
+ "studio_app": "helpdesk",
+ "tab_title": "{{ t('All categories') }} | {{ brandName }}"
 }

@@ -156,10 +156,10 @@ class Search:
         page_length=NUM_RESULTS,
         highlight=False,
     ):
-        # `search` cleans the reader's words before adding `*`, `%` and `|`; cleaning again stripped them
+        # `search` already cleaned it; recleaning strips its `*`, `%`, `|`
         query = Query(query).paging(start, page_length)
         if highlight:
-            # Bare HIGHLIGHT covers only the SUMMARIZE fields, which left titles unmarked
+            # bare HIGHLIGHT marks only SUMMARIZE fields, not titles
             query = query.highlight(fields=["subject", "description"])
 
         query.summarize(fields=["description"])
@@ -259,6 +259,13 @@ class HelpdeskSearch(Search):
                 "modified": doc.modified,
             }
             self.add_document(id, fields)
+            # update_article_index reads this instead of scanning the keyspace
+            key = self.redis.make_key(f"{self.prefix}:{id}").decode()
+            self.redis.sadd(self.get_sections_key(doc.name.split("#")[0]), key)
+
+    def get_sections_key(self, article: str) -> str:
+        # outside the index prefix, so RediSearch never sees it
+        return f"{self.prefix}_sections:{article}"
 
     def remove_doc(self, doc):
         key = f"{doc.doctype}:{doc.name}"
@@ -304,11 +311,11 @@ class HelpdeskSearch(Search):
         if doctype == "HD Article":
             return len(self.get_records(doctype))
 
-    def get_records(self, doctype):
+    def get_records(self, doctype, filters: dict | None = None):
         records = []
         for d in frappe.db.get_all(
             doctype,
-            filters={"status": "Published"},
+            filters={"status": "Published", **(filters or {})},
             fields=self.DOCTYPE_FIELDS[doctype],
         ):
             d.doctype = doctype
@@ -359,12 +366,28 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
 @frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=1)
 def build_index():
-    # Whitelisted for the HD Settings button; anyone else would rebuild it in their request.
+    # whitelisted only for the HD Settings button
     frappe.has_permission("HD Settings", "write", throw=True)
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
     search = HelpdeskSearch()
     search.build_index()
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", False)
+
+
+def update_article_index(article: str) -> None:
+    search = HelpdeskSearch()
+    try:
+        search.redis.ft(search.index_name).info()
+    except ResponseError:
+        return  # build_index_if_not_exists builds the whole index
+    # skips index_exists, which counts every article's sections
+    search._index_exists = True
+    # one key per section; after_migrate's full rebuild fills the set
+    sections_key = search.get_sections_key(article)
+    if keys := search.redis.smembers(sections_key):
+        search.redis.delete(*keys, search.redis.make_key(sections_key))
+    for record in search.get_records("HD Article", {"name": article}):
+        search.index_doc(record)
 
 
 def build_index_in_background():

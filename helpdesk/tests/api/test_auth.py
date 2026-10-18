@@ -14,8 +14,6 @@ from helpdesk.test_utils import (
 
 
 class TestUpdateProfile(IntegrationTestCase):
-    """A portal user editing their own name and picture."""
-
     def setUp(self) -> None:
         self.person = create_contact("Profile Owner", unique_email("profile-owner"))
         self.enterContext(self.set_user(self.person["user"]))
@@ -48,14 +46,21 @@ class TestUpdateProfile(IntegrationTestCase):
             ("en", "Asia/Kolkata"),
         )
 
+    def test_an_unknown_time_zone_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            update_profile(time_zone="Mars/Olympus_Mons")
+
+        self.assertNotEqual(
+            frappe.db.get_value("User", self.person["user"], "time_zone"),
+            "Mars/Olympus_Mons",
+        )
+
     def test_a_linked_picture_is_refused(self) -> None:
         with self.assertRaises(frappe.ValidationError):
             update_profile(image="https://tracker.example.com/pixel.png")
 
 
 class TestConfig(IntegrationTestCase):
-    """Guest-readable settings; the signed-out topbar is drawn from them."""
-
     def test_a_guest_gets_every_field_and_their_own_name(self) -> None:
         with self.set_user("Guest"):
             config = get_config()

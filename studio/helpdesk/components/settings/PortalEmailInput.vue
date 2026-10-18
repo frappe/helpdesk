@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-// `experimental/` is not in Studio's palette, so it reaches the block tree through this.
+// `experimental/` isn't in Studio's palette.
 import { computed, ref, watch } from "vue";
 import { debounce } from "frappe-ui";
 import { isValidEmail, MultiEmailInput } from "frappe-ui/experimental";
@@ -20,7 +20,6 @@ import { SEARCH_DEBOUNCE_MS } from "@helpdesk/shared/utils";
 type Contact = { full_name: string; email: string; image?: string };
 
 const props = defineProps<{
-  // Matched on the server: there are too many contacts to send them all.
   searchContacts?: (query: string) => Promise<Contact[]>;
   placeholder?: string;
 }>();
@@ -34,7 +33,7 @@ const search = debounce(async () => {
   const asked = query.value;
   try {
     const found = (await props.searchContacts?.(asked)) || [];
-    // A slower, older answer must not replace a newer one.
+    // Drop stale answers.
     if (asked === query.value) contacts.value = found;
   } catch (error) {
     console.error(error);
@@ -50,7 +49,7 @@ const options = computed(() =>
   }))
 );
 
-// It only splits on paste, but the placeholder promises commas.
+// MultiEmailInput splits only on paste; the placeholder promises commas.
 function onKeydown(event: KeyboardEvent) {
   if (event.key !== "," && event.key !== ";") return;
   const input = event.target;
@@ -68,7 +67,7 @@ function onKeydown(event: KeyboardEvent) {
   clear(input);
 }
 
-// v-model, so only the native setter plus an input event is noticed.
+// v-model only notices the native setter plus an input event.
 function clear(input: HTMLInputElement) {
   const setter = Object.getOwnPropertyDescriptor(
     window.HTMLInputElement.prototype,

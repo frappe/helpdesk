@@ -19,11 +19,11 @@
         :placeholder="__('Excel')"
       />
 
-      <div class="mt-3">
+      <div v-if="!allSelected" class="mt-3">
         <FormControl
           v-model="form.export_all"
           type="checkbox"
-          :label="__('Export All {0} Record(s)', [rowCount])"
+          :label="__('Export all {0} tickets', [rowCount])"
         />
       </div>
     </template>
@@ -31,7 +31,7 @@
       <Button
         :label="__('Download')"
         variant="solid"
-        @click="() => emit('update', form)"
+        @click="() => emit('update', { ...form, export_all: form.export_all || props.allSelected })"
         class="w-full"
       />
     </template>
@@ -40,10 +40,12 @@
 
 <script setup lang="ts">
 import { reactive, watch } from "vue";
-import { __ } from "@/translation";
+import { Button, Dialog, FormControl } from "frappe-ui";
+import { __ } from "./translation";
 
-defineProps<{
+const props = defineProps<{
   rowCount: number;
+  allSelected?: boolean;
 }>();
 
 interface R {

@@ -166,7 +166,6 @@ class TestHDTicket(IntegrationTestCase):
             self._edit_as_customer("Closed").check_update_perms()
 
     def _edit_as_customer(self, status: str, **values):
-        """A portal ticket set to `status`, reloaded as the customer with its subject edited."""
         ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1}).insert()
         ticket.db_set({"status": status, **values})
         frappe.set_user(non_agent)
@@ -177,8 +176,8 @@ class TestHDTicket(IntegrationTestCase):
         return edited
 
     def test_a_message_is_marked_by_its_author_s_role(self):
-        """A deactivated agent keeps the role, so the HD Agent record decides."""
-        # Its own agent: deactivating the shared one would leak into later tests.
+        """A deactivated agent keeps the role; the HD Agent record decides."""
+        # own agent: deactivating the shared one leaks into later tests
         sender = create_agent(unique_email("marked-agent")).name
         ticket = make_ticket()
         add_message(ticket.name, "Received", sender)
@@ -1353,6 +1352,14 @@ class TestHDTicket(IntegrationTestCase):
         contact1_ticket2 = make_ticket(customer=customer2.name, save=False)
         self.assertRaises(frappe.ValidationError, contact1_ticket2.save)
 
+    def test_get_one_says_whether_an_agent_replied(self):
+        ticket = make_ticket()
+        self.assertFalse(get_one(ticket.name)["has_agent_replied"])
+
+        ticket.reply_via_agent(message="Test reply")
+
+        self.assertTrue(get_one(ticket.name)["has_agent_replied"])
+
     def test_reply_via_agent_with_only_cc(self):
         """
         reply_via_agent should succeed when only cc is provided and to is empty/None
@@ -1836,8 +1843,7 @@ class TestHDTicket(IntegrationTestCase):
             self.assertEqual(ticket.resolution_failed_by, 15 * 60)
 
     def test_failed_by_follows_a_target_change(self):
-        # A reply at T+39min misses Urgent's 30 minutes by 9 and meets High's hour;
-        # the figure is measured against the target as it stands, not as it was.
+        # reply at T+39min misses Urgent's 30 minutes by 9, meets High's hour
         date = get_current_week_monday(hours=10)
         with self.freeze_time(date):
             ticket = make_ticket(priority="Urgent")
@@ -1862,8 +1868,7 @@ class TestHDTicket(IntegrationTestCase):
             self.assertEqual(ticket.first_response_failed_by, 9 * 60)
 
     def test_overdue_by_counts_business_hours(self):
-        # Urgent's response is due at 17:30 on Monday; at 17:40 it is 10 business minutes overdue,
-        # and the two-hour resolution target, which runs into Tuesday, is not due yet.
+        # Urgent due 17:30 Monday: 10 minutes overdue at 17:40; resolution not yet due
         date = get_current_week_monday(hours=17)
         with self.freeze_time(date):
             ticket = make_ticket(priority="Urgent")
@@ -2607,8 +2612,6 @@ class TestHDTicket(IntegrationTestCase):
 
 
 class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
-    """A customer reads the thread, never who else each email went to."""
-
     def setUp(self) -> None:
         self.customer = create_contact(
             "Recipients Customer", "recipients-customer@example.com"
@@ -2656,8 +2659,6 @@ class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
 
 
 class TestCustomerPing(IntegrationTestCase):
-    """Customers are pinged to refetch only when a field they can read changed."""
-
     def save_and_count_pings(self, **values) -> int:
         ticket = make_ticket()
         ticket.reload()
@@ -2674,8 +2675,6 @@ class TestCustomerPing(IntegrationTestCase):
 
 
 class TestTicketTimelineChanges(IntegrationTestCase):
-    """The portal draws "closed the ticket" and the rating from these, so a reader gets them without Version."""
-
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
 
@@ -2684,7 +2683,7 @@ class TestTicketTimelineChanges(IntegrationTestCase):
         # Assignment rules write to it on insert.
         ticket.reload()
         ticket.update({"status": "Closed", **values})
-        # Tests skip Version by default; this endpoint reads nothing else.
+        # tests skip Version by default
         ticket.save(ignore_permissions=True, ignore_version=False)
         return ticket
 
@@ -3044,7 +3043,6 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             client_set_value("HD Ticket", ticket.name, "feedback", other.name)
 
     def test_customer_cannot_rerate_a_resolved_ticket(self):
-        """The closed-ticket lock never covered this: only a Closed ticket was frozen."""
         option, other = frappe.get_all(
             "HD Ticket Feedback Option", fields=["name"], limit=2
         )

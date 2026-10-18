@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="mb-3 flex items-center gap-2">
+  <div class="flex min-h-0 flex-col">
+    <div class="mb-3 flex shrink-0 items-center gap-2">
       <TextInput
         v-model="search"
         type="text"
@@ -14,24 +14,51 @@
       <Select v-model="role" :options="roleFilters" size="sm" />
     </div>
 
-    <div>
-      <div :class="[ROW, 'min-h-8 pt-0 text-p-xs text-ink-gray-5']">
-        <span>{{ __("Name") }}</span>
-        <span>{{ __("Role") }}</span>
-        <span v-if="showLastActive" class="max-sm:hidden">{{
-          __("Last seen")
-        }}</span>
+    <div :class="[ROW, 'min-h-8 shrink-0 text-p-xs text-ink-gray-5']">
+      <span>{{ __("Name") }}</span>
+      <span>{{ __("Role") }}</span>
+      <span v-if="showLastActive" class="max-sm:hidden">{{
+        __("Last seen")
+      }}</span>
+      <span />
+    </div>
+
+    <div v-if="loading" class="min-h-0 flex-1 overflow-hidden" aria-busy="true">
+      <span class="sr-only" role="status">{{ __("Loading") }}</span>
+      <div v-for="i in 5" :key="i" :class="[ROW, BODY_ROW]">
+        <div class="flex min-w-0 items-center gap-2">
+          <Skeleton :class="[BLOCK, 'size-8 shrink-0 rounded-full']" />
+          <!-- Name-over-email height, so rows don't jump. -->
+          <div
+            class="flex h-[39px] min-w-0 flex-1 flex-col justify-center gap-2"
+          >
+            <Skeleton
+              :class="[BLOCK, 'h-2.5 rounded-full']"
+              :style="{ width: `${30 + ((i * 17) % 25)}%` }"
+            />
+            <Skeleton
+              :class="[BLOCK, 'h-2 rounded-full']"
+              :style="{ width: `${45 + ((i * 13) % 25)}%` }"
+            />
+          </div>
+        </div>
+        <Skeleton :class="[BLOCK, 'h-2.5 w-14 rounded-full']" />
+        <Skeleton
+          v-if="showLastActive"
+          :class="[BLOCK, 'h-2 w-16 rounded-full max-sm:hidden']"
+        />
         <span />
       </div>
+    </div>
 
+    <div v-else class="portal-reveal min-h-0 flex-1 overflow-y-auto">
       <div
         v-for="member in matches"
         :key="keyOf(member)"
-        :class="[ROW, 'min-h-13']"
+        :class="[ROW, BODY_ROW]"
       >
         <div class="flex min-w-0 items-center gap-2">
           <Avatar
-            class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
             shape="circle"
             size="lg"
             :image="member.image"
@@ -54,26 +81,9 @@
           </div>
         </div>
 
-        <div>
-          <Dropdown
-            v-if="canEditRole(member)"
-            :options="roleOptions(member)"
-            align="start"
-          >
-            <template #trigger>
-              <button
-                type="button"
-                class="flex cursor-pointer items-center gap-1 text-base text-ink-gray-8 hover:text-ink-gray-9"
-              >
-                {{ roleLabel(member.role) }}
-                <LucideChevronDown class="size-3.5 text-ink-gray-5" />
-              </button>
-            </template>
-          </Dropdown>
-          <span v-else class="text-base text-ink-gray-8">{{
-            roleLabel(member.role)
-          }}</span>
-        </div>
+        <span class="text-base text-ink-gray-8">{{
+          roleLabel(member.role)
+        }}</span>
 
         <div
           v-if="showLastActive"
@@ -82,10 +92,10 @@
           {{ lastActive(member) }}
         </div>
 
-        <div class="flex justify-end">
+        <div :class="ACTIONS">
           <Dropdown
-            v-if="canRemove(member)"
-            :options="removeOptions(member)"
+            v-if="canManage(member)"
+            :options="memberOptions(member)"
             align="end"
           >
             <template #trigger="{ open }">
@@ -103,7 +113,7 @@
       <div
         v-for="invitation in matchingInvitations"
         :key="invitation.name"
-        :class="[ROW, 'min-h-13']"
+        :class="[ROW, BODY_ROW]"
       >
         <div class="flex min-w-0 items-center gap-2">
           <div
@@ -132,7 +142,7 @@
           {{ __("Pending") }}
         </div>
 
-        <div class="flex justify-end">
+        <div :class="ACTIONS">
           <Tooltip :text="__('Cancel invitation')">
             <Button
               variant="ghost"
@@ -161,10 +171,10 @@ import {
   Button,
   Dropdown,
   Select,
+  Skeleton,
   TextInput,
   Tooltip,
 } from "frappe-ui";
-import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideMail from "~icons/lucide/mail";
 import LucideSearch from "~icons/lucide/search";
 import LucideUsers from "~icons/lucide/users";
@@ -177,12 +187,18 @@ import {
   type RoleLabel,
 } from "@app/stores/settings/roles";
 
-// A phone drops "Last seen", so the name keeps its width; only managers get it at all.
-const ROW = computed(() =>
+// Matches PortalOrganizationTickets.vue so both tabs line up.
+const ROW = computed(() => [
+  "grid items-center gap-3 border-b border-outline-gray-1 last:border-b-0",
   props.showLastActive
-    ? "grid grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px] items-center gap-3 py-2"
-    : "grid grid-cols-[minmax(0,1fr)_104px_32px] items-center gap-3 py-2"
-);
+    ? "grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px]"
+    : "grid-cols-[minmax(0,1fr)_104px_32px]",
+]);
+
+const BODY_ROW = "min-h-13 py-2.5";
+const BLOCK = "motion-reduce:animate-none";
+
+const ACTIONS = "flex justify-end";
 
 type Member = {
   contact?: string;
@@ -203,7 +219,7 @@ type Invitation = {
   invited_on?: string;
 };
 
-// Owner is left out: there is one per organization, already first in the list.
+// No Owner filter: one per org, already listed first.
 const roleFilters = computed(() => [
   { label: __("All"), value: "All", icon: LucideUsers },
   ...ASSIGNABLE_ROLES.map((role) => ({
@@ -220,15 +236,14 @@ const props = withDefaults(
   defineProps<{
     members?: Member[];
     invitations?: Invitation[];
-    canChangeRoles?: boolean;
-    canRemoveMembers?: boolean;
+    canManageMembers?: boolean;
     showLastActive?: boolean;
+    loading?: boolean;
   }>(),
   {
     members: () => [],
     invitations: () => [],
-    canChangeRoles: false,
-    canRemoveMembers: false,
+    canManageMembers: false,
   }
 );
 
@@ -272,25 +287,23 @@ function invitedLabel(invitation: Invitation) {
     : __("Invited {0} by {1}", [when, invitation.invited_by]);
 }
 
-// The owner's role is fixed, and changing yourself revokes the rights the call needs.
-function canEditRole(member: Member) {
-  return props.canChangeRoles && member.role !== "Owner" && !member.is_you;
+// Owner is fixed; changing yourself would revoke the needed rights.
+function canManage(member: Member) {
+  return props.canManageMembers && member.role !== "Owner" && !member.is_you;
 }
 
-function canRemove(member: Member) {
-  return props.canRemoveMembers && member.role !== "Owner" && !member.is_you;
-}
-
-function roleOptions(member: Member) {
-  return ASSIGNABLE_ROLES.map((role) => ({
-    label: roleLabel(role),
-    selected: member.role === role,
-    onClick: () => member.role !== role && emit("setRole", member, role),
-  }));
-}
-
-function removeOptions(member: Member) {
+function memberOptions(member: Member) {
   return [
+    {
+      label: __("Change role"),
+      icon: "lucide-user-cog",
+      submenu: ASSIGNABLE_ROLES.map((role) => ({
+        label: roleLabel(role),
+        icon: ROLES[role].icon,
+        selected: member.role === role,
+        onClick: () => member.role !== role && emit("setRole", member, role),
+      })),
+    },
     {
       label: __("Remove from organization"),
       icon: "lucide-user-minus",

@@ -4,20 +4,14 @@ import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, runAction, uploadableFileTypes } from '@helpdesk/shared/utils'
 
 export function useReplyComposer(ticket, { isClosed, isAgent }) {
-  // Closed on arrival, so the thread gets the room; the bar opens it.
   const isComposerOpen = ref(false)
   const reply = ref('')
   const isSending = ref(false)
-  // The composer sits over the thread; it reports its height and the thread keeps that much clear.
+  // Composer overlays the thread; its height is kept clear below.
   const composerReserve = ref(0)
 
   const canReply = computed(() => !isClosed.value)
 
-  function openComposer() {
-    isComposerOpen.value = true
-  }
-
-  // Inline images and attachments alike; the send links each by its File `name`.
   function uploadFile(file: File) {
     return useFileUpload().upload(file, {
       private: true,
@@ -33,9 +27,9 @@ export function useReplyComposer(ticket, { isClosed, isAgent }) {
     isComposerOpen.value = false
   }
 
-  function send({ body, attachments, reset }) {
+  async function send({ body, attachments, reset }) {
     if (isContentEmpty(body)) return
-    return runAction(
+    const sent = await runAction(
       async () => {
         await call('run_doc_method', {
           dt: 'HD Ticket',
@@ -45,17 +39,18 @@ export function useReplyComposer(ticket, { isClosed, isAgent }) {
         })
         reset()
         discard()
-        await ticket.fetch()
       },
       { busy: isSending, fallback: __('Could not send the message') },
     )
+    // Outside the action: a failed refetch must not trigger a resend.
+    if (sent) ticket.fetch()
+    return sent
   }
 
   return {
     canReply,
     isComposerOpen,
     composerReserve,
-    openComposer,
     reply,
     isSending,
     uploadFile,

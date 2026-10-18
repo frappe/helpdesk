@@ -84,8 +84,8 @@ def publish_event(
     user: str | None = None,
 ):
     """
-    Publish `event` to a room with `data`; without a room, to desk users only. The website
-    room would reach every portal socket, guests included, and these events can name agents.
+    Publish `event` to a room with `data`; without a room, to desk users only
+    (the website room reaches guests, and events can name agents).
 
     :param event: Event name. Example: "refetch_resource"
     :param data: Data to be sent with the event
@@ -107,7 +107,6 @@ def capture_event(event: str):
 
 
 def get_user_contact(user: str | None = None) -> str | None:
-    """The Contact linked to `user`, defaults to current user. Membership and permissions go by this link."""
     return frappe.db.get_value("Contact", {"user": user or frappe.session.user})
 
 
@@ -210,7 +209,10 @@ def is_agent_manager(user: str | None = None) -> bool:
     :return: Whether `user` is an agent manager, system manager or admin
     """
     user = user or frappe.session.user
-    # a deactivated agent keeps their roles; the record decides when there is one
+    # as in is_agent: Administrator is never restricted
+    if is_admin(user):
+        return True
+    # a deactivated agent keeps their roles
     if frappe.db.get_value("HD Agent", user, "is_active") == 0:
         return False
     roles = set(frappe.get_roles(user))

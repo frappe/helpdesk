@@ -22,8 +22,7 @@ def get_config():
         "disable_saved_replies_global_scope",
         "enable_comment_reactions",
         "allow_customer_managers_to_invite",
-        "allow_customer_managers_to_change_roles",
-        "allow_customer_managers_to_remove_members",
+        "allow_customer_managers_to_manage_members",
         "allow_customer_managers_to_edit_organization",
     ]
     # A Single omits fields never set; every requested key is answered so the portal reads null.
@@ -32,14 +31,13 @@ def get_config():
     )
     res = frappe._dict({field: values.get(field) for field in fields})
 
-    # The Studio portal has no boot payload, so this also names the session user.
     res.session_user = frappe.session.user
     res.is_agent = is_agent()
     res.can_edit_settings = frappe.has_permission("HD Settings", "write")
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 
-    # Form scripts for the knowledge base pages; a private one keeps them from guests.
+    # A private knowledge base hides its form scripts from guests.
     if res.public_knowledge_base or res.session_user != "Guest":
         res.knowledge_base_form_scripts = frappe.get_all(
             "HD Form Script",

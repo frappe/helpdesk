@@ -19,7 +19,9 @@ export function createProfileSettings(core) {
     transform: (data) => data.timezones.map((zone) => ({ label: zone, value: zone })),
   })
 
+  // Only the open dialog's profile tab lists them.
   core.afterLoad(() => {
+    if (!core.isSettingsOpen.value) return
     if (!languages.fetched) languages.fetch()
     if (!timezones.fetched) timezones.fetch()
   })
@@ -33,14 +35,13 @@ export function createProfileSettings(core) {
     return updateProfile({ [field]: value }, __('Preferences updated')).then(fetchTranslations)
   }
 
-  // One field, two stored names: everything after the first space is the last name.
   function renameProfile(value) {
     const [firstName, ...rest] = value.split(/\s+/)
     return updateProfile({ first_name: firstName, last_name: rest.join(' ') }, __('Profile updated'))
   }
 
-  function uploadProfileImage() {
-    core.pickImage((fileUrl) => updateProfile({ image: fileUrl }, __('Photo updated')))
+  function uploadProfileImage(fileUrl) {
+    return updateProfile({ image: fileUrl }, __('Photo updated'))
   }
 
   function removeProfileImage() {

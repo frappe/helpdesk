@@ -409,8 +409,6 @@ let highlightTimer: ReturnType<typeof setTimeout> | undefined;
 // The row can reach the DOM a few renders after the feed resolves, so a single
 // attempt lands only if it happens to be the last one. Keep trying instead; the
 // link stays in the URL until it does, which is also what stops the retries.
-// ponytail: 2s of polling, enough for any feed we render; a MutationObserver on
-// the timeline would be the exact version if that ever stops being true.
 function scrollToHighlight(attemptsLeft = 20) {
   clearTimeout(highlightTimer);
   const raw = route.query.highlight;

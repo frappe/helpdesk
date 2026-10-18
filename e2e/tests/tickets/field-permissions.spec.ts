@@ -1,5 +1,6 @@
 import type { Api } from "../../helpers/api";
 import { expect, test } from "../../helpers/fixtures";
+import { FormScripts } from "../../helpers/form-script";
 import { snapshotSettings } from "../../helpers/settings";
 import { openTicket } from "../../helpers/ticket";
 
@@ -95,6 +96,41 @@ test.describe("Default template rows", () => {
     await expect(agent.getByRole("combobox", { name: "Set Ticket Type..." })).toHaveValue("Bug");
     await agent.goto("/helpdesk/tickets/new");
     await expect(agent.getByText("Ticket Type", { exact: true })).toBeVisible();
+  });
+
+  test("a portal script changes only the fields editable after creation", async ({
+    api,
+    pageAs,
+    ticket,
+  }) => {
+    restoreTemplate = await setTemplateRows(api, [
+      { fieldname: "priority", visible_to: "Everyone", editable_after_creation: 1 },
+      { fieldname: "ticket_type", visible_to: "Everyone", editable_after_creation: 0 },
+    ]);
+    await api.update("HD Ticket", ticket.name, { priority: "High", ticket_type: "Question" });
+    const scripts = new FormScripts(api);
+    await scripts.create(
+      `return { actions: [
+        { label: "E2E Set Priority", onClick: () => ctx.updateField("priority", "Low") },
+        { label: "E2E Set Type", onClick: () => ctx.updateField("ticket_type", "Bug") },
+      ] };`,
+      { portal: true }
+    );
+    try {
+      const page = await pageAs("customer");
+      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.getByRole("button", { name: "E2E Set Priority" }).click();
+      await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).priority).toBe("Low");
+
+      const refused = page.waitForResponse((r) =>
+        r.url().endsWith("/api/method/frappe.client.set_value")
+      );
+      await page.getByRole("button", { name: "E2E Set Type" }).click();
+      expect((await refused).status()).toBe(403);
+      expect((await api.get("HD Ticket", ticket.name)).ticket_type).toBe("Question");
+    } finally {
+      await scripts.removeAll();
+    }
   });
 });
 

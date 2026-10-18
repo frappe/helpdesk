@@ -12,13 +12,8 @@
           :filters="defaultFilters"
           :page-length="100"
         />
-        <p v-if="joining.data" class="text-p-sm text-ink-gray-7">
-          {{
-            __(
-              "Articles in this category are visible to {0}, so moved articles will be too.",
-              [visibleTo(joining.data)]
-            )
-          }}
+        <p v-if="joiningNote" class="text-p-sm text-ink-gray-7">
+          {{ joiningNote }}
         </p>
       </div>
     </template>
@@ -29,13 +24,26 @@
 import { ref, computed, watch, nextTick } from "vue";
 import { Dialog } from "frappe-ui";
 import Link from "@/components/frappe-ui/Link.vue";
-import { useCategoryVisibility, visibleTo } from "@/stores/knowledgeBase";
+import { useCategoryVisibility } from "@/stores/knowledgeBase";
+import { __ } from "@/translation";
 
 const emit = defineEmits(["move"]);
 const showDialog = defineModel<boolean>();
 const category = ref("");
 const linkRef = ref(null);
 const joining = useCategoryVisibility(category);
+// A move only narrows access; Public needs no note.
+const joiningNote = computed(
+  () =>
+    ({
+      Customers: __(
+        "Articles in this category are visible to customers only, so moved public articles will be too."
+      ),
+      Private: __(
+        "Articles in this category are visible to agents only, so moved articles will be too."
+      ),
+    })[joining.data]
+);
 
 const props = defineProps<{
   excludeCategory?: string;

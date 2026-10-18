@@ -1,24 +1,31 @@
 <template>
-  <div class="flex flex-col gap-6">
-    <div
-      v-for="toggle in toggles"
-      :key="toggle.fieldname"
-      class="flex items-center justify-between"
-    >
-      <div class="flex flex-col gap-1">
-        <span class="text-base-medium text-ink-gray-8">
-          {{ toggle.label }}
-        </span>
-        <span class="text-p-sm text-ink-gray-6">
-          {{ toggle.description }}
-        </span>
+  <!-- Wait for settings: early off switches would look saved. -->
+  <Transition
+    enter-from-class="opacity-0"
+    enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
+  >
+    <div v-if="ready" class="flex flex-col gap-6">
+      <div
+        v-for="toggle in toggles"
+        :key="toggle.fieldname"
+        class="flex items-center justify-between"
+      >
+        <div class="flex flex-col gap-1">
+          <span class="text-base-medium text-ink-gray-8">
+            {{ toggle.label }}
+          </span>
+          <span class="text-p-sm text-ink-gray-6">
+            {{ toggle.description }}
+          </span>
+        </div>
+        <Switch
+          :model-value="Boolean(toggle.settings.doc?.[toggle.fieldname])"
+          @update:model-value="(value) => save(toggle, value)"
+        />
       </div>
-      <Switch
-        :model-value="Boolean(toggle.settings.doc?.[toggle.fieldname])"
-        @update:model-value="(value) => save(toggle, value)"
-      />
     </div>
-  </div>
+    <SettingsFormSkeleton v-else :toggles="4" />
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -26,23 +33,24 @@ import { __ } from "../translation";
 import {
   createDocumentResource,
   createResource,
+  getCachedDocumentResource,
   Switch,
   toast,
 } from "frappe-ui";
 import { computed } from "vue";
+import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 
-const hdSettings = createDocumentResource({
-  doctype: "HD Settings",
-  name: "HD Settings",
-});
+// The portal mounts all panels at once; re-creating a cached doc refetches.
+const hdSettings =
+  getCachedDocumentResource("HD Settings", "HD Settings") ||
+  createDocumentResource({ doctype: "HD Settings", name: "HD Settings" });
 
 const websiteSettings = createDocumentResource({
   doctype: "Website Settings",
   name: "Website Settings",
 });
 
-// Website Settings is readable by all but writable by admins only, so an Agent Manager
-// would see the switch and get a PermissionError on toggling it.
+// Only admins can write Website Settings; others would hit PermissionError.
 const canEditSignup = createResource({
   url: "frappe.client.has_permission",
   params: {
@@ -53,14 +61,21 @@ const canEditSignup = createResource({
   auto: true,
 });
 
+const ready = computed(
+  () =>
+    Boolean(hdSettings.doc) &&
+    canEditSignup.fetched &&
+    (!canEditSignup.data?.has_permission || Boolean(websiteSettings.doc))
+);
+
 // computed, so labels follow a translation load
 const toggles = computed(() => [
   {
     settings: hdSettings,
     fieldname: "prefer_knowledge_base",
-    label: __("Prefer knowledge base"),
+    label: __("Use knowledge base as home"),
     description: __(
-      "Customers will land on the knowledge base when they open the portal, instead of their tickets."
+      "Customers will land on the knowledge base when they log in or open the site, instead of their tickets."
     ),
   },
   {
@@ -73,18 +88,10 @@ const toggles = computed(() => [
   },
   {
     settings: hdSettings,
-    fieldname: "allow_customer_managers_to_change_roles",
-    label: __("Allow role changes"),
+    fieldname: "allow_customer_managers_to_manage_members",
+    label: __("Allow member management"),
     description: __(
-      "Customer managers will be able to promote members to managers, or demote them back."
-    ),
-  },
-  {
-    settings: hdSettings,
-    fieldname: "allow_customer_managers_to_remove_members",
-    label: __("Allow member removal"),
-    description: __(
-      "Customer managers will be able to remove people from their organization."
+      "Customer managers will be able to change member roles and remove members."
     ),
   },
   {

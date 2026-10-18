@@ -3,6 +3,7 @@ import {
   createDocumentResource,
   createListResource,
   createResource,
+  getCachedDocumentResource,
   toast,
 } from "frappe-ui";
 import { computed, ref, shallowRef, watch } from "vue";
@@ -21,11 +22,11 @@ const SETTINGS_FIELDS = ["banner_image", "banner_preset"] as const;
 
 const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
 
-// Quick links live in a knowledge base form script whose last line holds the rows as JSON.
+// Quick links live in a form script; its last line holds them as JSON.
 const LINKS_SCRIPT = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
 
-// The marker starts the last line; a label or URL may contain it too, and a hand-edited script may not parse.
+// Only the last line: labels may contain the marker; hand edits may not parse.
 function parseLinks(script: string): Link[] {
   const lastLine = script.trimEnd().split("\n").pop() || "";
   if (!lastLine.startsWith(JSON_MARKER)) return [];
@@ -37,7 +38,7 @@ function parseLinks(script: string): Link[] {
   }
 }
 
-// Shared by the desk and portal settings, and made on first use so readers never load it.
+// Lazy singleton shared by desk and portal settings.
 export const knowledgeBaseDraft = shallowRef<ReturnType<
   typeof createDraft
 > | null>(null);
@@ -47,21 +48,26 @@ export function useKnowledgeBaseDraft() {
 }
 
 function createDraft() {
-  const settings = createDocumentResource({
-    doctype: "HD Settings",
-    name: "HD Settings",
-  });
+  // Reuse: re-creating a cached doc refetches it.
+  const settings =
+    getCachedDocumentResource("HD Settings", "HD Settings") ||
+    createDocumentResource({ doctype: "HD Settings", name: "HD Settings" });
   const categories = createListResource({
     doctype: "HD Article Category",
     fields: ["name", "category_name", "icon", "pinned", "pinned_order"],
     orderBy: "category_name asc",
-    pageLength: 999,
+    pageLength: 99999,
     auto: true,
   });
-  // Published article counts for the pinned list.
-  const counts = createResource({
-    url: "helpdesk.api.knowledge_base.get_categories",
-    method: "GET",
+  const accessRows = createResource({
+    url: "frappe.client.get_list",
+    params: {
+      doctype: "HD Article",
+      fields: ["category", "visibility"],
+      group_by: "category, visibility",
+      order_by: "category asc",
+      limit_page_length: 0,
+    },
     auto: true,
   });
   const linksScript = createResource({
@@ -88,22 +94,37 @@ function createDraft() {
     };
   });
 
+  // Track `saved` but keep unsaved edits: a pin save must not wipe them.
   const draft = ref<Draft | null>(null);
   watch(
     () => JSON.stringify(saved.value),
-    (json) => (draft.value = JSON.parse(json)),
+    (json, previous) => {
+      const next = JSON.parse(json);
+      const before = previous ? JSON.parse(previous) : null;
+      if (next && before && draft.value) {
+        const now = normalize(draft.value);
+        const was = normalize(before);
+        for (const key of Object.keys(next) as (keyof Draft)[]) {
+          if (JSON.stringify(now[key]) !== JSON.stringify(was[key])) {
+            next[key] = draft.value[key];
+          }
+        }
+      }
+      draft.value = next;
+    },
     { immediate: true }
   );
 
   const categoryOptions = computed(() => {
-    const articleCounts = Object.fromEntries(
-      (counts.data || []).map((row) => [row.name, row.article_count])
-    );
+    const access: Record<string, string> = {};
+    for (const row of accessRows.data || []) {
+      access[row.category] = access[row.category] ? "Mixed" : row.visibility;
+    }
     return (categories.data || []).map((row) => ({
       label: row.category_name,
       value: row.name,
       icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
-      count: articleCounts[row.name] || 0,
+      access: access[row.name],
     }));
   });
 
@@ -147,14 +168,9 @@ function createDraft() {
           fieldname: Object.fromEntries(fields.map((key) => [key, value[key]])),
         });
       }
-      if (changed.value.includes("pinned")) await savePinned(value.pinned);
       if (changed.value.includes("links")) await saveLinks(value.links);
       clearPreview();
-      await Promise.all([
-        settings.reload(),
-        categories.reload(),
-        linksScript.reload(),
-      ]);
+      await Promise.all([settings.reload(), linksScript.reload()]);
       toast.success(__("Settings updated"));
       return true;
     } catch (error) {
@@ -164,7 +180,7 @@ function createDraft() {
     }
   }
 
-  // A pin's position counts from 1; unpinned categories go back to 0.
+  // Order is 1-based; 0 means unpinned.
   async function savePinned(pinned: string[]) {
     const { failed_docs } = await call("frappe.client.bulk_update", {
       docs: categories.data
@@ -208,7 +224,19 @@ function createDraft() {
     });
   }
 
-  // Switches save as they flip, outside the draft: the reload leaves `saved` and so the draft alone.
+  async function savePins(pinned: string[]) {
+    try {
+      await savePinned(pinned);
+      await categories.reload();
+      toast.success(__("Pinned categories updated"));
+      return true;
+    } catch (error) {
+      getErrorMessage(error, true);
+      return false;
+    }
+  }
+
+  // Saves at once, bypassing the draft.
   function setToggle(fieldname: string, value: boolean) {
     settings.setValue.submit(
       { [fieldname]: value },
@@ -218,9 +246,10 @@ function createDraft() {
 
   function discard() {
     draft.value = JSON.parse(JSON.stringify(saved.value));
+    clearPreview();
   }
 
-  // Preview tabs read the stored look until it's gone, so a save must not leave them on the old draft.
+  // Open preview tabs read this until it's removed.
   function clearPreview() {
     try {
       localStorage.removeItem(KNOWLEDGE_BASE_PREVIEW_KEY);
@@ -228,16 +257,14 @@ function createDraft() {
   }
 
   function preview() {
-    const { banner_image, banner_preset, pinned, links } = normalize(
-      draft.value!
-    );
-    const look: KnowledgeBasePreview = {
-      banner_image,
-      banner_preset,
-      pinned,
-      links,
-    };
-    localStorage.setItem(KNOWLEDGE_BASE_PREVIEW_KEY, JSON.stringify(look));
+    try {
+      localStorage.setItem(
+        KNOWLEDGE_BASE_PREVIEW_KEY,
+        JSON.stringify(normalize(draft.value!))
+      );
+    } catch {
+      return toast.error(__("Could not open the preview"));
+    }
     window.open(`${CUSTOMER_PORTAL_ROOT}?preview=1`, "_blank");
   }
 
@@ -245,6 +272,7 @@ function createDraft() {
     draft,
     settings,
     setToggle,
+    savePins,
     categoryOptions,
     isDirty,
     canPreview,
@@ -255,7 +283,7 @@ function createDraft() {
   };
 }
 
-// Trimmed and empty link rows dropped, so typing alone doesn't count as an edit. Pin order does.
+// Ignore whitespace and empty link rows when diffing.
 function normalize(draft: Draft): Draft {
   return {
     ...draft,

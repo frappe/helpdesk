@@ -26,7 +26,7 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc)
-    # only the portal sends an origin; the agent desk's tickets keep the fields empty
+    # only the portal sends an origin
     d.flags.ticket_origin = origin
     d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
@@ -34,7 +34,6 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status changes, oldest first, with who made them specifically for customer portal."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",
@@ -67,7 +66,7 @@ def get_one(name: str):
     fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
-    # The desk's getdoc marks it seen; this is the portal's, or the list keeps it bold.
+    # desk's getdoc does this; without it the portal list stays bold
     doc.add_seen()
     outside_hours_banner = get_outside_hours_banner(doc)
     overdue_by = doc.get_overdue_by()
@@ -94,7 +93,7 @@ def get_one(name: str):
     return {
         **ticket,
         "communications": get_communications(name),
-        # When, not to whom: customers cannot read assignees. Cancelled rows count, someone did pick it up.
+        # when, not who: customers can't read assignees; cancelled rows count
         "assigned_on": frappe.db.get_value(
             "ToDo",
             {"reference_type": "HD Ticket", "reference_name": name},
@@ -104,6 +103,8 @@ def get_one(name: str):
         "contact": contact,
         "outside_hours_banner": outside_hours_banner,
         "overdue_by": overdue_by,
+        # validate_feedback's rule for when closing needs a rating
+        "has_agent_replied": bool(doc.has_agent_replied),
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=not fields.is_agent
@@ -162,13 +163,13 @@ def get_communications(ticket: str):
     viewer_is_agent = is_agent()
     for c in communications:
         if not viewer_is_agent:
-            # who else an email went to; the portal never shows it, so it is not sent either
+            # portal never shows recipients, so don't send them
             c.pop("recipients")
             c.pop("cc")
             c.pop("bcc")
         c.attachments = get_attachments("Communication", c.name)
         c.user = get_user_info_for_avatar(c.author_id)
-        # The author's role, not the direction: an agent replying from the portal is still an agent.
+        # by author role: agents may reply from the portal
         c.is_agent = c.pop("author_id") in agents
     return communications
 

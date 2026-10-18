@@ -9,7 +9,7 @@
     aria-hidden="true"
   >
     <path :d="PATHS[answer].thumb" />
-    <!-- The cuff line, drawn in the background's colour once filled so it still reads. -->
+    <!-- Cuff in the background colour when filled, so it stays visible. -->
     <path
       :d="PATHS[answer].cuff"
       :stroke="filled ? background : 'currentColor'"
@@ -18,8 +18,7 @@
 </template>
 
 <script setup lang="ts">
-// Inline, not a lucide class: the chosen answer's thumb fills, which a mask icon cannot.
-// Lucide's thumbs-up and thumbs-down; keys match HD Article Feedback: 1 like, 2 dislike.
+// Inline lucide paths: a mask icon can't fill. Keys: 1 like, 2 dislike.
 const PATHS = {
   "1": {
     thumb:

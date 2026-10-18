@@ -38,15 +38,38 @@
        "componentName": "PortalArticleSidebar",
        "componentProps": {
         "activeCategory": "{{ route.params.category }}",
-        "articles": "{{ articleTitles.data || [] }}",
-        "categories": "{{ categories.data || [] }}",
-        "open": "{{ drawer.open }}"
+        "categories": "{{ sidebar.data || [] }}",
+        "open": "{{ drawer.open }}",
+        "loading": "{{ !sidebar.data }}"
        },
        "isCustomVueComponent": true
       },
       {
        "blockName": "main-layout",
        "children": [
+        {
+         "componentId": "PortalSkeleton-category",
+         "componentName": "PortalSkeleton",
+         "isCustomVueComponent": true,
+         "componentProps": {
+          "variant": "category",
+          "count": 8
+         },
+         "visibilityCondition": "{{ !category && !notFound }}",
+         "classes": [
+          "flex",
+          "flex-col",
+          "mt-0",
+          "max-w-[700px]",
+          "min-w-0",
+          "w-full",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "xl:px-0",
+          "xl:col-start-2"
+         ]
+        },
         {
          "blockName": "category-column",
          "children": [
@@ -131,6 +154,17 @@
            "blockName": "articles-section",
            "children": [
             {
+             "componentId": "PortalSkeleton-category-articles",
+             "componentName": "PortalSkeleton",
+             "isCustomVueComponent": true,
+             "componentProps": {
+              "variant": "category-rows",
+              "count": 8,
+              "instant": true
+             },
+             "visibilityCondition": "{{ !articles.data }}"
+            },
+            {
              "children": [
               {
                "blockName": "article-row",
@@ -201,7 +235,7 @@
                 "cursor-pointer",
                 "items-center",
                 "gap-4",
-                "py-2.5",
+                "py-4",
                 "-mx-2.5",
                 "px-2.5",
                 "rounded-4",
@@ -219,31 +253,26 @@
                 "focus-visible:focus-ring"
                ],
                "componentEvents": {
-                "click": {
+                "mouseenter": {
                  "action": "Run Script",
-                 "event": "click",
-                 "script": "router.push(routes.article(dataItem))"
-                },
-                "keydown.enter": {
-                 "action": "Run Script",
-                 "event": "keydown.enter",
-                 "script": "router.push(routes.article(dataItem))"
+                 "event": "mouseenter",
+                 "script": "prefetchOnHover(dataItem.name)"
                 }
                },
                "componentId": "container-jpuhf5mpa",
-               "componentName": "container",
-               "originalElement": "div",
+               "componentName": "PortalLink",
                "componentProps": {
-                "role": "link",
-                "tabindex": "0"
-               }
+                "to": "{{ routes.article(dataItem) }}"
+               },
+               "isCustomVueComponent": true
               }
              ],
              "classes": [
               "w-full",
               "!flex-col",
               "!flex-nowrap",
-              "!gap-0"
+              "!gap-0",
+              "portal-reveal"
              ],
              "componentId": "Repeater-m7atz02fl",
              "componentName": "Repeater",
@@ -288,7 +317,7 @@
             "flex",
             "flex-col",
             "gap-1",
-            "mt-8",
+            "mt-6",
             "w-full"
            ],
            "componentId": "category-articles",
@@ -307,7 +336,8 @@
           "px-4",
           "sm:px-6",
           "xl:px-0",
-          "xl:col-start-2"
+          "xl:col-start-2",
+          "portal-reveal"
          ],
          "componentId": "container-pdx9evglv",
          "componentName": "container",
@@ -346,7 +376,7 @@
         "relative",
         "w-full",
         "pt-6",
-        "sm:pt-[34px]"
+        "sm:pt-10"
        ],
        "componentId": "container-category-main",
        "componentName": "container",
@@ -387,7 +417,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-16 03:26:28.000000",
+ "modified": "2026-10-19 02:59:37.432603",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -404,28 +434,9 @@
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"
-  },
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{}",
-   "resource_name": "articleTitles",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_article_titles"
-  },
-  {
-   "auto": 1,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{\"with_creators\": 1}",
-   "resource_name": "categories",
-   "resource_type": "API Resource",
-   "url": "helpdesk.api.knowledge_base.get_categories"
   }
  ],
  "route": "/category/:category",
- "studio_app": "helpdesk"
+ "studio_app": "helpdesk",
+ "tab_title": "{{ categoryName ? categoryName + ' | ' + brandName : brandName }}"
 }

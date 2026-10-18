@@ -4,7 +4,6 @@ import { FormScripts, ensureTemplate } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 
-// Every customer action on /help/tickets/new, past what portal-new and portal-origin cover.
 usePersona("customer");
 
 const PIXEL = "e2e/fixtures/pixel.png";
@@ -13,7 +12,6 @@ const DATE_FIELDS = [
   { fieldname: "e2e_datetime", fieldtype: "Datetime" },
 ];
 
-/** Put rows on the portal's Default template for one test; returns the restore. */
 async function useTemplate(api: Api, rows: Record<string, any>[], extra: Record<string, any> = {}) {
   const before = await api.get("HD Ticket Template", "Default");
   await api.update("HD Ticket Template", "Default", {
@@ -69,7 +67,6 @@ test.describe("template", () => {
       await page.goto("/help/tickets/new");
       await expect(page.getByText("Tell us what broke")).toBeVisible();
       await expect(page.locator(".ProseMirror")).toContainText("Steps to reproduce:");
-      // the template fills the description, so only the subject is missing
       await expect(createButton(page)).toBeDisabled();
       await page.getByPlaceholder("A short description").fill(`E2E ${uid()}`);
       await expect(createButton(page)).toBeEnabled();
@@ -110,7 +107,7 @@ test.describe("template", () => {
       const date = field(page, "E2E date");
       await date.fill("2026-10-15");
       await date.press("Enter");
-      // yyyy-mm-dd on this site; the picker shows the site's own format
+      // the picker shows the site's own format
       expect(format).toBe("yyyy-mm-dd");
       await expect(date).toHaveValue("2026-10-15");
       await createButton(page).click();
@@ -152,7 +149,7 @@ test.describe("template", () => {
     await ensureTemplate(api);
     const restore = await useTemplate(api, [{ fieldname: "e2e_trigger" }, { fieldname: "e2e_choice" }]);
     const scripts = new FormScripts(api);
-    // Not portal-flagged: the portal's new page loads agent-scoped scripts (see the fixme in form-script.spec).
+    // Not portal-flagged: the portal new page loads agent scripts (form-script.spec fixme).
     await scripts.create(
       `return { actions: [], onChange: { e2e_trigger: (value) =>
         ctx.applyFilters("e2e_choice", value === "Show" ? ["Alpha", "Beta"] : null) } };`,
@@ -208,7 +205,7 @@ test.describe("template", () => {
 test.describe("article suggestions", () => {
   test("preview a suggestion on hover and open it", async ({ page, api, context }) => {
     const category = await createCategory(api);
-    // One word, so suggestions left by earlier runs can't outrank it.
+    // One word, so earlier runs' articles can't outrank it.
     const title = `Reset${uid()}`;
     const article = await createArticle(api, category.name, { title });
     await indexArticles(api, title);
@@ -253,7 +250,6 @@ test.describe("attachments", () => {
     await expect(createButton(page)).toBeEnabled();
 
     await attach(page, { name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
-    // a finished upload's name becomes a link to the file
     await expect(page.getByRole("link", { name: "notes.txt" })).toHaveAttribute("target", "_blank");
     await page
       .locator("div")
@@ -346,7 +342,7 @@ test.describe("submit", () => {
   test("search text over 140 characters is cut", async ({ page, api }) => {
     const longQuery = `${uid()} ${"q".repeat(200)}`;
     await page.goto(`/help/tickets/new?from=search&q=${longQuery}`);
-    // the subject starts from the query, cut to the 140 characters a subject holds
+    // cut to the 140 characters a subject holds
     const subjectField = page.getByPlaceholder("A short description");
     await expect(subjectField).toHaveValue(longQuery.slice(0, 140));
     const subject = `E2E long search ${uid()}`;

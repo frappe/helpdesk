@@ -21,8 +21,8 @@ export default function setup(context) {
   const { route } = context
   const settings = useSettingsModal(context)
   const { config } = settings
-  // The composer shows the reader's avatar, which comes with the settings payload.
-  settings.loadSettings()
+  // The composer's avatar comes with the settings payload.
+  settings.ensureSettings()
   loadTicketMeta()
 
   const ticketId = computed(() => String(route?.params?.name || ''))
@@ -32,10 +32,14 @@ export default function setup(context) {
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
-    onSuccess: async (data) => {
-      customActions.value = await runFormScripts(data, context, { doc: data, updateField })
-    },
   })
+  // Only on a real change, or each script's calls would repeat.
+  watch(
+    () => ticket.data && `${ticket.data.name}:${ticket.data.modified}`,
+    async (version) => {
+      if (version) customActions.value = await runFormScripts(ticket.data, context, { doc: ticket.data, updateField })
+    },
+  )
 
   function saveTicket(values: Record<string, unknown>, options: ActionOptions) {
     return runAction(async () => {
@@ -54,7 +58,7 @@ export default function setup(context) {
 
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
-  // A burst of pings, or a ping during the page's own refetch, ends in one trailing fetch.
+  // Bursts, or pings mid-refetch, end in one trailing fetch.
   let refetchQueued = false
   function refresh() {
     if (!ticketId.value) return
@@ -70,7 +74,7 @@ export default function setup(context) {
     },
   )
 
-  // Agents hear the ticket's room; customers are kept out of it and get a bare ping on their own channel.
+  // Customers aren't in the ticket's room; they get a ping on their own channel.
   watch(
     ticketId,
     (name, _, onCleanup) => name && onCleanup(subscribeToDoc(context.socket, 'HD Ticket', name)),
@@ -85,7 +89,7 @@ export default function setup(context) {
   function onTicketPing(payload) {
     if (payload?.ticket_id === ticketId.value) refresh()
   }
-  // Nothing replays what was sent while the socket was down or the tab asleep.
+  // Nothing replays events missed while disconnected or asleep.
   let wasDisconnected = false
   function onDisconnect() {
     wasDisconnected = true
@@ -103,7 +107,7 @@ export default function setup(context) {
     connect: onConnect,
   }
   for (const [event, handler] of Object.entries(listeners)) context.socket?.on(event, handler)
-  // By handler: the socket is shared, and a bare `off(event)` would drop other pages' listeners too.
+  // By handler: the socket is shared across pages.
   onScopeDispose(() => {
     for (const [event, handler] of Object.entries(listeners)) context.socket?.off(event, handler)
   })
@@ -113,11 +117,11 @@ export default function setup(context) {
   const feedback = useTicketFeedback(saveTicket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
-  // As on the server, a customer cannot touch a closed or rated ticket, even one an agent reopened.
+  // As on the server: customers cannot touch closed or rated tickets.
   const isLocked = computed(() => isClosed.value || (!settings.isAgent.value && Boolean(ticket.data?.feedback)))
   const isUpdatingStatus = ref(false)
 
-  // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
+  // Close dates come from ticket history, not the thread.
   const timelineChanges = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_timeline_changes',
     method: 'GET',
@@ -128,7 +132,7 @@ export default function setup(context) {
     (modified) => modified && timelineChanges.fetch(),
     { immediate: true },
   )
-  // Another ticket's closes would show until its own arrive.
+  // Else the previous ticket's closes show until these arrive.
   watch(ticketId, () => timelineChanges.reset())
 
   const timelineEvents = computed(() =>
@@ -138,7 +142,6 @@ export default function setup(context) {
         const closed = isClosedStatus(change.to)
         const key = `${closed ? 'closed' : 'reopened'}:${change.on}`
         const text = closed ? __('{0} closed the ticket', [change.by.name]) : __('{0} reopened the ticket', [change.by.name])
-        // The chat layout draws these as dividers, which read as a label rather than a sentence.
         const divider = closed ? __('Closed by {0}', [change.by.name]) : __('Reopened by {0}', [change.by.name])
         return {
           type: 'log',
@@ -163,10 +166,11 @@ export default function setup(context) {
 
   const suggestedArticles = computed(() => relatedArticles.data || [])
 
-  const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
-  // Where a rating is required, the status cannot be written without it; agents are not asked, as on the server.
+  // The server's test; it counts an agent reply that raised the ticket.
+  const canRate = computed(() => Boolean(ticket.data?.has_agent_replied) && !ticket.data?.feedback)
+  // As on the server: a required rating blocks the status write; agents exempt.
   const wantsFeedback = computed(
-    () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !config.value?.is_agent,
+    () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !settings.isAgent.value,
   )
 
   function onPageAction() {
@@ -197,7 +201,7 @@ export default function setup(context) {
     rating: thread.rating,
     timelineEvents,
     customActions,
-    // Empty hides the header button; an open ticket can be closed, a closed or rated one leads to a new ticket.
+    // Empty hides the header button.
     pageActionLabel: computed(() => {
       if (!ticket.data) return ''
       if (!isLocked.value) return __('Close')

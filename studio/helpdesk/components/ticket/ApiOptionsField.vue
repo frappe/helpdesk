@@ -3,7 +3,7 @@
     v-model="value"
     trigger="button"
     size="sm"
-    :options="options.data || []"
+    :options="list"
     :label="field.label"
     :description="field.description"
     :placeholder="field.placeholder || __('Select an option')"
@@ -13,23 +13,30 @@
 </template>
 
 <script setup lang="ts">
-// FieldComponent's props inlined: the SFC compiler cannot resolve that type through the alias.
+// Props inlined: the SFC compiler can't resolve FieldComponent via the alias.
 import { __ } from "@helpdesk/shared/translation";
 import { parseApiOptions } from "@helpdesk/shared/utils";
 import { Combobox, createResource } from "frappe-ui";
 import { computed } from "vue";
 
-const props = defineProps<{ field: any; modelValue: any; url: string }>();
+// `url` fetches the options; `options` passes a long Select's own, to search.
+const props = defineProps<{
+  field: any;
+  modelValue: any;
+  url?: string;
+  options?: { label: string; value: string }[];
+}>();
 const emit = defineEmits<{
   "update:modelValue": [value: any];
   change: [value: any];
 }>();
 
-const options = createResource({
+const fetched = createResource({
   url: props.url,
-  auto: true,
+  auto: Boolean(props.url),
   transform: parseApiOptions,
 });
+const list = computed(() => props.options ?? fetched.data ?? []);
 
 const value = computed({
   get: () => props.modelValue ?? null,

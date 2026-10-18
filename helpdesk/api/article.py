@@ -8,10 +8,11 @@ from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
 from helpdesk.helpdesk.doctype.hd_article.hd_article import make_article_filters
-from helpdesk.search import NUM_RESULTS
+from helpdesk.search import NUM_RESULTS, get_stopwords
 from helpdesk.search import search as hd_search
 
 RELATED_LIMIT = 3
+EXCERPT_LENGTH = 160
 
 
 def get_nouns(blob: TextBlob):
@@ -34,13 +35,15 @@ def search_with_enough_results(
     out = hd_search(query, qtype=qtype)
     if not out:
         return prev_res, len(prev_res) == NUM_RESULTS
-    items = prev_res + filter_accessible_articles(out[0].get("items", []))
-    items = list({v["id"]: v for v in items}.values())[:NUM_RESULTS]  # unique results
+    articles = {}
+    for item in prev_res + filter_accessible_articles(out[0].get("items", [])):
+        articles.setdefault(item["name"].split("#")[0], item)
+    items = list(articles.values())[:NUM_RESULTS]
     return items, len(items) == NUM_RESULTS
 
 
 def filter_accessible_articles(articles: list) -> list:
-    """Drop hits the reader can't view: the index can be stale, and holds every visibility."""
+    """The index can be stale and holds every visibility."""
     names = {article["name"].split("#")[0] for article in articles}
     if not names:
         return []
@@ -118,7 +121,6 @@ def search(query: str) -> list:
 
 @frappe.whitelist()
 def get_related(query: str) -> list[dict]:
-    """Published articles the reader may see that match free text, best first, as plain titles."""
     return [
         {
             "name": row["name"],
@@ -130,7 +132,10 @@ def get_related(query: str) -> list[dict]:
 
 
 def search_accessible_articles(query: str) -> list[dict]:
-    """`search`, one hit per article, its highlights as `<mark>`; nothing without RediSearch or its index."""
+    """Empty without RediSearch or its index."""
+    words = sanitize_query(query).split()
+    if words and set(words) <= set(get_stopwords()):
+        return search_titles(words)
     try:
         hits = search(query)
     except ResponseError:
@@ -143,7 +148,7 @@ def search_accessible_articles(query: str) -> list[dict]:
             {
                 "name": name,
                 "title": _as_mark(hit.get("subject")),
-                # portal links are /articles/<name>-<slug>; the slug skips the hit marks
+                # slug from the unmarked subject
                 "title_slug": cleanup_page_name(
                     strip_html_tags(hit.get("subject") or "")
                 ),
@@ -151,6 +156,30 @@ def search_accessible_articles(query: str) -> list[dict]:
             },
         )
     return list(articles.values())
+
+
+def search_titles(words: list[str]) -> list[dict]:
+    """Stopwords aren't indexed, so "what" alone reads titles instead."""
+    filters = [
+        [field, *(value if isinstance(value, list | tuple) else ("=", value))]
+        for field, value in make_article_filters().items()
+    ]
+    filters += [["title", "like", f"%{word}%"] for word in words]
+    return [
+        {
+            "name": row.name,
+            "title": row.title,
+            "title_slug": cleanup_page_name(row.title),
+            "excerpt": strip_html_tags(row.content or "")[:EXCERPT_LENGTH],
+        }
+        for row in frappe.get_all(
+            "HD Article",
+            filters=filters,
+            fields=["name", "title", "content"],
+            order_by="views desc",
+            limit=NUM_RESULTS,
+        )
+    ]
 
 
 def _as_mark(text: str | None) -> str:

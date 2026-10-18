@@ -111,8 +111,8 @@
     "blockName": "header-right",
     "children": [
      {
-      "componentId": "PortalCustomActions-header",
-      "componentName": "PortalCustomActions",
+      "componentId": "CustomActions-header",
+      "componentName": "CustomActions",
       "componentProps": {
        "actions": "{{ customActions }}"
       },
@@ -290,7 +290,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-10 20:51:47.071215",
+ "modified": "2026-10-19 05:28:45.751852",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

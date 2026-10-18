@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex w-full items-center justify-between gap-4 border-t border-outline-gray-1 pt-3.5"
+    class="flex w-full items-center justify-between gap-4 border-t border-outline-gray-1 pt-6"
   >
     <div class="flex min-w-0 flex-col gap-1.5">
       <span class="text-base text-ink-gray-8">
@@ -44,12 +44,14 @@ import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import PortalFeedbackThumb from "@app/components/knowledge_base/PortalFeedbackThumb.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
-import { feedbackAnswers } from "@app/components/knowledge_base/articleFeedback";
 
-const ANSWERS = feedbackAnswers();
+// HD Article Feedback values: 1 like, 2 dislike. In setup so labels translate.
+const ANSWERS = [
+  { value: 1, label: __("Yes, it was helpful") },
+  { value: 2, label: __("No, it wasn't helpful") },
+] as const;
 
 defineProps<{
-  // The article's name, sent as the origin of a ticket raised from here.
   article?: string;
   feedback?: number;
   onFeedback?: (value: number) => void;

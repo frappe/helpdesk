@@ -46,7 +46,6 @@ class CustomerEditController:
             frappe.throw(text, frappe.PermissionError)
 
     def check_feedback_is_final(self, old_doc):
-        """A customer rates a ticket once, whatever its status."""
         if not (old_doc.feedback or old_doc.feedback_rating):
             return
         if any(self.get(f) != old_doc.get(f) for f in FEEDBACK_FIELDS):

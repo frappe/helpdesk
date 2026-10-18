@@ -20,7 +20,8 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
 )
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
-    get_values_for_category,
+    get_stricter_visibility,
+    move_category_articles,
 )
 
 PUBLIC_ARTICLE_FIELDS = [
@@ -40,15 +41,12 @@ PUBLIC_CATEGORY_FIELDS = [
     "pinned",
     "pinned_order",
 ]
-# Avatars in a category page's byline.
 CREATOR_LIMIT = 32
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
-# Matches the article page's reading time.
 WORDS_PER_MINUTE = 200
-# A category past this many articles lists only the newest.
 LIST_LIMIT = 100
-# The sidebar's tree and search read these in one go; past this many, the oldest are left out.
+# the sidebar reads its titles in one request; newer ones win past this
 TITLES_LIMIT = 1000
 
 VISITOR_COOKIE = "hd_visitor"
@@ -57,7 +55,6 @@ VIEW_WINDOW = 60 * 60
 
 
 def validate_public_access():
-    """Anonymous readers only while the knowledge base is public."""
     if frappe.session.user != "Guest":
         return
     if not frappe.db.get_single_value("HD Settings", "public_knowledge_base"):
@@ -90,7 +87,7 @@ def create_category(title: str, icon: str | None = None):
 
 
 def _validate_category(category: str) -> None:
-    """A name, not a filter: `set_value` would take a list as one and touch every article."""
+    """A list would act as a filter and touch every article."""
     if not isinstance(category, str) or not frappe.db.exists(
         "HD Article Category", category
     ):
@@ -111,7 +108,7 @@ def set_category_visibility(category: str, visibility: str):
     options = frappe.get_meta("HD Article").get_options("visibility").split("\n")
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
-    # Saved one by one so each change shows in the article's version history.
+    # saved one by one for version history
     for name in frappe.get_all(
         "HD Article",
         filters={"category": category, "visibility": ["!=", visibility]},
@@ -127,20 +124,22 @@ def move_to_category(category: str, articles: list[str]):
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
 
-    values = get_values_for_category(category)
+    # read before the move changes it
+    category_visibility = hd_article_category.get_category_visibility(category)
     for name in articles:
         article = frappe.get_doc("HD Article", name)
-        article.update(values)
+        article.category = category
+        article.visibility = get_stricter_visibility(
+            article.visibility, category_visibility
+        )
         article.save()
 
 
-# The guest endpoints (nosemgrep) are the public knowledge base: each serves only what
-# make_article_filters lets the caller view, so a guest reads Public articles alone.
+# Guest endpoints: make_article_filters limits guests to Public articles.
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_articles(
     category: str | None = None, limit: int | None = None, sort: str = "latest"
 ) -> list[dict]:
-    """Published articles the reader may see, with what a list row shows and no body."""
     validate_public_access()
     filters = make_article_filters()
     if category:
@@ -155,27 +154,33 @@ def get_articles(
 
 
 def _get_byline(user: str) -> dict:
-    """What a byline shows; never the email, which guests could harvest."""
+    """Never the email: guests could harvest it."""
     info = get_user_info_for_avatar(user)
     return {"name": info["name"], "image": info["image"]}
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
-def get_article_titles() -> list[dict]:
-    """The newest articles the reader may see, as just name, title and category."""
+# guests count per IP, so leave room for a shared office address
+@rate_limit(limit=120, seconds=60, user_based=True)
+def get_kb_sidebar() -> list[dict]:
     validate_public_access()
-    return frappe.get_all(
+    articles = {}
+    for row in frappe.get_all(
         "HD Article",
-        filters=make_article_filters(),
+        filters=make_article_filters(category=["is", "set"]),
         fields=["name", "title", "category"],
         order_by="published_on desc",
         limit_page_length=TITLES_LIMIT,
-    )
+    ):
+        articles.setdefault(row.pop("category"), []).append(row)
+    categories = _get_categories(with_creators=True)
+    for category in categories:
+        category.articles = articles.get(category.name, [])
+    return categories
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_article(name: str) -> dict:
-    """One article, published — or any article to an agent previewing a draft."""
     name = _get_article_name(name)
     article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = _get_byline(article.author)
@@ -192,7 +197,6 @@ def get_article(name: str) -> dict:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_article_markdown(name: str) -> None:
-    """The article as a Markdown page, to paste into an LLM or point one at."""
     article = _get_viewable_article(name, ["title", "content"])
     body = html2text(expand_relative_urls(article.content or ""), wrap=False)
     frappe.response.update(
@@ -205,7 +209,7 @@ def get_article_markdown(name: str) -> None:
 
 
 def _get_article_name(path_name: str) -> str:
-    """URLs read `<name>-<title slug>`; names are random hashes, which hold no hyphen."""
+    """Names are hashes without hyphens; URLs append `-<title slug>`."""
     return path_name.split("-", 1)[0]
 
 
@@ -220,10 +224,12 @@ def _get_viewable_article(name: str, fields: list[str] | None = None) -> frappe.
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
-def get_categories(with_creators: bool = False) -> list[dict]:
-    """Only those with an article the reader may see, each with `article_count`,
-    and with `with_creators`, its first few authors and how many there are."""
+def get_categories() -> list[dict]:
     validate_public_access()
+    return _get_categories()
+
+
+def _get_categories(with_creators: bool = False) -> list[dict]:
     counts, authors = {}, {}
     for category, author, total in frappe.get_all(
         "HD Article",
@@ -243,7 +249,6 @@ def get_categories(with_creators: bool = False) -> list[dict]:
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
     )
-    with_creators = cint(with_creators)
     for category in categories:
         category.article_count = counts[category.name]
         if with_creators:
@@ -254,9 +259,8 @@ def get_categories(with_creators: bool = False) -> list[dict]:
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
-@rate_limit(limit=120, seconds=60)
+@rate_limit(limit=120, seconds=60, user_based=True)
 def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
-    """Full-text matches the reader may see, best first, with `<mark>` around the hits."""
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
     if not query:
@@ -288,7 +292,7 @@ def _get_search_hit(row: dict, article: frappe._dict) -> dict:
         "title": escape_marked(row["title"]),
         "title_slug": row["title_slug"],
         "excerpt": escape_marked(row["excerpt"]),
-        # HD Article has no cover field; the body's first image stands in for one.
+        # no cover field; the first body image stands in
         "image": find_first_image(content),
         "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
@@ -300,7 +304,7 @@ def _get_reading_minutes(body: BeautifulSoup) -> int:
 
 
 def escape_marked(text: str) -> str:
-    """Author text is not HTML; only the highlighter's own tags survive escaping."""
+    """Only the highlighter's own tags survive escaping."""
     return (
         escape_html(text)
         .replace("&lt;mark&gt;", "<mark>")
@@ -309,17 +313,17 @@ def escape_marked(text: str) -> str:
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
-@rate_limit(key="article", limit=5, seconds=60 * 60)
-def set_article_feedback(article: str, value: int) -> None:
-    """Give feedback on a published article, signed in or not."""
+@rate_limit(key="article", limit=5, seconds=60 * 60, user_based=True)
+def vote_on_article(article: str, vote: int) -> None:
+    """0 withdraws, 1 helpful, 2 not helpful."""
     _get_viewable_article(article)
     frappe.get_doc("HD Article", article).set_feedback(
-        value, visitor_id=_get_visitor_id(create=True)
+        vote, visitor_id=_get_visitor_id(create=True)
     )
 
 
 def _get_visitor_id(create: bool = False) -> str | None:
-    """A cookie that tells one `Guest` voter from another; only voting mints it."""
+    """Tells one Guest voter from another; only voting mints it."""
     if frappe.session.user != "Guest":
         return None
 
@@ -335,7 +339,6 @@ def _get_visitor_id(create: bool = False) -> str | None:
 
 
 def _get_own_feedback(article: str) -> int:
-    """The caller's own feedback on an article — 0 when they have given none."""
     # A null visitor id would match every signed-in reader's row.
     if not (voter := get_voter(_get_visitor_id())):
         return 0
@@ -355,12 +358,7 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
-    frappe.db.set_value(
-        "HD Article",
-        {"category": source},
-        get_values_for_category(target),
-        update_modified=False,
-    )
+    move_category_articles(source, target)
     frappe.delete_doc("HD Article Category", source)
 
 
@@ -373,8 +371,9 @@ def get_general_category():
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])  # nosemgrep
 def increment_views(article: str):
-    """Count a reader once per article an hour; a re-read inside that window is no new view."""
-    _get_viewable_article(article)
+    # an agent previewing a draft
+    if _get_viewable_article(article).status != "Published":
+        return
     reader = (
         frappe.local.request_ip
         if frappe.session.user == "Guest"

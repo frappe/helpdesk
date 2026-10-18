@@ -116,7 +116,7 @@ class HDCustomer(Document):
             if contact.is_manager == was_manager.get(contact.contact_name):
                 continue
             self.sync_contact_role(contact)
-        # a removed manager is demoted like one whose flag was cleared
+        # demote removed managers too
         remaining = {contact.contact_name for contact in self.contacts}
         for contact_name, is_manager in was_manager.items():
             if is_manager and contact_name not in remaining:
@@ -285,7 +285,8 @@ class HDCustomer(Document):
         return {"added": added, "invite_result": self.invite_contacts(to_invite, role)}
 
     def validate_contact_update_permission(self, role: str) -> None:
-        validate_customer_role(role)
+        if role not in CUSTOMER_ROLES:
+            frappe.throw(_("Invalid role {0}").format(role))
         roles = frappe.get_roles()
         if "System Manager" not in roles and "Agent Manager" not in roles:
             frappe.throw(
@@ -496,7 +497,7 @@ def permission_query(user: str) -> str:
 
 
 def has_permission(doc: Document, ptype: str, user: str) -> bool:
-    """Agents are unrestricted; members may only read. Managers change it through `helpdesk.api.customer`, never here."""
+    """Members only read; managers write through `helpdesk.api.customer`."""
     if is_agent(user):
         return True
     if ptype in ("write", "delete"):
@@ -513,13 +514,7 @@ def get_customer_membership(customer: str, user: str) -> dict | None:
 
 
 def is_customer_manager(customer: str | None, user: str | None = None) -> bool:
-    """Whether `user` is a manager member of `customer`; agent access is checked apart."""
     if not customer:
         return False
     membership = get_customer_membership(customer, user or frappe.session.user)
     return bool(membership and membership.get("is_manager"))
-
-
-def validate_customer_role(role: str) -> None:
-    if role not in CUSTOMER_ROLES:
-        frappe.throw(_("Invalid role {0}").format(role))

@@ -22,11 +22,11 @@
 
 <script setup lang="ts">
 import { provide, ref } from "vue";
-import PortalCollapse from "@app/components/common/PortalCollapse.vue";
+import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 
 defineProps<{ label: string }>();
 
 const opened = ref(true);
-// Content stays mounted while collapsed, so anything that animates in needs to know when it is shown again.
+// Stays mounted when folded; animated children watch this to replay.
 provide("portalSectionOpen", opened);
 </script>

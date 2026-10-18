@@ -127,6 +127,17 @@ test("the command palette finds a ticket and opens it", async ({ page, api, apiA
   await expect(page).toHaveURL(new RegExp(`/helpdesk/tickets/${ticket.name}`));
 });
 
+test("the command palette does not open over the settings dialog", async ({ page }) => {
+  await new TicketList(page).goto();
+  await page.keyboard.press("Control+,");
+  const settings = page.getByRole("dialog");
+  await expect(settings).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Command Palette" })).toBeHidden();
+  await expect(settings).toBeVisible();
+});
+
 test("search finds a ticket by text that is only in a comment", async ({
   page,
   api,

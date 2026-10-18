@@ -134,7 +134,7 @@ const themeMenuItem = computed(() => ({
 
 const isFCSite = ref(window.is_fc_site);
 
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   {
     label: __("Customer portal"),
@@ -179,8 +179,6 @@ const agentPortalDropdown = computed(() => [
     ],
   },
 ]);
-
-const profileSettings = agentPortalDropdown;
 
 const logo = h(
   HDLogo,

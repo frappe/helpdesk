@@ -76,7 +76,7 @@ class HDTicket(Document, CustomerEditController):
             self.notify_customers()
 
     def has_customer_visible_change(self) -> bool:
-        """Customers never read internal fields, so a change to only those leaves their page as it was."""
+        """Customers can't read internal fields; no ping for those alone."""
         before = self.get_doc_before_save()
         return not before or any(
             self.get(df.fieldname) != before.get(df.fieldname)
@@ -85,7 +85,7 @@ class HDTicket(Document, CustomerEditController):
         )
 
     def on_trash(self):
-        # Customers are worked out now; once the row is gone there is no one to ask about.
+        # resolve customers before the row is gone
         self.notify_customers()
 
     def autoname(self):
@@ -1041,7 +1041,6 @@ class HDTicket(Document, CustomerEditController):
         return frappe.get_doc("HD Service Level Agreement", self.sla)
 
     def get_overdue_by(self) -> dict:
-        """Business seconds each unmet target is overdue by; a paused ticket's clock is stopped."""
         sla = self.get_sla()
         if not sla or self.status_category == "Paused":
             return {}
@@ -1140,7 +1139,7 @@ class HDTicket(Document, CustomerEditController):
         if c.sent_or_received == "Sent":
             # Ignore system notifications
             if c.communication_type and c.communication_type == "Automated Message":
-                # No save follows, so nothing else tells open pages about it.
+                # no save follows to notify open pages
                 self.publish_update()
                 return
             # Set first response date if not set already
@@ -1385,7 +1384,7 @@ class HDTicket(Document, CustomerEditController):
         return fields
 
     def notify_customers(self):
-        """Customers are kept out of the ticket's room, so each one gets a bare ping on their own channel."""
+        """Customers aren't in the ticket's room; ping each user's channel."""
         for user in self.get_customers_to_notify():
             frappe.publish_realtime(
                 "helpdesk:ticket-update",
@@ -1395,20 +1394,21 @@ class HDTicket(Document, CustomerEditController):
             )
 
     def get_customers_to_notify(self) -> set[str]:
-        """Customers who may read the ticket; the author and agents already refetch, so they are left out."""
-        candidates = {self.raised_by, self.owner}
-        contacts = [self.contact] if self.contact else []
-        if self.customer:
-            contacts += frappe.get_all(
+        """Skips the author and agents: they refetch already.
+
+        The readers `has_permission` lets in; not called per user, it repeats these lookups."""
+        candidates = {self.raised_by, self.owner, self.contact}
+        if self.customer and (
+            managers := frappe.get_all(
                 "HD Customer Member",
                 filters={"parent": self.customer, "is_manager": 1},
                 pluck="contact_name",
             )
-        if contacts:
+        ):
             candidates.update(
                 frappe.get_all(
                     "Contact",
-                    filters={"name": ["in", contacts], "user": ["is", "set"]},
+                    filters={"name": ["in", managers], "user": ["is", "set"]},
                     pluck="user",
                 )
             )
@@ -1420,15 +1420,15 @@ class HDTicket(Document, CustomerEditController):
             filters={"name": ["in", list(candidates)], "enabled": 1},
             pluck="name",
         )
-        return {u for u in users if not is_agent(u) and has_permission(self, u)}
+        return {u for u in users if not is_agent(u)}
 
 
 def publish_assignment_update(todo, method=None):
     """Assigning writes `_assign` without saving the ticket, so `on_update` never runs."""
     if todo.reference_type != "HD Ticket" or not todo.reference_name:
         return
-    if ticket := frappe.db.exists("HD Ticket", todo.reference_name):
-        frappe.get_cached_doc("HD Ticket", ticket).notify_customers()
+    if frappe.db.exists("HD Ticket", todo.reference_name):
+        frappe.get_doc("HD Ticket", todo.reference_name).notify_customers()
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

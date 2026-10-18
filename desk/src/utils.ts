@@ -9,15 +9,13 @@ import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
 import { isEmoji } from "@helpdesk/shared/utils";
 
-// TODO: after #3846/#3847 merge, import these from `@helpdesk/shared/utils` directly in the
-// desk files that use `@/utils`, and delete this re-export.
+// TODO: drop after #3846/#3847 merge; import from shared directly.
 export {
   ConfirmDelete,
   CUSTOMER_PORTAL_ROOT,
   getErrorMessage,
   handleInviteUserSuccess,
   isContentEmpty,
-  isEmoji,
   parseApiOptions,
   prettyDate,
   timeAgo,

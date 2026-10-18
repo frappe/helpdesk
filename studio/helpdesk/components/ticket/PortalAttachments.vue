@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col gap-1.5">
+  <!-- `relative` keeps the sr-only picker inside the page's scroller; anchored to
+       <body> it overflows it, and the whole page scrolls past its bottom. -->
+  <div class="relative flex flex-col gap-1.5">
     <span class="text-p-sm text-ink-gray-5">{{ __("Attachments") }}</span>
 
     <div
@@ -149,7 +151,7 @@ const emit = defineEmits<{ "update:modelValue": [UploadResult[]] }>();
 
 const uploader = useUploader({
   transport: props.transport,
-  // useUploader keeps the object it is given; read through so later config applies
+  // useUploader keeps the given object; proxy so later config applies.
   restrictions: new Proxy({}, { get: (_, key) => props.restrictions?.[key] }),
   multiple: true,
 });
@@ -172,7 +174,7 @@ function onDrop(event: DragEvent) {
   add(event.dataTransfer?.files);
 }
 
-// the description editor and inputs handle their own paste
+// The editor and inputs handle their own paste.
 function onPaste(event: ClipboardEvent) {
   const target = event.target as HTMLElement;
   if (target.closest("input, textarea, [contenteditable='true']")) return;
@@ -195,15 +197,19 @@ function add(files?: FileList | null) {
   upload();
 }
 
-// commit() skips items added while a pass runs, so keep going until none are left
+// commit() skips items added mid-pass; loop until none are idle.
 async function upload() {
   if (running) return;
   running = true;
-  while (uploader.items.some((item) => item.status === "idle")) {
-    await uploader.commit();
-    emitDone();
+  try {
+    while (uploader.items.some((item) => item.status === "idle")) {
+      await uploader.commit();
+      emitDone();
+    }
+  } finally {
+    // Else one throw stalls every later file.
+    running = false;
   }
-  running = false;
 }
 
 function remove(id: string) {

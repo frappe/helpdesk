@@ -1,17 +1,11 @@
+import { ref } from 'vue'
 import { call } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { runAction } from '@helpdesk/shared/utils'
 
-// Values match HD Article Feedback: 1 like, 2 dislike; 0 clears.
-// A function, not a constant, so the labels are translated after translations load.
-export function feedbackAnswers() {
-  return [
-    { value: 1, label: __('Yes, it was helpful') },
-    { value: 2, label: __("No, it wasn't helpful") },
-  ] as const
-}
+// One vote in flight: the server's check-then-insert would record a double-click twice.
+const saving = ref(false)
 
-// A second click on the current answer clears it.
 export function saveArticleFeedback(
   article: string,
   current: number | undefined,
@@ -21,9 +15,9 @@ export function saveArticleFeedback(
   const value = current === answer ? 0 : answer
   return runAction(
     async () => {
-      await call('helpdesk.api.knowledge_base.set_article_feedback', { article, value })
+      await call('helpdesk.api.knowledge_base.vote_on_article', { article, vote: value })
       onSaved(value)
     },
-    { success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
+    { busy: saving, success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
   )
 }

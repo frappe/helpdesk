@@ -39,7 +39,8 @@ export const ComponentUtils: Extension = Extension.create({
         },
       },
       {
-        types: ["heading"],
+        // Ids for headings and outline blocks (`addOutlineIds`).
+        types: ["heading", "paragraph", "orderedList", "blockquote"],
         attributes: {
           id: {
             default: null,
@@ -109,3 +110,6 @@ export const ComponentUtils: Extension = Extension.create({
     ];
   },
 });
+
+// frappe-ui rounds article images; this adds a hairline border.
+export const ARTICLE_IMAGE_CLASSES = "[&_img]:border [&_img]:border-outline-gray-2";

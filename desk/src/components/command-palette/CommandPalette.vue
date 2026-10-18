@@ -410,14 +410,20 @@ watch(depth, () => nextTick(() => inputRef.value?.focus()));
 
 // frappe-ui's useKeyboardShortcut: the local one suppresses bindings in inputs
 // and dialogs, so Cmd+K couldn't open from a filter box. ProseMirror keeps its
-// own Mod-k (insert link), so bow out there.
+// own Mod-k (insert link), so bow out there. `allowInDialog` is only for closing
+// from the palette's own dialog: opening over another one (Settings) would stack
+// the palette, and the popovers its commands open, above that dialog.
 useKeyboardShortcut({
   combo: "Mod+K",
   description: __("Open command palette"),
   group: __("General"),
   allowInInput: true,
   allowInDialog: true,
-  enabled: () => !document.activeElement?.closest?.(".ProseMirror"),
+  enabled: () => {
+    const focused = document.activeElement;
+    if (focused?.closest?.(".ProseMirror")) return false;
+    return isOpen.value || !focused?.closest?.('[role="dialog"]');
+  },
   handler: () => (isOpen.value ? closePalette() : openPalette()),
 });
 </script>

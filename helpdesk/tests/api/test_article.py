@@ -109,6 +109,21 @@ class TestSearchArticles(IntegrationTestCase):
         self.assertEqual(result, [first, second, *rest][:NUM_RESULTS])
         hd_search.assert_called_with("password reset", qtype="and")
 
+    def test_sections_of_one_article_count_once(self, hd_search, *_) -> None:
+        long_article, *others = self.articles
+        sections = [
+            make_search_hit(long_article, f"section-{i}") for i in range(NUM_RESULTS)
+        ]
+        other_hits = [make_search_hit(article) for article in others]
+        hd_search.side_effect = [
+            make_search_page(*sections),
+            make_search_page(*other_hits),
+        ]
+
+        result = search("reset my password")
+
+        self.assertEqual(result, [sections[0], *other_hits][:NUM_RESULTS])
+
     def test_no_match_returns_empty_list(self, hd_search, *_) -> None:
         hd_search.return_value = []
 

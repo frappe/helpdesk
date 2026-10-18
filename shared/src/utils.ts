@@ -11,7 +11,7 @@ const DAY = 24 * HOUR;
 const MONTH = 30 * DAY;
 const YEAR = 365 * DAY;
 
-// The studio-built customer portal, served outside the desk SPA.
+// Studio portal, outside the desk SPA.
 export const CUSTOMER_PORTAL_ROOT = "/help";
 
 /**
@@ -23,7 +23,7 @@ export const CUSTOMER_PORTAL_ROOT = "/help";
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
-      label: "Delete",
+      label: __("Delete"),
       icon: "lucide-trash-2",
       // preventDefault keeps the menu open so the confirm row can replace this one
       onClick: (event) => {
@@ -33,7 +33,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => !isConfirmingDelete.value,
     },
     {
-      label: "Confirm Delete",
+      label: __("Confirm Delete"),
       icon: "lucide-trash-2",
       theme: "red",
       onClick: () => {
@@ -45,7 +45,7 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   ];
 }
 
-// Quick links reach guests, so only site paths, web and mail addresses are allowed.
+// Guests see quick links, so allow only paths, web and mail URLs.
 export function isSafeLink(url: unknown) {
   return typeof url === "string" && /^(\/|https?:|mailto:)/i.test(url);
 }
@@ -125,12 +125,12 @@ export function timeAgo(date) {
   return prettyDate(date);
 }
 
-/** Format a duration using its two most significant units, e.g. "1d 9h" */
-// The server's rule (HD Service Level Agreement): a milestone fails only when met after its due time.
+// Server rule: a milestone fails only when met after its due time.
 export function isSlaMissed(metOn: string, due?: string | null) {
   return Boolean(due) && dayjsLocal(metOn).isAfter(dayjsLocal(due));
 }
 
+/** Format a duration using its two most significant units, e.g. "1d 9h" */
 export function twoUnitDuration(milliseconds: number): string {
   const duration = dayjs.duration(milliseconds);
 
@@ -167,7 +167,7 @@ export function isContentEmpty(content: string) {
   return !doc.body.textContent?.trim();
 }
 
-// Plain-text mail has no markup, so its newlines would collapse into one paragraph.
+// Keep plain-text newlines, which HTML would collapse.
 export function plainTextToHtml(content: string) {
   const doc = new DOMParser().parseFromString(content || "", "text/html");
   if (doc.body.children.length) return content;
@@ -185,8 +185,7 @@ function slugify(text = "") {
     .replace(/^-|-$/g, "");
 }
 
-// One id per article heading, the same on the desk and the portal, so a `#heading` link works on both.
-// An id the editor already saved wins, so existing links keep working; repeats are numbered.
+// Same ids on desk and portal so `#heading` links work; saved ids win.
 export function addHeadingIds(html: string) {
   const doc = new DOMParser().parseFromString(html || "", "text/html");
   const used = new Set<string>();
@@ -204,6 +203,80 @@ export function addHeadingIds(html: string) {
   return { html: doc.body.innerHTML, headings };
 }
 
+// No headings: outline bold lookalikes, else steps, notes, screenshots (2+).
+export function addOutlineIds(html: string) {
+  const doc = new DOMParser().parseFromString(html || "", "text/html");
+  const top = Array.from(doc.body.children);
+
+  const lookalikes = top.flatMap((element) => {
+    const text = lookalikeHeading(element);
+    return text ? [{ element, text }] : [];
+  });
+  if (lookalikes.length >= 2) {
+    const used = new Set<string>();
+    const sections = lookalikes.map(({ element, text }) => {
+      const base = slugify(text) || "section";
+      let id = base;
+      for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+      used.add(id);
+      element.id = id;
+      return { id, text, level: 2 };
+    });
+    return { html: doc.body.innerHTML, sections };
+  }
+
+  const blocks = top.flatMap((element) => {
+    const kind = outlineKind(element);
+    if (!kind) return [];
+    // The editor keeps an image inside a paragraph, so the id goes on one.
+    if (element.tagName === "IMG") {
+      const paragraph = doc.createElement("p");
+      element.replaceWith(paragraph);
+      paragraph.append(element);
+      element = paragraph;
+    }
+    return [{ element, kind }];
+  });
+  if (blocks.length < 2) return { html, sections: [] };
+
+  const total = (kind: string) => blocks.filter((block) => block.kind === kind).length;
+  const seen: Record<string, number> = {};
+  const sections = blocks.map(({ element, kind }) => {
+    const n = (seen[kind] = (seen[kind] || 0) + 1);
+    const id = `${kind}-${n}`;
+    element.id = id;
+    let text = {
+      steps: __("Steps ({0})", [element.querySelectorAll(":scope > li").length]),
+      note: __("Note"),
+      screenshot: __("Screenshot"),
+    }[kind];
+    if (kind !== "steps" && total(kind) > 1) text = `${text} ${n}`;
+    return { id, text, level: 2 };
+  });
+  return { html: doc.body.innerHTML, sections };
+}
+
+// Short all-bold paragraphs read as headings; 60 chars skips bold sentences.
+function lookalikeHeading(element: Element) {
+  const text = element.textContent?.trim() || "";
+  if (element.tagName !== "P" || text.length < 3 || text.length > 60 || element.querySelector("img")) return null;
+  const walker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  let allBold = true;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.textContent?.trim() && !node.parentElement?.closest("strong, b")) allBold = false;
+  }
+  return allBold ? text.replace(/:$/, "").trim() : null;
+}
+
+function outlineKind(element: Element) {
+  if (element.tagName === "OL") return "steps";
+  if (element.tagName === "BLOCKQUOTE") return "note";
+  const imageOnly =
+    element.tagName === "IMG" ||
+    (element.tagName === "P" && element.querySelector("img") && !element.textContent?.trim());
+  return imageOnly ? "screenshot" : null;
+}
+
 // Lucide names are plain ASCII, so any emoji-presentation or pictographic
 // character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
 export function isEmoji(str: string): boolean {
@@ -218,16 +291,16 @@ export function shortDuration(target: string): string {
   const seconds = Math.abs(dayjsLocal(target).diff(dayjsLocal(), "second"));
   if (seconds >= YEAR) {
     const years = Math.floor(seconds / YEAR);
-    return `${years} ${years === 1 ? "year" : "years"}`;
+    return countLabel(years, __("1 year"), __("{0} years"));
   }
   if (seconds >= MONTH) {
     const months = Math.floor(seconds / MONTH);
-    return `${months} ${months === 1 ? "month" : "months"}`;
+    return countLabel(months, __("1 month"), __("{0} months"));
   }
   if (seconds >= DAY) {
     const days = Math.floor(seconds / DAY);
     const hours = Math.floor((seconds % DAY) / HOUR);
-    const dayLabel = `${days} ${days === 1 ? "day" : "days"}`;
+    const dayLabel = countLabel(days, __("1 day"), __("{0} days"));
     return hours ? `${dayLabel} ${hours}h` : dayLabel;
   }
   if (seconds >= HOUR) {
@@ -295,7 +368,6 @@ export function getErrorMessage(
   return msg;
 }
 
-/** Toasts who `invite_by_email`, or a call answering in its shape, invited and skipped. */
 export function handleInviteUserSuccess(
   data: Record<
     | "disabled_user_emails"
@@ -393,7 +465,7 @@ export function setValues(
   return call("frappe.client.set_value", { doctype, name, fieldname: values });
 }
 
-// `$dialog` for form scripts: their actions call `close()` or `close.close()`, as on the desk.
+// Form script actions call `close()` or `close.close()`, as on the desk.
 function scriptDialog({ title, message, size, icon, actions }) {
   return dialog.confirm({
     title,
@@ -404,7 +476,7 @@ function scriptDialog({ title, message, size, icon, actions }) {
   });
 }
 
-// HD Form Scripts get the desk portal's context, so scripts written for it keep working.
+// The desk's context, so existing scripts keep working.
 export async function runFormScripts(
   data,
   context,
@@ -434,7 +506,7 @@ export function updateTicket(name: string, values: Record<string, unknown>) {
   return setValues("HD Ticket", name, values);
 }
 
-// Takes strings already passed through `__()`, so the extractor sees the literals.
+// Args already went through `__()`, so the extractor sees the literals.
 export function countLabel(count: number, singular: string, plural: string) {
   return count === 1 ? singular : plural.replace("{0}", String(count));
 }

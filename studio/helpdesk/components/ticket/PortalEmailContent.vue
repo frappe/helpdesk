@@ -15,7 +15,6 @@ import {
   stripEmailColors,
   useDataTheme,
 } from "@framework/ui/components/ActivityTimeline/utils";
-import { plainTextToHtml } from "@helpdesk/shared/utils";
 
 const QUOTE_SELECTORS = [
   "div.gmail_quote",
@@ -30,7 +29,7 @@ const props = withDefaults(defineProps<{ content?: string }>(), {
 const frame = ref<HTMLIFrameElement | null>(null);
 
 const body = computed(() =>
-  collapseQuotes(plainTextToHtml(stripEmailColors(props.content || "")))
+  collapseQuotes(stripEmailColors(props.content || ""))
 );
 
 function collapseQuotes(html: string) {
@@ -48,18 +47,24 @@ function collapseQuotes(html: string) {
   return doc.body.innerHTML;
 }
 
-// Scripts and handlers go at parse time; the sandbox and CSP stay as the runtime backstop.
+// Strip scripts at parse time; sandbox and CSP are the backstop.
+// `javascript:` links open in an unsandboxed popup with this origin.
+const SCRIPT_URL = /^(javascript|vbscript):/i;
+
 function stripActiveContent(doc: Document) {
   doc.querySelectorAll("script").forEach((element) => element.remove());
   doc.querySelectorAll("*").forEach((element) => {
     for (const attribute of [...element.attributes]) {
-      if (attribute.name.toLowerCase().startsWith("on"))
+      const name = attribute.name.toLowerCase();
+      // Browsers ignore whitespace and control chars in a URL scheme.
+      const url = attribute.value.replace(/[\u0000-\u0020]/g, "");
+      if (name.startsWith("on") || SCRIPT_URL.test(url))
         element.removeAttribute(attribute.name);
     }
   });
 }
 
-// The editor leaves an empty paragraph after the text, which pads a one-word message into a tall bubble.
+// The editor's trailing empty paragraph would pad short bubbles.
 function trimEmptyEdges(doc: Document) {
   const isEmpty = (node: ChildNode | null) =>
     !!node &&
@@ -72,7 +77,7 @@ function trimEmptyEdges(doc: Document) {
   while (isEmpty(doc.body.firstChild)) doc.body.firstChild!.remove();
 }
 
-// Folding leaves the matched marker in the document, so skip what is already folded.
+// The folded marker stays in the doc; skip already-folded quotes.
 function nextQuote(doc: Document, selector: string) {
   return doc.querySelector(`${selector}:not(.replied-content *)`);
 }
@@ -82,7 +87,7 @@ function fold(doc: Document, quote: Element) {
   const wrapper = doc.createElement("div");
   wrapper.className = "replied-content";
 
-  // Literal classes: the frame mirrors the page's sheets, and Tailwind scans this file.
+  // Literal classes: Tailwind scans this file for the frame's sheets.
   const label = doc.createElement("label");
   label.className =
     "my-2.5 flex h-3 w-[23px] cursor-pointer items-center justify-center rounded-5 bg-surface-gray-2 text-lg font-bold leading-none text-ink-gray-8 hover:bg-surface-gray-3";
@@ -109,7 +114,7 @@ function fold(doc: Document, quote: Element) {
   quote.parentElement?.replaceChild(wrapper, quote);
 }
 
-// Stable id per quote, so toggling one does not re-render it as a different node.
+// Stable id per quote across re-renders.
 function hash(value: string) {
   let result = 0;
   for (let i = 0; i < value.length; i++) {
@@ -119,7 +124,7 @@ function hash(value: string) {
   return result;
 }
 
-// Read once: a reactive theme in the srcdoc would reload the frame on every toggle.
+// Read once: a reactive theme in srcdoc would reload the frame.
 const dataTheme = useDataTheme();
 const initialTheme = dataTheme.value;
 
@@ -144,7 +149,7 @@ watch(
       applyCssToIframe(element, () => resize(element));
       resize(element);
     };
-    // Text re-wraps on a width change, and a height measured at the old width clips it.
+    // Re-measure on width change, or rewrapped text clips.
     observer?.disconnect();
     observer = new ResizeObserver(([entry]) => {
       const width = entry.contentRect.width;
@@ -176,7 +181,7 @@ function resize(element: HTMLIFrameElement) {
   element.contentDocument
     ?.querySelectorAll('input[type="checkbox"]')
     .forEach((toggle) => toggle.addEventListener("change", fit));
-  // Images and video reserve no space until they arrive, so measure again as each does.
+  // Media reserve no space until loaded; re-measure then.
   element.contentDocument?.querySelectorAll("img").forEach((image) => {
     if (!image.complete) image.addEventListener("load", fit);
   });
@@ -185,7 +190,7 @@ function resize(element: HTMLIFrameElement) {
     .forEach((video) => video.addEventListener("loadedmetadata", fit));
 }
 
-// A bubble is as wide as its sentence; an iframe fills whatever it is given instead.
+// Size the bubble to its text; an iframe fills its container.
 function fitFrameToContent(element: HTMLIFrameElement) {
   const content =
     element.contentDocument?.querySelector<HTMLElement>(".email-content");

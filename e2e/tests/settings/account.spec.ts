@@ -112,7 +112,7 @@ test("ticket automation settings save status updates, auto close and the banner"
     "outside_working_hours_message",
   ]);
   try {
-    // The switch below turns the banner on, so start from off; `restore` puts it back.
+    // The switch turns the banner on, so start from off.
     await api.update("HD Settings", "HD Settings", { enable_outside_hours_banner: 0 });
     await page.goto("/helpdesk/tickets");
     const dialog = await openSettings(page, "General");
@@ -168,7 +168,7 @@ test("the brand logo uploads and removes, and signup can be disabled", async ({ 
     await page.getByRole("dialog", { name: "Remove Logo" }).getByRole("button", { name: "Confirm" }).click();
     await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).brand_logo).toBeFalsy();
 
-    // Signup lives under Portal Settings and saves as soon as it is toggled.
+    // Signup saves as soon as it is toggled.
     await dialog.getByRole("button", { name: "Portal Settings", exact: true }).click();
     await settingRow(dialog, "Disable signup").getByRole("switch").click();
     await expect

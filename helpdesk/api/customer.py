@@ -1,9 +1,3 @@
-"""HD Customer endpoints.
-
-Agents create and delete customers. The portal's settings modal reads and
-manages the caller's organizations and who is in them.
-"""
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -27,6 +21,29 @@ from helpdesk.utils import (
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 MAX_INVITES = 20
 MAX_SUGGESTIONS = 50
+# Shared by strangers: never suggest invitees from these.
+PUBLIC_EMAIL_DOMAINS = frozenset(
+    {
+        "aol.com",
+        "gmail.com",
+        "googlemail.com",
+        "gmx.com",
+        "hotmail.com",
+        "icloud.com",
+        "live.com",
+        "mail.com",
+        "me.com",
+        "msn.com",
+        "outlook.com",
+        "proton.me",
+        "protonmail.com",
+        "rediffmail.com",
+        "yahoo.co.in",
+        "yahoo.com",
+        "yandex.com",
+        "zoho.com",
+    }
+)
 
 
 @frappe.whitelist()
@@ -98,7 +115,6 @@ def delete_customer(name: str, delete_tickets: bool = False) -> None:
 
 @frappe.whitelist()
 def get_portal_account() -> dict:
-    """The session user's profile plus every organization they belong to."""
     user = frappe.db.get_value(
         "User",
         frappe.session.user,
@@ -119,7 +135,6 @@ def get_portal_account() -> dict:
 
 @frappe.whitelist()
 def get_organization(customer: str) -> dict:
-    """What the `get_portal_account` card lacks: contact details, members and, for an inviter, invitations."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     customer_doc.check_permission("read")
     can_manage = _has_manager_permission(customer_doc)
@@ -136,13 +151,16 @@ def get_organization(customer: str) -> dict:
 
 @frappe.whitelist()
 def get_invitable_contacts(customer: str, query: str = "") -> list[dict]:
-    """Login-holding contacts matching `query`, minus agents, members and invitees, as the desk's invite dialog offers them."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
         "allow_customer_managers_to_invite",
         _("You are not permitted to invite members"),
     )
+    domain = (customer_doc.domain or "").strip().lstrip("@").lower()
+    # Other organizations' people stay private.
+    if not domain or domain in PUBLIC_EMAIL_DOMAINS:
+        return []
     Contact = frappe.qb.DocType("Contact")
     Agent = frappe.qb.DocType("HD Agent")
     search = f"%{query.strip()}%"
@@ -152,6 +170,7 @@ def get_invitable_contacts(customer: str, query: str = "") -> list[dict]:
         .where(Contact.user.isnotnull() & (Contact.user != ""))
         .where(Contact.user.notin(frappe.qb.from_(Agent).select(Agent.name)))
         .where(Contact.full_name.like(search) | Contact.email_id.like(search))
+        .where(Contact.email_id.like(f"%@{domain}"))
         .orderby(Contact.full_name)
         .limit(MAX_SUGGESTIONS)
     )
@@ -165,39 +184,45 @@ def get_invitable_contacts(customer: str, query: str = "") -> list[dict]:
 @frappe.whitelist(methods=["POST"])
 @rate_limit(limit=10, seconds=60 * 60, ip_based=False, user_based=True)
 def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
-    """Skips emails `invite_by_email` would skip, without saying why: the checks
-    cover every user and invitation on the site, not only this organization's.
+    """Skips silently: the checks span the whole site, not this organization.
 
-    Inserts with `ignore_permissions`: `invite_by_email` needs the manager in the
-    `user_invitation` hook, which would also open Frappe's list, cancel and resend
-    endpoints to them. `HelpdeskUserInvitation` checks the customer."""
+    Not `invite_by_email`: its hook role would open Frappe's invite endpoints."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
         "allow_customer_managers_to_invite",
         _("You are not permitted to invite members"),
     )
+    # the db matches case-insensitively; lower both sides so lookups agree
+    emails = list(dict.fromkeys(email.strip().lower() for email in emails))
     if len(emails) > MAX_INVITES:
         frappe.throw(_("You can invite up to {0} people at a time").format(MAX_INVITES))
-    contact_by_email = dict(
-        frappe.get_all(
+    contact_by_email = {
+        email.lower(): name
+        for email, name in frappe.get_all(
             "Contact",
             filters={"email_id": ["in", emails]},
             fields=["email_id", "name"],
             as_list=True,
         )
-    )
-    emails = list(dict.fromkeys(emails))
-    skipped = {
-        *frappe.get_all(
+    }
+    # accepting would bypass update_member_role for an existing member
+    members = {row.contact_name for row in customer_doc.contacts}
+    disabled = {
+        email.lower()
+        for email in frappe.get_all(
             "User", filters={"email": ["in", emails], "enabled": 0}, pluck="email"
-        ),
+        )
+    }
+    skipped = {
+        *(email for email in emails if contact_by_email.get(email) in members),
         *_get_invited_emails(emails, "Accepted"),
         *_get_invited_emails(emails, "Pending"),
-    }
+    } - disabled
     result = {
-        "invited_emails": [email for email in emails if email not in skipped],
-        "skipped_emails": [email for email in emails if email in skipped],
+        "invited_emails": [e for e in emails if e not in skipped and e not in disabled],
+        "skipped_emails": [e for e in emails if e in skipped],
+        "disabled_emails": [e for e in emails if e in disabled],
     }
     role = MANAGER_ROLE if sbool(is_manager) else "HD Customer"
     invitations = [
@@ -212,7 +237,7 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         )
         for email in result["invited_emails"]
     ]
-    # each insert mails at once, so a later refusal must not follow mails already sent
+    # validate all first: each insert mails at once
     for invitation in invitations:
         invitation.validate_invite()
     for invitation in invitations:
@@ -224,7 +249,10 @@ def _get_invited_emails(emails: list[str], status: str) -> list[str]:
     filters = {"email": ["in", emails], "status": status, "app_name": "helpdesk"}
     if status == "Accepted":
         filters["user"] = ["is", "set"]
-    return frappe.get_all("User Invitation", filters=filters, pluck="email")
+    return [
+        email.lower()
+        for email in frappe.get_all("User Invitation", filters=filters, pluck="email")
+    ]
 
 
 @frappe.whitelist(methods=["POST"])
@@ -232,7 +260,7 @@ def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
-        "allow_customer_managers_to_change_roles",
+        "allow_customer_managers_to_manage_members",
         _("You are not permitted to change member roles"),
     )
     member = _get_member_row(customer_doc, contact)
@@ -245,7 +273,7 @@ def remove_member(customer: str, contact: str) -> None:
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
-        "allow_customer_managers_to_remove_members",
+        "allow_customer_managers_to_manage_members",
         _("You are not permitted to remove members"),
     )
     _get_member_row(customer_doc, contact)
@@ -255,7 +283,6 @@ def remove_member(customer: str, contact: str) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def cancel_invitation(customer: str, invitation: str) -> None:
-    """Withdraw an invitation that has not been accepted yet."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -274,7 +301,6 @@ def cancel_invitation(customer: str, invitation: str) -> None:
 
 @frappe.whitelist(methods=["POST"])
 def update_organization_image(customer: str, image: str) -> None:
-    """Change or clear the logo of an organization you manage."""
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
@@ -296,8 +322,16 @@ def _get_organizations() -> list[dict]:
     customer_names = [row["name"] for row in memberships]
     managed_customers = {row["name"] for row in memberships if row["is_manager"]}
     agent_manager = is_agent_manager()
-    member_counts = _count_by("HD Customer Member", "parent", customer_names)
-    ticket_counts = _count_by("HD Ticket", "customer", customer_names)
+    member_counts = dict(
+        frappe.get_all(
+            "HD Customer Member",
+            filters={"parent": ["in", customer_names]},
+            fields=["parent", COUNT_NAME],
+            group_by="parent",
+            as_list=True,
+        )
+    )
+    ticket_counts = _count_readable_tickets(customer_names)
     rows = frappe.get_all(
         "HD Customer",
         filters={"name": ["in", customer_names]},
@@ -309,7 +343,7 @@ def _get_organizations() -> list[dict]:
             "customer_name": row.customer_name,
             "image": row.image,
             "domain": row.domain,
-            # an agent manager manages it too, as `_has_manager_permission` lets them
+            # agent managers manage every organization, as in _has_manager_permission
             "role": _get_role(
                 row.primary_contact == session_contact,
                 row.name in managed_customers or agent_manager,
@@ -383,18 +417,18 @@ def _get_role(is_owner: bool, is_manager: bool) -> str:
     return "Owner" if is_owner else "Manager" if is_manager else "Member"
 
 
-def _count_by(doctype: str, fieldname: str, values: list[str]) -> dict[str, int]:
-    rows = frappe.get_all(
-        doctype,
-        filters={fieldname: ["in", values]},
-        fields=[fieldname, COUNT_NAME],
-        group_by=fieldname,
+def _count_readable_tickets(customers: list[str]) -> dict[str, int]:
+    """get_list: a member counts only their own tickets."""
+    rows = frappe.get_list(
+        "HD Ticket",
+        filters={"customer": ["in", customers]},
+        fields=["customer", COUNT_NAME],
+        group_by="customer",
     )
-    return {row[fieldname]: row["count"] for row in rows}
+    return {row.customer: row["count"] for row in rows}
 
 
 def _validate_manager_permission(customer_doc, setting: str, message: str) -> None:
-    """Refuse unless the helpdesk allows the action and the caller manages the organization."""
     if not frappe.db.get_single_value("HD Settings", setting):
         frappe.throw(message, frappe.PermissionError)
     if not _has_manager_permission(customer_doc):
@@ -405,12 +439,10 @@ def _validate_manager_permission(customer_doc, setting: str, message: str) -> No
 
 
 def _has_manager_permission(customer_doc) -> bool:
-    """An agent manager, or a manager member of this organization."""
     return is_agent_manager() or is_customer_manager(customer_doc.name)
 
 
 def _get_member_row(customer_doc, contact: str):
-    """The membership row, which is neither the owner's nor the caller's own."""
     if contact == customer_doc.primary_contact:
         frappe.throw(_("Role of primary contact cannot be changed"))
     if contact == get_user_contact():

@@ -1,5 +1,5 @@
 import { expect, request, type Page } from "@playwright/test";
-import { type Api } from "./api";
+import type { Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
 
@@ -24,8 +24,7 @@ export async function createArticle(
   });
 }
 
-/** Pick an option in a frappe-ui Combobox-backed Link field. */
-/** New articles reach the RediSearch index only when it is rebuilt; rebuild until `query` finds one. */
+/** Articles reach RediSearch only on a rebuild; rebuild until `query` hits. */
 export async function indexArticles(api: Api, query: string) {
   await expect
     .poll(
@@ -39,6 +38,7 @@ export async function indexArticles(api: Api, query: string) {
     .toBeGreaterThan(0);
 }
 
+/** Pick an option in a frappe-ui Combobox-backed Link field. */
 export async function pickOption(
   page: Page,
   trigger: string,

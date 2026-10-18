@@ -1,38 +1,45 @@
 <template>
-  <div v-if="draft" class="flex flex-col">
-    <div class="flex flex-col gap-6">
-      <div
-        v-for="toggle in toggles"
-        :key="toggle.fieldname"
-        class="flex items-center justify-between"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">
-            {{ toggle.label }}
-          </span>
-          <span class="text-p-sm text-ink-gray-6">
-            {{ toggle.description }}
-          </span>
+  <Transition
+    enter-from-class="opacity-0"
+    enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
+  >
+    <div v-if="draft" class="flex flex-col">
+      <div class="flex flex-col gap-6">
+        <div
+          v-for="toggle in toggles"
+          :key="toggle.fieldname"
+          class="flex items-center justify-between"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-base-medium text-ink-gray-8">
+              {{ toggle.label }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">
+              {{ toggle.description }}
+            </span>
+          </div>
+          <Switch
+            :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+            @update:model-value="(value) => setToggle(toggle.fieldname, value)"
+          />
         </div>
-        <Switch
-          :model-value="Boolean(settings.doc?.[toggle.fieldname])"
-          @update:model-value="(value) => setToggle(toggle.fieldname, value)"
-        />
       </div>
+      <PinnedCategories
+        class="mt-8"
+        :pinned="draft.pinned"
+        :categories="categoryOptions"
+        :save="savePins"
+      />
+      <BannerPicker
+        class="mt-8"
+        :image="draft.banner_image"
+        :preset="draft.banner_preset"
+        @change="(value) => Object.assign(draft, value)"
+      />
+      <HeaderLinks v-model="draft.links" class="mt-8" />
     </div>
-    <PinnedCategories
-      v-model="draft.pinned"
-      class="mt-8"
-      :categories="categoryOptions"
-    />
-    <BannerPicker
-      class="mt-8"
-      :image="draft.banner_image"
-      :preset="draft.banner_preset"
-      @change="(value) => Object.assign(draft, value)"
-    />
-    <HeaderLinks v-model="draft.links" class="mt-8" />
-  </div>
+    <SettingsFormSkeleton v-else :toggles="2" :sections="3" />
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -42,10 +49,12 @@ import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
 import PinnedCategories from "./PinnedCategories.vue";
+import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
-// Switches save at once; the rest waits for the host's Save button. See knowledgeBaseDraft.ts.
-const { draft, settings, setToggle, categoryOptions } = useKnowledgeBaseDraft();
+// Switches and pins save at once; the rest waits for Save.
+const { draft, settings, setToggle, savePins, categoryOptions } =
+  useKnowledgeBaseDraft();
 
 // computed, so labels follow a translation load
 const toggles = computed(

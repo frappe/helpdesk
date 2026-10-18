@@ -555,7 +555,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-10-10 17:20:16.064570",
+ "modified": "2026-10-18 16:20:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -600,6 +600,7 @@
   {
    "create": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
    "role": "HD Customer",
@@ -608,6 +609,7 @@
   {
    "create": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
    "role": "HD Customer Manager",

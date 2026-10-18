@@ -70,11 +70,10 @@ const props = withDefaults(
   { isPublic: false, compact: false }
 );
 
-// `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
+// `legacy`: execCommand fallback without the Clipboard API (plain http).
 const { copy } = useClipboard({ legacy: true });
 
-// Fetched on the press or focus before the click, not on every article open: Safari drops a
-// clipboard write that waits on the network, and most readers never copy.
+// Fetched on press/focus: Safari drops clipboard writes that await the network.
 const markdown = ref("");
 let request: Promise<void> | null = null;
 const markdownUrl = computed(
@@ -99,7 +98,7 @@ function load() {
     .then(async (response) => {
       if (!response.ok) return;
       const text = await response.text();
-      // the page reuses this component across articles; drop a late answer for the previous one
+      // Reused across articles; drop a stale answer.
       if (name === props.name) markdown.value = text;
     })
     .catch(() => {});

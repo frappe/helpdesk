@@ -269,8 +269,7 @@ class HDServiceLevelAgreement(Document):
         self.set_resolution_by(doc)
 
     def set_failed_by(self, doc: Document):
-        """Business hours each reached milestone ran past its target, measured against the
-        targets as they stand now, so changing the SLA re-measures them too."""
+        """Against current targets, so an SLA change re-measures them."""
         doc.first_response_failed_by = self.get_time_past(
             doc.response_by, doc.first_responded_on
         )
@@ -279,7 +278,6 @@ class HDServiceLevelAgreement(Document):
         )
 
     def get_time_past(self, due, end) -> int | None:
-        """Business seconds from `due` to `end`; None when either is unset or `end` is on time."""
         if not (due and end) or get_datetime(end) <= get_datetime(due):
             return None
         return self.calc_elapsed_time(due, end)

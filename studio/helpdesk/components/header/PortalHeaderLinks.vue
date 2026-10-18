@@ -4,8 +4,7 @@
     :aria-label="__('Links')"
     class="flex items-center gap-1"
   >
-    <!-- Button opens every `href` in a new tab; the attrs below win for same-tab links. -->
-    <!-- On a phone the text links move to the logo menu; service icons stay, as on Frappe Wiki. -->
+    <!-- Button opens every `href` in a new tab; these attrs override it. -->
     <Button
       v-for="link in textLinks"
       :key="link.url + link.label"
@@ -37,7 +36,7 @@
 import { computed } from "vue";
 import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
-import PortalServiceIcon from "@app/components/common/PortalServiceIcon.vue";
+import PortalServiceIcon from "@app/components/header/PortalServiceIcon.vue";
 
 type HeaderLink = {
   label: string;
@@ -46,7 +45,7 @@ type HeaderLink = {
   icon?: string | null;
 };
 
-// From the quick links form script; useKnowledgeBaseHeader drops any unsafe URL.
+// URLs already vetted by useKnowledgeBaseHeader.
 const props = defineProps<{ links?: HeaderLink[] }>();
 
 const textLinks = computed(() => (props.links || []).filter((l) => !l.icon));

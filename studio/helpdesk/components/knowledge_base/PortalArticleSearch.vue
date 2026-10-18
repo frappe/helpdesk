@@ -20,7 +20,7 @@
       <LucideSearch class="size-4.5 text-ink-gray-5" />
     </template>
     <template #suffix>
-      <LoadingIndicator v-if="results.loading" class="size-4 text-ink-gray-4" />
+      <LoadingIndicator v-if="canSearch && !isCurrent" class="size-4 text-ink-gray-4" />
       <KeyboardShortcut
         v-else-if="!query && !isFocused"
         class="slash-hint"
@@ -44,14 +44,14 @@
           </span>
           <span
             v-if="item.article"
-            class="truncate text-p-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:text-ink-gray-5"
+            class="truncate text-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:text-ink-gray-5"
           >
             <template v-if="item.article.category_name">
               {{ item.article.category_name }} ·
             </template>
             <span v-html="item.article.excerpt" />
           </span>
-          <span v-else class="truncate text-p-sm text-ink-gray-5">
+          <span v-else class="truncate text-sm text-ink-gray-5">
             {{
               articleMeta(
                 item.recentArticle.categoryName,
@@ -141,7 +141,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
 import LucideX from "~icons/lucide/x";
 import { __ } from "@helpdesk/shared/translation";
-import PortalArticleIcon from "@app/components/knowledge_base/PortalArticleIcon.vue";
+import PortalArticleIcon from "@helpdesk/shared/ArticleIcon.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import {
   MIN_QUERY_LENGTH,
@@ -183,7 +183,7 @@ const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
 watch(query, () => (isOpen.value = canSearch.value || hasHistory.value));
 
-// Emptied from inside the open list, it closes rather than show nothing.
+// Last history row removed: close rather than show nothing.
 watch(hasHistory, (value) => {
   if (!value && !canSearch.value) isOpen.value = false;
 });
@@ -216,10 +216,8 @@ const historyOptions = computed(() =>
     : []
 );
 
-// `params` changes when a fetch starts, so this is false from the keystroke until its answer lands.
-const isCurrent = computed(
-  () => !results.loading && results.params?.query?.trim() === searchText.value
-);
+// False until this query's answer lands.
+const isCurrent = computed(() => results.settledQuery === searchText.value);
 const hasResults = computed(() => Boolean(results.data?.length));
 const isSearching = computed(
   () => canSearch.value && !isCurrent.value && !hasResults.value
@@ -243,7 +241,7 @@ const resultOptions = computed(() =>
             key: article.name,
             label: article.title,
             article,
-            // The previous query's rows stay in view, but Enter must not open one.
+            // Stale rows stay visible, but Enter must not open one.
             disabled: !isCurrent.value,
             onClick: () => router.push(ROUTES.article(article)),
           })),
@@ -258,11 +256,11 @@ const options = computed(() =>
 </script>
 
 <style>
-/* Portaled to <body>, so unscoped; the large outline variant is this box's alone. */
+/* Portaled to <body>, so unscoped; only this box uses outline lg. */
 [data-slot="content"][data-variant="outline"][data-size="lg"] {
   width: var(--reka-combobox-trigger-width);
 }
-/* Whatever room the popper has, so results under a phone's keyboard still scroll into reach. */
+/* Fit the popper's room so results above a phone keyboard scroll. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="content-body"] {
   display: flex;
@@ -283,7 +281,6 @@ const options = computed(() =>
   [data-slot="footer"] {
   flex-shrink: 0;
 }
-/* On an 8px grid: 52px article rows, icons on the labels' edge. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="group-label"] {
   height: auto;
@@ -298,7 +295,7 @@ const options = computed(() =>
   padding: 8px;
   border-radius: 8px;
 }
-/* The list highlights its first row on open, so ↵ marks Enter's target; a hovered history row offers X instead. */
+/* ↵ marks Enter's target; a hovered history row shows X instead. */
 .history-remove,
 .row-enter {
   display: none;
@@ -314,7 +311,7 @@ const options = computed(() =>
     display: none;
   }
 }
-/* Touch has no hover or keys: X always shows, key hints never do. */
+/* Touch: no hover or keys. */
 @media (pointer: coarse) {
   .history-remove {
     display: flex;
@@ -328,7 +325,6 @@ const options = computed(() =>
     display: none;
   }
 }
-/* The rule between the sections runs edge to edge, through the panel's padding. */
 [data-slot="content"][data-variant="outline"][data-size="lg"]
   [data-slot="group"]
   + [data-slot="group"] {

@@ -251,10 +251,7 @@ def get_list_data(
 def _get_group_by_option_details(
     doctype: str, options: list[str], label_field: str, icon_field: str | None
 ) -> dict[str, dict]:
-    """Label and icon per group-by option in one query, not a `get_value` per option.
-
-    The view comes from the client, so both fields must exist on the doctype and
-    `get_list` keeps the read to rows and fields the user may see."""
+    # Fields come from the client: must exist; get_list enforces perms.
     meta = frappe.get_meta(doctype)
     fields = ["name"]
     if _is_plain_field(meta, label_field):

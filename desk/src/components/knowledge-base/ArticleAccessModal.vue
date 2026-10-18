@@ -18,7 +18,7 @@
       <div class="flex justify-end">
         <Button
           variant="solid"
-          :label="actionLabel || __('Publish')"
+          :label="actionLabel"
           :disabled="!access || (requireChange && access === visibility)"
           @click="publish"
         />
@@ -29,37 +29,32 @@
 
 <script setup lang="ts">
 import { Button, Dialog, Select } from "frappe-ui";
-import { computed, markRaw, ref, watch } from "vue";
-import { OrganizationsIcon } from "@/components/icons";
+import { computed, ref, watch } from "vue";
+import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 
-// A null `visibility` is a category whose articles differ.
+// null: the category's articles differ in access.
 const props = defineProps<{
   title: string;
   visibility: string | null;
-  actionLabel?: string;
+  actionLabel: string;
   requireChange?: boolean;
 }>();
 const emit = defineEmits<{ publish: [visibility: string] }>();
 const show = defineModel<boolean>({ default: false });
 
-const accessOptions = computed(() => [
-  {
-    value: "Private",
-    label: __("Private, agents only"),
-    icon: "lucide-lock",
-  },
-  {
-    value: "Customers",
-    label: __("Accessible to customers only"),
-    icon: markRaw(OrganizationsIcon),
-  },
-  {
-    value: "Public",
-    label: __("Accessible to everyone"),
-    icon: "lucide-globe",
-  },
-]);
+const accessOptions = computed(() => {
+  const meta = categoryAccess();
+  return [
+    { value: "Private", label: __("Private, agents only"), icon: meta.Private.icon },
+    {
+      value: "Customers",
+      label: __("Accessible to customers only"),
+      icon: meta.Customers.icon,
+    },
+    { value: "Public", label: __("Accessible to everyone"), icon: meta.Public.icon },
+  ];
+});
 
 const access = ref(props.visibility);
 

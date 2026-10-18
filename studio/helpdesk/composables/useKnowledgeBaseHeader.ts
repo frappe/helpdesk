@@ -4,7 +4,6 @@ import { isSafeLink, runFormScripts } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
 
-// A quick link to one of these shows as its icon, as on Frappe Wiki.
 const SERVICE_ICONS = {
   'github.com': 'github',
   'youtube.com': 'youtube',
@@ -24,7 +23,7 @@ const session = useSession()
 const customActions = ref([])
 const headerLinks = ref([])
 
-// On a phone the text links leave the header for the logo menu; service icons stay put.
+// Phone: text links move into the logo menu.
 const menuOptions = computed(() => [
   ...(session.isPhone.value ? headerLinks.value.filter((link) => !link.icon) : []).map((link) => ({
     icon: 'lucide-external-link',
@@ -47,19 +46,17 @@ let scriptContext = null
 async function runScripts(scripts: string[]) {
   const data = { _form_script: scripts }
   customActions.value = await runFormScripts(data, scriptContext)
-  // Settings' Preview shows its unsaved quick links in place of the saved ones, until a save clears it.
+  // Settings Preview shows unsaved links until saved.
   headerLinks.value = (readKnowledgeBasePreview()?.links || data._customLinks || [])
     .filter((link) => link?.label && isSafeLink(link.url))
     .map((link) => ({ ...link, icon: serviceIcon(link.url) }))
 }
 
-// Runs the "Apply to knowledge base" form scripts; only the knowledge base pages use this header.
-// Returns the settings, with this header's actions, links, menu and theme toggle in place of theirs.
 export function useKnowledgeBaseHeader(context) {
   if (!scriptContext) {
     // Not the whole context: the first page's resources would outlive it.
     scriptContext = { call: context.call, router: context.router }
-    // Detached from the page so scripts run once a visit, and again only when the list changes.
+    // Detached: run once per visit, again only when scripts change.
     effectScope(true).run(() =>
       watch(
         () => JSON.stringify(session.config.value?.knowledge_base_form_scripts || []),

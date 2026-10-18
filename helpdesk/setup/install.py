@@ -228,15 +228,16 @@ def setup_customer_role(fresh_install=True):
 
     if fresh_install:
         set_portal_defaults(overwrite=True)
-        # a Single's defaults are not stored on install, and the home pages above assume it on
+        # Single defaults aren't stored on install; the home pages assume it
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
 
 
 def set_portal_defaults(overwrite=False):
-    """Install claims the portal settings; the patch only fills empty ones. Writes the Single directly: a save validates stale menu rows."""
+    """Writes the Single directly: a save fails on stale menu rows."""
     defaults = {
         "default_role": "HD Customer",
-        "default_portal_home": KNOWLEDGE_BASE_HOME,
+        # agents fall back to it; customers get theirs from their role
+        "default_portal_home": "/helpdesk",
     }
     if overwrite:
         to_set = defaults

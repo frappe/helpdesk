@@ -4,6 +4,9 @@ from frappe.installer import install_app
 
 
 def execute():
+    # install_app's "already installed" return leaves flags.in_install set
+    if "studio" in frappe.get_installed_apps():
+        return
     if "studio" not in frappe.get_all_apps():
         frappe.throw(
             _(

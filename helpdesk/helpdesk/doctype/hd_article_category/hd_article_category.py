@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
+from helpdesk.utils import is_agent
+
 
 class HDArticleCategory(Document):
     def validate(self):
@@ -44,21 +46,48 @@ class HDArticleCategory(Document):
             frappe.throw(_("General category can't be deleted"))
 
     def move_articles_to_general(self):
-        # Imported here: the API module imports the article controller, which imports this one.
+        # local import: circular via the article controller
         from helpdesk.api.knowledge_base import get_general_category
 
         if general_category := get_general_category():
-            frappe.db.set_value(
-                "HD Article",
-                {"category": self.name},
-                get_values_for_category(general_category),
-                update_modified=False,
-            )
+            move_category_articles(self.name, general_category)
+
+
+# local imports below: circular via the article controller
+def permission_query(user: str | None = None) -> str | None:
+    """A category is readable when one of its articles is."""
+    from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+        permission_query as article_permission_query,
+    )
+
+    if not (conditions := article_permission_query(user)):
+        return None
+    return (
+        "`tabHD Article Category`.name in "
+        f"(select `tabHD Article`.category from `tabHD Article` where {conditions})"
+    )
+
+
+def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    """Writes fall through to role permissions."""
+    from helpdesk.helpdesk.doctype.hd_article.hd_article import make_article_filters
+
+    user = user or frappe.session.user
+    if ptype in ("write", "create", "delete") or is_agent(user):
+        return True
+    return bool(
+        frappe.get_all(
+            "HD Article",
+            filters=make_article_filters(user, category=doc.name),
+            limit=1,
+        )
+    )
 
 
 def get_category_visibility(category: str) -> str | None:
-    """The access every article in `category` the user can read shares; None when they differ."""
-    values = frappe.get_list(
+    """None when the articles' visibilities differ."""
+    # every article, not just the ones the caller can read
+    values = frappe.get_all(
         "HD Article",
         filters={"category": category},
         pluck="visibility",
@@ -67,12 +96,33 @@ def get_category_visibility(category: str) -> str | None:
     return values[0] if len(values) == 1 else None
 
 
-def get_values_for_category(category: str) -> dict:
-    """An article joining a category whose articles share one access takes it."""
-    values = {"category": category}
-    if visibility := get_category_visibility(category):
-        values["visibility"] = visibility
-    return values
+# joining a category narrows access, never widens it
+VISIBILITY_ORDER = ("Private", "Customers", "Public")
+
+
+def get_stricter_visibility(visibility: str, category_visibility: str | None) -> str:
+    if not category_visibility:
+        return visibility
+    return min(visibility, category_visibility, key=VISIBILITY_ORDER.index)
+
+
+def move_category_articles(source: str, target: str) -> None:
+    """Bulk move: per-article saves would refuse to empty `source`."""
+    category_visibility = get_category_visibility(target)
+    articles = frappe.get_all("HD Article", filters={"category": source}, pluck="name")
+    frappe.db.set_value(
+        "HD Article",
+        {"category": source},
+        "category",
+        target,
+        update_modified=False,
+    )
+    for name in articles:
+        article = frappe.get_doc("HD Article", name)
+        visibility = get_stricter_visibility(article.visibility, category_visibility)
+        if visibility != article.visibility:
+            article.visibility = visibility
+            article.save()
 
 
 def check_category_length(category: str | None) -> None:

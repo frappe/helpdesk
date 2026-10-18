@@ -14,15 +14,7 @@ import { __ } from "@/translation";
  */
 export const showShortcutsModal = ref(false);
 
-// `to` is a desk route name; `url` leaves the SPA (the studio portal).
-type SidebarOption = {
-  label: string;
-  icon: unknown;
-  to?: string;
-  url?: string;
-};
-
-export const agentPortalSidebarOptions: SidebarOption[] = [
+export const agentPortalSidebarOptions = [
   {
     label: __("Home"),
     icon: LucideHome,

@@ -10,8 +10,7 @@ import { computed, defineAsyncComponent } from "vue";
 
 import { useScreenSize } from "@/composables/screen";
 // eager: subscribes the availability socket handler and runs the login
-// greeting at boot instead of on first ticket open. PortalRoot mounts this
-// root for agents with desk access only; the router sends everyone else to the portal.
+// greeting at boot instead of on first ticket open. Desk-access agents only.
 useAgentStatusStore();
 
 const { isMobileView } = useScreenSize();

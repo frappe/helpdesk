@@ -4,7 +4,7 @@ import { CUSTOMER_PORTAL_ROOT } from './utils'
 export const ROUTES = {
   home: '/',
   categories: '/categories',
-  // Lists link the bare name; the article page then adds the slug `get_article` sends.
+  // Lists link the bare name; the article page adds the slug.
   article: ({ name, title_slug }: { name: string; title_slug?: string }) =>
     `/articles/${[name, title_slug].filter(Boolean).join('-')}`,
   category: (name: string) => `/category/${name}`,
@@ -14,13 +14,13 @@ export const ROUTES = {
   appRoot: CUSTOMER_PORTAL_ROOT,
 }
 
-// Where a "raise a ticket" link sits; the server stores it as the ticket's entry point.
+// Stored as the ticket's entry point.
 export type TicketOrigin =
   | { from: 'article'; article: string }
   | { from: 'search'; q?: string }
   | { from: 'ticket-list' | 'closed-ticket' }
 
-// Empty values stay out, so a search with no text does not leave a bare `q=` in the URL.
+// Drop empty values, so no bare `q=`.
 function originQuery(origin?: TicketOrigin) {
   return Object.fromEntries(Object.entries(origin ?? {}).filter(([, value]) => value))
 }

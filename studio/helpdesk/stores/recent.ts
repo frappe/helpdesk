@@ -4,7 +4,7 @@ import { useSession } from '@app/stores/session'
 
 const ARTICLE_LIMIT = 3
 
-export type RecentArticle = {
+type RecentArticle = {
   name: string
   title: string
   title_slug?: string
@@ -12,27 +12,19 @@ export type RecentArticle = {
   minutes?: number
 }
 
-// Per browser and user, so the next person at a shared machine starts clean.
+// Per user, so a shared machine doesn't leak history.
 const { config } = useSession()
 const user = () => config.value?.session_user || 'Guest'
 const articles = useStorage<RecentArticle[]>(() => `helpdesk-kb-recent-articles:${user()}`, [])
-try {
-  localStorage.removeItem('helpdesk-kb-recent-searches')
-  localStorage.removeItem('helpdesk-kb-recent-articles')
-} catch {}
 
-function remember<T>(list: T[], item: T, same: (row: T) => boolean, limit: number) {
-  return [item, ...list.filter((row) => !same(row))].slice(0, limit)
-}
-
-// An article opened before the session is known waits for it, so it lands in the right user's list.
+// Held until the session loads, so it lands in the right user's list.
 let pendingArticle: RecentArticle | undefined
 watch(config, () => pendingArticle && addArticle(pendingArticle))
 
 function addArticle(article: RecentArticle) {
   pendingArticle = config.value ? undefined : article
   if (pendingArticle) return
-  articles.value = remember(articles.value, article, (row) => row.name === article.name, ARTICLE_LIMIT)
+  articles.value = [article, ...articles.value.filter((row) => row.name !== article.name)].slice(0, ARTICLE_LIMIT)
 }
 
 export function useRecent() {

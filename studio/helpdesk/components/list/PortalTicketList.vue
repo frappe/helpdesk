@@ -1,46 +1,13 @@
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <div
-      v-if="loading && !rows.length"
-      class="flex h-full w-full items-center justify-center"
-    >
-      <LoadingIndicator class="size-6 text-ink-gray-4" />
-    </div>
-
-    <!-- One stacked row per ticket on a phone, where table columns leave the subject no room. -->
-    <div
-      v-else-if="rows.length && compact"
-      class="min-h-0 flex-1 overflow-y-auto"
-    >
-      <button
-        v-for="row in rows"
-        :key="row.name"
-        type="button"
-        class="flex w-full flex-col gap-1.5 border-b border-outline-gray-1 px-4 py-3 text-left text-base text-ink-gray-8 transition-colors active:bg-surface-gray-2"
-        @click="onRowClick?.(row)"
-      >
-        <span class="flex w-full min-w-0 items-baseline gap-3">
-          <component :is="cell('subject', row)" />
-          <span class="shrink-0 text-ink-gray-5">
-            <component :is="cell('creation', row)" />
-          </span>
-        </span>
-        <span class="flex w-full min-w-0 items-center gap-3 text-ink-gray-6">
-          <span class="flex min-w-0 flex-1">
-            <component :is="cell('status', row)" />
-          </span>
-          <span class="shrink-0">
-            <component :is="cell('name', row)" />
-          </span>
-        </span>
-      </button>
-    </div>
-
+    <!-- Skeleton reuses the table so headings and rows land in place. -->
     <ListView
-      v-else-if="rows.length"
+      v-if="shownRows.length"
       class="min-h-0 flex-1"
-      :columns="columns"
-      :rows="rows"
+      :class="isSkeleton ? 'pointer-events-none' : 'portal-reveal'"
+      v-bind="skeletonAttrs"
+      :columns="shownColumns"
+      :rows="shownRows"
       row-key="name"
       :options="{
         selectable: true,
@@ -59,7 +26,7 @@
       </ListHeader>
       <ListRows class="mx-3 sm:mx-5">
         <ListRow
-          v-for="row in rows"
+          v-for="row in shownRows"
           :key="row.name"
           :row="row"
           v-slot="{ column, item }"
@@ -74,7 +41,16 @@
           </ListRowItem>
         </ListRow>
       </ListRows>
-      <ListSelectBanner />
+      <ListSelectBanner>
+        <template #actions="{ selections }">
+          <Button
+            variant="ghost"
+            icon-left="lucide-download"
+            :label="__('Export')"
+            @click="openExport(selections)"
+          />
+        </template>
+      </ListSelectBanner>
     </ListView>
 
     <PortalEmptyState
@@ -92,11 +68,28 @@
         @loadMore="emit('loadMore')"
       />
     </div>
+    <div
+      v-else-if="isSkeleton"
+      class="flex h-[45px] items-center justify-between border-t px-3 sm:px-5"
+      aria-hidden="true"
+    >
+      <Skeleton class="h-7 w-[104px] rounded-6 motion-reduce:animate-none" />
+      <Skeleton class="h-2.5 w-14 rounded-full motion-reduce:animate-none" />
+    </div>
+    <ExportModal
+      v-model="showExport"
+      :row-count="totalCount"
+      :all-selected="selectedNames.length === totalCount"
+      @update="exportRows"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { LoadingIndicator } from "frappe-ui";
+import { computed, h, ref } from "vue";
+import { Button, Skeleton } from "frappe-ui";
+import ExportModal from "@helpdesk/shared/ExportModal.vue";
+import { __ } from "@helpdesk/shared/translation";
 import {
   ListFooter,
   ListHeader,
@@ -107,10 +100,10 @@ import {
   ListSelectBanner,
   ListView,
 } from "frappe-ui/experimental";
-import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
+import PortalEmptyState from "@app/components/ui/PortalEmptyState.vue";
 import { loadTicketMeta } from "@app/stores/ticketMeta";
 
-// Not at module load: this file ships in the public page bundles too.
+// Not at module load: this file ships in public page bundles too.
 loadTicketMeta();
 
 const props = withDefaults(
@@ -123,7 +116,6 @@ const props = withDefaults(
     pageLengthOptions?: number[];
     emptyState?: { title: string; description?: string };
     onRowClick?: (row: any) => void;
-    compact?: boolean;
   }>(),
   {
     columns: () => [],
@@ -133,7 +125,6 @@ const props = withDefaults(
     totalCount: 0,
     pageLengthOptions: () => [],
     emptyState: () => ({ title: "" }),
-    compact: false,
   }
 );
 
@@ -142,10 +133,63 @@ const pageLength = defineModel<number>("pageLength", { default: 20 });
 const emit = defineEmits<{
   columnResize: [payload: { key: string; width: string; save: boolean }];
   loadMore: [];
+  export: [payload: { exportType: "CSV" | "Excel"; names: string[] | null }];
 }>();
 
-function cell(key: string, row: any) {
-  const column = props.columns.find((column) => column.key === key);
-  return column?.cell?.({ row, item: row[key] }) ?? null;
+const showExport = ref(false);
+const selectedNames = ref<string[]>([]);
+
+function openExport(selections: Set<string>) {
+  selectedNames.value = [...selections];
+  showExport.value = true;
+}
+
+function exportRows(form: { export_type: "CSV" | "Excel"; export_all: boolean }) {
+  showExport.value = false;
+  emit("export", {
+    exportType: form.export_type,
+    names: form.export_all ? null : selectedNames.value,
+  });
+}
+
+const SKELETON_ROWS = Array.from({ length: 20 }, (_, index) => ({
+  name: `skeleton-${index}`,
+  index,
+}));
+const WIDTHS = [72, 58, 84, 64, 90, 52, 78, 68];
+
+const isSkeleton = computed(() => props.loading && !props.rows.length);
+const shownRows = computed(() =>
+  isSkeleton.value ? SKELETON_ROWS : props.rows
+);
+const shownColumns = computed(() =>
+  isSkeleton.value
+    ? props.columns.map((column) => ({
+        ...column,
+        cell: ({ row }) => placeholder(row, column.key),
+      }))
+    : props.columns
+);
+const skeletonAttrs = computed(() =>
+  isSkeleton.value
+    ? { "aria-busy": "true", "aria-label": __("Loading tickets") }
+    : {}
+);
+
+function placeholder(row: { index: number }, key: string) {
+  const share = WIDTHS[(row.index + key.length) % WIDTHS.length];
+  const width =
+    key === "subject"
+      ? `${Math.max(share, 45)}%`
+      : key === "name"
+      ? "2.5rem"
+      : `${share}%`;
+  return h(Skeleton, {
+    class: [
+      "h-2.5 rounded-full motion-reduce:animate-none",
+      key === "status" ? "max-w-[6rem]" : "max-w-[16rem]",
+    ],
+    style: { width },
+  });
 }
 </script>

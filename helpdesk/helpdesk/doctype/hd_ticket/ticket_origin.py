@@ -1,8 +1,4 @@
-"""Where in the portal a customer started when they raised a ticket.
-
-The portal's new-ticket page sends the `?from=` query of the link that led there.
-Only the server turns it into field values, since the query is whatever the browser says.
-"""
+"""The portal's `?from=` query is untrusted, so only the server maps it to fields."""
 
 import frappe
 
@@ -19,9 +15,9 @@ SEARCH_LENGTH = 140
 
 
 def resolve_ticket_origin(origin: dict) -> dict:
-    """Field values for a portal ticket; a bad origin degrades to Direct, never an error."""
+    """A bad origin degrades to Direct, never an error."""
     origin = origin if isinstance(origin, dict) else {}
-    # str() so an unhashable value from the request falls through to Direct
+    # str(): unhashable request values fall through to Direct
     entry_point = ENTRY_POINTS.get(str(origin.get("from")), DIRECT)
     values = {"entry_point": entry_point}
     if entry_point == "Article":
@@ -32,7 +28,7 @@ def resolve_ticket_origin(origin: dict) -> dict:
 
 
 def _accessible_article(article) -> str | None:
-    # has_permission raises on a missing name, so existence is checked first
+    # has_permission raises on a missing name
     if not isinstance(article, str) or not frappe.db.exists("HD Article", article):
         return None
     return article if frappe.has_permission("HD Article", "read", doc=article) else None

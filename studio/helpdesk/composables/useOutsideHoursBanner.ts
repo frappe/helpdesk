@@ -1,7 +1,8 @@
 import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { dayjsLocal } from 'frappe-ui'
 
-// Dismissal is remembered per ticket per day, so it returns tomorrow.
+// Dismissed per ticket per day.
 export function useOutsideHoursBanner(ticket) {
   const banner = computed(() => ticket.data?.outside_hours_banner)
   const isDismissed = useStorage(() => dismissKey(ticket.data?.name), false, localStorage, {
@@ -9,7 +10,8 @@ export function useOutsideHoursBanner(ticket) {
   })
 
   function dismissKey(name: string) {
-    return `kb:banner-dismissed:${name}:${new Date().toISOString().split('T')[0]}`
+    // Local day: an ISO date rolls over at UTC midnight.
+    return `kb:banner-dismissed:${name}:${dayjsLocal().format('YYYY-MM-DD')}`
   }
 
   function dismissBanner() {

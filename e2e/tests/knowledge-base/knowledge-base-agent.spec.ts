@@ -37,7 +37,7 @@ test("create a category and article, publish it, customer can read it", async ({
 
   const customer = await pageAs("customer");
   await customer.goto(`/help/category/${article.category}`);
-  // The sidebar lists it too; the category's own list comes last.
+  // The sidebar lists it too; the category list comes last.
   await customer.getByText(title).last().click();
   await expect(customer).toHaveURL(new RegExp(`/help/articles/${article.name}`));
   await expect(customer.getByText("Steps to reset a password")).toBeVisible();
@@ -94,7 +94,6 @@ test("merge a category into another, then delete one", async ({ page, api }) => 
 });
 
 async function openArticleMenu(page: Page, item: string) {
-  // ponytail: the article's "more" trigger has no label; add aria-label to target it directly
   await page
     .locator("button[aria-haspopup=menu]:not(nav *)")
     .filter({ hasNotText: /\S/ })

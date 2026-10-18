@@ -3,7 +3,7 @@ function helpdesk_handlers(socket) {
     socket.emit("pong");
   });
 
-  // Same gate as frappe's doc_open: the room names viewers and relays edits and typing.
+  // Same gate as frappe's doc_open: the room leaks viewers, edits, typing.
   socket.on("view_ticket", (ticket_id) => {
     if (!ticket_id) return;
     socket.has_permission("HD Ticket", ticket_id).then(() => {

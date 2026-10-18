@@ -92,7 +92,7 @@ const themeMenuItem = computed(() => ({
   onClick: () => toggleColorScheme(),
 }));
 
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   ...(authStore.hasAgentRecord ? [availabilityMenuOption.value] : []),
   {
@@ -117,8 +117,6 @@ const agentPortalDropdown = computed(() => [
     onClick: () => authStore.logout(),
   },
 ]);
-
-const profileSettings = agentPortalDropdown;
 
 watch(
   () => route.fullPath,
