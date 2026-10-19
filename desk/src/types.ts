@@ -661,6 +661,7 @@ export const CustomerResourceSymbol: InjectionKey<
 declare global {
   interface Window {
     is_fc_site: boolean;
+    is_v2_site: boolean;
     date_format: string;
     time_format: string;
     session_user: string;

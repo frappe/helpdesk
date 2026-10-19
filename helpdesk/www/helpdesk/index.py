@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.integrations.frappe_providers.cloud_settings import is_v2_site
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint, get_system_timezone
 from frappe.utils.jinja_globals import is_rtl
@@ -36,6 +37,7 @@ def get_boot():
             "csrf_token": frappe.sessions.get_csrf_token(),
             "setup_complete": cint(frappe.get_system_settings("setup_complete")),
             "is_fc_site": is_fc_site(),
+            "is_v2_site": is_v2_site(),
             "session_user": frappe.session.user,
             "agent": get_agent_name(),
             "date_format": frappe.get_system_settings("date_format"),
