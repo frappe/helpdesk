@@ -48,12 +48,15 @@ export function useGroupedList(
   const wantsTotals = (settings: GroupBySettings | null) =>
     Boolean(settings?.showTotals && serializeGroupByTotals(settings));
 
-  function reload() {
-    const settings = toValue(groupBy);
-    if (!settings) return;
+  function reloadGroups() {
+    if (!toValue(groupBy)) return;
     start.value = 0;
     groups.fetch();
-    if (wantsTotals(settings)) totals.fetch();
+  }
+
+  function reload() {
+    reloadGroups();
+    if (wantsTotals(toValue(groupBy))) totals.fetch();
   }
 
   function loadMore() {
@@ -69,11 +72,12 @@ export function useGroupedList(
     return JSON.stringify([serializeGroupBy(settings), settings.showTotals]);
   });
 
-  watch(
-    [() => toValue(doctype), query, () => toValue(filters), pageLength],
-    reload,
-    { immediate: true, deep: true }
-  );
+  watch([() => toValue(doctype), query, () => toValue(filters)], reload, {
+    immediate: true,
+    deep: true,
+  });
+  // the totals don't depend on the page size
+  watch(pageLength, reloadGroups);
 
   const error = computed(
     () =>
