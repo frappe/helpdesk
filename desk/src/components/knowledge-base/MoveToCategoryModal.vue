@@ -42,7 +42,7 @@ const joiningNote = computed(
       Private: __(
         "Articles in this category are visible to agents only, so moved articles will be too."
       ),
-    })[joining.data]
+    }[joining.data])
 );
 
 const props = defineProps<{

@@ -46,13 +46,21 @@ const show = defineModel<boolean>({ default: false });
 const accessOptions = computed(() => {
   const meta = categoryAccess();
   return [
-    { value: "Private", label: __("Private, agents only"), icon: meta.Private.icon },
+    {
+      value: "Private",
+      label: __("Private, agents only"),
+      icon: meta.Private.icon,
+    },
     {
       value: "Customers",
       label: __("Accessible to customers only"),
       icon: meta.Customers.icon,
     },
-    { value: "Public", label: __("Accessible to everyone"), icon: meta.Public.icon },
+    {
+      value: "Public",
+      label: __("Accessible to everyone"),
+      icon: meta.Public.icon,
+    },
   ];
 });
 

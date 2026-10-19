@@ -9,7 +9,6 @@ from frappe.tests.utils import FrappeTestCase
 
 from helpdesk.api.auth import get_user
 from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
-from helpdesk.utils import is_agent_manager
 from helpdesk.test_utils import (
     create_user,
     make_agent,
@@ -18,6 +17,7 @@ from helpdesk.test_utils import (
     set_agent_availability,
     set_agent_status_enabled,
 )
+from helpdesk.utils import is_agent_manager
 
 
 class TestHDAgent(FrappeTestCase):

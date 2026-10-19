@@ -61,6 +61,6 @@ const joiningNote = computed(
       Private: __(
         "Articles in this category are visible to agents only, so merged articles will be too."
       ),
-    })[joining.data]
+    }[joining.data])
 );
 </script>

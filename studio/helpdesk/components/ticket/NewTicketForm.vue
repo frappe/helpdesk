@@ -116,7 +116,7 @@ const props = withDefaults(
     // The desk's `$dialog`, so its form scripts render as on the ticket page.
     dialog?: (options: Record<string, unknown>) => unknown;
   }>(),
-  { template: "Default", initialSubject: "" },
+  { template: "Default", initialSubject: "" }
 );
 
 const emit = defineEmits<{
@@ -160,15 +160,20 @@ watch(
     const actions = await runFormScripts(
       data,
       { call, router },
-      { doc: model, applyFilters, ...(props.dialog && { $dialog: props.dialog }) },
+      {
+        doc: model,
+        applyFilters,
+        ...(props.dialog && { $dialog: props.dialog }),
+      }
     );
     emit("actions", actions);
-  },
+  }
 );
 
 // Check stays 1/0 as in Frappe, which depends_on rules and form scripts compare with.
 watch(
-  () => (template.data?.fields || []).filter((row) => row.fieldtype === "Check"),
+  () =>
+    (template.data?.fields || []).filter((row) => row.fieldtype === "Check"),
   (checks) => {
     for (const row of checks) {
       watch(
@@ -176,10 +181,10 @@ watch(
         (value) => {
           if (typeof value === "boolean") model[row.fieldname] = value ? 1 : 0;
         },
-        { flush: "sync" },
+        { flush: "sync" }
       );
     }
-  },
+  }
 );
 
 // Removing an uploaded file deletes it, as the desk did, so no orphan File stays.
@@ -189,7 +194,9 @@ watch(attachments, (now, before) => {
     const doc = uploadedByUrl.get(file.file_url);
     if (kept.has(file.file_url) || !doc) continue;
     uploadedByUrl.delete(file.file_url);
-    call("frappe.client.delete", { doctype: "File", name: doc.name }).catch(() => {});
+    call("frappe.client.delete", { doctype: "File", name: doc.name }).catch(
+      () => {}
+    );
   }
 });
 
@@ -199,14 +206,14 @@ function applyFilters(fieldname: string, filters: any = null) {
 
 function runChangeHandlers(row, value) {
   template.data?._customOnChange?.[row.fieldname]?.forEach((handler) =>
-    handler(value, row.fieldtype),
+    handler(value, row.fieldtype)
   );
 }
 
 const visibleFields = computed(() =>
   (template.data?.fields || []).filter((row) =>
-    evaluateDependsOn(row.depends_on, model),
-  ),
+    evaluateDependsOn(row.depends_on, model)
+  )
 );
 
 function isRequired(row) {
@@ -214,7 +221,7 @@ function isRequired(row) {
     Boolean(row.required) ||
     Boolean(
       row.mandatory_depends_on &&
-      evaluateDependsOn(row.mandatory_depends_on, model),
+        evaluateDependsOn(row.mandatory_depends_on, model)
     )
   );
 }
@@ -225,7 +232,7 @@ const canSubmit = computed(
     !isCreating.value &&
     Boolean(subject.value) &&
     !isContentEmpty(description.value) &&
-    visibleFields.value.filter(isRequired).every((row) => model[row.fieldname]),
+    visibleFields.value.filter(isRequired).every((row) => model[row.fieldname])
 );
 
 const about = computed(() => DOMPurify.sanitize(template.data?.about || ""));
@@ -233,7 +240,7 @@ const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT });
 
 // Only priority shows its description, as on the ticket page.
 const priorityHint = computed(
-  () => getPriority(model.priority)?.description?.trim() || undefined,
+  () => getPriority(model.priority)?.description?.trim() || undefined
 );
 
 function defaultPlaceholder(fieldtype: string) {
@@ -275,7 +282,7 @@ const fields = computed(() =>
       ...uiFor(row),
       on: { change: (value) => runChangeHandlers(row, value) },
     },
-  })),
+  }))
 );
 
 // One column, laid out as a grid by `.field-grid`, so cells keep their width as
@@ -329,13 +336,13 @@ function createTicket() {
           ...model,
         },
         attachments: attachments.value.map((file) =>
-          uploadedByUrl.get(file.file_url),
+          uploadedByUrl.get(file.file_url)
         ),
         origin: props.origin,
       });
       emit("created", ticket);
     },
-    { busy: isCreating, fallback: __("Could not create the ticket") },
+    { busy: isCreating, fallback: __("Could not create the ticket") }
   );
 }
 </script>

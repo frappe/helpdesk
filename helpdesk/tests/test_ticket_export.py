@@ -24,9 +24,12 @@ class TestTicketExport(IntegrationTestCase):
         super().setUpClass()
         frappe.set_user("Administrator")
         cls.customer, cls.owner, cls.manager, cls.member = make_organization("Export")
-        cls.outsider = create_contact("Export Outsider", unique_email("export-outsider"))
+        cls.outsider = create_contact(
+            "Export Outsider", unique_email("export-outsider")
+        )
         cls.other_customer = create_customer(
-            unique_name("Test Other Export"), [{"contact_name": cls.outsider["contact"]}]
+            unique_name("Test Other Export"),
+            [{"contact_name": cls.outsider["contact"]}],
         )
         cls.member_ticket = cls.raise_ticket(cls.member, cls.customer.name)
         cls.owner_ticket = cls.raise_ticket(cls.owner, cls.customer.name)

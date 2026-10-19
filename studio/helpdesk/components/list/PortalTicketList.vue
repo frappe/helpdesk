@@ -144,7 +144,10 @@ function openExport(selections: Set<string>) {
   showExport.value = true;
 }
 
-function exportRows(form: { export_type: "CSV" | "Excel"; export_all: boolean }) {
+function exportRows(form: {
+  export_type: "CSV" | "Excel";
+  export_all: boolean;
+}) {
   showExport.value = false;
   emit("export", {
     exportType: form.export_type,

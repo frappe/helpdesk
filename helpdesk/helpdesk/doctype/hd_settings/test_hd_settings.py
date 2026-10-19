@@ -32,7 +32,9 @@ class TestCustomerHomePage(IntegrationTestCase):
             "home_page",
             TICKETS_HOME,
         )
-        frappe.db.set_single_value("Portal Settings", "default_portal_home", "/helpdesk")
+        frappe.db.set_single_value(
+            "Portal Settings", "default_portal_home", "/helpdesk"
+        )
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 0)
 
     def test_turning_it_on_sends_customers_to_the_knowledge_base(self) -> None:

@@ -31,7 +31,13 @@
       <Button
         :label="__('Download')"
         variant="solid"
-        @click="() => emit('update', { ...form, export_all: form.export_all || props.allSelected })"
+        @click="
+          () =>
+            emit('update', {
+              ...form,
+              export_all: form.export_all || props.allSelected,
+            })
+        "
         class="w-full"
       />
     </template>

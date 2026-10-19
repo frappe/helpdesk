@@ -21,7 +21,10 @@
           :aria-label="__('Search categories')"
         >
           <template #prefix>
-            <span class="lucide-search size-4 text-ink-gray-5" aria-hidden="true" />
+            <span
+              class="lucide-search size-4 text-ink-gray-5"
+              aria-hidden="true"
+            />
           </template>
           <template v-if="query" #suffix>
             <Button
@@ -57,7 +60,10 @@
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
                   />
-                  <span :class="category.icon" class="size-4 shrink-0 text-ink-gray-6" />
+                  <span
+                    :class="category.icon"
+                    class="size-4 shrink-0 text-ink-gray-6"
+                  />
                   <span class="min-w-0 flex-1 truncate text-base">
                     {{ category.label }}
                   </span>
@@ -81,7 +87,9 @@
                   {{
                     search
                       ? __("No pinned matches")
-                      : __("No categories pinned. The home page will show all categories, A–Z.")
+                      : __(
+                          "No categories pinned. The home page will show all categories, A–Z."
+                        )
                   }}
                 </div>
               </template>
@@ -110,7 +118,10 @@
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
                   />
-                  <span :class="category.icon" class="size-4 shrink-0 text-ink-gray-6" />
+                  <span
+                    :class="category.icon"
+                    class="size-4 shrink-0 text-ink-gray-6"
+                  />
                   <span class="min-w-0 flex-1 truncate text-base">
                     {{ category.label }}
                   </span>
@@ -131,7 +142,9 @@
                   v-if="!shownUnpinned.length"
                   class="px-3 py-6 text-center text-p-sm text-ink-gray-5"
                 >
-                  {{ search ? __("No matches") : __("Every category is pinned") }}
+                  {{
+                    search ? __("No matches") : __("Every category is pinned")
+                  }}
                 </div>
               </template>
             </Draggable>
@@ -233,7 +246,9 @@ const pinnedCategories = computed(() =>
 
 // A–Z, as the home page lists them.
 const unpinnedCategories = computed(() =>
-  props.categories.filter((category) => !selected.value.includes(category.value))
+  props.categories.filter(
+    (category) => !selected.value.includes(category.value)
+  )
 );
 
 function matches(category: Category) {
@@ -245,7 +260,9 @@ const shownPinned = computed(() =>
   search.value ? pinnedCategories.value.filter(matches) : pinnedCategories.value
 );
 const shownUnpinned = computed(() =>
-  search.value ? unpinnedCategories.value.filter(matches) : unpinnedCategories.value
+  search.value
+    ? unpinnedCategories.value.filter(matches)
+    : unpinnedCategories.value
 );
 
 const hasUnsavedChanges = computed(

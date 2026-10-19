@@ -1396,7 +1396,8 @@ class HDTicket(Document, CustomerEditController):
     def get_customers_to_notify(self) -> set[str]:
         """Skips the author and agents: they refetch already.
 
-        The readers `has_permission` lets in; not called per user, it repeats these lookups."""
+        The readers `has_permission` lets in; not called per user, it repeats these lookups.
+        """
         candidates = {self.raised_by, self.owner, self.contact}
         if self.customer and (
             managers := frappe.get_all(

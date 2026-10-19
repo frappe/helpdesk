@@ -20,8 +20,8 @@ from helpdesk.api.knowledge_base import (
     merge_category,
     move_to_category,
     search_articles,
-    vote_on_article,
     set_category_visibility,
+    vote_on_article,
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import CUSTOMERS, PRIVATE, PUBLIC
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
@@ -338,7 +338,9 @@ class TestCustomersOnlyArticles(IntegrationTestCase):
             self.assertNotIn(self.members, names)
 
     def test_the_sidebar_nests_each_article_under_its_category(self) -> None:
-        category = next(row for row in get_kb_sidebar() if row.name == self.category.name)
+        category = next(
+            row for row in get_kb_sidebar() if row.name == self.category.name
+        )
         self.assertEqual(
             {row.name for row in category.articles}, {self.members, self.public}
         )
@@ -628,7 +630,6 @@ class TestCategoryAccess(IntegrationTestCase):
             frappe.db.get_value("HD Article", moved, ["category", "visibility"]),
             (general, PRIVATE),
         )
-
 
     def test_moving_into_a_public_category_keeps_a_private_article_private(
         self,

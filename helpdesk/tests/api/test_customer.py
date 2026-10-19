@@ -266,32 +266,39 @@ class TestInvitations(IntegrationTestCase):
             result = invite_members(self.customer.name, [email], False)
 
         self.assertEqual(
-            result, {"invited_emails": [], "skipped_emails": [], "disabled_emails": [email]}
+            result,
+            {"invited_emails": [], "skipped_emails": [], "disabled_emails": [email]},
         )
 
     def test_an_existing_member_is_skipped(self) -> None:
         """Accepting would bypass the member management setting."""
         email = unique_email("existing-member")
         member = create_contact("Existing Member", email)
-        frappe.get_doc("HD Customer", self.customer.name).add_contacts([member["contact"]])
+        frappe.get_doc("HD Customer", self.customer.name).add_contacts(
+            [member["contact"]]
+        )
         self.addCleanup(delete_invitations, email)
         with self.set_user(self.manager["user"]):
             result = invite_members(self.customer.name, [email], True)
 
         self.assertEqual(
-            result, {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []}
+            result,
+            {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []},
         )
 
     def test_an_existing_member_is_skipped_in_any_case(self) -> None:
         email = unique_email("cased-member")
         member = create_contact("Cased Member", email)
-        frappe.get_doc("HD Customer", self.customer.name).add_contacts([member["contact"]])
+        frappe.get_doc("HD Customer", self.customer.name).add_contacts(
+            [member["contact"]]
+        )
         self.addCleanup(delete_invitations, email)
         with self.set_user(self.manager["user"]):
             result = invite_members(self.customer.name, [email.upper()], True)
 
         self.assertEqual(
-            result, {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []}
+            result,
+            {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []},
         )
 
     def test_frappes_invite_endpoint_refuses_a_manager(self) -> None:

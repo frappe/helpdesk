@@ -59,10 +59,7 @@
       <div
         class="mx-auto flex w-full max-w-[832px] flex-col gap-4 px-4 pt-8 sm:pt-[41px]"
       >
-        <div
-          v-if="count === 1"
-          class="flex min-w-0 flex-col gap-1"
-        >
+        <div v-if="count === 1" class="flex min-w-0 flex-col gap-1">
           <Line text="text-lg" width="9rem" />
           <Line text="text-p-base" width="min(20rem, 80%)" />
         </div>
@@ -353,7 +350,7 @@ withDefaults(
     // Replaces an on-screen skeleton, so skip the fade-in delay.
     instant?: boolean;
   }>(),
-  { count: 6, columns: 3 },
+  { count: 6, columns: 3 }
 );
 
 const BLOCK = "motion-reduce:animate-none";

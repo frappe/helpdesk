@@ -410,8 +410,12 @@ const siblingsNote = computed(() => {
   const category = article.data?.category_name;
   return {
     Public: __("Other articles in {0} are visible to everyone.", [category]),
-    Customers: __("Other articles in {0} are visible to customers only.", [category]),
-    Private: __("Other articles in {0} are visible to agents only.", [category]),
+    Customers: __("Other articles in {0} are visible to customers only.", [
+      category,
+    ]),
+    Private: __("Other articles in {0} are visible to agents only.", [
+      category,
+    ]),
   }[siblingsVisibility.data];
 });
 

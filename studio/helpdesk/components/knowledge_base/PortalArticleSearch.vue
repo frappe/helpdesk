@@ -20,7 +20,10 @@
       <LucideSearch class="size-4.5 text-ink-gray-5" />
     </template>
     <template #suffix>
-      <LoadingIndicator v-if="canSearch && !isCurrent" class="size-4 text-ink-gray-4" />
+      <LoadingIndicator
+        v-if="canSearch && !isCurrent"
+        class="size-4 text-ink-gray-4"
+      />
       <KeyboardShortcut
         v-else-if="!query && !isFocused"
         class="slash-hint"

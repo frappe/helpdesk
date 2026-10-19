@@ -423,12 +423,18 @@ class TestHDCustomer(IntegrationTestCase):
 
         self.assertTrue(is_customer_manager(managed.name, user))
         self.assertFalse(is_customer_manager(joined.name, user))
-        self.assertTrue(frappe.has_permission("HD Ticket", "read", managed_ticket, user=user))
-        self.assertFalse(frappe.has_permission("HD Ticket", "read", joined_ticket, user=user))
+        self.assertTrue(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", joined_ticket, user=user)
+        )
 
         update_role_in_customer(managed, person["contact"], "HD Customer")
         self.assertFalse(is_customer_manager(managed.name, user))
-        self.assertFalse(frappe.has_permission("HD Ticket", "read", managed_ticket, user=user))
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
 
     def org_ticket(self, customer: str) -> str:
         ticket = make_ticket(raised_by=make_contact("perm-raiser")["user"])
