@@ -390,8 +390,9 @@ export function useView(dt: string = null) {
         route_name: router.currentRoute.value.name as string,
         order_by: list?.params.order_by,
         filters: JSON.stringify(list?.params.filters),
-        columns: JSON.stringify(list?.data.columns),
-        rows: JSON.stringify(list?.data?.rows),
+        // a grouped list never loads its records, so fall back to the view's own columns
+        columns: JSON.stringify(list?.data?.columns ?? list?.params.columns),
+        rows: JSON.stringify(list?.data?.rows ?? list?.params.rows),
         // a reactive list unwraps the grouping ref, so read it either way
         list_group_by: unref(list?.groupBy)
           ? JSON.stringify(unref(list.groupBy))
