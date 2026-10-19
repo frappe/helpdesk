@@ -126,24 +126,12 @@
             @update:model-value="(count) => (groups.pageLength.value = count)"
           />
         </template>
-        <!-- groups are counted up to a cap, so the total can be a floor -->
         <template #right>
-          <div class="flex items-center">
-            <template v-if="groups.hasNextPage.value">
-              <Button :label="__('Load More')" @click="groups.loadMore" />
-              <div class="mx-3 h-[80%] border-l" />
-            </template>
-            <div class="text-base text-ink-gray-5">
-              {{
-                __("{0} of {1}", [
-                  groups.rowCount.value,
-                  groups.totalCapped.value
-                    ? `${groups.totalCount.value}+`
-                    : groups.totalCount.value,
-                ])
-              }}
-            </div>
-          </div>
+          <Button
+            v-if="groups.hasNextPage.value"
+            :label="__('Load More')"
+            @click="groups.loadMore"
+          />
         </template>
       </ListFooter>
     </div>
@@ -789,7 +777,7 @@ onUnmounted(() => (listFilters.value = null));
 function applyFilters(filters) {
   isViewUpdated.value = true;
   defaultParams.filters = normalizeFilters(filters);
-  list.submit({ ...defaultParams });
+  loadList();
 
   // automatically update filters for default view
   if (!defaultParams.is_default) return;
@@ -806,6 +794,17 @@ const groups = useGroupedList(
 );
 // read by useView's create flow, which only gets the list resource
 list.groupBy = groupBy;
+
+// A grouped list hides the records, so only their params move until grouping is cleared.
+let listSkipped = false;
+function loadList() {
+  listSkipped = Boolean(groupBy.value);
+  if (listSkipped) list.params = { ...defaultParams };
+  else list.submit({ ...defaultParams });
+}
+watch(groupBy, (value) => {
+  if (!value && listSkipped) loadList();
+});
 
 function updateGroupBy(value: GroupBySettings | null) {
   isViewUpdated.value = true;
@@ -863,7 +862,7 @@ function groupCellText(
 function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
-  list.submit({ ...defaultParams, order_by });
+  loadList();
   if (!defaultParams.is_default) return;
   handleViewUpdate();
   isViewUpdated.value = false;
@@ -878,7 +877,7 @@ function updateColumns(obj) {
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
-  list.reload({ ...defaultParams });
+  loadList();
 }
 
 function reload(reset: boolean = false) {
@@ -892,7 +891,7 @@ function reload(reset: boolean = false) {
     defaultParams.rows = [];
     defaultParams.is_default = true;
   }
-  list.reload({ ...defaultParams });
+  loadList();
   groups.reload();
 }
 
@@ -980,7 +979,7 @@ function handleReload() {
 function handleViewChanges() {
   if (!switchToView(route.query.view as string)) return;
   applyUrlFilters();
-  list.submit({ ...defaultParams });
+  loadList();
 }
 
 /** Base for URL filters, so repeated pushes layer on the view, not each other. */
@@ -1063,7 +1062,7 @@ watch(
   ([view], [previousView]) => {
     if (view !== previousView && !switchToView(view)) return;
     applyUrlFilters();
-    list.submit({ ...defaultParams });
+    loadList();
   }
 );
 

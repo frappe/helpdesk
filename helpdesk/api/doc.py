@@ -536,6 +536,7 @@ def get_grouped_list(
     filters: str | list | dict | None = None,
     group_by: str | None = None,
     order_by: str | None = None,
+    limit_start: int = 0,
     limit_page_length: int = 20,
 ):
     """`get_list` for Group By, with `@me` and assigned-on filters handled like `get_list_data`."""
@@ -548,6 +549,7 @@ def get_grouped_list(
         filters=filters,
         group_by=group_by,
         order_by=order_by,
+        limit_start=limit_start,
         limit_page_length=limit_page_length,
     )
 

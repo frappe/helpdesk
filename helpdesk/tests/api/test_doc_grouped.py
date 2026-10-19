@@ -39,6 +39,22 @@ class TestGroupedList(IntegrationTestCase):
         counts = {row.subject: row.count for row in rows}
         self.assertEqual(counts, {self.subject_a: 2, self.subject_b: 1})
 
+    def test_pages_continue_from_limit_start(self) -> None:
+        params = {
+            "fields": ["subject"],
+            # a string, since the filters are rewritten in place on each call
+            "filters": json.dumps(self.filters),
+            "group_by": "subject",
+            "order_by": "subject asc",
+            "limit_page_length": 1,
+        }
+        with self.set_user(self.agent):
+            first = get_grouped_list("HD Ticket", **params)
+            second = get_grouped_list("HD Ticket", limit_start=1, **params)
+
+        subjects = [row.subject for row in first + second]
+        self.assertEqual(subjects, sorted([self.subject_a, self.subject_b]))
+
     def test_export_has_the_same_groups(self) -> None:
         with self.set_user(self.agent):
             frappe.local.form_dict = frappe._dict(

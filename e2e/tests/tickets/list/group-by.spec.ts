@@ -40,15 +40,40 @@ test("tickets group by priority with a count per group and a total, kept on relo
   await expect(list.rows().filter({ hasText: token })).toHaveCount(0);
   await expect.poll(() => savedGroupBy(api)).toContain("priority");
 
+  const requests: string[] = [];
+  page.on("request", (request) => requests.push(request.url()));
   await page.reload();
   await expect(page.getByRole("button", { name: "Group", exact: true })).toHaveText(
     "Grouped by Priority"
   );
   await expect(groupRow(page, "High")).toContainText("2");
+  // the groups and their totals, without loading the hidden ticket list or counting groups
+  await page.waitForLoadState("networkidle");
+  expect(requests.filter((url) => url.includes("get_list_data"))).toHaveLength(0);
+  expect(requests.filter((url) => url.includes("get_grouped_list"))).toHaveLength(2);
 
   await page.getByRole("button", { name: "Clear grouping" }).click();
   await expect(list.row(`E2E low ${token}`)).toBeVisible();
   await expect.poll(() => savedGroupBy(api)).toBeFalsy();
+});
+
+test("Load More adds the next page of groups to the ones shown", async ({ page, apiAs }) => {
+  const token = uid();
+  const customer = await apiAs("customer");
+  // one at a time, since parallel inserts deadlock
+  for (let i = 0; i < 21; i++) await raiseTicket(customer, `E2E page ${i} ${token}`);
+  const list = new TicketList(page);
+  await list.goto();
+  await list.searchSubject(token);
+  await groupBy(page, "Subject");
+  const groups = page.getByRole("row").filter({ hasText: token });
+  await expect(groups).toHaveCount(20);
+
+  const next = page.waitForResponse(/get_grouped_list/);
+  await page.getByRole("button", { name: "Load More" }).click();
+  expect((await next).request().postDataJSON()).toMatchObject({ limit_start: 20 });
+  await expect(groups).toHaveCount(21);
+  await expect(page.getByRole("button", { name: "Load More" })).toHaveCount(0);
 });
 
 test("grouped tickets export as CSV with one row per group", async ({ page, api, apiAs }) => {
