@@ -138,7 +138,7 @@ test.describe("list", () => {
     // a closed ticket drops out of an Open-only list
     await api.update("HD Ticket", tickets[0].name, { status: "Closed" });
     // the desk's filter: pick a field, then its value
-    await page.getByRole("button", { name: "Filter" }).click();
+    await page.getByRole("button", { name: "Filter", exact: true }).click();
     const popover = page.getByRole("dialog", { name: "Filter" });
     await expect(popover).toBeVisible();
     const addFilter = popover.getByRole("button", { name: "Add filter" });

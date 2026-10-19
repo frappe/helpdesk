@@ -1,13 +1,28 @@
 import type { Page } from "@playwright/test";
-import type { Api } from "../../../helpers/api";
+import { runScheduledJob, type Api } from "../../../helpers/api";
 import { raiseTicket } from "../../../helpers/factories";
 import { FormScripts } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { personas } from "../../../helpers/personas";
+import { createArticle, createCategory } from "../../../helpers/portal";
 import { snapshotSettings } from "../../../helpers/settings";
 
 // Every action on the portal ticket page (/help/tickets/:id), past what portal-conversation covers.
 usePersona("customer");
+
+/** New articles reach the related-help index only through scheduled jobs; run them now. */
+async function indexRelated(api: Api, query: string) {
+  await runScheduledJob(api, "frappe.search.sqlite_search.build_index_if_not_exists");
+  await expect
+    .poll(
+      async () => {
+        await runScheduledJob(api, "frappe.search.sqlite_search.index_docs_in_queue");
+        return (await api.call("helpdesk.api.article.get_related", { query })).length;
+      },
+      { timeout: 30_000, intervals: [1_000] }
+    )
+    .toBeGreaterThan(0);
+}
 
 async function agentReply(agent: Api, ticket: string, html: string) {
   await agent.call("run_doc_method", {
@@ -383,12 +398,11 @@ test.describe("details panel", () => {
     await expect(page.getByText("Priority")).toBeVisible();
     if (team) await expect(page.getByText(team.name).first()).toBeVisible();
 
-    for (const section of ["Timeline", "Related help"]) {
-      const toggle = page.getByRole("button", { name: section });
-      await expect(toggle).toHaveAttribute("aria-expanded", "true");
-      await toggle.click();
-      await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    }
+    // Related help shows only with a matching article; its own test covers it.
+    const toggle = page.getByRole("button", { name: "Timeline" });
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
   });
 
   test("timeline steps: received, first response due, resolution due", async ({ page, ticket }) => {
@@ -405,18 +419,17 @@ test.describe("details panel", () => {
     await expect(page.getByText("On hold")).toBeVisible();
   });
 
-  test("related help opens the article", async ({ page, ticket }) => {
+  test("related help opens the article", async ({ page, api, ticket }) => {
+    const article = await createArticle(api, (await createCategory(api)).name, {
+      title: `Help for ${ticket.subject}`,
+    });
+    await indexRelated(api, ticket.subject);
     await page.goto(`/help/tickets/${ticket.name}`);
-    const section = page.getByRole("button", { name: "Related help" });
-    await expect(section).toBeVisible();
-    // the section lists links after its toggle
-    const first = page.locator("aside, [class*=border-l]").getByRole("link").first()
-      .or(page.getByText(/^E2E Article /).first());
-    const title = (await first.innerText()).trim();
-    await first.click();
+    await expect(page.getByRole("button", { name: "Related help" })).toBeVisible();
+    await page.getByText(article.title, { exact: true }).click();
     // The article pages are still the desk's.
-    await expect(page).toHaveURL(/\/helpdesk\/kb-public\/articles\//);
-    await expect(page.getByText(title).first()).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/helpdesk/kb-public/articles/${article.name}`));
+    await expect(page.getByText(article.title).first()).toBeVisible();
   });
 
   test("the out-of-hours banner dismisses for the day", async ({ page, ticket }) => {
