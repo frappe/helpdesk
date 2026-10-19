@@ -36,7 +36,7 @@ function createSessionStore() {
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
-  const brandName = computed(() => config.value?.brand_name || 'Helpdesk')
+  const brandName = computed(() => config.value?.brand_name || window.boot?.brand_name || 'Helpdesk')
   // frappe writes `dd-mm-yyyy`; dayjs wants uppercase tokens.
   const dateFormat = computed(() => config.value?.date_format?.toUpperCase())
   // Tailwind `sm`, the desk's mobile cut-off.

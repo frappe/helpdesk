@@ -9,7 +9,6 @@ def get_config():
     fields = [
         "brand_name",
         "brand_logo",
-        "favicon",
         "public_knowledge_base",
         "allow_anonymous_article_voting",
         "banner_image",
@@ -45,9 +44,14 @@ def get_config():
             pluck="script",
         )
 
-    res.favicon = (
-        res.favicon
+    res.favicon = get_favicon()
+    return res
+
+
+def get_favicon() -> str:
+    """The desk's favicon, which the Studio portal uses too"""
+    return (
+        frappe.db.get_single_value("HD Settings", "favicon")
         or frappe.db.get_single_value("Website Settings", "favicon")
         or "/assets/helpdesk/desk/favicon.svg"
     )
-    return res
