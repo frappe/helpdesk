@@ -32,13 +32,14 @@ test("tickets group by priority with a count per group and a total, kept on relo
   const list = new TicketList(page);
   await list.goto();
   await list.searchSubject(token);
+  await expect.poll(() => savedView(api, "filters")).toContain(token);
   await groupBy(page, "Priority", { totals: true });
 
   await expect(groupRow(page, "High")).toContainText("2");
   await expect(groupRow(page, "Low")).toContainText("1");
   await expect(page.locator("[data-totals]")).toContainText("3");
   await expect(list.rows().filter({ hasText: token })).toHaveCount(0);
-  await expect.poll(() => savedGroupBy(api)).toContain("priority");
+  await expect.poll(() => savedView(api, "list_group_by")).toContain("priority");
 
   const requests: string[] = [];
   page.on("request", (request) => requests.push(request.url()));
@@ -54,10 +55,34 @@ test("tickets group by priority with a count per group and a total, kept on relo
 
   await page.getByRole("button", { name: "Clear grouping" }).click();
   await expect(list.row(`E2E low ${token}`)).toBeVisible();
-  await expect.poll(() => savedGroupBy(api)).toBeFalsy();
+  await expect.poll(() => savedView(api, "list_group_by")).toBeFalsy();
 });
 
-test("Load More adds the next page of groups to the ones shown", async ({ page, apiAs }) => {
+test("a reopened grouped view can be saved as a new view, with Columns hidden", async ({
+  page,
+  api,
+}) => {
+  const token = uid();
+  const list = new TicketList(page);
+  await list.goto();
+  await list.searchSubject(token);
+  await expect.poll(() => savedView(api, "filters")).toContain(token);
+  await groupBy(page, "Priority");
+  await expect(page.getByRole("button", { name: "Columns" })).toHaveCount(0);
+  await expect.poll(() => savedView(api, "list_group_by")).toContain("priority");
+
+  // the reload opens the grouped view without loading the ticket list
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Group", exact: true })).toHaveText(
+    "Grouped by Priority"
+  );
+  const view = await list.createView(api, `E2E view ${token}`);
+  const saved = await api.get("HD View", view);
+  expect(saved.list_group_by).toContain("priority");
+  expect(saved.filters).toContain(token);
+});
+
+test("Load More adds the next page of groups to the ones shown", async ({ page, api, apiAs }) => {
   const token = uid();
   const customer = await apiAs("customer");
   // one at a time, since parallel inserts deadlock
@@ -65,6 +90,7 @@ test("Load More adds the next page of groups to the ones shown", async ({ page, 
   const list = new TicketList(page);
   await list.goto();
   await list.searchSubject(token);
+  await expect.poll(() => savedView(api, "filters")).toContain(token);
   await groupBy(page, "Subject");
   const groups = page.getByRole("row").filter({ hasText: token });
   await expect(groups).toHaveCount(20);
@@ -86,6 +112,7 @@ test("grouped tickets export as CSV with one row per group", async ({ page, api,
   const list = new TicketList(page);
   await list.goto();
   await list.searchSubject(token);
+  await expect.poll(() => savedView(api, "filters")).toContain(token);
   await groupBy(page, "Priority");
   await expect(groupRow(page, "Urgent")).toContainText("2");
 
@@ -126,10 +153,11 @@ function groupRow(page: Page, value: string) {
     .filter({ has: page.getByRole("cell", { name: value, exact: true }) });
 }
 
-async function savedGroupBy(api: Api) {
+/** A field of the manager's auto saved default ticket view. */
+async function savedView(api: Api, field: string) {
   const [view] = await api.list("HD View", {
-    fields: ["list_group_by"],
+    fields: [field],
     filters: { user: personas.manager.email, dt: "HD Ticket", is_default: 1 },
   });
-  return view?.list_group_by;
+  return view?.[field];
 }

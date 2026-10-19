@@ -27,7 +27,7 @@
       />
       <Reload @click="handleReload" :loading="list.loading" />
       <Filter />
-      <!-- a grouped list sorts from its column headers instead -->
+      <!-- a grouped list sorts and sizes from its own column headers -->
       <SortBy v-if="!groupBy" :hide-label="isMobileView" />
       <GroupBy
         v-if="options.groupBy"
@@ -41,7 +41,7 @@
       </Dropdown>
       <ColumnSettings
         :hide-label="isMobileView"
-        v-if="!options.hideColumnSetting"
+        v-if="!options.hideColumnSetting && !groupBy"
       />
     </div>
     <div v-else class="flex justify-between items-center w-full">
