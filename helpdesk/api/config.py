@@ -9,7 +9,6 @@ def get_config():
     fields = [
         "brand_name",
         "brand_logo",
-        "favicon",
         "prefer_knowledge_base",
         "setup_complete",
         "skip_email_workflow",
@@ -36,9 +35,14 @@ def get_config():
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 
-    res.favicon = (
-        res.favicon
+    res.favicon = get_favicon()
+    return res
+
+
+def get_favicon() -> str:
+    """The desk's favicon, which the Studio portal uses too"""
+    return (
+        frappe.db.get_single_value("HD Settings", "favicon")
         or frappe.db.get_single_value("Website Settings", "favicon")
         or "/assets/helpdesk/desk/favicon.svg"
     )
-    return res

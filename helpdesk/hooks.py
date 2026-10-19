@@ -103,6 +103,7 @@ user_invitation = {
 }
 
 studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {
     "Assignment Rule": {
