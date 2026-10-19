@@ -188,10 +188,11 @@ class TestRelatedArticles(FrappeTestCase):
 
     def test_a_query_of_only_stopwords_finds_nothing_and_logs_nothing(self):
         self.search.build_index()
-        errors = frappe.db.count("Error Log")
 
-        self.assertEqual(self.related("how to"), [])
-        self.assertEqual(frappe.db.count("Error Log"), errors)
+        # Error Log is a virtual DocType on frappe develop, so count calls, not rows.
+        with patch("frappe.log_error") as log_error:
+            self.assertEqual(self.related("how to"), [])
+        log_error.assert_not_called()
 
     def test_no_index_yet_returns_nothing(self):
         self.assertEqual(self.related("zephyrine webhook"), [])

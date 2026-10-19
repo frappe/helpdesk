@@ -105,6 +105,8 @@ jobs:
           bench new-site --db-root-password root --admin-password admin --install-app helpdesk $SITE
           bench use $SITE
           bench --site $SITE set-config host_name "http://localhost:8000"
+          # The suite creates more users in an hour than the default limit (60) allows.
+          bench --site $SITE set-config -p throttle_user_limit 10000
           bench build --apps frappe,helpdesk
         env:
           CI: "Yes"
