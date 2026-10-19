@@ -26,11 +26,10 @@ test.describe("my settings", () => {
     expect((await api.get("User", email)).first_name).toBe("Renamed");
 
     const chooser = page.waitForEvent("filechooser");
-    await dialog.locator(".group.relative div.cursor-pointer").first().click();
+    await dialog.getByRole("button", { name: "Upload Photo" }).click();
     await (await chooser).setFiles(PIXEL);
     await expect.poll(async () => (await api.get("User", email)).user_image).toContain("/files/");
-    await dialog.locator(".group.relative").first().hover();
-    await dialog.locator(".group.relative div.\\-top-1").click();
+    await dialog.getByRole("button", { name: "Remove Photo" }).click();
     await expect.poll(async () => (await api.get("User", email)).user_image).toBeFalsy();
 
     const newPassword = `E2e-Changed-${uid()}!`;
