@@ -28,6 +28,10 @@ class HelpdeskAssignmentRule(AssignmentRule):
         fall back to the full pool (including Unavailable) only if no one else
         is available, so the ticket is never left unassigned.
         """
+        # Frappe's round robin indexes the user list, so a rule left without
+        # users would fail every save of a matching ticket.
+        if self.rule == "Round Robin" and not self.users:
+            return None
 
         away = get_agents_by_category("Away")
         unavailable = get_agents_by_category("Unavailable")
