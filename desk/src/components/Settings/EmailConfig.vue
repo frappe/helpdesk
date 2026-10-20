@@ -2,7 +2,6 @@
   <div class="px-10 py-8">
     <EmailAccounts
       doctype="HD Ticket"
-      :is-v2-site="isV2Site"
       v-model:dirty="disableSettingModalOutsideClick"
       @created="onCreated"
     />
@@ -15,7 +14,6 @@ import { EmailAccounts } from "@framework/ui/EmailAccounts";
 import { capture } from "@/telemetry";
 import { disableSettingModalOutsideClick } from "./settingsModal";
 
-const isV2Site = window.is_v2_site;
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 
 function onCreated(service: string) {
