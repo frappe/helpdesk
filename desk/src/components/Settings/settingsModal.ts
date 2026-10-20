@@ -97,7 +97,7 @@ export const tabs = computed(() => {
           condition: () => auth.isAdmin || auth.isManager,
         },
         {
-          label: __("Portal Permissions"),
+          label: __("Portal Settings"),
           icon: markRaw(LucideUserCog),
           component: markRaw(PortalPermissions),
           condition: () => auth.isAdmin || auth.isManager,
@@ -194,6 +194,7 @@ type TabName =
   | "Email Notifications"
   | "General"
   | "Knowledge Base"
+  | "Portal Settings"
   | "Agents"
   | "Invite Agents"
   | "Teams"

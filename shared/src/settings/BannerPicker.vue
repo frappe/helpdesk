@@ -1,10 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-1">
-      <span class="text-base-medium text-ink-gray-8">{{
-        __("Banner")
-      }}</span>
-      <span class="text-p-sm text-ink-gray-6">{{
+    <div class="flex flex-col">
+      <h3 class="text-base-medium text-ink-gray-8">{{ __("Banner") }}</h3>
+      <span class="mt-1 text-base leading-5 text-ink-gray-6">{{
         __(
           "Choose a color, pattern or image to show behind the search bar to customize your knowledge base home page. For custom images recommended image size is minimum 1440x240 px in PNG or JPG."
         )
@@ -51,15 +49,30 @@
             @click="save('', option.name)"
           />
         </Tooltip>
-        <Tooltip v-if="image" :text="__('Custom image')">
-          <span
-            role="radio"
-            :aria-label="__('Custom image')"
-            aria-checked="true"
-            :class="[swatch, ring(true)]"
-            :style="{ background: imageBackground(image) }"
-          />
-        </Tooltip>
+        <!-- flex: a block wrapper adds a line box, 6px taller than the swatches -->
+        <div v-if="uploaded" class="relative flex">
+          <Tooltip :text="__('Custom image')">
+            <button
+              type="button"
+              role="radio"
+              :aria-label="__('Custom image')"
+              :aria-checked="Boolean(image)"
+              :class="[swatch, ring(Boolean(image))]"
+              :style="{ background: imageBackground(uploaded) }"
+              @click="save(uploaded, '')"
+            />
+          </Tooltip>
+          <Tooltip :text="__('Remove image')">
+            <button
+              type="button"
+              :aria-label="__('Remove image')"
+              class="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full border-[1.5px] border-[--surface-base] bg-[--ink-gray-9] text-[--surface-base]"
+              @click="removeImage"
+            >
+              <LucideX class="size-2.5" />
+            </button>
+          </Tooltip>
+        </div>
       </div>
       <FileUploader
         :fileTypes="['image/*']"
@@ -82,16 +95,24 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { BANNER_PRESETS, findBannerPreset } from "../kbBanner";
+import { BANNER_PRESETS, findBannerPreset } from "../knowledgeBaseBanner";
 import { Button, FileUploader, Tooltip } from "frappe-ui";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import LucideBan from "~icons/lucide/ban";
 import LucideSearch from "~icons/lucide/search";
+import LucideX from "~icons/lucide/x";
 
 const props = defineProps<{ image: string; preset: string }>();
 const emit = defineEmits<{
   change: [value: { banner_image: string; banner_preset: string }];
 }>();
+
+// Keep the upload's swatch after picking another, to re-pick it.
+const uploaded = ref(props.image);
+watch(
+  () => props.image,
+  (url) => url && (uploaded.value = url)
+);
 
 const swatch =
   "size-8 shrink-0 rounded-[8px] border [--banner-pattern-scale:0.4] border-outline-gray-2 outline outline-[1.5px] outline-offset-2 transition-[outline-color]";
@@ -114,7 +135,7 @@ function imageBackground(url: string) {
 
 function uploadLabel(uploading: boolean, progress: number) {
   if (uploading) return __("Uploading {0}%", [progress]);
-  return props.image ? __("Replace image") : __("Upload image");
+  return uploaded.value ? __("Replace image") : __("Upload image");
 }
 
 function presetLabel(name: string) {
@@ -124,6 +145,11 @@ function presetLabel(name: string) {
     Violet: __("Violet"),
     Lines: __("Lines"),
   }[name];
+}
+
+function removeImage() {
+  uploaded.value = "";
+  if (props.image) save("", "");
 }
 
 function save(image: string, preset: string) {

@@ -1,7 +1,9 @@
-import { computed, markRaw, ref, watch } from 'vue'
-import { createResource, dayjs, toast } from 'frappe-ui'
+import { computed, markRaw, onScopeDispose, ref, watch } from 'vue'
+import { useDocumentVisibility } from '@vueuse/core'
+import { createResource } from 'frappe-ui'
+import { subscribeToDoc } from '@framework/ui/socket'
 import LucideCircleCheck from '~icons/lucide/circle-check'
-import { createToast, setupCustomizations } from '@helpdesk/shared/formScripts'
+import LucideRotateCcw from '~icons/lucide/rotate-ccw'
 import { __ } from '@helpdesk/shared/translation'
 import { useDrawer } from '@app/composables/useDrawer'
 import { useOutsideHoursBanner } from '@app/composables/useOutsideHoursBanner'
@@ -9,22 +11,18 @@ import { useReplyComposer } from '@app/composables/useReplyComposer'
 import { useTicketDetails } from '@app/composables/useTicketDetails'
 import { useTicketFeedback } from '@app/composables/useTicketFeedback'
 import { useTicketThread } from '@app/composables/useTicketThread'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import { CLOSED_STATUS, isClosedStatus, isResolvedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { askConfirm, runAction, scriptDialog, updateTicket } from '@app/utils'
-
-// Used when HD Settings has no `confirm_resolution_after_days`.
-const RESOLVED_PROMPT_DAYS = 5
-const REOPENED_STATUS = 'Open'
+import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
+import { askConfirm, copyToClipboard, runAction, runFormScripts, updateTicket, type ActionOptions } from '@helpdesk/shared/utils'
 
 export default function setup(context) {
   const { route } = context
   const settings = useSettingsModal(context)
   const { config } = settings
-  // The composer shows the reader's avatar, which comes with the settings payload.
-  settings.loadSettings()
+  // The composer's avatar comes with the settings payload.
+  settings.ensureSettings()
   loadTicketMeta()
 
   const ticketId = computed(() => String(route?.params?.name || ''))
@@ -34,29 +32,25 @@ export default function setup(context) {
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
-    onSuccess: runFormScripts,
   })
+  // Only on a real change, or each script's calls would repeat.
+  watch(
+    () => ticket.data && `${ticket.data.name}:${ticket.data.modified}`,
+    async (version) => {
+      if (version) customActions.value = await runFormScripts(ticket.data, context, { doc: ticket.data, updateField })
+    },
+  )
 
-  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
-  async function runFormScripts(data) {
-    await setupCustomizations(data, {
-      doc: data,
-      call: context.call,
-      router: context.router,
-      toast,
-      createToast,
-      $dialog: scriptDialog,
-      updateField,
-    })
-    customActions.value = data._customActions || []
+  function saveTicket(values: Record<string, unknown>, options: ActionOptions) {
+    return runAction(async () => {
+      await updateTicket(ticketId.value, values)
+      ticket.fetch()
+    }, options)
   }
 
   function updateField(fieldname: string, value: unknown, callback = () => {}) {
-    runAction(
-      async () => {
-        await updateTicket(ticketId.value, { [fieldname]: value })
-        ticket.fetch()
-      },
+    saveTicket(
+      { [fieldname]: value },
       { success: __('Ticket updated successfully.'), fallback: __('Could not update this ticket') },
     )
     callback()
@@ -64,13 +58,70 @@ export default function setup(context) {
 
   watch(ticketId, (name) => name && ticket.fetch(), { immediate: true })
 
-  const feedback = useTicketFeedback(ticket)
+  // Bursts, or pings mid-refetch, end in one trailing fetch.
+  let refetchQueued = false
+  function refresh() {
+    if (!ticketId.value) return
+    if (ticket.loading) refetchQueued = true
+    else ticket.fetch()
+  }
+  watch(
+    () => ticket.loading,
+    (loading) => {
+      if (loading || !refetchQueued) return
+      refetchQueued = false
+      ticket.fetch()
+    },
+  )
+
+  // Customers aren't in the ticket's room; they get a ping on their own channel.
+  watch(
+    ticketId,
+    (name, _, onCleanup) => name && onCleanup(subscribeToDoc(context.socket, 'HD Ticket', name)),
+    { immediate: true },
+  )
+  function onTicketChange(payload) {
+    const doc = payload?.doc || payload
+    const doctype = doc?.reference_doctype || doc?.doctype
+    const name = doc?.reference_name || doc?.name
+    if (doctype === 'HD Ticket' && name === ticketId.value) refresh()
+  }
+  function onTicketPing(payload) {
+    if (payload?.ticket_id === ticketId.value) refresh()
+  }
+  // Nothing replays events missed while disconnected or asleep.
+  let wasDisconnected = false
+  function onDisconnect() {
+    wasDisconnected = true
+  }
+  function onConnect() {
+    if (!wasDisconnected) return
+    wasDisconnected = false
+    refresh()
+  }
+  const listeners = {
+    doc_update: onTicketChange,
+    docinfo_update: onTicketChange,
+    'helpdesk:ticket-update': onTicketPing,
+    disconnect: onDisconnect,
+    connect: onConnect,
+  }
+  for (const [event, handler] of Object.entries(listeners)) context.socket?.on(event, handler)
+  // By handler: the socket is shared across pages.
+  onScopeDispose(() => {
+    for (const [event, handler] of Object.entries(listeners)) context.socket?.off(event, handler)
+  })
+  const visibility = useDocumentVisibility()
+  watch(visibility, (state, before) => state === 'visible' && before === 'hidden' && refresh())
+
+  const feedback = useTicketFeedback(saveTicket)
   const thread = useTicketThread(ticket)
   const isClosed = computed(() => isClosedStatus(ticket.data?.status))
-  const isResolved = computed(() => isResolvedStatus(ticket.data?.status))
+  // As on the server: customers cannot touch closed or rated tickets.
+  const isLocked = computed(() => isClosed.value || (!settings.isAgent.value && Boolean(ticket.data?.feedback)))
   const isUpdatingStatus = ref(false)
 
-  // Closing changes the ticket, not the thread, so its date comes from the ticket's history.
+  // Close dates come from ticket history, not the thread.
   const timelineChanges = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_timeline_changes',
     method: 'GET',
@@ -81,18 +132,26 @@ export default function setup(context) {
     (modified) => modified && timelineChanges.fetch(),
     { immediate: true },
   )
+  // Else the previous ticket's closes show until these arrive.
+  watch(ticketId, () => timelineChanges.reset())
 
   const timelineEvents = computed(() =>
     (timelineChanges.data || [])
-      .filter((change) => change.field === 'status' && isClosedStatus(change.to))
-      .map((change) => ({
-        type: 'log',
-        key: `closed:${change.on}`,
-        timestamp: change.on,
-        author: { fullname: change.by.name, image: change.by.image },
-        icon: markRaw(LucideCircleCheck),
-        data: { name: `closed:${change.on}`, subtype: 'info', text: __('{0} closed the ticket', [change.by.name]) },
-      })),
+      .filter((change) => change.field === 'status' && isClosedStatus(change.to) !== isClosedStatus(change.from))
+      .map((change) => {
+        const closed = isClosedStatus(change.to)
+        const key = `${closed ? 'closed' : 'reopened'}:${change.on}`
+        const text = closed ? __('{0} closed the ticket', [change.by.name]) : __('{0} reopened the ticket', [change.by.name])
+        const divider = closed ? __('Closed by {0}', [change.by.name]) : __('Reopened by {0}', [change.by.name])
+        return {
+          type: 'log',
+          key,
+          timestamp: change.on,
+          author: { fullname: change.by.name, image: change.by.image },
+          icon: markRaw(closed ? LucideCircleCheck : LucideRotateCcw),
+          data: { name: key, subtype: 'info', text, divider },
+        }
+      }),
   )
 
   const relatedArticles = createResource({
@@ -107,42 +166,15 @@ export default function setup(context) {
 
   const suggestedArticles = computed(() => relatedArticles.data || [])
 
-  const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
-  // Where a rating is required, the status cannot be written without it.
-  const wantsFeedback = computed(() => canRate.value && Boolean(config.value?.is_feedback_mandatory))
-
-  const promptAfterDays = computed(() => Number(config.value?.confirm_resolution_after_days ?? RESOLVED_PROMPT_DAYS))
-
-  // Asked once, of the requester, under the latest agent reply, once the resolution has stood a while.
-  // It takes the reply's time, and the thread puts the page's rows after emails at the same time.
-  const solvePrompt = computed(() => {
-    const data = ticket.data
-    const reply = thread.lastAgentReply.value
-    if (!data || !reply || !isResolved.value || !data.resolution_date) return null
-    if (dayjs().diff(dayjs(data.resolution_date), 'day') < promptAfterDays.value) return null
-    const viewer = config.value?.session_user
-    if (viewer && data.raised_by && viewer !== data.raised_by) return null
-    return { type: 'solve_prompt', key: 'solve-prompt', timestamp: reply.communication_date || reply.creation, data: {} }
-  })
-
-  const threadExtras = computed(() => [...timelineEvents.value, ...(solvePrompt.value ? [solvePrompt.value] : [])])
-
-  // Where a rating is still owed, the feedback dialog is the only way past `validate_feedback`.
-  function confirmSolved() {
-    if (canRate.value) return feedback.openFeedback()
-    return closeTicket()
-  }
-
-  // An agent reply leaves the ticket "Replied", so No puts it back in the queue.
-  function reopenTicket() {
-    return setStatus(REOPENED_STATUS, {
-      success: __('Reopened, we will take another look'),
-      fallback: __('Could not reopen this ticket'),
-    })
-  }
+  // The server's test; it counts an agent reply that raised the ticket.
+  const canRate = computed(() => Boolean(ticket.data?.has_agent_replied) && !ticket.data?.feedback)
+  // As on the server: a required rating blocks the status write; agents exempt.
+  const wantsFeedback = computed(
+    () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !settings.isAgent.value,
+  )
 
   function onPageAction() {
-    if (isClosed.value) return navigateTo(ROUTES.newTicket)
+    if (isLocked.value) return navigateTo(ROUTES.newTicket({ from: 'closed-ticket' }))
     if (wantsFeedback.value) return feedback.openFeedback()
     askConfirm({
       title: __('Close ticket'),
@@ -154,41 +186,34 @@ export default function setup(context) {
   }
 
   function closeTicket() {
-    return setStatus(CLOSED_STATUS, { fallback: __('Could not close this ticket') })
-  }
-
-  function setStatus(status: string, messages: { success?: string; fallback: string }) {
-    return runAction(
-      async () => {
-        await updateTicket(ticketId.value, { status })
-        ticket.fetch()
-      },
-      { busy: isUpdatingStatus, ...messages },
-    )
+    return saveTicket({ status: CLOSED_STATUS }, { busy: isUpdatingStatus, fallback: __('Could not close this ticket') })
   }
 
   return {
     ...settings,
-    ...useTicketDetails(ticket, thread),
-    ...useReplyComposer(ticket),
+    ...useTicketDetails(ticket, thread, timelineChanges),
+    ...useReplyComposer(ticket, { ticketId, isClosed: isLocked, isAgent: settings.isAgent }),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),
     ticketId,
     ticket,
     rating: thread.rating,
-    threadExtras,
+    timelineEvents,
     customActions,
-    // Empty hides the header button; any open ticket can be closed, a closed one leads to a new ticket.
+    // Empty hides the header button.
     pageActionLabel: computed(() => {
-      if (!isClosed.value) return __('Close')
+      if (!ticket.data) return ''
+      if (!isLocked.value) return __('Close')
       return settings.canCreateTicket.value ? __('Raise a ticket') : ''
     }),
-    pageActionIcon: computed(() => (isClosed.value ? 'lucide-plus' : 'lucide-check')),
+    pageActionIcon: computed(() => {
+      if (!ticket.data) return ''
+      return isLocked.value ? 'lucide-plus' : 'lucide-check'
+    }),
     onPageAction,
-    confirmSolved,
-    reopenTicket,
     suggestedArticles,
-    openHelpArticle: (article) => navigateTo(ROUTES.article(article.name)),
+    openHelpArticle: (article) => navigateTo(ROUTES.article(article)),
+    copyTicketId: () => copyToClipboard(ticket.data.name, __('Ticket #{0} copied', [ticket.data.name])),
   }
 }

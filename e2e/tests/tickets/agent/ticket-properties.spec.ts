@@ -113,6 +113,8 @@ test("agents are assigned and unassigned from the sidebar", async ({ page, api, 
   await openTicket(page, ticket.name);
 
   await page.getByRole("button", { name: "Set Assignee..." }).click();
+  // Search first: the list shows only one page of agents.
+  await page.getByPlaceholder("Search agents...").fill("Bela");
   await page.getByRole("button", { name: "Bela E2E" }).click();
   await page.keyboard.press("Escape");
   await expect.poll(assignees).toEqual([personas.agent2.email]);

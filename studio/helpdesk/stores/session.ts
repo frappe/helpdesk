@@ -1,9 +1,23 @@
 import { computed, ref } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
-import { call } from 'frappe-ui'
-import { ROUTES } from '@app/routes'
+import { call, setConfig } from 'frappe-ui'
+import { spritePlugin } from 'frappe-ui/experimental'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 
-// A published Studio app has no boot payload; `get_config` is the one call guests may make.
+// From boot: must be set before the first date renders.
+setConfig('systemTimezone', window.boot?.system_timezone)
+
+// Stored icons can be any lucide name, beyond Studio's build-time classes.
+if (!document.getElementById('lucide-sprite')) spritePlugin.install()
+
+if (window.boot?.send_guest_to_login) {
+  document.documentElement.style.visibility = 'hidden'
+  location.replace(loginUrl())
+} else if (location.pathname === '/' && window.boot?.home_page && window.boot.home_page !== '/') {
+  // Else the router reads `/` as the portal root, the knowledge base.
+  location.replace(window.boot.home_page)
+}
+
 const store = createSessionStore()
 
 export function useSession() {
@@ -15,17 +29,19 @@ function createSessionStore() {
   const config = ref(null)
   let sessionRequest = null
 
-  // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
   const canCreateTicket = computed(
     () => !isGuest.value || Boolean(config.value?.allow_anyone_to_create_tickets),
   )
+  const canGiveFeedback = computed(() => !isGuest.value || Boolean(config.value?.allow_anonymous_article_voting))
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
-  const brandName = computed(() => config.value?.brand_name || 'Helpdesk')
-  // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
+  const brandName = computed(() => config.value?.brand_name || window.boot?.brand_name || 'Helpdesk')
+  // frappe writes `dd-mm-yyyy`; dayjs wants uppercase tokens.
+  const dateFormat = computed(() => config.value?.date_format?.toUpperCase())
+  // Tailwind `sm`, the desk's mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
 
   function loadSession() {
@@ -42,7 +58,15 @@ function createSessionStore() {
     return loadSession()
   }
 
-  // A private knowledge base 403s every call, so sign in beats an unfillable shell.
+  // Once per app: every page passes the same socket.
+  let listeningForSettings = false
+  function reloadOnSettingsUpdate(socket) {
+    if (listeningForSettings || !socket) return
+    listeningForSettings = true
+    socket.on('helpdesk:settings-updated', reloadSession)
+  }
+
+  // A private knowledge base 403s every guest call.
   function sendGuestToLogin() {
     if (!isGuest.value || isPublicKnowledgeBase.value || isNewTicketPage()) return
     signIn()
@@ -53,10 +77,10 @@ function createSessionStore() {
   }
 
   function signIn() {
-    window.location.href = `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
+    window.location.href = loginUrl()
   }
 
-  // Posted, not navigated: frappe only accepts POST on logout.
+  // frappe only accepts POST on logout.
   async function signOut() {
     try {
       await call('logout')
@@ -68,17 +92,24 @@ function createSessionStore() {
 
   return {
     config,
+    reloadOnSettingsUpdate,
     isGuest,
     isPublicKnowledgeBase,
     canCreateTicket,
+    canGiveFeedback,
     isAgent,
     canEditSettings,
     brandLogo,
     brandName,
+    dateFormat,
     isPhone,
     loadSession,
     signIn,
     reloadSession,
     signOut,
   }
+}
+
+function loginUrl() {
+  return `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
 }

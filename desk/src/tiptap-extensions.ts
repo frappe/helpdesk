@@ -80,8 +80,6 @@ export const FieldAutocomplete = SuggestionExtension.configure<FieldItem>({
   listComponent: FieldAutocompleteList,
 });
 
-export { ComponentUtils } from "@helpdesk/shared/tiptap";
-
 // The extensions that match frappe-ui's TextEditor schema, used for generateJSON
 const excelPasteExtensions = [
   StarterKit,

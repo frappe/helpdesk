@@ -5,7 +5,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
-    has_permission,
+    is_customer_manager,
     permission_query,
 )
 from helpdesk.helpdesk.hooks.user_invitation import after_accept
@@ -14,8 +14,12 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     create_user,
+    get_granted_rights,
     get_invitation,
+    make_contact,
+    make_invitation,
     make_ticket,
+    unique_name,
     update_role_in_customer,
 )
 
@@ -375,21 +379,10 @@ class TestHDCustomer(IntegrationTestCase):
             customer_name, [{"contact_name": contact_doc["contact"]}]
         )
         ticket = make_ticket(customer=customer.name, contact=contact_doc["contact"])
-        invitation = frappe.get_doc(
-            {
-                "doctype": "User Invitation",
-                "email": email,
-                "app_name": "helpdesk",
-                "redirect_to_path": "/helpdesk",
-                "roles": [{"role": "HD Customer"}],
-                "customer": customer.name,
-                "contact": contact_doc["contact"],
-            }
-        ).insert(ignore_permissions=True)
+        invitation = make_invitation(email, customer.name, contact_doc["contact"])
         return contact_doc, customer, ticket, invitation
 
-    def test_has_permission_member_reads_manager_writes(self) -> None:
-        # Members may read their customer; only managers may write it.
+    def test_has_permission_members_read_and_never_write(self) -> None:
         customer = create_customer("Perm Member Manager")
         member = create_contact("PermMember", "perm-member@example.com")
         manager = create_contact("PermManager", "perm-manager@example.com")
@@ -397,12 +390,56 @@ class TestHDCustomer(IntegrationTestCase):
         add_contact_in_customer(customer, manager["contact"], is_manager=True)
         name = customer.name
 
-        frappe.set_user(member["user"])
-        self.assertTrue(frappe.has_permission("HD Customer", "read", name))
-        self.assertFalse(frappe.has_permission("HD Customer", "write", name))
-        frappe.set_user(manager["user"])
-        self.assertTrue(frappe.has_permission("HD Customer", "read", name))
-        self.assertTrue(frappe.has_permission("HD Customer", "write", name))
+        for user in (member["user"], manager["user"]):
+            with self.set_user(user):
+                self.assertTrue(frappe.has_permission("HD Customer", "read", name))
+                self.assertFalse(frappe.has_permission("HD Customer", "write", name))
+                self.assertFalse(frappe.has_permission("HD Customer", "delete", name))
+
+    def test_a_customer_manager_cannot_save_it_directly(self) -> None:
+        manager = make_contact("perm-direct-manager")
+        customer = create_customer(
+            unique_name("Perm Direct Save"),
+            contacts=[{"contact_name": manager["contact"], "is_manager": 1}],
+        )
+        customer.domain = "renamed.example.com"
+
+        with self.set_user(manager["user"]), self.assertRaises(frappe.PermissionError):
+            customer.save()
+        self.assertNotEqual(
+            frappe.db.get_value("HD Customer", customer.name, "domain"),
+            "renamed.example.com",
+        )
+
+    def test_manager_rights_are_per_organization(self) -> None:
+        managed = create_customer(unique_name("Perm Managed"))
+        joined = create_customer(unique_name("Perm Joined"))
+        person = make_contact("perm-dual")
+        add_contact_in_customer(managed, person["contact"], is_manager=True)
+        add_contact_in_customer(joined, person["contact"], is_manager=False)
+        managed_ticket = self.org_ticket(managed.name)
+        joined_ticket = self.org_ticket(joined.name)
+        user = person["user"]
+
+        self.assertTrue(is_customer_manager(managed.name, user))
+        self.assertFalse(is_customer_manager(joined.name, user))
+        self.assertTrue(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", joined_ticket, user=user)
+        )
+
+        update_role_in_customer(managed, person["contact"], "HD Customer")
+        self.assertFalse(is_customer_manager(managed.name, user))
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
+
+    def org_ticket(self, customer: str) -> str:
+        ticket = make_ticket(raised_by=make_contact("perm-raiser")["user"])
+        ticket.db_set("customer", customer, update_modified=False)
+        return ticket.name
 
     def test_has_permission_denies_non_member(self) -> None:
         # A portal user who is not a member is denied read and write (IDOR guard).
@@ -413,27 +450,6 @@ class TestHDCustomer(IntegrationTestCase):
         frappe.set_user(outsider["user"])
         self.assertFalse(frappe.has_permission("HD Customer", "read", name))
         self.assertFalse(frappe.has_permission("HD Customer", "write", name))
-
-    def test_has_permission_per_record_role(self) -> None:
-        # Manager of one customer who is only a member of another can write the
-        # first but not the second; the role is bound per record, not per user.
-        customer_a = create_customer("Perm Record A")
-        customer_b = create_customer("Perm Record B")
-        contact_in_dual_customers = create_contact("PermDual", "perm-dual@example.com")
-        add_contact_in_customer(
-            customer_a, contact_in_dual_customers["contact"], is_manager=True
-        )
-        add_contact_in_customer(
-            customer_b, contact_in_dual_customers["contact"], is_manager=False
-        )
-        user = contact_in_dual_customers["user"]
-
-        frappe.set_user(user)
-        self.assertTrue(has_permission(customer_a, "read", user))
-        self.assertTrue(has_permission(customer_a, "write", user))
-
-        self.assertTrue(has_permission(customer_b, "read", user))
-        self.assertFalse(has_permission(customer_b, "write", user))
 
     def test_permission_query_scopes_list(self) -> None:
         # Agents are unrestricted, members see only their customers, others none.
@@ -455,23 +471,6 @@ class TestHDCustomer(IntegrationTestCase):
         self.assertIn(mine.name, names)
         self.assertNotIn(other.name, names)
 
-    def test_has_permission_follows_live_role_change(self) -> None:
-        # Write access tracks the live is_manager flag, not a cached role.
-        # update_role_in_customer()
-        customer = create_customer("Perm Live Change")
-        member = create_contact("PermLive", "perm-live@example.com")
-        add_contact_in_customer(customer, member["contact"], is_manager=False)
-        user = member["user"]
-
-        frappe.set_user(user)
-        self.assertFalse(has_permission(customer, "write", user))
-        update_role_in_customer(customer, member["contact"], "HD Customer Manager")
-        frappe.set_user(user)
-        self.assertTrue(has_permission(customer, "write", user))
-        update_role_in_customer(customer, member["contact"], "HD Customer")
-        frappe.set_user(user)
-        self.assertFalse(has_permission(customer, "write", user))
-
     def test_primary_contact_must_be_a_listed_contact(self) -> None:
         customer = create_customer("Test Customer Primary Validate")
         contact = create_contact(
@@ -483,6 +482,31 @@ class TestHDCustomer(IntegrationTestCase):
 
         with self.assertRaises(frappe.ValidationError):
             customer.save()
+
+    def test_manager_invite_for_existing_manager_grants_both_roles(self) -> None:
+        """A contact already listed as manager gets both customer roles on accept."""
+        name = "Test Customer Existing Manager Invite"
+        email = "existing-manager-invite@example.com"
+        cleanup_customer_and_contact(name, email)
+        customer = create_customer(name)
+        contact = create_contact("ExistingManager", email, user=False)
+        add_contact_in_customer(customer, contact["contact"], is_manager=True)
+        customer.add_contacts([contact["contact"]], "HD Customer Manager")
+
+        invitation = frappe.get_doc("User Invitation", get_invitation(email).name)
+        invitation.accept(ignore_permissions=True)
+
+        roles = frappe.get_roles(email)
+        # the invite only carries the manager role; the base role must still be synced
+        self.assertIn("HD Customer", roles)
+        self.assertIn("HD Customer Manager", roles)
+
+    def test_manager_role_covers_customer_permissions(self) -> None:
+        """A user with only the manager role can do everything a customer can."""
+        manager = get_granted_rights("HD Customer Manager")
+        # an unrestricted grant also covers the own-records-only one
+        manager |= {(*p[:3], 1) for p in manager}
+        self.assertFalse(get_granted_rights("HD Customer") - manager)
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:

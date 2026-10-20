@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { useShortcut } from "@/composables/shortcuts";
+import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useUserStore } from "@/stores/user";
 import { TicketContactSymbol, TicketSymbol } from "@/types";

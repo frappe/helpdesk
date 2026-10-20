@@ -1,36 +1,19 @@
-import { computed, reactive, ref, watch } from 'vue'
-import { call, toast, useFileUpload } from 'frappe-ui'
-import { evaluateDependsOn } from '@framework/ui/FormLayout'
-import {
-  handleLinkFieldUpdate,
-  handleSelectFieldUpdate,
-  setupCustomizations,
-} from '@helpdesk/shared/formScripts'
+import { computed, ref, watch } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
-import { isContentEmpty, parseLinkFilters } from '@helpdesk/shared/utils'
-import ApiOptionsField from '@app/components/common/ApiOptionsField.vue'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
-import { getPriority, loadTicketMeta } from '@app/stores/ticketMeta'
-import { runAction, scriptDialog } from '@app/utils'
-import { useArticleSearch } from '@app/composables/useArticleSearch'
-
-const DEFAULT_TEMPLATE = 'Default'
-const UPLOAD_FOLDER = 'Home/Helpdesk'
-const SUGGESTION_LIMIT = 3
 
 export default function setup(context) {
-  const { subject, description, guestName, guestEmail, template, newTicket, route } = context
+  const { route } = context
   const settings = useSettingsModal(context)
 
-  const searched = String(route?.query?.subject || '').trim()
-  if (searched && !subject.value) subject.value = searched
-
-  const model = reactive({})
-  const attachments = ref([])
-  const isCreating = ref(false)
-  const submittedEmail = ref('')
+  // Sent even when empty: an origin marks a portal ticket.
+  const { from, article, q } = route?.query || {}
+  const origin = { from, article, q }
+  // Subject holds 140 chars; longer would block submit.
+  const initialSubject = String(q || '').trim().slice(0, 140)
+  const draft = String(route?.query?.draft || '')
 
   watch(
     settings.config,
@@ -40,234 +23,21 @@ export default function setup(context) {
     { immediate: true },
   )
 
-  const draftToken = String(route?.query?.draft || '')
-  if (draftToken) {
-    watch(
-      settings.isGuest,
-      async (isGuest) => {
-        if (isGuest) return
-        const draft = await call('helpdesk.api.ticket.get_guest_draft', { token: draftToken }).catch(() => null)
-        context.router.replace({ query: { ...route.query, draft: undefined } })
-        if (!draft) return toast.info(__("We couldn't find your saved request. It may have expired."))
-        subject.value = draft.subject
-        description.value = draft.description
-      },
-      { immediate: true },
-    )
-  }
-
-  // The upload queue keeps only `file_url`; the server links attachments by File name.
-  const uploadedByUrl = new Map()
-
-  function uploadPrivately(file, _args, { signal, onProgress }) {
-    return useFileUpload()
-      .upload(file, {
-        private: true,
-        folder: UPLOAD_FOLDER,
-        signal,
-        onProgress: ({ loaded, total }) => onProgress(loaded, total),
-      })
-      .then((doc) => {
-        uploadedByUrl.set(doc.file_url, doc)
-        return doc
-      })
-  }
-
-  // Waits for the session: isGuest reads true until get_config answers.
-  watch(
-    settings.isGuest,
-    (isGuest) => {
-      if (isGuest) return
-      template.fetch()
-      loadTicketMeta()
-    },
-    { immediate: true },
-  )
-
   const customActions = ref([])
-  // The template's own fields, for `applyFilters` to restore once a filter is lifted.
-  let oldFields = []
-
-  // HD Form Scripts get the desk portal's context, so scripts written for it keep working.
-  watch(
-    () => template.data,
-    async (data) => {
-      if (!data) return
-      if (data.description_template && isContentEmpty(description.value)) {
-        description.value = data.description_template
-      }
-      oldFields = JSON.parse(JSON.stringify(data.fields || []))
-      // Field dependency rules compare with '' (`doc.priority != ''`), which undefined passes.
-      for (const row of data.fields || []) model[row.fieldname] ??= ''
-      await setupCustomizations(data, {
-        doc: model,
-        call: context.call,
-        router: context.router,
-        $dialog: scriptDialog,
-        applyFilters,
-      })
-      customActions.value = data._customActions || []
-    },
-    { immediate: true },
-  )
-
-  function applyFilters(fieldname: string, filters: any = null) {
-    const field = template.data.fields.find((row) => row.fieldname === fieldname)
-    if (field?.fieldtype === 'Select') handleSelectFieldUpdate(field, fieldname, filters, model, oldFields)
-    else if (field?.fieldtype === 'Link') handleLinkFieldUpdate(field, fieldname, filters, model, oldFields)
-  }
-
-  // A script's `onChange` handlers for a field, run when its value is committed.
-  function scriptListeners(row) {
-    const handlers = template.data?._customOnChange?.[row.fieldname]
-    if (!handlers) return undefined
-    return { change: (value) => handlers.forEach((handler) => handler(value, row.fieldtype)) }
-  }
-
-  const about = computed(() => template.data?.about || '')
-
-  const searchQuery = computed(() =>
-    settings.isGuest.value && !settings.isPublicKnowledgeBase.value ? '' : subject.value,
-  )
-  const suggestions = useArticleSearch(searchQuery, { limit: SUGGESTION_LIMIT })
-
-  // TextEditor has no `modelValue`, so Studio's automatic binding never fires.
-  function setDescription(html) {
-    description.value = html
-  }
-
-  function refuseGuestImages() {
-    toast.info(__('Sign in to add images'))
-    return Promise.reject(new Error('Guests cannot upload images'))
-  }
-
-  const dateFormat = computed(() => settings.config.value?.date_format?.toUpperCase())
   const timeFormat = computed(() => settings.config.value?.time_format)
-
-  // As on the desk's form, only priority shows its description.
-  const priorityHint = computed(() => getPriority(model.priority)?.description?.trim() || undefined)
-
-  // The desk's fallback when the template sets no placeholder.
-  function defaultPlaceholder(fieldtype) {
-    return ['Select', 'Link', 'Check'].includes(fieldtype) ? __('Select an option') : __('Type something')
-  }
-
-  // Site date formats reach the pickers as attrs; unset until the config arrives.
-  function uiFor(row) {
-    if (row.url_method) return { component: ApiOptionsField, props: { url: row.url_method } }
-    if (!dateFormat.value) return undefined
-    if (row.fieldtype === 'Datetime') return { props: { format: `${dateFormat.value} ${timeFormat.value}` } }
-    if (row.fieldtype === 'Date') return { props: { format: dateFormat.value } }
-  }
-
-  const fields = computed(() =>
-    (template.data?.fields || []).map((row) => ({
-      fieldname: row.fieldname,
-      fieldtype: row.fieldtype,
-      label: __(row.label),
-      options: row.options,
-      reqd: Boolean(row.required),
-      placeholder: row.placeholder || defaultPlaceholder(row.fieldtype),
-      description: row.fieldname === 'priority' ? priorityHint.value : undefined,
-      dependsOn: row.depends_on,
-      mandatoryDependsOn: row.mandatory_depends_on,
-      filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
-      readOnly: Boolean(row.disabled),
-      ui: { ...uiFor(row), on: scriptListeners(row) },
-    })),
-  )
-
-  // Fields alternate between two columns, which would stack out of order on a phone.
-  const layout = computed(() => [
-    {
-      sections: [
-        {
-          hideLabel: true,
-          hideBorder: true,
-          columns: settings.isPhone.value
-            ? [{ fields: fields.value }]
-            : [
-                { fields: fields.value.filter((_, index) => index % 2 === 0) },
-                { fields: fields.value.filter((_, index) => index % 2 === 1) },
-              ],
-        },
-      ],
-    },
-  ])
-
-  const canSubmit = computed(() => {
-    if (!subject.value || isContentEmpty(description.value)) return false
-    if (settings.isGuest.value && !guestEmail.value.trim()) return false
-    return fields.value
-      .filter((field) => evaluateDependsOn(field.dependsOn, model) && isRequired(field))
-      .every((field) => model[field.fieldname])
-  })
-
-  function isRequired(field) {
-    return field.reqd || (field.mandatoryDependsOn && evaluateDependsOn(field.mandatoryDependsOn, model))
-  }
-
-  function createTicket() {
-    if (!canSubmit.value) return
-    if (settings.isGuest.value) return createGuestTicket()
-    // The dialog's "Web link" source stores a URL without a File doc, which the server cannot link.
-    const uploaded = attachments.value.map((file) => uploadedByUrl.get(file.file_url))
-    if (uploaded.includes(undefined)) {
-      return toast.error(__('Web links cannot be attached; upload the file instead'))
-    }
-    return runAction(
-      async () => {
-        const ticket = await newTicket.submit({
-          doc: {
-            subject: subject.value,
-            description: description.value,
-            template: DEFAULT_TEMPLATE,
-            ...model,
-          },
-          attachments: uploaded,
-        })
-        navigateTo(ROUTES.ticket(ticket.name))
-      },
-      { busy: isCreating, fallback: __('Could not create the ticket') },
-    )
-  }
-
-  function createGuestTicket() {
-    return runAction(
-      async () => {
-        try {
-          await call('helpdesk.api.ticket.new_guest_ticket', {
-            subject: subject.value,
-            description: description.value,
-            email: guestEmail.value,
-            first_name: guestName.value,
-          })
-        } catch (error) {
-          if (error?.exc_type !== 'RateLimitExceededError') throw error
-          throw new Error(__("You've sent a lot of requests. Please try again in an hour, or sign in."))
-        }
-        submittedEmail.value = guestEmail.value.trim()
-      },
-      { busy: isCreating, fallback: __('Could not send your request') },
-    )
-  }
+  const submittedEmail = ref('')
 
   return {
     ...settings,
+    initialSubject,
+    origin,
+    draft,
+    timeFormat,
     customActions,
-    about,
-    suggestions,
-    fields,
-    layout,
-    model,
-    setDescription,
-    refuseGuestImages,
     submittedEmail,
     receipt: computed(() => __("Thanks, we'll be in touch at {0}.", [submittedEmail.value])),
-    canSubmit,
-    attachments,
-    uploadPrivately,
-    isCreating,
-    createTicket,
+    setActions: (actions) => (customActions.value = actions),
+    openTicket: (ticket) => navigateTo(ROUTES.ticket(ticket.name)),
+    showReceipt: (email) => (submittedEmail.value = email),
   }
 }

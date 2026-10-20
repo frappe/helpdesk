@@ -1,81 +1,101 @@
 import { computed, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
-import { call, dayjs, toast } from 'frappe-ui'
+import { call, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
+import { addHeadingIds, copyPageLink, countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
-import { useSettingsModal } from '@app/stores/settings'
-import { useKbHeader } from '@app/composables/useKbHeader'
-import { countLabel, DATE_FORMATS, runAction } from '@app/utils'
+import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
+import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
 import { useDrawer } from '@app/composables/useDrawer'
+import { articleName, prefetchOnHover, useArticle, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
-const WORDS_PER_MINUTE = 200
-const RELATED_LIMIT = 6
+const RELATED_LIMIT = 5
 
 export default function setup(context) {
-  // `article` is absent on the builder canvas, where the route has no name.
-  const { article, articles } = context
-  const settings = useSettingsModal(context)
+  const { route, router } = context
+  const article = useArticle(() => articleName(route?.params?.name))
+  const { sidebar } = useKnowledgeBase()
+  const settings = useKnowledgeBaseHeader(context)
 
   const parsed = computed(() => {
-    const dom = new DOMParser().parseFromString(article?.data?.content || '', 'text/html')
-    const toc = Array.from(dom.querySelectorAll('h1, h2, h3')).map((heading, index) => {
-      heading.id = `section-${index}`
-      return { id: heading.id, text: heading.textContent.trim(), level: Number(heading.tagName[1]) }
-    })
-    const words = dom.body.textContent.trim().split(/\s+/).filter(Boolean).length
-    const image = dom.querySelector('img')?.getAttribute('src') || null
-    return { html: dom.body.innerHTML, toc, words, image }
+    const { html, headings } = addHeadingIds(article.data?.content)
+    return { html, toc: headings.filter((heading) => heading.level <= 3) }
   })
-  const minutes = computed(() => Math.max(1, Math.round(parsed.value.words / WORDS_PER_MINUTE)))
-  const readingTime = computed(() => countLabel(minutes.value, __('1 minute to read'), __('{0} minutes to read')))
+  const minutes = computed(() => article.data?.minutes)
+  const readingTime = computed(() =>
+    minutes.value ? countLabel(minutes.value, __('1 minute to read'), __('{0} minutes to read')) : '',
+  )
 
   const publishedOn = computed(() => {
-    const date = article?.data?.published_on
-    return date ? dayjs(date).format(DATE_FORMATS.short) : ''
+    const date = article.data?.published_on
+    return date ? dayjsLocal(date).format(DATE_FORMATS.short) : ''
   })
 
   const isPublicArticle = computed(
-    () => article?.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
+    () => article.data?.visibility === 'Public' && settings.isPublicKnowledgeBase.value,
   )
 
   const relatedArticles = computed(() =>
-    (articles.data || [])
-      .filter((row) => row.category === article?.data?.category && row.name !== article.data.name)
+    (sidebar.data?.find((category) => category.name === article.data?.category)?.articles || [])
+      .filter((row) => row.name !== article.data.name)
       .slice(0, RELATED_LIMIT),
   )
 
-  // `get_public_article` answers with the reader's own vote: '1' like, '2' dislike, '0' none.
-  function submitFeedback(value) {
-    return runAction(
-      async () => {
-        await call('helpdesk.api.knowledge_base.vote_on_article', { article: article.data.name, value })
-        article.data.feedback = value
-      },
-      { success: __('Thanks for your feedback!'), fallback: __('Could not submit feedback') },
+  // Pre-slug links carry the bare name.
+  function isCurrentArticle(routeName) {
+    const name = article.data?.name
+    return Boolean(name) && (routeName === name || routeName?.startsWith(`${name}-`))
+  }
+
+  function scrollToHash(tries = 40) {
+    const heading = findHeading(decodeURIComponent(location.hash.slice(1)))
+    if (heading) heading.scrollIntoView()
+    else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
+  }
+
+  // Old desk KB ids kept edge dashes: "What's new?" was `what-s-new-`.
+  function findHeading(id) {
+    return (
+      document.getElementById(id) ||
+      [...document.querySelectorAll('h2, h3, h4, h5, h6')].find(
+        (heading) => heading.textContent.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() === id,
+      )
     )
   }
 
-  // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
-  const { copy } = useClipboard({ legacy: true })
-  async function copyLink() {
-    await copy(window.location.href)
-    toast.success(__('Link copied'))
+  // The reader's own feedback: 1 like, 2 dislike, 0 none.
+  function submitFeedback(answer) {
+    const { name, feedback } = article.data
+    return saveArticleFeedback(name, feedback, answer, (value) => (article.data.feedback = value))
   }
 
-  // Counted here, not on read: the endpoint is rate limited per article and reader.
+  // Replacing while the navigation is pending would cancel it.
+  watch(
+    () => [article.data?.name, router.currentRoute.value.path],
+    ([name, current]) => {
+      if (!name || !isCurrentArticle(router.currentRoute.value.params.name)) return
+      // Resolved, so slugs compare in the router's own encoding.
+      const path = router.resolve(ROUTES.article(article.data)).path
+      if (current !== path) router.replace({ path, hash: location.hash })
+    },
+    { immediate: true },
+  )
+
+  // The endpoint counts a reader once per article an hour.
   const { rememberArticle } = useRecent()
   watch(
-    () => article?.data?.name,
+    () => article.data?.name,
     (name) => {
       if (!name) return
-      // The article scrolls in its own panel, which keeps its place from one article to the next.
-      if (!location.hash) document.querySelector('[data-component-id="container-gi1caqqm1"]')?.scrollTo({ top: 0 })
+      // Own scroll panel keeps its place; the hash target renders after fetch.
+      if (location.hash) scrollToHash()
+      else document.querySelector('[data-component-id="container-gi1caqqm1"]')?.scrollTo({ top: 0 })
       call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {})
       rememberArticle({
         name,
         title: article.data.title,
+        title_slug: article.data.title_slug,
         categoryName: article.data.category_name,
-        image: parsed.value.image,
         minutes: minutes.value,
       })
     },
@@ -84,14 +104,17 @@ export default function setup(context) {
 
   return {
     ...settings,
-    ...useKbHeader(context),
-    drawer: useDrawer(context.route),
+    drawer: useDrawer(route),
+    sidebar,
+    article,
+    prefetchOnHover,
     parsed,
     readingTime,
     publishedOn,
     relatedArticles,
     submitFeedback,
-    copyLink,
+    copyPageLink,
     isPublicArticle,
+    isCurrentArticle,
   }
 }

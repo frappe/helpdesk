@@ -1,55 +1,22 @@
 import { toast } from "frappe-ui";
 import { h, isVNode, type Component } from "vue";
+import StoredIcon from "./Icon.vue";
 import { __ } from "./translation";
-
-// HD Form Script runtime, shared by the desk and the Studio portal.
 
 type ToastType = "success" | "error" | "warning" | "info";
 
-let spriteLoad: Promise<unknown> | undefined;
-
-// Scripts name any lucide icon, so it comes from frappe-ui's sprite: the desk
-// installs it at boot, the portal fetches it the first time a script asks.
-export function ScriptIcon({ icon }: { icon: string }) {
-  if (!document.getElementById("lucide-sprite")) {
-    spriteLoad ??= import("frappe-ui/experimental").then(({ spritePlugin }) =>
-      spritePlugin.install()
-    );
-  }
-  return h(
-    "svg",
-    {
-      class: "size-4",
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      "stroke-width": 1.5,
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      "aria-hidden": "true",
-    },
-    [h("use", { href: `#${icon.replace("lucide-", "")}` })]
-  );
-}
-
-// vue-sonner renders the icon through `<component :is>`, so the three shapes
-// beta.24's toast.create took have to arrive as components.
+// vue-sonner renders icons via `<component :is>`.
 function resolveIcon(icon: unknown): Component | undefined {
   if (icon == null) return undefined;
   if (typeof icon === "string") {
-    // Anything but an icon name, such as an emoji, shows as text.
-    if (!/^[\w-]+$/.test(icon)) return () => h("span", icon);
-    return () => h(ScriptIcon, { icon });
+    return () => h(StoredIcon, { icon, class: "size-4" });
   }
   if (isVNode(icon)) return () => icon;
   return icon as Component;
 }
 
-/**
- * `toast.create({ message, ... })` shape kept alive for customer-written form
- * scripts. frappe-ui v1 dropped `toast.create` for `toast(message, options)`.
- */
-export function createToast({
+// Shim for pre-v1 `toast.create({ message })` in form scripts.
+function createToast({
   message,
   type,
   icon,
@@ -85,7 +52,7 @@ export async function setupCustomizations(doc, obj) {
   let links = [];
   let onChangeFieldMap = {};
   for (const script of scripts) {
-    const parsed = await parseScript(script, obj);
+    const parsed = await parseScript(script, { toast, createToast, ...obj });
     actions = actions.concat(parsed.actions);
     links = links.concat(parsed.links);
     if (parsed.onChange) {
@@ -99,8 +66,7 @@ export async function setupCustomizations(doc, obj) {
   }
 }
 
-// Form scripts written before frappe-ui v1 name a group's children `items`,
-// which the menu no longer reads, so the whole group goes missing.
+// Pre-v1 scripts name a group's children `items`.
 function withLegacyGroupOptions(actions: any[]) {
   return actions.map((action) =>
     action.items && !action.options
@@ -118,7 +84,6 @@ function parseOnChangeFn(fieldMap: object, currentField: object) {
   }
 }
 
-// A broken script is skipped, so the page and the other scripts still work.
 async function parseScript(script, obj) {
   try {
     const scriptFn = new Function(script + "\nreturn setupForm")();
@@ -135,7 +100,7 @@ async function parseScript(script, obj) {
   }
 }
 
-export function handleSelectFieldUpdate(
+function handleSelectFieldUpdate(
   f: any,
   fieldname: string,
   filters: any,
@@ -153,7 +118,7 @@ export function handleSelectFieldUpdate(
   doc[fieldname] = "";
 }
 
-export function handleLinkFieldUpdate(
+function handleLinkFieldUpdate(
   f: any,
   fieldname: string,
   filters: any,
@@ -170,4 +135,33 @@ export function handleLinkFieldUpdate(
 
   // reset dependent field
   doc[fieldname] = "";
+}
+
+// Backs form scripts' `applyFilters(fieldname, values)`.
+export function applyFieldFilters(
+  fields: any[],
+  fieldname: string,
+  filters: any,
+  doc: any,
+  oldFields: any[]
+) {
+  const f = fields.find((f) => f.fieldname === fieldname);
+  if (f?.fieldtype === "Select") {
+    handleSelectFieldUpdate(f, fieldname, filters, doc, oldFields);
+  } else if (f?.fieldtype === "Link") {
+    handleLinkFieldUpdate(f, fieldname, filters, doc, oldFields);
+  }
+}
+
+// Callable context so form scripts written for `onClick(close)` keep working
+// alongside frappe-ui v1's `onClick({ close })`.
+export function withLegacyCloseContext(actions) {
+  return actions?.map((action) =>
+    action.onClick
+      ? {
+          ...action,
+          onClick: ({ close }) => action.onClick(Object.assign(() => close(), { close })),
+        }
+      : action
+  );
 }

@@ -1,65 +1,94 @@
 <template>
-  <div v-if="draft" class="flex flex-col">
-    <div class="flex flex-col gap-6">
-      <div
-        v-for="toggle in toggles"
-        :key="toggle.fieldname"
-        class="flex items-center justify-between"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">
-            {{ toggle.label }}
-          </span>
-          <span class="text-p-sm text-ink-gray-6">
-            {{ toggle.description }}
-          </span>
+  <Transition
+    enter-from-class="opacity-0"
+    enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
+  >
+    <div v-if="draft" class="space-y-11">
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">{{ __("Access") }}</h2>
+        <div class="mt-2 divide-y divide-outline-gray-1">
+          <SettingsRow
+            v-for="toggle in accessToggles"
+            :key="toggle.fieldname"
+            :title="toggle.label"
+            :description="toggle.description"
+          >
+            <Switch
+              :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+              @update:model-value="
+                (value) => setToggle(toggle.fieldname, value)
+              "
+            />
+          </SettingsRow>
         </div>
-        <Switch v-model="draft[toggle.fieldname]" />
-      </div>
-      <div class="flex items-center justify-between gap-6">
-        <div class="flex flex-col gap-1">
-          <span class="text-base-medium text-ink-gray-8">
-            {{ __("Pinned categories") }}
-          </span>
-          <span class="text-p-sm text-ink-gray-6">
-            {{
+      </section>
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">
+          {{ __("Customize home page") }}
+        </h2>
+        <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
+          <PinnedCategories
+            :pinned="draft.pinned"
+            :categories="categoryOptions"
+            :save="savePins"
+          />
+          <BannerPicker
+            :image="draft.banner_image"
+            :preset="draft.banner_preset"
+            @change="(value) => Object.assign(draft, value)"
+          />
+        </div>
+      </section>
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">{{ __("Header") }}</h2>
+        <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
+          <!-- Stored inverted so unset (existing sites) means shown. -->
+          <SettingsRow
+            :title="__('Show Raise a ticket button')"
+            :description="
               __(
-                "Select the categories you want on your knowledge base home page. Leave empty or select all to show all of them."
+                'Logged-in customers will see a Raise a ticket button in the knowledge base header.'
               )
-            }}
-          </span>
+            "
+          >
+            <Switch
+              :model-value="!settings.doc?.hide_raise_ticket_button"
+              @update:model-value="
+                (show) => setToggle('hide_raise_ticket_button', !show)
+              "
+            />
+          </SettingsRow>
+          <HeaderLinks v-model="draft.links" />
         </div>
-        <MultiSelect
-          v-model="draft.pinned"
-          class="w-48 shrink-0"
-          :options="categoryOptions"
-          :placeholder="__('All categories')"
-        />
-      </div>
+      </section>
     </div>
-    <BannerPicker
-      class="mt-8"
-      :image="draft.banner_image"
-      :preset="draft.banner_preset"
-      @change="(value) => Object.assign(draft, value)"
+    <SettingsFormSkeleton
+      v-else
+      :sections="[
+        { title: __('Access'), rows: accessToggles.length },
+        { title: __('Customize home page'), panels: [50, 180] },
+        { title: __('Header'), rows: 1, panels: [96] },
+      ]"
     />
-    <HeaderLinks v-model="draft.links" class="mt-8" />
-  </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { MultiSelect, Switch } from "frappe-ui";
+import { SettingsRow, Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
+import PinnedCategories from "./PinnedCategories.vue";
+import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
-// Changes wait for the host's Save button; see knowledgeBaseDraft.ts.
-const { draft, categoryOptions } = useKnowledgeBaseDraft();
+// Switches and pins save at once; the rest waits for Save.
+const { draft, settings, setToggle, savePins, categoryOptions } =
+  useKnowledgeBaseDraft();
 
 // computed, so labels follow a translation load
-const toggles = computed(
+const accessToggles = computed(
   () =>
     [
       {

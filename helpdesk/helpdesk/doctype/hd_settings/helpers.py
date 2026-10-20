@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import get_datetime
 
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT
+
 
 def is_email_content_empty(content: str | None) -> bool:
     return content is None or content.strip() == ""
@@ -140,3 +142,50 @@ def get_rendered_banner_msg(ticket_id):
     return {
         "banner_msg": rendered,
     }
+
+
+KNOWLEDGE_BASE_HOME = CUSTOMER_PORTAL_ROOT
+TICKETS_HOME = f"{CUSTOMER_PORTAL_ROOT}/my-tickets"
+CUSTOMER_HOME_PAGES = [KNOWLEDGE_BASE_HOME, TICKETS_HOME]
+
+
+def get_customer_home_page() -> str:
+    if frappe.db.get_single_value("HD Settings", "prefer_knowledge_base"):
+        return KNOWLEDGE_BASE_HOME
+    return TICKETS_HOME
+
+
+def set_customer_home_page(replace: list[str]) -> None:
+    """Keeps hand-set home pages. Roles only: the portal default is also agents' home."""
+    from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+
+    home_page = get_customer_home_page()
+    frappe.db.set_value(
+        "Role",
+        {"name": ["in", CUSTOMER_ROLES], "home_page": ["in", replace]},
+        "home_page",
+        home_page,
+    )
+    # frappe caches each user's home page
+    frappe.cache.delete_value("home_page")
+
+
+def sync_brand_to_website_settings(settings) -> None:
+    """Site-wide: framework emails, login page and desk read the brand from Website Settings."""
+    logo_changed = settings.has_value_changed("brand_logo")
+    name_changed = settings.has_value_changed("brand_name") and settings.brand_name
+    if logo_changed:
+        frappe.db.set_single_value(
+            "Website Settings", "app_logo", settings.brand_logo or ""
+        )
+    if name_changed:
+        set_site_brand_name(settings.brand_name)
+    if logo_changed or name_changed:
+        # set_single_value skips Website Settings' on_update, which clears the boot cache
+        frappe.clear_cache()
+
+
+def set_site_brand_name(brand_name: str) -> None:
+    frappe.db.set_single_value("Website Settings", "app_name", brand_name)
+    # Display name in framework emails, e.g. the welcome mail "Welcome to <name>".
+    frappe.db.set_default("site_name", brand_name)

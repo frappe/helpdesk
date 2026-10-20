@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -5,15 +6,17 @@ from unittest.mock import MagicMock, patch
 import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
+from frappe.permissions import rights
 from frappe.tests.classes.context_managers import freeze_time
-from frappe.utils import add_to_date, getdate
+from frappe.utils import add_to_date, getdate, now_datetime
 
 from helpdesk.api.banners import BANNERS, dismiss_banner
+from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.api.ticket import new_guest_ticket
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
-from helpdesk.utils import get_customers, is_frappe_version
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -375,20 +378,36 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
-def enable_public_knowledge_base():
-    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+def category_row(name: str, with_creators: bool = False) -> frappe._dict:
+    from helpdesk.api.knowledge_base import _get_categories
+
+    return next(row for row in _get_categories(with_creators) if row.name == name)
 
 
-def disable_public_knowledge_base():
-    frappe.db.set_single_value("HD Settings", "public_knowledge_base", 0)
+def category_names() -> list[str]:
+    from helpdesk.api.knowledge_base import get_categories
+
+    return [row.name for row in get_categories()]
 
 
-def enable_anonymous_article_voting():
-    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+def use_test_index(case, search_class, db_name: str, *modules):
+    """Swaps each module's `search_class` for a throwaway index."""
+    search = search_class(db_name=db_name)
+    search.drop_index()
+    case.addCleanup(search.drop_index)
+    for module in modules:
+        case.enterContext(
+            patch.object(
+                module, search_class.__name__, lambda: search_class(db_name=db_name)
+            )
+        )
+    return search
 
 
-def disable_anonymous_article_voting():
-    frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 0)
+def is_outside_hours_banner_shown(ticket_name: str) -> bool:
+    from helpdesk.helpdesk.doctype.hd_ticket.api import get_outside_hours_banner
+
+    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))["show"]
 
 
 def create_agent(
@@ -691,11 +710,22 @@ def create_contact(name, email, user=True, role="HD Customer"):
     return result
 
 
-def create_customer(name, contacts=[]):
+def make_contact(prefix: str = "customer") -> dict:
+    email = unique_email(prefix)
+    return create_contact(email.split("@")[0], email)
+
+
+def create_customer(name, contacts=[], primary_contact=None):
     if frappe.db.exists("HD Customer", name):
         frappe.delete_doc("HD Customer", name, force=True)
 
-    customer = frappe.get_doc({"doctype": "HD Customer", "customer_name": name})
+    customer = frappe.get_doc(
+        {
+            "doctype": "HD Customer",
+            "customer_name": name,
+            "primary_contact": primary_contact,
+        }
+    )
 
     for c in contacts:
         customer.append("contacts", c)
@@ -714,6 +744,37 @@ def create_user(email: str):
     ).insert(ignore_permissions=True)
 
 
+def make_organization(label: str) -> tuple:
+    """Returns `(customer, owner, manager, member)`."""
+    prefix = label.lower().replace(" ", "-")
+    owner, manager, member = (
+        create_contact(f"{label} {role}", unique_email(f"{prefix}-{role.lower()}"))
+        for role in ("Owner", "Manager", "Member")
+    )
+    customer = create_customer(
+        unique_name(f"Test {label}"),
+        [
+            {"contact_name": owner["contact"]},
+            {"contact_name": manager["contact"], "is_manager": 1},
+            {"contact_name": member["contact"]},
+        ],
+        primary_contact=owner["contact"],
+    )
+    return customer, owner, manager, member
+
+
+def make_invitation(email: str, customer: str, contact: str | None = None):
+    return frappe.get_doc(
+        doctype="User Invitation",
+        email=email,
+        roles=[{"role": "HD Customer"}],
+        app_name="helpdesk",
+        redirect_to_path=CUSTOMER_PORTAL_ROOT,
+        customer=customer,
+        contact=contact,
+    ).insert(ignore_permissions=True)
+
+
 def get_invitation(email: str):
     """Return the helpdesk User Invitation raised for an email, if any."""
     return frappe.db.get_value(
@@ -725,8 +786,7 @@ def get_invitation(email: str):
 
 
 def get_organization_members(customer: str) -> dict:
-    """The portal's member rows for a customer, keyed by contact name."""
-    from helpdesk.api.organization import get_organization
+    from helpdesk.api.customer import get_organization
 
     return {
         member["contact"]: member
@@ -736,22 +796,16 @@ def get_organization_members(customer: str) -> dict:
 
 
 def get_organization_card(customer: str) -> dict:
-    """The portal's card for one of the session user's organizations."""
-    from helpdesk.api.organization import get_settings
+    from helpdesk.api.customer import get_portal_account
 
     return next(
-        org for org in get_settings()["organizations"] if org["name"] == customer
+        organization
+        for organization in get_portal_account()["organizations"]
+        if organization["name"] == customer
     )
 
 
-def get_invitable_emails(customer: str) -> list[str]:
-    from helpdesk.api.organization import get_invitable_contacts
-
-    return [row["email"] for row in get_invitable_contacts(customer)]
-
-
 def delete_invitations(email: str) -> None:
-    """Remove every helpdesk invitation raised for an email, whoever the session user is."""
     frappe.set_user("Administrator")
     names = frappe.get_all(
         "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
@@ -922,9 +976,10 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    visibility: str | None = "Public",
     **values,
 ) -> str:
-    """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    """Public by default; `visibility=None` keeps the field's default."""
     title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
@@ -934,6 +989,7 @@ def make_article(
                 "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                "visibility": visibility,
                 **values,
             }
         )
@@ -1076,6 +1132,16 @@ def get_user_roles(user: str) -> list[str]:
     )
 
 
+def get_granted_rights(role: str) -> set[tuple]:
+    """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
+    perms = frappe.get_all(
+        "DocPerm", {"role": role}, ["parent", "permlevel", "if_owner", *rights]
+    )
+    return {
+        (p.parent, p.permlevel, r, p.if_owner) for p in perms for r in rights if p[r]
+    }
+
+
 def show_only_banners(*banners: str):
     """Turn on exactly `banners` in HD Settings and turn every other banner off."""
     for banner, flag in BANNERS.items():
@@ -1092,6 +1158,37 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }
+
+
+def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
+    """A ticket that has been responded to and is assigned to `agent`, so dashboard
+    queries filtered by that agent only see the tickets a test creates."""
+    ticket = make_ticket(subject=subject)
+    ticket.reload()
+    ticket.first_responded_on = now_datetime()
+    if status:
+        ticket.status = status
+    ticket.save()
+    frappe.db.set_value("HD Ticket", ticket.name, "_assign", json.dumps([agent]))
+    return ticket
+
+
+def get_number_cards(agent: str, from_date: str, to_date: str) -> dict[str, dict]:
+    """dashboard number cards for tickets assigned to `agent`, keyed by title"""
+    filters = frappe._dict(from_date=from_date, to_date=to_date, agent=agent)
+    cards = HelpdeskDashboard(filters).get_number_card_data()
+    return {card["title"]: card for card in cards}
 
 
 def submit_guest_form(case, email: str, **values) -> None:

@@ -15,24 +15,25 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_ms
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
+TIMELINE_FIELDS = ("status",)
+
 
 @frappe.whitelist()
 # flake8: noqa
-def new(doc: dict, attachments: list[dict] = []):
+def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
-    d = frappe.get_doc(doc).insert()
+    d = frappe.get_doc(doc)
+    # only the portal sends an origin
+    d.flags.ticket_origin = origin
+    d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
-
-
-TIMELINE_FIELDS = ("status",)
 
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status changes, oldest first, with who made them: readers of a ticket can't read Version."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",
@@ -65,6 +66,10 @@ def get_one(name: str):
     fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
+    # desk's getdoc does this; without it the portal list stays bold
+    doc.add_seen()
+    outside_hours_banner = get_outside_hours_banner(doc)
+    overdue_by = doc.get_overdue_by()
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
     ticket = fields.strip_hidden_fields(doc.as_dict())
@@ -88,7 +93,21 @@ def get_one(name: str):
     return {
         **ticket,
         "communications": get_communications(name),
+        # when, not who: customers can't read assignees; cancelled rows count
+        "assigned_on": frappe.db.get_value(
+            "ToDo",
+            {"reference_type": "HD Ticket", "reference_name": name},
+            "creation",
+            order_by="creation asc",
+        ),
         "contact": contact,
+        # `customer` is already readable here; customers can't read HD Customer
+        "customer_image": ticket.get("customer")
+        and frappe.db.get_value("HD Customer", ticket.customer, "image"),
+        "outside_hours_banner": outside_hours_banner,
+        "overdue_by": overdue_by,
+        # validate_feedback's rule for when closing needs a rating
+        "has_agent_replied": bool(doc.has_agent_replied),
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=not fields.is_agent
@@ -141,9 +160,20 @@ def get_communications(ticket: str):
         .run(as_dict=True)
     )
     for c in communications:
+        c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
+    authors = {c.author_id for c in communications if c.author_id}
+    agents = {author for author in authors if is_agent(author)}
+    viewer_is_agent = is_agent()
+    for c in communications:
+        if not viewer_is_agent:
+            # portal never shows recipients, so don't send them
+            c.pop("recipients")
+            c.pop("cc")
+            c.pop("bcc")
         c.attachments = get_attachments("Communication", c.name)
-        user_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
-        c.user = get_user_info_for_avatar(user_id)
+        c.user = get_user_info_for_avatar(c.author_id)
+        # by author role: agents may reply from the portal
+        c.is_agent = c.pop("author_id") in agents
     return communications
 
 
@@ -630,22 +660,20 @@ def show_banner_next_day(ticket):
     return next_start is None or now_datetime() <= next_start
 
 
-@frappe.whitelist()
-def show_outside_hours_banner(ticket_name: str):
+def get_outside_hours_banner(ticket) -> dict:
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"
     )
     if not show_banner_settings:
         return {"show": False}
 
-    ticket = frappe.get_doc("HD Ticket", ticket_name)
     is_currently_outside = (
         ticket.is_currently_outside_working_hours()
         and ticket.raised_outside_working_hours
         and show_banner_next_day(ticket)
     )
     if is_currently_outside and not ticket.has_agent_replied:
-        banner_data = get_rendered_banner_msg(ticket_name)
+        banner_data = get_rendered_banner_msg(ticket.name)
 
         return {"msg": banner_data.get("banner_msg"), "show": True}
 

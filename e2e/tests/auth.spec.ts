@@ -13,7 +13,7 @@ test.describe("logged out", () => {
     await page.getByRole("button", { name: "Continue" }).click();
 
     await expect(page).toHaveURL(/\/helpdesk\/tickets$/);
-    await expect(page.getByRole("button", { name: "Filter" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: /^Helpdesk / }).click();
     await page.getByRole("menuitem", { name: "Log out" }).click();
@@ -35,10 +35,10 @@ test.describe("customer", () => {
 
   test("lands on the portal and is kept out of agent routes", async ({ page, ticket }) => {
     await page.goto("/helpdesk");
-    await expect(page).toHaveURL(/\/helpdesk\/my-tickets$/);
+    await expect(page).toHaveURL(/\/help\/?$/);
     await expect(page.getByRole("button", { name: "Customers" })).toHaveCount(0);
 
     await page.goto(`/helpdesk/tickets/${ticket.name}`);
-    await expect(page).toHaveURL(new RegExp(`/helpdesk/my-tickets/${ticket.name}$`));
+    await expect(page).toHaveURL(new RegExp(`/help/tickets/${ticket.name}$`));
   });
 });

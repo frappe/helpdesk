@@ -6,16 +6,16 @@ import {
   datetimeCell, idCell, priorityCell, ratingCell,
   resolutionCell, responseCell, statusCell, subjectCell, textCell,
 } from '@app/components/list/ticketCells'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { useViews } from '@app/stores/views'
 
-// HD Ticket's permission_query already scopes the rows to what the requester may see.
+// permission_query scopes rows to what the requester may see.
 const DOCTYPE = 'HD Ticket'
 const PAGE_LENGTH_OPTIONS = [20, 50, 100]
 
-// A function, so headings follow a language change; literal `__()` calls, so they extract.
+// A function so labels follow language; literal `__()` so they extract.
 function columnLabels() {
   return {
     name: __('ID'),
@@ -37,22 +37,16 @@ const DEFAULT_COLUMNS = [
   { fieldname: 'name', width: 'auto' },
   { fieldname: 'subject', width: '25rem' },
   { fieldname: 'status', width: '8rem' },
+  { fieldname: 'priority', width: '10rem' },
   { fieldname: 'response_by', width: '8rem' },
   { fieldname: 'resolution_by', width: '8rem' },
-  { fieldname: 'customer', width: '8rem' },
-  { fieldname: 'priority', width: '10rem' },
-  { fieldname: 'ticket_type', width: '11rem' },
-  { fieldname: 'agent_group', width: '10rem' },
-  { fieldname: 'contact', width: '8rem' },
-  { fieldname: 'feedback_rating', width: '10rem' },
   { fieldname: 'creation', width: '8rem' },
 ]
 
-// Always fetched: the phone rows, SLA badges and unread subjects read them whatever the columns.
-const PHONE_FIELDS = ['subject', 'creation', 'status', 'name']
-const SUPPORT_FIELDS = ['first_responded_on', 'resolution_date', '_seen', ...PHONE_FIELDS]
+// Always fetched: phone rows, SLA badges and unread state need them.
+const SUPPORT_FIELDS = ['sla', 'first_responded_on', 'resolution_date', '_seen']
 
-// `creation`/`modified` are keyed, not left to the type fallback: neither is a docfield.
+// Neither is a docfield, so no type fallback.
 const CELLS = {
   name: idCell,
   status: statusCell,
@@ -81,7 +75,7 @@ function withLabel(column) {
 
 export default function setup(context) {
   const settings = useSettingsModal(context)
-  settings.loadSettings()
+  settings.ensureSettings()
 
   // Seeded before `useListData`, which fetches on creation.
   const view = useListView(DOCTYPE)
@@ -105,9 +99,12 @@ export default function setup(context) {
   const data = useListData(DOCTYPE, fetchView)
 
   const listColumns = computed(() =>
-    settings.isPhone.value
-      ? PHONE_FIELDS.map((key) => ({ key, cell: cellFor({ key }) }))
-      : view.columns.wire.value.map((column) => ({ ...column, cell: cellFor(column) })),
+    view.columns.wire.value.map((column) => ({
+      ...column,
+      // Added columns arrive as `fr`, which breaks the `auto` ID column.
+      width: typeof column.width === 'number' ? '10rem' : column.width,
+      cell: cellFor(column),
+    })),
   )
 
   function cellFor(column) {
@@ -123,6 +120,21 @@ export default function setup(context) {
       ? __('No tickets match the applied filters. Try adjusting or clearing them.')
       : __('Tickets you raise will show up here.'),
   }))
+
+  // get_list's permission query limits the export to readable tickets.
+  function exportTickets({ exportType, names }) {
+    const filters = names ? [...view.filters.wire.value, ['name', 'in', names]] : view.filters.wire.value
+    const params = new URLSearchParams({
+      doctype: DOCTYPE,
+      title: DOCTYPE,
+      file_format_type: exportType,
+      fields: JSON.stringify(view.columns.wire.value.map((column) => column.key)),
+      filters: JSON.stringify(filters),
+      order_by: view.sort.orderBy.value || 'creation desc',
+      view: 'Report',
+    })
+    window.location.href = `/api/method/frappe.desk.reportview.export_query?${params}`
+  }
 
   function openTicket(row) {
     navigateTo(ROUTES.ticket(row.name))
@@ -143,7 +155,7 @@ export default function setup(context) {
       : others
   }
 
-  // `equals` too, so a condition set from the Filter panel is still reflected.
+  // `equals` too, for conditions set from the Filter panel.
   function isCustomerCondition(condition) {
     return (
       condition.fieldname === 'customer' &&
@@ -158,7 +170,7 @@ export default function setup(context) {
     auto: true,
   })
 
-  // Customer arrives as a quick filter, but the switcher is that filter here.
+  // The organization switcher replaces the customer quick filter.
   const quickFilterFields = computed({
     get: () => view.quickFilter.fields.value.filter((field) => field.fieldname !== 'customer'),
     set: (fields) => (view.quickFilter.fields.value = fields),
@@ -178,9 +190,10 @@ export default function setup(context) {
     listColumns,
     emptyState,
     openTicket,
+    exportTickets,
     pageActionLabel: computed(() => (settings.canCreateTicket.value ? __('Raise a ticket') : '')),
     pageActionIcon: 'lucide-plus',
-    onPageAction: () => navigateTo(ROUTES.newTicket),
+    onPageAction: () => navigateTo(ROUTES.newTicket({ from: 'ticket-list' })),
     rows: data.rows,
     listLoading: data.loading,
     rowCount: data.rowCount,

@@ -1,9 +1,10 @@
 import type { Locator, Page } from "@playwright/test";
-import type { Api } from "../helpers/api";
+import { runScheduledJob, type Api } from "../helpers/api";
 import { raiseTicket } from "../helpers/factories";
 import { expect, test, uid, usePersona } from "../helpers/fixtures";
 import { TicketList } from "../helpers/list";
-import { personas } from "../helpers/personas";
+import { type PersonaKey, personas } from "../helpers/personas";
+import { addComment } from "../helpers/ticket";
 
 usePersona("agent2");
 
@@ -66,7 +67,7 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   const request = page.waitForRequest(
     (request) =>
       request.url().includes("get_dashboard_data") &&
-      request.postData()!.includes(daysAgo(7))
+      request.postData()!.includes(daysAgo(6))
   );
   await page.getByRole("menuitem", { name: "Last 7 Days" }).click();
   await request;
@@ -87,6 +88,31 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   await expect(page.getByText(/^\w{3} \d+ to \w{3} \d+$/)).toBeVisible();
 });
 
+test.describe("dashboard charts", () => {
+  usePersona("manager");
+
+  test("number cards show this period and every chart draws", async ({ page, ticket }) => {
+    expect(ticket.name).toBeTruthy();
+    await page.goto("/helpdesk/dashboard");
+    const cards = page
+      .locator("div", { has: page.getByText("% SLA Fulfilled", { exact: true }) })
+      .filter({ has: page.getByText("Avg. Resolution", { exact: true }) })
+      .last();
+    const tickets = cards
+      .getByText("Tickets", { exact: true })
+      .locator("xpath=ancestor::div[contains(@class, 'flex-col')][1]");
+    await expect(tickets).toContainText(/Tickets\s*\d+/);
+    const chart = page.locator("[_echarts_instance_]");
+    for (const title of ["Ticket Trend", "Tickets by Team", "Tickets by Priority"]) {
+      const card = page
+        .locator("div", { has: page.getByText(title, { exact: true }) })
+        .filter({ has: chart })
+        .last();
+      await expect(card.locator("[_echarts_instance_] svg")).toBeVisible();
+    }
+  });
+});
+
 test("the command palette finds a ticket and opens it", async ({ page, api, apiAs }) => {
   const token = `palette${uid()}`;
   const ticket = await raiseTicket(await apiAs("customer"), `${token} subject`);
@@ -99,6 +125,17 @@ test("the command palette finds a ticket and opens it", async ({ page, api, apiA
   await palette.getByRole("combobox").fill(token);
   await palette.getByRole("option", { name: new RegExp(`${token} subject`) }).click();
   await expect(page).toHaveURL(new RegExp(`/helpdesk/tickets/${ticket.name}`));
+});
+
+test("the command palette does not open over the settings dialog", async ({ page }) => {
+  await new TicketList(page).goto();
+  await page.keyboard.press("Control+,");
+  const settings = page.getByRole("dialog");
+  await expect(settings).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  await expect(page.getByRole("dialog", { name: "Command Palette" })).toBeHidden();
+  await expect(settings).toBeVisible();
 });
 
 test("search finds a ticket by text that is only in a comment", async ({
@@ -157,6 +194,64 @@ test("a notification opens its ticket and mark all as read clears it", async ({
   await expect.poll(async () => (await log(second))[0].read).toBe(1);
 });
 
+test("notification filters narrow the feed by read state and category and reset on close", async ({
+  page,
+  api,
+  apiAs,
+}) => {
+  const { read, unread, note } = await seedFilterNotifications(api, apiAs);
+
+  await page.goto("/helpdesk/tickets");
+  const bell = page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: "Notifications" });
+  const panel = page.locator(".notifications-panel");
+  // the open menu makes the page aria-hidden, so reach the trigger by CSS
+  const categories = panel.locator("button", { hasText: /categories|Mentions/ });
+  await bell.click();
+  await expect(panel.getByText(read.subject)).toBeVisible();
+
+  await panel.getByRole("radio", { name: "Unread" }).click();
+  await expect(panel.getByText(read.subject)).toHaveCount(0);
+  await expect(panel.getByText(unread.subject)).toBeVisible();
+
+  // clicking the trigger again closes only the menu, not the panel
+  await categories.click();
+  await categories.click({ force: true });
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  await expect(panel).toBeVisible();
+
+  await categories.click();
+  await page.getByRole("menuitem", { name: "Mentions" }).click();
+  await expect(panel.getByText(note)).toBeVisible();
+  await expect(panel.getByText(unread.subject)).toHaveCount(0);
+
+  await panel.getByRole("button", { name: "Close" }).click();
+  await bell.click();
+  await expect(categories).toHaveText("All categories");
+  await expect(panel.getByRole("radio", { name: "All" })).toHaveAttribute("aria-checked", "true");
+  await expect(panel.getByText(read.subject)).toBeVisible();
+});
+
+test("the mobile notifications page filters by read state and category", async ({
+  page,
+  api,
+  apiAs,
+}) => {
+  const { read, unread, note } = await seedFilterNotifications(api, apiAs);
+
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto("/helpdesk/notifications");
+  await expect(page.getByText(read.subject)).toBeVisible();
+
+  await page.getByRole("radio", { name: "Unread" }).click();
+  await expect(page.getByText(read.subject)).toHaveCount(0);
+  await expect(page.getByText(unread.subject)).toBeVisible();
+
+  await page.getByRole("button", { name: "All categories" }).click();
+  await page.getByRole("menuitem", { name: "Assignments" }).click();
+  await expect(page.getByText(unread.subject)).toBeVisible();
+  await expect(page.getByText(note)).toHaveCount(0);
+});
+
 test("the shortcuts modal opens from the keyboard", async ({ page }) => {
   await new TicketList(page).goto();
   await page.keyboard.press("Control+/");
@@ -164,6 +259,44 @@ test("the shortcuts modal opens from the keyboard", async ({ page }) => {
   await expect(modal.getByRole("heading", { name: "Ticket Management" })).toBeVisible();
   await expect(modal.getByText("Open reply box")).toBeVisible();
 });
+
+/** Give agent2 a read and an unread assignment and an unread mention, each on
+ *  its own ticket, so a filter's effect shows up as rows coming and going. */
+async function seedFilterNotifications(api: Api, apiAs: (key: PersonaKey) => Promise<Api>) {
+  const customer = await apiAs("customer");
+  const read = await raiseTicket(customer);
+  const unread = await raiseTicket(customer);
+  for (const ticket of [read, unread]) {
+    await api.call("frappe.desk.form.assign_to.add", {
+      doctype: "HD Ticket",
+      name: ticket.name,
+      assign_to: JSON.stringify([personas.agent2.email]),
+    });
+  }
+  const mentioned = await raiseTicket(customer);
+  const note = `Filter mention ${uid()}`;
+  const email = personas.agent2.email;
+  await addComment(
+    await apiAs("agent"),
+    mentioned.name,
+    `<span class="mention" data-type="mention" data-id="${email}" data-label="${email}">@${email}</span> ${note}`
+  );
+  const logs = () =>
+    api.list("Notification Log", {
+      fields: ["name", "document_name"],
+      filters: {
+        for_user: email,
+        document_name: ["in", [read.name, unread.name, mentioned.name]],
+      },
+    });
+  await expect.poll(async () => (await logs()).length).toBe(3);
+  const readLog = (await logs()).find((l) => l.document_name === read.name)!;
+  await (await apiAs("agent2")).call(
+    "frappe.desk.doctype.notification_log.notification_log.mark_as_read",
+    { docname: readLog.name }
+  );
+  return { read, unread, note };
+}
 
 async function dashboard(api: Api) {
   return api.call("helpdesk.api.agent_home.agent_home.get_dashboard");
@@ -215,13 +348,6 @@ async function indexForSearch(api: Api, token: string) {
       { timeout: 30_000, intervals: [1_000] }
     )
     .toBeGreaterThan(0);
-}
-
-async function runScheduledJob(api: Api, method: string) {
-  const [job] = await api.list("Scheduled Job Type", { filters: { method } });
-  await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
-    doc: JSON.stringify({ name: job.name }),
-  });
 }
 
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.

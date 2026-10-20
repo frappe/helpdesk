@@ -348,8 +348,9 @@ export interface RootCategory {
 export interface Article {
   name: string;
   title: string;
+  title_slug: string;
   category_name: string;
-  category_id: string;
+  category: string;
   published_on: string;
   author: Author;
   subtitle: string;
@@ -697,6 +698,7 @@ declare global {
     default_country: string;
     apps: string[];
     telemetry: { enabled: boolean };
+    customer_home_page: string;
   }
 }
 

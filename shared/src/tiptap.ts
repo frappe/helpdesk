@@ -74,7 +74,7 @@ export const ComponentUtils: Extension = Extension.create({
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
               style:
-                "border-collapse: collapse; width: 100%; border: 1px solid var(--outline-gray-2, #d1d5db);",
+                "border-collapse: collapse; width: 100%; border: 1px solid #d1d5db;",
             }),
           },
         },
@@ -87,7 +87,7 @@ export const ComponentUtils: Extension = Extension.create({
             default: null,
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
-              style: "border: 1px solid var(--outline-gray-2, #d1d5db);",
+              style: "border: 1px solid #d1d5db;",
             }),
           },
         },
@@ -101,7 +101,7 @@ export const ComponentUtils: Extension = Extension.create({
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
               style:
-                "border: 1px solid var(--outline-gray-2, #d1d5db); padding: 6px 8px; vertical-align: top; text-align: left;",
+                "border: 1px solid #d1d5db; padding: 6px 8px; vertical-align: top; text-align: left;",
             }),
           },
         },
@@ -109,3 +109,6 @@ export const ComponentUtils: Extension = Extension.create({
     ];
   },
 });
+
+// frappe-ui rounds article images; this adds a hairline border.
+export const ARTICLE_IMAGE_CLASSES = "[&_img]:border [&_img]:border-outline-gray-2";

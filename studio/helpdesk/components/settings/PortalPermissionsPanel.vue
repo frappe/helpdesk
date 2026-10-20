@@ -3,6 +3,6 @@
 </template>
 
 <script setup lang="ts">
-// Studio finds custom blocks only under the app folder, so the desk's page reaches the block tree through this.
+// Studio only finds custom blocks under the app folder.
 import PortalPermissionsForm from "@helpdesk/shared/settings/PortalPermissionsForm.vue";
 </script>

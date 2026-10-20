@@ -10,7 +10,7 @@
 			"@framework/ui": ["../../frappe/ui/src/index.ts"],
 			"@framework/ui/*": ["../../frappe/ui/src/*"],
 			"@helpdesk/shared/*": ["../shared/src/*"],
-			// shared/ sits outside desk/; resolve its vue/frappe-ui peers to desk's copies
+			// shared/ is outside desk/; resolve its peers to desk's copies
 			"vue": ["./node_modules/vue"],
 			"frappe-ui": ["./node_modules/frappe-ui/src/index.ts"]
 		},

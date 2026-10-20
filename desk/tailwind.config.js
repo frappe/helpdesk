@@ -11,6 +11,8 @@ export default {
     "./node_modules/frappe-ui/experimental/ListView/**/*.{vue,js,ts,jsx,tsx}",
     "../../frappe/ui/src/**/*.{vue,js,ts,jsx,tsx}",
     "../shared/src/**/*.{vue,js,ts}",
+    // studio's NewTicketForm, rendered by the desk
+    "../studio/helpdesk/components/**/*.vue",
   ],
   plugins: [
     require("@tailwindcss/typography"),

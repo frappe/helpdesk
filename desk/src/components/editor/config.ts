@@ -1,6 +1,6 @@
+import { ComponentUtils } from "@helpdesk/shared/tiptap";
 import {
   CleanStyles,
-  ComponentUtils,
   DismissSuggestionsOnOutsideClick,
   HandleExcelPaste,
 } from "@/tiptap-extensions";

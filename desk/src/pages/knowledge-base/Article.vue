@@ -52,9 +52,18 @@
               />
               <div
                 v-if="!editable && !isMobileView"
-                class="text-p-sm text-ink-gray-4 items-center"
+                class="flex items-center gap-2 text-p-sm text-ink-gray-5"
               >
-                <span>{{ views }} {{ __("views") }}</span>
+                <span>{{ viewsLabel }}</span>
+                <template v-if="access && isPublished">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span class="flex items-center gap-1.5">
+                    <Icon :icon="access.icon" class="size-4 shrink-0" />
+                    {{ access.label }}
+                  </span>
+                </template>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -138,7 +147,10 @@
           <template #default>
             <!-- Scroll here so selected nodes aren't clipped. -->
             <div :class="editorScrollClass">
-              <EditorContent class="rounded-b-6 max-w-[unset] prose-sm" />
+              <EditorContent
+                class="rounded-b-6 max-w-[unset] prose-sm"
+                :class="ARTICLE_IMAGE_CLASSES"
+              />
             </div>
             <EditorFixedMenu
               v-if="editable"
@@ -175,7 +187,7 @@
                   v-if="isMobileView"
                   class="text-p-xs text-ink-gray-4 items-center"
                 >
-                  {{ __("{0} views", [views]) }}
+                  {{ viewsLabel }}
                 </span>
               </div>
             </div>
@@ -193,19 +205,23 @@
     <MoveToCategoryModal
       v-model="moveToModal"
       @move="handleMoveToCategory"
-      :exclude-category="article.data?.category_id"
+      :exclude-category="article.data?.category"
     />
     <CategoryModal
       :edit="editTitle"
       v-model:title="category.title"
+      v-model:icon="category.icon"
       v-model="showCategoryModal"
       @create="handleCategoryCreate"
     />
-    <ArticleSharingModal
+    <ArticleAccessModal
       v-if="article.data"
-      v-model="showSharingModal"
-      :title="__('Sharing “{0}”', [article.data.title])"
+      v-model="showAccessModal"
+      :title="
+        isPublished ? __('Change article access') : __('Publish article as')
+      "
       :visibility="article.data.visibility"
+      :action-label="isPublished ? __('Update access') : __('Publish')"
       @publish="publishArticle"
     >
       <template #default="{ access }">
@@ -213,15 +229,10 @@
           v-if="siblingsVisibility.data && access !== siblingsVisibility.data"
           class="text-p-sm text-ink-gray-7"
         >
-          {{
-            __("Other articles in {0} are visible to {1}.", [
-              article.data.category_name,
-              visibleTo(siblingsVisibility.data),
-            ])
-          }}
+          {{ siblingsNote }}
         </p>
       </template>
-    </ArticleSharingModal>
+    </ArticleAccessModal>
   </div>
 </template>
 
@@ -229,8 +240,9 @@
 import DiscardButton from "@/components/DiscardButton.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 import { ThumbsDownIcon, ThumbsUpIcon } from "@/components/icons";
-import ArticleSharingModal from "@/components/knowledge-base/ArticleSharingModal.vue";
+import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -240,12 +252,20 @@ import {
   newCategory,
   updateRes as updateArticle,
   useCategoryVisibility,
-  visibleTo,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import { ConfirmDelete, uploadFunction } from "@/utils";
+import {
+  ConfirmDelete,
+  copyToClipboard,
+  CUSTOMER_PORTAL_ROOT,
+  uploadFunction,
+} from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import Icon from "@helpdesk/shared/Icon.vue";
+import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
+import { addHeadingIds, countLabel } from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
@@ -287,6 +307,7 @@ function handleCategoryCreate() {
   newCategory.submit(
     {
       title: category.title,
+      icon: category.icon,
     },
     {
       onSuccess: (data: any) => {
@@ -316,6 +337,7 @@ function handleCategoryCreate() {
 const category = reactive({
   title: "",
   id: "",
+  icon: "lucide-folder",
 });
 
 const router = useRouter();
@@ -326,6 +348,12 @@ const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
 const views = ref(0);
+const access = computed(
+  () => categoryAccess()[article.data?.visibility as string]
+);
+const viewsLabel = computed(() =>
+  countLabel(views.value, __("1 view"), __("{0} views"))
+);
 const content = ref("");
 const title = ref("");
 
@@ -351,6 +379,7 @@ const categories = createResource({
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.api.knowledge_base.get_article",
+  method: "GET",
   params: {
     name: props.articleId,
   },
@@ -360,9 +389,11 @@ const article: Resource<Article> = createResource({
     title.value = data.title;
   },
   onError: (err: Error) => {
-    if (err.exc_type === "PermissionError") {
-      router.replace({ name: "AgentKnowledgeBase" });
+    if (!["DoesNotExistError", "PermissionError"].includes(err.exc_type)) {
+      return;
     }
+    toast.error(__("Article not found"));
+    router.replace({ name: "AgentKnowledgeBase" });
   },
 });
 
@@ -383,14 +414,26 @@ const togglePublished = debounce(
   () =>
     isPublished.value
       ? save({ status: "Draft" }, __("Article unpublished."))
-      : save({ status: "Published" }, __("Article published.")),
+      : (showAccessModal.value = true),
   300
 );
 
-const showSharingModal = ref(false);
+const showAccessModal = ref(false);
 const siblingsVisibility = useCategoryVisibility(
-  computed(() => (showSharingModal.value && article.data?.category_id) || null)
+  computed(() => (showAccessModal.value && article.data?.category) || null)
 );
+const siblingsNote = computed(() => {
+  const category = article.data?.category_name;
+  return {
+    Public: __("Other articles in {0} are visible to everyone.", [category]),
+    Customers: __("Other articles in {0} are visible to customers only.", [
+      category,
+    ]),
+    Private: __("Other articles in {0} are visible to agents only.", [
+      category,
+    ]),
+  }[siblingsVisibility.data];
+});
 
 function publishArticle(visibility: string) {
   save(
@@ -445,7 +488,7 @@ function handleDiscard() {
   isDirty.value = false;
   title.value = article.data.title;
   content.value = article.data.content;
-  const original = addLinksToHeadings(article.data.content);
+  const original = addHeadingIds(article.data.content).html;
   textEditorContentWithIDs.value = null;
   nextTick(() => {
     textEditorContentWithIDs.value = original;
@@ -522,23 +565,12 @@ watch(
   () => article.data?.content,
   (newContent) => {
     if (newContent) {
-      textEditorContentWithIDs.value = addLinksToHeadings(newContent);
+      textEditorContentWithIDs.value = addHeadingIds(newContent).html;
     }
   },
   { immediate: true }
 );
 
-function addLinksToHeadings(content: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
-  headings.forEach((heading) => {
-    const text = heading.textContent.trim();
-    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
-    heading.setAttribute("id", id);
-  });
-  return doc.body.innerHTML;
-}
 function scrollToHeading() {
   const articleHeading = window.location.hash;
   if (!articleHeading) return;
@@ -603,9 +635,23 @@ const articleActions = computed(() => [
         },
       ]),
   {
-    label: __("Share"),
-    icon: "lucide-share-2",
-    onClick: () => (showSharingModal.value = true),
+    label: __("Change access"),
+    icon: "lucide-lock",
+    onClick: () => (showAccessModal.value = true),
+  },
+  {
+    label: __("Copy link"),
+    icon: "lucide-link",
+    onClick: () =>
+      copyToClipboard(
+        window.location.origin +
+          CUSTOMER_PORTAL_ROOT +
+          ROUTES.article({
+            name: props.articleId,
+            title_slug: article.data?.title_slug,
+          }),
+        __("Article link copied to clipboard.")
+      ),
   },
   {
     group: __("Danger"),

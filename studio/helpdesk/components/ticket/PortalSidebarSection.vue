@@ -21,10 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import PortalCollapse from "@app/components/common/PortalCollapse.vue";
+import { provide, ref } from "vue";
+import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 
 defineProps<{ label: string }>();
 
 const opened = ref(true);
+// Stays mounted when folded; animated children watch this to replay.
+provide("portalSectionOpen", opened);
 </script>

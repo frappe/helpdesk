@@ -1,33 +1,37 @@
 import { computed } from 'vue'
 import { useColorScheme } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
-import { ROUTES } from '@app/routes'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { bindRouter, navigateTo } from '@app/stores/router'
-import { askConfirm } from '@app/utils'
+import { askConfirm } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { knowledgeBaseDraft } from '@helpdesk/shared/settings/knowledgeBaseDraft.ts'
 import { createSettingsCore, createSettingsDialog } from './core'
 import { createOrganizationSettings } from './organization'
 import { createProfileSettings } from './profile'
+import { conversationLayout } from '@app/stores/conversationLayout'
 
 const AGENT_PORTAL_ROOT = '/helpdesk'
 
 fetchTranslations()
 
-// One instance for the whole app, or each page's copy would go stale on the others.
+// One shared instance, or each page's copy goes stale.
 const core = createSettingsCore()
 const organization = createOrganizationSettings(core)
 const profile = createProfileSettings(core)
-const dialog = createSettingsDialog(core, organization)
 const session = useSession()
+const dialog = createSettingsDialog(core, organization, session)
 
-// Here, not in the dialog, so the saved theme applies on load rather than on open.
-const { colorScheme, setColorScheme } = useColorScheme()
+// Here, so the saved theme applies on load, not on dialog open.
+const { colorScheme, setColorScheme, resolvedColorScheme, toggleColorScheme } = useColorScheme()
 
 const theme = computed({
   get: () => colorScheme.value,
   set: setColorScheme,
 })
+
+export const themeIcon = computed(() => (resolvedColorScheme.value === 'dark' ? 'lucide-sun' : 'lucide-moon-star'))
+export const toggleTheme = toggleColorScheme
 
 const themeOptions = computed(() => [
   { label: __('Light'), value: 'light' },
@@ -35,7 +39,14 @@ const themeOptions = computed(() => [
   { label: __('System'), value: 'system' },
 ])
 
-// Leaving the Knowledge Base tab with unsaved changes asks first, as the desk's settings do.
+export { conversationLayout }
+
+const conversationLayoutOptions = computed(() => [
+  { label: __('Timeline'), value: 'timeline', icon: 'lucide-list' },
+  { label: __('Chat'), value: 'chat', icon: 'lucide-messages-square' },
+])
+
+// Leaving a dirty Knowledge Base tab asks first, as the desk does.
 const settingsTab = computed({
   get: () => core.settingsTab.value,
   set: (tab) => {
@@ -57,7 +68,7 @@ const settingsTab = computed({
   },
 })
 
-// Like the desk's, the dialog stays open while the Knowledge Base tab has unsaved changes.
+// Stays open while the Knowledge Base tab is dirty, as the desk does.
 const isSettingsOpen = computed({
   get: () => core.isSettingsOpen.value,
   set: (open) => {
@@ -65,11 +76,10 @@ const isSettingsOpen = computed({
   },
 })
 
-// The Knowledge Base panel's header buttons; the panel's form makes the draft.
 const knowledgeBase = {
-  kbIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
-  kbCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
-  kbSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
+  knowledgeBaseIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
+  knowledgeBaseCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
+  knowledgeBaseSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
   previewKnowledgeBase: () => knowledgeBaseDraft.value?.preview(),
   saveKnowledgeBase: async () => {
     if (await knowledgeBaseDraft.value?.save()) session.reloadSession()
@@ -82,12 +92,18 @@ export const accountMenuOptions = computed(() =>
     : [
         { icon: 'lucide-home', label: __('Home'), onClick: () => navigateTo(ROUTES.home) },
         { icon: 'lucide-ticket', label: __('My tickets'), onClick: () => navigateTo(ROUTES.ticketList) },
-        { icon: 'lucide-settings', label: __('Settings'), onClick: () => dialog.openSettings('profile') },
         {
           icon: 'lucide-headphones',
           label: __('Agent portal'),
           condition: () => session.isAgent.value,
           onClick: () => (window.location.href = AGENT_PORTAL_ROOT),
+        },
+        {
+          icon: 'lucide-settings',
+          label: __('Settings'),
+          // As in the desk: the settings dialog is desktop-only.
+          condition: () => !session.isPhone.value,
+          onClick: () => dialog.openSettings('profile'),
         },
         { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
       ],
@@ -96,19 +112,23 @@ export const accountMenuOptions = computed(() =>
 const store = {
   themeOptions,
   theme,
-  // Blocks bind `t`, not `__`.
+  conversationLayout,
+  conversationLayoutOptions,
   t: __,
+  routes: ROUTES,
   accountMenuOptions,
-  // HD Form Script header actions; the ticket pages fill them.
+  // Placeholders the pages override.
   customActions: [],
-  // The admin's header links; the knowledge base pages fill them.
   headerLinks: [],
+  themeIcon: '',
   isSettingsOpen,
   settingsTab,
   isSettingsBusy: core.isSettingsBusy,
   settingsUser: core.settingsUser,
   organizations: core.organizations,
+  settingsLoaded: core.settingsLoaded,
   loadSettings: core.loadSettings,
+  ensureSettings: core.ensureSettings,
   ...organization,
   ...profile,
   ...knowledgeBase,
@@ -116,6 +136,7 @@ const store = {
 
 export function useSettingsModal(context) {
   bindRouter(context?.router)
+  session.reloadOnSettingsUpdate(context?.socket)
   dialog.watchRoute()
   return { ...store, ...session }
 }

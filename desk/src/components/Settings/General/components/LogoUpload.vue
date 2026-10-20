@@ -21,7 +21,7 @@
       </div>
     </div>
     <div>
-      <!-- Public: logos and banners are served to signed-out portal visitors. -->
+      <!-- Public: signed-out portal visitors load these. -->
       <FileUploader
         :fileTypes="['image/*']"
         :private="false"

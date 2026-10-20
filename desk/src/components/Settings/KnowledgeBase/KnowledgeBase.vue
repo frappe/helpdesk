@@ -49,12 +49,12 @@ import { disableSettingModalOutsideClick } from "../settingsModal";
 const { isDirty, canPreview, saving, save, discard, preview } =
   useKnowledgeBaseDraft();
 
-// Unsaved changes hold the modal open and make a tab change ask first, as General does.
+// Unsaved edits keep the modal open and guard tab changes.
 watch(isDirty, (dirty) => (disableSettingModalOutsideClick.value = dirty), {
   immediate: true,
 });
 
-// The draft outlives this tab, so changes left behind by a confirmed tab change go here.
+// The draft is shared; drop edits left by a confirmed tab change.
 onUnmounted(() => {
   if (isDirty.value) discard();
   disableSettingModalOutsideClick.value = false;

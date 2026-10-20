@@ -1,6 +1,5 @@
 import { createResource } from "frappe-ui";
 import { type Ref, watch } from "vue";
-import { __ } from "@/translation";
 
 // Title
 export const newArticle = createResource({
@@ -44,9 +43,10 @@ export const deleteArticles = createResource({
 // Category
 export const newCategory = createResource({
   url: "helpdesk.api.knowledge_base.create_category",
-  makeParams({ title }) {
+  makeParams({ title, icon }) {
     return {
       title,
+      icon,
     };
   },
   validate({ title }) {
@@ -54,10 +54,10 @@ export const newCategory = createResource({
   },
 });
 
-export const updateCategoryTitle = createResource({
+export const updateCategory = createResource({
   url: "frappe.client.set_value",
-  validate({ name, value }) {
-    if (!value) throw "Title is required";
+  validate({ fieldname }) {
+    if (!fieldname.category_name) throw "Title is required";
   },
 });
 
@@ -89,7 +89,7 @@ export const mergeCategory = createResource({
   },
 });
 
-// The access every article in a category shares; `data` is null when they differ.
+// `data` is null when the category's articles differ in access.
 export function useCategoryVisibility(
   category: Ref<string | null | undefined>
 ) {
@@ -105,10 +105,3 @@ export function useCategoryVisibility(
   return visibility;
 }
 
-export function visibleTo(visibility: string) {
-  return {
-    Public: __("everyone"),
-    "Customers only": __("customers only"),
-    "Agents only": __("agents only"),
-  }[visibility];
-}

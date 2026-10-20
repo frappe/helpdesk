@@ -50,6 +50,7 @@
           class="form-control"
           doctype="HD Ticket"
           :placeholder="__('Select Ticket')"
+          :search-placeholder="__('Search')"
           :filters="getDefaultFilters()"
           :label="__('Ticket')"
           :page-length="10"

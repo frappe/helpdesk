@@ -17,7 +17,8 @@
   "author",
   "title_slug",
   "content_section",
-  "content"
+  "content",
+  "excerpt"
  ],
  "fields": [
   {
@@ -49,6 +50,13 @@
    "label": "Content"
   },
   {
+   "fieldname": "excerpt",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Excerpt",
+   "read_only": 1
+  },
+  {
    "depends_on": "author",
    "fieldname": "author",
    "fieldtype": "Link",
@@ -76,11 +84,11 @@
    "options": "Published\nDraft\nArchived"
   },
   {
-   "default": "Public",
+   "default": "Customers",
    "fieldname": "visibility",
    "fieldtype": "Select",
    "label": "Visibility",
-   "options": "Public\nCustomers only\nAgents only"
+   "options": "Public\nCustomers\nPrivate"
   },
   {
    "fieldname": "title_slug",
@@ -98,7 +106,7 @@
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2026-10-05 02:23:21.495108",
+ "modified": "2026-10-16 02:10:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

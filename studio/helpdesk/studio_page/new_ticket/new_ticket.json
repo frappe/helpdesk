@@ -5,395 +5,98 @@
    "blockName": "body",
    "children": [
     {
-     "blockName": "topbar",
-     "children": [
-      {
-       "blockName": "Header",
-       "componentId": "header-topbar",
-       "componentName": "header",
-       "componentProps": {
-        "crumb": "New ticket",
-        "parentCrumb": "{{ isGuest ? '' : 'Tickets' }}",
-        "parentRoute": "/customer-tickets"
-       },
-       "isStudioComponent": true
-      }
-     ],
-     "classes": [
-      "items-center",
-      "bg-surface-base",
-      "border-b",
-      "border-outline-gray-2",
-      "flex",
-      "flex-row",
-      "shrink-0",
-      "h-[43px]",
-      "py-0",
-      "w-full",
-      "px-3",
-      "sm:px-5"
-     ],
-     "componentId": "container-topbar-nt",
-     "componentName": "container",
-     "originalElement": "div"
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "crumb": "{{ t('New ticket') }}",
+      "parentCrumb": "{{ isGuest ? '' : t('Tickets') }}",
+      "parentRoute": "{{ routes.ticketList }}"
+     },
+     "isStudioComponent": true
     },
     {
      "blockName": "content",
      "children": [
       {
-       "blockName": "receipt",
-       "children": [
-        {
-         "classes": [
-          "text-ink-gray-9",
-          "font-semibold"
-         ],
-         "componentId": "TextBlock-receipt",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-xl",
-          "tag": "h1",
-          "text": "{{ receipt }}"
-         }
-        },
-        {
-         "componentEvents": {
-          "click": {
-           "action": "Run Script",
-           "event": "click",
-           "script": "router.push('/')"
-          }
-         },
-         "componentId": "Button-receipt-home",
-         "componentName": "Button",
-         "componentProps": {
-          "label": "{{ t('Back to the knowledge base') }}",
-          "variant": "subtle"
-         }
-        }
-       ],
-       "classes": [
-        "flex",
-        "flex-col",
-        "items-start",
-        "gap-5",
-        "w-full",
-        "max-w-[896px]",
-        "pt-6",
-        "sm:pt-[50px]",
-        "pb-8"
-       ],
-       "componentId": "receipt",
-       "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": "{{ submittedEmail }}"
-      },
-      {
        "blockName": "stack",
        "children": [
         {
-         "blockName": "about",
-         "classes": [
-          "prose-sm",
-          "max-w-none",
-          "text-ink-gray-7"
-         ],
-         "componentId": "about",
-         "componentName": "HTML",
-         "componentProps": {
-          "html": "{{ about }}"
-         },
-         "visibilityCondition": "{{ about }}"
-        },
-        {
-         "blockName": "f-guest",
+         "blockName": "receipt",
          "children": [
           {
            "classes": [
-            "flex-1",
-            "min-w-0"
+            "text-ink-gray-9",
+            "font-semibold"
            ],
-           "componentId": "c-guest-name",
-           "componentName": "FormControl",
+           "componentId": "TextBlock-receipt",
+           "componentName": "TextBlock",
            "componentProps": {
-            "label": "Name",
-            "modelValue": {
-             "$type": "variable",
-             "name": "guestName"
-            },
-            "placeholder": "{{ t('Jane Cooper') }}",
-            "size": "sm",
-            "type": "text",
-            "variant": "subtle"
+            "fontSize": "text-xl",
+            "tag": "h1",
+            "text": "{{ receipt }}"
            }
           },
           {
-           "classes": [
-            "flex-1",
-            "min-w-0"
-           ],
-           "componentId": "c-guest-email",
-           "componentName": "FormControl",
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push(routes.home)"
+            }
+           },
+           "componentId": "Button-receipt-home",
+           "componentName": "Button",
            "componentProps": {
-            "label": "Email",
-            "modelValue": {
-             "$type": "variable",
-             "name": "guestEmail"
-            },
-            "placeholder": "{{ t('jane@acme.com') }}",
-            "size": "sm",
-            "type": "email",
-            "variant": "subtle",
-            "required": true
+            "label": "{{ t('Back to the knowledge base') }}",
+            "variant": "subtle"
            }
           }
          ],
          "classes": [
           "flex",
           "flex-col",
-          "sm:flex-row",
+          "items-start",
           "gap-5",
           "w-full"
          ],
-         "componentId": "f-guest",
+         "componentId": "receipt",
          "componentName": "container",
          "originalElement": "div",
-         "visibilityCondition": "{{ isGuest }}"
+         "visibilityCondition": "{{ submittedEmail }}"
         },
         {
-         "blockName": "f-subject",
-         "children": [
-          {
-           "blockName": "c-subject",
-           "classes": [
-            "w-full"
-           ],
-           "componentId": "c-subject",
-           "componentName": "FormControl",
-           "componentProps": {
-            "error": "",
-            "label": "Subject",
-            "modelValue": {
-             "$type": "variable",
-             "name": "subject"
-            },
-            "placeholder": "{{ t('A short description') }}",
-            "required": true,
-            "size": "sm",
-            "type": "text",
-            "variant": "subtle"
-           }
-          }
-         ],
-         "classes": [
-          "flex",
-          "flex-col",
-          "w-full"
-         ],
-         "componentId": "f-subject",
-         "componentName": "container",
-         "originalElement": "div"
-        },
-        {
-         "blockName": "suggestions",
-         "children": [
-          {
-           "children": [
-            {
-             "classes": [
-              "text-ink-gray-5"
-             ],
-             "componentId": "TextBlock-nt-suggestions",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-base",
-              "tag": "span",
-              "text": "{{ t('Suggested articles based on your subject') }}"
-             }
-            },
-            {
-             "classes": [
-              "cursor-pointer",
-              "text-ink-blue-link",
-              "hover:underline"
-             ],
-             "componentEvents": {
-              "click": {
-               "action": "Run Script",
-               "event": "click",
-               "script": "router.push({ path: '/help', query: { q: subject } })"
-              }
-             },
-             "componentId": "TextBlock-nt-see-all",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-base",
-              "tag": "span",
-              "text": "{{ t('See all') }}"
-             }
-            }
-           ],
-           "classes": [
-            "mb-1",
-            "flex",
-            "items-center",
-            "justify-between",
-            "px-2",
-            "pt-1",
-            "flex-wrap",
-            "gap-x-3",
-            "gap-y-1"
-           ],
-           "componentId": "container-nt-suggestions-head",
-           "componentName": "container",
-           "originalElement": "div"
-          },
-          {
-           "baseStyles": {
-            "display": "flex",
-            "flexDirection": "column",
-            "gap": "0px"
-           },
-           "children": [
-            {
-             "componentId": "PortalArticleRow-nt",
-             "componentName": "PortalArticleRow",
-             "componentProps": {
-              "article": "{{ dataItem }}",
-              "variant": "suggestion"
-             },
-             "isCustomVueComponent": true
-            }
-           ],
-           "componentId": "Repeater-nt-suggestions",
-           "componentName": "Repeater",
-           "componentProps": {
-            "data": "{{ suggestions.data }}",
-            "dataKey": "name"
-           }
-          }
-         ],
-         "classes": [
-          "rounded-7",
-          "bg-surface-gray-2",
-          "p-3"
-         ],
-         "componentId": "container-nt-suggestions",
-         "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": "{{ suggestions.data && suggestions.data.length }}"
-        },
-        {
-         "blockName": "f-desc",
-         "children": [
-          {
-           "blockName": "l-desc",
-           "classes": [
-            "text-ink-gray-5",
-            "block",
-            "mb-1.5"
-           ],
-           "componentId": "l-desc",
-           "componentName": "TextBlock",
-           "componentProps": {
-            "fontSize": "text-p-sm",
-            "tag": "span",
-            "text": "Description"
-           }
-          },
-          {
-           "blockName": "c-desc",
-           "classes": [
-            "w-full"
-           ],
-           "componentEvents": {
-            "change": {
-             "action": "Run Script",
-             "event": "change",
-             "script": "setDescription(eventArgs[0])"
-            }
-           },
-           "componentId": "TextEditor-a63tnqrdh",
-           "componentName": "TextEditor",
-           "componentProps": {
-            "autofocus": false,
-            "bubbleMenuOptions": {},
-            "content": "{{ description }}",
-            "editable": true,
-            "editorClass": "prose-sm max-w-none min-h-32 max-h-60 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2",
-            "extensions": [],
-            "fixedMenu": true,
-            "mentions": null,
-            "placeholder": "{{ t('Describe your issue…') }}",
-            "tags": null,
-            "uploadFunction": "{{ isGuest ? refuseGuestImages : undefined }}"
-           }
-          }
-         ],
-         "classes": [
-          "flex",
-          "flex-col",
-          "w-full"
-         ],
-         "componentId": "f-desc",
-         "componentName": "container",
-         "originalElement": "div"
-        },
-        {
-         "blockName": "fields",
-         "classes": [
-          "w-full"
-         ],
-         "componentId": "fields",
-         "componentName": "FormLayout",
+         "componentId": "new-ticket-form",
+         "componentName": "NewTicketForm",
          "componentProps": {
-          "doc": "{{ model }}",
-          "layout": "{{ layout }}"
+          "initialSubject": "{{ initialSubject }}",
+          "origin": "{{ origin }}",
+          "isAgent": "{{ isAgent }}",
+          "suggestArticles": "{{ !isGuest || isPublicKnowledgeBase }}",
+          "dateFormat": "{{ dateFormat }}",
+          "timeFormat": "{{ timeFormat }}",
+          "isGuest": "{{ isGuest }}",
+          "draft": "{{ draft }}"
          },
-         "visibilityCondition": "{{ fields.length }}"
-        },
-        {
-         "blockName": "f-attach",
-         "children": [
-          {
-           "blockName": "l-attach",
-           "classes": [
-            "text-ink-gray-5",
-            "block",
-            "mb-1.5"
-           ],
-           "componentId": "l-attach",
-           "componentName": "TextBlock",
-           "componentProps": {
-            "fontSize": "text-p-sm",
-            "tag": "span",
-            "text": "Attachment"
-           }
+         "componentEvents": {
+          "created": {
+           "action": "Run Script",
+           "event": "created",
+           "script": "openTicket(eventArgs[0])"
           },
-          {
-           "classes": [
-            "w-full"
-           ],
-           "componentId": "KbFileAttachment-attach",
-           "componentName": "AttachmentsList",
-           "componentProps": {
-            "modelValue": {
-             "$type": "variable",
-             "name": "attachments"
-            },
-            "transport": "{{ uploadPrivately }}"
-           }
+          "actions": {
+           "action": "Run Script",
+           "event": "actions",
+           "script": "setActions(eventArgs[0])"
+          },
+          "submitted": {
+           "action": "Run Script",
+           "event": "submitted",
+           "script": "showReceipt(eventArgs[0])"
           }
-         ],
-         "classes": [
-          "flex",
-          "flex-col",
-          "w-full"
-         ],
-         "componentId": "f-attach",
-         "componentName": "container",
-         "originalElement": "div",
-         "visibilityCondition": "{{ !isGuest }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ !submittedEmail }}"
         }
        ],
        "classes": [
@@ -410,53 +113,7 @@
        ],
        "componentId": "stack",
        "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": "{{ !submittedEmail }}"
-      },
-      {
-       "blockName": "container",
-       "children": [
-        {
-         "blockName": "submit",
-         "classes": [
-          "w-full"
-         ],
-         "componentEvents": {
-          "click": {
-           "action": "Run Script",
-           "event": "click",
-           "script": "createTicket()"
-          }
-         },
-         "componentId": "submit",
-         "componentName": "Button",
-         "componentProps": {
-          "disabled": "{{ !canSubmit }}",
-          "label": "{{ t('Create ticket') }}",
-          "loading": "{{ isCreating }}",
-          "size": "md",
-          "theme": "gray",
-          "type": "submit",
-          "variant": "solid"
-         }
-        }
-       ],
-       "classes": [
-        "flex",
-        "flex-col",
-        "shrink",
-        "gap-5",
-        "h-fit",
-        "w-full",
-        "pt-8",
-        "sm:pt-[39px]",
-        "pb-8",
-        "max-w-[896px]"
-       ],
-       "componentId": "container-pp0kzmif9",
-       "componentName": "container",
-       "originalElement": "div",
-       "visibilityCondition": "{{ !submittedEmail }}"
+       "originalElement": "div"
       }
      ],
      "classes": [
@@ -469,7 +126,7 @@
       "overflow-y-auto",
       "w-full",
       "px-4",
-      "sm:px-0"
+      "sm:px-6"
      ],
      "componentId": "content",
      "componentName": "container",
@@ -488,7 +145,6 @@
     "flex",
     "flex-col",
     "h-full",
-    "justify-center",
     "overflow-x-hidden",
     "w-[inherit]"
    ],
@@ -497,63 +153,22 @@
    "originalElement": "div"
   }
  ],
- "creation": "2026-10-01 15:56:40.168008",
+ "creation": "2026-10-07 15:18:21.023020",
  "docstatus": 0,
  "doctype": "Studio Page",
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-08 02:10:00.000000",
+ "modified": "2026-10-21 04:21:47.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",
  "page_name": "page-d05d82bf",
  "page_title": "New ticket",
  "published": 1,
- "resources": [
-  {
-   "auto": 0,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "POST",
-   "params": "{}",
-   "resource_name": "newTicket",
-   "resource_type": "API Resource",
-   "url": "helpdesk.helpdesk.doctype.hd_ticket.api.new"
-  },
-  {
-   "auto": 0,
-   "fetch_document_using_filters": 0,
-   "limit": 0,
-   "method": "GET",
-   "params": "{\"name\": \"Default\"}",
-   "resource_name": "template",
-   "resource_type": "API Resource",
-   "url": "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one"
-  }
- ],
+ "resources": [],
  "route": "/tickets/new",
  "studio_app": "helpdesk",
- "variables": [
-  {
-   "initial_value": "\"\"",
-   "variable_name": "subject",
-   "variable_type": "String"
-  },
-  {
-   "initial_value": "\"\"",
-   "variable_name": "description",
-   "variable_type": "String"
-  },
-  {
-   "initial_value": "\"\"",
-   "variable_name": "guestName",
-   "variable_type": "String"
-  },
-  {
-   "initial_value": "\"\"",
-   "variable_name": "guestEmail",
-   "variable_type": "String"
-  }
- ]
+ "tab_title": "{{ t('New ticket') }} | {{ brandName }}",
+ "variables": []
 }

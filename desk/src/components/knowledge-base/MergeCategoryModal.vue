@@ -18,17 +18,13 @@
         class="form-control"
         doctype="HD Article Category"
         placeholder="Select Category"
+        :search-placeholder="__('Search')"
         v-model="toCategory"
         label="Category"
         :page-length="100"
       />
-      <p v-if="joining.data" class="mt-3 text-p-sm text-ink-gray-7">
-        {{
-          __(
-            "Articles in this category are visible to {0}, so merged articles will be too.",
-            [visibleTo(joining.data)]
-          )
-        }}
+      <p v-if="joiningNote" class="mt-3 text-p-sm text-ink-gray-7">
+        {{ joiningNote }}
       </p>
     </template>
     <template #actions>
@@ -42,10 +38,11 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Dialog } from "frappe-ui";
 import { Link } from "@/components";
-import { useCategoryVisibility, visibleTo } from "@/stores/knowledgeBase";
+import { useCategoryVisibility } from "@/stores/knowledgeBase";
+import { __ } from "@/translation";
 defineProps<{
   categoryId: string;
   categoryTitle: string;
@@ -55,4 +52,16 @@ const showDialog = defineModel<boolean>();
 
 const toCategory = ref("");
 const joining = useCategoryVisibility(toCategory);
+// A merge only narrows access; Public needs no note.
+const joiningNote = computed(
+  () =>
+    ({
+      Customers: __(
+        "Articles in this category are visible to customers only, so merged public articles will be too."
+      ),
+      Private: __(
+        "Articles in this category are visible to agents only, so merged articles will be too."
+      ),
+    }[joining.data])
+);
 </script>

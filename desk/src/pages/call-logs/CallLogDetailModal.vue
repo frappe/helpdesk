@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import Icon from "@/components/Icon.vue";
+import Icon from "@helpdesk/shared/Icon.vue";
 import LucideArrowRight from "~icons/lucide/arrow-right";
 import ArrowUpRightIcon from "@/components/icons/ArrowUpRightIcon.vue";
 import DurationIcon from "@/components/icons/DurationIcon.vue";

@@ -1,85 +1,74 @@
 import { computed, ref, watch } from 'vue'
-import { __ } from '@helpdesk/shared/translation'
-import { findBannerPreset } from '@helpdesk/shared/kbBanner'
-import { readKbPreview } from '@helpdesk/shared/kbPreview'
-import { useSettingsModal } from '@app/stores/settings'
-import { useKbHeader } from '@app/composables/useKbHeader'
-import { countLabel } from '@app/utils'
+import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
+import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
+import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
+import { useRememberedCount } from '@app/composables/useRememberedCount'
+import { prefetchOnHover } from '@app/stores/knowledgeBase'
 
 const ARTICLE_LIMIT = 5
-
 export default function setup(context) {
   const { articles, categories } = context
-  const settings = useSettingsModal(context)
+  const settings = useKnowledgeBaseHeader(context)
   const { config } = settings
 
-  // Settings' Preview shows its unsaved banner and pins in place of the saved ones.
-  // Read again with each session reload: saving the settings clears a stored preview.
-  const preview = computed(() => config.value && readKbPreview())
+  // Settings Preview overrides banner and pins; re-read on session reload.
+  const preview = computed(() => config.value && readKnowledgeBasePreview())
   const bannerImage = computed(() => (preview.value ? preview.value.banner_image : config.value?.banner_image))
 
-  // An uploaded image sits under a dark scrim, so it always takes white text.
+  // Uploaded images sit under a dark scrim, so take white text.
   const bannerPreset = computed(() =>
     bannerImage.value ? null : findBannerPreset(preview.value ? preview.value.banner_preset : config.value?.banner_preset),
   )
   const bannerBackground = computed(() => bannerPreset.value?.background || '')
   const bannerTextColor = computed(() => (bannerImage.value ? '#fff' : 'var(--ink-gray-8)'))
 
-  // Saving the knowledge base settings reloads the session; the pins come with the categories.
+  // Saving KB settings reloads the session; pins come with categories.
   watch(config, (_, previous) => previous && categories.reload())
 
-  // Only the pinned categories, unless none are.
   const homeCategories = computed(() => {
     const rows = categories.data || []
-    const pinned = rows.filter((row) => (preview.value ? preview.value.pinned.includes(row.name) : row.pinned))
+    const order = preview.value?.pinned
+    const pinned = order
+      ? rows.filter((row) => order.includes(row.name)).sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name))
+      : rows.filter((row) => row.pinned).sort((a, b) => a.pinned_order - b.pinned_order)
     return pinned.length ? pinned : rows
   })
 
   const hasHiddenCategories = computed(() => homeCategories.value.length < (categories.data || []).length)
 
-  // One or two home categories get their own layouts.
-  const fewCategories = computed(() => (homeCategories.value.length <= 2 ? homeCategories.value : []))
-  const hasCategoryPicker = computed(() => fewCategories.value.length === 2)
-  const pickedName = ref(null)
-  const focusCategory = computed(
-    () => fewCategories.value.find((row) => row.name === pickedName.value) || fewCategories.value[0] || null,
+  // The skeleton takes the layout of last time's count.
+  const skeletonCount = useRememberedCount(
+    'helpdesk-kb-home-categories',
+    () => categories.data && homeCategories.value.length,
+    6,
   )
-  const isLoneCategory = computed(() => Boolean(focusCategory.value && !hasCategoryPicker.value))
 
-  function pickCategory(name) {
-    pickedName.value = name
-  }
+  const focusCategory = computed(() => (homeCategories.value.length === 1 ? homeCategories.value[0] : null))
+  const isLoneCategory = computed(() => Boolean(focusCategory.value))
 
-  function articleCount(category) {
-    return countLabel(category.article_count, __('1 article'), __('{0} articles'))
-  }
-
-  // Waits for the categories: an earlier fetch could land after the right one.
-  const sort = ref('latest')
+  // Waits for categories: an earlier fetch could land after the right one.
+  const sort = ref('popular')
   watch(
     [sort, focusCategory, () => categories.data],
     ([value, category, loaded]) => {
       if (!loaded) return
       if (!category) return articles.fetch({ limit: ARTICLE_LIMIT, sort: value })
-      const limit = isLoneCategory.value ? 0 : ARTICLE_LIMIT
-      articles.fetch({ category: category.name, limit, sort: value })
+      articles.fetch({ category: category.name, limit: 0, sort: value })
     },
     { immediate: true },
   )
 
   return {
+    prefetchOnHover,
     ...settings,
-    ...useKbHeader(context),
     bannerImage,
     bannerBackground,
     bannerTextColor,
     homeCategories,
+    skeletonCount,
     hasHiddenCategories,
     sort,
     focusCategory,
-    hasCategoryPicker,
     isLoneCategory,
-    articleCount,
-    pickCategory,
   }
 }

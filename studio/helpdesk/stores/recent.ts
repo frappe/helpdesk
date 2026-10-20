@@ -1,56 +1,40 @@
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { useSession } from '@app/stores/session'
 
-const SEARCH_LIMIT = 5
 const ARTICLE_LIMIT = 3
 
-export type RecentArticle = {
+type RecentArticle = {
   name: string
   title: string
+  title_slug?: string
   categoryName?: string
-  image?: string | null
   minutes?: number
 }
 
-// Per browser, as DocSearch does, so it works for guests.
-const searches = useStorage<string[]>('helpdesk-kb-recent-searches', [])
-const articles = useStorage<RecentArticle[]>('helpdesk-kb-recent-articles', [])
+// Per user, so a shared machine doesn't leak history.
+const { config } = useSession()
+const user = () => config.value?.session_user || 'Guest'
+const articles = useStorage<RecentArticle[]>(() => `helpdesk-kb-recent-articles:${user()}`, [])
 
-function remember<T>(list: T[], item: T, same: (row: T) => boolean, limit: number) {
-  return [item, ...list.filter((row) => !same(row))].slice(0, limit)
+// Held until the session loads, so it lands in the right user's list.
+let pendingArticle: RecentArticle | undefined
+watch(config, () => pendingArticle && addArticle(pendingArticle))
+
+function addArticle(article: RecentArticle) {
+  pendingArticle = config.value ? undefined : article
+  if (pendingArticle) return
+  articles.value = [article, ...articles.value.filter((row) => row.name !== article.name)].slice(0, ARTICLE_LIMIT)
 }
 
 export function useRecent() {
-  function rememberSearch(text: string) {
-    const query = text.trim()
-    if (!query) return
-    const key = query.toLowerCase()
-    searches.value = remember(searches.value, query, (row) => row.toLowerCase() === key, SEARCH_LIMIT)
-  }
-
-  function forgetSearch(text: string) {
-    searches.value = searches.value.filter((row) => row !== text)
-  }
-
-  function clearSearches() {
-    searches.value = []
-  }
-
   function forgetArticle(name: string) {
     articles.value = articles.value.filter((row) => row.name !== name)
   }
 
-  function rememberArticle(article: RecentArticle) {
-    articles.value = remember(articles.value, article, (row) => row.name === article.name, ARTICLE_LIMIT)
-  }
-
   return {
-    recentSearches: computed(() => searches.value),
     recentArticles: computed(() => articles.value),
-    rememberSearch,
-    forgetSearch,
-    clearSearches,
-    rememberArticle,
+    rememberArticle: addArticle,
     forgetArticle,
   }
 }

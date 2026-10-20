@@ -1,25 +1,17 @@
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
-import { createResource } from 'frappe-ui'
+import { dayjsLocal } from 'frappe-ui'
 
-// Dismissal is remembered per ticket per day, so it returns tomorrow.
+// Dismissed per ticket per day.
 export function useOutsideHoursBanner(ticket) {
-  const banner = createResource({
-    url: 'helpdesk.helpdesk.doctype.hd_ticket.api.show_outside_hours_banner',
-    makeParams: () => ({ ticket_name: ticket.data?.name }),
-  })
+  const banner = computed(() => ticket.data?.outside_hours_banner)
   const isDismissed = useStorage(() => dismissKey(ticket.data?.name), false, localStorage, {
     writeDefaults: false,
   })
 
-  watch(
-    () => ticket.data?.name,
-    (name) => name && banner.fetch(),
-    { immediate: true },
-  )
-
   function dismissKey(name: string) {
-    return `kb:banner-dismissed:${name}:${new Date().toISOString().split('T')[0]}`
+    // Local day: an ISO date rolls over at UTC midnight.
+    return `kb:banner-dismissed:${name}:${dayjsLocal().format('YYYY-MM-DD')}`
   }
 
   function dismissBanner() {
@@ -27,8 +19,8 @@ export function useOutsideHoursBanner(ticket) {
   }
 
   return {
-    showBanner: computed(() => Boolean(banner.data?.show) && !isDismissed.value),
-    bannerMessage: computed(() => banner.data?.msg || ''),
+    showBanner: computed(() => Boolean(banner.value?.show) && !isDismissed.value),
+    bannerMessage: computed(() => banner.value?.msg || ''),
     dismissBanner,
   }
 }

@@ -5,7 +5,7 @@ export { default as CommunicationArea } from "./CommunicationArea.vue";
 export { default as EmailEditor } from "./EmailEditor.vue";
 export { default as FadedScrollableDiv } from "./FadedScrollableDiv.vue";
 export { default as Link } from "./frappe-ui/Link.vue";
-export { default as Icon } from "./Icon.vue";
+export { default as Icon } from "@helpdesk/shared/Icon.vue";
 export { default as LayoutHeader } from "./LayoutHeader.vue";
 export { default as ListViewBuilder } from "./ListViewBuilder.vue";
 export { default as MultipleAvatar } from "./MultipleAvatar.vue";

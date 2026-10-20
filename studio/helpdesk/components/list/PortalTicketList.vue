@@ -1,44 +1,8 @@
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <div
-      v-if="loading && !rows.length"
-      class="flex h-full w-full items-center justify-center"
-    >
-      <LoadingIndicator :scale="8" />
-    </div>
-
-    <!-- One stacked row per ticket on a phone, where table columns leave the subject no room. -->
-    <div
-      v-else-if="rows.length && compact"
-      class="min-h-0 flex-1 overflow-y-auto"
-    >
-      <button
-        v-for="row in rows"
-        :key="row.name"
-        type="button"
-        class="flex w-full flex-col gap-1.5 border-b border-outline-gray-1 px-4 py-3 text-left text-base text-ink-gray-8 transition-colors active:bg-surface-gray-2"
-        @click="onRowClick?.(row)"
-      >
-        <span class="flex w-full min-w-0 items-baseline gap-3">
-          <component :is="cell('subject', row)" />
-          <span class="shrink-0 text-ink-gray-5">
-            <component :is="cell('creation', row)" />
-          </span>
-        </span>
-        <span class="flex w-full min-w-0 items-center gap-3 text-ink-gray-6">
-          <span class="flex min-w-0 flex-1">
-            <component :is="cell('status', row)" />
-          </span>
-          <span class="shrink-0">
-            <component :is="cell('name', row)" />
-          </span>
-        </span>
-      </button>
-    </div>
-
     <ListView
-      v-else-if="rows.length"
-      class="min-h-0 flex-1"
+      v-if="rows.length"
+      class="portal-reveal min-h-0 flex-1"
       :columns="columns"
       :rows="rows"
       row-key="name"
@@ -74,11 +38,79 @@
           </ListRowItem>
         </ListRow>
       </ListRows>
-      <ListSelectBanner />
+      <ListSelectBanner>
+        <template #actions="{ selections }">
+          <Button
+            variant="ghost"
+            icon-left="lucide-download"
+            :label="__('Export')"
+            @click="openExport(selections)"
+          />
+        </template>
+      </ListSelectBanner>
     </ListView>
 
+    <!-- Header bar and 40px rows share one column grid. -->
+    <PortalSkeleton v-else-if="loading" class="flex min-h-0 flex-1 flex-col">
+      <!-- w-max: narrow screens clip the columns, not squeeze them. -->
+      <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          class="mx-3 flex w-max min-w-[calc(100%-1.5rem)] flex-col sm:mx-5 sm:min-w-[calc(100%-2.5rem)]"
+        >
+          <div
+            class="mb-2 grid h-[34px] shrink-0 items-center gap-4 rounded-4 bg-surface-gray-2 px-2"
+            :style="{ gridTemplateColumns }"
+          >
+            <Skeleton
+              class="size-3.5 rounded-[4px] motion-reduce:animate-none"
+            />
+            <Skeleton
+              v-for="(column, i) in columns"
+              :key="column.key"
+              class="h-[0.6em] min-w-6 max-w-16 rounded-full text-sm motion-reduce:animate-none"
+              :style="{ width: `${50 + ((i * 17) % 30)}%` }"
+            />
+          </div>
+          <div
+            v-for="row in Math.min(pageLength, 20)"
+            :key="row"
+            class="shrink-0"
+          >
+            <div
+              class="grid h-10 items-center gap-4 px-2"
+              :style="{ gridTemplateColumns }"
+            >
+              <Skeleton
+                class="size-3.5 rounded-[4px] motion-reduce:animate-none"
+              />
+              <Skeleton
+                v-for="(column, i) in columns"
+                :key="column.key"
+                class="h-[0.6em] min-w-8 rounded-full text-base motion-reduce:animate-none"
+                :style="{ width: `${40 + ((row * 7 + i * 13) % 45)}%` }"
+              />
+            </div>
+            <div
+              v-if="row < Math.min(pageLength, 20)"
+              class="mx-2 h-px border-t border-outline-gray-1"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex h-[49px] shrink-0 items-center justify-between border-t px-3 sm:px-5"
+      >
+        <Skeleton
+          class="h-7 w-[104px] rounded-[8px] motion-reduce:animate-none"
+        />
+        <Skeleton
+          class="h-[0.6em] w-16 rounded-full text-base motion-reduce:animate-none"
+        />
+      </div>
+    </PortalSkeleton>
+
     <PortalEmptyState
-      v-else
+      v-else-if="!loading"
       class="pointer-events-none flex-1"
       icon="ticket"
       :title="emptyState.title"
@@ -92,11 +124,20 @@
         @loadMore="emit('loadMore')"
       />
     </div>
+    <ExportModal
+      v-model="showExport"
+      :row-count="totalCount"
+      :all-selected="selectedNames.length === totalCount"
+      @update="exportRows"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { LoadingIndicator } from "frappe-ui";
+import { computed, ref } from "vue";
+import { Button, Skeleton } from "frappe-ui";
+import ExportModal from "@helpdesk/shared/ExportModal.vue";
+import { __ } from "@helpdesk/shared/translation";
 import {
   ListFooter,
   ListHeader,
@@ -107,10 +148,11 @@ import {
   ListSelectBanner,
   ListView,
 } from "frappe-ui/experimental";
-import PortalEmptyState from "@app/components/common/PortalEmptyState.vue";
+import PortalEmptyState from "@app/components/ui/PortalEmptyState.vue";
+import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 import { loadTicketMeta } from "@app/stores/ticketMeta";
 
-// Not at module load: this file ships in the public page bundles too.
+// Not at module load: this file ships in public page bundles too.
 loadTicketMeta();
 
 const props = withDefaults(
@@ -123,7 +165,6 @@ const props = withDefaults(
     pageLengthOptions?: number[];
     emptyState?: { title: string; description?: string };
     onRowClick?: (row: any) => void;
-    compact?: boolean;
   }>(),
   {
     columns: () => [],
@@ -133,19 +174,45 @@ const props = withDefaults(
     totalCount: 0,
     pageLengthOptions: () => [],
     emptyState: () => ({ title: "" }),
-    compact: false,
   }
 );
 
 const pageLength = defineModel<number>("pageLength", { default: 20 });
 
+// Checkbox, then each column's width; plain numbers become `fr`.
+const gridTemplateColumns = computed(() =>
+  [
+    "14px",
+    ...props.columns.map((column) =>
+      typeof (column.width || 1) === "number"
+        ? `${column.width || 1}fr`
+        : column.width
+    ),
+  ].join(" ")
+);
+
 const emit = defineEmits<{
   columnResize: [payload: { key: string; width: string; save: boolean }];
   loadMore: [];
+  export: [payload: { exportType: "CSV" | "Excel"; names: string[] | null }];
 }>();
 
-function cell(key: string, row: any) {
-  const column = props.columns.find((column) => column.key === key);
-  return column?.cell?.({ row, item: row[key] }) ?? null;
+const showExport = ref(false);
+const selectedNames = ref<string[]>([]);
+
+function openExport(selections: Set<string>) {
+  selectedNames.value = [...selections];
+  showExport.value = true;
+}
+
+function exportRows(form: {
+  export_type: "CSV" | "Excel";
+  export_all: boolean;
+}) {
+  showExport.value = false;
+  emit("export", {
+    exportType: form.export_type,
+    names: form.export_all ? null : selectedNames.value,
+  });
 }
 </script>

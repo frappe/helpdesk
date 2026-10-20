@@ -6,7 +6,8 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony", "frappe/studio"]
+# As org/app, so `bench get-app helpdesk` fetches whichever is missing.
+required_apps = ["frappe/telephony", "frappe/studio"]
 require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
@@ -33,7 +34,6 @@ after_migrate = [
 
 sqlite_search = [
     "helpdesk.search_sqlite.HelpdeskSearch",
-    "helpdesk.search_sqlite.HelpdeskArticleSearch",
 ]
 
 scheduler_events = {
@@ -55,49 +55,36 @@ website_route_rules = [
         "from_route": "/helpdesk/<path:app_path>",
         "to_route": "helpdesk",
     },
-    # Static rules outrank frappe's /kb/<category>; add one per single-segment Studio page.
-    {
-        "from_route": "/kb/customer-tickets",
-        "to_route": "kb",
-    },
-    {
-        "from_route": "/kb/help",
-        "to_route": "kb",
-    },
-    {
-        "from_route": "/kb/categories",
-        "to_route": "kb",
-    },
 ]
 
 # The old customer portal's URLs keep working through these.
 website_redirects = [
     {
         "source": "/helpdesk/my-tickets/new",
-        "target": "/kb/tickets/new",
+        "target": "/help/tickets/new",
         "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/my-tickets",
-        "target": "/kb/customer-tickets",
+        "target": "/help/my-tickets",
         "forward_query_parameters": True,
     },
     {
         "source": r"/helpdesk/my-tickets/(.*)",
-        "target": r"/kb/tickets/\1",
+        "target": r"/help/tickets/\1",
         "forward_query_parameters": True,
     },
     {
         "source": "/helpdesk/kb-public",
-        "target": "/kb",
+        "target": "/help",
     },
     {
         "source": r"/helpdesk/kb-public/articles/(.*)",
-        "target": r"/kb/articles/\1",
+        "target": r"/help/articles/\1",
     },
     {
         "source": r"/helpdesk/kb-public/(.*)",
-        "target": r"/kb/category/\1",
+        "target": r"/help/category/\1",
     },
 ]
 
@@ -120,6 +107,9 @@ user_invitation = {
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
+
+studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {
     "Assignment Rule": {
@@ -153,12 +143,16 @@ doc_events = {
         "validate": "helpdesk.extends.comment.validate",
         "on_trash": "helpdesk.extends.comment.on_trash",
     },
+    "ToDo": {
+        "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
+    },
 }
 
 # For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
     "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.permission_query",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
@@ -168,6 +162,7 @@ has_permission = {
     "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
     "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.has_permission",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
     "Comment": "helpdesk.extends.comment.has_permission",
@@ -175,6 +170,8 @@ has_permission = {
 
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
+    "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
 }
 
 

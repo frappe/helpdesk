@@ -54,7 +54,7 @@ test("filters and quick filters narrow the list and clear back", async ({
   await expect(list.rows()).toHaveCount(1);
   await expect(list.row(`${id} low`)).toBeVisible();
 
-  await page.getByRole("button", { name: "Filter" }).click();
+  await page.getByRole("button", { name: "Filter", exact: true }).click();
   await popover.getByRole("button", { name: "Clear all" }).click();
   await expect(page.getByRole("textbox", { name: "Subject" })).toHaveValue("");
   await expect(list.rows().nth(2)).toBeVisible();

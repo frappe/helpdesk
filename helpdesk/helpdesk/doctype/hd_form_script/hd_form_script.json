@@ -75,7 +75,7 @@
   {
    "default": "0",
    "depends_on": "eval: doc.apply_to_customer_portal===0 && doc.apply_on_new_page===0",
-   "description": "Runs on the knowledge base pages only, for every reader of the knowledge base.",
+   "description": "Runs on the knowledge base pages only, for every reader, including visitors who are not signed in when the knowledge base is public.",
    "fieldname": "apply_to_knowledge_base",
    "fieldtype": "Check",
    "label": "Apply to knowledge base"

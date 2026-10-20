@@ -2,11 +2,13 @@ import { computed, ref, watch } from 'vue'
 import { createListResource } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
-import { runAction, updateTicket } from '@app/utils'
 
-export function useTicketFeedback(ticket) {
+// Well past any real count per rating.
+const FEEDBACK_OPTION_LIMIT = 100
+
+export function useTicketFeedback(saveTicket) {
   const isFeedbackOpen = ref(false)
-  // In stars, as the Rating component counts; HD Ticket stores a fraction.
+  // Stars, as Rating counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
   const feedbackText = ref('')
@@ -15,7 +17,7 @@ export function useTicketFeedback(ticket) {
   const options = createListResource({
     doctype: 'HD Ticket Feedback Option',
     fields: ['name', 'label'],
-    pageLength: 99999,
+    pageLength: FEEDBACK_OPTION_LIMIT,
   })
 
   const feedbackOptions = computed(() =>
@@ -42,7 +44,6 @@ export function useTicketFeedback(ticket) {
     feedbackText.value = ''
   }
 
-  // The status is saved with the rating: `validate_feedback` refuses a customer's close without one.
   function openFeedback() {
     isFeedbackOpen.value = true
   }
@@ -51,20 +52,14 @@ export function useTicketFeedback(ticket) {
     feedbackOption.value = name
   }
 
-  function submitFeedback() {
+  // Status saved with the rating: `validate_feedback` refuses a close without one.
+  async function submitFeedback() {
     if (!feedbackOption.value) return
-    return runAction(
-      async () => {
-        await updateTicket(ticket.data.name, {
-          status: CLOSED_STATUS,
-          feedback: feedbackOption.value,
-          feedback_extra: feedbackText.value,
-        })
-        isFeedbackOpen.value = false
-        ticket.fetch()
-      },
+    const saved = await saveTicket(
+      { status: CLOSED_STATUS, feedback: feedbackOption.value, feedback_extra: feedbackText.value },
       { busy: isFeedbackSaving, fallback: __('Could not save the feedback') },
     )
+    if (saved) isFeedbackOpen.value = false
   }
 
   return {

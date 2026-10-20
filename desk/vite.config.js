@@ -124,6 +124,8 @@ export default defineConfig(async ({ mode }) => {
         "vue",
         "vue-router",
         "frappe-ui",
+        // studio's NewTicketForm imports it from outside desk/
+        "@framework/ui",
         "dompurify",
         "reka-ui",
         "@tiptap/core",
@@ -137,6 +139,8 @@ export default defineConfig(async ({ mode }) => {
         "prosemirror-history",
         "prosemirror-gapcursor",
         "prosemirror-tables",
+        // shared/ imports it from outside desk/
+        "vuedraggable",
       ],
     },
     optimizeDeps: {
