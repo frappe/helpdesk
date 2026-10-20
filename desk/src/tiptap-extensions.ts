@@ -855,12 +855,8 @@ export const CleanStyles = Extension.create<CleanStylesOptions>({
   },
 });
 
-/**
- * The editor shows blank lines and runs of spaces (ProseMirror renders with
- * `white-space: break-spaces` and a trailing `<br>`), but `getHTML()` emits a
- * bare `<p></p>` and plain spaces, which the timeline and mail clients collapse.
- * Encode them with `&nbsp;` so the sent HTML looks like what was typed.
- */
+// getHTML() emits bare `<p></p>` and plain spaces, which HTML collapses;
+// encode them with `&nbsp;` so the timeline and mail show what was typed.
 export const PreserveWhitespace = Extension.create({
   name: "preserveWhitespace",
 
@@ -873,7 +869,7 @@ export const PreserveWhitespace = Extension.create({
 });
 
 function preserveWhitespace(html: string): string {
-  if (!/<p[^>]*><\/p>| {2}/.test(html)) return html;
+  if (!/<p[^>]*><\/p>| {2}|> /.test(html)) return html;
 
   const template = document.createElement("template");
   template.innerHTML = html;
@@ -887,7 +883,8 @@ function preserveWhitespace(html: string): string {
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     // code blocks already keep their spaces
     if (node.parentElement?.closest("pre")) continue;
-    node.nodeValue = node.nodeValue!.replace(/ {2}/g, " \u00a0");
+    // a leading space or one before another space would collapse
+    node.nodeValue = node.nodeValue!.replace(/^ | (?= )/g, "\u00a0");
   }
   return template.innerHTML;
 }
