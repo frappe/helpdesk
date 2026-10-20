@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import type { Api } from "./api";
+import { uid } from "./factories";
 
 /** The agent ticket list at /helpdesk/tickets. */
 export class TicketList {
@@ -8,6 +9,18 @@ export class TicketList {
   async goto() {
     await this.page.goto("/helpdesk/tickets");
     await expect(this.page.getByRole("button", { name: "Filter", exact: true })).toBeVisible();
+  }
+
+  /** Reload and wait for the rows; the header reads "List" until the views load. */
+  async reload() {
+    const loaded = this.page.waitForResponse(/get_list_data/);
+    await this.page.reload();
+    await loaded;
+  }
+
+  /** The header's view dropdown, labelled with the open view or "List". */
+  viewButton(label: string) {
+    return this.page.getByRole("banner").getByRole("button", { name: label, exact: true });
   }
 
   rows() {
@@ -50,7 +63,9 @@ export class TicketList {
     const dialog = this.page.getByRole("dialog", { name: "Create View" });
     await dialog.getByRole("textbox").first().fill(label);
     await dialog.getByRole("button", { name: "Create" }).click();
-    await expect(this.page).toHaveURL(/\?view=/);
+    await expect(
+      this.page.getByRole("banner").getByRole("button", { name: label })
+    ).toBeVisible();
     await expect.poll(() => api.exists("HD View", { label })).toBeTruthy();
     return (await api.exists("HD View", { label }))!;
   }
@@ -100,12 +115,34 @@ export class TicketList {
   }
 }
 
+/** Every view a spec creates is labelled with this, so `resetDefaultTicketView` can drop it. */
+const E2E_VIEW_PREFIX = "E2E view ";
+
+/** A private ticket view pinned to `user`'s sidebar, listing subjects that contain `subject`. */
+export async function createPinnedTicketView(api: Api, user: string, subject: string) {
+  return api.insert("HD View", {
+    label: `${E2E_VIEW_PREFIX}${uid()}`,
+    user,
+    dt: "HD Ticket",
+    type: "list",
+    route_name: "TicketsAgent",
+    pinned: 1,
+    filters: JSON.stringify({ subject: ["like", `%${subject}%`] }),
+    order_by: "modified desc",
+    columns: JSON.stringify([
+      { label: "ID", type: "Int", key: "name", width: "5rem" },
+      { label: "Subject", type: "Data", key: "subject", width: "25rem" },
+    ]),
+    rows: JSON.stringify(["name", "subject", "status", "modified", "_assign"]),
+  });
+}
+
 /** Drop the auto saved default view and any view a spec left behind. */
 export async function resetDefaultTicketView(api: Api, user: string) {
   const views = await api.list("HD View", {
     filters: { user, dt: "HD Ticket", is_default: 1 },
   });
-  views.push(...(await api.list("HD View", { filters: { label: ["like", "E2E view %"] } })));
+  views.push(...(await api.list("HD View", { filters: { label: ["like", `${E2E_VIEW_PREFIX}%`] } })));
   // the list may still be auto saving the default view, which locks it for a moment
   for (const view of views) {
     await expect(async () => {

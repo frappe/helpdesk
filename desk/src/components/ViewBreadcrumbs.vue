@@ -1,10 +1,13 @@
 <template>
   <div class="flex items-center">
-    <router-link
-      :to="{ name: routeName }"
-      class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
-    >
-      {{ isMobileView ? "..." : label }}
+    <router-link :to="{ name: routeName }" custom v-slot="{ href }">
+      <a
+        :href="href"
+        @click="onListClick"
+        class="ps-0 pe-0.5 py-1 text-lg-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
+      >
+        {{ isMobileView ? "..." : label }}
+      </a>
     </router-link>
     <span class="ml-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown v-model:open="isOpen" :options="options">
@@ -86,9 +89,9 @@ import LucideChevronDown from "~icons/lucide/chevron-down";
 import LucideCheck from "~icons/lucide/check";
 import Icon from "@/components/Icon.vue";
 import { useScreenSize } from "@/composables/screen";
+import { useActiveView } from "@/composables/useActiveView";
 import { Badge, Dropdown } from "frappe-ui";
 import { ref } from "vue";
-import { useRoute } from "vue-router";
 
 const props = defineProps({
   routeName: {
@@ -113,7 +116,7 @@ const props = defineProps({
   },
 });
 
-const route = useRoute();
+const { activeViewName, openView } = useActiveView();
 const { isMobileView } = useScreenSize();
 const isOpen = ref(false);
 
@@ -131,10 +134,16 @@ const viewActions = (item) =>
     })),
   }));
 
-const isCurrentView = (item) => {
-  if (!route.query.view) return false;
-  return item.name === route.query.view;
-};
+/** Opens the default list; modified clicks are left to the browser (new tab). */
+function onListClick(event) {
+  const { button, metaKey, ctrlKey, shiftKey, altKey } = event;
+  if (button || metaKey || ctrlKey || shiftKey || altKey) return;
+  event.preventDefault();
+  openView(props.routeName);
+}
+
+const isCurrentView = (item) =>
+  !!activeViewName.value && item.name === activeViewName.value;
 </script>
 
 <style>
