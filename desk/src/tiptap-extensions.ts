@@ -880,11 +880,12 @@ function withVisibleWhitespace(node: ProseMirrorNode): ProseMirrorNode {
   if (node.isLeaf) return node;
   const children: ProseMirrorNode[] = [];
   node.forEach((child, _offset, index) => {
-    // the editor keeps an empty paragraph at the end; it is not a typed line
+    // TrailingNode appends an empty paragraph after a final list or code block
     const isTrailing =
       node.type === node.type.schema.topNodeType &&
       index === node.childCount - 1 &&
-      !child.childCount;
+      !child.childCount &&
+      node.maybeChild(index - 1)?.type !== child.type;
     children.push(isTrailing ? child : withVisibleWhitespace(child));
   });
   return node.copy(Fragment.fromArray(children));
