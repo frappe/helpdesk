@@ -1,4 +1,4 @@
-import { Extension, generateJSON } from "@tiptap/core";
+import { Extension, generateJSON, getHTMLFromFragment } from "@tiptap/core";
 import {
   Table,
   TableCell,
@@ -7,6 +7,7 @@ import {
 } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
+import { Fragment, type Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import { SuggestionExtension } from "frappe-ui/editor";
@@ -864,29 +865,51 @@ export const PreserveWhitespace = Extension.create({
     const editor = this.editor;
     const getHTML = editor.getHTML.bind(editor);
     editor.getHTML = () =>
-      editor.isEmpty ? getHTML() : preserveWhitespace(getHTML());
+      editor.isEmpty
+        ? getHTML()
+        : getHTMLFromFragment(
+            withVisibleWhitespace(editor.state.doc).content,
+            editor.schema
+          );
   },
 });
 
-function preserveWhitespace(html: string): string {
-  if (!/<p[^>]*><\/p>| {2}|> /.test(html)) return html;
+function withVisibleWhitespace(node: ProseMirrorNode): ProseMirrorNode {
+  if (node.type.spec.code) return node;
+  if (node.isTextblock) return withVisibleSpaces(node);
+  if (node.isLeaf) return node;
+  const children: ProseMirrorNode[] = [];
+  node.forEach((child, _offset, index) => {
+    // the editor keeps an empty paragraph at the end; it is not a typed line
+    const isTrailing =
+      node.type === node.type.schema.topNodeType &&
+      index === node.childCount - 1 &&
+      !child.childCount;
+    children.push(isTrailing ? child : withVisibleWhitespace(child));
+  });
+  return node.copy(Fragment.fromArray(children));
+}
 
-  const template = document.createElement("template");
-  template.innerHTML = html;
-  for (const paragraph of template.content.querySelectorAll("p:empty")) {
-    paragraph.textContent = "\u00a0";
+function withVisibleSpaces(block: ProseMirrorNode): ProseMirrorNode {
+  if (!block.childCount) {
+    return block.copy(Fragment.from(block.type.schema.text("\u00a0")));
   }
-  const walker = document.createTreeWalker(
-    template.content,
-    NodeFilter.SHOW_TEXT
-  );
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    // code blocks already keep their spaces
-    if (node.parentElement?.closest("pre")) continue;
-    // a leading space or one before another space would collapse
-    node.nodeValue = node.nodeValue!.replace(/^ | (?= )/g, "\u00a0");
-  }
-  return template.innerHTML;
+  // a space at a line start or after another space collapses in HTML
+  let previous = "\n";
+  const children: ProseMirrorNode[] = [];
+  block.forEach((child) => {
+    if (!child.isText) {
+      previous = child.type.name === "hardBreak" ? "\n" : "";
+      children.push(child);
+      return;
+    }
+    const text = child.text!.replace(/ /g, (space, index, whole) =>
+      /[ \n]/.test(index ? whole[index - 1] : previous) ? "\u00a0" : space
+    );
+    previous = child.text!.slice(-1);
+    children.push(block.type.schema.text(text, child.marks));
+  });
+  return block.copy(Fragment.fromArray(children));
 }
 
 // frappe-ui's suggestion popups (`/`, `@`, `{{`) don't close on an outside click.
