@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex items-start justify-between gap-4">
-      <div class="flex min-w-0 flex-col gap-1">
-        <span class="text-base-medium text-ink-gray-8">
+      <div class="flex min-w-0 flex-col">
+        <h3 class="text-base-medium text-ink-gray-8">
           {{ __("Pinned categories") }}
-        </span>
-        <span class="text-p-sm text-ink-gray-6">
+        </h3>
+        <span class="mt-1 text-base leading-5 text-ink-gray-6">
           {{
             __(
               "Pinned categories will appear first on your knowledge base home page, in this order."

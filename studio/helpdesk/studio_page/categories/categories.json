@@ -12,33 +12,141 @@
      "isStudioComponent": true
     },
     {
+     "componentEvents": {
+      "click": {
+       "action": "Run Script",
+       "event": "click",
+       "script": "drawer.toggle()"
+      }
+     },
+     "componentId": "PortalSectionBar-categories",
+     "componentName": "PortalSectionBar",
+     "componentProps": {
+      "label": "{{ t('All categories') }}",
+      "open": "{{ drawer.open }}"
+     },
+     "isCustomVueComponent": true
+    },
+    {
+     "blockName": "sidebar",
+     "classes": [
+      "md:hidden"
+     ],
+     "componentEvents": {
+      "close": {
+       "action": "Run Script",
+       "event": "close",
+       "script": "drawer.close()"
+      }
+     },
+     "componentId": "PortalArticleSidebar-categories",
+     "componentName": "PortalArticleSidebar",
+     "componentProps": {
+      "categories": "{{ sidebar.data || [] }}",
+      "open": "{{ drawer.open }}",
+      "loading": "{{ !sidebar.data }}"
+     },
+     "isCustomVueComponent": true
+    },
+    {
      "blockName": "categories-body",
      "children": [
       {
        "blockName": "categories-section",
        "children": [
         {
-         "classes": [
-          "text-ink-gray-7",
-          "font-semibold"
+         "blockName": "categories-heading",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-7",
+            "font-semibold"
+           ],
+           "componentId": "TextBlock-fbq9hffj6-all",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-lg",
+            "tag": "h1",
+            "text": "{{ t(\"All categories\") }}"
+           }
+          },
+          {
+           "classes": [
+            "w-full",
+            "sm:w-60",
+            "[&_input]:!shadow-none"
+           ],
+           "componentId": "TextInput-categories-search",
+           "componentName": "TextInput",
+           "componentProps": {
+            "modelValue": {
+             "$type": "variable",
+             "name": "search"
+            },
+            "placeholder": "{{ t('Search categories') }}",
+            "size": "sm",
+            "type": "text",
+            "variant": "outline",
+            "aria-label": "{{ t('Search categories') }}"
+           },
+           "componentSlots": {
+            "prefix": {
+             "slotContent": [
+              {
+               "classes": [
+                "size-4",
+                "text-ink-gray-4"
+               ],
+               "componentId": "TextInput-categories-search-icon",
+               "componentName": "Icon",
+               "componentProps": {
+                "icon": "lucide-search"
+               },
+               "componentSlots": {}
+              }
+             ],
+             "slotId": "categories-search-slot-prefix",
+             "slotName": "prefix"
+            }
+           },
+           "visibilityCondition": "{{ !categories.data || categories.data.length }}"
+          }
          ],
-         "componentId": "TextBlock-fbq9hffj6-all",
-         "componentName": "TextBlock",
-         "componentProps": {
-          "fontSize": "text-lg",
-          "tag": "h1",
-          "text": "{{ t(\"All categories\") }}"
-         }
+         "classes": [
+          "flex",
+          "flex-col",
+          "gap-3",
+          "sm:flex-row",
+          "sm:items-center",
+          "sm:justify-between",
+          "sm:gap-4"
+         ],
+         "componentId": "container-categories-heading",
+         "componentName": "container",
+         "originalElement": "div"
         },
         {
          "blockName": "Category grid",
          "componentId": "category_grid-categories",
          "componentName": "category_grid",
          "componentProps": {
-          "categories": "{{ categories.data }}"
+          "categories": "{{ shownCategories }}"
          },
          "isStudioComponent": true,
-         "visibilityCondition": "{{ categories.data }}"
+         "visibilityCondition": "{{ shownCategories.length }}"
+        },
+        {
+         "componentId": "PortalEmptyState-categories-no-match",
+         "componentName": "PortalEmptyState",
+         "componentProps": {
+          "description": "{{ t('Change your search terms.') }}",
+          "title": "{{ t('No categories found') }}"
+         },
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ categories.data?.length && !shownCategories.length }}",
+         "classes": [
+          "flex-1"
+         ]
         },
         {
          "componentId": "PortalSkeleton-categories",
@@ -46,7 +154,7 @@
          "isCustomVueComponent": true,
          "componentProps": {
           "variant": "category-grid",
-          "count": 9
+          "count": "{{ skeletonCount }}"
          },
          "visibilityCondition": "{{ !categories.data }}"
         }
@@ -60,9 +168,10 @@
         "w-full",
         "px-4",
         "md:px-0",
-        "pt-8",
+        "pt-6",
         "sm:pt-[41px]",
-        "pb-8"
+        "pb-8",
+        "flex-1"
        ],
        "componentId": "container-categories-section",
        "componentName": "container",
@@ -108,7 +217,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-18 03:34:29.865314",
+ "modified": "2026-10-21 02:28:55.000000",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",

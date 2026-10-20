@@ -101,10 +101,18 @@
 
     <div v-else-if="variant === 'article'" class="flex flex-col gap-6">
       <div class="flex flex-col gap-3 border-b border-outline-gray-1 pb-3.5">
-        <Line
-          text="text-4xl-semibold max-sm:!text-[24px]"
-          width="min(28rem, 80%)"
-        />
+        <div class="flex items-center justify-between gap-4">
+          <Line
+            text="text-4xl-semibold max-sm:!text-[24px] flex-1"
+            width="min(28rem, 80%)"
+          />
+          <Skeleton
+            :class="[
+              BLOCK,
+              'mt-1 h-6 w-[136px] shrink-0 self-start rounded-[8px] max-sm:hidden',
+            ]"
+          />
+        </div>
         <div class="flex h-6 items-center gap-2">
           <Skeleton :class="[BLOCK, 'size-6 shrink-0 rounded-full']" />
           <Line text="text-sm" width="14rem" />
@@ -149,88 +157,93 @@
         class="flex w-[352px] shrink-0 flex-col border-l border-outline-gray-2 max-lg:hidden"
       >
         <div class="flex flex-col gap-4 p-4">
-          <div class="flex items-center gap-2.5">
-            <Skeleton :class="[BLOCK, 'size-10 shrink-0 rounded-full']" />
-            <div class="flex min-w-0 flex-1 flex-col">
-              <Line text="text-xl" width="9rem" />
+          <div class="flex items-center gap-3">
+            <Skeleton :class="[BLOCK, 'size-[46px] shrink-0 rounded-full']" />
+            <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+              <Line text="text-md" width="9rem" />
               <Line text="text-p-sm" width="3rem" />
             </div>
           </div>
           <div class="flex flex-col gap-2.5">
             <div
-              v-for="i in 4"
+              v-for="i in 3"
               :key="i"
               class="flex min-h-7 items-center gap-2"
             >
-              <Line text="text-base w-[106px] shrink-0" width="4.5rem" />
+              <Line
+                text="text-base me-[9px] w-[106px] shrink-0"
+                width="4.5rem"
+              />
               <Line text="text-base flex-1" :width="width(i, 40)" />
             </div>
           </div>
         </div>
+        <!-- The Timeline section, so nothing pops in below on load. -->
         <div class="border-t border-outline-gray-2">
-          <div class="flex h-[47px] items-center px-4">
-            <Line text="text-base w-full" width="4.5rem" />
+          <div class="flex items-center px-4 py-3.5">
+            <Line text="text-base" width="4.5rem" />
           </div>
           <div class="px-4 pb-4 pt-0.5">
-            <div
-              v-for="i in 4"
-              :key="i"
-              class="grid min-h-14 grid-cols-[16px_minmax(0,1fr)] gap-3 last:min-h-0"
-            >
-              <div class="flex justify-center">
-                <Skeleton :class="[BLOCK, 'mt-1.5 size-2 rounded-full']" />
-              </div>
-              <div>
-                <Line text="text-base-medium" :width="width(i, 45)" />
-                <Line text="text-p-xs" :width="width(i + 3, 35)" />
-              </div>
-            </div>
+            <PortalSkeleton variant="timeline-steps" :count="5" bare />
           </div>
         </div>
       </div>
     </template>
 
-    <div
-      v-else-if="variant === 'thread' && conversationLayout === 'chat'"
-      class="flex flex-col gap-4 pt-6"
-    >
-      <div
-        v-for="i in 3"
-        :key="i"
-        class="flex flex-col gap-1"
-        :class="i === 2 ? 'items-end' : 'items-start'"
-      >
-        <Line text="text-p-sm w-28" width="100%" />
+    <!-- The viewer's conversation layout: chat bubbles, or email cards. -->
+    <div v-else-if="variant === 'thread'" class="flex flex-col pt-4">
+      <div v-if="conversationLayout === 'chat'" class="flex flex-col gap-3">
         <div
-          class="w-[min(28rem,76%)] rounded-[10px] border border-outline-gray-2 px-3 py-1.5"
+          v-for="(bubble, i) in ['45%', '60%', '35%']"
+          :key="i"
+          class="flex gap-2"
+          :class="i % 2 ? '' : 'flex-row-reverse'"
         >
-          <Line text="text-p-base" width="100%" />
-          <Line text="text-p-base" :width="width(i, 40)" />
+          <Skeleton
+            v-if="i % 2"
+            :class="[BLOCK, 'size-7 shrink-0 rounded-full']"
+          />
+          <Skeleton
+            :class="[BLOCK, 'h-12 rounded-[18px]']"
+            :style="{ width: bubble }"
+          />
         </div>
       </div>
-    </div>
-    <div v-else-if="variant === 'thread'" class="flex flex-col gap-6 pt-6">
-      <div v-for="i in 2" :key="i" class="flex gap-2.5">
-        <Skeleton :class="[BLOCK, 'size-7 shrink-0 rounded-full']" />
-        <div class="min-w-0 flex-1 rounded-[10px] border border-outline-gray-2">
-          <div
-            class="flex h-10 items-center justify-between gap-4 border-b border-outline-gray-1 px-3"
-          >
-            <Line text="text-base w-24" width="100%" />
-            <Line text="text-p-sm w-16" width="100%" />
-          </div>
-          <div class="p-3">
-            <Line
-              v-for="line in i === 1 ? 3 : 2"
-              :key="line"
-              text="text-p-base"
-              :width="line === (i === 1 ? 3 : 2) ? width(i, 40) : '100%'"
-            />
+      <div v-else class="flex flex-col gap-4">
+        <div v-for="i in 2" :key="i" class="flex gap-2.5">
+          <Skeleton :class="[BLOCK, 'size-7 shrink-0 rounded-full']" />
+          <div class="flex-1 rounded-[8px] border border-outline-gray-2">
+            <div class="flex h-10 items-center justify-between gap-4 px-3">
+              <Line text="text-base w-24" width="100%" />
+              <Line text="text-sm w-20" width="100%" />
+            </div>
+            <div class="border-t border-outline-gray-2 p-3">
+              <Line text="text-base" :width="width(i, 60)" />
+              <Line v-if="i === 1" text="text-base" width="40%" />
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- PortalTicketTimeline's rows: 16px rail, 56px steps. -->
+    <div v-else-if="variant === 'timeline-steps'" class="flex flex-col">
+      <div
+        v-for="i in count"
+        :key="i"
+        class="grid grid-cols-[16px_minmax(0,1fr)] gap-3"
+      >
+        <div class="flex justify-center">
+          <Skeleton :class="[BLOCK, 'mt-1.5 size-2 rounded-full']" />
+        </div>
+        <div :class="i < count && 'min-h-14'">
+          <Line text="text-base-medium" :width="width(i, 45)" />
+          <Line text="text-p-xs" :width="width(i + 3, 35)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- count: the template's fields last time. -->
     <div v-else-if="variant === 'form'" class="flex w-full flex-col">
       <div class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5">
@@ -241,28 +254,31 @@
           <Line text="text-p-sm" width="4.5rem" />
           <div class="h-[164px] rounded-6 border border-outline-gray-2">
             <div
-              class="flex h-9 items-center gap-2.5 border-b border-outline-gray-2 px-2"
+              class="flex h-9 items-center gap-3.5 overflow-hidden border-b border-outline-gray-2 px-2"
             >
               <Skeleton
-                v-for="i in 8"
+                v-for="i in 24"
                 :key="i"
-                :class="[BLOCK, 'size-4 rounded-4']"
+                :class="[BLOCK, 'size-4 shrink-0 rounded-4']"
               />
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div v-for="i in 6" :key="i" class="flex flex-col gap-1.5">
+        <div v-if="count" class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div v-for="i in count" :key="i" class="flex flex-col gap-1.5">
             <Line text="text-xs" :width="width(i, 30)" />
             <Skeleton :class="[BLOCK, 'h-7 w-full rounded-[8px]']" />
           </div>
         </div>
-        <div
-          class="h-[58px] rounded-6 border border-dashed border-outline-gray-2"
-        />
+        <div class="flex flex-col gap-1.5">
+          <Line text="text-p-sm" width="5rem" />
+          <div
+            class="h-[68px] rounded-6 border border-dashed border-outline-gray-2"
+          />
+        </div>
       </div>
       <div class="flex justify-end pb-8 pt-8 sm:pt-[39px]">
-        <Skeleton :class="[BLOCK, 'h-8 w-28 rounded-[8px]']" />
+        <Skeleton :class="[BLOCK, 'h-8 w-[105px] rounded-[8px]']" />
       </div>
     </div>
 
@@ -276,27 +292,100 @@
           <Line text="text-p-sm w-48" width="100%" />
         </div>
       </div>
-      <div class="mt-8 flex h-7 items-center">
-        <Line text="text-base w-full" width="6rem" />
-      </div>
+      <h2 class="mt-8 flex h-7 items-center text-md-semibold text-ink-gray-8">
+        {{ __("Preferences") }}
+      </h2>
       <div class="mt-2">
         <PortalSkeleton variant="settings-rows" :count="4" bare />
       </div>
-      <div class="mt-4"><Line text="text-base" width="4.5rem" /></div>
+      <h2 class="mt-11 text-md-semibold text-ink-gray-8">
+        {{ __("Security") }}
+      </h2>
       <div class="mt-2">
         <PortalSkeleton variant="settings-rows" :count="1" bare />
       </div>
     </div>
 
-    <div v-else-if="variant === 'settings-rows'" class="flex flex-col">
+    <!-- Settings' organization screen. count: organizations last time; one opens directly. -->
+    <div
+      v-else-if="variant === 'organization'"
+      class="flex min-h-0 flex-1 flex-col"
+    >
+      <div class="flex shrink-0 flex-col gap-1 px-4 py-5 sm:px-10 sm:py-8">
+        <Line text="text-lg" width="11rem" />
+        <Line text="text-base" width="min(17rem, 80%)" />
+      </div>
+      <div class="min-h-0 flex-1 overflow-hidden px-4 pb-5 sm:px-10">
+        <template v-if="count === 1">
+          <div class="flex items-center gap-4 pt-1.5">
+            <Skeleton :class="[BLOCK, 'size-16 shrink-0 rounded-[12px]']" />
+            <Line text="text-2xl-semibold w-40" width="100%" />
+          </div>
+          <div class="mt-5 flex h-[29px] gap-6 border-b border-outline-gray-2">
+            <Line text="text-base w-16" width="100%" />
+            <Line text="text-base w-12" width="100%" />
+          </div>
+          <Skeleton :class="[BLOCK, 'mt-7 h-7 w-full rounded-[8px]']" />
+          <div class="mt-3 flex min-h-8 items-center">
+            <Line text="text-p-xs w-10" width="100%" />
+          </div>
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="flex min-h-13 items-center gap-2 border-t border-outline-gray-1 py-2.5"
+          >
+            <Skeleton :class="[BLOCK, 'size-8 shrink-0 rounded-full']" />
+            <div class="flex h-[39px] flex-1 flex-col justify-center gap-2">
+              <Skeleton
+                :class="[BLOCK, 'h-2.5 rounded-full']"
+                :style="{ width: width(i, 30) }"
+              />
+              <Skeleton
+                :class="[BLOCK, 'h-2 rounded-full']"
+                :style="{ width: width(i + 3, 45) }"
+              />
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <Skeleton :class="[BLOCK, 'mb-6 h-7 w-full rounded-[8px]']" />
+          <div
+            class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3"
+          >
+            <div
+              v-for="i in Math.min(count, 9)"
+              :key="i"
+              class="rounded-[10px] border border-outline-gray-2 p-4"
+            >
+              <Skeleton :class="[BLOCK, 'mb-3 size-12 rounded-[10px]']" />
+              <Line text="text-base" width="60%" />
+              <Line text="text-p-sm mt-0.5" width="40%" />
+              <div
+                class="mt-3 flex h-[33px] items-end border-t border-outline-gray-1"
+              >
+                <Skeleton :class="[BLOCK, 'mb-1 h-2 w-4/5 rounded-full']" />
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div
+      v-else-if="variant === 'settings-rows'"
+      class="flex flex-col divide-y divide-outline-gray-1"
+    >
       <div
         v-for="i in count"
         :key="i"
-        class="flex h-[68px] items-center justify-between gap-4"
+        class="flex items-center justify-between gap-8 py-3.5"
       >
         <div class="flex min-w-0 flex-1 flex-col gap-1">
-          <Line text="text-base-medium" :width="`${4.5 + (i % 3)}rem`" />
-          <Line text="text-p-sm" :width="width(i, 40)" />
+          <Line
+            text="text-base-medium h-[17px]"
+            :width="`${4.5 + (i % 3)}rem`"
+          />
+          <Line text="text-base leading-5" :width="width(i, 40)" />
         </div>
         <Skeleton :class="[BLOCK, 'h-7 w-32 shrink-0 rounded-[8px]']" />
       </div>
@@ -322,7 +411,7 @@
 import { h, type FunctionalComponent } from "vue";
 import { Skeleton } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
-// Relative, not `@app/`: the desk's new-ticket form renders this.
+// Relative, not @app: the desk imports this through NewTicketForm.
 import { conversationLayout } from "../../stores/conversationLayout";
 
 defineOptions({ name: "PortalSkeleton" });
@@ -339,10 +428,12 @@ withDefaults(
       | "nav"
       | "filters"
       | "ticket"
+      | "timeline-steps"
       | "thread"
       | "form"
       | "profile"
-      | "settings-rows";
+      | "settings-rows"
+      | "organization";
     count?: number;
     columns?: number;
     // Nested: the parent already announces loading.

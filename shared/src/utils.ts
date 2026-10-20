@@ -203,80 +203,6 @@ export function addHeadingIds(html: string) {
   return { html: doc.body.innerHTML, headings };
 }
 
-// No headings: outline bold lookalikes, else steps, notes, screenshots (2+).
-export function addOutlineIds(html: string) {
-  const doc = new DOMParser().parseFromString(html || "", "text/html");
-  const top = Array.from(doc.body.children);
-
-  const lookalikes = top.flatMap((element) => {
-    const text = lookalikeHeading(element);
-    return text ? [{ element, text }] : [];
-  });
-  if (lookalikes.length >= 2) {
-    const used = new Set<string>();
-    const sections = lookalikes.map(({ element, text }) => {
-      const base = slugify(text) || "section";
-      let id = base;
-      for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
-      used.add(id);
-      element.id = id;
-      return { id, text, level: 2 };
-    });
-    return { html: doc.body.innerHTML, sections };
-  }
-
-  const blocks = top.flatMap((element) => {
-    const kind = outlineKind(element);
-    if (!kind) return [];
-    // The editor keeps an image inside a paragraph, so the id goes on one.
-    if (element.tagName === "IMG") {
-      const paragraph = doc.createElement("p");
-      element.replaceWith(paragraph);
-      paragraph.append(element);
-      element = paragraph;
-    }
-    return [{ element, kind }];
-  });
-  if (blocks.length < 2) return { html, sections: [] };
-
-  const total = (kind: string) => blocks.filter((block) => block.kind === kind).length;
-  const seen: Record<string, number> = {};
-  const sections = blocks.map(({ element, kind }) => {
-    const n = (seen[kind] = (seen[kind] || 0) + 1);
-    const id = `${kind}-${n}`;
-    element.id = id;
-    let text = {
-      steps: __("Steps ({0})", [element.querySelectorAll(":scope > li").length]),
-      note: __("Note"),
-      screenshot: __("Screenshot"),
-    }[kind];
-    if (kind !== "steps" && total(kind) > 1) text = `${text} ${n}`;
-    return { id, text, level: 2 };
-  });
-  return { html: doc.body.innerHTML, sections };
-}
-
-// Short all-bold paragraphs read as headings; 60 chars skips bold sentences.
-function lookalikeHeading(element: Element) {
-  const text = element.textContent?.trim() || "";
-  if (element.tagName !== "P" || text.length < 3 || text.length > 60 || element.querySelector("img")) return null;
-  const walker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-  let allBold = true;
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (node.textContent?.trim() && !node.parentElement?.closest("strong, b")) allBold = false;
-  }
-  return allBold ? text.replace(/:$/, "").trim() : null;
-}
-
-function outlineKind(element: Element) {
-  if (element.tagName === "OL") return "steps";
-  if (element.tagName === "BLOCKQUOTE") return "note";
-  const imageOnly =
-    element.tagName === "IMG" ||
-    (element.tagName === "P" && element.querySelector("img") && !element.textContent?.trim());
-  return imageOnly ? "screenshot" : null;
-}
-
 // Lucide names are plain ASCII, so any emoji-presentation or pictographic
 // character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
 export function isEmoji(str: string): boolean {
@@ -520,9 +446,13 @@ export function articleMeta(categoryName?: string, minutes?: number) {
 }
 
 // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
-export async function copyPageLink() {
-  await useClipboard({ legacy: true }).copy(window.location.href);
-  toast.success(__("Link copied"));
+export async function copyToClipboard(text: string, message: string) {
+  await useClipboard({ legacy: true }).copy(text);
+  toast.success(message);
+}
+
+export function copyPageLink() {
+  return copyToClipboard(window.location.href, __("Link copied"));
 }
 
 export function matchesQuery(query: string, ...fields: (string | undefined)[]) {

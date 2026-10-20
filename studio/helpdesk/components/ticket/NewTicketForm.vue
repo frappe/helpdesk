@@ -64,7 +64,7 @@
       />
     </div>
   </div>
-  <PortalSkeleton v-else variant="form" />
+  <PortalSkeleton v-else variant="form" :count="skeletonFieldCount" />
 </template>
 
 <script setup lang="ts">
@@ -95,6 +95,7 @@ import PortalSkeleton from "../ui/PortalSkeleton.vue";
 import PortalRelatedArticles from "../knowledge_base/PortalRelatedArticles.vue";
 import PortalAttachments from "./PortalAttachments.vue";
 import { useArticleSearch } from "../../composables/useArticleSearch";
+import { useRememberedCount } from "../../composables/useRememberedCount";
 import { getPriority, loadTicketMeta } from "../../stores/ticketMeta";
 
 const UPLOAD_FOLDER = "Home/Helpdesk";
@@ -140,6 +141,15 @@ const template = createResource({
   auto: true,
 });
 loadTicketMeta();
+
+const skeletonFieldCount = useRememberedCount(
+  // Per side: agents don't get the contact's `customer` field.
+  `helpdesk-ticket-template-fields:${props.template}:${
+    props.isAgent ? "agent" : "portal"
+  }`,
+  () => template.data?.fields?.length,
+  0
+);
 
 const model = reactive<Record<string, any>>({});
 // Original fields, for `applyFilters` to restore.

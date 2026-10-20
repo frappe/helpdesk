@@ -1,23 +1,11 @@
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
+import { useRememberedCount } from '@app/composables/useRememberedCount'
 import { prefetchOnHover } from '@app/stores/knowledgeBase'
 
 const ARTICLE_LIMIT = 5
-const CATEGORY_GRID = '[data-component-id="category-grid-repeater"]'
-const EASE = 'cubic-bezier(0.2, 0, 0, 1)'
-// How many categories the home page showed last time, so the skeleton takes the same layout.
-const HOME_COUNT_KEY = 'helpdesk-kb-home-categories'
-
-function readHomeCount() {
-  try {
-    return Number(localStorage.getItem(HOME_COUNT_KEY)) || 0
-  } catch {
-    return 0
-  }
-}
-
 export default function setup(context) {
   const { articles, categories } = context
   const settings = useKnowledgeBaseHeader(context)
@@ -48,64 +36,18 @@ export default function setup(context) {
 
   const hasHiddenCategories = computed(() => homeCategories.value.length < (categories.data || []).length)
 
-  const showAllCategories = ref(false)
-  const gridCategories = computed(() => {
-    if (!showAllCategories.value) return homeCategories.value
-    const rest = (categories.data || []).filter((row) => !homeCategories.value.includes(row))
-    return [...homeCategories.value, ...rest]
-  })
-
-  let isToggling = false
-  async function toggleAllCategories() {
-    const grid = document.querySelector<HTMLElement>(CATEGORY_GRID)
-    if (!grid || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      showAllCategories.value = !showAllCategories.value
-      return
-    }
-    if (isToggling) return
-    isToggling = true
-    const extraCards = () => [...grid.children].slice(homeCategories.value.length)
-    if (showAllCategories.value) {
-      const fades = extraCards().map((card) => card.animate({ opacity: [1, 0], transform: ['none', 'translateY(8px)'] }, { duration: 150, easing: EASE, fill: 'forwards' }))
-      await Promise.all(fades.map((fade) => fade.finished))
-    }
-    const from = grid.offsetHeight
-    showAllCategories.value = !showAllCategories.value
-    await nextTick()
-    // Equal-height rows would squeeze every card during the height animation.
-    grid.style.gridAutoRows = `${grid.firstElementChild?.getBoundingClientRect().height}px`
-    grid.style.overflow = 'hidden'
-    const resize = grid.animate({ height: [`${from}px`, `${grid.offsetHeight}px`] }, { duration: 300, easing: EASE })
-    if (showAllCategories.value) {
-      extraCards().forEach((card, index) =>
-        card.animate(
-          { opacity: [0, 1], transform: ['translateY(12px)', 'none'] },
-          { duration: 300, delay: 60 + Math.min(index, 8) * 30, easing: EASE, fill: 'backwards' },
-        ),
-      )
-    }
-    await resize.finished
-    grid.style.overflow = ''
-    grid.style.gridAutoRows = ''
-    isToggling = false
-  }
-
-  const skeletonCount = readHomeCount() || 6
-  watch(
+  // The skeleton takes the layout of last time's count.
+  const skeletonCount = useRememberedCount(
+    'helpdesk-kb-home-categories',
     () => categories.data && homeCategories.value.length,
-    (count) => {
-      if (!count) return
-      try {
-        localStorage.setItem(HOME_COUNT_KEY, String(count))
-      } catch {}
-    },
+    6,
   )
 
   const focusCategory = computed(() => (homeCategories.value.length === 1 ? homeCategories.value[0] : null))
   const isLoneCategory = computed(() => Boolean(focusCategory.value))
 
   // Waits for categories: an earlier fetch could land after the right one.
-  const sort = ref('latest')
+  const sort = ref('popular')
   watch(
     [sort, focusCategory, () => categories.data],
     ([value, category, loaded]) => {
@@ -125,9 +67,6 @@ export default function setup(context) {
     homeCategories,
     skeletonCount,
     hasHiddenCategories,
-    showAllCategories,
-    gridCategories,
-    toggleAllCategories,
     sort,
     focusCategory,
     isLoneCategory,

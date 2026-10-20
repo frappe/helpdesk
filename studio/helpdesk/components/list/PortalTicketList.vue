@@ -1,13 +1,10 @@
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <!-- Skeleton reuses the table so headings and rows land in place. -->
     <ListView
-      v-if="shownRows.length"
-      class="min-h-0 flex-1"
-      :class="isSkeleton ? 'pointer-events-none' : 'portal-reveal'"
-      v-bind="skeletonAttrs"
-      :columns="shownColumns"
-      :rows="shownRows"
+      v-if="rows.length"
+      class="portal-reveal min-h-0 flex-1"
+      :columns="columns"
+      :rows="rows"
       row-key="name"
       :options="{
         selectable: true,
@@ -26,7 +23,7 @@
       </ListHeader>
       <ListRows class="mx-3 sm:mx-5">
         <ListRow
-          v-for="row in shownRows"
+          v-for="row in rows"
           :key="row.name"
           :row="row"
           v-slot="{ column, item }"
@@ -53,8 +50,67 @@
       </ListSelectBanner>
     </ListView>
 
+    <!-- Header bar and 40px rows share one column grid. -->
+    <PortalSkeleton v-else-if="loading" class="flex min-h-0 flex-1 flex-col">
+      <!-- w-max: narrow screens clip the columns, not squeeze them. -->
+      <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          class="mx-3 flex w-max min-w-[calc(100%-1.5rem)] flex-col sm:mx-5 sm:min-w-[calc(100%-2.5rem)]"
+        >
+          <div
+            class="mb-2 grid h-[34px] shrink-0 items-center gap-4 rounded-4 bg-surface-gray-2 px-2"
+            :style="{ gridTemplateColumns }"
+          >
+            <Skeleton
+              class="size-3.5 rounded-[4px] motion-reduce:animate-none"
+            />
+            <Skeleton
+              v-for="(column, i) in columns"
+              :key="column.key"
+              class="h-[0.6em] min-w-6 max-w-16 rounded-full text-sm motion-reduce:animate-none"
+              :style="{ width: `${50 + ((i * 17) % 30)}%` }"
+            />
+          </div>
+          <div
+            v-for="row in Math.min(pageLength, 20)"
+            :key="row"
+            class="shrink-0"
+          >
+            <div
+              class="grid h-10 items-center gap-4 px-2"
+              :style="{ gridTemplateColumns }"
+            >
+              <Skeleton
+                class="size-3.5 rounded-[4px] motion-reduce:animate-none"
+              />
+              <Skeleton
+                v-for="(column, i) in columns"
+                :key="column.key"
+                class="h-[0.6em] min-w-8 rounded-full text-base motion-reduce:animate-none"
+                :style="{ width: `${40 + ((row * 7 + i * 13) % 45)}%` }"
+              />
+            </div>
+            <div
+              v-if="row < Math.min(pageLength, 20)"
+              class="mx-2 h-px border-t border-outline-gray-1"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex h-[49px] shrink-0 items-center justify-between border-t px-3 sm:px-5"
+      >
+        <Skeleton
+          class="h-7 w-[104px] rounded-[8px] motion-reduce:animate-none"
+        />
+        <Skeleton
+          class="h-[0.6em] w-16 rounded-full text-base motion-reduce:animate-none"
+        />
+      </div>
+    </PortalSkeleton>
+
     <PortalEmptyState
-      v-else
+      v-else-if="!loading"
       class="pointer-events-none flex-1"
       icon="ticket"
       :title="emptyState.title"
@@ -68,14 +124,6 @@
         @loadMore="emit('loadMore')"
       />
     </div>
-    <div
-      v-else-if="isSkeleton"
-      class="flex h-[45px] items-center justify-between border-t px-3 sm:px-5"
-      aria-hidden="true"
-    >
-      <Skeleton class="h-7 w-[104px] rounded-6 motion-reduce:animate-none" />
-      <Skeleton class="h-2.5 w-14 rounded-full motion-reduce:animate-none" />
-    </div>
     <ExportModal
       v-model="showExport"
       :row-count="totalCount"
@@ -86,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, ref } from "vue";
+import { computed, ref } from "vue";
 import { Button, Skeleton } from "frappe-ui";
 import ExportModal from "@helpdesk/shared/ExportModal.vue";
 import { __ } from "@helpdesk/shared/translation";
@@ -101,6 +149,7 @@ import {
   ListView,
 } from "frappe-ui/experimental";
 import PortalEmptyState from "@app/components/ui/PortalEmptyState.vue";
+import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 import { loadTicketMeta } from "@app/stores/ticketMeta";
 
 // Not at module load: this file ships in public page bundles too.
@@ -130,6 +179,18 @@ const props = withDefaults(
 
 const pageLength = defineModel<number>("pageLength", { default: 20 });
 
+// Checkbox, then each column's width; plain numbers become `fr`.
+const gridTemplateColumns = computed(() =>
+  [
+    "14px",
+    ...props.columns.map((column) =>
+      typeof (column.width || 1) === "number"
+        ? `${column.width || 1}fr`
+        : column.width
+    ),
+  ].join(" ")
+);
+
 const emit = defineEmits<{
   columnResize: [payload: { key: string; width: string; save: boolean }];
   loadMore: [];
@@ -152,47 +213,6 @@ function exportRows(form: {
   emit("export", {
     exportType: form.export_type,
     names: form.export_all ? null : selectedNames.value,
-  });
-}
-
-const SKELETON_ROWS = Array.from({ length: 20 }, (_, index) => ({
-  name: `skeleton-${index}`,
-  index,
-}));
-const WIDTHS = [72, 58, 84, 64, 90, 52, 78, 68];
-
-const isSkeleton = computed(() => props.loading && !props.rows.length);
-const shownRows = computed(() =>
-  isSkeleton.value ? SKELETON_ROWS : props.rows
-);
-const shownColumns = computed(() =>
-  isSkeleton.value
-    ? props.columns.map((column) => ({
-        ...column,
-        cell: ({ row }) => placeholder(row, column.key),
-      }))
-    : props.columns
-);
-const skeletonAttrs = computed(() =>
-  isSkeleton.value
-    ? { "aria-busy": "true", "aria-label": __("Loading tickets") }
-    : {}
-);
-
-function placeholder(row: { index: number }, key: string) {
-  const share = WIDTHS[(row.index + key.length) % WIDTHS.length];
-  const width =
-    key === "subject"
-      ? `${Math.max(share, 45)}%`
-      : key === "name"
-      ? "2.5rem"
-      : `${share}%`;
-  return h(Skeleton, {
-    class: [
-      "h-2.5 rounded-full motion-reduce:animate-none",
-      key === "status" ? "max-w-[6rem]" : "max-w-[16rem]",
-    ],
-    style: { width },
   });
 }
 </script>

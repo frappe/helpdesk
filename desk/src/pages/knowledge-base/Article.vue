@@ -52,9 +52,18 @@
               />
               <div
                 v-if="!editable && !isMobileView"
-                class="text-p-sm text-ink-gray-4 items-center"
+                class="flex items-center gap-2 text-p-sm text-ink-gray-5"
               >
                 <span>{{ viewsLabel }}</span>
+                <template v-if="access && isPublished">
+                  <span
+                    class="size-1 rounded-full bg-[var(--outline-gray-3)]"
+                  />
+                  <span class="flex items-center gap-1.5">
+                    <Icon :icon="access.icon" class="size-4 shrink-0" />
+                    {{ access.label }}
+                  </span>
+                </template>
               </div>
             </div>
             <div class="flex gap-4 justify-between sm:items-start">
@@ -208,7 +217,9 @@
     <ArticleAccessModal
       v-if="article.data"
       v-model="showAccessModal"
-      :title="__('Access for “{0}”', [article.data.title])"
+      :title="
+        isPublished ? __('Change article access') : __('Publish article as')
+      "
       :visibility="article.data.visibility"
       :action-label="isPublished ? __('Update access') : __('Publish')"
       @publish="publishArticle"
@@ -252,6 +263,8 @@ import {
   uploadFunction,
 } from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import Icon from "@helpdesk/shared/Icon.vue";
+import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { addHeadingIds, countLabel } from "@helpdesk/shared/utils";
 import {
   Avatar,
@@ -335,6 +348,9 @@ const editable = ref(route.query.isEdit ?? false);
 const likes = ref(0);
 const dislikes = ref(0);
 const views = ref(0);
+const access = computed(
+  () => categoryAccess()[article.data?.visibility as string]
+);
 const viewsLabel = computed(() =>
   countLabel(views.value, __("1 view"), __("{0} views"))
 );
@@ -398,7 +414,7 @@ const togglePublished = debounce(
   () =>
     isPublished.value
       ? save({ status: "Draft" }, __("Article unpublished."))
-      : save({ status: "Published" }, __("Article published.")),
+      : (showAccessModal.value = true),
   300
 );
 

@@ -208,7 +208,7 @@ const groupByActions = [
       Object.assign(accessDialog, {
         open: true,
         forCategory: true,
-        title: __("Access for “{0}”", [group.label]),
+        title: __("Change category access"),
         visibility,
       });
     },
@@ -241,41 +241,33 @@ const setCategoryVisibility = createResource({
 });
 
 function categoryAccessNote(access: string | null) {
-  const name = category.title;
   if (!access) {
     return __(
-      "Articles in {0} have different access. Choosing one applies it to every article.",
-      [name]
+      "Articles in this category have different access. Choosing one applies it to every article."
     );
   }
   if (access === accessDialog.visibility) {
     return {
       Public: __(
-        "Anyone, including visitors who aren't logged in, can read the articles in {0}.",
-        [name]
+        "Anyone, including visitors who aren't logged in, can read the articles in this category."
       ),
       Customers: __(
-        "Only logged-in customers and agents can read the articles in {0}.",
-        [name]
+        "Only logged-in customers and agents can read the articles in this category."
       ),
       Private: __(
-        "Only agents can read the articles in {0}. It doesn't appear on the customer portal.",
-        [name]
+        "Only agents can read the articles in this category. It doesn't appear on the customer portal."
       ),
     }[access];
   }
   return {
     Public: __(
-      "Every article in {0} will be readable by anyone, including visitors who aren't logged in.",
-      [name]
+      "Every article in this category will be readable by anyone, including visitors who aren't logged in."
     ),
     Customers: __(
-      "Every article in {0} will be readable only by logged-in customers and agents.",
-      [name]
+      "Every article in this category will be readable only by logged-in customers and agents."
     ),
     Private: __(
-      "Every article in {0} will be readable only by agents, and {0} will no longer appear on the customer portal.",
-      [name]
+      "Every article in this category will be readable only by agents, and the category will no longer appear on the customer portal."
     ),
   }[access];
 }
@@ -338,8 +330,8 @@ async function changeArticlesAccess(selections: Set<string>) {
     forCategory: false,
     title:
       selections.size === 1
-        ? __("Access for 1 article")
-        : __("Access for {0} articles", [selections.size]),
+        ? __("Change access for 1 article")
+        : __("Change access for {0} articles", [selections.size]),
     visibility: current.size === 1 ? [...current][0] : null,
   });
 }

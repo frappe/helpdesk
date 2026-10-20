@@ -17,6 +17,7 @@
               class="form-control"
               doctype="HD Article Category"
               :placeholder="__('Select Category')"
+              :search-placeholder="__('Search')"
               v-model="categoryId"
               :pageLength="100"
               :hide-clear-button="true"
@@ -88,7 +89,7 @@ import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 const extensions = buildEditorExtensions();
 import { useOnboarding } from "@framework/ui";
 import Link from "@/components/frappe-ui/Link.vue";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { __ } from "@/translation";
 
 import { LayoutHeader, UserAvatar } from "@/components";

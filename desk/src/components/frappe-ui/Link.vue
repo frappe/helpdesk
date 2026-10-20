@@ -14,7 +14,7 @@
     :description="description"
     :required="required"
     @update:model-value="(val) => (value = val)"
-    @update:open="() => (text = '')"
+    @update:open="onOpen"
     v-model:query="text"
   >
     <template v-if="$slots.trigger" #trigger="slotProps">
@@ -72,7 +72,7 @@ import LucidePlus from "~icons/lucide/plus";
 import { watchDebounced } from "@vueuse/core";
 import { Button, Combobox, createResource } from "frappe-ui";
 import { __ } from "@/translation";
-import { computed, ref, useAttrs, watch } from "vue";
+import { computed, nextTick, ref, useAttrs, watch } from "vue";
 
 const props = defineProps({
   doctype: {
@@ -106,6 +106,7 @@ const props = defineProps({
   label: String,
   description: String,
   placeholder: String,
+  searchPlaceholder: String,
   required: Boolean,
   disabled: Boolean,
   size: {
@@ -148,6 +149,18 @@ const linkOptions = computed(() => {
 // it stops resetting it (`useIsModelBound`). Opening and closing clear it here
 // instead, or the label committed on select stays in the search box.
 const text = ref("");
+
+// frappe-ui's Combobox gives its dropdown search the field's placeholder
+// too; `searchPlaceholder` replaces it there. Drop this once Combobox takes
+// a separate search placeholder.
+function onOpen(open) {
+  text.value = "";
+  if (!open || !props.searchPlaceholder) return;
+  nextTick(() => {
+    const search = document.querySelector('input[id$="-search-input"]');
+    if (search) search.placeholder = props.searchPlaceholder;
+  });
+}
 
 const showClear = computed(
   () => !props.disabled && !props.hideClearButton && Boolean(value.value)

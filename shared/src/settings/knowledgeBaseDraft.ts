@@ -120,12 +120,15 @@ function createDraft() {
     for (const row of accessRows.data || []) {
       access[row.category] = access[row.category] ? "Mixed" : row.visibility;
     }
-    return (categories.data || []).map((row) => ({
-      label: row.category_name,
-      value: row.name,
-      icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
-      access: access[row.name],
-    }));
+    // Customers never see Private categories; already pinned ones stay to unpin.
+    return (categories.data || [])
+      .filter((row) => access[row.name] !== "Private" || row.pinned)
+      .map((row) => ({
+        label: row.category_name,
+        value: row.name,
+        icon: row.icon?.startsWith("lucide-") ? row.icon : "lucide-folder",
+        access: access[row.name],
+      }));
   });
 
   const changed = computed(() => {

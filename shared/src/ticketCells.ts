@@ -32,7 +32,8 @@ export function resolutionBadge(row: any, due: string | undefined, paused: boole
 
 function urgentIcon() {
   const glyph = "fill-surface-gray-1";
-  return h("svg", { class: "h-3.5 w-3.5", viewBox: "0 0 14 14", fill: "none" }, [
+  // Fills its slot, so callers set the size.
+  return h("svg", { class: "size-full", viewBox: "0 0 14 14", fill: "none" }, [
     h("rect", { width: 14, height: 14, rx: 4, class: "fill-ink-gray-6" }),
     h("rect", { x: 6.25, y: 3, width: 1.5, height: 4.75, rx: 0.75, class: glyph }),
     h("circle", { cx: 7, cy: 10, r: 0.9, class: glyph }),

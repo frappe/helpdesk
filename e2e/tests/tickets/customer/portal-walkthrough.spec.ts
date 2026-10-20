@@ -384,6 +384,45 @@ test.describe("details panel", () => {
     await expect(page.getByText(/^Due /).first()).toBeVisible();
   });
 
+  test("closed before any reply: middle steps read as skipped", async ({ page, api, ticket }) => {
+    await api.update("HD Ticket", ticket.name, { status: "Closed" });
+    await page.goto(`/help/tickets/${ticket.name}`);
+    await expect(page.getByText("Skipped")).toHaveCount(3);
+    await expect(page.getByText(/Closed directly/)).toHaveCount(0);
+    await expect(page.getByText(/^Due /)).toHaveCount(0);
+  });
+
+  test("an email field stacks an avatar per address, named on hover; a bad one shows the raw text", async ({ page, api, ticket }) => {
+    if (!(await api.exists("Custom Field", { name: "HD Ticket-e2e_emails" }))) {
+      await api.insert("Custom Field", {
+        dt: "HD Ticket",
+        fieldname: "e2e_emails",
+        label: "E2E Emails",
+        fieldtype: "Data",
+        insert_after: "description",
+      });
+    }
+    const { fields } = await api.get("HD Ticket Template", "Default");
+    await api.update("HD Ticket Template", "Default", {
+      fields: [{ fieldname: "e2e_emails", visible_to: "Everyone", required: 0 }],
+    });
+    try {
+      const emails = page.locator('[data-component-id="PortalEmailList-ticket-basics"]');
+      await api.update("HD Ticket", ticket.name, { e2e_emails: "ann@example.com; bob@example.com" });
+      await page.goto(`/help/tickets/${ticket.name}`);
+      await expect(emails).toContainText("ann@example.com, bob@example.com");
+      await emails.getByText("b", { exact: true }).hover();
+      await expect(page.locator("[data-slot=bubble]")).toHaveText("bob@example.com");
+
+      await api.update("HD Ticket", ticket.name, { e2e_emails: "ann@example.com, not an email" });
+      await page.reload();
+      await expect(page.getByText("ann@example.com, not an email")).toBeVisible();
+      await expect(emails).toHaveCount(0);
+    } finally {
+      await api.update("HD Ticket Template", "Default", { fields });
+    }
+  });
+
   test("a paused status puts the next step on hold", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Replied" });
     await page.goto(`/help/tickets/${ticket.name}`);

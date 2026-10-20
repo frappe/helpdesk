@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-1">
-      <span class="text-base-medium text-ink-gray-8">{{ __("Banner") }}</span>
-      <span class="text-p-sm text-ink-gray-6">{{
+    <div class="flex flex-col">
+      <h3 class="text-base-medium text-ink-gray-8">{{ __("Banner") }}</h3>
+      <span class="mt-1 text-base leading-5 text-ink-gray-6">{{
         __(
           "Choose a color, pattern or image to show behind the search bar to customize your knowledge base home page. For custom images recommended image size is minimum 1440x240 px in PNG or JPG."
         )
@@ -49,7 +49,8 @@
             @click="save('', option.name)"
           />
         </Tooltip>
-        <div v-if="uploaded" class="relative">
+        <!-- flex: a block wrapper adds a line box, 6px taller than the swatches -->
+        <div v-if="uploaded" class="relative flex">
           <Tooltip :text="__('Custom image')">
             <button
               type="button"

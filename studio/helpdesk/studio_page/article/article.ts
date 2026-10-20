@@ -2,7 +2,7 @@ import { computed, watch } from 'vue'
 import { call, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
-import { addHeadingIds, addOutlineIds, articleMeta, copyPageLink, countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
+import { addHeadingIds, copyPageLink, countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
@@ -19,15 +19,12 @@ export default function setup(context) {
 
   const parsed = computed(() => {
     const { html, headings } = addHeadingIds(article.data?.content)
-    if (headings.length) return { html, toc: headings.filter((heading) => heading.level <= 3) }
-    const outline = addOutlineIds(html)
-    return { html: outline.html, toc: outline.sections }
+    return { html, toc: headings.filter((heading) => heading.level <= 3) }
   })
   const minutes = computed(() => article.data?.minutes)
   const readingTime = computed(() =>
     minutes.value ? countLabel(minutes.value, __('1 minute to read'), __('{0} minutes to read')) : '',
   )
-  const eyebrow = computed(() => articleMeta(article.data?.category_name, minutes.value))
 
   const publishedOn = computed(() => {
     const date = article.data?.published_on
@@ -113,7 +110,6 @@ export default function setup(context) {
     prefetchOnHover,
     parsed,
     readingTime,
-    eyebrow,
     publishedOn,
     relatedArticles,
     submitFeedback,

@@ -56,6 +56,16 @@
        {
         "children": [
          {
+          "componentId": "PortalSkeleton-nav-members",
+          "componentName": "PortalSkeleton",
+          "isCustomVueComponent": true,
+          "componentProps": {
+           "variant": "nav",
+           "count": 1
+          },
+          "visibilityCondition": "{{ !settingsLoaded }}"
+         },
+         {
           "children": [
            {
             "componentId": "kb_settings-nav-members-label",
@@ -91,7 +101,8 @@
             "slotId": "kb_settings-slot-prefix",
             "slotName": "prefix"
            }
-          }
+          },
+          "visibilityCondition": "{{ settingsLoaded }}"
          }
         ],
         "componentId": "kb_settings-nav-organization",
@@ -100,7 +111,7 @@
          "label": "{{ t('Organization') }}"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ settingsLoaded && organizations.length }}",
+        "visibilityCondition": "{{ settingsLoaded ? organizations.length : organizationCountHint }}",
         "classes": [
          "portal-reveal"
         ]
@@ -190,7 +201,7 @@
          "label": "{{ t('App Settings') }}"
         },
         "componentSlots": {},
-        "visibilityCondition": "{{ settingsLoaded && canEditSettings }}",
+        "visibilityCondition": "{{ canEditSettings }}",
         "classes": [
          "portal-reveal"
         ]
@@ -320,15 +331,14 @@
                 "children": [
                  {
                   "classes": [
-                   "text-base",
-                   "font-semibold",
-                   "text-ink-gray-9"
+                   "text-ink-gray-8"
                   ],
                   "componentId": "kb_settings-preferences-title",
                   "componentName": "TextBlock",
                   "componentProps": {
-                   "tag": "span",
-                   "text": "{{ t('Preferences') }}"
+                   "tag": "h2",
+                   "text": "{{ t('Preferences') }}",
+                   "fontSize": "text-md-semibold"
                   },
                   "componentSlots": {}
                  }
@@ -486,7 +496,9 @@
                  }
                 ],
                 "classes": [
-                 "mt-2"
+                 "mt-2",
+                 "divide-y",
+                 "divide-outline-gray-1"
                 ],
                 "componentId": "kb_settings-preferences-rows",
                 "componentName": "container",
@@ -511,15 +523,14 @@
               "children": [
                {
                 "classes": [
-                 "text-base",
-                 "font-semibold",
-                 "text-ink-gray-9"
+                 "text-ink-gray-8"
                 ],
                 "componentId": "kb_settings-security-title",
                 "componentName": "TextBlock",
                 "componentProps": {
-                 "tag": "span",
-                 "text": "{{ t('Security') }}"
+                 "tag": "h2",
+                 "text": "{{ t('Security') }}",
+                 "fontSize": "text-md-semibold"
                 },
                 "componentSlots": {}
                },
@@ -546,7 +557,9 @@
                  }
                 ],
                 "classes": [
-                 "mt-2"
+                 "mt-2",
+                 "divide-y",
+                 "divide-outline-gray-1"
                 ],
                 "componentId": "kb_settings-security-rows",
                 "componentName": "container",
@@ -556,7 +569,7 @@
                }
               ],
               "classes": [
-               "mt-4",
+               "mt-11",
                "portal-reveal"
               ],
               "componentId": "kb_settings-security",
@@ -604,6 +617,22 @@
        {
         "blockName": "Manage organization",
         "children": [
+         {
+          "componentId": "PortalSkeleton-organization",
+          "componentName": "PortalSkeleton",
+          "isCustomVueComponent": true,
+          "componentProps": {
+           "variant": "organization",
+           "count": "{{ organizationCountHint }}"
+          },
+          "classes": [
+           "flex",
+           "flex-1",
+           "min-h-0",
+           "flex-col"
+          ],
+          "visibilityCondition": "{{ !settingsLoaded }}"
+         },
          {
           "children": [
            {
@@ -662,7 +691,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrganization }}"
+          "visibilityCondition": "{{ settingsLoaded && !selectedOrganization }}"
          },
          {
           "children": [
@@ -693,7 +722,7 @@
           "componentProps": {},
           "componentSlots": {},
           "originalElement": "div",
-          "visibilityCondition": "{{ !selectedOrganization }}"
+          "visibilityCondition": "{{ settingsLoaded && !selectedOrganization }}"
          },
          {
           "children": [
@@ -1722,8 +1751,10 @@
           ],
           "classes": [
            "shrink-0",
-           "py-8",
-           "px-10"
+           "px-4",
+           "sm:px-10",
+           "py-5",
+           "sm:py-8"
           ],
           "componentId": "kb_settings-portal-settings-header",
           "componentName": "container",
@@ -1746,8 +1777,10 @@
            "min-h-0",
            "overflow-y-auto",
            "pt-0",
-           "px-10",
-           "pb-8"
+           "px-4",
+           "sm:px-10",
+           "pb-5",
+           "sm:pb-8"
           ],
           "componentId": "kb_settings-portal-settings-body",
           "componentName": "container",
@@ -1823,7 +1856,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-19 03:50:00.000000",
+ "modified": "2026-10-21 12:30:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

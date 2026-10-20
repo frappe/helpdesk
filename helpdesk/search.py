@@ -335,14 +335,14 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
     query_parts: list[str] = query.split()
     query = ""
     sep = " " if qtype == "and" else "|"
-    for part in query_parts:
+    for index, part in enumerate(query_parts):
         if part in get_synonym_words():
             query += f"{sep}{part}"
             continue
         if part in get_stopwords():
             continue
-        if len(part) > 3:
-            # fuzzy for a typo in a whole word, prefix for one still being typed
+        # The last word may still be typed: fuzzy would match "autho" to "auto".
+        if len(part) > 3 and index < len(query_parts) - 1:
             query += f"{sep}(%{part}%|{part}*)"
         else:
             query += f"{sep}{part}*"

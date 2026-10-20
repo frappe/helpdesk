@@ -4,14 +4,16 @@
     :srcdoc="srcdoc"
     sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
     referrerpolicy="no-referrer"
-    class="block h-10 max-h-[500px] w-full max-w-full border-0"
+    class="email-fade block h-10 max-h-[500px] w-full max-w-full border-0"
   />
 </template>
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { __ } from "@helpdesk/shared/translation";
 import {
   applyCssToIframe,
+  bottomFade,
   stripEmailColors,
   useDataTheme,
 } from "@framework/ui/components/ActivityTimeline/utils";
@@ -90,9 +92,12 @@ function fold(doc: Document, quote: Element) {
   // Literal classes: Tailwind scans this file for the frame's sheets.
   const label = doc.createElement("label");
   label.className =
-    "my-2.5 flex h-3 w-[23px] cursor-pointer items-center justify-center rounded-5 bg-surface-gray-2 text-lg font-bold leading-none text-ink-gray-8 hover:bg-surface-gray-3";
+    "mt-2 flex h-4 w-6 cursor-pointer items-center justify-center gap-[2px] rounded-full bg-surface-gray-3 text-ink-gray-7 hover:bg-surface-gray-4";
   label.setAttribute("for", id);
-  label.innerHTML = "...";
+  label.setAttribute("title", __("Show quoted text"));
+  // Drawn dots, not "...": text sits on its baseline, below the pill's centre.
+  label.innerHTML =
+    '<span class="size-[3px] rounded-full bg-current"></span>'.repeat(3);
 
   const toggle = doc.createElement("input");
   toggle.id = id;
@@ -132,7 +137,10 @@ const srcdoc = computed(
   () => `<!DOCTYPE html><html data-theme="${initialTheme}"><head>
   <meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none';" />
   <base target="_blank" />
-  <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }</style>
+  <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }
+  .email-content pre { background: var(--surface-gray-3); color: var(--ink-gray-8); }
+  .email-content table { display: block; max-width: 100%; overflow-x: auto; }
+  .email-content :is(th, td) { padding: 4px 12px; }</style>
   </head><body class="m-0">
   <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
   </body></html>`
@@ -148,6 +156,11 @@ watch(
     element.onload = () => {
       applyCssToIframe(element, () => resize(element));
       resize(element);
+      element.contentWindow?.addEventListener(
+        "scroll",
+        () => syncFade(element),
+        { passive: true }
+      );
     };
     // Re-measure on width change, or rewrapped text clips.
     observer?.disconnect();
@@ -175,6 +188,7 @@ function resize(element: HTMLIFrameElement) {
   const fit = () => {
     fitFrameToContent(element);
     element.style.height = `${root.offsetHeight + 1}px`;
+    syncFade(element);
   };
   fit();
   element.contentDocument?.fonts?.ready.then(fit);
@@ -188,6 +202,12 @@ function resize(element: HTMLIFrameElement) {
   element.contentDocument
     ?.querySelectorAll("video")
     .forEach((video) => video.addEventListener("loadedmetadata", fit));
+}
+
+// Fade the bottom edge while more of a capped email remains below.
+function syncFade(element: HTMLIFrameElement) {
+  const root = element.contentDocument?.documentElement;
+  if (root) element.style.setProperty("--fade", bottomFade(root));
 }
 
 // Size the bubble to its text; an iframe fills its container.
@@ -208,3 +228,14 @@ watch(dataTheme, (theme) =>
   )
 );
 </script>
+
+<style scoped>
+/* At 0px the stop sits on the edge, so the mask is opaque. */
+.email-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - var(--fade, 0px)),
+    transparent
+  );
+}
+</style>

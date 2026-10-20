@@ -422,7 +422,12 @@ test.describe("knowledge base home", () => {
     await searchBox(page).fill(`nothing${word}`);
     await expect(page.getByText(`No articles match “nothing${word}”`)).toBeVisible();
     await expect(page.getByText("Try other words, or ask our team.")).toBeVisible();
-    await page.getByRole("button", { name: "Create a ticket" }).first().click();
+    // the header has a "Raise a ticket" button too
+    await page
+      .getByText("Try other words, or ask our team.")
+      .locator("..")
+      .getByRole("button", { name: "Raise a ticket" })
+      .click();
     await expect(page).toHaveURL(new RegExp(`/help/tickets/new\\?from=search&q=nothing${word}`));
     await expect(page.getByPlaceholder("A short description")).toHaveValue(`nothing${word}`);
 
@@ -451,7 +456,7 @@ test.describe("knowledge base home", () => {
     expect.soft(lists["helpdesk-kb-recent-articles:Guest"] || []).toEqual([]);
   });
 
-  test("K10 K12 pinned categories, View all and Show less", async ({ page, api }) => {
+  test("K10 K12 pinned categories and View all", async ({ page, api }) => {
     const pinned = [await createCategory(api), await createCategory(api)];
     for (const category of pinned) await createArticle(api, category.name);
     try {
@@ -466,10 +471,8 @@ test.describe("knowledge base home", () => {
       const columns = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
       expect(columns).toBe(2);
       await page.getByRole("button", { name: "View all" }).click();
-      await expect.poll(() => grid.getByRole("link").count()).toBeGreaterThan(2);
-      // Clicks during the 300ms animation are dropped.
-      await page.waitForTimeout(600);
-      await page.getByRole("button", { name: "Show less" }).click();
+      await expect(page).toHaveURL(/\/help\/categories$/);
+      await page.goBack();
       await expect(grid.getByRole("link")).toHaveCount(2);
       // K11: a card opens its category.
       await grid.getByRole("link").first().click();
@@ -503,6 +506,8 @@ test.describe("knowledge base home", () => {
     const latest = await createArticle(api, category.name, { title: `Latest ${uid()}` });
     await page.goto("/help");
     const articles = page.locator('[data-component-id="Repeater-9o4hxaycp"]').getByRole("link");
+    await expect(articles.first()).toContainText(popular.title);
+    await page.getByRole("radio", { name: "Latest" }).click();
     await expect(articles.first()).toContainText(latest.title);
     await page.getByRole("radio", { name: "Popular" }).click();
     await expect(articles.first()).toContainText(popular.title);

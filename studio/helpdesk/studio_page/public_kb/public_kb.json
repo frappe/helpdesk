@@ -210,13 +210,13 @@
             "click": {
              "action": "Run Script",
              "event": "click",
-             "script": "toggleAllCategories()"
+             "script": "router.push(routes.categories)"
             }
            },
            "componentId": "Button-view-all-categories",
            "componentName": "Button",
            "componentProps": {
-            "label": "{{ showAllCategories ? t('Show less') : t('View all') }}",
+            "label": "{{ t('View all') }}",
             "variant": "ghost"
            },
            "visibilityCondition": "{{ hasHiddenCategories }}"
@@ -226,7 +226,8 @@
           "flex",
           "items-center",
           "justify-between",
-          "gap-4"
+          "gap-4",
+          "min-h-7"
          ],
          "componentId": "container-categories-heading",
          "componentName": "container",
@@ -237,7 +238,7 @@
          "componentId": "category_grid-public_kb",
          "componentName": "category_grid",
          "componentProps": {
-          "categories": "{{ gridCategories }}",
+          "categories": "{{ homeCategories }}",
           "columns": "{{ homeCategories.length === 2 ? 2 : 3 }}"
          },
          "isStudioComponent": true
@@ -347,7 +348,7 @@
              "$type": "variable",
              "name": "sort"
             },
-            "options": "{{ [{ label: t(\"Latest\"), value: \"latest\" }, { label: t(\"Popular\"), value: \"popular\" }] }}",
+            "options": "{{ [{ label: t(\"Popular\"), value: \"popular\" }, { label: t(\"Latest\"), value: \"latest\" }] }}",
             "size": "sm",
             "type": "subtle",
             "vertical": false
@@ -625,7 +626,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-19 02:59:37.432603",
+ "modified": "2026-10-21 02:14:14.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

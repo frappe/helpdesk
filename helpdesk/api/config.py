@@ -11,6 +11,7 @@ def get_config():
         "brand_logo",
         "public_knowledge_base",
         "allow_anonymous_article_voting",
+        "hide_raise_ticket_button",
         "banner_image",
         "banner_preset",
         "setup_complete",

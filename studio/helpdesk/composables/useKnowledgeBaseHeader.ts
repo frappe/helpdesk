@@ -1,6 +1,9 @@
 import { computed, effectScope, ref, watch } from 'vue'
+import { __ } from '@helpdesk/shared/translation'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { isSafeLink, runFormScripts } from '@helpdesk/shared/utils'
+import { navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
 import { accountMenuOptions, themeIcon, toggleTheme, useSettingsModal } from '@app/stores/settings'
 
@@ -22,6 +25,11 @@ const session = useSession()
 
 const customActions = ref([])
 const headerLinks = ref([])
+
+// Empty hides the header button.
+const pageActionLabel = computed(() =>
+  session.canCreateTicket.value && !session.config.value?.hide_raise_ticket_button ? __('Raise a ticket') : '',
+)
 
 // Phone: text links move into the logo menu.
 const menuOptions = computed(() => [
@@ -72,5 +80,8 @@ export function useKnowledgeBaseHeader(context) {
     accountMenuOptions: menuOptions,
     themeIcon,
     toggleTheme,
+    pageActionLabel,
+    pageActionIcon: 'lucide-plus',
+    onPageAction: () => navigateTo(ROUTES.newTicket()),
   }
 }

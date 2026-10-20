@@ -4,7 +4,7 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.search import HelpdeskSearch, update_article_index
+from helpdesk.search import HelpdeskSearch, search, update_article_index
 from helpdesk.test_utils import make_article, make_article_category
 
 
@@ -77,3 +77,15 @@ class TestArticleIndex(IntegrationTestCase):
             enqueue.call_args.args[0], "helpdesk.search.update_article_index"
         )
         self.assertEqual(enqueue.call_args.kwargs["article"], self.article)
+
+
+class TestSearchQuery(IntegrationTestCase):
+    def test_the_last_word_is_a_prefix_only(self) -> None:
+        with patch.object(HelpdeskSearch, "search") as search_index:
+            search_index.return_value.docs = []
+            search("restore backup autho")
+        # "autho" may be half typed: no fuzzy, or it matches "auto"
+        self.assertEqual(
+            search_index.call_args.args[0],
+            "(%restore%|restore*) (%backup%|backup*) autho*",
+        )

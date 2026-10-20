@@ -28,7 +28,7 @@
          "isCustomVueComponent": true,
          "componentProps": {
           "variant": "filters",
-          "count": 3
+          "count": 2
          },
          "visibilityCondition": "{{ !settingsLoaded }}"
         },
@@ -349,7 +349,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-19 03:15:00.639761",
+ "modified": "2026-10-21 02:14:14.000000",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",

@@ -623,18 +623,17 @@ test.describe("app settings", () => {
     try {
       const page = await pageAs("admin");
       const dialog = await openSettingsAt(page, "settings/portal-settings");
-      await expect(dialog.getByText("Disable signup")).toBeVisible();
+      await expect(dialog.getByText("Allow signup")).toBeVisible();
       const labels = ["Allow member invites", "Allow member management", "Allow organization edits"];
       for (const [index, label] of labels.entries()) {
-        const row = dialog.locator("div.flex.items-center.justify-between").filter({ hasText: label });
         const before = (await api.get("HD Settings", "HD Settings"))[PORTAL_TOGGLES[index]];
-        await row.getByRole("switch").click();
+        await dialog.getByRole("switch", { name: label }).click();
         await expect(toast(page, "Settings updated")).toBeVisible();
         await expect.poll(async () => (await api.get("HD Settings", "HD Settings"))[PORTAL_TOGGLES[index]]).toBe(before ? 0 : 1);
       }
       const managerDialog = await openSettingsAt(await pageAs("manager"), "settings/portal-settings");
       await expect(managerDialog.getByText("Allow member invites")).toBeVisible();
-      await expect(managerDialog.getByText("Disable signup")).toHaveCount(0);
+      await expect(managerDialog.getByText("Allow signup")).toHaveCount(0);
     } finally {
       await restore();
       await api.update("Website Settings", "Website Settings", { disable_signup: signup });

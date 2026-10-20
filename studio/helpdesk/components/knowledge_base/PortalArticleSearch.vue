@@ -47,7 +47,7 @@
           </span>
           <span
             v-if="item.article"
-            class="truncate text-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:text-ink-gray-5"
+            class="truncate text-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:font-medium [&_mark]:text-ink-gray-8"
           >
             <template v-if="item.article.category_name">
               {{ item.article.category_name }} ·
@@ -96,7 +96,7 @@
           variant="subtle"
           size="sm"
           icon-left="lucide-plus"
-          :label="__('Create a ticket')"
+          :label="__('Raise a ticket')"
           @pointerdown.prevent
           @click="createTicket"
         />

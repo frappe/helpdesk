@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col gap-3">
-    <div class="flex flex-col gap-1">
-      <span class="text-base-medium text-ink-gray-8">
+    <div class="flex flex-col">
+      <h3 class="text-base-medium text-ink-gray-8">
         {{ __("Quick links") }}
-      </span>
-      <span class="text-p-sm text-ink-gray-6">
+      </h3>
+      <span class="mt-1 text-base leading-5 text-ink-gray-6">
         {{
           __(
             "Add links to your website, docs or social pages. They will appear at the top right of every knowledge base page."

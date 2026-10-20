@@ -101,6 +101,9 @@ def get_one(name: str):
             order_by="creation asc",
         ),
         "contact": contact,
+        # `customer` is already readable here; customers can't read HD Customer
+        "customer_image": ticket.get("customer")
+        and frappe.db.get_value("HD Customer", ticket.customer, "image"),
         "outside_hours_banner": outside_hours_banner,
         "overdue_by": overdue_by,
         # validate_feedback's rule for when closing needs a rating

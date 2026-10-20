@@ -1,26 +1,51 @@
 <template>
+  <!-- Phone: a bottom sheet the section bar opens. Visibility transitions
+       only on close, so the sheet is focusable as soon as it opens. -->
   <div
     ref="panel"
     v-bind="$attrs"
-    class="flex h-full w-[239px] shrink-0 flex-col transition-[transform,visibility] duration-200 ease-out motion-reduce:transition-none max-md:fixed max-md:inset-y-0 max-md:start-0 max-md:z-40 max-md:w-[min(320px,85vw)] max-md:bg-surface-base max-md:shadow-2xl"
+    :role="isSheet ? 'dialog' : undefined"
+    :aria-modal="isSheet || undefined"
+    :aria-label="isSheet ? __('Browse articles') : undefined"
+    class="flex h-full w-[239px] shrink-0 flex-col max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-40 max-md:h-[86dvh] max-md:w-full max-md:overflow-hidden max-md:rounded-t-[22px] max-md:bg-surface-base max-md:shadow-2xl max-md:duration-300 max-md:ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none"
     :class="
-      !open &&
-      'max-md:invisible max-md:-translate-x-full max-md:rtl:translate-x-full'
+      open
+        ? 'max-md:transition-transform'
+        : 'max-md:invisible max-md:translate-y-[105%] max-md:transition-[transform,visibility]'
     "
+    @keydown.tab="trapFocus"
   >
+    <div class="shrink-0 md:hidden">
+      <div
+        class="mx-auto mt-2 h-[5px] w-[38px] rounded-[3px] bg-surface-gray-4"
+      />
+      <div class="flex items-center justify-between pe-3 ps-5 pt-1">
+        <h2 class="text-lg font-semibold text-ink-gray-9">
+          {{ __("Browse articles") }}
+        </h2>
+        <Button
+          data-sheet-close
+          variant="ghost"
+          icon="lucide-x"
+          :aria-label="__('Close')"
+          class="!size-11 [&_svg]:!size-5"
+          @click="emit('close')"
+        />
+      </div>
+    </div>
     <Sidebar
       :collapsible="false"
       width="100%"
       :aria-label="__('Knowledge base')"
-      class="border-r border-outline-gray-1 !bg-surface-base"
+      class="border-r border-outline-gray-1 !bg-surface-base max-md:!h-auto max-md:min-h-0 max-md:flex-1 max-md:border-r-0"
     >
-      <div class="px-3 pb-2 pt-4">
+      <div class="px-3 pb-2 pt-4 max-md:px-4 max-md:pt-2">
         <TextInput
           ref="search"
           v-model="query"
           size="sm"
           variant="outline"
-          class="[&_input]:!shadow-none"
+          class="[&_input]:!shadow-none max-md:[&_input]:h-11 max-md:[&_input]:text-base"
           :placeholder="__('Search articles')"
         >
           <template #prefix>
@@ -40,14 +65,20 @@
           '[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)]'
         "
       >
-        <PortalSkeleton v-if="loading" variant="nav" :count="12" />
+        <!-- Rows already in hand beat the skeleton; enough rows to fill, clipped. -->
+        <PortalSkeleton
+          v-if="loading && !categories.length"
+          variant="nav"
+          :count="40"
+          class="min-h-0 flex-1 overflow-hidden"
+        />
         <div
           v-for="category in visibleCategories"
           :key="category.name"
           :class="revealed && 'portal-reveal'"
         >
           <SidebarItem
-            class="max-md:h-9"
+            class="max-md:h-11"
             :active="false"
             :aria-expanded="category.isOpen"
             :aria-controls="`kb-sidebar-${category.name}`"
@@ -57,14 +88,14 @@
             <template #prefix>
               <Icon
                 :icon="category.icon || 'lucide-folder'"
-                class="size-4"
+                class="size-4 max-md:size-[18px]"
                 :class="
                   category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
                 "
               />
             </template>
             <span
-              class="min-w-0 flex-1 truncate text-sm"
+              class="min-w-0 flex-1 truncate text-sm max-md:text-base"
               :class="
                 category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
               "
@@ -93,11 +124,13 @@
                 :route="ROUTES.article(article)"
                 :active="article.name === activeName"
                 :title="article.title"
-                class="max-md:h-9 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
+                class="max-md:h-11 data-[state=active]:bg-surface-gray-2 data-[state=active]:shadow-none"
               >
                 <template #prefix />
                 <!-- -ml-2 undoes SidebarItem's icon gap; pr-2 mirrors its pl-2. -->
-                <span class="-ml-2 min-w-0 truncate pr-2 text-sm">
+                <span
+                  class="-ml-2 min-w-0 truncate pr-2 text-sm max-md:text-[15px]"
+                >
                   <template
                     v-for="(part, i) in splitMatch(article.title)"
                     :key="i"
@@ -113,7 +146,7 @@
               <button
                 v-if="category.hidden"
                 type="button"
-                class="flex h-7 items-center rounded-4 px-2 text-left text-sm text-ink-gray-5 hover:bg-surface-gray-2 max-md:h-9"
+                class="flex h-7 items-center rounded-4 px-2 text-left text-sm text-ink-gray-5 hover:bg-surface-gray-2 max-md:h-11"
                 @click="showMore(category.name)"
               >
                 {{
@@ -133,15 +166,22 @@
       </div>
     </Sidebar>
   </div>
-  <div
-    v-if="open"
-    class="fixed inset-0 z-30 bg-black-overlay-500 md:hidden"
-    @click="emit('close')"
-  />
+  <Transition
+    enter-from-class="opacity-0"
+    leave-to-class="opacity-0"
+    enter-active-class="transition-opacity duration-[250ms]"
+    leave-active-class="transition-opacity duration-[250ms]"
+  >
+    <div
+      v-if="open"
+      class="fixed inset-0 z-30 bg-black-overlay-500 md:hidden"
+      @click="emit('close')"
+    />
+  </Transition>
 </template>
 
 <script setup lang="ts">
-import { useScroll } from "@vueuse/core";
+import { useMediaQuery, useScroll } from "@vueuse/core";
 import {
   computed,
   nextTick,
@@ -151,6 +191,7 @@ import {
   watch,
 } from "vue";
 import {
+  Button,
   Icon,
   Sidebar,
   SidebarItem,
@@ -193,8 +234,34 @@ const props = withDefaults(
 
 const emit = defineEmits<{ close: [] }>();
 
+const isNarrow = useMediaQuery("(max-width: 767px)");
+const isSheet = computed(() => isNarrow.value && props.open);
+
+// Not the search box: focusing it would pop the phone keyboard.
+watch(isSheet, async (sheet) => {
+  if (!sheet) return;
+  await nextTick();
+  panel.value?.querySelector<HTMLElement>("[data-sheet-close]")?.focus();
+});
+
+// Tab wraps inside the open sheet.
+function trapFocus(event: KeyboardEvent) {
+  if (!isSheet.value || !panel.value) return;
+  const focusable = [
+    ...panel.value.querySelectorAll<HTMLElement>(
+      "a[href], button:not([disabled]), input, [tabindex]:not([tabindex='-1'])"
+    ),
+  ].filter((element) => element.offsetParent);
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const edge = event.shiftKey ? first : last;
+  if (document.activeElement !== edge) return;
+  event.preventDefault();
+  (event.shiftKey ? last : first)?.focus();
+}
+
 // Fade in only rows that replace the skeleton.
-const revealed = ref(props.loading);
+const revealed = ref(props.loading && !props.categories.length);
 
 const panel = ref<HTMLElement | null>(null);
 defineExpose({ rootRef: panel });

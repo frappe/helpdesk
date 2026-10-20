@@ -77,6 +77,9 @@ class HDTicket(Document, CustomerEditController):
 
     def has_customer_visible_change(self) -> bool:
         """Customers can't read internal fields; no ping for those alone."""
+        # The email is visible, though the fields it sets may all be internal
+        if self.flags.new_communication:
+            return True
         before = self.get_doc_before_save()
         return not before or any(
             self.get(df.fieldname) != before.get(df.fieldname)
@@ -1165,6 +1168,7 @@ class HDTicket(Document, CustomerEditController):
         # portal replies save as the customer; the reset must keep server-set fields
         self.flags.ignore_permlevel_for_fields = list(SERVER_COMPUTED_FIELDS)
         self.flags.ignore_customer_edit_guard = True
+        self.flags.new_communication = True
         # Save the ticket, allowing for hooks to run.
         self.save()
 

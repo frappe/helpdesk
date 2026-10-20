@@ -1,11 +1,24 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { call, useFileUpload } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { isContentEmpty, runAction, uploadableFileTypes } from '@helpdesk/shared/utils'
 
-export function useReplyComposer(ticket, { isClosed, isAgent }) {
+export function useReplyComposer(ticket, { ticketId, isClosed, isAgent }) {
   const isComposerOpen = ref(false)
   const reply = ref('')
+
+  // A draft stays with its ticket: switching swaps it in before the next render.
+  const drafts = new Map<string, { reply: string; open: boolean }>()
+  watch(
+    ticketId,
+    (next, previous) => {
+      if (previous) drafts.set(previous, { reply: reply.value, open: isComposerOpen.value })
+      const draft = drafts.get(next)
+      reply.value = draft?.reply || ''
+      isComposerOpen.value = draft?.open || false
+    },
+    { flush: 'sync' },
+  )
   const isSending = ref(false)
   // Composer overlays the thread; its height is kept clear below.
   const composerReserve = ref(0)

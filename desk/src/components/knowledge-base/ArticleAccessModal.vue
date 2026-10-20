@@ -2,11 +2,9 @@
   <Dialog v-model:open="show" :title="title">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
-        <span class="text-p-sm text-ink-gray-6">
-          {{ __("General access") }}
-        </span>
         <Select
           v-model="access"
+          :aria-label="__('General access')"
           class="w-full"
           size="md"
           :options="accessOptions"
@@ -43,25 +41,14 @@ const props = defineProps<{
 const emit = defineEmits<{ publish: [visibility: string] }>();
 const show = defineModel<boolean>({ default: false });
 
+// Same labels as the access column.
 const accessOptions = computed(() => {
   const meta = categoryAccess();
-  return [
-    {
-      value: "Private",
-      label: __("Private, agents only"),
-      icon: meta.Private.icon,
-    },
-    {
-      value: "Customers",
-      label: __("Accessible to customers only"),
-      icon: meta.Customers.icon,
-    },
-    {
-      value: "Public",
-      label: __("Accessible to everyone"),
-      icon: meta.Public.icon,
-    },
-  ];
+  return ["Public", "Private", "Customers"].map((value) => ({
+    value,
+    label: meta[value].label,
+    icon: meta[value].icon,
+  }));
 });
 
 const access = ref(props.visibility);

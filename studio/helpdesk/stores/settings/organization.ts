@@ -4,6 +4,7 @@ import { __ } from '@helpdesk/shared/translation'
 import { askConfirm, countLabel, getErrorMessage } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
 import { ASSIGNABLE_ROLES, roleLabel, type RoleLabel } from './roles'
+import { useRememberedCount } from '@app/composables/useRememberedCount'
 
 const API = 'helpdesk.api.customer'
 
@@ -35,6 +36,13 @@ export function createOrganizationSettings(core) {
 
   const managesAnyOrganization = computed(() =>
     core.organizations.value.some((row) => row.role !== 'Member'),
+  )
+  // Loading shows a lone organization's screen, or the list, by last time's count.
+  const organizationCountHint = useRememberedCount(
+    'helpdesk-portal-organizations',
+    // A failed load has no account: keep last time's count.
+    () => (core.settingsLoaded.value && core.settingsUser.value.name ? core.organizations.value.length : undefined),
+    1,
   )
   const organizationScreenTitle = computed(() =>
     managesAnyOrganization.value ? __('Manage Organization') : __('View Organization'),
@@ -232,6 +240,7 @@ export function createOrganizationSettings(core) {
     organizationLoading,
     organizationInvitations: invitations,
     organizationScreenTitle,
+    organizationCountHint,
     organizationScreenDescription,
     organizationDetailDescription,
     organizationTab,

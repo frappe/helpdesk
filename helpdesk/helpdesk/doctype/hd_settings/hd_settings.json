@@ -23,6 +23,7 @@
   "public_knowledge_base",
   "prefer_knowledge_base",
   "allow_anonymous_article_voting",
+  "hide_raise_ticket_button",
   "banner_image",
   "banner_preset",
   "portal_tab",
@@ -268,6 +269,13 @@
    "fieldname": "allow_anonymous_article_voting",
    "fieldtype": "Check",
    "label": "Allow guests to vote on articles"
+  },
+  {
+   "default": "0",
+   "description": "Logged-in customers won't see the Raise a ticket button in the knowledge base header.",
+   "fieldname": "hide_raise_ticket_button",
+   "fieldtype": "Check",
+   "label": "Hide Raise a ticket button"
   },
   {
    "description": "Appears behind the search bar on the knowledge base home page.",
@@ -635,7 +643,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-19 11:00:00.000000",
+ "modified": "2026-10-20 11:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

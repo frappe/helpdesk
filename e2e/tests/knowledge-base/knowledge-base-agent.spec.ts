@@ -28,6 +28,8 @@ test("create a category and article, publish it, customer can read it", async ({
   await expect(page.getByText("Article updated successfully.")).toBeVisible();
 
   await page.getByRole("button", { name: "Publish" }).click();
+  // Publishing asks for the access first.
+  await page.getByRole("dialog", { name: "Publish article as" }).getByRole("button", { name: "Publish" }).click();
   await expect(page.getByRole("button", { name: "Unpublish" })).toBeVisible();
   const [article] = await api.list("HD Article", {
     filters: { title },

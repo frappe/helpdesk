@@ -6,95 +6,21 @@
     :version="version"
     :authors="isChat ? authors : null"
     :reserve="reserve"
-  >
-    <template v-if="isChat" #icon-email="{ activity }">
-      <div class="flex h-10 items-start">
-        <Avatar
-          v-if="activity.chat.showAvatar"
-          size="lg"
-          :label="activity.author?.fullname"
-          :image="activity.author?.image"
-        />
-      </div>
-    </template>
-    <template v-if="isChat" #icon-log><span /></template>
-    <template v-if="isChat" #item-log="{ activity }">
-      <!-- Pulled over the avatar column to centre on the thread. -->
-      <div
-        class="relative z-20 -ms-[38px] flex flex-1 items-center gap-3 py-1 text-p-sm text-ink-gray-5"
-      >
-        <div class="flex-1 border-t border-outline-gray-2" />
-        <span class="shrink-0">
-          {{ activity.data.divider }} ·
-          <Tooltip :text="dateFormat(activity.timestamp)">
-            <span>{{ clockTime(activity.timestamp) }}</span>
-          </Tooltip>
-        </span>
-        <div class="flex-1 border-t border-outline-gray-2" />
-      </div>
-    </template>
-    <template v-if="isChat" #item-email="{ activity }">
-      <div
-        class="portal-chat-message flex w-full flex-col gap-1"
-        :class="[
-          activity.chat.isOwn ? 'items-end' : 'items-start',
-          { '-mt-3': !activity.chat.opensGroup },
-        ]"
-      >
-        <div
-          v-if="activity.chat.opensGroup"
-          class="flex items-center gap-1 px-1 text-p-sm"
-        >
-          <span class="font-medium text-ink-gray-8">
-            {{ activity.author?.fullname }}
-          </span>
-          <span class="text-ink-gray-4">·</span>
-          <Tooltip :text="dateFormat(activity.timestamp)">
-            <span class="text-ink-gray-5">{{
-              clockTime(activity.timestamp)
-            }}</span>
-          </Tooltip>
-        </div>
-        <div
-          class="w-fit min-w-0 max-w-[76%] rounded-[10px] border px-3 py-1.5"
-          :class="
-            activity.chat.isOwn
-              ? 'border-transparent bg-surface-gray-1'
-              : 'border-outline-gray-2 bg-surface-elevation-1'
-          "
-        >
-          <PortalEmailContent :content="activity.data.content" />
-          <div
-            v-if="activity.data.attachments?.length"
-            class="flex flex-wrap gap-2 pb-1 pt-2"
-          >
-            <AttachmentChip
-              v-for="attachment in activity.data.attachments"
-              :key="attachment.file_url"
-              :label="attachment.file_name"
-              :url="attachment.file_url"
-            />
-          </div>
-        </div>
-      </div>
-    </template>
-  </TicketEmails>
+  />
 </template>
 
 <script setup lang="ts">
 import { computed, defineComponent, h, ref, watch, type PropType } from "vue";
-import { Avatar, Tooltip, dayjs, dayjsLocal } from "frappe-ui";
-import { __ } from "@helpdesk/shared/translation";
+import { dayjs } from "frappe-ui";
 import {
   ActivityTimeline,
-  AttachmentChip,
   useActivityTimeline,
 } from "@framework/ui/components/ActivityTimeline";
-import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
-import { DATE_FORMATS, plainTextToHtml } from "@helpdesk/shared/utils";
+import { plainTextToHtml } from "@helpdesk/shared/utils";
 import { useSession } from "@app/stores/session";
 import { conversationLayout } from "@app/stores/settings";
-import PortalEmailContent from "./PortalEmailContent.vue";
+import { useChatRows } from "@app/composables/useChatRows";
+import PortalChatList from "./PortalChatList.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 
 type Row = {
@@ -103,8 +29,6 @@ type Row = {
   author?: { email?: string };
   data?: any;
 };
-
-const GROUP_SECONDS = 5 * 60;
 
 const props = defineProps<{
   ticket: string;
@@ -133,19 +57,13 @@ const authors = computed(
     )
 );
 
-function clockTime(value: string) {
-  const at = dayjsLocal(value);
-  if (at.isSame(dayjsLocal(), "day")) return at.format(DATE_FORMATS.clock);
-  const day = at.isSame(dayjsLocal(), "year") ? "D MMMM" : "D MMMM YYYY";
-  return __("{0} at {1}", [at.format(day), at.format(DATE_FORMATS.clock)]);
-}
-
 // Keyed by ticket: the composable reads its ticket once.
 const TicketEmails = defineComponent({
   props: {
     ticket: { type: String, required: true },
     extraActivities: { type: Array as PropType<Row[]>, default: () => [] },
     version: String,
+    // Set in the chat layout, which places each email on a side.
     authors: {
       type: Map as PropType<Map<
         string,
@@ -155,7 +73,7 @@ const TicketEmails = defineComponent({
     },
     reserve: { type: Number, default: 0 },
   },
-  setup(props, { slots }) {
+  setup(props) {
     const { activities, loading, paginate, reload } = useActivityTimeline(
       "HD Ticket",
       props.ticket,
@@ -169,7 +87,7 @@ const TicketEmails = defineComponent({
     const rows = computed(() => {
       // Wait for emails so a close never shows alone.
       if (loading.value && !activities.value.length) return [];
-      const sorted = [
+      return [
         ...activities.value.map((row) => ({
           ...row,
           data: {
@@ -180,58 +98,48 @@ const TicketEmails = defineComponent({
             bcc: "",
           },
         })),
-        ...props.extraActivities,
-      ].sort(
-        (first, second) =>
-          dayjs(first.timestamp).valueOf() - dayjs(second.timestamp).valueOf()
-      );
-      if (!props.authors) return sorted;
-      const placed = sorted.filter(
-        (row) => row.type !== "email" || isPlaceable(row)
-      );
-      return placed.map((row, index) =>
-        row.type === "email"
-          ? { ...row, chat: chatPlacement(row, placed[index - 1]) }
-          : row
-      );
+        ...props.extraActivities.filter(isLoaded),
+      ]
+        .sort(
+          (first, second) =>
+            dayjs(first.timestamp).valueOf() - dayjs(second.timestamp).valueOf()
+        )
+        .filter(
+          (row) => !props.authors || row.type !== "email" || isPlaceable(row)
+        );
     });
+    const chatRows = useChatRows(rows, {
+      isCustomer: (row) => !isAgent(row),
+      isViewer,
+    });
+
+    // Events aren't paged: hold back those older than the oldest loaded email.
+    const oldestEmail = computed(() =>
+      Math.min(...activities.value.map((row) => dayjs(row.timestamp).valueOf()))
+    );
+    function isLoaded(row: Row) {
+      return (
+        !paginate.hasNextPage ||
+        dayjs(row.timestamp).valueOf() >= oldestEmail.value
+      );
+    }
 
     // Unknown sender: wait for the ticket rather than guess a side.
     function isPlaceable(row: Row) {
-      return (
-        props.authors!.has(row.data.name) ||
-        row.author?.email === session.config.value?.session_user
-      );
+      return props.authors!.has(row.data.name) || isViewer(row);
     }
 
-    function chatPlacement(row: Row, previous?: Row) {
-      const isOwn = isViewerSide(row);
-      const opensGroup = !(
-        previous?.type === "email" &&
-        authorEmail(previous) === authorEmail(row) &&
-        isViewerSide(previous) === isOwn &&
-        dayjs(row.timestamp).diff(dayjs(previous.timestamp), "s") <=
-          GROUP_SECONDS
-      );
-      return { isOwn, opensGroup, showAvatar: opensGroup && !isOwn };
-    }
-
-    function isViewerSide(row: Row) {
-      return isAgent(row) === Boolean(session.config.value?.is_agent);
+    function isViewer(row: Row) {
+      const email =
+        props.authors!.get(row.data.name)?.email || row.author?.email;
+      return email === session.config.value?.session_user;
     }
 
     // The viewer's just-sent email precedes the communications reload.
     function isAgent(row: Row) {
       const known = props.authors!.get(row.data.name);
       if (known) return known.isAgent;
-      const viewer = session.config.value;
-      return (
-        row.author?.email === viewer?.session_user && Boolean(viewer?.is_agent)
-      );
-    }
-
-    function authorEmail(row: Row) {
-      return props.authors!.get(row.data.name)?.email || row.author?.email;
+      return Boolean(session.config.value?.is_agent);
     }
 
     // Offset scroll by the reserve change so messages stay put.
@@ -240,14 +148,27 @@ const TicketEmails = defineComponent({
       () => props.reserve,
       (height, previous) => {
         if (!previous) return;
-        const scroller =
-          wrapper.value?.querySelector<HTMLElement>(".activity-timeline");
-        if (scroller) scroller.scrollTop -= height - previous;
+        const scroller = wrapper.value?.firstElementChild;
+        // Pinned to the newest (column-reverse: 0), the padding already lifts it.
+        if (!scroller || scroller.scrollTop > -2) return;
+        scroller.scrollTop -= height - previous;
       },
       { flush: "post" }
     );
 
-    // Fade in only when replacing the skeleton.
+    // Sending a message scrolls back to the newest.
+    watch(
+      () => (props.authors ? chatRows.value.at(-1) : undefined),
+      (last, before) => {
+        if (!before || last?.key === before.key) return;
+        if (last?.kind !== "message" || !last.isViewer) return;
+        const scroller = wrapper.value?.firstElementChild;
+        if (scroller) scroller.scrollTop = 0;
+      },
+      { flush: "post" }
+    );
+
+    // Fade in only after a first load that showed nothing.
     const isFirstLoad = computed(
       () => loading.value && !activities.value.length
     );
@@ -262,6 +183,8 @@ const TicketEmails = defineComponent({
           ref: wrapper,
           class: [
             "portal-thread flex flex-col",
+            // Chat lines up with the composer; the timeline keeps its gutter.
+            props.authors ? "px-3 sm:px-5" : "sm:px-6 lg:px-10",
             revealed.value && "portal-reveal",
           ],
           style: { "--composer-reserve": `${props.reserve}px` },
@@ -270,14 +193,17 @@ const TicketEmails = defineComponent({
           isFirstLoad.value
             ? h(PortalSkeleton, {
                 variant: "thread",
+                // Follows the page skeleton, which already faded in.
                 instant: true,
-                class: "flex-1 overflow-hidden",
+                class: !props.authors && "max-sm:px-4",
               })
-            : h(
-                ActivityTimeline,
-                { activities: rows.value, loading: loading.value, paginate },
-                slots
-              ),
+            : props.authors
+            ? h(PortalChatList, { rows: chatRows.value, paginate })
+            : h(ActivityTimeline, {
+                activities: rows.value,
+                loading: loading.value,
+                paginate,
+              }),
         ]
       );
   },
@@ -285,23 +211,15 @@ const TicketEmails = defineComponent({
 </script>
 
 <style>
-.portal-thread > .activity-timeline {
+.portal-thread > * {
   flex: 1 1 0%;
   min-height: 0;
 }
 
 /* Padding inside the scroller so messages slide under header and composer. */
-.portal-thread > .activity-timeline > div {
+.portal-thread > * > div {
   padding-top: 1rem;
   padding-bottom: var(--composer-reserve, 0px);
-}
-
-/* Unscoped: no scope id reaches ActivityTimeline's fragment root. */
-.activity-timeline:has(.portal-chat-message)
-  .activity
-  > div
-  > div:first-child::after {
-  display: none;
 }
 
 /* Email frames copy page sheets; keep their :root transparent. */

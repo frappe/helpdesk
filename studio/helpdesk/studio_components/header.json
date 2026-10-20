@@ -25,27 +25,6 @@
     "blockName": "container",
     "children": [
      {
-      "classes": [
-       "md:hidden",
-       "shrink-0"
-      ],
-      "componentEvents": {
-       "click": {
-        "action": "Run Script",
-        "event": "click",
-        "script": "drawer.toggle()"
-       }
-      },
-      "componentId": "Button-drawer-start",
-      "componentName": "Button",
-      "componentProps": {
-       "aria-label": "{{ inputs.drawerLabel }}",
-       "icon": "lucide-menu",
-       "variant": "ghost"
-      },
-      "visibilityCondition": "{{ inputs.drawerToggle === 'start' }}"
-     },
-     {
       "baseStyles": {
        "display": "flex",
        "width": "fit-content"
@@ -233,7 +212,8 @@
    "border-b",
    "border-outline-gray-2",
    "px-3",
-   "sm:px-5"
+   "sm:px-5",
+   "max-md:ps-4"
   ]
  },
  "component_id": "header",
@@ -290,7 +270,7 @@
   }
  ],
  "is_disabled": 0,
- "modified": "2026-10-19 05:28:45.751852",
+ "modified": "2026-10-21 04:16:45.000000",
  "modified_by": "Administrator",
  "name": "header",
  "owner": "Administrator"

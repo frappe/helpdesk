@@ -169,7 +169,7 @@ test("the brand logo uploads and removes, and signup can be disabled", async ({ 
 
     // Signup saves as soon as it is toggled.
     await dialog.getByRole("button", { name: "Portal Settings", exact: true }).click();
-    await settingRow(dialog, "Disable signup").getByRole("switch").click();
+    await settingRow(dialog, "Allow signup").getByRole("switch").click();
     await expect
       .poll(async () => (await api.get("Website Settings", "Website Settings")).disable_signup)
       .toBe(signup ? 0 : 1);

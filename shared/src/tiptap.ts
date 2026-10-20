@@ -39,8 +39,7 @@ export const ComponentUtils: Extension = Extension.create({
         },
       },
       {
-        // Ids for headings and outline blocks (`addOutlineIds`).
-        types: ["heading", "paragraph", "orderedList", "blockquote"],
+        types: ["heading"],
         attributes: {
           id: {
             default: null,

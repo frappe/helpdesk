@@ -157,6 +157,7 @@
               v-model="state.customer"
               doctype="HD Customer"
               :placeholder="__('Select Customer')"
+              :search-placeholder="__('Search')"
             />
           </div>
 

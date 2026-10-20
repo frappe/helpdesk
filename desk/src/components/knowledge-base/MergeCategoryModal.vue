@@ -18,6 +18,7 @@
         class="form-control"
         doctype="HD Article Category"
         placeholder="Select Category"
+        :search-placeholder="__('Search')"
         v-model="toCategory"
         label="Category"
         :page-length="100"

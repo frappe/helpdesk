@@ -15,7 +15,7 @@ import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { navigateTo } from '@app/stores/router'
 import { useSettingsModal } from '@app/stores/settings'
 import { CLOSED_STATUS, isClosedStatus, loadTicketMeta } from '@app/stores/ticketMeta'
-import { askConfirm, runAction, runFormScripts, updateTicket, type ActionOptions } from '@helpdesk/shared/utils'
+import { askConfirm, copyToClipboard, runAction, runFormScripts, updateTicket, type ActionOptions } from '@helpdesk/shared/utils'
 
 export default function setup(context) {
   const { route } = context
@@ -192,7 +192,7 @@ export default function setup(context) {
   return {
     ...settings,
     ...useTicketDetails(ticket, thread, timelineChanges),
-    ...useReplyComposer(ticket, { isClosed: isLocked, isAgent: settings.isAgent }),
+    ...useReplyComposer(ticket, { ticketId, isClosed: isLocked, isAgent: settings.isAgent }),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),
@@ -214,5 +214,6 @@ export default function setup(context) {
     onPageAction,
     suggestedArticles,
     openHelpArticle: (article) => navigateTo(ROUTES.article(article)),
+    copyTicketId: () => copyToClipboard(ticket.data.name, __('Ticket #{0} copied', [ticket.data.name])),
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div
     ref="root"
-    class="bg-surface-base px-3 pb-3 sm:px-5 sm:pb-5"
+    class="bg-surface-base px-3 pb-3 before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-4 before:bg-gradient-to-t before:from-[color:var(--surface-base)] before:to-transparent sm:px-5 sm:pb-5"
     :class="{ 'cursor-ns-resize': isResizing }"
   >
     <div

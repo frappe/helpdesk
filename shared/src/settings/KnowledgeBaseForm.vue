@@ -3,48 +3,79 @@
     enter-from-class="opacity-0"
     enter-active-class="transition-opacity duration-200 motion-reduce:transition-none"
   >
-    <div v-if="draft" class="flex flex-col">
-      <div class="flex flex-col gap-6">
-        <div
-          v-for="toggle in toggles"
-          :key="toggle.fieldname"
-          class="flex items-center justify-between"
-        >
-          <div class="flex flex-col gap-1">
-            <span class="text-base-medium text-ink-gray-8">
-              {{ toggle.label }}
-            </span>
-            <span class="text-p-sm text-ink-gray-6">
-              {{ toggle.description }}
-            </span>
-          </div>
-          <Switch
-            :model-value="Boolean(settings.doc?.[toggle.fieldname])"
-            @update:model-value="(value) => setToggle(toggle.fieldname, value)"
+    <div v-if="draft" class="space-y-11">
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">{{ __("Access") }}</h2>
+        <div class="mt-2 divide-y divide-outline-gray-1">
+          <SettingsRow
+            v-for="toggle in accessToggles"
+            :key="toggle.fieldname"
+            :title="toggle.label"
+            :description="toggle.description"
+          >
+            <Switch
+              :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+              @update:model-value="
+                (value) => setToggle(toggle.fieldname, value)
+              "
+            />
+          </SettingsRow>
+        </div>
+      </section>
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">
+          {{ __("Customize home page") }}
+        </h2>
+        <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
+          <PinnedCategories
+            :pinned="draft.pinned"
+            :categories="categoryOptions"
+            :save="savePins"
+          />
+          <BannerPicker
+            :image="draft.banner_image"
+            :preset="draft.banner_preset"
+            @change="(value) => Object.assign(draft, value)"
           />
         </div>
-      </div>
-      <PinnedCategories
-        class="mt-8"
-        :pinned="draft.pinned"
-        :categories="categoryOptions"
-        :save="savePins"
-      />
-      <BannerPicker
-        class="mt-8"
-        :image="draft.banner_image"
-        :preset="draft.banner_preset"
-        @change="(value) => Object.assign(draft, value)"
-      />
-      <HeaderLinks v-model="draft.links" class="mt-8" />
+      </section>
+      <section>
+        <h2 class="text-md-semibold text-ink-gray-8">{{ __("Header") }}</h2>
+        <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
+          <!-- Stored inverted so unset (existing sites) means shown. -->
+          <SettingsRow
+            :title="__('Show Raise a ticket button')"
+            :description="
+              __(
+                'Logged-in customers will see a Raise a ticket button in the knowledge base header.'
+              )
+            "
+          >
+            <Switch
+              :model-value="!settings.doc?.hide_raise_ticket_button"
+              @update:model-value="
+                (show) => setToggle('hide_raise_ticket_button', !show)
+              "
+            />
+          </SettingsRow>
+          <HeaderLinks v-model="draft.links" />
+        </div>
+      </section>
     </div>
-    <SettingsFormSkeleton v-else :toggles="2" :sections="3" />
+    <SettingsFormSkeleton
+      v-else
+      :sections="[
+        { title: __('Access'), rows: accessToggles.length },
+        { title: __('Customize home page'), panels: [50, 180] },
+        { title: __('Header'), rows: 1, panels: [96] },
+      ]"
+    />
   </Transition>
 </template>
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { Switch } from "frappe-ui";
+import { SettingsRow, Switch } from "frappe-ui";
 import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
@@ -57,7 +88,7 @@ const { draft, settings, setToggle, savePins, categoryOptions } =
   useKnowledgeBaseDraft();
 
 // computed, so labels follow a translation load
-const toggles = computed(
+const accessToggles = computed(
   () =>
     [
       {

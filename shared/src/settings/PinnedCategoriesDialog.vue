@@ -1,20 +1,29 @@
 <template>
-  <Dialog v-model:open="show" size="md" bare>
+  <Dialog :open="show" size="md" bare @update:open="onOpenChange">
     <div class="flex flex-col" style="height: min(640px, calc(100vh - 8rem))">
-      <div
-        class="flex shrink-0 items-center justify-between border-b border-outline-gray-1 px-4 py-3"
-      >
-        <Dialog.Title as-child>
-          <h2 class="text-lg font-medium text-ink-gray-9">
-            {{ __("Pinned categories") }}
-          </h2>
-        </Dialog.Title>
+      <div class="flex shrink-0 items-center justify-between px-4 pt-3">
+        <div class="flex items-center gap-2">
+          <Dialog.Title as-child>
+            <h2 class="text-lg font-medium text-ink-gray-9">
+              {{ __("Pinned categories") }}
+            </h2>
+          </Dialog.Title>
+          <!-- As the settings title shows it. -->
+          <Badge
+            v-if="hasUnsavedChanges"
+            variant="subtle"
+            theme="amber"
+            size="sm"
+            :label="__('Unsaved')"
+          />
+        </div>
         <Dialog.Close as-child>
           <Button variant="ghost" :label="__('Close')" icon="lucide-x" />
         </Dialog.Close>
       </div>
 
-      <div class="shrink-0 px-4 pt-3">
+      <!-- The divider sits under the search, so scrolled rows clip against it -->
+      <div class="shrink-0 border-b border-outline-gray-1 px-4 py-3">
         <TextInput
           v-model="query"
           :placeholder="__('Search categories')"
@@ -179,7 +188,8 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { Button, Dialog, ScrollArea, TextInput } from "frappe-ui";
+import { askConfirm } from "../utils";
+import { Badge, Button, Dialog, ScrollArea, TextInput } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
@@ -288,6 +298,24 @@ function onUnpinnedChange({ added }: Change) {
 function moveTo(name: string, section: Section) {
   const rest = selected.value.filter((row) => row !== name);
   selected.value = section === "pinned" ? [...rest, name] : rest;
+}
+
+// Closing with edits asks first.
+function onOpenChange(open: boolean) {
+  if (open || !hasUnsavedChanges.value) {
+    show.value = open;
+    return;
+  }
+  askConfirm({
+    title: __("Unsaved changes"),
+    message: __(
+      "Are you sure you want to close? Unsaved changes will be lost."
+    ),
+    label: __("Confirm"),
+    action: () => {
+      show.value = false;
+    },
+  });
 }
 
 async function saveChanges() {

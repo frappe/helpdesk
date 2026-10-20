@@ -4,15 +4,22 @@ import { onKeyStroke, useScrollLock } from '@vueuse/core'
 // Reactive, so blocks bind `drawer.open` without `.value`.
 export function useDrawer(route) {
   const open = useScrollLock(document.body)
+  // Close returns focus to the opener.
+  let opener: HTMLElement | null = null
   watch(() => route.fullPath, close)
   onKeyStroke('Escape', () => open.value && close())
 
   function toggle() {
-    open.value = !open.value
+    if (open.value) return close()
+    opener = document.activeElement as HTMLElement | null
+    open.value = true
   }
 
   function close() {
+    if (!open.value) return
     open.value = false
+    opener?.focus()
+    opener = null
   }
 
   return reactive({ open, toggle, close })

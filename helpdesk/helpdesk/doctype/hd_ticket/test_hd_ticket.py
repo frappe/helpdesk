@@ -2673,6 +2673,22 @@ class TestCustomerPing(IntegrationTestCase):
     def test_a_visible_field_change_pings(self) -> None:
         self.assertEqual(self.save_and_count_pings(subject="New subject"), 1)
 
+    def test_a_second_agent_reply_pings(self) -> None:
+        # The first reply also sets first_responded_on; the second sets only internal fields
+        ticket = make_ticket()
+        reply = {
+            "doctype": "Communication",
+            "communication_type": "Communication",
+            "sent_or_received": "Sent",
+            "content": "A reply",
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket.name,
+        }
+        frappe.get_doc(reply).insert(ignore_permissions=True)
+        with patch.object(type(ticket), "notify_customers") as notify:
+            frappe.get_doc(reply).insert(ignore_permissions=True)
+        self.assertTrue(notify.called)
+
 
 class TestTicketTimelineChanges(IntegrationTestCase):
     def tearDown(self) -> None:

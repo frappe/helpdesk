@@ -168,3 +168,24 @@ def set_customer_home_page(replace: list[str]) -> None:
     )
     # frappe caches each user's home page
     frappe.cache.delete_value("home_page")
+
+
+def sync_brand_to_website_settings(settings) -> None:
+    """Site-wide: framework emails, login page and desk read the brand from Website Settings."""
+    logo_changed = settings.has_value_changed("brand_logo")
+    name_changed = settings.has_value_changed("brand_name") and settings.brand_name
+    if logo_changed:
+        frappe.db.set_single_value(
+            "Website Settings", "app_logo", settings.brand_logo or ""
+        )
+    if name_changed:
+        set_site_brand_name(settings.brand_name)
+    if logo_changed or name_changed:
+        # set_single_value skips Website Settings' on_update, which clears the boot cache
+        frappe.clear_cache()
+
+
+def set_site_brand_name(brand_name: str) -> None:
+    frappe.db.set_single_value("Website Settings", "app_name", brand_name)
+    # Display name in framework emails, e.g. the welcome mail "Welcome to <name>".
+    frappe.db.set_default("site_name", brand_name)
