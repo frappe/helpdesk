@@ -20,7 +20,7 @@ jobs:
           node-version: 24
           check-latest: true
       - name: Check commit titles
-        # outside the repo: npm rejects the root package.json's yarn `link:` dep
+        # Installed outside the repo: npm rejects the root package.json's yarn `link:` dependency.
         run: |
           cp commitlint.config.mjs "$RUNNER_TEMP/"
           (cd "$RUNNER_TEMP" && npm install @commitlint/cli @commitlint/config-conventional)
