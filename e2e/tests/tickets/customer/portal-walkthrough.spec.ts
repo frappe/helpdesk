@@ -217,7 +217,7 @@ test.describe("layouts", () => {
     throw new Error(frameText);
   }
 
-  test("chat: the customer's messages on the right, the agent's on the left; closes are dividers", async ({
+  test("chat: the customer's messages on the right, the agent's on the left; closes are centred events", async ({
     page,
     api,
     apiAs,
@@ -233,8 +233,8 @@ test.describe("layouts", () => {
     const width = page.viewportSize()!.width;
     expect(await centreX(page, `${ticket.subject} description`)).toBeGreaterThan(width / 3);
     expect(await centreX(page, answer)).toBeLessThan(width / 3);
-    await expect(page.getByText(/^Closed by /)).toBeVisible();
-    await expect(page.getByText(/^Reopened by /)).toBeVisible();
+    await expect(page.getByText(/ closed the ticket/)).toBeVisible();
+    await expect(page.getByText(/ reopened the ticket/)).toBeVisible();
   });
 
   test("timeline: closes and reopens read as log rows", async ({ page, api, ticket }) => {
@@ -245,14 +245,16 @@ test.describe("layouts", () => {
     await expect(page.getByText(/ reopened the ticket/)).toBeVisible();
   });
 
-  test("chat: an agent's own replies sit on the right", async ({ pageAs, apiAs, ticket }) => {
+  test("chat: an agent sees the same sides, their own replies on the left", async ({ pageAs, apiAs, ticket }) => {
     const answer = `Own reply ${uid()}`;
     await agentReply(await apiAs("agent"), ticket.name, `<p>${answer}</p>`);
     const page = await pageAs("agent");
     await useChat(page);
     await page.goto(`/help/tickets/${ticket.name}`);
     await frameWith(page, answer);
-    expect(await centreX(page, answer)).toBeGreaterThan(page.viewportSize()!.width / 3);
+    const width = page.viewportSize()!.width;
+    expect(await centreX(page, `${ticket.subject} description`)).toBeGreaterThan(width / 3);
+    expect(await centreX(page, answer)).toBeLessThan(width / 3);
   });
 });
 

@@ -328,16 +328,20 @@ test.describe("header", () => {
     usePersona("customer");
     test.use({ viewport: PHONE });
 
-    test("H13 Browse articles opens the sidebar drawer; Esc closes it", async ({ page, api }) => {
+    test("H13 the section bar opens the article sheet; Esc closes it", async ({ page, api }) => {
       const category = await createCategory(api);
       const article = await createArticle(api, category.name);
       await page.goto(`/help/articles/${article.name}`);
       const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
+      const bar = page.getByRole("button", { name: `Articles / ${category.category_name}` });
       await expect(sidebar).not.toBeInViewport();
-      await page.getByRole("button", { name: "Browse articles" }).click();
+      await bar.click();
+      await expect(page.getByRole("dialog", { name: "Browse articles" })).toBeVisible();
       await expect(sidebar).toBeInViewport();
+      await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
       await page.keyboard.press("Escape");
       await expect(sidebar).not.toBeInViewport();
+      await expect(bar).toBeFocused();
     });
 
     test("H14 Ticket details opens the details drawer; Close details closes it", async ({ page, apiAs }) => {
