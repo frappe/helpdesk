@@ -52,7 +52,6 @@ export function useView(dt: string = null) {
     if (
       (views.filters?.dt === dt && views.data?.length > 0) ||
       views.list?.promise
-      // views.isCustomerPortal === isCustomerPortal.value
     ) {
       return;
     }

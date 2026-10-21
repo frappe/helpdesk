@@ -250,7 +250,9 @@ class TestInvitations(IntegrationTestCase):
 
     def test_inviting_a_manager_needs_the_role_setting(self) -> None:
         with (
-            change_settings("HD Settings", {"allow_customer_managers_to_manage_members": 0}),
+            change_settings(
+                "HD Settings", {"allow_customer_managers_to_manage_members": 0}
+            ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
         ):
