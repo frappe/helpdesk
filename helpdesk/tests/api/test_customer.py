@@ -241,6 +241,14 @@ class TestInvitations(IntegrationTestCase):
         ):
             invite_members(self.customer.name, [self.newcomer], False)
 
+    def test_inviting_a_manager_needs_the_role_setting(self) -> None:
+        with (
+            change_settings("HD Settings", {"allow_customer_managers_to_manage_members": 0}),
+            self.set_user(self.manager["user"]),
+            self.assertRaises(frappe.PermissionError),
+        ):
+            invite_members(self.customer.name, [self.newcomer], True)
+
     def test_an_already_invited_email_is_skipped(self) -> None:
         invitee = unique_email("invitee")
         self.addCleanup(delete_invitations, invitee)

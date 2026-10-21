@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap gap-2">
+  <div v-if="attachments.length" class="flex flex-wrap gap-2">
     <AttachmentItem
       v-for="attachment in attachments"
       :key="attachment.file_url"

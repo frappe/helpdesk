@@ -41,7 +41,8 @@ export function useReplyComposer(ticket, { ticketId, isClosed, isAgent }) {
   }
 
   async function send({ body, attachments, reset }) {
-    if (isContentEmpty(body)) return
+    // An attachment alone is a reply; the composer enables Send for it.
+    if (isContentEmpty(body) && !attachments?.length) return
     const sent = await runAction(
       async () => {
         await call('run_doc_method', {

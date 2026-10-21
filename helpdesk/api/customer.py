@@ -193,6 +193,13 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         "allow_customer_managers_to_invite",
         _("You are not permitted to invite members"),
     )
+    if sbool(is_manager):
+        # inviting a manager grants the role, so it needs the members setting too
+        _validate_manager_permission(
+            customer_doc,
+            "allow_customer_managers_to_manage_members",
+            _("You are not permitted to change member roles"),
+        )
     # the db matches case-insensitively; lower both sides so lookups agree
     emails = list(dict.fromkeys(email.strip().lower() for email in emails))
     if len(emails) > MAX_INVITES:
