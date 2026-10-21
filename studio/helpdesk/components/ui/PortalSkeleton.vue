@@ -192,9 +192,10 @@
 
     <!-- The viewer's conversation layout: chat bubbles, or email cards. -->
     <div v-else-if="variant === 'thread'" class="flex flex-col pt-4">
+      <!-- PortalChatList's rows: a one-line bubble, then the name and time under it. -->
       <div v-if="conversationLayout === 'chat'" class="flex flex-col gap-3">
         <div
-          v-for="(bubble, i) in ['45%', '60%', '35%']"
+          v-for="(bubble, i) in ['16rem', '13rem', '15rem']"
           :key="i"
           class="flex gap-2"
           :class="i % 2 ? '' : 'flex-row-reverse'"
@@ -203,10 +204,18 @@
             v-if="i % 2"
             :class="[BLOCK, 'size-7 shrink-0 rounded-full']"
           />
-          <Skeleton
-            :class="[BLOCK, 'h-12 rounded-[18px]']"
+          <div
+            class="flex max-w-[80%] flex-col gap-1"
+            :class="i % 2 ? 'items-start' : 'items-end'"
             :style="{ width: bubble }"
-          />
+          >
+            <Skeleton :class="[BLOCK, 'h-[34px] w-full rounded-6']" />
+            <!-- The viewer's own messages show only the time. -->
+            <Line
+              :text="i % 2 ? 'mx-1 w-28 text-xs' : 'mx-1 w-14 text-xs'"
+              width="100%"
+            />
+          </div>
         </div>
       </div>
       <div v-else class="flex flex-col gap-4">
