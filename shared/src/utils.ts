@@ -1,5 +1,5 @@
 import { useClipboard } from "@vueuse/core";
-import { call, dayjs, dayjsLocal, dialog, toast } from "frappe-ui";
+import { call, dayjs, dayjsLocal, dialog, getConfig, toast } from "frappe-ui";
 import type { Ref } from "vue";
 
 import { setupCustomizations, withLegacyCloseContext } from "./formScripts";
@@ -125,9 +125,20 @@ export function timeAgo(date) {
   return prettyDate(date);
 }
 
+/**
+ * The moment a server datetime names, for comparisons and durations. These do
+ * not depend on the zone a date shows in, so skip `dayjsLocal`'s conversion:
+ * it, and every later op on a zoned value, builds an `Intl` formatter.
+ */
+export function serverInstant(date: string) {
+  const systemTimezone = getConfig("systemTimezone");
+  if (!systemTimezone) return dayjs(date);
+  return dayjs(dayjs.tz(date, systemTimezone).valueOf());
+}
+
 // Server rule: a milestone fails only when met after its due time.
 export function isSlaMissed(metOn: string, due?: string | null) {
-  return Boolean(due) && dayjsLocal(metOn).isAfter(dayjsLocal(due));
+  return Boolean(due) && serverInstant(metOn).isAfter(serverInstant(due));
 }
 
 /** Format a duration using its two most significant units, e.g. "1d 9h" */
@@ -214,7 +225,7 @@ export function isEmoji(str: string): boolean {
  * Examples: `1y`, `4 days 4h`, `2h 20m`, `5m`.
  */
 export function shortDuration(target: string): string {
-  const seconds = Math.abs(dayjsLocal(target).diff(dayjsLocal(), "second"));
+  const seconds = Math.abs(serverInstant(target).diff(dayjs(), "second"));
   if (seconds >= YEAR) {
     const years = Math.floor(seconds / YEAR);
     return countLabel(years, __("1 year"), __("{0} years"));

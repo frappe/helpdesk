@@ -193,8 +193,7 @@ test.describe("conversation", () => {
     expect(await page.evaluate(() => localStorage.getItem("kb:composer-height"))).toBe(stored);
   });
 
-  // Socket server resolves the site by Host; localhost:8020 isn't e2e.localhost.
-  test.fixme("an agent's reply elsewhere shows without a reload", async ({ page, apiAs, ticket }) => {
+  test("an agent's reply elsewhere shows without a reload", async ({ page, apiAs, ticket }) => {
     await page.goto(`/help/tickets/${ticket.name}`);
     await expect(closeButton(page)).toBeVisible();
     const live = `Live ${uid()}`;

@@ -48,8 +48,7 @@ test("sidebar fields save once per change and persist", async ({ page, api, tick
   expect(saved).toMatchObject({ priority: "Low", ticket_type: "Bug", agent_group: team });
 });
 
-test.fixme("setting a team that has no members does not error", async ({ page, ticket }) => {
-  // fresh sites ship Billing with an enabled, empty round robin rule: IndexError in get_user_round_robin
+test("setting a team that has no members does not error", async ({ page, ticket }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await openTicket(page, ticket.name);
