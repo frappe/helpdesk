@@ -29,7 +29,7 @@ async function openMergeDialog(page: Page, source: Ticket, target: Ticket) {
   await page.getByRole("menuitem", { name: "Merge Ticket" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: "Ticket", exact: true }).click();
-  await page.getByRole("combobox", { name: "Select Ticket" }).fill(target.subject);
+  await page.getByRole("combobox", { name: "Search" }).fill(target.subject);
   await page.getByRole("option", { name: `${target.subject} ${target.name},` }).click();
   return dialog;
 }
