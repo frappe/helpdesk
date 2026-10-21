@@ -153,7 +153,14 @@ class TestInvitations(IntegrationTestCase):
         )
         cls.other_customer = create_customer(unique_name("Test Other Invitations"))
         cls.enterClassContext(
-            change_settings("HD Settings", {"allow_customer_managers_to_invite": 1})
+            change_settings(
+                "HD Settings",
+                {
+                    "allow_customer_managers_to_invite": 1,
+                    # some tests invite managers
+                    "allow_customer_managers_to_change_roles": 1,
+                },
+            )
         )
 
     def setUp(self) -> None:
