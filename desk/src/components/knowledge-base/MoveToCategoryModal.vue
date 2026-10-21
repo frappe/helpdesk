@@ -7,7 +7,6 @@
           class="w-full"
           doctype="HD Article Category"
           placeholder="Select Category"
-          :search-placeholder="__('Search')"
           v-model="category"
           label="Category"
           :filters="defaultFilters"

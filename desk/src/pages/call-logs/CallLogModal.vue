@@ -78,7 +78,6 @@
                 :value="callLog.receiver"
                 :doctype="'User'"
                 :placeholder="__('Select')"
-                :search-placeholder="__('Search')"
                 :label="__('Call Received By')"
                 @change="(data) => (callLog.receiver = data)"
               />
@@ -91,7 +90,6 @@
                 :value="callLog.caller"
                 :doctype="'User'"
                 :placeholder="__('Select')"
-                :search-placeholder="__('Search')"
                 :label="__('Caller')"
                 @change="(data) => (callLog.caller = data)"
               />
@@ -101,7 +99,6 @@
                 :value="callLog.ticket"
                 :doctype="'HD Ticket'"
                 :placeholder="__('Select')"
-                :search-placeholder="__('Search')"
                 :label="__('Ticket')"
                 :show-description="true"
                 @change="(data) => (callLog.ticket = String(data))"
