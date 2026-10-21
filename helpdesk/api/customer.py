@@ -176,6 +176,13 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         "allow_customer_managers_to_invite",
         _("You are not permitted to invite members"),
     )
+    if sbool(is_manager):
+        # inviting a manager grants the role, so it needs the role setting too
+        _validate_manager_permission(
+            customer_doc,
+            "allow_customer_managers_to_change_roles",
+            _("You are not permitted to change member roles"),
+        )
     if len(emails) > MAX_INVITES:
         frappe.throw(_("You can invite up to {0} people at a time").format(MAX_INVITES))
     contact_by_email = dict(
