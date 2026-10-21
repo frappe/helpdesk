@@ -122,8 +122,11 @@ test.describe("Default template rows", () => {
       await page.getByRole("button", { name: "E2E Set Priority" }).click();
       await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).priority).toBe("Low");
 
-      const refused = page.waitForResponse((r) =>
-        r.url().endsWith("/api/method/frappe.client.set_value")
+      // Only the type's save: the priority save's response may still be in flight.
+      const refused = page.waitForResponse(
+        (r) =>
+          r.url().endsWith("/api/method/frappe.client.set_value") &&
+          (r.request().postData() || "").includes("ticket_type")
       );
       await page.getByRole("button", { name: "E2E Set Type" }).click();
       expect((await refused).status()).toBe(403);
