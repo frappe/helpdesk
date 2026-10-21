@@ -161,6 +161,10 @@ const selectBannerActions = [
 
 const options = computed(() => ({
   doctype: "HD Ticket",
+  // agents only for now; customers keep the plain list
+  groupBy: !isCustomerPortal.value,
+  // two fields Helpdesk never fills in, and the per-ticket feedback-link token
+  groupByExclude: ["avg_response_time", "user_resolution_time", "key"],
   columnConfig: {
     subject: {
       custom: ({ row, item }) => {
@@ -308,7 +312,7 @@ const dropdownOptions = computed(() => {
       options: [
         {
           label: __("List View"),
-          icon: "lucide-align-justify",
+          icon: "lucide-text-align-justify",
           onClick: () =>
             router.push({
               name: "TicketsAgent",
