@@ -3,59 +3,68 @@
 # See license.txt
 import frappe
 from frappe.tests import IntegrationTestCase
+from frappe.utils import set_request
+from frappe.website.serve import get_response
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
 )
+from helpdesk.setup.install import setup_customer_role
+from helpdesk.test_utils import create_agent
+
+CUSTOMER = "home-page-customer@example.com"
+AGENT_CUSTOMER = "home-page-agent@example.com"
 
 
 class TestCustomerHomePage(IntegrationTestCase):
-    def set_prefer_knowledge_base(self, value: int) -> None:
-        settings = frappe.get_single("HD Settings")
-        settings.prefer_knowledge_base = value
-        settings.save(ignore_permissions=True)
-
-    def home_pages(self) -> set[str]:
-        return set(
-            frappe.get_all(
-                "Role",
-                filters={"name": ["in", ["HD Customer", "HD Customer Manager"]]},
-                pluck="home_page",
-            )
-        )
+    def open_desk(self, user: str, path: str = "/helpdesk"):
+        frappe.set_user(user)
+        set_request(method="GET", path=path)
+        return get_response()
 
     def setUp(self) -> None:
-        frappe.db.set_value(
-            "Role",
-            {"name": ["in", ["HD Customer", "HD Customer Manager"]]},
-            "home_page",
-            TICKETS_HOME,
-        )
-        frappe.db.set_single_value(
-            "Portal Settings", "default_portal_home", "/helpdesk"
-        )
+        make_customer(CUSTOMER)
+        create_agent(AGENT_CUSTOMER)
+        frappe.get_doc("User", AGENT_CUSTOMER).add_roles("HD Customer")
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 0)
 
-    def test_turning_it_on_sends_customers_to_the_knowledge_base(self) -> None:
-        self.set_prefer_knowledge_base(1)
-        self.assertEqual(self.home_pages(), {KNOWLEDGE_BASE_HOME})
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
 
-    def test_turning_it_off_sends_customers_to_their_tickets(self) -> None:
-        self.set_prefer_knowledge_base(1)
-        self.set_prefer_knowledge_base(0)
-        self.assertEqual(self.home_pages(), {TICKETS_HOME})
-
-    def test_a_home_page_set_by_hand_is_kept(self) -> None:
-        frappe.db.set_value("Role", "HD Customer", "home_page", "/custom")
-        self.set_prefer_knowledge_base(1)
+    def test_customer_roles_keep_the_desk_as_home(self) -> None:
+        setup_customer_role(fresh_install=False)
         self.assertEqual(
-            frappe.db.get_value("Role", "HD Customer", "home_page"), "/custom"
+            frappe.db.get_value("Role", "HD Customer", "home_page"), "/helpdesk"
         )
 
-    def test_agents_keep_the_desk_as_home(self) -> None:
-        self.set_prefer_knowledge_base(1)
-        self.assertEqual(
-            frappe.db.get_single_value("Portal Settings", "default_portal_home"),
-            "/helpdesk",
-        )
+    def test_customers_go_on_to_their_tickets(self) -> None:
+        response = self.open_desk(CUSTOMER)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], TICKETS_HOME)
+
+    def test_customers_go_on_to_the_knowledge_base_when_preferred(self) -> None:
+        frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
+        self.assertEqual(self.open_desk(CUSTOMER).headers["Location"], KNOWLEDGE_BASE_HOME)
+
+    def test_an_agent_who_is_also_a_customer_stays_on_the_desk(self) -> None:
+        self.assertEqual(self.open_desk(AGENT_CUSTOMER).status_code, 200)
+
+    def test_a_deep_link_is_left_to_the_desk_router(self) -> None:
+        response = self.open_desk(CUSTOMER, "/helpdesk/tickets/1")
+        self.assertEqual(response.status_code, 200)
+
+
+def make_customer(email: str) -> None:
+    if frappe.db.exists("User", email):
+        return
+    user = frappe.get_doc(
+        {
+            "doctype": "User",
+            "email": email,
+            "first_name": "Home Page",
+            "send_welcome_email": 0,
+            "user_type": "Website User",
+        }
+    ).insert(ignore_permissions=True)
+    user.add_roles("HD Customer")

@@ -6,13 +6,14 @@ from frappe.utils.jinja_globals import is_rtl
 from frappe.utils.telemetry import capture
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_customer_home_page
-from helpdesk.utils import get_agent_name
+from helpdesk.utils import get_agent_name, is_agent
 
 no_cache = 1
 
 
 def get_context(context):
     frappe.db.commit()
+    redirect_customer_home()
     context.boot = get_boot()
 
     # telemetry
@@ -20,6 +21,20 @@ def get_context(context):
         capture("active_site", "helpdesk")
     return context
 
+
+
+def redirect_customer_home():
+    """Customer roles keep `/helpdesk` as their home, so a user who is also an
+    agent lands on the desk. Everyone else goes on to the portal from here."""
+    # as `has_desk_access` in api/auth.py
+    if frappe.session.user == "Guest" or is_agent() or "System Manager" in frappe.get_roles():
+        return
+    # Deep links stay with the desk router, which sends customers to the same page on the portal
+    if frappe.request.path.rstrip("/") not in ("", "/helpdesk"):
+        return
+    frappe.local.flags.redirect_location = get_customer_home_page()
+    # 302: the target follows HD Settings and the user's roles, so browsers must not cache it
+    raise frappe.Redirect(302)
 
 @frappe.whitelist(methods=["POST"], allow_guest=True)
 def get_context_for_dev():

@@ -6,7 +6,6 @@ from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
-from helpdesk.helpdesk.doctype.hd_settings.helpers import KNOWLEDGE_BASE_HOME
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
 
@@ -222,7 +221,7 @@ def setup_customer_role(fresh_install=True):
         else:
             role_doc = frappe.new_doc("Role")
             role_doc.role_name = role_name
-        role_doc.home_page = KNOWLEDGE_BASE_HOME
+        role_doc.home_page = "/helpdesk"
         role_doc.desk_access = 0
         role_doc.save()
 

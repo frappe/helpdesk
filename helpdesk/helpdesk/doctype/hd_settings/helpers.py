@@ -146,7 +146,6 @@ def get_rendered_banner_msg(ticket_id):
 
 KNOWLEDGE_BASE_HOME = CUSTOMER_PORTAL_ROOT
 TICKETS_HOME = f"{CUSTOMER_PORTAL_ROOT}/my-tickets"
-CUSTOMER_HOME_PAGES = [KNOWLEDGE_BASE_HOME, TICKETS_HOME]
 
 
 def get_customer_home_page() -> str:
@@ -154,20 +153,6 @@ def get_customer_home_page() -> str:
         return KNOWLEDGE_BASE_HOME
     return TICKETS_HOME
 
-
-def set_customer_home_page(replace: list[str]) -> None:
-    """Keeps hand-set home pages. Roles only: the portal default is also agents' home."""
-    from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
-
-    home_page = get_customer_home_page()
-    frappe.db.set_value(
-        "Role",
-        {"name": ["in", CUSTOMER_ROLES], "home_page": ["in", replace]},
-        "home_page",
-        home_page,
-    )
-    # frappe caches each user's home page
-    frappe.cache.delete_value("home_page")
 
 
 def sync_brand_to_website_settings(settings) -> None:
