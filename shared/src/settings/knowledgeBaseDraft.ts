@@ -6,7 +6,7 @@ import {
   getCachedDocumentResource,
   toast,
 } from "frappe-ui";
-import { computed, ref, shallowRef, watch } from "vue";
+import { computed, effectScope, ref, shallowRef, watch } from "vue";
 import {
   KNOWLEDGE_BASE_PREVIEW_KEY,
   type KnowledgeBasePreview,
@@ -44,7 +44,8 @@ export const knowledgeBaseDraft = shallowRef<ReturnType<
 > | null>(null);
 
 export function useKnowledgeBaseDraft() {
-  return (knowledgeBaseDraft.value ??= createDraft());
+  // Detached: the singleton outlives the first form, so must its watchers.
+  return (knowledgeBaseDraft.value ??= effectScope(true).run(createDraft)!);
 }
 
 function createDraft() {
