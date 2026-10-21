@@ -161,8 +161,7 @@ const selectBannerActions = [
 
 const options = computed(() => ({
   doctype: "HD Ticket",
-  // agents only for now; customers keep the plain list
-  groupBy: !isCustomerPortal.value,
+  groupBy: true,
   // two fields Helpdesk never fills in, and the per-ticket feedback-link token
   groupByExclude: ["avg_response_time", "user_resolution_time", "key"],
   columnConfig: {
