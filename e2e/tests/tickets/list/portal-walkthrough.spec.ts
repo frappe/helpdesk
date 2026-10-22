@@ -45,7 +45,7 @@ test.describe("header", () => {
 
     await menu.click();
     await page.getByRole("menuitem", { name: "Settings" }).click();
-    await expect(page).toHaveURL(/#settings\/profile$/);
+    await expect(page).toHaveURL(/\/settings\/profile$/);
     await expect(page.getByRole("dialog")).toBeVisible();
   });
 

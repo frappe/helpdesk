@@ -173,8 +173,13 @@ function createDraft() {
         });
       }
       if (changed.value.includes("links")) await saveLinks(value.links);
+      if (changed.value.includes("pinned")) await savePinned(value.pinned);
       clearPreview();
-      await Promise.all([settings.reload(), linksScript.reload()]);
+      await Promise.all([
+        settings.reload(),
+        linksScript.reload(),
+        categories.reload(),
+      ]);
       toast.success(__("Settings updated"));
       return true;
     } catch (error) {

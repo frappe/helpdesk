@@ -19,7 +19,7 @@ import {
   ERPNextSettingsIcon,
   FieldDependencyIcon,
   PhoneIcon,
-  SlidersIcon
+  SlidersIcon,
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
@@ -91,18 +91,6 @@ export const tabs = computed(() => {
           condition: () => auth.isAdmin,
         },
         {
-          label: __("Knowledge Base"),
-          icon: markRaw(LucideBookOpen),
-          component: markRaw(KnowledgeBase),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
-          label: __("Portal Settings"),
-          icon: markRaw(LucideUserCog),
-          component: markRaw(PortalPermissions),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
           label: __("Agents"),
           icon: markRaw(LucideUser),
           component: markRaw(Agents),
@@ -148,6 +136,22 @@ export const tabs = computed(() => {
           label: __("Saved Replies"),
           icon: markRaw(ZapIcon),
           component: markRaw(SavedReplies),
+        },
+      ],
+    },
+    {
+      label: __("Customer Portal"),
+      condition: () => auth.isAdmin || auth.isManager,
+      items: [
+        {
+          label: __("Knowledge Base"),
+          icon: markRaw(LucideBookOpen),
+          component: markRaw(KnowledgeBase),
+        },
+        {
+          label: __("Portal Settings"),
+          icon: markRaw(LucideUserCog),
+          component: markRaw(PortalPermissions),
         },
       ],
     },

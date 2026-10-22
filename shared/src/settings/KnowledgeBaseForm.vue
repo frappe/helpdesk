@@ -28,7 +28,7 @@
         </h2>
         <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
           <PinnedCategories
-            :pinned="draft.pinned"
+            v-model:pinned="draft.pinned"
             :categories="categoryOptions"
             :save="savePins"
           />
@@ -83,7 +83,7 @@ import PinnedCategories from "./PinnedCategories.vue";
 import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
-// Switches and pins save at once; the rest waits for Save.
+// Switches and the pin dialog save at once; the rest waits for Save.
 const { draft, settings, setToggle, savePins, categoryOptions } =
   useKnowledgeBaseDraft();
 

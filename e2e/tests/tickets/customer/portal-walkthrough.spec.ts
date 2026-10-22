@@ -385,10 +385,11 @@ test.describe("details panel", () => {
     await expect(page.getByText(/^Due /).first()).toBeVisible();
   });
 
-  test("closed before any reply: middle steps read as skipped", async ({ page, api, ticket }) => {
+  test("closed before any reply: assignment and first response skipped, closing resolves", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Closed" });
     await page.goto(`/help/tickets/${ticket.name}`);
-    await expect(page.getByText("Skipped")).toHaveCount(3);
+    await expect(page.getByText("Skipped")).toHaveCount(2);
+    await expect(page.getByText("Resolution")).toBeVisible();
     await expect(page.getByText(/Closed directly/)).toHaveCount(0);
     await expect(page.getByText(/^Due /)).toHaveCount(0);
   });

@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUpdate, ref, watch, type PropType } from "vue";
 import type { Editor, Range } from "@tiptap/core";
-import { FieldItem } from "../../../../tiptap-extensions";
+import type { FieldItem } from "./tiptap";
 
 const props = defineProps({
   items: {

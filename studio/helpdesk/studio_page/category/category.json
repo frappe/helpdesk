@@ -121,7 +121,6 @@
                "componentId": "category-byline",
                "componentName": "PortalCategoryByline",
                "componentProps": {
-                "creatorCount": "{{ category?.creator_count }}",
                 "creators": "{{ category?.creators }}"
                },
                "isCustomVueComponent": true
@@ -430,7 +429,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-21 13:51:45.000000",
+ "modified": "2026-10-22 15:30:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

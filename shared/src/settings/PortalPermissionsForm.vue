@@ -123,15 +123,11 @@ const sections = computed(() => [
       },
       {
         settings: hdSettings,
-        fieldname: "allow_customer_managers_to_manage_members",
-        label: __("Allow member management"),
-        description: __("Change member roles and remove members."),
-      },
-      {
-        settings: hdSettings,
-        fieldname: "allow_customer_managers_to_edit_organization",
-        label: __("Allow organization edits"),
-        description: __("Change their organization's logo."),
+        fieldname: "allow_customer_managers_to_manage_organization",
+        label: __("Allow organization management"),
+        description: __(
+          "Change member roles, remove members and change the organization's logo."
+        ),
       },
     ],
   },

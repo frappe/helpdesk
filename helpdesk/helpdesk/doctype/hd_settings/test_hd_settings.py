@@ -45,7 +45,9 @@ class TestCustomerHomePage(IntegrationTestCase):
 
     def test_customers_go_on_to_the_knowledge_base_when_preferred(self) -> None:
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
-        self.assertEqual(self.open_desk(CUSTOMER).headers["Location"], KNOWLEDGE_BASE_HOME)
+        self.assertEqual(
+            self.open_desk(CUSTOMER).headers["Location"], KNOWLEDGE_BASE_HOME
+        )
 
     def test_an_agent_who_is_also_a_customer_stays_on_the_desk(self) -> None:
         self.assertEqual(self.open_desk(AGENT_CUSTOMER).status_code, 200)
@@ -53,6 +55,28 @@ class TestCustomerHomePage(IntegrationTestCase):
     def test_a_deep_link_is_left_to_the_desk_router(self) -> None:
         response = self.open_desk(CUSTOMER, "/helpdesk/tickets/1")
         self.assertEqual(response.status_code, 200)
+
+
+class TestEmailBrandImage(IntegrationTestCase):
+    """Sign-in and invite emails show Website Settings' app logo."""
+
+    def set_brand(self, brand_logo: str = "", favicon: str = "") -> str:
+        settings = frappe.get_single("HD Settings")
+        settings.update({"brand_logo": brand_logo, "favicon": favicon})
+        settings.save()
+        return frappe.db.get_single_value("Website Settings", "app_logo")
+
+    def test_the_logo_marks_auth_emails(self) -> None:
+        self.assertEqual(
+            self.set_brand("/files/logo.png", "/files/icon.png"), "/files/logo.png"
+        )
+
+    def test_an_icon_only_brand_marks_auth_emails(self) -> None:
+        self.assertEqual(self.set_brand(favicon="/files/icon.png"), "/files/icon.png")
+
+    def test_removing_the_brand_image_clears_it(self) -> None:
+        self.set_brand(favicon="/files/icon.png")
+        self.assertFalse(self.set_brand())
 
 
 def make_customer(email: str) -> None:

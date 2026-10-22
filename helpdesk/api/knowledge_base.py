@@ -41,7 +41,6 @@ PUBLIC_CATEGORY_FIELDS = [
     "pinned",
     "pinned_order",
 ]
-CREATOR_LIMIT = 32
 SEARCH_LIMIT = 10
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
@@ -252,9 +251,7 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
     for category in categories:
         category.article_count = counts[category.name]
         if with_creators:
-            names = authors[category.name]
-            category.creators = [_get_byline(name) for name in names[:CREATOR_LIMIT]]
-            category.creator_count = len(names)
+            category.creators = [_get_byline(name) for name in authors[category.name]]
     return categories
 
 

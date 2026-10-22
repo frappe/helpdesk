@@ -138,7 +138,7 @@ const emptyState = computed(() =>
   search.value
     ? {
         title: __("No organizations found"),
-        description: __("Change your search terms."),
+        description: __("Try a different search."),
       }
     : {
         title: __("No organizations"),

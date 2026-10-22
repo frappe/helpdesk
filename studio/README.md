@@ -30,6 +30,7 @@ Studio documents its own rules. Read them before you change a page:
 ```
 studio/helpdesk/
   helpdesk.json          Studio App record: route "help", app_home = public_kb
+  router.ts              opens the Settings dialog at <page>/settings/<screen>
   studio_page/<page>/    <page>.json (block tree) + <page>.ts (setup script)
   studio_components/     Studio Components: reusable block trees with inputs
   components/            custom Vue components, by area
@@ -85,7 +86,7 @@ The stores are module-level singletons, not Pinia.
 
 - `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions.
 - `useArticleSearch`: debounced article search, used by the search box and the new ticket form.
-- `useDrawer`: the mobile sidebar drawer.
+- `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
 - `useRememberedCount`: remembers a list's length so its skeleton keeps the same size.
 

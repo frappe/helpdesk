@@ -214,6 +214,11 @@ export function addHeadingIds(html: string) {
   return { html: doc.body.innerHTML, headings };
 }
 
+// Scoped to the article: the icon sprite's <symbol>s reuse ids like `settings`.
+export function findArticleHeading(id: string) {
+  return document.querySelector<HTMLElement>(`.ProseMirror #${CSS.escape(id)}`);
+}
+
 // Lucide names are plain ASCII, so any emoji-presentation or pictographic
 // character (or a variation selector, for keycaps like 1️⃣) means a legacy emoji.
 export function isEmoji(str: string): boolean {

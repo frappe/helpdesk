@@ -136,6 +136,12 @@
           :attachments="attachments"
           @remove="removeAttachment"
         />
+        <FailedUploads
+          class="px-5 my-2"
+          :files="failedUploads.files.value"
+          @retry="failedUploads.retry"
+          @remove="failedUploads.remove"
+        />
         <!-- Saved reply actions, applied once the reply is sent -->
         <SavedReplyActions
           ref="savedReplyActionsRef"
@@ -153,11 +159,13 @@
                 :doctype="doctype"
                 :docname="ticketId"
                 private
+                :validate-file="pickFile"
                 @success="
                   (f) => {
                     attachments.push(f);
                   }
                 "
+                @failure="failedUploads.add(pickedFile)"
               >
                 <template #default="{ openFileSelector, uploading }">
                   {{ void (attachmentUploading = uploading) }}
@@ -234,6 +242,8 @@ import SavedReplyActions from "@/components/SavedReplyActions/SavedReplyActions.
 import { useTyping } from "@/composables/realtime";
 import { getUserEmailInfo } from "@/composables/useUserEmailInfo";
 import { useUploadTracker } from "@/composables/useUploadTracker";
+import FailedUploads from "@helpdesk/shared/FailedUploads.vue";
+import { useFailedUploads } from "@helpdesk/shared/failedUploads";
 import { replyComposer } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
@@ -413,10 +423,23 @@ const hasMultipleSenders = computed(() => (from?.value.length ?? 0) > 1);
 const attachments = ref([]);
 const attachmentUploading = ref(false);
 const { isUploading: editorUploading, track, dropUnused } = useUploadTracker();
+const failedUploads = useFailedUploads(
+  (file) => uploadFunction(file, props.doctype, props.ticketId, true),
+  (file) => attachments.value.push(file)
+);
+// FileUploader's failure event carries no file; keep the pick to retry it
+let pickedFile: File;
+function pickFile(file: File) {
+  pickedFile = file;
+  return null;
+}
 
 // The paperclip and the editor's own media buttons upload by different routes
 const isUploading = computed(
-  () => attachmentUploading.value || editorUploading.value
+  () =>
+    attachmentUploading.value ||
+    editorUploading.value ||
+    failedUploads.isRetrying.value
 );
 
 async function removeAttachment(attachment) {
@@ -638,6 +661,7 @@ function addToReply(
 function resetState() {
   newEmail.value = emailSignature.value ? emailSignature.value : null;
   attachments.value = [];
+  failedUploads.clear();
   quotedContent.value = null;
   isQuoteExpanded.value = false;
   focusEditorAtStart();
@@ -645,6 +669,7 @@ function resetState() {
 
 function handleDiscard() {
   attachments.value = [];
+  failedUploads.clear();
   savedReplyActionsRef.value?.clear();
   newEmail.value = getInitialContent();
   quotedContent.value = null;

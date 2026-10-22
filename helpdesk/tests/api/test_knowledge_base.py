@@ -236,7 +236,7 @@ class TestPublicReads(IntegrationTestCase):
 
         category = category_row(self.category.name, with_creators=True)
 
-        self.assertEqual(category.creator_count, 2)
+        self.assertEqual(len(category.creators), 2)
         self.assertEqual(
             category.creators[0]["name"],
             frappe.db.get_value("User", author, "full_name"),

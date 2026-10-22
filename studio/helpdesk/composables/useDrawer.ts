@@ -24,3 +24,16 @@ export function useDrawer(route) {
 
   return reactive({ open, toggle, close })
 }
+
+// State only, for a frappe-ui `BottomSheet`, which locks scroll, closes on
+// Escape and returns focus itself. A second scroll lock would leave the page
+// locked after the sheet closes.
+export function useBottomSheet(route) {
+  const sheet = reactive({
+    open: false,
+    toggle: () => (sheet.open = !sheet.open),
+    close: () => (sheet.open = false),
+  })
+  watch(() => route.fullPath, sheet.close)
+  return sheet
+}

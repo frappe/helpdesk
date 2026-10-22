@@ -112,8 +112,9 @@ export function useTicketDetails(ticket, thread, statusChanges) {
 
   function resolution() {
     const on = data.value.resolution_date
-    // A direct close stamps `resolution_date` too, so the close history decides.
-    if (isClosed() && (closedOutright() || !on)) return [skipped(__('Resolution'))]
+    // Closing resolves too: a direct close reads as resolved at the close.
+    if (isClosed() && (closedOutright() || !on))
+      return [reachedStep(__('Resolution'), closedOn(), data.value.resolution_by, data.value.resolution_failed_by)]
     if (data.value.status_category !== 'Resolved') return [awaiting(__('Resolution'), data.value.resolution_by, data.value.overdue_by?.resolution)]
     if (!on) return []
     return [reachedStep(__('Resolution'), on, data.value.resolution_by, data.value.resolution_failed_by)]
@@ -131,11 +132,15 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     return isClosedStatus(data.value.status) && Boolean(lastClose.value) && !isResolvedStatus(lastClose.value.from)
   }
 
+  // `modified` stands in when nothing dates the close; wrong if edited after closing
+  function closedOn() {
+    return lastClose.value?.on || data.value.resolution_date || data.value.modified
+  }
+
   // `resolution_date` keeps the resolve time; status history dates the close.
   function closing() {
     if (!isClosed()) return []
-    // `modified` stands in when nothing dates the close; wrong if edited after closing
-    const on = lastClose.value?.on || data.value.resolution_date || data.value.modified
+    const on = closedOn()
     const late = isSlaMissed(data.value.resolution_date || on, data.value.resolution_by)
     const subtitle = [late && __('SLA failed'), stepDate(on)]
       .filter(Boolean)

@@ -9,6 +9,7 @@ import {
   previousLocation,
 } from '@app/stores/router'
 import { getErrorMessage } from '@helpdesk/shared/utils'
+import { settingsPath } from '@app/router'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
@@ -77,9 +78,6 @@ export function createSettingsCore() {
   }
 }
 
-// One hash segment per screen, so device back steps through the dialog.
-const HASH_ROOT = 'settings'
-
 // Only settings editors get these.
 const EDITOR_TABS = ['knowledge-base', 'portal-settings']
 const TABS = ['profile', 'members', ...EDITOR_TABS]
@@ -99,7 +97,7 @@ export function createSettingsDialog(core, organization, session) {
   // Not in watchRoute: Studio stops the page's effect scope on navigation.
   watch(
     [core.isSettingsOpen, core.settingsTab, organization.selectedOrganization, organization.inviteOpen],
-    () => pushHash(),
+    () => pushPath(),
   )
 
   // `afterEach`: a page script's `route` is a snapshot.
@@ -108,66 +106,76 @@ export function createSettingsDialog(core, organization, session) {
   function watchRoute() {
     if (isWatchingRoute) return
     isWatchingRoute = true
-    applyHash(currentRoute().hash)
-    afterEachRoute((to) => applyHash(to.hash))
+    applyRoute(currentRoute())
+    afterEachRoute(applyRoute)
   }
 
-  async function applyHash(hash) {
-    const [root, hashTab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
-    if (root !== HASH_ROOT) return closeSettings()
+  async function applyRoute(route) {
+    const screens = readScreens(route)
+    if (!screens) return closeSettings()
     // Guests have no account; unseen tabs would open blank.
     await session.loadSession()
-    if (session.isGuest.value) return closeSettings()
-    const allowed = TABS.includes(hashTab) && (!EDITOR_TABS.includes(hashTab) || session.canEditSettings.value)
-    const tab = allowed ? hashTab : 'profile'
+    if (session.isGuest.value) {
+      closeSettings()
+      return navigateTo({ path: pagePath(route), query: route.query, hash: route.hash, replace: true })
+    }
+    const [routeTab, ...rest] = screens
+    const allowed = TABS.includes(routeTab) && (!EDITOR_TABS.includes(routeTab) || session.canEditSettings.value)
+    const tab = allowed ? routeTab : 'profile'
     if (core.isSettingsOpen.value) core.settingsTab.value = tab
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
-    applyOrganizationHash(rest.join('/'), invite)
+    applyOrganization(rest.join('/'), invite)
   }
 
-  function applyOrganizationHash(org, invite) {
+  function applyOrganization(org, invite) {
     if (!org) return organization.closeOrganization()
     if (org !== organization.selectedOrganization.value) organization.openOrganization(org)
     organization.inviteOpen.value = invite
   }
 
-  function settingsHash() {
-    if (!core.isSettingsOpen.value) return ''
-    const parts = [HASH_ROOT, core.settingsTab.value]
-    if (organization.selectedOrganization.value) parts.push(organization.selectedOrganization.value)
-    if (organization.selectedOrganization.value && organization.inviteOpen.value) parts.push('invite')
-    return `#${parts.join('/')}`
+  // One path segment per screen, so device back steps through the dialog.
+  function targetPath(route) {
+    const page = pagePath(route)
+    if (!core.isSettingsOpen.value) return page
+    const screens = [core.settingsTab.value]
+    if (organization.selectedOrganization.value) screens.push(organization.selectedOrganization.value)
+    if (organization.selectedOrganization.value && organization.inviteOpen.value) screens.push('invite')
+    return settingsPath(page, screens)
   }
 
-  // The router escapes spaces in names.
-  function readHash(hash) {
+  // The `<page>/settings/:settings*` alias from router.ts; null off it.
+  function readScreens(route) {
+    const screens = route.params?.settings
+    if (screens === undefined) return null
+    return Array.isArray(screens) ? screens : [screens].filter(Boolean)
+  }
+
+  function pagePath(route) {
+    const screens = readScreens(route)
+    if (!screens) return route.path
+    return route.path.replace(/\/$/, '').split('/').slice(0, -(screens.length + 1)).join('/') || '/'
+  }
+
+  // Paths come from the router, the address bar and here, each escaped its own way.
+  function decode(path) {
     try {
-      return decodeURIComponent(String(hash || ''))
+      return decodeURIComponent(String(path || ''))
     } catch {
-      return String(hash || '')
+      return String(path || '')
     }
   }
 
-  function pushHash() {
-    const hash = settingsHash()
+  function pushPath() {
     const current = currentRoute()
-    if (readHash(current.hash) === hash) return
+    if (!current.path) return
+    const path = targetPath(current)
+    if (decode(current.path) === decode(path)) return
     // Unwind history, or back points into the closed screen.
-    const previous = previousHash()
-    if (previous !== null && readHash(previous) === hash) return navigateBack()
-    // A bare `{ hash }` resolves against whatever route is current.
-    navigateTo({ path: current.path, query: current.query, hash })
-  }
-
-  // History state holds a full path; compare only the page part.
-  function previousHash() {
     const previous = previousLocation()
-    if (previous === null) return null
-    const index = previous.indexOf('#')
-    const [location, hash] = index === -1 ? [previous, ''] : [previous.slice(0, index), previous.slice(index)]
-    return location.split('?')[0] === currentRoute().path ? hash : null
+    if (previous !== null && decode(previous.split(/[?#]/)[0]) === decode(path)) return navigateBack()
+    navigateTo({ path, query: current.query, hash: current.hash })
   }
 
   return {

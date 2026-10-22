@@ -16,7 +16,6 @@
         :date-format="dateFormat"
         :time-format="timeFormat"
         :dialog="$dialog"
-        :editor-extensions="[HandleExcelPaste]"
         @actions="customActions = $event"
         @created="openTicket"
       />
@@ -31,7 +30,6 @@ import CustomActions from "../../../../studio/helpdesk/components/header/CustomA
 import NewTicketForm from "../../../../studio/helpdesk/components/ticket/NewTicketForm.vue";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
-import { HandleExcelPaste } from "@/tiptap-extensions";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { useOnboarding } from "@framework/ui";

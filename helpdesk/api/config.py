@@ -3,37 +3,52 @@ from frappe.utils import get_user_date_format, get_user_time_format
 
 from helpdesk.utils import is_agent
 
+# What the knowledge base needs to render for a guest
+GUEST_FIELDS = [
+    "brand_name",
+    "brand_logo",
+    "public_knowledge_base",
+    "allow_anonymous_article_voting",
+    "banner_image",
+    "banner_preset",
+]
+# The portal's ticket and organization pages
+USER_FIELDS = [
+    "hide_raise_ticket_button",
+    "is_feedback_mandatory",
+    "allow_customer_managers_to_invite",
+    "allow_customer_managers_to_manage_organization",
+]
+# The desk's ticket workflow
+AGENT_FIELDS = [
+    "skip_email_workflow",
+    "restrict_tickets_by_agent_group",
+    "assign_within_team",
+    "disable_saved_replies_global_scope",
+    "enable_comment_reactions",
+]
+
 
 @frappe.whitelist(allow_guest=True)  # nosemgrep
 def get_config():
-    fields = [
-        "brand_name",
-        "brand_logo",
-        "public_knowledge_base",
-        "allow_anonymous_article_voting",
-        "hide_raise_ticket_button",
-        "banner_image",
-        "banner_preset",
-        "setup_complete",
-        "skip_email_workflow",
-        "is_feedback_mandatory",
-        "restrict_tickets_by_agent_group",
-        "assign_within_team",
-        "disable_saved_replies_global_scope",
-        "enable_comment_reactions",
-        "allow_customer_managers_to_invite",
-        "allow_customer_managers_to_manage_members",
-        "allow_customer_managers_to_edit_organization",
-    ]
+    """Each caller gets only the settings its app reads: guests the knowledge base look,
+    signed-in users the portal switches, agents the desk workflow"""
+    res = frappe._dict(
+        session_user=frappe.session.user,
+        is_agent=is_agent(),
+        can_edit_settings=frappe.has_permission("HD Settings", "write"),
+    )
+    fields = GUEST_FIELDS
+    if res.session_user != "Guest":
+        fields = fields + USER_FIELDS
+    if res.is_agent:
+        fields = fields + AGENT_FIELDS
+
     # A Single omits fields never set; every requested key is answered so the portal reads null.
     values = (
         frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True) or {}
     )
-    res = frappe._dict({field: values.get(field) for field in fields})
-
-    res.session_user = frappe.session.user
-    res.is_agent = is_agent()
-    res.can_edit_settings = frappe.has_permission("HD Settings", "write")
+    res.update({field: values.get(field) for field in fields})
     res.date_format = get_user_date_format()
     res.time_format = get_user_time_format()
 

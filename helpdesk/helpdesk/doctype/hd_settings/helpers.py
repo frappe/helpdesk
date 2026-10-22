@@ -154,20 +154,26 @@ def get_customer_home_page() -> str:
     return TICKETS_HOME
 
 
-
 def sync_brand_to_website_settings(settings) -> None:
     """Site-wide: framework emails, login page and desk read the brand from Website Settings."""
-    logo_changed = settings.has_value_changed("brand_logo")
+    logo_changed = any(
+        settings.has_value_changed(field) for field in ("brand_logo", "favicon")
+    )
     name_changed = settings.has_value_changed("brand_name") and settings.brand_name
     if logo_changed:
         frappe.db.set_single_value(
-            "Website Settings", "app_logo", settings.brand_logo or ""
+            "Website Settings", "app_logo", get_brand_image(settings)
         )
     if name_changed:
         set_site_brand_name(settings.brand_name)
     if logo_changed or name_changed:
         # set_single_value skips Website Settings' on_update, which clears the boot cache
         frappe.clear_cache()
+
+
+def get_brand_image(settings) -> str:
+    """The logo, else the favicon, so an icon-only brand still marks auth emails."""
+    return settings.brand_logo or settings.favicon or ""
 
 
 def set_site_brand_name(brand_name: str) -> None:

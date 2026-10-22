@@ -41,7 +41,7 @@ class TestOrganizationMembers(IntegrationTestCase):
         cls.outsider = create_contact("Org Outsider", unique_email("org-outsider"))
         cls.enterClassContext(
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_manage_members": 1}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 1}
             )
         )
 
@@ -120,7 +120,7 @@ class TestOrganizationMembers(IntegrationTestCase):
     def test_role_changes_need_the_member_management_setting(self) -> None:
         settings = {
             "allow_customer_managers_to_invite": 1,
-            "allow_customer_managers_to_manage_members": 0,
+            "allow_customer_managers_to_manage_organization": 0,
         }
         with (
             change_settings("HD Settings", settings),
@@ -154,7 +154,7 @@ class TestInvitations(IntegrationTestCase):
                 {
                     "allow_customer_managers_to_invite": 1,
                     # some tests invite managers
-                    "allow_customer_managers_to_manage_members": 1,
+                    "allow_customer_managers_to_manage_organization": 1,
                 },
             )
         )
@@ -251,7 +251,7 @@ class TestInvitations(IntegrationTestCase):
     def test_inviting_a_manager_needs_the_role_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_manage_members": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -288,7 +288,7 @@ class TestInvitations(IntegrationTestCase):
         )
 
     def test_an_existing_member_is_skipped(self) -> None:
-        """Accepting would bypass the member management setting."""
+        """Accepting would bypass the manage organization setting."""
         email = unique_email("existing-member")
         member = create_contact("Existing Member", email)
         frappe.get_doc("HD Customer", self.customer.name).add_contacts(
@@ -361,7 +361,7 @@ class TestMemberRemoval(IntegrationTestCase):
                 "HD Settings",
                 {
                     "allow_customer_managers_to_invite": 1,
-                    "allow_customer_managers_to_manage_members": 1,
+                    "allow_customer_managers_to_manage_organization": 1,
                 },
             )
         )
@@ -422,7 +422,7 @@ class TestMemberRemoval(IntegrationTestCase):
     def test_removal_needs_the_member_management_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_manage_members": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -468,14 +468,14 @@ class TestOrganizationEdits(IntegrationTestCase):
         )
         cls.enterClassContext(
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_edit_organization": 1}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 1}
             )
         )
 
     def test_edits_need_the_portal_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_edit_organization": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),

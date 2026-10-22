@@ -82,6 +82,7 @@ import { FormLayout, evaluateDependsOn } from "@framework/ui/FormLayout";
 import DOMPurify from "dompurify";
 import { applyFieldFilters } from "@helpdesk/shared/formScripts";
 import { __ } from "@helpdesk/shared/translation";
+import { HandleExcelPaste } from "@helpdesk/shared/tiptap";
 import {
   isContentEmpty,
   parseLinkFilters,
@@ -102,6 +103,7 @@ const UPLOAD_FOLDER = "Home/Helpdesk";
 const SUGGESTION_LIMIT = 3;
 // Longer Select lists get a search box if there are more than 10 results
 const SEARCHABLE_FROM = 10;
+const editorExtensions = [HandleExcelPaste];
 
 const props = withDefaults(
   defineProps<{
@@ -112,8 +114,6 @@ const props = withDefaults(
     suggestArticles?: boolean;
     dateFormat?: string;
     timeFormat?: string;
-    // The desk's own extensions, e.g. Excel paste, built on its tiptap copy.
-    editorExtensions?: unknown[];
     // The desk's `$dialog`, so its form scripts render as on the ticket page.
     dialog?: (options: Record<string, unknown>) => unknown;
   }>(),

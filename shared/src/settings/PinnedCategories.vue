@@ -52,7 +52,7 @@
       >
         {{
           __(
-            "No categories pinned. The home page will show all categories, A–Z."
+            "Nothing pinned yet. The home page will list all categories alphabetically."
           )
         }}
       </div>
@@ -83,9 +83,12 @@ type Category = {
 const props = defineProps<{
   categories: Category[];
   pinned: string[];
-  // Saves at once; resolves true on success.
+  // The Customize dialog saves at once; resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
 }>();
+
+// Row menu edits wait for the form's Save.
+const emit = defineEmits<{ "update:pinned": [pinned: string[]] }>();
 
 const open = ref(false);
 
@@ -100,7 +103,7 @@ function labelOf(name: string) {
 function moveTo(name: string, index: number) {
   const next = props.pinned.filter((row) => row !== name);
   next.splice(index, 0, name);
-  return props.save(next);
+  emit("update:pinned", next);
 }
 
 function rowOptions(index: number) {
@@ -121,7 +124,11 @@ function rowOptions(index: number) {
     {
       label: __("Unpin"),
       icon: "lucide-pin-off",
-      onClick: () => props.save(props.pinned.filter((row) => row !== name)),
+      onClick: () =>
+        emit(
+          "update:pinned",
+          props.pinned.filter((row) => row !== name)
+        ),
     },
   ];
 }
