@@ -653,6 +653,20 @@ def create_user(email: str):
     ).insert(ignore_permissions=True)
 
 
+def make_contact_invitation(contact: str, email: str):
+    """Create a pending Helpdesk invitation for an existing contact."""
+    return frappe.get_doc(
+        {
+            "doctype": "User Invitation",
+            "email": email,
+            "app_name": "helpdesk",
+            "redirect_to_path": "/helpdesk",
+            "roles": [{"role": "HD Customer"}],
+            "contact": contact,
+        }
+    ).insert(ignore_permissions=True)
+
+
 def get_invitation(email: str):
     """Return the helpdesk User Invitation raised for an email, if any."""
     return frappe.db.get_value(
