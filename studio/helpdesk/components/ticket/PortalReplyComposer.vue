@@ -35,7 +35,11 @@
       >
         <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
       </div>
-      <div v-if="avatar?.label" class="flex items-center gap-2 pt-3">
+      <!-- pl-0.5: the avatar's centred initial lines up with the editor text. -->
+      <div
+        v-if="avatar?.label"
+        class="flex items-center gap-2 pl-0.5 pr-2.5 pt-3"
+      >
         <Avatar :image="avatar.image" :label="avatar.label" size="md" />
         <span class="truncate text-base-medium text-ink-gray-9">{{
           avatar.label

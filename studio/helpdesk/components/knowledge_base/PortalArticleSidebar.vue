@@ -1,43 +1,15 @@
 <template>
-  <!-- Phone: a bottom sheet the section bar opens. Visibility transitions
-       only on close, so the sheet is focusable as soon as it opens. -->
-  <div
+  <!-- Phone: frappe-ui's sheet, which the section bar opens. Wider: a column. -->
+  <component
+    :is="isNarrow ? BottomSheet : 'div'"
     ref="panel"
-    v-bind="$attrs"
-    :role="isSheet ? 'dialog' : undefined"
-    :aria-modal="isSheet || undefined"
-    :aria-label="isSheet ? __('Browse articles') : undefined"
-    class="flex h-full w-[239px] shrink-0 flex-col max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-40 max-md:h-[86dvh] max-md:w-full max-md:overflow-hidden max-md:rounded-t-[22px] max-md:bg-surface-base max-md:shadow-2xl max-md:duration-300 max-md:ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none"
-    :class="
-      open
-        ? 'max-md:transition-transform'
-        : 'max-md:invisible max-md:translate-y-[105%] max-md:transition-[transform,visibility]'
-    "
-    @keydown.tab="trapFocus"
+    v-bind="wrapperProps"
   >
-    <div class="shrink-0 md:hidden">
-      <div
-        class="mx-auto mt-2 h-[5px] w-[38px] rounded-[3px] bg-surface-gray-4"
-      />
-      <div class="flex items-center justify-between pe-3 ps-5 pt-1">
-        <h2 class="text-lg font-semibold text-ink-gray-9">
-          {{ __("Browse articles") }}
-        </h2>
-        <Button
-          data-sheet-close
-          variant="ghost"
-          icon="lucide-x"
-          :aria-label="__('Close')"
-          class="!size-11 [&_svg]:!size-5"
-          @click="emit('close')"
-        />
-      </div>
-    </div>
     <Sidebar
       :collapsible="false"
       width="100%"
       :aria-label="__('Knowledge base')"
-      class="border-r border-outline-gray-1 !bg-surface-base max-md:!h-auto max-md:min-h-0 max-md:flex-1 max-md:border-r-0"
+      class="border-r border-outline-gray-1 !bg-surface-base max-md:!h-[calc(90dvh-6rem)] max-md:border-r-0"
     >
       <div class="px-3 pb-2 pt-4 max-md:px-4 max-md:pt-2">
         <TextInput
@@ -165,33 +137,14 @@
         </p>
       </div>
     </Sidebar>
-  </div>
-  <Transition
-    enter-from-class="opacity-0"
-    leave-to-class="opacity-0"
-    enter-active-class="transition-opacity duration-[250ms]"
-    leave-active-class="transition-opacity duration-[250ms]"
-  >
-    <div
-      v-if="open"
-      class="fixed inset-0 z-30 bg-black-overlay-500 md:hidden"
-      @click="emit('close')"
-    />
-  </Transition>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { useMediaQuery, useScroll } from "@vueuse/core";
+import { computed, nextTick, ref, useAttrs, watch } from "vue";
 import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
-import {
-  Button,
+  BottomSheet,
   Icon,
   Sidebar,
   SidebarItem,
@@ -213,7 +166,7 @@ type Category = {
   articles?: ArticleTitle[];
 };
 
-// Two roots: Studio's attrs go on the drawer, exposed as `rootRef`.
+// Studio's attrs go on the column, not the sheet, which renders in a portal.
 defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
@@ -234,31 +187,20 @@ const props = withDefaults(
 
 const emit = defineEmits<{ close: [] }>();
 
+const attrs = useAttrs();
 const isNarrow = useMediaQuery("(max-width: 767px)");
-const isSheet = computed(() => isNarrow.value && props.open);
-
-// Not the search box: focusing it would pop the phone keyboard.
-watch(isSheet, async (sheet) => {
-  if (!sheet) return;
-  await nextTick();
-  panel.value?.querySelector<HTMLElement>("[data-sheet-close]")?.focus();
-});
-
-// Tab wraps inside the open sheet.
-function trapFocus(event: KeyboardEvent) {
-  if (!isSheet.value || !panel.value) return;
-  const focusable = [
-    ...panel.value.querySelectorAll<HTMLElement>(
-      "a[href], button:not([disabled]), input, [tabindex]:not([tabindex='-1'])"
-    ),
-  ].filter((element) => element.offsetParent);
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  const edge = event.shiftKey ? first : last;
-  if (document.activeElement !== edge) return;
-  event.preventDefault();
-  (event.shiftKey ? last : first)?.focus();
-}
+const wrapperProps = computed(() =>
+  isNarrow.value
+    ? {
+        open: props.open,
+        title: __("Browse articles"),
+        "onUpdate:open": (open: boolean) => open || emit("close"),
+      }
+    : {
+        ...attrs,
+        class: [attrs.class, "flex h-full w-[239px] shrink-0 flex-col"],
+      }
+);
 
 // Fade in only rows that replace the skeleton.
 const revealed = ref(props.loading && !props.categories.length);
@@ -347,31 +289,33 @@ const visibleCategories = computed(() => {
     .filter((category) => !searching || category.matches.length);
 });
 
-// Scroll the current item into view once per page, list only.
+// The list mounts with the page, and again with each sheet open: each mount
+// gets the last scroll back. The current item scrolls into view once per page.
 const list = ref<HTMLElement | null>(null);
-const { arrivedState } = useScroll(list);
-onMounted(() => list.value && (list.value.scrollTop = sidebarState.scrollTop));
-onBeforeUnmount(
-  () => list.value && (sidebarState.scrollTop = list.value.scrollTop)
-);
+const { arrivedState, y } = useScroll(list);
+watch(y, (top) => list.value && (sidebarState.scrollTop = top));
 let shownFor = "";
 watch(
-  () => [
-    props.activeName || currentCategory.value,
-    visibleCategories.value.length,
-  ],
-  async ([key]) => {
-    if (!key || key === shownFor || !list.value) return;
+  () =>
+    [
+      props.activeName || currentCategory.value,
+      visibleCategories.value.length,
+      list.value,
+    ] as const,
+  async ([key, , element], previous) => {
+    if (!element) return;
+    if (element !== previous?.[2]) element.scrollTop = sidebarState.scrollTop;
+    if (!key || key === shownFor) return;
     await nextTick();
     const target =
-      list.value.querySelector('[aria-current="page"]') ||
-      list.value.querySelector("[data-current]");
+      element.querySelector('[aria-current="page"]') ||
+      element.querySelector("[data-current]");
     if (!target) return;
-    shownFor = key as string;
-    const box = list.value.getBoundingClientRect();
+    shownFor = key;
+    const box = element.getBoundingClientRect();
     const top = target.getBoundingClientRect().top - box.top;
     if (top < 0 || top > box.height - 48) {
-      list.value.scrollTop += top - box.height / 3;
+      element.scrollTop += top - box.height / 3;
     }
   },
   { flush: "post" }

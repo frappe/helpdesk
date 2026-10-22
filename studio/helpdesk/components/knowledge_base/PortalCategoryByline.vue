@@ -27,14 +27,13 @@ import { __ } from "@helpdesk/shared/translation";
 const props = withDefaults(
   defineProps<{
     creators?: { name: string; image: string | null }[];
-    creatorCount?: number;
   }>(),
-  { creators: () => [], creatorCount: 0 }
+  { creators: () => [] }
 );
 
 const label = computed(() => {
   const first = props.creators[0].name.split(" ")[0];
-  const others = Math.max(props.creatorCount, 1) - 1;
+  const others = props.creators.length - 1;
   if (!others) return __("By {0}", [first]);
   if (others === 1) return __("By {0} and 1 other", [first]);
   return __("By {0} and {1} others", [first, others]);

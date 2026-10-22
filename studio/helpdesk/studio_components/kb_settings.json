@@ -195,10 +195,10 @@
           }
          }
         ],
-        "componentId": "kb_settings-nav-app",
+        "componentId": "kb_settings-nav-customer-portal",
         "componentName": "SettingsNavGroup",
         "componentProps": {
-         "label": "{{ t('App Settings') }}"
+         "label": "{{ t('Customer Portal') }}"
         },
         "componentSlots": {},
         "visibilityCondition": "{{ canEditSettings }}",
@@ -1058,7 +1058,7 @@
               "componentName": "PortalSettingsIdentity",
               "componentProps": {
                "busy": "{{ isSettingsBusy }}",
-               "editable": "{{ canEdit }}",
+               "editable": "{{ canManageOrganization }}",
                "image": "{{ settingsOrganization.image }}",
                "name": "{{ settingsOrganization.customer_name }}",
                "renameable": false,
@@ -1095,14 +1095,13 @@
               "children": [
                {
                 "classes": [
-                 "mt-3",
                  "flex-1",
                  "min-h-0"
                 ],
                 "componentId": "kb_settings-members-list",
                 "componentName": "PortalMemberList",
                 "componentProps": {
-                 "canManageMembers": "{{ canManageMembers }}",
+                 "canManageMembers": "{{ canManageOrganization }}",
                  "showLastActive": "{{ showLastActive }}",
                  "invitations": "{{ organizationInvitations }}",
                  "members": "{{ organizationMembers }}",
@@ -1856,7 +1855,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-21 12:30:00.000000",
+ "modified": "2026-10-22 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

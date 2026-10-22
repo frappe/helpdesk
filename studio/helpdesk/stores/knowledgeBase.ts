@@ -21,7 +21,7 @@ export const sidebarState = {
 }
 
 const ARTICLE_CACHE_SIZE = 30
-// covers hover-then-click and a quick back; older entries refetch, so edits show
+// Reuse a fetched article for 60s (hover then click, a quick back), then fetch it again so edits show up
 const ARTICLE_MAX_AGE_MS = 60_000
 const HOVER_DELAY = 80
 const articles = new Map<string, { request: Promise<any>; fetchedAt: number }>()

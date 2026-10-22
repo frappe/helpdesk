@@ -63,6 +63,16 @@
           </span>
         </div>
         <button
+          v-if="item.status === 'error'"
+          type="button"
+          :aria-label="__('Retry uploading {0}', [item.name])"
+          :title="__('Retry upload')"
+          class="grid size-7 shrink-0 place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
+          @click="retry(item.id)"
+        >
+          <LucideRotateCw class="size-4" />
+        </button>
+        <button
           type="button"
           :aria-label="isBusy(item) ? __('Cancel upload') : __('Remove')"
           class="grid size-7 shrink-0 place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
@@ -139,6 +149,7 @@ import LucideCircleAlert from "~icons/lucide/circle-alert";
 import LucideFile from "~icons/lucide/file";
 import LucidePaperclip from "~icons/lucide/paperclip";
 import LucidePlus from "~icons/lucide/plus";
+import LucideRotateCw from "~icons/lucide/rotate-cw";
 import LucideX from "~icons/lucide/x";
 
 const props = defineProps<{
@@ -210,6 +221,12 @@ async function upload() {
     // Else one throw stalls every later file.
     running = false;
   }
+}
+
+// Back to idle with the same File; the upload loop picks it up.
+function retry(id: string) {
+  uploader.retry(id);
+  upload();
 }
 
 function remove(id: string) {

@@ -183,8 +183,11 @@ const TicketEmails = defineComponent({
           ref: wrapper,
           class: [
             "portal-thread flex flex-col",
-            // Chat lines up with the composer; the timeline keeps its gutter.
-            props.authors ? "px-3 sm:px-5" : "sm:px-6 lg:px-10",
+            // Chat lines up with the composer; the timeline keeps its gutter
+            // inside the scroller, so the scrollbar sits at the container edge.
+            props.authors
+              ? "px-3 sm:px-5"
+              : "sm:[&>.activity-timeline]:px-6 lg:[&>.activity-timeline]:px-10",
             revealed.value && "portal-reveal",
           ],
           style: { "--composer-reserve": `${props.reserve}px` },
@@ -195,7 +198,7 @@ const TicketEmails = defineComponent({
                 variant: "thread",
                 // Follows the page skeleton, which already faded in.
                 instant: true,
-                class: !props.authors && "max-sm:px-4",
+                class: !props.authors && "max-sm:px-4 sm:px-6 lg:px-10",
               })
             : props.authors
             ? h(PortalChatList, { rows: chatRows.value, paginate })

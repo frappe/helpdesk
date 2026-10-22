@@ -5,7 +5,7 @@
         <div class="flex gap-2 items-center crumbs max-w-[50vw]">
           <Breadcrumbs :items="breadcrumbs" class="-ms-0.5 truncate" />
           <Badge
-            v-if="!article.loading"
+            v-if="article.data"
             variant="subtle"
             :theme="article.data?.status === 'Draft' ? 'amber' : 'green'"
             size="md"
@@ -15,7 +15,7 @@
       </template>
       <template #right-header>
         <!-- Default Buttons -->
-        <div class="flex gap-2" v-if="!editable && !article.loading">
+        <div class="flex gap-2" v-if="!editable && article.data">
           <Button
             :label="isPublished ? __('Unpublish') : __('Publish')"
             :iconLeft="isPublished ? undefined : 'lucide-globe'"
@@ -27,7 +27,7 @@
 
     <div
       class="py-4 mx-auto w-full max-w-3xl px-5 flex flex-col"
-      v-if="!article.loading"
+      v-if="article.data"
     >
       <!-- article Info -->
       <div
@@ -195,9 +195,9 @@
         </div>
       </div>
     </div>
-    <!-- Loading State -->
+    <!-- First load only: reloads after a save or move keep the page shown. -->
     <div
-      v-if="article.loading"
+      v-if="!article.data"
       class="w-full h-screen flex items-center justify-center"
     >
       <LoadingIndicator class="size-10" />
@@ -442,12 +442,19 @@ function publishArticle(visibility: string) {
   );
 }
 
+// Show the new status at once. A reload would wait a second round trip and
+// swap the page for the loading state.
 function save(values: Record<string, string>, message: string) {
+  Object.assign(article.data, values);
   updateArticle.submit(
     { doctype: "HD Article", name: article.data.name, fieldname: values },
     {
-      onSuccess: () => {
+      onSuccess: (doc: Article) => {
+        article.data.modified = doc.modified;
         toast.success(message);
+      },
+      onError: (error: Error) => {
+        toast.error(error?.messages?.[0] || error.message);
         article.reload();
       },
     }

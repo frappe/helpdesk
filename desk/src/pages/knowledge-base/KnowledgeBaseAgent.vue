@@ -33,7 +33,11 @@
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
-    <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
+    <MoveToCategoryModal
+      v-model="moveToModal"
+      :exclude-category="selectionCategory"
+      @move="handleMoveToCategory"
+    />
     <MergeCategoryModal
       :categoryTitle="category.title"
       :category-id="category.id"
@@ -362,6 +366,15 @@ async function updateArticlesAccess(visibility: string) {
 }
 
 const listSelections = ref(new Set());
+// The category every selected article is in, if they share one.
+const selectionCategory = computed(() => {
+  const categories = new Set(
+    (listViewRef.value?.list?.data?.data || [])
+      .filter((row) => listSelections.value.has(row.name))
+      .map((row) => row.category)
+  );
+  return categories.size === 1 ? [...categories][0] : undefined;
+});
 const selectBannerActions = [
   {
     label: __("Change access"),

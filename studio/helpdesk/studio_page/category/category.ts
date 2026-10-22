@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
-import { useDrawer } from '@app/composables/useDrawer'
+import { useBottomSheet } from '@app/composables/useDrawer'
 import { countLabel } from '@helpdesk/shared/utils'
 import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
@@ -21,7 +21,7 @@ export default function setup(context) {
 
   return {
     ...useKnowledgeBaseHeader(context),
-    drawer: useDrawer(route),
+    drawer: useBottomSheet(route),
     sidebar,
     prefetchOnHover,
     category,

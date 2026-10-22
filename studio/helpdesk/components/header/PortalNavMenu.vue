@@ -41,7 +41,8 @@ const props = defineProps<{
 const route = useRoute();
 const isTicketPage = computed(
   () =>
-    route.path === ROUTES.ticketList || route.path.startsWith(ROUTES.ticket(""))
+    route.path.startsWith(ROUTES.ticketList) ||
+    route.path.startsWith(ROUTES.ticket(""))
 );
 
 function Brand() {

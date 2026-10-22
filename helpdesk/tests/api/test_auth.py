@@ -61,13 +61,27 @@ class TestUpdateProfile(IntegrationTestCase):
 
 
 class TestConfig(IntegrationTestCase):
-    def test_a_guest_gets_every_field_and_their_own_name(self) -> None:
+    def test_a_guest_gets_only_the_knowledge_base_settings(self) -> None:
         with self.set_user("Guest"):
             config = get_config()
         self.assertEqual(config.session_user, "Guest")
         self.assertFalse(config.is_agent)
         self.assertFalse(config.can_edit_settings)
         self.assertTrue(config.date_format)
+        self.assertIn("public_knowledge_base", config)
+        self.assertNotIn("allow_customer_managers_to_invite", config)
+        self.assertNotIn("restrict_tickets_by_agent_group", config)
+
+    def test_the_desk_workflow_settings_reach_only_agents(self) -> None:
+        customer = create_contact("Config Customer", unique_email("config-customer"))
+        with self.set_user(customer["user"]):
+            config = get_config()
+        self.assertIn("allow_customer_managers_to_invite", config)
+        self.assertNotIn("restrict_tickets_by_agent_group", config)
+
+        agent = create_agent(unique_email("config-agent"))
+        with self.set_user(agent.name):
+            self.assertIn("restrict_tickets_by_agent_group", get_config())
 
     def test_knowledge_base_scripts_reach_guests_only_on_a_public_kb(self) -> None:
         make_form_script(self, "Test KB Script", "kb", apply_to_knowledge_base=True)

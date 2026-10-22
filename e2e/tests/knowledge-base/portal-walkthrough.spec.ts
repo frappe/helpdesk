@@ -175,7 +175,7 @@ test.describe("header", () => {
       await expect(page).toHaveURL(/\/help\/?$/);
       await accountMenu(page).click();
       await page.getByRole("menuitem", { name: "Settings" }).click();
-      await expect(page).toHaveURL(/#settings\/profile$/);
+      await expect(page).toHaveURL(/\/settings\/profile$/);
       await expect(page.getByRole("dialog")).toBeVisible();
     });
 
@@ -336,9 +336,11 @@ test.describe("header", () => {
       const bar = page.getByRole("button", { name: `Articles / ${category.category_name}` });
       await expect(sidebar).not.toBeInViewport();
       await bar.click();
-      await expect(page.getByRole("dialog", { name: "Browse articles" })).toBeVisible();
+      const sheet = page.getByRole("dialog", { name: "Browse articles" });
+      await expect(sheet).toBeVisible();
       await expect(sidebar).toBeInViewport();
-      await expect(page.getByRole("button", { name: "Close" })).toBeFocused();
+      // The sheet traps focus: it lands on the sheet or inside it.
+      await expect.poll(() => sheet.evaluate((el) => el.contains(document.activeElement))).toBe(true);
       await page.keyboard.press("Escape");
       await expect(sidebar).not.toBeInViewport();
       await expect(bar).toBeFocused();
@@ -838,7 +840,7 @@ test.describe("knowledge base settings", () => {
       await page.getByRole("menuitem", { name: "Settings" }).click();
       const dialog = page.getByRole("dialog");
       await dialog.getByRole("tab", { name: "Knowledge Base", exact: true }).click();
-      await expect(page).toHaveURL(/#settings\/knowledge-base$/);
+      await expect(page).toHaveURL(/\/settings\/knowledge-base$/);
 
       // Switches save without the Save button.
       await dialog.getByText("Allow guests to vote on articles").locator("xpath=../..").getByRole("switch").click();
@@ -878,6 +880,42 @@ test.describe("knowledge base settings", () => {
     } finally {
       await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
       if (await api.exists("HD Form Script", { name: QUICK_LINKS })) await api.delete("HD Form Script", QUICK_LINKS);
+    }
+  });
+});
+
+test.describe("knowledge base settings: pin row menu", () => {
+  usePersona("admin");
+
+  test("S38 a pinned row's menu edits the draft; Save writes the order", async ({ page, api }) => {
+    const first = await createCategory(api);
+    const second = await createCategory(api);
+    await api.update("HD Article Category", first.name, { pinned: 1, pinned_order: 1 });
+    await api.update("HD Article Category", second.name, { pinned: 1, pinned_order: 2 });
+    try {
+      await page.goto("/help/settings/knowledge-base");
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("button", { name: `Options for ${first.category_name}` }).click();
+      await page.getByRole("menuitem", { name: "Move down" }).click();
+      await expect(dialog.getByText("Unsaved")).toBeVisible();
+      expect((await api.get("HD Article Category", first.name)).pinned_order).toBe(1);
+      await dialog.getByRole("button", { name: "Save" }).click();
+      await expect(dialog.getByText("Unsaved")).toBeHidden();
+      expect((await api.get("HD Article Category", first.name)).pinned_order).toBe(2);
+      expect((await api.get("HD Article Category", second.name)).pinned_order).toBe(1);
+
+      await dialog.getByRole("button", { name: `Options for ${second.category_name}` }).click();
+      await page.getByRole("menuitem", { name: "Unpin" }).click();
+      await expect(dialog.getByText("Unsaved")).toBeVisible();
+      expect((await api.get("HD Article Category", second.name)).pinned).toBe(1);
+      await dialog.getByRole("button", { name: "Save" }).click();
+      await expect(dialog.getByText("Unsaved")).toBeHidden();
+      expect((await api.get("HD Article Category", second.name)).pinned).toBe(0);
+      expect((await api.get("HD Article Category", first.name)).pinned_order).toBe(1);
+    } finally {
+      for (const category of [first, second]) {
+        await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
+      }
     }
   });
 });

@@ -9,35 +9,14 @@
       :class="isCustomer ? 'bg-surface-gray-2' : 'bg-surface-gray-1'"
     >
       <PortalEmailContent v-if="hasText" :content="activity.data.content" />
-      <!-- Images fill the bubble; the link opens the uncropped file. -->
+      <!-- Attached images stay chips too; the chip previews them on click. -->
       <div
-        v-if="images.length"
-        class="grid gap-1.5"
-        :class="[images.length > 1 && 'grid-cols-2', { 'mt-1.5': hasText }]"
-      >
-        <a
-          v-for="(image, index) in images"
-          :key="`${index}:${image.file_url}`"
-          :href="image.file_url"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            :src="image.file_url"
-            :alt="image.file_name"
-            class="block w-full rounded-4 object-cover"
-            :class="images.length > 1 ? 'aspect-square' : 'max-h-72'"
-            @error="failed.add(image.file_url)"
-          />
-        </a>
-      </div>
-      <div
-        v-if="files.length"
+        v-if="attachments.length"
         class="flex flex-wrap gap-1.5"
-        :class="{ 'mt-1.5': hasText || images.length }"
+        :class="{ 'mt-1.5': hasText }"
       >
         <AttachmentChip
-          v-for="(file, index) in files"
+          v-for="(file, index) in attachments"
           :key="`${index}:${file.file_url}`"
           :label="file.file_name"
           :url="file.file_url"
@@ -66,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from "vue";
+import { computed } from "vue";
 import { Tooltip, dayjsLocal } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { DATE_FORMATS, isContentEmpty } from "@helpdesk/shared/utils";
@@ -75,8 +54,6 @@ import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
 import PortalEmailContent from "./PortalEmailContent.vue";
 
 type Attachment = { file_name: string; file_url: string };
-
-const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
 
 const props = defineProps<{
   activity: any;
@@ -87,18 +64,8 @@ const props = defineProps<{
 const at = computed(() => dayjsLocal(props.activity.timestamp));
 const hasText = computed(() => !isContentEmpty(props.activity.data.content));
 
-// An image that fails to load, a private file say, falls back to a chip.
-const failed = reactive(new Set<string>());
 const attachments = computed<Attachment[]>(
   () => props.activity.data.attachments || []
-);
-const images = computed(() =>
-  attachments.value.filter(
-    (file) => IMAGE.test(file.file_url) && !failed.has(file.file_url)
-  )
-);
-const files = computed(() =>
-  attachments.value.filter((file) => !images.value.includes(file))
 );
 const isBlank = computed(() => !hasText.value && !attachments.value.length);
 </script>

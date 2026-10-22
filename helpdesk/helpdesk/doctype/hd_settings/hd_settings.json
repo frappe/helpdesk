@@ -21,6 +21,7 @@
   "base_support_rotation",
   "knowledge_base_tab",
   "public_knowledge_base",
+  "knowledge_base_as_home_page",
   "prefer_knowledge_base",
   "allow_anonymous_article_voting",
   "hide_raise_ticket_button",
@@ -29,8 +30,7 @@
   "portal_tab",
   "customer_managers_section",
   "allow_customer_managers_to_invite",
-  "allow_customer_managers_to_manage_members",
-  "allow_customer_managers_to_edit_organization",
+  "allow_customer_managers_to_manage_organization",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -257,8 +257,16 @@
    "label": "Make knowledge base public"
   },
   {
+   "default": "0",
+   "depends_on": "public_knowledge_base",
+   "description": "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in.",
+   "fieldname": "knowledge_base_as_home_page",
+   "fieldtype": "Check",
+   "label": "Show knowledge base to logged-out visitors"
+  },
+  {
    "default": "1",
-   "description": "Customers will land on the knowledge base when they log in or open the site, instead of their tickets.",
+   "description": "Customers will land on the knowledge base when they log in, instead of their tickets.",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
    "label": "Use knowledge base as home"
@@ -626,24 +634,17 @@
    "description": "If enabled, customer managers can invite people to their organization from the portal. Invited people get a portal login."
   },
   {
-   "fieldname": "allow_customer_managers_to_manage_members",
+   "fieldname": "allow_customer_managers_to_manage_organization",
    "fieldtype": "Check",
    "default": "0",
-   "label": "Allow customer managers to manage members",
-   "description": "If enabled, customer managers can promote members of their organization to managers, demote them back, or remove them."
-  },
-  {
-   "fieldname": "allow_customer_managers_to_edit_organization",
-   "fieldtype": "Check",
-   "default": "0",
-   "label": "Allow customer managers to edit organization details",
-   "description": "If enabled, customer managers can change their organization's logo."
+   "label": "Allow customer managers to manage their organization",
+   "description": "If enabled, customer managers can promote members of their organization to managers, demote them back, remove them, and change the organization's logo."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-20 11:00:00.000000",
+ "modified": "2026-10-22 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

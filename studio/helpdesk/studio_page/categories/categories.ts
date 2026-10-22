@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { matchesQuery } from '@helpdesk/shared/utils'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
-import { useDrawer } from '@app/composables/useDrawer'
+import { useBottomSheet } from '@app/composables/useDrawer'
 import { useRememberedCount } from '@app/composables/useRememberedCount'
 import { useKnowledgeBase } from '@app/stores/knowledgeBase'
 
@@ -18,7 +18,7 @@ export default function setup(context) {
   )
   return {
     ...useKnowledgeBaseHeader(context),
-    drawer: useDrawer(context.route),
+    drawer: useBottomSheet(context.route),
     sidebar,
     search,
     shownCategories,

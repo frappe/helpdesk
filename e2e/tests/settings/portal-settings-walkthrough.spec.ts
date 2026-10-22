@@ -12,8 +12,7 @@ import { setHelpdeskSetting } from "../../helpers/ticket";
 const PIXEL = "e2e/fixtures/pixel.png";
 const PORTAL_TOGGLES = [
   "allow_customer_managers_to_invite",
-  "allow_customer_managers_to_manage_members",
-  "allow_customer_managers_to_edit_organization",
+  "allow_customer_managers_to_manage_organization",
 ];
 
 interface Person {
@@ -76,8 +75,8 @@ async function pageOf(browser: Browser, baseURL: string, email: string, password
   return context.newPage();
 }
 
-async function openSettingsAt(page: Page, hash = "settings/profile") {
-  await page.goto(`/help#${hash}`);
+async function openSettingsAt(page: Page, path = "settings/profile") {
+  await page.goto(`/help/${path}`);
   const dialog = page.getByRole("dialog", { name: "Settings" });
   await expect(dialog).toBeVisible();
   return dialog;
@@ -122,31 +121,31 @@ async function confirm(page: Page, title: string, button: string) {
 test.describe("dialog", () => {
   usePersona("customerManager");
 
-  test("S1 opens from the menu, follows each screen in the hash, and closes", async ({ page }) => {
+  test("S1 opens from the menu, follows each screen in the path, and closes", async ({ page }) => {
     await page.goto("/help");
     await page.getByRole("button", { name: /Helpdesk/ }).first().click();
     await page.getByRole("menuitem", { name: "Settings" }).click();
     const dialog = page.getByRole("dialog", { name: "Settings" });
     await expect(dialog.getByRole("heading", { name: "Profile" })).toBeVisible();
-    await expect(page).toHaveURL(/#settings\/profile$/);
+    await expect(page).toHaveURL(/\/help\/settings\/profile$/);
 
     await dialog.getByRole("tab", { name: "Manage Organization" }).click();
-    await expect(page).toHaveURL(/#settings\/members\/E2E%20Customer%20Org$/);
+    await expect(page).toHaveURL(/\/help\/settings\/members\/E2E%20Customer%20Org$/);
     await page.goBack();
-    await expect(page).toHaveURL(/#settings\/profile$/);
+    await expect(page).toHaveURL(/\/help\/settings\/profile$/);
     await expect(dialog.getByRole("heading", { name: "Profile" })).toBeVisible();
 
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
-    await expect(page).not.toHaveURL(/#settings/);
+    await expect(page).not.toHaveURL(/\/settings/);
 
     await openSettingsAt(page);
     await page.mouse.click(5, 300);
     await expect(dialog).toBeHidden();
-    await expect(page).not.toHaveURL(/#settings/);
+    await expect(page).not.toHaveURL(/\/settings/);
   });
 
-  test("S4 a customer's hash for an admin tab shows nothing broken", async ({ page }) => {
+  test("S4 a customer's path to an admin tab shows nothing broken", async ({ page }) => {
     const dialog = await openSettingsAt(page, "settings/knowledge-base");
     await expect(dialog.getByRole("tab", { name: "Knowledge Base" })).toHaveCount(0);
     await expect(dialog.getByText("Make knowledge base public")).toHaveCount(0);
@@ -154,16 +153,23 @@ test.describe("dialog", () => {
     await openSettingsAt(page, "settings/portal-settings");
     await expect(dialog.getByText("Allow member invites")).toHaveCount(0);
   });
+
+  test("an old #settings link moves to the settings path", async ({ page }) => {
+    await page.goto("/help/my-tickets#settings/members/E2E Customer Org");
+    await expect(page).toHaveURL(/\/help\/my-tickets\/settings\/members\/E2E%20Customer%20Org$/);
+    await expect(page.getByRole("dialog", { name: "Settings" }).getByText("E2E Customer Org", { exact: true })).toBeVisible();
+  });
 });
 
 test.describe("guest", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test("S3 a settings hash on the public knowledge base", async ({ page, api }) => {
+  test("S3 a settings path on the public knowledge base", async ({ page, api }) => {
     const restore = await setHelpdeskSetting(api, "public_knowledge_base", 1);
     try {
-      await page.goto("/help#settings/profile");
+      await page.goto("/help/settings/profile");
       await expect(page.getByRole("heading", { name: "Here's what might help" })).toBeVisible();
+      await expect(page).toHaveURL(/\/help\/?$/);
       await page.waitForLoadState("networkidle");
       await expect(page.getByRole("dialog"), "a guest gets no settings dialog").toHaveCount(0);
     } finally {
@@ -340,7 +346,7 @@ test.describe("organization", () => {
     await expect(dialog.getByText("No organizations found")).toBeVisible();
     await dialog.getByPlaceholder("Search").fill("");
     await dialog.getByRole("button", { name: new RegExp(org.name) }).press("Enter");
-    await expect(page).toHaveURL(new RegExp(`#settings/members/${encodeURIComponent(org.name)}$`));
+    await expect(page).toHaveURL(new RegExp(`/settings/members/${encodeURIComponent(org.name)}$`));
     await dialog.locator('[data-component-id="kb_settings-organization-back"]').click();
     await expect(dialog.getByRole("button", { name: new RegExp(second.name) })).toBeVisible();
   });
@@ -540,7 +546,7 @@ test.describe("organization", () => {
     const org = await newOrg(api);
     await setToggles(api, true);
     const page = await pageOf(browser, baseURL!, org.manager.email);
-    await page.goto(`/help#settings/members/${org.name}/invite`);
+    await page.goto(`/help/settings/members/${org.name}/invite`);
     const dialog = page.getByRole("dialog", { name: "Settings" });
     await expect(dialog.getByText("Invite by email")).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Send Invites" })).toBeVisible();
@@ -602,8 +608,8 @@ test.describe("organization", () => {
   });
 });
 
-test.describe("app settings", () => {
-  test("S29 the App Settings group shows only to settings editors", async ({ pageAs }) => {
+test.describe("customer portal settings", () => {
+  test("S29 the Customer Portal group shows only to settings editors", async ({ pageAs }) => {
     for (const [key, shown] of [
       ["admin", true],
       ["manager", true],
@@ -624,7 +630,7 @@ test.describe("app settings", () => {
       const page = await pageAs("admin");
       const dialog = await openSettingsAt(page, "settings/portal-settings");
       await expect(dialog.getByText("Allow signup")).toBeVisible();
-      const labels = ["Allow member invites", "Allow member management", "Allow organization edits"];
+      const labels = ["Allow member invites", "Allow organization management"];
       for (const [index, label] of labels.entries()) {
         const before = (await api.get("HD Settings", "HD Settings"))[PORTAL_TOGGLES[index]];
         await dialog.getByRole("switch", { name: label }).click();

@@ -61,8 +61,9 @@ function createViewsStore() {
       : { ...DEFAULT_VIEW, label: __('List') },
   )
 
+  const memoryKey = (name) => `${MEMORY_PREFIX}:${DOCTYPE}:${name}`
   const rememberedLayout = useStorage(
-    () => `${MEMORY_PREFIX}:${DOCTYPE}:${activeName.value}`,
+    () => memoryKey(activeName.value),
     null,
     localStorage,
     { serializer: StorageSerializers.object, writeDefaults: false },
@@ -211,7 +212,14 @@ function createViewsStore() {
     })
   }
 
+  // Picking a view opens it as saved; the memory is for coming back from elsewhere.
   function openView(name) {
+    if (name === activeName.value) {
+      rememberedLayout.value = null
+      applyActiveView()
+      return
+    }
+    localStorage.removeItem(memoryKey(name))
     navigateTo({ query: name ? { view: name } : {} })
   }
 

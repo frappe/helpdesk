@@ -16,7 +16,6 @@
         side="top"
         align="end"
         :placeholder="__('Select language')"
-        :search-placeholder="__('Search')"
         hide-clear-button
         @update:model-value="updateLanguage"
       />

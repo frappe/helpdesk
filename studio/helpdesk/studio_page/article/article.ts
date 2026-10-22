@@ -2,11 +2,17 @@ import { computed, watch } from 'vue'
 import { call, dayjsLocal } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
-import { addHeadingIds, copyPageLink, countLabel, DATE_FORMATS } from '@helpdesk/shared/utils'
+import {
+  addHeadingIds,
+  copyPageLink,
+  countLabel,
+  DATE_FORMATS,
+  findArticleHeading,
+} from '@helpdesk/shared/utils'
 import { useRecent } from '@app/stores/recent'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { saveArticleFeedback } from '@app/components/knowledge_base/articleFeedback'
-import { useDrawer } from '@app/composables/useDrawer'
+import { useBottomSheet } from '@app/composables/useDrawer'
 import { articleName, prefetchOnHover, useArticle, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 const RELATED_LIMIT = 5
@@ -48,15 +54,24 @@ export default function setup(context) {
   }
 
   function scrollToHash(tries = 40) {
-    const heading = findHeading(decodeURIComponent(location.hash.slice(1)))
+    const heading = findHeading(decodeHash())
     if (heading) heading.scrollIntoView()
     else if (tries) setTimeout(() => scrollToHash(tries - 1), 50)
+  }
+
+  // A hand-typed `#100%` is not valid percent-encoding.
+  function decodeHash() {
+    try {
+      return decodeURIComponent(location.hash.slice(1))
+    } catch {
+      return location.hash.slice(1)
+    }
   }
 
   // Old desk KB ids kept edge dashes: "What's new?" was `what-s-new-`.
   function findHeading(id) {
     return (
-      document.getElementById(id) ||
+      findArticleHeading(id) ||
       [...document.querySelectorAll('h2, h3, h4, h5, h6')].find(
         (heading) => heading.textContent.trim().replace(/[^a-z0-9]+/gi, '-').toLowerCase() === id,
       )
@@ -74,9 +89,12 @@ export default function setup(context) {
     () => [article.data?.name, router.currentRoute.value.path],
     ([name, current]) => {
       if (!name || !isCurrentArticle(router.currentRoute.value.params.name)) return
+      // `<article>/settings/...`: fixed once the dialog closes.
+      if (router.currentRoute.value.params.settings !== undefined) return
       // Resolved, so slugs compare in the router's own encoding.
       const path = router.resolve(ROUTES.article(article.data)).path
-      if (current !== path) router.replace({ path, hash: location.hash })
+      // The route's hash is decoded; `location.hash` would be encoded twice.
+      if (current !== path) router.replace({ path, hash: router.currentRoute.value.hash })
     },
     { immediate: true },
   )
@@ -104,7 +122,7 @@ export default function setup(context) {
 
   return {
     ...settings,
-    drawer: useDrawer(route),
+    drawer: useBottomSheet(route),
     sidebar,
     article,
     prefetchOnHover,

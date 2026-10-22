@@ -90,7 +90,15 @@ const sections = computed(() => [
         fieldname: "prefer_knowledge_base",
         label: __("Use knowledge base as home"),
         description: __(
-          "Customers will land on the knowledge base when they log in or open the site, instead of their tickets."
+          "Customers will land on the knowledge base when they log in, instead of their tickets."
+        ),
+      },
+      {
+        settings: hdSettings,
+        fieldname: "knowledge_base_as_home_page",
+        label: __("Show knowledge base to logged-out visitors"),
+        description: __(
+          "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in."
         ),
       },
       {
@@ -131,15 +139,11 @@ const sections = computed(() => [
       },
       {
         settings: hdSettings,
-        fieldname: "allow_customer_managers_to_manage_members",
-        label: __("Allow member management"),
-        description: __("Change member roles and remove members."),
-      },
-      {
-        settings: hdSettings,
-        fieldname: "allow_customer_managers_to_edit_organization",
-        label: __("Allow organization edits"),
-        description: __("Change their organization's logo."),
+        fieldname: "allow_customer_managers_to_manage_organization",
+        label: __("Allow organization management"),
+        description: __(
+          "Change member roles, remove members and change the organization's logo."
+        ),
       },
     ],
   },

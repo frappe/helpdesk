@@ -56,7 +56,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useEventListener } from "@vueuse/core";
+import { useRoute } from "vue-router";
 import { __ } from "@helpdesk/shared/translation";
+import { findArticleHeading } from "@helpdesk/shared/utils";
 import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 
 const ACTIVE_RATIO = 1 / 3;
@@ -98,7 +100,7 @@ function measure(scrolled?: EventTarget | null) {
   if (!box || box.scrollTop >= TOP_ZONE) {
     const line = window.innerHeight * ACTIVE_RATIO;
     for (const item of props.items) {
-      const top = document.getElementById(item.id)?.getBoundingClientRect().top;
+      const top = findArticleHeading(item.id)?.getBoundingClientRect().top;
       if (top !== undefined && top <= line) current = item.id;
     }
   }
@@ -108,7 +110,7 @@ function measure(scrolled?: EventTarget | null) {
 function scrollTo(id: string) {
   pinnedId = activeId.value = id;
   // Instant on purpose: Chrome drops smooth scrolls under an overflow-hidden ancestor.
-  document.getElementById(id)?.scrollIntoView({ block: "start" });
+  findArticleHeading(id)?.scrollIntoView({ block: "start" });
 }
 
 // Scroll the rail by hand: scrollIntoView would move the page.
@@ -134,7 +136,7 @@ useEventListener(
   "scroll",
   (event) => {
     // Only the article's scroller, not sidebars or this rail.
-    const first = document.getElementById(props.items[0]?.id ?? "");
+    const first = findArticleHeading(props.items[0]?.id ?? "");
     if (event.target instanceof Node && event.target.contains(first))
       measure(event.target);
   },
@@ -148,6 +150,16 @@ watch(
   () => props.items,
   () => measure(),
   { flush: "post" }
+);
+// A heading's "#" link sets the hash: that heading is current, as if clicked here.
+const route = useRoute();
+watch(
+  () => [route.hash, props.items] as const,
+  ([hash, items]) => {
+    const id = hash.slice(1);
+    if (items.some((item) => item.id === id)) pinnedId = activeId.value = id;
+  },
+  { immediate: true }
 );
 onMounted(() => measure());
 </script>

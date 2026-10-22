@@ -23,11 +23,8 @@ export function createOrganizationSettings(core) {
   const canInvite = computed(
     () => canManage.value && Boolean(config.value?.allow_customer_managers_to_invite),
   )
-  const canManageMembers = computed(
-    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_manage_members),
-  )
-  const canEdit = computed(
-    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_edit_organization),
+  const canManageOrganization = computed(
+    () => canManage.value && Boolean(config.value?.allow_customer_managers_to_manage_organization),
   )
   const members = computed(() => organization.value?.members || [])
   const organizationLoading = computed(() => Boolean(selectedOrganizationName.value) && !organization.value)
@@ -233,9 +230,8 @@ export function createOrganizationSettings(core) {
     settingsOrganization,
     canLeaveOrganization,
     canInvite,
-    canManageMembers,
+    canManageOrganization,
     showLastActive: canManage,
-    canEdit,
     organizationMembers: members,
     organizationLoading,
     organizationInvitations: invitations,

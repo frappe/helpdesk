@@ -1,10 +1,10 @@
-import { ComponentUtils } from "@helpdesk/shared/tiptap";
 import {
   CleanStyles,
+  ComponentUtils,
   DismissSuggestionsOnOutsideClick,
   HandleExcelPaste,
   PreserveWhitespace,
-} from "@/tiptap-extensions";
+} from "@helpdesk/shared/tiptap";
 import {
   AlignCenter,
   AlignLeft,

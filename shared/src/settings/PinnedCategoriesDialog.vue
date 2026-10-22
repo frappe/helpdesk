@@ -26,8 +26,8 @@
       <div class="shrink-0 border-b border-outline-gray-1 px-4 py-3">
         <TextInput
           v-model="query"
-          :placeholder="__('Search categories')"
-          :aria-label="__('Search categories')"
+          :placeholder="__('Search categories to pin')"
+          :aria-label="__('Search categories to pin')"
         >
           <template #prefix>
             <span
@@ -53,19 +53,18 @@
             <h3 class="text-base font-medium text-ink-gray-8">
               {{ __("Pinned") }}
             </h3>
+            <!-- Search leaves the pins alone: it finds categories to pin. -->
             <Draggable
-              :list="shownPinned"
+              :list="pinnedCategories"
               item-key="value"
               :group="GROUP"
-              :disabled="Boolean(search)"
               v-bind="DRAG_OPTIONS"
               :class="LIST"
               @change="onPinnedChange"
             >
               <template #item="{ element: category }">
-                <div :class="[ROW, search ? 'cursor-default' : 'cursor-grab']">
+                <div :class="[ROW, 'cursor-grab']">
                   <span
-                    v-if="!search"
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
                   />
@@ -90,15 +89,13 @@
               </template>
               <template #footer>
                 <div
-                  v-if="!shownPinned.length"
+                  v-if="!pinnedCategories.length"
                   class="px-3 py-6 text-center text-p-sm text-ink-gray-5"
                 >
                   {{
-                    search
-                      ? __("No pinned matches")
-                      : __(
-                          "No categories pinned. The home page will show all categories, A–Z."
-                        )
+                    __(
+                      "Nothing pinned yet. The home page will list all categories alphabetically."
+                    )
                   }}
                 </div>
               </template>
@@ -107,7 +104,7 @@
 
           <section class="space-y-1.5">
             <h3 class="text-base font-medium text-ink-gray-8">
-              {{ __("Not pinned") }}
+              {{ __("Other categories") }}
             </h3>
             <!-- Sorted A–Z, so a dropped row snaps into place. -->
             <Draggable
@@ -265,10 +262,6 @@ function matches(category: Category) {
   return category.label.toLowerCase().includes(search.value);
 }
 
-// Drag is off while searching, so these indexes never reach onPinnedChange.
-const shownPinned = computed(() =>
-  search.value ? pinnedCategories.value.filter(matches) : pinnedCategories.value
-);
 const shownUnpinned = computed(() =>
   search.value
     ? unpinnedCategories.value.filter(matches)

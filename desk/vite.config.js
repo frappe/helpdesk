@@ -130,6 +130,11 @@ export default defineConfig(async ({ mode }) => {
         "reka-ui",
         "@tiptap/core",
         "@tiptap/pm",
+        // shared/ imports these from outside desk/
+        "@tiptap/extension-table",
+        "@tiptap/extension-text-align",
+        "@tiptap/extension-text-style",
+        "@tiptap/starter-kit",
         "prosemirror-state",
         "prosemirror-model",
         "prosemirror-transform",

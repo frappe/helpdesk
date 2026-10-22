@@ -194,10 +194,10 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         _("You are not permitted to invite members"),
     )
     if sbool(is_manager):
-        # inviting a manager grants the role, so it needs the members setting too
+        # inviting a manager grants the role, so it needs the manage setting too
         _validate_manager_permission(
             customer_doc,
-            "allow_customer_managers_to_manage_members",
+            "allow_customer_managers_to_manage_organization",
             _("You are not permitted to change member roles"),
         )
     # the db matches case-insensitively; lower both sides so lookups agree
@@ -267,7 +267,7 @@ def update_member_role(customer: str, contact: str, is_manager: bool) -> None:
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
-        "allow_customer_managers_to_manage_members",
+        "allow_customer_managers_to_manage_organization",
         _("You are not permitted to change member roles"),
     )
     member = _get_member_row(customer_doc, contact)
@@ -280,7 +280,7 @@ def remove_member(customer: str, contact: str) -> None:
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
-        "allow_customer_managers_to_manage_members",
+        "allow_customer_managers_to_manage_organization",
         _("You are not permitted to remove members"),
     )
     _get_member_row(customer_doc, contact)
@@ -311,7 +311,7 @@ def update_organization_image(customer: str, image: str) -> None:
     customer_doc = frappe.get_doc("HD Customer", customer)
     _validate_manager_permission(
         customer_doc,
-        "allow_customer_managers_to_edit_organization",
+        "allow_customer_managers_to_manage_organization",
         _("You are not permitted to change the organization's logo"),
     )
     validate_uploaded_image(image)
