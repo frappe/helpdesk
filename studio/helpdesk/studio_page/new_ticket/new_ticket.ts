@@ -7,9 +7,10 @@ export default function setup(context) {
   const { route } = context
   const settings = useSettingsModal(context)
 
-  // Sent even when empty: an origin marks a portal ticket.
+  // Sent even when empty: an origin marks a portal ticket. Not `origin`: that is
+  // window.origin (the site URL) whenever this script fails to load.
   const { from, article, q } = route?.query || {}
-  const origin = { from, article, q }
+  const ticketOrigin = { from, article, q }
   // Subject holds 140 chars; longer would block submit.
   const initialSubject = String(q || '').trim().slice(0, 140)
 
@@ -19,7 +20,7 @@ export default function setup(context) {
   return {
     ...settings,
     initialSubject,
-    origin,
+    ticketOrigin,
     timeFormat,
     customActions,
     setActions: (actions) => (customActions.value = actions),

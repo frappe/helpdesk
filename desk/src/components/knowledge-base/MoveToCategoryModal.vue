@@ -12,25 +12,7 @@
           :filters="defaultFilters"
           :page-length="100"
         />
-        <!-- The note loads after a pick: the space opens, then the text rises in. -->
-        <div
-          class="grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none"
-          :class="joiningNote ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
-          aria-live="polite"
-        >
-          <div class="overflow-hidden">
-            <p
-              class="pt-3 text-p-sm text-ink-gray-7 transition-[opacity,transform,filter] ease-out motion-reduce:transition-none"
-              :class="
-                joiningNote
-                  ? 'duration-300 delay-100'
-                  : 'translate-y-1 opacity-0 blur-[2px] duration-150'
-              "
-            >
-              {{ shownNote }}
-            </p>
-          </div>
-        </div>
+        <AnimatedNote :note="joiningNote" />
       </div>
     </template>
   </Dialog>
@@ -40,6 +22,7 @@
 import { ref, computed, watch, nextTick } from "vue";
 import { Dialog } from "frappe-ui";
 import Link from "@/components/frappe-ui/Link.vue";
+import AnimatedNote from "./AnimatedNote.vue";
 import { useCategoryVisibility } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
 
@@ -60,10 +43,6 @@ const joiningNote = computed(
       ),
     }[joining.data])
 );
-
-// Keeps the text while the note collapses.
-const shownNote = ref("");
-watch(joiningNote, (note) => note && (shownNote.value = note));
 
 const props = defineProps<{
   excludeCategory?: string;

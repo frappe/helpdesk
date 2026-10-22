@@ -24,11 +24,10 @@
         v-if="canSearch && !isCurrent"
         class="size-4 text-ink-gray-4"
       />
-      <KeyboardShortcut
+      <ShortcutKey
         v-else-if="!query && !isFocused"
-        class="slash-hint"
-        combo="Slash"
-        bg
+        class="[@media(pointer:coarse)]:hidden"
+        keys="/"
       />
       <span v-else />
     </template>
@@ -113,15 +112,7 @@
           :key="hint.label"
           class="flex items-center gap-1.5 last:ml-auto"
         >
-          <span class="flex gap-1">
-            <kbd
-              v-for="key in hint.keys"
-              :key="key"
-              class="flex h-5 min-w-5 items-center justify-center rounded-[5px] border border-outline-gray-2 bg-surface-base px-1 pt-px text-xs text-ink-gray-5"
-            >
-              {{ key }}
-            </kbd>
-          </span>
+          <ShortcutKey :keys="hint.keys" />
           {{ hint.label }}
         </span>
       </div>
@@ -135,7 +126,6 @@ import { useRouter } from "vue-router";
 import {
   Button,
   Combobox,
-  KeyboardShortcut,
   LoadingIndicator,
   useKeyboardShortcut,
 } from "frappe-ui";
@@ -143,6 +133,7 @@ import LucideCornerDownLeft from "~icons/lucide/corner-down-left";
 import LucideSearch from "~icons/lucide/search";
 import LucideSearchX from "~icons/lucide/search-x";
 import LucideX from "~icons/lucide/x";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleIcon from "@helpdesk/shared/ArticleIcon.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
@@ -155,9 +146,9 @@ import { articleMeta, countLabel } from "@helpdesk/shared/utils";
 
 const MAX_RESULTS = 6;
 const KEY_HINTS = [
-  { keys: ["↑", "↓"], label: __("Navigate") },
-  { keys: ["↵"], label: __("Open") },
-  { keys: ["esc"], label: __("Close") },
+  { keys: "↑ ↓", label: __("Navigate") },
+  { keys: "↵", label: __("Open") },
+  { keys: "esc", label: __("Close") },
 ];
 
 withDefaults(defineProps<{ placeholder?: string }>(), {
@@ -318,9 +309,6 @@ const options = computed(() =>
 @media (pointer: coarse) {
   .history-remove {
     display: flex;
-  }
-  .slash-hint {
-    display: none;
   }
 }
 @media (max-width: 639px), (pointer: coarse) {

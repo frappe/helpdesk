@@ -10,7 +10,24 @@
           :options="accessOptions"
           :placeholder="__('Mixed')"
         />
-        <slot :access="access" />
+        <!-- A new option's note can differ in length: the box eases to the
+             new height while the text rises in, as in Move To. -->
+        <div
+          class="overflow-hidden transition-[height] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none"
+          :style="noteHeight ? { height: `${noteHeight}px` } : undefined"
+          aria-live="polite"
+        >
+          <div ref="note">
+            <Transition
+              enter-from-class="translate-y-1 opacity-0 blur-[2px]"
+              enter-active-class="transition-[opacity,transform,filter] duration-300 delay-100 ease-out motion-reduce:transition-none"
+            >
+              <div :key="access ?? ''">
+                <slot :access="access" />
+              </div>
+            </Transition>
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-end">
@@ -28,6 +45,7 @@
 <script setup lang="ts">
 import { Button, Dialog, Select } from "frappe-ui";
 import { computed, ref, watch } from "vue";
+import { useElementSize } from "@vueuse/core";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import { __ } from "@/translation";
 
@@ -52,6 +70,9 @@ const accessOptions = computed(() => {
 });
 
 const access = ref(props.visibility);
+const note = ref<HTMLElement | null>(null);
+// 0 until measured: the box opens at its natural height, not from zero.
+const { height: noteHeight } = useElementSize(note);
 
 watch(show, (open) => {
   if (open) access.value = props.visibility;

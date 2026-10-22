@@ -10,7 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineComponent, h, ref, watch, type PropType } from "vue";
+import {
+  computed,
+  defineComponent,
+  h,
+  nextTick,
+  ref,
+  watch,
+  type PropType,
+} from "vue";
 import { dayjs } from "frappe-ui";
 import {
   ActivityTimeline,
@@ -173,7 +181,15 @@ const TicketEmails = defineComponent({
       () => loading.value && !activities.value.length
     );
     const revealed = ref(false);
-    watch(isFirstLoad, (first) => !first && (revealed.value = true));
+    // Email frames open at a fixed height and fit once loaded and styled, so
+    // the skeleton stays over them until then; tall emails would flash squashed.
+    const settled = ref(!isFirstLoad.value);
+    watch(isFirstLoad, async (first) => {
+      if (first) return;
+      await nextTick();
+      if (wrapper.value) await framesFitted(wrapper.value);
+      settled.value = revealed.value = true;
+    });
 
     // ActivityTimeline's root is a fragment; classes go on this wrapper.
     return () =>
@@ -186,20 +202,26 @@ const TicketEmails = defineComponent({
             // Chat lines up with the composer; the timeline keeps its gutter
             // inside the scroller, so the scrollbar sits at the container edge.
             props.authors
-              ? "px-3 sm:px-5"
+              ? "is-chat px-3 sm:px-5"
               : "sm:[&>.activity-timeline]:px-6 lg:[&>.activity-timeline]:px-10",
             revealed.value && "portal-reveal",
+            !settled.value && "is-settling relative",
           ],
           style: { "--composer-reserve": `${props.reserve}px` },
         },
         [
+          !settled.value &&
+            h(PortalSkeleton, {
+              variant: "thread",
+              // Follows the page skeleton, which already faded in.
+              instant: true,
+              class: [
+                "absolute inset-0",
+                !props.authors && "max-sm:px-4 sm:px-6 lg:px-10",
+              ],
+            }),
           isFirstLoad.value
-            ? h(PortalSkeleton, {
-                variant: "thread",
-                // Follows the page skeleton, which already faded in.
-                instant: true,
-                class: !props.authors && "max-sm:px-4 sm:px-6 lg:px-10",
-              })
+            ? null
             : props.authors
             ? h(PortalChatList, { rows: chatRows.value, paginate })
             : h(ActivityTimeline, {
@@ -211,6 +233,41 @@ const TicketEmails = defineComponent({
       );
   },
 });
+
+// Each frame fits on load and again as its copied stylesheets load. Capped, so
+// one stuck frame cannot hide the thread.
+function framesFitted(root: HTMLElement) {
+  const frames = [...root.querySelectorAll("iframe")].map(frameStyled);
+  const cap = new Promise((resolve) => setTimeout(resolve, 1000));
+  return Promise.race([Promise.all(frames), cap]).then(
+    () => new Promise((resolve) => requestAnimationFrame(resolve))
+  );
+}
+
+function frameStyled(frame: HTMLIFrameElement) {
+  return new Promise((resolve) =>
+    frame.addEventListener(
+      "load",
+      () => {
+        const sheets = [
+          ...(frame.contentDocument?.querySelectorAll<HTMLLinkElement>(
+            'link[rel="stylesheet"]'
+          ) || []),
+        ].filter((link) => !link.sheet);
+        Promise.all(
+          sheets.map(
+            (link) =>
+              new Promise((done) => {
+                link.addEventListener("load", done);
+                link.addEventListener("error", done);
+              })
+          )
+        ).then(resolve);
+      },
+      { once: true }
+    )
+  );
+}
 </script>
 
 <style>
@@ -223,6 +280,11 @@ const TicketEmails = defineComponent({
 .portal-thread > * > div {
   padding-top: 1rem;
   padding-bottom: var(--composer-reserve, 0px);
+}
+
+/* Laid out, so the frames load and measure, but not shown yet. */
+.portal-thread.is-settling > :not(.portal-skeleton) {
+  visibility: hidden;
 }
 
 /* Email frames copy page sheets; keep their :root transparent. */

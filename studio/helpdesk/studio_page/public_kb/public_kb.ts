@@ -43,6 +43,11 @@ export default function setup(context) {
     6,
   )
 
+  // Nothing the reader may see: the page offers its own actions, so the header doesn't.
+  const isEmptyKnowledgeBase = computed(() => Boolean(categories.data) && !categories.data.length)
+  const pageActionLabel = computed(() => (isEmptyKnowledgeBase.value ? '' : settings.pageActionLabel.value))
+  const showLogin = computed(() => settings.isGuest.value && !isEmptyKnowledgeBase.value)
+
   const focusCategory = computed(() => (homeCategories.value.length === 1 ? homeCategories.value[0] : null))
   const isLoneCategory = computed(() => Boolean(focusCategory.value))
 
@@ -61,6 +66,9 @@ export default function setup(context) {
   return {
     prefetchOnHover,
     ...settings,
+    isEmptyKnowledgeBase,
+    pageActionLabel,
+    showLogin,
     bannerImage,
     bannerBackground,
     bannerTextColor,

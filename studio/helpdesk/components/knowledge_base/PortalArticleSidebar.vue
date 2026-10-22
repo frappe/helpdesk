@@ -19,9 +19,19 @@
           variant="outline"
           class="[&_input]:!shadow-none max-md:[&_input]:h-11 max-md:[&_input]:text-base"
           :placeholder="__('Search articles')"
+          @focus="isFocused = true"
+          @blur="isFocused = false"
         >
           <template #prefix>
             <span class="lucide-search size-4 text-ink-gray-4" />
+          </template>
+          <template #suffix>
+            <ShortcutKey
+              v-if="!query && !isFocused"
+              class="[@media(pointer:coarse)]:hidden"
+              size="sm"
+              keys="/"
+            />
           </template>
         </TextInput>
       </div>
@@ -151,6 +161,7 @@ import {
   TextInput,
   useKeyboardShortcut,
 } from "frappe-ui";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
 import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
@@ -329,6 +340,7 @@ function prefetchHovered(event: Event) {
 }
 
 const search = ref<InstanceType<typeof TextInput> | null>(null);
+const isFocused = ref(false);
 useKeyboardShortcut({
   combo: "Slash",
   description: __("Search articles"),

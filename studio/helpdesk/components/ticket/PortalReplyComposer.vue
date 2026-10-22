@@ -127,15 +127,20 @@ const resizing = ref<{
 } | null>(null);
 const isResizing = computed(() => resizing.value !== null);
 
-// Reserve holds while dragging up (composer overlays); shrinking returns it at once.
+// A resized composer overlays the thread: the reserve stays at the last
+// unresized height (the closed bar or the natural editor), or less.
 const { height: composerHeight } = useElementSize(root, undefined, {
   box: "border-box",
 });
+let baseReserve = 0;
 watch(
-  [composerHeight, () => resizing.value],
-  ([value, drag]) => {
-    if (!drag || value < (props.reserve ?? 0))
-      emit("update:reserve", Math.round(value));
+  [composerHeight, () => height.value > 0],
+  ([value, resized]) => {
+    if (!resized) baseReserve = value;
+    emit(
+      "update:reserve",
+      Math.round(resized ? Math.min(value, baseReserve) : value)
+    );
   },
   { immediate: true }
 );

@@ -192,10 +192,11 @@
 
     <!-- The viewer's conversation layout: chat bubbles, or email cards. -->
     <div v-else-if="variant === 'thread'" class="flex flex-col pt-4">
-      <!-- PortalChatList's rows: a one-line bubble, then the name and time under it. -->
+      <!-- PortalChatList's rows: a bubble, then the name and time under it. A bubble
+           is 12px of padding plus 22px per line of its iframe; messages run 1 to 3 lines. -->
       <div v-if="conversationLayout === 'chat'" class="flex flex-col gap-3">
         <div
-          v-for="(bubble, i) in ['16rem', '13rem', '15rem']"
+          v-for="(bubble, i) in CHAT_BUBBLES"
           :key="i"
           class="flex gap-2"
           :class="i % 2 ? '' : 'flex-row-reverse'"
@@ -207,9 +208,12 @@
           <div
             class="flex max-w-[80%] flex-col gap-1"
             :class="i % 2 ? 'items-start' : 'items-end'"
-            :style="{ width: bubble }"
+            :style="{ width: bubble.width }"
           >
-            <Skeleton :class="[BLOCK, 'h-[34px] w-full rounded-6']" />
+            <Skeleton
+              :class="[BLOCK, 'w-full rounded-6']"
+              :style="{ height: `${12 + 22 * bubble.lines}px` }"
+            />
             <!-- The viewer's own messages show only the time. -->
             <Line
               :text="i % 2 ? 'mx-1 w-28 text-xs' : 'mx-1 w-14 text-xs'"
@@ -454,6 +458,12 @@ withDefaults(
 );
 
 const BLOCK = "motion-reduce:animate-none";
+
+const CHAT_BUBBLES = [
+  { width: "16rem", lines: 1 },
+  { width: "22rem", lines: 3 },
+  { width: "18rem", lines: 2 },
+];
 
 const WIDTHS = [72, 58, 84, 64, 90, 52, 78, 68];
 function width(index: number, floor: number) {

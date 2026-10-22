@@ -98,7 +98,8 @@ class HDSettings(Document):
         return
 
     def before_save(self):
-        self.update_ticket_permissions()
+        if self.has_value_changed("allow_anyone_to_create_tickets"):
+            self.update_ticket_permissions()
 
     def on_update(self):
         sync_brand_to_website_settings(self)

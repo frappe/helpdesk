@@ -171,7 +171,8 @@
        ],
        "componentId": "container-leo7uctqp",
        "componentName": "container",
-       "originalElement": "div"
+       "originalElement": "div",
+       "visibilityCondition": "{{ !isEmptyKnowledgeBase }}"
       },
       {
        "componentId": "PortalSkeleton-home",
@@ -182,6 +183,110 @@
         "variant": "kb-home"
        },
        "visibilityCondition": "{{ !categories.data }}"
+      },
+      {
+       "blockName": "empty-home",
+       "children": [
+        {
+         "classes": [
+          "mb-8"
+         ],
+         "componentId": "PortalTicketIllustration-empty-home",
+         "componentName": "PortalTicketIllustration",
+         "isCustomVueComponent": true
+        },
+        {
+         "classes": [
+          "font-semibold",
+          "text-center",
+          "leading-[1.15]",
+          "text-ink-gray-8"
+         ],
+         "componentId": "TextBlock-empty-home-title",
+         "componentName": "TextBlock",
+         "componentProps": {
+          "fontSize": "text-[34px] sm:text-[40px]",
+          "tag": "h1",
+          "text": "{{ t(\"How can we help?\") }}"
+         }
+        },
+        {
+         "classes": [
+          "text-center",
+          "mt-3",
+          "max-w-md",
+          "self-center",
+          "text-ink-gray-6"
+         ],
+         "componentId": "TextBlock-empty-home-description",
+         "componentName": "TextBlock",
+         "componentProps": {
+          "fontSize": "text-p-lg",
+          "tag": "p",
+          "text": "{{ t(\"Our help articles are on the way. In the meantime, our support team is happy to help directly.\") }}"
+         }
+        },
+        {
+         "blockName": "container",
+         "children": [
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push(routes.newTicket())"
+            }
+           },
+           "componentId": "Button-empty-home-new-ticket",
+           "componentName": "Button",
+           "componentProps": {
+            "iconLeft": "lucide-plus",
+            "label": "{{ t('Raise a ticket') }}",
+            "variant": "solid"
+           }
+          },
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push(routes.ticketList)"
+            }
+           },
+           "componentId": "Button-empty-home-tickets",
+           "componentName": "Button",
+           "componentProps": {
+            "label": "{{ t('View my tickets') }}",
+            "variant": "subtle"
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-wrap",
+          "justify-center",
+          "gap-2",
+          "mt-5"
+         ],
+         "componentId": "container-empty-home-actions",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-1",
+        "flex-col",
+        "items-center",
+        "justify-center",
+        "w-full",
+        "px-4",
+        "py-16"
+       ],
+       "componentId": "container-empty-home",
+       "componentName": "container",
+       "originalElement": "div",
+       "visibilityCondition": "{{ isEmptyKnowledgeBase }}"
       },
       {
        "blockName": "categories-section",
@@ -242,21 +347,6 @@
           "columns": "{{ homeCategories.length === 2 ? 2 : 3 }}"
          },
          "isStudioComponent": true
-        },
-        {
-         "baseStyles": {
-          "color": "var(--ink-gray-4)",
-          "textAlign": "center"
-         },
-         "componentId": "TextBlock-uboyx0fo9",
-         "componentName": "PortalEmptyState",
-         "componentProps": {
-          "description": "{{ t(\"Categories show up here once they're published.\") }}",
-          "icon": "article",
-          "title": "{{ t(\"No categories yet\") }}"
-         },
-         "isCustomVueComponent": true,
-         "visibilityCondition": "{{ categories.data && !categories.data.length }}"
         }
        ],
        "classes": [
@@ -276,7 +366,7 @@
        "componentId": "container-a9wzslqxz",
        "componentName": "container",
        "originalElement": "div",
-       "visibilityCondition": "{{ categories.data && !focusCategory }}"
+       "visibilityCondition": "{{ categories.data && !focusCategory && !isEmptyKnowledgeBase }}"
       },
       {
        "blockName": "articles-section",
@@ -586,7 +676,7 @@
        "componentId": "container-yi3s1zcyy",
        "componentName": "container",
        "originalElement": "div",
-       "visibilityCondition": "{{ categories.data }}"
+       "visibilityCondition": "{{ categories.data && !isEmptyKnowledgeBase }}"
       }
      ],
      "classes": [
@@ -626,7 +716,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-21 02:14:14.000000",
+ "modified": "2026-10-22 20:45:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

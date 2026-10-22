@@ -118,6 +118,7 @@ const store = {
   routes: ROUTES,
   accountMenuOptions,
   // Placeholders the pages override.
+  showLogin: session.isGuest,
   customActions: [],
   headerLinks: [],
   themeIcon: '',

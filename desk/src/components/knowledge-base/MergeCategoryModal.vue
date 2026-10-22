@@ -22,9 +22,7 @@
         label="Category"
         :page-length="100"
       />
-      <p v-if="joiningNote" class="mt-3 text-p-sm text-ink-gray-7">
-        {{ joiningNote }}
-      </p>
+      <AnimatedNote :note="joiningNote" />
     </template>
     <template #actions>
       <Button
@@ -40,6 +38,7 @@
 import { computed, ref } from "vue";
 import { Dialog } from "frappe-ui";
 import { Link } from "@/components";
+import AnimatedNote from "./AnimatedNote.vue";
 import { useCategoryVisibility } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
 defineProps<{

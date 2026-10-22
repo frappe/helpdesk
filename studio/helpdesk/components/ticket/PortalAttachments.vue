@@ -30,7 +30,7 @@
           <Spinner v-if="isBusy(item)" size="md" class="text-ink-gray-5" />
           <LucideCircleAlert
             v-else-if="item.status === 'error'"
-            class="size-4 text-ink-red-4"
+            class="size-4 text-ink-red-6"
           />
           <img
             v-else-if="isImage(item.name)"
@@ -56,7 +56,7 @@
           <span
             class="text-p-xs"
             :class="
-              item.status === 'error' ? 'text-ink-red-4' : 'text-ink-gray-5'
+              item.status === 'error' ? 'text-ink-red-6' : 'text-ink-gray-5'
             "
           >
             {{ meta(item) }}
@@ -98,10 +98,10 @@
           >{{ __("Add more") }}</span
         >
         <span
-          class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex"
+          class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex [@media(pointer:coarse)]:hidden"
         >
           {{ __("drop, browse or") }}
-          <KeyboardShortcut bg combo="Mod+V" />
+          <ShortcutKey :keys="`${metaIcon} V`" />
         </span>
       </button>
       <button
@@ -127,7 +127,7 @@
     <p
       v-for="error in uploader.errors.value"
       :key="error"
-      class="text-p-xs text-ink-red-4"
+      class="text-p-xs text-ink-red-6"
     >
       {{ error }}
     </p>
@@ -136,7 +136,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { KeyboardShortcut, Spinner } from "frappe-ui";
+import { Spinner } from "frappe-ui";
 import { useUploader } from "@framework/ui/FileUpload";
 import type {
   Restrictions,
@@ -144,6 +144,8 @@ import type {
   UploadResult,
   UploadTransport,
 } from "@framework/ui/FileUpload";
+import { useDevice } from "@helpdesk/shared/device";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
 import LucideCircleAlert from "~icons/lucide/circle-alert";
 import LucideFile from "~icons/lucide/file";
@@ -159,6 +161,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ "update:modelValue": [UploadResult[]] }>();
+const { metaIcon } = useDevice();
 
 const uploader = useUploader({
   transport: props.transport,

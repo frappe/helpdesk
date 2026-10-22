@@ -70,6 +70,8 @@
             "mx-4",
             "sm:mx-6",
             "lg:mx-10",
+            "[&:has(+_*_.is-chat)]:!mx-3",
+            "sm:[&:has(+_*_.is-chat)]:!mx-5",
             "mt-4",
             "sm:mt-6"
            ],
@@ -322,25 +324,31 @@
                 {
                  "children": [
                   {
-                   "classes": [
-                    "w-[106px]",
-                    "shrink-0",
-                    "truncate",
-                    "text-ink-gray-5",
-                    "me-[9px]",
-                    "self-start",
-                    "leading-7"
-                   ],
-                   "attributes": {
-                    "title": "{{ dataItem.label }}"
-                   },
-                   "componentId": "TextBlock-ticket-basics-label",
-                   "componentName": "TextBlock",
+                   "componentId": "Tooltip-ticket-basics-label",
+                   "componentName": "Tooltip",
                    "componentProps": {
-                    "fontSize": "text-base",
-                    "tag": "span",
                     "text": "{{ dataItem.label }}"
-                   }
+                   },
+                   "children": [
+                    {
+                     "classes": [
+                      "w-[106px]",
+                      "shrink-0",
+                      "truncate",
+                      "text-ink-gray-5",
+                      "me-[9px]",
+                      "self-start",
+                      "leading-7"
+                     ],
+                     "componentId": "TextBlock-ticket-basics-label",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-base",
+                      "tag": "span",
+                      "text": "{{ dataItem.label }}"
+                     }
+                    }
+                   ]
                   },
                   {
                    "componentId": "PortalEmailList-ticket-basics",
@@ -366,22 +374,28 @@
                    "visibilityCondition": "{{ dataItem.isCustomer }}"
                   },
                   {
-                   "classes": [
-                    "truncate",
-                    "min-w-0",
-                    "flex-1",
-                    "text-ink-gray-8"
-                   ],
-                   "attributes": {
-                    "title": "{{ dataItem.value }}"
-                   },
-                   "componentId": "TextBlock-ticket-basics-value",
-                   "componentName": "TextBlock",
+                   "componentId": "Tooltip-ticket-basics-value",
+                   "componentName": "Tooltip",
                    "componentProps": {
-                    "fontSize": "text-base",
-                    "tag": "span",
                     "text": "{{ dataItem.value }}"
                    },
+                   "children": [
+                    {
+                     "classes": [
+                      "truncate",
+                      "min-w-0",
+                      "flex-1",
+                      "text-ink-gray-8"
+                     ],
+                     "componentId": "TextBlock-ticket-basics-value",
+                     "componentName": "TextBlock",
+                     "componentProps": {
+                      "fontSize": "text-base",
+                      "tag": "span",
+                      "text": "{{ dataItem.value }}"
+                     }
+                    }
+                   ],
                    "visibilityCondition": "{{ !dataItem.isPriority && !dataItem.emails }}"
                   },
                   {
@@ -1093,7 +1107,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-21 13:51:45.000000",
+ "modified": "2026-10-22 19:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",
