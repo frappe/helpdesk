@@ -64,7 +64,7 @@ function anchors(doc: Node) {
           side: 1,
           stopEvent: () => true,
           ignoreSelection: true,
-        }),
+        })
       );
     return false;
   });

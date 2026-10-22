@@ -37,7 +37,10 @@ class HDSettings(Document):
         so a site already in that state still saves its other settings."""
         if self.public_knowledge_base:
             return
-        for fieldname in ("allow_anonymous_article_voting", "knowledge_base_home_page_for_guests"):
+        for fieldname in (
+            "allow_anonymous_article_voting",
+            "knowledge_base_home_page_for_guests",
+        ):
             if self.get(fieldname) and self.has_value_changed(fieldname):
                 frappe.throw(
                     _("Knowledge base must be public to turn on {0}").format(

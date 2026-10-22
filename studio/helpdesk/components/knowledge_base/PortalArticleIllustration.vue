@@ -46,9 +46,7 @@
   box-sizing: border-box;
   border: 1.5px dashed var(--illo-dash);
   border-radius: 9px;
-  transition:
-    transform 450ms var(--illo-ease),
-    border-color 300ms;
+  transition: transform 450ms var(--illo-ease), border-color 300ms;
 }
 .article-illo-card {
   position: absolute;
@@ -65,10 +63,8 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  transition:
-    transform 450ms var(--illo-ease),
-    box-shadow 450ms var(--illo-ease),
-    background 300ms;
+  transition: transform 450ms var(--illo-ease),
+    box-shadow 450ms var(--illo-ease), background 300ms;
 }
 .article-illo-line {
   animation: 4.8s var(--illo-ease) infinite;
@@ -104,22 +100,60 @@
   border-color: var(--illo-dash-hover);
 }
 @keyframes article-illo-l1 {
-  0% { width: 0; opacity: 1; }
-  12% { width: 70%; }
-  88% { width: 70%; opacity: 1; }
-  96%, 100% { width: 70%; opacity: 0; }
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  12% {
+    width: 70%;
+  }
+  88% {
+    width: 70%;
+    opacity: 1;
+  }
+  96%,
+  100% {
+    width: 70%;
+    opacity: 0;
+  }
 }
 @keyframes article-illo-l2 {
-  0%, 12% { width: 0; opacity: 1; }
-  30% { width: 100%; }
-  88% { width: 100%; opacity: 1; }
-  96%, 100% { width: 100%; opacity: 0; }
+  0%,
+  12% {
+    width: 0;
+    opacity: 1;
+  }
+  30% {
+    width: 100%;
+  }
+  88% {
+    width: 100%;
+    opacity: 1;
+  }
+  96%,
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
 }
 @keyframes article-illo-l3 {
-  0%, 30% { width: 0; opacity: 1; }
-  40% { width: 45%; }
-  88% { width: 45%; opacity: 1; }
-  96%, 100% { width: 45%; opacity: 0; }
+  0%,
+  30% {
+    width: 0;
+    opacity: 1;
+  }
+  40% {
+    width: 45%;
+  }
+  88% {
+    width: 45%;
+    opacity: 1;
+  }
+  96%,
+  100% {
+    width: 45%;
+    opacity: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .article-illo-line {

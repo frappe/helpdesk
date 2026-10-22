@@ -154,7 +154,9 @@ class TestGuestOnlySettings(IntegrationTestCase):
         frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
         settings = frappe.get_single("HD Settings")
         before = settings.prefer_knowledge_base
-        self.addCleanup(frappe.db.set_single_value, "HD Settings", "prefer_knowledge_base", before)
+        self.addCleanup(
+            frappe.db.set_single_value, "HD Settings", "prefer_knowledge_base", before
+        )
         settings.prefer_knowledge_base = int(not before)
         settings.save()
 
