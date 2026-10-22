@@ -1388,52 +1388,66 @@ class HDTicket(Document, CustomerEditController):
         return fields
 
     def notify_customers(self):
-        """Customers aren't in the ticket's room; ping each user's channel."""
-        for user in self.get_customers_to_notify():
-            frappe.publish_realtime(
-                "helpdesk:ticket-update",
-                {"ticket_id": self.name},
-                user=user,
-                after_commit=True,
-            )
+        ping_customers(self)
 
-    def get_customers_to_notify(self) -> set[str]:
-        """Skips the author and agents: they refetch already.
 
-        The readers `has_permission` lets in; not called per user, it repeats these lookups.
-        """
-        candidates = {self.raised_by, self.owner, self.contact}
-        if self.customer and (
-            managers := frappe.get_all(
-                "HD Customer Member",
-                filters={"parent": self.customer, "is_manager": 1},
-                pluck="contact_name",
-            )
-        ):
-            candidates.update(
-                frappe.get_all(
-                    "Contact",
-                    filters={"name": ["in", managers], "user": ["is", "set"]},
-                    pluck="user",
-                )
-            )
-        candidates -= {None, "", "Guest", frappe.session.user}
-        if not candidates:
-            return set()
-        users = frappe.get_all(
-            "User",
-            filters={"name": ["in", list(candidates)], "enabled": 1},
-            pluck="name",
+def ping_customers(ticket):
+    """Customers aren't in the ticket's room; ping each user's channel."""
+    for user in get_customers_to_notify(ticket):
+        frappe.publish_realtime(
+            "helpdesk:ticket-update",
+            {"ticket_id": ticket.name},
+            user=user,
+            after_commit=True,
         )
-        return {u for u in users if not is_agent(u)}
+
+
+def get_customers_to_notify(ticket) -> set[str]:
+    """Skips the author and agents: they refetch already.
+
+    The readers `has_permission` lets in; not called per user, it repeats these lookups.
+    """
+    candidates = {ticket.raised_by, ticket.owner, ticket.contact}
+    if ticket.customer and (
+        managers := frappe.get_all(
+            "HD Customer Member",
+            filters={"parent": ticket.customer, "is_manager": 1},
+            pluck="contact_name",
+        )
+    ):
+        candidates.update(
+            frappe.get_all(
+                "Contact",
+                filters={"name": ["in", managers], "user": ["is", "set"]},
+                pluck="user",
+            )
+        )
+    candidates -= {None, "", "Guest", frappe.session.user}
+    if not candidates:
+        return set()
+    users = frappe.get_all(
+        "User",
+        filters={"name": ["in", list(candidates)], "enabled": 1},
+        pluck="name",
+    )
+    return {u for u in users if not is_agent(u)}
 
 
 def publish_assignment_update(todo, method=None):
     """Assigning writes `_assign` without saving the ticket, so `on_update` never runs."""
     if todo.reference_type != "HD Ticket" or not todo.reference_name:
         return
-    if frappe.db.exists("HD Ticket", todo.reference_name):
-        frappe.get_doc("HD Ticket", todo.reference_name).notify_customers()
+    # only an assign, unassign or close changes `_assign`; True on insert
+    if not todo.has_value_changed("status"):
+        return
+    ticket = frappe.db.get_value(
+        "HD Ticket",
+        todo.reference_name,
+        ["name", "raised_by", "owner", "contact", "customer"],
+        as_dict=True,
+    )
+    if ticket:
+        ping_customers(ticket)
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

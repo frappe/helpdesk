@@ -23,6 +23,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_stricter_visibility,
     move_category_articles,
 )
+from helpdesk.search import NUM_RESULTS
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -41,7 +42,7 @@ PUBLIC_CATEGORY_FIELDS = [
     "pinned",
     "pinned_order",
 ]
-SEARCH_LIMIT = 10
+SEARCH_LIMIT = NUM_RESULTS
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
