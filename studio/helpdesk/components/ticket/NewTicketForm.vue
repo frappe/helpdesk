@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="template.data || template.error"
+    v-if="isGuest || template.data || template.error"
     class="portal-reveal flex w-full flex-col"
   >
     <div class="flex w-full flex-col gap-5">
@@ -9,6 +9,27 @@
         class="prose-sm max-w-none text-ink-gray-7"
         v-html="about"
       />
+      <div v-if="isGuest" class="flex w-full flex-col gap-5 sm:flex-row">
+        <FormControl
+          v-model="guestName"
+          class="min-w-0 flex-1"
+          type="text"
+          size="sm"
+          variant="subtle"
+          :label="__('Name')"
+          :placeholder="__('Jane Cooper')"
+        />
+        <FormControl
+          v-model="guestEmail"
+          class="min-w-0 flex-1"
+          type="email"
+          size="sm"
+          variant="subtle"
+          required
+          :label="__('Email')"
+          :placeholder="__('jane@acme.com')"
+        />
+      </div>
       <div class="flex w-full flex-col gap-2">
         <FormControl
           v-model="subject"
@@ -37,7 +58,7 @@
           fixed-menu
           :placeholder="__('Describe your issue…')"
           editor-class="prose-sm max-w-none min-h-32 max-h-60 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2"
-          :upload-function="uploadInline"
+          :upload-function="isGuest ? refuseGuestImages : uploadInline"
           :extensions="editorExtensions"
           @change="description = $event"
         />
@@ -46,6 +67,7 @@
         <FormLayout :doc="model" :layout="layout" />
       </div>
       <PortalAttachments
+        v-if="!isGuest"
         v-model="attachments"
         class="w-full"
         :restrictions="{ allowed_file_types: uploadableFileTypes(isAgent) }"
@@ -75,6 +97,7 @@ import {
   FormControl,
   call,
   createResource,
+  toast,
   useFileUpload,
 } from "frappe-ui";
 import { TextEditor } from "frappe-ui/experimental";
@@ -116,18 +139,25 @@ const props = withDefaults(
     timeFormat?: string;
     // The desk's `$dialog`, so its form scripts render as on the ticket page.
     dialog?: (options: Record<string, unknown>) => unknown;
+    // Guests send only who they are, a subject and a description.
+    isGuest?: boolean;
+    // A guest's saved request, restored once they sign in.
+    draft?: string;
   }>(),
   { template: "Default", initialSubject: "" }
 );
 
 const emit = defineEmits<{
   created: [ticket: { name: string }];
+  submitted: [email: string];
   actions: [actions: any[]];
 }>();
 
 const router = useRouter();
 const subject = ref(props.initialSubject);
 const description = ref("");
+const guestName = ref("");
+const guestEmail = ref("");
 const attachments = ref([]);
 const isCreating = ref(false);
 const uploading = ref(0);
@@ -138,9 +168,33 @@ const uploadedByUrl = new Map();
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
   params: { name: props.template },
-  auto: true,
 });
-loadTicketMeta();
+
+// `isGuest` reads true until the session loads.
+watch(
+  () => props.isGuest,
+  (isGuest) => {
+    if (isGuest || template.data || template.loading) return;
+    template.fetch();
+    loadTicketMeta();
+    if (props.draft) restoreDraft();
+  },
+  { immediate: true }
+);
+
+async function restoreDraft() {
+  const draft = await call("helpdesk.api.ticket.get_guest_draft", {
+    token: props.draft,
+  }).catch(() => null);
+  const { draft: _, ...query } = router.currentRoute.value.query;
+  router.replace({ query });
+  if (!draft)
+    return toast.info(
+      __("We couldn't find your saved request. It may have expired.")
+    );
+  subject.value = draft.subject;
+  description.value = draft.description;
+}
 
 const skeletonFieldCount = useRememberedCount(
   // Per side: agents don't get the contact's `customer` field.
@@ -242,11 +296,15 @@ const canSubmit = computed(
     !isCreating.value &&
     Boolean(subject.value) &&
     !isContentEmpty(description.value) &&
+    (!props.isGuest || Boolean(guestEmail.value.trim())) &&
     visibleFields.value.filter(isRequired).every((row) => model[row.fieldname])
 );
 
 const about = computed(() => DOMPurify.sanitize(template.data?.about || ""));
-const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT });
+const suggestions = useArticleSearch(
+  computed(() => (props.suggestArticles ? subject.value : "")),
+  { limit: SUGGESTION_LIMIT }
+);
 
 // Only priority shows its description, as on the ticket page.
 const priorityHint = computed(
@@ -333,8 +391,14 @@ function uploadInline(file: File) {
     .finally(() => (uploading.value -= 1));
 }
 
+function refuseGuestImages() {
+  toast.info(__("Sign in to add images"));
+  return Promise.reject(new Error("Guests cannot upload images"));
+}
+
 function createTicket() {
   if (!canSubmit.value) return;
+  if (props.isGuest) return createGuestTicket();
   return runAction(
     async () => {
       // call(), not a resource: the desk's resource error handler toasts again.
@@ -353,6 +417,30 @@ function createTicket() {
       emit("created", ticket);
     },
     { busy: isCreating, fallback: __("Could not create the ticket") }
+  );
+}
+
+function createGuestTicket() {
+  return runAction(
+    async () => {
+      try {
+        await call("helpdesk.api.ticket.new_guest_ticket", {
+          subject: subject.value,
+          description: description.value,
+          email: guestEmail.value,
+          first_name: guestName.value,
+        });
+      } catch (error) {
+        if (error?.exc_type !== "RateLimitExceededError") throw error;
+        throw new Error(
+          __(
+            "You've sent a lot of requests. Please try again in an hour, or sign in."
+          )
+        );
+      }
+      emit("submitted", guestEmail.value.trim());
+    },
+    { busy: isCreating, fallback: __("Could not send your request") }
   );
 }
 </script>

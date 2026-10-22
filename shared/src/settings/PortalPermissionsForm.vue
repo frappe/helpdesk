@@ -101,6 +101,14 @@ const sections = computed(() => [
           "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in."
         ),
       },
+      {
+        settings: hdSettings,
+        fieldname: "allow_anyone_to_create_tickets",
+        label: __("Allow anyone to create tickets"),
+        description: __(
+          "Visitors will be able to raise tickets from the portal without logging in."
+        ),
+      },
       // Shown as "Allow": the field stores the opposite. Counted while
       // unknown, so the skeleton has a row for it.
       ...(!canEditSignup.fetched || canEditSignup.data?.has_permission

@@ -1,7 +1,26 @@
+from urllib.parse import quote
+
 import frappe
 from frappe import _
+from frappe.contacts.doctype.contact.contact import get_contact_name
+from frappe.core.api.user_invitation import invite_by_email
+from frappe.email.doctype.email_account.email_account import EmailAccount
+from frappe.rate_limiter import rate_limit
+from frappe.utils import (
+    add_to_date,
+    escape_html,
+    get_url,
+    now_datetime,
+    strip_html_tags,
+    validate_email_address,
+)
 
-from helpdesk.utils import agent_only, is_admin
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, agent_only, is_admin
+
+GUEST_TICKETS_PER_HOUR = 100
+GUEST_DRAFT_SECONDS = 3 * 24 * 60 * 60
+CONTINUE_EMAIL_COOLDOWN_SECONDS = 10 * 60
+CONTACT_CLAIM_SECONDS = 60
 
 
 @frappe.whitelist()
@@ -84,3 +103,135 @@ def delete_ticket(name: str):
             exc=frappe.PermissionError,
         )
     frappe.delete_doc("HD Ticket", name, force=True, ignore_permissions=True)
+
+
+@frappe.whitelist(allow_guest=True, methods=["POST"])
+@rate_limit(limit=5, seconds=60 * 60)
+def new_guest_ticket(
+    subject: str, description: str, email: str, first_name: str | None = None
+) -> None:
+    if not frappe.db.get_single_value("HD Settings", "allow_anyone_to_create_tickets"):
+        frappe.throw(_("Sign in to raise a ticket"), frappe.PermissionError)
+
+    email = (email or "").strip().lower()
+    validate_email_address(email, throw=True)
+    subject = (subject or "").strip()
+    if not subject or not strip_html_tags(description or "").strip():
+        frappe.throw(_("Subject and description are required"))
+    if frappe.db.exists("Email Account", {"email_id": email}):
+        frappe.throw(_("Please use your own email address"))
+    hour_ago = add_to_date(now_datetime(), hours=-1)
+    if (
+        frappe.db.count("HD Ticket", {"owner": "Guest", "creation": (">", hour_ago)})
+        >= GUEST_TICKETS_PER_HOUR
+    ):
+        frappe.throw(
+            _(
+                "You've sent a lot of requests. Please try again in an hour, or sign in."
+            ),
+            frappe.RateLimitExceededError,
+        )
+
+    # Same reply for every email, so the form never reveals who has an account.
+    if frappe.db.exists("User", {"email": email, "enabled": 1}) and can_email(email):
+        send_continue_email(email, subject, description)
+        return
+
+    ensure_contact(email, first_name)
+    ticket = frappe.get_doc(
+        {
+            "doctype": "HD Ticket",
+            "subject": subject,
+            "description": description,
+            "raised_by": email,
+        }
+    ).insert()
+    invite_requester(ticket)
+
+
+def can_email(email: str) -> bool:
+    return bool(EmailAccount.find_outgoing()) and not frappe.db.exists(
+        "Email Unsubscribe", {"email": email, "global_unsubscribe": 1}
+    )
+
+
+def ensure_contact(email: str, first_name: str | None) -> None:
+    if get_contact_name(email):
+        return
+    claim = frappe.cache.make_key(f"hd_guest_contact:{email}")
+    if not frappe.cache.set(claim, 1, nx=True, ex=CONTACT_CLAIM_SECONDS):
+        return
+    contact = frappe.get_doc(
+        {
+            "doctype": "Contact",
+            "first_name": escape_html((first_name or "").strip()) or email,
+        }
+    )
+    contact.append("email_ids", {"email_id": email, "is_primary": True})
+    # Guest has no Contact permission; the setting checked above stands in for it.
+    contact.insert(ignore_permissions=True)
+
+
+def invite_requester(ticket) -> None:
+    if frappe.db.exists("User", {"email": ticket.raised_by}):
+        return
+    frappe.enqueue(
+        send_requester_invite,
+        queue="short",
+        now=frappe.flags.in_test,
+        ticket_name=ticket.name,
+        email=ticket.raised_by,
+        contact=ticket.contact,
+    )
+
+
+def send_requester_invite(ticket_name: str, email: str, contact: str | None) -> None:
+    # User Invitation only accepts an inviter with an agent or manager role.
+    frappe.set_user("Administrator")
+    invite_by_email(
+        emails=email,
+        roles=["HD Customer"],
+        redirect_to_path=f"{CUSTOMER_PORTAL_ROOT}/tickets/{ticket_name}",
+        app_name="helpdesk",
+        contact=contact,
+    )
+
+
+def send_continue_email(email: str, subject: str, description: str) -> None:
+    token_key = f"hd_guest_draft_token:{email}"
+    token = frappe.cache.get_value(token_key) or frappe.generate_hash(length=32)
+    frappe.cache.set_value(token_key, token, expires_in_sec=GUEST_DRAFT_SECONDS)
+    frappe.cache.set_value(
+        f"hd_guest_draft:{token}",
+        {"email": email, "subject": subject, "description": description},
+        expires_in_sec=GUEST_DRAFT_SECONDS,
+    )
+
+    cooldown_key = f"hd_guest_continue:{email}"
+    if frappe.cache.get_value(cooldown_key):
+        return
+    frappe.cache.set_value(
+        cooldown_key, 1, expires_in_sec=CONTINUE_EMAIL_COOLDOWN_SECONDS
+    )
+    form = f"{CUSTOMER_PORTAL_ROOT}/tickets/new?draft={token}"
+    frappe.sendmail(
+        recipients=email,
+        subject=_("Continue your support request"),
+        template="continue_guest_request",
+        args={
+            "link": get_url(f"/login?redirect-to={quote(form, safe='')}"),
+            "first_name": frappe.db.get_value("User", {"email": email}, "first_name"),
+        },
+    )
+
+
+@frappe.whitelist(methods=["POST"])
+def get_guest_draft(token: str) -> dict | None:
+    key = f"hd_guest_draft:{token}"
+    draft = frappe.cache.get_value(key)
+    if not draft or draft["email"] != frappe.db.get_value(
+        "User", frappe.session.user, "email"
+    ):
+        return None
+    frappe.cache.delete_value(key)
+    return {"subject": draft["subject"], "description": draft["description"]}

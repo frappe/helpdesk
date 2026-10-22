@@ -32,7 +32,9 @@ function createSessionStore() {
   let sessionRequest = null
 
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
-  const canCreateTicket = computed(() => !isGuest.value)
+  const canCreateTicket = computed(
+    () => !isGuest.value || Boolean(config.value?.allow_anyone_to_create_tickets),
+  )
   const canGiveFeedback = computed(() => !isGuest.value || Boolean(config.value?.allow_anonymous_article_voting))
   const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
@@ -68,8 +70,12 @@ function createSessionStore() {
 
   // A private knowledge base 403s every guest call.
   function sendGuestToLogin() {
-    if (!isGuest.value || isPublicKnowledgeBase.value) return
+    if (!isGuest.value || isPublicKnowledgeBase.value || isNewTicketPage()) return
     signIn()
+  }
+
+  function isNewTicketPage() {
+    return window.location.pathname.replace(/\/$/, '') === ROUTES.appRoot + ROUTES.newTicket
   }
 
   function signIn() {
@@ -99,8 +105,8 @@ function createSessionStore() {
     brandName,
     dateFormat,
     isPhone,
-    signIn,
     loadSession,
+    signIn,
     reloadSession,
     signOut,
   }

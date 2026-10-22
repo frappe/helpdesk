@@ -1,5 +1,5 @@
 {
- "allow_guest": 0,
+ "allow_guest": 1,
  "blocks": [
   {
    "blockName": "body",
@@ -10,7 +10,7 @@
      "componentName": "header",
      "componentProps": {
       "crumb": "{{ t('New ticket') }}",
-      "parentCrumb": "{{ t('Tickets') }}",
+      "parentCrumb": "{{ isGuest ? '' : t('Tickets') }}",
       "parentRoute": "{{ routes.ticketList }}"
      },
      "isStudioComponent": true
@@ -22,15 +22,61 @@
        "blockName": "stack",
        "children": [
         {
+         "blockName": "receipt",
+         "children": [
+          {
+           "classes": [
+            "text-ink-gray-9",
+            "font-semibold"
+           ],
+           "componentId": "TextBlock-receipt",
+           "componentName": "TextBlock",
+           "componentProps": {
+            "fontSize": "text-xl",
+            "tag": "h1",
+            "text": "{{ receipt }}"
+           }
+          },
+          {
+           "componentEvents": {
+            "click": {
+             "action": "Run Script",
+             "event": "click",
+             "script": "router.push(routes.home)"
+            }
+           },
+           "componentId": "Button-receipt-home",
+           "componentName": "Button",
+           "componentProps": {
+            "label": "{{ t('Back to the knowledge base') }}",
+            "variant": "subtle"
+           }
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "items-start",
+          "gap-5",
+          "w-full"
+         ],
+         "componentId": "receipt",
+         "componentName": "container",
+         "originalElement": "div",
+         "visibilityCondition": "{{ submittedEmail }}"
+        },
+        {
          "componentId": "new-ticket-form",
          "componentName": "NewTicketForm",
          "componentProps": {
           "initialSubject": "{{ initialSubject }}",
           "origin": "{{ origin }}",
           "isAgent": "{{ isAgent }}",
-          "suggestArticles": true,
+          "suggestArticles": "{{ !isGuest || isPublicKnowledgeBase }}",
           "dateFormat": "{{ dateFormat }}",
-          "timeFormat": "{{ timeFormat }}"
+          "timeFormat": "{{ timeFormat }}",
+          "isGuest": "{{ isGuest }}",
+          "draft": "{{ draft }}"
          },
          "componentEvents": {
           "created": {
@@ -42,9 +88,15 @@
            "action": "Run Script",
            "event": "actions",
            "script": "setActions(eventArgs[0])"
+          },
+          "submitted": {
+           "action": "Run Script",
+           "event": "submitted",
+           "script": "showReceipt(eventArgs[0])"
           }
          },
-         "isCustomVueComponent": true
+         "isCustomVueComponent": true,
+         "visibilityCondition": "{{ !submittedEmail }}"
         }
        ],
        "classes": [
@@ -107,7 +159,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-16 23:50:00.000000",
+ "modified": "2026-10-21 04:21:47.000000",
  "modified_by": "Administrator",
  "name": "new_ticket",
  "owner": "Administrator",

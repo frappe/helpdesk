@@ -11,6 +11,8 @@ GUEST_FIELDS = [
     "allow_anonymous_article_voting",
     "banner_image",
     "banner_preset",
+    # whether a guest may raise a ticket
+    "allow_anyone_to_create_tickets",
 ]
 # The portal's ticket and organization pages
 USER_FIELDS = [
