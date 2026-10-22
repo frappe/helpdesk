@@ -7,7 +7,7 @@ app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 # As org/app, so `bench get-app helpdesk` fetches whichever is missing.
-required_apps = ["frappe/telephony", "frappe/studio"]
+required_apps = ["frappe/telephony"]
 require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
