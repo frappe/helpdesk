@@ -65,7 +65,6 @@ helpdesk.patches.grant_ticket_export_to_customers
 helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
 helpdesk.patches.sync_customer_manager_roles
-helpdesk.patches.add_studio_app
 helpdesk.patches.set_article_excerpts
 helpdesk.patches.sync_brand_image_to_website_settings
 helpdesk.patches.merge_customer_manager_settings
