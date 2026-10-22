@@ -182,7 +182,7 @@
         "count": "{{ skeletonCount }}",
         "variant": "kb-home"
        },
-       "visibilityCondition": "{{ !categories.data }}"
+       "visibilityCondition": "{{ !categories.data && !isEmptyKnowledgeBase }}"
       },
       {
        "blockName": "empty-home",
@@ -191,8 +191,8 @@
          "classes": [
           "mb-8"
          ],
-         "componentId": "PortalTicketIllustration-empty-home",
-         "componentName": "PortalTicketIllustration",
+         "componentId": "PortalArticleIllustration-empty-home",
+         "componentName": "PortalArticleIllustration",
          "isCustomVueComponent": true
         },
         {
@@ -716,7 +716,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-22 20:45:00.000000",
+ "modified": "2026-10-23 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",

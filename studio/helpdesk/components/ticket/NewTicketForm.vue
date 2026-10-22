@@ -36,7 +36,7 @@
           editable
           fixed-menu
           :placeholder="__('Describe your issue…')"
-          editor-class="prose-sm max-w-none min-h-32 max-h-60 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2"
+          editor-class="prose-sm max-w-none min-h-48 max-h-80 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2"
           :upload-function="uploadInline"
           :extensions="editorExtensions"
           @change="description = $event"

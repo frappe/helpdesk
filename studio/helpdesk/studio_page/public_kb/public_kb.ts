@@ -44,7 +44,8 @@ export default function setup(context) {
   )
 
   // Nothing the reader may see: the page offers its own actions, so the header doesn't.
-  const isEmptyKnowledgeBase = computed(() => Boolean(categories.data) && !categories.data.length)
+  // Until categories load, last visit's count decides, so an empty one doesn't flash search.
+  const isEmptyKnowledgeBase = computed(() => (categories.data ? !categories.data.length : skeletonCount === 0))
   const pageActionLabel = computed(() => (isEmptyKnowledgeBase.value ? '' : settings.pageActionLabel.value))
   const showLogin = computed(() => settings.isGuest.value && !isEmptyKnowledgeBase.value)
 
@@ -58,7 +59,9 @@ export default function setup(context) {
     ([value, category, loaded]) => {
       if (!loaded) return
       if (!category) return articles.fetch({ limit: ARTICLE_LIMIT, sort: value })
-      articles.fetch({ category: category.name, limit: 0, sort: value })
+      // A pinned lone category previews like the rest; a site's only category lists everything.
+      const limit = hasHiddenCategories.value ? ARTICLE_LIMIT : 0
+      articles.fetch({ category: category.name, limit, sort: value })
     },
     { immediate: true },
   )

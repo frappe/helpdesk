@@ -265,7 +265,7 @@
         </div>
         <div class="flex flex-col gap-1.5">
           <Line text="text-p-sm" width="4.5rem" />
-          <div class="h-[164px] rounded-6 border border-outline-gray-2">
+          <div class="h-[228px] rounded-6 border border-outline-gray-2">
             <div
               class="flex h-9 items-center gap-3.5 overflow-hidden border-b border-outline-gray-2 px-2"
             >
