@@ -1,5 +1,5 @@
 import frappe
-from frappe.utils import get_system_timezone
+from frappe.utils import escape_html, get_system_timezone
 from frappe.website.utils import get_home_page
 
 from helpdesk.api.config import get_favicon
@@ -24,8 +24,14 @@ def update_website_context(context):
     A favicon set on the Studio app itself wins."""
     doc = context.get("doc")
     if doc and doc.doctype == "Studio App" and doc.name == "helpdesk":
-        context.app_title = get_brand_name()
-        context.favicon = context.favicon or get_favicon()
+        context.app_title = escape_for_shell(get_brand_name())
+        context.favicon = context.favicon or escape_for_shell(get_favicon())
+
+
+def escape_for_shell(value: str | None) -> str:
+    """Frappe's renderer.html prints these unescaped, inside HTML and a JS string."""
+    value = escape_html(value or "").replace("\\", "&#92;")
+    return " ".join(value.splitlines())
 
 
 def get_brand_name() -> str:

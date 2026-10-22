@@ -51,11 +51,17 @@ def get_timeline_changes(name: str) -> list[dict]:
                         "field": field,
                         "from": old,
                         "to": new,
-                        "by": get_user_info_for_avatar(version.owner),
+                        "by": get_name_and_image(version.owner),
                         "on": version.creation,
                     }
                 )
     return changes
+
+
+def get_name_and_image(user: str) -> dict:
+    """Customers see who changed the status, never their email."""
+    info = get_user_info_for_avatar(user)
+    return {"name": info["name"], "image": info["image"]}
 
 
 @frappe.whitelist()
@@ -164,13 +170,16 @@ def get_communications(ticket: str):
     authors = {c.author_id for c in communications if c.author_id}
     agents = {author for author in authors if is_agent(author)}
     viewer_is_agent = is_agent()
+    attachments = get_attachments_by_name(
+        "Communication", [c.name for c in communications]
+    )
     for c in communications:
         if not viewer_is_agent:
             # portal never shows recipients, so don't send them
             c.pop("recipients")
             c.pop("cc")
             c.pop("bcc")
-        c.attachments = get_attachments("Communication", c.name)
+        c.attachments = attachments.get(c.name, [])
         c.user = get_user_info_for_avatar(c.author_id)
         # by author role: agents may reply from the portal
         c.is_agent = c.pop("author_id") in agents
@@ -208,6 +217,21 @@ def get_call_logs(ticket: str):
 
     call_logs = parse_call_logs(calls)
     return call_logs
+
+
+def get_attachments_by_name(doctype: str, names: list[str]) -> dict[str, list[dict]]:
+    """One query for every document's files."""
+    if not names:
+        return {}
+    files = frappe.get_all(
+        "File",
+        filters={"attached_to_doctype": doctype, "attached_to_name": ["in", names]},
+        fields=["name", "file_url", "file_name", "attached_to_name"],
+    )
+    grouped = {}
+    for file in files:
+        grouped.setdefault(file.pop("attached_to_name"), []).append(file)
+    return grouped
 
 
 @redis_cache()

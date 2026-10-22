@@ -2657,6 +2657,19 @@ class TestEmailRecipientsStayWithAgents(IntegrationTestCase):
         bccs = [email.get("bcc") for email in self.timeline_emails()]
         self.assertIn("boss@example.com", bccs)
 
+    def test_a_customer_cannot_load_the_desk_form(self) -> None:
+        from helpdesk.overrides import activity
+
+        frappe.set_user(self.customer)
+        loaders = (
+            lambda: activity.getdoc("HD Ticket", self.ticket.name),
+            lambda: activity.get_docinfo(doctype="HD Ticket", name=self.ticket.name),
+            lambda: activity.get_communications("HD Ticket", self.ticket.name),
+        )
+        for load in loaders:
+            with self.assertRaises(frappe.PermissionError):
+                load()
+
 
 class TestCustomerPing(IntegrationTestCase):
     def save_and_count_pings(self, **values) -> int:

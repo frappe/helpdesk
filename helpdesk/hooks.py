@@ -173,8 +173,13 @@ override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
     "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
     "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
+    "frappe.desk.form.load.getdoc": "helpdesk.overrides.activity.getdoc",
+    "frappe.desk.form.load.get_docinfo": "helpdesk.overrides.activity.get_docinfo",
+    "frappe.desk.form.load.get_communications": "helpdesk.overrides.activity.get_communications",
 }
 
+# The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild
+persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
 
 notification_skip_email_types = [
     "Reaction",

@@ -413,6 +413,17 @@ class TestArticlePermissions(IntegrationTestCase):
         with self.set_user(self.agent):
             self.assertEqual(self.listed(), {self.members, self.internal, self.draft})
 
+    def test_a_customer_votes_only_through_vote_on_article(self) -> None:
+        # vote_on_article holds the rate limit and the one-vote-per-reader rule
+        vote = {
+            "doctype": "HD Article Feedback",
+            "article": self.members,
+            "feedback": 1,
+        }
+        with self.set_user(self.customer):
+            with self.assertRaises(frappe.PermissionError):
+                frappe.get_doc({**vote, "visitor_id": "forged"}).insert()
+
     def test_a_check_for_another_user_uses_their_visibility(self) -> None:
         internal = frappe.get_doc("HD Article", self.internal)
 
