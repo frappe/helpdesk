@@ -168,11 +168,15 @@ To setup the repository locally follow the steps mentioned below:
 1. Get the Telephony app. Run `bench get-app https://github.com/frappe/telephony`
 1. Get the Helpdesk app. Run `bench get-app https://github.com/frappe/helpdesk`
 1. Run `bench --site helpdesk.test install-app helpdesk`.
-1. Run `bench build --app helpdesk`
-1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running
+1. Run `bench build --app helpdesk`. This also builds the customer portal.
+1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running. Customers use the portal at `http://helpdesk.test:8000/help`.
+
+**Note:** The `develop` branch needs frappe `develop`, which ships Studio, the app that runs the customer portal. Article search needs Redis with the RediSearch module, for example [Redis Stack](https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/), in your bench's `redis_cache`.
 
 
 **For Frontend Development**
+
+The agent desk:
 1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
     ```
     yarn install
@@ -180,7 +184,19 @@ To setup the repository locally follow the steps mentioned below:
     ```
 1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
 
-**Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
+The customer portal, a Studio app:
+1. Enable developer mode, allow the dev server's requests, and install dev dependencies:
+    ```
+    bench set-config -g developer_mode 1
+    bench --site helpdesk.test set-config ignore_csrf 1
+    bench setup requirements --dev
+    ```
+1. Run `yarn install` in `frappe-bench/apps/helpdesk`. This links `@helpdesk/shared`, the code that the desk and the portal share.
+1. Start Studio's dev server in `frappe-bench/apps/frappe/studio/frontend` with `yarn install` and `yarn dev --host`. In developer mode, `bench watch` starts it for you.
+1. In another terminal, run `bench --site helpdesk.test watch-studio` and keep it running. It imports the page JSON that you change.
+1. Open `http://helpdesk.test:8080/dev/help`. If the desk's dev server already holds 8080, use the port that Studio's dev server prints. `/help` serves the last build, so it shows your changes only after `bench build --app helpdesk`.
+
+**Note:** The desk's code is in `frappe-bench/apps/helpdesk/desk`, the portal's in `frappe-bench/apps/helpdesk/studio`, and the code they share in `frappe-bench/apps/helpdesk/shared`. See [`studio/README.md`](studio/README.md) for how the portal is laid out.
 
 
 ## Compatibility matrix 
