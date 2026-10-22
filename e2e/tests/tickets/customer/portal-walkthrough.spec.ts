@@ -236,6 +236,29 @@ test.describe("layouts", () => {
     await expect(page.getByText(/ reopened the ticket/)).toBeVisible();
   });
 
+  test("chat: an attached image is a chip that previews on click; an inline one stays inline", async ({
+    page,
+    apiAs,
+    ticket,
+  }) => {
+    const agent = await apiAs("agent");
+    const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+    const name = `chat-${uid()}.png`;
+    const file = await agent.insert("File", { file_name: name, content: PNG, decode: 1, is_private: 0 });
+    const inline = `Inline ${uid()}`;
+    await runTicketMethod(agent, ticket.name, "reply_via_agent", {
+      message: `<p>${inline}</p><img src="data:image/png;base64,${PNG}" alt="inline">`,
+      attachments: [file.name],
+    });
+    await useChat(page);
+    await page.goto(`/help/tickets/${ticket.name}`);
+    const frame = await frameWith(page, inline);
+    await expect(frame.getByRole("img", { name: "inline" })).toBeVisible();
+    await expect(page.locator(`img[src$="${name}"]`)).toHaveCount(0);
+    await page.getByRole("button", { name }).click();
+    await expect(page.getByRole("dialog", { name })).toBeVisible();
+  });
+
   test("timeline: closes and reopens read as log rows", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Closed" });
     await api.update("HD Ticket", ticket.name, { status: "Open" });
