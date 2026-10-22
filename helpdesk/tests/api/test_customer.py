@@ -1,6 +1,8 @@
 # Copyright (c) 2025, Frappe Technologies and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe.core.api.user_invitation import get_pending_invitations, invite_by_email
 from frappe.tests import IntegrationTestCase
@@ -346,6 +348,18 @@ class TestInvitations(IntegrationTestCase):
             self.assertRaises(frappe.ValidationError),
         ):
             invite_members(self.customer.name, emails, False)
+
+    def test_more_than_the_hourly_cap_is_refused(self) -> None:
+        first, second = unique_email("hourly"), unique_email("hourly")
+        self.addCleanup(delete_invitations, first)
+        with (
+            patch("helpdesk.api.customer.MAX_INVITES_PER_HOUR", 1),
+            self.set_user(self.manager["user"]),
+        ):
+            invite_members(self.customer.name, [first], False)
+            with self.assertRaises(frappe.RateLimitExceededError):
+                invite_members(self.customer.name, [second], False)
+        self.assertFalse(frappe.db.exists("User Invitation", {"email": second}))
 
 
 class TestMemberRemoval(IntegrationTestCase):

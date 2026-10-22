@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.rate_limiter import rate_limit
-from frappe.utils import get_fullname, sbool
+from frappe.utils import add_to_date, get_fullname, now_datetime, sbool
 
 from helpdesk.api.auth import validate_uploaded_image
 from helpdesk.api.contact import create_contact
@@ -20,6 +20,8 @@ from helpdesk.utils import (
 
 ROLE_ORDER = {"Owner": 0, "Manager": 1, "Member": 2}
 MAX_INVITES = 20
+# invitation emails one manager may send an hour, whatever the batch size
+MAX_INVITES_PER_HOUR = 50
 MAX_SUGGESTIONS = 50
 # Shared by strangers: never suggest invitees from these.
 PUBLIC_EMAIL_DOMAINS = frozenset(
@@ -231,6 +233,18 @@ def invite_members(customer: str, emails: list[str], is_manager: bool) -> dict:
         "skipped_emails": [e for e in emails if e in skipped],
         "disabled_emails": [e for e in emails if e in disabled],
     }
+    sent = frappe.db.count(
+        "User Invitation",
+        {
+            "invited_by": frappe.session.user,
+            "creation": [">", add_to_date(now_datetime(), hours=-1)],
+        },
+    )
+    if sent + len(result["invited_emails"]) > MAX_INVITES_PER_HOUR:
+        frappe.throw(
+            _("You can invite up to {0} people an hour").format(MAX_INVITES_PER_HOUR),
+            frappe.RateLimitExceededError,
+        )
     role = MANAGER_ROLE if sbool(is_manager) else "HD Customer"
     invitations = [
         frappe.get_doc(
