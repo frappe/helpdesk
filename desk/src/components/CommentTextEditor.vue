@@ -27,12 +27,6 @@
         :attachments="attachments"
         @remove="removeAttachment"
       />
-      <FailedUploads
-        class="my-2 ms-5"
-        :files="failedUploads.files.value"
-        @retry="failedUploads.retry"
-        @remove="failedUploads.remove"
-      />
       <div v-if="editable" class="flex flex-col gap-2 border-t">
         <div class="px-4">
           <!-- Fixed Menu -->
@@ -43,9 +37,7 @@
                   :doctype="doctype"
                   :docname="ticketId"
                   private
-                  :validate-file="pickFile"
                   @success="(f) => attachments.push(f)"
-                  @failure="failedUploads.add(pickedFile)"
                 >
                   <template #default="{ openFileSelector, uploading }">
                     {{ void (loading = uploading) }}
@@ -75,7 +67,6 @@
                   () => {
                     newComment = '';
                     attachments = [];
-                    failedUploads.clear();
                     dropUnused(null);
                     emit('discard');
                   }
@@ -127,8 +118,6 @@ import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
 import { AttachmentIcon } from "@/components/icons/";
 import { useTyping } from "@/composables/realtime";
 import { useUploadTracker } from "@/composables/useUploadTracker";
-import FailedUploads from "@helpdesk/shared/FailedUploads.vue";
-import { useFailedUploads } from "@helpdesk/shared/failedUploads";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
@@ -185,20 +174,7 @@ const extensions = buildEditorExtensions({
 const { onUserType, cleanup } = useTyping(props.ticketId);
 
 const attachments = ref([]);
-const { isUploading: editorUploading, track, dropUnused } = useUploadTracker();
-const failedUploads = useFailedUploads(
-  (file) => uploadFunction(file, props.doctype, props.ticketId, true),
-  (file) => attachments.value.push(file)
-);
-// FileUploader's failure event carries no file; keep the pick to retry it
-let pickedFile: File;
-function pickFile(file: File) {
-  pickedFile = file;
-  return null;
-}
-const isUploading = computed(
-  () => editorUploading.value || failedUploads.isRetrying.value
-);
+const { isUploading, track, dropUnused } = useUploadTracker();
 const isDisabled = computed(() => {
   return isContentEmpty(newComment.value) || loading.value || isUploading.value;
 });
@@ -234,7 +210,6 @@ async function submitComment() {
   dropUnused(content);
   newComment.value = null;
   attachments.value = [];
-  failedUploads.clear();
   loading.value = true;
   emit("sending");
 

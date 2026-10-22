@@ -51,20 +51,10 @@
         :placeholder="placeholder"
         :submit-label="submitLabel"
         :submitting="submitting"
-        :upload-function="uploadFunction && uploadOrKeep"
+        :upload-function="uploadFunction"
         @update:model-value="emit('update:modelValue', $event)"
-        @submit="emit('submit', { ...$event, reset })"
-      >
-        <template #actions="api">{{ void (composerApi = api) }}</template>
-        <template #footer>
-          <FailedUploads
-            class="mb-2 px-2.5"
-            :files="failedUploads.files.value"
-            @retry="failedUploads.retry"
-            @remove="failedUploads.remove"
-          />
-        </template>
-      </CommentComposer>
+        @submit="emit('submit', { ...$event, reset: () => composer?.reset() })"
+      />
     </div>
   </div>
 </template>
@@ -80,8 +70,6 @@ import {
 import { Avatar } from "frappe-ui";
 import { CommentComposer } from "@framework/ui/components/Composer";
 import { __ } from "@helpdesk/shared/translation";
-import FailedUploads from "@helpdesk/shared/FailedUploads.vue";
-import { useFailedUploads } from "@helpdesk/shared/failedUploads";
 
 // Releasing below this closes the editor.
 const MIN_BODY_HEIGHT = 80;
@@ -111,37 +99,6 @@ const emit = defineEmits<{
 
 const root = ref<HTMLElement | null>(null);
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
-
-// The composer's paperclip only toasts a failed upload; keep the File so the
-// footer can offer Retry. Its `actions` slot is the way to add an attachment.
-let composerApi: {
-  addAttachment: (file: Record<string, unknown>) => void;
-  setUploading: (value: boolean) => void;
-} | null = null;
-const failedUploads = useFailedUploads(
-  (file) => props.uploadFunction!(file) as Promise<Record<string, any>>,
-  (uploaded) =>
-    composerApi?.addAttachment({
-      name: uploaded.name ?? uploaded.file_url,
-      file_name: uploaded.file_name,
-      file_url: uploaded.file_url,
-      file_type: uploaded.file_type ?? "",
-      file_size: uploaded.file_size,
-    })
-);
-watch(failedUploads.isRetrying, (value) => composerApi?.setUploading(value));
-
-function uploadOrKeep(file: File) {
-  return props.uploadFunction!(file).catch((error) => {
-    failedUploads.add(file);
-    throw error;
-  });
-}
-
-function reset() {
-  failedUploads.clear();
-  composer.value?.reset();
-}
 
 // Keyed on the editor too: it can mount open before the editor exists.
 watch(
