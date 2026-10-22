@@ -15,7 +15,7 @@ test.describe("raising a ticket", () => {
     });
     try {
       const subject = `E2E portal ${uid()}`;
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await page.getByRole("combobox", { name: "Ticket Type" }).click();
       await page.getByRole("option", { name: "Question" }).click();
       await page.getByPlaceholder("A short description").fill(subject);
@@ -23,7 +23,7 @@ test.describe("raising a ticket", () => {
       await attachImage(page);
       await page.getByRole("button", { name: "Create ticket" }).click();
 
-      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", {
         filters: { subject },
         fields: ["description", "ticket_type", "raised_by"],
@@ -37,7 +37,7 @@ test.describe("raising a ticket", () => {
   });
 
   test("accepts a description that is only an image", async ({ page }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await page.getByPlaceholder("A short description").fill(`E2E image only ${uid()}`);
     await attachImage(page);
     await expect(page.getByRole("button", { name: "Create ticket" })).toBeEnabled();
@@ -51,7 +51,7 @@ test.describe("raising a ticket", () => {
       await route.continue();
     });
 
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await page.getByPlaceholder("A short description").fill(`E2E upload ${uid()}`);
     await page.locator(".ProseMirror").fill("See the screenshot");
     const submit = page.getByRole("button", { name: "Create ticket" });
@@ -69,7 +69,7 @@ test.describe("raising a ticket", () => {
     const title = `Rotate ${uid()} credentials`;
     await createArticle(api, category.name, { title });
     await indexArticles(api, title);
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
     await expect(page.getByText("Related articles:")).toBeVisible();
     await expect(page.getByText(title).last()).toBeVisible();

@@ -62,7 +62,7 @@ website_route_rules = [
 website_redirects = [
     {
         "source": "/helpdesk/my-tickets/new",
-        "target": "/help/tickets/new",
+        "target": "/help/my-tickets/new",
         "forward_query_parameters": True,
     },
     {
@@ -72,7 +72,13 @@ website_redirects = [
     },
     {
         "source": r"/helpdesk/my-tickets/(.*)",
-        "target": r"/help/tickets/\1",
+        "target": r"/help/my-tickets/\1",
+        "forward_query_parameters": True,
+    },
+    # Ticket emails and the new ticket form lived here before they moved under my-tickets.
+    {
+        "source": r"/help/tickets/(.+)",
+        "target": r"/help/my-tickets/\1",
         "forward_query_parameters": True,
     },
     {

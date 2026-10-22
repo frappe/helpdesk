@@ -34,7 +34,7 @@ test.describe("ticket origin", () => {
     const closed = await raiseTicket(await apiAs("customer"));
     await api.update("HD Ticket", closed.name, { status: "Closed" });
 
-    await page.goto(`/help/tickets/${closed.name}`);
+    await page.goto(`/help/my-tickets/${closed.name}`);
     await page.getByRole("button", { name: "Raise a ticket" }).click();
 
     expect((await submitTicket(page, api)).entry_point).toBe("Closed Ticket");
@@ -43,7 +43,7 @@ test.describe("ticket origin", () => {
   test("a ticket raised from search records the search text", async ({ page, api }) => {
     const query = `nothing matches ${uid()}`;
 
-    await page.goto(`/help/tickets/new?from=search&q=${encodeURIComponent(query)}`);
+    await page.goto(`/help/my-tickets/new?from=search&q=${encodeURIComponent(query)}`);
     await expect(page.getByPlaceholder("A short description")).toHaveValue(query);
     const origin = await submitTicket(page, api, { keepSubject: true });
 
@@ -52,20 +52,20 @@ test.describe("ticket origin", () => {
   });
 
   test("a ticket raised without a known link is direct", async ({ page, api }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
 
     expect((await submitTicket(page, api)).entry_point).toBe("Direct");
   });
 });
 
 async function submitTicket(page: Page, api: Api, { keepSubject = false } = {}) {
-  await expect(page).toHaveURL(/\/help\/tickets\/new/);
+  await expect(page).toHaveURL(/\/help\/my-tickets\/new/);
   const subjectField = page.getByPlaceholder("A short description");
   if (!keepSubject) await subjectField.fill(`E2E origin ${uid()}`);
   const subject = await subjectField.inputValue();
   await page.locator(".ProseMirror").fill("Where did this start?");
   await page.getByRole("button", { name: "Create ticket" }).click();
-  await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+  await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
 
   const [ticket] = await api.list("HD Ticket", {
     filters: { subject },

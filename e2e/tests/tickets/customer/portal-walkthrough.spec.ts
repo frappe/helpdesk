@@ -58,7 +58,7 @@ test.describe("access", () => {
   test("someone else's ticket, or none, reads as not found", async ({ page, apiAs }) => {
     const colleague = await raiseTicket(await apiAs("customerManager"));
     for (const name of [colleague.name, "99999999"]) {
-      await page.goto(`/help/tickets/${name}`);
+      await page.goto(`/help/my-tickets/${name}`);
       await expect(page.getByText("Ticket not found")).toBeVisible();
       await expect(
         page.getByText("It may have been removed, or you may not have access to it.")
@@ -69,7 +69,7 @@ test.describe("access", () => {
   test("a manager opens, answers and closes a colleague's ticket", async ({ pageAs, api, apiAs }) => {
     const colleague = await raiseTicket(await apiAs("customer"));
     const page = await pageAs("customerManager");
-    await page.goto(`/help/tickets/${colleague.name}`);
+    await page.goto(`/help/my-tickets/${colleague.name}`);
     await expect(page.getByRole("button", { name: colleague.subject })).toBeVisible();
 
     const reply = `Manager note ${uid()}`;
@@ -89,7 +89,7 @@ test.describe("access", () => {
   test("an agent opens any ticket on the portal", async ({ pageAs, apiAs }) => {
     const ticket = await raiseTicket(await apiAs("customer"));
     const page = await pageAs("agent");
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByRole("button", { name: ticket.subject })).toBeVisible();
     await expect(closeButton(page)).toBeVisible();
   });
@@ -109,7 +109,7 @@ test.describe("conversation", () => {
        <img src="x" onerror="window.__e2eXss=1"><script>window.__e2eXss=1</script>
        <div class="gmail_quote">Quoted ${marker}</div>`
     );
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     const frame = await frameWith(page, marker);
     // by its own target or the frame's <base target>
     const target = await frame.getByRole("link", { name: "the doc" }).evaluate(
@@ -127,14 +127,14 @@ test.describe("conversation", () => {
   });
 
   test("whitespace alone cannot be sent", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await (await openComposer(page)).fill("   ");
     await expect(page.getByRole("button", { name: "Send" })).toBeDisabled();
   });
 
   test("a reply to a resolved ticket reopens it; there is no separate reopen", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Resolved" });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByRole("button", { name: /Reopen/ })).toHaveCount(0);
     const reply = `Still broken ${uid()}`;
     await (await openComposer(page)).fill(reply);
@@ -144,7 +144,7 @@ test.describe("conversation", () => {
   });
 
   test("a reply carries an attached file", async ({ page, api, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await openComposer(page);
     const chooser = page.waitForEvent("filechooser");
     await page.getByRole("button", { name: "Attach file" }).click();
@@ -167,7 +167,7 @@ test.describe("conversation", () => {
   });
 
   test("the composer collapses after sending and reopens from its bar", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     const reply = `Collapse ${uid()}`;
     await (await openComposer(page)).fill(reply);
     await page.getByRole("button", { name: "Send" }).click();
@@ -179,7 +179,7 @@ test.describe("conversation", () => {
   });
 
   test("the composer resizes from the keyboard and keeps its height", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await openComposer(page);
     const handle = page.getByRole("separator", { name: "Resize composer" });
     await handle.focus();
@@ -194,7 +194,7 @@ test.describe("conversation", () => {
   });
 
   test("an agent's reply elsewhere shows without a reload", async ({ page, apiAs, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(closeButton(page)).toBeVisible();
     const live = `Live ${uid()}`;
     await agentReply(await apiAs("agent"), ticket.name, `<p>${live}</p>`);
@@ -227,7 +227,7 @@ test.describe("layouts", () => {
     await api.update("HD Ticket", ticket.name, { status: "Closed" });
     await api.update("HD Ticket", ticket.name, { status: "Open" });
     await useChat(page);
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await frameWith(page, answer);
     const width = page.viewportSize()!.width;
     expect(await centreX(page, `${ticket.subject} description`)).toBeGreaterThan(width / 3);
@@ -251,7 +251,7 @@ test.describe("layouts", () => {
       attachments: [file.name],
     });
     await useChat(page);
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     const frame = await frameWith(page, inline);
     await expect(frame.getByRole("img", { name: "inline" })).toBeVisible();
     await expect(page.locator(`img[src$="${name}"]`)).toHaveCount(0);
@@ -262,7 +262,7 @@ test.describe("layouts", () => {
   test("timeline: closes and reopens read as log rows", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Closed" });
     await api.update("HD Ticket", ticket.name, { status: "Open" });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText(/ closed the ticket/)).toBeVisible();
     await expect(page.getByText(/ reopened the ticket/)).toBeVisible();
   });
@@ -272,7 +272,7 @@ test.describe("layouts", () => {
     await agentReply(await apiAs("agent"), ticket.name, `<p>${answer}</p>`);
     const page = await pageAs("agent");
     await useChat(page);
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await frameWith(page, answer);
     const width = page.viewportSize()!.width;
     expect(await centreX(page, `${ticket.subject} description`)).toBeGreaterThan(width / 3);
@@ -282,7 +282,7 @@ test.describe("layouts", () => {
 
 test.describe("closing and rating", () => {
   test("close asks to confirm; cancel keeps it open", async ({ page, api, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await closeButton(page).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByText("Are you sure you want to close this ticket?")).toBeVisible();
@@ -306,7 +306,7 @@ test.describe("closing and rating", () => {
     await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
     const restore = await setHelpdeskSetting(api, "is_feedback_mandatory", 1);
     try {
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await closeButton(page).click();
       const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
       const submit = dialog.getByRole("button", { name: "Submit" });
@@ -337,7 +337,7 @@ test.describe("closing and rating", () => {
     await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
     const restore = await setHelpdeskSetting(api, "is_feedback_mandatory", 1);
     try {
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await closeButton(page).click();
       const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
       await dialog.getByRole("radio").nth(4).click();
@@ -355,7 +355,7 @@ test.describe("closing and rating", () => {
     await agentReply(await apiAs("agent"), ticket.name, "<p>Done</p>");
     const restore = await setHelpdeskSetting(api, "is_feedback_mandatory", 0);
     try {
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await closeButton(page).click();
       await expect(page.getByRole("dialog").getByText("Are you sure you want to close this ticket?")).toBeVisible();
       await expect(page.getByRole("dialog", { name: "Rate this ticket" })).toHaveCount(0);
@@ -369,7 +369,7 @@ test.describe("closing and rating", () => {
     const restore = await setHelpdeskSetting(api, "is_feedback_mandatory", 1);
     try {
       const page = await pageAs("agent");
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await closeButton(page).click();
       await expect(page.getByRole("dialog").getByText("Are you sure you want to close this ticket?")).toBeVisible({
         timeout: 5_000,
@@ -388,7 +388,7 @@ test.describe("details panel", () => {
   }) => {
     const [team] = await api.list("HD Team", { fields: ["name"], limit: 1 });
     if (team) await api.update("HD Ticket", ticket.name, { agent_group: team.name });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText(`#${ticket.name}`)).toBeVisible();
     await expect(page.getByText("Status")).toBeVisible();
     await expect(page.getByText("Priority")).toBeVisible();
@@ -401,7 +401,7 @@ test.describe("details panel", () => {
   });
 
   test("timeline steps: received, first response due, resolution due", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("Request received")).toBeVisible();
     await expect(page.getByText("First response")).toBeVisible();
     await expect(page.getByText("Resolution")).toBeVisible();
@@ -410,7 +410,7 @@ test.describe("details panel", () => {
 
   test("closed before any reply: assignment and first response skipped, closing resolves", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Closed" });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("Skipped")).toHaveCount(2);
     await expect(page.getByText("Resolution")).toBeVisible();
     await expect(page.getByText(/Closed directly/)).toHaveCount(0);
@@ -434,7 +434,7 @@ test.describe("details panel", () => {
     try {
       const emails = page.locator('[data-component-id="PortalEmailList-ticket-basics"]');
       await api.update("HD Ticket", ticket.name, { e2e_emails: "ann@example.com; bob@example.com" });
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await expect(emails).toContainText("ann@example.com, bob@example.com");
       await emails.getByText("b", { exact: true }).hover();
       await expect(page.locator("[data-slot=bubble]")).toHaveText("bob@example.com");
@@ -450,14 +450,14 @@ test.describe("details panel", () => {
 
   test("a paused status puts the next step on hold", async ({ page, api, ticket }) => {
     await api.update("HD Ticket", ticket.name, { status: "Replied" });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("On hold")).toBeVisible();
   });
 
   test("related help opens the article", async ({ page, api, ticket }) => {
     const article = await createArticle(api, (await createCategory(api)).name, { title: `Help for ${ticket.subject}` });
     await indexArticles(api, ticket.subject);
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByRole("button", { name: "Related help" })).toBeVisible();
     // A clickable row, not a link.
     await page.getByText(article.title, { exact: true }).click();
@@ -473,7 +473,7 @@ test.describe("details panel", () => {
       json.message.outside_hours_banner = { show: true, msg: message };
       await route.fulfill({ response, json });
     });
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByRole("alert").getByText(message)).toBeVisible();
     await page.getByRole("button", { name: "Dismiss" }).click();
     await expect(page.getByText(message)).toHaveCount(0);
@@ -496,7 +496,7 @@ test.describe("form scripts", () => {
       { portal: true }
     );
     try {
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await page.getByRole("button", { name: "E2E Menu" }).click();
       await expect(page.getByRole("menuitem", { name: "E2E Menu Item" })).toBeVisible();
       await page.keyboard.press("Escape");
@@ -512,7 +512,7 @@ test.describe("form scripts", () => {
     await scripts.create(`return { actions: [{ label: "E2E Agent Scoped", onClick: () => {} }] };`);
     try {
       const page = await pageAs("agent");
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await expect(page.getByRole("button", { name: "E2E Agent Scoped" })).toBeVisible();
     } finally {
       await scripts.removeAll();
@@ -524,7 +524,7 @@ test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 800 } });
 
   test("ticket details open in a drawer and close on Escape", async ({ page, ticket }) => {
-    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("Request received")).toBeHidden();
     await page.getByRole("button", { name: "Ticket details" }).click();
     await expect(page.getByText("Request received")).toBeVisible();

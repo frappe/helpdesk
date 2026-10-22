@@ -635,7 +635,7 @@ class HDTicket(Document, CustomerEditController):
     @property
     def portal_uri(self):
         root_uri = frappe.utils.get_url()
-        return f"{root_uri}{CUSTOMER_PORTAL_ROOT}/tickets/{self.name}"
+        return f"{root_uri}{CUSTOMER_PORTAL_ROOT}/my-tickets/{self.name}"
 
     @frappe.whitelist()
     def new_comment(self, content: str, attachments: list[str] = []):

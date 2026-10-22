@@ -39,6 +39,6 @@ test.describe("customer", () => {
     await expect(page.getByRole("button", { name: "Customers" })).toHaveCount(0);
 
     await page.goto(`/helpdesk/tickets/${ticket.name}`);
-    await expect(page).toHaveURL(new RegExp(`/help/tickets/${ticket.name}$`));
+    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/${ticket.name}$`));
   });
 });

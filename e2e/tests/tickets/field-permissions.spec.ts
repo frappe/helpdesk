@@ -83,11 +83,11 @@ test.describe("Default template rows", () => {
     await api.update("HD Ticket", ticket.name, { priority: "High", ticket_type: "Bug" });
 
     const customer = await pageAs("customer");
-    await customer.goto("/help/tickets/new");
+    await customer.goto("/help/my-tickets/new");
     await expect(customer.getByText("Priority", { exact: true })).toBeVisible();
     await expect(customer.getByText("Ticket Type", { exact: true })).toHaveCount(0);
 
-    await customer.goto(`/help/tickets/${ticket.name}`);
+    await customer.goto(`/help/my-tickets/${ticket.name}`);
     await expect(customer.getByText("High", { exact: true })).toBeVisible();
     await expect(customer.getByText("Bug", { exact: true })).toHaveCount(0);
 
@@ -118,7 +118,7 @@ test.describe("Default template rows", () => {
     );
     try {
       const page = await pageAs("customer");
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await page.getByRole("button", { name: "E2E Set Priority" }).click();
       await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).priority).toBe("Low");
 

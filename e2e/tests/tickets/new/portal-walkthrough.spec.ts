@@ -64,7 +64,7 @@ test.describe("template", () => {
       description_template: "<p>Steps to reproduce:</p>",
     });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await expect(page.getByText("Tell us what broke")).toBeVisible();
       await expect(page.locator(".ProseMirror")).toContainText("Steps to reproduce:");
       await expect(createButton(page)).toBeDisabled();
@@ -78,7 +78,7 @@ test.describe("template", () => {
   test("link options load and a required field blocks submit", async ({ page, api }) => {
     const restore = await useTemplate(api, [{ fieldname: "ticket_type", required: 1 }]);
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       const subject = await fillBasics(page);
       await expect(createButton(page)).toBeDisabled();
       await field(page, "Ticket Type").click();
@@ -86,7 +86,7 @@ test.describe("template", () => {
       await page.getByRole("option", { name: "Bug", exact: true }).click();
       await expect(createButton(page)).toBeEnabled();
       await createButton(page).click();
-      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", { filters: { subject }, fields: ["ticket_type"] });
       expect(ticket.ticket_type).toBe("Bug");
     } finally {
@@ -102,7 +102,7 @@ test.describe("template", () => {
       field: "date_format",
     });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       const subject = await fillBasics(page);
       const date = field(page, "E2E date");
       await date.fill("2026-10-15");
@@ -111,7 +111,7 @@ test.describe("template", () => {
       expect(format).toBe("yyyy-mm-dd");
       await expect(date).toHaveValue("2026-10-15");
       await createButton(page).click();
-      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", { filters: { subject }, fields: ["e2e_date"] });
       expect(ticket.e2e_date).toBe("2026-10-15");
     } finally {
@@ -127,7 +127,7 @@ test.describe("template", () => {
       { fieldname: "e2e_needed" },
     ]);
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await fillBasics(page);
       await expect(page.getByText("E2E shown")).toHaveCount(0);
       // hidden, so its `required` does not block submit
@@ -156,7 +156,7 @@ test.describe("template", () => {
       { newPage: true }
     );
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await pick(page, "E2E trigger", "Show");
       await field(page, "E2E choice").click();
       await expect(page.getByRole("option")).toHaveText(["Alpha", "Beta"]);
@@ -175,7 +175,7 @@ test.describe("template", () => {
     const hint = `Within four hours ${uid()}`;
     await api.update("HD Ticket Priority", "High", { description: hint });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await pick(page, "Priority", "High");
       await expect(page.getByText(hint)).toBeVisible();
     } finally {
@@ -193,7 +193,7 @@ test.describe("template", () => {
       route.fulfill({ json: { message: ["Red", { label: "Green", value: "green" }] } })
     );
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await page.getByRole("button", { name: /^E2E needed/ }).or(field(page, "E2E needed")).first().click();
       await expect(page.getByRole("option")).toHaveText(["Red", "Green"]);
     } finally {
@@ -210,7 +210,7 @@ test.describe("article suggestions", () => {
     const article = await createArticle(api, category.name, { title });
     await indexArticles(api, title);
 
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
     const suggestion = page.getByRole("link", { name: title, exact: true });
     await suggestion.hover();
@@ -228,7 +228,7 @@ test.describe("article suggestions", () => {
     const title = `Rotate${uid()}`;
     const article = await createArticle(api, category.name, { title });
     await indexArticles(api, title);
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await page.getByPlaceholder("A short description").fill(title);
     await expect(page.getByRole("link", { name: title, exact: true })).toHaveAttribute(
       "href",
@@ -243,7 +243,7 @@ test.describe("attachments", () => {
   }
 
   test("upload, remove and submit with an attachment", async ({ page, api }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     const subject = await fillBasics(page);
     await attach(page, PIXEL);
     await expect(page.getByRole("link", { name: "pixel.png" }).or(page.getByText("pixel.png"))).toBeVisible();
@@ -261,7 +261,7 @@ test.describe("attachments", () => {
     await expect(page.getByText("notes.txt")).toHaveCount(0);
 
     await createButton(page).click();
-    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
     const name = page.url().split("/").pop()!;
     const files = await api.list("File", {
       filters: { attached_to_doctype: "HD Ticket", attached_to_name: name },
@@ -272,14 +272,14 @@ test.describe("attachments", () => {
   });
 
   test("a disallowed type is refused for a customer", async ({ page }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await attach(page, { name: "evil.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
     await expect(page.locator("p.text-ink-red-4")).toBeVisible();
   });
 
   test("an agent may attach any type", async ({ pageAs }) => {
     const page = await pageAs("agent");
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await expect(page.locator("input[type=file].sr-only")).not.toHaveAttribute("accept", /.+/);
     await attach(page, { name: "page.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
     await expect(page.getByText("page.html")).toBeVisible();
@@ -287,7 +287,7 @@ test.describe("attachments", () => {
   });
 
   test("files can be dropped or pasted onto the page", async ({ page }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     const dropZone = page.getByRole("button", { name: "Drag or paste files here, or click to browse" });
     const transfer = await page.evaluateHandle(() => {
       const data = new DataTransfer();
@@ -314,23 +314,23 @@ test.describe("submit", () => {
     await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new", (route) =>
       route.fulfill({ status: 417, json: { exc_type: "ValidationError", _server_messages: JSON.stringify([JSON.stringify({ message: "E2E refused" })]) } })
     );
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await fillBasics(page);
     await createButton(page).click();
     await expect(page.getByText("E2E refused").first()).toBeVisible();
-    await expect(page).toHaveURL(/\/help\/tickets\/new/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/new/);
     await expect(createButton(page)).toBeEnabled();
   });
 
   test("odd origins fall back safely", async ({ page, api }) => {
     const longQuery = "q".repeat(200);
-    await page.goto(`/help/tickets/new?from=bogus&article=no-such-article&q=${longQuery}`);
+    await page.goto(`/help/my-tickets/new?from=bogus&article=no-such-article&q=${longQuery}`);
     const subjectField = page.getByPlaceholder("A short description");
     await subjectField.fill(`E2E origin ${uid()}`);
     const subject = await subjectField.inputValue();
     await page.locator(".ProseMirror").fill("Where from?");
     await createButton(page).click();
-    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
     const [ticket] = await api.list("HD Ticket", {
       filters: { subject },
       fields: ["entry_point", "source_article", "source_search"],
@@ -341,7 +341,7 @@ test.describe("submit", () => {
 
   test("search text over 140 characters is cut", async ({ page, api }) => {
     const longQuery = `${uid()} ${"q".repeat(200)}`;
-    await page.goto(`/help/tickets/new?from=search&q=${longQuery}`);
+    await page.goto(`/help/my-tickets/new?from=search&q=${longQuery}`);
     // cut to the 140 characters a subject holds
     const subjectField = page.getByPlaceholder("A short description");
     await expect(subjectField).toHaveValue(longQuery.slice(0, 140));
@@ -349,7 +349,7 @@ test.describe("submit", () => {
     await subjectField.fill(subject);
     await page.locator(".ProseMirror").fill("Long search");
     await createButton(page).click();
-    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
     const [ticket] = await api.list("HD Ticket", {
       filters: { subject },
       fields: ["entry_point", "source_search"],
@@ -359,9 +359,9 @@ test.describe("submit", () => {
   });
 
   test("a long search can still be raised as it is", async ({ page }) => {
-    await page.goto(`/help/tickets/new?from=search&q=${"q".repeat(200)}`);
+    await page.goto(`/help/my-tickets/new?from=search&q=${"q".repeat(200)}`);
     await page.locator(".ProseMirror").fill("Long search");
     await createButton(page).click();
-    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/, { timeout: 5_000 });
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/, { timeout: 5_000 });
   });
 });

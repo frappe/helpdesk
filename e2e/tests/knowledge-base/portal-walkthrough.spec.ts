@@ -78,7 +78,7 @@ test.describe("routing", () => {
     test("R3 ticket pages send a guest to login with the query kept", async ({ page, kb, apiAs }) => {
       await kb({ public_knowledge_base: 1 });
       const ticket = await raiseTicket(await apiAs("customer"));
-      for (const path of ["/help/my-tickets?x=1", "/help/tickets/new?from=search&q=hi", `/help/tickets/${ticket.name}`]) {
+      for (const path of ["/help/my-tickets?x=1", "/help/my-tickets/new?from=search&q=hi", `/help/my-tickets/${ticket.name}`]) {
         await page.goto(path);
         await expect(page).toHaveURL(`/login?redirect-to=${encodeURIComponent(path)}`);
       }
@@ -113,7 +113,7 @@ test.describe("routing", () => {
       const article = await createArticle(api, category.name, { title: `Old link ${uid()}` });
       const cases: [string, RegExp][] = [
         ["/helpdesk/my-tickets?x=1", /\/help\/my-tickets\?x=1$/],
-        ["/helpdesk/my-tickets/new?from=article", /\/help\/tickets\/new\?from=article$/],
+        ["/helpdesk/my-tickets/new?from=article", /\/help\/my-tickets\/new\?from=article$/],
         ["/helpdesk/kb-public", /\/help\/?$/],
         [`/helpdesk/kb-public/articles/${article.name}`, new RegExp(`/help/articles/${article.name}-old-link-`)],
         [`/helpdesk/kb-public/${category.name}`, new RegExp(`/help/category/${category.name}$`)],
@@ -193,9 +193,9 @@ test.describe("header", () => {
 
     test("H12 ticket breadcrumbs lead back to the list", async ({ page, apiAs }) => {
       const ticket = await raiseTicket(await apiAs("customer"));
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await expect(page.getByText("New ticket").first()).toBeVisible();
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await expect(page.getByText(ticket.subject).first()).toBeVisible();
       await page.getByRole("link", { name: "Tickets" }).first().click();
       await expect(page).toHaveURL(/\/help\/my-tickets/);
@@ -348,7 +348,7 @@ test.describe("header", () => {
 
     test("H14 Ticket details opens the details drawer; Close details closes it", async ({ page, apiAs }) => {
       const ticket = await raiseTicket(await apiAs("customer"));
-      await page.goto(`/help/tickets/${ticket.name}`);
+      await page.goto(`/help/my-tickets/${ticket.name}`);
       await page.getByRole("button", { name: "Ticket details" }).click();
       const close = page.getByRole("button", { name: "Close details" });
       await expect(close).toBeInViewport();
@@ -434,7 +434,7 @@ test.describe("knowledge base home", () => {
       .locator("..")
       .getByRole("button", { name: "Raise a ticket" })
       .click();
-    await expect(page).toHaveURL(new RegExp(`/help/tickets/new\\?from=search&q=nothing${word}`));
+    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/new\\?from=search&q=nothing${word}`));
     await expect(page.getByPlaceholder("A short description")).toHaveValue(`nothing${word}`);
 
     // K7: the article just opened is under Recently viewed.

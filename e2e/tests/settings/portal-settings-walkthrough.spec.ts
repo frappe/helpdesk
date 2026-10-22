@@ -594,7 +594,7 @@ test.describe("organization", () => {
     await expect(dialog.getByText("No tickets match your search.")).toBeVisible();
     await dialog.getByPlaceholder("Search").last().fill("");
     await links.first().click();
-    await expect(page).toHaveURL(new RegExp(`/help/tickets/${theirs.name}$`));
+    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/${theirs.name}$`));
 
     const memberDialog = await openOrgScreen(await pageOf(browser, baseURL!, org.member.email), org.name);
     await memberDialog.getByRole("tab", { name: "Tickets" }).click();

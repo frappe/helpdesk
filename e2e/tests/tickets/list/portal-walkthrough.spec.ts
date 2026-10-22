@@ -103,7 +103,7 @@ test.describe("list", () => {
     }
     await narrowTo(page, token);
     await row(page, tickets[0].subject).click();
-    await expect(page).toHaveURL(new RegExp(`/help/tickets/${tickets[0].name}$`));
+    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/${tickets[0].name}$`));
   });
 
   test("a ticket an agent changed reads unread until the customer opens it", async ({ page, api, apiAs }) => {
@@ -299,7 +299,7 @@ test.describe("phone", () => {
     await expect(page.getByRole("button", { name: "Columns" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Refresh" })).toBeVisible();
     await row(page, tickets[0].subject).click();
-    await expect(page).toHaveURL(new RegExp(`/help/tickets/${tickets[0].name}$`));
+    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/${tickets[0].name}$`));
   });
 });
 
