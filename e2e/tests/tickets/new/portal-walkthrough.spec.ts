@@ -274,7 +274,7 @@ test.describe("attachments", () => {
   test("a disallowed type is refused for a customer", async ({ page }) => {
     await page.goto("/help/my-tickets/new");
     await attach(page, { name: "evil.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
-    await expect(page.locator("p.text-ink-red-4")).toBeVisible();
+    await expect(page.getByText('"evil.html" was skipped')).toBeVisible();
   });
 
   test("an agent may attach any type", async ({ pageAs }) => {
@@ -283,7 +283,7 @@ test.describe("attachments", () => {
     await expect(page.locator("input[type=file].sr-only")).not.toHaveAttribute("accept", /.+/);
     await attach(page, { name: "page.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
     await expect(page.getByText("page.html")).toBeVisible();
-    await expect(page.locator("p.text-ink-red-4")).toHaveCount(0);
+    await expect(page.getByText(/was skipped/)).toHaveCount(0);
   });
 
   test("files can be dropped or pasted onto the page", async ({ page }) => {
