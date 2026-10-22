@@ -16,7 +16,6 @@
       <Transition name="fade">
         <div v-if="isDirty" class="flex items-center gap-2">
           <Button
-            v-if="canPreview"
             icon-left="lucide-external-link"
             :label="__('Preview')"
             @click="preview"
@@ -46,8 +45,7 @@ import { Button } from "frappe-ui";
 import { onUnmounted, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 
-const { isDirty, canPreview, saving, save, discard, preview } =
-  useKnowledgeBaseDraft();
+const { isDirty, saving, save, discard, preview } = useKnowledgeBaseDraft();
 
 // Unsaved edits keep the modal open and guard tab changes.
 watch(isDirty, (dirty) => (disableSettingModalOutsideClick.value = dirty), {

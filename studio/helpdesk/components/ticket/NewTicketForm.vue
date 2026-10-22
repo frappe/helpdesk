@@ -246,7 +246,13 @@ const canSubmit = computed(
 );
 
 const about = computed(() => DOMPurify.sanitize(template.data?.about || ""));
-const suggestions = useArticleSearch(subject, { limit: SUGGESTION_LIMIT });
+// The desk's TicketNew has no suggestions: an empty query never fetches.
+const suggestionQuery = computed(() =>
+  props.suggestArticles ? subject.value : ""
+);
+const suggestions = useArticleSearch(suggestionQuery, {
+  limit: SUGGESTION_LIMIT,
+});
 
 // Only priority shows its description, as on the ticket page.
 const priorityHint = computed(

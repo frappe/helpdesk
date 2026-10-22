@@ -107,7 +107,7 @@ export default function setup(context) {
       if (!name) return
       // Own scroll panel keeps its place; the hash target renders after fetch.
       if (location.hash) scrollToHash()
-      else document.querySelector('[data-component-id="container-gi1caqqm1"]')?.scrollTo({ top: 0 })
+      else document.querySelector('[data-component-id="container-article-scroll"]')?.scrollTo({ top: 0 })
       call('helpdesk.api.knowledge_base.increment_views', { article: name }).catch(() => {})
       rememberArticle({
         name,

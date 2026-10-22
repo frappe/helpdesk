@@ -1,13 +1,13 @@
 import { router } from "@/router";
 import { useAuthStore } from "@/stores/auth";
-import { call, dayjsLocal, toast, useFileUpload } from "frappe-ui";
+import { call, dayjsLocal, useFileUpload } from "frappe-ui";
 import { h, ref } from "vue";
 import zod from "zod";
 import LucideBrushCleaning from "~icons/lucide/brush-cleaning";
 import { Icon } from "frappe-ui/experimental";
 import { getMeta } from "./stores/meta";
 import { __ } from "./translation";
-import { isEmoji } from "@helpdesk/shared/utils";
+import { copyToClipboard, isEmoji } from "@helpdesk/shared/utils";
 
 // TODO: drop after #3846/#3847 merge; import from shared directly.
 export {
@@ -97,25 +97,6 @@ export function formatTime(
 
   const limited = config.maxUnits ? parts.slice(0, config.maxUnits) : parts;
   return limited.join(" ").trim();
-}
-
-export async function copyToClipboard(
-  msg: string = "",
-  toastMessage: string = __("Copied to clipboard.")
-) {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(msg);
-  } else {
-    let input = document.createElement("input");
-    let body = document.querySelector("body");
-    body.appendChild(input);
-    input.value = msg;
-    input.select();
-    document.execCommand("copy");
-    input.remove();
-  }
-
-  toast.success(toastMessage);
 }
 
 /**

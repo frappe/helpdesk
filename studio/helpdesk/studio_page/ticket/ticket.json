@@ -212,7 +212,10 @@
                   "cursor-copy",
                   "hover:text-ink-gray-8",
                   "self-start",
-                  "max-w-full"
+                  "max-w-full",
+                  "text-start",
+                  "rounded-4",
+                  "focus-visible:focus-ring"
                  ],
                  "componentEvents": {
                   "click": {
@@ -225,7 +228,7 @@
                  "componentName": "TextBlock",
                  "componentProps": {
                   "fontSize": "text-p-sm",
-                  "tag": "span",
+                  "tag": "button",
                   "text": "{{ identity.reference }}"
                  }
                 }
@@ -671,22 +674,17 @@
                   "items-center",
                   "gap-2",
                   "h-7",
-                  "cursor-pointer",
                   "min-w-0",
-                  "w-full"
+                  "w-full",
+                  "rounded-4",
+                  "focus-visible:focus-ring"
                  ],
-                 "componentEvents": {
-                  "click": {
-                   "action": "Run Script",
-                   "event": "click",
-                   "script": "openHelpArticle(dataItem)"
-                  }
-                 },
                  "componentId": "container-ticket-help-link",
-                 "componentName": "container",
-                 "componentProps": {},
-                 "componentSlots": {},
-                 "originalElement": "div"
+                 "componentName": "PortalLink",
+                 "componentProps": {
+                  "to": "{{ routes.article(dataItem) }}"
+                 },
+                 "isCustomVueComponent": true
                 }
                ],
                "classes": [
@@ -1107,7 +1105,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-22 19:00:00.000000",
+ "modified": "2026-10-23 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

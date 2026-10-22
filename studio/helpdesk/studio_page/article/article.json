@@ -263,9 +263,13 @@
                  "componentName": "TextBlock",
                  "componentProps": {
                   "fontSize": "text-sm",
-                  "tag": "span",
+                  "tag": "button",
                   "text": "{{ t(\"Copy link\") }}"
-                 }
+                 },
+                 "classes": [
+                  "rounded-4",
+                  "focus-visible:focus-ring"
+                 ]
                 }
                ],
                "classes": [
@@ -576,7 +580,7 @@
         "pt-6",
         "sm:pt-10"
        ],
-       "componentId": "container-gi1caqqm1",
+       "componentId": "container-article-scroll",
        "componentName": "container",
        "originalElement": "div"
       }
@@ -615,7 +619,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-21 13:51:45.000000",
+ "modified": "2026-10-23 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "article",
  "owner": "Administrator",

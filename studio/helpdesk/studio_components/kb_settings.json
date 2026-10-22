@@ -733,13 +733,19 @@
                {
                 "children": [
                  {
-                  "classes": [
-                   "size-4.5"
-                  ],
-                  "componentId": "kb_settings-organization-back-icon",
-                  "componentName": "Icon",
+                  "componentEvents": {
+                   "click": {
+                    "action": "Run Script",
+                    "event": "click",
+                    "script": "closeOrganization()"
+                   }
+                  },
+                  "componentId": "kb_settings-organization-back",
+                  "componentName": "Button",
                   "componentProps": {
-                   "icon": "lucide-chevron-left"
+                   "aria-label": "{{ t('Back to organizations') }}",
+                   "icon": "lucide-chevron-left",
+                   "variant": "ghost"
                   },
                   "componentSlots": {}
                  },
@@ -758,24 +764,14 @@
                  }
                 ],
                 "classes": [
-                 "cursor-pointer",
-                 "select-none",
-                 "hover:opacity-80",
                  "items-center",
                  "text-ink-gray-8",
                  "flex",
-                 "gap-2",
+                 "gap-1",
                  "-ml-1.5",
                  "pr-2"
                 ],
-                "componentEvents": {
-                 "click": {
-                  "action": "Run Script",
-                  "event": "click",
-                  "script": "closeOrganization()"
-                 }
-                },
-                "componentId": "kb_settings-organization-back",
+                "componentId": "kb_settings-organization-back-row",
                 "componentName": "container",
                 "componentProps": {},
                 "componentSlots": {},
@@ -1184,13 +1180,19 @@
                {
                 "children": [
                  {
-                  "classes": [
-                   "size-4.5"
-                  ],
-                  "componentId": "kb_settings-invite-back-icon",
-                  "componentName": "Icon",
+                  "componentEvents": {
+                   "click": {
+                    "action": "Run Script",
+                    "event": "click",
+                    "script": "closeInvite()"
+                   }
+                  },
+                  "componentId": "kb_settings-invite-back",
+                  "componentName": "Button",
                   "componentProps": {
-                   "icon": "lucide-chevron-left"
+                   "aria-label": "{{ t('Back') }}",
+                   "icon": "lucide-chevron-left",
+                   "variant": "ghost"
                   },
                   "componentSlots": {}
                  },
@@ -1209,25 +1211,15 @@
                  }
                 ],
                 "classes": [
-                 "cursor-pointer",
-                 "select-none",
-                 "hover:opacity-80",
                  "items-center",
                  "text-ink-gray-8",
                  "flex",
-                 "gap-2",
+                 "gap-1",
                  "-ml-1.5",
                  "min-h-8",
                  "pr-2"
                 ],
-                "componentEvents": {
-                 "click": {
-                  "action": "Run Script",
-                  "event": "click",
-                  "script": "closeInvite()"
-                 }
-                },
-                "componentId": "kb_settings-invite-back",
+                "componentId": "kb_settings-invite-back-row",
                 "componentName": "container",
                 "componentProps": {},
                 "componentSlots": {},
@@ -1610,7 +1602,7 @@
                "label": "{{ t('Preview') }}"
               },
               "componentSlots": {},
-              "visibilityCondition": "{{ knowledgeBaseCanPreview }}"
+              "visibilityCondition": "{{ knowledgeBaseIsDirty }}"
              },
              {
               "componentEvents": {
@@ -1855,7 +1847,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-22 12:00:00.000000",
+ "modified": "2026-10-23 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

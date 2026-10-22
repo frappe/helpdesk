@@ -213,7 +213,6 @@ export default function setup(context) {
     }),
     onPageAction,
     suggestedArticles,
-    openHelpArticle: (article) => navigateTo(ROUTES.article(article)),
     copyTicketId: () => copyToClipboard(ticket.data.name, __('Ticket #{0} copied', [ticket.data.name])),
   }
 }

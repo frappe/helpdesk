@@ -256,16 +256,15 @@ import {
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Article, Breadcrumb, Error, Resource } from "@/types";
-import {
-  ConfirmDelete,
-  copyToClipboard,
-  CUSTOMER_PORTAL_ROOT,
-  uploadFunction,
-} from "@/utils";
+import { ConfirmDelete, CUSTOMER_PORTAL_ROOT, uploadFunction } from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import Icon from "@helpdesk/shared/Icon.vue";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
-import { addHeadingIds, countLabel } from "@helpdesk/shared/utils";
+import {
+  addHeadingIds,
+  copyToClipboard,
+  countLabel,
+} from "@helpdesk/shared/utils";
 import {
   Avatar,
   Badge,
@@ -641,11 +640,16 @@ const articleActions = computed(() => [
           onClick: () => (showCategoryModal.value = true),
         },
       ]),
-  {
-    label: __("Change access"),
-    icon: "lucide-lock",
-    onClick: () => (showAccessModal.value = true),
-  },
+  // Drafts pick their access when published; the modal publishes them.
+  ...(isPublished.value
+    ? [
+        {
+          label: __("Change access"),
+          icon: "lucide-lock",
+          onClick: () => (showAccessModal.value = true),
+        },
+      ]
+    : []),
   {
     label: __("Copy link"),
     icon: "lucide-link",

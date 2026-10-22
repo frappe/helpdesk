@@ -89,7 +89,8 @@ import {
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { Error } from "@/types";
-import { copyToClipboard, CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
+import { copyToClipboard } from "@helpdesk/shared/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { categoryAccess } from "@helpdesk/shared/settings/categoryAccess.ts";
 import {

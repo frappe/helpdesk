@@ -78,7 +78,6 @@ const isSettingsOpen = computed({
 
 const knowledgeBase = {
   knowledgeBaseIsDirty: computed(() => Boolean(knowledgeBaseDraft.value?.isDirty.value)),
-  knowledgeBaseCanPreview: computed(() => Boolean(knowledgeBaseDraft.value?.canPreview.value)),
   knowledgeBaseSaving: computed(() => Boolean(knowledgeBaseDraft.value?.saving.value)),
   previewKnowledgeBase: () => knowledgeBaseDraft.value?.preview(),
   saveKnowledgeBase: async () => {

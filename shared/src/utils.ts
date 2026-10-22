@@ -462,7 +462,10 @@ export function articleMeta(categoryName?: string, minutes?: number) {
 }
 
 // `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
-export async function copyToClipboard(text: string, message: string) {
+export async function copyToClipboard(
+  text: string,
+  message: string = __("Copied to clipboard.")
+) {
   await useClipboard({ legacy: true }).copy(text);
   toast.success(message);
 }

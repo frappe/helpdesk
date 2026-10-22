@@ -85,8 +85,10 @@ export function createOrganizationSettings(core) {
 
   async function loadOrganization(name) {
     try {
-      organization.value = await call(`${API}.get_organization`, { customer: name })
+      const data = await call(`${API}.get_organization`, { customer: name })
+      if (name === selectedOrganizationName.value) organization.value = data
     } catch (error) {
+      if (name !== selectedOrganizationName.value) return
       console.error(error)
       getErrorMessage(error, true, __('Could not open organization'))
       closeOrganization()

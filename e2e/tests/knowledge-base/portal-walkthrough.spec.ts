@@ -781,9 +781,9 @@ test.describe("article page", () => {
     for (let i = 0; i < 8; i++) created.push(await createArticle(api, category.name, { title: `Related ${i} ${uid()}`, content: filler }));
     await page.goto(`/help/articles/${created[0].name}`);
     await expect(page.getByText("Related articles")).toBeVisible();
-    const rows = page.locator('[data-component-id="container-gi1caqqm1"]').getByRole("link", { name: /^Related \d/ });
+    const rows = page.locator('[data-component-id="container-article-scroll"]').getByRole("link", { name: /^Related \d/ });
     await expect(rows).toHaveCount(5);
-    const panel = page.locator('[data-component-id="container-gi1caqqm1"]');
+    const panel = page.locator('[data-component-id="container-article-scroll"]');
     await panel.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
     const target = rows.first();
     const title = (await target.innerText()).split("\n")[0];

@@ -21,8 +21,7 @@ declare module "vue-router" {
   }
 }
 
-// Pages that render inside the portal chrome; PortalRoot picks the agent or
-// customer shell from the session.
+// Pages that render inside the desk chrome.
 const portalRoutes = [
   // Agent Portal Routes
   {
@@ -151,7 +150,7 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("@/roots/PortalRoot.vue"),
+    component: () => import("@/roots/AgentRoot.vue"),
     children: portalRoutes,
   },
 ];

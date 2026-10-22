@@ -49,7 +49,10 @@ function createSessionStore() {
     sessionRequest = call('helpdesk.api.config.get_config')
       .then((data) => (config.value = data))
       .then(sendGuestToLogin)
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        sessionRequest = null
+        console.error(error)
+      })
     return sessionRequest
   }
 

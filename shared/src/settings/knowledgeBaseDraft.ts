@@ -20,8 +20,6 @@ type Draft = KnowledgeBasePreview;
 
 const SETTINGS_FIELDS = ["banner_image", "banner_preset"] as const;
 
-const PREVIEW_FIELDS = ["banner_image", "banner_preset", "pinned", "links"];
-
 // Quick links live in a form script; its last line holds them as JSON.
 const LINKS_SCRIPT = "Knowledge Base Quick Links";
 const JSON_MARKER = "//JSON: ";
@@ -141,9 +139,6 @@ function createDraft() {
     );
   });
   const isDirty = computed(() => changed.value.length > 0);
-  const canPreview = computed(() =>
-    changed.value.some((key) => PREVIEW_FIELDS.includes(key))
-  );
 
   const saving = ref(false);
 
@@ -236,6 +231,8 @@ function createDraft() {
   async function savePins(pinned: string[]) {
     try {
       await savePinned(pinned);
+      // The merge watch keeps a draft that differs from the old saved order.
+      draft.value!.pinned = [...pinned];
       await categories.reload();
       toast.success(__("Pinned categories updated"));
       return true;
@@ -284,7 +281,6 @@ function createDraft() {
     savePins,
     categoryOptions,
     isDirty,
-    canPreview,
     saving,
     save,
     discard,
