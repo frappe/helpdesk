@@ -1,6 +1,6 @@
 # Customer portal
 
-The customer portal is a [Studio](https://github.com/frappe/studio) app. Customers use it at `/help` to read the knowledge base, raise tickets and reply to them. Agents use the desk app at `/helpdesk`.
+The customer portal is a Studio app (Studio ships with frappe). Customers use it at `/help` to read the knowledge base, raise tickets and reply to them. Agents use the desk app at `/helpdesk`.
 
 This file explains how the portal is built, where its code lives and how to work on it. For the knowledge base from end to end (DocTypes, APIs, desk authoring), read [`KNOWLEDGE_BASE.md`](KNOWLEDGE_BASE.md).
 
@@ -17,9 +17,9 @@ Helpdesk ships the portal as a **standard app**: the pages live as files in this
 
 Studio documents its own rules. Read them before you change a page:
 
-| Topic | File in `apps/studio` |
+| Topic | File in `apps/frappe` |
 |---|---|
-| Dev server and `watch-studio` setup | `README.md` |
+| Dev server and `watch-studio` setup | `studio/frontend/README.md` |
 | File layout, page JSON, `setup(context)`, custom Vue components, sync loop | `skills/studio-app-building/SKILL.md` |
 | Runtime rules: `{{ }}`, event scripts, v-model, Repeater, icons, tokens | `skills/studio-app-building/RULES.md` |
 | Routing and the global `boot` | `skills/studio-app-building/ROUTING.md` |
@@ -110,12 +110,11 @@ Put code in `shared/src` only when both apps use it. Inside `shared/src`, use re
   - `website_redirects` sends the old `/helpdesk/my-tickets` and `/helpdesk/kb-public` URLs to `/help`.
 - `helpdesk/helpdesk/hooks/studio_app.py`: the two hook functions.
 - `helpdesk/www/helpdesk/index.py`: sends a customer who opens `/helpdesk` to the portal.
-- `helpdesk/patches/add_studio_app.py`: installs Studio on existing sites.
 - `helpdesk/api/`: the portal calls `config.py`, `knowledge_base.py`, `article.py` and `customer.py`. Ticket calls go to `helpdesk/helpdesk/doctype/hd_ticket/api.py`.
 
 ## Set up for development
 
-1. Do the "Frontend Development & Exported Apps" setup in `apps/studio/README.md`: `developer_mode`, `ignore_csrf`, `bench setup requirements --dev` and `yarn dev --host` in `apps/studio`.
+1. Do the "Frontend Development & Exported Apps" setup in `apps/frappe/studio/frontend/README.md`: `developer_mode`, `ignore_csrf`, `bench setup requirements --dev` and `yarn dev --host` in `apps/frappe/studio/frontend`. In developer mode `bench watch` starts the same dev server.
 2. Run `yarn install` in `apps/helpdesk`. This links `@helpdesk/shared`.
 3. Start the watcher and keep it running: `bench --site <site> watch-studio`.
 4. Open `/dev/help` on the Vite dev server, for example `http://<site>:8080/dev/help`.
