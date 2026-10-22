@@ -36,7 +36,8 @@ def get_config():
     res = frappe._dict(
         session_user=frappe.session.user,
         is_agent=is_agent(),
-        can_edit_settings=frappe.has_permission("HD Settings", "write"),
+        # shows the settings editors; saving still checks HD Settings' permissions
+        can_edit_settings=frappe.has_permission("HD Settings", "write"),  # nosemgrep
     )
     fields = GUEST_FIELDS
     if res.session_user != "Guest":
