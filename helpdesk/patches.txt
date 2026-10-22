@@ -64,3 +64,4 @@ helpdesk.patches.harden_hd_ticket_field_permissions
 helpdesk.patches.backfill_template_field_visible_to
 helpdesk.patches.show_ticket_field_permission_notice
 helpdesk.patches.sync_customer_manager_roles
+helpdesk.patches.add_agent_manager_email_domain_permission

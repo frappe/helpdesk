@@ -199,6 +199,7 @@ def add_agent_manager_permissions():
         return
     doc_to_permissions = {
         "Email Account": ["create", "delete", "write"],
+        "Email Domain": ["read"],
         "File": ["create", "delete", "write"],
         "Contact": ["create", "delete", "write", "select"],
         "Communication": ["create", "delete", "write"],

@@ -3,10 +3,14 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import frappe
+from frappe.permissions import add_permission, update_permission_property
 from frappe.tests import IntegrationTestCase
 
 from helpdesk.api.auth import get_current_user_email_info, set_user_email_accounts
 from helpdesk.api.settings.email import create_email_account
+from helpdesk.patches.add_agent_manager_email_domain_permission import (
+    execute as grant_email_domain_read,
+)
 from helpdesk.test_utils import (
     create_agent,
     create_user,
@@ -196,3 +200,32 @@ class TestSetUserEmailAccounts(IntegrationTestCase):
 
         with self.set_user(user), self.assertRaises(frappe.PermissionError):
             set_user_email_accounts([self.support])
+
+
+class TestEmailDomainPermissions(IntegrationTestCase):
+    def test_agent_manager_can_read_email_domain(self):
+        with self.set_user("Administrator"):
+            manager = make_agent_manager("email-domain-manager")
+
+        with self.set_user(manager):
+            self.assertNotIn("System Manager", frappe.get_roles())
+            self.assertTrue(frappe.has_permission("Email Domain", ptype="read"))
+
+    def test_patch_enables_read_on_existing_select_only_rule(self):
+        with self.set_user("Administrator"):
+            manager = make_agent_manager("email-domain-existing-rule")
+            add_permission("Email Domain", "Agent Manager", ptype="select")
+            update_permission_property("Email Domain", "Agent Manager", 0, "select", 1)
+            update_permission_property("Email Domain", "Agent Manager", 0, "read", 0)
+
+            self.assertFalse(
+                frappe.has_permission("Email Domain", ptype="read", user=manager)
+            )
+            grant_email_domain_read()
+
+        with self.set_user(manager):
+            self.assertTrue(frappe.has_permission("Email Domain", ptype="read"))
+            for permission in ("create", "write", "delete"):
+                self.assertFalse(
+                    frappe.has_permission("Email Domain", ptype=permission)
+                )
