@@ -184,6 +184,11 @@ def sync_brand_to_website_settings(settings) -> None:
     )
     name_changed = settings.has_value_changed("brand_name") and settings.brand_name
     if logo_changed:
+        # a logo set by hand or by another app stays
+        previous = get_brand_image(settings.get_doc_before_save() or frappe._dict())
+        current = frappe.db.get_single_value("Website Settings", "app_logo") or ""
+        logo_changed = current in ("", previous)
+    if logo_changed:
         frappe.db.set_single_value(
             "Website Settings", "app_logo", get_brand_image(settings)
         )

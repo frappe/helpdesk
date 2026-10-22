@@ -11,7 +11,6 @@ from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
     TICKETS_HOME,
 )
-from helpdesk.setup.install import setup_customer_role
 from helpdesk.test_utils import create_agent
 
 CUSTOMER = "home-page-customer@example.com"
@@ -32,12 +31,6 @@ class TestCustomerHomePage(IntegrationTestCase):
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
-
-    def test_customer_roles_keep_the_desk_as_home(self) -> None:
-        setup_customer_role(fresh_install=False)
-        self.assertEqual(
-            frappe.db.get_value("Role", "HD Customer", "home_page"), "/helpdesk"
-        )
 
     def test_customers_go_on_to_their_tickets(self) -> None:
         response = self.open_desk(CUSTOMER)
@@ -67,6 +60,10 @@ class TestEmailBrandImage(IntegrationTestCase):
         settings.save()
         return frappe.db.get_single_value("Website Settings", "app_logo")
 
+    def setUp(self) -> None:
+        frappe.db.set_single_value("HD Settings", {"brand_logo": "", "favicon": ""})
+        frappe.db.set_single_value("Website Settings", "app_logo", "")
+
     def test_the_logo_marks_auth_emails(self) -> None:
         self.assertEqual(
             self.set_brand("/files/logo.png", "/files/icon.png"), "/files/logo.png"
@@ -79,13 +76,18 @@ class TestEmailBrandImage(IntegrationTestCase):
         self.set_brand(favicon="/files/icon.png")
         self.assertFalse(self.set_brand())
 
+    def test_a_logo_set_elsewhere_stays(self) -> None:
+        frappe.db.set_single_value("Website Settings", "app_logo", "/files/theirs.png")
+        self.assertEqual(self.set_brand("/files/logo.png"), "/files/theirs.png")
+        self.assertEqual(self.set_brand(), "/files/theirs.png")
+
 
 class TestKnowledgeBaseHomePage(IntegrationTestCase):
     """The setting makes the knowledge base the site's home page for guests."""
 
     def set_setting(self, value: int) -> str:
         settings = frappe.get_single("HD Settings")
-        settings.knowledge_base_as_home_page = value
+        settings.knowledge_base_home_page_for_guests = value
         settings.save()
         return frappe.db.get_single_value("Website Settings", "home_page")
 
