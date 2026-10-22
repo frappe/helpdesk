@@ -3,7 +3,6 @@ from frappe.utils import get_system_timezone
 from frappe.website.utils import get_home_page
 
 from helpdesk.api.config import get_favicon
-from helpdesk.helpdesk.doctype.hd_settings.helpers import KNOWLEDGE_BASE_HOME
 
 
 def get_boot() -> dict:
@@ -18,13 +17,6 @@ def get_boot() -> dict:
         # Pages put it in their tab title before get_config answers
         "brand_name": get_brand_name(),
     }
-
-
-def get_website_user_home_page(user: str) -> str | None:
-    """Guests land on the portal at `/`, not the login page. Customers never get
-    here: their role's home page wins. Desk users get None and stay on /desk."""
-    if frappe.get_cached_value("User", user, "user_type") != "System User":
-        return KNOWLEDGE_BASE_HOME
 
 
 def update_website_context(context):

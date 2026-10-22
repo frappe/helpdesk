@@ -23,6 +23,7 @@ add_to_apps_screen = [
 get_site_info = "helpdesk.activation.get_site_info"
 
 after_install = "helpdesk.setup.install.after_install"
+before_uninstall = "helpdesk.setup.install.before_uninstall"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
@@ -110,9 +111,6 @@ user_invitation = {
 
 studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
 update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
-get_website_user_home_page = (
-    "helpdesk.helpdesk.hooks.studio_app.get_website_user_home_page"
-)
 
 doc_events = {
     "Assignment Rule": {

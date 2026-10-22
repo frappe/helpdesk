@@ -21,6 +21,7 @@
   "base_support_rotation",
   "knowledge_base_tab",
   "public_knowledge_base",
+  "knowledge_base_as_home_page",
   "prefer_knowledge_base",
   "allow_anonymous_article_voting",
   "hide_raise_ticket_button",
@@ -256,8 +257,16 @@
    "label": "Make knowledge base public"
   },
   {
+   "default": "0",
+   "depends_on": "public_knowledge_base",
+   "description": "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in.",
+   "fieldname": "knowledge_base_as_home_page",
+   "fieldtype": "Check",
+   "label": "Show knowledge base to logged-out visitors"
+  },
+  {
    "default": "1",
-   "description": "Customers will land on the knowledge base when they log in or open the site, instead of their tickets.",
+   "description": "Customers will land on the knowledge base when they log in, instead of their tickets.",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
    "label": "Use knowledge base as home"
@@ -635,7 +644,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-22 12:00:00.000000",
+ "modified": "2026-10-22 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

@@ -5,6 +5,7 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import set_request
 from frappe.website.serve import get_response
+from frappe.website.utils import get_home_page
 
 from helpdesk.helpdesk.doctype.hd_settings.helpers import (
     KNOWLEDGE_BASE_HOME,
@@ -77,6 +78,42 @@ class TestEmailBrandImage(IntegrationTestCase):
     def test_removing_the_brand_image_clears_it(self) -> None:
         self.set_brand(favicon="/files/icon.png")
         self.assertFalse(self.set_brand())
+
+
+class TestKnowledgeBaseHomePage(IntegrationTestCase):
+    """The setting makes the knowledge base the site's home page for guests."""
+
+    def set_setting(self, value: int) -> str:
+        settings = frappe.get_single("HD Settings")
+        settings.knowledge_base_as_home_page = value
+        settings.save()
+        return frappe.db.get_single_value("Website Settings", "home_page")
+
+    def guest_home_page(self) -> str:
+        frappe.set_user("Guest")
+        try:
+            return get_home_page()
+        finally:
+            frappe.set_user("Administrator")
+
+    def setUp(self) -> None:
+        frappe.db.set_single_value("Website Settings", "home_page", "")
+        frappe.db.set_single_value("HD Settings", "knowledge_base_as_home_page", 0)
+        frappe.clear_cache()
+
+    def test_guests_land_on_the_knowledge_base(self) -> None:
+        self.assertEqual(self.set_setting(1), "help")
+        self.assertEqual(self.guest_home_page(), "help")
+
+    def test_turning_it_off_restores_the_login_page(self) -> None:
+        self.set_setting(1)
+        self.assertFalse(self.set_setting(0))
+        self.assertEqual(self.guest_home_page(), "login")
+
+    def test_turning_it_off_keeps_a_home_page_set_elsewhere(self) -> None:
+        self.set_setting(1)
+        frappe.db.set_single_value("Website Settings", "home_page", "about")
+        self.assertEqual(self.set_setting(0), "about")
 
 
 def make_customer(email: str) -> None:

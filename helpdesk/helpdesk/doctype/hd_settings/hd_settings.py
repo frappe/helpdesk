@@ -11,7 +11,10 @@ from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
-from helpdesk.helpdesk.doctype.hd_settings.helpers import sync_brand_to_website_settings
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    sync_brand_to_website_settings,
+    sync_home_page_to_website_settings,
+)
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
@@ -99,6 +102,7 @@ class HDSettings(Document):
 
     def on_update(self):
         sync_brand_to_website_settings(self)
+        sync_home_page_to_website_settings(self)
 
         event = "helpdesk:settings-updated"
         room = get_website_room()

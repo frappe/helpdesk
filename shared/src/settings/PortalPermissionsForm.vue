@@ -90,7 +90,15 @@ const sections = computed(() => [
         fieldname: "prefer_knowledge_base",
         label: __("Use knowledge base as home"),
         description: __(
-          "Customers will land on the knowledge base when they log in or open the site, instead of their tickets."
+          "Customers will land on the knowledge base when they log in, instead of their tickets."
+        ),
+      },
+      {
+        settings: hdSettings,
+        fieldname: "knowledge_base_as_home_page",
+        label: __("Show knowledge base to logged-out visitors"),
+        description: __(
+          "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in."
         ),
       },
       // Shown as "Allow": the field stores the opposite. Counted while

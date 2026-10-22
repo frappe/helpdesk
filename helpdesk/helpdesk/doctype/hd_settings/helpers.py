@@ -148,6 +148,29 @@ KNOWLEDGE_BASE_HOME = CUSTOMER_PORTAL_ROOT
 TICKETS_HOME = f"{CUSTOMER_PORTAL_ROOT}/my-tickets"
 
 
+def sync_home_page_to_website_settings(settings) -> None:
+    """Guests at the site root see the knowledge base while the setting is on.
+    Turning it off clears the home page only if it is still ours."""
+    if not settings.has_value_changed("knowledge_base_as_home_page"):
+        return
+    if settings.knowledge_base_as_home_page:
+        set_website_home_page(KNOWLEDGE_BASE_HOME.strip("/"))
+    else:
+        clear_website_home_page()
+
+
+def set_website_home_page(home_page: str) -> None:
+    frappe.db.set_single_value("Website Settings", "home_page", home_page)
+    # set_single_value skips Website Settings' on_update; home pages are cached per user
+    frappe.clear_cache()
+
+
+def clear_website_home_page() -> None:
+    home_page = frappe.db.get_single_value("Website Settings", "home_page")
+    if (home_page or "").strip("/") == KNOWLEDGE_BASE_HOME.strip("/"):
+        set_website_home_page("")
+
+
 def get_customer_home_page() -> str:
     if frappe.db.get_single_value("HD Settings", "prefer_knowledge_base"):
         return KNOWLEDGE_BASE_HOME
