@@ -830,7 +830,7 @@ test.describe("knowledge base settings", () => {
   usePersona("admin");
 
   test("S30–S34 the Knowledge Base panel saves toggles, pins, banner and links", async ({ page, api, kb, context }) => {
-    await kb({ allow_anonymous_article_voting: 0, banner_preset: "" });
+    await kb({ public_knowledge_base: 1, allow_anonymous_article_voting: 0, banner_preset: "" });
     const category = await createCategory(api);
     await createArticle(api, category.name);
     const label = `E2E Link ${uid()}`;

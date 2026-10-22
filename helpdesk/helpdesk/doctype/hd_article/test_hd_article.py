@@ -43,7 +43,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
 
     def test_anonymous_readers_are_counted_separately(self):
         self.enterContext(
-            change_settings("HD Settings", allow_anonymous_article_voting=1)
+            change_settings(
+                "HD Settings", public_knowledge_base=1, allow_anonymous_article_voting=1
+            )
         )
         frappe.set_user("Guest")
 
@@ -54,7 +56,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
 
     def test_an_anonymous_reader_holds_one_vote(self):
         self.enterContext(
-            change_settings("HD Settings", allow_anonymous_article_voting=1)
+            change_settings(
+                "HD Settings", public_knowledge_base=1, allow_anonymous_article_voting=1
+            )
         )
         frappe.set_user("Guest")
 
@@ -65,7 +69,9 @@ class TestHDArticleFeedback(IntegrationTestCase):
 
     def test_an_unidentified_reader_cannot_vote(self):
         self.enterContext(
-            change_settings("HD Settings", allow_anonymous_article_voting=1)
+            change_settings(
+                "HD Settings", public_knowledge_base=1, allow_anonymous_article_voting=1
+            )
         )
         frappe.set_user("Guest")
 

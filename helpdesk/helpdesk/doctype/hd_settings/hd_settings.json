@@ -21,16 +21,17 @@
   "base_support_rotation",
   "knowledge_base_tab",
   "public_knowledge_base",
-  "knowledge_base_as_home_page",
-  "prefer_knowledge_base",
   "allow_anonymous_article_voting",
   "hide_raise_ticket_button",
   "banner_image",
   "banner_preset",
   "portal_tab",
+  "access_section",
+  "prefer_knowledge_base",
+  "knowledge_base_home_page_for_guests",
   "customer_managers_section",
-  "allow_customer_managers_to_invite",
   "allow_customer_managers_to_manage_organization",
+  "allow_customer_managers_to_invite",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -259,17 +260,17 @@
   {
    "default": "0",
    "depends_on": "public_knowledge_base",
-   "description": "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in.",
-   "fieldname": "knowledge_base_as_home_page",
+   "description": "Guests land on the knowledge base landing page instead of the login page.",
+   "fieldname": "knowledge_base_home_page_for_guests",
    "fieldtype": "Check",
-   "label": "Show knowledge base to logged-out visitors"
+   "label": "Skip login page for guests"
   },
   {
    "default": "1",
    "description": "Customers will land on the knowledge base when they log in, instead of their tickets.",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
-   "label": "Use knowledge base as home"
+   "label": "Use knowledge base as customer home"
   },
   {
    "default": "0",
@@ -622,6 +623,11 @@
    "label": "Auto-set customer from contact"
   },
   {
+   "fieldname": "access_section",
+   "fieldtype": "Section Break",
+   "label": "Access"
+  },
+  {
    "fieldname": "customer_managers_section",
    "fieldtype": "Section Break",
    "label": "Customer Managers"
@@ -644,7 +650,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-22 16:00:00.000000",
+ "modified": "2026-10-23 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

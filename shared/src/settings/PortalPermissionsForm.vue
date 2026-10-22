@@ -8,13 +8,16 @@
       <section v-for="section in sections" :key="section.title">
         <h2 class="text-md-semibold text-ink-gray-8">{{ section.title }}</h2>
         <div class="mt-2 divide-y divide-outline-gray-1">
+          <!-- label-for="": a title click must not flip the switch, so aria-label names it -->
           <SettingsRow
+            label-for=""
             v-for="toggle in section.toggles"
             :key="toggle.fieldname"
             :title="toggle.label"
             :description="toggle.description"
           >
             <Switch
+              :aria-label="toggle.label"
               :model-value="
                 Boolean(toggle.settings.doc?.[toggle.fieldname]) !==
                 Boolean(toggle.inverted)
@@ -88,19 +91,24 @@ const sections = computed(() => [
       {
         settings: hdSettings,
         fieldname: "prefer_knowledge_base",
-        label: __("Use knowledge base as home"),
+        label: __("Use knowledge base as customer home"),
         description: __(
           "Customers will land on the knowledge base when they log in, instead of their tickets."
         ),
       },
-      {
-        settings: hdSettings,
-        fieldname: "knowledge_base_as_home_page",
-        label: __("Show knowledge base to logged-out visitors"),
-        description: __(
-          "Your site's address will open the knowledge base instead of the login page for anyone who isn't logged in."
-        ),
-      },
+      // Guests only reach a public knowledge base. Counted while unknown.
+      ...(!hdSettings.doc || hdSettings.doc.public_knowledge_base
+        ? [
+            {
+              settings: hdSettings,
+              fieldname: "knowledge_base_home_page_for_guests",
+              label: __("Skip login page for guests"),
+              description: __(
+                "Guests land on the knowledge base landing page instead of the login page."
+              ),
+            },
+          ]
+        : []),
       // Shown as "Allow": the field stores the opposite. Counted while
       // unknown, so the skeleton has a row for it.
       ...(!canEditSignup.fetched || canEditSignup.data?.has_permission
@@ -123,18 +131,18 @@ const sections = computed(() => [
     toggles: [
       {
         settings: hdSettings,
-        fieldname: "allow_customer_managers_to_invite",
-        label: __("Allow member invites"),
-        description: __(
-          "Invite people to their organization. Invited people get a portal login."
-        ),
-      },
-      {
-        settings: hdSettings,
         fieldname: "allow_customer_managers_to_manage_organization",
         label: __("Allow organization management"),
         description: __(
           "Change member roles, remove members and change the organization's logo."
+        ),
+      },
+      {
+        settings: hdSettings,
+        fieldname: "allow_customer_managers_to_invite",
+        label: __("Allow member invites"),
+        description: __(
+          "Invite people to their organization. Invited people get a portal login."
         ),
       },
     ],

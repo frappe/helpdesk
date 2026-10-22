@@ -97,8 +97,16 @@ class TestPublicReads(IntegrationTestCase):
 
     def test_a_private_knowledge_base_refuses_anonymous_votes(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=0))
-        self.enterContext(
-            change_settings("HD Settings", allow_anonymous_article_voting=1)
+        # Validation now refuses this pair, but sites from before it can have it.
+        voting = frappe.db.get_single_value(
+            "HD Settings", "allow_anonymous_article_voting"
+        )
+        frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+        self.addCleanup(
+            frappe.db.set_single_value,
+            "HD Settings",
+            "allow_anonymous_article_voting",
+            voting,
         )
         with self.set_user("Guest"):
             self.assertRaises(

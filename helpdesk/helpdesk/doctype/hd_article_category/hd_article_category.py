@@ -12,6 +12,14 @@ class HDArticleCategory(Document):
     def validate(self):
         self.validate_default_category()
         self.validate_general_category()
+        self.validate_pinned_order()
+
+    def validate_pinned_order(self):
+        """Order is 1-based; 0 means unpinned."""
+        if not self.pinned:
+            self.pinned_order = 0
+        elif self.pinned_order < 1:
+            frappe.throw(_("Pinned order must be 1 or more"))
 
     def validate_general_category(self):
         if self.category_name.strip().lower() != "general":

@@ -7,16 +7,22 @@
       <section>
         <h2 class="text-md-semibold text-ink-gray-8">{{ __("Access") }}</h2>
         <div class="mt-2 divide-y divide-outline-gray-1">
+          <!-- label-for="": a title click must not flip the switch, so aria-label names it -->
           <SettingsRow
+            label-for=""
             v-for="toggle in accessToggles"
             :key="toggle.fieldname"
             :title="toggle.label"
             :description="toggle.description"
           >
             <Switch
-              :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+              :aria-label="toggle.label"
+              :model-value="
+                Boolean(settings.doc?.[toggle.fieldname]) ||
+                bounced === toggle.fieldname
+              "
               @update:model-value="
-                (value) => setToggle(toggle.fieldname, value)
+                (value) => onAccessToggle(toggle.fieldname, value)
               "
             />
           </SettingsRow>
@@ -44,6 +50,7 @@
         <div class="mt-2 divide-y divide-outline-gray-1 [&>*]:py-3.5">
           <!-- Stored inverted so unset (existing sites) means shown. -->
           <SettingsRow
+            label-for=""
             :title="__('Show Raise a ticket button')"
             :description="
               __(
@@ -52,6 +59,7 @@
             "
           >
             <Switch
+              :aria-label="__('Show Raise a ticket button')"
               :model-value="!settings.doc?.hide_raise_ticket_button"
               @update:model-value="
                 (show) => setToggle('hide_raise_ticket_button', !show)
@@ -75,8 +83,8 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { SettingsRow, Switch } from "frappe-ui";
-import { computed } from "vue";
+import { SettingsRow, Switch, toast } from "frappe-ui";
+import { computed, ref } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
 import PinnedCategories from "./PinnedCategories.vue";
@@ -86,6 +94,24 @@ import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 // Switches and the pin dialog save at once; the rest waits for Save.
 const { draft, settings, setToggle, savePins, categoryOptions } =
   useKnowledgeBaseDraft();
+
+// Guest voting needs a public knowledge base: the switch flips on, then
+// back, so the click visibly registers before the toast explains why.
+const bounced = ref<string | null>(null);
+
+function onAccessToggle(fieldname: string, value: boolean) {
+  if (
+    fieldname === "allow_anonymous_article_voting" &&
+    value &&
+    !settings.doc?.public_knowledge_base
+  ) {
+    bounced.value = fieldname;
+    setTimeout(() => (bounced.value = null), 300);
+    toast.warning(__("Knowledge base must be public"));
+    return;
+  }
+  setToggle(fieldname, value);
+}
 
 // computed, so labels follow a translation load
 const accessToggles = computed(

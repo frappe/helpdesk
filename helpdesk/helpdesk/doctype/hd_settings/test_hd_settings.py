@@ -100,7 +100,10 @@ class TestKnowledgeBaseHomePage(IntegrationTestCase):
 
     def setUp(self) -> None:
         frappe.db.set_single_value("Website Settings", "home_page", "")
-        frappe.db.set_single_value("HD Settings", "knowledge_base_as_home_page", 0)
+        frappe.db.set_single_value(
+            "HD Settings", "knowledge_base_home_page_for_guests", 0
+        )
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
         frappe.clear_cache()
 
     def test_guests_land_on_the_knowledge_base(self) -> None:
@@ -116,6 +119,63 @@ class TestKnowledgeBaseHomePage(IntegrationTestCase):
         self.set_setting(1)
         frappe.db.set_single_value("Website Settings", "home_page", "about")
         self.assertEqual(self.set_setting(0), "about")
+
+
+class TestGuestOnlySettings(IntegrationTestCase):
+    """Guests reach only a public knowledge base, so their settings need one."""
+
+    GUEST_ONLY = (
+        "allow_anonymous_article_voting",
+        "knowledge_base_home_page_for_guests",
+    )
+
+    def setUp(self) -> None:
+        frappe.db.set_single_value(
+            "HD Settings",
+            {field: 0 for field in self.GUEST_ONLY} | {"public_knowledge_base": 0},
+        )
+
+    def turn_on(self, field: str):
+        settings = frappe.get_single("HD Settings")
+        settings.set(field, 1)
+        return settings.save()
+
+    def test_cannot_turn_on_while_private(self) -> None:
+        for field in self.GUEST_ONLY:
+            with self.subTest(field=field), self.assertRaises(frappe.ValidationError):
+                self.turn_on(field)
+
+    def test_can_turn_on_while_public(self) -> None:
+        frappe.db.set_single_value("HD Settings", "public_knowledge_base", 1)
+        for field in self.GUEST_ONLY:
+            self.assertEqual(self.turn_on(field).get(field), 1)
+
+    def test_a_site_already_in_that_state_still_saves(self) -> None:
+        frappe.db.set_single_value("HD Settings", "allow_anonymous_article_voting", 1)
+        settings = frappe.get_single("HD Settings")
+        before = settings.prefer_knowledge_base
+        self.addCleanup(frappe.db.set_single_value, "HD Settings", "prefer_knowledge_base", before)
+        settings.prefer_knowledge_base = int(not before)
+        settings.save()
+
+
+class TestBannerImage(IntegrationTestCase):
+    def save_banner(self, url: str):
+        settings = frappe.get_single("HD Settings")
+        settings.banner_image = url
+        return settings.save()
+
+    def tearDown(self) -> None:
+        frappe.db.set_single_value("HD Settings", "banner_image", None)
+
+    def test_a_linked_image_is_refused(self) -> None:
+        with self.assertRaises(frappe.ValidationError):
+            self.save_banner("https://tracker.example.com/pixel.png")
+
+    def test_an_uploaded_image_saves(self) -> None:
+        self.assertEqual(
+            self.save_banner("/files/banner.png").banner_image, "/files/banner.png"
+        )
 
 
 def make_customer(email: str) -> None:

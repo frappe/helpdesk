@@ -151,9 +151,9 @@ TICKETS_HOME = f"{CUSTOMER_PORTAL_ROOT}/my-tickets"
 def sync_home_page_to_website_settings(settings) -> None:
     """Guests at the site root see the knowledge base while the setting is on.
     Turning it off clears the home page only if it is still ours."""
-    if not settings.has_value_changed("knowledge_base_as_home_page"):
+    if not settings.has_value_changed("knowledge_base_home_page_for_guests"):
         return
-    if settings.knowledge_base_as_home_page:
+    if settings.knowledge_base_home_page_for_guests:
         set_website_home_page(KNOWLEDGE_BASE_HOME.strip("/"))
     else:
         clear_website_home_page()
