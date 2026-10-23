@@ -104,7 +104,8 @@ const DOT_BASE = "shrink-0 rounded-full";
 const HOVER_AREA =
   "flex shrink-0 self-start after:absolute after:inset-0 after:z-[1] after:content-['']";
 
-const LINE_BASE = "absolute bottom-0 top-[18px] w-[0.05rem] rounded-full";
+// Starts 4px below the dot (mt-1 + size-2), the gap the line above leaves.
+const LINE_BASE = "absolute bottom-0 top-4 w-[0.05rem] rounded-full";
 
 // Gradient, not a dashed border, to control dash length.
 const DASHED_OWED =
