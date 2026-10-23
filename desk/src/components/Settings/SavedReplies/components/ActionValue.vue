@@ -53,11 +53,11 @@
         v-if="selectedOptions.length"
         class="flex items-center gap-1.5 truncate"
       >
-        <TagChip
+        <Tag
           v-for="option in (selectedOptions as ActionOption[]).slice(0, 3)"
           :key="option.value"
-          :tag="option.label"
-          :color="colorToken(option.color)"
+          :label="option.label"
+          :color="option.color"
         />
         <span v-if="selectedOptions.length > 3" class="text-ink-gray-5">
           +{{ selectedOptions.length - 3 }}
@@ -94,12 +94,10 @@
 
 <script setup lang="ts">
 import { buildEditorExtensions } from "@/components/editor/config";
-import TagChip from "@/components/tag/TagChip.vue";
 import { useSavedReplyActionOptions } from "@/composables/useSavedReplyActionOptions";
-import { colorToken } from "@/composables/useTags";
 import { __ } from "@/translation";
 import { SavedReplyActionType } from "@/types";
-import { Link } from "@framework/ui";
+import { Link, Tag, colorToken } from "@framework/ui";
 import { Avatar, Combobox, MultiSelect, Select } from "frappe-ui";
 import { Editor, EditorContent } from "frappe-ui/editor";
 import { computed } from "vue";
