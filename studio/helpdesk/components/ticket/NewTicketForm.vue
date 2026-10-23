@@ -103,7 +103,7 @@ import PortalRelatedArticles from "../knowledge_base/PortalRelatedArticles.vue";
 import PortalAttachments from "./PortalAttachments.vue";
 import { useArticleSearch } from "../../composables/useArticleSearch";
 import { useRememberedCount } from "../../composables/useRememberedCount";
-import { getPriority, loadTicketMeta } from "../../stores/ticketMeta";
+import { getPriority, loadPriorities } from "../../stores/ticketMeta";
 
 const UPLOAD_FOLDER = "Home/Helpdesk";
 const SUGGESTION_LIMIT = 3;
@@ -199,7 +199,7 @@ const template = createResource({
   params: { name: props.template },
   auto: true,
 });
-loadTicketMeta();
+loadPriorities();
 
 const skeletonFieldCount = useRememberedCount(
   // Per side: agents don't get the contact's `customer` field.
