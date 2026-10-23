@@ -22,8 +22,9 @@
         </span>
       </template>
     </Button>
+    <!-- invisible: a collapsed X still has a box; visibility waits out the transition -->
     <div
-      :class="[REVEAL, count ? 'grid-cols-[1fr]' : 'grid-cols-[0fr]']"
+      :class="[REVEAL, count ? 'grid-cols-[1fr]' : 'invisible grid-cols-[0fr]']"
       :inert="!count"
     >
       <div class="min-w-0 overflow-hidden">
