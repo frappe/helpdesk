@@ -389,12 +389,12 @@ test.describe("organization", () => {
     const page = await pageOf(browser, baseURL!, org.manager.email);
     const dialog = await openOrgScreen(page, org.name);
     const names = await dialog.locator("div.grid div.text-base-medium").allInnerTexts();
-    expect(names.map((name) => name.split("\n")[0].replace(/You$/, "").trim())).toEqual([
-      org.owner.fullName,
+    // you first, then by role
+    expect(names.map((name) => name.split("\n")[0].trim())).toEqual([
       org.manager.fullName,
+      org.owner.fullName,
       org.member.fullName,
     ]);
-    await expect(memberRow(dialog, org.manager.email)).toContainText("You");
     // S19 last seen: managers only
     await expect(dialog.getByText("Last seen")).toBeVisible();
     await expect(memberRow(dialog, org.owner.email)).toContainText("Never");
