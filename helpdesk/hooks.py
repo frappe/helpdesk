@@ -6,7 +6,8 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony"]
+# As org/app, so `bench get-app helpdesk` fetches whichever is missing.
+required_apps = ["frappe/telephony"]
 require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
@@ -31,7 +32,10 @@ after_migrate = [
 # Full Text Search
 # ------------------
 
-sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+sqlite_search = [
+    "helpdesk.search_sqlite.HelpdeskSearch",
+    "helpdesk.search_sqlite.HelpdeskArticleSearch",
+]
 
 scheduler_events = {
     "all": [
@@ -54,6 +58,30 @@ website_route_rules = [
     },
 ]
 
+# The old customer portal's ticket URLs keep working through these.
+website_redirects = [
+    # The app root will be the knowledge base once its pages land.
+    {
+        "source": "/help",
+        "target": "/help/customer-tickets",
+    },
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/help/tickets/new",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/help/customer-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/help/tickets/\1",
+        "forward_query_parameters": True,
+    },
+]
+
 user_invitation = {
     "allowed_roles": {
         "Agent Manager": [
@@ -73,6 +101,9 @@ user_invitation = {
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
+
+studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {
     "Assignment Rule": {
@@ -105,6 +136,9 @@ doc_events = {
         "before_insert": "helpdesk.extends.comment.before_insert",
         "validate": "helpdesk.extends.comment.validate",
         "on_trash": "helpdesk.extends.comment.on_trash",
+    },
+    "ToDo": {
+        "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
     },
 }
 

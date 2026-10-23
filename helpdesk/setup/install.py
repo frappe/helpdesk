@@ -5,8 +5,10 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
@@ -214,14 +216,13 @@ def add_agent_manager_permissions():
 
 
 def setup_customer_role(fresh_install=True):
-    customer_roles = ["HD Customer", "HD Customer Manager"]
-    for role_name in customer_roles:
+    for role_name in CUSTOMER_ROLES:
         if frappe.db.exists("Role", role_name):
             role_doc = frappe.get_doc("Role", role_name)
         else:
             role_doc = frappe.new_doc("Role")
             role_doc.role_name = role_name
-        role_doc.home_page = "/helpdesk"
+        role_doc.home_page = CUSTOMER_PORTAL_ROOT
         role_doc.desk_access = 0
         role_doc.save()
 
@@ -230,14 +231,11 @@ def setup_customer_role(fresh_install=True):
 
 
 def set_portal_defaults(overwrite=False):
-    """Point the portal at helpdesk. Installing claims the settings outright;
-    the upgrade patch only fills what a site left empty.
-
-    Writes straight into the Single rather than saving the document. A save
-    also validates the portal menu rows, and a row left behind by a deleted
-    doctype fails that validation and takes the whole migration down.
-    """
-    defaults = {"default_role": "HD Customer", "default_portal_home": "/helpdesk"}
+    """Install claims the portal settings; the patch only fills empty ones. Writes the Single directly: a save validates stale menu rows."""
+    defaults = {
+        "default_role": "HD Customer",
+        "default_portal_home": CUSTOMER_PORTAL_ROOT,
+    }
     if overwrite:
         to_set = defaults
     else:

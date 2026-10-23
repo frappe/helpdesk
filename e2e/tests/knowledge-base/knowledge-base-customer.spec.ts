@@ -35,5 +35,5 @@ test("public knowledge base: browse, rate an article, then raise a ticket from i
     })
     .toBe("1");
   await page.getByRole("link", { name: "here" }).click();
-  await expect(page).toHaveURL(/\/helpdesk\/my-tickets\/new/);
+  await expect(page).toHaveURL(/\/help\/tickets\/new/);
 });

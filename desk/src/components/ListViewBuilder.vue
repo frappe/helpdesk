@@ -269,7 +269,7 @@ import {
   Reload,
   SortBy,
 } from "@/components/view-controls";
-import { Filter, normalizeFilters } from "@/components/view-controls/filter";
+import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -341,7 +341,6 @@ interface P {
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;
-    isCustomerPortal?: boolean;
     rowRoute?: Record<string, string>;
   };
 }
@@ -369,7 +368,6 @@ const defaultOptions = reactive({
   },
   groupByActions: [],
   default_page_length: 20,
-  isCustomerPortal: false,
   hideColumnSetting: true,
   rowRoute: {
     name: "",
@@ -398,7 +396,7 @@ const defaultOptions = reactive({
           ],
         });
       },
-      condition: () => !options.value.isCustomerPortal && isManager,
+      condition: () => isManager,
     },
   ],
 });
@@ -507,7 +505,6 @@ const defaultParams = reactive({
   view: options.value.view,
   columns: [],
   rows: [],
-  show_customer_portal_fields: options.value.isCustomerPortal,
   is_default: false,
 });
 
@@ -633,7 +630,6 @@ const filterableFields = createResource({
   params: {
     doctype: options.value.doctype,
     append_assign: true,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     data = data.map((field) => {
@@ -652,7 +648,6 @@ const sortableFields = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
 });
 
@@ -661,7 +656,6 @@ const quickFilters = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
@@ -923,7 +917,7 @@ function handleViewUpdate() {
     name: (route.query.view as string) || "default",
     dt: options.value.doctype,
     route_name: route.name,
-    is_customer_portal: options.value.isCustomerPortal,
+    is_customer_portal: false,
   };
   const currentView = findView(route.query.view as string).value;
   if (currentView && currentView.public) {

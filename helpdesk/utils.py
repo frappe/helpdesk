@@ -16,6 +16,8 @@ from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
 from pypika.functions import Replace
 
+CUSTOMER_PORTAL_ROOT = "/help"
+
 
 def check_permissions(doctype, parent, doc=None):
     user = frappe.session.user
@@ -103,6 +105,11 @@ def capture_event(event: str):
     return _capture(event, "helpdesk")
 
 
+def get_user_contact(user: str | None = None) -> str | None:
+    """The Contact linked to `user`, defaults to current user. Membership and permissions go by this link."""
+    return frappe.db.get_value("Contact", {"user": user or frappe.session.user})
+
+
 def get_customers(user: str = "", contact: str = "", get_roles=False):
     """
     Get `Customer` from `Contact`
@@ -111,9 +118,8 @@ def get_customers(user: str = "", contact: str = "", get_roles=False):
     :param user: User to check against, defaults to current user
     :return: Customer `name` if available
     """
-    user = user or frappe.session.user
     if not contact:
-        contact = frappe.db.get_value("Contact", {"user": user})
+        contact = get_user_contact(user)
 
     HDCustomer = frappe.qb.DocType("HD Customer")
     HDCustomerMember = frappe.qb.DocType("HD Customer Member")
@@ -202,6 +208,10 @@ def is_agent_manager(user: str | None = None) -> bool:
     :param user: User to check against, defaults to current user
     :return: Whether `user` is an agent manager, system manager or admin
     """
+    user = user or frappe.session.user
+    # a deactivated agent keeps their roles; the record decides when there is one
+    if frappe.db.get_value("HD Agent", user, "is_active") == 0:
+        return False
     roles = set(frappe.get_roles(user))
     return bool(roles & {"Administrator", "System Manager", "Agent Manager"})
 

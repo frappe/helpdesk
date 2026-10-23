@@ -26,9 +26,11 @@ test("conversation: customer and agent replies both show, internal comments neve
     args: { content: `<p>${note}</p>` },
   });
 
-  await page.goto(`/helpdesk/my-tickets/${ticket.name}`);
+  await page.goto(`/help/tickets/${ticket.name}`);
   await expectInConversation(page, agentReply);
+  // closed on arrival; its bar opens it with the cursor in it
   await page.getByText("Type a message").click();
+  await expect(page.locator(".portal-reply-composer .ProseMirror")).toBeFocused();
   await page.locator(".ProseMirror").fill(customerReply);
   await page.getByRole("button", { name: "Send" }).click();
   await expectInConversation(page, customerReply);
@@ -54,7 +56,7 @@ test("closing after an agent reply asks for a rating when feedback is mandatory"
   const mandatory = (await api.get("HD Settings", "HD Settings")).is_feedback_mandatory;
   await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: 1 });
   try {
-    await page.goto(`/helpdesk/my-tickets/${ticket.name}`);
+    await page.goto(`/help/tickets/${ticket.name}`);
     await page.getByRole("button", { name: "Close" }).click();
     const dialog = page.getByRole("dialog", { name: "Rate this ticket" });
     await dialog.getByRole("radio").nth(4).click();
@@ -69,6 +71,30 @@ test("closing after an agent reply asks for a rating when feedback is mandatory"
       })
       .toEqual(["Closed", "Exceptional support experience", "Quick turnaround"]);
     await expect(page.getByRole("button", { name: "Close" })).toHaveCount(0);
+  } finally {
+    await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: mandatory });
+  }
+});
+
+test("a ticket rated by email closes without asking for a rating again", async ({ page, api, apiAs, ticket }) => {
+  await (await apiAs("agent")).call("run_doc_method", {
+    dt: "HD Ticket",
+    dn: ticket.name,
+    method: "reply_via_agent",
+    args: { message: "<p>Fixed on our side</p>" },
+  });
+  // Email feedback sets only the rating; the customer then wrote back and reopened it.
+  await api.update("HD Ticket", ticket.name, { feedback_rating: 0.8, status: "Open" });
+  const mandatory = (await api.get("HD Settings", "HD Settings")).is_feedback_mandatory;
+  await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: 1 });
+  try {
+    await page.goto(`/help/tickets/${ticket.name}`);
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.getByRole("dialog", { name: "Rate this ticket" })).toHaveCount(0);
+    // The dialog's X is also named Close; the confirm button comes last.
+    const confirm = page.getByRole("dialog", { name: "Close ticket" });
+    await confirm.getByRole("button", { name: "Close", exact: true }).last().click();
+    await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).status).toBe("Closed");
   } finally {
     await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: mandatory });
   }

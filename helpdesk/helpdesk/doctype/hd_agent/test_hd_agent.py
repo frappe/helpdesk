@@ -213,6 +213,15 @@ class TestHDAgent(FrappeTestCase):
         assignment_rule.last_user = None
         return assignment_rule
 
+    def test_round_robin_without_users_assigns_nobody(self):
+        agent = make_agent("rr_only@test.com", first_name="RR Only")
+        assignment_rule = self._make_assignment_rule(
+            "Test AR Empty", [agent], "Round Robin"
+        )
+        assignment_rule.users = []
+
+        self.assertIsNone(assignment_rule.get_user(make_ticket(subject="RR empty")))
+
     # Round Robin: away user is skipped, next user in list is picked
     def test_round_robin_skips_away_agent(self):
         active_user = make_agent("rr_active@test.com", first_name="RR Active")

@@ -2,12 +2,16 @@ import re
 
 import frappe
 from frappe import _
+from frappe.utils import strip_html_tags
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
 from helpdesk.search import NUM_RESULTS
 from helpdesk.search import search as hd_search
+from helpdesk.search_sqlite import HelpdeskArticleSearch
 from helpdesk.utils import is_agent
+
+RELATED_LIMIT = 3
 
 
 def get_nouns(blob: TextBlob):
@@ -111,3 +115,16 @@ def search(query: str) -> list:
             return ret
         ret, enough = search_with_enough_results(ret, query, qtype="or")
     return ret
+
+
+@frappe.whitelist()
+def get_related(query: str) -> list[dict]:
+    """Published articles matching free text, best first; empty until the index exists."""
+    search = HelpdeskArticleSearch()
+    if not search.index_exists():
+        return []
+    results = search.search(query)["results"][:RELATED_LIMIT]
+    # Titles come back with the highlighter's <mark> tags; a link list shows plain text.
+    return [
+        {"name": row["name"], "title": strip_html_tags(row["title"])} for row in results
+    ]

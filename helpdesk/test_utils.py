@@ -15,7 +15,7 @@ from helpdesk.api.dashboard import HelpdeskDashboard
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.integrations.erpnext.utils import create_customer_field
-from helpdesk.utils import get_customers, is_frappe_version
+from helpdesk.utils import CUSTOMER_PORTAL_ROOT, get_customers, is_frappe_version
 
 if is_frappe_version("16", above=True):
     from frappe.tests.utils import make_test_objects
@@ -179,6 +179,12 @@ def make_ticket(
     return ticket
 
 
+def make_feedback_option(label: str, rating: float = 1.0):
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Feedback Option", "label": label, "rating": rating}
+    ).insert()
+
+
 def close_emailed_ticket(raised_by: str) -> str:
     """Only a ticket that arrived by email is ever sent a feedback link."""
     ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
@@ -328,6 +334,28 @@ def get_customer_ticket(email: str):
     ticket = make_ticket(raised_by=email)
     frappe.set_user(email)
     return frappe.get_doc("HD Ticket", ticket.name)
+
+
+def use_test_index(case, search_class, db_name: str, *modules):
+    """A throwaway `search_class` index for one test, so the site's real one is never touched.
+
+    Each of `modules` gets it in place of its own `search_class`."""
+    search = search_class(db_name=db_name)
+    search.drop_index()
+    case.addCleanup(search.drop_index)
+    for module in modules:
+        case.enterContext(
+            patch.object(
+                module, search_class.__name__, lambda: search_class(db_name=db_name)
+            )
+        )
+    return search
+
+
+def is_outside_hours_banner_shown(ticket_name: str) -> bool:
+    from helpdesk.helpdesk.doctype.hd_ticket.api import get_outside_hours_banner
+
+    return get_outside_hours_banner(frappe.get_doc("HD Ticket", ticket_name))["show"]
 
 
 def create_agent(
@@ -630,11 +658,23 @@ def create_contact(name, email, user=True, role="HD Customer"):
     return result
 
 
-def create_customer(name, contacts=[]):
+def make_contact(prefix: str = "customer") -> dict:
+    """A contact with a portal user under a unique email, as `create_contact` returns it."""
+    email = unique_email(prefix)
+    return create_contact(email.split("@")[0], email)
+
+
+def create_customer(name, contacts=[], primary_contact=None):
     if frappe.db.exists("HD Customer", name):
         frappe.delete_doc("HD Customer", name, force=True)
 
-    customer = frappe.get_doc({"doctype": "HD Customer", "customer_name": name})
+    customer = frappe.get_doc(
+        {
+            "doctype": "HD Customer",
+            "customer_name": name,
+            "primary_contact": primary_contact,
+        }
+    )
 
     for c in contacts:
         customer.append("contacts", c)
@@ -653,6 +693,40 @@ def create_user(email: str):
     ).insert(ignore_permissions=True)
 
 
+def make_organization(label: str) -> tuple:
+    """An HD Customer with an owner, a manager and a plain member, each a contact with a portal user.
+
+    Returns `(customer, owner, manager, member)`."""
+    prefix = label.lower().replace(" ", "-")
+    owner, manager, member = (
+        create_contact(f"{label} {role}", unique_email(f"{prefix}-{role.lower()}"))
+        for role in ("Owner", "Manager", "Member")
+    )
+    customer = create_customer(
+        unique_name(f"Test {label}"),
+        [
+            {"contact_name": owner["contact"]},
+            {"contact_name": manager["contact"], "is_manager": 1},
+            {"contact_name": member["contact"]},
+        ],
+        primary_contact=owner["contact"],
+    )
+    return customer, owner, manager, member
+
+
+def make_invitation(email: str, customer: str, contact: str | None = None):
+    """A helpdesk User Invitation into `customer`, inserted without permission checks."""
+    return frappe.get_doc(
+        doctype="User Invitation",
+        email=email,
+        roles=[{"role": "HD Customer"}],
+        app_name="helpdesk",
+        redirect_to_path=CUSTOMER_PORTAL_ROOT,
+        customer=customer,
+        contact=contact,
+    ).insert(ignore_permissions=True)
+
+
 def get_invitation(email: str):
     """Return the helpdesk User Invitation raised for an email, if any."""
     return frappe.db.get_value(
@@ -661,6 +735,38 @@ def get_invitation(email: str):
         ["name", "customer", "contact"],
         as_dict=True,
     )
+
+
+def get_organization_members(customer: str) -> dict:
+    """The portal's member rows for a customer, keyed by contact name."""
+    from helpdesk.api.customer import get_organization
+
+    return {
+        member["contact"]: member
+        for member in get_organization(customer)["members"]
+        if member.get("contact")
+    }
+
+
+def get_organization_card(customer: str) -> dict:
+    """The portal's card for one of the session user's organizations."""
+    from helpdesk.api.customer import get_portal_account
+
+    return next(
+        organization
+        for organization in get_portal_account()["organizations"]
+        if organization["name"] == customer
+    )
+
+
+def delete_invitations(email: str) -> None:
+    """Remove every helpdesk invitation raised for an email, whoever the session user is."""
+    frappe.set_user("Administrator")
+    names = frappe.get_all(
+        "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
+    )
+    for name in names:
+        frappe.delete_doc("User Invitation", name, force=True)
 
 
 def update_role_in_customer(customer, contact, role="HD Customer", is_primary=False):
@@ -1002,6 +1108,18 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
     finally:
         frappe.set_user(previous_user)
     return publish_realtime
+
+
+def ticket_pings(publish_realtime: MagicMock) -> set[str]:
+    """Users sent the customer "ticket changed" ping, read off a patched `frappe.publish_realtime`."""
+    return {
+        call.kwargs["user"]
+        for call in publish_realtime.call_args_list
+        if call.args
+        and call.args[0] == "helpdesk:ticket-update"
+        and call.kwargs.get("user")
+        and not call.kwargs.get("room")
+    }
 
 
 def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
