@@ -50,3 +50,19 @@ jobs:
 
       - name: Run Semgrep rules
         run: semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness
+
+  deps-vulnerable-check:
+    name: 'Vulnerable Dependency Check'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install and run pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit --desc on .
