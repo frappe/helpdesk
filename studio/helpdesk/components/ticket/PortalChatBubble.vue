@@ -5,7 +5,7 @@
     :class="isCustomer ? 'items-end' : 'items-start'"
   >
     <div
-      class="w-fit min-w-0 max-w-full break-words rounded-6 px-2.5 py-1.5 text-p-base text-ink-gray-9 shadow-[inset_0_0_0.25px_0.25px_rgba(0,0,0,0.03)]"
+      class="w-fit min-w-0 max-w-full break-words rounded-6 px-2.5 py-2.5 text-p-base text-ink-gray-9 shadow-[inset_0_0_0.25px_0.25px_rgba(0,0,0,0.03)]"
       :class="isCustomer ? 'bg-surface-gray-2' : 'bg-surface-gray-1'"
     >
       <PortalEmailContent v-if="hasText" :content="activity.data.content" />
