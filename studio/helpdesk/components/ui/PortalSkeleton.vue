@@ -142,7 +142,7 @@
     </div>
 
     <template v-else-if="variant === 'ticket'">
-      <div class="relative flex min-w-0 flex-1 flex-col px-4 sm:px-6 lg:px-10">
+      <div class="relative flex min-w-0 flex-1 flex-col">
         <PortalSkeleton variant="thread" bare />
         <div class="absolute inset-x-0 bottom-0 px-3 pb-3 sm:px-5 sm:pb-5">
           <div
@@ -191,7 +191,16 @@
     </template>
 
     <!-- The viewer's conversation layout: chat bubbles, or email cards. -->
-    <div v-else-if="variant === 'thread'" class="flex flex-col pt-4">
+    <!-- PortalTicketThread's gutters, so the page skeleton and its own line up. -->
+    <div
+      v-else-if="variant === 'thread'"
+      class="flex flex-col pt-4"
+      :class="
+        conversationLayout === 'chat'
+          ? 'px-3 sm:px-5'
+          : 'max-sm:px-4 sm:px-6 lg:px-10'
+      "
+    >
       <!-- PortalChatList's rows: a bubble, then the name and time under it. A bubble
            is 12px of padding plus 22px per line of its iframe; messages run 1 to 3 lines. -->
       <div v-if="conversationLayout === 'chat'" class="flex flex-col gap-3">
@@ -222,9 +231,10 @@
           </div>
         </div>
       </div>
-      <div v-else class="flex flex-col gap-4">
+      <!-- ActivityTimeline's rows: mt-2 on the list, the avatar 6px into its card. -->
+      <div v-else class="mt-2 flex flex-col gap-4">
         <div v-for="i in 2" :key="i" class="flex gap-2.5">
-          <Skeleton :class="[BLOCK, 'size-7 shrink-0 rounded-full']" />
+          <Skeleton :class="[BLOCK, 'mt-1.5 size-7 shrink-0 rounded-full']" />
           <div class="flex-1 rounded-[8px] border border-outline-gray-2">
             <div class="flex h-10 items-center justify-between gap-4 px-3">
               <Line text="text-base w-24" width="100%" />

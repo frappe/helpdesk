@@ -215,10 +215,7 @@ const TicketEmails = defineComponent({
               variant: "thread",
               // Follows the page skeleton, which already faded in.
               instant: true,
-              class: [
-                "absolute inset-0",
-                !props.authors && "max-sm:px-4 sm:px-6 lg:px-10",
-              ],
+              class: "absolute inset-0",
             }),
           isFirstLoad.value
             ? null
