@@ -79,10 +79,10 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Button, Tooltip, dayjsLocal } from "frappe-ui";
+import { Avatar, Button, Tooltip } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { DATE_FORMATS } from "@helpdesk/shared/utils";
-import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
+import { dateFormat, dayjsLocal } from "@helpdesk/shared/timezone";
 import type { Pagination } from "@framework/ui/components/ActivityTimeline";
 import type { ChatRow } from "@app/composables/useChatRows";
 import PortalChatBubble from "./PortalChatBubble.vue";

@@ -227,10 +227,7 @@ test.describe("profile", () => {
     // S9 timezone
     await dialog.getByRole("button", { name: /Asia\/Kolkata|Select timezone/ }).click();
     await page.getByRole("combobox").last().fill("Europe/Berlin");
-    // Dates take the zone from boot, so the page reloads; the dialog's route reopens it.
-    const reloaded = page.waitForEvent("load");
     await page.getByRole("option", { name: "Europe/Berlin" }).click();
-    await reloaded;
     await expect.poll(async () => (await api.get("User", person.email)).time_zone).toBe("Europe/Berlin");
     await expect(dialog.getByRole("button", { name: /Europe\/Berlin/ })).toBeVisible();
 

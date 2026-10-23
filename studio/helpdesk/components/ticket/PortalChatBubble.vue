@@ -46,11 +46,11 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Tooltip, dayjsLocal } from "frappe-ui";
+import { Tooltip } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { DATE_FORMATS, isContentEmpty } from "@helpdesk/shared/utils";
 import { AttachmentChip } from "@framework/ui/components/ActivityTimeline";
-import { dateFormat } from "@framework/ui/components/ActivityTimeline/utils";
+import { dateFormat, dayjsLocal } from "@helpdesk/shared/timezone";
 import PortalEmailContent from "./PortalEmailContent.vue";
 
 type Attachment = { file_name: string; file_url: string };

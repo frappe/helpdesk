@@ -1,6 +1,6 @@
 import { computed } from 'vue'
-import { dayjs, dayjsLocal } from 'frappe-ui'
-import { dateFormat } from '@framework/ui/components/ActivityTimeline/utils'
+import { dayjs } from 'frappe-ui'
+import { dateFormat, dayjsLocal } from '@helpdesk/shared/timezone'
 import { __ } from '@helpdesk/shared/translation'
 import { DATE_FORMATS, isSlaMissed, twoUnitDuration } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'

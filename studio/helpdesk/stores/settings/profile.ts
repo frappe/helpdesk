@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { call, createResource } from 'frappe-ui'
 import { __, fetchTranslations } from '@helpdesk/shared/translation'
+import { setLocalTimezone } from '@helpdesk/shared/timezone'
 
 export function createProfileSettings(core) {
   const languages = createResource({
@@ -34,9 +35,8 @@ export function createProfileSettings(core) {
     if (!value || value === core.settingsUser.value[field]) return
     return updateProfile({ [field]: value }, __('Preferences updated')).then(() => {
       if (field !== 'time_zone') return fetchTranslations()
-      // Dates take the boot's zone, so a reload shows the new one. run() swallows
-      // errors: reload only once the saved zone is the one picked.
-      if (core.settingsUser.value?.time_zone === value) location.reload()
+      // run() swallows errors: apply only the zone that saved.
+      if (core.settingsUser.value?.time_zone === value) setLocalTimezone(value)
     })
   }
 

@@ -1,5 +1,6 @@
-import { Badge, Tooltip, dayjsLocal } from "frappe-ui";
+import { Badge, Tooltip } from "frappe-ui";
 import { h } from "vue";
+import { dayjsLocal } from "./timezone";
 import { __ } from "./translation";
 import { isSlaMissed, serverInstant, shortDuration } from "./utils";
 
