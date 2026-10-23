@@ -17,7 +17,7 @@
           :hover-delay="200"
           side="left"
         >
-          <span :class="[HOVER_AREA, 'mt-1.5']">
+          <span :class="[HOVER_AREA, 'mt-1']">
             <span
               aria-hidden="true"
               :class="[
