@@ -62,7 +62,8 @@ function createViewsStore() {
   )
 
   const rememberedLayout = useStorage(
-    () => `${MEMORY_PREFIX}:${DOCTYPE}:${activeName.value}`,
+    // Per user: another customer on this browser would get these filters.
+    () => `${MEMORY_PREFIX}:${sessionUser()}:${DOCTYPE}:${activeName.value}`,
     null,
     localStorage,
     { serializer: StorageSerializers.object, writeDefaults: false },
@@ -97,7 +98,7 @@ function createViewsStore() {
 
   function rememberLayout() {
     const view = listView.value
-    if (isRestoring || !view) return
+    if (isRestoring || !view || !sessionUser()) return
     rememberedLayout.value = {
       filters: view.filters.conditions.value,
       sort: view.sort.by.value,
