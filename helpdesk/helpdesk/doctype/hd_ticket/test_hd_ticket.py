@@ -959,6 +959,7 @@ class TestHDTicket(IntegrationTestCase):
 
     def test_ticket_split(self):
         ticket1 = make_ticket(description="Test Desc for split")
+        ticket1.db_set({"entry_point": "External", "utm_source": "frappe-cloud"})
 
         ticket1.reply_via_agent(message="Test reply to split")
         communcation_name = frappe.get_all(
@@ -977,6 +978,7 @@ class TestHDTicket(IntegrationTestCase):
         ticket2_doc = frappe.get_doc("HD Ticket", ticket2)
         self.assertTrue(ticket2_doc)
         self.assertEqual(ticket2_doc.subject, "Split Ticket")
+        self.assertFalse(ticket2_doc.entry_point or ticket2_doc.utm_source)
         self.assertTrue(
             frappe.get_value("Communication", communcation_name, "reference_name"),
             ticket2_doc.name,

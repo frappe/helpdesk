@@ -448,6 +448,7 @@
    "fieldname": "entry_point",
    "fieldtype": "Select",
    "label": "Entry Point",
+   "no_copy": 1,
    "options": "\nArticle\nSearch\nTicket List\nClosed Ticket\nDirect\nExternal",
    "permlevel": 8,
    "read_only": 1
@@ -457,6 +458,7 @@
    "fieldname": "source_article",
    "fieldtype": "Link",
    "label": "Source Article",
+   "no_copy": 1,
    "options": "HD Article",
    "permlevel": 8,
    "read_only": 1
@@ -471,6 +473,7 @@
    "fieldtype": "Data",
    "label": "Source Search",
    "length": 140,
+   "no_copy": 1,
    "permlevel": 8,
    "read_only": 1
   },
@@ -480,6 +483,7 @@
    "fieldtype": "Data",
    "label": "UTM Source",
    "length": 140,
+   "no_copy": 1,
    "permlevel": 8,
    "read_only": 1
   },
@@ -565,7 +569,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-10-23 12:00:00.000000",
+ "modified": "2026-10-24 04:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
