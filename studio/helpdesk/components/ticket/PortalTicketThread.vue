@@ -199,10 +199,10 @@ const TicketEmails = defineComponent({
           ref: wrapper,
           class: [
             "portal-thread flex flex-col",
-            // Chat lines up with the composer; the timeline keeps its gutter
-            // inside the scroller, so the scrollbar sits at the container edge.
+            // Both keep their gutter inside the scroller, so the scrollbar sits
+            // at the container edge; chat's lines up with the composer.
             props.authors
-              ? "is-chat px-3 sm:px-5"
+              ? "is-chat [&>*>div]:px-3 sm:[&>*>div]:px-5"
               : "[&_.activities]:mt-0 sm:[&>.activity-timeline]:px-6 lg:[&>.activity-timeline]:px-10",
             revealed.value && "portal-reveal",
             !settled.value && "is-settling relative",
