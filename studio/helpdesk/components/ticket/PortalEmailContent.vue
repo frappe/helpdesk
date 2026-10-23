@@ -1,11 +1,28 @@
 <template>
-  <iframe
-    ref="frame"
-    :srcdoc="srcdoc"
-    sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-    referrerpolicy="no-referrer"
-    class="block h-10 w-full max-w-full border-0"
-  />
+  <div>
+    <div
+      :class="
+        clipped &&
+        'max-h-[600px] overflow-hidden [mask-image:linear-gradient(to_bottom,#000_calc(100%-48px),transparent)]'
+      "
+    >
+      <iframe
+        ref="frame"
+        :srcdoc="srcdoc"
+        sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        referrerpolicy="no-referrer"
+        class="block h-10 w-full max-w-full border-0"
+      />
+    </div>
+    <button
+      v-if="clipped"
+      type="button"
+      class="mt-1 text-sm-medium text-ink-gray-6 hover:text-ink-gray-8"
+      @click="expanded = true"
+    >
+      {{ __("Show more") }}
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -28,6 +45,10 @@ const props = withDefaults(defineProps<{ content?: string }>(), {
 });
 
 const frame = ref<HTMLIFrameElement | null>(null);
+// Long emails are cut at 600px until the reader asks for the rest.
+const height = ref(0);
+const expanded = ref(false);
+const clipped = computed(() => !expanded.value && height.value > 600);
 
 const body = computed(() =>
   collapseQuotes(stripEmailColors(props.content || ""))
@@ -194,7 +215,8 @@ function resize(element: HTMLIFrameElement) {
   if (!root) return;
   const fit = () => {
     fitFrameToContent(element);
-    element.style.height = `${root.offsetHeight + 1}px`;
+    height.value = root.offsetHeight + 1;
+    element.style.height = `${height.value}px`;
   };
   fit();
   element.contentDocument?.fonts?.ready.then(fit);
