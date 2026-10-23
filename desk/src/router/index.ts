@@ -1,7 +1,8 @@
 import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
@@ -133,37 +134,6 @@ const portalRoutes = [
 
   // Customer Portal Routes
   {
-    path: "/my-tickets",
-    name: "TicketsCustomer",
-    component: () => import("@/pages/ticket/Tickets.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/my-tickets/:ticketId",
-    name: "TicketCustomer",
-    component: () => import("@/pages/ticket/TicketCustomer.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-    props: true,
-  },
-  {
-    path: "/my-tickets/new",
-    name: "TicketNew",
-    component: () => import("@/pages/ticket/TicketNew.vue"),
-    props: true,
-    meta: {
-      onSuccessRoute: "TicketCustomer",
-      parent: "TicketsCustomer",
-      public: true,
-      auth: true,
-    },
-  },
-  {
     path: "/kb-public",
     name: "CustomerKnowledgeBase",
     component: () => import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
@@ -232,13 +202,11 @@ router.beforeEach(async (to, _, next) => {
       LOGIN_PAGE +
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
-    const ticketId = to.params.ticketId;
-    next({
-      name: "TicketCustomer",
-      params: { ticketId },
-    });
+    window.location.replace(
+      CUSTOMER_PORTAL_ROOT + ROUTES.ticket(to.params.ticketId as string)
+    );
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    next({ name: "TicketsCustomer" });
+    window.location.replace(CUSTOMER_PORTAL_ROOT);
   } else {
     next();
   }

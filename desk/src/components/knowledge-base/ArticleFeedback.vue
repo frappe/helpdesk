@@ -14,9 +14,9 @@
           <span class="text-sm">
             {{ __("If your issue isn't resolved, raise a support ticket") }}
           </span>
-          <router-link :to="{ name: 'TicketNew' }">
+          <a :href="newTicketUrl">
             <p class="underline font-base text-sm">here</p>
-          </router-link>
+          </a>
         </div>
       </div>
     </div>
@@ -47,6 +47,7 @@ import {
   ThumbsDownFilledIcon,
 } from "@/components/icons";
 import { setFeedback } from "@/stores/knowledgeBase";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { ref } from "vue";
 import { toast } from "frappe-ui";
 import { __ } from "@/translation";
@@ -60,6 +61,7 @@ const props = withDefaults(defineProps<P>(), {
   feedback: 0,
 });
 
+const newTicketUrl = `${CUSTOMER_PORTAL_ROOT}/tickets/new`;
 const _feedback = ref(props.feedback);
 const emit = defineEmits(["articleReaction"]);
 

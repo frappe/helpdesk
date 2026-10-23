@@ -17,7 +17,7 @@
             ? 'cursor-pointer transition-transform active:scale-[0.98]'
             : '',
         ]"
-        @click="copyOnClick ? copy(value) : null"
+        @click="copyOnClick ? copyToClipboard(value) : null"
         @keydown.delete.capture.stop="removeLastValue"
       >
         <template #suffix>
@@ -112,7 +112,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideX from "~icons/lucide/x";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { useUserStore } from "@/stores/user";
-import { copy } from "@/utils";
+import { copyToClipboard } from "@/utils";
 import { watchDebounced } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import {

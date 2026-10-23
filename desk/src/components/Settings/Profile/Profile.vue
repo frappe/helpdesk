@@ -158,6 +158,7 @@
   <ChangePasswordModal
     v-if="showChangePasswordModal"
     v-model="showChangePasswordModal"
+    :user="userId"
   />
 </template>
 
@@ -182,7 +183,7 @@ import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAvailability } from "@/composables/useAvailability";
 import { useAgentStatusStore } from "@/stores/agentStatus";
-import ChangePasswordModal from "./components/ChangePasswordModal.vue";
+import ChangePasswordModal from "@helpdesk/shared/ChangePasswordModal.vue";
 
 const agentStatusStore = useAgentStatusStore();
 const showChangePasswordModal = ref(false);
