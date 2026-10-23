@@ -22,6 +22,7 @@
                 Boolean(toggle.settings.doc?.[toggle.fieldname]) !==
                 Boolean(toggle.inverted)
               "
+              :disabled="toggle.disabled"
               @update:model-value="
                 (value) => save(toggle, value !== Boolean(toggle.inverted))
               "
@@ -96,19 +97,16 @@ const sections = computed(() => [
           "Customers will land on the knowledge base when they log in, instead of their tickets."
         ),
       },
-      // Guests only reach a public knowledge base. Counted while unknown.
-      ...(!hdSettings.doc || hdSettings.doc.public_knowledge_base
-        ? [
-            {
-              settings: hdSettings,
-              fieldname: "knowledge_base_home_page_for_guests",
-              label: __("Set knowledge base as guest home"),
-              description: __(
-                "Guests land on the knowledge base landing page instead of the login page."
-              ),
-            },
-          ]
-        : []),
+      {
+        settings: hdSettings,
+        fieldname: "knowledge_base_home_page_for_guests",
+        label: __("Set knowledge base as guest home"),
+        description: __(
+          "Guests land on the knowledge base landing page instead of the login page."
+        ),
+        // Guests only reach a public knowledge base.
+        disabled: !hdSettings.doc?.public_knowledge_base,
+      },
       // Shown as "Allow": the field stores the opposite. Counted while
       // unknown, so the skeleton has a row for it.
       ...(!canEditSignup.fetched || canEditSignup.data?.has_permission
