@@ -26,10 +26,13 @@ def get_users():
         if priority.get(row.role, 0) > priority.get(roles_map.get(row.parent), 0):
             roles_map[row.parent] = row.role
 
-    # Fetch all active users
+    # Fetch active desk users (agents + system users). Website Users, i.e.
+    # customer contacts, are intentionally excluded: this endpoint only powers
+    # agent/name/avatar lookups in the desk, and on contact-heavy sites the
+    # unfiltered query returned the entire (potentially 100k+ row) User table.
     users = frappe.db.get_all(
         "User",
-        filters={"enabled": 1},
+        filters={"enabled": 1, "user_type": "System User"},
         fields=["name", "email", "enabled", "user_image", "full_name", "user_type"],
         order_by="full_name asc",
     )
