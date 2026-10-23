@@ -58,8 +58,7 @@
         theme="gray"
         variant="solid"
         :label="__('Create ticket')"
-        :loading="isCreating"
-        :disabled="uploading > 0"
+        :loading="isCreating || uploading > 0"
         @click="createTicket"
       />
       <p
