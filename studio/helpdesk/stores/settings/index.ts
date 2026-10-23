@@ -104,7 +104,12 @@ export const accountMenuOptions = computed(() =>
           condition: () => !session.isPhone.value,
           onClick: () => dialog.openSettings('profile'),
         },
-        { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
+        // A group of its own puts a divider above it, as in the desk.
+        {
+          group: __('Log out'),
+          hideLabel: true,
+          options: [{ icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut }],
+        },
       ],
 )
 
