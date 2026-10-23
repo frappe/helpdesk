@@ -385,6 +385,63 @@ test.describe("saved views", () => {
     }
   });
 
+  test("a view saved by the old portal opens; its auto-saved list state stays hidden", async ({
+    page,
+    api,
+    apiAs,
+  }) => {
+    const { token } = await raiseBatch(apiAs, 2);
+    const customer = await apiAs("customer");
+    const legacy = {
+      doctype: "HD View",
+      dt: "HD Ticket",
+      type: "list",
+      route_name: "TicketsCustomer",
+      is_customer_portal: 1,
+      filters: JSON.stringify({ subject: ["LIKE", `%${token}%`] }),
+      columns: JSON.stringify([
+        { label: "ID", type: "Int", key: "name", width: "5rem" },
+        { label: "Subject", type: "Data", key: "subject", width: "25rem" },
+      ]),
+    };
+    const label = `E2E legacy ${uid()}`;
+    const named = await customer.insert<{ name: string }>("HD View", { ...legacy, label });
+    const bare = await customer.insert<{ name: string }>("HD View", {
+      ...legacy,
+      label: `E2E bare ${uid()}`,
+      columns: "[]",
+    });
+    const autoSaved = await customer.insert<{ name: string }>("HD View", {
+      ...legacy,
+      label: `E2E auto ${uid()}`,
+      is_default: 1,
+    });
+    const errors: Error[] = [];
+    page.on("pageerror", (error) => errors.push(error));
+    try {
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(named.name)}`);
+      await expect(page.getByRole("button", { name: new RegExp(`${token} walk`) })).toHaveCount(2);
+      await expect(page.getByRole("button", { name: /^\d{4} / })).toHaveCount(2);
+      const header = page.locator("[style*='grid-template-columns']").first();
+      await expect(header).toContainText("Subject");
+      await expect(header).not.toContainText("Status");
+
+      await openViews(page, label);
+      await expect(page.getByRole("menuitem", { name: label })).toBeVisible();
+      await expect(page.getByRole("menuitem", { name: /^E2E auto / })).toHaveCount(0);
+
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(bare.name)}`);
+      await expect(page.getByRole("button", { name: new RegExp(`${token} walk`) })).toHaveCount(2);
+      await expect(header).toContainText("Status");
+      await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
+      expect(errors).toEqual([]);
+    } finally {
+      await api.delete("HD View", named.name);
+      await api.delete("HD View", bare.name);
+      await api.delete("HD View", autoSaved.name);
+    }
+  });
+
   test("save, open, update, rename and delete a view", async ({ page, api, apiAs }) => {
     const { token } = await raiseBatch(apiAs, 2);
     const label = `E2E view ${uid()}`;

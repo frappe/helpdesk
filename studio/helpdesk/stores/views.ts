@@ -2,6 +2,9 @@ import { computed, nextTick, ref, shallowRef, toRaw, watch } from 'vue'
 import { StorageSerializers, useStorage } from '@vueuse/core'
 import { call, createListResource, toast } from 'frappe-ui'
 import { parseOrderBy } from '@framework/ui/SortBy'
+import { parseColumns } from '@framework/ui/ColumnSettings'
+import { parseFilters } from '@framework/ui/Filter'
+import { normalizeFilters } from '@helpdesk/shared/filter'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
@@ -32,7 +35,8 @@ function createViewsStore() {
       'name', 'label', 'icon', 'dt', 'route_name', 'pinned', 'public',
       'is_default', 'is_standard', 'filters', 'order_by', 'columns', 'user',
     ],
-    filters: { dt: DOCTYPE, is_customer_portal: 1 },
+    // `is_default` rows are the old portal's auto-saved list state, never a named view.
+    filters: { dt: DOCTYPE, is_customer_portal: 1, is_default: 0 },
     pageLength: 1000,
   })
 
@@ -119,11 +123,14 @@ function createViewsStore() {
     if (!row) {
       if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
     } else {
+      const columns = parseViewColumns(row.columns)
       view.restore({
-        filters: parseJson(row.filters, []),
+        filters: parseViewFilters(row.filters),
         sort: parseOrderBy(row.order_by || ''),
-        columns: parseJson(row.columns, []),
+        ...(columns.length ? { columns } : {}),
       })
+      // No saved columns means the defaults, as the old portal stored them.
+      if (!columns.length) view.columns.reset()
     }
     // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
@@ -151,10 +158,13 @@ function createViewsStore() {
     const row = activeView.value
     if (!row || !listView.value) return false
     const current = currentPayload()
+    const columns = parseViewColumns(row.columns)
     return (
       current.order_by !== (row.order_by || '') ||
-      current.filters !== JSON.stringify(parseJson(row.filters, [])) ||
-      current.columns !== JSON.stringify(parseJson(row.columns, []))
+      current.filters !== JSON.stringify(parseViewFilters(row.filters)) ||
+      (columns.length
+        ? current.columns !== JSON.stringify(columns)
+        : listView.value.columns.isCustomized.value)
     )
   })
 
@@ -291,6 +301,24 @@ function createViewsStore() {
   }
 
   return { attachListView, bindings }
+}
+
+// Views from the old portal hold a filter dict or wire triples, and wire columns.
+function parseViewFilters(raw) {
+  const filters = parseJson(raw, [])
+  if (Array.isArray(filters) && filters.every((condition) => condition?.fieldname)) return filters
+  const wire = normalizeFilters(filters)
+  const fields = wire.map(([fieldname]) => ({ fieldname, fieldtype: 'Data' }))
+  return parseFilters(fields, wire).map(({ fieldname, operator, value }) => ({
+    fieldname,
+    operator,
+    value,
+  }))
+}
+
+function parseViewColumns(raw) {
+  const columns = parseJson(raw, [])
+  return columns.every((column) => column?.fieldname) ? columns : parseColumns(columns)
 }
 
 // Cloned, so a restore cannot alias the default into live refs.
