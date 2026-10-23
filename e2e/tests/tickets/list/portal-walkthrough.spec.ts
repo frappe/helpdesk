@@ -432,7 +432,9 @@ test.describe("saved views", () => {
 
       await page.goto(`/help/my-tickets?view=${encodeURIComponent(bare.name)}`);
       await expect(page.getByRole("button", { name: new RegExp(`${token} walk`) })).toHaveCount(2);
-      await expect(header).toContainText("Status");
+      for (const column of ["ID", "Status", "First Response", "Created"]) {
+        await expect(header).toContainText(column);
+      }
       await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
       expect(errors).toEqual([]);
     } finally {

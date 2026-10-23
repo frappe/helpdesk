@@ -88,14 +88,14 @@ function createViewsStore() {
   )
 
   function attachListView(view) {
+    // Before any restore: the defaults for "List" and for views with no saved columns.
+    defaultSnapshot ??= snapshotOf(view)
     // The store outlives the page: rebind on every mount.
     listView.value = view
     // The watch fires on neither a same-view return nor a remount.
     applyActiveView()
     if (hasAttached) return
     hasAttached = true
-    // For the unnamed "List" view, which has no saved columns.
-    defaultSnapshot = snapshotOf(view)
     // `if_owner` does not cover agents.
     useSession()
       .loadSession()
@@ -123,14 +123,13 @@ function createViewsStore() {
     if (!row) {
       if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
     } else {
+      // No saved columns means the default List columns, as the old portal stored them.
       const columns = parseViewColumns(row.columns)
       view.restore({
         filters: parseViewFilters(row.filters),
         sort: parseOrderBy(row.order_by || ''),
-        ...(columns.length ? { columns } : {}),
+        columns: structuredClone(columns.length ? columns : defaultSnapshot?.columns),
       })
-      // No saved columns means the defaults, as the old portal stored them.
-      if (!columns.length) view.columns.reset()
     }
     // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
@@ -162,9 +161,7 @@ function createViewsStore() {
     return (
       current.order_by !== (row.order_by || '') ||
       current.filters !== JSON.stringify(parseViewFilters(row.filters)) ||
-      (columns.length
-        ? current.columns !== JSON.stringify(columns)
-        : listView.value.columns.isCustomized.value)
+      current.columns !== JSON.stringify(columns.length ? columns : defaultSnapshot?.columns)
     )
   })
 
