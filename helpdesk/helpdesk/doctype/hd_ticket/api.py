@@ -126,9 +126,8 @@ def get_one(name: str):
         # validate_feedback's rule for when closing needs a rating
         "has_agent_replied": bool(doc.has_agent_replied),
         "template": {"fields": fields.get_form()},
-        "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=not fields.is_agent
-        ),
+        # the page decides, not the reader: an agent here sees the portal too
+        "_form_script": get_form_script("HD Ticket", is_customer_portal=True),
     }
 
 

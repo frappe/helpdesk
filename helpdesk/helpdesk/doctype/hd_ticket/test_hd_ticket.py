@@ -3089,8 +3089,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         with self.assertRaises(frappe.PermissionError):
             frappe.get_list("HD Form Script", fields=["name", "script"])
 
-    def test_customer_gets_portal_scripts_and_never_agent_ones(self):
-        """The server decides the audience; a customer never gets agent scripts."""
+    def test_portal_ticket_page_never_serves_agent_scripts(self):
+        """The portal page decides the audience, not the reader's role."""
         for name, portal, body in (
             ("Perms Portal Script", 1, "PORTAL"),
             ("Perms Agent Script", 0, "AGENT"),
@@ -3118,9 +3118,11 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             # agent scripts, and checking only the top level is what hid that
             self.assertNotIn("AGENT", frappe.as_json(customer_view))
 
+            # an agent opening the portal gets the portal's scripts too
             frappe.set_user(PERMS_AGENT)
             agent_view = get_one(ticket.name).get("_form_script")
-            self.assertTrue(any("AGENT" in s for s in agent_view))
+            self.assertTrue(any("PORTAL" in s for s in agent_view))
+            self.assertFalse(any("AGENT" in s for s in agent_view))
         finally:
             frappe.set_user("Administrator")
             for name in ("Perms Portal Script", "Perms Agent Script"):
