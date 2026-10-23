@@ -1,5 +1,6 @@
 import frappe
 from frappe.tests import IntegrationTestCase, UnitTestCase
+from frappe.utils import get_system_timezone
 
 from helpdesk.helpdesk.hooks.studio_app import escape_for_shell, get_boot
 from helpdesk.test_utils import make_contact
@@ -26,6 +27,10 @@ class TestBoot(IntegrationTestCase):
         frappe.set_user(customer)
         self.assertEqual(get_boot()["user_timezone"], "Asia/Tokyo")
 
-    def test_a_guest_gets_no_timezone(self) -> None:
-        frappe.set_user("Guest")
-        self.assertFalse(get_boot()["user_timezone"])
+    def test_without_a_timezone_the_boot_carries_the_system_one(self) -> None:
+        customer = make_contact("boot_customer_without_zone")["user"]
+        frappe.db.set_value("User", customer, "time_zone", None)
+        frappe.db.set_value("User", "Guest", "time_zone", "Asia/Tokyo")
+        for user in (customer, "Guest"):
+            frappe.set_user(user)
+            self.assertEqual(get_boot()["user_timezone"], get_system_timezone())
