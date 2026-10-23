@@ -14,7 +14,12 @@
       @keydown.space.prevent="emit('update:open', true)"
     >
       <Avatar :image="avatar?.image" :label="avatar?.label" size="sm" />
-      <span class="text-base text-ink-gray-7">{{ placeholder }}</span>
+      <span
+        class="min-w-0 truncate text-base"
+        :class="draft ? 'text-ink-gray-8' : 'text-ink-gray-7'"
+      >
+        {{ draft || placeholder }}
+      </span>
     </div>
     <!-- v-show: a drag that closes it can reopen it mid-gesture. -->
     <div
@@ -98,6 +103,13 @@ const emit = defineEmits<{
 }>();
 
 const root = ref<HTMLElement | null>(null);
+
+// The closed bar shows the draft on one line; blocks and breaks become spaces.
+const draft = computed(() => {
+  const html = (props.modelValue || "").replace(/<br\s*\/?>|<\/(p|div|li|h\d)>/gi, " ");
+  const text = new DOMParser().parseFromString(html, "text/html").body.textContent;
+  return (text || "").replace(/\s+/g, " ").trim();
+});
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
 
 // Keyed on the editor too: it can mount open before the editor exists.
@@ -128,13 +140,14 @@ const resizing = ref<{
 const isResizing = computed(() => resizing.value !== null);
 
 // A resized composer overlays the thread: the reserve stays at the last
-// unresized height (the closed bar or the natural editor), or less.
+// unresized height (the closed bar or the natural editor), or less. The saved
+// height sizes only the open editor, so the closed bar always counts in full.
 const { height: composerHeight } = useElementSize(root, undefined, {
   box: "border-box",
 });
 let baseReserve = 0;
 watch(
-  [composerHeight, () => height.value > 0],
+  [composerHeight, () => props.open && height.value > 0],
   ([value, resized]) => {
     if (!resized) baseReserve = value;
     emit(

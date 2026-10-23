@@ -188,9 +188,24 @@ test.describe("conversation", () => {
     const stored = await page.evaluate(() => localStorage.getItem("kb:composer-height"));
     expect(Number(stored)).toBeGreaterThan(0);
     await page.reload();
+    // The closed bar still keeps the thread's end clear of it.
+    await expect(page.locator(".portal-thread")).toHaveAttribute("style", /--composer-reserve: [1-9]/);
     await openComposer(page);
     await expect(page.getByRole("separator", { name: "Resize composer" })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("kb:composer-height"))).toBe(stored);
+  });
+
+  test("a composer dragged shut shows its draft in the bar", async ({ page, ticket }) => {
+    await page.goto(`/help/my-tickets/${ticket.name}`);
+    const draft = `Draft ${uid()}`;
+    await (await openComposer(page)).fill(draft);
+    const box = (await page.getByRole("separator", { name: "Resize composer" }).boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2, box.y + 400, { steps: 8 });
+    await page.mouse.up();
+    await expect(composer(page)).toBeHidden();
+    await expect(page.getByRole("button", { name: draft })).toBeVisible();
   });
 
   test("an agent's reply elsewhere shows without a reload", async ({ page, apiAs, ticket }) => {
