@@ -445,23 +445,19 @@ test.describe("saved views", () => {
   });
 
   test("a view with no saved columns shows translated headers and stays unmodified", async ({ page, api, apiAs }) => {
-    // Cold load order: the list mounts, then translations arrive, then the views list.
-    let mounted: () => void;
-    const listMounted = new Promise<void>((resolve) => (mounted = resolve));
-    let translated: () => void;
-    const translationsSent = new Promise<void>((resolve) => (translated = resolve));
+    const { token } = await raiseBatch(apiAs, 2);
+    const isViewList = (request) =>
+      /frappe\.client\.get_list/.test(request.url()) && request.postDataJSON()?.doctype === "HD View";
+    // Translations land once the session is loaded, while the view is requested but not yet applied.
+    const viewsRequested = page.waitForRequest(isViewList);
     await page.route(/helpdesk\.api\.general\.get_translations/, async (route) => {
-      await listMounted;
+      await viewsRequested;
       await route.fulfill({ json: { message: { Subject: "Asunto", Status: "Estado" } } });
-      translated();
     });
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
     await page.route(/frappe\.client\.get_list/, async (route) => {
-      const body = route.request().postData() || "";
-      if (body.includes("HD Ticket")) mounted();
-      if (body.includes("HD View")) {
-        await translationsSent;
-        await new Promise((resolve) => setTimeout(resolve, 1_000));
-      }
+      if (isViewList(route.request())) await released;
       await route.continue();
     });
     const customer = await apiAs("customer");
@@ -470,13 +466,18 @@ test.describe("saved views", () => {
       dt: "HD Ticket",
       type: "list",
       is_customer_portal: 1,
-      filters: "[]",
+      filters: JSON.stringify({ subject: ["LIKE", `%${token}%`] }),
+      order_by: "creation asc",
       columns: "[]",
     });
     try {
       await page.goto(`/help/my-tickets?view=${encodeURIComponent(view.name)}`);
-      await expect(page.getByRole("button", { name: /^\d{4} / }).first()).toBeVisible();
       const header = page.locator("[style*='grid-template-columns']").first();
+      await expect(header).toContainText("Asunto");
+      release();
+      const rows = page.getByRole("button", { name: /^\d{4} / });
+      await expect(rows).toHaveCount(2);
+      await expect(rows.first()).toContainText(`${token} walk 0`);
       await expect(header).toContainText("Asunto");
       await expect(header).toContainText("Estado");
       await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
