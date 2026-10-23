@@ -491,11 +491,17 @@ test.describe("organization", () => {
     await expect(dialog.getByRole("button", { name: "Send Invites" })).toBeDisabled();
     const input = dialog.getByPlaceholder("user1@example.com, user2@example.com, ...");
     await input.click();
-    // S22 comma and semicolon split into chips
+    // S22 Enter adds each address as a chip
     const first = `invitee-a-${uid()}@${org.domain}`;
     const second = `invitee-b-${uid()}@${org.domain}`;
-    await input.pressSequentially(`${first},`);
-    await page.keyboard.type(`${second};`);
+    // Enter picks the highlighted row, which offers the typed address.
+    const addEmail = async (email: string) => {
+      await page.keyboard.type(email);
+      await expect(page.getByRole("option", { name: email }).first()).toBeVisible();
+      await page.keyboard.press("Enter");
+    };
+    await addEmail(first);
+    await addEmail(second);
     await expect(dialog.getByText(first)).toBeVisible();
     await expect(dialog.getByText(second)).toBeVisible();
     await choose(page, dialog.locator('[data-component-id="kb_settings-invite-role"]'), "Manager");
@@ -513,7 +519,7 @@ test.describe("organization", () => {
     // S22 an already invited email is skipped, not refused
     await dialog.getByRole("button", { name: "Invite people" }).click();
     await input.click();
-    await input.pressSequentially(`${first},`);
+    await addEmail(first);
     await dialog.getByRole("button", { name: "Send Invites" }).click();
     await expect(toast(page, `Could not invite ${first}`)).toBeVisible();
     await expect(page).not.toHaveURL(/\/invite$/);

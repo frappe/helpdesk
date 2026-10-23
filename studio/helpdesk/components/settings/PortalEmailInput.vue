@@ -1,20 +1,18 @@
 <template>
-  <div @keydown.capture="onKeydown">
-    <MultiEmailInput
-      v-model="emails"
-      :options="options"
-      :placeholder="placeholder"
-      size="md"
-      @update:query="query = $event"
-    />
-  </div>
+  <MultiEmailInput
+    v-model="emails"
+    :options="options"
+    :placeholder="placeholder"
+    size="md"
+    @update:query="query = $event"
+  />
 </template>
 
 <script setup lang="ts">
 // `experimental/` isn't in Studio's palette.
 import { computed, ref, watch } from "vue";
 import { debounce } from "frappe-ui";
-import { isValidEmail, MultiEmailInput } from "frappe-ui/experimental";
+import { MultiEmailInput } from "frappe-ui/experimental";
 import { SEARCH_DEBOUNCE_MS } from "@helpdesk/shared/utils";
 
 type Contact = { full_name: string; email: string; image?: string };
@@ -48,32 +46,4 @@ const options = computed(() =>
     avatar: contact.image,
   }))
 );
-
-// MultiEmailInput splits only on paste; the placeholder promises commas.
-function onKeydown(event: KeyboardEvent) {
-  if (event.key !== "," && event.key !== ";") return;
-  const input = event.target;
-  if (!(input instanceof HTMLInputElement)) return;
-
-  const email = input.value.trim().replace(/[,;]+$/, "");
-  if (!email || !isValidEmail(email)) return;
-  event.preventDefault();
-
-  if (
-    !emails.value.some((entry) => entry.toLowerCase() === email.toLowerCase())
-  ) {
-    emails.value = [...emails.value, email];
-  }
-  clear(input);
-}
-
-// v-model only notices the native setter plus an input event.
-function clear(input: HTMLInputElement) {
-  const setter = Object.getOwnPropertyDescriptor(
-    window.HTMLInputElement.prototype,
-    "value"
-  )?.set;
-  setter?.call(input, "");
-  input.dispatchEvent(new Event("input", { bubbles: true }));
-}
 </script>
