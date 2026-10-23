@@ -27,10 +27,17 @@ class TestCustomerHomePage(IntegrationTestCase):
         make_customer(CUSTOMER)
         create_agent(AGENT_CUSTOMER)
         frappe.get_doc("User", AGENT_CUSTOMER).add_roles("HD Customer")
+        # get_response commits, so the rollback alone would leave the setting off.
+        prefer = frappe.db.get_single_value("HD Settings", "prefer_knowledge_base")
+        self.addCleanup(self.restore_prefer_knowledge_base, prefer)
         frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 0)
 
     def tearDown(self) -> None:
         frappe.set_user("Administrator")
+
+    def restore_prefer_knowledge_base(self, value) -> None:
+        frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", value)
+        frappe.db.commit()  # nosemgrep
 
     def test_customers_go_on_to_their_tickets(self) -> None:
         response = self.open_desk(CUSTOMER)
