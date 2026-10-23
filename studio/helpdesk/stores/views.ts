@@ -43,7 +43,7 @@ function createViewsStore() {
 
   const listView = shallowRef(null)
   let hasAttached = false
-  let defaultSnapshot = null
+  const defaultSnapshot = shallowRef(null)
   let isRestoring = false
 
   const isViewModalOpen = ref(false)
@@ -66,7 +66,7 @@ function createViewsStore() {
     return {
       filters: parseViewFilters(row.filters),
       sort: parseOrderBy(row.order_by || ''),
-      columns: columns.length ? columns : defaultSnapshot?.columns,
+      columns: columns.length ? columns : defaultSnapshot.value?.columns,
     }
   })
 
@@ -100,7 +100,7 @@ function createViewsStore() {
 
   function attachListView(view) {
     // Before any restore: the defaults for "List" and for views with no saved columns.
-    defaultSnapshot ??= snapshotOf(view)
+    defaultSnapshot.value ??= snapshotOf(view)
     // The store outlives the page: rebind on every mount.
     listView.value = view
     // The watch fires on neither a same-view return nor a remount.
@@ -130,7 +130,7 @@ function createViewsStore() {
     const view = listView.value
     if (!view) return
     isRestoring = true
-    const layout = activeLayout.value || defaultSnapshot
+    const layout = activeLayout.value || defaultSnapshot.value
     if (layout) view.restore(structuredClone(layout))
     // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
