@@ -145,10 +145,14 @@ const BLOCK = "motion-reduce:animate-none";
 
 function load() {
   if (!props.customer) return;
-  const filters: Record<string, unknown> = { customer: props.customer };
-  const query = search.value.trim();
-  if (query) filters.subject = ["like", `%${query}%`];
-  tickets.update({ filters, start: 0 });
+  // IDs show as "#123".
+  const query = search.value.trim().replace(/^#/, "");
+  const like = ["like", `%${query}%`];
+  tickets.update({
+    filters: { customer: props.customer },
+    orFilters: query ? { name: like, subject: like, status: like } : null,
+    start: 0,
+  });
   tickets.reload();
 }
 
