@@ -104,7 +104,7 @@ export const accountMenuOptions = computed(() =>
           condition: () => !session.isPhone.value,
           onClick: () => dialog.openSettings('profile'),
         },
-        // A group of its own puts a divider above it, as in the desk.
+        { icon: themeIcon.value, label: __('Toggle theme'), onClick: toggleTheme },
         {
           group: __('Log out'),
           hideLabel: true,
