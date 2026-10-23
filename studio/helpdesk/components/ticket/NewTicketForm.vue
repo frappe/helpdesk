@@ -59,10 +59,14 @@
         variant="solid"
         :label="__('Create ticket')"
         :loading="isCreating"
-        :disabled="!canSubmit"
+        :disabled="uploading > 0"
         @click="createTicket"
       />
-      <p v-if="missingFields.length" class="mt-2 text-p-sm text-ink-gray-5">
+      <p
+        v-if="triedSubmit && missingFields.length"
+        role="alert"
+        class="mt-2 text-p-sm text-ink-red-6"
+      >
         {{ __("Required: {0}", missingFields.join(", ")) }}
       </p>
     </div>
@@ -311,9 +315,8 @@ const missingFields = computed(() => [
     .map((row) => __(row.label)),
 ]);
 
-const canSubmit = computed(
-  () => !uploading.value && !isCreating.value && !missingFields.value.length
-);
+// Shown once a submit is tried, then kept live as fields fill.
+const triedSubmit = ref(false);
 
 // Links keep `target` so they never navigate away from a half-filled form.
 const about = computed(() => {
@@ -420,7 +423,8 @@ function uploadInline(file: File) {
 }
 
 function createTicket() {
-  if (!canSubmit.value) return;
+  triedSubmit.value = true;
+  if (missingFields.value.length || uploading.value || isCreating.value) return;
   return runAction(
     async () => {
       // call(), not a resource: the desk's resource error handler toasts again.

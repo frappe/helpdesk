@@ -56,6 +56,17 @@ function createButton(page: Page) {
   return page.getByRole("button", { name: "Create ticket" });
 }
 
+/** Submitting with a required field empty names it and stays on the form. */
+async function expectRequired(page: Page, label: string) {
+  await createButton(page).click();
+  await expect(page.getByRole("alert").filter({ hasText: /^Required:/ })).toContainText(label);
+  await expect(page).toHaveURL(/\/help\/my-tickets\/new/);
+}
+
+function requiredHint(page: Page) {
+  return page.getByRole("alert").filter({ hasText: /^Required:/ });
+}
+
 test.describe("template", () => {
   test("about, description template and required subject", async ({ page, api }) => {
     const restore = await useTemplate(api, [], {
@@ -66,9 +77,9 @@ test.describe("template", () => {
       await page.goto("/help/my-tickets/new");
       await expect(page.getByText("Tell us what broke")).toBeVisible();
       await expect(page.locator(".ProseMirror")).toContainText("Steps to reproduce:");
-      await expect(createButton(page)).toBeDisabled();
+      await expectRequired(page, "Subject");
       await page.getByPlaceholder("A short description").fill(`E2E ${uid()}`);
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
     } finally {
       await restore();
     }
@@ -79,11 +90,11 @@ test.describe("template", () => {
     try {
       await page.goto("/help/my-tickets/new");
       const subject = await fillBasics(page);
-      await expect(createButton(page)).toBeDisabled();
+      await expectRequired(page, "Ticket Type");
       await field(page, "Ticket Type").click();
       await expect(page.getByRole("option", { name: "Bug", exact: true })).toBeVisible();
       await page.getByRole("option", { name: "Bug", exact: true }).click();
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
       await createButton(page).click();
       await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", { filters: { subject }, fields: ["ticket_type"] });
@@ -129,16 +140,21 @@ test.describe("template", () => {
       await page.goto("/help/my-tickets/new");
       await fillBasics(page);
       await expect(page.getByText("E2E shown")).toHaveCount(0);
-      // hidden, so its `required` does not block submit
-      await expect(createButton(page)).toBeEnabled();
+      // hidden, so its `required` does not block submit; abort the create to stay on the form
+      await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new", (route) => route.abort());
+      const create = page.waitForRequest("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new");
+      await createButton(page).click();
+      await create;
+      await page.unroute("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new");
+      await expect(requiredHint(page)).toBeHidden();
 
       await pick(page, "E2E trigger", "Show");
       await expect(page.getByRole("textbox", { name: /^E2E shown/ })).toBeVisible();
       await expect(page.getByRole("textbox", { name: /^E2E needed \(required\)/ })).toBeVisible();
-      await expect(createButton(page)).toBeDisabled();
+      await expect(requiredHint(page)).toContainText("E2E needed");
       await page.getByRole("textbox", { name: /^E2E shown/ }).fill("x");
       await page.getByRole("textbox", { name: /^E2E needed/ }).fill("y");
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
     } finally {
       await restore();
     }

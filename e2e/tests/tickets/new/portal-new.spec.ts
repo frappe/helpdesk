@@ -109,17 +109,24 @@ test.describe("the form", () => {
     }
   });
 
-  test("says what is still required and ignores a blank subject", async ({ page }) => {
+  test("says what is still required on submit and ignores a blank subject", async ({ page }) => {
+    let creates = 0;
+    page.on("request", (request) => request.url().includes("hd_ticket.api.new") && creates++);
     await page.goto("/help/my-tickets/new");
-    const hint = page.getByText(/^Required:/);
+    const hint = page.getByRole("alert").filter({ hasText: /^Required:/ });
+    const submit = page.getByRole("button", { name: "Create ticket" });
+    await expect(hint).toBeHidden();
+    await expect(submit).toBeEnabled();
+
+    await submit.click();
     await expect(hint).toHaveText("Required: Subject, Description");
     await page.getByPlaceholder("A short description").fill("   ");
     await page.locator(".ProseMirror").fill("Details");
     await expect(hint).toHaveText("Required: Subject");
-    await expect(page.getByRole("button", { name: "Create ticket" })).toBeDisabled();
+    await submit.click();
+    expect(creates).toBe(0);
     await page.getByPlaceholder("A short description").fill(`E2E ${uid()}`);
     await expect(hint).toBeHidden();
-    await expect(page.getByRole("button", { name: "Create ticket" })).toBeEnabled();
   });
 
   test("a url_method field asks to select an option", async ({ page, api }) => {
