@@ -104,7 +104,12 @@ export const accountMenuOptions = computed(() =>
           condition: () => !session.isPhone.value,
           onClick: () => dialog.openSettings('profile'),
         },
-        { icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut },
+        { icon: themeIcon.value, label: __('Toggle theme'), onClick: toggleTheme },
+        {
+          group: __('Log out'),
+          hideLabel: true,
+          options: [{ icon: 'lucide-log-out', label: __('Log out'), onClick: session.signOut }],
+        },
       ],
 )
 

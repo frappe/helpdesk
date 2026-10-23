@@ -385,6 +385,107 @@ test.describe("saved views", () => {
     }
   });
 
+  test("a view saved by the old portal opens; its auto-saved list state stays hidden", async ({
+    page,
+    api,
+    apiAs,
+  }) => {
+    const { token } = await raiseBatch(apiAs, 2);
+    const customer = await apiAs("customer");
+    const legacy = {
+      doctype: "HD View",
+      dt: "HD Ticket",
+      type: "list",
+      route_name: "TicketsCustomer",
+      is_customer_portal: 1,
+      filters: JSON.stringify({ subject: ["LIKE", `%${token}%`] }),
+      columns: JSON.stringify([
+        { label: "ID", type: "Int", key: "name", width: "5rem" },
+        { label: "Subject", type: "Data", key: "subject", width: "25rem" },
+      ]),
+    };
+    const label = `E2E legacy ${uid()}`;
+    const named = await customer.insert<{ name: string }>("HD View", { ...legacy, label });
+    const bare = await customer.insert<{ name: string }>("HD View", {
+      ...legacy,
+      label: `E2E bare ${uid()}`,
+      columns: "[]",
+    });
+    const autoSaved = await customer.insert<{ name: string }>("HD View", {
+      ...legacy,
+      label: `E2E auto ${uid()}`,
+      is_default: 1,
+    });
+    const errors: Error[] = [];
+    page.on("pageerror", (error) => errors.push(error));
+    try {
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(named.name)}`);
+      await expect(page.getByRole("button", { name: new RegExp(`${token} walk`) })).toHaveCount(2);
+      await expect(page.getByRole("button", { name: /^\d{4} / })).toHaveCount(2);
+      const header = page.locator("[style*='grid-template-columns']").first();
+      await expect(header).toContainText("Subject");
+      await expect(header).not.toContainText("Status");
+
+      await openViews(page, label);
+      await expect(page.getByRole("menuitem", { name: label })).toBeVisible();
+      await expect(page.getByRole("menuitem", { name: /^E2E auto / })).toHaveCount(0);
+
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(bare.name)}`);
+      await expect(page.getByRole("button", { name: new RegExp(`${token} walk`) })).toHaveCount(2);
+      for (const column of ["ID", "Status", "First Response", "Created"]) {
+        await expect(header).toContainText(column);
+      }
+      await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
+      expect(errors).toEqual([]);
+    } finally {
+      await api.delete("HD View", named.name);
+      await api.delete("HD View", bare.name);
+      await api.delete("HD View", autoSaved.name);
+    }
+  });
+
+  test("a view with no saved columns shows translated headers and stays unmodified", async ({ page, api, apiAs }) => {
+    const { token } = await raiseBatch(apiAs, 2);
+    const isViewList = (request) =>
+      /frappe\.client\.get_list/.test(request.url()) && request.postDataJSON()?.doctype === "HD View";
+    // Translations land once the session is loaded, while the view is requested but not yet applied.
+    const viewsRequested = page.waitForRequest(isViewList);
+    await page.route(/helpdesk\.api\.general\.get_translations/, async (route) => {
+      await viewsRequested;
+      await route.fulfill({ json: { message: { Subject: "Asunto", Status: "Estado" } } });
+    });
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
+    await page.route(/frappe\.client\.get_list/, async (route) => {
+      if (isViewList(route.request())) await released;
+      await route.continue();
+    });
+    const customer = await apiAs("customer");
+    const view = await customer.insert<{ name: string }>("HD View", {
+      label: `E2E bare ${uid()}`,
+      dt: "HD Ticket",
+      type: "list",
+      is_customer_portal: 1,
+      filters: JSON.stringify({ subject: ["LIKE", `%${token}%`] }),
+      order_by: "creation asc",
+      columns: "[]",
+    });
+    try {
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(view.name)}`);
+      const header = page.locator("[style*='grid-template-columns']").first();
+      await expect(header).toContainText("Asunto");
+      release();
+      const rows = page.getByRole("button", { name: /^\d{4} / });
+      await expect(rows).toHaveCount(2);
+      await expect(rows.first()).toContainText(`${token} walk 0`);
+      await expect(header).toContainText("Asunto");
+      await expect(header).toContainText("Estado");
+      await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
+    } finally {
+      await api.delete("HD View", view.name);
+    }
+  });
+
   test("save, open, update, rename and delete a view", async ({ page, api, apiAs }) => {
     const { token } = await raiseBatch(apiAs, 2);
     const label = `E2E view ${uid()}`;
@@ -463,5 +564,21 @@ test.describe("saved views", () => {
     } finally {
       await manager.delete("HD View", view.name);
     }
+  });
+
+  test("a link to a missing view remembers changes on the fallback List", async ({ page, apiAs }) => {
+    const { token } = await raiseBatch(apiAs);
+    const missing = `/help/my-tickets?view=${encodeURIComponent(`missing-${uid()}`)}`;
+    const viewsLoaded = page.waitForResponse(
+      (response) =>
+        /frappe\.client\.get_list/.test(response.url()) &&
+        response.request().postDataJSON()?.doctype === "HD View"
+    );
+    await page.goto(missing);
+    await viewsLoaded;
+    await narrowTo(page, token);
+    await page.goto("/help");
+    await page.goto(missing);
+    await expect(page.getByRole("textbox", { name: "Subject" })).toHaveValue(token);
   });
 });

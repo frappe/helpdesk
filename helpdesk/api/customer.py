@@ -411,8 +411,10 @@ def _get_members(customer_doc, include_last_active: bool) -> list[dict]:
         if include_last_active:
             member["last_active"] = last_active.get(contact.user)
         members.append(member)
+    # the caller first, then by role
     members.sort(
         key=lambda member: (
+            not member["is_you"],
             ROLE_ORDER[member["role"]],
             (member["full_name"] or "").lower(),
         )

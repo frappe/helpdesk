@@ -121,44 +121,6 @@
          {
           "children": [
            {
-            "componentId": "kb_settings-nav-knowledge-base-label",
-            "componentName": "TextBlock",
-            "componentProps": {
-             "tag": "span",
-             "text": "{{ t('Knowledge Base') }}"
-            },
-            "componentSlots": {}
-           }
-          ],
-          "componentId": "kb_settings-nav-knowledge-base",
-          "componentName": "SettingsNavItem",
-          "componentProps": {
-           "value": "knowledge-base"
-          },
-          "componentSlots": {
-           "prefix": {
-            "slotContent": [
-             {
-              "classes": [
-               "h-4",
-               "w-4"
-              ],
-              "componentId": "kb_settings-nav-knowledge-base-icon",
-              "componentName": "Icon",
-              "componentProps": {
-               "icon": "lucide-book-open"
-              },
-              "componentSlots": {}
-             }
-            ],
-            "slotId": "kb_settings-slot-knowledge-base-prefix",
-            "slotName": "prefix"
-           }
-          }
-         },
-         {
-          "children": [
-           {
             "componentId": "kb_settings-nav-portal-settings-label",
             "componentName": "TextBlock",
             "componentProps": {
@@ -190,6 +152,44 @@
              }
             ],
             "slotId": "kb_settings-slot-portal-settings-prefix",
+            "slotName": "prefix"
+           }
+          }
+         },
+         {
+          "children": [
+           {
+            "componentId": "kb_settings-nav-knowledge-base-label",
+            "componentName": "TextBlock",
+            "componentProps": {
+             "tag": "span",
+             "text": "{{ t('Knowledge Base') }}"
+            },
+            "componentSlots": {}
+           }
+          ],
+          "componentId": "kb_settings-nav-knowledge-base",
+          "componentName": "SettingsNavItem",
+          "componentProps": {
+           "value": "knowledge-base"
+          },
+          "componentSlots": {
+           "prefix": {
+            "slotContent": [
+             {
+              "classes": [
+               "h-4",
+               "w-4"
+              ],
+              "componentId": "kb_settings-nav-knowledge-base-icon",
+              "componentName": "Icon",
+              "componentProps": {
+               "icon": "lucide-book-open"
+              },
+              "componentSlots": {}
+             }
+            ],
+            "slotId": "kb_settings-slot-knowledge-base-prefix",
             "slotName": "prefix"
            }
           }
@@ -924,7 +924,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "\u2022"
+                   "text": "•"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ settingsOrganization.email && settingsOrganization.domain }}"
@@ -977,7 +977,7 @@
                   "componentName": "TextBlock",
                   "componentProps": {
                    "tag": "span",
-                   "text": "\u2022"
+                   "text": "•"
                   },
                   "componentSlots": {},
                   "visibilityCondition": "{{ (settingsOrganization.email || settingsOrganization.domain) && settingsOrganization.country }}"
@@ -1847,7 +1847,7 @@
  "doctype": "Studio Component",
  "idx": 0,
  "is_disabled": 0,
- "modified": "2026-10-23 13:00:00.000000",
+ "modified": "2026-10-24 01:30:00.000000",
  "modified_by": "Administrator",
  "name": "kb_settings",
  "owner": "Administrator"

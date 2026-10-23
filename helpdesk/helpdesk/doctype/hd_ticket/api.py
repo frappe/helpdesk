@@ -13,6 +13,7 @@ from pypika import Order
 from helpdesk.api.doc import handle_at_me_support
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
+from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
@@ -126,9 +127,8 @@ def get_one(name: str):
         # validate_feedback's rule for when closing needs a rating
         "has_agent_replied": bool(doc.has_agent_replied),
         "template": {"fields": fields.get_form()},
-        "_form_script": get_form_script(
-            "HD Ticket", is_customer_portal=not fields.is_agent
-        ),
+        # the page decides, not the reader: an agent here sees the portal too
+        "_form_script": get_form_script("HD Ticket", is_customer_portal=True),
     }
 
 
@@ -468,6 +468,8 @@ def duplicate_ticket(ticket_doc, subject):
 
     new_ticket.is_merged = 0
     new_ticket.merged_with = None
+    # an agent made it; where the customer started belongs to the original
+    new_ticket.update(dict.fromkeys(TICKET_ORIGIN_FIELDS))
 
     if new_ticket.sla:
         new_ticket.sla = None

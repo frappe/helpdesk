@@ -1,8 +1,9 @@
 import { useClipboard } from "@vueuse/core";
-import { call, dayjs, dayjsLocal, dialog, getConfig, toast } from "frappe-ui";
+import { call, dayjs, dialog, getConfig, toast } from "frappe-ui";
 import type { Ref } from "vue";
 
 import { setupCustomizations, withLegacyCloseContext } from "./formScripts";
+import { dayjsLocal } from "./timezone";
 import { __ } from "./translation";
 
 const MINUTE = 60;

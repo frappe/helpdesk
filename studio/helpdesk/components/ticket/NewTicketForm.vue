@@ -6,7 +6,7 @@
     <div class="flex w-full flex-col gap-5">
       <div
         v-if="template.data?.about"
-        class="prose-sm max-w-none text-ink-gray-7"
+        class="prose prose-sm max-w-none text-ink-gray-7"
         v-html="about"
       />
       <div class="flex w-full flex-col gap-2">
@@ -58,8 +58,7 @@
         theme="gray"
         variant="solid"
         :label="__('Create ticket')"
-        :loading="isCreating"
-        :disabled="uploading > 0"
+        :loading="isCreating || uploading > 0"
         @click="createTicket"
       />
       <p
@@ -104,7 +103,7 @@ import PortalRelatedArticles from "../knowledge_base/PortalRelatedArticles.vue";
 import PortalAttachments from "./PortalAttachments.vue";
 import { useArticleSearch } from "../../composables/useArticleSearch";
 import { useRememberedCount } from "../../composables/useRememberedCount";
-import { getPriority, loadTicketMeta } from "../../stores/ticketMeta";
+import { getPriority, loadPriorities } from "../../stores/ticketMeta";
 
 const UPLOAD_FOLDER = "Home/Helpdesk";
 const SUGGESTION_LIMIT = 3;
@@ -200,7 +199,7 @@ const template = createResource({
   params: { name: props.template },
   auto: true,
 });
-loadTicketMeta();
+loadPriorities();
 
 const skeletonFieldCount = useRememberedCount(
   // Per side: agents don't get the contact's `customer` field.
@@ -357,6 +356,8 @@ function uiFor(row) {
     const list = options.map((value) => ({ label: __(value), value }));
     return { component: ApiOptionsField, props: { options: list } };
   }
+  // `padded` gives the Check the inputs' height, so `.field-grid` can row it with them.
+  if (row.fieldtype === "Check") return { props: { padded: true } };
   if (!props.dateFormat) return undefined;
   if (row.fieldtype === "Datetime")
     return { props: { format: `${props.dateFormat} ${props.timeFormat}` } };
@@ -461,6 +462,10 @@ function createTicket() {
   .field-grid :deep(.column) {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  /* Checks have no label above, so sit them on the inputs' row. */
+  .field-grid :deep(.field[data-fieldtype="Check"]) {
+    align-self: end;
   }
 }
 </style>

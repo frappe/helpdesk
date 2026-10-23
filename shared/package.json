@@ -9,6 +9,7 @@
 		"./translation": "./src/translation.ts",
 		"./utils": "./src/utils.ts",
 		"./ticketCells": "./src/ticketCells.ts",
+		"./timezone": "./src/timezone.ts",
 		"./ticketStatus": "./src/ticketStatus.ts",
 		"./tiptap": "./src/tiptap.ts",
 		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",

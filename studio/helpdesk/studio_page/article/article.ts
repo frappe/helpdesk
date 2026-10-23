@@ -1,5 +1,6 @@
 import { computed, watch } from 'vue'
-import { call, dayjsLocal } from 'frappe-ui'
+import { call } from 'frappe-ui'
+import { dayjsLocal } from '@helpdesk/shared/timezone'
 import { __ } from '@helpdesk/shared/translation'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import {

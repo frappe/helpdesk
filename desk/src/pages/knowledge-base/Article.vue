@@ -225,11 +225,8 @@
       @publish="publishArticle"
     >
       <template #default="{ access }">
-        <p
-          v-if="siblingsVisibility.data && access !== siblingsVisibility.data"
-          class="text-p-sm text-ink-gray-7"
-        >
-          {{ siblingsNote }}
+        <p v-if="access" class="text-p-sm text-ink-gray-7">
+          {{ accessNote(access) }}
         </p>
       </template>
     </ArticleAccessModal>
@@ -251,7 +248,6 @@ import {
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
-  useCategoryVisibility,
 } from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
@@ -418,21 +414,16 @@ const togglePublished = debounce(
 );
 
 const showAccessModal = ref(false);
-const siblingsVisibility = useCategoryVisibility(
-  computed(() => (showAccessModal.value && article.data?.category) || null)
-);
-const siblingsNote = computed(() => {
-  const category = article.data?.category_name;
+
+function accessNote(access: string) {
   return {
-    Public: __("Other articles in {0} are visible to everyone.", [category]),
-    Customers: __("Other articles in {0} are visible to customers only.", [
-      category,
-    ]),
-    Private: __("Other articles in {0} are visible to agents only.", [
-      category,
-    ]),
-  }[siblingsVisibility.data];
-});
+    Public: __(
+      "Anyone, including visitors who aren't logged in, can read this article."
+    ),
+    Customers: __("Only logged-in customers and agents can read this article."),
+    Private: __("Only agents can read this article."),
+  }[access];
+}
 
 function publishArticle(visibility: string) {
   save(

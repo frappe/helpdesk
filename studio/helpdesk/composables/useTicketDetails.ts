@@ -1,6 +1,6 @@
 import { computed } from 'vue'
-import { dayjs, dayjsLocal } from 'frappe-ui'
-import { dateFormat } from '@framework/ui/components/ActivityTimeline/utils'
+import { dayjs } from 'frappe-ui'
+import { dateFormat, dayjsLocal } from '@helpdesk/shared/timezone'
 import { __ } from '@helpdesk/shared/translation'
 import { DATE_FORMATS, isSlaMissed, twoUnitDuration } from '@helpdesk/shared/utils'
 import { useSession } from '@app/stores/session'
@@ -35,9 +35,9 @@ export function useTicketDetails(ticket, thread, statusChanges) {
   const basics = computed(() =>
     [
       // Always shown when set, whatever the template says.
+      { label: __('Priority'), value: data.value.priority, isPriority: true },
       { label: __('Customer'), value: data.value.customer, isCustomer: true, image: data.value.customer_image || '' },
       { label: __('Team'), value: data.value.agent_group },
-      { label: __('Priority'), value: data.value.priority, isPriority: true },
       ...templateFields(),
     ].filter((row) => row.value),
   )

@@ -1,5 +1,5 @@
 import { computed, type Ref } from 'vue'
-import { dayjsLocal } from 'frappe-ui'
+import { dayjsLocal } from '@helpdesk/shared/timezone'
 import { __ } from '@helpdesk/shared/translation'
 
 type Activity = { type?: string; key?: string; timestamp: string; data?: any; author?: any; icon?: any }

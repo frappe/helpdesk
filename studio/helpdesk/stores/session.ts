@@ -4,11 +4,12 @@ import { call, setConfig } from 'frappe-ui'
 import { spritePlugin } from 'frappe-ui/experimental'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { __ } from '@helpdesk/shared/translation'
+import { setLocalTimezone } from '@helpdesk/shared/timezone'
 
 // From boot: must be set before the first date renders.
 setConfig('systemTimezone', window.boot?.system_timezone)
-// frappe-ui falls back to the browser zone, but looks it up again on every date.
-setConfig('localTimezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
+// The zone picked in Settings, else the system's.
+setLocalTimezone(window.boot?.user_timezone)
 
 // Stored icons can be any lucide name, beyond Studio's build-time classes.
 if (!document.getElementById('lucide-sprite')) spritePlugin.install()

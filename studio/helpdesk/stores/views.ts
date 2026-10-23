@@ -2,6 +2,8 @@ import { computed, nextTick, ref, shallowRef, toRaw, watch } from 'vue'
 import { StorageSerializers, useStorage } from '@vueuse/core'
 import { call, createListResource, toast } from 'frappe-ui'
 import { parseOrderBy } from '@framework/ui/SortBy'
+import { parseColumns } from '@framework/ui/ColumnSettings'
+import { normalizeFilters, toConditions } from '@helpdesk/shared/filter'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
@@ -32,7 +34,8 @@ function createViewsStore() {
       'name', 'label', 'icon', 'dt', 'route_name', 'pinned', 'public',
       'is_default', 'is_standard', 'filters', 'order_by', 'columns', 'user',
     ],
-    filters: { dt: DOCTYPE, is_customer_portal: 1 },
+    // `is_default` rows are the old portal's auto-saved list state, never a named view.
+    filters: { dt: DOCTYPE, is_customer_portal: 1, is_default: 0 },
     pageLength: 1000,
   })
 
@@ -40,7 +43,7 @@ function createViewsStore() {
 
   const listView = shallowRef(null)
   let hasAttached = false
-  let defaultSnapshot = null
+  const defaultSnapshot = shallowRef(null)
   let isRestoring = false
 
   const isViewModalOpen = ref(false)
@@ -54,6 +57,18 @@ function createViewsStore() {
   const activeView = computed(
     () => views.value.find((view) => view.name === activeName.value) || null,
   )
+
+  // No saved columns means the default List columns, as the old portal stored them.
+  const activeLayout = computed(() => {
+    const row = activeView.value
+    if (!row) return null
+    const columns = parseViewColumns(row.columns)
+    return {
+      filters: parseViewFilters(row.filters),
+      sort: parseOrderBy(row.order_by || ''),
+      columns: columns.length ? columns : defaultSnapshot.value?.columns,
+    }
+  })
 
   const currentView = computed(() =>
     activeView.value
@@ -84,14 +99,14 @@ function createViewsStore() {
   )
 
   function attachListView(view) {
+    // Before any restore: the defaults for "List" and for views with no saved columns.
+    defaultSnapshot.value ??= snapshotOf(view)
     // The store outlives the page: rebind on every mount.
     listView.value = view
     // The watch fires on neither a same-view return nor a remount.
     applyActiveView()
     if (hasAttached) return
     hasAttached = true
-    // For the unnamed "List" view, which has no saved columns.
-    defaultSnapshot = snapshotOf(view)
     // `if_owner` does not cover agents.
     useSession()
       .loadSession()
@@ -103,7 +118,8 @@ function createViewsStore() {
 
   function rememberLayout() {
     const view = listView.value
-    if (isRestoring || !view || !sessionUser()) return
+    // Until the views load, a requested view shows the defaults, not that view.
+    if (isRestoring || !view || !sessionUser() || (activeName.value && !list.data)) return
     rememberedLayout.value = {
       filters: view.filters.conditions.value,
       sort: view.sort.by.value,
@@ -115,16 +131,8 @@ function createViewsStore() {
     const view = listView.value
     if (!view) return
     isRestoring = true
-    const row = activeView.value
-    if (!row) {
-      if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
-    } else {
-      view.restore({
-        filters: parseJson(row.filters, []),
-        sort: parseOrderBy(row.order_by || ''),
-        columns: parseJson(row.columns, []),
-      })
-    }
+    const layout = activeLayout.value || defaultSnapshot.value
+    if (layout) view.restore(structuredClone(layout))
     // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
     if (remembered) {
@@ -149,12 +157,13 @@ function createViewsStore() {
 
   const isViewModified = computed(() => {
     const row = activeView.value
-    if (!row || !listView.value) return false
+    const layout = activeLayout.value
+    if (!row || !layout || !listView.value) return false
     const current = currentPayload()
     return (
       current.order_by !== (row.order_by || '') ||
-      current.filters !== JSON.stringify(parseJson(row.filters, [])) ||
-      current.columns !== JSON.stringify(parseJson(row.columns, []))
+      current.filters !== JSON.stringify(layout.filters) ||
+      columnLayout(listView.value.columns.shown.value) !== columnLayout(layout.columns)
     )
   })
 
@@ -291,6 +300,23 @@ function createViewsStore() {
   }
 
   return { attachListView, bindings }
+}
+
+// Views from the old portal hold a filter dict or wire triples, and wire columns.
+function parseViewFilters(raw) {
+  const filters = parseJson(raw, [])
+  if (Array.isArray(filters) && filters.every((condition) => condition?.fieldname)) return filters
+  return toConditions(normalizeFilters(filters))
+}
+
+function parseViewColumns(raw) {
+  const columns = parseJson(raw, [])
+  return columns.every((column) => column?.fieldname) ? columns : parseColumns(columns)
+}
+
+// Labels follow the language, not the view.
+function columnLayout(columns) {
+  return JSON.stringify(columns.map(({ fieldname, width }) => ({ fieldname, width })))
 }
 
 // Cloned, so a restore cannot alias the default into live refs.

@@ -1,11 +1,28 @@
 <template>
-  <iframe
-    ref="frame"
-    :srcdoc="srcdoc"
-    sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-    referrerpolicy="no-referrer"
-    class="email-fade block h-10 max-h-[500px] w-full max-w-full border-0"
-  />
+  <div>
+    <div
+      :class="
+        clipped &&
+        'max-h-[600px] overflow-hidden [mask-image:linear-gradient(to_bottom,#000_calc(100%-48px),transparent)]'
+      "
+    >
+      <iframe
+        ref="frame"
+        :srcdoc="srcdoc"
+        sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        referrerpolicy="no-referrer"
+        class="block h-10 w-full max-w-full border-0"
+      />
+    </div>
+    <button
+      v-if="clipped"
+      type="button"
+      class="mt-1 text-sm-medium text-ink-gray-6 hover:text-ink-gray-8"
+      @click="expanded = true"
+    >
+      {{ __("Show more") }}
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -13,7 +30,6 @@ import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { __ } from "@helpdesk/shared/translation";
 import {
   applyCssToIframe,
-  bottomFade,
   stripEmailColors,
   useDataTheme,
 } from "@framework/ui/components/ActivityTimeline/utils";
@@ -29,6 +45,10 @@ const props = withDefaults(defineProps<{ content?: string }>(), {
 });
 
 const frame = ref<HTMLIFrameElement | null>(null);
+// Long emails are cut at 600px until the reader asks for the rest.
+const height = ref(0);
+const expanded = ref(false);
+const clipped = computed(() => !expanded.value && height.value > 600);
 
 const body = computed(() =>
   collapseQuotes(stripEmailColors(props.content || ""))
@@ -38,6 +58,7 @@ function collapseQuotes(html: string) {
   const doc = new DOMParser().parseFromString(html, "text/html");
   stripActiveContent(doc);
   trimEmptyEdges(doc);
+  linkImages(doc);
   const selector = QUOTE_SELECTORS.find((s) => doc.querySelector(s));
   if (!selector) return doc.body.innerHTML;
 
@@ -63,6 +84,17 @@ function stripActiveContent(doc: Document) {
       if (name.startsWith("on") || SCRIPT_URL.test(url))
         element.removeAttribute(attribute.name);
     }
+  });
+}
+
+// Images are capped in height; the link opens one at full size.
+function linkImages(doc: Document) {
+  doc.querySelectorAll("img[src]").forEach((image) => {
+    if (image.closest("a")) return;
+    const link = doc.createElement("a");
+    link.href = image.getAttribute("src")!;
+    image.replaceWith(link);
+    link.appendChild(image);
   });
 }
 
@@ -140,7 +172,8 @@ const srcdoc = computed(
   <style>:root { color-scheme: light; } [data-theme='dark'] { color-scheme: dark; } html, body { background: transparent; }
   .email-content pre { background: var(--surface-gray-3); color: var(--ink-gray-8); }
   .email-content table { display: block; max-width: 100%; overflow-x: auto; }
-  .email-content :is(th, td) { padding: 4px 12px; }</style>
+  .email-content :is(th, td) { padding: 4px 12px; }
+  .email-content img { max-height: 360px; width: auto; height: auto; object-fit: contain; }</style>
   </head><body class="m-0">
   <div class="email-content prose prose-sm max-w-none break-words prose-img:m-0 prose-img:border-0">${body.value}</div>
   </body></html>`
@@ -156,11 +189,6 @@ watch(
     element.onload = () => {
       applyCssToIframe(element, () => resize(element));
       resize(element);
-      element.contentWindow?.addEventListener(
-        "scroll",
-        () => syncFade(element),
-        { passive: true }
-      );
     };
     // Re-measure on width change, or rewrapped text clips.
     observer?.disconnect();
@@ -187,8 +215,8 @@ function resize(element: HTMLIFrameElement) {
   if (!root) return;
   const fit = () => {
     fitFrameToContent(element);
-    element.style.height = `${root.offsetHeight + 1}px`;
-    syncFade(element);
+    height.value = root.offsetHeight + 1;
+    element.style.height = `${height.value}px`;
   };
   fit();
   element.contentDocument?.fonts?.ready.then(fit);
@@ -202,12 +230,6 @@ function resize(element: HTMLIFrameElement) {
   element.contentDocument
     ?.querySelectorAll("video")
     .forEach((video) => video.addEventListener("loadedmetadata", fit));
-}
-
-// Fade the bottom edge while more of a capped email remains below.
-function syncFade(element: HTMLIFrameElement) {
-  const root = element.contentDocument?.documentElement;
-  if (root) element.style.setProperty("--fade", bottomFade(root));
 }
 
 // Size the bubble to its text; an iframe fills its container.
@@ -228,14 +250,3 @@ watch(dataTheme, (theme) =>
   )
 );
 </script>
-
-<style scoped>
-/* At 0px the stop sits on the edge, so the mask is opaque. */
-.email-fade {
-  mask-image: linear-gradient(
-    to bottom,
-    #000 calc(100% - var(--fade, 0px)),
-    transparent
-  );
-}
-</style>
