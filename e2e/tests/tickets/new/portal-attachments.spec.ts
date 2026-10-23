@@ -104,6 +104,19 @@ test.describe("upload messages", () => {
     await attach(page, { name: "one.txt", mimeType: "text/plain", buffer: Buffer.from("x") });
     await expect(row(page, "one.txt").getByText("1 B", { exact: true })).toBeVisible();
   });
+
+  test("a file name over 140 characters uploads under a shortened name", async ({ page, api }) => {
+    const stem = `long-${uid()}-`;
+    for (const length of [200, 260]) {
+      const name = `${stem}${"y".repeat(length)}.txt`;
+      await page.goto("/help/my-tickets/new");
+      await attach(page, { name, mimeType: "text/plain", buffer: Buffer.from(name) });
+      await expect(row(page, stem).getByText("Upload failed")).toHaveCount(0);
+      await expect(row(page, stem).getByRole("link")).toBeVisible();
+      const saved = await api.list("File", { filters: { file_name: ["like", `${stem}%`] }, fields: ["file_name"] });
+      expect(saved.map((file) => file.file_name)).toContainEqual(`${stem}${"y".repeat(134 - stem.length - 4)}.txt`);
+    }
+  });
 });
 
 test.describe("pasting", () => {

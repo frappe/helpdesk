@@ -54,7 +54,7 @@
             item.name
           }}</span>
           <span
-            class="text-p-xs"
+            class="text-p-xs [overflow-wrap:anywhere]"
             :class="
               item.status === 'error' ? 'text-ink-red-6' : 'text-ink-gray-5'
             "
@@ -156,6 +156,7 @@ import LucideX from "~icons/lucide/x";
 
 // The site limit caps the whole request, so leave room for the multipart wrapping.
 const MULTIPART_MARGIN = 64 * 1024;
+const FILE_NAME_LIMIT = 134;
 
 const props = defineProps<{
   modelValue: UploadResult[];
@@ -241,7 +242,7 @@ async function send(file: File, args, ctx) {
     if (sending) controller.abort();
   });
   const doc: any = await props
-    .transport(file, args, {
+    .transport(withShortName(file), args, {
       signal: controller.signal,
       onProgress: (loaded, total) => {
         sending = loaded < total;
@@ -256,6 +257,20 @@ async function send(file: File, args, ctx) {
       () => {}
     );
   return doc;
+}
+
+// File.file_name holds 140 characters, and a taken name gets a 6-character suffix;
+// a longer name fails the whole upload.
+function withShortName(file: File) {
+  if (file.name.length <= FILE_NAME_LIMIT) return file;
+  const dot = file.name.lastIndexOf(".");
+  const extension = dot > 0 ? file.name.slice(dot).slice(0, 20) : "";
+  const name =
+    file.name.slice(0, FILE_NAME_LIMIT - extension.length) + extension;
+  return new File([file], name, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
 }
 
 // commit() skips items added mid-pass; loop until none are idle.
