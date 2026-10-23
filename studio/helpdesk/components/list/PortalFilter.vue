@@ -4,11 +4,8 @@
 
 <script setup lang="ts">
 import { computed, provide, reactive } from "vue";
-import {
-  parseFilters,
-  serializeFilters,
-} from "@framework/ui/components/Filter/filters";
-import { Filter } from "@helpdesk/shared/filter";
+import { serializeFilters } from "@framework/ui/components/Filter/filters";
+import { Filter, toConditions } from "@helpdesk/shared/filter";
 
 // The desk's Filter injects these, as ListViewBuilder provides them.
 const props = defineProps<{ fields?: any[] }>();
@@ -29,23 +26,8 @@ provide("listViewData", {
   }),
   filterableFields: reactive({ data: fields }),
 });
+// Keeps unlisted fields, e.g. the org switcher's `customer`.
 provide("listViewActions", {
-  applyFilters: (wire) =>
-    (conditions.value = parseFilters(withUnlisted(wire), wire).map(
-      ({ fieldname, operator, value }) => ({
-        fieldname,
-        operator,
-        value,
-      })
-    )),
+  applyFilters: (wire) => (conditions.value = toConditions(wire, fields.value)),
 });
-
-// parseFilters drops unlisted fields, e.g. the org switcher's `customer`.
-function withUnlisted(wire) {
-  const listed = new Set(fields.value.map((field) => field.fieldname));
-  const unlisted = wire
-    .filter(([fieldname]) => !listed.has(fieldname))
-    .map(([fieldname]) => ({ fieldname, fieldtype: "Data" }));
-  return [...fields.value, ...unlisted];
-}
 </script>

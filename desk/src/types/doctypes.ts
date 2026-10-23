@@ -100,11 +100,13 @@ export interface HDTicket extends DocType {
   /** Summary: Text Editor */
   summary?: string;
   /** Entry Point: Select */
-  entry_point?: '' | 'Article' | 'Search' | 'Ticket List' | 'Closed Ticket' | 'Direct';
+  entry_point?: '' | 'Article' | 'Search' | 'Ticket List' | 'Closed Ticket' | 'Direct' | 'External';
   /** Source Article: Link (HD Article) */
   source_article?: string;
   /** Source Search: Data */
   source_search?: string;
+  /** UTM Source: Data */
+  utm_source?: string;
   /** Ticket Merged: Check */
   is_merged: 0 | 1;
   /** Merged With: Link (HD Ticket) */

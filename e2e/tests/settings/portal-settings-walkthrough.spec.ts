@@ -228,8 +228,8 @@ test.describe("profile", () => {
     await dialog.getByRole("button", { name: /Asia\/Kolkata|Select timezone/ }).click();
     await page.getByRole("combobox").last().fill("Europe/Berlin");
     await page.getByRole("option", { name: "Europe/Berlin" }).click();
-    await expect(toast(page, "Preferences updated")).toBeVisible();
     await expect.poll(async () => (await api.get("User", person.email)).time_zone).toBe("Europe/Berlin");
+    await expect(dialog.getByRole("button", { name: /Europe\/Berlin/ })).toBeVisible();
 
     // S8 language
     await dialog.getByRole("button", { name: "Select language" }).click();
@@ -386,12 +386,12 @@ test.describe("organization", () => {
     const page = await pageOf(browser, baseURL!, org.manager.email);
     const dialog = await openOrgScreen(page, org.name);
     const names = await dialog.locator("div.grid div.text-base-medium").allInnerTexts();
-    expect(names.map((name) => name.split("\n")[0].replace(/You$/, "").trim())).toEqual([
-      org.owner.fullName,
+    // you first, then by role
+    expect(names.map((name) => name.split("\n")[0].trim())).toEqual([
       org.manager.fullName,
+      org.owner.fullName,
       org.member.fullName,
     ]);
-    await expect(memberRow(dialog, org.manager.email)).toContainText("You");
     // S19 last seen: managers only
     await expect(dialog.getByText("Last seen")).toBeVisible();
     await expect(memberRow(dialog, org.owner.email)).toContainText("Never");

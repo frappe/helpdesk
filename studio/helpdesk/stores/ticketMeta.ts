@@ -28,9 +28,13 @@ export function loadStatuses() {
   fetchOnce(statuses)
 }
 
+export function loadPriorities() {
+  fetchOnce(priorities)
+}
+
 export function loadTicketMeta() {
   loadStatuses()
-  fetchOnce(priorities)
+  loadPriorities()
 }
 
 export function getStatus(label: string) {

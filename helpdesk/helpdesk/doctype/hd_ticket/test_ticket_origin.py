@@ -94,13 +94,31 @@ class TestTicketOrigin(IntegrationTestCase):
         )
         self.assertIsNone(origin.source_search)
 
+    def test_utm_source_wins_over_from(self):
+        origin = self.raise_ticket(
+            self.customer, {"utm_source": " frappe-cloud ", "from": "search", "q": "x"}
+        )
+        self.assertEqual(origin.entry_point, "External")
+        self.assertEqual(origin.utm_source, "frappe-cloud")
+        self.assertIsNone(origin.source_search)
+
+        for utm_source in ("   ", ["frappe-cloud"]):
+            with self.subTest(utm_source=utm_source):
+                origin = self.raise_ticket(
+                    self.customer, {"utm_source": utm_source, "from": "ticket-list"}
+                )
+                self.assertEqual(origin.entry_point, "Ticket List")
+                self.assertIsNone(origin.utm_source)
+
     def test_origin_fields_sent_in_the_doc_are_ignored(self):
         smuggled = {
             "entry_point": "Closed Ticket",
             "source_article": self.article,
             "source_search": "spoofed",
+            "utm_source": "spoofed",
         }
         origin = self.raise_ticket(self.customer, {"from": "ticket-list"}, **smuggled)
         self.assertEqual(origin.entry_point, "Ticket List")
         self.assertIsNone(origin.source_article)
         self.assertIsNone(origin.source_search)
+        self.assertIsNone(origin.utm_source)

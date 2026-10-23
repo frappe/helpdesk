@@ -9,7 +9,7 @@
       }}</span>
     </div>
     <div
-      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-1 px-4"
+      class="flex h-28 items-center justify-center rounded-6 border border-outline-gray-2 px-4"
       :style="{ background: previewBackground }"
     >
       <div

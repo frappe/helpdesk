@@ -518,13 +518,17 @@ test.describe("form scripts", () => {
     }
   });
 
-  test("an agent on the portal gets agent-scoped scripts", async ({ pageAs, api, ticket }) => {
+  test("an agent on the portal gets the portal's scripts, not the desk's", async ({ pageAs, api, ticket }) => {
     const scripts = new FormScripts(api);
     await scripts.create(`return { actions: [{ label: "E2E Agent Scoped", onClick: () => {} }] };`);
+    await scripts.create(`return { actions: [{ label: "E2E Portal Scoped", onClick: () => {} }] };`, {
+      portal: true,
+    });
     try {
       const page = await pageAs("agent");
       await page.goto(`/help/my-tickets/${ticket.name}`);
-      await expect(page.getByRole("button", { name: "E2E Agent Scoped" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "E2E Portal Scoped" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "E2E Agent Scoped" })).toBeHidden();
     } finally {
       await scripts.removeAll();
     }

@@ -36,10 +36,10 @@ const joiningNote = computed(
   () =>
     ({
       Customers: __(
-        "Articles in this category are visible to customers only, so moved public articles will be too."
+        "Articles in this category are visible to customers only. Moved public articles will have the same visibility."
       ),
       Private: __(
-        "Articles in this category are visible to agents only, so moved articles will be too."
+        "Articles in this category are visible to agents only. Moved articles will have the same visibility."
       ),
     }[joining.data])
 );

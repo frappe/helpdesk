@@ -9,8 +9,8 @@ export default function setup(context) {
 
   // Sent even when empty: an origin marks a portal ticket. Not `origin`: that is
   // window.origin (the site URL) whenever this script fails to load.
-  const { from, article, q } = route?.query || {}
-  const ticketOrigin = { from, article, q }
+  const { from, article, q, utm_source } = route?.query || {}
+  const ticketOrigin = { from, article, q, utm_source }
   // Subject holds 140 chars; longer would block submit.
   const initialSubject = String(q || '').trim().slice(0, 140)
 

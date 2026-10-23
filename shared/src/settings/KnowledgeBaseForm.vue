@@ -17,12 +17,14 @@
           >
             <Switch
               :aria-label="toggle.label"
-              :model-value="
-                Boolean(settings.doc?.[toggle.fieldname]) ||
-                bounced === toggle.fieldname
+              :model-value="Boolean(settings.doc?.[toggle.fieldname])"
+              :disabled="
+                toggle.fieldname === 'allow_anonymous_article_voting' &&
+                !settings.doc?.public_knowledge_base &&
+                !settings.doc?.[toggle.fieldname]
               "
               @update:model-value="
-                (value) => onAccessToggle(toggle.fieldname, value)
+                (value) => setToggle(toggle.fieldname, value)
               "
             />
           </SettingsRow>
@@ -83,8 +85,8 @@
 
 <script setup lang="ts">
 import { __ } from "../translation";
-import { SettingsRow, Switch, toast } from "frappe-ui";
-import { computed, ref } from "vue";
+import { SettingsRow, Switch } from "frappe-ui";
+import { computed } from "vue";
 import BannerPicker from "./BannerPicker.vue";
 import HeaderLinks from "./HeaderLinks.vue";
 import PinnedCategories from "./PinnedCategories.vue";
@@ -101,24 +103,6 @@ async function savePinsAndNotify(pinned: string[]) {
   const saved = await savePins(pinned);
   if (saved) emit("pinsSaved");
   return saved;
-}
-
-// Guest voting needs a public knowledge base: the switch flips on, then
-// back, so the click visibly registers before the toast explains why.
-const bounced = ref<string | null>(null);
-
-function onAccessToggle(fieldname: string, value: boolean) {
-  if (
-    fieldname === "allow_anonymous_article_voting" &&
-    value &&
-    !settings.doc?.public_knowledge_base
-  ) {
-    bounced.value = fieldname;
-    setTimeout(() => (bounced.value = null), 300);
-    toast.warning(__("Knowledge base must be public"));
-    return;
-  }
-  setToggle(fieldname, value);
 }
 
 // computed, so labels follow a translation load

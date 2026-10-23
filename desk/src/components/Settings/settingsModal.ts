@@ -159,14 +159,14 @@ export const tabs = computed(() => {
       condition: () => auth.isAdmin || auth.isManager,
       items: [
         {
-          label: __("Knowledge Base"),
-          icon: markRaw(LucideBookOpen),
-          component: markRaw(KnowledgeBase),
-        },
-        {
           label: __("Portal Settings"),
           icon: markRaw(LucideUserCog),
           component: markRaw(PortalPermissions),
+        },
+        {
+          label: __("Knowledge Base"),
+          icon: markRaw(LucideBookOpen),
+          component: markRaw(KnowledgeBase),
         },
       ],
     },

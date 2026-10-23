@@ -251,6 +251,21 @@ class TestPublicReads(IntegrationTestCase):
         )
         self.assertEqual(set(category.creators[0]), BYLINE_FIELDS)
 
+    def test_a_byline_drops_a_private_image(self) -> None:
+        author = make_agent(unique_email("kb-author"), "Fixture Author")
+        with self.set_user(author):
+            name = self.make_article("Fixture by author")
+
+        for image, expected in (
+            ("/private/files/fixture.png", None),
+            ("/files/fixture.png", "/files/fixture.png"),
+        ):
+            user = frappe.get_doc("User", author)
+            user.user_image = image
+            user.save(ignore_permissions=True)
+
+            self.assertEqual(get_article(name).author["image"], expected)
+
     def test_a_category_carries_its_description(self) -> None:
         category = category_row(self.category.name)
 
