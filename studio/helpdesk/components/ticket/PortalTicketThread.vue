@@ -203,7 +203,7 @@ const TicketEmails = defineComponent({
             // inside the scroller, so the scrollbar sits at the container edge.
             props.authors
               ? "is-chat px-3 sm:px-5"
-              : "sm:[&>.activity-timeline]:px-6 lg:[&>.activity-timeline]:px-10",
+              : "[&_.activities]:mt-0 sm:[&>.activity-timeline]:px-6 lg:[&>.activity-timeline]:px-10",
             revealed.value && "portal-reveal",
             !settled.value && "is-settling relative",
           ],

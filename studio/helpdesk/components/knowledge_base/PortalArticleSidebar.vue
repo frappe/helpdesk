@@ -27,7 +27,7 @@
           </template>
           <template #suffix>
             <ShortcutKey
-              v-if="!query && !isFocused"
+              v-if="searchShortcut && !query && !isFocused"
               class="[@media(pointer:coarse)]:hidden"
               size="sm"
               keys="/"
@@ -187,12 +187,15 @@ const props = withDefaults(
     activeCategory?: string;
     open?: boolean;
     loading?: boolean;
+    // Off where the page's own search takes "/".
+    searchShortcut?: boolean;
   }>(),
   {
     categories: () => [],
     activeName: "",
     activeCategory: "",
     open: false,
+    searchShortcut: true,
   }
 );
 
@@ -344,6 +347,7 @@ const isFocused = ref(false);
 useKeyboardShortcut({
   combo: "Slash",
   description: __("Search articles"),
+  enabled: () => props.searchShortcut,
   handler: () => search.value?.focus(),
 });
 </script>

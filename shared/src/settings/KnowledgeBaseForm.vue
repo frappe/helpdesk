@@ -36,7 +36,7 @@
           <PinnedCategories
             v-model:pinned="draft.pinned"
             :categories="categoryOptions"
-            :save="savePins"
+            :save="savePinsAndNotify"
           />
           <BannerPicker
             :image="draft.banner_image"
@@ -94,6 +94,14 @@ import { useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 // Switches and the pin dialog save at once; the rest waits for Save.
 const { draft, settings, setToggle, savePins, categoryOptions } =
   useKnowledgeBaseDraft();
+
+const emit = defineEmits<{ pinsSaved: [] }>();
+
+async function savePinsAndNotify(pinned: string[]) {
+  const saved = await savePins(pinned);
+  if (saved) emit("pinsSaved");
+  return saved;
+}
 
 // Guest voting needs a public knowledge base: the switch flips on, then
 // back, so the click visibly registers before the toast explains why.

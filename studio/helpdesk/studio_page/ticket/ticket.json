@@ -212,10 +212,7 @@
                   "cursor-copy",
                   "hover:text-ink-gray-8",
                   "self-start",
-                  "max-w-full",
-                  "text-start",
-                  "rounded-4",
-                  "focus-visible:focus-ring"
+                  "max-w-full"
                  ],
                  "componentEvents": {
                   "click": {
@@ -228,7 +225,7 @@
                  "componentName": "TextBlock",
                  "componentProps": {
                   "fontSize": "text-p-sm",
-                  "tag": "button",
+                  "tag": "span",
                   "text": "{{ identity.reference }}"
                  }
                 }
@@ -1104,7 +1101,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-23 18:30:00.000000",
+ "modified": "2026-10-23 19:00:00.000000",
  "modified_by": "Administrator",
  "name": "ticket",
  "owner": "Administrator",

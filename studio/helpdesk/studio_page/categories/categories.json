@@ -44,7 +44,8 @@
      "componentProps": {
       "categories": "{{ sidebar.data || [] }}",
       "open": "{{ drawer.open }}",
-      "loading": "{{ !sidebar.data }}"
+      "loading": "{{ !sidebar.data }}",
+      "searchShortcut": false
      },
      "isCustomVueComponent": true
     },
@@ -107,6 +108,22 @@
              ],
              "slotId": "categories-search-slot-prefix",
              "slotName": "prefix"
+            },
+            "suffix": {
+             "slotContent": [
+              {
+               "componentId": "PortalSearchShortcut-categories-search",
+               "componentName": "PortalSearchShortcut",
+               "componentProps": {
+                "description": "{{ t('Search categories') }}",
+                "hideKey": "{{ Boolean(search) }}"
+               },
+               "componentSlots": {},
+               "isCustomVueComponent": true
+              }
+             ],
+             "slotId": "categories-search-slot-suffix",
+             "slotName": "suffix"
             }
            },
            "visibilityCondition": "{{ !categories.data || categories.data.length }}"
@@ -217,7 +234,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-22 13:30:00.000000",
+ "modified": "2026-10-23 19:30:00.000000",
  "modified_by": "Administrator",
  "name": "categories",
  "owner": "Administrator",

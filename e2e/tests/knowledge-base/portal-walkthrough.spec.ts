@@ -614,6 +614,22 @@ test.describe("categories and category pages", () => {
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
   });
 
+  test("/ focuses Search categories on All categories, and the article search elsewhere", async ({ page, api }) => {
+    const category = await createCategory(api);
+    await createArticle(api, category.name);
+    await page.goto("/help/categories");
+    const search = page.getByRole("textbox", { name: "Search categories" });
+    await expect(search).toBeVisible();
+    await page.keyboard.press("/");
+    await expect(search).toBeFocused();
+    await expect(search).toHaveValue("");
+
+    await page.goto(`/help/category/${category.name}`);
+    await expect(page.getByPlaceholder("Search articles").first()).toBeVisible();
+    await page.keyboard.press("/");
+    await expect(page.getByPlaceholder("Search articles").first()).toBeFocused();
+  });
+
   test("CT2–CT5 article list, sidebar toggle and sidebar search", async ({ page, api }) => {
     const category = await createCategory(api);
     const other = await createCategory(api);
@@ -880,6 +896,33 @@ test.describe("knowledge base settings", () => {
     } finally {
       await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
       if (await api.exists("HD Form Script", { name: QUICK_LINKS })) await api.delete("HD Form Script", QUICK_LINKS);
+    }
+  });
+});
+
+test.describe("knowledge base settings: pins on the home page", () => {
+  usePersona("admin");
+
+  test("pins saved from Settings show on the home page without a reload", async ({ page, api }) => {
+    const pinned = [await createCategory(api), await createCategory(api)];
+    for (const category of pinned) await createArticle(api, category.name);
+    try {
+      await page.goto("/help/settings/knowledge-base");
+      const grid = page.locator('[data-component-id="category-grid-repeater"]');
+      // The settings dialog hides the page from the accessibility tree, so match by CSS.
+      const cards = grid.locator("a");
+      await expect.poll(() => cards.count()).toBeGreaterThan(2);
+      await page.getByRole("dialog").getByRole("button", { name: "Customize" }).click();
+      const pins = page.getByRole("dialog", { name: "Pinned categories" });
+      for (const category of pinned) {
+        await pins.getByRole("button", { name: `Pin ${category.category_name}`, exact: true }).click();
+      }
+      await pins.getByRole("button", { name: "Save" }).click();
+      await expect(pins).toBeHidden();
+      await expect(cards).toHaveCount(2);
+      await expect(cards.first()).toContainText(pinned[0].category_name);
+    } finally {
+      for (const category of pinned) await api.update("HD Article Category", category.name, { pinned: 0, pinned_order: 0 });
     }
   });
 });
