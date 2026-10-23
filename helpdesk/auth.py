@@ -64,6 +64,14 @@ ALLOWED_PATHS = [
     "/api/method/frappe.integrations.oauth2.register_client",
     "/api/method/frappe.integrations.oauth2.introspect_token",
     "/api/method/frappe.integrations.oauth2.revoke_token",
+    # the Studio portal at /help
+    "/api/method/frappe.studio.doctype.studio_page.studio_page.get_page",
+    "/api/method/frappe.translate.get_boot_translations",
+    "/api/method/frappe.core.api.file.get_max_file_size",
+    "/api/method/frappe.desk.form.activity.get_activity_timeline",
+    "/api/method/frappe.desk.form.activity.get_more_email_activities",
+    "/api/method/frappe.desk.form.activity.get_more_milestone_activities",
+    "/api/method/frappe.core.doctype.user.user.get_timezones",
 ]
 
 WILDCARD_PATHS = [
