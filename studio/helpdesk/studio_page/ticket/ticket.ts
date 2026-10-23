@@ -167,7 +167,10 @@ export default function setup(context) {
   const suggestedArticles = computed(() => relatedArticles.data || [])
 
   // The server's test; it counts an agent reply that raised the ticket.
-  const canRate = computed(() => Boolean(ticket.data?.has_agent_replied) && !ticket.data?.feedback)
+  // Email feedback sets only the rating, and a rating is final.
+  const canRate = computed(
+    () => Boolean(ticket.data?.has_agent_replied) && !ticket.data?.feedback && !ticket.data?.feedback_rating,
+  )
   // As on the server: a required rating blocks the status write; agents exempt.
   const wantsFeedback = computed(
     () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !settings.isAgent.value,
