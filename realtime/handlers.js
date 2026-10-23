@@ -4,9 +4,15 @@ function helpdesk_handlers(socket) {
   });
 
   // Same gate as frappe's doc_open: the room names viewers and relays edits and typing.
+  // Tickets this socket still means to view: a stop that lands during the
+  // permission check would otherwise be undone by the late join.
+  const viewing = new Set();
+
   socket.on("view_ticket", (ticket_id) => {
     if (!ticket_id) return;
+    viewing.add(ticket_id);
     socket.has_permission("HD Ticket", ticket_id).then(() => {
+      if (!viewing.has(ticket_id)) return;
       socket.join(open_doc_room("HD Ticket", ticket_id));
 
       // Notify all viewers in this ticket room about the new viewer
@@ -19,6 +25,7 @@ function helpdesk_handlers(socket) {
 
   socket.on("stop_view_ticket", (ticket_id) => {
     if (!ticket_id) return;
+    viewing.delete(ticket_id);
     const room = open_doc_room("HD Ticket", ticket_id);
     socket.leave(room);
 
