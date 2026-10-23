@@ -36,8 +36,8 @@ export function useTicketDetails(ticket, thread, statusChanges) {
     [
       // Always shown when set, whatever the template says.
       { label: __('Customer'), value: data.value.customer, isCustomer: true, image: data.value.customer_image || '' },
-      { label: __('Team'), value: data.value.agent_group },
       { label: __('Priority'), value: data.value.priority, isPriority: true },
+      { label: __('Team'), value: data.value.agent_group },
       ...templateFields(),
     ].filter((row) => row.value),
   )
