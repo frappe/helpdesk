@@ -81,6 +81,12 @@ class TestOrganizationMembers(IntegrationTestCase):
             [member["contact"] for member in you], [self.manager["contact"]]
         )
 
+    def test_the_caller_is_listed_first(self) -> None:
+        # a Member, who would otherwise sort after the owner and managers
+        with self.set_user(self.member["user"]):
+            members = get_organization(self.customer.name)["members"]
+        self.assertEqual(members[0]["contact"], self.member["contact"])
+
     def test_a_non_member_cannot_read_the_organization(self) -> None:
         with (
             self.set_user(self.outsider["user"]),

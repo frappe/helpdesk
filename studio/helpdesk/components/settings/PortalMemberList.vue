@@ -219,7 +219,7 @@ type Invitation = {
   invited_on?: string;
 };
 
-// No Owner filter: one per org, already listed first.
+// No Owner filter: one per org, listed right after you.
 const roleFilters = computed(() => [
   { label: __("All"), value: "All", icon: LucideUsers },
   ...ASSIGNABLE_ROLES.map((role) => ({
