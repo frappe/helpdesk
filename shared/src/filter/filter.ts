@@ -1,6 +1,7 @@
 import { __ } from "../translation";
 import { useDebounceFn } from "@vueuse/core";
 import { createResource } from "frappe-ui";
+import { parseFilters } from "@framework/ui/components/Filter/filters";
 import { computed, inject, Component, ComputedRef } from "vue";
 import LucideCalendar from "~icons/lucide/calendar";
 import LucideClock from "~icons/lucide/clock";
@@ -153,6 +154,17 @@ export function normalizeFilters(raw: any): FilterCondition[] {
     if (Array.isArray(value)) return [fieldname, value[0], value[1]];
     return [fieldname, "=", value];
   });
+}
+
+// parseFilters drops fields it is not given; an unknown one is kept as Data.
+export function toConditions(wire: FilterCondition[], fields: any[] = []) {
+  const known = new Set(fields.map((field) => field.fieldname));
+  const unknown = wire
+    .filter(([fieldname]) => !known.has(fieldname))
+    .map(([fieldname]) => ({ fieldname, fieldtype: "Data" }));
+  return parseFilters([...fields, ...unknown], wire).map(
+    ({ fieldname, operator, value }) => ({ fieldname, operator, value })
+  );
 }
 
 export function useLinkSearch(doctype: string, filters?: Record<string, any>) {

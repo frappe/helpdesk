@@ -3,8 +3,7 @@ import { StorageSerializers, useStorage } from '@vueuse/core'
 import { call, createListResource, toast } from 'frappe-ui'
 import { parseOrderBy } from '@framework/ui/SortBy'
 import { parseColumns } from '@framework/ui/ColumnSettings'
-import { parseFilters } from '@framework/ui/Filter'
-import { normalizeFilters } from '@helpdesk/shared/filter'
+import { normalizeFilters, toConditions } from '@helpdesk/shared/filter'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
@@ -58,6 +57,18 @@ function createViewsStore() {
   const activeView = computed(
     () => views.value.find((view) => view.name === activeName.value) || null,
   )
+
+  // No saved columns means the default List columns, as the old portal stored them.
+  const activeLayout = computed(() => {
+    const row = activeView.value
+    if (!row) return null
+    const columns = parseViewColumns(row.columns)
+    return {
+      filters: parseViewFilters(row.filters),
+      sort: parseOrderBy(row.order_by || ''),
+      columns: columns.length ? columns : defaultSnapshot?.columns,
+    }
+  })
 
   const currentView = computed(() =>
     activeView.value
@@ -119,18 +130,8 @@ function createViewsStore() {
     const view = listView.value
     if (!view) return
     isRestoring = true
-    const row = activeView.value
-    if (!row) {
-      if (defaultSnapshot) view.restore(structuredClone(defaultSnapshot))
-    } else {
-      // No saved columns means the default List columns, as the old portal stored them.
-      const columns = parseViewColumns(row.columns)
-      view.restore({
-        filters: parseViewFilters(row.filters),
-        sort: parseOrderBy(row.order_by || ''),
-        columns: structuredClone(columns.length ? columns : defaultSnapshot?.columns),
-      })
-    }
+    const layout = activeLayout.value || defaultSnapshot
+    if (layout) view.restore(structuredClone(layout))
     // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
     if (remembered) {
@@ -155,13 +156,13 @@ function createViewsStore() {
 
   const isViewModified = computed(() => {
     const row = activeView.value
-    if (!row || !listView.value) return false
+    const layout = activeLayout.value
+    if (!row || !layout || !listView.value) return false
     const current = currentPayload()
-    const columns = parseViewColumns(row.columns)
     return (
       current.order_by !== (row.order_by || '') ||
-      current.filters !== JSON.stringify(parseViewFilters(row.filters)) ||
-      current.columns !== JSON.stringify(columns.length ? columns : defaultSnapshot?.columns)
+      current.filters !== JSON.stringify(layout.filters) ||
+      current.columns !== JSON.stringify(layout.columns)
     )
   })
 
@@ -304,13 +305,7 @@ function createViewsStore() {
 function parseViewFilters(raw) {
   const filters = parseJson(raw, [])
   if (Array.isArray(filters) && filters.every((condition) => condition?.fieldname)) return filters
-  const wire = normalizeFilters(filters)
-  const fields = wire.map(([fieldname]) => ({ fieldname, fieldtype: 'Data' }))
-  return parseFilters(fields, wire).map(({ fieldname, operator, value }) => ({
-    fieldname,
-    operator,
-    value,
-  }))
+  return toConditions(normalizeFilters(filters))
 }
 
 function parseViewColumns(raw) {
