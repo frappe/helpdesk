@@ -28,9 +28,17 @@ class HDSettings(Document):
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
         self.validate_default_agent_status()
+        self.turn_off_guest_home_when_private()
         self.validate_guest_only_settings()
         # every visitor loads it, so a linked image could track them
         validate_uploaded_image(self.banner_image)
+
+    def turn_off_guest_home_when_private(self):
+        """A private knowledge base turns away guests, so it can't be their home."""
+        if not self.public_knowledge_base and self.has_value_changed(
+            "public_knowledge_base"
+        ):
+            self.knowledge_base_home_page_for_guests = 0
 
     def validate_guest_only_settings(self):
         """Guests reach only a public knowledge base. Checked only when turned on,

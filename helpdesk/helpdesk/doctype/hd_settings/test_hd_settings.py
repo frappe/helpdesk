@@ -127,6 +127,14 @@ class TestKnowledgeBaseHomePage(IntegrationTestCase):
         frappe.db.set_single_value("Website Settings", "home_page", "about")
         self.assertEqual(self.set_setting(0), "about")
 
+    def test_making_the_knowledge_base_private_turns_it_off(self) -> None:
+        self.set_setting(1)
+        settings = frappe.get_single("HD Settings")
+        settings.public_knowledge_base = 0
+        settings.save()
+        self.assertEqual(settings.knowledge_base_home_page_for_guests, 0)
+        self.assertEqual(self.guest_home_page(), "login")
+
 
 class TestGuestOnlySettings(IntegrationTestCase):
     """Guests reach only a public knowledge base, so their settings need one."""
