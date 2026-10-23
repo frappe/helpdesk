@@ -91,7 +91,9 @@ test("a ticket rated by email closes without asking for a rating again", async (
     await page.goto(`/help/tickets/${ticket.name}`);
     await page.getByRole("button", { name: "Close" }).click();
     await expect(page.getByRole("dialog", { name: "Rate this ticket" })).toHaveCount(0);
-    await page.getByRole("dialog", { name: "Close ticket" }).getByRole("button", { name: "Close ticket" }).click();
+    // The dialog's X is also named Close; the confirm button comes last.
+    const confirm = page.getByRole("dialog", { name: "Close ticket" });
+    await confirm.getByRole("button", { name: "Close", exact: true }).last().click();
     await expect.poll(async () => (await api.get("HD Ticket", ticket.name)).status).toBe("Closed");
   } finally {
     await api.update("HD Settings", "HD Settings", { is_feedback_mandatory: mandatory });
