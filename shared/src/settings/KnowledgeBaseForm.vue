@@ -20,7 +20,8 @@
               :model-value="Boolean(settings.doc?.[toggle.fieldname])"
               :disabled="
                 toggle.fieldname === 'allow_anonymous_article_voting' &&
-                !settings.doc?.public_knowledge_base
+                !settings.doc?.public_knowledge_base &&
+                !settings.doc?.[toggle.fieldname]
               "
               @update:model-value="
                 (value) => setToggle(toggle.fieldname, value)

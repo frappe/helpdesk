@@ -104,8 +104,10 @@ const sections = computed(() => [
         description: __(
           "Guests land on the knowledge base landing page instead of the login page."
         ),
-        // Guests only reach a public knowledge base.
-        disabled: !hdSettings.doc?.public_knowledge_base,
+        // Guests only reach a public knowledge base. Left on, it can still be turned off.
+        disabled:
+          !hdSettings.doc?.public_knowledge_base &&
+          !hdSettings.doc?.knowledge_base_home_page_for_guests,
       },
       // Shown as "Allow": the field stores the opposite. Counted while
       // unknown, so the skeleton has a row for it.
