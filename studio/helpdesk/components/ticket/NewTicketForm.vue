@@ -357,6 +357,8 @@ function uiFor(row) {
     const list = options.map((value) => ({ label: __(value), value }));
     return { component: ApiOptionsField, props: { options: list } };
   }
+  // `padded` gives the Check the inputs' height, so `.field-grid` can row it with them.
+  if (row.fieldtype === "Check") return { props: { padded: true } };
   if (!props.dateFormat) return undefined;
   if (row.fieldtype === "Datetime")
     return { props: { format: `${props.dateFormat} ${props.timeFormat}` } };
@@ -461,6 +463,10 @@ function createTicket() {
   .field-grid :deep(.column) {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  /* Checks have no label above, so sit them on the inputs' row. */
+  .field-grid :deep(.field[data-fieldtype="Check"]) {
+    align-self: end;
   }
 }
 </style>
