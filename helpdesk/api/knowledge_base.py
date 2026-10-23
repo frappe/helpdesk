@@ -154,9 +154,12 @@ def get_articles(
 
 
 def _get_byline(user: str) -> dict:
-    """Never the email: guests could harvest it."""
+    """Never the email: guests could harvest it. Never a private image: readers get a 403."""
     info = get_user_info_for_avatar(user)
-    return {"name": info["name"], "image": info["image"]}
+    image = info["image"]
+    if image and image.startswith("/private/"):
+        image = None
+    return {"name": info["name"], "image": image}
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
