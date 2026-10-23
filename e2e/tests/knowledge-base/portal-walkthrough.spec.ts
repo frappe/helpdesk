@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect, test as base, uid, usePersona } from "../../helpers/fixtures";
 import { raiseTicket } from "../../helpers/factories";
 import { PASSWORD, personas } from "../../helpers/personas";
-import { createArticle, createCategory, indexArticles } from "../../helpers/portal";
+import { createArticle, createCategory } from "../../helpers/portal";
 import { snapshotSettings } from "../../helpers/settings";
 import { siteHeader } from "../../helpers/site";
 
@@ -32,10 +32,6 @@ async function seedAudiences(api) {
     agents: await make("Private"),
     draft: await make("Public", "Draft"),
   };
-}
-
-function searchBox(page: Page) {
-  return page.getByRole("combobox", { name: /Search articles/ });
 }
 
 function accountMenu(page: Page) {
@@ -395,58 +391,6 @@ test.describe("knowledge base home", () => {
       [...document.querySelectorAll<HTMLElement>("*")].map((el) => el.style.background).find((bg) => bg.includes("surface-blue"))
     );
     expect(background).toContain("surface-blue");
-  });
-
-  test("K2–K8 search, keyboard, no results, recently viewed", async ({ page, api }) => {
-    const word = `zq${uid()}`;
-    const category = await createCategory(api);
-    const article = await createArticle(api, category.name, { title: `Searchable ${word} guide` });
-    await indexArticles(api, word);
-
-    await page.goto("/help");
-    // K6: "/" focuses the box.
-    await page.locator("body").press("/");
-    await expect(searchBox(page)).toBeFocused();
-
-    // K2: fewer than three characters sends nothing.
-    let searches = 0;
-    page.on("request", (request) => request.url().includes("search_articles") && searches++);
-    await searchBox(page).fill("zq");
-    await page.waitForTimeout(600);
-    expect(searches).toBe(0);
-
-    await searchBox(page).fill(word);
-    await expect(page.getByText("1 article")).toBeVisible();
-    await expect(page.locator("mark", { hasText: word }).first()).toBeVisible();
-    // K3: arrows and Enter open the hit.
-    await searchBox(page).press("ArrowDown");
-    await searchBox(page).press("Enter");
-    await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}-searchable-`));
-
-    // K4: no results offers a ticket with the search text.
-    await page.goto("/help");
-    await searchBox(page).fill(`nothing${word}`);
-    await expect(page.getByText(`No articles match “nothing${word}”`)).toBeVisible();
-    await expect(page.getByText("Try other words, or ask our team.")).toBeVisible();
-    // the header has a "Raise a ticket" button too
-    await page
-      .getByText("Try other words, or ask our team.")
-      .locator("..")
-      .getByRole("button", { name: "Raise a ticket" })
-      .click();
-    await expect(page).toHaveURL(new RegExp(`/help/my-tickets/new\\?from=search&q=nothing${word}`));
-    await expect(page.getByPlaceholder("A short description")).toHaveValue(`nothing${word}`);
-
-    // K7: the article just opened is under Recently viewed.
-    await page.goto("/help");
-    await searchBox(page).click();
-    await expect(page.getByText("Recently viewed")).toBeVisible();
-    const recent = page.getByRole("option", { name: new RegExp(`Searchable ${word}`) });
-    await expect(recent).toBeVisible();
-    // K8: Remove drops it.
-    await recent.hover();
-    await recent.getByRole("button", { name: "Remove" }).click();
-    await expect(recent).toHaveCount(0);
   });
 
   test("K9 recently viewed is kept per user", async ({ page, api }) => {

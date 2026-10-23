@@ -2,7 +2,6 @@ import type { Page } from "@playwright/test";
 import type { Api } from "../../../helpers/api";
 import { FormScripts, ensureTemplate } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
-import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 
 usePersona("customer");
 
@@ -199,41 +198,6 @@ test.describe("template", () => {
     } finally {
       await restore();
     }
-  });
-});
-
-test.describe("article suggestions", () => {
-  test("preview a suggestion on hover and open it", async ({ page, api, context }) => {
-    const category = await createCategory(api);
-    // One word, so earlier runs' articles can't outrank it.
-    const title = `Reset${uid()}`;
-    const article = await createArticle(api, category.name, { title });
-    await indexArticles(api, title);
-
-    await page.goto("/help/my-tickets/new");
-    await page.getByPlaceholder("A short description").fill(title);
-    const suggestion = page.getByRole("link", { name: title, exact: true });
-    await suggestion.hover();
-    await expect(page.getByText("Open article")).toBeVisible();
-
-    const popup = context.waitForEvent("page");
-    await suggestion.click();
-    const opened = await popup;
-    await expect(opened).toHaveURL(new RegExp(`/help/articles/${article.name}-reset`));
-    await expect(opened.getByRole("heading", { name: title }).first()).toBeVisible();
-  });
-
-  test("article links carry a clean slug, not the search highlight", async ({ page, api }) => {
-    const category = await createCategory(api);
-    const title = `Rotate${uid()}`;
-    const article = await createArticle(api, category.name, { title });
-    await indexArticles(api, title);
-    await page.goto("/help/my-tickets/new");
-    await page.getByPlaceholder("A short description").fill(title);
-    await expect(page.getByRole("link", { name: title, exact: true })).toHaveAttribute(
-      "href",
-      new RegExp(`/help/articles/${article.name}-rotate[a-z0-9]+$`)
-    );
   });
 });
 

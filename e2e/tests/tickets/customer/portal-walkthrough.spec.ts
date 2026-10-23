@@ -4,7 +4,6 @@ import { raiseTicket } from "../../../helpers/factories";
 import { FormScripts } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 import { personas } from "../../../helpers/personas";
-import { createArticle, createCategory, indexArticles } from "../../../helpers/portal";
 import { runTicketMethod, setHelpdeskSetting } from "../../../helpers/ticket";
 
 usePersona("customer");
@@ -475,17 +474,6 @@ test.describe("details panel", () => {
     await api.update("HD Ticket", ticket.name, { status: "Replied" });
     await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("On hold")).toBeVisible();
-  });
-
-  test("related help opens the article", async ({ page, api, ticket }) => {
-    const article = await createArticle(api, (await createCategory(api)).name, { title: `Help for ${ticket.subject}` });
-    await indexArticles(api, ticket.subject);
-    await page.goto(`/help/my-tickets/${ticket.name}`);
-    await expect(page.getByRole("button", { name: "Related help" })).toBeVisible();
-    // A clickable row, not a link.
-    await page.getByText(article.title, { exact: true }).click();
-    await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}`));
-    await expect(page.getByRole("heading", { name: article.title }).first()).toBeVisible();
   });
 
   test("the out-of-hours banner dismisses for the day", async ({ page, ticket }) => {

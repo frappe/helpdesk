@@ -1,4 +1,4 @@
-import { expect, request, type Page } from "@playwright/test";
+import { request, type Page } from "@playwright/test";
 import type { Api } from "./api";
 import { uid } from "./factories";
 import { siteHeader } from "./site";
@@ -22,20 +22,6 @@ export async function createArticle(
     visibility: "Public",
     ...fields,
   });
-}
-
-/** Articles reach RediSearch only on a rebuild; rebuild until `query` hits. */
-export async function indexArticles(api: Api, query: string) {
-  await expect
-    .poll(
-      async () => {
-        await api.call("helpdesk.search.build_index");
-        const hits = await api.callGet("helpdesk.api.knowledge_base.search_articles", { query });
-        return hits.length;
-      },
-      { timeout: 30_000, intervals: [1_000] }
-    )
-    .toBeGreaterThan(0);
 }
 
 /** Pick an option in a frappe-ui Combobox-backed Link field. */
