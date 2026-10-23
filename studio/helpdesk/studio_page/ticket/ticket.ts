@@ -167,7 +167,10 @@ export default function setup(context) {
     })),
   )
 
-  const canRate = computed(() => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback)
+  // Email feedback sets only the rating, and a rating is final.
+  const canRate = computed(
+    () => Boolean(thread.lastAgentReply.value) && !ticket.data?.feedback && !ticket.data?.feedback_rating,
+  )
   // Where a rating is required, the status cannot be written without it; agents are not asked, as on the server.
   const wantsFeedback = computed(
     () => canRate.value && Boolean(config.value?.is_feedback_mandatory) && !config.value?.is_agent,
