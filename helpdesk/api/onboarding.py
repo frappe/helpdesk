@@ -1,5 +1,6 @@
 import frappe
 
+from helpdesk.helpdesk.doctype.hd_settings.helpers import set_site_brand_name
 from helpdesk.utils import agent_manager_only
 
 
@@ -13,9 +14,7 @@ def mark_persona_captured(brand_name: str | None = None) -> None:
     brand_name = (brand_name or "").strip()
     if brand_name:
         frappe.db.set_single_value("HD Settings", "brand_name", brand_name)
-        frappe.db.set_single_value("Website Settings", "app_name", brand_name)
-        # Display name in framework emails, e.g. the welcome mail "Welcome to <name>".
-        frappe.db.set_default("site_name", brand_name)
+        set_site_brand_name(brand_name)
         # set_single_value skips Website Settings' on_update, so clear the cache
         # ourselves for the new brand to show up in the desk/PWA/app identity.
         frappe.clear_cache()

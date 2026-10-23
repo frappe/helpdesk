@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import { FileUploadHandler, call, toast } from 'frappe-ui'
+import { call, toast } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import {
   afterEachRoute,
@@ -9,15 +9,18 @@ import {
   previousLocation,
 } from '@app/stores/router'
 import { getErrorMessage } from '@helpdesk/shared/utils'
+import { settingsPath } from '@app/router'
 
 export function createSettingsCore() {
   const isSettingsOpen = ref(false)
-  const settingsTab = ref<'profile' | 'members' | 'portal-permissions'>('profile')
+  const settingsTab = ref<'profile' | 'members' | 'knowledge-base' | 'portal-settings'>('profile')
   const account = ref(null)
   const isSettingsBusy = ref(false)
 
   const settingsUser = computed(() => account.value?.user || {})
   const organizations = computed(() => account.value?.organizations || [])
+  // Set even on failure, so nothing waits forever.
+  const settingsLoaded = ref(false)
 
   const reloadHooks = []
   function afterLoad(hook) {
@@ -31,20 +34,28 @@ export function createSettingsCore() {
     } catch (error) {
       console.error(error)
       toast.error(__('Could not load settings'))
+    } finally {
+      settingsLoaded.value = true
     }
   }
 
-  // `landed` reports a change that saved but whose mail failed.
-  async function run(action, successMessage, landed) {
+  // Pages need the account once; opening the dialog refetches it.
+  let firstLoad: Promise<void> | null = null
+  function ensureSettings() {
+    return (firstLoad ??= loadSettings())
+  }
+
+  // `landed`: saved but the mail failed. `reload`: refetch what changed.
+  async function run(action, successMessage, landed?, reload = loadSettings) {
     if (isSettingsBusy.value) return
     isSettingsBusy.value = true
     try {
       await action()
       if (successMessage) toast.success(successMessage)
-      await loadSettings()
+      await reload()
     } catch (error) {
       console.error(error)
-      await loadSettings()
+      await reload()
       const partial = landed?.()
       if (partial) toast.warning(partial)
       else getErrorMessage(error, true, __('Something went wrong'))
@@ -53,41 +64,22 @@ export function createSettingsCore() {
     }
   }
 
-  function pickImage(onUploaded) {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = async () => {
-      const file = input.files?.[0]
-      if (!file) return
-      const uploaded = await new FileUploadHandler()
-        .upload(file, { private: false, optimize: true })
-        .catch(() => {
-          toast.error(__('Could not upload the image'))
-        })
-      if (uploaded) await onUploaded(uploaded.file_url)
-    }
-    input.click()
-  }
-
   return {
     isSettingsOpen,
     settingsTab,
     isSettingsBusy,
     settingsUser,
     organizations,
+    settingsLoaded,
     afterLoad,
     loadSettings,
+    ensureSettings,
     run,
-    pickImage,
   }
 }
 
-// One hash segment per screen, so the device back button steps through the dialog.
-const HASH_ROOT = 'settings'
-
-// Tabs only settings editors get; any other tab outside the list falls back to Profile.
-const EDITOR_TABS = ['portal-permissions']
+// Only settings editors get these.
+const EDITOR_TABS = ['knowledge-base', 'portal-settings']
 const TABS = ['profile', 'members', ...EDITOR_TABS]
 
 export function createSettingsDialog(core, organization, session) {
@@ -102,83 +94,92 @@ export function createSettingsDialog(core, organization, session) {
     core.isSettingsOpen.value = false
   }
 
-  // At module load, not in watchRoute: Studio stops the page's effect scope on navigation.
+  // Not in watchRoute: Studio stops the page's effect scope on navigation.
   watch(
     [core.isSettingsOpen, core.settingsTab, organization.selectedOrganization, organization.inviteOpen],
-    () => pushHash(),
+    () => pushPath(),
   )
 
-  // `afterEach`, not a route watcher: a page script's `route` is a snapshot.
+  // `afterEach`: a page script's `route` is a snapshot.
   let isWatchingRoute = false
 
   function watchRoute() {
     if (isWatchingRoute) return
     isWatchingRoute = true
-    applyHash(currentRoute().hash)
-    afterEachRoute((to) => applyHash(to.hash))
+    applyRoute(currentRoute())
+    afterEachRoute(applyRoute)
   }
 
-  async function applyHash(hash) {
-    const [root, hashTab, ...rest] = readHash(hash).replace(/^#/, '').split('/')
-    if (root !== HASH_ROOT) return closeSettings()
-    // A guest has no account to show, and a tab the user can't see would open blank.
+  async function applyRoute(route) {
+    const screens = readScreens(route)
+    if (!screens) return closeSettings()
+    // Guests have no account; unseen tabs would open blank.
     await session.loadSession()
-    if (session.isGuest.value) return closeSettings()
-    const allowed = TABS.includes(hashTab) && (!EDITOR_TABS.includes(hashTab) || session.canEditSettings.value)
-    const tab = allowed ? hashTab : 'profile'
+    if (session.isGuest.value) {
+      closeSettings()
+      return navigateTo({ path: pagePath(route), query: route.query, hash: route.hash, replace: true })
+    }
+    const [routeTab, ...rest] = screens
+    const allowed = TABS.includes(routeTab) && (!EDITOR_TABS.includes(routeTab) || session.canEditSettings.value)
+    const tab = allowed ? routeTab : 'profile'
     if (core.isSettingsOpen.value) core.settingsTab.value = tab
     else openSettings(tab)
     const invite = rest[rest.length - 1] === 'invite'
     if (invite) rest.pop()
-    applyOrganizationHash(rest.join('/'), invite)
+    applyOrganization(rest.join('/'), invite)
   }
 
-  function applyOrganizationHash(org, invite) {
+  function applyOrganization(org, invite) {
     if (!org) return organization.closeOrganization()
     if (org !== organization.selectedOrganization.value) organization.openOrganization(org)
     organization.inviteOpen.value = invite
   }
 
-  function settingsHash() {
-    if (!core.isSettingsOpen.value) return ''
-    const parts = [HASH_ROOT, core.settingsTab.value]
-    if (organization.selectedOrganization.value) parts.push(organization.selectedOrganization.value)
-    if (organization.selectedOrganization.value && organization.inviteOpen.value) parts.push('invite')
-    return `#${parts.join('/')}`
+  // One path segment per screen, so device back steps through the dialog.
+  function targetPath(route) {
+    const page = pagePath(route)
+    if (!core.isSettingsOpen.value) return page
+    const screens = [core.settingsTab.value]
+    if (organization.selectedOrganization.value) screens.push(organization.selectedOrganization.value)
+    if (organization.selectedOrganization.value && organization.inviteOpen.value) screens.push('invite')
+    return settingsPath(page, screens)
   }
 
-  // Names carry spaces, which the router escapes, so every hash is read decoded.
-  function readHash(hash) {
+  // The `<page>/settings/:settings*` alias from router.ts; null off it.
+  function readScreens(route) {
+    const screens = route.params?.settings
+    if (screens === undefined) return null
+    return Array.isArray(screens) ? screens : [screens].filter(Boolean)
+  }
+
+  function pagePath(route) {
+    const screens = readScreens(route)
+    if (!screens) return route.path
+    return route.path.replace(/\/$/, '').split('/').slice(0, -(screens.length + 1)).join('/') || '/'
+  }
+
+  // Paths come from the router, the address bar and here, each escaped its own way.
+  function decode(path) {
     try {
-      return decodeURIComponent(String(hash || ''))
+      return decodeURIComponent(String(path || ''))
     } catch {
-      return String(hash || '')
+      return String(path || '')
     }
   }
 
-  function pushHash() {
-    const hash = settingsHash()
+  function pushPath() {
     const current = currentRoute()
-    if (readHash(current.hash) === hash) return
-    // Unwind history rather than grow it, or back points forward into the closed screen.
-    const previous = previousHash()
-    if (previous !== null && readHash(previous) === hash) return navigateBack()
-    // The path travels with it: a bare `{ hash }` resolves against whatever is current.
-    navigateTo({ path: current.path, query: current.query, hash })
-  }
-
-  // History state holds a full path, so only the part before the query names the page.
-  function previousHash() {
+    if (!current.path) return
+    const path = targetPath(current)
+    if (decode(current.path) === decode(path)) return
+    // Unwind history, or back points into the closed screen.
     const previous = previousLocation()
-    if (previous === null) return null
-    const index = previous.indexOf('#')
-    const [location, hash] = index === -1 ? [previous, ''] : [previous.slice(0, index), previous.slice(index)]
-    return location.split('?')[0] === currentRoute().path ? hash : null
+    if (previous !== null && decode(previous.split(/[?#]/)[0]) === decode(path)) return navigateBack()
+    navigateTo({ path, query: current.query, hash: current.hash })
   }
 
   return {
     openSettings,
-    closeSettings,
     watchRoute,
   }
 }

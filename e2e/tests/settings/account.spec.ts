@@ -26,11 +26,10 @@ test.describe("my settings", () => {
     expect((await api.get("User", email)).first_name).toBe("Renamed");
 
     const chooser = page.waitForEvent("filechooser");
-    await dialog.locator(".group.relative div.cursor-pointer").first().click();
+    await dialog.getByRole("button", { name: "Upload Photo" }).click();
     await (await chooser).setFiles(PIXEL);
     await expect.poll(async () => (await api.get("User", email)).user_image).toContain("/files/");
-    await dialog.locator(".group.relative").first().hover();
-    await dialog.locator(".group.relative div.\\-top-1").click();
+    await dialog.getByRole("button", { name: "Remove Photo" }).click();
     await expect.poll(async () => (await api.get("User", email)).user_image).toBeFalsy();
 
     const newPassword = `E2e-Changed-${uid()}!`;
@@ -112,7 +111,7 @@ test("ticket automation settings save status updates, auto close and the banner"
     "outside_working_hours_message",
   ]);
   try {
-    // The switch below turns the banner on, so start from off; `restore` puts it back.
+    // The switch turns the banner on, so start from off.
     await api.update("HD Settings", "HD Settings", { enable_outside_hours_banner: 0 });
     await page.goto("/helpdesk/tickets");
     const dialog = await openSettings(page, "General");
@@ -168,9 +167,9 @@ test("the brand logo uploads and removes, and signup can be disabled", async ({ 
     await page.getByRole("dialog", { name: "Remove Logo" }).getByRole("button", { name: "Confirm" }).click();
     await expect.poll(async () => (await api.get("HD Settings", "HD Settings")).brand_logo).toBeFalsy();
 
-    // Signup lives under Portal Permissions and saves as soon as it is toggled.
-    await dialog.getByRole("button", { name: "Portal Permissions", exact: true }).click();
-    await settingRow(dialog, "Disable signup").getByRole("switch").click();
+    // Signup saves as soon as it is toggled.
+    await dialog.getByRole("button", { name: "Portal Settings", exact: true }).click();
+    await settingRow(dialog, "Allow signup").getByRole("switch").click();
     await expect
       .poll(async () => (await api.get("Website Settings", "Website Settings")).disable_signup)
       .toBe(signup ? 0 : 1);

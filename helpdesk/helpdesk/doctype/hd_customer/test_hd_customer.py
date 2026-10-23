@@ -4,7 +4,10 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from helpdesk.helpdesk.doctype.hd_customer.hd_customer import permission_query
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
+    is_customer_manager,
+    permission_query,
+)
 from helpdesk.helpdesk.hooks.user_invitation import after_accept
 from helpdesk.test_utils import (
     add_contact_in_customer,
@@ -380,7 +383,6 @@ class TestHDCustomer(IntegrationTestCase):
         return contact_doc, customer, ticket, invitation
 
     def test_has_permission_members_read_and_never_write(self) -> None:
-        # Managers change their customer through helpdesk.api.customer only.
         customer = create_customer("Perm Member Manager")
         member = create_contact("PermMember", "perm-member@example.com")
         manager = create_contact("PermManager", "perm-manager@example.com")
@@ -408,6 +410,36 @@ class TestHDCustomer(IntegrationTestCase):
             frappe.db.get_value("HD Customer", customer.name, "domain"),
             "renamed.example.com",
         )
+
+    def test_manager_rights_are_per_organization(self) -> None:
+        managed = create_customer(unique_name("Perm Managed"))
+        joined = create_customer(unique_name("Perm Joined"))
+        person = make_contact("perm-dual")
+        add_contact_in_customer(managed, person["contact"], is_manager=True)
+        add_contact_in_customer(joined, person["contact"], is_manager=False)
+        managed_ticket = self.org_ticket(managed.name)
+        joined_ticket = self.org_ticket(joined.name)
+        user = person["user"]
+
+        self.assertTrue(is_customer_manager(managed.name, user))
+        self.assertFalse(is_customer_manager(joined.name, user))
+        self.assertTrue(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", joined_ticket, user=user)
+        )
+
+        update_role_in_customer(managed, person["contact"], "HD Customer")
+        self.assertFalse(is_customer_manager(managed.name, user))
+        self.assertFalse(
+            frappe.has_permission("HD Ticket", "read", managed_ticket, user=user)
+        )
+
+    def org_ticket(self, customer: str) -> str:
+        ticket = make_ticket(raised_by=make_contact("perm-raiser")["user"])
+        ticket.db_set("customer", customer, update_modified=False)
+        return ticket.name
 
     def test_has_permission_denies_non_member(self) -> None:
         # A portal user who is not a member is denied read and write (IDOR guard).

@@ -1,10 +1,8 @@
-// Portal list cells; the priority and SLA pieces are the desk's, from `@helpdesk/shared`.
 import { h } from 'vue'
 import { Rating } from 'frappe-ui'
 import { PriorityIcon, resolutionBadge, responseBadge } from '@helpdesk/shared/ticketCells'
-import { timeAgo } from '@helpdesk/shared/utils'
+import { parseJson, timeAgo } from '@helpdesk/shared/utils'
 import { getPriorityLevel, getStatus, statusMeta } from '@app/stores/ticketMeta'
-import { parseJson } from '@app/utils'
 import PortalStatusPill from '@app/components/ticket/PortalStatusPill.vue'
 
 export function statusCell({ item }: any) {
@@ -38,7 +36,7 @@ export function subjectCell({ row, item }: any, reader: string) {
   return h('span', { class: ['truncate flex-1', !seen && 'font-semibold'] }, item)
 }
 
-// HD Ticket stores the rating as a fraction of five stars.
+// Stored as a fraction of five stars.
 export function ratingCell({ item }: any) {
   return h(Rating, { modelValue: (item || 0) * 5, disabled: true, size: 'sm' })
 }

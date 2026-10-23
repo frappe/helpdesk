@@ -3,7 +3,6 @@ import type { Api } from "../../../helpers/api";
 import { FormScripts, ensureTemplate } from "../../../helpers/form-script";
 import { expect, test, uid, usePersona } from "../../../helpers/fixtures";
 
-// Every customer action on /help/tickets/new, past what portal-new covers.
 usePersona("customer");
 
 const PIXEL = "e2e/fixtures/pixel.png";
@@ -12,7 +11,6 @@ const DATE_FIELDS = [
   { fieldname: "e2e_datetime", fieldtype: "Datetime" },
 ];
 
-/** Put rows on the portal's Default template for one test; returns the restore. */
 async function useTemplate(api: Api, rows: Record<string, any>[], extra: Record<string, any> = {}) {
   const before = await api.get("HD Ticket Template", "Default");
   await api.update("HD Ticket Template", "Default", {
@@ -58,6 +56,17 @@ function createButton(page: Page) {
   return page.getByRole("button", { name: "Create ticket" });
 }
 
+/** Submitting with a required field empty names it and stays on the form. */
+async function expectRequired(page: Page, label: string) {
+  await createButton(page).click();
+  await expect(page.getByRole("alert").filter({ hasText: /^Required:/ })).toContainText(label);
+  await expect(page).toHaveURL(/\/help\/my-tickets\/new/);
+}
+
+function requiredHint(page: Page) {
+  return page.getByRole("alert").filter({ hasText: /^Required:/ });
+}
+
 test.describe("template", () => {
   test("about, description template and required subject", async ({ page, api }) => {
     const restore = await useTemplate(api, [], {
@@ -65,13 +74,12 @@ test.describe("template", () => {
       description_template: "<p>Steps to reproduce:</p>",
     });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await expect(page.getByText("Tell us what broke")).toBeVisible();
       await expect(page.locator(".ProseMirror")).toContainText("Steps to reproduce:");
-      // the template fills the description, so only the subject is missing
-      await expect(createButton(page)).toBeDisabled();
+      await expectRequired(page, "Subject");
       await page.getByPlaceholder("A short description").fill(`E2E ${uid()}`);
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
     } finally {
       await restore();
     }
@@ -80,15 +88,15 @@ test.describe("template", () => {
   test("link options load and a required field blocks submit", async ({ page, api }) => {
     const restore = await useTemplate(api, [{ fieldname: "ticket_type", required: 1 }]);
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       const subject = await fillBasics(page);
-      await expect(createButton(page)).toBeDisabled();
+      await expectRequired(page, "Ticket Type");
       await field(page, "Ticket Type").click();
       await expect(page.getByRole("option", { name: "Bug", exact: true })).toBeVisible();
       await page.getByRole("option", { name: "Bug", exact: true }).click();
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
       await createButton(page).click();
-      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", { filters: { subject }, fields: ["ticket_type"] });
       expect(ticket.ticket_type).toBe("Bug");
     } finally {
@@ -104,16 +112,16 @@ test.describe("template", () => {
       field: "date_format",
     });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       const subject = await fillBasics(page);
       const date = field(page, "E2E date");
       await date.fill("2026-10-15");
       await date.press("Enter");
-      // yyyy-mm-dd on this site; the picker shows the site's own format
+      // the picker shows the site's own format
       expect(format).toBe("yyyy-mm-dd");
       await expect(date).toHaveValue("2026-10-15");
       await createButton(page).click();
-      await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+      await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
       const [ticket] = await api.list("HD Ticket", { filters: { subject }, fields: ["e2e_date"] });
       expect(ticket.e2e_date).toBe("2026-10-15");
     } finally {
@@ -129,19 +137,24 @@ test.describe("template", () => {
       { fieldname: "e2e_needed" },
     ]);
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await fillBasics(page);
       await expect(page.getByText("E2E shown")).toHaveCount(0);
-      // hidden, so its `required` does not block submit
-      await expect(createButton(page)).toBeEnabled();
+      // hidden, so its `required` does not block submit; abort the create to stay on the form
+      await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new", (route) => route.abort());
+      const create = page.waitForRequest("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new");
+      await createButton(page).click();
+      await create;
+      await page.unroute("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new");
+      await expect(requiredHint(page)).toBeHidden();
 
       await pick(page, "E2E trigger", "Show");
       await expect(page.getByRole("textbox", { name: /^E2E shown/ })).toBeVisible();
       await expect(page.getByRole("textbox", { name: /^E2E needed \(required\)/ })).toBeVisible();
-      await expect(createButton(page)).toBeDisabled();
+      await expect(requiredHint(page)).toContainText("E2E needed");
       await page.getByRole("textbox", { name: /^E2E shown/ }).fill("x");
       await page.getByRole("textbox", { name: /^E2E needed/ }).fill("y");
-      await expect(createButton(page)).toBeEnabled();
+      await expect(requiredHint(page)).toBeHidden();
     } finally {
       await restore();
     }
@@ -151,14 +164,14 @@ test.describe("template", () => {
     await ensureTemplate(api);
     const restore = await useTemplate(api, [{ fieldname: "e2e_trigger" }, { fieldname: "e2e_choice" }]);
     const scripts = new FormScripts(api);
-    // Not portal-flagged: the portal's new page loads agent-scoped scripts (see the fixme in form-script.spec).
+    // Not portal-flagged: the portal new page loads agent scripts (form-script.spec fixme).
     await scripts.create(
       `return { actions: [], onChange: { e2e_trigger: (value) =>
         ctx.applyFilters("e2e_choice", value === "Show" ? ["Alpha", "Beta"] : null) } };`,
       { newPage: true }
     );
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await pick(page, "E2E trigger", "Show");
       await field(page, "E2E choice").click();
       await expect(page.getByRole("option")).toHaveText(["Alpha", "Beta"]);
@@ -177,7 +190,7 @@ test.describe("template", () => {
     const hint = `Within four hours ${uid()}`;
     await api.update("HD Ticket Priority", "High", { description: hint });
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await pick(page, "Priority", "High");
       await expect(page.getByText(hint)).toBeVisible();
     } finally {
@@ -195,7 +208,7 @@ test.describe("template", () => {
       route.fulfill({ json: { message: ["Red", { label: "Green", value: "green" }] } })
     );
     try {
-      await page.goto("/help/tickets/new");
+      await page.goto("/help/my-tickets/new");
       await page.getByRole("button", { name: /^E2E needed/ }).or(field(page, "E2E needed")).first().click();
       await expect(page.getByRole("option")).toHaveText(["Red", "Green"]);
     } finally {
@@ -210,14 +223,13 @@ test.describe("attachments", () => {
   }
 
   test("upload, remove and submit with an attachment", async ({ page, api }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     const subject = await fillBasics(page);
     await attach(page, PIXEL);
     await expect(page.getByRole("link", { name: "pixel.png" }).or(page.getByText("pixel.png"))).toBeVisible();
     await expect(createButton(page)).toBeEnabled();
 
     await attach(page, { name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
-    // a finished upload's name becomes a link to the file
     await expect(page.getByRole("link", { name: "notes.txt" })).toHaveAttribute("target", "_blank");
     await page
       .locator("div")
@@ -229,7 +241,7 @@ test.describe("attachments", () => {
     await expect(page.getByText("notes.txt")).toHaveCount(0);
 
     await createButton(page).click();
-    await expect(page).toHaveURL(/\/help\/tickets\/\d+$/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
     const name = page.url().split("/").pop()!;
     const files = await api.list("File", {
       filters: { attached_to_doctype: "HD Ticket", attached_to_name: name },
@@ -240,22 +252,22 @@ test.describe("attachments", () => {
   });
 
   test("a disallowed type is refused for a customer", async ({ page }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await attach(page, { name: "evil.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
-    await expect(page.locator("p.text-ink-red-4")).toBeVisible();
+    await expect(page.getByText('"evil.html" was skipped')).toBeVisible();
   });
 
   test("an agent may attach any type", async ({ pageAs }) => {
     const page = await pageAs("agent");
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await expect(page.locator("input[type=file].sr-only")).not.toHaveAttribute("accept", /.+/);
     await attach(page, { name: "page.html", mimeType: "text/html", buffer: Buffer.from("<b>x</b>") });
     await expect(page.getByText("page.html")).toBeVisible();
-    await expect(page.locator("p.text-ink-red-4")).toHaveCount(0);
+    await expect(page.getByText(/was skipped/)).toHaveCount(0);
   });
 
   test("files can be dropped or pasted onto the page", async ({ page }) => {
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     const dropZone = page.getByRole("button", { name: "Drag or paste files here, or click to browse" });
     const transfer = await page.evaluateHandle(() => {
       const data = new DataTransfer();
@@ -282,11 +294,54 @@ test.describe("submit", () => {
     await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.new", (route) =>
       route.fulfill({ status: 417, json: { exc_type: "ValidationError", _server_messages: JSON.stringify([JSON.stringify({ message: "E2E refused" })]) } })
     );
-    await page.goto("/help/tickets/new");
+    await page.goto("/help/my-tickets/new");
     await fillBasics(page);
     await createButton(page).click();
     await expect(page.getByText("E2E refused").first()).toBeVisible();
-    await expect(page).toHaveURL(/\/help\/tickets\/new/);
+    await expect(page).toHaveURL(/\/help\/my-tickets\/new/);
     await expect(createButton(page)).toBeEnabled();
+  });
+
+  test("odd origins fall back safely", async ({ page, api }) => {
+    const longQuery = "q".repeat(200);
+    await page.goto(`/help/my-tickets/new?from=bogus&article=no-such-article&q=${longQuery}`);
+    const subjectField = page.getByPlaceholder("A short description");
+    await subjectField.fill(`E2E origin ${uid()}`);
+    const subject = await subjectField.inputValue();
+    await page.locator(".ProseMirror").fill("Where from?");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
+    const [ticket] = await api.list("HD Ticket", {
+      filters: { subject },
+      fields: ["entry_point", "source_article", "source_search"],
+    });
+    expect(ticket.entry_point).toBe("Direct");
+    expect(ticket.source_article).toBeNull();
+  });
+
+  test("search text over 140 characters is cut", async ({ page, api }) => {
+    const longQuery = `${uid()} ${"q".repeat(200)}`;
+    await page.goto(`/help/my-tickets/new?from=search&q=${longQuery}`);
+    // cut to the 140 characters a subject holds
+    const subjectField = page.getByPlaceholder("A short description");
+    await expect(subjectField).toHaveValue(longQuery.slice(0, 140));
+    const subject = `E2E long search ${uid()}`;
+    await subjectField.fill(subject);
+    await page.locator(".ProseMirror").fill("Long search");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/);
+    const [ticket] = await api.list("HD Ticket", {
+      filters: { subject },
+      fields: ["entry_point", "source_search"],
+    });
+    expect(ticket.entry_point).toBe("Search");
+    expect(ticket.source_search).toBe(longQuery.slice(0, 140));
+  });
+
+  test("a long search can still be raised as it is", async ({ page }) => {
+    await page.goto(`/help/my-tickets/new?from=search&q=${"q".repeat(200)}`);
+    await page.locator(".ProseMirror").fill("Long search");
+    await createButton(page).click();
+    await expect(page).toHaveURL(/\/help\/my-tickets\/\d+$/, { timeout: 5_000 });
   });
 });

@@ -18,6 +18,8 @@ export async function createArticle(
     category,
     content: `<p>${title} body</p>`,
     status: "Published",
+    // New articles default to Customers.
+    visibility: "Public",
     ...fields,
   });
 }

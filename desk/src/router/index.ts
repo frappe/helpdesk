@@ -2,7 +2,7 @@ import { useScreenSize } from "@/composables/screen";
 import { canViewPersona, personaInterrupt } from "@/persona";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
@@ -21,8 +21,7 @@ declare module "vue-router" {
   }
 }
 
-// Pages that render inside the portal chrome; PortalRoot picks the agent or
-// customer shell from the session.
+// Pages that render inside the desk chrome.
 const portalRoutes = [
   // Agent Portal Routes
   {
@@ -133,37 +132,6 @@ const portalRoutes = [
     component: () => import("@/pages/call-logs/CallLogs.vue"),
   },
 
-  // Customer Portal Routes
-  {
-    path: "/kb-public",
-    name: "CustomerKnowledgeBase",
-    component: () => import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/kb-public/:categoryId",
-    name: "Articles",
-    component: () => import("@/pages/knowledge-base/Articles.vue"),
-    props: true,
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-  {
-    path: "/kb-public/articles/:articleId",
-    name: "ArticlePublic",
-    component: () => import("@/pages/knowledge-base/Article.vue"),
-    props: true,
-    meta: {
-      public: true,
-      auth: true,
-    },
-  },
-
   // Additonal routes
   {
     path: "/:pathMatch(.*)*",
@@ -182,7 +150,7 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("@/roots/PortalRoot.vue"),
+    component: () => import("@/roots/AgentRoot.vue"),
     children: portalRoutes,
   },
 ];
@@ -198,7 +166,6 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-  isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
@@ -216,15 +183,14 @@ router.beforeEach(async (to, _, next) => {
     window.location.replace(
       CUSTOMER_PORTAL_ROOT + ROUTES.ticket(to.params.ticketId as string)
     );
-  } else if (!to.meta.public && !authStore.hasDeskAccess) {
-    window.location.replace(CUSTOMER_PORTAL_ROOT);
+  } else if (!authStore.hasDeskAccess) {
+    window.location.replace(window.customer_home_page);
   } else {
     next();
   }
 });
 
 router.afterEach(async (to) => {
-  if (to.meta.public) return;
   const { users } = useUserStore();
   if (!users?.fetched) {
     await users.fetch();

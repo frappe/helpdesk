@@ -1,9 +1,7 @@
-"""Customers can't join a ticket's socket room, so each reader gets a bare ping on their own channel."""
-
 from unittest.mock import patch
 
 import frappe
-from frappe.tests.utils import FrappeTestCase
+from frappe.tests import IntegrationTestCase
 
 from helpdesk.test_utils import (
     create_customer,
@@ -17,7 +15,7 @@ from helpdesk.test_utils import (
 )
 
 
-class TestTicketRealtime(FrappeTestCase):
+class TestTicketRealtime(IntegrationTestCase):
     def setUp(self):
         self.agent = make_agent(unique_email("realtime-agent"))
         self.requester = make_contact("realtime-customer")
@@ -49,7 +47,7 @@ class TestTicketRealtime(FrappeTestCase):
         def change():
             with self.set_user(user):
                 doc = frappe.get_doc("HD Ticket", self.ticket.name)
-                doc.priority = doc.priority
+                doc.feedback_extra = "edited"  # one field a customer may change
                 doc.save(ignore_permissions=True)
 
         return change

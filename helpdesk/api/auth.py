@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.core.doctype.user.user import get_timezones
 
 from helpdesk.utils import agent_only, get_agent_name, get_agents_team, get_user_contact
 from helpdesk.utils import is_agent as _is_agent
@@ -87,7 +88,6 @@ def update_profile(
     language: str | None = None,
     time_zone: str | None = None,
 ) -> None:
-    """Change the session user's own name, picture, language or time zone."""
     user = frappe.get_doc("User", frappe.session.user)
     if first_name is not None:
         user.first_name = first_name
@@ -99,6 +99,9 @@ def update_profile(
     if language:
         user.language = language
     if time_zone:
+        # Autocomplete field: unvalidated, and a bad zone breaks every date
+        if time_zone not in get_timezones()["timezones"]:
+            frappe.throw(_("Unknown time zone: {0}").format(time_zone))
         user.time_zone = time_zone
     user.save(ignore_permissions=True)
     _sync_contact(user)
@@ -110,11 +113,11 @@ def validate_uploaded_image(image: str | None) -> None:
 
 
 def _sync_contact(user) -> None:
-    # Frappe mirrors the User onto its Contact after commit, too late for the reload that follows.
+    # Frappe syncs Contact after commit, too late for the client reload.
     contact_name = get_user_contact(user.name)
     if not contact_name:
         return
-    # Locked: the User's own after-commit job saves this Contact too, and a quick second change would race it.
+    # Locked: races the User's own after-commit Contact save.
     contact = frappe.get_doc("Contact", contact_name, for_update=True)
     contact.update(
         {

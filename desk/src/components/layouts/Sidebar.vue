@@ -7,28 +7,23 @@
         class="flex flex-col gap-2"
         :class="isCollapsed ? 'items-center' : 'px-2'"
       >
-        <TrialBanner
-          v-if="isFCSite && !isCustomerPortal"
-          :isSidebarCollapsed="isCollapsed"
-        />
+        <TrialBanner v-if="isFCSite" :isSidebarCollapsed="isCollapsed" />
         <GettingStartedBanner
           v-if="showOnboardingBanner"
           :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
-        <template v-if="!isCustomerPortal">
-          <CustomerPortalPermissionBanner
-            v-if="isBannerVisible('customer_portal_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-          <TicketFieldPermissionBanner
-            v-if="isBannerVisible('ticket_field_permission')"
-            :isSidebarCollapsed="isCollapsed"
-          />
-        </template>
+        <CustomerPortalPermissionBanner
+          v-if="isBannerVisible('customer_portal_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
+        <TicketFieldPermissionBanner
+          v-if="isBannerVisible('ticket_field_permission')"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
       <SidebarItem
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        v-if="isOnboardingStepsCompleted"
         :label="__('Help')"
         :icon="HelpIcon"
         :on-click="
@@ -64,7 +59,11 @@
 
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import {
+  ArticleIcon,
+  FrappeCloudIcon,
+  InviteCustomer,
+} from "@/components/icons";
 import CustomerPortalPermissionBanner from "@/components/banners/CustomerPortalPermissionBanner.vue";
 import TicketFieldPermissionBanner from "@/components/banners/TicketFieldPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
@@ -81,7 +80,7 @@ import {
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
-import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { call, SidebarItem, toast, useColorScheme } from "frappe-ui";
 import {
   GettingStartedBanner,
@@ -101,7 +100,6 @@ import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { __ } from "@/translation";
-import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMoon from "~icons/lucide/moon";
@@ -136,22 +134,7 @@ const themeMenuItem = computed(() => ({
 
 const isFCSite = ref(window.is_fc_site);
 
-const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    options: [
-      {
-        label: __("Log out"),
-        icon: "lucide-log-out",
-        onClick: () => authStore.logout(),
-      },
-    ],
-  },
-]);
-
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   {
     label: __("Customer portal"),
@@ -197,12 +180,6 @@ const agentPortalDropdown = computed(() => [
   },
 ]);
 
-const profileSettings = computed(() => {
-  return isCustomerPortal.value
-    ? customerPortalDropdown.value
-    : agentPortalDropdown.value;
-});
-
 const logo = h(
   HDLogo,
   {
@@ -212,11 +189,7 @@ const logo = h(
 );
 
 const showOnboardingBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    !isOnboardingStepsCompleted?.value &&
-    authStore.isManager
-  );
+  return !isOnboardingStepsCompleted?.value && authStore.isManager;
 });
 
 const steps = [
@@ -305,7 +278,7 @@ const steps = [
     name: "first_article",
     title: __("Create an article"),
     completed: false,
-    icon: markRaw(FileText),
+    icon: markRaw(ArticleIcon),
     onClick: async () => {
       const generalCategory = await getGeneralCategory();
       router.push({
@@ -487,7 +460,6 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
-  if (isCustomerPortal.value) return;
   useShortcut({ key: ",", meta: true }, () => {
     showSettingsModal.value = !showSettingsModal.value;
   });

@@ -1,5 +1,3 @@
-"""A portal reply links only files its sender uploaded for that ticket, never someone else's."""
-
 import frappe
 from frappe.tests.utils import FrappeTestCase
 

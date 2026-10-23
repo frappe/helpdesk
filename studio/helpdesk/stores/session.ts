@@ -3,14 +3,24 @@ import { useMediaQuery } from '@vueuse/core'
 import { call, setConfig } from 'frappe-ui'
 import { spritePlugin } from 'frappe-ui/experimental'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
+import { __ } from '@helpdesk/shared/translation'
 
-// From boot, not `get_config`: it must be set before the first date renders.
+// From boot: must be set before the first date renders.
 setConfig('systemTimezone', window.boot?.system_timezone)
+// frappe-ui falls back to the browser zone, but looks it up again on every date.
+setConfig('localTimezone', Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-// Stored icons (views, form scripts) can be any lucide name, which Studio's build-time classes cannot cover.
+// Stored icons can be any lucide name, beyond Studio's build-time classes.
 if (!document.getElementById('lucide-sprite')) spritePlugin.install()
 
-// `get_config` is the one call guests may make.
+if (window.boot?.send_guest_to_login) {
+  document.documentElement.style.visibility = 'hidden'
+  location.replace(loginUrl())
+} else if (location.pathname === '/' && window.boot?.home_page && window.boot.home_page !== '/') {
+  // Else the router reads `/` as the portal root, the knowledge base.
+  location.replace(window.boot.home_page)
+}
+
 const store = createSessionStore()
 
 export function useSession() {
@@ -22,24 +32,30 @@ function createSessionStore() {
   const config = ref(null)
   let sessionRequest = null
 
-  // Guest until told otherwise: the topbar renders before the call returns.
   const isGuest = computed(() => (config.value?.session_user || 'Guest') === 'Guest')
   const canCreateTicket = computed(() => !isGuest.value)
+  const canGiveFeedback = computed(() => !isGuest.value || Boolean(config.value?.allow_anonymous_article_voting))
+  const isPublicKnowledgeBase = computed(() => Boolean(config.value?.public_knowledge_base))
   const isAgent = computed(() => Boolean(config.value?.is_agent))
   const canEditSettings = computed(() => Boolean(config.value?.can_edit_settings))
   const brandLogo = computed(() => config.value?.brand_logo || config.value?.favicon || '')
   const brandName = computed(() => config.value?.brand_name || window.boot?.brand_name || 'Helpdesk')
-  // The site's format, in dayjs tokens: frappe writes `dd-mm-yyyy`.
+  // frappe writes `dd-mm-yyyy`; dayjs wants uppercase tokens.
   const dateFormat = computed(() => config.value?.date_format?.toUpperCase())
-  // Tailwind's `sm`, which the desk also takes as its mobile cut-off.
+  // Tailwind `sm`, the desk's mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
+  // The header has no room for the full label on a phone.
+  const raiseTicketLabel = computed(() => (isPhone.value ? __('Create') : __('Raise a ticket')))
 
   function loadSession() {
     if (sessionRequest) return sessionRequest
     sessionRequest = call('helpdesk.api.config.get_config')
       .then((data) => (config.value = data))
       .then(sendGuestToLogin)
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        sessionRequest = null
+        console.error(error)
+      })
     return sessionRequest
   }
 
@@ -48,7 +64,7 @@ function createSessionStore() {
     return loadSession()
   }
 
-  // Once per app: every page passes the same socket. The desk's config store does the same.
+  // Once per app: every page passes the same socket.
   let listeningForSettings = false
   function reloadOnSettingsUpdate(socket) {
     if (listeningForSettings || !socket) return
@@ -56,17 +72,17 @@ function createSessionStore() {
     socket.on('helpdesk:settings-updated', reloadSession)
   }
 
-  // A guest 403s on every call, so sign in beats an unfillable shell.
+  // A private knowledge base 403s every guest call.
   function sendGuestToLogin() {
-    if (!isGuest.value) return
+    if (!isGuest.value || isPublicKnowledgeBase.value) return
     signIn()
   }
 
   function signIn() {
-    window.location.href = `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
+    window.location.href = loginUrl()
   }
 
-  // Posted, not navigated: frappe only accepts POST on logout.
+  // frappe only accepts POST on logout.
   async function signOut() {
     try {
       await call('logout')
@@ -80,16 +96,23 @@ function createSessionStore() {
     config,
     reloadOnSettingsUpdate,
     isGuest,
+    isPublicKnowledgeBase,
     canCreateTicket,
+    canGiveFeedback,
     isAgent,
     canEditSettings,
     brandLogo,
     brandName,
     dateFormat,
     isPhone,
+    raiseTicketLabel,
     signIn,
     loadSession,
     reloadSession,
     signOut,
   }
+}
+
+function loginUrl() {
+  return `/login?redirect-to=${encodeURIComponent(location.pathname + location.search)}`
 }

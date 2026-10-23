@@ -19,7 +19,7 @@ import {
   ERPNextSettingsIcon,
   FieldDependencyIcon,
   PhoneIcon,
-  SlidersIcon
+  SlidersIcon,
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
@@ -29,8 +29,10 @@ import SavedReplies from "./SavedReplies/SavedReplies.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import General from "./General/General.vue";
+import KnowledgeBase from "./KnowledgeBase/KnowledgeBase.vue";
 import PortalPermissions from "./Customers/PortalPermissions.vue";
 import LucideUserCog from "~icons/lucide/user-cog";
+import LucideBookOpen from "~icons/lucide/book-open";
 import SettingsGear from "~icons/lucide/settings";
 import ZapIcon from "~icons/lucide/zap";
 import ProfilePage from "./Profile/ProfilePage.vue";
@@ -89,12 +91,6 @@ export const tabs = computed(() => {
           condition: () => auth.isAdmin,
         },
         {
-          label: __("Portal Permissions"),
-          icon: markRaw(LucideUserCog),
-          component: markRaw(PortalPermissions),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
           label: __("Agents"),
           icon: markRaw(LucideUser),
           component: markRaw(Agents),
@@ -144,6 +140,22 @@ export const tabs = computed(() => {
       ],
     },
     {
+      label: __("Customer Portal"),
+      condition: () => auth.isAdmin || auth.isManager,
+      items: [
+        {
+          label: __("Knowledge Base"),
+          icon: markRaw(LucideBookOpen),
+          component: markRaw(KnowledgeBase),
+        },
+        {
+          label: __("Portal Settings"),
+          icon: markRaw(LucideUserCog),
+          component: markRaw(PortalPermissions),
+        },
+      ],
+    },
+    {
       label: __("Integrations"),
       items: [
         {
@@ -185,7 +197,8 @@ type TabName =
   | "Email Accounts"
   | "Email Notifications"
   | "General"
-  | "Portal Permissions"
+  | "Knowledge Base"
+  | "Portal Settings"
   | "Agents"
   | "Invite Agents"
   | "Teams"

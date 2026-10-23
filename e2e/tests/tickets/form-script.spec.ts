@@ -27,7 +27,7 @@ test("a flat action fires exactly once on each page", async ({ pageAs, ticket })
 
   const surfaces = [
     { persona: "agent", url: `/helpdesk/tickets/${ticket.name}`, label: "E2E Agent Ticket" },
-    { persona: "customer", url: `/help/tickets/${ticket.name}`, label: "E2E Portal Ticket" },
+    { persona: "customer", url: `/help/my-tickets/${ticket.name}`, label: "E2E Portal Ticket" },
     { persona: "agent", url: "/helpdesk/tickets/new", label: "E2E Agent New" },
   ] as const;
   for (const surface of surfaces) {
@@ -151,8 +151,7 @@ test.describe("new ticket form", () => {
     await expect(field(page, "E2E needed").getByText("*")).toBeVisible();
   });
 
-  test.fixme("read_only_depends_on locks a field", async ({ pageAs }) => {
-    // get_fields in hd_ticket_template/api.py never selects read_only_depends_on.
+  test("read_only_depends_on locks a field", async ({ pageAs }) => {
     const page = await pageAs("agent");
     await page.goto(NEW_WITH_TEMPLATE);
     await pick(page, "E2E trigger", "Show");
@@ -171,7 +170,7 @@ test.describe("scoping", () => {
     await expect(agent.getByRole("button", { name: "E2E Portal Only" })).toHaveCount(0);
 
     const customer = await pageAs("customer");
-    await customer.goto(`/help/tickets/${ticket.name}`);
+    await customer.goto(`/help/my-tickets/${ticket.name}`);
     await expect(customer.getByRole("button", { name: "E2E Portal Only" })).toBeVisible();
     await expect(customer.getByRole("button", { name: "E2E Agent Only" })).toHaveCount(0);
   });
@@ -197,7 +196,7 @@ test.describe("scoping", () => {
     await scripts.create(countingAction("E2E Portal New Only"), { newPage: true, portal: true });
 
     const customer = await pageAs("customer");
-    await customer.goto("/help/tickets/new");
+    await customer.goto("/help/my-tickets/new");
     await expect(customer.getByRole("button", { name: "E2E Portal New Only" })).toBeVisible();
     await expect(customer.getByRole("button", { name: "E2E Agent New Only" })).toHaveCount(0);
   });

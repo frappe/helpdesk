@@ -40,7 +40,7 @@ import { computed, h, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
-import { CUSTOMER_PORTAL_ROOT, isCustomerPortal } from "@/utils";
+import { CUSTOMER_PORTAL_ROOT } from "@/utils";
 import { useColorScheme } from "frappe-ui";
 import LucideMoon from "~icons/lucide/moon";
 import LucideSun from "~icons/lucide/sun";
@@ -92,16 +92,7 @@ const themeMenuItem = computed(() => ({
   onClick: () => toggleColorScheme(),
 }));
 
-const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
-  {
-    label: __("Log out"),
-    icon: "lucide-log-out",
-    onClick: () => authStore.logout(),
-  },
-]);
-
-const agentPortalDropdown = computed(() => [
+const profileSettings = computed(() => [
   appsMenuOption.value,
   ...(authStore.hasAgentRecord ? [availabilityMenuOption.value] : []),
   {
@@ -126,12 +117,6 @@ const agentPortalDropdown = computed(() => [
     onClick: () => authStore.logout(),
   },
 ]);
-
-const profileSettings = computed(() => {
-  return isCustomerPortal.value
-    ? customerPortalDropdown.value
-    : agentPortalDropdown.value;
-});
 
 watch(
   () => route.fullPath,

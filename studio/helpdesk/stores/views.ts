@@ -5,7 +5,7 @@ import { parseOrderBy } from '@framework/ui/SortBy'
 import { __ } from '@helpdesk/shared/translation'
 import { currentRoute, navigateTo } from '@app/stores/router'
 import { useSession } from '@app/stores/session'
-import { parseJson, runAction, setValues } from '@app/utils'
+import { askConfirm, parseJson, runAction, setValues } from '@helpdesk/shared/utils'
 
 const DOCTYPE = 'HD Ticket'
 
@@ -38,7 +38,7 @@ function createViewsStore() {
 
   const views = computed(() => list.data || [])
 
-  const listView = shallowRef(null) // the page's useListView
+  const listView = shallowRef(null)
   let hasAttached = false
   let defaultSnapshot = null
   let isRestoring = false
@@ -61,33 +61,38 @@ function createViewsStore() {
       : { ...DEFAULT_VIEW, label: __('List') },
   )
 
+  // Per user: another customer on this browser would get these filters.
+  const memoryKey = (name) => `${MEMORY_PREFIX}:${sessionUser()}:${DOCTYPE}:${name}`
   const rememberedLayout = useStorage(
-    // Per user: another customer on this browser would get these filters.
-    () => `${MEMORY_PREFIX}:${sessionUser()}:${DOCTYPE}:${activeName.value}`,
+    () => memoryKey(activeName.value),
     null,
     localStorage,
     { serializer: StorageSerializers.object, writeDefaults: false },
   )
 
-  // Here, not in attachListView: Studio stops the page's effect scope on navigation.
-  // On route change, not on click, so a shared URL lands on the same view.
+  // Not in attachListView: Studio stops the page's effect scope on navigation.
   watch(() => [activeName.value, list.data], () => applyActiveView())
   watch(
-    () => listView.value && [listView.value.filters.conditions.value, listView.value.sort.by.value],
+    () =>
+      listView.value && [
+        listView.value.filters.conditions.value,
+        listView.value.sort.by.value,
+        listView.value.columns.shown.value,
+      ],
     () => rememberLayout(),
     { deep: true },
   )
 
   function attachListView(view) {
-    // This store outlives the page, so never hold the first mount's `useListView`.
+    // The store outlives the page: rebind on every mount.
     listView.value = view
-    // On every mount: the watch above fires on neither a same-view return nor a remount.
+    // The watch fires on neither a same-view return nor a remount.
     applyActiveView()
     if (hasAttached) return
     hasAttached = true
-    // Restored by the unnamed "List" view, which has no saved columns of its own.
+    // For the unnamed "List" view, which has no saved columns.
     defaultSnapshot = snapshotOf(view)
-    // `if_owner` does not cover agents, so filter by owner once the session names them.
+    // `if_owner` does not cover agents.
     useSession()
       .loadSession()
       .then(() => {
@@ -102,6 +107,7 @@ function createViewsStore() {
     rememberedLayout.value = {
       filters: view.filters.conditions.value,
       sort: view.sort.by.value,
+      columns: view.columns.shown.value,
     }
   }
 
@@ -119,12 +125,13 @@ function createViewsStore() {
         columns: parseJson(row.columns, []),
       })
     }
-    // The remembered layout refines the view; an empty sort was never chosen.
+    // An empty remembered sort was never chosen.
     const remembered = rememberedLayout.value
     if (remembered) {
       view.restore({
         filters: remembered.filters,
         ...(remembered.sort?.length ? { sort: remembered.sort } : {}),
+        ...(remembered.columns?.length ? { columns: remembered.columns } : {}),
       })
     }
     // Next tick, so the restore's own writes are not remembered.
@@ -139,6 +146,17 @@ function createViewsStore() {
       columns: JSON.stringify(view.columns.shown.value),
     }
   }
+
+  const isViewModified = computed(() => {
+    const row = activeView.value
+    if (!row || !listView.value) return false
+    const current = currentPayload()
+    return (
+      current.order_by !== (row.order_by || '') ||
+      current.filters !== JSON.stringify(parseJson(row.filters, [])) ||
+      current.columns !== JSON.stringify(parseJson(row.columns, []))
+    )
+  })
 
   async function createView(label, icon) {
     const doc = await call('frappe.client.insert', {
@@ -155,7 +173,7 @@ function createViewsStore() {
     })
     await list.reload()
     openView(doc.name)
-    toast.success(__('View "{0}" created', [label]))
+    toast.success(__('View created'))
   }
 
   async function renameView(name, label, icon) {
@@ -168,6 +186,7 @@ function createViewsStore() {
       async () => {
         await setValues('HD View', name, currentPayload())
         await list.reload()
+        if (name === activeName.value) rememberedLayout.value = null
       },
       { success: __('View updated'), fallback: __('Could not update the view') },
     )
@@ -180,11 +199,28 @@ function createViewsStore() {
         await list.reload()
         if (activeName.value === name) openView('')
       },
-      { fallback: __('Could not delete the view') },
+      { success: __('View deleted'), fallback: __('Could not delete the view') },
     )
   }
 
+  function confirmDeleteView(view) {
+    askConfirm({
+      title: __('Delete {0}', [view.label]),
+      message: __('Are you sure you want to delete this view?'),
+      label: __('Delete'),
+      theme: 'red',
+      action: () => deleteView(view.name),
+    })
+  }
+
+  // Picking a view opens it as saved; the memory is for coming back from elsewhere.
   function openView(name) {
+    if (name === activeName.value) {
+      rememberedLayout.value = null
+      applyActiveView()
+      return
+    }
+    localStorage.removeItem(memoryKey(name))
     navigateTo({ query: name ? { view: name } : {} })
   }
 
@@ -214,7 +250,7 @@ function createViewsStore() {
       group: 'Actions',
       hideLabel: true,
       options: [
-        { label: __('Save as new view'), icon: 'lucide-plus', onClick: () => openViewModal('create') },
+        { label: __('Create View'), icon: 'lucide-plus', onClick: () => openViewModal('create') },
       ],
     },
   ])
@@ -222,9 +258,8 @@ function createViewsStore() {
   function viewActions(item) {
     if (!item?.name) return []
     return [
-      { label: __('Save current layout'), icon: 'lucide-save', onClick: () => saveCurrentView(item.name) },
       { label: __('Rename'), icon: 'lucide-edit-2', onClick: () => openViewModal('rename', item) },
-      { label: __('Delete'), icon: 'lucide-trash-2', onClick: () => deleteView(item.name) },
+      { label: __('Delete'), icon: 'lucide-trash-2', onClick: () => confirmDeleteView(item) },
     ]
   }
 
@@ -251,12 +286,14 @@ function createViewsStore() {
     viewModalLabel,
     viewModalIcon,
     submitViewModal,
+    isViewModified,
+    saveViewChanges: () => saveCurrentView(activeName.value),
   }
 
   return { attachListView, bindings }
 }
 
-// Cloned, so a restore cannot alias the stored default into live refs.
+// Cloned, so a restore cannot alias the default into live refs.
 function snapshotOf(listView) {
   return structuredClone({
     filters: toRaw(listView.filters.conditions.value),

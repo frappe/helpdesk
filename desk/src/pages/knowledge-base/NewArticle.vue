@@ -61,6 +61,7 @@
           <template #default>
             <EditorContent
               class="rounded-b-6 max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+              :class="ARTICLE_IMAGE_CLASSES"
             />
             <EditorFixedMenu
               class="-ms-1 overflow-x-auto w-full"
@@ -83,10 +84,11 @@ import {
   EditorTableMenu,
 } from "frappe-ui/editor";
 import { buildEditorExtensions, fullToolbar } from "@/components/editor/config";
+import { ARTICLE_IMAGE_CLASSES } from "@helpdesk/shared/tiptap";
 const extensions = buildEditorExtensions();
 import { useOnboarding } from "@framework/ui";
 import Link from "@/components/frappe-ui/Link.vue";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { __ } from "@/translation";
 
 import { LayoutHeader, UserAvatar } from "@/components";

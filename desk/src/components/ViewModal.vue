@@ -24,7 +24,7 @@
             :disabled="Boolean(view.public)"
           />
           <FormControl
-            v-if="canMakePublic"
+            v-if="isManager"
             type="checkbox"
             :label="__('Make it public')"
             v-model="view.public"
@@ -69,9 +69,6 @@ const view = ref({
 });
 
 const isCreateMode = computed(() => modalInfo.value.action === "create");
-
-// Only managers can publish views.
-const canMakePublic = computed(() => isManager);
 
 const modalInfo = computed(() => {
   return {

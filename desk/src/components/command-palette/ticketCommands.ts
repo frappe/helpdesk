@@ -16,7 +16,7 @@ import { useAgentStore } from "@/stores/agent";
 import { getMeta } from "@/stores/meta";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
-import { copyToClipboard } from "@/utils";
+import { copyToClipboard } from "@helpdesk/shared/utils";
 import { createListResource, createResource, toast } from "frappe-ui";
 import { priorityOptions, statusOptions } from "./optionCommands";
 import {

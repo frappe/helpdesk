@@ -6,15 +6,20 @@ from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_settings.helpers import clear_website_home_page
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
-from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
 from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
+
+
+def before_uninstall():
+    # The portal's route goes with the app
+    clear_website_home_page()
 
 
 def after_install():
@@ -222,19 +227,22 @@ def setup_customer_role(fresh_install=True):
         else:
             role_doc = frappe.new_doc("Role")
             role_doc.role_name = role_name
-        role_doc.home_page = CUSTOMER_PORTAL_ROOT
+        role_doc.home_page = "/helpdesk"
         role_doc.desk_access = 0
         role_doc.save()
 
     if fresh_install:
         set_portal_defaults(overwrite=True)
+        # Single defaults aren't stored on install; the home pages assume it
+        frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
 
 
 def set_portal_defaults(overwrite=False):
-    """Install claims the portal settings; the patch only fills empty ones. Writes the Single directly: a save validates stale menu rows."""
+    """Writes the Single directly: a save fails on stale menu rows."""
     defaults = {
         "default_role": "HD Customer",
-        "default_portal_home": CUSTOMER_PORTAL_ROOT,
+        # agents fall back to it; customers get theirs from their role
+        "default_portal_home": "/helpdesk",
     }
     if overwrite:
         to_set = defaults

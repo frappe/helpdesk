@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col gap-1.5">
+  <!-- `relative` keeps the sr-only picker inside the page's scroller; anchored to
+       <body> it overflows it, and the whole page scrolls past its bottom. -->
+  <div class="relative flex flex-col gap-1.5">
     <span class="text-p-sm text-ink-gray-5">{{ __("Attachments") }}</span>
 
     <div
@@ -28,7 +30,7 @@
           <Spinner v-if="isBusy(item)" size="md" class="text-ink-gray-5" />
           <LucideCircleAlert
             v-else-if="item.status === 'error'"
-            class="size-4 text-ink-red-4"
+            class="size-4 text-ink-red-6"
           />
           <img
             v-else-if="isImage(item.name)"
@@ -52,14 +54,24 @@
             item.name
           }}</span>
           <span
-            class="text-p-xs"
+            class="text-p-xs [overflow-wrap:anywhere]"
             :class="
-              item.status === 'error' ? 'text-ink-red-4' : 'text-ink-gray-5'
+              item.status === 'error' ? 'text-ink-red-6' : 'text-ink-gray-5'
             "
           >
             {{ meta(item) }}
           </span>
         </div>
+        <button
+          v-if="item.status === 'error'"
+          type="button"
+          :aria-label="__('Retry uploading {0}', [item.name])"
+          :title="__('Retry upload')"
+          class="grid size-7 shrink-0 place-items-center rounded-4 text-ink-gray-5 hover:bg-surface-gray-3 hover:text-ink-gray-8"
+          @click="retry(item.id)"
+        >
+          <LucideRotateCw class="size-4" />
+        </button>
         <button
           type="button"
           :aria-label="isBusy(item) ? __('Cancel upload') : __('Remove')"
@@ -86,10 +98,10 @@
           >{{ __("Add more") }}</span
         >
         <span
-          class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex"
+          class="hidden items-center gap-1.5 text-p-xs text-ink-gray-5 sm:flex [@media(pointer:coarse)]:hidden"
         >
           {{ __("drop, browse or") }}
-          <KeyboardShortcut bg combo="Mod+V" />
+          <ShortcutKey :keys="`${metaIcon} V`" />
         </span>
       </button>
       <button
@@ -115,7 +127,7 @@
     <p
       v-for="error in uploader.errors.value"
       :key="error"
-      class="text-p-xs text-ink-red-4"
+      class="text-p-xs text-ink-red-6"
     >
       {{ error }}
     </p>
@@ -124,7 +136,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { KeyboardShortcut, Spinner } from "frappe-ui";
+import { Spinner, call } from "frappe-ui";
 import { useUploader } from "@framework/ui/FileUpload";
 import type {
   Restrictions,
@@ -132,24 +144,36 @@ import type {
   UploadResult,
   UploadTransport,
 } from "@framework/ui/FileUpload";
+import { useDevice } from "@helpdesk/shared/device";
+import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
 import LucideCircleAlert from "~icons/lucide/circle-alert";
 import LucideFile from "~icons/lucide/file";
 import LucidePaperclip from "~icons/lucide/paperclip";
 import LucidePlus from "~icons/lucide/plus";
+import LucideRotateCw from "~icons/lucide/rotate-cw";
 import LucideX from "~icons/lucide/x";
+
+// The site limit caps the whole request, so leave room for the multipart wrapping.
+const MULTIPART_MARGIN = 64 * 1024;
+const FILE_NAME_LIMIT = 134;
 
 const props = defineProps<{
   modelValue: UploadResult[];
   restrictions?: Restrictions;
-  transport?: UploadTransport;
+  transport: UploadTransport;
 }>();
 
 const emit = defineEmits<{ "update:modelValue": [UploadResult[]] }>();
+const { metaIcon } = useDevice();
+// The endpoint already falls back to frappe's 25 MB.
+const maxFileSize = call("frappe.core.api.file.get_max_file_size").catch(
+  () => 25 * 1024 * 1024
+);
 
 const uploader = useUploader({
-  transport: props.transport,
-  // useUploader keeps the object it is given; read through so later config applies
+  transport: send,
+  // useUploader keeps the given object; proxy so later config applies.
   restrictions: new Proxy({}, { get: (_, key) => props.restrictions?.[key] }),
   multiple: true,
 });
@@ -172,13 +196,16 @@ function onDrop(event: DragEvent) {
   add(event.dataTransfer?.files);
 }
 
-// the description editor and inputs handle their own paste
+// Inputs handle their own paste; the editor takes images inline, and the rest come here.
 function onPaste(event: ClipboardEvent) {
   const target = event.target as HTMLElement;
-  if (target.closest("input, textarea, [contenteditable='true']")) return;
-  if (!event.clipboardData?.files.length) return;
-  event.preventDefault();
-  add(event.clipboardData.files);
+  if (target.closest("input, textarea")) return;
+  const files = Array.from(event.clipboardData?.files ?? []);
+  if (!target.closest("[contenteditable='true']")) {
+    if (files.length) event.preventDefault();
+    return add(files);
+  }
+  add(files.filter((file) => !file.type.startsWith("image/")));
 }
 
 onMounted(() => document.addEventListener("paste", onPaste));
@@ -189,21 +216,82 @@ function onDragLeave(event: DragEvent) {
   if (!box.contains(event.relatedTarget as Node)) dragging.value = false;
 }
 
-function add(files?: FileList | null) {
+// The server fails an empty file with a bare OSError, so it never gets there.
+function add(files?: FileList | File[] | null) {
   if (!files?.length) return;
-  uploader.add(files);
+  const list = Array.from(files);
+  uploader.add(list.filter((file) => file.size));
+  for (const file of list.filter((file) => !file.size))
+    uploader.errors.value.push(
+      __('"{0}" was skipped — the file is empty.', [file.name])
+    );
   upload();
 }
 
-// commit() skips items added while a pass runs, so keep going until none are left
+// Abort only while progress shows the body still going up. Once it is sent, or
+// too small to report progress, the server may save the File: let it finish and delete it.
+async function send(file: File, args, ctx) {
+  const limit = await maxFileSize;
+  if (ctx.signal.aborted) throw new DOMException("Cancelled", "AbortError");
+  const tooLarge = __("File is larger than {0}", [formatSize(limit)]);
+  if (file.size > limit - MULTIPART_MARGIN) throw new Error(tooLarge);
+
+  const controller = new AbortController();
+  let sending = false;
+  ctx.signal.addEventListener("abort", () => {
+    if (sending) controller.abort();
+  });
+  const doc: any = await props
+    .transport(withShortName(file), args, {
+      signal: controller.signal,
+      onProgress: (loaded, total) => {
+        sending = loaded < total;
+        ctx.onProgress(loaded, total);
+      },
+    })
+    .catch((error) => {
+      throw error?.status === 413 ? new Error(tooLarge) : error;
+    });
+  if (ctx.signal.aborted)
+    call("frappe.client.delete", { doctype: "File", name: doc.name }).catch(
+      () => {}
+    );
+  return doc;
+}
+
+// File.file_name holds 140 characters, and a taken name gets a 6-character suffix;
+// a longer name fails the whole upload.
+function withShortName(file: File) {
+  if (file.name.length <= FILE_NAME_LIMIT) return file;
+  const dot = file.name.lastIndexOf(".");
+  const extension = dot > 0 ? file.name.slice(dot).slice(0, 20) : "";
+  const name =
+    file.name.slice(0, FILE_NAME_LIMIT - extension.length) + extension;
+  return new File([file], name, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+}
+
+// commit() skips items added mid-pass; loop until none are idle.
 async function upload() {
   if (running) return;
   running = true;
-  while (uploader.items.some((item) => item.status === "idle")) {
-    await uploader.commit();
-    emitDone();
+  try {
+    while (uploader.items.some((item) => item.status === "idle")) {
+      await uploader.commit();
+      emitDone();
+    }
+  } finally {
+    // Else one throw stalls every later file.
+    running = false;
   }
-  running = false;
+}
+
+// Back to idle with the same File; the upload loop picks it up.
+function retry(id: string) {
+  uploader.retry(id);
+  upload();
 }
 
 function remove(id: string) {
@@ -229,15 +317,21 @@ function isBusy(item: UploadItem) {
 }
 
 function meta(item: UploadItem) {
-  if (item.status === "error") return item.error;
+  if (item.status === "error") return plainText(item.error);
   if (isBusy(item))
     return __("Uploading… {0}%", [Math.round(item.progress * 100)]);
   return formatSize(item.size ?? 0);
 }
 
+// Server messages carry markup, like `<strong>File Name</strong>`.
+function plainText(html = "") {
+  return new DOMParser().parseFromString(html, "text/html").body.textContent;
+}
+
 function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${Number((bytes / 1024 / 1024).toFixed(1))} MB`;
 }
 
 function isImage(name: string) {

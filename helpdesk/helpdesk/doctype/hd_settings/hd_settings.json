@@ -19,8 +19,19 @@
   "disable_saved_replies_global_scope",
   "assignment_rules_section",
   "base_support_rotation",
-  "knowledge_base_section",
+  "knowledge_base_tab",
+  "public_knowledge_base",
+  "allow_anonymous_article_voting",
+  "hide_raise_ticket_button",
+  "banner_image",
+  "banner_preset",
+  "portal_tab",
+  "access_section",
   "prefer_knowledge_base",
+  "knowledge_base_home_page_for_guests",
+  "customer_managers_section",
+  "allow_customer_managers_to_manage_organization",
+  "allow_customer_managers_to_invite",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -85,12 +96,7 @@
   "reply_email_to_agent_content",
   "reply_from_agent_section",
   "enable_reply_email_via_agent",
-  "reply_via_agent_email_content",
-  "customer_managers_section",
-  "allow_customer_managers_to_invite",
-  "allow_customer_managers_to_change_roles",
-  "allow_customer_managers_to_remove_members",
-  "allow_customer_managers_to_edit_organization"
+  "reply_via_agent_email_content"
  ],
  "fields": [
   {
@@ -108,8 +114,13 @@
    "read_only": 1
   },
   {
-   "fieldname": "knowledge_base_section",
-   "fieldtype": "Section Break",
+   "fieldname": "portal_tab",
+   "fieldtype": "Tab Break",
+   "label": "Portal"
+  },
+  {
+   "fieldname": "knowledge_base_tab",
+   "fieldtype": "Tab Break",
    "label": "Knowledge Base"
   },
   {
@@ -241,9 +252,54 @@
   },
   {
    "default": "0",
+   "description": "If enabled, anyone can read articles without logging in.",
+   "fieldname": "public_knowledge_base",
+   "fieldtype": "Check",
+   "label": "Make knowledge base public"
+  },
+  {
+   "default": "0",
+   "depends_on": "public_knowledge_base",
+   "description": "Guests land on the knowledge base landing page instead of the login page.",
+   "fieldname": "knowledge_base_home_page_for_guests",
+   "fieldtype": "Check",
+   "label": "Set knowledge base as guest home"
+  },
+  {
+   "default": "1",
+   "description": "Customers will land on the knowledge base when they log in, instead of their tickets.",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
-   "label": "Prefer knowledge base"
+   "label": "Use knowledge base as customer home"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, visitors who aren't logged in can mark articles as helpful or not.",
+   "fieldname": "allow_anonymous_article_voting",
+   "fieldtype": "Check",
+   "label": "Allow guests to vote on articles"
+  },
+  {
+   "default": "0",
+   "description": "Logged-in customers won't see the Raise a ticket button in the knowledge base header.",
+   "fieldname": "hide_raise_ticket_button",
+   "fieldtype": "Check",
+   "label": "Hide Raise a ticket button"
+  },
+  {
+   "description": "Appears behind the search bar on the knowledge base home page.",
+   "fieldname": "banner_image",
+   "fieldtype": "Attach Image",
+   "label": "Banner image"
+  },
+  {
+   "default": "Lines",
+   "depends_on": "eval:!doc.banner_image",
+   "description": "Background color used when no banner image is set.",
+   "fieldname": "banner_preset",
+   "fieldtype": "Select",
+   "label": "Banner preset",
+   "options": "\nLines\nGray\nBlue\nViolet"
   },
   {
    "fieldname": "agent_status_section",
@@ -567,6 +623,11 @@
    "label": "Auto-set customer from contact"
   },
   {
+   "fieldname": "access_section",
+   "fieldtype": "Section Break",
+   "label": "Access"
+  },
+  {
    "fieldname": "customer_managers_section",
    "fieldtype": "Section Break",
    "label": "Customer Managers"
@@ -579,31 +640,17 @@
    "description": "If enabled, customer managers can invite people to their organization from the portal. Invited people get a portal login."
   },
   {
-   "fieldname": "allow_customer_managers_to_change_roles",
+   "fieldname": "allow_customer_managers_to_manage_organization",
    "fieldtype": "Check",
    "default": "0",
-   "label": "Allow customer managers to change member roles",
-   "description": "If enabled, customer managers can promote members of their organization to managers, or demote them back."
-  },
-  {
-   "fieldname": "allow_customer_managers_to_remove_members",
-   "fieldtype": "Check",
-   "default": "0",
-   "label": "Allow customer managers to remove members",
-   "description": "If enabled, customer managers can remove people from their organization."
-  },
-  {
-   "fieldname": "allow_customer_managers_to_edit_organization",
-   "fieldtype": "Check",
-   "default": "0",
-   "label": "Allow customer managers to edit organization details",
-   "description": "If enabled, customer managers can change their organization's logo."
+   "label": "Allow customer managers to manage their organization",
+   "description": "If enabled, customer managers can promote members of their organization to managers, demote them back, remove them, and change the organization's logo."
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-10 04:00:00.000000",
+ "modified": "2026-10-23 19:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

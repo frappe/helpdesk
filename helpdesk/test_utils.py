@@ -209,6 +209,7 @@ def make_form_script(
     body: str,
     apply_to_customer_portal: bool = False,
     apply_on_new_page: bool = False,
+    apply_to_knowledge_base: bool = False,
 ):
     """An enabled HD Ticket form script whose source carries `body`; removed when the test ends."""
     frappe.delete_doc("HD Form Script", name, force=True, ignore_missing=True)
@@ -221,6 +222,7 @@ def make_form_script(
             "enabled": 1,
             "apply_to_customer_portal": int(apply_to_customer_portal),
             "apply_on_new_page": int(apply_on_new_page),
+            "apply_to_knowledge_base": int(apply_to_knowledge_base),
             "script": f"function setupForm() {{ return {{}} }} // {body}",
         }
     ).insert()
@@ -336,10 +338,26 @@ def get_customer_ticket(email: str):
     return frappe.get_doc("HD Ticket", ticket.name)
 
 
-def use_test_index(case, search_class, db_name: str, *modules):
-    """A throwaway `search_class` index for one test, so the site's real one is never touched.
+def make_article_category(label: str, **values):
+    return frappe.get_doc(
+        {"doctype": "HD Article Category", "category_name": label, **values}
+    ).insert()
 
-    Each of `modules` gets it in place of its own `search_class`."""
+
+def category_row(name: str, with_creators: bool = False) -> frappe._dict:
+    from helpdesk.api.knowledge_base import _get_categories
+
+    return next(row for row in _get_categories(with_creators) if row.name == name)
+
+
+def category_names() -> list[str]:
+    from helpdesk.api.knowledge_base import get_categories
+
+    return [row.name for row in get_categories()]
+
+
+def use_test_index(case, search_class, db_name: str, *modules):
+    """Swaps each module's `search_class` for a throwaway index."""
     search = search_class(db_name=db_name)
     search.drop_index()
     case.addCleanup(search.drop_index)
@@ -659,7 +677,6 @@ def create_contact(name, email, user=True, role="HD Customer"):
 
 
 def make_contact(prefix: str = "customer") -> dict:
-    """A contact with a portal user under a unique email, as `create_contact` returns it."""
     email = unique_email(prefix)
     return create_contact(email.split("@")[0], email)
 
@@ -694,9 +711,7 @@ def create_user(email: str):
 
 
 def make_organization(label: str) -> tuple:
-    """An HD Customer with an owner, a manager and a plain member, each a contact with a portal user.
-
-    Returns `(customer, owner, manager, member)`."""
+    """Returns `(customer, owner, manager, member)`."""
     prefix = label.lower().replace(" ", "-")
     owner, manager, member = (
         create_contact(f"{label} {role}", unique_email(f"{prefix}-{role.lower()}"))
@@ -715,7 +730,6 @@ def make_organization(label: str) -> tuple:
 
 
 def make_invitation(email: str, customer: str, contact: str | None = None):
-    """A helpdesk User Invitation into `customer`, inserted without permission checks."""
     return frappe.get_doc(
         doctype="User Invitation",
         email=email,
@@ -738,7 +752,6 @@ def get_invitation(email: str):
 
 
 def get_organization_members(customer: str) -> dict:
-    """The portal's member rows for a customer, keyed by contact name."""
     from helpdesk.api.customer import get_organization
 
     return {
@@ -749,7 +762,6 @@ def get_organization_members(customer: str) -> dict:
 
 
 def get_organization_card(customer: str) -> dict:
-    """The portal's card for one of the session user's organizations."""
     from helpdesk.api.customer import get_portal_account
 
     return next(
@@ -760,7 +772,6 @@ def get_organization_card(customer: str) -> dict:
 
 
 def delete_invitations(email: str) -> None:
-    """Remove every helpdesk invitation raised for an email, whoever the session user is."""
     frappe.set_user("Administrator")
     names = frappe.get_all(
         "User Invitation", {"email": email, "app_name": "helpdesk"}, pluck="name"
@@ -931,16 +942,21 @@ def make_article(
     title: str | None = None,
     status: str = "Published",
     category: str | None = None,
+    visibility: str | None = "Public",
+    **values,
 ) -> str:
-    """Insert an HD Article, titled uniquely unless `title` is given, and return its name."""
+    """Public by default; `visibility=None` keeps the field's default."""
+    title = title or unique_name("Test Article")
     return (
         frappe.get_doc(
             {
                 "doctype": "HD Article",
-                "title": title or unique_name("Test Article"),
-                "content": "<p>Open settings and click reset.</p>",
+                "title": title,
+                "content": f"<p>{title}</p>",
                 "status": status,
                 "category": category,
+                "visibility": visibility,
+                **values,
             }
         )
         .insert(ignore_permissions=True)
@@ -1111,7 +1127,6 @@ def dismiss_banner_as(user: str, banner: str) -> MagicMock:
 
 
 def ticket_pings(publish_realtime: MagicMock) -> set[str]:
-    """Users sent the customer "ticket changed" ping, read off a patched `frappe.publish_realtime`."""
     return {
         call.kwargs["user"]
         for call in publish_realtime.call_args_list

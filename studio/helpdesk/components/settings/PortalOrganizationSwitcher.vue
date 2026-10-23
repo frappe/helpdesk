@@ -1,6 +1,6 @@
 <template>
   <div class="w-full sm:w-[220px]">
-    <!-- The width sits on a wrapper: MultiSelect hands its class to the trigger, not its root. -->
+    <!-- Width on a wrapper: MultiSelect puts class on its trigger. -->
     <MultiSelect
       class="w-full"
       size="sm"
@@ -13,7 +13,6 @@
     >
       <template #prefix="{ selectedOptions }">
         <Avatar
-          class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
           v-if="selectedOptions.length === 1"
           size="xs"
           shape="square"
@@ -25,7 +24,6 @@
 
       <template #item-prefix="{ item }">
         <Avatar
-          class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
           size="sm"
           shape="square"
           :image="item.image"

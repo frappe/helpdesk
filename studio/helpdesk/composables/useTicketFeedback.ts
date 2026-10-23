@@ -3,13 +3,12 @@ import { createListResource } from 'frappe-ui'
 import { __ } from '@helpdesk/shared/translation'
 import { CLOSED_STATUS } from '@app/stores/ticketMeta'
 
-// A handful exist per rating; one page well past any real count holds them all.
+// Well past any real count per rating.
 const FEEDBACK_OPTION_LIMIT = 100
 
-// `saveTicket` writes the ticket and refetches it; it resolves true once saved.
 export function useTicketFeedback(saveTicket) {
   const isFeedbackOpen = ref(false)
-  // In stars, as the Rating component counts; HD Ticket stores a fraction.
+  // Stars, as Rating counts; HD Ticket stores a fraction.
   const feedbackStars = ref(0)
   const feedbackOption = ref<string | null>(null)
   const feedbackText = ref('')
@@ -45,7 +44,6 @@ export function useTicketFeedback(saveTicket) {
     feedbackText.value = ''
   }
 
-  // The status is saved with the rating: `validate_feedback` refuses a customer's close without one.
   function openFeedback() {
     isFeedbackOpen.value = true
   }
@@ -54,6 +52,7 @@ export function useTicketFeedback(saveTicket) {
     feedbackOption.value = name
   }
 
+  // Status saved with the rating: `validate_feedback` refuses a close without one.
   async function submitFeedback() {
     if (!feedbackOption.value) return
     const saved = await saveTicket(

@@ -159,8 +159,7 @@ test("an admin links and unlinks an outgoing email account", async ({ page, api 
   }
 });
 
-test.fixme("a plain agent links an outgoing email account", async ({ page, api }) => {
-  // User.user_emails is permlevel 1, so an Agent's save silently drops the row.
+test("a plain agent links an outgoing email account", async ({ page, api }) => {
   const email = `e2e-link-${uid()}@example.com`;
   await createThrowawayAgent(api, email, PASSWORD);
   await page.context().clearCookies();

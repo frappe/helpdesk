@@ -1,12 +1,12 @@
 import { Badge, Tooltip, dayjsLocal } from "frappe-ui";
 import { h } from "vue";
 import { __ } from "./translation";
-import { isSlaMissed, shortDuration } from "./utils";
+import { isSlaMissed, serverInstant, shortDuration } from "./utils";
 
 /** Tallest bars faded per level: High is fully solid, Low nearly empty. */
 const FADED_BARS: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
 
-// Shortest first, so a bar's index from the top counts down.
+// Shortest first; fading counts from the tallest.
 const BARS = [
   { x: 0, y: 8, height: 4 },
   { x: 4, y: 4, height: 8 },
@@ -18,7 +18,7 @@ export function PriorityIcon({ level }: { level: string }) {
 }
 PriorityIcon.props = ["level"];
 
-// No SLA means nothing was promised, so there is nothing to report against.
+// No SLA: nothing promised.
 export function responseBadge(row: any, due?: string) {
   if (!row.sla) return null;
   return slaBadge(row.first_responded_on, due, "amber");
@@ -32,7 +32,8 @@ export function resolutionBadge(row: any, due: string | undefined, paused: boole
 
 function urgentIcon() {
   const glyph = "fill-surface-gray-1";
-  return h("svg", { class: "h-3.5 w-3.5", viewBox: "0 0 14 14", fill: "none" }, [
+  // Fills its slot, so callers set the size.
+  return h("svg", { class: "size-full", viewBox: "0 0 14 14", fill: "none" }, [
     h("rect", { width: 14, height: 14, rx: 4, class: "fill-ink-gray-6" }),
     h("rect", { x: 6.25, y: 3, width: 1.5, height: 4.75, rx: 0.75, class: glyph }),
     h("circle", { cx: 7, cy: 10, r: 0.9, class: glyph }),
@@ -55,10 +56,10 @@ function levelBars(level: string) {
 }
 
 function slaBadge(metOn: string | undefined, due: string | undefined, countdownTheme: string) {
-  // No target means it was never breached, so meeting it at all fulfils it.
+  // No due date: any met time counts as fulfilled.
   if (metOn) return outcomeBadge(!isSlaMissed(metOn, due));
   if (!due) return null;
-  if (dayjsLocal(due).isBefore(dayjsLocal())) return outcomeBadge(false);
+  if (serverInstant(due).isBefore()) return outcomeBadge(false);
   return h(Tooltip, { text: dayjsLocal(due).format("LLLL") }, () =>
     badge(shortDuration(due), countdownTheme)
   );
