@@ -65,15 +65,8 @@
             :label="member.full_name"
           />
           <div class="min-w-0">
-            <div
-              class="flex items-center gap-1.5 truncate text-base-medium text-ink-gray-8"
-            >
+            <div class="truncate text-base-medium text-ink-gray-8">
               {{ member.full_name }}
-              <span
-                v-if="member.is_you"
-                class="text-p-xs font-normal text-ink-gray-5"
-                >{{ __("You") }}</span
-              >
             </div>
             <div class="truncate text-p-sm text-ink-gray-5">
               {{ member.email }}
