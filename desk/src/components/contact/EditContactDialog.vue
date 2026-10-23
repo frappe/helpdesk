@@ -158,6 +158,12 @@
               doctype="HD Customer"
               :placeholder="__('Select Customer')"
             />
+            <p
+              v-if="canLinkCustomer && !doc.doc?.user && state.customer"
+              class="text-xs text-ink-gray-5"
+            >
+              {{ __("Saving will send a portal invitation to this contact.") }}
+            </p>
           </div>
 
           <!-- Save -->
