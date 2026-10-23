@@ -1,6 +1,8 @@
-from frappe.tests import UnitTestCase
+import frappe
+from frappe.tests import IntegrationTestCase, UnitTestCase
 
-from helpdesk.helpdesk.hooks.studio_app import escape_for_shell
+from helpdesk.helpdesk.hooks.studio_app import escape_for_shell, get_boot
+from helpdesk.test_utils import make_contact
 
 
 class TestPageShell(UnitTestCase):
@@ -12,3 +14,18 @@ class TestPageShell(UnitTestCase):
 
     def test_an_empty_value_stays_empty(self) -> None:
         self.assertEqual(escape_for_shell(None), "")
+
+
+class TestBoot(IntegrationTestCase):
+    def tearDown(self) -> None:
+        frappe.set_user("Administrator")
+
+    def test_the_boot_carries_the_customer_timezone(self) -> None:
+        customer = make_contact("boot_customer")["user"]
+        frappe.db.set_value("User", customer, "time_zone", "Asia/Tokyo")
+        frappe.set_user(customer)
+        self.assertEqual(get_boot()["user_timezone"], "Asia/Tokyo")
+
+    def test_a_guest_gets_no_timezone(self) -> None:
+        frappe.set_user("Guest")
+        self.assertFalse(get_boot()["user_timezone"])

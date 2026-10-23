@@ -32,7 +32,12 @@ export function createProfileSettings(core) {
 
   function setPreference(field, value) {
     if (!value || value === core.settingsUser.value[field]) return
-    return updateProfile({ [field]: value }, __('Preferences updated')).then(fetchTranslations)
+    return updateProfile({ [field]: value }, __('Preferences updated')).then(() => {
+      if (field !== 'time_zone') return fetchTranslations()
+      // Dates take the boot's zone, so a reload shows the new one. run() swallows
+      // errors: reload only once the saved zone is the one picked.
+      if (core.settingsUser.value?.time_zone === value) location.reload()
+    })
   }
 
   function renameProfile(value) {

@@ -9,6 +9,10 @@ def get_boot() -> dict:
     """In boot so the timezone is there before the first date renders."""
     return {
         "system_timezone": get_system_timezone(),
+        # the zone the customer picked in Settings; empty means the browser's.
+        # Guest has a zone too, set at install, which says nothing about the visitor.
+        "user_timezone": frappe.session.user != "Guest"
+        and frappe.db.get_value("User", frappe.session.user, "time_zone"),
         # Read before the first render, so a private knowledge base never flashes for a guest
         "send_guest_to_login": frappe.session.user == "Guest"
         and not frappe.db.get_single_value("HD Settings", "public_knowledge_base"),
