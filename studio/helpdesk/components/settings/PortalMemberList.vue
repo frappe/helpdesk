@@ -189,7 +189,7 @@ import {
 
 // Matches PortalOrganizationTickets.vue so both tabs line up.
 const ROW = computed(() => [
-  "grid items-center gap-3 border-b border-outline-gray-1 last:border-b-0",
+  "grid items-center gap-3 border-b border-outline-gray-1 px-0.5 last:border-b-0",
   props.showLastActive
     ? "grid-cols-[minmax(0,1fr)_104px_32px] sm:grid-cols-[minmax(0,1fr)_104px_120px_32px]"
     : "grid-cols-[minmax(0,1fr)_104px_32px]",

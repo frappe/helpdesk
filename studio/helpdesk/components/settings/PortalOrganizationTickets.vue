@@ -15,17 +15,12 @@
 
     <template v-if="tickets.data?.length || isFirstLoad">
       <div :class="[ROW, 'min-h-8 shrink-0 text-p-xs text-ink-gray-5']">
-        <span class="w-14 shrink-0 text-p-sm text-ink-gray-5">{{
-          __("ID")
-        }}</span>
+        <span class="w-14 shrink-0">{{ __("ID") }}</span>
         <span class="min-w-0 flex-1 truncate">{{ __("Subject") }}</span>
-        <span class="w-36 shrink-0 text-p-sm text-ink-gray-7 max-sm:w-auto">{{
-          __("Status")
+        <span class="w-36 shrink-0 max-sm:w-auto">{{ __("Status") }}</span>
+        <span class="w-28 shrink-0 text-right max-sm:hidden">{{
+          __("Created")
         }}</span>
-        <span
-          class="w-28 shrink-0 text-right text-p-sm text-ink-gray-5 max-sm:hidden"
-          >{{ __("Created") }}</span
-        >
       </div>
 
       <div
@@ -124,7 +119,7 @@ import { loadStatuses, statusMeta } from "@app/stores/ticketMeta";
 const PAGE_LENGTH = 20;
 
 const ROW =
-  "flex items-center gap-3 border-b border-outline-gray-1 last:border-b-0";
+  "flex items-center gap-3 border-b border-outline-gray-1 px-0.5 last:border-b-0";
 
 const BODY_ROW =
   "relative py-2.5 text-p-base text-ink-gray-8 no-underline before:absolute before:-inset-x-2 before:inset-y-px before:-z-10 before:rounded-5 before:content-[''] hover:before:bg-surface-gray-2";
