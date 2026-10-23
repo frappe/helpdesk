@@ -6,7 +6,7 @@
     <div class="flex w-full flex-col gap-5">
       <div
         v-if="template.data?.about"
-        class="prose-sm max-w-none text-ink-gray-7"
+        class="prose prose-sm max-w-none text-ink-gray-7"
         v-html="about"
       />
       <div class="flex w-full flex-col gap-2">
