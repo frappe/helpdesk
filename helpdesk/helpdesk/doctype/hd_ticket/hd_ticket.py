@@ -1154,7 +1154,10 @@ class HDTicket(Document, CustomerEditController):
             self.last_agent_response = frappe.utils.now_datetime()
 
             # TODO: remove this feature once we add automation feature
-            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+            # a merged ticket is closed; the merge notice must not reopen it
+            if not self.is_merged and frappe.db.get_single_value(
+                "HD Settings", "auto_update_status"
+            ):
                 self.status = frappe.db.get_single_value(
                     "HD Settings", "update_status_to"
                 )
