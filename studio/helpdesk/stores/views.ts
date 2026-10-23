@@ -118,8 +118,8 @@ function createViewsStore() {
 
   function rememberLayout() {
     const view = listView.value
-    // Until the requested view is applied, the list shows the defaults, not that view.
-    if (isRestoring || !view || !sessionUser() || (activeName.value && !activeView.value)) return
+    // Until the views load, a requested view shows the defaults, not that view.
+    if (isRestoring || !view || !sessionUser() || (activeName.value && !list.data)) return
     rememberedLayout.value = {
       filters: view.filters.conditions.value,
       sort: view.sort.by.value,

@@ -565,4 +565,20 @@ test.describe("saved views", () => {
       await manager.delete("HD View", view.name);
     }
   });
+
+  test("a link to a missing view remembers changes on the fallback List", async ({ page, apiAs }) => {
+    const { token } = await raiseBatch(apiAs);
+    const missing = `/help/my-tickets?view=${encodeURIComponent(`missing-${uid()}`)}`;
+    const viewsLoaded = page.waitForResponse(
+      (response) =>
+        /frappe\.client\.get_list/.test(response.url()) &&
+        response.request().postDataJSON()?.doctype === "HD View"
+    );
+    await page.goto(missing);
+    await viewsLoaded;
+    await narrowTo(page, token);
+    await page.goto("/help");
+    await page.goto(missing);
+    await expect(page.getByRole("textbox", { name: "Subject" })).toHaveValue(token);
+  });
 });
