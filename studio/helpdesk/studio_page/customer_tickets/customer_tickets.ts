@@ -220,7 +220,7 @@ export default function setup(context) {
     emptyState,
     openTicket,
     exportTickets,
-    pageActionLabel: computed(() => (settings.canCreateTicket.value ? __('Raise a ticket') : '')),
+    pageActionLabel: computed(() => (settings.canCreateTicket.value ? settings.raiseTicketLabel.value : '')),
     pageActionIcon: 'lucide-plus',
     onPageAction: () => navigateTo(ROUTES.newTicket({ from: 'ticket-list' })),
     rows: data.rows,

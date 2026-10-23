@@ -534,6 +534,12 @@ test.describe("form scripts", () => {
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 800 } });
 
+  test("the header's raise button is shortened to Create", async ({ page }) => {
+    await page.goto("/help/my-tickets");
+    await page.getByRole("button", { name: "Create", exact: true }).click();
+    await expect(page).toHaveURL(/\/help\/my-tickets\/new(\?|$)/);
+  });
+
   test("ticket details open in a drawer and close on Escape", async ({ page, ticket }) => {
     await page.goto(`/help/my-tickets/${ticket.name}`);
     await expect(page.getByText("Request received")).toBeHidden();

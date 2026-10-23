@@ -209,7 +209,7 @@ export default function setup(context) {
     pageActionLabel: computed(() => {
       if (!ticket.data) return ''
       if (!isLocked.value) return __('Close')
-      return settings.canCreateTicket.value ? __('Raise a ticket') : ''
+      return settings.canCreateTicket.value ? settings.raiseTicketLabel.value : ''
     }),
     pageActionIcon: computed(() => {
       if (!ticket.data) return ''

@@ -3,6 +3,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { call, setConfig } from 'frappe-ui'
 import { spritePlugin } from 'frappe-ui/experimental'
 import { ROUTES } from '@helpdesk/shared/portalRoutes'
+import { __ } from '@helpdesk/shared/translation'
 
 // From boot: must be set before the first date renders.
 setConfig('systemTimezone', window.boot?.system_timezone)
@@ -43,6 +44,8 @@ function createSessionStore() {
   const dateFormat = computed(() => config.value?.date_format?.toUpperCase())
   // Tailwind `sm`, the desk's mobile cut-off.
   const isPhone = useMediaQuery('(max-width: 639px)')
+  // The header has no room for the full label on a phone.
+  const raiseTicketLabel = computed(() => (isPhone.value ? __('Create') : __('Raise a ticket')))
 
   function loadSession() {
     if (sessionRequest) return sessionRequest
@@ -102,6 +105,7 @@ function createSessionStore() {
     brandName,
     dateFormat,
     isPhone,
+    raiseTicketLabel,
     signIn,
     loadSession,
     reloadSession,

@@ -28,7 +28,7 @@ const headerLinks = ref([])
 
 // Empty hides the header button.
 const pageActionLabel = computed(() =>
-  session.canCreateTicket.value && !session.config.value?.hide_raise_ticket_button ? __('Raise a ticket') : '',
+  session.canCreateTicket.value && !session.config.value?.hide_raise_ticket_button ? session.raiseTicketLabel.value : '',
 )
 
 // Phone: text links move into the logo menu.
