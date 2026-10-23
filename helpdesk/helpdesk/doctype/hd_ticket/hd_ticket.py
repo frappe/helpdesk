@@ -895,25 +895,27 @@ class HDTicket(Document, CustomerEditController):
 
     def handle_inline_media_new_ticket(self):
         soup = BeautifulSoup(self.description, "html.parser")
-        files = []  # List of file URLs
-        for tag in soup.find_all(["img", "video"]):
-            if tag.has_attr("src"):
-                src = tag["src"]
-                files.append(src)
-        for f in files:
-            file = frappe.db.exists(
-                "File",
-                {
-                    "file_url": f,
-                    "attached_to_doctype": ["is", "Not Set"],
-                    "owner": frappe.session.user,
-                },
-            )
-            if file:
-                doc = frappe.get_doc("File", file)
-                doc.attached_to_doctype = "HD Ticket"
-                doc.attached_to_name = self.name
-                doc.save()
+        urls = {
+            tag["src"] for tag in soup.find_all(["img", "video"]) if tag.has_attr("src")
+        }
+        if not urls:
+            return
+        # an image pasted twice is uploaded twice under one URL, so a URL can match
+        # several Files; the same URL means the same bytes, so attach them all
+        files = frappe.get_all(
+            "File",
+            filters={
+                "file_url": ["in", list(urls)],
+                "attached_to_doctype": ["is", "not set"],
+                "owner": frappe.session.user,
+            },
+            pluck="name",
+        )
+        for name in files:
+            doc = frappe.get_doc("File", name)
+            doc.attached_to_doctype = "HD Ticket"
+            doc.attached_to_name = self.name
+            doc.save()
 
     def send_reply_email_to_agent(
         self, message: str = "Please check the latest update on the portal."

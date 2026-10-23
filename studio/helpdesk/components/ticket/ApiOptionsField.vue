@@ -9,6 +9,8 @@
     :placeholder="field.placeholder || __('Select an option')"
     :required="field.reqd"
     :disabled="field.readOnly"
+    :loading="fetched.loading"
+    :error="fetched.error ? __('Could not load the options') : undefined"
   />
 </template>
 
@@ -33,9 +35,10 @@ const emit = defineEmits<{
 
 const fetched = createResource({
   url: props.url,
-  auto: Boolean(props.url),
   transform: parseApiOptions,
 });
+// fetch() rethrows after setting `fetched.error`, which the field shows.
+if (props.url) fetched.fetch().catch(() => {});
 const list = computed(() => props.options ?? fetched.data ?? []);
 
 const value = computed({

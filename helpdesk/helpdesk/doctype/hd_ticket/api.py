@@ -5,6 +5,7 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
+from frappe.rate_limiter import rate_limit
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
@@ -19,8 +20,11 @@ TIMELINE_FIELDS = ("status",)
 
 
 @frappe.whitelist()
+# far above anyone filling the form by hand; per user, since an office shares one IP
+@rate_limit(limit=300, seconds=60, user_based=True)
 # flake8: noqa
 def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
+    _validate_attachments(attachments)
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
@@ -30,6 +34,13 @@ def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     d.flags.ticket_origin = origin
     d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
+
+
+def _validate_attachments(attachments: list) -> None:
+    """Attachments are the File records `upload_file` returned, looked up by name."""
+    if all(isinstance(a, dict) and isinstance(a.get("name"), str) for a in attachments):
+        return
+    frappe.throw(_("Attachments must be files uploaded with the ticket"))
 
 
 @frappe.whitelist(methods=["GET"])

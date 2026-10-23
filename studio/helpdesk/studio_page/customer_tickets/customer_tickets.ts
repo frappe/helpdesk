@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, onScopeDispose, watch } from 'vue'
 import { createResource } from 'frappe-ui'
 import { useListData, useListView } from '@framework/ui/ListView'
 import { __, translations } from '@helpdesk/shared/translation'
@@ -68,6 +68,9 @@ function settled(source) {
   })
 }
 
+// Back from a ticket remounts this page; Load More's rows are fetched again.
+let loadedRows = 0
+
 function withLabel(column) {
   const label = columnLabels()[column.fieldname || column.key]
   return label ? { ...column, label } : column
@@ -97,6 +100,32 @@ export default function setup(context) {
     },
   }
   const data = useListData(DOCTYPE, fetchView)
+  watch(data.rowCount, (count) => (loadedRows = count))
+
+  // `useListData` refetches only the first page; Load More one page at a time up to `rows`.
+  let stopGrowing = () => {}
+  function growTo(rows) {
+    stopGrowing()
+    let previous = 0
+    stopGrowing = watch(data.loading, (loading) => {
+      if (loading) return
+      const count = data.rowCount.value
+      if (count >= rows || count === previous) return stopGrowing()
+      previous = count
+      data.loadMore()
+    })
+  }
+  growTo(loadedRows)
+
+  function reload() {
+    const rows = data.rowCount.value
+    data.reload()
+    growTo(rows)
+  }
+
+  // A teammate's new ticket pings each customer manager's own channel.
+  context.socket?.on('helpdesk:ticket-update', reload)
+  onScopeDispose(() => context.socket?.off('helpdesk:ticket-update', reload))
 
   const listColumns = computed(() =>
     view.columns.wire.value.map((column) => ({
@@ -201,7 +230,7 @@ export default function setup(context) {
     pageLength: data.pageLength,
     pageLengthOptions: PAGE_LENGTH_OPTIONS,
     loadMore: data.loadMore,
-    reload: data.reload,
+    reload,
     resizeColumn: ({ key, width }) => view.columns.setWidth(key, width),
   }
 }

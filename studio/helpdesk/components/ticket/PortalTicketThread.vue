@@ -288,4 +288,16 @@ function frameStyled(frame: HTMLIFrameElement) {
 :root:has(.email-content) {
   background: transparent;
 }
+
+/* frappe-ui's email frame wraps content in the desk's .prose-f; same rules as desk/src/index.css. */
+.prose-f {
+  @apply break-normal max-w-none prose prose-code:break-all prose-code:whitespace-pre-wrap prose-img:border prose-img:rounded-6 prose-sm;
+}
+.prose-f * {
+  unicode-bidi: plaintext;
+}
+.prose-f:not(.not-prose):not(.not-prose *) pre {
+  background-color: var(--surface-gray-2);
+  color: var(--ink-gray-9);
+}
 </style>

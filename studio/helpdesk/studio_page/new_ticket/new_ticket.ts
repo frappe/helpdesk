@@ -24,6 +24,7 @@ export default function setup(context) {
     timeFormat,
     customActions,
     setActions: (actions) => (customActions.value = actions),
-    openTicket: (ticket) => navigateTo(ROUTES.ticket(ticket.name)),
+    // Replace: Back from the new ticket goes where the form was opened from.
+    openTicket: (ticket) => navigateTo(ROUTES.ticket(ticket.name), { replace: true }),
   }
 }

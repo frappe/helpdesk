@@ -12,8 +12,8 @@ export function currentRoute() {
   return router.value?.currentRoute?.value || router.value?.currentRoute || {}
 }
 
-export function navigateTo(location: unknown) {
-  return router.value?.push(location)
+export function navigateTo(location: unknown, { replace = false } = {}) {
+  return replace ? router.value?.replace(location) : router.value?.push(location)
 }
 
 export function afterEachRoute(handler: (to: any) => void) {

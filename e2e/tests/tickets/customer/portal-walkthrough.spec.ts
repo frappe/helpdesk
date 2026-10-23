@@ -31,9 +31,8 @@ function closeButton(page: Page) {
   return page.getByRole("button", { name: "Close", exact: true }).first();
 }
 
-/** The confirm dialog's red Close; its X is labelled Close too. */
 function confirmClose(page: Page) {
-  return page.getByRole("dialog").getByRole("button", { name: "Close", exact: true }).last().click();
+  return page.getByRole("dialog").getByRole("button", { name: "Close ticket" }).click();
 }
 
 function composer(page: Page) {
@@ -53,6 +52,15 @@ async function communication(api: Api, ticket: string, text: string) {
   });
   return rows.find((row) => row.content.includes(text));
 }
+
+// Studio evaluates component inputs once per input, so `{{ }}` in data runs (frappe StudioComponentWrapper.vue).
+test.fixme("a subject that looks like an expression shows as text", async ({ page, apiAs }) => {
+  const subject = `E2E ${uid()} {{ 7 * 7 }}`;
+  const ticket = await raiseTicket(await apiAs("customer"), subject);
+  await page.goto(`/help/my-tickets/${ticket.name}`);
+  await expect(page.getByText(subject).first()).toBeVisible();
+  await expect(page.locator("body")).not.toContainText(subject.replace("{{ 7 * 7 }}", "49"));
+});
 
 test.describe("access", () => {
   test("someone else's ticket, or none, reads as not found", async ({ page, apiAs }) => {

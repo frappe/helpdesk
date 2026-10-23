@@ -179,7 +179,8 @@ export default function setup(context) {
     askConfirm({
       title: __('Close ticket'),
       message: __('Are you sure you want to close this ticket?'),
-      label: __('Close'),
+      // Not "Close": the dialog's X is already named that.
+      label: __('Close ticket'),
       theme: 'red',
       action: closeTicket,
     })

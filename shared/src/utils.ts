@@ -216,6 +216,8 @@ export function addHeadingIds(html: string) {
 
 // Scoped to the article: the icon sprite's <symbol>s reuse ids like `settings`.
 export function findArticleHeading(id: string) {
+  // `#` alone is not a selector: an article without headings asks for "".
+  if (!id) return null;
   return document.querySelector<HTMLElement>(`.ProseMirror #${CSS.escape(id)}`);
 }
 

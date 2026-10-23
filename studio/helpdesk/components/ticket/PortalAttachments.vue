@@ -136,7 +136,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { Spinner } from "frappe-ui";
+import { Spinner, call } from "frappe-ui";
 import { useUploader } from "@framework/ui/FileUpload";
 import type {
   Restrictions,
@@ -154,17 +154,24 @@ import LucidePlus from "~icons/lucide/plus";
 import LucideRotateCw from "~icons/lucide/rotate-cw";
 import LucideX from "~icons/lucide/x";
 
+// The site limit caps the whole request, so leave room for the multipart wrapping.
+const MULTIPART_MARGIN = 64 * 1024;
+
 const props = defineProps<{
   modelValue: UploadResult[];
   restrictions?: Restrictions;
-  transport?: UploadTransport;
+  transport: UploadTransport;
 }>();
 
 const emit = defineEmits<{ "update:modelValue": [UploadResult[]] }>();
 const { metaIcon } = useDevice();
+// The endpoint already falls back to frappe's 25 MB.
+const maxFileSize = call("frappe.core.api.file.get_max_file_size").catch(
+  () => 25 * 1024 * 1024
+);
 
 const uploader = useUploader({
-  transport: props.transport,
+  transport: send,
   // useUploader keeps the given object; proxy so later config applies.
   restrictions: new Proxy({}, { get: (_, key) => props.restrictions?.[key] }),
   multiple: true,
@@ -188,13 +195,16 @@ function onDrop(event: DragEvent) {
   add(event.dataTransfer?.files);
 }
 
-// The editor and inputs handle their own paste.
+// Inputs handle their own paste; the editor takes images inline, and the rest come here.
 function onPaste(event: ClipboardEvent) {
   const target = event.target as HTMLElement;
-  if (target.closest("input, textarea, [contenteditable='true']")) return;
-  if (!event.clipboardData?.files.length) return;
-  event.preventDefault();
-  add(event.clipboardData.files);
+  if (target.closest("input, textarea")) return;
+  const files = Array.from(event.clipboardData?.files ?? []);
+  if (!target.closest("[contenteditable='true']")) {
+    if (files.length) event.preventDefault();
+    return add(files);
+  }
+  add(files.filter((file) => !file.type.startsWith("image/")));
 }
 
 onMounted(() => document.addEventListener("paste", onPaste));
@@ -205,10 +215,47 @@ function onDragLeave(event: DragEvent) {
   if (!box.contains(event.relatedTarget as Node)) dragging.value = false;
 }
 
-function add(files?: FileList | null) {
+// The server fails an empty file with a bare OSError, so it never gets there.
+function add(files?: FileList | File[] | null) {
   if (!files?.length) return;
-  uploader.add(files);
+  const list = Array.from(files);
+  uploader.add(list.filter((file) => file.size));
+  for (const file of list.filter((file) => !file.size))
+    uploader.errors.value.push(
+      __('"{0}" was skipped — the file is empty.', [file.name])
+    );
   upload();
+}
+
+// Abort only while progress shows the body still going up. Once it is sent, or
+// too small to report progress, the server may save the File: let it finish and delete it.
+async function send(file: File, args, ctx) {
+  const limit = await maxFileSize;
+  if (ctx.signal.aborted) throw new DOMException("Cancelled", "AbortError");
+  const tooLarge = __("File is larger than {0}", [formatSize(limit)]);
+  if (file.size > limit - MULTIPART_MARGIN) throw new Error(tooLarge);
+
+  const controller = new AbortController();
+  let sending = false;
+  ctx.signal.addEventListener("abort", () => {
+    if (sending) controller.abort();
+  });
+  const doc: any = await props
+    .transport(file, args, {
+      signal: controller.signal,
+      onProgress: (loaded, total) => {
+        sending = loaded < total;
+        ctx.onProgress(loaded, total);
+      },
+    })
+    .catch((error) => {
+      throw error?.status === 413 ? new Error(tooLarge) : error;
+    });
+  if (ctx.signal.aborted)
+    call("frappe.client.delete", { doctype: "File", name: doc.name }).catch(
+      () => {}
+    );
+  return doc;
 }
 
 // commit() skips items added mid-pass; loop until none are idle.
@@ -255,15 +302,21 @@ function isBusy(item: UploadItem) {
 }
 
 function meta(item: UploadItem) {
-  if (item.status === "error") return item.error;
+  if (item.status === "error") return plainText(item.error);
   if (isBusy(item))
     return __("Uploading… {0}%", [Math.round(item.progress * 100)]);
   return formatSize(item.size ?? 0);
 }
 
+// Server messages carry markup, like `<strong>File Name</strong>`.
+function plainText(html = "") {
+  return new DOMParser().parseFromString(html, "text/html").body.textContent;
+}
+
 function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${Number((bytes / 1024 / 1024).toFixed(1))} MB`;
 }
 
 function isImage(name: string) {

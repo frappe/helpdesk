@@ -34,7 +34,7 @@
           class="w-full"
           :content="description"
           editable
-          fixed-menu
+          :fixed-menu="menuButtons"
           :placeholder="__('Describe your issue…')"
           editor-class="prose-sm max-w-none min-h-48 max-h-80 overflow-y-auto rounded-b-6 border border-t-0 border-outline-elevation-2 p-2"
           :upload-function="uploadInline"
@@ -62,13 +62,16 @@
         :disabled="!canSubmit"
         @click="createTicket"
       />
+      <p v-if="missingFields.length" class="mt-2 text-p-sm text-ink-gray-5">
+        {{ __("Required: {0}", missingFields.join(", ")) }}
+      </p>
     </div>
   </div>
   <PortalSkeleton v-else variant="form" :count="skeletonFieldCount" />
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   Button,
@@ -104,6 +107,59 @@ const SUGGESTION_LIMIT = 3;
 // Longer Select lists get a search box if there are more than 10 results
 const SEARCHABLE_FROM = 10;
 const editorExtensions = [HandleExcelPaste];
+// frappe-ui's default toolbar without Embed: the server strips iframes on save.
+const menuButtons = [
+  "Paragraph",
+  [
+    "Heading 1",
+    "Heading 2",
+    "Heading 3",
+    "Heading 4",
+    "Heading 5",
+    "Heading 6",
+  ],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Strikethrough",
+  "Link",
+  "FontColor",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Task List",
+  "Separator",
+  "Align Left",
+  "Align Center",
+  "Align Right",
+  "Separator",
+  "Image",
+  "Video",
+  "Blockquote",
+  "Code",
+  "Separator",
+  "Horizontal Rule",
+  [
+    "InsertTable",
+    "AddColumnBefore",
+    "AddColumnAfter",
+    "DeleteColumn",
+    "AddRowBefore",
+    "AddRowAfter",
+    "DeleteRow",
+    "MergeCells",
+    "SplitCell",
+    "ToggleHeaderColumn",
+    "ToggleHeaderRow",
+    "ToggleHeaderCell",
+    "DeleteTable",
+  ],
+  "Separator",
+  "TableOfContents",
+  "Separator",
+  "Undo",
+  "Redo",
+];
 
 const props = withDefaults(
   defineProps<{
@@ -166,7 +222,8 @@ watch(
     oldFields = JSON.parse(JSON.stringify(data.fields || []));
     // depends_on rules compare with ''; undefined would pass them.
     for (const row of data.fields || [])
-      model[row.fieldname] ??= row.fieldtype === "Check" ? 0 : "";
+      model[row.fieldname] ??=
+        row.default ?? (row.fieldtype === "Check" ? 0 : "");
     const actions = await runFormScripts(
       data,
       { call, router },
@@ -210,6 +267,16 @@ watch(attachments, (now, before) => {
   }
 });
 
+let created = false;
+onBeforeUnmount(() => {
+  if (created) return;
+  for (const doc of uploadedByUrl.values()) {
+    call("frappe.client.delete", { doctype: "File", name: doc.name }).catch(
+      () => {}
+    );
+  }
+});
+
 function applyFilters(fieldname: string, filters: any = null) {
   applyFieldFilters(template.data.fields, fieldname, filters, model, oldFields);
 }
@@ -236,16 +303,29 @@ function isRequired(row) {
   );
 }
 
+const missingFields = computed(() => [
+  ...(subject.value.trim() ? [] : [__("Subject")]),
+  ...(isContentEmpty(description.value) ? [__("Description")] : []),
+  ...visibleFields.value
+    .filter((row) => isRequired(row) && !model[row.fieldname])
+    .map((row) => __(row.label)),
+]);
+
 const canSubmit = computed(
-  () =>
-    !uploading.value &&
-    !isCreating.value &&
-    Boolean(subject.value) &&
-    !isContentEmpty(description.value) &&
-    visibleFields.value.filter(isRequired).every((row) => model[row.fieldname])
+  () => !uploading.value && !isCreating.value && !missingFields.value.length
 );
 
-const about = computed(() => DOMPurify.sanitize(template.data?.about || ""));
+// Links keep `target` so they never navigate away from a half-filled form.
+const about = computed(() => {
+  const body = DOMPurify.sanitize(template.data?.about || "", {
+    ADD_ATTR: ["target"],
+    RETURN_DOM: true,
+  });
+  body
+    .querySelectorAll("a[target]")
+    .forEach((link) => link.setAttribute("rel", "noopener noreferrer"));
+  return body.innerHTML;
+});
 // The desk's TicketNew has no suggestions: an empty query never fetches.
 const suggestionQuery = computed(() =>
   props.suggestArticles ? subject.value : ""
@@ -259,8 +339,8 @@ const priorityHint = computed(
   () => getPriority(model.priority)?.description?.trim() || undefined
 );
 
-function defaultPlaceholder(fieldtype: string) {
-  return ["Select", "Link", "Check"].includes(fieldtype)
+function defaultPlaceholder(row) {
+  return row.url_method || ["Select", "Link", "Check"].includes(row.fieldtype)
     ? __("Select an option")
     : __("Type something");
 }
@@ -287,13 +367,13 @@ const fields = computed(() =>
     label: __(row.label),
     options: row.options,
     reqd: Boolean(row.required),
-    placeholder: row.placeholder || defaultPlaceholder(row.fieldtype),
+    placeholder: row.placeholder || defaultPlaceholder(row),
     description: row.fieldname === "priority" ? priorityHint.value : undefined,
     dependsOn: row.depends_on,
     mandatoryDependsOn: row.mandatory_depends_on,
     readOnlyDependsOn: row.read_only_depends_on,
     filters: row.link_filters ? parseLinkFilters(row.link_filters) : undefined,
-    readOnly: Boolean(row.disabled),
+    readOnly: Boolean(row.read_only || row.disabled),
     ui: {
       ...uiFor(row),
       on: { change: (value) => runChangeHandlers(row, value) },
@@ -346,7 +426,7 @@ function createTicket() {
       // call(), not a resource: the desk's resource error handler toasts again.
       const ticket = await call("helpdesk.helpdesk.doctype.hd_ticket.api.new", {
         doc: {
-          subject: subject.value,
+          subject: subject.value.trim(),
           description: description.value,
           template: props.template,
           ...model,
@@ -356,9 +436,14 @@ function createTicket() {
         ),
         origin: props.origin,
       });
+      created = true;
       emit("created", ticket);
     },
-    { busy: isCreating, fallback: __("Could not create the ticket") }
+    {
+      busy: isCreating,
+      success: __("Ticket created"),
+      fallback: __("Could not create the ticket"),
+    }
   );
 }
 </script>
