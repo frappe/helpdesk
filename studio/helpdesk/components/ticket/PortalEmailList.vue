@@ -18,17 +18,17 @@
         </div>
       </Tooltip>
     </div>
-    <Tooltip :text="emails.join(', ')">
-      <span class="ms-1.5 truncate text-base text-ink-gray-8">
-        {{ emails.join(", ") }}
-      </span>
-    </Tooltip>
+    <PortalTruncatedText
+      class="ms-1.5 text-base text-ink-gray-8"
+      :text="emails.join(', ')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { Avatar, Tooltip } from "frappe-ui";
 import { computed } from "vue";
+import PortalTruncatedText from "@app/components/ui/PortalTruncatedText.vue";
 
 const MAX = 3;
 

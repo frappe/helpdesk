@@ -86,3 +86,23 @@ test("Load More rows survive opening a ticket and going back", async ({ page, ap
   await page.goBack();
   await expect(ticketRows(page)).toHaveCount(22);
 });
+
+test("ticket details show a tooltip only for text that is cut off", async ({ page, ticket }) => {
+  const longName = `Acme ${"Holdings ".repeat(12)}Ltd`;
+  await page.route("**/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.get_one*", async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.message.customer = longName;
+    await route.fulfill({ response, json: body });
+  });
+  await page.goto(`/help/my-tickets/${ticket.name}`);
+
+  // A tooltip repeats its text, so a second copy means it opened.
+  const priority = page.getByText("Priority", { exact: true });
+  await priority.hover();
+  await page.waitForTimeout(800); // past the tooltip's 500ms delay
+  await expect(priority).toHaveCount(1);
+
+  await page.getByText(longName).first().hover();
+  await expect.poll(() => page.getByText(longName, { exact: true }).count()).toBeGreaterThan(1);
+});
