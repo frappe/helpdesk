@@ -106,8 +106,12 @@ const root = ref<HTMLElement | null>(null);
 
 // The closed bar shows the draft on one line; blocks and breaks become spaces.
 const draft = computed(() => {
-  const html = (props.modelValue || "").replace(/<br\s*\/?>|<\/(p|div|li|h\d)>/gi, " ");
-  const text = new DOMParser().parseFromString(html, "text/html").body.textContent;
+  const html = (props.modelValue || "").replace(
+    /<br\s*\/?>|<\/(p|div|li|h\d)>/gi,
+    " "
+  );
+  const text = new DOMParser().parseFromString(html, "text/html").body
+    .textContent;
   return (text || "").replace(/\s+/g, " ").trim();
 });
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
