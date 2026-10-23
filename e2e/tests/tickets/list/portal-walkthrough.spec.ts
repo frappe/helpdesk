@@ -444,6 +444,47 @@ test.describe("saved views", () => {
     }
   });
 
+  test("a view with no saved columns shows translated headers and stays unmodified", async ({ page, api, apiAs }) => {
+    // Cold load order: the list mounts, then translations arrive, then the views list.
+    let mounted: () => void;
+    const listMounted = new Promise<void>((resolve) => (mounted = resolve));
+    let translated: () => void;
+    const translationsSent = new Promise<void>((resolve) => (translated = resolve));
+    await page.route(/helpdesk\.api\.general\.get_translations/, async (route) => {
+      await listMounted;
+      await route.fulfill({ json: { message: { Subject: "Asunto", Status: "Estado" } } });
+      translated();
+    });
+    await page.route(/frappe\.client\.get_list/, async (route) => {
+      const body = route.request().postData() || "";
+      if (body.includes("HD Ticket")) mounted();
+      if (body.includes("HD View")) {
+        await translationsSent;
+        await new Promise((resolve) => setTimeout(resolve, 1_000));
+      }
+      await route.continue();
+    });
+    const customer = await apiAs("customer");
+    const view = await customer.insert<{ name: string }>("HD View", {
+      label: `E2E bare ${uid()}`,
+      dt: "HD Ticket",
+      type: "list",
+      is_customer_portal: 1,
+      filters: "[]",
+      columns: "[]",
+    });
+    try {
+      await page.goto(`/help/my-tickets?view=${encodeURIComponent(view.name)}`);
+      await expect(page.getByRole("button", { name: /^\d{4} / }).first()).toBeVisible();
+      const header = page.locator("[style*='grid-template-columns']").first();
+      await expect(header).toContainText("Asunto");
+      await expect(header).toContainText("Estado");
+      await expect(page.getByRole("button", { name: "Save Changes" })).toBeHidden();
+    } finally {
+      await api.delete("HD View", view.name);
+    }
+  });
+
   test("save, open, update, rename and delete a view", async ({ page, api, apiAs }) => {
     const { token } = await raiseBatch(apiAs, 2);
     const label = `E2E view ${uid()}`;

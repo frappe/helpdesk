@@ -83,7 +83,11 @@ export default function setup(context) {
   // Seeded before `useListData`, which fetches on creation.
   const view = useListView(DOCTYPE)
   view.columns.shown.value = DEFAULT_COLUMNS.map(withLabel)
-  watch(translations, () => (view.columns.shown.value = view.columns.shown.value.map(withLabel)))
+  // A restore brings the labels the columns were saved with.
+  watch([view.columns.shown, translations], ([shown]) => {
+    if (shown.some((column) => withLabel(column).label !== column.label))
+      view.columns.shown.value = shown.map(withLabel)
+  })
   view.sort.by.value = [{ fieldname: 'creation', direction: 'desc' }]
   const views = useViews(view)
 

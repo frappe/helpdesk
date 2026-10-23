@@ -162,7 +162,7 @@ function createViewsStore() {
     return (
       current.order_by !== (row.order_by || '') ||
       current.filters !== JSON.stringify(layout.filters) ||
-      current.columns !== JSON.stringify(layout.columns)
+      columnLayout(listView.value.columns.shown.value) !== columnLayout(layout.columns)
     )
   })
 
@@ -311,6 +311,11 @@ function parseViewFilters(raw) {
 function parseViewColumns(raw) {
   const columns = parseJson(raw, [])
   return columns.every((column) => column?.fieldname) ? columns : parseColumns(columns)
+}
+
+// Labels follow the language, not the view.
+function columnLayout(columns) {
+  return JSON.stringify(columns.map(({ fieldname, width }) => ({ fieldname, width })))
 }
 
 // Cloned, so a restore cannot alias the default into live refs.
