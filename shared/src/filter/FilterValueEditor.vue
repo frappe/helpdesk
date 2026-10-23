@@ -526,6 +526,14 @@ watch(operator, (newOperator, oldOperator) => {
     textValue.value = "";
     return;
   }
+  if (
+    switchesLinkInput(newOperator, oldOperator) &&
+    !readsSameAsText(value.value)
+  ) {
+    value.value = defaultValueFor(newOperator);
+    textValue.value = "";
+    return;
+  }
   value.value = convertValue(value.value);
   textValue.value = plainText(value.value);
   if (hasValue(value.value)) emit("apply", newOperator, value.value);
@@ -536,6 +544,28 @@ function dateValueKind(operatorName: string): string {
   if (operatorName === "timespan") return "timespan";
   if (operatorName === "between") return "range";
   return "scalar";
+}
+
+// A Link field picks a docname from a list but "like" takes free text. Crossing
+// between them would show a docname as text (e.g. a ticket number instead of its
+// subject), or apply a typed fragment as an exact match.
+function switchesLinkInput(newOperator: string, oldOperator: string): boolean {
+  if (!isLink.value || multiValueFields.includes(props.field.fieldname))
+    return false;
+  return newOperator.includes("like") !== oldOperator.includes("like");
+}
+
+// Carry a value across only when its docname is also what the user reads
+// ponytail: checks loaded search results only; unlisted values are reset
+function readsSameAsText(rawValue: any): boolean {
+  const values = Array.isArray(rawValue) ? rawValue : [plainText(rawValue)];
+  const results = linkSearch.results.data || [];
+  return values.every((candidate: string) =>
+    results.some(
+      (option: { label: string; value: string }) =>
+        option.value === candidate && option.label === candidate
+    )
+  );
 }
 
 function convertValue(rawValue: any): any {

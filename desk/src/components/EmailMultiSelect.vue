@@ -112,7 +112,7 @@ import LucideSearch from "~icons/lucide/search";
 import LucideX from "~icons/lucide/x";
 import UserAvatar from "@/components/UserAvatar.vue";
 import { useUserStore } from "@/stores/user";
-import { copyToClipboard } from "@/utils";
+import { copyToClipboard } from "@helpdesk/shared/utils";
 import { watchDebounced } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import {

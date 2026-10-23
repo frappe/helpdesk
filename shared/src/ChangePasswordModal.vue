@@ -2,10 +2,21 @@
   <Dialog v-model:open="show" :title="__('Change Password')">
     <template #default>
       <div class="flex flex-col gap-4">
+        <!-- Without its own username field and `new-password`, the browser fills
+             the saved login: the password here, the username into whatever text
+             field the page has (the portal's article search). -->
+        <input
+          type="text"
+          autocomplete="username"
+          :value="user"
+          readonly
+          hidden
+        />
         <div>
           <Password
             v-model="newPassword"
             :placeholder="__('New Password')"
+            autocomplete="new-password"
             maxLength="50"
           >
             <template #prefix>
@@ -17,6 +28,7 @@
           <Password
             v-model="confirmPassword"
             :placeholder="__('Confirm Password')"
+            autocomplete="new-password"
             maxLength="50"
           >
             <template #prefix>

@@ -1,14 +1,20 @@
 import frappe
-from frappe.utils import get_system_timezone
+from frappe.utils import escape_html, get_system_timezone
+from frappe.website.utils import get_home_page
 
 from helpdesk.api.config import get_favicon
 
 
 def get_boot() -> dict:
-    """`window.boot` for the portal, there before its first date renders."""
+    """In boot so the timezone is there before the first date renders."""
     return {
         "system_timezone": get_system_timezone(),
-        # Shown before get_config answers
+        # Read before the first render, so a private knowledge base never flashes for a guest
+        "send_guest_to_login": frappe.session.user == "Guest"
+        and not frappe.db.get_single_value("HD Settings", "public_knowledge_base"),
+        # Frappe renders the home page at `/` instead of redirecting to it
+        "home_page": "/" + get_home_page().lstrip("/"),
+        # Pages put it in their tab title before get_config answers
         "brand_name": get_brand_name(),
     }
 
@@ -18,8 +24,14 @@ def update_website_context(context):
     A favicon set on the Studio app itself wins."""
     doc = context.get("doc")
     if doc and doc.doctype == "Studio App" and doc.name == "helpdesk":
-        context.app_title = get_brand_name()
-        context.favicon = context.favicon or get_favicon()
+        context.app_title = escape_for_shell(get_brand_name())
+        context.favicon = context.favicon or escape_for_shell(get_favicon())
+
+
+def escape_for_shell(value: str | None) -> str:
+    """Frappe's renderer.html prints these unescaped, inside HTML and a JS string."""
+    value = escape_html(value or "").replace("\\", "&#92;")
+    return " ".join(value.splitlines())
 
 
 def get_brand_name() -> str:

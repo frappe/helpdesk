@@ -23,11 +23,22 @@
        "blockName": "toolbar-left",
        "children": [
         {
+         "componentId": "PortalSkeleton-tickets-filters",
+         "componentName": "PortalSkeleton",
+         "isCustomVueComponent": true,
+         "componentProps": {
+          "variant": "filters",
+          "count": 2
+         },
+         "visibilityCondition": "{{ !settingsLoaded }}"
+        },
+        {
          "blockName": "tickets-org-switcher",
          "classes": [
           "max-sm:flex-1",
           "min-w-0",
-          "sm:shrink-0"
+          "sm:shrink-0",
+          "portal-reveal"
          ],
          "componentId": "KbOrgSwitcher-tickets",
          "componentName": "PortalOrganizationSwitcher",
@@ -37,7 +48,7 @@
           "selectedOrganizations": "{{ selectedOrganizations }}"
          },
          "isCustomVueComponent": true,
-         "visibilityCondition": "{{ organizations.length > 1 }}"
+         "visibilityCondition": "{{ settingsLoaded && organizations.length > 1 }}"
         },
         {
          "children": [
@@ -66,11 +77,13 @@
           "block",
           "flex-1",
           "min-w-0",
-          "max-lg:hidden"
+          "max-lg:hidden",
+          "portal-reveal"
          ],
          "componentId": "container-toolbar-quickfilter",
          "componentName": "container",
-         "originalElement": "div"
+         "originalElement": "div",
+         "visibilityCondition": "{{ settingsLoaded }}"
         }
        ],
        "classes": [
@@ -102,6 +115,23 @@
       {
        "blockName": "toolbar-right",
        "children": [
+        {
+         "blockName": "tickets-save-view",
+         "componentEvents": {
+          "click": {
+           "action": "Run Script",
+           "event": "click",
+           "script": "saveViewChanges()"
+          }
+         },
+         "componentId": "Button-tickets-save-view",
+         "componentName": "Button",
+         "componentProps": {
+          "label": "{{ t('Save Changes') }}",
+          "variant": "subtle"
+         },
+         "visibilityCondition": "{{ isViewModified }}"
+        },
         {
          "blockName": "tickets-reload",
          "classes": [
@@ -238,10 +268,10 @@
        "componentName": "PortalTicketList",
        "componentProps": {
         "columns": "{{ listColumns }}",
-        "compact": "{{ isPhone }}",
         "emptyState": "{{ emptyState }}",
         "loading": "{{ listLoading }}",
         "onColumnResize": "(payload) => resizeColumn(payload)",
+        "onExport": "(payload) => exportTickets(payload)",
         "onLoadMore": "() => loadMore()",
         "onRowClick": "(row) => openTicket(row)",
         "pageLength": {
@@ -319,13 +349,14 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-11 01:05:00.000000",
+ "modified": "2026-10-21 02:14:14.000000",
  "modified_by": "Administrator",
  "name": "customer_tickets",
  "owner": "Administrator",
  "page_name": "page-e0f4b5bc",
  "page_title": "Customer tickets",
  "published": 1,
- "route": "/customer-tickets",
- "studio_app": "helpdesk"
+ "route": "/my-tickets",
+ "studio_app": "helpdesk",
+ "tab_title": "{{ t('My tickets') }} | {{ brandName }}"
 }

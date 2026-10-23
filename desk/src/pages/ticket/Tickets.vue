@@ -74,7 +74,7 @@ import TicketPriority from "@/components/TicketPriority.vue";
 import BulkAssignModal from "@/components/ticket-agent/BulkAssignModal.vue";
 import BulkEditModal from "@/components/ticket-agent/BulkEditModal.vue";
 import BulkReplyModal from "@/components/ticket-agent/BulkReplyModal.vue";
-import ExportModal from "@/components/ticket/ExportModal.vue";
+import ExportModal from "@helpdesk/shared/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import { normalizeFilters } from "@helpdesk/shared/filter";
 import ViewModal from "@/components/ViewModal.vue";

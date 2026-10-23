@@ -28,6 +28,8 @@ test("create a category and article, publish it, customer can read it", async ({
   await expect(page.getByText("Article updated successfully.")).toBeVisible();
 
   await page.getByRole("button", { name: "Publish" }).click();
+  // Publishing asks for the access first.
+  await page.getByRole("dialog", { name: "Publish article as" }).getByRole("button", { name: "Publish" }).click();
   await expect(page.getByRole("button", { name: "Unpublish" })).toBeVisible();
   const [article] = await api.list("HD Article", {
     filters: { title },
@@ -36,9 +38,10 @@ test("create a category and article, publish it, customer can read it", async ({
   expect(article.status).toBe("Published");
 
   const customer = await pageAs("customer");
-  await customer.goto(`/helpdesk/kb-public/${article.category}`);
-  await customer.getByText(title).click();
-  await expect(customer).toHaveURL(new RegExp(`/kb-public/articles/${article.name}`));
+  await customer.goto(`/help/category/${article.category}`);
+  // The sidebar lists it too; the category list comes last.
+  await customer.getByText(title).last().click();
+  await expect(customer).toHaveURL(new RegExp(`/help/articles/${article.name}`));
   await expect(customer.getByText("Steps to reset a password")).toBeVisible();
 });
 
@@ -93,7 +96,6 @@ test("merge a category into another, then delete one", async ({ page, api }) => 
 });
 
 async function openArticleMenu(page: Page, item: string) {
-  // ponytail: the article's "more" trigger has no label; add aria-label to target it directly
   await page
     .locator("button[aria-haspopup=menu]:not(nav *)")
     .filter({ hasNotText: /\S/ })

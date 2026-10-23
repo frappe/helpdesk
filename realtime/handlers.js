@@ -3,7 +3,7 @@ function helpdesk_handlers(socket) {
     socket.emit("pong");
   });
 
-  // Same gate as frappe's doc_open: the room names viewers and relays edits and typing.
+  // Same gate as frappe's doc_open: the room leaks viewers, edits, typing.
   // Tickets this socket still means to view: a stop that lands during the
   // permission check would otherwise be undone by the late join.
   const viewing = new Set();

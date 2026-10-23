@@ -11,7 +11,6 @@ export const ROLES = {
 
 export type RoleLabel = keyof typeof ROLES
 
-// What a member can be made, or invited as; the owner is fixed.
 export const ASSIGNABLE_ROLES: RoleLabel[] = ['Manager', 'Member']
 
 export function roleLabel(role: RoleLabel) {

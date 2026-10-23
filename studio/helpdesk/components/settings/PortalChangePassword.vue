@@ -1,5 +1,6 @@
 <template>
   <Button
+    icon-left="lucide-lock"
     :label="__('Change password')"
     variant="subtle"
     @click="open = true"
@@ -8,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// Studio finds custom blocks only under the app folder, so the desk's modal reaches the block tree through this.
+// Studio only finds custom blocks under the app folder.
 import { computed, ref } from "vue";
 import { Button } from "frappe-ui";
 import ChangePasswordModal from "@helpdesk/shared/ChangePasswordModal.vue";

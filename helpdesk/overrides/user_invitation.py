@@ -10,7 +10,7 @@ from helpdesk.helpdesk.doctype.hd_customer.hd_customer import (
 
 class HelpdeskUserInvitation(UserInvitation):
     def validate_invite(self) -> None:
-        """What `insert` checks before it mails, so a batch can refuse before any mail goes out."""
+        """Lets a batch refuse before `insert` mails anyone."""
         self._validate_invite()
 
     def _get_allowed_roles(self):

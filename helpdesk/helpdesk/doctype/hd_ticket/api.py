@@ -5,6 +5,7 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import get_controller
+from frappe.rate_limiter import rate_limit
 from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Order
@@ -19,19 +20,31 @@ TIMELINE_FIELDS = ("status",)
 
 
 @frappe.whitelist()
+# far above anyone filling the form by hand; per user, since an office shares one IP
+@rate_limit(limit=300, seconds=60, user_based=True)
 # flake8: noqa
-def new(doc: dict, attachments: list[dict] = []):
+def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
+    _validate_attachments(attachments)
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
-    d = frappe.get_doc(doc).insert()
+    d = frappe.get_doc(doc)
+    # only the portal sends an origin
+    d.flags.ticket_origin = origin
+    d.insert()
     return TicketFields().strip_hidden_fields(d.as_dict())
+
+
+def _validate_attachments(attachments: list) -> None:
+    """Attachments are the File records `upload_file` returned, looked up by name."""
+    if all(isinstance(a, dict) and isinstance(a.get("name"), str) for a in attachments):
+        return
+    frappe.throw(_("Attachments must be files uploaded with the ticket"))
 
 
 @frappe.whitelist(methods=["GET"])
 def get_timeline_changes(name: str) -> list[dict]:
-    """Status changes, oldest first, with who made them, since ticket readers can't read Version."""
     frappe.has_permission("HD Ticket", "read", name, throw=True)
     versions = frappe.get_all(
         "Version",
@@ -49,11 +62,17 @@ def get_timeline_changes(name: str) -> list[dict]:
                         "field": field,
                         "from": old,
                         "to": new,
-                        "by": get_user_info_for_avatar(version.owner),
+                        "by": get_name_and_image(version.owner),
                         "on": version.creation,
                     }
                 )
     return changes
+
+
+def get_name_and_image(user: str) -> dict:
+    """Customers see who changed the status, never their email."""
+    info = get_user_info_for_avatar(user)
+    return {"name": info["name"], "image": info["image"]}
 
 
 @frappe.whitelist()
@@ -64,9 +83,10 @@ def get_one(name: str):
     fields = TicketFields()
 
     doc = frappe.get_doc("HD Ticket", name)
-    # The desk's getdoc marks it seen; this is the portal's, or the list keeps it bold.
+    # desk's getdoc does this; without it the portal list stays bold
     doc.add_seen()
     outside_hours_banner = get_outside_hours_banner(doc)
+    overdue_by = doc.get_overdue_by()
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
     ticket = fields.strip_hidden_fields(doc.as_dict())
@@ -90,7 +110,7 @@ def get_one(name: str):
     return {
         **ticket,
         "communications": get_communications(name),
-        # When, not to whom: customers cannot read assignees. Cancelled rows count, someone did pick it up.
+        # when, not who: customers can't read assignees; cancelled rows count
         "assigned_on": frappe.db.get_value(
             "ToDo",
             {"reference_type": "HD Ticket", "reference_name": name},
@@ -98,7 +118,13 @@ def get_one(name: str):
             order_by="creation asc",
         ),
         "contact": contact,
+        # `customer` is already readable here; customers can't read HD Customer
+        "customer_image": ticket.get("customer")
+        and frappe.db.get_value("HD Customer", ticket.customer, "image"),
         "outside_hours_banner": outside_hours_banner,
+        "overdue_by": overdue_by,
+        # validate_feedback's rule for when closing needs a rating
+        "has_agent_replied": bool(doc.has_agent_replied),
         "template": {"fields": fields.get_form()},
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=not fields.is_agent
@@ -154,10 +180,19 @@ def get_communications(ticket: str):
         c.author_id = c.user if c.sent_or_received == "Sent" and c.user else c.sender
     authors = {c.author_id for c in communications if c.author_id}
     agents = {author for author in authors if is_agent(author)}
+    viewer_is_agent = is_agent()
+    attachments = get_attachments_by_name(
+        "Communication", [c.name for c in communications]
+    )
     for c in communications:
-        c.attachments = get_attachments("Communication", c.name)
+        if not viewer_is_agent:
+            # portal never shows recipients, so don't send them
+            c.pop("recipients")
+            c.pop("cc")
+            c.pop("bcc")
+        c.attachments = attachments.get(c.name, [])
         c.user = get_user_info_for_avatar(c.author_id)
-        # The author's role, not the direction: an agent replying from the portal is still an agent.
+        # by author role: agents may reply from the portal
         c.is_agent = c.pop("author_id") in agents
     return communications
 
@@ -193,6 +228,21 @@ def get_call_logs(ticket: str):
 
     call_logs = parse_call_logs(calls)
     return call_logs
+
+
+def get_attachments_by_name(doctype: str, names: list[str]) -> dict[str, list[dict]]:
+    """One query for every document's files."""
+    if not names:
+        return {}
+    files = frappe.get_all(
+        "File",
+        filters={"attached_to_doctype": doctype, "attached_to_name": ["in", names]},
+        fields=["name", "file_url", "file_name", "attached_to_name"],
+    )
+    grouped = {}
+    for file in files:
+        grouped.setdefault(file.pop("attached_to_name"), []).append(file)
+    return grouped
 
 
 @redis_cache()

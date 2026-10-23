@@ -165,7 +165,8 @@ function reload(val) {
   if (
     options.data?.length &&
     val === options.params?.txt &&
-    props.doctype === options.params?.doctype
+    props.doctype === options.params?.doctype &&
+    JSON.stringify(props.filters) === JSON.stringify(options.params?.filters)
   )
     return;
 
@@ -182,7 +183,7 @@ function reload(val) {
 
 const options = createResource({
   url: "frappe.desk.search.search_link",
-  cache: [props.doctype, text.value, props.hideMe],
+  cache: [props.doctype, text.value, props.hideMe, props.filters],
   method: "POST",
   params: {
     txt: text.value,

@@ -2,7 +2,8 @@
 	"private": true,
 	"dependencies": {
 		"@helpdesk/shared": "link:./shared",
-		"@vueuse/core": "^14.1.0"
+		"@vueuse/core": "^14.1.0",
+		"vuedraggable": "^4.1.0"
 	},
 	"scripts": {
 		"postinstall": "cd desk && yarn install",

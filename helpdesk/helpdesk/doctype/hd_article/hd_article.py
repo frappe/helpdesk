@@ -2,11 +2,25 @@
 # For license information, please see license.txt
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
+from frappe.desk.reportview import get_filters_cond
 from frappe.model.document import Document
-from frappe.utils import cint
+from frappe.types.filter import Filters
+from frappe.utils import cint, evaluate_filters
+from frappe.website.utils import cleanup_page_name
 
-from helpdesk.utils import capture_event
+from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    check_category_length,
+    get_category_visibility,
+)
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.utils import capture_event, is_agent
+
+PUBLIC = "Public"
+CUSTOMERS = "Customers"
+PRIVATE = "Private"
+EXCERPT_LENGTH = 140
 
 
 class HDArticle(Document):
@@ -16,8 +30,7 @@ class HDArticle(Document):
 
     def validate_article_category(self):
         if self.has_value_changed("category") and not self.is_new():
-            old_category = self.get_doc_before_save().get("category")
-            self.check_category_length(old_category)
+            check_category_length(self.get_doc_before_save().get("category"))
 
     def validate_published_content(self):
         if self.status == "Published" and not self.content:
@@ -25,8 +38,11 @@ class HDArticle(Document):
 
     def before_insert(self):
         self.author = frappe.session.user
+        self.inherit_category_visibility()
 
     def before_save(self):
+        self.excerpt = get_excerpt(self.content)
+
         # set published date of the hd_article
         if self.status == "Published" and not self.published_on:
             self.published_on = frappe.utils.now()
@@ -47,22 +63,34 @@ class HDArticle(Document):
                 )
             )
 
+    def inherit_category_visibility(self):
+        if (
+            self.visibility == CUSTOMERS
+            and self.category
+            and get_category_visibility(self.category) == PRIVATE
+        ):
+            self.visibility = PRIVATE
+
     def after_insert(self):
         count = frappe.db.count("HD Article")
         if count == 1:
             return
         capture_event("article_created")
 
-    def on_trash(self):
-        self.check_category_length()
+    def on_update(self):
+        self.update_search_index()
 
-    def check_category_length(self, category=None):
-        category = category or self.get("category")
-        if not category:
-            return
-        category_articles = frappe.db.count("HD Article", {"category": category})
-        if category_articles == 1:
-            frappe.throw(_("Category must have atleast one article"))
+    def on_trash(self):
+        check_category_length(self.category)
+        self.update_search_index()
+
+    def update_search_index(self):
+        frappe.enqueue(
+            "helpdesk.search.update_article_index",
+            article=self.name,
+            queue="short",
+            enqueue_after_commit=True,
+        )
 
     @staticmethod
     def default_list_data():
@@ -80,6 +108,12 @@ class HDArticle(Document):
                 "width": "10rem",
             },
             {
+                "label": "Visibility",
+                "type": "Select",
+                "key": "visibility",
+                "width": "10rem",
+            },
+            {
                 "label": "Author",
                 "type": "Link",
                 "key": "author",
@@ -94,33 +128,95 @@ class HDArticle(Document):
         ]
         return {"columns": columns}
 
-    @frappe.whitelist()
-    def set_feedback(self, value: int):
-        # 0 empty, 1 like, 2 dislike
-        user = frappe.session.user
+    def set_feedback(self, value: int, visitor_id: str | None = None):
+        """0 none, 1 like, 2 dislike; guests are keyed by `visitor_id`."""
+        value = cint(value)
+        if value not in (0, 1, 2):
+            frappe.throw(_("Invalid vote"))
+        self.validate_voter(visitor_id)
+        self.save_feedback(get_voter(visitor_id), value)
 
+    def validate_voter(self, visitor_id: str | None):
+        if frappe.session.user != "Guest":
+            return
+        if not frappe.db.get_single_value(
+            "HD Settings", "allow_anonymous_article_voting"
+        ):
+            frappe.throw(_("Voting requires an account"), frappe.PermissionError)
+        if not visitor_id:
+            frappe.throw(_("Please enable cookies to vote"))
+
+    def save_feedback(self, voter: dict, value: int):
         feedback = frappe.db.exists(
-            "HD Article Feedback", {"user": user, "article": self.name}
+            "HD Article Feedback", {**voter, "article": self.name}
         )
         if feedback:
-            current_value = frappe.db.get_value(
-                "HD Article Feedback", feedback, "feedback"
-            )
-            if int(current_value) == value:
-                return
             frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
-        else:
-            frappe.new_doc(
-                "HD Article Feedback", user=user, article=self.name, feedback=value
-            ).insert()
+            return
+        # guests lack create permission; validate_voter is the gate
+        frappe.get_doc(
+            {
+                "doctype": "HD Article Feedback",
+                "article": self.name,
+                "feedback": value,
+                **voter,
+            }
+        ).insert(ignore_permissions=True)
 
     @property
     def title_slug(self) -> str:
-        """
-        Generate slug from article title.
-        Example: "Introduction to Frappe Helpdesk" -> "introduction-to-frappe-helpdesk"
+        """Display only; the server ignores the slug in URLs."""
+        return cleanup_page_name(self.title)
 
-        :return: Generated slug
-        """
-        return self.title.lower().replace(" ", "-")
+
+def get_excerpt(html: str | None) -> str:
+    """First paragraph only: headings and table cells would run into it."""
+    soup = BeautifulSoup(html or "", "html.parser")
+    paragraph = next((p for p in soup.find_all("p") if p.get_text(strip=True)), soup)
+    return " ".join(paragraph.get_text().split())[:EXCERPT_LENGTH]
+
+
+def can_view_article(user: str, article) -> bool:
+    if is_agent(user):
+        return True
+    return evaluate_filters(
+        article, Filters(make_article_filters(user), doctype="HD Article")
+    )
+
+
+def make_article_filters(user: str | None = None, **extra) -> dict:
+    user = user or frappe.session.user
+    filters = {"status": "Published", **extra}
+    if not is_agent(user):
+        filters["visibility"] = ["in", get_readable_visibilities(user)]
+    return filters
+
+
+def get_readable_visibilities(user: str) -> list[str]:
+    """Other apps' signed-in users lack a customer role: Public only."""
+    if set(CUSTOMER_ROLES) & set(frappe.get_roles(user)):
+        return [PUBLIC, CUSTOMERS]
+    return [PUBLIC]
+
+
+def get_voter(visitor_id: str | None) -> dict | None:
+    if frappe.session.user != "Guest":
+        return {"user": frappe.session.user}
+    return {"visitor_id": visitor_id} if visitor_id else None
+
+
+def permission_query(user: str | None = None) -> str | None:
+    user = user or frappe.session.user
+    if is_agent(user):
+        return None
+    conditions = get_filters_cond(
+        "HD Article", make_article_filters(user), [], ignore_permissions=True
+    )
+    return conditions.removeprefix(" and ")
+
+
+def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+    """Writes fall through to role permissions."""
+    if ptype in ("write", "create", "delete"):
+        return True
+    return can_view_article(user or frappe.session.user, doc)

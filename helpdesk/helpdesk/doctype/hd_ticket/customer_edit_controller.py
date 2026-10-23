@@ -22,6 +22,8 @@ class CustomerEditController:
         # a System Manager pulling emails is not the sender of the pulled tickets
         if is_agent() or "System Manager" in frappe.get_roles():
             return
+        self.check_no_feedback_on_insert()
+        self.reset_read_only_fields()
         if frappe.session.user != "Guest":
             self.raised_by = frappe.session.user
         self.via_customer_portal = 1
@@ -29,6 +31,23 @@ class CustomerEditController:
             *PORTAL_INSERT_EXEMPT_FIELDS,
             *(row.fieldname for row in self.customer_writable_rows()),
         ]
+
+    def check_no_feedback_on_insert(self):
+        # feedback is permlevel 0 so a customer can rate a resolved ticket, not a new one
+        if any(self.get(f) for f in FEEDBACK_FIELDS):
+            text = _("Feedback cannot be given while raising a ticket")
+            frappe.throw(text, frappe.PermissionError)
+
+    def reset_read_only_fields(self):
+        # a read-only field at permlevel 0 survives the framework's permlevel reset
+        defaults = frappe.new_doc("HD Ticket", as_dict=True)
+        for df in self.meta.fields:
+            if (
+                df.read_only
+                and df.fieldtype not in no_value_fields
+                and df.fieldname not in PORTAL_INSERT_EXEMPT_FIELDS
+            ):
+                self.set(df.fieldname, defaults.get(df.fieldname))
 
     def check_update_perms(self):
         # not gated on via_customer_portal: agent-raised tickets are still the customer's
@@ -40,13 +59,12 @@ class CustomerEditController:
         # rating the ticket is the one thing a closing email asks the customer to do
         if self.flags.get("ignore_closed_ticket_guard"):
             return
-        # Closed only: `feedback` is never cleared, so a rating lock froze reopened tickets.
-        if old_doc.status == "Closed":
-            text = _("Closed tickets cannot be updated by non-agents")
+        # `feedback` is never cleared, so a rated ticket stays frozen even after an agent reopens it
+        if old_doc.status == "Closed" or old_doc.feedback:
+            text = _("Closed or rated tickets cannot be updated by non-agents")
             frappe.throw(text, frappe.PermissionError)
 
     def check_feedback_is_final(self, old_doc):
-        """A customer rates a ticket once, whatever its status."""
         if not (old_doc.feedback or old_doc.feedback_rating):
             return
         if any(self.get(f) != old_doc.get(f) for f in FEEDBACK_FIELDS):

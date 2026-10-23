@@ -2,7 +2,7 @@ import { createResource } from "frappe-ui";
 import { ref } from "vue";
 import type { App } from "vue";
 
-// A ref, so text bound through `__()` re-renders when the language changes.
+// Ref, so `__()` text re-renders on language change.
 export const translations = ref<Record<string, string>>({});
 
 type Replacement = string | number;
@@ -29,7 +29,7 @@ export const __ = translate;
 
 let resource: ReturnType<typeof createResource> | null = null;
 
-// Fetched once; later calls refetch, as after the user changes their language.
+// Later calls refetch, e.g. after a language change.
 export function fetchTranslations() {
   if (resource) return resource.reload();
   resource = createResource({

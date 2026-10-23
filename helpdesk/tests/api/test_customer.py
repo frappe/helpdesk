@@ -1,6 +1,8 @@
 # Copyright (c) 2025, Frappe Technologies and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe.core.api.user_invitation import get_pending_invitations, invite_by_email
 from frappe.tests import IntegrationTestCase
@@ -33,8 +35,6 @@ from helpdesk.utils import CUSTOMER_PORTAL_ROOT
 
 
 class TestOrganizationMembers(IntegrationTestCase):
-    """The payload behind the portal's member list, and the guards on changing it."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -43,7 +43,7 @@ class TestOrganizationMembers(IntegrationTestCase):
         cls.outsider = create_contact("Org Outsider", unique_email("org-outsider"))
         cls.enterClassContext(
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_change_roles": 1}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 1}
             )
         )
 
@@ -119,10 +119,10 @@ class TestOrganizationMembers(IntegrationTestCase):
         ):
             update_member_role(self.customer.name, self.manager["contact"], False)
 
-    def test_role_changes_need_their_own_portal_setting(self) -> None:
+    def test_role_changes_need_the_member_management_setting(self) -> None:
         settings = {
             "allow_customer_managers_to_invite": 1,
-            "allow_customer_managers_to_change_roles": 0,
+            "allow_customer_managers_to_manage_organization": 0,
         }
         with (
             change_settings("HD Settings", settings),
@@ -140,8 +140,6 @@ class TestOrganizationMembers(IntegrationTestCase):
 
 
 class TestInvitations(IntegrationTestCase):
-    """A customer manager invites into the organization they manage and sees no other."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -158,7 +156,7 @@ class TestInvitations(IntegrationTestCase):
                 {
                     "allow_customer_managers_to_invite": 1,
                     # some tests invite managers
-                    "allow_customer_managers_to_change_roles": 1,
+                    "allow_customer_managers_to_manage_organization": 1,
                 },
             )
         )
@@ -196,7 +194,6 @@ class TestInvitations(IntegrationTestCase):
         )
 
     def test_each_invitation_keeps_its_own_role(self) -> None:
-        """Roles load in one query, so they must still land on the right invitation."""
         manager_invitee = unique_email("manager-invitee")
         self.addCleanup(delete_invitations, manager_invitee)
         with self.set_user(self.manager["user"]):
@@ -256,7 +253,7 @@ class TestInvitations(IntegrationTestCase):
     def test_inviting_a_manager_needs_the_role_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_change_roles": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -270,11 +267,61 @@ class TestInvitations(IntegrationTestCase):
             invite_members(self.customer.name, [invitee], False)
             result = invite_members(self.customer.name, [self.newcomer, invitee], False)
 
-        self.assertEqual(result["invited_emails"], [self.newcomer])
-        self.assertEqual(result["pending_invite_emails"], [invitee])
+        # no per-email reason: the checks span the whole site
+        self.assertEqual(
+            result,
+            {
+                "invited_emails": [self.newcomer],
+                "skipped_emails": [invitee],
+                "disabled_emails": [],
+            },
+        )
+
+    def test_a_disabled_user_is_reported_apart(self) -> None:
+        email = unique_email("disabled")
+        create_contact("Disabled User", email)
+        frappe.db.set_value("User", email, "enabled", 0)
+        with self.set_user(self.manager["user"]):
+            result = invite_members(self.customer.name, [email], False)
+
+        self.assertEqual(
+            result,
+            {"invited_emails": [], "skipped_emails": [], "disabled_emails": [email]},
+        )
+
+    def test_an_existing_member_is_skipped(self) -> None:
+        """Accepting would bypass the manage organization setting."""
+        email = unique_email("existing-member")
+        member = create_contact("Existing Member", email)
+        frappe.get_doc("HD Customer", self.customer.name).add_contacts(
+            [member["contact"]]
+        )
+        self.addCleanup(delete_invitations, email)
+        with self.set_user(self.manager["user"]):
+            result = invite_members(self.customer.name, [email], True)
+
+        self.assertEqual(
+            result,
+            {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []},
+        )
+
+    def test_an_existing_member_is_skipped_in_any_case(self) -> None:
+        email = unique_email("cased-member")
+        member = create_contact("Cased Member", email)
+        frappe.get_doc("HD Customer", self.customer.name).add_contacts(
+            [member["contact"]]
+        )
+        self.addCleanup(delete_invitations, email)
+        with self.set_user(self.manager["user"]):
+            result = invite_members(self.customer.name, [email.upper()], True)
+
+        self.assertEqual(
+            result,
+            {"invited_emails": [], "skipped_emails": [email], "disabled_emails": []},
+        )
 
     def test_frappes_invite_endpoint_refuses_a_manager(self) -> None:
-        """Managers stay out of the `user_invitation` hook, which also guards Frappe's cancel and resend."""
+        """The `user_invitation` hook also guards Frappe's cancel and resend."""
         with (
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -302,10 +349,20 @@ class TestInvitations(IntegrationTestCase):
         ):
             invite_members(self.customer.name, emails, False)
 
+    def test_more_than_the_hourly_cap_is_refused(self) -> None:
+        first, second = unique_email("hourly"), unique_email("hourly")
+        self.addCleanup(delete_invitations, first)
+        with (
+            patch("helpdesk.api.customer.MAX_INVITES_PER_HOUR", 1),
+            self.set_user(self.manager["user"]),
+        ):
+            invite_members(self.customer.name, [first], False)
+            with self.assertRaises(frappe.RateLimitExceededError):
+                invite_members(self.customer.name, [second], False)
+        self.assertFalse(frappe.db.exists("User Invitation", {"email": second}))
+
 
 class TestMemberRemoval(IntegrationTestCase):
-    """Who a manager may drop, and whose invitations they may cancel."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -318,7 +375,7 @@ class TestMemberRemoval(IntegrationTestCase):
                 "HD Settings",
                 {
                     "allow_customer_managers_to_invite": 1,
-                    "allow_customer_managers_to_remove_members": 1,
+                    "allow_customer_managers_to_manage_organization": 1,
                 },
             )
         )
@@ -338,6 +395,22 @@ class TestMemberRemoval(IntegrationTestCase):
         self.addCleanup(self.readd_member)
 
         self.assertNotIn(self.member["contact"], self.member_contacts())
+
+    def test_a_removed_manager_loses_the_manager_role(self) -> None:
+        with self.set_user(self.owner["user"]):
+            remove_member(self.customer.name, self.manager["contact"])
+        self.addCleanup(self.readd_manager)
+
+        roles = frappe.get_roles(self.manager["user"])
+        self.assertNotIn("HD Customer Manager", roles)
+        self.assertIn("HD Customer", roles)
+
+    def readd_manager(self) -> None:
+        customer = frappe.get_doc("HD Customer", self.customer.name)
+        customer.append(
+            "contacts", {"contact_name": self.manager["contact"], "is_manager": 1}
+        )
+        customer.save()
 
     def test_the_owner_cannot_be_removed(self) -> None:
         with (
@@ -360,10 +433,10 @@ class TestMemberRemoval(IntegrationTestCase):
         ):
             remove_member(self.customer.name, self.owner["contact"])
 
-    def test_removal_needs_its_own_portal_setting(self) -> None:
+    def test_removal_needs_the_member_management_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_remove_members": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -394,8 +467,6 @@ class TestMemberRemoval(IntegrationTestCase):
 
 
 class TestOrganizationEdits(IntegrationTestCase):
-    """Changing the logo, behind its own portal setting."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -411,14 +482,14 @@ class TestOrganizationEdits(IntegrationTestCase):
         )
         cls.enterClassContext(
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_edit_organization": 1}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 1}
             )
         )
 
     def test_edits_need_the_portal_setting(self) -> None:
         with (
             change_settings(
-                "HD Settings", {"allow_customer_managers_to_edit_organization": 0}
+                "HD Settings", {"allow_customer_managers_to_manage_organization": 0}
             ),
             self.set_user(self.manager["user"]),
             self.assertRaises(frappe.PermissionError),
@@ -458,8 +529,6 @@ class TestOrganizationEdits(IntegrationTestCase):
 
 
 class TestInvitableContacts(IntegrationTestCase):
-    """Suggestions for the invite screen: anyone with a login, minus who is already in or invited."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -486,11 +555,23 @@ class TestInvitableContacts(IntegrationTestCase):
                 row.email for row in get_invitable_contacts(self.customer.name, query)
             ]
 
-    def test_suggests_matching_contacts_from_any_domain(self) -> None:
-        self.assertIn(self.outsider["user"], self.emails(self.outsider["user"]))
-        emails = self.emails(self.domain)
-        self.assertIn(self.colleague["user"], emails)
-        self.assertNotIn(self.outsider["user"], emails)
+    def test_suggests_only_contacts_at_the_organization_domain(self) -> None:
+        self.assertIn(self.colleague["user"], self.emails("Invite Colleague"))
+        self.assertEqual(self.emails(self.outsider["user"]), [])
+
+    def test_an_organization_without_a_domain_suggests_nobody(self) -> None:
+        self.customer.db_set("domain", "")
+        self.addCleanup(self.customer.db_set, "domain", self.domain)
+        self.assertEqual(self.emails(self.colleague["user"]), [])
+
+    def test_an_organization_on_a_public_domain_suggests_nobody(self) -> None:
+        stranger = create_contact(
+            "Invite Stranger", f"{frappe.generate_hash(length=8)}@gmail.com"
+        )
+        self.customer.db_set("domain", "Gmail.com")
+        self.addCleanup(self.customer.db_set, "domain", self.domain)
+        self.assertNotIn(stranger["user"], self.emails(stranger["user"]))
+        self.assertEqual(self.emails(), [])
 
     def test_members_agents_and_pending_invitees_are_not_suggested(self) -> None:
         with self.set_user(self.manager["user"]):
@@ -510,8 +591,6 @@ class TestInvitableContacts(IntegrationTestCase):
 
 
 class TestOrganizationCards(IntegrationTestCase):
-    """The counts each organization card carries."""
-
     @classmethod
     def setUpClass(cls) -> None:
         super().setUpClass()
@@ -535,6 +614,19 @@ class TestOrganizationCards(IntegrationTestCase):
 
     def test_the_ticket_count_includes_settled_tickets(self) -> None:
         self.assertEqual(self.card()["ticket_count"], 2)
+
+    def test_a_member_counts_only_the_tickets_they_can_open(self) -> None:
+        customer, _owner, manager, member = make_organization("Card Count")
+        for contact in (manager, member):
+            ticket = make_ticket(subject="Card count ticket", raised_by=contact["user"])
+            ticket.db_set("customer", customer.name, update_modified=False)
+
+        def count(user: str) -> int:
+            with self.set_user(user):
+                return get_organization_card(customer.name)["ticket_count"]
+
+        self.assertEqual(count(member["user"]), 1)
+        self.assertEqual(count(manager["user"]), 2)
 
     def test_members_are_counted(self) -> None:
         self.assertEqual(self.card()["member_count"], 1)

@@ -61,6 +61,8 @@ class TicketFields:
             label=docfield.label,
             fieldtype=docfield.fieldtype,
             options=docfield.options,
+            read_only=docfield.read_only,
+            default=self.new_ticket.get(row.fieldname),
             link_filters=docfield.link_filters,
             depends_on=docfield.depends_on,
             mandatory_depends_on=docfield.mandatory_depends_on,
@@ -72,7 +74,7 @@ class TicketFields:
 
     @cached_property
     def visible_template_rows(self) -> list[frappe._dict]:
-        # customers always raise as themselves, so raised_by is never theirs to edit
+        # customers always raise as themselves
         hidden = (
             self.hidden_fields if self.is_agent else self.hidden_fields | {"raised_by"}
         )
@@ -87,6 +89,11 @@ class TicketFields:
             row.fieldname for row in self.template_rows if row.visible_to == "Agents"
         }
         return self.unreadable_fields | agent_only_fields | AGENT_WORKFLOW_FIELDS
+
+    @cached_property
+    def new_ticket(self) -> dict:
+        """Defaults as an insert sets them: it skips a field the form sends as ''."""
+        return frappe.new_doc("HD Ticket", as_dict=True)
 
     @cached_property
     def is_agent(self) -> bool:

@@ -1,7 +1,7 @@
 <template>
   <div
     ref="root"
-    class="bg-surface-base px-3 pb-3 sm:px-5 sm:pb-5"
+    class="bg-surface-base px-3 pb-3 before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-4 before:bg-gradient-to-t before:from-[color:var(--surface-base)] before:to-transparent sm:px-5 sm:pb-5"
     :class="{ 'cursor-ns-resize': isResizing }"
   >
     <div
@@ -13,15 +13,15 @@
       @keydown.enter.prevent="emit('update:open', true)"
       @keydown.space.prevent="emit('update:open', true)"
     >
-      <Avatar
-        :image="avatar?.image"
-        :label="avatar?.label"
-        size="sm"
-        class="has-[>div:first-child]:border has-[>div:first-child]:border-outline-gray-2"
-      />
-      <span class="text-base text-ink-gray-7">{{ placeholder }}</span>
+      <Avatar :image="avatar?.image" :label="avatar?.label" size="sm" />
+      <span
+        class="min-w-0 truncate text-base"
+        :class="draft ? 'text-ink-gray-8' : 'text-ink-gray-7'"
+      >
+        {{ draft || placeholder }}
+      </span>
     </div>
-    <!-- Hidden, not unmounted: a drag that closes the editor can reopen it in the same gesture. -->
+    <!-- v-show: a drag that closes it can reopen it mid-gesture. -->
     <div
       v-show="open"
       class="portal-reply-composer group/composer relative rounded-6 border border-outline-gray-2 bg-surface-elevation-1 px-3"
@@ -39,6 +39,16 @@
         @keydown.down.prevent="resizeBy(-KEY_STEP)"
       >
         <span class="h-1 w-10 rounded-full bg-surface-gray-4" />
+      </div>
+      <!-- pl-0.5: the avatar's centred initial lines up with the editor text. -->
+      <div
+        v-if="avatar?.label"
+        class="flex items-center gap-2 pl-0.5 pr-2.5 pt-3"
+      >
+        <Avatar :image="avatar.image" :label="avatar.label" size="md" />
+        <span class="truncate text-base-medium text-ink-gray-9">{{
+          avatar.label
+        }}</span>
       </div>
       <CommentComposer
         ref="composer"
@@ -66,10 +76,10 @@ import { Avatar } from "frappe-ui";
 import { CommentComposer } from "@framework/ui/components/Composer";
 import { __ } from "@helpdesk/shared/translation";
 
-// Below this the editor is too short to type in, so letting go there closes it.
+// Releasing below this closes the editor.
 const MIN_BODY_HEIGHT = 80;
 const MAX_VIEWPORT_SHARE = 0.7;
-// The drag stops this far below the top of the thread, so some of it stays in view.
+// Drag stops this far below the thread top, keeping some in view.
 const THREAD_PEEK = 64;
 const KEY_STEP = 16;
 
@@ -80,10 +90,8 @@ const props = defineProps<{
   submitLabel?: string;
   submitting?: boolean;
   uploadFunction?: (file: File) => Promise<unknown>;
-  // File types the attach button offers; empty allows any.
   accept?: string;
   avatar?: { image?: string; label?: string };
-  // The room the thread keeps clear under the composer.
   reserve?: number;
 }>();
 
@@ -95,16 +103,27 @@ const emit = defineEmits<{
 }>();
 
 const root = ref<HTMLElement | null>(null);
+
+// The closed bar shows the draft on one line; blocks and breaks become spaces.
+const draft = computed(() => {
+  const html = (props.modelValue || "").replace(
+    /<br\s*\/?>|<\/(p|div|li|h\d)>/gi,
+    " "
+  );
+  const text = new DOMParser().parseFromString(html, "text/html").body
+    .textContent;
+  return (text || "").replace(/\s+/g, " ").trim();
+});
 const composer = ref<InstanceType<typeof CommentComposer> | null>(null);
 
-// Keyed on the editor too: the composer can mount open before its editor exists.
+// Keyed on the editor too: it can mount open before the editor exists.
 watch(
   () => props.open && composer.value?.editor,
   (editor) => editor && composer.value?.focus(),
   { immediate: true, flush: "post" }
 );
 
-// CommentComposer has no prop for this, so it goes straight onto its hidden file input.
+// CommentComposer has no `accept` prop; set it on the file input.
 watchEffect(() => {
   const input = root.value?.querySelector<HTMLInputElement>(
     '[aria-label="Attach file"] + input[type="file"]'
@@ -112,7 +131,7 @@ watchEffect(() => {
   if (props.accept) input?.setAttribute("accept", props.accept);
   else input?.removeAttribute("accept");
 });
-// Per browser, like the desk's; 0 leaves the editor at its natural height.
+// 0 = natural height.
 const height = useStorage("kb:composer-height", 0);
 const { height: viewportHeight } = useWindowSize();
 
@@ -124,21 +143,26 @@ const resizing = ref<{
 } | null>(null);
 const isResizing = computed(() => resizing.value !== null);
 
-// Held while the drag grows the composer, so it slides over the thread instead of pushing it up;
-// a shrinking composer hands the room straight back, or the thread would end above a blank band.
+// A resized composer overlays the thread: the reserve stays at the last
+// unresized height (the closed bar or the natural editor), or less. The saved
+// height sizes only the open editor, so the closed bar always counts in full.
 const { height: composerHeight } = useElementSize(root, undefined, {
   box: "border-box",
 });
+let baseReserve = 0;
 watch(
-  [composerHeight, () => resizing.value],
-  ([value, drag]) => {
-    if (!drag || value < (props.reserve ?? 0))
-      emit("update:reserve", Math.round(value));
+  [composerHeight, () => props.open && height.value > 0],
+  ([value, resized]) => {
+    if (!resized) baseReserve = value;
+    emit(
+      "update:reserve",
+      Math.round(resized ? Math.min(value, baseReserve) : value)
+    );
   },
   { immediate: true }
 );
 
-// Clamped on read too, so a height saved on a taller window still fits this one.
+// Clamped on read: a saved height may not fit this window.
 const bodyStyle = computed(() =>
   height.value > 0
     ? { "--composer-body-height": `${clamp(height.value)}px` }
@@ -161,7 +185,7 @@ function startResize(event: PointerEvent) {
     minY: threadTop() + (event.clientY - handle.getBoundingClientRect().top),
     closed: false,
   };
-  // Captured on the root, so the drag keeps its cursor and events off the handle and the window.
+  // Capture on root so the drag keeps its cursor and events.
   try {
     (root.value ?? handle).setPointerCapture(event.pointerId);
   } catch {}

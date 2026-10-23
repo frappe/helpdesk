@@ -29,9 +29,7 @@ import { isEmoji } from "./utils";
 
 const icon = defineModel<string>({ default: "" });
 
-// IconPicker is lucide-only and seeds its search from the value, so an emoji
-// from an older view is kept out of it. A no-op edit keeps the emoji; picking
-// an icon replaces it.
+// IconPicker is lucide-only; keep a legacy emoji out of it until replaced.
 const isEmojiIcon = computed(() => isEmoji(icon.value));
 const pickerIcon = computed({
   get: () => (isEmojiIcon.value ? "" : icon.value),

@@ -1,5 +1,5 @@
 <template>
-  <!-- Same box as frappe-ui's Breadcrumbs, so "Tickets" stays put between the list and a ticket. -->
+  <!-- Matches frappe-ui Breadcrumbs' box so "Tickets" doesn't shift. -->
   <div class="flex min-w-0 items-center leading-tighter">
     <span
       class="px-0.5 py-1 text-lg-medium leading-tighter text-ink-gray-5 shrink-0 max-sm:hidden"
@@ -46,12 +46,12 @@
             icon="lucide-check"
             class="size-4 text-ink-gray-7"
           />
-          <!-- Always shown on touch, where no row is hovered. -->
+          <!-- Always shown on touch (no hover); -my-0.5 keeps row height. -->
           <Dropdown side="right" align="start" :options="closingActions(item)">
             <template #default="{ open }">
               <Button
                 variant="ghost"
-                class="ms-0 !size-4 rounded-1 [[data-slot=item][data-highlighted]_&]:!block [[data-slot=item][data-state=checked]_&]:!block [@media(hover:none)]:!block [@media(hover:none)]:!size-6"
+                class="ms-0 !-my-0.5 !size-5 !rounded-2 [[data-slot=item][data-highlighted]_&]:!inline-flex [[data-slot=item][data-state=checked]_&]:!inline-flex [@media(hover:none)]:!inline-flex [@media(hover:none)]:!size-6"
                 :class="open ? 'inline-flex' : 'hidden'"
                 icon="lucide-more-horizontal"
                 :aria-label="__('View actions')"
@@ -82,7 +82,6 @@ function ViewIcon(props: { icon?: string }) {
   return h(StoredIcon, { icon, class: [ICON_CLASS, centre] });
 }
 
-// The header renders this only when a page hands it a view, so every prop arrives set.
 const props = defineProps<{
   label: string;
   currentView: { name?: string; label: string; icon: string };
@@ -92,7 +91,7 @@ const props = defineProps<{
 
 const isOpen = ref(false);
 
-// Popovers paint above dialogs, so the menu closes itself before an action opens one, as on the desk.
+// Popovers paint above dialogs; close the menu before the action.
 const closingActions = (item) =>
   props.viewActions(item).map((option) => ({
     ...option,
