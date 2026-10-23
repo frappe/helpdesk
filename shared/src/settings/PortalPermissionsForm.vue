@@ -102,7 +102,7 @@ const sections = computed(() => [
             {
               settings: hdSettings,
               fieldname: "knowledge_base_home_page_for_guests",
-              label: __("Skip login page for guests"),
+              label: __("Set knowledge base as guest home"),
               description: __(
                 "Guests land on the knowledge base landing page instead of the login page."
               ),
