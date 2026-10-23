@@ -64,10 +64,12 @@ test("dashboard presets and custom range drive the stats period", async ({ page 
   await page.goto("/helpdesk/dashboard");
   const trigger = page.getByText("Last 30 Days");
   await trigger.click();
+  // the site's date, as the dashboard counts it; the browser's UTC date can differ
+  const timeZone = await page.evaluate(() => (window as any).timezone.system);
   const request = page.waitForRequest(
     (request) =>
       request.url().includes("get_dashboard_data") &&
-      request.postData()!.includes(daysAgo(6))
+      request.postData()!.includes(daysAgo(6, timeZone))
   );
   await page.getByRole("menuitem", { name: "Last 7 Days" }).click();
   await request;
@@ -351,6 +353,6 @@ async function indexForSearch(api: Api, token: string) {
 }
 
 // The browser runs in UTC (see playwright.config.ts), so the date is computed in UTC too.
-function daysAgo(days: number) {
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+function daysAgo(days: number, timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone }).format(Date.now() - days * 86_400_000);
 }
