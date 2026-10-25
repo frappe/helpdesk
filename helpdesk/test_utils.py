@@ -351,6 +351,17 @@ def make_subcategory(parent: str, label: str = "Sub", **values):
     )
 
 
+def article_index_jobs(enqueue: MagicMock) -> list[set[str]]:
+    """The articles of each search index job a patched `frappe.enqueue` was given."""
+    jobs = []
+    for call in enqueue.call_args_list:
+        if call.args[0] == "helpdesk.search.update_article_indexes":
+            jobs.append(set(call.kwargs["articles"]))
+        elif call.args[0] == "helpdesk.search.update_article_index":
+            jobs.append({call.kwargs["article"]})
+    return jobs
+
+
 def category_row(name: str, with_creators: bool = False) -> frappe._dict:
     from helpdesk.api.knowledge_base import _get_categories
 

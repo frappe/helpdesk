@@ -21,10 +21,11 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     SEPARATOR,
+    batched_article_index,
     get_category_labels,
     get_parent,
-    get_subcategories,
     get_stricter_visibility,
+    get_subcategories,
     move_category_articles,
 )
 from helpdesk.search import NUM_RESULTS
@@ -156,17 +157,18 @@ def set_category_visibility(category: str, visibility: str):
     if visibility not in options:
         frappe.throw(_("Invalid access: {0}").format(visibility))
     # saved one by one for version history
-    for name in frappe.get_all(
-        "HD Article",
-        filters={
-            "category": ["in", hd_article_category.get_branch(category)],
-            "visibility": ["!=", visibility],
-        },
-        pluck="name",
-    ):
-        article = frappe.get_doc("HD Article", name)
-        article.visibility = visibility
-        article.save()
+    with batched_article_index():
+        for name in frappe.get_all(
+            "HD Article",
+            filters={
+                "category": ["in", hd_article_category.get_branch(category)],
+                "visibility": ["!=", visibility],
+            },
+            pluck="name",
+        ):
+            article = frappe.get_doc("HD Article", name)
+            article.visibility = visibility
+            article.save()
 
 
 @frappe.whitelist(methods=["POST"])
@@ -457,6 +459,11 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
+    with batched_article_index():
+        _merge_category(source, target)
+
+
+def _merge_category(source: str, target: str) -> None:
     if subcategories := get_subcategories(source):
         if target in subcategories:
             _set_parent(target, None)
@@ -516,14 +523,15 @@ def delete_category(category: str, delete_articles: bool = False) -> dict:
     branch = hd_article_category.get_branch(category)
     frappe.flags.deleting_category = branch
     try:
-        archived = sum(
-            delete_or_archive_article(name)
-            for name in frappe.get_all(
-                "HD Article",
-                filters={"category": ["in", branch]},
-                pluck="name",
+        with batched_article_index():
+            archived = sum(
+                delete_or_archive_article(name)
+                for name in frappe.get_all(
+                    "HD Article",
+                    filters={"category": ["in", branch]},
+                    pluck="name",
+                )
             )
-        )
         # subcategories first: the category's on_trash would promote them
         for name in reversed(branch):
             frappe.delete_doc("HD Article Category", name)

@@ -9,8 +9,8 @@ from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
-    delete_articles,
     create_category,
+    delete_articles,
     delete_category,
     get_article,
     get_article_markdown,
@@ -35,6 +35,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_subcategories,
 )
 from helpdesk.test_utils import (
+    article_index_jobs,
     category_names,
     category_row,
     create_user,
@@ -560,8 +561,18 @@ class TestCategoryAccess(IntegrationTestCase):
         with patch("frappe.enqueue") as enqueue:
             merge_category(other.name, self.category.name)
 
-        # the target's own articles are reindexed too
-        self.assertLessEqual(set(moved), self.indexed(enqueue))
+        # one job, and not for the target's own articles
+        self.assertEqual(article_index_jobs(enqueue), [set(moved)])
+
+    def test_deleting_a_category_reindexes_only_its_articles(self) -> None:
+        make_article(category=get_general_category())
+        other = make_article_category(unique_name("Deleted"))
+        moved = [make_article(category=other.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            delete_category(other.name)
+
+        self.assertEqual(article_index_jobs(enqueue), [set(moved)])
 
     def test_renaming_a_category_reindexes_its_articles(self) -> None:
         category = frappe.get_doc("HD Article Category", self.category.name)
@@ -570,14 +581,7 @@ class TestCategoryAccess(IntegrationTestCase):
         with patch("frappe.enqueue") as enqueue:
             category.save()
 
-        self.assertEqual(self.indexed(enqueue), set(self.articles))
-
-    def indexed(self, enqueue) -> set[str]:
-        return {
-            c.kwargs["article"]
-            for c in enqueue.call_args_list
-            if c.args[0] == "helpdesk.search.update_article_index"
-        }
+        self.assertEqual(article_index_jobs(enqueue), [set(self.articles)])
 
     def test_a_category_access_change_saves_each_article(self) -> None:
         before = {
@@ -826,6 +830,28 @@ class TestSubcategoryAccess(IntegrationTestCase):
             ),
             {PRIVATE},
         )
+
+    def test_setting_access_queues_one_index_job_for_the_branch(self) -> None:
+        articles = [
+            make_article(category=self.parent),
+            make_article(category=self.sub),
+            make_article(category=self.sub),
+        ]
+
+        with patch("frappe.enqueue") as enqueue:
+            set_category_visibility(self.parent, PRIVATE)
+
+        self.assertEqual(article_index_jobs(enqueue), [set(articles)])
+
+    def test_getting_a_parent_queues_one_index_job(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        category = make_article_category(unique_name("Fixture Joining"))
+        articles = [make_article(category=category.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            category.update({"parent_article_category": self.parent}).save()
+
+        self.assertEqual(article_index_jobs(enqueue), [set(articles)])
 
     def give_parent(self, visibility) -> str:
         """A category with one `visibility` article, moved under the parent."""

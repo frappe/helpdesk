@@ -1,6 +1,8 @@
 # Copyright (c) 2021, Frappe Technologies and contributors
 # For license information, please see license.txt
 
+from contextlib import contextmanager
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -76,7 +78,12 @@ class HDArticleCategory(Document):
 
     def on_update(self):
         if not self.is_new() and self.has_value_changed("category_name"):
-            reindex_category_articles(self.name)
+            # the index carries each article's category name
+            index_articles(
+                frappe.get_all(
+                    "HD Article", filters={"category": self.name}, pluck="name"
+                )
+            )
         if self.parent_article_category and self.has_value_changed(
             "parent_article_category"
         ):
@@ -87,7 +94,8 @@ class HDArticleCategory(Document):
         visibility = get_category_visibility(
             self.parent_article_category, exclude=self.name
         )
-        narrow_category_articles(self.name, visibility)
+        with batched_article_index():
+            narrow_category_articles(self.name, visibility)
 
     def on_trash(self):
         self.validate_general_category_delete()
@@ -233,17 +241,23 @@ def get_stricter_visibility(visibility: str, category_visibility: str | None) ->
 
 def move_category_articles(source: str, target: str) -> None:
     """Bulk move: per-article saves would refuse to empty `source`."""
-    # narrowed before the move, so only the moved articles are touched
-    # `source` may be a subcategory of `target`: its articles must not count
-    narrow_category_articles(source, get_category_visibility(target, exclude=source))
-    frappe.db.set_value(
-        "HD Article",
-        {"category": source},
-        "category",
-        target,
-        update_modified=False,
-    )
-    reindex_category_articles(target)
+    moved = frappe.get_all("HD Article", filters={"category": source}, pluck="name")
+    if not moved:
+        return
+    with batched_article_index():
+        # narrowed before the move, so only the moved articles are touched
+        # `source` may be a subcategory of `target`: its articles must not count
+        narrow_category_articles(
+            source, get_category_visibility(target, exclude=source)
+        )
+        frappe.db.set_value(
+            "HD Article",
+            {"category": source},
+            "category",
+            target,
+            update_modified=False,
+        )
+        index_articles(moved)
 
 
 def narrow_category_articles(category: str, visibility: str | None) -> None:
@@ -259,16 +273,31 @@ def narrow_category_articles(category: str, visibility: str | None) -> None:
             article.save()
 
 
-def reindex_category_articles(category: str) -> None:
-    """The index carries each article's category name."""
-    articles = frappe.get_all(
-        "HD Article", filters={"category": category}, pluck="name"
-    )
-    for name in articles:
+@contextmanager
+def batched_article_index():
+    """Article saves inside queue their search index updates as one job."""
+    if frappe.flags.batch_article_index is not None:
+        yield  # the outer batch sends the job
+        return
+    frappe.flags.batch_article_index = articles = []
+    try:
+        yield
+    finally:
+        frappe.flags.batch_article_index = None
+    index_articles(articles)
+
+
+def index_articles(articles: list[str]) -> None:
+    """One job: a job per article overloads the queue on a big category."""
+    if (batch := frappe.flags.batch_article_index) is not None:
+        batch.extend(articles)
+        return
+    if articles:
         frappe.enqueue(
-            "helpdesk.search.update_article_index",
-            article=name,
-            queue="short",
+            "helpdesk.search.update_article_indexes",
+            # a save in the batch and the bulk move may name the same article
+            articles=list(dict.fromkeys(articles)),
+            queue="long",
             enqueue_after_commit=True,
         )
 

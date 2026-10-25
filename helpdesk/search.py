@@ -390,6 +390,11 @@ def update_article_index(article: str) -> None:
         search.index_doc(record)
 
 
+def update_article_indexes(articles: list[str]) -> None:
+    for article in articles:
+        update_article_index(article)
+
+
 def build_index_in_background():
     if not frappe.cache().get_value("helpdesk_search_indexing_in_progress"):
         frappe.enqueue(build_index, queue="long")

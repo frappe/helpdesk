@@ -85,6 +85,10 @@ class HDArticle(Document):
         self.update_search_index()
 
     def update_search_index(self):
+        # a bulk change sends one job for all its articles
+        if (batch := frappe.flags.batch_article_index) is not None:
+            batch.append(self.name)
+            return
         frappe.enqueue(
             "helpdesk.search.update_article_index",
             article=self.name,
