@@ -84,9 +84,10 @@ class HDArticleCategory(Document):
 
     def narrow_to_parent(self):
         # the parent's branch already counts this category in: leave it out
-        branch = get_branch(self.parent_article_category)
-        others = [category for category in branch if category != self.name]
-        narrow_category_articles(self.name, read_visibility(others))
+        visibility = get_category_visibility(
+            self.parent_article_category, exclude=self.name
+        )
+        narrow_category_articles(self.name, visibility)
 
     def on_trash(self):
         self.validate_general_category_delete()
@@ -140,22 +141,29 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
     )
 
 
-def get_category_visibility(category: str) -> str | None:
-    """Read across the category and its subcategories."""
-    return read_visibility(get_branch(category))
+def get_category_visibility(category: str, exclude: str | None = None) -> str | None:
+    """Read across the category and its subcategories but `exclude`.
 
-
-def read_visibility(categories: list[str]) -> str | None:
-    """None when the articles' visibilities differ."""
+    None when the articles' visibilities differ.
+    """
     # published articles decide; categories of only drafts read their drafts.
     # Not just the ones the caller can read
-    filters = {"category": ["in", categories]}
+    branch = [name for name in get_branch(category) if name != exclude]
+    filters = {"category": ["in", branch]}
     if frappe.db.exists("HD Article", {**filters, "status": "Published"}):
         filters["status"] = "Published"
     values = frappe.get_all(
         "HD Article", filters=filters, pluck="visibility", distinct=True
     )
     return values[0] if len(values) == 1 else None
+
+
+def get_joining_visibility(category: str) -> str | None:
+    """What an article joining `category` narrows to; an empty subcategory reads its parent."""
+    visibility = get_category_visibility(category)
+    if not visibility and (parent := get_parent(category)):
+        visibility = get_category_visibility(parent)
+    return visibility
 
 
 def get_subcategories(category: str) -> list[str]:
@@ -190,7 +198,8 @@ def get_stricter_visibility(visibility: str, category_visibility: str | None) ->
 def move_category_articles(source: str, target: str) -> None:
     """Bulk move: per-article saves would refuse to empty `source`."""
     # narrowed before the move, so only the moved articles are touched
-    narrow_category_articles(source, get_category_visibility(target))
+    # `source` may be a subcategory of `target`: its articles must not count
+    narrow_category_articles(source, get_category_visibility(target, exclude=source))
     frappe.db.set_value(
         "HD Article",
         {"category": source},

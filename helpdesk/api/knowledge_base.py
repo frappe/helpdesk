@@ -128,7 +128,7 @@ def move_to_category(category: str, articles: list[str]):
     _validate_category(category)
 
     # read before the move changes it
-    category_visibility = hd_article_category.get_category_visibility(category)
+    category_visibility = hd_article_category.get_joining_visibility(category)
     for name in articles:
         article = frappe.get_doc("HD Article", name)
         article.category = category

@@ -844,6 +844,40 @@ class TestSubcategoryAccess(IntegrationTestCase):
 
         self.assertEqual(self.visibility(article), PRIVATE)
 
+    def test_moving_into_an_empty_subcategory_narrows_to_its_parent(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        other = make_article_category(unique_name("Fixture Source")).name
+        make_article(category=other)
+        article = make_article(category=other, visibility=CUSTOMERS)
+
+        move_to_category(self.sub, [article])
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+    def private_general_with_a_customers_subcategory(self) -> tuple[str, str]:
+        """A sub of an all-Private General, holding one Customers article."""
+        general = get_general_category()
+        make_article(category=general)
+        set_category_visibility(general, PRIVATE)
+        sub = make_subcategory(general).name
+        article = make_article(category=sub)
+        frappe.db.set_value("HD Article", article, "visibility", CUSTOMERS)
+        return sub, article
+
+    def test_deleting_a_subcategory_of_general_never_widens(self) -> None:
+        sub, article = self.private_general_with_a_customers_subcategory()
+
+        frappe.delete_doc("HD Article Category", sub)
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_merging_a_subcategory_into_its_parent_never_widens(self) -> None:
+        sub, article = self.private_general_with_a_customers_subcategory()
+
+        merge_category(sub, get_general_category())
+
+        self.assertEqual(self.visibility(article), PRIVATE)
+
 
 class TestSearch(IntegrationTestCase):
     def setUp(self) -> None:
