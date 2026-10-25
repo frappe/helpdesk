@@ -208,7 +208,7 @@ class RedisSearchBackend:
     def _text(value):
         return value.decode() if isinstance(value, bytes) else value
 
-    def _rows(self, query):
+    def _rows(self, query, *, filters_only=False):
         fields = list(
             dict.fromkeys(
                 [
@@ -219,20 +219,17 @@ class RedisSearchBackend:
                 ]
             )
         )
+        if filters_only:
+            fields = ["__key", "reference_ticket", *self.FILTER_FIELDS]
         rows, cursor = self._command(
             "FT.AGGREGATE",
             self.index,
             query,
-            "ADDSCORES",
+            *([] if filters_only else ["ADDSCORES"]),
             "LOAD",
             len(fields),
             *(f"@{field}" for field in fields),
-            "SORTBY",
-            4,
-            "@__score",
-            "DESC",
-            "@id",
-            "ASC",
+            *([] if filters_only else ["SORTBY", 4, "@__score", "DESC", "@id", "ASC"]),
             "LIMIT",
             0,
             2147483647,
@@ -248,7 +245,8 @@ class RedisSearchBackend:
                     row = dict(
                         zip(map(self._text, values[::2]), map(self._text, values[1::2]))
                     )
-                    row["score"] = float(row.pop("__score"))
+                    if not filters_only:
+                        row["score"] = float(row.pop("__score"))
                     yield row.pop("__key"), row
                 if not cursor:
                     return
@@ -259,10 +257,10 @@ class RedisSearchBackend:
             if cursor:
                 self._command("FT.CURSOR", "DEL", self.index, cursor)
 
-    def _permitted_rows(self, query):
+    def _permitted_rows(self, query, *, filters_only=False):
         batch = []
         agent = is_agent()
-        for _, row in self._rows(query):
+        for _, row in self._rows(query, filters_only=filters_only):
             if row.get("doctype") == "Comment" and not agent:
                 continue
             batch.append(row)
@@ -322,7 +320,7 @@ class RedisSearchBackend:
         options = {name: {} for name in self.FACETS.values()}
         if not self.index_exists():
             return options
-        for row in self._permitted_rows("*"):
+        for row in self._permitted_rows("*", filters_only=True):
             for field, name in self.FACETS.items():
                 value = row.get(field)
                 if value:

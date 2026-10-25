@@ -161,9 +161,21 @@ class TestRedisTicketSearch(IntegrationTestCase):
                 result = self.backend.search(
                     self.token, filters={"agent_group": [team.name]}
                 )
+                with patch.object(
+                    self.backend, "_command", wraps=self.backend._command
+                ) as command:
+                    options = self.backend.get_filter_options()
         self.assertEqual(len(result["results"]), 3)
         self.assertEqual({row["name"] for row in result["results"]}, expected)
         self.assertEqual(result["summary"]["total_matches"], 3)
+        self.assertEqual(options["teams"][team.name], 3)
+        aggregate = next(
+            call.args
+            for call in command.call_args_list
+            if call.args[0] == "FT.AGGREGATE"
+        )
+        for unnecessary in ("@content", "@title", "ADDSCORES", "SORTBY"):
+            self.assertNotIn(unnecessary, aggregate)
 
     def test_deleting_ticket_removes_indexed_comments(self):
         comment = self.ticket.add_comment("Comment", self.token + "child")
