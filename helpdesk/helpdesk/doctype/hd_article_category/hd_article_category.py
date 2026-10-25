@@ -91,11 +91,24 @@ class HDArticleCategory(Document):
 
     def on_trash(self):
         self.validate_general_category_delete()
+        if self.parent_article_category:
+            move_category_articles(self.name, self.parent_article_category)
+            return
+        self.promote_subcategories()
         self.move_articles_to_general()
 
     def validate_general_category_delete(self):
         if self.category_name == "General":
             frappe.throw(_("General category can't be deleted"))
+
+    def promote_subcategories(self):
+        # Frappe's link check runs after on_trash
+        frappe.db.set_value(
+            "HD Article Category",
+            {"parent_article_category": self.name},
+            "parent_article_category",
+            None,
+        )
 
     def move_articles_to_general(self):
         # local import: circular via the article controller
@@ -262,7 +275,12 @@ def reindex_category_articles(category: str) -> None:
 
 def check_category_length(category: str | None) -> None:
     """Only a category without subcategories must keep an article."""
-    if not category or get_subcategories(category):
+    # a branch being deleted may empty its categories
+    if (
+        not category
+        or category in (frappe.flags.deleting_category or ())
+        or get_subcategories(category)
+    ):
         return
     if frappe.db.count("HD Article", {"category": category}) == 1:
         frappe.throw(_("Category must have at least one article"))

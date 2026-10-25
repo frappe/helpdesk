@@ -67,9 +67,22 @@ def validate_public_access():
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_articles(articles: list[str]):
-    for article in articles:
-        frappe.delete_doc("HD Article", article)
+def delete_articles(articles: list[str]) -> dict:
+    return {"archived": sum(delete_or_archive_article(name) for name in articles)}
+
+
+def delete_or_archive_article(name: str) -> bool:
+    """A ticket cites it: archive instead, keeping the link. True when archived."""
+    if frappe.db.exists("HD Ticket", {"source_article": name}):
+        # a save, for version history and the search index
+        article = frappe.get_doc("HD Article", name)
+        article.status = "Archived"
+        article.save()
+        return True
+    # feedback would fail the link check
+    frappe.db.delete("HD Article Feedback", {"article": name})
+    frappe.delete_doc("HD Article", name)
+    return False
 
 
 @frappe.whitelist(methods=["POST"])
@@ -441,6 +454,61 @@ def merge_category(source: str, target: str):
         frappe.throw(_("Cannot merge General category"))
     move_category_articles(source, target)
     frappe.delete_doc("HD Article Category", source)
+
+
+@frappe.whitelist()
+def get_category_delete_summary(category: str) -> dict:
+    frappe.has_permission("HD Article Category", "delete", throw=True)
+    _validate_category(category)
+    branch = hd_article_category.get_branch(category)
+    articles = frappe.get_all(
+        "HD Article", filters={"category": ["in", branch]}, pluck="name"
+    )
+    cited = (
+        frappe.get_all(
+            "HD Ticket",
+            filters={"source_article": ["in", articles]},
+            pluck="source_article",
+            distinct=True,
+        )
+        if articles
+        else []
+    )
+    return {
+        "articles": len(articles),
+        "subcategories": len(branch) - 1,
+        "cited": len(cited),
+    }
+
+
+@frappe.whitelist(methods=["POST"])
+def delete_category(category: str, delete_articles: bool = False) -> dict:
+    """Ticked `delete_articles` deletes the whole branch; cited articles are archived."""
+    frappe.has_permission("HD Article Category", "delete", throw=True)
+    _validate_category(category)
+    if category == get_general_category():
+        frappe.throw(_("General category can't be deleted"))
+    if not delete_articles:
+        frappe.delete_doc("HD Article Category", category)
+        return {"archived": 0}
+
+    branch = hd_article_category.get_branch(category)
+    frappe.flags.deleting_category = branch
+    try:
+        archived = sum(
+            delete_or_archive_article(name)
+            for name in frappe.get_all(
+                "HD Article",
+                filters={"category": ["in", branch]},
+                pluck="name",
+            )
+        )
+        # subcategories first: the category's on_trash would promote them
+        for name in reversed(branch):
+            frappe.delete_doc("HD Article Category", name)
+    finally:
+        frappe.flags.deleting_category = None
+    return {"archived": archived}
 
 
 @frappe.whitelist()

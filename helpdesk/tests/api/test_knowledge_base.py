@@ -9,10 +9,13 @@ from helpdesk.api.article import get_related
 from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
+    delete_articles,
+    delete_category,
     get_article,
     get_article_markdown,
     get_articles,
     get_categories,
+    get_category_delete_summary,
     get_category_options,
     get_category_visibility,
     get_general_category,
@@ -36,10 +39,12 @@ from helpdesk.test_utils import (
     make_agent,
     make_article,
     make_article_category,
+    make_article_feedback,
     make_contact,
     make_search_hit,
     make_search_page,
     make_subcategory,
+    make_ticket,
     unique_email,
     unique_name,
 )
@@ -1140,3 +1145,142 @@ class TestSearch(IntegrationTestCase):
         self.assertEqual(
             get_related("zebra")[0]["title_slug"], "fixture-zebra-crossing"
         )
+
+
+class TestCategoryDelete(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Doomed")).name
+        self.sub = make_subcategory(self.parent).name
+
+    def category(self, article) -> str | None:
+        return frappe.db.get_value("HD Article", article, "category")
+
+    def cite(self, article) -> None:
+        make_ticket(source_article=article)
+
+    def test_deleting_a_subcategory_moves_its_articles_to_the_parent(self) -> None:
+        article = make_article(category=self.sub)
+
+        delete_category(self.sub)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(self.category(article), self.parent)
+
+    def test_deleting_a_category_promotes_its_subcategories(self) -> None:
+        own_article = make_article(category=self.parent)
+        sub_article = make_article(category=self.sub)
+
+        delete_category(self.parent)
+
+        self.assertIsNone(
+            frappe.db.get_value(
+                "HD Article Category", self.sub, "parent_article_category"
+            )
+        )
+        self.assertEqual(self.category(own_article), get_general_category())
+        self.assertEqual(self.category(sub_article), self.sub)
+
+    def test_deleting_a_subcategory_of_general_keeps_articles_in_general(self) -> None:
+        sub = make_subcategory(get_general_category()).name
+        article = make_article(category=sub)
+
+        delete_category(sub)
+
+        self.assertEqual(self.category(article), get_general_category())
+
+    def test_branch_delete_removes_subcategories_and_articles(self) -> None:
+        branch_articles = [
+            make_article(category=self.parent),
+            make_article(category=self.sub),
+            make_article(category=self.sub, status="Draft"),
+        ]
+
+        self.assertEqual(
+            delete_category(self.parent, delete_articles=True), {"archived": 0}
+        )
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertFalse(
+            frappe.db.exists("HD Article", {"name": ["in", branch_articles]})
+        )
+        self.assertFalse(frappe.flags.deleting_category)
+
+    def test_branch_delete_archives_cited_articles(self) -> None:
+        make_article(category=self.parent)
+        # the only article of its subcategory: the length guard must not fire
+        cited = make_article(category=self.sub)
+        self.cite(cited)
+
+        self.assertEqual(
+            delete_category(self.parent, delete_articles=True), {"archived": 1}
+        )
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", cited, ["status", "category"]),
+            ("Archived", None),
+        )
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_deleting_an_article_with_feedback_removes_the_feedback(self) -> None:
+        make_article(category=self.parent)
+        article = make_article(category=self.parent)
+        make_article_feedback(article, 1)
+
+        delete_articles([article])
+
+        self.assertFalse(frappe.db.exists("HD Article", article))
+        self.assertFalse(frappe.db.exists("HD Article Feedback", {"article": article}))
+
+    def test_deleting_a_cited_article_archives_it(self) -> None:
+        make_article(category=self.parent)
+        cited = make_article(category=self.parent)
+        self.cite(cited)
+
+        self.assertEqual(delete_articles([cited]), {"archived": 1})
+
+        self.assertEqual(frappe.db.get_value("HD Article", cited, "status"), "Archived")
+
+    def test_archiving_the_last_article_outside_a_branch_delete_is_refused(
+        self,
+    ) -> None:
+        cited = make_article(category=self.sub)
+        self.cite(cited)
+
+        with self.assertRaisesRegex(frappe.ValidationError, "at least one article"):
+            delete_articles([cited])
+
+        self.assertEqual(self.category(cited), self.sub)
+
+    def test_the_summary_counts_the_branch(self) -> None:
+        cited = make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub, status="Draft")
+        # two tickets, one cited article
+        self.cite(cited)
+        self.cite(cited)
+
+        self.assertEqual(
+            get_category_delete_summary(self.parent),
+            {"articles": 3, "subcategories": 1, "cited": 1},
+        )
+
+    def test_general_cannot_be_deleted(self) -> None:
+        general = get_general_category()
+
+        with self.assertRaises(frappe.ValidationError):
+            delete_category(general, delete_articles=True)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", general))
+
+    def test_a_user_without_delete_permission_is_refused(self) -> None:
+        article = make_article(category=self.parent)
+        customer = make_contact("kb-deleter")["user"]
+
+        with self.set_user(customer):
+            with self.assertRaises(frappe.PermissionError):
+                delete_category(self.parent, delete_articles=True)
+            with self.assertRaises(frappe.PermissionError):
+                get_category_delete_summary(self.parent)
+
+        self.assertTrue(frappe.db.exists("HD Article", article))
