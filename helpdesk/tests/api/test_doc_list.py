@@ -312,6 +312,34 @@ class TestSubcategoryGroups(IntegrationTestCase):
 
         self.assertIn(self.parent, values)
 
+    def test_a_parent_only_group_keeps_the_parent_icon(self) -> None:
+        frappe.db.set_value("HD Article Category", self.parent, "icon", "🧾")
+        make_article(f"{self.token} a", "Draft", self.sub)
+
+        group = next(o for o in self.options() if o["value"] == self.parent)
+
+        self.assertEqual(group["icon"], "🧾")
+
+    def test_category_group_order_is_fixed_whatever_the_sort(self) -> None:
+        other = make_article_category(f"Zzz{self.token}b").name
+        make_article(f"{self.token} a", "Draft", self.sub)
+        make_article(f"{self.token} b", "Draft", other)
+        make_article(f"{self.token} c", "Draft", None)
+        general = frappe.db.get_value(
+            "HD Article Category", {"category_name": "General"}
+        )
+        make_article(f"{self.token} d", "Draft", general)
+
+        result = get_list_data(
+            "HD Article",
+            filters=[["title", "like", f"{self.token}%"]],
+            order_by="category desc",
+            view=self.VIEW,
+        )
+
+        values = [o["value"] for o in result["group_by_field"]["options"]]
+        self.assertEqual(values, [general, self.parent, self.sub, other, ""])
+
     def test_subcategory_groups_follow_their_parent(self) -> None:
         other = make_article_category(f"Zzz{self.token}b").name
         make_article(f"{self.token} a", "Draft", self.sub)

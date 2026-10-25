@@ -555,9 +555,15 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
         )
     }
     # a parent's own group is there even when it has no rows
+    missing = {parent for parent in parents.values() if parent} - set(values)
     groups += [
-        {"value": parent, "icon": None}
-        for parent in {parent for parent in parents.values() if parent} - set(values)
+        {"value": name, "icon": icon}
+        for name, icon in frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", list(missing)]},
+            fields=["name", "icon"],
+            as_list=True,
+        )
     ]
     names = [group["value"] for group in groups]
     labels = get_category_labels(names)
