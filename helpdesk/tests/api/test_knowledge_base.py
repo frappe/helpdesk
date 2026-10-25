@@ -36,6 +36,7 @@ from helpdesk.test_utils import (
     make_search_hit,
     make_search_page,
     unique_email,
+    unique_name,
 )
 
 LIST_ROW_FIELDS = {"name", "title", "excerpt"}
@@ -513,6 +514,53 @@ class TestCategoryAccess(IntegrationTestCase):
             self.assertIsNone(
                 hd_article_category.get_category_visibility(self.category.name)
             )
+
+    def test_a_private_draft_does_not_make_access_mixed(self) -> None:
+        frappe.db.set_value("HD Article", self.articles[0], "visibility", CUSTOMERS)
+        frappe.db.set_value("HD Article", self.articles[1], "visibility", CUSTOMERS)
+        make_article(
+            "Fixture access draft",
+            status="Draft",
+            category=self.category.name,
+            visibility=PRIVATE,
+        )
+
+        self.assertEqual(
+            hd_article_category.get_category_visibility(self.category.name), CUSTOMERS
+        )
+
+    def test_a_category_of_drafts_reads_its_drafts(self) -> None:
+        category = make_article_category(unique_name("Drafts")).name
+        for _ in range(2):
+            make_article(status="Draft", category=category, visibility=PRIVATE)
+
+        self.assertEqual(hd_article_category.get_category_visibility(category), PRIVATE)
+
+    def test_merging_reindexes_the_moved_articles(self) -> None:
+        other = make_article_category(unique_name("Merged"))
+        moved = [make_article(category=other.name) for _ in range(2)]
+
+        with patch("frappe.enqueue") as enqueue:
+            merge_category(other.name, self.category.name)
+
+        # the target's own articles are reindexed too
+        self.assertLessEqual(set(moved), self.indexed(enqueue))
+
+    def test_renaming_a_category_reindexes_its_articles(self) -> None:
+        category = frappe.get_doc("HD Article Category", self.category.name)
+        category.category_name = unique_name("Renamed")
+
+        with patch("frappe.enqueue") as enqueue:
+            category.save()
+
+        self.assertEqual(self.indexed(enqueue), set(self.articles))
+
+    def indexed(self, enqueue) -> set[str]:
+        return {
+            c.kwargs["article"]
+            for c in enqueue.call_args_list
+            if c.args[0] == "helpdesk.search.update_article_index"
+        }
 
     def test_a_category_access_change_saves_each_article(self) -> None:
         before = {

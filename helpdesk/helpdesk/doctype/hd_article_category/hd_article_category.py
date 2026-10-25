@@ -45,6 +45,10 @@ class HDArticleCategory(Document):
         if self.has_value_changed("category_name") and old_value == "General":
             frappe.throw(_("General category name can't be changed"))
 
+    def on_update(self):
+        if not self.is_new() and self.has_value_changed("category_name"):
+            reindex_category_articles(self.name)
+
     def on_trash(self):
         self.validate_general_category_delete()
         self.move_articles_to_general()
@@ -94,12 +98,13 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
 
 def get_category_visibility(category: str) -> str | None:
     """None when the articles' visibilities differ."""
-    # every article, not just the ones the caller can read
+    # published articles decide; a category of only drafts reads its drafts.
+    # Not just the ones the caller can read
+    filters = {"category": category}
+    if frappe.db.exists("HD Article", {**filters, "status": "Published"}):
+        filters["status"] = "Published"
     values = frappe.get_all(
-        "HD Article",
-        filters={"category": category},
-        pluck="visibility",
-        distinct=True,
+        "HD Article", filters=filters, pluck="visibility", distinct=True
     )
     return values[0] if len(values) == 1 else None
 
@@ -125,12 +130,25 @@ def move_category_articles(source: str, target: str) -> None:
         target,
         update_modified=False,
     )
+    reindex_category_articles(target)
     for name in articles:
         article = frappe.get_doc("HD Article", name)
         visibility = get_stricter_visibility(article.visibility, category_visibility)
         if visibility != article.visibility:
             article.visibility = visibility
             article.save()
+
+
+def reindex_category_articles(category: str) -> None:
+    """The index carries each article's category name."""
+    articles = frappe.get_all("HD Article", filters={"category": category}, pluck="name")
+    for name in articles:
+        frappe.enqueue(
+            "helpdesk.search.update_article_index",
+            article=name,
+            queue="short",
+            enqueue_after_commit=True,
+        )
 
 
 def check_category_length(category: str | None) -> None:

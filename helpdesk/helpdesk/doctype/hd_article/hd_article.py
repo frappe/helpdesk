@@ -25,6 +25,9 @@ EXCERPT_LENGTH = 140
 
 class HDArticle(Document):
     def validate(self):
+        # archived articles leave their category, so the length check sees it
+        if self.status == "Archived":
+            self.category = None
         self.validate_article_category()
         self.validate_published_content()
 
@@ -48,9 +51,6 @@ class HDArticle(Document):
             self.published_on = frappe.utils.now()
         elif self.status == "Draft" and self.published_on:
             self.published_on = None
-
-        if self.status == "Archived" and self.category != None:
-            self.category = None
 
         # index is only set if its not set already, this allows defining index
         # at the time of creation itself if not set the index is set to the
