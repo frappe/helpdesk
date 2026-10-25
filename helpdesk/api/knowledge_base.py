@@ -127,7 +127,8 @@ def get_category_visibility(category: str) -> str | None:
 
 def category_label_sort_key(label: str) -> tuple:
     """General first, then by label parts so a Subcategory follows its parent."""
-    return (label != "General", [part.casefold() for part in label.split(SEPARATOR)])
+    parts = label.split(SEPARATOR)
+    return (parts[0] != "General", [part.casefold() for part in parts])
 
 
 @frappe.whitelist()

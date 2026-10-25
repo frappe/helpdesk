@@ -360,3 +360,15 @@ class TestSubcategoryGroups(IntegrationTestCase):
         values = [o["value"] for o in self.options()]
 
         self.assertEqual(values, [self.parent, self.sub, other, ""])
+
+    def test_a_general_subcategory_group_follows_general(self) -> None:
+        general = frappe.db.get_value("HD Article Category", {"category_name": "General"})
+        general_sub = make_subcategory(general, "Setup").name
+        make_article(f"{self.token} a", "Draft", general)
+        make_article(f"{self.token} b", "Draft", general_sub)
+        early = make_article_category(f"Aaa{self.token}").name
+        make_article(f"{self.token} c", "Draft", early)
+
+        values = [o["value"] for o in self.options()]
+
+        self.assertEqual(values, [general, general_sub, early])
