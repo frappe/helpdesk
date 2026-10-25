@@ -65,6 +65,7 @@ import {
   ListRows,
 } from "frappe-ui/experimental";
 import { computed, ref, watch } from "vue";
+import { __ } from "@/translation";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
@@ -88,7 +89,9 @@ const actions = (group) => {
       onClick: () => action.onClick(group),
     }));
   if (group.group.label == "General") {
-    _actions = _actions.filter((action) => action.label === "Add New Article");
+    // General may hold Subcategories too
+    const allowed = [__("Add New Article"), __("New subcategory")];
+    _actions = _actions.filter((action) => allowed.includes(action.label));
   }
   return _actions;
 };

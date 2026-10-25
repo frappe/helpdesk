@@ -1,13 +1,5 @@
 <template>
-  <Dialog
-    title="Merge with another category"
-    @after-leave="
-      () => {
-        toCategory = null;
-      }
-    "
-    v-model:open="showDialog"
-  >
+  <Dialog title="Merge with another category" v-model:open="showDialog">
     <template #default>
       <p class="text-p-base text-ink-gray-8 mb-4">
         This will move all articles of the
@@ -50,7 +42,10 @@ const options = computed(() =>
   (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
 );
 watch(showDialog, (open) => {
-  if (open) categoryOptions.submit({ exclude: props.categoryId });
+  if (!open) return;
+  // a pick made before a cancel must not survive
+  toCategory.value = "";
+  categoryOptions.submit({ exclude: props.categoryId });
 });
 const joining = useCategoryVisibility(toCategory);
 // A merge only narrows access; Public needs no note.

@@ -16,11 +16,7 @@
           v-if="deleteArticles && summary?.cited"
           class="text-p-base text-ink-gray-7"
         >
-          {{
-            __("{0} articles cited by tickets will be archived", [
-              summary.cited,
-            ])
-          }}
+          {{ citedMessage }}
         </p>
       </div>
     </template>
@@ -68,10 +64,21 @@ const message = computed(() => {
       summary.value?.articles ?? 0,
     ]);
   }
-  return props.isSubcategory
-    ? __("Articles in this subcategory will move to the parent category.")
-    : __(
+  if (props.isSubcategory) {
+    return __("Articles in this subcategory will move to the parent category.");
+  }
+  return summary.value?.subcategories
+    ? __(
         "Subcategories will become top-level categories and articles will move to the General category."
-      );
+      )
+    : __("Articles will move to the General category.");
 });
+
+const citedMessage = computed(() =>
+  summary.value?.cited === 1
+    ? __("1 article cited by tickets will be archived")
+    : __("{0} articles cited by tickets will be archived", [
+        summary.value?.cited,
+      ])
+);
 </script>

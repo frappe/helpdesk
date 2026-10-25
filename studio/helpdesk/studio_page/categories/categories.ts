@@ -10,8 +10,14 @@ export default function setup(context) {
   const search = ref('')
   // Subcategories open from their parent's page.
   const topCategories = computed(() => context.categories.data?.filter((row) => !row.parent_article_category))
+  const matches = (row) => matchesQuery(search.value, row.category_name, row.description)
+  // A parent is shown when it or one of its subcategories matches.
   const shownCategories = computed(() =>
-    (topCategories.value || []).filter((row) => matchesQuery(search.value, row.category_name, row.description)),
+    (topCategories.value || []).filter(
+      (row) =>
+        matches(row) ||
+        context.categories.data.some((sub) => sub.parent_article_category === row.name && matches(sub)),
+    ),
   )
   // Five rows fill the page; more would only scroll.
   const skeletonCount = Math.min(

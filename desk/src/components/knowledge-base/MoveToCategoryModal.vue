@@ -46,17 +46,17 @@ const options = computed(() =>
   (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
 );
 watch(showDialog, (open) => {
-  if (open) categoryOptions.submit({ exclude: props.excludeCategory });
+  if (!open) return;
+  // a pick made before a cancel must not survive
+  category.value = "";
+  categoryOptions.submit({ exclude: props.excludeCategory });
 });
 
 const actions = [
   {
     label: "Move",
     variant: "solid",
-    onClick: () => {
-      emit("move", category.value);
-      category.value = "";
-    },
+    onClick: () => emit("move", category.value),
   },
 ];
 </script>
