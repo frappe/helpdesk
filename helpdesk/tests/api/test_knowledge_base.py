@@ -1100,7 +1100,9 @@ class TestSubcategoryReads(IntegrationTestCase):
         self.assertEqual(labels[0], "General")
         make_subcategory(get_general_category())
         labels = [row["label"] for row in get_category_options()]
-        general_subs = [label for label in labels if label.startswith("General \u203a ")]
+        general_subs = [
+            label for label in labels if label.startswith("General \u203a ")
+        ]
         self.assertEqual(labels[1 : 1 + len(general_subs)], general_subs)
         self.assertTrue(rows[self.parent]["has_subcategories"])
         self.assertFalse(rows[extra]["has_subcategories"])

@@ -561,15 +561,14 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
     groups = [option for option in options if option["value"]]
     empty = [option for option in options if not option["value"]]
     values = [option["value"] for option in groups]
-    parents = {
-        name: parent
-        for name, parent in frappe.get_all(
+    parents = dict(
+        frappe.get_all(
             "HD Article Category",
             filters={"name": ["in", values]},
             fields=["name", "parent_article_category"],
             as_list=True,
         )
-    }
+    )
     # a parent's own group is there even when it has no rows
     missing = {parent for parent in parents.values() if parent} - set(values)
     groups += [
