@@ -581,7 +581,7 @@ function handleCategoryUpdate() {
 
 function handleCategoryDelete(alsoDeleteArticles: boolean) {
   deleteCategory.submit(
-    { category: category.id, delete_articles: alsoDeleteArticles },
+    { category: category.id, with_articles: alsoDeleteArticles },
     {
       onSuccess: ({ archived }: { archived: number }) => {
         deleteModal.value = false;

@@ -9,6 +9,7 @@ from helpdesk.test_utils import (
     delete_default_views,
     make_article,
     make_article_category,
+    make_contact,
     make_default_view,
     make_subcategory,
     make_ticket,
@@ -304,6 +305,16 @@ class TestSubcategoryGroups(IntegrationTestCase):
         self.assertEqual(sub_option["parent_article_category"], self.parent)
         self.assertFalse(sub_option["has_subcategories"])
         self.assertTrue(by_value[self.parent]["has_subcategories"])
+
+    def test_a_customer_is_not_told_of_a_private_subcategory(self) -> None:
+        make_article(f"{self.token} a", category=self.parent)
+        make_article(f"{self.token} b", category=self.sub, visibility="Private")
+
+        with self.set_user(make_contact("kb-grouper")["user"]):
+            by_value = {o["value"]: o for o in self.options()}
+
+        self.assertNotIn(self.sub, by_value)
+        self.assertFalse(by_value[self.parent]["has_subcategories"])
 
     def test_a_parent_with_no_articles_still_gets_a_group(self) -> None:
         make_article(f"{self.token} a", "Draft", self.sub)

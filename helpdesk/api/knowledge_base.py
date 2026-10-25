@@ -30,6 +30,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     validate_parent_keeps_content,
 )
 from helpdesk.search import NUM_RESULTS
+from helpdesk.utils import is_agent
 
 PUBLIC_ARTICLE_FIELDS = [
     "name",
@@ -518,13 +519,13 @@ def get_category_delete_summary(category: str) -> dict:
 
 
 @frappe.whitelist(methods=["POST"])
-def delete_category(category: str, delete_articles: bool = False) -> dict:
-    """Ticked `delete_articles` deletes the whole branch; cited articles are archived."""
+def delete_category(category: str, with_articles: bool = False) -> dict:
+    """`with_articles` deletes the whole branch; cited articles are archived."""
     frappe.has_permission("HD Article Category", "delete", throw=True)
     _validate_category(category)
     if category == get_general_category():
         frappe.throw(_("General category can't be deleted"))
-    if not delete_articles:
+    if not with_articles:
         frappe.delete_doc("HD Article Category", category)
         return {"archived": 0}
 
@@ -581,15 +582,21 @@ def get_category_group_options(options: list[dict]) -> list[dict]:
     ]
     names = [group["value"] for group in groups]
     labels = get_category_labels(names)
-    with_subcategories = set(
-        frappe.get_all(
-            "HD Article Category",
-            filters={"parent_article_category": ["in", names]},
-            pluck="parent_article_category",
+    # read past permissions: would tell a customer a Private subcategory exists
+    with_subcategories = (
+        set(
+            frappe.get_all(
+                "HD Article Category",
+                filters={"parent_article_category": ["in", names]},
+                pluck="parent_article_category",
+            )
         )
+        if is_agent()
+        else set()
     )
     for group in groups:
-        group["label"] = labels[group["value"]]
+        # a dangling link has no category to label it
+        group["label"] = labels.get(group["value"], group["value"])
         group["parent_article_category"] = parents.get(group["value"])
         group["has_subcategories"] = group["value"] in with_subcategories
     groups.sort(key=lambda group: category_label_sort_key(group["label"]))

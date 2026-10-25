@@ -1282,7 +1282,7 @@ class TestCategoryDelete(IntegrationTestCase):
         ]
 
         self.assertEqual(
-            delete_category(self.parent, delete_articles=True), {"archived": 0}
+            delete_category(self.parent, with_articles=True), {"archived": 0}
         )
 
         self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
@@ -1299,7 +1299,7 @@ class TestCategoryDelete(IntegrationTestCase):
         self.cite(cited)
 
         self.assertEqual(
-            delete_category(self.parent, delete_articles=True), {"archived": 1}
+            delete_category(self.parent, with_articles=True), {"archived": 1}
         )
 
         self.assertEqual(
@@ -1355,7 +1355,7 @@ class TestCategoryDelete(IntegrationTestCase):
         article = make_article(category=self.sub)
 
         with self.assertRaisesRegex(frappe.ValidationError, "Delete the parent"):
-            delete_category(self.sub, delete_articles=True)
+            delete_category(self.sub, with_articles=True)
 
         self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
         self.assertEqual(self.category(article), self.sub)
@@ -1366,7 +1366,7 @@ class TestCategoryDelete(IntegrationTestCase):
         make_article(category=self.parent)
         own = make_article(category=self.sub)
 
-        delete_category(self.sub, delete_articles=True)
+        delete_category(self.sub, with_articles=True)
 
         self.assertFalse(frappe.db.exists("HD Article", own))
         self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
@@ -1378,7 +1378,7 @@ class TestCategoryDelete(IntegrationTestCase):
         make_article(category=sibling)
         own = make_article(category=self.sub)
 
-        delete_category(self.sub, delete_articles=True)
+        delete_category(self.sub, with_articles=True)
 
         self.assertFalse(frappe.db.exists("HD Article", own))
         self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
@@ -1392,7 +1392,7 @@ class TestCategoryDelete(IntegrationTestCase):
     def test_branch_delete_of_a_parent_with_only_subcategory_articles(self) -> None:
         article = make_article(category=self.sub)
 
-        delete_category(self.parent, delete_articles=True)
+        delete_category(self.parent, with_articles=True)
 
         self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
         self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
@@ -1402,7 +1402,7 @@ class TestCategoryDelete(IntegrationTestCase):
         general = get_general_category()
 
         with self.assertRaises(frappe.ValidationError):
-            delete_category(general, delete_articles=True)
+            delete_category(general, with_articles=True)
 
         self.assertTrue(frappe.db.exists("HD Article Category", general))
 
@@ -1412,7 +1412,7 @@ class TestCategoryDelete(IntegrationTestCase):
 
         with self.set_user(customer):
             with self.assertRaises(frappe.PermissionError):
-                delete_category(self.parent, delete_articles=True)
+                delete_category(self.parent, with_articles=True)
             with self.assertRaises(frappe.PermissionError):
                 get_category_delete_summary(self.parent)
 

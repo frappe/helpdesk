@@ -35,7 +35,11 @@ class HDArticleCategory(Document):
             for_update=True,
         ):
             frappe.throw(_("A subcategory cannot have subcategories"))
-        if not self.is_new() and get_subcategories(self.name):
+        if not self.is_new() and frappe.db.get_value(
+            "HD Article Category",
+            {"parent_article_category": self.name},
+            for_update=True,
+        ):
             frappe.throw(_("A category with subcategories cannot have a parent"))
 
         if not self.pinned:
