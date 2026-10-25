@@ -27,20 +27,18 @@ before_uninstall = "helpdesk.setup.install.before_uninstall"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
+    "helpdesk.ticket_search.build_index_in_background",
 ]
 
 
 # Full Text Search
 # ------------------
 
-sqlite_search = [
-    "helpdesk.search_sqlite.HelpdeskSearch",
-]
-
 scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
+        "helpdesk.ticket_search.build_index_if_not_exists",
     ],
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
@@ -119,6 +117,11 @@ studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
 update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {
+    "*": {
+        "on_update": "helpdesk.ticket_search.update_doc_index",
+        "on_trash": "helpdesk.ticket_search.update_doc_index",
+        "after_rename": "helpdesk.ticket_search.rename_doc_index",
+    },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
         "validate": "helpdesk.extends.assignment_rule.on_assignment_rule_validate",
@@ -184,8 +187,12 @@ override_whitelisted_methods = {
     "frappe.desk.form.load.get_communications": "helpdesk.overrides.activity.get_communications",
 }
 
-# The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild
-persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
+# Preserve article and ticket search data when clearing the site's cache.
+persistent_cache_keys = [
+    "search_doc:*",
+    "search_doc_sections:*",
+    "helpdesk_ticket_search:*",
+]
 
 notification_skip_email_types = [
     "Reaction",

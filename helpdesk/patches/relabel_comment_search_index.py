@@ -15,6 +15,8 @@ OLD_PREFIX_LENGTH = len("HD Ticket Comment:")
 
 
 def execute():
+    if frappe.conf.get("helpdesk_search_backend", "sqlite") != "sqlite":
+        return
     search = HelpdeskSearch()
     if not search.index_exists():
         return
