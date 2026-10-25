@@ -13,6 +13,7 @@ from helpdesk.api.knowledge_base import (
     get_article_markdown,
     get_articles,
     get_categories,
+    get_category_options,
     get_category_visibility,
     get_general_category,
     get_kb_sidebar,
@@ -25,6 +26,9 @@ from helpdesk.api.knowledge_base import (
 )
 from helpdesk.helpdesk.doctype.hd_article.hd_article import CUSTOMERS, PRIVATE, PUBLIC
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
+from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    get_category_labels,
+)
 from helpdesk.test_utils import (
     category_names,
     category_row,
@@ -184,6 +188,9 @@ class TestPublicReads(IntegrationTestCase):
                 "visibility",
                 "content",
                 "category_name",
+                "category_label",
+                "parent_article_category",
+                "parent_category_name",
                 "feedback",
                 "minutes",
                 "title_slug",
@@ -231,7 +238,9 @@ class TestPublicReads(IntegrationTestCase):
     def test_categories_carry_a_fixed_shape(self) -> None:
         category = category_row(self.category.name)
 
-        self.assertEqual(set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count"})
+        self.assertEqual(
+            set(category), {*PUBLIC_CATEGORY_FIELDS, "article_count", "label"}
+        )
 
     def test_a_category_counts_only_its_published_articles(self) -> None:
         category = category_row(self.category.name)
@@ -877,6 +886,127 @@ class TestSubcategoryAccess(IntegrationTestCase):
         merge_category(sub, get_general_category())
 
         self.assertEqual(self.visibility(article), PRIVATE)
+
+
+class TestSubcategoryReads(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("helpdesk.api.article.get_nouns", return_value=[]))
+        self.enterContext(
+            patch("helpdesk.api.article.get_noun_phrases", return_value=[])
+        )
+        self.hd_search = self.enterContext(patch("helpdesk.api.article.hd_search"))
+        self.parent_name = unique_name("Fixture Billing")
+        self.parent = make_article_category(self.parent_name).name
+        self.sub_name = unique_name("FAQ")
+        self.sub = make_article_category(
+            self.sub_name, parent_article_category=self.parent
+        ).name
+        self.sub_label = f"{self.parent_name} \u203a {self.sub_name}"
+
+    def test_labels_name_the_parent(self) -> None:
+        self.assertEqual(
+            get_category_labels([self.parent, self.sub]),
+            {self.parent: self.parent_name, self.sub: self.sub_label},
+        )
+
+    def test_a_parent_counts_its_subcategories(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub)
+
+        self.assertEqual(category_row(self.parent).article_count, 3)
+        self.assertEqual(category_row(self.sub).article_count, 2)
+
+    def test_a_parent_counts_only_what_the_reader_reads(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        with self.set_user("Guest"):
+            self.assertEqual(category_row(self.parent).article_count, 2)
+        self.assertEqual(category_row(self.parent).article_count, 4)
+
+    def test_a_guest_sees_a_parent_with_only_a_public_subcategory_article(
+        self,
+    ) -> None:
+        make_article(category=self.sub)
+
+        with self.set_user("Guest"):
+            self.assertIn(self.parent, category_names())
+            self.assertEqual(category_row(self.parent).article_count, 1)
+
+    def test_a_guest_sees_neither_when_the_subcategory_holds_no_public_article(
+        self,
+    ) -> None:
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        with self.set_user("Guest"):
+            self.assertNotIn(self.parent, category_names())
+            self.assertNotIn(self.sub, category_names())
+
+    def test_rows_carry_their_parent(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+
+        self.assertEqual(category_row(self.sub).parent_article_category, self.parent)
+        self.assertEqual(category_row(self.sub).label, self.sub_label)
+        self.assertFalse(category_row(self.parent).parent_article_category)
+        self.assertEqual(category_row(self.parent).label, self.parent_name)
+
+    def test_the_sidebar_lists_a_parent_with_only_a_subcategory_article(self) -> None:
+        article = make_article(category=self.sub)
+
+        rows = {row.name: row for row in get_kb_sidebar()}
+
+        self.assertEqual(rows[self.parent].article_count, 1)
+        self.assertEqual(rows[self.parent].articles, [])
+        self.assertEqual(rows[self.parent].creators, rows[self.sub].creators)
+        self.assertEqual([a.name for a in rows[self.sub].articles], [article])
+
+    def test_an_article_carries_its_category_label(self) -> None:
+        article = get_article(make_article(category=self.sub))
+
+        self.assertEqual(article.category_label, self.sub_label)
+        self.assertEqual(article.parent_article_category, self.parent)
+        self.assertEqual(article.parent_category_name, self.parent_name)
+        self.assertEqual(article.category_name, self.sub_name)
+
+    def test_a_search_hit_carries_its_category_label(self) -> None:
+        article = make_article(category=self.sub)
+        self.hd_search.return_value = make_search_page(make_search_hit(article))
+
+        [row] = search_articles("anything")
+
+        self.assertEqual(row["category_label"], self.sub_label)
+        self.assertEqual(row["category_name"], self.sub_name)
+
+    def test_category_options_put_subcategories_after_their_parent(self) -> None:
+        extra = make_article_category(f"{self.parent_name} Extra").name
+        rows = {row["value"]: row for row in get_category_options()}
+        labels = [row["label"] for row in get_category_options()]
+
+        self.assertLess(labels.index(self.parent_name), labels.index(self.sub_label))
+        self.assertLess(
+            labels.index(self.sub_label), labels.index(f"{self.parent_name} Extra")
+        )
+        self.assertEqual(labels[0], "General")
+        self.assertTrue(rows[self.parent]["has_subcategories"])
+        self.assertFalse(rows[extra]["has_subcategories"])
+        self.assertEqual(rows[self.sub]["parent_article_category"], self.parent)
+
+    def test_category_options_leave_out_the_excluded(self) -> None:
+        values = [row["value"] for row in get_category_options(exclude=self.sub)]
+
+        self.assertNotIn(self.sub, values)
+        self.assertIn(self.parent, values)
+
+    def test_a_customer_cannot_list_category_options(self) -> None:
+        with self.set_user(make_contact("kb-options")["user"]):
+            with self.assertRaises(frappe.PermissionError):
+                get_category_options()
 
 
 class TestSearch(IntegrationTestCase):

@@ -185,6 +185,29 @@ def get_parent(category: str) -> str | None:
     )
 
 
+SEPARATOR = " \u203a "
+
+
+def get_category_labels(names: list[str]) -> dict[str, str]:
+    """A top-level name maps to its category name, a Subcategory to `<parent> › <name>`."""
+    return {
+        row.name: (
+            f"{row.parent_name}{SEPARATOR}{row.category_name}"
+            if row.parent_name
+            else row.category_name
+        )
+        for row in frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", names]},
+            fields=[
+                "name",
+                "category_name",
+                "parent_article_category.category_name as parent_name",
+            ],
+        )
+    }
+
+
 # joining a category narrows access, never widens it
 VISIBILITY_ORDER = ("Private", "Customers", "Public")
 

@@ -20,6 +20,8 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import (
 )
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    SEPARATOR,
+    get_category_labels,
     get_stricter_visibility,
     move_category_articles,
 )
@@ -41,6 +43,7 @@ PUBLIC_CATEGORY_FIELDS = [
     "icon",
     "pinned",
     "pinned_order",
+    "parent_article_category",
 ]
 SEARCH_LIMIT = NUM_RESULTS
 SEARCH_QUERY_LENGTH = 200
@@ -99,6 +102,32 @@ def get_category_visibility(category: str) -> str | None:
     frappe.has_permission("HD Article", "write", throw=True)
     _validate_category(category)
     return hd_article_category.get_category_visibility(category)
+
+
+def category_label_sort_key(label: str) -> tuple:
+    """General first, then by label parts so a Subcategory follows its parent."""
+    return (label != "General", [part.casefold() for part in label.split(SEPARATOR)])
+
+
+@frappe.whitelist()
+def get_category_options(exclude: str | None = None) -> list[dict]:
+    frappe.has_permission("HD Article", "write", throw=True)
+    rows = frappe.get_all(
+        "HD Article Category", fields=["name", "parent_article_category"]
+    )
+    labels = get_category_labels([row.name for row in rows])
+    parents = {row.parent_article_category for row in rows}
+    options = [
+        {
+            "value": row.name,
+            "label": labels[row.name],
+            "parent_article_category": row.parent_article_category,
+            "has_subcategories": row.name in parents,
+        }
+        for row in rows
+        if row.name != exclude
+    ]
+    return sorted(options, key=lambda option: category_label_sort_key(option["label"]))
 
 
 @frappe.whitelist(methods=["POST"])
@@ -191,8 +220,21 @@ def get_article(name: str) -> dict:
     article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
-    article.category_name = frappe.db.get_value(
-        "HD Article Category", article.category, "category_name"
+    category = frappe.db.get_value(
+        "HD Article Category",
+        article.category,
+        ["category_name", "parent_article_category"],
+        as_dict=True,
+    )
+    article.category_name = category.category_name
+    article.category_label = get_category_labels([article.category])[article.category]
+    article.parent_article_category = category.parent_article_category
+    article.parent_category_name = (
+        frappe.db.get_value(
+            "HD Article Category", category.parent_article_category, "category_name"
+        )
+        if category.parent_article_category
+        else None
     )
     article.feedback = _get_own_feedback(name)
     article.minutes = _get_reading_minutes(
@@ -249,16 +291,35 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
         authors.setdefault(category, []).append(author)
     if not counts:
         return []
+    parents = dict(
+        frappe.get_all(
+            "HD Article Category",
+            filters={
+                "name": ["in", list(counts)],
+                "parent_article_category": ["is", "set"],
+            },
+            fields=["name", "parent_article_category"],
+            as_list=True,
+        )
+    )
+    # a parent counts its Subcategories' readable Articles too
+    for sub, parent in parents.items():
+        counts[parent] = counts.get(parent, 0) + counts[sub]
+        authors.setdefault(parent, []).extend(authors[sub])
     categories = frappe.get_all(
         "HD Article Category",
         filters={"name": ["in", list(counts)]},
         fields=PUBLIC_CATEGORY_FIELDS,
         order_by="category_name asc",
     )
+    labels = get_category_labels([category.name for category in categories])
     for category in categories:
         category.article_count = counts[category.name]
+        category.label = labels[category.name]
         if with_creators:
-            category.creators = [_get_byline(name) for name in authors[category.name]]
+            category.creators = [
+                _get_byline(name) for name in dict.fromkeys(authors[category.name])
+            ]
     return categories
 
 
@@ -279,17 +340,23 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         for article in frappe.get_all(
             "HD Article",
             filters={"name": ["in", [row["name"] for row in hits]]},
-            fields=["name", "content", "category.category_name as category_name"],
+            fields=[
+                "name",
+                "content",
+                "category",
+                "category.category_name as category_name",
+            ],
         )
     }
+    labels = get_category_labels(list({a.category for a in articles.values()}))
     return [
-        _get_search_hit(row, articles[row["name"]])
+        _get_search_hit(row, articles[row["name"]], labels)
         for row in hits
         if row["name"] in articles
     ]
 
 
-def _get_search_hit(row: dict, article: frappe._dict) -> dict:
+def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
     content = article.content or ""
     return {
         "name": row["name"],
@@ -300,6 +367,7 @@ def _get_search_hit(row: dict, article: frappe._dict) -> dict:
         "image": find_first_image(content),
         "minutes": _get_reading_minutes(BeautifulSoup(content, "html.parser")),
         "category_name": article.category_name,
+        "category_label": labels.get(article.category),
     }
 
 
