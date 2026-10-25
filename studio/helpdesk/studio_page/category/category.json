@@ -185,6 +185,22 @@
              "visibilityCondition": "{{ !articles.data }}"
             },
             {
+             "classes": [
+              "text-ink-gray-5",
+              "pb-2",
+              "border-b",
+              "border-outline-gray-1"
+             ],
+             "componentId": "articles-heading",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-sm",
+              "tag": "h2",
+              "text": "{{ t('Articles') }}"
+             },
+             "visibilityCondition": "{{ articles.data && articles.data.length }}"
+            },
+            {
              "children": [
               {
                "blockName": "article-row",
@@ -349,13 +365,15 @@
            "children": [
             {
              "classes": [
-              "text-ink-gray-8",
-              "font-semibold"
+              "text-ink-gray-5",
+              "pb-2",
+              "border-b",
+              "border-outline-gray-1"
              ],
              "componentId": "subcategories-heading",
              "componentName": "TextBlock",
              "componentProps": {
-              "fontSize": "text-lg",
+              "fontSize": "text-sm",
               "tag": "h2",
               "text": "{{ t('Subcategories') }}"
              }
@@ -363,60 +381,39 @@
             {
              "children": [
               {
-               "blockName": "subcategory-card",
+               "blockName": "subcategory-row",
                "children": [
                 {
-                 "classes": [
-                  "size-5",
-                  "text-ink-gray-6",
-                  "transition-colors",
-                  "group-hover:text-ink-gray-8"
-                 ],
-                 "componentId": "subcategory-icon",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-                 }
-                },
-                {
-                 "blockName": "container",
+                 "blockName": "article-text",
                  "children": [
                   {
-                   "blockName": "category-title",
                    "classes": [
-                    "text-ink-gray-9"
+                    "text-ink-gray-8",
+                    "font-medium",
+                    "truncate",
+                    "group-hover:text-ink-gray-9",
+                    "max-sm:whitespace-normal",
+                    "max-sm:line-clamp-2"
                    ],
                    "componentId": "subcategory-title",
                    "componentName": "TextBlock",
                    "componentProps": {
-                    "fontSize": "text-base-semibold",
-                    "tag": "h3",
+                    "fontSize": "text-base",
+                    "tag": "p",
                     "text": "{{ dataItem.category_name }}"
                    }
                   },
                   {
-                   "blockName": "category-description",
                    "classes": [
-                    "line-clamp-2",
-                    "grow-0",
-                    "text-ink-gray-6"
-                   ],
-                   "componentId": "subcategory-description",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-sm",
-                    "tag": "p",
-                    "text": "{{ dataItem.description || t('Browse articles in this category') }}"
-                   }
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-5"
+                    "text-ink-gray-5",
+                    "truncate",
+                    "max-sm:whitespace-normal",
+                    "max-sm:line-clamp-2"
                    ],
                    "componentId": "subcategory-count",
                    "componentName": "TextBlock",
                    "componentProps": {
-                    "fontSize": "text-sm",
+                    "fontSize": "text-p-sm",
                     "tag": "p",
                     "text": "{{ countText(dataItem.article_count) }}"
                    }
@@ -424,42 +421,54 @@
                  ],
                  "classes": [
                   "flex",
-                  "flex-col",
-                  "shrink",
-                  "gap-1",
-                  "h-fit",
                   "min-w-0",
-                  "w-full"
+                  "flex-1",
+                  "flex-col",
+                  "gap-0.5"
                  ],
-                 "componentId": "subcategory-text",
+                 "componentId": "subcategory-row-text",
                  "componentName": "container",
                  "originalElement": "div"
+                },
+                {
+                 "classes": [
+                  "size-4",
+                  "shrink-0",
+                  "text-ink-gray-4",
+                  "transition-colors",
+                  "group-hover:text-ink-gray-6"
+                 ],
+                 "componentId": "subcategory-icon",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+                 }
                 }
                ],
                "classes": [
-                "transition",
-                "hover:bg-surface-gray-1",
-                "items-start",
-                "border-outline-gray-2",
-                "rounded-5",
-                "border",
-                "cursor-pointer",
-                "flex",
-                "flex-col",
-                "justify-start",
-                "overflow-hidden",
-                "w-full",
-                "max-sm:flex-row",
-                "max-sm:items-start",
-                "max-sm:gap-3",
-                "max-sm:px-4",
-                "max-sm:py-3.5",
                 "group",
+                "flex",
+                "cursor-pointer",
+                "items-center",
                 "gap-4",
-                "p-5",
+                "py-4",
+                "-mx-2.5",
+                "px-2.5",
+                "rounded-4",
+                "transition-colors",
+                "hover:bg-surface-gray-1",
+                "relative",
+                "after:absolute",
+                "after:inset-x-2.5",
+                "after:bottom-0",
+                "after:h-px",
+                "after:bg-[--outline-gray-1]",
+                "last:after:hidden",
+                "hover:after:opacity-0",
+                "[&:has(+*:hover)]:after:opacity-0",
                 "focus-visible:focus-ring"
                ],
-               "componentId": "subcategory-card",
+               "componentId": "subcategory-row",
                "componentName": "PortalLink",
                "componentProps": {
                 "to": "{{ routes.category(dataItem.name) }}"
@@ -468,13 +477,10 @@
               }
              ],
              "classes": [
-              "grid",
-              "gap-2.5",
-              "grid-cols-1",
-              "sm:grid-cols-2",
-              "sm:auto-rows-fr",
-              "content-start",
               "w-full",
+              "!flex-col",
+              "!flex-nowrap",
+              "!gap-0",
               "portal-reveal"
              ],
              "componentId": "subcategories-repeater",
@@ -488,7 +494,7 @@
            "classes": [
             "flex",
             "flex-col",
-            "gap-3",
+            "gap-1",
             "mt-8",
             "w-full"
            ],
@@ -590,7 +596,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-25 22:00:00.000000",
+ "modified": "2026-10-26 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
