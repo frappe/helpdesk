@@ -212,10 +212,20 @@ const groupByActions = [
     icon: "lucide-edit",
     onClick: async ({ group }) => {
       // the group label is "Parent › Sub", so read the plain name
-      const doc = await call("frappe.client.get", {
-        doctype: "HD Article Category",
-        name: group.value,
-      });
+      let doc;
+      try {
+        doc = await call("frappe.client.get", {
+          doctype: "HD Article Category",
+          name: group.value,
+        });
+      } catch (error: any) {
+        toast.error(
+          error?.messages?.[0] ||
+            error?.message ||
+            __("Failed to load category.")
+        );
+        return;
+      }
       editTitle.value = true;
       category.title = doc.category_name;
       category.id = group.value;
@@ -268,6 +278,7 @@ const groupByActions = [
     icon: "lucide-trash-2",
     theme: "red",
     onClick: ({ group }) => {
+      resetState();
       category.id = group.value;
       category.parent = group.parent_article_category || "";
       deleteModal.value = true;
@@ -529,26 +540,33 @@ function handleCategoryUpdate() {
     },
     {
       onSuccess: async () => {
-        // saving with a parent unpins the category; say so
-        const { pinned } = await call("frappe.client.get_value", {
-          doctype: "HD Article Category",
-          filters: category.id,
-          fieldname: "pinned",
-        });
-        if (category.pinned && category.parent && !pinned) {
-          toast.info(
-            __(
-              "{0} is now a subcategory and was unpinned from the knowledge base home",
-              [category.title]
-            )
-          );
+        // saving with a parent unpins the category; say so (best effort)
+        let unpinned = false;
+        if (category.pinned && category.parent) {
+          try {
+            const { pinned } = await call("frappe.client.get_value", {
+              doctype: "HD Article Category",
+              filters: category.id,
+              fieldname: "pinned",
+            });
+            unpinned = !pinned;
+          } catch {
+            // the save worked; fall back to the generic toast
+          }
         }
+        const title = category.title;
         listViewRef.value.reload();
         showCategoryModal.value = false;
         editTitle.value = false;
-
-        toast.success(__("Category updated successfully."));
         resetState();
+        toast.success(
+          unpinned
+            ? __(
+                "{0} is now a subcategory and was unpinned from the knowledge base home",
+                [title]
+              )
+            : __("Category updated successfully.")
+        );
       },
       onError: (error: any) => {
         const title =
@@ -561,9 +579,9 @@ function handleCategoryUpdate() {
   );
 }
 
-function handleCategoryDelete(deleteArticles: boolean) {
+function handleCategoryDelete(alsoDeleteArticles: boolean) {
   deleteCategory.submit(
-    { category: category.id, delete_articles: deleteArticles },
+    { category: category.id, delete_articles: alsoDeleteArticles },
     {
       onSuccess: ({ archived }: { archived: number }) => {
         deleteModal.value = false;
