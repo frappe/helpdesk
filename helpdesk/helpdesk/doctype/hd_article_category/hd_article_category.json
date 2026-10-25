@@ -9,6 +9,7 @@
  "engine": "InnoDB",
  "field_order": [
   "category_name",
+  "parent_article_category",
   "description",
   "column_break_iczs",
   "icon",
@@ -22,6 +23,12 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Name"
+  },
+  {
+   "fieldname": "parent_article_category",
+   "fieldtype": "Link",
+   "label": "Parent Category",
+   "options": "HD Article Category"
   },
   {
    "allow_in_quick_entry": 1,
@@ -54,7 +61,7 @@
   }
  ],
  "links": [],
- "modified": "2026-10-08 12:00:00.000000",
+ "modified": "2026-10-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",

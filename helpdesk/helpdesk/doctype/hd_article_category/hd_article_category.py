@@ -12,7 +12,36 @@ class HDArticleCategory(Document):
     def validate(self):
         self.validate_default_category()
         self.validate_general_category()
+        self.validate_parent()
         self.validate_pinned_order()
+
+    def validate_parent(self):
+        """One level only; a Subcategory is never pinned."""
+        if not self.parent_article_category:
+            return
+
+        if self.parent_article_category == self.name:
+            frappe.throw(_("A category cannot be its own parent"))
+        if self.category_name == "General":
+            frappe.throw(_("General cannot be a subcategory"))
+        # row lock: serialises two saves that would otherwise nest each other
+        if frappe.db.get_value(
+            "HD Article Category",
+            self.parent_article_category,
+            "parent_article_category",
+            for_update=True,
+        ):
+            frappe.throw(_("A subcategory cannot have subcategories"))
+        if not self.is_new() and get_subcategories(self.name):
+            frappe.throw(_("A category with subcategories cannot have a parent"))
+
+        if not self.pinned:
+            return
+        if not self.is_new() and self.has_value_changed("parent_article_category"):
+            self.pinned = 0
+            self.flags.unpinned = True
+        else:
+            frappe.throw(_("A subcategory cannot be pinned"))
 
     def validate_pinned_order(self):
         """Order is 1-based; 0 means unpinned."""
@@ -107,6 +136,25 @@ def get_category_visibility(category: str) -> str | None:
         "HD Article", filters=filters, pluck="visibility", distinct=True
     )
     return values[0] if len(values) == 1 else None
+
+
+def get_subcategories(category: str) -> list[str]:
+    return frappe.get_all(
+        "HD Article Category",
+        filters={"parent_article_category": category},
+        order_by="category_name asc",
+        pluck="name",
+    )
+
+
+def get_branch(category: str) -> list[str]:
+    return [category, *get_subcategories(category)]
+
+
+def get_parent(category: str) -> str | None:
+    return frappe.db.get_value(
+        "HD Article Category", category, "parent_article_category"
+    )
 
 
 # joining a category narrows access, never widens it
