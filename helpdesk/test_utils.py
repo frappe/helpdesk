@@ -344,6 +344,13 @@ def make_article_category(label: str, **values):
     ).insert()
 
 
+def make_subcategory(parent: str, label: str = "Sub", **values):
+    """A uniquely named Subcategory of `parent`."""
+    return make_article_category(
+        unique_name(label), parent_article_category=parent, **values
+    )
+
+
 def category_row(name: str, with_creators: bool = False) -> frappe._dict:
     from helpdesk.api.knowledge_base import _get_categories
 

@@ -111,7 +111,10 @@ def set_category_visibility(category: str, visibility: str):
     # saved one by one for version history
     for name in frappe.get_all(
         "HD Article",
-        filters={"category": category, "visibility": ["!=", visibility]},
+        filters={
+            "category": ["in", hd_article_category.get_branch(category)],
+            "visibility": ["!=", visibility],
+        },
         pluck="name",
     ):
         article = frappe.get_doc("HD Article", name)

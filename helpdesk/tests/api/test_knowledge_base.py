@@ -35,6 +35,7 @@ from helpdesk.test_utils import (
     make_contact,
     make_search_hit,
     make_search_page,
+    make_subcategory,
     unique_email,
     unique_name,
 )
@@ -753,6 +754,95 @@ class TestCategoryAccess(IntegrationTestCase):
             frappe.db.get_value("HD Article", moved, ["category", "visibility"]),
             (general, PRIVATE),
         )
+
+
+class TestSubcategoryAccess(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.customer = make_contact("kb-branch-reader")["user"]
+        self.parent = make_article_category(unique_name("Fixture Parent")).name
+        self.sub = make_subcategory(self.parent).name
+
+    def visibility(self, name) -> str:
+        return frappe.db.get_value("HD Article", name, "visibility")
+
+    def readable(self, category) -> bool:
+        return category in frappe.get_list(
+            "HD Article Category", pluck="name"
+        ) and frappe.has_permission("HD Article Category", "read", category)
+
+    def test_a_parent_with_only_a_readable_subcategory_is_shown(self) -> None:
+        make_article(category=self.sub)
+
+        # a customer, not Guest: Guest has no role permission on categories
+        with self.set_user(self.customer):
+            self.assertTrue(self.readable(self.parent))
+
+    def test_a_private_subcategory_keeps_its_parent_hidden(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+        make_article(category=self.sub, visibility=PRIVATE)
+
+        with self.set_user(self.customer):
+            self.assertFalse(self.readable(self.parent))
+            self.assertFalse(self.readable(self.sub))
+
+    def test_access_reads_the_whole_branch(self) -> None:
+        make_article(category=self.parent, visibility=CUSTOMERS)
+        make_article(category=self.sub, visibility=PUBLIC)
+
+        self.assertIsNone(hd_article_category.get_category_visibility(self.parent))
+        self.assertEqual(hd_article_category.get_category_visibility(self.sub), PUBLIC)
+
+    def test_setting_access_rewrites_subcategory_articles(self) -> None:
+        make_article(category=self.parent, visibility=PUBLIC)
+        make_article(category=self.sub, visibility=CUSTOMERS)
+
+        set_category_visibility(self.parent, PRIVATE)
+
+        self.assertEqual(
+            set(
+                frappe.get_all(
+                    "HD Article",
+                    {"category": ["in", [self.parent, self.sub]]},
+                    pluck="visibility",
+                    distinct=True,
+                )
+            ),
+            {PRIVATE},
+        )
+
+    def give_parent(self, visibility) -> str:
+        """A category with one `visibility` article, moved under the parent."""
+        category = make_article_category(unique_name("Fixture Joining"))
+        article = make_article(category=category.name, visibility=visibility)
+        category.update({"parent_article_category": self.parent}).save()
+        return article
+
+    def test_getting_a_parent_narrows_its_articles(self) -> None:
+        make_article(category=self.parent, visibility=CUSTOMERS)
+
+        self.assertEqual(self.visibility(self.give_parent(PUBLIC)), CUSTOMERS)
+
+    def test_getting_a_parent_never_widens(self) -> None:
+        make_article(category=self.parent, visibility=PUBLIC)
+
+        self.assertEqual(self.visibility(self.give_parent(PRIVATE)), PRIVATE)
+
+    def test_a_parent_may_lose_its_last_own_article(self) -> None:
+        make_article(category=self.sub)
+        article = frappe.get_doc("HD Article", make_article(category=self.parent))
+        other = make_article_category(unique_name("Fixture Elsewhere")).name
+
+        article.update({"category": other}).save()
+
+        self.assertEqual(frappe.db.count("HD Article", {"category": self.parent}), 0)
+
+    def test_a_first_article_in_a_new_subcategory_inherits_the_parent(self) -> None:
+        make_article(category=self.parent, visibility=PRIVATE)
+
+        article = make_article(category=self.sub, visibility=CUSTOMERS)
+
+        self.assertEqual(self.visibility(article), PRIVATE)
 
 
 class TestSearch(IntegrationTestCase):

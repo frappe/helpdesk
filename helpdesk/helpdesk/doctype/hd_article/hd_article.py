@@ -13,6 +13,7 @@ from frappe.website.utils import cleanup_page_name
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     check_category_length,
     get_category_visibility,
+    get_parent,
 )
 from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
 from helpdesk.utils import capture_event, is_agent
@@ -64,11 +65,13 @@ class HDArticle(Document):
             )
 
     def inherit_category_visibility(self):
-        if (
-            self.visibility == CUSTOMERS
-            and self.category
-            and get_category_visibility(self.category) == PRIVATE
-        ):
+        if self.visibility != CUSTOMERS or not self.category:
+            return
+        # an empty subcategory reads its parent
+        visibility = get_category_visibility(self.category)
+        if not visibility and (parent := get_parent(self.category)):
+            visibility = get_category_visibility(parent)
+        if visibility == PRIVATE:
             self.visibility = PRIVATE
 
     def after_insert(self):

@@ -77,6 +77,16 @@ class HDArticleCategory(Document):
     def on_update(self):
         if not self.is_new() and self.has_value_changed("category_name"):
             reindex_category_articles(self.name)
+        if self.parent_article_category and self.has_value_changed(
+            "parent_article_category"
+        ):
+            self.narrow_to_parent()
+
+    def narrow_to_parent(self):
+        # the parent's branch already counts this category in: leave it out
+        branch = get_branch(self.parent_article_category)
+        others = [category for category in branch if category != self.name]
+        narrow_category_articles(self.name, read_visibility(others))
 
     def on_trash(self):
         self.validate_general_category_delete()
@@ -96,16 +106,21 @@ class HDArticleCategory(Document):
 
 # local imports below: circular via the article controller
 def permission_query(user: str | None = None) -> str | None:
-    """A category is readable when one of its articles is."""
+    """A category is readable when one of its or its subcategories' articles is."""
     from helpdesk.helpdesk.doctype.hd_article.hd_article import (
         permission_query as article_permission_query,
     )
 
     if not (conditions := article_permission_query(user)):
         return None
+    # one level deep, so no recursion
     return (
-        "`tabHD Article Category`.name in "
+        "(`tabHD Article Category`.name in "
         f"(select `tabHD Article`.category from `tabHD Article` where {conditions})"
+        " or `tabHD Article Category`.name in "
+        "(select sub.parent_article_category from `tabHD Article Category` sub"
+        " join `tabHD Article` on `tabHD Article`.category = sub.name"
+        f" where {conditions}))"
     )
 
 
@@ -119,17 +134,22 @@ def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bo
     return bool(
         frappe.get_all(
             "HD Article",
-            filters=make_article_filters(user, category=doc.name),
+            filters=make_article_filters(user, category=["in", get_branch(doc.name)]),
             limit=1,
         )
     )
 
 
 def get_category_visibility(category: str) -> str | None:
+    """Read across the category and its subcategories."""
+    return read_visibility(get_branch(category))
+
+
+def read_visibility(categories: list[str]) -> str | None:
     """None when the articles' visibilities differ."""
-    # published articles decide; a category of only drafts reads its drafts.
+    # published articles decide; categories of only drafts read their drafts.
     # Not just the ones the caller can read
-    filters = {"category": category}
+    filters = {"category": ["in", categories]}
     if frappe.db.exists("HD Article", {**filters, "status": "Published"}):
         filters["status"] = "Published"
     values = frappe.get_all(
@@ -169,8 +189,8 @@ def get_stricter_visibility(visibility: str, category_visibility: str | None) ->
 
 def move_category_articles(source: str, target: str) -> None:
     """Bulk move: per-article saves would refuse to empty `source`."""
-    category_visibility = get_category_visibility(target)
-    articles = frappe.get_all("HD Article", filters={"category": source}, pluck="name")
+    # narrowed before the move, so only the moved articles are touched
+    narrow_category_articles(source, get_category_visibility(target))
     frappe.db.set_value(
         "HD Article",
         {"category": source},
@@ -179,17 +199,26 @@ def move_category_articles(source: str, target: str) -> None:
         update_modified=False,
     )
     reindex_category_articles(target)
-    for name in articles:
-        article = frappe.get_doc("HD Article", name)
-        visibility = get_stricter_visibility(article.visibility, category_visibility)
-        if visibility != article.visibility:
-            article.visibility = visibility
+
+
+def narrow_category_articles(category: str, visibility: str | None) -> None:
+    """Saves each article `visibility` narrows, for version history."""
+    articles = frappe.get_all(
+        "HD Article", filters={"category": category}, fields=["name", "visibility"]
+    )
+    for row in articles:
+        stricter = get_stricter_visibility(row.visibility, visibility)
+        if stricter != row.visibility:
+            article = frappe.get_doc("HD Article", row.name)
+            article.visibility = stricter
             article.save()
 
 
 def reindex_category_articles(category: str) -> None:
     """The index carries each article's category name."""
-    articles = frappe.get_all("HD Article", filters={"category": category}, pluck="name")
+    articles = frappe.get_all(
+        "HD Article", filters={"category": category}, pluck="name"
+    )
     for name in articles:
         frappe.enqueue(
             "helpdesk.search.update_article_index",
@@ -200,5 +229,8 @@ def reindex_category_articles(category: str) -> None:
 
 
 def check_category_length(category: str | None) -> None:
-    if category and frappe.db.count("HD Article", {"category": category}) == 1:
+    """Only a category without subcategories must keep an article."""
+    if not category or get_subcategories(category):
+        return
+    if frappe.db.count("HD Article", {"category": category}) == 1:
         frappe.throw(_("Category must have at least one article"))
