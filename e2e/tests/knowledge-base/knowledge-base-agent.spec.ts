@@ -83,7 +83,7 @@ test("merge a category into another, then delete one", async ({ page, api }) => 
 
   await page.goto("/helpdesk/kb");
   await openCategoryMenu(page, source.category_name, "Merge");
-  await pickOption(page, "Category", target.category_name);
+  await pickOption(page, "Category", target.category_name, { opensItself: true });
   await page.getByRole("dialog").getByRole("button", { name: "Merge" }).click();
   await expect.poll(async () => (await api.get("HD Article", moved.name)).category).toBe(target.name);
   expect(await api.exists("HD Article Category", { name: source.name })).toBeUndefined();
