@@ -49,7 +49,7 @@
             class="truncate text-sm text-ink-gray-5 [&_mark]:bg-transparent [&_mark]:font-medium [&_mark]:text-ink-gray-8"
           >
             <template v-if="item.article.category_name">
-              {{ item.article.category_name }} ·
+              {{ item.article.category_label || item.article.category_name }} ·
             </template>
             <span v-html="item.article.excerpt" />
           </span>

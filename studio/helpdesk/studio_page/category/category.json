@@ -90,6 +90,14 @@
            "blockName": "category-header",
            "children": [
             {
+             "componentId": "PortalBreadcrumbs-category",
+             "componentName": "PortalBreadcrumbs",
+             "componentProps": {
+              "items": "{{ breadcrumbs }}"
+             },
+             "isCustomVueComponent": true
+            },
+            {
              "classes": [
               "text-ink-gray-8",
               "font-bold"
@@ -322,7 +330,7 @@
              "componentId": "container-7hq5bv7hx",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ articles.data && articles.data.length === 0 }}"
+             "visibilityCondition": "{{ articles.data && articles.data.length === 0 && !subcategories.length }}"
             }
            ],
            "classes": [
@@ -335,6 +343,159 @@
            "componentId": "category-articles",
            "componentName": "container",
            "originalElement": "div"
+          },
+          {
+           "blockName": "subcategories-section",
+           "children": [
+            {
+             "classes": [
+              "text-ink-gray-8",
+              "font-semibold"
+             ],
+             "componentId": "subcategories-heading",
+             "componentName": "TextBlock",
+             "componentProps": {
+              "fontSize": "text-lg",
+              "tag": "h2",
+              "text": "{{ t('Subcategories') }}"
+             }
+            },
+            {
+             "children": [
+              {
+               "blockName": "subcategory-card",
+               "children": [
+                {
+                 "classes": [
+                  "size-5",
+                  "text-ink-gray-6",
+                  "transition-colors",
+                  "group-hover:text-ink-gray-8"
+                 ],
+                 "componentId": "subcategory-icon",
+                 "componentName": "Icon",
+                 "componentProps": {
+                  "icon": "{{ dataItem.icon || 'lucide-folder' }}"
+                 }
+                },
+                {
+                 "blockName": "container",
+                 "children": [
+                  {
+                   "blockName": "category-title",
+                   "classes": [
+                    "text-ink-gray-9"
+                   ],
+                   "componentId": "subcategory-title",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-base-semibold",
+                    "tag": "h3",
+                    "text": "{{ dataItem.category_name }}"
+                   }
+                  },
+                  {
+                   "blockName": "category-description",
+                   "classes": [
+                    "line-clamp-2",
+                    "grow-0",
+                    "text-ink-gray-6"
+                   ],
+                   "componentId": "subcategory-description",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-p-sm",
+                    "tag": "p",
+                    "text": "{{ dataItem.description || t('Browse articles in this category') }}"
+                   }
+                  },
+                  {
+                   "classes": [
+                    "text-ink-gray-5"
+                   ],
+                   "componentId": "subcategory-count",
+                   "componentName": "TextBlock",
+                   "componentProps": {
+                    "fontSize": "text-sm",
+                    "tag": "p",
+                    "text": "{{ countText(dataItem.article_count) }}"
+                   }
+                  }
+                 ],
+                 "classes": [
+                  "flex",
+                  "flex-col",
+                  "shrink",
+                  "gap-1",
+                  "h-fit",
+                  "min-w-0",
+                  "w-full"
+                 ],
+                 "componentId": "subcategory-text",
+                 "componentName": "container",
+                 "originalElement": "div"
+                }
+               ],
+               "classes": [
+                "transition",
+                "hover:bg-surface-gray-1",
+                "items-start",
+                "border-outline-gray-2",
+                "rounded-5",
+                "border",
+                "cursor-pointer",
+                "flex",
+                "flex-col",
+                "justify-start",
+                "overflow-hidden",
+                "w-full",
+                "max-sm:flex-row",
+                "max-sm:items-start",
+                "max-sm:gap-3",
+                "max-sm:px-4",
+                "max-sm:py-3.5",
+                "group",
+                "gap-4",
+                "p-5",
+                "focus-visible:focus-ring"
+               ],
+               "componentId": "subcategory-card",
+               "componentName": "PortalLink",
+               "componentProps": {
+                "to": "{{ routes.category(dataItem.name) }}"
+               },
+               "isCustomVueComponent": true
+              }
+             ],
+             "classes": [
+              "grid",
+              "gap-2.5",
+              "grid-cols-1",
+              "sm:grid-cols-2",
+              "sm:auto-rows-fr",
+              "content-start",
+              "w-full",
+              "portal-reveal"
+             ],
+             "componentId": "subcategories-repeater",
+             "componentName": "Repeater",
+             "componentProps": {
+              "data": "{{ subcategories }}",
+              "dataKey": "name"
+             }
+            }
+           ],
+           "classes": [
+            "flex",
+            "flex-col",
+            "gap-3",
+            "mt-8",
+            "w-full"
+           ],
+           "componentId": "category-subcategories",
+           "componentName": "container",
+           "originalElement": "div",
+           "visibilityCondition": "{{ articles.data && subcategories.length }}"
           }
          ],
          "classes": [
@@ -429,7 +590,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-22 15:30:00.000000",
+ "modified": "2026-10-25 22:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

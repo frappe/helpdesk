@@ -25,8 +25,11 @@ export default function setup(context) {
   // Saving KB settings reloads the session; pins come with categories.
   watch(config, (_, previous) => previous && categories.reload())
 
+  // Subcategories open from their parent's page.
+  const topCategories = computed(() => (categories.data || []).filter((row) => !row.parent_article_category))
+
   const homeCategories = computed(() => {
-    const rows = categories.data || []
+    const rows = topCategories.value
     const order = preview.value?.pinned
     const pinned = order
       ? rows.filter((row) => order.includes(row.name)).sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name))
@@ -34,7 +37,7 @@ export default function setup(context) {
     return pinned.length ? pinned : rows
   })
 
-  const hasHiddenCategories = computed(() => homeCategories.value.length < (categories.data || []).length)
+  const hasHiddenCategories = computed(() => homeCategories.value.length < topCategories.value.length)
 
   // The skeleton takes the layout of last time's count.
   const skeletonCount = useRememberedCount(

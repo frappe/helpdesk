@@ -53,7 +53,14 @@ function createDraft() {
     createDocumentResource({ doctype: "HD Settings", name: "HD Settings" });
   const categories = createListResource({
     doctype: "HD Article Category",
-    fields: ["name", "category_name", "icon", "pinned", "pinned_order"],
+    fields: [
+      "name",
+      "category_name",
+      "icon",
+      "pinned",
+      "pinned_order",
+      "parent_article_category",
+    ],
     orderBy: "category_name asc",
     pageLength: 99999,
     auto: true,
@@ -120,7 +127,9 @@ function createDraft() {
       access[row.category] = access[row.category] ? "Mixed" : row.visibility;
     }
     // Customers never see Private categories; already pinned ones stay to unpin.
+    // Subcategories are never pinned.
     return (categories.data || [])
+      .filter((row) => !row.parent_article_category)
       .filter((row) => access[row.name] !== "Private" || row.pinned)
       .map((row) => ({
         label: row.category_name,

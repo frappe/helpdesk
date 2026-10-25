@@ -3,6 +3,7 @@ import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useBottomSheet } from '@app/composables/useDrawer'
 import { countLabel } from '@helpdesk/shared/utils'
+import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 export default function setup(context) {
@@ -16,8 +17,24 @@ export default function setup(context) {
   const categoryDescription = computed(
     () => category.value?.description || __('Find answers to common {0} questions.', [categoryName.value]),
   )
-  // `articles` is capped server side.
-  const articleCount = computed(() => countLabel(category.value?.article_count, __('1 article'), __('{0} articles')))
+  // `articles` is capped server side; the count includes Subcategories.
+  const countText = (count) => countLabel(count, __('1 article'), __('{0} articles'))
+  const articleCount = computed(() => countText(category.value?.article_count))
+
+  // Sidebar rows come sorted by `category_name`.
+  const subcategories = computed(() =>
+    (sidebar.data || []).filter((row) => row.parent_article_category === route.params.category),
+  )
+  const parentCategory = computed(
+    () => sidebar.data?.find((row) => row.name === category.value?.parent_article_category) || null,
+  )
+  const breadcrumbs = computed(() => [
+    { label: __('Help'), route: ROUTES.home },
+    ...(parentCategory.value
+      ? [{ label: parentCategory.value.category_name, route: ROUTES.category(parentCategory.value.name) }]
+      : []),
+    { label: categoryName.value },
+  ])
 
   return {
     ...useKnowledgeBaseHeader(context),
@@ -29,5 +46,9 @@ export default function setup(context) {
     categoryName,
     categoryDescription,
     articleCount,
+    countText,
+    subcategories,
+    parentCategory,
+    breadcrumbs,
   }
 }

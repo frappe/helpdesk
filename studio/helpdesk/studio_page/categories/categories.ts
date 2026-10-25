@@ -8,12 +8,14 @@ import { useKnowledgeBase } from '@app/stores/knowledgeBase'
 export default function setup(context) {
   const { sidebar } = useKnowledgeBase()
   const search = ref('')
+  // Subcategories open from their parent's page.
+  const topCategories = computed(() => context.categories.data?.filter((row) => !row.parent_article_category))
   const shownCategories = computed(() =>
-    (context.categories.data || []).filter((row) => matchesQuery(search.value, row.category_name, row.description)),
+    (topCategories.value || []).filter((row) => matchesQuery(search.value, row.category_name, row.description)),
   )
   // Five rows fill the page; more would only scroll.
   const skeletonCount = Math.min(
-    useRememberedCount('helpdesk-kb-categories', () => context.categories.data?.length, 15),
+    useRememberedCount('helpdesk-kb-categories', () => topCategories.value?.length, 15),
     15,
   )
   return {
