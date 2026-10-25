@@ -974,6 +974,20 @@ class TestSubcategoryReads(IntegrationTestCase):
         self.assertEqual(article.parent_category_name, self.parent_name)
         self.assertEqual(article.category_name, self.sub_name)
 
+    def test_an_article_without_a_category_has_no_category_fields(self) -> None:
+        article = make_article(status="Archived", category=None)
+
+        with self.set_user(make_agent(unique_email("kb-preview"))):
+            row = get_article(article)
+
+        for field in (
+            "category_name",
+            "category_label",
+            "parent_article_category",
+            "parent_category_name",
+        ):
+            self.assertIsNone(row[field])
+
     def test_a_search_hit_carries_its_category_label(self) -> None:
         article = make_article(category=self.sub)
         self.hd_search.return_value = make_search_page(make_search_hit(article))

@@ -220,20 +220,29 @@ def get_article(name: str) -> dict:
     article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
-    category = frappe.db.get_value(
-        "HD Article Category",
-        article.category,
-        ["category_name", "parent_article_category"],
-        as_dict=True,
+    # archived articles have no category
+    category = (
+        frappe.db.get_value(
+            "HD Article Category",
+            article.category,
+            ["category_name", "parent_article_category"],
+            as_dict=True,
+        )
+        if article.category
+        else frappe._dict()
     )
-    article.category_name = category.category_name
-    article.category_label = get_category_labels([article.category])[article.category]
-    article.parent_article_category = category.parent_article_category
+    article.category_name = category.get("category_name")
+    article.category_label = (
+        get_category_labels([article.category])[article.category]
+        if article.category
+        else None
+    )
+    article.parent_article_category = category.get("parent_article_category")
     article.parent_category_name = (
         frappe.db.get_value(
             "HD Article Category", category.parent_article_category, "category_name"
         )
-        if category.parent_article_category
+        if category.get("parent_article_category")
         else None
     )
     article.feedback = _get_own_feedback(name)
