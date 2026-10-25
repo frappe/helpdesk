@@ -935,6 +935,50 @@ class TestSubcategoryAccess(IntegrationTestCase):
         self.assertEqual(self.visibility(article), PRIVATE)
 
 
+class TestParentKeepsContent(IntegrationTestCase):
+    """A parent keeps an article of its own or a Subcategory."""
+
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Lone Parent")).name
+        self.sub = frappe.get_doc(
+            "HD Article Category", make_subcategory(self.parent).name
+        )
+        make_article(category=self.sub.name)
+
+    def assert_move_refused(self, parent) -> None:
+        self.sub.parent_article_category = parent
+
+        with self.assertRaisesRegex(frappe.ValidationError, "would be left empty"):
+            self.sub.save()
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "HD Article Category", self.sub.name, "parent_article_category"
+            ),
+            self.parent,
+        )
+
+    def test_moving_the_only_subcategory_to_the_top_level_is_refused(self) -> None:
+        self.assert_move_refused(None)
+
+    def test_moving_the_only_subcategory_to_another_parent_is_refused(self) -> None:
+        self.assert_move_refused(
+            make_article_category(unique_name("Fixture Other Parent")).name
+        )
+
+    def test_a_parent_with_its_own_article_lets_it_go(self) -> None:
+        make_article(category=self.parent)
+        self.sub.parent_article_category = None
+
+        self.sub.save()
+
+        self.assertIsNone(
+            frappe.db.get_value(
+                "HD Article Category", self.sub.name, "parent_article_category"
+            )
+        )
+
+
 class TestSubcategoryReads(IntegrationTestCase):
     def setUp(self) -> None:
         self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
@@ -1339,6 +1383,21 @@ class TestCategoryDelete(IntegrationTestCase):
         self.assertFalse(frappe.db.exists("HD Article", own))
         self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
 
+    def test_deleting_the_last_empty_subcategory_is_refused(self) -> None:
+        with self.assertRaisesRegex(frappe.ValidationError, "Delete the parent"):
+            delete_category(self.sub)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_branch_delete_of_a_parent_with_only_subcategory_articles(self) -> None:
+        article = make_article(category=self.sub)
+
+        delete_category(self.parent, delete_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertFalse(frappe.db.exists("HD Article", article))
+
     def test_general_cannot_be_deleted(self) -> None:
         general = get_general_category()
 
@@ -1406,6 +1465,18 @@ class TestCategoryMerge(IntegrationTestCase):
         self.assertEqual(
             frappe.db.get_value("HD Article", article, "category"), self.parent
         )
+
+    def test_merging_the_only_subcategory_elsewhere_is_refused(self) -> None:
+        parent = make_article_category(unique_name("Fixture Lone")).name
+        sub = make_subcategory(parent).name
+        article = make_article(category=sub)
+        target = make_article_category(unique_name("Fixture Target")).name
+
+        with self.assertRaisesRegex(frappe.ValidationError, "would be left empty"):
+            merge_category(sub, target)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", sub))
+        self.assertEqual(frappe.db.get_value("HD Article", article, "category"), sub)
 
     def test_merged_articles_narrow_to_the_target(self) -> None:
         target = make_article_category(unique_name("Fixture Target")).name

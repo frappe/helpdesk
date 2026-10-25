@@ -27,6 +27,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_stricter_visibility,
     get_subcategories,
     move_category_articles,
+    validate_parent_keeps_content,
 )
 from helpdesk.search import NUM_RESULTS
 
@@ -459,8 +460,16 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
-    with batched_article_index():
-        _merge_category(source, target)
+    if (parent := get_parent(source)) != target:
+        validate_parent_keeps_content(parent, leaving=source)
+
+    # `source` may lose its last subcategory on the way out
+    frappe.flags.deleting_category = [source]
+    try:
+        with batched_article_index():
+            _merge_category(source, target)
+    finally:
+        frappe.flags.deleting_category = None
 
 
 def _merge_category(source: str, target: str) -> None:
@@ -519,7 +528,12 @@ def delete_category(category: str, delete_articles: bool = False) -> dict:
         frappe.delete_doc("HD Article Category", category)
         return {"archived": 0}
 
-    _validate_parent_keeps_content(category)
+    # on_trash checks it too, but only after every article is deleted
+    validate_parent_keeps_content(
+        get_parent(category),
+        leaving=category,
+        message=_("Delete the parent category instead"),
+    )
     branch = hd_article_category.get_branch(category)
     frappe.flags.deleting_category = branch
     try:
@@ -538,17 +552,6 @@ def delete_category(category: str, delete_articles: bool = False) -> dict:
     finally:
         frappe.flags.deleting_category = None
     return {"archived": archived}
-
-
-def _validate_parent_keeps_content(category: str) -> None:
-    """A parent needs an article of its own or a Subcategory."""
-    parent = get_parent(category)
-    if (
-        parent
-        and not frappe.db.exists("HD Article", {"category": parent})
-        and not set(get_subcategories(parent)) - {category}
-    ):
-        frappe.throw(_("Delete the parent category instead"))
 
 
 def get_category_group_options(options: list[dict]) -> list[dict]:

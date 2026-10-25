@@ -15,6 +15,7 @@ class HDArticleCategory(Document):
         self.validate_default_category()
         self.validate_general_category()
         self.validate_parent()
+        self.validate_old_parent()
         self.validate_pinned_order()
 
     def validate_parent(self):
@@ -44,6 +45,13 @@ class HDArticleCategory(Document):
             self.flags.unpinned = True
         else:
             frappe.throw(_("A subcategory cannot be pinned"))
+
+    def validate_old_parent(self):
+        old_doc = self.get_doc_before_save()
+        if old_doc and self.has_value_changed("parent_article_category"):
+            validate_parent_keeps_content(
+                old_doc.parent_article_category, leaving=self.name
+            )
 
     def validate_pinned_order(self):
         """Order is 1-based; 0 means unpinned."""
@@ -101,6 +109,12 @@ class HDArticleCategory(Document):
         self.validate_general_category_delete()
         if self.parent_article_category:
             move_category_articles(self.name, self.parent_article_category)
+            # its moved articles, if any, fill the parent
+            validate_parent_keeps_content(
+                self.parent_article_category,
+                leaving=self.name,
+                message=_("Delete the parent category instead"),
+            )
             return
         self.promote_subcategories()
         self.move_articles_to_general()
@@ -237,6 +251,26 @@ def get_stricter_visibility(visibility: str, category_visibility: str | None) ->
     if not category_visibility:
         return visibility
     return min(visibility, category_visibility, key=VISIBILITY_ORDER.index)
+
+
+def validate_parent_keeps_content(
+    parent: str | None, leaving: str, message: str | None = None
+) -> None:
+    """A parent needs an article of its own or a Subcategory other than `leaving`."""
+    if (
+        not parent
+        # a branch being deleted may empty its categories
+        or parent in (frappe.flags.deleting_category or ())
+        or frappe.db.exists("HD Article", {"category": parent})
+        or set(get_subcategories(parent)) - {leaving}
+    ):
+        return
+    frappe.throw(
+        message
+        or _("{0} would be left empty. Move or add an article to it first").format(
+            frappe.db.get_value("HD Article Category", parent, "category_name")
+        )
+    )
 
 
 def move_category_articles(source: str, target: str) -> None:
