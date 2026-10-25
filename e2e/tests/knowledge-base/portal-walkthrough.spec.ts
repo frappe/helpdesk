@@ -918,8 +918,8 @@ test.describe("subcategories", () => {
     const hidden = await createCategory(api, `Hidden Sub ${uid()}`, { parent_article_category: parent.name });
     await createArticle(api, hidden.name, { visibility: "Private" });
 
-    await page.goto("/help");
-    await page.getByRole("link", { name: parent.category_name }).first().click();
+    // Pinned categories may keep the new parent off the home page.
+    await page.goto(`/help/category/${parent.name}`);
     await expect(page.getByRole("heading", { name: parent.category_name, level: 1 })).toBeVisible();
     await expect(page.getByRole("link", { name: visible.category_name })).toBeVisible();
     await expect(page.getByRole("link", { name: hidden.category_name })).toHaveCount(0);
