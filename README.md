@@ -199,46 +199,6 @@ The customer portal, a Studio app:
 **Note:** The desk's code is in `frappe-bench/apps/helpdesk/desk`, the portal's in `frappe-bench/apps/helpdesk/studio`, and the code they share in `frappe-bench/apps/helpdesk/shared`. See [`studio/README.md`](studio/README.md) for how the portal is laid out.
 
 
-## Ticket search backend
-
-Ticket search uses SQLite by default. For backend and worker processes on different
-hosts, select Redis Search on each site's configuration:
-
-```bash
-bench --site helpdesk.test set-config helpdesk_search_backend redis
-bench --site helpdesk.test execute helpdesk.ticket_search.build_index
-```
-
-The site's existing `redis_cache` must run Redis 8 with Search enabled
-(including `FT.AGGREGATE ADDSCORES`). Each site has its own index. Ticket search
-does not change the article search backend or other applications' search indexes. Redis mode
-does not create SQLite ticket index files.
-
-Document changes are indexed by the long worker after the database transaction
-commits. Keep that worker running. Migrations and scheduled checks enqueue an
-initial build when needed. Redis index data must fit in memory; avoid eviction
-of search hashes and provision persistence according to your recovery needs.
-Cache clearing preserves Helpdesk's search keys.
-
-Redis uses native text relevance and prefix matching. Results retain the existing
-API format and permission checks, but ranking and tokenization can differ from
-SQLite; SQLite's spelling corrections are not provided by Redis mode. Filter
-counts include only documents the current user may read. Broad searches and
-filter counts inspect matching records in batches to enforce those permissions.
-
-To rebuild after restoring data or changing the backend:
-
-```bash
-bench --site helpdesk.test execute helpdesk.ticket_search.build_index --kwargs '{"force": true}'
-```
-
-A forced rebuild temporarily makes ticket search unavailable. Concurrent updates
-wait for the build and read current committed documents afterwards. To return to
-SQLite, set `helpdesk_search_backend` to `sqlite` and force a rebuild on a local
-filesystem shared by all ticket search readers and writers. Independently stored
-SQLite replicas are not synchronized. Existing SQLite migration queues are drained
-when the SQLite backend is initialized by the migration build job.
-
 ## Compatibility matrix 
 
 | Helpdesk Branch | Compatible Frappe Framework Version |
