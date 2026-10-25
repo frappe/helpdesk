@@ -929,10 +929,14 @@ test.describe("subcategories", () => {
     await page.getByRole("link", { name: article.title }).first().click();
     await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
 
-    const crumbs = page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("listitem");
-    // The first crumb is the translated "Help" label, so match it by its link.
+    // The breadcrumb is the navigation that links home and ends on the article.
+    const crumbs = page
+      .getByRole("navigation")
+      .filter({ has: page.locator('a[href="/help/"]') })
+      .filter({ hasText: article.title })
+      .getByRole("listitem");
     await expect(crumbs.first().getByRole("link")).toHaveAttribute("href", "/help/");
-    await expect(crumbs).toHaveText([/.+/, parent.category_name, visible.category_name, article.title]);
+    await expect(crumbs).toHaveText(["Help", parent.category_name, visible.category_name, article.title]);
   });
 });
 
