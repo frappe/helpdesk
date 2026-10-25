@@ -907,6 +907,35 @@ test.describe("knowledge base settings: pin row menu", () => {
   });
 });
 
+test.describe("subcategories", () => {
+  usePersona("customer");
+
+  test("D32 a customer walks from a category into a subcategory and its article", async ({ page, api }) => {
+    const parent = await createCategory(api);
+    await createArticle(api, parent.name, { visibility: "Customers" });
+    const visible = await createCategory(api, `Visible Sub ${uid()}`, { parent_article_category: parent.name });
+    const article = await createArticle(api, visible.name, { title: `Sub article ${uid()}`, visibility: "Customers" });
+    const hidden = await createCategory(api, `Hidden Sub ${uid()}`, { parent_article_category: parent.name });
+    await createArticle(api, hidden.name, { visibility: "Private" });
+
+    await page.goto("/help");
+    await page.getByRole("link", { name: parent.category_name }).first().click();
+    await expect(page.getByRole("heading", { name: parent.category_name, level: 1 })).toBeVisible();
+    await expect(page.getByRole("link", { name: visible.category_name })).toBeVisible();
+    await expect(page.getByRole("link", { name: hidden.category_name })).toHaveCount(0);
+
+    await page.getByRole("link", { name: visible.category_name }).click();
+    await expect(page.getByRole("heading", { name: visible.category_name, level: 1 })).toBeVisible();
+    await page.getByRole("link", { name: article.title }).first().click();
+    await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
+
+    const crumbs = page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("listitem");
+    // The first crumb is the translated "Help" label, so match it by its link.
+    await expect(crumbs.first().getByRole("link")).toHaveAttribute("href", "/help/");
+    await expect(crumbs).toHaveText([/.+/, parent.category_name, visible.category_name, article.title]);
+  });
+});
+
 async function saveQuickLinks(api, links: Record<string, any>[]) {
   const json = JSON.stringify(links);
   await api.insert("HD Form Script", {
