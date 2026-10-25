@@ -198,6 +198,12 @@ def get_list_data(
                 if has_empty_values:
                     options.append({"label": "", "value": ""})
 
+                if doctype == "HD Article" and group_by_field == "category":
+                    # local import: circular via the article controller
+                    from helpdesk.api.knowledge_base import get_category_group_options
+
+                    return get_category_group_options(options)
+
                 if order_by and group_by_field in order_by:
                     order_by_fields = order_by.split(",")
                     order_by_fields = [

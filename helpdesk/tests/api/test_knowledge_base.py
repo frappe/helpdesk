@@ -31,6 +31,7 @@ from helpdesk.helpdesk.doctype.hd_article.hd_article import CUSTOMERS, PRIVATE, 
 from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_category_labels,
+    get_subcategories,
 )
 from helpdesk.test_utils import (
     category_names,
@@ -1265,6 +1266,38 @@ class TestCategoryDelete(IntegrationTestCase):
             {"articles": 3, "subcategories": 1, "cited": 1},
         )
 
+    def test_a_last_subcategory_branch_delete_is_refused(self) -> None:
+        article = make_article(category=self.sub)
+
+        with self.assertRaisesRegex(frappe.ValidationError, "Delete the parent"):
+            delete_category(self.sub, delete_articles=True)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(self.category(article), self.sub)
+
+    def test_a_subcategory_is_deleted_when_the_parent_has_its_own_article(
+        self,
+    ) -> None:
+        make_article(category=self.parent)
+        own = make_article(category=self.sub)
+
+        delete_category(self.sub, delete_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article", own))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
+    def test_a_subcategory_is_deleted_when_a_sibling_keeps_the_parent_filled(
+        self,
+    ) -> None:
+        sibling = make_subcategory(self.parent).name
+        make_article(category=sibling)
+        own = make_article(category=self.sub)
+
+        delete_category(self.sub, delete_articles=True)
+
+        self.assertFalse(frappe.db.exists("HD Article", own))
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+
     def test_general_cannot_be_deleted(self) -> None:
         general = get_general_category()
 
@@ -1284,3 +1317,63 @@ class TestCategoryDelete(IntegrationTestCase):
                 get_category_delete_summary(self.parent)
 
         self.assertTrue(frappe.db.exists("HD Article", article))
+
+
+class TestCategoryMerge(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.parent = make_article_category(unique_name("Fixture Source")).name
+        self.sub = make_subcategory(self.parent).name
+        self.other_sub = make_subcategory(self.parent).name
+
+    def parent_of(self, category) -> str | None:
+        return frappe.db.get_value(
+            "HD Article Category", category, "parent_article_category"
+        )
+
+    def test_subcategories_follow_into_a_top_level_target(self) -> None:
+        target = make_article_category(unique_name("Fixture Target")).name
+
+        merge_category(self.parent, target)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertEqual(self.parent_of(self.sub), target)
+        self.assertEqual(self.parent_of(self.other_sub), target)
+
+    def test_merging_a_parent_into_another_subcategory_is_refused(self) -> None:
+        other_parent = make_article_category(unique_name("Fixture Other")).name
+        target = make_subcategory(other_parent).name
+
+        with self.assertRaisesRegex(frappe.ValidationError, "Move its subcategories"):
+            merge_category(self.parent, target)
+
+        self.assertTrue(frappe.db.exists("HD Article Category", self.parent))
+        self.assertEqual(self.parent_of(self.sub), self.parent)
+
+    def test_merging_into_its_own_subcategory_promotes_it(self) -> None:
+        merge_category(self.parent, self.sub)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
+        self.assertIsNone(self.parent_of(self.sub))
+        self.assertEqual(set(get_subcategories(self.sub)), {self.other_sub})
+
+    def test_a_subcategory_merges_into_its_parent(self) -> None:
+        article = make_article(category=self.sub)
+
+        merge_category(self.sub, self.parent)
+
+        self.assertFalse(frappe.db.exists("HD Article Category", self.sub))
+        self.assertEqual(
+            frappe.db.get_value("HD Article", article, "category"), self.parent
+        )
+
+    def test_merged_articles_narrow_to_the_target(self) -> None:
+        target = make_article_category(unique_name("Fixture Target")).name
+        make_article(category=target, visibility=PRIVATE)
+        article = make_article(category=self.parent)
+
+        merge_category(self.parent, target)
+
+        self.assertEqual(
+            frappe.db.get_value("HD Article", article, ["category", "visibility"]),
+            (target, PRIVATE),
+        )

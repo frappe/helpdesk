@@ -22,6 +22,8 @@ from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     SEPARATOR,
     get_category_labels,
+    get_parent,
+    get_subcategories,
     get_stricter_visibility,
     move_category_articles,
 )
@@ -452,8 +454,23 @@ def merge_category(source: str, target: str):
     _validate_category(target)
     if source == get_general_category():
         frappe.throw(_("Cannot merge General category"))
+    if subcategories := get_subcategories(source):
+        if target in subcategories:
+            _set_parent(target, None)
+            subcategories.remove(target)
+        elif get_parent(target):
+            frappe.throw(_("Move its subcategories first"))
+        for subcategory in subcategories:
+            _set_parent(subcategory, target)
     move_category_articles(source, target)
     frappe.delete_doc("HD Article Category", source)
+
+
+def _set_parent(category: str, parent: str | None) -> None:
+    """Saves, so the parent rules and the article narrowing run."""
+    doc = frappe.get_doc("HD Article Category", category)
+    doc.parent_article_category = parent
+    doc.save()
 
 
 @frappe.whitelist()
@@ -492,6 +509,7 @@ def delete_category(category: str, delete_articles: bool = False) -> dict:
         frappe.delete_doc("HD Article Category", category)
         return {"archived": 0}
 
+    _validate_parent_keeps_content(category)
     branch = hd_article_category.get_branch(category)
     frappe.flags.deleting_category = branch
     try:
@@ -509,6 +527,53 @@ def delete_category(category: str, delete_articles: bool = False) -> dict:
     finally:
         frappe.flags.deleting_category = None
     return {"archived": archived}
+
+
+def _validate_parent_keeps_content(category: str) -> None:
+    """A parent needs an article of its own or a Subcategory."""
+    parent = get_parent(category)
+    if (
+        parent
+        and not frappe.db.exists("HD Article", {"category": parent})
+        and not set(get_subcategories(parent)) - {category}
+    ):
+        frappe.throw(_("Delete the parent category instead"))
+
+
+def get_category_group_options(options: list[dict]) -> list[dict]:
+    """Group options of the desk article list: labelled `Parent › Sub`, a Subcategory under its parent."""
+    groups = [option for option in options if option["value"]]
+    empty = [option for option in options if not option["value"]]
+    values = [option["value"] for option in groups]
+    parents = {
+        name: parent
+        for name, parent in frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", values]},
+            fields=["name", "parent_article_category"],
+            as_list=True,
+        )
+    }
+    # a parent's own group is there even when it has no rows
+    groups += [
+        {"value": parent, "icon": None}
+        for parent in {parent for parent in parents.values() if parent} - set(values)
+    ]
+    names = [group["value"] for group in groups]
+    labels = get_category_labels(names)
+    with_subcategories = set(
+        frappe.get_all(
+            "HD Article Category",
+            filters={"parent_article_category": ["in", names]},
+            pluck="parent_article_category",
+        )
+    )
+    for group in groups:
+        group["label"] = labels[group["value"]]
+        group["parent_article_category"] = parents.get(group["value"])
+        group["has_subcategories"] = group["value"] in with_subcategories
+    groups.sort(key=lambda group: category_label_sort_key(group["label"]))
+    return groups + empty
 
 
 @frappe.whitelist()
