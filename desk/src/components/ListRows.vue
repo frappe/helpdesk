@@ -81,12 +81,12 @@ const props = defineProps({
 const groupedRows = ref(props.rows);
 
 const actions = (group) => {
-  let _actions = props.groupByActions.map((action) => {
-    return {
+  let _actions = props.groupByActions
+    .filter((action) => action.condition?.(group) ?? true)
+    .map(({ condition, ...action }) => ({
       ...action,
       onClick: () => action.onClick(group),
-    };
-  });
+    }));
   if (group.group.label == "General") {
     _actions = _actions.filter((action) => action.label === "Add New Article");
   }

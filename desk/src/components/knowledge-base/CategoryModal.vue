@@ -23,6 +23,22 @@
           />
         </div>
         <div>
+          <div class="mb-1.5 text-base text-ink-gray-5">
+            {{ __("Parent Category") }}
+          </div>
+          <Select
+            class="w-full"
+            v-model="parent"
+            :options="parentOptions"
+            :disabled="hasSubcategories"
+          />
+          <p v-if="hasSubcategories" class="mt-1.5 text-p-sm text-ink-gray-5">
+            {{
+              __("A category with subcategories can't become a subcategory.")
+            }}
+          </p>
+        </div>
+        <div>
           <div class="mb-1.5 text-base text-ink-gray-5">{{ __("Icon") }}</div>
           <Combobox
             class="w-full"
@@ -38,7 +54,8 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Combobox, Dialog } from "frappe-ui";
+import { Combobox, Dialog, Select } from "frappe-ui";
+import { categoryOptions } from "@/stores/knowledgeBase";
 import { CATEGORY_ICONS } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
 import { ref } from "vue";
@@ -53,6 +70,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // The category being edited, left out of the parent options.
+  categoryId: {
+    type: String,
+    default: "",
+  },
+  hasSubcategories: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update", "create"]);
@@ -60,6 +86,21 @@ const emit = defineEmits(["update", "create"]);
 const showDialog = defineModel<boolean>();
 const newTitle = defineModel<string>("title");
 const icon = defineModel<string>("icon");
+const parent = defineModel<string>("parent", { default: "" });
+
+const parentOptions = computed(() => [
+  { label: __("None"), value: "" },
+  ...(categoryOptions.data || [])
+    .filter(
+      (option) =>
+        !option.parent_article_category && option.value !== props.categoryId
+    )
+    .map(({ value, label }) => ({ value, label })),
+]);
+
+watch(showDialog, (open) => {
+  if (open) categoryOptions.submit();
+});
 
 const iconOptions = CATEGORY_ICONS.map((value) => ({
   value,
@@ -71,7 +112,7 @@ const iconOptions = CATEGORY_ICONS.map((value) => ({
 }));
 
 const dialogTitle = computed(() =>
-  props.edit ? "Edit Category" : "Create Category"
+  props.edit ? __("Edit Category") : __("Create Category")
 );
 
 const titleRef = ref(null);

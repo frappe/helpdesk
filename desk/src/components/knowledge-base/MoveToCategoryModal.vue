@@ -2,15 +2,11 @@
   <Dialog v-model:open="showDialog" title="Move To" :actions="actions">
     <template #default>
       <div class="flex flex-col flex-1">
-        <Link
-          ref="linkRef"
+        <Combobox
           class="w-full"
-          doctype="HD Article Category"
-          placeholder="Select Category"
           v-model="category"
-          label="Category"
-          :filters="defaultFilters"
-          :page-length="100"
+          :options="options"
+          :placeholder="__('Select Category')"
         />
         <AnimatedNote :note="joiningNote" />
       </div>
@@ -19,17 +15,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
-import { Dialog } from "frappe-ui";
-import Link from "@/components/frappe-ui/Link.vue";
+import { ref, computed, watch } from "vue";
+import { Combobox, Dialog } from "frappe-ui";
 import AnimatedNote from "./AnimatedNote.vue";
-import { useCategoryVisibility } from "@/stores/knowledgeBase";
+import { categoryOptions, useCategoryVisibility } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
 
 const emit = defineEmits(["move"]);
 const showDialog = defineModel<boolean>();
 const category = ref("");
-const linkRef = ref(null);
 const joining = useCategoryVisibility(category);
 // A move only narrows access; Public needs no note.
 const joiningNote = computed(
@@ -48,19 +42,11 @@ const props = defineProps<{
   excludeCategory?: string;
 }>();
 
-const defaultFilters = computed(() => {
-  if (!props.excludeCategory) return {};
-
-  return {
-    name: ["!=", props.excludeCategory],
-  };
-});
-watch(showDialog, async (val) => {
-  if (!val) return;
-  await nextTick();
-  setTimeout(() => {
-    linkRef.value?.$el?.querySelector("button")?.click();
-  }, 300);
+const options = computed(() =>
+  (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
+);
+watch(showDialog, (open) => {
+  if (open) categoryOptions.submit({ exclude: props.excludeCategory });
 });
 
 const actions = [

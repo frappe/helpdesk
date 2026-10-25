@@ -30,6 +30,9 @@
       v-model="showCategoryModal"
       v-model:title="category.title"
       v-model:icon="category.icon"
+      v-model:parent="category.parent"
+      :category-id="category.id"
+      :has-subcategories="category.hasSubcategories"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
@@ -43,6 +46,12 @@
       :category-id="category.id"
       v-model="mergeModal"
       @merge="handleMergeCategory"
+    />
+    <DeleteCategoryModal
+      v-model="deleteModal"
+      :category="category.id"
+      :is-subcategory="!!category.parent"
+      @confirm="handleCategoryDelete"
     />
     <ArticleAccessModal
       v-model="accessDialog.open"
@@ -76,12 +85,13 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import ArticleAccessModal from "@/components/knowledge-base/ArticleAccessModal.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
+import DeleteCategoryModal from "@/components/knowledge-base/DeleteCategoryModal.vue";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { globalStore } from "@/stores/globalStore";
 import {
   deleteArticles,
-  deleteRes as deleteCategory,
+  deleteCategory,
   mergeCategory,
   moveToCategory,
   newCategory,
@@ -114,6 +124,9 @@ const category = reactive({
   title: "",
   id: "",
   icon: "lucide-folder",
+  parent: "",
+  hasSubcategories: false,
+  pinned: false,
 });
 
 const listViewRef = ref(null);
@@ -123,6 +136,7 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 const mergeModal = ref(false);
+const deleteModal = ref(false);
 const accessDialog = reactive({
   open: false,
   forCategory: true,
@@ -182,14 +196,34 @@ const groupByActions = [
     },
   },
   {
+    label: __("New subcategory"),
+    icon: "lucide-folder-plus",
+    // A Subcategory can't have its own Subcategories.
+    condition: ({ group }) => !group.parent_article_category,
+    onClick: ({ group }) => {
+      resetState();
+      category.parent = group.value;
+      editTitle.value = false;
+      showCategoryModal.value = true;
+    },
+  },
+  {
     label: __("Edit"),
     icon: "lucide-edit",
-    onClick: (groupedRow) => {
+    onClick: async ({ group }) => {
+      // the group label is "Parent › Sub", so read the plain name
+      const doc = await call("frappe.client.get", {
+        doctype: "HD Article Category",
+        name: group.value,
+      });
       editTitle.value = true;
+      category.title = doc.category_name;
+      category.id = group.value;
+      category.icon = doc.icon || "lucide-folder";
+      category.parent = doc.parent_article_category || "";
+      category.hasSubcategories = !!group.has_subcategories;
+      category.pinned = !!doc.pinned;
       showCategoryModal.value = true;
-      category.title = groupedRow.group.label;
-      category.id = groupedRow.group.value;
-      category.icon = groupedRow.group.icon || "lucide-folder";
     },
   },
   {
@@ -233,8 +267,10 @@ const groupByActions = [
     label: __("Delete"),
     icon: "lucide-trash-2",
     theme: "red",
-    onClick: (groupedRow) => {
-      handleCategoryDelete(groupedRow);
+    onClick: ({ group }) => {
+      category.id = group.value;
+      category.parent = group.parent_article_category || "";
+      deleteModal.value = true;
     },
   },
 ];
@@ -444,6 +480,7 @@ function handleCategoryCreate() {
     {
       title: category.title,
       icon: category.icon,
+      parent: category.parent || null,
     },
     {
       onSuccess: (data: any) => {
@@ -484,10 +521,28 @@ function handleCategoryUpdate() {
     {
       doctype: "HD Article Category",
       name: category.id,
-      fieldname: { category_name: category.title, icon: category.icon },
+      fieldname: {
+        category_name: category.title,
+        icon: category.icon,
+        parent_article_category: category.parent || null,
+      },
     },
     {
-      onSuccess: () => {
+      onSuccess: async () => {
+        // saving with a parent unpins the category; say so
+        const { pinned } = await call("frappe.client.get_value", {
+          doctype: "HD Article Category",
+          filters: category.id,
+          fieldname: "pinned",
+        });
+        if (category.pinned && category.parent && !pinned) {
+          toast.info(
+            __(
+              "{0} is now a subcategory and was unpinned from the knowledge base home",
+              [category.title]
+            )
+          );
+        }
         listViewRef.value.reload();
         showCategoryModal.value = false;
         editTitle.value = false;
@@ -506,34 +561,26 @@ function handleCategoryUpdate() {
   );
 }
 
-function handleCategoryDelete(groupedRow) {
-  $dialog({
-    title: __("Delete category?"),
-    message: __(
-      "All articles from this category will move to General category."
-    ),
-    actions: [
-      {
-        label: __("Confirm"),
-        variant: "solid",
-        onClick({ close }: { close: () => void }) {
-          deleteCategory.submit(
-            {
-              doctype: "HD Article Category",
-              name: groupedRow.group.value,
-            },
-            {
-              onSuccess: () => {
-                toast.success(__("Category deleted successfully."));
-                listViewRef.value.reload();
-              },
-            }
-          );
-          close();
-        },
+function handleCategoryDelete(deleteArticles: boolean) {
+  deleteCategory.submit(
+    { category: category.id, delete_articles: deleteArticles },
+    {
+      onSuccess: ({ archived }: { archived: number }) => {
+        deleteModal.value = false;
+        toast.success(
+          archived
+            ? __("Category deleted successfully. {0} articles were archived.", [
+                archived,
+              ])
+            : __("Category deleted successfully.")
+        );
+        listViewRef.value.reload();
+        resetState();
       },
-    ],
-  });
+      onError: (error: Error) =>
+        toast.error(error?.messages?.[0] || error.message),
+    }
+  );
 }
 
 function handleDeleteArticles() {
@@ -542,11 +589,18 @@ function handleDeleteArticles() {
       articles: Array.from(listSelections.value),
     },
     {
-      onSuccess: () => {
+      onSuccess: ({ archived }: { archived: number }) => {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        toast.success(__("Articles deleted successfully."));
+        toast.success(
+          archived
+            ? __(
+                "Articles deleted successfully. {0} cited by tickets were archived.",
+                [archived]
+              )
+            : __("Articles deleted successfully.")
+        );
       },
     }
   );
@@ -577,6 +631,9 @@ function resetState() {
   category.title = "";
   category.id = "";
   category.icon = "lucide-folder";
+  category.parent = "";
+  category.hasSubcategories = false;
+  category.pinned = false;
 }
 
 const options = computed(() => {

@@ -88,7 +88,7 @@ def delete_or_archive_article(name: str) -> bool:
 
 
 @frappe.whitelist(methods=["POST"])
-def create_category(title: str, icon: str | None = None):
+def create_category(title: str, icon: str | None = None, parent: str | None = None):
     if title.strip().lower() == "general":
         frappe.throw(
             _(
@@ -96,7 +96,10 @@ def create_category(title: str, icon: str | None = None):
             )
         )
     category = frappe.new_doc(
-        "HD Article Category", category_name=title, icon=icon
+        "HD Article Category",
+        category_name=title,
+        icon=icon,
+        parent_article_category=parent,
     ).insert()
     article = frappe.new_doc(
         "HD Article", title="New Article", category=category.name

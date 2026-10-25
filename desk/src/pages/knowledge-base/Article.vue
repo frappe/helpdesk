@@ -244,7 +244,7 @@ import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
-  deleteRes as deleteArticle,
+  deleteArticles,
   moveToCategory,
   newCategory,
   updateRes as updateArticle,
@@ -547,11 +547,15 @@ function handleArticleUpdate() {
 }
 
 function handleDelete() {
-  deleteArticle.submit(
-    { doctype: "HD Article", name: article.data.name },
+  deleteArticles.submit(
+    { articles: [article.data.name] },
     {
-      onSuccess: () => {
-        toast.success(__("Article deleted successfully."));
+      onSuccess: ({ archived }: { archived: number }) => {
+        toast.success(
+          archived
+            ? __("Article is cited by tickets, so it was archived.")
+            : __("Article deleted successfully.")
+        );
         router.push({ name: "AgentKnowledgeBase" });
       },
     }

@@ -10,6 +10,7 @@ from helpdesk.api.knowledge_base import (
     PUBLIC_ARTICLE_FIELDS,
     PUBLIC_CATEGORY_FIELDS,
     delete_articles,
+    create_category,
     delete_category,
     get_article,
     get_article_markdown,
@@ -868,6 +869,20 @@ class TestSubcategoryAccess(IntegrationTestCase):
         move_to_category(self.sub, [article])
 
         self.assertEqual(self.visibility(article), PRIVATE)
+
+    def test_a_new_subcategory_starts_with_an_article_under_its_parent(self) -> None:
+        created = create_category(unique_name("Fixture New Sub"), parent=self.parent)
+
+        self.assertEqual(
+            frappe.db.get_value(
+                "HD Article Category", created["category"], "parent_article_category"
+            ),
+            self.parent,
+        )
+        self.assertEqual(
+            frappe.db.get_value("HD Article", created["article"], "category"),
+            created["category"],
+        )
 
     def private_general_with_a_customers_subcategory(self) -> tuple[str, str]:
         """A sub of an all-Private General, holding one Customers article."""

@@ -14,13 +14,11 @@
         <span class="whitespace-nowrap font-semibold">{{ categoryTitle }}</span>
         category to the selected category. This change is irreversible!
       </p>
-      <Link
-        class="form-control"
-        doctype="HD Article Category"
-        placeholder="Select Category"
+      <Combobox
+        class="w-full"
         v-model="toCategory"
-        label="Category"
-        :page-length="100"
+        :options="options"
+        :placeholder="__('Select Category')"
       />
       <AnimatedNote :note="joiningNote" />
     </template>
@@ -35,13 +33,12 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Dialog } from "frappe-ui";
-import { Link } from "@/components";
+import { computed, ref, watch } from "vue";
+import { Combobox, Dialog } from "frappe-ui";
 import AnimatedNote from "./AnimatedNote.vue";
-import { useCategoryVisibility } from "@/stores/knowledgeBase";
+import { categoryOptions, useCategoryVisibility } from "@/stores/knowledgeBase";
 import { __ } from "@/translation";
-defineProps<{
+const props = defineProps<{
   categoryId: string;
   categoryTitle: string;
 }>();
@@ -49,6 +46,12 @@ const emit = defineEmits(["merge"]);
 const showDialog = defineModel<boolean>();
 
 const toCategory = ref("");
+const options = computed(() =>
+  (categoryOptions.data || []).map(({ value, label }) => ({ value, label }))
+);
+watch(showDialog, (open) => {
+  if (open) categoryOptions.submit({ exclude: props.categoryId });
+});
 const joining = useCategoryVisibility(toCategory);
 // A merge only narrows access; Public needs no note.
 const joiningNote = computed(
