@@ -27,7 +27,7 @@ TIMELINE_FIELDS = ("status",)
 def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     _validate_attachments(attachments)
     doc["doctype"] = "HD Ticket"
-    doc["via_customer_portal"] = bool(frappe.session.user)
+    doc["source"] = "Portal"
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc)

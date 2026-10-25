@@ -147,7 +147,7 @@ class TestHDTicket(IntegrationTestCase):
         # a before_insert hook that persists the ticket clears __islocal, so is_new()
         # can be False on create while there is still no previous version to check
         frappe.set_user(non_agent)
-        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1})
+        ticket = frappe.get_doc({**get_ticket_obj(), "source": "Portal"})
         ticket.set("__islocal", False)
         ticket.check_update_perms()
         frappe.set_user("Administrator")
@@ -166,7 +166,7 @@ class TestHDTicket(IntegrationTestCase):
             self._edit_as_customer("Closed").check_update_perms()
 
     def _edit_as_customer(self, status: str, **values):
-        ticket = frappe.get_doc({**get_ticket_obj(), "via_customer_portal": 1}).insert()
+        ticket = frappe.get_doc({**get_ticket_obj(), "source": "Portal"}).insert()
         ticket.db_set({"status": status, **values})
         frappe.set_user(non_agent)
         self.addCleanup(frappe.set_user, "Administrator")
@@ -1210,7 +1210,7 @@ class TestHDTicket(IntegrationTestCase):
         self.assertEqual(contact1_ticket1.customer, customer1.name)
 
         frappe.set_user(user_contact2.get("user"))
-        contact2_ticket1 = make_ticket(save=False, via_customer_portal=True)
+        contact2_ticket1 = make_ticket(save=False, source="Portal")
         self.assertRaises(frappe.ValidationError, contact2_ticket1.save)  # throws error
         # adds customer explicitly and saves
         contact2_ticket1.customer = customer1.name
@@ -2587,7 +2587,7 @@ class TestHDTicket(IntegrationTestCase):
     def test_only_agents_can_comment_on_a_ticket(self):
         contact = create_contact("Commenter", "commenter@test.com")
         customer = contact.get("user")
-        ticket = make_ticket(raised_by=customer, via_customer_portal=1)
+        ticket = make_ticket(raised_by=customer, source="Portal")
 
         frappe.set_user(customer)
         self.assertTrue(frappe.has_permission("HD Ticket", "read", doc=ticket.name))
@@ -2868,7 +2868,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         """Assignment rules and mail templates evaluate as_dict as the customer."""
         frappe.set_user(PERMS_CUSTOMER)
         ticket = frappe.get_doc(get_ticket_obj()).insert()
-        self.assertEqual(ticket.as_dict().get("via_customer_portal"), 1)
+        self.assertEqual(ticket.as_dict().get("source"), "Portal")
 
     def test_first_communication_fills_a_blank_description(self):
         """Tickets raised by email or by a split start without one."""
@@ -2932,8 +2932,8 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
         frappe.set_user(PERMS_CUSTOMER)
         baseline = frappe.get_doc(get_ticket_obj()).insert()
         self.assertEqual(baseline.raised_by, PERMS_CUSTOMER)
-        # the server-set portal flag survives the permission reset
-        self.assertEqual(baseline.via_customer_portal, 1)
+        # the server-set portal source survives the permission reset
+        self.assertEqual(baseline.source, "Portal")
         self.assertTrue(baseline.key)
 
         spoofed = frappe.get_doc(
@@ -3066,7 +3066,7 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             {
                 "status": "Closed",
                 "feedback": option.name,
-                "via_customer_portal": 0,
+                "source": "Email",
             },
         )
         frappe.set_user(PERMS_CUSTOMER)

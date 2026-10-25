@@ -151,7 +151,7 @@ class HDTicket(Document, CustomerEditController):
     def handle_email_feedback(self):
         if (
             self.is_new()
-            or self.via_customer_portal
+            or self.source != "Email"
             or self.feedback_rating
             or not self.has_value_changed("status")
             or not self.key
@@ -213,7 +213,7 @@ class HDTicket(Document, CustomerEditController):
             "HD Settings", "send_acknowledgement_email"
         )
         if (
-            not self.via_customer_portal
+            self.source == "Email"
             and not frappe.flags.initial_sync
             and send_ack_email
         ):
@@ -224,9 +224,9 @@ class HDTicket(Document, CustomerEditController):
             return
 
         capture_event("ticket_created")
-        if not self.via_customer_portal:
+        if self.source == "Email":
             capture_event("ticket_created_via_email")
-        if self.via_customer_portal and not is_agent():
+        if self.source == "Portal" and not is_agent():
             capture_event("ticket_created_via_customer")
 
         if self.ticket_split_from:
@@ -377,7 +377,7 @@ class HDTicket(Document, CustomerEditController):
             elif (
                 len(contact_customers) > 1
                 and not is_agent()
-                and self.via_customer_portal
+                and self.source == "Portal"
             ):
                 frappe.throw(
                     _(
@@ -777,7 +777,7 @@ class HDTicket(Document, CustomerEditController):
 
         reply_to_email = sender_email.email_id
         rendered_template: str | None = None
-        if self.via_customer_portal:
+        if self.source == "Portal":
             email_content = frappe.db.get_single_value(
                 "HD Settings", "reply_via_agent_email_content"
             )

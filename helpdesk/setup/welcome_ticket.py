@@ -79,7 +79,7 @@ def create_ticket():
     d.description = rendered_content
     d.raised_by = AUTHOR_EMAIl
     d.contact = AUTHOR_NAME
-    d.via_customer_portal = True
+    d.source = "Portal"
     d.insert()
     add_assign(
         {

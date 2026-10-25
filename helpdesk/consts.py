@@ -33,7 +33,7 @@ NEVER_CUSTOMER_VISIBLE_FIELDS = ("key",)
 PORTAL_INSERT_EXEMPT_FIELDS = [
     "key",
     "raised_by",
-    "via_customer_portal",
+    "source",
     "customer",
 ]
 
