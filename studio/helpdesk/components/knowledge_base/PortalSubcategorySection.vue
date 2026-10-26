@@ -3,9 +3,9 @@
     <h2
       class="box-content flex h-7 items-center gap-2 border-b border-outline-gray-1 pb-2"
     >
-      <span
+      <Icon
+        :icon="categoryIcon(category.icon)"
         class="size-4 shrink-0 text-ink-gray-6"
-        :class="categoryIcon(category.icon)"
         aria-hidden="true"
       />
       <PortalLink
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "frappe-ui";
+import { Button, Icon } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import { categoryIcon } from "@helpdesk/shared/categoryIcons";

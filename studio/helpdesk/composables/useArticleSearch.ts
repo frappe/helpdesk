@@ -58,7 +58,11 @@ export function usePagedArticleSearch(query: Ref<string>, categories: Ref<string
       state.counts = data.categories
       settle()
     },
-    onError: settle,
+    onError() {
+      // Old rows must not stand in as answers to the new query
+      if (!page.params.start) Object.assign(state, { rows: [], total: 0, counts: {} })
+      settle()
+    },
   })
 
   const search = debounce(() => {

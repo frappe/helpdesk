@@ -15,7 +15,6 @@
       <div v-if="showSearch" class="px-3 pb-2 pt-4 max-md:pt-2">
         <RouterLink
           :to="searchRoute"
-          :aria-label="__('Search articles')"
           class="flex h-7 items-center gap-2 rounded-4 border border-outline-gray-2 bg-surface-base px-2 text-base text-ink-gray-4 transition-colors hover:border-outline-gray-3 focus-visible:focus-ring max-md:h-11"
         >
           <span class="lucide-search size-4 shrink-0" aria-hidden="true" />
@@ -25,6 +24,7 @@
           <ShortcutKey
             v-if="searchShortcut"
             class="[@media(pointer:coarse)]:hidden"
+            aria-hidden="true"
             size="sm"
             keys="/"
           />
