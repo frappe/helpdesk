@@ -21,6 +21,7 @@ from helpdesk.api.knowledge_base import (
     get_category_visibility,
     get_general_category,
     get_kb_sidebar,
+    get_subcategory_articles,
     increment_views,
     merge_category,
     move_to_category,
@@ -82,6 +83,7 @@ class TestPublicReads(IntegrationTestCase):
             get_article_markdown,
             get_categories,
             get_kb_sidebar,
+            get_subcategory_articles,
             vote_on_article,
             increment_views,
         ):
@@ -94,6 +96,7 @@ class TestPublicReads(IntegrationTestCase):
                 (get_articles, ()),
                 (get_kb_sidebar, ()),
                 (get_categories, ()),
+                (get_subcategory_articles, (self.category.name,)),
                 (get_article, (self.published,)),
                 (get_article_markdown, (self.published,)),
                 (increment_views, (self.published,)),
@@ -1000,6 +1003,41 @@ class TestSubcategoryReads(IntegrationTestCase):
         self.assertEqual(
             get_category_labels([self.parent, self.sub]),
             {self.parent: self.parent_name, self.sub: self.sub_label},
+        )
+
+    def test_subcategory_articles_are_newest_first_and_capped(self) -> None:
+        names = [
+            make_article(category=self.sub, published_on=f"2026-01-0{day} 10:00:00")
+            for day in range(1, 6)
+        ]
+
+        rows = get_subcategory_articles(self.parent)[self.sub]
+
+        self.assertEqual([row.name for row in rows], names[:0:-1])
+        self.assertEqual(set(rows[0]), LIST_ROW_FIELDS)
+
+    def test_subcategory_articles_hide_unreadable_rows_from_guests(self) -> None:
+        other = make_subcategory(self.parent).name
+        public = make_article(category=self.sub)
+        make_article(category=self.sub, visibility=PRIVATE)
+        make_article(category=other, visibility=PRIVATE)
+
+        with self.set_user("Guest"):
+            result = get_subcategory_articles(self.parent)
+
+        self.assertEqual(list(result), [self.sub])
+        self.assertEqual([row.name for row in result[self.sub]], [public])
+
+    def test_subcategory_articles_skip_other_categories(self) -> None:
+        make_article(category=self.parent)
+        make_article(category=self.sub)
+
+        names = {row.name for row in get_subcategory_articles(self.parent)[self.sub]}
+
+        self.assertEqual(len(names), 1)
+        self.assertFalse(
+            names
+            & set(frappe.get_all("HD Article", {"category": self.parent}, pluck="name"))
         )
 
     def test_a_parent_counts_its_subcategories(self) -> None:

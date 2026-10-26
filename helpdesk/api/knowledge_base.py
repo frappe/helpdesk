@@ -54,6 +54,7 @@ SEARCH_LIMIT = NUM_RESULTS
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
+SUBCATEGORY_ARTICLES_LIMIT = 4
 # the sidebar reads its titles in one request; newer ones win past this
 TITLES_LIMIT = 1000
 
@@ -206,6 +207,25 @@ def get_articles(
         order_by="views desc" if sort == "popular" else "published_on desc",
         limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+def get_subcategory_articles(category: str, limit: int = 4) -> dict[str, list[dict]]:
+    """The newest articles of each Subcategory of `category`, skipping empty ones."""
+    validate_public_access()
+    limit = min(cint(limit) or SUBCATEGORY_ARTICLES_LIMIT, SUBCATEGORY_ARTICLES_LIMIT)
+    result = {}
+    for subcategory in get_subcategories(category):
+        rows = frappe.get_all(
+            "HD Article",
+            filters=make_article_filters(category=subcategory),
+            fields=["name", "title", "excerpt"],
+            order_by="published_on desc",
+            limit_page_length=limit,
+        )
+        if rows:
+            result[subcategory] = rows
+    return result
 
 
 def _get_byline(user: str) -> dict:
