@@ -48,6 +48,7 @@ studio/helpdesk/
 | `categories` | `/help/categories` | yes | All categories with a filter |
 | `category` | `/help/category/:category` | yes | Articles in one category |
 | `article` | `/help/articles/:name` | yes | Article body, contents, feedback, related articles |
+| `search` | `/help/search` | yes | Article search with a Category filter; `?q=&category=` hold the state |
 | `customer_tickets` | `/help/my-tickets` | no | Ticket list with saved views, filters, sort and export |
 | `new_ticket` | `/help/tickets/new` | no | New ticket form with article suggestions |
 | `ticket` | `/help/tickets/:name` | no | Ticket thread, reply composer, details and feedback |
@@ -85,7 +86,7 @@ The stores are module-level singletons, not Pinia.
 ### Composables
 
 - `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions.
-- `useArticleSearch`: debounced article search, used by the search box and the new ticket form.
+- `useArticleSearch`: debounced article search, used by the search box and the new ticket form. `usePagedArticleSearch`: the search page's pages of 20, with counts per Category.
 - `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
 - `useRememberedCount`: remembers a list's length so its skeleton keeps the same size.

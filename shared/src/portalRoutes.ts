@@ -9,8 +9,9 @@ export const ROUTES = {
     `/articles/${[name, title_slug].filter(Boolean).join('-')}`,
   category: (name: string) => `/category/${name}`,
   ticketList: '/my-tickets',
-  newTicket: (origin?: TicketOrigin) => ({ path: '/my-tickets/new', query: originQuery(origin) }),
+  newTicket: (origin?: TicketOrigin) => ({ path: '/my-tickets/new', query: compactQuery(origin) }),
   ticket: (name: string) => `/my-tickets/${name}`,
+  search: (query?: { q?: string; category?: string | string[] }) => ({ path: '/search', query: compactQuery(query) }),
   appRoot: CUSTOMER_PORTAL_ROOT,
 }
 
@@ -20,7 +21,7 @@ export type TicketOrigin =
   | { from: 'search'; q?: string }
   | { from: 'ticket-list' | 'closed-ticket' }
 
-// Drop empty values, so no bare `q=`.
-function originQuery(origin?: TicketOrigin) {
-  return Object.fromEntries(Object.entries(origin ?? {}).filter(([, value]) => value))
+// Drop empty values and lists, so no bare `q=`.
+function compactQuery(query: object = {}) {
+  return Object.fromEntries(Object.entries(query).filter(([, value]) => [value].flat().some(Boolean)))
 }

@@ -104,13 +104,21 @@
 
     <template v-if="!isEmpty" #footer>
       <div
-        class="search-hints flex h-11 items-center gap-4 border-t border-outline-gray-2 px-3 text-sm text-ink-gray-5"
+        class="flex h-11 items-center gap-4 border-t border-outline-gray-2 px-3 text-sm text-ink-gray-5"
+        :class="{ 'search-hints': !showAll }"
         @pointerdown.prevent
       >
+        <PortalLink
+          v-if="showAll"
+          :to="ROUTES.search({ q: searchText })"
+          class="rounded-4 font-medium text-ink-gray-7 hover:text-ink-gray-9 focus-visible:focus-ring"
+        >
+          {{ __("See all results") }}
+        </PortalLink>
         <span
           v-for="hint in KEY_HINTS"
           :key="hint.label"
-          class="flex items-center gap-1.5 last:ml-auto"
+          class="search-hint flex items-center gap-1.5 last:ml-auto"
         >
           <ShortcutKey :keys="hint.keys" />
           {{ hint.label }}
@@ -136,6 +144,7 @@ import LucideX from "~icons/lucide/x";
 import ShortcutKey from "@helpdesk/shared/ShortcutKey.vue";
 import { __ } from "@helpdesk/shared/translation";
 import PortalArticleIcon from "@helpdesk/shared/ArticleIcon.vue";
+import PortalLink from "@app/components/ui/PortalLink.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
 import {
   MIN_QUERY_LENGTH,
@@ -216,6 +225,7 @@ const hasResults = computed(() => Boolean(results.data?.length));
 const isSearching = computed(
   () => canSearch.value && !isCurrent.value && !hasResults.value
 );
+const showAll = computed(() => canSearch.value && hasResults.value);
 const isEmpty = computed(
   () => canSearch.value && isCurrent.value && !hasResults.value
 );
@@ -312,7 +322,8 @@ const options = computed(() =>
   }
 }
 @media (max-width: 639px), (pointer: coarse) {
-  .search-hints {
+  .search-hints,
+  .search-hint {
     display: none;
   }
 }

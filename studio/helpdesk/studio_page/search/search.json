@@ -1,0 +1,171 @@
+{
+ "allow_guest": 1,
+ "blocks": [
+  {
+   "baseStyles": {
+    "display": "flex",
+    "flexDirection": "column",
+    "flexShrink": 0,
+    "height": "100%",
+    "overflowX": "hidden",
+    "width": "inherit"
+   },
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {},
+     "isStudioComponent": true
+    },
+    {
+     "componentEvents": {
+      "click": {
+       "action": "Run Script",
+       "event": "click",
+       "script": "drawer.toggle()"
+      }
+     },
+     "componentId": "PortalSectionBar-search",
+     "componentName": "PortalSectionBar",
+     "componentProps": {
+      "label": "{{ t('Search') }}",
+      "open": "{{ drawer.open }}"
+     },
+     "isCustomVueComponent": true
+    },
+    {
+     "blockName": "page-wrapper",
+     "children": [
+      {
+       "blockName": "sidebar",
+       "componentEvents": {
+        "close": {
+         "action": "Run Script",
+         "event": "close",
+         "script": "drawer.close()"
+        }
+       },
+       "componentId": "PortalArticleSidebar-search",
+       "componentName": "PortalArticleSidebar",
+       "componentProps": {
+        "categories": "{{ sidebar.data || [] }}",
+        "open": "{{ drawer.open }}",
+        "loading": "{{ !sidebar.data }}",
+        "showSearch": false,
+        "searchShortcut": false
+       },
+       "isCustomVueComponent": true
+      },
+      {
+       "blockName": "main-layout",
+       "children": [
+        {
+         "blockName": "search-column",
+         "children": [
+          {
+           "componentId": "PortalBreadcrumbs-search",
+           "componentName": "PortalBreadcrumbs",
+           "componentProps": {
+            "items": "{{ breadcrumbs }}"
+           },
+           "isCustomVueComponent": true
+          },
+          {
+           "classes": [
+            "w-full"
+           ],
+           "componentId": "PortalSearchResults-search",
+           "componentName": "PortalSearchResults",
+           "isCustomVueComponent": true
+          }
+         ],
+         "classes": [
+          "flex",
+          "flex-col",
+          "mt-0",
+          "max-w-[700px]",
+          "min-w-0",
+          "w-full",
+          "mx-auto",
+          "px-4",
+          "sm:px-6",
+          "xl:px-0",
+          "xl:col-start-2",
+          "portal-reveal",
+          "gap-3"
+         ],
+         "componentId": "container-search-column",
+         "componentName": "container",
+         "originalElement": "div"
+        }
+       ],
+       "classes": [
+        "items-start",
+        "border-outline-gray-1",
+        "grid",
+        "grid-cols-1",
+        "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
+        "xl:pe-4",
+        "flex-1",
+        "h-full",
+        "min-w-0",
+        "overflow-y-auto",
+        "pb-10",
+        "relative",
+        "w-full",
+        "pt-6",
+        "sm:pt-10"
+       ],
+       "componentId": "container-search-main",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "flex",
+      "flex-1",
+      "flex-row",
+      "min-h-0",
+      "overflow-y-hidden",
+      "static",
+      "w-full"
+     ],
+     "componentId": "container-search-wrapper",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base"
+   ],
+   "componentId": "root",
+   "componentName": "div",
+   "originalElement": "body"
+  }
+ ],
+ "creation": "2026-10-27 10:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-27 10:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "search",
+ "owner": "Administrator",
+ "page_name": "page-5e4c7a91",
+ "page_title": "Search",
+ "published": 1,
+ "resources": [],
+ "route": "/search",
+ "studio_app": "helpdesk",
+ "tab_title": "{{ tabTitle }}"
+}
