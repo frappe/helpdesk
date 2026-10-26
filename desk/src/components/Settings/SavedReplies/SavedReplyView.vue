@@ -139,6 +139,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { uploadFunction } from "@/utils";
+import { createFieldAutocomplete } from "@helpdesk/shared/tiptap";
 import {
   Button,
   createListResource,
@@ -156,13 +157,15 @@ import { computed, inject, onUnmounted, ref, watch } from "vue";
 import GlobeIcon from "~icons/lucide/globe";
 import UserIcon from "~icons/lucide/user";
 import UsersIcon from "~icons/lucide/users";
-import { FieldAutocomplete } from "../../../tiptap-extensions";
 import { SavedReply, SavedReplyListResourceSymbol, Team } from "../../../types";
 import SettingsLayoutBase from "../../layouts/SettingsLayoutBase.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import ActionsEditor from "./components/ActionsEditor.vue";
 import { actionNeedsValue, isActionValueEmpty } from "./components/actionTypes";
 import PreviewDialog from "./components/PreviewDialog.vue";
+import { getTemplateFields } from "./savedReplies";
+
+const FieldAutocomplete = createFieldAutocomplete(getTemplateFields);
 
 const showConfirmDialog = ref({
   show: false,

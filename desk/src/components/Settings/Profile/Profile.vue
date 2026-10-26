@@ -5,99 +5,27 @@
   >
     <template #content>
       <div class="flex items-center justify-between gap-2 pt-1.5 pb-8">
-        <FileUploader
-          :fileTypes="['image/*']"
-          @success="
-            (file) => {
-              updateImage(file.file_url);
-            }
-          "
+        <AvatarRow
+          :image="user.doc?.user_image"
+          :name="user.doc?.full_name"
+          :subtitle="user.doc?.email"
+          :busy="user.save.loading"
+          @upload="updateImage"
+          @remove="updateImage()"
+          @rename="updateFullName"
         >
-          <template #default="{ openFileSelector, error: _error, uploading }">
-            <div class="flex items-center justify-center gap-4">
-              <div class="group relative flex-shrink-0 size-16">
-                <Avatar
-                  class="!size-16"
-                  :image="user.doc?.user_image"
-                  :label="fullName"
-                />
-                <div
-                  v-if="agentStatusStore.myStatus"
-                  class="absolute -bottom-0.5 end-0 rounded-full bg-surface-elevation-2 p-1"
-                >
-                  <div
-                    class="size-3.5 rounded-full"
-                    :class="
-                      agentStatusStore.statusColor(agentStatusStore.myStatus)
-                    "
-                  />
-                </div>
-                <!-- one Tooltip each: it wires only its first child -->
-                <Tooltip :hoverDelay="0" side="bottom" :text="uploadTooltip">
-                  <div
-                    class="z-1 absolute top-0 left-0 flex h-9 cursor-pointer items-center justify-center rounded-full !size-16"
-                    @click.stop="openFileSelector"
-                  />
-                </Tooltip>
-                <Tooltip
-                  v-if="user.doc?.user_image"
-                  :hoverDelay="0"
-                  side="bottom"
-                  :text="__('Remove Photo')"
-                >
-                  <div
-                    class="z-1 size-4 absolute -top-1 -right-1 flex cursor-pointer items-center justify-center rounded-full bg-surface-base opacity-0 duration-300 ease-in-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 hover:bg-surface-gray-2 outline outline-black-overlay-50"
-                    @click.stop="updateImage()"
-                  >
-                    <LucideX class="size-3.5 cursor-pointer text-ink-gray-4" />
-                  </div>
-                </Tooltip>
-                <div
-                  v-if="uploading"
-                  class="w-full h-full top-0 left-0 absolute bg-surface-gray-10 bg-opacity-20 rounded-full flex items-center justify-center"
-                >
-                  <LoadingIndicator class="size-4" />
-                </div>
-              </div>
-              <div class="flex flex-col gap-1">
-                <div class="flex flex-col gap-1">
-                  <div v-if="!editName" class="flex items-end gap-1">
-                    <span
-                      class="text-md sm:text-xl !font-semibold text-ink-gray-8"
-                    >
-                      {{ user?.doc?.full_name }}
-                    </span>
-                    <Button
-                      class="!px-1 !h-5"
-                      variant="ghost"
-                      @click="editFullName"
-                    >
-                      <EditIcon class="size-3.5" />
-                    </Button>
-                  </div>
-                  <div v-else class="flex items-center gap-1">
-                    <TextInput
-                      ref="fullNameRef"
-                      v-model="fullName"
-                      @keydown.enter="isNameDirty ? save() : (editName = false)"
-                      @keydown.esc.stop="editName = false"
-                    />
-                    <Button
-                      variant="outline"
-                      icon="lucide-check"
-                      :loading="user?.save?.loading"
-                      :disabled="user?.save?.loading"
-                      @click="isNameDirty ? save() : (editName = false)"
-                    />
-                  </div>
-                  <span class="text-p-sm text-ink-gray-6">
-                    {{ user?.doc?.email }}
-                  </span>
-                </div>
-              </div>
+          <template #badge>
+            <div
+              v-if="agentStatusStore.myStatus"
+              class="absolute -bottom-0.5 end-0 rounded-full bg-surface-elevation-2 p-1"
+            >
+              <div
+                class="size-3.5 rounded-full"
+                :class="agentStatusStore.statusColor(agentStatusStore.myStatus)"
+              />
             </div>
           </template>
-        </FileUploader>
+        </AvatarRow>
       </div>
       <div>
         <div class="flex items-center justify-between h-7">
@@ -162,30 +90,23 @@
   <ChangePasswordModal
     v-if="showChangePasswordModal"
     v-model="showChangePasswordModal"
+    :user="userId"
   />
 </template>
 
 <script setup lang="ts">
-import LucideX from "~icons/lucide/x";
-import {
-  Avatar,
-  Button,
-  createDocumentResource,
-  FileUploader,
-  LoadingIndicator,
-  toast,
-} from "frappe-ui";
-import { computed, nextTick, ref, useTemplateRef } from "vue";
+import { Button, createDocumentResource, toast } from "frappe-ui";
+import { ref } from "vue";
 
 import { useAuthStore } from "@/stores/auth";
 import { __ } from "@/translation";
-import EditIcon from "~icons/lucide/edit";
 const emit = defineEmits(["updateStep"]);
 
 import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
 import SettingsLayoutBase from "@/components/layouts/SettingsLayoutBase.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
-import ChangePasswordModal from "./components/ChangePasswordModal.vue";
+import AvatarRow from "@helpdesk/shared/AvatarRow.vue";
+import ChangePasswordModal from "@helpdesk/shared/ChangePasswordModal.vue";
 
 const agentStatusStore = useAgentStatusStore();
 const showChangePasswordModal = ref(false);
@@ -193,39 +114,16 @@ const showChangePasswordModal = ref(false);
 const { userId, hasAgentRecord } = useAuthStore();
 const user = createDocumentResource({ doctype: "User", name: userId });
 
-const editName = ref(false);
-
-const uploadTooltip = computed(() =>
-  user.doc?.user_image ? __("Change Photo") : __("Upload Photo")
-);
-
-const fullNameRef = useTemplateRef("fullNameRef");
-const fullName = computed({
-  get: () => user.doc?.full_name ?? "",
-  set: (val) => {
-    if (!user.doc) return;
-    const [firstName, ...lastName] = val.split(" ");
-    user.doc.first_name = firstName;
-    user.doc.last_name = lastName.join(" ");
-  },
-});
-
-function editFullName() {
-  editName.value = true;
-  nextTick(() => fullNameRef.value?.focus());
+function updateFullName(fullName: string) {
+  const [firstName, ...lastName] = fullName.split(" ");
+  user.doc.first_name = firstName;
+  user.doc.last_name = lastName.join(" ");
+  save();
 }
-
-const isNameDirty = computed(() => {
-  return (
-    user.doc?.first_name !== user.originalDoc?.first_name ||
-    user.doc?.last_name !== user.originalDoc?.last_name
-  );
-});
 
 function save() {
   user.save.submit(null, {
     onSuccess: () => {
-      editName.value = false;
       toast.success(__("Profile updated successfully."));
     },
     onError: (err: { message: string; messages: string[] }) => {

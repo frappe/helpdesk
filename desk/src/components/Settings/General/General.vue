@@ -15,10 +15,7 @@
             :label="__('Save')"
             variant="solid"
             @click="saveSettings"
-            :loading="
-              saveSettingsResource.loading ||
-              saveWebsiteSettingsResource.loading
-            "
+            :loading="saveSettingsResource.loading"
           />
         </div>
       </Transition>
@@ -35,26 +32,7 @@
         <hr class="my-8" />
         <TicketSettings />
         <hr class="my-8" />
-        <WorkflowKnowledgebaseSettings />
-        <hr class="my-8" />
-        <div>
-          <div class="text-base-semibold text-ink-gray-9">
-            {{ __("User Signup") }}
-          </div>
-          <div class="flex items-center justify-between mt-6">
-            <div class="flex flex-col gap-1">
-              <span class="text-base-medium text-ink-gray-8">{{
-                __("Disable signup")
-              }}</span>
-              <span class="text-p-sm text-ink-gray-6">{{
-                __(
-                  "New users will have to be manually registered by system managers."
-                )
-              }}</span>
-            </div>
-            <Switch v-model="disableSignup" />
-          </div>
-        </div>
+        <WorkflowSettings />
       </div>
     </template>
   </SettingsLayoutBase>
@@ -66,18 +44,12 @@ import UnsavedBadge from "@/components/UnsavedBadge.vue";
 import { useConfigStore } from "@/stores/config";
 import { __ } from "@/translation";
 import { HDSettings, HDSettingsSymbol } from "@/types";
-import {
-  Button,
-  createResource,
-  LoadingIndicator,
-  Switch,
-  toast,
-} from "frappe-ui";
-import { computed, provide, ref, watch } from "vue";
+import { Button, createResource, LoadingIndicator, toast } from "frappe-ui";
+import { provide, ref, watch } from "vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import Branding from "./components/Branding.vue";
 import TicketSettings from "./components/TicketSettings.vue";
-import WorkflowKnowledgebaseSettings from "./components/WorkflowKnowledgebaseSettings.vue";
+import WorkflowSettings from "./components/WorkflowSettings.vue";
 
 const configStore = useConfigStore();
 
@@ -99,13 +71,11 @@ const settingsData = ref({
   enableCommentReactions: false,
   allowAnyoneToCreateTickets: false,
   defaultTicketType: "",
-  preferKnowledgeBase: false,
   skipEmailWorkflow: false,
   disableSavedRepliesGlobalScope: false,
   enableOutsideHoursBanner: false,
   outsideWorkingHoursBannerMessage: "",
 });
-const disableSignup = ref(false);
 
 provide(HDSettingsSymbol, settingsData);
 
@@ -120,13 +90,6 @@ const settingsDataResource = createResource({
     settingsData.value = transformData(data);
     initialData.value = JSON.stringify(settingsData.value);
   },
-});
-
-const isWebsiteSettingsChanged = computed(() => {
-  return (
-    disableSignup.value !==
-    Boolean(websiteSettingsResource.data?.disable_signup)
-  );
 });
 
 const saveSettingsResource = createResource({
@@ -152,7 +115,6 @@ const saveSettingsResource = createResource({
         allow_anyone_to_create_tickets:
           settingsData.value.allowAnyoneToCreateTickets,
         default_ticket_type: settingsData.value.defaultTicketType,
-        prefer_knowledge_base: settingsData.value.preferKnowledgeBase,
         skip_email_workflow: settingsData.value.skipEmailWorkflow,
         disable_saved_replies_global_scope:
           settingsData.value.disableSavedRepliesGlobalScope,
@@ -190,7 +152,6 @@ const transformData = (data: any) => {
     enableCommentReactions: Boolean(data.enable_comment_reactions),
     allowAnyoneToCreateTickets: Boolean(data.allow_anyone_to_create_tickets),
     defaultTicketType: data.default_ticket_type,
-    preferKnowledgeBase: Boolean(data.prefer_knowledge_base),
     skipEmailWorkflow: Boolean(data.skip_email_workflow),
     disableSavedRepliesGlobalScope: Boolean(
       data.disable_saved_replies_global_scope
@@ -199,35 +160,6 @@ const transformData = (data: any) => {
     outsideWorkingHoursBannerMessage: data.outside_working_hours_message || "",
   };
 };
-
-const websiteSettingsResource = createResource({
-  url: "frappe.client.get",
-  params: {
-    doctype: "Website Settings",
-    name: "Website Settings",
-    fields: ["disable_signup"],
-  },
-  auto: true,
-  onSuccess(data: any) {
-    disableSignup.value = Boolean(data.disable_signup);
-  },
-});
-
-const saveWebsiteSettingsResource = createResource({
-  url: "frappe.client.set_value",
-  makeParams() {
-    return {
-      doctype: "Website Settings",
-      name: "Website Settings",
-      fieldname: {
-        disable_signup: disableSignup.value,
-      },
-    };
-  },
-  onSuccess() {
-    websiteSettingsResource.reload();
-  },
-});
 
 const saveSettings = async () => {
   if (
@@ -246,9 +178,6 @@ const saveSettings = async () => {
   if (isDirty.value) {
     promises.push(saveSettingsResource.submit());
   }
-  if (isWebsiteSettingsChanged.value) {
-    promises.push(saveWebsiteSettingsResource.submit());
-  }
   await Promise.allSettled(promises).then(() => {
     toast.success(__("Settings updated"));
   });
@@ -259,7 +188,6 @@ const toggleFieldnames = {
   enableCommentReactions: "enable_comment_reactions",
   disableSavedRepliesGlobalScope: "disable_saved_replies_global_scope",
   allowAnyoneToCreateTickets: "allow_anyone_to_create_tickets",
-  preferKnowledgeBase: "prefer_knowledge_base",
   skipEmailWorkflow: "skip_email_workflow",
 } as const;
 const toggleFields = Object.keys(toggleFieldnames) as Array<
@@ -339,12 +267,4 @@ watch(
     );
   }
 );
-
-watch(disableSignup, async (newVal) => {
-  if (!websiteSettingsResource.data) return;
-  if (newVal !== Boolean(websiteSettingsResource.data.disable_signup)) {
-    await saveWebsiteSettingsResource.submit();
-    toast.success(__("Settings updated"));
-  }
-});
 </script>

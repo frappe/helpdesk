@@ -1,4 +1,6 @@
+import { getMeta } from "@/stores/meta";
 import { __ } from "@/translation";
+import type { FieldItem } from "@helpdesk/shared/tiptap";
 import { ref } from "vue";
 
 export const menuButtons = [
@@ -97,3 +99,20 @@ export const userFields = [
 ];
 
 export const activeFilter = ref("Personal");
+
+const ticketMeta = getMeta("HD Ticket");
+
+/** The fields a saved reply can insert as `{{ field }}`. */
+export function getTemplateFields(): FieldItem[] {
+  return ticketMeta
+    .getFields()
+    .filter(
+      (f) =>
+        f.fieldtype !== "Tab Break" &&
+        f.fieldtype !== "Section Break" &&
+        Boolean(f.label)
+    )
+    .map((f) => ({ label: f.label, value: f.fieldname }))
+    .concat(userFields);
+}
+

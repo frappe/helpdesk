@@ -3,20 +3,29 @@ function helpdesk_handlers(socket) {
     socket.emit("pong");
   });
 
+  // Same gate as frappe's doc_open: the room leaks viewers, edits, typing.
+  // Tickets this socket still means to view: a stop that lands during the
+  // permission check would otherwise be undone by the late join.
+  const viewing = new Set();
+
   socket.on("view_ticket", (ticket_id) => {
     if (!ticket_id) return;
-    const room = open_doc_room("HD Ticket", ticket_id);
-    socket.join(room);
+    viewing.add(ticket_id);
+    socket.has_permission("HD Ticket", ticket_id).then(() => {
+      if (!viewing.has(ticket_id)) return;
+      socket.join(open_doc_room("HD Ticket", ticket_id));
 
-    // Notify all viewers in this ticket room about the new viewer
-    notify_ticket_viewers({
-      socket: socket,
-      ticket_id: ticket_id,
+      // Notify all viewers in this ticket room about the new viewer
+      notify_ticket_viewers({
+        socket: socket,
+        ticket_id: ticket_id,
+      });
     });
   });
 
   socket.on("stop_view_ticket", (ticket_id) => {
     if (!ticket_id) return;
+    viewing.delete(ticket_id);
     const room = open_doc_room("HD Ticket", ticket_id);
     socket.leave(room);
 
@@ -28,7 +37,7 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("ticket_get_viewers", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!in_ticket_room(socket, ticket_id)) return;
     // Send current viewers list to the requesting user only
     notify_ticket_viewers({
       socket: socket,
@@ -39,6 +48,7 @@ function helpdesk_handlers(socket) {
 
   socket.on("notify_ticket_update", (ticket_id, field, value) => {
     if (!(ticket_id && field)) return;
+    if (!in_ticket_room(socket, ticket_id)) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
     socket.to(ticket_room).emit("ticket_update", {
       ticket_id,
@@ -50,7 +60,7 @@ function helpdesk_handlers(socket) {
 
   // Typing indicators
   socket.on("helpdesk_ticket_typing", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!in_ticket_room(socket, ticket_id)) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 
     // Broadcast to all other users in the ticket room that this user is typing
@@ -61,7 +71,7 @@ function helpdesk_handlers(socket) {
   });
 
   socket.on("helpdesk_ticket_typing_stopped", (ticket_id) => {
-    if (!ticket_id) return;
+    if (!in_ticket_room(socket, ticket_id)) return;
     const ticket_room = open_doc_room("HD Ticket", ticket_id);
 
     // Broadcast to all other users in the ticket room that this user stopped typing
@@ -104,6 +114,8 @@ function notify_ticket_viewers(args) {
 }
 
 // Helper functions
+const in_ticket_room = (socket, ticket_id) =>
+  socket.rooms.has(open_doc_room("HD Ticket", ticket_id));
 const open_doc_room = (doctype, docname) =>
   "open_doc:" + doctype + "/" + docname;
 const user_room = (user) => "user:" + user;

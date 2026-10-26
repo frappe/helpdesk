@@ -1,0 +1,40 @@
+{
+	"name": "@helpdesk/shared",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Source-only helpers shared by the desk and the Studio portal",
+	"type": "module",
+	"exports": {
+		"./formScripts": "./src/formScripts.ts",
+		"./translation": "./src/translation.ts",
+		"./utils": "./src/utils.ts",
+		"./ticketCells": "./src/ticketCells.ts",
+		"./timezone": "./src/timezone.ts",
+		"./ticketStatus": "./src/ticketStatus.ts",
+		"./tiptap": "./src/tiptap.ts",
+		"./knowledgeBaseBanner": "./src/knowledgeBaseBanner.ts",
+		"./knowledgeBasePreview": "./src/knowledgeBasePreview.ts",
+		"./portalRoutes": "./src/portalRoutes.ts",
+		"./categoryIcons": "./src/categoryIcons.ts",
+		"./Icon.vue": "./src/Icon.vue",
+		"./ViewIconField.vue": "./src/ViewIconField.vue",
+		"./filter": "./src/filter/index.ts",
+		"./shortcuts": "./src/shortcuts.ts",
+		"./device": "./src/device.ts",
+		"./ShortcutKey.vue": "./src/ShortcutKey.vue",
+		"./FilterIcon.vue": "./src/FilterIcon.vue",
+		"./ChangePasswordModal.vue": "./src/ChangePasswordModal.vue",
+		"./AvatarRow.vue": "./src/AvatarRow.vue",
+		"./ExportModal.vue": "./src/ExportModal.vue",
+		"./ArticleIcon.vue": "./src/ArticleIcon.vue",
+		"./OrganizationsIcon.vue": "./src/OrganizationsIcon.vue",
+		"./settings/*": "./src/settings/*"
+	},
+	"peerDependencies": {
+		"@tiptap/core": "*",
+		"@vueuse/core": "*",
+		"frappe-ui": "*",
+		"vuedraggable": "*",
+		"vue": "*"
+	}
+}

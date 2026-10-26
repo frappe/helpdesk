@@ -1,6 +1,9 @@
 import { HDTicketStatus } from "@/types/doctypes";
 import { createListResource } from "frappe-ui";
 import { defineStore } from "pinia";
+import { statusDotClass as parseColor } from "@helpdesk/shared/ticketStatus";
+
+export { parseColor };
 
 export const useTicketStatusStore = defineStore("ticketStatus", () => {
   const statuses = createListResource({
@@ -58,24 +61,3 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
     getStatus,
   };
 });
-// Spelt out so Tailwind's scanner sees every class. Keys mirror the
-// HD Ticket Status "color" Select.
-const dotColorMap: Record<string, string> = {
-  Black: "!text-ink-gray-9",
-  Gray: "!text-gray-500",
-  Blue: "!text-blue-500",
-  Green: "!text-green-500",
-  Red: "!text-red-500",
-  Pink: "!text-pink-500",
-  Orange: "!text-orange-500",
-  Amber: "!text-amber-500",
-  Yellow: "!text-yellow-500",
-  Cyan: "!text-cyan-500",
-  Teal: "!text-teal-500",
-  Violet: "!text-violet-500",
-  Purple: "!text-purple-500",
-};
-
-export function parseColor(color: string): string {
-  return dotColorMap[color] ?? dotColorMap.Gray;
-}

@@ -22,6 +22,7 @@
         label="Category"
         :page-length="100"
       />
+      <AnimatedNote :note="joiningNote" />
     </template>
     <template #actions>
       <Button
@@ -34,9 +35,12 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Dialog } from "frappe-ui";
 import { Link } from "@/components";
+import AnimatedNote from "./AnimatedNote.vue";
+import { useCategoryVisibility } from "@/stores/knowledgeBase";
+import { __ } from "@/translation";
 defineProps<{
   categoryId: string;
   categoryTitle: string;
@@ -45,4 +49,17 @@ const emit = defineEmits(["merge"]);
 const showDialog = defineModel<boolean>();
 
 const toCategory = ref("");
+const joining = useCategoryVisibility(toCategory);
+// A merge only narrows access; Public needs no note.
+const joiningNote = computed(
+  () =>
+    ({
+      Customers: __(
+        "Articles in this category are visible to customers only. Merged public articles will have the same visibility."
+      ),
+      Private: __(
+        "Articles in this category are visible to agents only. Merged articles will have the same visibility."
+      ),
+    }[joining.data])
+);
 </script>
