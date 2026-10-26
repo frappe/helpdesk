@@ -1030,15 +1030,12 @@ class TestSubcategoryReads(IntegrationTestCase):
 
     def test_subcategory_articles_skip_other_categories(self) -> None:
         make_article(category=self.parent)
-        make_article(category=self.sub)
+        sub_article = make_article(category=self.sub)
 
-        names = {row.name for row in get_subcategory_articles(self.parent)[self.sub]}
+        result = get_subcategory_articles(self.parent)
 
-        self.assertEqual(len(names), 1)
-        self.assertFalse(
-            names
-            & set(frappe.get_all("HD Article", {"category": self.parent}, pluck="name"))
-        )
+        self.assertNotIn(self.parent, result)
+        self.assertEqual([row.name for row in result[self.sub]], [sub_article])
 
     def test_a_parent_counts_its_subcategories(self) -> None:
         make_article(category=self.parent)

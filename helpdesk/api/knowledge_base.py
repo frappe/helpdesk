@@ -210,10 +210,9 @@ def get_articles(
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
-def get_subcategory_articles(category: str, limit: int = 4) -> dict[str, list[dict]]:
+def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
     """The newest articles of each Subcategory of `category`, skipping empty ones."""
     validate_public_access()
-    limit = min(cint(limit) or SUBCATEGORY_ARTICLES_LIMIT, SUBCATEGORY_ARTICLES_LIMIT)
     result = {}
     for subcategory in get_subcategories(category):
         rows = frappe.get_all(
@@ -221,7 +220,7 @@ def get_subcategory_articles(category: str, limit: int = 4) -> dict[str, list[di
             filters=make_article_filters(category=subcategory),
             fields=["name", "title", "excerpt"],
             order_by="published_on desc",
-            limit_page_length=limit,
+            limit_page_length=SUBCATEGORY_ARTICLES_LIMIT,
         )
         if rows:
             result[subcategory] = rows
