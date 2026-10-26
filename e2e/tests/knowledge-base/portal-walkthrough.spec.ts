@@ -923,14 +923,12 @@ test.describe("subcategories", () => {
     await expect(page.getByRole("heading", { name: parent.category_name, level: 1 })).toBeVisible();
     await expect(page.getByRole("link", { name: visible.category_name })).toBeVisible();
     await expect(page.getByRole("link", { name: hidden.category_name })).toHaveCount(0);
-    // the Articles label only sets articles apart from Subcategories
-    const articlesLabel = page.getByRole("heading", { name: "Articles", exact: true, level: 2 });
-    await expect(articlesLabel).toBeVisible();
+    // the header counts the subcategories
+    await expect(page.getByText("1 subcategory", { exact: true })).toBeVisible();
 
     await page.getByRole("link", { name: visible.category_name }).click();
     await expect(page.getByRole("heading", { name: visible.category_name, level: 1 })).toBeVisible();
     await expect(page.getByRole("link", { name: article.title }).first()).toBeVisible();
-    await expect(articlesLabel).toHaveCount(0);
     await page.getByRole("link", { name: article.title }).first().click();
     await expect(page.getByRole("heading", { name: article.title, level: 1 })).toBeVisible();
 

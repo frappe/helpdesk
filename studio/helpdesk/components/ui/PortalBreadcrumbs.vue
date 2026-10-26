@@ -14,11 +14,11 @@
         <PortalLink
           v-if="item.route"
           :to="item.route"
-          class="truncate rounded-4 text-ink-gray-5 transition-colors hover:text-ink-gray-8 focus-visible:focus-ring"
+          class="truncate rounded-4 text-ink-gray-5 transition-colors hover:text-ink-gray-7 focus-visible:focus-ring"
         >
           {{ item.label }}
         </PortalLink>
-        <span v-else class="truncate text-ink-gray-7" aria-current="page">
+        <span v-else class="truncate text-ink-gray-8" aria-current="page">
           {{ item.label }}
         </span>
       </li>

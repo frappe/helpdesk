@@ -25,6 +25,10 @@ export default function setup(context) {
   const subcategories = computed(() =>
     (sidebar.data || []).filter((row) => row.parent_article_category === route.params.category),
   )
+  const subcategoryCount = computed(() =>
+    countLabel(subcategories.value.length, __('1 subcategory'), __('{0} subcategories')),
+  )
+  const categoryIcon = computed(() => category.value?.icon || 'lucide-folder')
   const parentCategory = computed(
     () => sidebar.data?.find((row) => row.name === category.value?.parent_article_category) || null,
   )
@@ -47,6 +51,8 @@ export default function setup(context) {
     categoryDescription,
     articleCount,
     subcategories,
+    subcategoryCount,
+    categoryIcon,
     parentCategory,
     breadcrumbs,
   }
