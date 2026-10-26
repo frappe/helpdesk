@@ -42,6 +42,7 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app erpnext --branch "develop"
 bench get-app telephony
+bench get-app https://github.com/frappe/whatsapp --branch develop
 # get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
 # which --skip-assets left without its node_modules
 (cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
@@ -55,4 +56,5 @@ bench --site test_site reinstall --yes
 
 bench --verbose --site test_site install-app erpnext
 bench --verbose --site test_site install-app telephony
+bench --verbose --site test_site install-app whatsapp
 bench --verbose --site test_site install-app helpdesk

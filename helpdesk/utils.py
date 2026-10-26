@@ -424,21 +424,24 @@ def get_contact(phone_number):
 
     # Check if the number is associated with a contact
     Contact = frappe.qb.DocType("Contact")
-    normalized_phone = Replace(
-        Replace(
-            Replace(Replace(Replace(Contact.phone, " ", ""), "-", ""), "(", ""), ")", ""
-        ),
-        "+",
-        "",
-    )
     query = (
         frappe.qb.from_(Contact)
         .select(Contact.name, Contact.full_name, Contact.image, Contact.phone)
-        .where(normalized_phone.like(f"%{cleaned_number}%"))
+        .where(
+            normalize_phone_column(Contact.phone).like(f"%{cleaned_number}%")
+            | normalize_phone_column(Contact.mobile_no).like(f"%{cleaned_number}%")
+        )
         .orderby("modified", order=Order.desc)
     )
     contacts = query.run(as_dict=True)
     return contacts[0] if contacts else {"mobile_no": phone_number}
+
+
+def normalize_phone_column(column):
+    """Strip the separators people type into phone numbers, for matching in SQL."""
+    for character in (" ", "-", "(", ")", "+"):
+        column = Replace(column, character, "")
+    return column
 
 
 def get_contact_by_phone_number(phone_number):
@@ -448,6 +451,28 @@ def get_contact_by_phone_number(phone_number):
         return get_contact(number.get("national_number"))
     else:
         return get_contact(phone_number)
+
+
+def get_contact_by_international_number(phone_number: str) -> str | None:
+    """The latest Contact whose phone or mobile is exactly this number, stored with or without its country code."""
+    digits = phone_number.lstrip("+")
+    candidates = [digits]
+    number = parse_phone_number(f"+{digits}")
+    if number.get("is_valid"):
+        candidates += [number["national_number"], f"0{number['national_number']}"]
+    Contact = frappe.qb.DocType("Contact")
+    names = (
+        frappe.qb.from_(Contact)
+        .select(Contact.name)
+        .where(
+            normalize_phone_column(Contact.phone).isin(candidates)
+            | normalize_phone_column(Contact.mobile_no).isin(candidates)
+        )
+        .orderby(Contact.modified, order=Order.desc)
+        .limit(1)
+        .run(pluck=True)
+    )
+    return names[0] if names else None
 
 
 def parse_call_log(call):

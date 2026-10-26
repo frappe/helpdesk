@@ -70,6 +70,8 @@ ALLOWED_PATHS = [
     "/api/method/frappe.desk.form.activity.get_more_email_activities",
     "/api/method/frappe.desk.form.activity.get_more_milestone_activities",
     "/api/method/frappe.core.doctype.user.user.get_timezones",
+    # Meta calls the WhatsApp webhook as Guest
+    "/api/method/whatsapp.whatsapp.webhook.handler",
 ]
 
 WILDCARD_PATHS = [

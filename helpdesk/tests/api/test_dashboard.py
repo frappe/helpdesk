@@ -5,7 +5,11 @@ from frappe import _
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_days, getdate, now_datetime, nowdate
 
-from helpdesk.api.dashboard import HelpdeskDashboard, get_dashboard_data
+from helpdesk.api.dashboard import (
+    HelpdeskDashboard,
+    get_dashboard_data,
+    get_ticket_channel_chart_data,
+)
 from helpdesk.test_utils import (
     create_agent,
     create_contact,
@@ -274,3 +278,18 @@ class TestTagDashboard(IntegrationTestCase):
     @staticmethod
     def top_tag_counts(charts: dict[str, dict]) -> dict[str, int]:
         return {row["tag"]: row["Tickets"] for row in charts["top_tags"]["data"]}
+
+
+class TestChannelChart(IntegrationTestCase):
+    def test_tickets_are_counted_by_source(self) -> None:
+        team = make_team(f"Channel Team {frappe.generate_hash(length=6)}", []).name
+        for source in ("Email", "Portal", "Email"):
+            make_ticket(agent_group=team, source=source)
+
+        filters = {"agent_group": team}
+        chart = get_ticket_channel_chart_data(nowdate(), nowdate(), filters)
+        # busiest channel first
+        self.assertEqual(
+            chart["data"],
+            [{"channel": "Email", "count": 2}, {"channel": "Portal", "count": 1}],
+        )

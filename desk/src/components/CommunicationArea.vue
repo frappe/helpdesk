@@ -5,6 +5,7 @@
     >
       <div class="flex gap-1.5 items-center">
         <Button
+          v-if="!whatsapp || whatsapp.enabled"
           ref="sendEmailRef"
           variant="ghost"
           label="Reply"
@@ -14,7 +15,7 @@
           @click="toggleEmailBox()"
         >
           <template #prefix>
-            <EmailIcon class="h-4" />
+            <component :is="whatsapp ? WhatsAppIcon : EmailIcon" class="h-4" />
           </template>
         </Button>
         <Button
@@ -41,7 +42,14 @@
         @keydown.esc.capture.stop="showEmailBox = false"
       >
         <div class="overflow-hidden">
+          <WhatsAppReplyBox
+            v-if="whatsapp"
+            ref="whatsAppReplyBoxRef"
+            :whatsapp="whatsapp"
+            @sent="emit('update')"
+          />
           <EmailEditor
+            v-else
             ref="emailEditorRef"
             :label="
               isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
@@ -119,12 +127,16 @@
 <script setup lang="ts">
 import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
+import type { TicketWhatsApp } from "@/components/whatsapp/useTicketWhatsApp";
+import WhatsAppIcon from "@/components/whatsapp/WhatsAppIcon.vue";
+import WhatsAppReplyBox from "@/components/whatsapp/WhatsAppReplyBox.vue";
+import type { WhatsAppMessage } from "@whatsapp/ui";
 import { useDevice } from "@/composables";
 import { useScreenSize } from "@/composables/screen";
 import { useShortcut } from "@helpdesk/shared/shortcuts";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { onClickOutside } from "@vueuse/core";
-import { ref, watch } from "vue";
+import { ref, watch, type PropType } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
@@ -133,11 +145,16 @@ const { isMobileView } = useScreenSize();
 let doc = defineModel();
 // let doc = inject(TicketSymbol)?.value.doc
 const emailEditorRef = ref(null);
+const whatsAppReplyBoxRef = ref<InstanceType<typeof WhatsAppReplyBox> | null>(
+  null
+);
 const commentTextEditorRef = ref(null);
 const emailBoxRef = ref(null);
 const commentBoxRef = ref(null);
 
 function toggleEmailBox() {
+  // a WhatsApp ticket has nothing to reply with without the whatsapp app
+  if (props.whatsapp && !props.whatsapp.enabled) return;
   if (showCommentBox.value) {
     showCommentBox.value = false;
   }
@@ -154,6 +171,8 @@ function toggleCommentBox() {
 // the editors emit `submit` once the write lands; reloading here too would
 // fetch twice, and the guards' `false` never reaches this side anyway
 function submitEmail() {
+  // MessageInput sends on Enter itself
+  if (props.whatsapp) return;
   emailEditorRef.value.submitMail();
 }
 
@@ -169,6 +188,7 @@ function splitIfString(str: string | string[]) {
 }
 
 function replyToEmail(data: object) {
+  if (props.whatsapp) return;
   showEmailBox.value = true;
 
   emailEditorRef.value.addToReply(
@@ -179,7 +199,17 @@ function replyToEmail(data: object) {
   );
 }
 
+function replyToWhatsApp(message: WhatsAppMessage) {
+  showEmailBox.value = true;
+  props.whatsapp?.messages.setReplyTo(message);
+}
+
 const props = defineProps({
+  // set on a WhatsApp ticket: the reply box sends through it instead of email
+  whatsapp: {
+    type: Object as PropType<TicketWhatsApp | null>,
+    default: null,
+  },
   doctype: {
     type: String,
     default: "HD Ticket",
@@ -205,9 +235,9 @@ const props = defineProps({
 watch(
   () => showEmailBox.value,
   (value) => {
-    if (value) {
-      emailEditorRef.value?.editor?.commands?.focus("start");
-    }
+    if (!value) return;
+    if (props.whatsapp) whatsAppReplyBoxRef.value?.focus();
+    else emailEditorRef.value?.editor?.commands?.focus("start");
   }
 );
 
@@ -229,6 +259,7 @@ useShortcut("c", () => {
 
 defineExpose({
   replyToEmail,
+  replyToWhatsApp,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,

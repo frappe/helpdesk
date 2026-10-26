@@ -188,7 +188,7 @@ def make_feedback_option(label: str, rating: float = 1.0):
 def close_emailed_ticket(raised_by: str) -> str:
     """Only a ticket that arrived by email is ever sent a feedback link."""
     ticket = make_ticket(subject="Feedback flow", raised_by=raised_by)
-    frappe.db.set_value("HD Ticket", ticket.name, "via_customer_portal", 0)
+    frappe.db.set_value("HD Ticket", ticket.name, "source", "Email")
 
     doc = frappe.get_doc("HD Ticket", ticket.name)
     doc.status = "Closed"

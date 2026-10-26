@@ -1,15 +1,18 @@
 import frappe
 from frappe import _
 
+from helpdesk.integrations.whatsapp.setup import WHATSAPP_SOURCE
 from helpdesk.utils import agent_only, is_admin
 
 
 @frappe.whitelist()
 @agent_only
-def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
-
+def bulk_reply(
+    ticket_ids: list, message: str, attachments: list | None = None
+) -> dict[str, list[str]]:
+    """Reply by email to each ticket; WhatsApp tickets are skipped and returned as `skipped`."""
     if not ticket_ids:
-        return
+        return {"skipped": []}
 
     # dedupe but keep the order the agent picked. set() orders by hash, which varies
     # per process, and duplicates would attach the same file to a ticket twice
@@ -22,7 +25,9 @@ def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
         frappe.has_permission("HD Ticket", "write", doc=ticket_id, throw=True)
         tickets.append(frappe.get_doc("HD Ticket", ticket_id))
 
-    link_attachments_to_tickets(attachments, ticket_ids)
+    skipped = [doc.name for doc in tickets if doc.source == WHATSAPP_SOURCE]
+    tickets = [doc for doc in tickets if doc.source != WHATSAPP_SOURCE]
+    link_attachments_to_tickets(attachments, [doc.name for doc in tickets])
 
     for doc in tickets:
         try:
@@ -34,6 +39,7 @@ def bulk_reply(ticket_ids: list, message: str, attachments: list | None = None):
                 title=f"Bulk reply failed for ticket {doc.name}",
                 message=str(e),
             )
+    return {"skipped": skipped}
 
 
 def link_attachments_to_tickets(attachments: list | None, ticket_ids: list):

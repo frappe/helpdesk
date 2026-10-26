@@ -61,10 +61,6 @@ const editorRef = ref<InstanceType<typeof CompactEditor> | null>(null);
 
 const bulkReplyResource: Resource = createResource({
   url: "helpdesk.api.ticket.bulk_reply",
-  onSuccess() {
-    clearDraft();
-    open.value = false;
-  },
 });
 
 function clearDraft() {
@@ -98,18 +94,40 @@ function handleSubmit() {
       attachments: (attachments.value ?? []).map((a) => a.name),
     },
     {
-      onSuccess() {
-        const msg =
-          props.selections.size === 1
-            ? __("Bulk reply sent successfully to 1 ticket.")
-            : __(
-                "Bulk reply sent successfully to {0} tickets.",
-                String(props.selections.size)
-              );
-        toast.success(msg);
+      onSuccess({ skipped }: { skipped: string[] }) {
+        notifySent(skipped);
+        // all skipped: keep the dialog, draft and selection so the agent can change it
+        if (skipped.length === props.selections.size) return;
+        clearDraft();
+        open.value = false;
         emit("success");
       },
     }
+  );
+}
+
+function notifySent(skipped: string[]) {
+  const total = props.selections.size;
+  const tickets = skipped.map((name) => `#${name}`).join(", ");
+  if (skipped.length === total) {
+    toast.warning(__("Nothing sent. Reply to {0} on WhatsApp.", tickets));
+    return;
+  }
+  if (skipped.length) {
+    toast.warning(
+      __(
+        "Sent to {0} of {1} tickets. Reply to {2} on WhatsApp.",
+        String(total - skipped.length),
+        String(total),
+        tickets
+      )
+    );
+    return;
+  }
+  toast.success(
+    total === 1
+      ? __("Bulk reply sent successfully to 1 ticket.")
+      : __("Bulk reply sent successfully to {0} tickets.", String(total))
   );
 }
 

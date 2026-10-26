@@ -59,7 +59,7 @@
   "customer",
   "email_account",
   "column_break_16",
-  "via_customer_portal",
+  "source",
   "origin_section",
   "entry_point",
   "source_article",
@@ -377,11 +377,15 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "fieldname": "via_customer_portal",
-   "fieldtype": "Check",
-   "label": "Via Customer Portal",
-   "permlevel": 8
+   "default": "Email",
+   "description": "The channel the ticket came in through. WhatsApp is added when the WhatsApp app is installed.",
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Source",
+   "options": "Email\nPortal",
+   "permlevel": 8,
+   "read_only": 1
   },
   {
    "fieldname": "customer_feedback_section",
@@ -569,7 +573,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-10-24 04:00:00.000000",
+ "modified": "2026-10-26 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

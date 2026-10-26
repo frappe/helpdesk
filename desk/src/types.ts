@@ -207,7 +207,7 @@ export interface Ticket {
   status: string;
   subject: string;
   ticket_type: string;
-  via_customer_portal: string;
+  source: string;
   agreement_status: string;
   creation: string;
   feedback_rating?: number;
@@ -328,6 +328,7 @@ export interface EmailAccount {
 export type TicketTab =
   | "activity"
   | "email"
+  | "whatsapp"
   | "comment"
   | "details"
   | "call"
@@ -623,6 +624,8 @@ export interface SavedReplyAction {
 }
 
 export interface RenderedSavedReply {
+  /** The saved reply it came from, for composers that render it themselves */
+  name?: string;
   title: string;
   message: string;
   actions: SavedReplyAction[];

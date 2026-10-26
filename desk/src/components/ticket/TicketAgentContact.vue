@@ -1,5 +1,8 @@
 <template>
-  <div class="flex items-center justify-start gap-5 border-b p-5">
+  <div
+    class="flex items-center justify-start gap-5 border-b p-5"
+    data-testid="ticket-contact-card"
+  >
     <Avatar size="3xl" :image="contact.image" :label="contact.name" />
     <div class="flex items-center justify-between flex-1">
       <Tooltip :text="contact.name">
@@ -15,8 +18,9 @@
             </template>
           </Button>
         </Tooltip>
-        <Tooltip :text="contact.email_id">
-          <Button @click="openEmailBox()">
+        <!-- a WhatsApp ticket is answered from the Reply bar, never by email -->
+        <Tooltip v-if="!whatsapp" :text="contact.email_id">
+          <Button :label="__('Email')" @click="openEmailBox()">
             <template #icon>
               <EmailIcon class="size-4" />
             </template>
@@ -73,6 +77,10 @@ const props = defineProps({
   ticketId: {
     type: String,
     required: true,
+  },
+  whatsapp: {
+    type: Boolean,
+    default: false,
   },
 });
 

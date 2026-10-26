@@ -10,6 +10,8 @@
 			"@framework/ui": ["../../frappe/ui/src/index.ts"],
 			"@framework/ui/*": ["../../frappe/ui/src/*"],
 			"@helpdesk/shared/*": ["../shared/src/*"],
+			// falls back to the stub when the whatsapp app is not on the bench
+			"@whatsapp/ui": ["../../whatsapp/ui/src/index.ts", "./src/components/whatsapp/uiStub.ts"],
 			// shared/ is outside desk/; resolve its peers to desk's copies
 			"vue": ["./node_modules/vue"],
 			"frappe-ui": ["./node_modules/frappe-ui/src/index.ts"]

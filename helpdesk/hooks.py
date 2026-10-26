@@ -24,10 +24,15 @@ get_site_info = "helpdesk.activation.get_site_info"
 
 after_install = "helpdesk.setup.install.after_install"
 before_uninstall = "helpdesk.setup.install.before_uninstall"
+before_app_uninstall = "helpdesk.integrations.whatsapp.setup.before_app_uninstall"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
+    "helpdesk.integrations.whatsapp.setup.setup_whatsapp",
 ]
+after_app_install = "helpdesk.integrations.whatsapp.setup.setup_whatsapp"
+# the whatsapp app has no role model; ticket conversations are gated here
+whatsapp_access_guard = ["helpdesk.integrations.whatsapp.permissions.validate_access"]
 
 
 # Full Text Search
@@ -145,6 +150,26 @@ doc_events = {
     "Notification Log": {
         "before_insert": "helpdesk.extends.notification_log.before_insert",
     },
+    # only fires when the whatsapp app is installed
+    "WA Message": {
+        "before_insert": [
+            "helpdesk.integrations.whatsapp.incoming.before_insert",
+            "helpdesk.integrations.whatsapp.outgoing.before_insert",
+        ],
+        "validate": "helpdesk.integrations.whatsapp.outgoing.validate",
+        "on_submit": "helpdesk.integrations.whatsapp.outgoing.on_submit",
+        "before_submit": "helpdesk.integrations.whatsapp.incoming.before_submit",
+        "after_insert": "helpdesk.integrations.whatsapp.incoming.after_insert",
+    },
+    "WA Log": {
+        "after_insert": "helpdesk.integrations.whatsapp.incoming.after_status_log",
+    },
+    "HD Ticket": {
+        "on_trash": "helpdesk.integrations.whatsapp.incoming.delete_thread",
+    },
+    "Communication": {
+        "before_insert": "helpdesk.extends.communication.before_insert",
+    },
     "Comment": {
         "before_insert": "helpdesk.extends.comment.before_insert",
         "validate": "helpdesk.extends.comment.validate",
@@ -162,6 +187,7 @@ permission_query_conditions = {
     "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
+    "WA Message": "helpdesk.integrations.whatsapp.permissions.permission_query",
 }
 
 
@@ -173,6 +199,7 @@ has_permission = {
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
     "Comment": "helpdesk.extends.comment.has_permission",
+    "WA Message": "helpdesk.integrations.whatsapp.permissions.has_permission",
 }
 
 override_whitelisted_methods = {
@@ -182,6 +209,7 @@ override_whitelisted_methods = {
     "frappe.desk.form.load.getdoc": "helpdesk.overrides.activity.getdoc",
     "frappe.desk.form.load.get_docinfo": "helpdesk.overrides.activity.get_docinfo",
     "frappe.desk.form.load.get_communications": "helpdesk.overrides.activity.get_communications",
+    "frappe.core.doctype.communication.email.make": "helpdesk.extends.communication.make",
 }
 
 # The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild

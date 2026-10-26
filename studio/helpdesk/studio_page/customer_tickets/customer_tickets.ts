@@ -203,9 +203,12 @@ export default function setup(context) {
     auto: true,
   })
 
-  // The organization switcher replaces the customer quick filter.
+  // The organization switcher replaces the customer filter; source is agent only.
   const quickFilterFields = computed({
-    get: () => view.quickFilter.fields.value.filter((field) => field.fieldname !== 'customer'),
+    get: () =>
+      view.quickFilter.fields.value.filter(
+        (field) => !['customer', 'source'].includes(field.fieldname),
+      ),
     set: (fields) => (view.quickFilter.fields.value = fields),
   })
 

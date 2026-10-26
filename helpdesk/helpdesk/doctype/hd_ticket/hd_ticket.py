@@ -47,7 +47,7 @@ from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
 from .ticket_origin import resolve_ticket_origin
 
-customer_not_allowed_fields = ["customer"]
+customer_not_allowed_fields = ["customer", "source"]
 
 
 class HDTicket(Document, CustomerEditController):
@@ -121,6 +121,7 @@ class HDTicket(Document, CustomerEditController):
         self.set_ticket_origin()
 
     def validate(self):
+        self.validate_source()
         self.validate_feedback()
 
     def before_save(self):
@@ -151,7 +152,7 @@ class HDTicket(Document, CustomerEditController):
     def handle_email_feedback(self):
         if (
             self.is_new()
-            or self.via_customer_portal
+            or self.source != "Email"
             or self.feedback_rating
             or not self.has_value_changed("status")
             or not self.key
@@ -205,18 +206,15 @@ class HDTicket(Document, CustomerEditController):
         publish_event("helpdesk:new-ticket")
         self.tag_first_ticket()
 
-        if self.get("description"):
+        # a WhatsApp ticket's first message lives in its WhatsApp thread
+        if self.get("description") and self.source != "WhatsApp":
             self.create_communication_via_contact(self.description, new_ticket=True)
             self.handle_inline_media_new_ticket()
 
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
         )
-        if (
-            not self.via_customer_portal
-            and not frappe.flags.initial_sync
-            and send_ack_email
-        ):
+        if self.source == "Email" and not frappe.flags.initial_sync and send_ack_email:
             self.send_acknowledgement_email()
 
     def capture_ticket_created_telemetry_events(self):
@@ -224,9 +222,11 @@ class HDTicket(Document, CustomerEditController):
             return
 
         capture_event("ticket_created")
-        if not self.via_customer_portal:
+        if self.source == "Email":
             capture_event("ticket_created_via_email")
-        if self.via_customer_portal and not is_agent():
+        if self.source == "WhatsApp":
+            capture_event("ticket_created_via_whatsapp")
+        if self.source == "Portal" and not is_agent():
             capture_event("ticket_created_via_customer")
 
         if self.ticket_split_from:
@@ -290,7 +290,8 @@ class HDTicket(Document, CustomerEditController):
         )
 
     def set_raised_by(self):
-        if self.raised_by:
+        # a WhatsApp customer may have no email; never fall back to the session user
+        if self.raised_by or self.source == "WhatsApp":
             return
         self.raised_by = frappe.session.user
 
@@ -377,7 +378,7 @@ class HDTicket(Document, CustomerEditController):
             elif (
                 len(contact_customers) > 1
                 and not is_agent()
-                and self.via_customer_portal
+                and self.source == "Portal"
             ):
                 frappe.throw(
                     _(
@@ -427,6 +428,11 @@ class HDTicket(Document, CustomerEditController):
                 "sent_or_received": "Sent",
             },
         )
+
+    def validate_source(self) -> None:
+        """The channel a ticket came in through is fixed once it exists."""
+        if not self.is_new() and self.has_value_changed("source"):
+            frappe.throw(_("The ticket source cannot be changed."))
 
     def validate_feedback(self):
         is_feedback_mandatory = frappe.get_cached_value(
@@ -703,6 +709,8 @@ class HDTicket(Document, CustomerEditController):
             frappe.throw(
                 _("You are not permitted to reply as an agent"), frappe.PermissionError
             )
+        if self.source == "WhatsApp":
+            frappe.throw(_("Reply to this ticket on WhatsApp."))
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject}"
@@ -777,7 +785,7 @@ class HDTicket(Document, CustomerEditController):
 
         reply_to_email = sender_email.email_id
         rendered_template: str | None = None
-        if self.via_customer_portal:
+        if self.source == "Portal":
             email_content = frappe.db.get_single_value(
                 "HD Settings", "reply_via_agent_email_content"
             )
@@ -837,6 +845,8 @@ class HDTicket(Document, CustomerEditController):
         attachments: list[dict] | None = None,
         new_ticket: bool = False,
     ):
+        if not new_ticket and self.source == "WhatsApp":
+            frappe.throw(_("Reply to this ticket on WhatsApp."), frappe.PermissionError)
         if not new_ticket and frappe.db.get_single_value(
             "HD Settings", "enable_reply_email_to_agent"
         ):
@@ -1106,6 +1116,15 @@ class HDTicket(Document, CustomerEditController):
             current_ticket_name = ticket.merged_with
         return None
 
+    def record_agent_response(self):
+        """Stamp an agent's reply, by email or WhatsApp, for SLA and status."""
+        self.first_responded_on = self.first_responded_on or frappe.utils.now_datetime()
+        self.last_agent_response = frappe.utils.now_datetime()
+
+        # TODO: remove this feature once we add automation feature
+        if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+            self.status = frappe.db.get_single_value("HD Settings", "update_status_to")
+
     def redirect_communication_to_merge_target(self, communication):
         merge_target_name = self.get_merge_target()
         if not merge_target_name:
@@ -1147,17 +1166,7 @@ class HDTicket(Document, CustomerEditController):
                 # no save follows to notify open pages
                 self.publish_update()
                 return
-            # Set first response date if not set already
-            self.first_responded_on = (
-                self.first_responded_on or frappe.utils.now_datetime()
-            )
-            self.last_agent_response = frappe.utils.now_datetime()
-
-            # TODO: remove this feature once we add automation feature
-            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
-                self.status = frappe.db.get_single_value(
-                    "HD Settings", "update_status_to"
-                )
+            self.record_agent_response()
 
         # email tickets are inserted blank; set_only_once refuses the save that
         # would fill it, so write it already sanitized the way that save would
@@ -1384,10 +1393,7 @@ class HDTicket(Document, CustomerEditController):
 
     @staticmethod
     def filter_standard_fields(fields):
-        for f in fields:
-            if f["name"] in customer_not_allowed_fields:
-                fields.remove(f)
-        return fields
+        return [f for f in fields if f["name"] not in customer_not_allowed_fields]
 
     def notify_customers(self):
         ping_customers(self)

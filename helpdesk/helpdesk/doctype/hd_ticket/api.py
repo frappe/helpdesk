@@ -14,6 +14,9 @@ from helpdesk.api.doc import handle_at_me_support
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_settings.helpers import get_rendered_banner_msg
 from helpdesk.helpdesk.doctype.hd_ticket.ticket_origin import TICKET_ORIGIN_FIELDS
+from helpdesk.integrations.whatsapp.merge import WhatsAppMerge
+from helpdesk.integrations.whatsapp.outgoing import get_first_agent_reply_on
+from helpdesk.integrations.whatsapp.setup import WHATSAPP_SOURCE
 from helpdesk.ticket_fields import TicketFields
 from helpdesk.utils import agent_only, is_agent, parse_call_logs
 
@@ -27,7 +30,7 @@ TIMELINE_FIELDS = ("status",)
 def new(doc: dict, attachments: list[dict] = [], origin: dict | None = None):
     _validate_attachments(attachments)
     doc["doctype"] = "HD Ticket"
-    doc["via_customer_portal"] = bool(frappe.session.user)
+    doc["source"] = "Portal"
     doc["attachments"] = attachments
     doc["raised_by"] = frappe.session.user
     d = frappe.get_doc(doc)
@@ -88,6 +91,7 @@ def get_one(name: str):
     doc.add_seen()
     outside_hours_banner = get_outside_hours_banner(doc)
     overdue_by = doc.get_overdue_by()
+    is_whatsapp = doc.source == WHATSAPP_SOURCE
     # strips permlevel fields the caller cannot read; no-op for agents
     doc.apply_fieldlevel_read_permissions()
     ticket = fields.strip_hidden_fields(doc.as_dict())
@@ -126,6 +130,12 @@ def get_one(name: str):
         "overdue_by": overdue_by,
         # validate_feedback's rule for when closing needs a rating
         "has_agent_replied": bool(doc.has_agent_replied),
+        # `source` is internal; the page only needs to know which thread to show
+        "is_whatsapp": is_whatsapp,
+        # first_responded_on is also stamped by a status change
+        "first_whatsapp_reply_on": (
+            get_first_agent_reply_on(name) if is_whatsapp else None
+        ),
         "template": {"fields": fields.get_form()},
         # the page decides, not the reader: an agent here sees the portal too
         "_form_script": get_form_script("HD Ticket", is_customer_portal=True),
@@ -272,6 +282,8 @@ def merge_ticket(source: str, target: str):
         frappe.throw(_("Ticket #{0} is already merged").format(source))
     for name in (source, target):
         frappe.has_permission("HD Ticket", "write", doc=name, throw=True)
+    whatsapp = WhatsAppMerge(source, target)
+    whatsapp.validate()
 
     controller = get_controller("HD Ticket")
 
@@ -308,13 +320,16 @@ def merge_ticket(source: str, target: str):
     doc.flags.ignore_permlevel_for_fields = ["is_merged", "merged_with"]
     doc.save()
 
-    message = _(
-        "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
-    ).format(source, target)
-    controller.reply_via_agent(
-        doc,
-        message=message,
-    )
+    if whatsapp.is_whatsapp:
+        whatsapp.merge()
+    else:
+        message = _(
+            "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
+        ).format(source, target)
+        controller.reply_via_agent(
+            doc,
+            message=message,
+        )
 
     # comment in target ticket that
     c = frappe.new_doc("Comment")
@@ -395,6 +410,8 @@ def split_ticket(subject: str, communication_id: str):
     )
 
     ticket_id = frappe.db.get_value("Communication", communication_id, "reference_name")
+    if frappe.db.get_value("HD Ticket", ticket_id, "source") == WHATSAPP_SOURCE:
+        frappe.throw(_("WhatsApp tickets cannot be split"))
     ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
     new_ticket = duplicate_ticket(ticket_doc, subject)
 
