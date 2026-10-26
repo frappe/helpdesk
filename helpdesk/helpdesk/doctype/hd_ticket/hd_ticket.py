@@ -47,7 +47,7 @@ from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
 from .ticket_origin import resolve_ticket_origin
 
-customer_not_allowed_fields = ["customer"]
+customer_not_allowed_fields = ["customer", "source"]
 
 
 class HDTicket(Document, CustomerEditController):
@@ -1384,10 +1384,7 @@ class HDTicket(Document, CustomerEditController):
 
     @staticmethod
     def filter_standard_fields(fields):
-        for f in fields:
-            if f["name"] in customer_not_allowed_fields:
-                fields.remove(f)
-        return fields
+        return [f for f in fields if f["name"] not in customer_not_allowed_fields]
 
     def notify_customers(self):
         ping_customers(self)

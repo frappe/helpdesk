@@ -160,6 +160,13 @@ const cases: FilterCase[] = [
     hidden: ["a", "c"],
   },
   {
+    field: "Source",
+    setup: emailTicketAsB,
+    enter: pick("Email"),
+    shown: ["b"],
+    hidden: ["a", "c"],
+  },
+  {
     field: "Opening Date",
     setup: openingDates,
     enter: pick("Today"),
@@ -256,4 +263,14 @@ async function tagB({ api, id, names }: Context) {
     dt: "HD Ticket",
     dn: names.b,
   });
+}
+
+// The source is fixed once a ticket exists, so b is swapped for one that came in by email.
+async function emailTicketAsB({ api, id, names }: Context) {
+  await api.update("HD Ticket", names.b, { subject: `${id} retired` });
+  const emailed = await api.insert("HD Ticket", {
+    subject: `${id} ${SUBJECTS.b}`,
+    raised_by: personas.customer.email,
+  });
+  names.b = String(emailed.name);
 }

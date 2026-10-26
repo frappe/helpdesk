@@ -9,9 +9,10 @@ from frappe.client import get as client_get
 from frappe.client import save as client_save
 from frappe.client import set_value as client_set_value
 from frappe.desk.form.utils import add_comment as desk_add_comment
-from frappe.tests import IntegrationTestCase
+from frappe.tests import IntegrationTestCase, change_settings
 from frappe.utils import add_to_date, get_datetime, getdate, now_datetime
 
+from helpdesk.api.doc import get_quick_filters
 from helpdesk.api.ticket import bulk_reply
 from helpdesk.consts import DEFAULT_SLA, DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket.api import (
@@ -28,6 +29,8 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     permission_query,
 )
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_ticket_form
+from helpdesk.patches import set_ticket_source
+from helpdesk.patches.set_ticket_source import OLD_FIELD
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
     add_comment,
@@ -45,6 +48,7 @@ from helpdesk.test_utils import (
     get_priority_response_resolution_time,
     is_outside_hours_banner_shown,
     make_agent,
+    make_assignment_rule,
     make_feedback_option,
     make_form_script,
     make_notification_log,
@@ -64,6 +68,7 @@ from helpdesk.test_utils import (
     update_role_in_customer,
     upload_test_file,
 )
+from helpdesk.utils import get_context
 
 ERROR_MSG_RESPONSE = "Response time differs by more than 1 second"
 ERROR_MSG_RESOLUTION = "Resolution time differs by more than 1 second"
@@ -3356,3 +3361,129 @@ class TestHDTicketFieldPermissions(IntegrationTestCase):
             frappe.set_user("Administrator")
             frappe.db.set_single_value("HD Settings", setting, original)
             frappe.delete_doc("HD Customer", "Perms Unlinked Corp", force=True)
+
+
+class TestTicketSource(IntegrationTestCase):
+    def test_only_email_tickets_are_acknowledged(self):
+        acknowledge = "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.HDTicket.send_acknowledgement_email"
+        with (
+            change_settings("HD Settings", {"send_acknowledgement_email": 1}),
+            patch(acknowledge) as sent,
+        ):
+            make_ticket(source="Portal")
+            sent.assert_not_called()
+            make_ticket()
+            sent.assert_called_once()
+
+    def test_agent_raised_ticket_counts_as_portal(self):
+        email = f"source.agent.{frappe.generate_hash(length=6)}@example.com"
+        create_agent(email)
+        with self.set_user(email):
+            ticket = new({"subject": "Raised by an agent", "description": "x"})
+        self.assertEqual(ticket["source"], "Portal")
+
+    def test_patch_backfills_source_from_the_old_column(self):
+        if not frappe.db.has_column("HD Ticket", "via_customer_portal"):
+            self.skipTest("site was installed after the column was dropped")
+        old_portal, blank, portal = (
+            make_ticket(),
+            make_ticket(),
+            make_ticket(source="Portal"),
+        )
+        Ticket = frappe.qb.DocType("HD Ticket")
+        frappe.qb.update(Ticket).set(Ticket.via_customer_portal, 1).where(
+            Ticket.name == old_portal.name
+        ).run()
+        frappe.db.set_value("HD Ticket", blank.name, "source", "")
+
+        for _run in range(2):
+            set_ticket_source.execute()
+            self.assertEqual(
+                self.source_of(old_portal, blank, portal), ["Portal", "Email", "Portal"]
+            )
+
+    def test_patch_runs_without_the_old_column(self):
+        blank = make_ticket()
+        frappe.db.set_value("HD Ticket", blank.name, "source", None)
+        with patch.object(frappe.db, "has_column", return_value=False):
+            set_ticket_source.execute()
+        self.assertEqual(self.source_of(blank), ["Email"])
+
+    def test_patch_moves_saved_view_filters_to_source(self):
+        as_dict = self.make_view({"via_customer_portal": 1, "status": "Open"})
+        as_list = self.make_view(
+            [["HD Ticket", "via_customer_portal", "!=", "No"]],
+            "via_customer_portal desc",
+        )
+        set_ticket_source.execute()
+
+        as_dict.reload()
+        as_list.reload()
+        self.assertEqual(
+            frappe.parse_json(as_dict.filters), {"source": "Portal", "status": "Open"}
+        )
+        self.assertEqual(
+            frappe.parse_json(as_list.filters), [["HD Ticket", "source", "!=", "Email"]]
+        )
+        self.assertEqual(as_list.order_by, "source desc")
+        frappe.get_list(
+            "HD Ticket", filters=frappe.parse_json(as_dict.filters), limit=1
+        )
+
+    def test_patch_moves_sla_and_assignment_conditions_to_source(self):
+        portal, email = make_ticket(source="Portal"), make_ticket()
+        old_json = frappe.as_json([[OLD_FIELD, "==", "Yes"]])
+        sla = make_sla(f"Old portal SLA {frappe.generate_hash(length=6)}", "doc.status")
+        frappe.db.set_value(
+            sla.doctype,
+            sla.name,
+            {"condition": f"doc.{OLD_FIELD}", "condition_json": old_json},
+        )
+        rule = make_assignment_rule(f"Old portal rule {portal.name}", "HD Ticket")
+        frappe.db.set_value(
+            "Assignment Rule",
+            rule,
+            {
+                "assign_condition": f"{OLD_FIELD} and status == 'Open'",
+                "assign_condition_json": old_json,
+                "unassign_condition": f"not {OLD_FIELD}",
+                "close_condition": f"doc.get('{OLD_FIELD}')",
+            },
+        )
+        set_ticket_source.execute()
+
+        sla.reload()
+        rule = frappe.get_doc("Assignment Rule", rule)
+        self.assertTrue(frappe.safe_eval(sla.condition, None, get_context(portal)))
+        self.assertFalse(frappe.safe_eval(sla.condition, None, get_context(email)))
+        self.assertEqual(
+            frappe.parse_json(sla.condition_json), [["source", "==", "Portal"]]
+        )
+        self.assertTrue(rule.safe_eval("assign_condition", portal.as_dict()))
+        self.assertFalse(rule.safe_eval("unassign_condition", portal.as_dict()))
+        self.assertTrue(rule.safe_eval("unassign_condition", email.as_dict()))
+        self.assertEqual(rule.assign_condition_json, sla.condition_json)
+        self.assertEqual(rule.close_condition, f"doc.get('{OLD_FIELD}')")
+
+    def test_customer_quick_filters_hide_agent_only_fields(self):
+        fields = get_quick_filters("HD Ticket", show_customer_portal_fields=True)
+        names = [field["name"] for field in fields]
+        self.assertNotIn("customer", names)
+        self.assertNotIn("source", names)
+
+    @staticmethod
+    def make_view(filters: dict | list, order_by: str = "modified desc"):
+        return frappe.get_doc(
+            {
+                "doctype": "HD View",
+                "label": f"Old portal view {frappe.generate_hash(length=6)}",
+                "dt": "HD Ticket",
+                "type": "list",
+                "filters": frappe.as_json(filters),
+                "order_by": order_by,
+            }
+        ).insert()
+
+    @staticmethod
+    def source_of(*tickets) -> list[str]:
+        return [frappe.db.get_value("HD Ticket", t.name, "source") for t in tickets]
