@@ -11,7 +11,7 @@ A Category grows too many Articles, and nothing groups related Articles inside i
 ### Model
 
 1. One level only: Category › Subcategory. A Subcategory never holds Subcategories.
-2. Field `parent_article_category` (Link to HD Article Category, label "Parent Category"). The old `parent_category`, `lft`, `rgt`, `is_group` and `old_parent` columns stay untouched.
+2. Field `parent_article_category` (Link to HD Article Category, label "Parent Category"). HD Article Category is a Frappe tree (`is_tree`) with `parent_article_category` as its tree parent, so admins get the Tree view at `/app/hd-article-category/view/tree`. The tree stays one level deep: the controller validations refuse a deeper one. `is_group` is 1 for a top-level Category and 0 for a Subcategory. On existing sites, `lft`, `rgt`, `is_group` and `old_parent` hold stale values from the old tree. The patch `hd_article_category_tree` recomputes them from `parent_article_category`. The old `parent_category` column stays untouched.
 3. A Category holds Articles and Subcategories. A Subcategory holds Articles only.
 4. The "at least one Article" rule applies only to a Category without Subcategories.
 5. General can hold Subcategories. General never becomes a Subcategory.
