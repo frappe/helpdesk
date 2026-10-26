@@ -18,28 +18,28 @@ EXCERPT_LENGTH = 160
 def get_nouns(blob: TextBlob):
     try:
         return [word for word, pos in blob.pos_tags if pos[0] == "N"]
-    except (LookupError, MissingCorpusError):
+    except LookupError, MissingCorpusError:
         return []
 
 
 def get_noun_phrases(blob: TextBlob):
     try:
         return blob.noun_phrases
-    except (LookupError, MissingCorpusError):
+    except LookupError, MissingCorpusError:
         return []
 
 
 def search_with_enough_results(
-    prev_res: list, query: str, qtype="and"
+    prev_res: list, query: str, qtype="and", limit: int = NUM_RESULTS
 ) -> tuple[list, bool]:
-    out = hd_search(query, qtype=qtype)
+    out = hd_search(query, qtype=qtype, limit=limit)
     if not out:
-        return prev_res, len(prev_res) == NUM_RESULTS
+        return prev_res, len(prev_res) >= NUM_RESULTS
     articles = {}
     for item in prev_res + filter_accessible_articles(out[0].get("items", [])):
         articles.setdefault(item["name"].split("#")[0], item)
-    items = list(articles.values())[:NUM_RESULTS]
-    return items, len(items) == NUM_RESULTS
+    items = list(articles.values())[:limit]
+    return items, len(items) >= NUM_RESULTS
 
 
 def filter_accessible_articles(articles: list) -> list:
@@ -96,26 +96,26 @@ def get_article_stats(article_name: str):
 
 
 @frappe.whitelist()
-def search(query: str) -> list:
+def search(query: str, limit: int = NUM_RESULTS) -> list:
     query = sanitize_query(query)
-    ret, enough = search_with_enough_results([], query)
+    ret, enough = search_with_enough_results([], query, limit=limit)
     if enough:
         return ret
     blob = TextBlob(query)  # fallback
     if noun_phrases := get_noun_phrases(blob):
         query = " ".join(noun_phrases)
-        ret, enough = search_with_enough_results(ret, query)
+        ret, enough = search_with_enough_results(ret, query, limit=limit)
         if enough:
             return ret
-        ret, enough = search_with_enough_results(ret, query, qtype="or")
+        ret, enough = search_with_enough_results(ret, query, qtype="or", limit=limit)
         if enough:
             return ret
     if nouns := get_nouns(blob):
         query = " ".join(nouns)
-        ret, enough = search_with_enough_results(ret, query)
+        ret, enough = search_with_enough_results(ret, query, limit=limit)
         if enough:
             return ret
-        ret, enough = search_with_enough_results(ret, query, qtype="or")
+        ret, enough = search_with_enough_results(ret, query, qtype="or", limit=limit)
     return ret
 
 
@@ -131,13 +131,13 @@ def get_related(query: str) -> list[dict]:
     ]
 
 
-def search_accessible_articles(query: str) -> list[dict]:
+def search_accessible_articles(query: str, limit: int = NUM_RESULTS) -> list[dict]:
     """Empty without RediSearch or its index."""
     words = sanitize_query(query).split()
     if words and set(words) <= set(get_stopwords()):
-        return search_titles(words)
+        return search_titles(words, limit)
     try:
-        hits = search(query)
+        hits = search(query, limit)
     except ResponseError:
         return []
     articles = {}
@@ -158,7 +158,7 @@ def search_accessible_articles(query: str) -> list[dict]:
     return list(articles.values())
 
 
-def search_titles(words: list[str]) -> list[dict]:
+def search_titles(words: list[str], limit: int = NUM_RESULTS) -> list[dict]:
     """Stopwords aren't indexed, so "what" alone reads titles instead."""
     filters = [
         [field, *(value if isinstance(value, list | tuple) else ("=", value))]
@@ -177,7 +177,7 @@ def search_titles(words: list[str]) -> list[dict]:
             filters=filters,
             fields=["name", "title", "content"],
             order_by="views desc",
-            limit=NUM_RESULTS,
+            limit=limit,
         )
     ]
 

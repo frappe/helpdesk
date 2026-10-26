@@ -1275,6 +1275,91 @@ class TestSearch(IntegrationTestCase):
         )
 
 
+class TestPagedSearch(IntegrationTestCase):
+    def setUp(self) -> None:
+        self.enterContext(change_settings("HD Settings", public_knowledge_base=1))
+        self.enterContext(patch("helpdesk.api.article.get_nouns", return_value=[]))
+        self.enterContext(
+            patch("helpdesk.api.article.get_noun_phrases", return_value=[])
+        )
+        self.hd_search = self.enterContext(patch("helpdesk.api.article.hd_search"))
+        self.parent = make_article_category(unique_name("Fixture Paged P")).name
+        self.sub = make_subcategory(self.parent).name
+        self.other = make_article_category(unique_name("Fixture Paged C")).name
+
+    def found(self, *hits) -> None:
+        self.hd_search.return_value = make_search_page(*hits)
+
+    def test_counts_before_the_filter_and_expands_parents(self) -> None:
+        in_parent = make_article(category=self.parent)
+        in_sub = make_article(category=self.sub)
+        in_other = make_article(category=self.other)
+        self.found(*[make_search_hit(a) for a in (in_parent, in_sub, in_other)])
+
+        everything = search_articles("anything", start=0)
+        filtered = search_articles("anything", category=self.parent)
+
+        self.assertEqual(
+            everything["categories"], {self.parent: 2, self.sub: 1, self.other: 1}
+        )
+        self.assertEqual(filtered["categories"], everything["categories"])
+        self.assertEqual({r["name"] for r in filtered["results"]}, {in_parent, in_sub})
+        self.assertEqual(filtered["total"], 2)
+
+    def test_category_accepts_a_list_and_a_json_string(self) -> None:
+        a = make_article(category=self.parent)
+        b = make_article(category=self.other)
+        self.found(make_search_hit(a), make_search_hit(b))
+
+        for value in ([self.other, "Nope"], f'["{self.other}"]'):
+            result = search_articles("anything", category=value)
+            self.assertEqual([r["name"] for r in result["results"]], [b])
+
+    def test_slices_articles_not_hits(self) -> None:
+        articles = [make_article(category=self.other) for _ in range(25)]
+        self.found(*[make_search_hit(a, f"s{i}") for a in articles for i in range(3)])
+
+        first = search_articles("anything", start=0, page_length=20)
+        second = search_articles("anything", start=20, page_length=20)
+
+        names = [r["name"] for r in first["results"]]
+        rest = [r["name"] for r in second["results"]]
+        self.assertEqual((len(names), len(rest)), (20, 5))
+        self.assertFalse(set(names) & set(rest))
+        self.assertEqual(first["total"], 25)
+
+    def test_caps_page_length_at_50(self) -> None:
+        articles = [make_article(category=self.other) for _ in range(55)]
+        self.found(*[make_search_hit(a) for a in articles])
+
+        result = search_articles("anything", start=0, page_length=500)
+
+        self.assertEqual(len(result["results"]), 50)
+
+    def test_asks_for_up_to_200_hits(self) -> None:
+        self.found(make_search_hit(make_article(category=self.other)))
+
+        search_articles("anything", start=0)
+
+        self.assertEqual(self.hd_search.call_args.kwargs["limit"], 200)
+
+    def test_unpaged_search_keeps_the_list_response(self) -> None:
+        self.found(make_search_hit(make_article(category=self.other)))
+
+        self.assertIsInstance(search_articles("anything"), list)
+
+    def test_a_guest_never_sees_a_private_category_counted(self) -> None:
+        private = make_article_category(unique_name("Fixture Paged Private")).name
+        public = make_article(category=self.other)
+        hidden = make_article(category=private, visibility=PRIVATE)
+        self.found(make_search_hit(public), make_search_hit(hidden))
+
+        with self.set_user("Guest"):
+            result = search_articles("anything", start=0)
+
+        self.assertEqual(result["categories"], {self.other: 1})
+
+
 class TestCategoryDelete(IntegrationTestCase):
     def setUp(self) -> None:
         self.parent = make_article_category(unique_name("Fixture Doomed")).name

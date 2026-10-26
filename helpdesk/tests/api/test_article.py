@@ -95,7 +95,9 @@ class TestSearchArticles(IntegrationTestCase):
         result = search("  How do I RESET my password?! ")
 
         self.assertEqual(result, hits)
-        hd_search.assert_called_once_with("how do i reset my password", qtype="and")
+        hd_search.assert_called_once_with(
+            "how do i reset my password", qtype="and", limit=NUM_RESULTS
+        )
 
     def test_fallback_merges_unique_hits_up_to_the_limit(self, hd_search, *_) -> None:
         first, second, *rest = [make_search_hit(article) for article in self.articles]
@@ -107,7 +109,7 @@ class TestSearchArticles(IntegrationTestCase):
         result = search("reset my password")
 
         self.assertEqual(result, [first, second, *rest][:NUM_RESULTS])
-        hd_search.assert_called_with("password reset", qtype="and")
+        hd_search.assert_called_with("password reset", qtype="and", limit=NUM_RESULTS)
 
     def test_sections_of_one_article_count_once(self, hd_search, *_) -> None:
         long_article, *others = self.articles
@@ -123,6 +125,13 @@ class TestSearchArticles(IntegrationTestCase):
         result = search("reset my password")
 
         self.assertEqual(result, [sections[0], *other_hits][:NUM_RESULTS])
+
+    def test_search_passes_the_hit_limit(self, hd_search, *_) -> None:
+        hd_search.return_value = make_search_page(make_search_hit(self.articles[0]))
+
+        search("reset my password", limit=200)
+
+        self.assertEqual(hd_search.call_args.kwargs["limit"], 200)
 
     def test_no_match_returns_empty_list(self, hd_search, *_) -> None:
         hd_search.return_value = []

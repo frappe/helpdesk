@@ -329,7 +329,9 @@ class HelpdeskSearch(Search):
         return records
 
 
-def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[dict]]]:
+def search(
+    query, qtype: Literal["and", "or"] = "and", limit: int = NUM_RESULTS
+) -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts: list[str] = query.split()
@@ -348,7 +350,7 @@ def search(query, qtype: Literal["and", "or"] = "and") -> list[dict[str, list[di
             query += f"{sep}{part}*"
 
     query = query.lstrip(sep)  # Remove leading separator (| at beginning is invalid)
-    result = search.search(query, start=0, highlight=True)
+    result = search.search(query, start=0, page_length=limit, highlight=True)
     groups = {}
     for r in result.docs:
         doctype, name = r.id.split(":")

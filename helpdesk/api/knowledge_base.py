@@ -51,6 +51,8 @@ PUBLIC_CATEGORY_FIELDS = [
     "parent_article_category",
 ]
 SEARCH_LIMIT = NUM_RESULTS
+MAX_PAGE_HITS = 200
+PAGE_LENGTH_LIMIT = 50
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
@@ -376,14 +378,40 @@ def _get_categories(with_creators: bool = False) -> list[dict]:
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 @rate_limit(limit=120, seconds=60, user_based=True)
-def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
+def search_articles(
+    query: str,
+    limit: int = SEARCH_LIMIT,
+    category: str | list | None = None,
+    start: int | None = None,
+    page_length: int | None = None,
+) -> list[dict] | dict:
     validate_public_access()
     query = query.strip()[:SEARCH_QUERY_LENGTH]
-    if not query:
-        return []
-    hits = search_accessible_articles(query)[
-        : min(cint(limit) or SEARCH_LIMIT, SEARCH_LIMIT)
-    ]
+    paged = start is not None or category is not None
+    if not paged:
+        hits = (
+            search_accessible_articles(query)[
+                : min(cint(limit) or SEARCH_LIMIT, SEARCH_LIMIT)
+            ]
+            if query
+            else []
+        )
+        return _get_search_hits(hits)
+    hits = search_accessible_articles(query, MAX_PAGE_HITS) if query else []
+    categories = _count_by_category(hits)
+    wanted = _expand_categories(category)
+    if wanted is not None:
+        hits = [row for row in hits if categories["of"].get(row["name"]) in wanted]
+    begin = max(cint(start), 0)
+    size = min(cint(page_length) or SEARCH_LIMIT, PAGE_LENGTH_LIMIT)
+    return {
+        "results": _get_search_hits(hits[begin : begin + size]),
+        "total": len(hits),
+        "categories": categories["counts"],
+    }
+
+
+def _get_search_hits(hits: list[dict]) -> list[dict]:
     if not hits:
         return []
     articles = {
@@ -405,6 +433,41 @@ def search_articles(query: str, limit: int = SEARCH_LIMIT) -> list[dict]:
         for row in hits
         if row["name"] in articles
     ]
+
+
+def _count_by_category(hits: list[dict]) -> dict:
+    """Each article counts under its category and, for a Subcategory, its parent."""
+    of = dict(
+        frappe.get_all(
+            "HD Article",
+            filters={"name": ["in", [row["name"] for row in hits]]},
+            fields=["name", "category"],
+            as_list=True,
+        )
+    )
+    parents = dict(
+        frappe.get_all(
+            "HD Article Category",
+            filters={"name": ["in", list(set(of.values()))]},
+            fields=["name", "parent_article_category"],
+            as_list=True,
+        )
+    )
+    counts: dict[str, int] = {}
+    for category in of.values():
+        for name in (category, parents.get(category)):
+            if name:
+                counts[name] = counts.get(name, 0) + 1
+    return {"of": of, "counts": counts}
+
+
+def _expand_categories(category) -> set[str] | None:
+    if category is None:
+        return None
+    if isinstance(category, str) and category.lstrip().startswith("["):
+        category = frappe.parse_json(category)
+    names = [category] if isinstance(category, str) else category
+    return {name for each in names for name in (each, *get_subcategories(each))}
 
 
 def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:
