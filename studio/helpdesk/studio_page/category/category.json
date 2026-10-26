@@ -198,7 +198,7 @@
               "tag": "h2",
               "text": "{{ t('Articles') }}"
              },
-             "visibilityCondition": "{{ articles.data && articles.data.length }}"
+             "visibilityCondition": "{{ articles.data && articles.data.length && subcategories.length }}"
             },
             {
              "children": [
@@ -384,7 +384,7 @@
                "blockName": "subcategory-row",
                "children": [
                 {
-                 "blockName": "article-text",
+                 "blockName": "subcategory-text",
                  "children": [
                   {
                    "classes": [
@@ -596,7 +596,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-26 12:00:00.000000",
+ "modified": "2026-10-26 18:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
