@@ -84,7 +84,7 @@ def authenticate():
     if frappe.form_dict.cmd:
         path = f"/api/method/{frappe.form_dict.cmd}"
     else:
-        path = frappe.request.path
+        path = as_v1_method_path(frappe.request.path)
     user_type = frappe.db.get_value("User", frappe.session.user, "user_type")
 
     if user_type == "System User":
@@ -111,6 +111,14 @@ def authenticate():
     if path in ALLOWED_PATHS:
         return
     frappe.throw(f"Access not allowed for this URL: {path}", frappe.PermissionError)
+
+
+def as_v1_method_path(path: str) -> str:
+    """Read /api/v1|v2/method/<m> as /api/method/<m>, so frappectl's v2 calls get the same rules."""
+    for prefix in ("/api/v1/method/", "/api/v2/method/"):
+        if path.startswith(prefix):
+            return "/api/method/" + path.removeprefix(prefix)
+    return path
 
 
 def is_server_script_path(path):
