@@ -26,10 +26,11 @@
           <div class="mb-1.5 text-base text-ink-gray-5">
             {{ __("Parent Category") }}
           </div>
-          <Select
+          <Combobox
             class="w-full"
             v-model="parent"
             :options="parentOptions"
+            :placeholder="__('Select Category')"
             :disabled="hasSubcategories"
           />
           <p v-if="hasSubcategories" class="mt-1.5 text-p-sm text-ink-gray-5">
@@ -54,7 +55,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Combobox, Dialog, Select } from "frappe-ui";
+import { Combobox, Dialog } from "frappe-ui";
 import { categoryOptions } from "@/stores/knowledgeBase";
 import { CATEGORY_ICONS } from "@helpdesk/shared/categoryIcons";
 import { __ } from "@/translation";
