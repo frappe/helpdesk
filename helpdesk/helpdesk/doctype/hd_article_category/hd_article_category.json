@@ -14,7 +14,11 @@
   "column_break_iczs",
   "icon",
   "pinned",
-  "pinned_order"
+  "pinned_order",
+  "is_group",
+  "lft",
+  "rgt",
+  "old_parent"
  ],
  "fields": [
   {
@@ -58,15 +62,46 @@
    "fieldtype": "Int",
    "hidden": 1,
    "label": "Pinned Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Old Parent",
+   "options": "HD Article Category"
   }
  ],
+ "is_tree": 1,
  "links": [],
- "modified": "2026-10-25 12:00:00.000000",
+ "modified": "2026-10-26 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
  "naming_rule": "Random",
- "nsm_parent_field": "parent_hd_article_category",
+ "nsm_parent_field": "parent_article_category",
  "owner": "Administrator",
  "permissions": [
   {

@@ -48,6 +48,7 @@ from helpdesk.test_utils import (
     make_search_page,
     make_subcategory,
     make_ticket,
+    misplaced_categories,
     unique_email,
     unique_name,
 )
@@ -1271,6 +1272,10 @@ class TestCategoryDelete(IntegrationTestCase):
         )
         self.assertEqual(self.category(own_article), get_general_category())
         self.assertEqual(self.category(sub_article), self.sub)
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", self.sub, "is_group"), 1
+        )
+        self.assertEqual(misplaced_categories(), [])
 
     def test_deleting_a_subcategory_of_general_keeps_articles_in_general(self) -> None:
         sub = make_subcategory(get_general_category()).name
@@ -1444,6 +1449,7 @@ class TestCategoryMerge(IntegrationTestCase):
         self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
         self.assertEqual(self.parent_of(self.sub), target)
         self.assertEqual(self.parent_of(self.other_sub), target)
+        self.assertEqual(misplaced_categories(), [])
 
     def test_merging_a_parent_into_another_subcategory_is_refused(self) -> None:
         other_parent = make_article_category(unique_name("Fixture Other")).name
@@ -1461,6 +1467,10 @@ class TestCategoryMerge(IntegrationTestCase):
         self.assertFalse(frappe.db.exists("HD Article Category", self.parent))
         self.assertIsNone(self.parent_of(self.sub))
         self.assertEqual(set(get_subcategories(self.sub)), {self.other_sub})
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", self.sub, "is_group"), 1
+        )
+        self.assertEqual(misplaced_categories(), [])
 
     def test_a_subcategory_merges_into_its_parent(self) -> None:
         article = make_article(category=self.sub)

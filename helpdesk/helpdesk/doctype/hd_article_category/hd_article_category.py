@@ -5,13 +5,16 @@ from contextlib import contextmanager
 
 import frappe
 from frappe import _
-from frappe.model.document import Document
+from frappe.utils import sbool
+from frappe.utils.nestedset import NestedSet
 
 from helpdesk.utils import is_agent
 
 
-class HDArticleCategory(Document):
+class HDArticleCategory(NestedSet):
     def validate(self):
+        # one level: only a top-level category takes children
+        self.is_group = 0 if self.parent_article_category else 1
         self.validate_default_category()
         self.validate_general_category()
         self.validate_parent()
@@ -100,6 +103,7 @@ class HDArticleCategory(Document):
             "parent_article_category"
         ):
             self.narrow_to_parent()
+        super().on_update()
 
     def narrow_to_parent(self):
         # the parent's branch already counts this category in: leave it out
@@ -119,21 +123,22 @@ class HDArticleCategory(Document):
                 leaving=self.name,
                 message=_("Delete the parent category instead"),
             )
-            return
-        self.promote_subcategories()
-        self.move_articles_to_general()
+        else:
+            self.promote_subcategories()
+            self.move_articles_to_general()
+        super().on_trash()
 
     def validate_general_category_delete(self):
         if self.category_name == "General":
             frappe.throw(_("General category can't be deleted"))
 
     def promote_subcategories(self):
-        # Frappe's link check runs after on_trash
+        # Frappe's link check runs after on_trash.
+        # Their lft/rgt stay: once this category is gone they nest in no one
         frappe.db.set_value(
             "HD Article Category",
             {"parent_article_category": self.name},
-            "parent_article_category",
-            None,
+            {"parent_article_category": None, "old_parent": None, "is_group": 1},
         )
 
     def move_articles_to_general(self):
@@ -142,6 +147,24 @@ class HDArticleCategory(Document):
 
         if general_category := get_general_category():
             move_category_articles(self.name, general_category)
+
+
+@frappe.whitelist(methods=["POST"])
+def add_node(
+    category_name: str, parent: str | None = None, is_root: bool | str = False
+) -> str:
+    """The Tree view's add: Frappe's own would set `parent_hd_article_category`."""
+    return (
+        frappe.get_doc(
+            {
+                "doctype": "HD Article Category",
+                "category_name": category_name,
+                "parent_article_category": None if sbool(is_root) else parent,
+            }
+        )
+        .insert()
+        .name
+    )
 
 
 # local imports below: circular via the article controller

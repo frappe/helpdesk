@@ -368,6 +368,31 @@ def category_row(name: str, with_creators: bool = False) -> frappe._dict:
     return next(row for row in _get_categories(with_creators) if row.name == name)
 
 
+def misplaced_categories() -> list[str]:
+    """Categories whose `lft`/`rgt` range does not sit exactly inside their parent's."""
+    rows = frappe.get_all(
+        "HD Article Category", fields=["name", "parent_article_category", "lft", "rgt"]
+    )
+
+    def is_misplaced(row) -> bool:
+        if not row.lft < row.rgt:
+            return True
+        enclosing = set()
+        for other in rows:
+            if other.lft < row.lft < other.rgt < row.rgt:
+                return True  # ranges cross
+            if other.lft < row.lft and row.rgt < other.rgt:
+                enclosing.add(other.name)
+        return enclosing != {row.parent_article_category} - {None}
+
+    # ponytail: O(n²) over categories, fine for test data
+    return [row.name for row in rows if is_misplaced(row)]
+
+
+def category_range(name: str) -> tuple[int, int]:
+    return tuple(frappe.db.get_value("HD Article Category", name, ["lft", "rgt"]))
+
+
 def category_names() -> list[str]:
     from helpdesk.api.knowledge_base import get_categories
 

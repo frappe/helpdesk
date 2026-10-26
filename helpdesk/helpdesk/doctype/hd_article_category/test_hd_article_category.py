@@ -7,11 +7,20 @@ from frappe.tests import IntegrationTestCase
 from helpdesk.api.knowledge_base import create_category
 from helpdesk.api.onboarding import get_general_category_id
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
+    add_node,
     get_branch,
     get_parent,
     get_subcategories,
 )
-from helpdesk.test_utils import make_article_category, make_subcategory, unique_name
+from helpdesk.patches import hd_article_category_tree
+from helpdesk.test_utils import (
+    category_range,
+    make_article,
+    make_article_category,
+    make_subcategory,
+    misplaced_categories,
+    unique_name,
+)
 
 
 class TestHDArticleCategory(IntegrationTestCase):
@@ -122,3 +131,84 @@ class TestSubcategory(IntegrationTestCase):
         self.assertEqual(get_branch(parent.name), [parent.name, sub_a.name, sub_b.name])
         self.assertEqual(get_parent(sub_a.name), parent.name)
         self.assertIsNone(get_parent(parent.name))
+
+
+class TestCategoryTree(IntegrationTestCase):
+    def setUp(self):
+        self.parent = make_article_category(unique_name("Tree Parent")).name
+        self.sub = make_subcategory(self.parent).name
+        # a parent keeps content when its Subcategory leaves
+        make_article(category=self.parent)
+
+    def is_group(self, name) -> int:
+        return frappe.db.get_value("HD Article Category", name, "is_group")
+
+    def assertNests(self, child, parent):
+        (parent_lft, parent_rgt), (lft, rgt) = category_range(parent), category_range(
+            child
+        )
+        self.assertTrue(parent_lft < lft < rgt < parent_rgt)
+
+    def test_a_subcategory_nests_inside_its_parent(self):
+        self.assertNests(self.sub, self.parent)
+        self.assertEqual((self.is_group(self.parent), self.is_group(self.sub)), (1, 0))
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_reparenting_moves_the_subcategory_range(self):
+        other = make_article_category(unique_name("Tree Other")).name
+        make_article(category=other)
+        doc = frappe.get_doc("HD Article Category", self.sub)
+        doc.update({"parent_article_category": other}).save()
+
+        self.assertNests(self.sub, other)
+        self.assertEqual(misplaced_categories(), [])
+
+        doc.update({"parent_article_category": None}).save()
+
+        self.assertEqual(self.is_group(self.sub), 1)
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_deleting_a_category_promotes_its_subcategories_in_the_tree(self):
+        frappe.delete_doc("HD Article Category", self.parent)
+
+        self.assertEqual(self.is_group(self.sub), 1)
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_deleting_a_subcategory_keeps_the_tree(self):
+        frappe.delete_doc("HD Article Category", self.sub)
+
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_the_patch_rebuilds_a_stale_tree_and_is_idempotent(self):
+        frappe.db.set_value(
+            "HD Article Category",
+            {"name": ["in", [self.parent, self.sub]]},
+            {"lft": 0, "rgt": 0, "is_group": 0, "old_parent": None},
+        )
+
+        hd_article_category_tree.execute()
+        ranges = frappe.get_all("HD Article Category", fields=["name", "lft", "rgt"])
+        hd_article_category_tree.execute()
+
+        self.assertEqual(
+            frappe.get_all("HD Article Category", fields=["name", "lft", "rgt"]),
+            ranges,
+        )
+        self.assertNests(self.sub, self.parent)
+        self.assertEqual((self.is_group(self.parent), self.is_group(self.sub)), (1, 0))
+        self.assertEqual(
+            frappe.db.get_value("HD Article Category", self.sub, "old_parent"),
+            self.parent,
+        )
+        self.assertEqual(misplaced_categories(), [])
+
+    def test_the_tree_view_adds_a_top_level_category_or_a_subcategory(self):
+        top = add_node(category_name=unique_name("Tree Top"), is_root="true")
+        sub = add_node(
+            category_name=unique_name("Tree Sub"), parent=self.parent, is_root="false"
+        )
+
+        self.assertIsNone(get_parent(top))
+        self.assertEqual(get_parent(sub), self.parent)
+        with self.assertRaises(frappe.ValidationError):
+            add_node(category_name=unique_name("Tree Deep"), parent=sub)
