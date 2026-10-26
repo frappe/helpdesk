@@ -233,7 +233,7 @@
               "count": 8,
               "instant": true
              },
-             "visibilityCondition": "{{ !articles.data }}"
+             "visibilityCondition": "{{ !articles.data || !sidebar.data || !subcategoryArticles.data }}"
             },
             {
              "classes": [
@@ -247,6 +247,32 @@
              },
              "isCustomVueComponent": true,
              "visibilityCondition": "{{ articles.data && articles.data.length }}"
+            },
+            {
+             "classes": [
+              "w-full",
+              "!flex-col",
+              "!flex-nowrap",
+              "!gap-8"
+             ],
+             "componentId": "Repeater-category-sections",
+             "componentName": "Repeater",
+             "componentProps": {
+              "data": "{{ sections }}",
+              "dataKey": "name"
+             },
+             "children": [
+              {
+               "componentId": "PortalSubcategorySection-category",
+               "componentName": "PortalSubcategorySection",
+               "isCustomVueComponent": true,
+               "componentProps": {
+                "category": "{{ dataItem.category }}",
+                "articles": "{{ dataItem.articles }}"
+               }
+              }
+             ],
+             "visibilityCondition": "{{ sections.length }}"
             },
             {
              "blockName": "empty-state",
@@ -276,60 +302,19 @@
              "componentId": "container-7hq5bv7hx",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ articles.data && articles.data.length === 0 && !subcategories.length }}"
+             "visibilityCondition": "{{ articles.data && sidebar.data && subcategoryArticles.data && !articles.data.length && !sections.length }}"
             }
            ],
            "classes": [
             "flex",
             "flex-col",
-            "gap-1",
+            "gap-8",
             "mt-6",
             "w-full"
            ],
            "componentId": "category-articles",
            "componentName": "container",
            "originalElement": "div"
-          },
-          {
-           "blockName": "subcategories-section",
-           "children": [
-            {
-             "classes": [
-              "text-ink-gray-5",
-              "pb-2",
-              "border-b",
-              "border-outline-gray-1"
-             ],
-             "componentId": "subcategories-heading",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-sm",
-              "tag": "h2",
-              "text": "{{ t('Subcategories') }}"
-             }
-            },
-            {
-             "blockName": "Subcategory grid",
-             "componentId": "category_grid-subcategories",
-             "componentName": "category_grid",
-             "componentProps": {
-              "categories": "{{ subcategories }}",
-              "columns": "2"
-             },
-             "isStudioComponent": true
-            }
-           ],
-           "classes": [
-            "flex",
-            "flex-col",
-            "gap-3",
-            "mt-8",
-            "w-full"
-           ],
-           "componentId": "category-subcategories",
-           "componentName": "container",
-           "originalElement": "div",
-           "visibilityCondition": "{{ articles.data && subcategories.length }}"
           }
          ],
          "classes": [
@@ -424,7 +409,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 10:00:00.000000",
+ "modified": "2026-10-27 11:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
@@ -441,6 +426,16 @@
    "resource_name": "articles",
    "resource_type": "API Resource",
    "url": "helpdesk.api.knowledge_base.get_articles"
+  },
+  {
+   "auto": 1,
+   "fetch_document_using_filters": 0,
+   "limit": 0,
+   "method": "GET",
+   "params": "{\"category\": \"{{ route.params.category }}\"}",
+   "resource_name": "subcategoryArticles",
+   "resource_type": "API Resource",
+   "url": "helpdesk.api.knowledge_base.get_subcategory_articles"
   }
  ],
  "route": "/category/:category",

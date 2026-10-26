@@ -921,12 +921,24 @@ test.describe("subcategories", () => {
     // Pinned categories may keep the new parent off the home page.
     await page.goto(`/help/category/${parent.name}`);
     await expect(page.getByRole("heading", { name: parent.category_name, level: 1 })).toBeVisible();
-    await expect(page.getByRole("link", { name: visible.category_name })).toBeVisible();
-    await expect(page.getByRole("link", { name: hidden.category_name })).toHaveCount(0);
+    const head = page.getByRole("heading", { name: visible.category_name, level: 2 });
+    await expect(head.getByRole("link", { name: visible.category_name })).toHaveAttribute("href", `/help/category/${visible.name}`);
+    await expect(page.getByRole("link", { name: article.title })).toBeVisible();
+    await expect(page.getByRole("heading", { name: hidden.category_name, level: 2 })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /^View all/ })).toHaveCount(0);
     // the header counts the subcategories
     await expect(page.getByText("1 subcategory", { exact: true })).toBeVisible();
 
-    await page.getByRole("link", { name: visible.category_name }).click();
+    // a subcategory with more than 4 articles offers "View all"
+    const big = await createCategory(api, `Big Sub ${uid()}`, { parent_article_category: parent.name });
+    for (let i = 0; i < 5; i++) await createArticle(api, big.name, { visibility: "Customers" });
+    await page.reload();
+    await expect(page.getByRole("link", { name: /^View all/ })).toHaveCount(1);
+    await page.getByRole("link", { name: `View all 5 articles in ${big.category_name}` }).click();
+    await expect(page.getByRole("heading", { name: big.category_name, level: 1 })).toBeVisible();
+    await page.goBack();
+
+    await head.getByRole("link", { name: visible.category_name }).click();
     await expect(page.getByRole("heading", { name: visible.category_name, level: 1 })).toBeVisible();
     await expect(page.getByRole("link", { name: article.title }).first()).toBeVisible();
     await page.getByRole("link", { name: article.title }).first().click();
