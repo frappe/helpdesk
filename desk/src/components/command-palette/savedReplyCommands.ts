@@ -127,7 +127,8 @@ async function applySavedReply(
     toast.error(__("Could not open the reply box"));
     return;
   }
-  insert(reply);
+  // the id lets a composer that renders replies itself, like WhatsApp, do so
+  insert({ ...reply, name: replyId });
   recordSavedReplyUse(replyId, title);
   capture("saved_reply_applied", { data: { source: "command_palette" } });
 }

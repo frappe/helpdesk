@@ -26,6 +26,11 @@
       class="min-h-0 flex-1 flex-col overflow-auto data-[state=active]:flex"
     >
       <TicketAnalyticsTab v-if="tab.value === 'analytics'" />
+      <WhatsAppConversation
+        v-else-if="tab.value === 'whatsapp'"
+        :whatsapp="whatsapp"
+        @reply="(message) => communicationAreaRef?.replyToWhatsApp(message)"
+      />
       <TicketTimeline
         v-else
         :ticket-id="String(ticket.doc?.name)"
@@ -39,6 +44,7 @@
   <CommunicationArea
     ref="communicationAreaRef"
     :ticketId="String(ticket.doc?.name)"
+    :whatsapp="isWhatsApp ? whatsapp : null"
     :to-emails="[ticket.doc?.raised_by]"
     :cc-emails="[]"
     :bcc-emails="[]"
@@ -49,14 +55,12 @@
 
 <script setup lang="ts">
 import CommunicationArea from "@/components/CommunicationArea.vue";
-import {
-  ActivityIcon,
-  CommentIcon,
-  EmailIcon,
-  PhoneIcon,
-} from "@/components/icons";
+import { ActivityIcon, CommentIcon, PhoneIcon } from "@/components/icons";
 import TicketAnalyticsTab from "@/components/ticket-agent/analytics/TicketAnalyticsTab.vue";
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
+import { withConversationTab } from "@/components/whatsapp/conversationTab";
+import { useTicketWhatsApp } from "@/components/whatsapp/useTicketWhatsApp";
+import WhatsAppConversation from "@/components/whatsapp/WhatsAppConversation.vue";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
 import { reloadTicketFeed } from "@/composables/useTicket";
 import { useTelephonyStore } from "@/stores/telephony";
@@ -75,24 +79,25 @@ const communicationAreaRef = ref<InstanceType<typeof CommunicationArea> | null>(
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
+const isWhatsApp = computed(() => ticket.value.doc?.source === "WhatsApp");
+const whatsapp = useTicketWhatsApp(() => ticket.value.doc);
+
 const tabs: ComputedRef<TabObject[]> = computed(() => {
-  const _tabs: TabObject[] = [
-    {
-      value: "activity",
-      label: "Activity",
-      iconLeft: ActivityIcon,
-    },
-    {
-      value: "email",
-      label: "Emails",
-      iconLeft: EmailIcon,
-    },
-    {
-      value: "comment",
-      label: "Comments",
-      iconLeft: CommentIcon,
-    },
-  ];
+  const _tabs: TabObject[] = withConversationTab(
+    [
+      {
+        value: "activity",
+        label: "Activity",
+        iconLeft: ActivityIcon,
+      },
+      {
+        value: "comment",
+        label: "Comments",
+        iconLeft: CommentIcon,
+      },
+    ],
+    isWhatsApp.value
+  );
 
   if (isCallingEnabled.value) {
     _tabs.push({

@@ -95,7 +95,11 @@
               "extraActivities": "{{ timelineEvents }}",
               "reserve": "{{ canReply ? composerReserve : 0 }}",
               "ticket": "{{ ticketId }}",
-              "version": "{{ ticket.data && `${ticket.data.modified}:${ticket.data.communications.length}` }}"
+              "version": "{{ threadVersion }}",
+              "whatsapp": "{{ isWhatsApp }}",
+              "contactName": "{{ identity.name }}",
+              "raisedBy": "{{ ticket.data && ticket.data.raised_by }}",
+              "locked": "{{ isLocked }}"
              },
              "componentSlots": {},
              "isCustomVueComponent": true

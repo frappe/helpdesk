@@ -74,6 +74,8 @@ ALLOWED_PATHS = [
     "/api/method/frappe.integrations.oauth2.register_client",
     "/api/method/frappe.integrations.oauth2.introspect_token",
     "/api/method/frappe.integrations.oauth2.revoke_token",
+    # Meta calls the WhatsApp webhook as Guest
+    "/api/method/whatsapp.whatsapp.webhook.handler",
 ]
 
 WILDCARD_PATHS = [

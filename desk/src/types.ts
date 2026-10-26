@@ -296,6 +296,7 @@ export type UserInfo = {
 export type TicketTab =
   | "activity"
   | "email"
+  | "whatsapp"
   | "comment"
   | "details"
   | "call"
@@ -594,6 +595,8 @@ export interface SavedReplyAction {
 }
 
 export interface RenderedSavedReply {
+  /** The saved reply it came from, for composers that render it themselves */
+  name?: string;
   title: string;
   message: string;
   actions: SavedReplyAction[];

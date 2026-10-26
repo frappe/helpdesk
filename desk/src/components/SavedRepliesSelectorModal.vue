@@ -316,7 +316,7 @@ const onTemplateSelect = (template: SavedReply) => {
       };
       // If user cancelled (Escape/outside click) while API was in flight, discard
       if (!show.value) return;
-      pendingTemplate.value = data;
+      pendingTemplate.value = { ...data, name: template.name };
       show.value = false;
       // Shared with the palette: modal picks count toward its most-used rows.
       recordSavedReplyUse(template.name, template.title);
