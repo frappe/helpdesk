@@ -1,4 +1,4 @@
-import { reactive, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
+import { reactive, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import { createResource, frappeRequest } from 'frappe-ui'
 
 // Module-level, not `cache`: what a reader sees depends on who they are.
@@ -14,10 +14,6 @@ export function useKnowledgeBase() {
 
 // Survives the sidebar's remount on each page.
 export const sidebarState = {
-  query: ref(''),
-  openName: ref<string | null>(null),
-  openSubName: ref<string | null>(null),
-  shown: reactive<Record<string, number>>({}),
   scrollTop: 0,
 }
 

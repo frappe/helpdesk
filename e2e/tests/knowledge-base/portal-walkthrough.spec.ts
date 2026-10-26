@@ -558,7 +558,7 @@ test.describe("categories and category pages", () => {
     await expect(page).toHaveURL(new RegExp(`/help/category/${category.name}$`));
   });
 
-  test("/ focuses Search categories on All categories, and the article search elsewhere", async ({ page, api }) => {
+  test("/ focuses Search categories on All categories, and opens the search page elsewhere", async ({ page, api }) => {
     const category = await createCategory(api);
     await createArticle(api, category.name);
     await page.goto("/help/categories");
@@ -569,43 +569,59 @@ test.describe("categories and category pages", () => {
     await expect(search).toHaveValue("");
 
     await page.goto(`/help/category/${category.name}`);
-    await expect(page.getByPlaceholder("Search articles").first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Search articles" })).toBeVisible();
     await page.keyboard.press("/");
-    await expect(page.getByPlaceholder("Search articles").first()).toBeFocused();
+    await expect(page).toHaveURL(new RegExp(`/help/search\\?category=${category.name}$`));
+    await expect(page.getByRole("textbox", { name: "Search articles" }).last()).toBeFocused();
   });
 
-  test("CT2–CT5 article list, sidebar toggle and sidebar search", async ({ page, api }) => {
-    const category = await createCategory(api);
+  test("CT2–CT5 the sidebar navigates categories and links to search", async ({ page, api }) => {
+    const parent = await createCategory(api);
+    const sub = await createCategory(api, undefined, { parent_article_category: parent.name });
+    const sibling = await createCategory(api, undefined, { parent_article_category: parent.name });
     const other = await createCategory(api);
-    const article = await createArticle(api, category.name, { title: `Sidebar ${uid()}` });
-    const otherArticle = await createArticle(api, other.name, { title: `Elsewhere ${uid()}` });
+    const otherSub = await createCategory(api, undefined, { parent_article_category: other.name });
+    const article = await createArticle(api, sub.name);
+    for (const category of [parent, sibling, otherSub]) await createArticle(api, category.name);
 
     await page.goto("/help/category/no-such-category");
     await expect(page.getByText("Category not found")).toBeVisible();
 
-    await page.goto(`/help/category/${category.name}`);
     const sidebar = page.getByRole("navigation", { name: "Knowledge base" });
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "true");
-    await sidebar.getByRole("button", { name: other.category_name }).click();
-    await expect(sidebar.getByRole("button", { name: other.category_name })).toHaveAttribute("aria-expanded", "true");
-    await expect(sidebar.getByRole("button", { name: category.category_name })).toHaveAttribute("aria-expanded", "false");
-    await expect(sidebar.getByRole("link", { name: otherArticle.title })).toBeVisible();
+    const row = (category: { category_name: string }) =>
+      sidebar.getByRole("link", { name: category.category_name, exact: true });
 
-    await page.locator("body").press("/");
-    const search = sidebar.getByRole("textbox", { name: "Search articles" });
-    await expect(search).toBeFocused();
-    await search.fill(article.title);
-    await expect(sidebar.getByRole("link", { name: article.title })).toBeVisible();
-    await expect(sidebar.getByRole("link", { name: otherArticle.title })).toHaveCount(0);
-    await search.fill(`nothing ${uid()}`);
-    await expect(sidebar.getByText(/No articles match/)).toBeVisible();
-    await search.fill("");
+    // A top-level page fills its row and opens its children only.
+    await page.goto(`/help/category/${parent.name}`);
+    await expect(row(parent)).toHaveAttribute("aria-current", "page");
+    await expect(row(sub)).toBeVisible();
+    await expect(row(sibling)).toBeVisible();
+    await expect(row(other)).toBeVisible();
+    await expect(row(otherSub)).toHaveCount(0);
+    // No article titles in the sidebar.
+    await expect(sidebar.getByRole("link", { name: article.title })).toHaveCount(0);
+
+    // A subcategory page keeps its parent open, without a fill.
+    await row(sub).click();
+    await expect(page).toHaveURL(new RegExp(`/help/category/${sub.name}$`));
+    await expect(row(sub)).toHaveAttribute("aria-current", "page");
+    await expect(row(parent)).not.toHaveAttribute("aria-current");
+    await expect(row(sibling)).toBeVisible();
+    await expect(row(otherSub)).toHaveCount(0);
+
+    // The search link carries the current category.
+    await sidebar.getByRole("link", { name: "Search articles" }).click();
+    await expect(page).toHaveURL(new RegExp(`/help/search\\?category=${sub.name}$`));
+    await expect(sidebar.getByRole("link", { name: "Search articles" })).toHaveCount(0);
+    await expect(row(parent)).toBeVisible();
 
     // CT2: the list row opens the article.
-    await page.locator("main, body").getByRole("link", { name: article.title }).last().click();
+    await page.goto(`/help/category/${sub.name}`);
+    await page.getByRole("link", { name: article.title }).click();
     await expect(page).toHaveURL(new RegExp(`/help/articles/${article.name}-`));
-    // AR26: the sidebar marks the article being read.
-    await expect(sidebar.getByRole("link", { name: article.title })).toHaveAttribute("aria-current", "page");
+    // AR26: the sidebar fills the category of the article being read.
+    await expect(row(sub)).toHaveAttribute("aria-current", "page");
+    await expect(row(sibling)).toBeVisible();
   });
 });
 
