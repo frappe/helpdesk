@@ -233,7 +233,7 @@
               "count": 8,
               "instant": true
              },
-             "visibilityCondition": "{{ !articles.data || !sidebar.data || !subcategoryArticles.data }}"
+             "visibilityCondition": "{{ !loaded }}"
             },
             {
              "classes": [
@@ -246,7 +246,7 @@
               "articles": "{{ articles.data || [] }}"
              },
              "isCustomVueComponent": true,
-             "visibilityCondition": "{{ articles.data && articles.data.length }}"
+             "visibilityCondition": "{{ loaded && articles.data.length }}"
             },
             {
              "classes": [
@@ -272,7 +272,7 @@
                }
               }
              ],
-             "visibilityCondition": "{{ sections.length }}"
+             "visibilityCondition": "{{ loaded && sections.length }}"
             },
             {
              "blockName": "empty-state",
@@ -302,7 +302,7 @@
              "componentId": "container-7hq5bv7hx",
              "componentName": "container",
              "originalElement": "div",
-             "visibilityCondition": "{{ articles.data && sidebar.data && subcategoryArticles.data && !articles.data.length && !sections.length }}"
+             "visibilityCondition": "{{ loaded && !articles.data.length && !sections.length }}"
             }
            ],
            "classes": [
@@ -409,7 +409,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 11:00:00.000000",
+ "modified": "2026-10-27 12:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
