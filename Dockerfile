@@ -114,9 +114,13 @@ WORKDIR /home/frappe
 
 RUN git clone --depth 1 --branch "${FRAPPE_BRANCH}" https://github.com/frappe/frappe /home/frappe/frappe
 
+# --no-backups: otherwise bench init calls `crontab -l` as the frappe user to
+# install its backup cron job, which fails with "Permission denied" in the
+# Railway build sandbox and aborts the build.
 RUN bench init \
         --skip-redis-config-generation \
         --skip-assets \
+        --no-backups \
         --frappe-path /home/frappe/frappe \
         --python "$(command -v python)" \
         frappe-bench \
