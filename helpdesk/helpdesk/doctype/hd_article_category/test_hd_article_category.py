@@ -11,6 +11,7 @@ from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     get_branch,
     get_parent,
     get_subcategories,
+    get_tree_nodes,
 )
 from helpdesk.patches import hd_article_category_tree
 from helpdesk.test_utils import (
@@ -140,6 +141,14 @@ class TestCategoryTree(IntegrationTestCase):
         # a parent keeps content when its Subcategory leaves
         make_article(category=self.parent)
 
+    def ranges(self) -> dict[str, tuple[int, int]]:
+        return {
+            row.name: (row.lft, row.rgt)
+            for row in frappe.get_all(
+                "HD Article Category", fields=["name", "lft", "rgt"]
+            )
+        }
+
     def is_group(self, name) -> int:
         return frappe.db.get_value("HD Article Category", name, "is_group")
 
@@ -187,13 +196,10 @@ class TestCategoryTree(IntegrationTestCase):
         )
 
         hd_article_category_tree.execute()
-        ranges = frappe.get_all("HD Article Category", fields=["name", "lft", "rgt"])
+        ranges = self.ranges()
         hd_article_category_tree.execute()
 
-        self.assertEqual(
-            frappe.get_all("HD Article Category", fields=["name", "lft", "rgt"]),
-            ranges,
-        )
+        self.assertEqual(self.ranges(), ranges)
         self.assertNests(self.sub, self.parent)
         self.assertEqual((self.is_group(self.parent), self.is_group(self.sub)), (1, 0))
         self.assertEqual(
@@ -208,7 +214,39 @@ class TestCategoryTree(IntegrationTestCase):
             category_name=unique_name("Tree Sub"), parent=self.parent, is_root="false"
         )
 
-        self.assertIsNone(get_parent(top))
-        self.assertEqual(get_parent(sub), self.parent)
+        self.assertIsNone(get_parent(top["category"]))
+        self.assertEqual(get_parent(sub["category"]), self.parent)
+        # a starter article, so the new category shows in the lists
+        for added in (top, sub):
+            self.assertEqual(
+                frappe.db.get_value("HD Article", added["article"], "category"),
+                added["category"],
+            )
+
+    def test_the_tree_view_keeps_the_category_rules(self):
+        sub = add_node(category_name=unique_name("Tree Sub"), parent=self.parent)
         with self.assertRaises(frappe.ValidationError):
-            add_node(category_name=unique_name("Tree Deep"), parent=sub)
+            add_node(category_name=unique_name("Tree Deep"), parent=sub["category"])
+        with self.assertRaises(frappe.ValidationError):
+            add_node(category_name="General", is_root="true")
+
+    def test_the_tree_lists_categories_by_name(self):
+        prefix = unique_name("Tree Sort")
+        late = make_article_category(f"{prefix} b").name
+        early = make_article_category(f"{prefix} A").name
+        late_sub = make_subcategory(self.parent, "b").name
+        early_sub = make_subcategory(self.parent, "A").name
+
+        roots = [row.value for row in get_tree_nodes("HD Article Category")]
+        children = get_tree_nodes("HD Article Category", parent=self.parent)
+
+        self.assertLess(roots.index(early), roots.index(late))
+        self.assertNotIn(self.sub, roots)
+        self.assertEqual(
+            [row.value for row in children if row.value != self.sub],
+            [early_sub, late_sub],
+        )
+        self.assertEqual(
+            {row.value: row.expandable for row in children},
+            dict.fromkeys([self.sub, early_sub, late_sub], 0),
+        )

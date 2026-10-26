@@ -4,6 +4,9 @@ frappe.treeview_settings["HD Article Category"] = {
   root_label: __("All Categories"),
   add_tree_node:
     "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.add_node",
+  // siblings by category name, not by the hash name
+  get_tree_nodes:
+    "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.get_tree_nodes",
   fields: [
     {
       fieldtype: "Data",

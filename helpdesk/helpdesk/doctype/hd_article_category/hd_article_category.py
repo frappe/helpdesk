@@ -152,18 +152,24 @@ class HDArticleCategory(NestedSet):
 @frappe.whitelist(methods=["POST"])
 def add_node(
     category_name: str, parent: str | None = None, is_root: bool | str = False
-) -> str:
-    """The Tree view's add: Frappe's own would set `parent_hd_article_category`."""
-    return (
-        frappe.get_doc(
-            {
-                "doctype": "HD Article Category",
-                "category_name": category_name,
-                "parent_article_category": None if sbool(is_root) else parent,
-            }
-        )
-        .insert()
-        .name
+) -> dict:
+    """The Tree view's add, with the desk's starter article.
+
+    Frappe's own would set `parent_hd_article_category`."""
+    # local import: circular via the article controller
+    from helpdesk.api.knowledge_base import create_category
+
+    return create_category(category_name, parent=None if sbool(is_root) else parent)
+
+
+@frappe.whitelist()
+def get_tree_nodes(doctype: str, parent: str = "", **kwargs) -> list[dict]:
+    """The Tree view's nodes, by category name; Frappe's sort by the hash name."""
+    return frappe.get_list(
+        "HD Article Category",
+        filters={"parent_article_category": parent or ["is", "not set"]},
+        fields=["name as value", "category_name as title", "is_group as expandable"],
+        order_by="category_name asc",
     )
 
 
