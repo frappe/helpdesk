@@ -44,22 +44,27 @@
         <template #item-email="{ activity }">
           <EmailItem :email="withEmailFixups(activity)">
             <template #actions>
-              <Button
-                variant="ghost"
-                :tooltip="__('Reply')"
-                @click="reply(activity)"
-              >
-                <template #icon><ReplyIcon class="text-ink-gray-7" /></template>
-              </Button>
-              <Button
-                variant="ghost"
-                :tooltip="__('Reply All')"
-                @click="replyAll(activity)"
-              >
-                <template #icon
-                  ><ReplyAllIcon class="text-ink-gray-7"
-                /></template>
-              </Button>
+              <!-- a WhatsApp ticket is answered on WhatsApp, never by email -->
+              <template v-if="ticket.doc?.source !== 'WhatsApp'">
+                <Button
+                  variant="ghost"
+                  :tooltip="__('Reply')"
+                  @click="reply(activity)"
+                >
+                  <template #icon
+                    ><ReplyIcon class="text-ink-gray-7"
+                  /></template>
+                </Button>
+                <Button
+                  variant="ghost"
+                  :tooltip="__('Reply All')"
+                  @click="replyAll(activity)"
+                >
+                  <template #icon
+                    ><ReplyAllIcon class="text-ink-gray-7"
+                  /></template>
+                </Button>
+              </template>
               <Dropdown align="end" :options="emailOptions(activity)">
                 <Button
                   icon="lucide-more-horizontal"
@@ -346,7 +351,11 @@ function isFirstEmail(activity: EmailActivity): boolean {
 }
 
 function showSplitOption(activity: EmailActivity): boolean {
-  return !isFirstEmail(activity) && ticket.value?.doc?.status !== "Closed";
+  return (
+    !isFirstEmail(activity) &&
+    ticket.value?.doc?.status !== "Closed" &&
+    ticket.value?.doc?.source !== "WhatsApp"
+  );
 }
 
 // sender is an email address; userId may be the raw session user

@@ -28,7 +28,8 @@
 		"./ExportModal.vue": "./src/ExportModal.vue",
 		"./ArticleIcon.vue": "./src/ArticleIcon.vue",
 		"./OrganizationsIcon.vue": "./src/OrganizationsIcon.vue",
-		"./settings/*": "./src/settings/*"
+		"./settings/*": "./src/settings/*",
+		"./whatsapp/format": "./src/whatsapp/format.ts"
 	},
 	"peerDependencies": {
 		"@tiptap/core": "*",

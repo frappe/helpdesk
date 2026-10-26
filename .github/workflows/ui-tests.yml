@@ -101,12 +101,13 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           bench get-app telephony
+          bench get-app https://github.com/frappe/whatsapp --branch develop
           # get-app builds helpdesk's Studio portal with frappe's Studio toolchain,
           # which --skip-assets left without its node_modules
           (cd apps/frappe/studio/frontend && yarn install --frozen-lockfile)
           bench get-app helpdesk $GITHUB_WORKSPACE
           bench setup requirements --dev
-          bench new-site --db-root-password root --admin-password admin --install-app helpdesk $SITE
+          bench new-site --db-root-password root --admin-password admin --install-app whatsapp --install-app helpdesk $SITE
           bench use $SITE
           bench --site $SITE set-config host_name "http://localhost:8000"
           # The suite creates more users in an hour than the default limit (60) allows.

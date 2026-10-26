@@ -23,6 +23,9 @@ import {
 } from "@/components/icons";
 import ERPNextIntegrationSettings from "@/components/erpnext-integration/ERPNextIntegrationSettings.vue";
 import TelephonyPage from "./Telephony/TelephonyPage.vue";
+import WhatsApp from "./WhatsApp/WhatsApp.vue";
+import { isWhatsAppInstalled } from "@/components/whatsapp/conversationTab";
+import LucideMessageCircle from "~icons/lucide/message-circle";
 import { EmailNotifications } from "./EmailNotifications";
 import { __ } from "@/translation";
 import SavedReplies from "./SavedReplies/SavedReplies.vue";
@@ -169,6 +172,12 @@ export const tabs = computed(() => {
           component: markRaw(ERPNextIntegrationSettings),
           condition: () => auth.isAdmin || auth.isManager,
         },
+        {
+          label: __("WhatsApp"),
+          icon: markRaw(LucideMessageCircle),
+          component: markRaw(WhatsApp),
+          condition: () => auth.isAdmin && isWhatsAppInstalled(),
+        },
       ],
     },
   ];
@@ -208,6 +217,7 @@ type TabName =
   | "Field Dependencies"
   | "Telephony"
   | "ERPNext"
+  | "WhatsApp"
   | "Saved Replies";
 
 export const setActiveSettingsTab = (tabName: TabName) => {

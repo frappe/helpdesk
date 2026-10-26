@@ -128,6 +128,7 @@
                   v-if="contact.data"
                   :contact="contact.data"
                   :ticketId="ticket.doc?.name"
+                  :whatsapp="ticket.doc?.source === 'WhatsApp'"
                   @email:open="communicationAreaRef.toggleEmailBox()"
                 />
                 <!-- feedback component -->
@@ -169,6 +170,13 @@
                 />
               </div>
 
+              <WhatsAppConversation
+                v-else-if="tab.value === 'whatsapp'"
+                :whatsapp="whatsapp"
+                @reply="
+                  (message) => communicationAreaRef?.replyToWhatsApp(message)
+                "
+              />
               <!-- Rest Activities -->
               <TicketTimeline
                 v-else
@@ -185,6 +193,7 @@
             ref="communicationAreaRef"
             v-model="ticket.doc"
             :ticketId="ticket.doc?.name"
+            :whatsapp="ticket.doc?.source === 'WhatsApp' ? whatsapp : null"
             :to-emails="[ticket.doc.raised_by]"
             :cc-emails="[]"
             :bcc-emails="[]"
@@ -275,11 +284,13 @@ import {
   ActivityIcon,
   CommentIcon,
   DetailsIcon,
-  EmailIcon,
   IndicatorIcon,
   PhoneIcon,
 } from "@/components/icons";
 import TicketCallActions from "@/components/ticket/TicketCallActions.vue";
+import { withConversationTab } from "@/components/whatsapp/conversationTab";
+import { useTicketWhatsApp } from "@/components/whatsapp/useTicketWhatsApp";
+import WhatsAppConversation from "@/components/whatsapp/WhatsAppConversation.vue";
 import TicketTimeline from "@/components/ticket-agent/timeline/TicketTimeline.vue";
 
 // Lives in studio/ so Studio pages can use it as a block too.
@@ -344,6 +355,7 @@ const ticketComposable = computed(() => useTicket(props.ticketId));
 const ticket = computed(() => ticketComposable.value.ticket);
 const assignees = computed(() => ticketComposable.value.assignees);
 const contact = computed(() => ticketComposable.value.contact);
+const whatsapp = useTicketWhatsApp(() => ticket.value?.doc);
 
 const customizations: Resource<Customizations> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_customizations",
@@ -510,29 +522,27 @@ const dropdownOptions = computed(() =>
 );
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
-  const _tabs = [
-    {
-      value: "details",
-      label: __("Details"),
-      iconLeft: DetailsIcon,
-      condition: () => isMobileView.value,
-    },
-    {
-      value: "activity",
-      label: __("Activity"),
-      iconLeft: ActivityIcon,
-    },
-    {
-      value: "email",
-      label: __("Emails"),
-      iconLeft: EmailIcon,
-    },
-    {
-      value: "comment",
-      label: __("Comments"),
-      iconLeft: CommentIcon,
-    },
-  ];
+  const _tabs = withConversationTab(
+    [
+      {
+        value: "details",
+        label: __("Details"),
+        iconLeft: DetailsIcon,
+        condition: () => isMobileView.value,
+      },
+      {
+        value: "activity",
+        label: __("Activity"),
+        iconLeft: ActivityIcon,
+      },
+      {
+        value: "comment",
+        label: __("Comments"),
+        iconLeft: CommentIcon,
+      },
+    ],
+    ticket.value.doc?.source === "WhatsApp"
+  );
 
   if (isCallingEnabled.value) {
     _tabs.push({

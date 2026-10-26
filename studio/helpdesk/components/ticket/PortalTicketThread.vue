@@ -1,5 +1,16 @@
 <template>
+  <PortalWhatsAppThread
+    v-if="whatsapp"
+    :key="ticket"
+    :ticket="ticket"
+    :contact-name="contactName"
+    :raised-by="raisedBy"
+    :extra-activities="extraActivities"
+    :version="version"
+    :locked="locked"
+  />
   <TicketEmails
+    v-else
     :key="ticket"
     :ticket="ticket"
     :extra-activities="extraActivities"
@@ -30,6 +41,7 @@ import { conversationLayout } from "@app/stores/settings";
 import { useChatRows } from "@app/composables/useChatRows";
 import PortalChatList from "./PortalChatList.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
+import PortalWhatsAppThread from "@app/components/whatsapp/PortalWhatsAppThread.vue";
 
 type Row = {
   type?: string;
@@ -49,6 +61,11 @@ const props = defineProps<{
     user?: { email?: string };
   }[];
   reserve?: number;
+  // A WhatsApp ticket shows its WhatsApp conversation instead of emails.
+  whatsapp?: boolean;
+  contactName?: string;
+  raisedBy?: string;
+  locked?: boolean;
 }>();
 
 const isChat = computed(() => conversationLayout.value === "chat");

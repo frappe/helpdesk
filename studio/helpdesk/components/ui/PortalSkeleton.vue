@@ -196,14 +196,14 @@
       v-else-if="variant === 'thread'"
       class="flex flex-col pt-4"
       :class="
-        conversationLayout === 'chat'
+        threadLayout === 'chat'
           ? 'px-3 sm:px-5'
           : 'max-sm:px-4 sm:px-6 lg:px-10'
       "
     >
       <!-- PortalChatList's rows: a bubble, then the name and time under it. A bubble
            is 12px of padding plus 22px per line of its iframe; messages run 1 to 3 lines. -->
-      <div v-if="conversationLayout === 'chat'" class="flex flex-col gap-3">
+      <div v-if="threadLayout === 'chat'" class="flex flex-col gap-3">
         <div
           v-for="(bubble, i) in CHAT_BUBBLES"
           :key="i"
@@ -431,7 +431,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, type FunctionalComponent } from "vue";
+import { computed, h, type FunctionalComponent } from "vue";
 import { Skeleton } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 // Relative, not @app: the desk imports this through NewTicketForm.
@@ -439,7 +439,7 @@ import { conversationLayout } from "../../stores/conversationLayout";
 
 defineOptions({ name: "PortalSkeleton" });
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     variant?:
       | "category-grid"
@@ -463,11 +463,15 @@ withDefaults(
     bare?: boolean;
     // Replaces an on-screen skeleton, so skip the fade-in delay.
     instant?: boolean;
+    // The thread's layout; the viewer's setting unless the thread is always chat.
+    layout?: "chat" | "timeline";
   }>(),
   { count: 6, columns: 3 }
 );
 
 const BLOCK = "motion-reduce:animate-none";
+
+const threadLayout = computed(() => props.layout || conversationLayout.value);
 
 const CHAT_BUBBLES = [
   { width: "16rem", lines: 1 },

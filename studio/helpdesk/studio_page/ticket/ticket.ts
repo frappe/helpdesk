@@ -29,9 +29,12 @@ export default function setup(context) {
 
   const customActions = ref([])
 
+  // WhatsApp messages land without saving the ticket, so each fetch reloads the thread.
+  const ticketFetches = ref(0)
   const ticket = createResource({
     url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
     makeParams: () => ({ name: ticketId.value }),
+    onSuccess: () => ticketFetches.value++,
   })
   // Only on a real change, or each script's calls would repeat.
   watch(
@@ -120,6 +123,14 @@ export default function setup(context) {
   // As on the server: customers cannot touch closed or rated tickets.
   const isLocked = computed(() => isClosed.value || (!settings.isAgent.value && Boolean(ticket.data?.feedback)))
   const isUpdatingStatus = ref(false)
+  const isWhatsApp = computed(() => Boolean(ticket.data?.is_whatsapp))
+  // WhatsApp customers reply on WhatsApp, where the agents answer.
+  const canReply = computed(() => !isLocked.value && !isWhatsApp.value)
+  const threadVersion = computed(() => {
+    if (!ticket.data) return ''
+    if (isWhatsApp.value) return String(ticketFetches.value)
+    return `${ticket.data.modified}:${ticket.data.communications.length}`
+  })
 
   // Close dates come from ticket history, not the thread.
   const timelineChanges = createResource({
@@ -196,12 +207,15 @@ export default function setup(context) {
   return {
     ...settings,
     ...useTicketDetails(ticket, thread, timelineChanges),
-    ...useReplyComposer(ticket, { ticketId, isClosed: isLocked, isAgent: settings.isAgent }),
+    ...useReplyComposer(ticket, { ticketId, canReply, isAgent: settings.isAgent }),
     ...useOutsideHoursBanner(ticket),
     ...feedback,
     drawer: useDrawer(route),
     ticketId,
     ticket,
+    isWhatsApp,
+    isLocked,
+    threadVersion,
     rating: thread.rating,
     timelineEvents,
     customActions,
