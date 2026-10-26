@@ -1,3 +1,4 @@
+import inspect
 from unittest.mock import PropertyMock, patch
 
 import frappe
@@ -5,7 +6,13 @@ from frappe.tests import IntegrationTestCase
 from textblob import TextBlob
 from textblob.exceptions import MissingCorpusError
 
-from helpdesk.api.article import get_article_stats, get_noun_phrases, get_nouns, search
+from helpdesk.api.article import (
+    _search,
+    get_article_stats,
+    get_noun_phrases,
+    get_nouns,
+    search,
+)
 from helpdesk.search import NUM_RESULTS
 from helpdesk.test_utils import (
     create_agent,
@@ -129,9 +136,19 @@ class TestSearchArticles(IntegrationTestCase):
     def test_search_passes_the_hit_limit(self, hd_search, *_) -> None:
         hd_search.return_value = make_search_page(make_search_hit(self.articles[0]))
 
-        search("reset my password", limit=200)
+        _search("reset my password", limit=200)
 
         self.assertEqual(hd_search.call_args.kwargs["limit"], 200)
+
+    def test_whitelisted_search_cannot_request_more_than_the_default(
+        self, hd_search, *_
+    ) -> None:
+        hd_search.return_value = make_search_page(make_search_hit(self.articles[0]))
+
+        self.assertEqual(list(inspect.signature(search).parameters), ["query"])
+        self.assertRaises(TypeError, search, "reset my password", limit=100000)
+        search("reset my password")
+        self.assertEqual(hd_search.call_args.kwargs["limit"], NUM_RESULTS)
 
     def test_no_match_returns_empty_list(self, hd_search, *_) -> None:
         hd_search.return_value = []

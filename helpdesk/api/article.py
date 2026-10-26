@@ -96,7 +96,11 @@ def get_article_stats(article_name: str):
 
 
 @frappe.whitelist()
-def search(query: str, limit: int = NUM_RESULTS) -> list:
+def search(query: str) -> list:
+    return _search(query)
+
+
+def _search(query: str, limit: int = NUM_RESULTS) -> list:
     query = sanitize_query(query)
     ret, enough = search_with_enough_results([], query, limit=limit)
     if enough:
@@ -137,7 +141,7 @@ def search_accessible_articles(query: str, limit: int = NUM_RESULTS) -> list[dic
     if words and set(words) <= set(get_stopwords()):
         return search_titles(words, limit)
     try:
-        hits = search(query, limit)
+        hits = _search(query, limit)
     except ResponseError:
         return []
     articles = {}
