@@ -22,6 +22,7 @@ from helpdesk.helpdesk.doctype.hd_article_category import hd_article_category
 from helpdesk.helpdesk.doctype.hd_article_category.hd_article_category import (
     SEPARATOR,
     batched_article_index,
+    get_branch,
     get_category_labels,
     get_parent,
     get_stricter_visibility,
@@ -53,6 +54,7 @@ PUBLIC_CATEGORY_FIELDS = [
 SEARCH_LIMIT = NUM_RESULTS
 MAX_PAGE_HITS = 200
 PAGE_LENGTH_LIMIT = 50
+CATEGORY_FILTER_LIMIT = 20
 SEARCH_QUERY_LENGTH = 200
 WORDS_PER_MINUTE = 200
 LIST_LIMIT = 100
@@ -403,7 +405,7 @@ def search_articles(
     if wanted is not None:
         hits = [row for row in hits if categories["of"].get(row["name"]) in wanted]
     begin = max(cint(start), 0)
-    size = min(cint(page_length) or SEARCH_LIMIT, PAGE_LENGTH_LIMIT)
+    size = min(max(cint(page_length), 0) or SEARCH_LIMIT, PAGE_LENGTH_LIMIT)
     return {
         "results": _get_search_hits(hits[begin : begin + size]),
         "total": len(hits),
@@ -462,12 +464,19 @@ def _count_by_category(hits: list[dict]) -> dict:
 
 
 def _expand_categories(category) -> set[str] | None:
-    if category is None:
-        return None
+    """None means no filter. Guest input: bad JSON is a plain name, junk is dropped."""
     if isinstance(category, str) and category.lstrip().startswith("["):
-        category = frappe.parse_json(category)
+        try:
+            category = frappe.parse_json(category)
+        except Exception:
+            pass
     names = [category] if isinstance(category, str) else category
-    return {name for each in names for name in (each, *get_subcategories(each))}
+    if not isinstance(names, list):
+        return None
+    names = [n for n in names if isinstance(n, str) and n][:CATEGORY_FILTER_LIMIT]
+    if not names:
+        return None
+    return {name for each in names for name in get_branch(each)}
 
 
 def _get_search_hit(row: dict, article: frappe._dict, labels: dict) -> dict:

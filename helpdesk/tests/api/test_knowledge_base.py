@@ -1336,6 +1336,23 @@ class TestPagedSearch(IntegrationTestCase):
 
         self.assertEqual(len(result["results"]), 50)
 
+    def test_negative_paging_is_clamped(self) -> None:
+        articles = [make_article(category=self.other) for _ in range(55)]
+        self.found(*[make_search_hit(a) for a in articles])
+
+        result = search_articles("anything", start=-5, page_length=-1)
+
+        self.assertEqual(len(result["results"]), 5)
+        self.assertEqual(result["total"], 55)
+
+    def test_empty_or_malformed_category_is_handled(self) -> None:
+        a = make_article(category=self.other)
+        self.found(make_search_hit(a))
+
+        for value in ("", "[]", "[not json", '[["x"], 1, ""]'):
+            result = search_articles("anything", category=value)
+            self.assertEqual(result["total"], 1 if value != "[not json" else 0)
+
     def test_asks_for_up_to_200_hits(self) -> None:
         self.found(make_search_hit(make_article(category=self.other)))
 
