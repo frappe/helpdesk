@@ -46,7 +46,6 @@ export default function setup(context) {
     categoryName,
     categoryDescription,
     articleCount,
-    countText,
     subcategories,
     parentCategory,
     breadcrumbs,

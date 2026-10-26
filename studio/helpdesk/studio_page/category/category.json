@@ -379,122 +379,20 @@
              }
             },
             {
-             "children": [
-              {
-               "blockName": "subcategory-row",
-               "children": [
-                {
-                 "blockName": "subcategory-text",
-                 "children": [
-                  {
-                   "classes": [
-                    "text-ink-gray-8",
-                    "font-medium",
-                    "truncate",
-                    "group-hover:text-ink-gray-9",
-                    "max-sm:whitespace-normal",
-                    "max-sm:line-clamp-2"
-                   ],
-                   "componentId": "subcategory-title",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-base",
-                    "tag": "p",
-                    "text": "{{ dataItem.category_name }}"
-                   }
-                  },
-                  {
-                   "classes": [
-                    "text-ink-gray-5",
-                    "truncate",
-                    "max-sm:whitespace-normal",
-                    "max-sm:line-clamp-2"
-                   ],
-                   "componentId": "subcategory-count",
-                   "componentName": "TextBlock",
-                   "componentProps": {
-                    "fontSize": "text-p-sm",
-                    "tag": "p",
-                    "text": "{{ countText(dataItem.article_count) }}"
-                   }
-                  }
-                 ],
-                 "classes": [
-                  "flex",
-                  "min-w-0",
-                  "flex-1",
-                  "flex-col",
-                  "gap-0.5"
-                 ],
-                 "componentId": "subcategory-row-text",
-                 "componentName": "container",
-                 "originalElement": "div"
-                },
-                {
-                 "classes": [
-                  "size-4",
-                  "shrink-0",
-                  "text-ink-gray-4",
-                  "transition-colors",
-                  "group-hover:text-ink-gray-6"
-                 ],
-                 "componentId": "subcategory-icon",
-                 "componentName": "Icon",
-                 "componentProps": {
-                  "icon": "{{ dataItem.icon || 'lucide-folder' }}"
-                 }
-                }
-               ],
-               "classes": [
-                "group",
-                "flex",
-                "cursor-pointer",
-                "items-center",
-                "gap-4",
-                "py-4",
-                "-mx-2.5",
-                "px-2.5",
-                "rounded-4",
-                "transition-colors",
-                "hover:bg-surface-gray-1",
-                "relative",
-                "after:absolute",
-                "after:inset-x-2.5",
-                "after:bottom-0",
-                "after:h-px",
-                "after:bg-[--outline-gray-1]",
-                "last:after:hidden",
-                "hover:after:opacity-0",
-                "[&:has(+*:hover)]:after:opacity-0",
-                "focus-visible:focus-ring"
-               ],
-               "componentId": "subcategory-row",
-               "componentName": "PortalLink",
-               "componentProps": {
-                "to": "{{ routes.category(dataItem.name) }}"
-               },
-               "isCustomVueComponent": true
-              }
-             ],
-             "classes": [
-              "w-full",
-              "!flex-col",
-              "!flex-nowrap",
-              "!gap-0",
-              "portal-reveal"
-             ],
-             "componentId": "subcategories-repeater",
-             "componentName": "Repeater",
+             "blockName": "Subcategory grid",
+             "componentId": "category_grid-subcategories",
+             "componentName": "category_grid",
              "componentProps": {
-              "data": "{{ subcategories }}",
-              "dataKey": "name"
-             }
+              "categories": "{{ subcategories }}",
+              "columns": "2"
+             },
+             "isStudioComponent": true
             }
            ],
            "classes": [
             "flex",
             "flex-col",
-            "gap-1",
+            "gap-3",
             "mt-8",
             "w-full"
            ],
@@ -596,7 +494,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-26 18:00:00.000000",
+ "modified": "2026-10-26 20:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
