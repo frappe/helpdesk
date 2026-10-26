@@ -212,11 +212,7 @@ class HDTicket(Document, CustomerEditController):
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
         )
-        if (
-            self.source == "Email"
-            and not frappe.flags.initial_sync
-            and send_ack_email
-        ):
+        if self.source == "Email" and not frappe.flags.initial_sync and send_ack_email:
             self.send_acknowledgement_email()
 
     def capture_ticket_created_telemetry_events(self):
