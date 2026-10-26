@@ -12,7 +12,7 @@
       class="border-r border-outline-gray-1 !bg-surface-base max-md:!h-[calc(90dvh-6rem)] max-md:border-r-0"
     >
       <!-- A link styled as the search box: the search page does the searching. -->
-      <div v-if="showSearch" class="px-3 pb-2 pt-4 max-md:px-4 max-md:pt-2">
+      <div v-if="showSearch" class="px-3 pb-2 pt-4 max-md:pt-2">
         <RouterLink
           :to="searchRoute"
           :aria-label="__('Search articles')"
@@ -140,6 +140,8 @@ const props = withDefaults(
   defineProps<{
     categories?: Category[];
     activeCategory?: string;
+    // Only a category page scopes the search link.
+    searchCategory?: string;
     open?: boolean;
     loading?: boolean;
     // Off on the search page, which has its own box.
@@ -150,6 +152,7 @@ const props = withDefaults(
   {
     categories: () => [],
     activeCategory: "",
+    searchCategory: "",
     open: false,
     showSearch: true,
     searchShortcut: true,
@@ -192,16 +195,16 @@ const openName = computed(() => {
   return current?.parent_article_category || current?.name;
 });
 
-const children = computed(() =>
-  props.categories.filter(
-    (category) =>
-      openName.value && category.parent_article_category === openName.value
-  )
-);
+const children = computed(() => {
+  if (!openName.value) return [];
+  return props.categories.filter(
+    (category) => category.parent_article_category === openName.value
+  );
+});
 
 const searchRoute = computed(() =>
   ROUTES.search(
-    props.activeCategory ? { category: props.activeCategory } : undefined
+    props.searchCategory ? { category: props.searchCategory } : undefined
   )
 );
 

@@ -51,6 +51,7 @@
        "componentName": "PortalArticleSidebar",
        "componentProps": {
         "activeCategory": "{{ route.params.category }}",
+        "searchCategory": "{{ route.params.category }}",
         "categories": "{{ sidebar.data || [] }}",
         "open": "{{ drawer.open }}",
         "loading": "{{ !sidebar.data }}"
@@ -388,7 +389,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 12:59:00.000000",
+ "modified": "2026-10-27 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

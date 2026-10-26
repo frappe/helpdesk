@@ -622,6 +622,10 @@ test.describe("categories and category pages", () => {
     // AR26: the sidebar fills the category of the article being read.
     await expect(row(sub)).toHaveAttribute("aria-current", "page");
     await expect(row(sibling)).toBeVisible();
+    // Only a category page scopes the search link.
+    await expect(sidebar.getByRole("link", { name: "Search articles" })).toHaveAttribute("href", "/help/search");
+    await page.keyboard.press("/");
+    await expect(page).toHaveURL(/\/help\/search$/);
   });
 });
 
