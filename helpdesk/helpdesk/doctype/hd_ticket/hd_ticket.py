@@ -29,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
     default_ticket_outgoing_email_account,
 )
 from helpdesk.notifications import clear as clear_notifications
-from helpdesk.notifications import notify_ticket_reopened
+from helpdesk.notifications import notify_new_ticket, notify_ticket_reopened
 from helpdesk.utils import (
     CUSTOMER_PORTAL_ROOT,
     agent_only,
@@ -203,6 +203,7 @@ class HDTicket(Document, CustomerEditController):
         # Telemetry Event
         self.capture_ticket_created_telemetry_events()
         publish_event("helpdesk:new-ticket")
+        self.notify_agents_of_new_ticket()
         self.tag_first_ticket()
 
         if self.get("description"):
@@ -234,6 +235,28 @@ class HDTicket(Document, CustomerEditController):
                 "Info", "split the ticket from #{0}".format(self.ticket_split_from)
             )
             capture_event("ticket_split")
+
+    def notify_agents_of_new_ticket(self):
+        # an initial email sync, a data import or the install's welcome ticket is not news
+        if (
+            frappe.flags.initial_sync
+            or frappe.flags.in_import
+            or frappe.flags.in_install
+        ):
+            return
+        notify_new_ticket(self.name, created_by=self.get_creator())
+
+    def get_creator(self) -> str | None:
+        """The User shown as raising the ticket; they are not notified of it.
+
+        Emailed-in and guest tickets are saved as Administrator or Guest, so the
+        requester stands in; None when they have no User.
+        """
+        if frappe.session.user not in ("Administrator", "Guest"):
+            return frappe.session.user
+        if not self.raised_by:
+            return None
+        return frappe.db.exists("User", self.raised_by)
 
     def tag_first_ticket(self):
         """Tag the first ticket a requester ever raises.

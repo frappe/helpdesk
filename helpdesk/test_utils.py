@@ -921,6 +921,20 @@ def make_notification_log(name: str, ticket: str, user: str, **values) -> None:
     doc.db_insert()
 
 
+def get_new_ticket_notifications(ticket: str) -> dict[str, frappe._dict]:
+    """The "New Ticket" Notification Log rows for `ticket`, keyed by recipient."""
+    rows = frappe.get_all(
+        "Notification Log",
+        filters={
+            "type": "New Ticket",
+            "document_type": "HD Ticket",
+            "document_name": str(ticket),
+        },
+        fields=["for_user", "from_user", "title", "description", "app", "read"],
+    )
+    return {row.for_user: row for row in rows}
+
+
 def unique_name(prefix: str) -> str:
     """`prefix` plus a random suffix, for records that must not clash across tests."""
     return f"{prefix}-{frappe.generate_hash(length=8)}"

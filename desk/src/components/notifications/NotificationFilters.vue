@@ -36,6 +36,7 @@ const categories = [
   { label: __("Assignments"), value: "Assignment" },
   { label: __("Reactions"), value: "Reaction" },
   { label: __("Reopened tickets"), value: "Ticket Reopened" },
+  { label: __("New tickets"), value: "New Ticket" },
 ];
 const categoryOptions = categories.map((c) => ({
   label: c.label,

@@ -134,3 +134,47 @@ def notify_ticket_reopened(
             "app": HELPDESK_APP,
         },
     )
+
+
+def notify_new_ticket(ticket: str, created_by: str | None = None) -> None:
+    """Notify every active agent who can open a new ticket.
+
+    Checking each agent's access costs queries per agent, so it runs in a job
+    instead of holding up the request or email pull that created the ticket.
+    """
+    frappe.enqueue(
+        "helpdesk.notifications.make_new_ticket_notifications",
+        ticket=ticket,
+        created_by=created_by,
+        now=frappe.in_test,
+        enqueue_after_commit=not frappe.in_test,
+    )
+
+
+def make_new_ticket_notifications(ticket: str, created_by: str | None = None) -> None:
+    # the ticket can be deleted before the job runs
+    if not frappe.db.exists("HD Ticket", ticket):
+        return
+    doc = frappe.get_doc("HD Ticket", ticket)
+    # get_all: the job runs as the ticket's creator, often a customer or Guest
+    agents = frappe.get_all("HD Agent", filters={"is_active": 1}, pluck="name")
+    recipients = [
+        agent
+        for agent in agents
+        if frappe.has_permission("HD Ticket", "read", doc=doc, user=agent)
+    ]
+    if not recipients:
+        return
+    make_notification_logs(
+        frappe._dict(
+            type="New Ticket",
+            document_type="HD Ticket",
+            document_name=ticket,
+            subject=_("New ticket #{0}").format(ticket),
+            # the panel renders it as HTML; core sanitizes it on insert
+            description=doc.subject,
+            from_user=created_by,
+            app=HELPDESK_APP,
+        ),
+        recipients,
+    )
