@@ -33,8 +33,9 @@ export default function setup(context) {
       .filter((row) => context.subcategoryArticles.data?.[row.name]?.length)
       .map((row) => ({ name: row.name, category: row, articles: context.subcategoryArticles.data[row.name] })),
   )
-  const loaded = computed(
-    () => Boolean(context.articles.data && sidebar.data && context.subcategoryArticles.data),
+  // An errored section fetch still shows the category's own articles.
+  const loaded = computed(() =>
+    Boolean(context.articles.data && sidebar.data && (context.subcategoryArticles.data || context.subcategoryArticles.error)),
   )
   const categoryIcon = computed(() => category.value?.icon || 'lucide-folder')
   const parentCategory = computed(
