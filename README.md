@@ -56,6 +56,22 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 ![Agent List View](.github/AgentListView.png)
 
+<div align="center">
+	<sub>
+		See each ticket's timeline, response times and conversation summary in Analytics.
+	</sub>
+</div>
+
+![Ticket Analytics](.github/TicketAnalytics.png)
+
+<div align="center">
+	<sub>
+		Customers follow their tickets and reply from the customer portal.
+	</sub>
+</div>
+
+![Customer Ticket View](.github/CustomerTicketView.png)
+
 
 <div align="center">
 	<sub>
@@ -176,7 +192,7 @@ To setup the repository locally follow the steps mentioned below:
 
 **For Frontend Development**
 
-The agent desk:
+The agent portal:
 1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
     ```
     yarn install
@@ -195,8 +211,9 @@ The customer portal, a Studio app:
 1. Start Studio's dev server in `frappe-bench/apps/frappe/studio/frontend` with `yarn install` and `yarn dev --host`. In developer mode, `bench watch` starts it for you.
 1. In another terminal, run `bench --site helpdesk.test watch-studio` and keep it running. It imports the page JSON that you change.
 1. Open `http://helpdesk.test:8080/dev/help`. If the desk's dev server already holds 8080, use the port that Studio's dev server prints. `/help` serves the last build, so it shows your changes only after `bench build --app helpdesk`.
+1. To edit the portal in the Studio editor, open `http://helpdesk.test:8080/studio` on the same dev server as Administrator and select the **Helpdesk** app. In developer mode, a save writes the page JSON to `frappe-bench/apps/helpdesk/studio`.
 
-**Note:** The desk's code is in `frappe-bench/apps/helpdesk/desk`, the portal's in `frappe-bench/apps/helpdesk/studio`, and the code they share in `frappe-bench/apps/helpdesk/shared`. See [`studio/README.md`](studio/README.md) for how the portal is laid out.
+**Note:** Helpdesk’s frontend code is in `frappe-bench/apps/helpdesk/desk`, the portal's in `frappe-bench/apps/helpdesk/studio`, and the code they share in `frappe-bench/apps/helpdesk/shared`. See [`studio/README.md`](studio/README.md) for how the portal is laid out.
 
 
 ## Compatibility matrix 
