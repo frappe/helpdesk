@@ -2,7 +2,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
-HELPDESK_NOTIFICATION_TYPES = ["Reaction", "Ticket Reopened"]
+HELPDESK_NOTIFICATION_TYPES = ["Reaction", "Ticket Reopened", "New Ticket"]
 
 # depends_on keeps the fields out of non-helpdesk Comment forms in Desk;
 # the SPA reads them via API, which is unaffected

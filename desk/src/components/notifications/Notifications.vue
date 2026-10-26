@@ -39,6 +39,7 @@
             @click="close"
           />
         </div>
+        <DesktopNotificationBanner />
         <NotificationFilters />
       </template>
     </NotificationPanel>
@@ -56,6 +57,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import LucideCheckCheck from "~icons/lucide/check-check";
 import LucideX from "~icons/lucide/x";
+import DesktopNotificationBanner from "./DesktopNotificationBanner.vue";
 import NotificationFilters from "./NotificationFilters.vue";
 
 const notificationStore = useNotificationStore();

@@ -6,12 +6,15 @@
 
 <script setup lang="ts">
 import { useAgentStatusStore } from "@/stores/agentStatus";
+import { useDesktopNotificationStore } from "@/stores/desktopNotification";
 import { computed, defineAsyncComponent } from "vue";
 
 import { useScreenSize } from "@/composables/screen";
 // eager: subscribes the availability socket handler and runs the login
 // greeting at boot instead of on first ticket open.
 useAgentStatusStore();
+// eager too: new-ticket popups must not wait for the bell to be opened
+useDesktopNotificationStore();
 
 const { isMobileView } = useScreenSize();
 

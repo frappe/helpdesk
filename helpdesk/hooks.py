@@ -190,6 +190,8 @@ persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
 notification_skip_email_types = [
     "Reaction",
     "Ticket Reopened",
+    # else every agent gets an email per ticket, on by default for new users
+    "New Ticket",
 ]
 
 
