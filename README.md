@@ -192,7 +192,7 @@ To setup the repository locally follow the steps mentioned below:
 
 **For Frontend Development**
 
-The agent desk:
+The agent portal:
 1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
     ```
     yarn install
