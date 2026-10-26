@@ -78,7 +78,7 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `get_article_markdown` |
 | `search` | `/help/search` | `search_articles` with `start`, `page_length` and `category` |
 
-All four pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` Studio Component. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
+All five pages allow guests and use `useKnowledgeBaseHeader` and the `kb_settings` Studio Component. The sidebar, the article cache and hover prefetch are in `studio/helpdesk/stores/knowledgeBase.ts`. The article parts (body, contents, feedback, sidebar, "copy for LLM") are in `studio/helpdesk/components/knowledge_base/`.
 
 Search (`PortalArticleSearch`) and the article suggestions on the new ticket form both use `useArticleSearch`, which calls `search_articles`.
 

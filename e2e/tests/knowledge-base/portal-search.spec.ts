@@ -114,6 +114,38 @@ test.describe("knowledge base search page", () => {
     await expect(page).toHaveURL(new RegExp(`/help/search\\?q=${word}$`));
   });
 
+  test("a category from the URL stays selected while a query has no matches in it", async ({ page, api }) => {
+    const word = token();
+    const elsewhere = token();
+    const category = await createCategory(api);
+    const other = await createCategory(api);
+    const inside = await createArticle(api, category.name, { title: `${word} inside` });
+    await createArticle(api, other.name, { title: `${elsewhere} elsewhere` });
+    await waitForIndex(api, word, 1);
+    await waitForIndex(api, elsewhere, 1);
+
+    await page.goto(`/help/search?category=${category.name}`);
+    await searchBox(page).fill(elsewhere);
+    await expect(page.getByText(`No articles match “${elsewhere}”`)).toBeVisible();
+    const chip = page.getByRole("button", { name: `Remove filter ${category.category_name}` });
+    await expect(chip).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`category=${encodeURIComponent(category.name)}`));
+
+    await searchBox(page).fill(word);
+    await expect(results(page)).toHaveCount(1);
+    await expect(results(page).filter({ hasText: inside.title })).toHaveCount(1);
+    await expect(chip).toBeVisible();
+  });
+
+  test("the search box text is 16 semibold", async ({ page }) => {
+    await page.goto("/help/search");
+    const style = await searchBox(page).evaluate((input) => {
+      const { fontSize, fontWeight } = getComputedStyle(input);
+      return { fontSize, fontWeight };
+    });
+    expect(style).toEqual({ fontSize: "16px", fontWeight: "600" });
+  });
+
   test("Load more adds the next 20 results and goes away at the end", async ({ page, api }) => {
     const word = token();
     const category = await createCategory(api);

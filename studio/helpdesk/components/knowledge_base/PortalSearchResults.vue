@@ -6,6 +6,7 @@
         v-model="query"
         size="lg"
         variant="outline"
+        class="[&_input]:font-semibold"
         :placeholder="__('Search articles')"
         :aria-label="__('Search articles')"
       >
@@ -173,24 +174,52 @@ watch([query, selected], () =>
 const searchText = computed(() => query.value.trim());
 const canSearch = computed(() => searchText.value.length >= MIN_QUERY_LENGTH);
 
-// URL names this reader has no results in are only known after an answer.
+// Drop URL names this reader cannot see. A known Category with no matches
+// for the current query stays: it still scopes the search.
 const checked = ref(false);
 watch(
-  () => search.counts,
-  (counts) => {
-    if (checked.value || !search.isCurrent) return;
+  () => sidebar.data,
+  (rows) => {
+    if (checked.value || !rows) return;
     checked.value = true;
-    selected.value = selected.value.filter((name) => name in counts);
+    selected.value = selected.value.filter((name) =>
+      rows.some((row) => row.name === name),
+    );
   },
+  { immediate: true },
 );
 
 const labelOf = (name: string) =>
   sidebar.data?.find((row) => row.name === name)?.label || name;
 
+// As the server's `category_label_sort_key`: General first, then by label
+// parts, so a Subcategory follows its parent. The sidebar sorts by name only.
+function byLabel(a: { label: string }, b: { label: string }) {
+  const [left, right] = [a.label, b.label].map((label) =>
+    label.split(" › ").map((part) => part.toLocaleLowerCase()),
+  );
+  const general =
+    Number(left[0] !== "general") - Number(right[0] !== "general");
+  if (general) return general;
+  for (let index = 0; index < Math.min(left.length, right.length); index++) {
+    if (left[index] !== right[index])
+      return left[index] < right[index] ? -1 : 1;
+  }
+  return left.length - right.length;
+}
+
+// Selected rows stay listed so they can be unchecked.
 const options = computed(() =>
-  Object.entries(search.counts)
-    .map(([name, count]) => ({ value: name, label: labelOf(name), count }))
-    .sort((a, b) => a.label.localeCompare(b.label)),
+  (sidebar.data || [])
+    .filter(
+      (row) => row.name in search.counts || selected.value.includes(row.name),
+    )
+    .map((row) => ({
+      value: row.name,
+      label: row.label,
+      count: search.counts[row.name] || 0,
+    }))
+    .sort(byLabel),
 );
 const chips = computed(() =>
   checked.value

@@ -85,7 +85,7 @@ The stores are module-level singletons, not Pinia.
 
 ### Composables
 
-- `useKnowledgeBaseHeader`: the header for the four KB pages. It runs KB form scripts into header links and custom actions.
+- `useKnowledgeBaseHeader`: the header for the five KB pages. It runs KB form scripts into header links and custom actions.
 - `useArticleSearch`: debounced article search, used by the search box and the new ticket form. `usePagedArticleSearch`: the search page's pages of 20, with counts per Category.
 - `useDrawer`: the ticket page's mobile side drawer. `useBottomSheet`: open state for the knowledge base sidebar, a frappe-ui `BottomSheet` on phones.
 - `useTicketThread`, `useReplyComposer`, `useTicketDetails`, `useTicketFeedback`, `useOutsideHoursBanner`, `useChatRows`: the parts of the `ticket` page.
