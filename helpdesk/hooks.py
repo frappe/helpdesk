@@ -6,7 +6,8 @@ app_icon = "octicon octicon-file-directory"
 app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
-required_apps = ["telephony"]
+# As org/app, so `bench get-app helpdesk` fetches whichever is missing.
+required_apps = ["frappe/telephony"]
 require_type_annotated_api_methods = True
 
 add_to_apps_screen = [
@@ -22,6 +23,7 @@ add_to_apps_screen = [
 get_site_info = "helpdesk.activation.get_site_info"
 
 after_install = "helpdesk.setup.install.after_install"
+before_uninstall = "helpdesk.setup.install.before_uninstall"
 after_migrate = [
     "helpdesk.search.build_index_in_background",
     "helpdesk.search.download_corpus",
@@ -31,7 +33,9 @@ after_migrate = [
 # Full Text Search
 # ------------------
 
-sqlite_search = ["helpdesk.search_sqlite.HelpdeskSearch"]
+sqlite_search = [
+    "helpdesk.search_sqlite.HelpdeskSearch",
+]
 
 scheduler_events = {
     "all": [
@@ -54,6 +58,43 @@ website_route_rules = [
     },
 ]
 
+# The old customer portal's URLs keep working through these.
+website_redirects = [
+    {
+        "source": "/helpdesk/my-tickets/new",
+        "target": "/help/my-tickets/new",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/my-tickets",
+        "target": "/help/my-tickets",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": r"/helpdesk/my-tickets/(.*)",
+        "target": r"/help/my-tickets/\1",
+        "forward_query_parameters": True,
+    },
+    # Ticket emails and the new ticket form lived here before they moved under my-tickets.
+    {
+        "source": r"/help/tickets/(.+)",
+        "target": r"/help/my-tickets/\1",
+        "forward_query_parameters": True,
+    },
+    {
+        "source": "/helpdesk/kb-public",
+        "target": "/help",
+    },
+    {
+        "source": r"/helpdesk/kb-public/articles/(.*)",
+        "target": r"/help/articles/\1",
+    },
+    {
+        "source": r"/helpdesk/kb-public/(.*)",
+        "target": r"/help/category/\1",
+    },
+]
+
 user_invitation = {
     "allowed_roles": {
         "Agent Manager": [
@@ -73,6 +114,9 @@ user_invitation = {
     "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
     "extra_invite_params": ["customer", "contact"],
 }
+
+studio_app_boot = {"helpdesk": "helpdesk.helpdesk.hooks.studio_app.get_boot"}
+update_website_context = "helpdesk.helpdesk.hooks.studio_app.update_website_context"
 
 doc_events = {
     "Assignment Rule": {
@@ -106,11 +150,16 @@ doc_events = {
         "validate": "helpdesk.extends.comment.validate",
         "on_trash": "helpdesk.extends.comment.on_trash",
     },
+    "ToDo": {
+        "on_update": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.publish_assignment_update",
+    },
 }
 
 # For List View
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.permission_query",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.permission_query",
 }
@@ -119,6 +168,8 @@ permission_query_conditions = {
 has_permission = {
     "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Article": "helpdesk.helpdesk.doctype.hd_article.hd_article.has_permission",
+    "HD Article Category": "helpdesk.helpdesk.doctype.hd_article_category.hd_article_category.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
     "HD Customer": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.has_permission",
     "Comment": "helpdesk.extends.comment.has_permission",
@@ -126,8 +177,15 @@ has_permission = {
 
 override_whitelisted_methods = {
     "frappe.realtime.has_permission": "helpdesk.overrides.realtime.has_permission",
+    "frappe.desk.form.activity.get_activity_timeline": "helpdesk.overrides.activity.get_activity_timeline",
+    "frappe.desk.form.activity.get_more_email_activities": "helpdesk.overrides.activity.get_more_email_activities",
+    "frappe.desk.form.load.getdoc": "helpdesk.overrides.activity.getdoc",
+    "frappe.desk.form.load.get_docinfo": "helpdesk.overrides.activity.get_docinfo",
+    "frappe.desk.form.load.get_communications": "helpdesk.overrides.activity.get_communications",
 }
 
+# The article search index; frappe.clear_cache() would otherwise empty it until the next rebuild
+persistent_cache_keys = ["search_doc:*", "search_doc_sections:*"]
 
 notification_skip_email_types = [
     "Reaction",

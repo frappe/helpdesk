@@ -170,6 +170,43 @@ class TestGetListData(IntegrationTestCase):
 
         self.assertEqual([row.name for row in result["data"]], [self.own_ticket])
 
+    def test_group_by_labels_keep_to_what_the_user_may_read(self) -> None:
+        frappe.db.set_value(
+            "User", self.customer["user"], "reset_password_key", "secret-token"
+        )
+        view = {
+            "view_type": "group_by",
+            "group_by_field": "raised_by",
+            "label_doc": "User",
+            "label_field": "reset_password_key",
+            "icon_field": "api_secret",
+        }
+
+        with self.set_user(self.customer["user"]):
+            result = get_list_data("HD Ticket", filters=[], view=view)
+
+        options = result["group_by_field"]["options"]
+        self.assertIn(self.customer["user"], [o["value"] for o in options])
+        for option in options:
+            self.assertNotEqual(option["label"], "secret-token")
+            self.assertIsNone(option["icon"])
+
+    def test_group_by_ignores_a_label_field_that_does_not_exist(self) -> None:
+        view = {
+            "view_type": "group_by",
+            "group_by_field": "raised_by",
+            "label_doc": "User",
+            "label_field": "(select password from __Auth limit 1)",
+        }
+
+        with self.set_user(self.agent):
+            result = get_list_data(
+                "HD Ticket", filters=[["name", "=", self.own_ticket]], view=view
+            )
+
+        options = result["group_by_field"]["options"]
+        self.assertEqual([o["label"] for o in options], [None])
+
     def list_default(self, default_filters: dict, filters: list) -> dict:
         return get_list_data(
             "HD Ticket",

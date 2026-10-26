@@ -5,6 +5,8 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY, DEFAULT_SLA
+from helpdesk.helpdesk.doctype.hd_customer.hd_customer import CUSTOMER_ROLES
+from helpdesk.helpdesk.doctype.hd_settings.helpers import clear_website_home_page
 from helpdesk.setup.comments import setup_comments_and_notifications
 from helpdesk.setup.default_views import add_default_views
 
@@ -13,6 +15,11 @@ from .file import create_helpdesk_folder
 from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
+
+
+def before_uninstall():
+    # The portal's route goes with the app
+    clear_website_home_page()
 
 
 def after_install():
@@ -214,8 +221,7 @@ def add_agent_manager_permissions():
 
 
 def setup_customer_role(fresh_install=True):
-    customer_roles = ["HD Customer", "HD Customer Manager"]
-    for role_name in customer_roles:
+    for role_name in CUSTOMER_ROLES:
         if frappe.db.exists("Role", role_name):
             role_doc = frappe.get_doc("Role", role_name)
         else:
@@ -227,17 +233,17 @@ def setup_customer_role(fresh_install=True):
 
     if fresh_install:
         set_portal_defaults(overwrite=True)
+        # Single defaults aren't stored on install; the home pages assume it
+        frappe.db.set_single_value("HD Settings", "prefer_knowledge_base", 1)
 
 
 def set_portal_defaults(overwrite=False):
-    """Point the portal at helpdesk. Installing claims the settings outright;
-    the upgrade patch only fills what a site left empty.
-
-    Writes straight into the Single rather than saving the document. A save
-    also validates the portal menu rows, and a row left behind by a deleted
-    doctype fails that validation and takes the whole migration down.
-    """
-    defaults = {"default_role": "HD Customer", "default_portal_home": "/helpdesk"}
+    """Writes the Single directly: a save fails on stale menu rows."""
+    defaults = {
+        "default_role": "HD Customer",
+        # agents fall back to it; customers get theirs from their role
+        "default_portal_home": "/helpdesk",
+    }
     if overwrite:
         to_set = defaults
     else:

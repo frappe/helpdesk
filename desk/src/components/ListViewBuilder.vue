@@ -3,7 +3,9 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-4',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute inset-x-0',
+      groupBy || list.loading || list?.data?.data?.length > 0
+        ? 'relative'
+        : 'absolute inset-x-0',
     ]"
     v-if="showViewControls"
   >
@@ -20,27 +22,133 @@
       />
       <Reload @click="handleReload" :loading="list.loading" />
       <Filter />
-      <SortBy :hide-label="isMobileView" />
+      <!-- a grouped list sorts and sizes from its own column headers -->
+      <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+      <GroupBy
+        v-if="options.groupBy"
+        :modelValue="groupBy"
+        :doctype="options.doctype"
+        :exclude="options.groupByExclude"
+        @update:modelValue="updateGroupBy"
+      />
+      <Dropdown v-if="groupBy" :options="exportGroupOptions">
+        <Button :label="__('Export')" icon-left="lucide-download" />
+      </Dropdown>
       <ColumnSettings
         :hide-label="isMobileView"
-        v-if="!options.hideColumnSetting"
+        v-if="!options.hideColumnSetting && !groupBy"
       />
     </div>
     <div v-else class="flex justify-between items-center w-full">
       <Filter />
       <div class="flex items-center gap-2">
         <Reload @click="handleReload" :loading="list.loading" />
-        <SortBy :hide-label="isMobileView" />
+        <SortBy v-if="!groupBy" :hide-label="isMobileView" />
+        <GroupBy
+          v-if="options.groupBy"
+          :modelValue="groupBy"
+          :doctype="options.doctype"
+          :exclude="options.groupByExclude"
+          hideLabel
+          @update:modelValue="updateGroupBy"
+        />
+        <Dropdown v-if="groupBy" :options="exportGroupOptions">
+          <Button :tooltip="__('Export')" icon="lucide-download" />
+        </Dropdown>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
+  <!-- Group By summary: one row per group instead of the records -->
+  <template v-if="groupBy">
+    <div class="flex min-h-0 flex-1 flex-col px-3 sm:px-5">
+      <GroupByTable
+        class="[&_[data-slot=list-header-border]]:hidden [&_[data-slot=list-header]]:mb-2 [&_[data-slot=list-header]]:rounded-4 [&_[data-slot=list-header]]:bg-surface-gray-2"
+        :doctype="options.doctype"
+        :groupBy="groupBy"
+        :rows="groups.rows.value"
+        :totals="groups.totals.value"
+        :loading="groups.loading.value"
+        @update:groupBy="updateGroupBy"
+      >
+        <template #cell="{ row, column, value, total }">
+          <div
+            class="flex items-center gap-2 truncate text-base"
+            :class="[
+              column.align === 'right' ? 'tabular-nums' : '',
+              total ? 'font-medium text-ink-gray-9' : 'text-ink-gray-8',
+            ]"
+          >
+            <Avatar
+              v-if="!total && column.options === 'User' && row[column.key]"
+              size="sm"
+              :label="getUser(row[column.key]).full_name"
+              :image="getUser(row[column.key]).user_image"
+            />
+            <IndicatorIcon
+              v-else-if="!total && statusColor(column, row[column.key])"
+              :class="statusColor(column, row[column.key])"
+            />
+            <Tooltip
+              v-if="ratingStars(column, row[column.key]) !== null"
+              :text="formatRating(Number(row[column.key]), column.options)"
+            >
+              <Rating
+                :model-value="ratingStars(column, row[column.key])"
+                :max="Number(column.options) || 5"
+                :step="0.5"
+                disabled
+              />
+            </Tooltip>
+            <span v-else class="truncate">{{
+              groupCellText(row, column, value)
+            }}</span>
+          </div>
+        </template>
+        <template v-if="groups.error.value" #empty>
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <span class="text-base text-ink-gray-7">{{
+              __("Couldn't load the groups")
+            }}</span>
+            <Button :label="__('Retry')" @click="groups.reload" />
+          </div>
+        </template>
+      </GroupByTable>
+    </div>
+    <div v-if="groups.rowCount.value" class="border-t sm:px-5 px-3 py-2">
+      <ListFooter v-model="groups.pageLength.value">
+        <template #left>
+          <TabButtons
+            :model-value="groups.pageLength.value"
+            :options="
+              [20, 50, 100].map((o) => ({ label: String(o), value: o }))
+            "
+            @update:model-value="(count) => (groups.pageLength.value = count)"
+          />
+        </template>
+        <template #right>
+          <Button
+            v-if="groups.hasNextPage.value"
+            :label="__('Load More')"
+            @click="groups.loadMore"
+          />
+        </template>
+      </ListFooter>
+    </div>
+  </template>
+  <!-- Loading State: header and placeholder rows, like the grouped table -->
   <div
-    v-if="list.loading && !list.data?.data?.length"
-    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
+    v-else-if="list.loading && !list.data?.data?.length"
+    class="flex-1 overflow-hidden"
   >
-    <LoadingIndicator class="size-6 text-ink-gray-4" />
+    <div class="mb-2 h-[34px] rounded-4 bg-surface-gray-2 sm:mx-5 mx-3" />
+    <div
+      v-for="i in 8"
+      :key="i"
+      class="flex h-10 items-center gap-4 border-b px-2 sm:mx-5 mx-3"
+    >
+      <Skeleton v-for="j in 4" :key="j" class="h-3 flex-1 rounded-1" />
+    </div>
   </div>
   <!-- List View -->
   <ListView
@@ -105,7 +213,7 @@
   <!-- List Footer -->
   <div
     class="p-20 border-t sm:px-5 px-3 py-2"
-    v-if="list.data?.data.length > 0"
+    v-if="!groupBy && list.data?.data.length > 0"
   >
     <ListFooter
       :options="{
@@ -134,7 +242,7 @@
   </div>
   <!-- Empty State -->
   <EmptyState
-    v-else-if="!list.loading"
+    v-else-if="!groupBy && !list.loading"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -143,13 +251,24 @@
 
 <script setup lang="ts">
 import { MultipleAvatar, StarRating } from "@/components";
+import { IndicatorIcon } from "@/components/icons";
+import { useGroupedList } from "@/composables/useGroupedList";
+import { useUserStore } from "@/stores/user";
+import {
+  formatRating,
+  GroupBy,
+  GroupByTable,
+  parseGroupBy,
+  serializeGroupBy,
+} from "@framework/ui/GroupBy";
+import type { GroupByColumn, GroupBySettings } from "@framework/ui/GroupBy";
 import {
   ColumnSettings,
   QuickFilters,
   Reload,
   SortBy,
 } from "@/components/view-controls";
-import { Filter, normalizeFilters } from "@/components/view-controls/filter";
+import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
 import { useScreenSize } from "@/composables/screen";
 import {
   listRouteOf,
@@ -170,13 +289,16 @@ import { View, ViewType } from "@/types";
 import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
+  Avatar,
   createResource,
   dayjsLocal,
   Dropdown,
   frappeRequest,
-  LoadingIndicator,
+  Rating,
+  Skeleton,
   TabButtons,
   toast,
+  Tooltip,
 } from "frappe-ui";
 import {
   Icon as SpriteIcon,
@@ -223,7 +345,6 @@ interface P {
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;
-    isCustomerPortal?: boolean;
     rowRoute?: Record<string, string>;
   };
 }
@@ -251,7 +372,6 @@ const defaultOptions = reactive({
   },
   groupByActions: [],
   default_page_length: 20,
-  isCustomerPortal: false,
   hideColumnSetting: true,
   rowRoute: {
     name: "",
@@ -280,7 +400,7 @@ const defaultOptions = reactive({
           ],
         });
       },
-      condition: () => !options.value.isCustomerPortal && isManager,
+      condition: () => isManager,
     },
   ],
 });
@@ -389,7 +509,6 @@ const defaultParams = reactive({
   view: options.value.view,
   columns: [],
   rows: [],
-  show_customer_portal_fields: options.value.isCustomerPortal,
   is_default: false,
 });
 
@@ -483,7 +602,7 @@ function getGroupedByRows(listRows, groupByField) {
       collapsed: false,
       rows: filteredRows,
       icon: h(SpriteIcon, {
-        name: "folder",
+        name: option.icon?.replace(/^lucide-/, "") || "folder",
         class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
       }),
     };
@@ -515,7 +634,6 @@ const filterableFields = createResource({
   params: {
     doctype: options.value.doctype,
     append_assign: true,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     data = data.map((field) => {
@@ -534,7 +652,6 @@ const sortableFields = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
 });
 
@@ -543,7 +660,6 @@ const quickFilters = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
-    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
@@ -659,7 +775,7 @@ onUnmounted(() => (listFilters.value = null));
 function applyFilters(filters) {
   isViewUpdated.value = true;
   defaultParams.filters = normalizeFilters(filters);
-  list.submit({ ...defaultParams });
+  loadList();
 
   // automatically update filters for default view
   if (!defaultParams.is_default) return;
@@ -667,10 +783,84 @@ function applyFilters(filters) {
   isViewUpdated.value = false;
 }
 
+// one summary row per group, saved with the view like sort and filters
+const groupBy = ref<GroupBySettings | null>(null);
+const groups = useGroupedList(
+  () => options.value.doctype,
+  groupBy,
+  () => defaultParams.filters
+);
+// read by useView's create flow, which only gets the list resource
+list.groupBy = groupBy;
+
+// A grouped list hides the records, so only their params move until grouping is cleared.
+let listSkipped = false;
+function loadList() {
+  listSkipped = Boolean(groupBy.value);
+  if (listSkipped) list.params = { ...defaultParams };
+  else list.submit({ ...defaultParams });
+}
+watch(groupBy, (value) => {
+  if (!value && listSkipped) loadList();
+});
+
+function updateGroupBy(value: GroupBySettings | null) {
+  isViewUpdated.value = true;
+  groupBy.value = value;
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
+}
+
+const { getUser } = useUserStore();
+
+// downloads the groups on screen, through the same filter handling as the grouped list
+function exportGroups(fileFormat: "Excel" | "CSV") {
+  const grouped = serializeGroupBy(groupBy.value!);
+  const params = new URLSearchParams({
+    doctype: options.value.doctype,
+    title: options.value.doctype,
+    file_format_type: fileFormat,
+    fields: JSON.stringify(grouped.fields),
+    filters: JSON.stringify(defaultParams.filters),
+    group_by: grouped.group_by,
+    order_by: grouped.order_by,
+    view: "Report",
+  });
+  window.location.href = `/api/method/helpdesk.api.doc.export_grouped_list?${params}`;
+}
+
+const exportGroupOptions = [
+  { label: __("Excel"), onClick: () => exportGroups("Excel") },
+  { label: __("CSV"), onClick: () => exportGroups("CSV") },
+];
+
+function statusColor(column: GroupByColumn, value: unknown): string {
+  if (options.value.doctype !== "HD Ticket" || column.key !== "status")
+    return "";
+  return value ? getStatus(String(value))?.parsed_color ?? "" : "";
+}
+
+// a Rating is stored as a fraction of its stars (0.6 of 5 is 3 stars)
+function ratingStars(column: GroupByColumn, value: unknown): number | null {
+  if (column.fieldtype !== "Rating" || typeof value !== "number") return null;
+  return value * (Number(column.options) || 5);
+}
+
+function groupCellText(
+  row: Record<string, unknown>,
+  column: GroupByColumn,
+  value: string
+): string {
+  const raw = row[column.key];
+  if (column.options === "User" && raw) return getUser(String(raw)).full_name;
+  return value;
+}
+
 function applySort(order_by: string) {
   isViewUpdated.value = true;
   defaultParams.order_by = order_by;
-  list.submit({ ...defaultParams, order_by });
+  loadList();
   if (!defaultParams.is_default) return;
   handleViewUpdate();
   isViewUpdated.value = false;
@@ -685,7 +875,7 @@ function updateColumns(obj) {
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
-  list.reload({ ...defaultParams });
+  loadList();
 }
 
 function reload(reset: boolean = false) {
@@ -699,7 +889,8 @@ function reload(reset: boolean = false) {
     defaultParams.rows = [];
     defaultParams.is_default = true;
   }
-  list.reload({ ...defaultParams });
+  loadList();
+  groups.reload();
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {
@@ -726,10 +917,11 @@ function handleViewUpdate() {
     columns: JSON.stringify(defaultParams.columns),
     rows: JSON.stringify(defaultParams.rows),
     order_by: defaultParams.order_by,
+    list_group_by: groupBy.value ? JSON.stringify(groupBy.value) : "",
     name: activeViewName.value || "default",
     dt: options.value.doctype,
     route_name: route.name,
-    is_customer_portal: options.value.isCustomerPortal,
+    is_customer_portal: false,
   };
   const currentView = findView(activeViewName.value).value;
   if (currentView && currentView.public) {
@@ -785,7 +977,7 @@ function handleReload() {
 function handleViewChanges() {
   if (!switchToView(activeViewName.value)) return;
   applyUrlFilters();
-  list.submit({ ...defaultParams });
+  loadList();
 }
 
 /** Base for URL filters, so repeated pushes layer on the view, not each other. */
@@ -801,6 +993,9 @@ function switchToView(view: string): boolean {
     defaultParams.order_by = currentView.order_by || "modified desc";
     defaultParams.columns = currentView.columns;
     defaultParams.rows = currentView.rows;
+    groupBy.value = options.value.groupBy
+      ? parseGroupBy(currentView.list_group_by)
+      : null;
     return true;
   }
   if (view) {
@@ -812,6 +1007,7 @@ function switchToView(view: string): boolean {
   defaultParams.order_by = "modified desc";
   defaultParams.columns = [];
   defaultParams.rows = [];
+  groupBy.value = null;
   defaultParams.is_default = true;
   headerView.value.label = __("List");
   headerView.value.icon = LucideAlignJustify;
@@ -861,7 +1057,7 @@ watch(
   ([view], [previousView]) => {
     if (view !== previousView && !switchToView(view)) return;
     applyUrlFilters();
-    list.submit({ ...defaultParams });
+    loadList();
   }
 );
 

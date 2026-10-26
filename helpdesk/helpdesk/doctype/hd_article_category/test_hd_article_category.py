@@ -42,3 +42,23 @@ class TestHDArticleCategory(IntegrationTestCase):
         # "  general  " should also fail
         with self.assertRaises(frappe.ValidationError):
             create_category("  general  ")
+
+
+class TestPinnedCategory(IntegrationTestCase):
+    def setUp(self):
+        self.category = frappe.get_doc(
+            {"doctype": "HD Article Category", "category_name": "Pin Test"}
+        ).insert()
+
+    def tearDown(self):
+        frappe.delete_doc("HD Article Category", self.category.name, force=True)
+
+    def test_pinned_needs_an_order(self):
+        for order in (0, -1):
+            with self.subTest(order=order), self.assertRaises(frappe.ValidationError):
+                self.category.update({"pinned": 1, "pinned_order": order}).save()
+
+    def test_unpinning_clears_the_order(self):
+        self.category.update({"pinned": 1, "pinned_order": 2}).save()
+        self.category.update({"pinned": 0}).save()
+        self.assertEqual(self.category.pinned_order, 0)

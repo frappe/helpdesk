@@ -8,6 +8,7 @@ from helpdesk.test_utils import create_agent
 class TestPermission(FrappeTestCase):
     website_user = "helpdesk-website-user@example.com"
     manager_user = "helpdesk-manager@example.com"
+    customer_user = "helpdesk-customer@example.com"
     original_user = None
 
     @classmethod
@@ -52,3 +53,12 @@ class TestPermission(FrappeTestCase):
                 "send_welcome_email": 0,
             }
         ).insert(ignore_permissions=True)
+
+    def test_customer_is_not_sent_to_the_agent_app(self):
+        # the portal at /help is theirs; the app screen would route them via /helpdesk
+        user = self._get_or_create_user(self.customer_user)
+        user.add_roles("HD Customer", "HD Customer Manager")
+
+        frappe.set_user(self.customer_user)
+
+        self.assertFalse(has_app_permission())

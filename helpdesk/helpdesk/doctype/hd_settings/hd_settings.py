@@ -11,6 +11,11 @@ from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 from frappe.utils.jinja import validate_template
 
+from helpdesk.api.auth import validate_uploaded_image
+from helpdesk.helpdesk.doctype.hd_settings.helpers import (
+    sync_brand_to_website_settings,
+    sync_home_page_to_website_settings,
+)
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
     remove_guest_ticket_creation_permission,
     set_guest_ticket_creation_permission,
@@ -23,6 +28,33 @@ class HDSettings(Document):
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
         self.validate_default_agent_status()
+        self.turn_off_guest_home_when_private()
+        self.validate_guest_only_settings()
+        # every visitor loads it, so a linked image could track them
+        validate_uploaded_image(self.banner_image)
+
+    def turn_off_guest_home_when_private(self):
+        """A private knowledge base turns away guests, so it can't be their home."""
+        if not self.public_knowledge_base and self.has_value_changed(
+            "public_knowledge_base"
+        ):
+            self.knowledge_base_home_page_for_guests = 0
+
+    def validate_guest_only_settings(self):
+        """Guests reach only a public knowledge base. Checked only when turned on,
+        so a site already in that state still saves its other settings."""
+        if self.public_knowledge_base:
+            return
+        for fieldname in (
+            "allow_anonymous_article_voting",
+            "knowledge_base_home_page_for_guests",
+        ):
+            if self.get(fieldname) and self.has_value_changed(fieldname):
+                frappe.throw(
+                    _("Knowledge base must be public to turn on {0}").format(
+                        frappe.bold(_(self.meta.get_label(fieldname)))
+                    )
+                )
 
     def validate_default_agent_status(self):
         """The default status should be enabled, else agent creation breaks.
@@ -94,9 +126,13 @@ class HDSettings(Document):
         return
 
     def before_save(self):
-        self.update_ticket_permissions()
+        if self.has_value_changed("allow_anyone_to_create_tickets"):
+            self.update_ticket_permissions()
 
     def on_update(self):
+        sync_brand_to_website_settings(self)
+        sync_home_page_to_website_settings(self)
+
         event = "helpdesk:settings-updated"
         room = get_website_room()
 

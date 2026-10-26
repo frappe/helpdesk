@@ -8,13 +8,15 @@ from bs4 import BeautifulSoup
 from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder import Order
-from frappe.realtime import get_website_room
+from frappe.realtime import get_site_room
 from frappe.utils import floor
 from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from phonenumbers import NumberParseException
 from phonenumbers import PhoneNumberFormat as PNF
 from pypika.functions import Replace
+
+CUSTOMER_PORTAL_ROOT = "/help"
 
 
 def check_permissions(doctype, parent, doc=None):
@@ -82,13 +84,14 @@ def publish_event(
     user: str | None = None,
 ):
     """
-    Publish `event` to a room with `data`
+    Publish `event` to a room with `data`; without a room, to desk users only
+    (the website room reaches guests, and events can name agents).
 
     :param event: Event name. Example: "refetch_resource"
     :param data: Data to be sent with the event
     :param user: User to send the event to, defaults to current user
     """
-    room = room or get_website_room()
+    room = room or get_site_room()
     user = user or frappe.session.user
     frappe.publish_realtime(
         event, message=data, room=room, after_commit=True, user=user
@@ -103,6 +106,10 @@ def capture_event(event: str):
     return _capture(event, "helpdesk")
 
 
+def get_user_contact(user: str | None = None) -> str | None:
+    return frappe.db.get_value("Contact", {"user": user or frappe.session.user})
+
+
 def get_customers(user: str = "", contact: str = "", get_roles=False):
     """
     Get `Customer` from `Contact`
@@ -111,9 +118,8 @@ def get_customers(user: str = "", contact: str = "", get_roles=False):
     :param user: User to check against, defaults to current user
     :return: Customer `name` if available
     """
-    user = user or frappe.session.user
     if not contact:
-        contact = frappe.db.get_value("Contact", {"user": user})
+        contact = get_user_contact(user)
 
     HDCustomer = frappe.qb.DocType("HD Customer")
     HDCustomerMember = frappe.qb.DocType("HD Customer Member")
@@ -202,6 +208,13 @@ def is_agent_manager(user: str | None = None) -> bool:
     :param user: User to check against, defaults to current user
     :return: Whether `user` is an agent manager, system manager or admin
     """
+    user = user or frappe.session.user
+    # as in is_agent: Administrator is never restricted
+    if is_admin(user):
+        return True
+    # a deactivated agent keeps their roles
+    if frappe.db.get_value("HD Agent", user, "is_active") == 0:
+        return False
     roles = set(frappe.get_roles(user))
     return bool(roles & {"Administrator", "System Manager", "Agent Manager"})
 

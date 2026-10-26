@@ -17,6 +17,7 @@ from helpdesk.test_utils import (
     set_agent_availability,
     set_agent_status_enabled,
 )
+from helpdesk.utils import is_agent_manager
 
 
 class TestHDAgent(FrappeTestCase):
@@ -49,6 +50,12 @@ class TestHDAgent(FrappeTestCase):
         )
 
     # a new agent starts on the default from HD Settings
+    def test_a_deactivated_agent_record_keeps_administrator_a_manager(self):
+        make_agent("Administrator")
+        frappe.db.set_value("HD Agent", "Administrator", "is_active", 0)
+
+        self.assertTrue(is_agent_manager("Administrator"))
+
     def test_new_agent_defaults_to_configured_status(self):
         agent = make_agent("defaults_active@test.com", first_name="Defaults Active")
 
@@ -76,6 +83,19 @@ class TestHDAgent(FrappeTestCase):
 
     # the frontend now writes this straight through frappe.client.set_value, so a
     # plain agent must be able to save their own record without elevated rights
+    def test_availability_reaches_desk_users_only(self):
+        # the event names agents; the website room reaches portal sockets
+        agent = frappe.get_doc("HD Agent", self.test_user)
+        agent.availability = "Away"
+        with patch("frappe.publish_realtime") as publish:
+            agent.save()
+        rooms = [
+            call.kwargs["room"]
+            for call in publish.call_args_list
+            if call.args[0] == "agent_availability_updated"
+        ]
+        self.assertEqual(rooms, ["all"])
+
     def test_agent_can_set_own_availability(self):
         frappe.set_user(self.test_user)
 
@@ -212,6 +232,15 @@ class TestHDAgent(FrappeTestCase):
             assignment_rule.reload()
         assignment_rule.last_user = None
         return assignment_rule
+
+    def test_round_robin_without_users_assigns_nobody(self):
+        agent = make_agent("rr_only@test.com", first_name="RR Only")
+        assignment_rule = self._make_assignment_rule(
+            "Test AR Empty", [agent], "Round Robin"
+        )
+        assignment_rule.users = []
+
+        self.assertIsNone(assignment_rule.get_user(make_ticket(subject="RR empty")))
 
     # Round Robin: away user is skipped, next user in list is picked
     def test_round_robin_skips_away_agent(self):

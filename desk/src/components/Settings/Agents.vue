@@ -90,7 +90,7 @@
           title="No agent found"
           :description="
             activeFilter.length
-              ? 'Change your search terms or filters'
+              ? 'Try a different search or filter.'
               : 'Add one to get started.'
           "
         />

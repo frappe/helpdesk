@@ -1,0 +1,122 @@
+{
+ "allow_guest": 0,
+ "blocks": [
+  {
+   "blockName": "body",
+   "children": [
+    {
+     "blockName": "Header",
+     "componentId": "header-topbar",
+     "componentName": "header",
+     "componentProps": {
+      "crumb": "{{ t('New ticket') }}",
+      "parentCrumb": "{{ t('Tickets') }}",
+      "parentRoute": "{{ routes.ticketList }}"
+     },
+     "isStudioComponent": true
+    },
+    {
+     "blockName": "content",
+     "children": [
+      {
+       "blockName": "stack",
+       "children": [
+        {
+         "componentId": "new-ticket-form",
+         "componentName": "NewTicketForm",
+         "componentProps": {
+          "initialSubject": "{{ initialSubject }}",
+          "origin": "{{ ticketOrigin }}",
+          "isAgent": "{{ isAgent }}",
+          "suggestArticles": true,
+          "dateFormat": "{{ dateFormat }}",
+          "timeFormat": "{{ timeFormat }}"
+         },
+         "componentEvents": {
+          "created": {
+           "action": "Run Script",
+           "event": "created",
+           "script": "openTicket(eventArgs[0])"
+          },
+          "actions": {
+           "action": "Run Script",
+           "event": "actions",
+           "script": "setActions(eventArgs[0])"
+          }
+         },
+         "isCustomVueComponent": true
+        }
+       ],
+       "classes": [
+        "flex",
+        "flex-col",
+        "gap-5",
+        "mx-auto",
+        "my-0",
+        "pb-0",
+        "w-full",
+        "pt-6",
+        "sm:pt-[50px]",
+        "max-w-[896px]"
+       ],
+       "componentId": "stack",
+       "componentName": "container",
+       "originalElement": "div"
+      }
+     ],
+     "classes": [
+      "items-center",
+      "flex",
+      "flex-col",
+      "grow",
+      "shrink",
+      "justify-start",
+      "overflow-y-auto",
+      "w-full",
+      "px-4",
+      "sm:px-6"
+     ],
+     "componentId": "content",
+     "componentName": "container",
+     "originalElement": "div"
+    },
+    {
+     "blockName": "KB Settings",
+     "componentId": "kb_settings-ref",
+     "componentName": "kb_settings",
+     "isStudioComponent": true
+    }
+   ],
+   "classes": [
+    "bg-surface-base",
+    "items-center",
+    "flex",
+    "flex-col",
+    "h-full",
+    "overflow-x-hidden",
+    "w-[inherit]"
+   ],
+   "componentId": "body",
+   "componentName": "container",
+   "originalElement": "div"
+  }
+ ],
+ "creation": "2026-10-07 15:18:21.023020",
+ "docstatus": 0,
+ "doctype": "Studio Page",
+ "frappe_app": "helpdesk",
+ "idx": 0,
+ "is_standard": 1,
+ "modified": "2026-10-23 13:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "new_ticket",
+ "owner": "Administrator",
+ "page_name": "page-d05d82bf",
+ "page_title": "New ticket",
+ "published": 1,
+ "resources": [],
+ "route": "/my-tickets/new",
+ "studio_app": "helpdesk",
+ "tab_title": "{{ t('New ticket') }} | {{ brandName }}",
+ "variables": []
+}

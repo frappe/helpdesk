@@ -1,0 +1,86 @@
+<template>
+  <Dialog v-model:open="show" :title="__('Export')">
+    <template #default>
+      <FormControl
+        v-model="form.export_type"
+        variant="outline"
+        :label="__('Export Type')"
+        type="select"
+        :options="[
+          {
+            label: __('Excel'),
+            value: 'Excel',
+          },
+          {
+            label: __('CSV'),
+            value: 'CSV',
+          },
+        ]"
+        :placeholder="__('Excel')"
+      />
+
+      <div v-if="!allSelected" class="mt-3">
+        <FormControl
+          v-model="form.export_all"
+          type="checkbox"
+          :label="__('Export all {0} tickets', [rowCount])"
+        />
+      </div>
+    </template>
+    <template #actions>
+      <Button
+        :label="__('Download')"
+        variant="solid"
+        @click="
+          () =>
+            emit('update', {
+              ...form,
+              export_all: form.export_all || props.allSelected,
+            })
+        "
+        class="w-full"
+      />
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { reactive, watch } from "vue";
+import { Button, Dialog, FormControl } from "frappe-ui";
+import { __ } from "./translation";
+
+const props = defineProps<{
+  rowCount: number;
+  allSelected?: boolean;
+}>();
+
+interface R {
+  export_type: "CSV" | "Excel";
+  export_all: boolean;
+}
+
+interface E {
+  (event: "update", value: R);
+}
+
+const emit = defineEmits<E>();
+
+const show = defineModel();
+
+const form: R = reactive({
+  export_type: "Excel",
+  export_all: false,
+});
+
+watch(
+  () => show.value,
+  (val) => {
+    if (!val) {
+      form.export_type = "Excel";
+      form.export_all = false;
+    }
+  }
+);
+</script>
+
+<style scoped></style>

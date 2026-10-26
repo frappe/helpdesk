@@ -37,7 +37,6 @@ export function useUploadTracker() {
    * Deletes what this editor uploaded and the content no longer shows; a pasted
    * image is attached the moment it lands. Call it where the content is final
    * (send, discard, unmount), not on removal, which would break undo and cut.
-   * ponytail: a crash still leaks the file; needs a server-side sweep.
    */
   async function dropUnused(content: string | null) {
     // Discard is live during an upload, so wait for it to register or it leaks
