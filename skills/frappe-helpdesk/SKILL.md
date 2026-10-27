@@ -1,9 +1,9 @@
 ---
-name: frappe-helpdesk-agent
-description: Manage a Frappe Helpdesk site from outside the app, through frappectl. Use to find tickets and read their conversations, explain a ticket's SLA, reply, comment, assign, tag, change status or priority, merge or split tickets, look up or create contacts and customers, answer questions about ticket volume, response and resolution times, SLA breaches and feedback, or set up agents, teams, SLAs, saved replies and email accounts, when the frappectl profile is an agent or manager on a site running the Helpdesk app.
+name: frappe-helpdesk
+description: Manage a Frappe Helpdesk site from outside the app, through frappectl. Use to find tickets and read their conversations, explain a ticket's SLA, reply, comment, assign, tag, change status or priority, merge or split tickets, look up or create contacts and customers, answer questions about ticket volume, response and resolution times, SLA breaches and feedback, set up agents, teams, SLAs, saved replies and email accounts, or, for a customer's profile, raise, reply to, close and rate their own tickets, when the site runs the Helpdesk app.
 ---
 
-# Frappe Helpdesk for agents
+# Frappe Helpdesk
 
 A Helpdesk site is a set of documents. A ticket (`HD Ticket`) is raised by a contact (`Contact`; `raised_by` is their email), who may belong to a customer (`HD Customer`). The emails on a ticket are `Communication` rows, and the agents' internal notes are `Comment` rows with `comment_type` Comment. Both point back with `reference_doctype` "HD Ticket" and `reference_name`.
 
@@ -11,14 +11,13 @@ A ticket belongs to a team (`agent_group`, an `HD Team`) and is assigned to agen
 
 Read and change these documents with `frappectl`. Use the app's own methods where this file names one, because they send the email, thread the reply and keep assignment correct. Use plain document calls for the rest.
 
-For a customer's profile, use the `frappe-helpdesk-customer` skill instead.
-
 ## 1. Connect
 
-Ask the human for a frappectl profile, and pass it as `-s <p>`. Check it with `frappectl -s <p> method call helpdesk.api.auth.get_user`: it returns `is_agent`, `is_manager` and `user_teams`. If `is_agent` is false, this is the wrong skill.
+Ask the human for a frappectl profile, and pass it as `-s <p>`. Check it with `frappectl -s <p> method call helpdesk.api.auth.get_user`: it returns `is_agent`, `is_manager` and `user_teams`.
 
 - **Agent** works tickets: reads, replies, comments, assigns, tags, merges and splits. Agents also manage teams and saved replies, and read contacts and customers.
 - **Agent Manager** also manages contacts, customers, SLAs, assignment rules, email accounts and other agents, and sees every agent's numbers.
+- **A customer** (`is_agent` false) is a contact working their own tickets. Read `reference/customer.md` and use only the calls there; the rest of this file is for agents.
 - Administrator counts as an agent. A deactivated agent (`HD Agent` `is_active` 0) is not one, whatever its roles.
 
 A call refused with "does not have doctype access" needs a role the profile lacks. Tell the human; do not look for a way around it.
@@ -91,4 +90,5 @@ To explain a date, read the SLA named in `sla` with `doc get "HD Service Level A
 - `reference/tickets.md`: ticket fields, filters, the conversation, history, feedback, creating, merging and splitting.
 - `reference/sla.md`: which SLA applies and how its due dates, pauses and breaches are worked out.
 - `reference/reports.md`: ticket volume, response and resolution times, SLA breaches and ratings, for an agent, a team, a customer or a contact.
+- `reference/customer.md`: everything a customer's profile can do, and the rules the portal enforces.
 - `reference/setup.md`: agents, teams and assignment, SLAs and holiday lists, ticket types and priorities, saved replies and email accounts.

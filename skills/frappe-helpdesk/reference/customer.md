@@ -1,23 +1,13 @@
----
-name: frappe-helpdesk-customer
-description: Act as a customer of a Frappe Helpdesk site, through frappectl. Use to raise a support ticket, check a ticket's status and when it is due, read and reply to the conversation, close and rate a ticket, see the customer's organization and its members, or read the knowledge base, when the frappectl profile is a contact on a site running the Helpdesk app, not an agent.
----
+# Working as a customer
 
-# Frappe Helpdesk for customers
+A customer is a contact with a user on the site. They raise tickets and talk to the support team through them. A contact can belong to one or more organizations (`HD Customer`), as a Member or a Manager. The frappectl notes in `SKILL.md` apply here too.
 
-A customer is a contact (`Contact`) with a user on the site. They raise tickets (`HD Ticket`) and talk to the support team through them. The emails on a ticket, theirs and the agents', are `Communication` rows. A contact can belong to one or more organizations (`HD Customer`), as a Member or a Manager.
+## 1. What a customer sees
 
-For an agent's profile, use the `frappe-helpdesk-agent` skill instead.
-
-## 1. Connect
-
-Ask the human for a frappectl profile, and pass it as `-s <p>`. Check it with `frappectl -s <p> method call helpdesk.api.customer.get_portal_account`: it returns the user and their organizations, with their `role` in each. If `helpdesk.api.auth.get_user` says `is_agent` is true, this is the wrong skill.
+`frappectl -s <p> method call helpdesk.api.customer.get_portal_account` returns the user and their organizations, with their `role` in each.
 
 - A contact sees the tickets where they are the `contact`, the `raised_by` or the owner. An organization's Managers also see all of its tickets.
 - Agents' internal notes are never visible, and some ticket fields are hidden. `doc list` leaves out a hidden field without saying so.
-- Ticket names are numbers. Pass them with `-f` (always a string), not `-F`, which sends `4` as an integer and the method refuses it.
-- Some methods accept only GET. Call those with `method call -X GET`. This file marks them.
-- `doc update` reads stdin when it is not a terminal, and hangs in an agent's shell. Pass `< /dev/null` with `--set`.
 - A call refused with "Access not allowed for this URL" comes from a site that blocks API paths for customers on an older Helpdesk. Tell the human; the site's admin has to update it.
 
 ## 2. Find tickets
