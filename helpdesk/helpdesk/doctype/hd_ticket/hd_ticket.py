@@ -13,9 +13,6 @@ from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
-<<<<<<< HEAD
-from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
-=======
 from frappe.utils import (
     add_to_date,
     cint,
@@ -24,8 +21,6 @@ from frappe.utils import (
     getdate,
     now_datetime,
 )
-from frappe.utils.html_utils import sanitize_html
->>>>>>> d35c645 (fix(ticket): match inline images pasted with the site's absolute URL)
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -859,11 +854,10 @@ class HDTicket(Document):
 
     def handle_inline_media_new_ticket(self):
         soup = BeautifulSoup(self.description, "html.parser")
-<<<<<<< HEAD
         files = []  # List of file URLs
         for tag in soup.find_all(["img", "video"]):
-            if tag.has_attr("src"):
-                src = tag["src"]
+            src = get_site_file_url(tag.get("src"))
+            if src:
                 files.append(src)
         for f in files:
             file = frappe.db.exists(
@@ -879,30 +873,6 @@ class HDTicket(Document):
                 doc.attached_to_doctype = "HD Ticket"
                 doc.attached_to_name = self.name
                 doc.save()
-=======
-        urls = {
-            get_site_file_url(tag.get("src")) for tag in soup.find_all(["img", "video"])
-        }
-        urls.discard(None)
-        if not urls:
-            return
-        # an image pasted twice is uploaded twice under one URL, so a URL can match
-        # several Files; the same URL means the same bytes, so attach them all
-        files = frappe.get_all(
-            "File",
-            filters={
-                "file_url": ["in", list(urls)],
-                "attached_to_doctype": ["is", "not set"],
-                "owner": frappe.session.user,
-            },
-            pluck="name",
-        )
-        for name in files:
-            doc = frappe.get_doc("File", name)
-            doc.attached_to_doctype = "HD Ticket"
-            doc.attached_to_name = self.name
-            doc.save()
->>>>>>> d35c645 (fix(ticket): match inline images pasted with the site's absolute URL)
 
     def send_reply_email_to_agent(
         self, message: str = "Please check the latest update on the portal."
@@ -1347,11 +1317,6 @@ class HDTicket(Document):
                 fields.remove(f)
         return fields
 
-<<<<<<< HEAD
-=======
-    def notify_customers(self):
-        ping_customers(self)
-
 
 def get_site_file_url(src: str | None) -> str | None:
     """Turn an absolute file URL of this site into its relative path.
@@ -1371,66 +1336,6 @@ def get_site_file_url(src: str | None) -> str | None:
         return None
     return path
 
-
-def ping_customers(ticket):
-    """Customers aren't in the ticket's room; ping each user's channel."""
-    for user in get_customers_to_notify(ticket):
-        frappe.publish_realtime(
-            "helpdesk:ticket-update",
-            {"ticket_id": ticket.name},
-            user=user,
-            after_commit=True,
-        )
-
-
-def get_customers_to_notify(ticket) -> set[str]:
-    """Skips the author and agents: they refetch already.
-
-    The readers `has_permission` lets in; not called per user, it repeats these lookups.
-    """
-    candidates = {ticket.raised_by, ticket.owner, ticket.contact}
-    if ticket.customer and (
-        managers := frappe.get_all(
-            "HD Customer Member",
-            filters={"parent": ticket.customer, "is_manager": 1},
-            pluck="contact_name",
-        )
-    ):
-        candidates.update(
-            frappe.get_all(
-                "Contact",
-                filters={"name": ["in", managers], "user": ["is", "set"]},
-                pluck="user",
-            )
-        )
-    candidates -= {None, "", "Guest", frappe.session.user}
-    if not candidates:
-        return set()
-    users = frappe.get_all(
-        "User",
-        filters={"name": ["in", list(candidates)], "enabled": 1},
-        pluck="name",
-    )
-    return {u for u in users if not is_agent(u)}
-
-
-def publish_assignment_update(todo, method=None):
-    """Assigning writes `_assign` without saving the ticket, so `on_update` never runs."""
-    if todo.reference_type != "HD Ticket" or not todo.reference_name:
-        return
-    # only an assign, unassign or close changes `_assign`; True on insert
-    if not todo.has_value_changed("status"):
-        return
-    ticket = frappe.db.get_value(
-        "HD Ticket",
-        todo.reference_name,
-        ["name", "raised_by", "owner", "contact", "customer"],
-        as_dict=True,
-    )
-    if ticket:
-        ping_customers(ticket)
-
->>>>>>> d35c645 (fix(ticket): match inline images pasted with the site's absolute URL)
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
 # permission checks which is not possible with standard permission system. This function
