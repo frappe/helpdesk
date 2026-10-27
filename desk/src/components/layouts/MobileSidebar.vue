@@ -74,19 +74,17 @@ const statusDot = (status: string) =>
     }),
   ]);
 
-// the sidebar closes first so its focus trap does not fight the dialog's
-const availabilityMenuOption = computed(() => {
-  return {
-    label: agentStatusStore.myStatus
-      ? __(agentStatusStore.myStatus)
-      : __("Set status"),
-    icon: () => statusDot(agentStatusStore.myStatus),
-    onClick: () => {
-      sidebarOpened.value = false;
-      availabilityDialogOpen.value = true;
-    },
-  };
-});
+// a dialog, not nested submenus: they crowd a phone screen
+const availabilityMenuOption = computed(() => ({
+  label: agentStatusStore.myStatus
+    ? __(agentStatusStore.myStatus)
+    : __("Set status"),
+  icon: () => statusDot(agentStatusStore.myStatus),
+  onClick: () => {
+    sidebarOpened.value = false;
+    availabilityDialogOpen.value = true;
+  },
+}));
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),
