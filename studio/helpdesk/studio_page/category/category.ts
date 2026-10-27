@@ -37,7 +37,6 @@ export default function setup(context) {
   const loaded = computed(() =>
     Boolean(context.articles.data && sidebar.data && (context.subcategoryArticles.data || context.subcategoryArticles.error)),
   )
-  const categoryIcon = computed(() => category.value?.icon || 'lucide-folder')
   const parentCategory = computed(
     () => sidebar.data?.find((row) => row.name === category.value?.parent_article_category) || null,
   )
@@ -63,7 +62,6 @@ export default function setup(context) {
     subcategoryCount,
     sections,
     loaded,
-    categoryIcon,
     parentCategory,
     breadcrumbs,
   }
