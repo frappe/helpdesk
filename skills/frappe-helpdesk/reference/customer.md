@@ -7,22 +7,26 @@ A customer is a contact with a user on the site. They raise tickets and talk to 
 `frappectl -s <p> method call helpdesk.api.customer.get_portal_account` returns the user and their organizations, with their `role` in each.
 
 - A contact sees the tickets where they are the `contact`, the `raised_by` or the owner. An organization's Managers also see all of its tickets.
-- Agents' internal notes are never visible, and some ticket fields are hidden. `doc list` leaves out a hidden field without saying so.
+- Agents' internal notes are never visible, and some ticket fields are hidden. `get_list` leaves out a hidden field without saying so.
+- Use the `frappe.client` methods below to read and change tickets, not frappectl's `doc` commands. Sites that block API paths for customers refuse `doc`, and allow the methods the portal itself calls.
 - A call refused with "Access not allowed for this URL" comes from a site that blocks API paths for customers on an older Helpdesk. Tell the human; the site's admin has to update it.
 
 ## 2. Find tickets
 
 ```sh
 T=helpdesk.helpdesk.doctype.hd_ticket.api
-frappectl -s <p> doc list "HD Ticket" -f status_category=Open --fields name,subject,status,modified --order-by "modified desc"
-frappectl -s <p> doc list "HD Ticket" -f customer=<organization> --fields name,subject,status,raised_by   # a Manager's view
-frappectl -s <p> method call $T.get_one -f name=<ticket>                       # the ticket and every email on it
-frappectl -s <p> method call -X GET $T.get_timeline_changes -f name=<ticket>   # each status change, by whom and when
+C=frappe.client
+frappectl -s <p> method call $C.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","modified"]' \
+  -F 'filters:={"status_category": "Open"}' -f order_by="modified desc"
+frappectl -s <p> method call $C.get_list -f doctype="HD Ticket" -F 'fields:=["name","subject","status","raised_by"]' \
+  -F 'filters:={"customer": "<organization>"}'                                  # a Manager's view
+frappectl -s <p> method call $C.get -f doctype="HD Ticket" -f name=<ticket>      # the ticket's fields
+frappectl -s <p> method call frappe.desk.form.activity.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails and status changes
 ```
 
-`get_one` has `response_by` and `resolution_by`, when the team is due to answer and to resolve, and `first_responded_on`. Its `communications` are oldest first, with `sender`, `content` and `creation`.
+The ticket has `response_by` and `resolution_by`, when the team is due to answer and to resolve, and `first_responded_on`. The timeline lists the emails from both sides (`email`, with `sender` and `content`) and the changes to fields the customer can see (`version`), oldest first. It holds the latest 20 emails; `SKILL.md` says how to get older ones.
 
-A status falls in one of three categories, kept in `status_category`: Open, Paused or Resolved. Paused usually means the team is waiting for the customer. The app shows a status by its `label_customer` when it has one: `doc list "HD Ticket Status" --fields name,label_customer,category`.
+A status falls in one of three categories, kept in `status_category`: Open, Paused or Resolved. Paused usually means the team is waiting for the customer. The app shows a status by its `label_customer` when it has one: `method call $C.get_list -f doctype="HD Ticket Status" -F 'fields:=["name","label_customer","category"]'`.
 
 ## 3. Common tasks
 
@@ -31,8 +35,8 @@ A status falls in one of three categories, kept in `status_category`: Open, Paus
 | Raise a ticket | `method call $T.new -F 'doc:={"subject": "...", "description": "<p>...</p>"}'`. It returns the new ticket. |
 | See what else a new ticket can carry | `method call helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one -f name=Default`. Its `fields` (such as `priority` and `ticket_type`) can go in `doc`. Add `customer` when the contact is in more than one organization. |
 | Reply | `method call create_communication_via_contact --doctype "HD Ticket" --name <t> -F message="<html>"`. The ticket moves back to an Open status. |
-| Close a ticket | `doc update "HD Ticket" <t> --set status=Closed < /dev/null` |
-| Close and rate it | Add `--set feedback=<option> --set feedback_extra="<comment>"`. List the options with `doc list "HD Ticket Feedback Option" -f disabled=0 --fields name,rating`; `rating` runs from 0.2 (one star) to 1 (five). |
+| Close a ticket | `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -f fieldname=status -f value=Closed` |
+| Close and rate it | `method call frappe.client.set_value -f doctype="HD Ticket" -f name=<t> -F 'fieldname:={"status": "Closed", "feedback": "<option>", "feedback_extra": "<comment>"}'`. List the options with `method call frappe.client.get_list -f doctype="HD Ticket Feedback Option" -F 'fields:=["name","rating"]' -F 'filters:={"disabled": 0}'`; `rating` runs from 0.2 (one star) to 1 (five). |
 | See an organization | `method call helpdesk.api.customer.get_organization -f customer=<organization>`: its members and their roles |
 | Manage an organization (Managers) | `invite_members -f customer=<o> -F 'emails:=["..."]' -F is_manager:=false`, `update_member_role -f customer=<o> -f contact=<c> -F is_manager:=true` and `remove_member -f customer=<o> -f contact=<c>`, all in `helpdesk.api.customer`. The site's HD Settings must allow it. |
 | Search the knowledge base | `method call -X GET helpdesk.api.knowledge_base.search_articles -f query=<words>` |
@@ -41,7 +45,7 @@ A status falls in one of three categories, kept in `status_category`: Open, Paus
 ## 4. Traps
 
 - **Replies and ratings go to the team.** Show the human the message, or the rating, and ask before you send it.
-- **A customer can only close a ticket.** Any other change of status, and changes to its priority, team or other fields after it is raised, are refused with "You cannot change ... after the ticket is raised".
+- **A customer can only close a ticket.** Any other change of status is refused. So are changes to other fields after the ticket is raised ("You cannot change ... after the ticket is raised"), unless the site's ticket template lets customers edit that field after creation.
 - **A closed or rated ticket is final.** It takes no reply and no change. Raise a new ticket, and mention the old number in it.
 - **A rating cannot be changed**, and cannot be given while raising a ticket.
 - **Closing may need a rating.** When the site requires feedback, closing a resolved ticket that an agent answered without one fails with "Ticket must be resolved with a feedback".

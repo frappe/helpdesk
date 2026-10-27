@@ -32,17 +32,26 @@ A call refused with "does not have doctype access" needs a role the profile lack
 
 ```sh
 T=helpdesk.helpdesk.doctype.hd_ticket.api
+A=frappe.desk.form.activity
 frappectl -s <p> doc list "HD Ticket" -f status_category=Open -f agent_group=<team> \
   --fields name,subject,status,priority,_assign,customer,response_by,agreement_status
 frappectl -s <p> method call helpdesk.api.search.search -F query=<words>     # subjects, descriptions, emails and comments
-frappectl -s <p> method call $T.get_one -f name=<ticket>                      # the ticket, its emails and contact
-frappectl -s <p> doc list Comment -f reference_doctype="HD Ticket" -f reference_name=<ticket> -f comment_type=Comment --fields content,owner,creation
-frappectl -s <p> method call -X GET $T.get_timeline_changes -f name=<ticket>  # each status change, by whom and when
+frappectl -s <p> doc get "HD Ticket" <ticket>                                 # the ticket's fields
+frappectl -s <p> method call $A.get_activity_timeline -f doctype="HD Ticket" -f name=<ticket>   # its emails, notes and changes
 frappectl -s <p> method call $T.get_recent_similar_tickets -f ticket=<ticket>
 frappectl -s <p> method call -X GET helpdesk.api.contact.get_contact_info -f name=<contact>
 ```
 
-Read a ticket's emails from `get_one`'s `communications`. `doc list Communication` returns nothing for an agent. `get_one` also marks the ticket as seen by the caller.
+The timeline lists everything that happened on the ticket, oldest first. Each activity has a `type`, an `author`, a `timestamp` and its `data`:
+
+- `email`: an email, with its `name`, `sender`, `subject` and `content`.
+- `comment`: an internal note, with its `content`.
+- `version`: a field change, with `fieldname`, `from` and `to`.
+- `log`: the ticket was created, assigned or given an attachment.
+
+To keep only the conversation and the status changes, add `-F 'visible_types:=["email", "comment", {"version": ["status"]}]'`. It holds the latest 20 emails. When `has_more_emails` is true, `method call frappe.desk.form.activity.get_more_email_activities -f doctype="HD Ticket" -f name=<ticket> -F start=20` gives the 20 before them.
+
+Read emails and notes through the timeline: `doc list Communication` returns nothing for an agent.
 
 Common filters (mine, unassigned, overdue, a customer's, a date range): `reference/tickets.md`.
 
@@ -50,7 +59,7 @@ For numbers across many tickets (counts, average response and resolution time, S
 
 ## 3. SLA: when is it due, why is it late
 
-`get_one` returns `overdue_by`, with `response` and `resolution` in working seconds past due. It is empty while the ticket is paused. The ticket itself has `sla`, `agreement_status` (First Response Due, Resolution Due, Paused, Failed or Fulfilled), `response_by`, `resolution_by`, `first_responded_on`, `on_hold_since`, `total_hold_time`, `first_response_failed_by` and `resolution_failed_by`.
+`method call $T.get_one -f name=<ticket>` returns `overdue_by`, with `response` and `resolution` in working seconds past due. It is empty while the ticket is paused. `get_one` also marks the ticket as seen by the caller. The ticket itself has `sla`, `agreement_status` (First Response Due, Resolution Due, Paused, Failed or Fulfilled), `response_by`, `resolution_by`, `first_responded_on`, `on_hold_since`, `total_hold_time`, `first_response_failed_by` and `resolution_failed_by`.
 
 To explain a date, read the SLA named in `sla` with `doc get "HD Service Level Agreement" <sla>` (Agent Manager only): its priorities, working hours and holiday list. Without that role, `get_ticket_analytics` (`reference/tickets.md`) still gives each target and how far it was missed. `reference/sla.md` explains how the SLA is picked and the dates are worked out.
 

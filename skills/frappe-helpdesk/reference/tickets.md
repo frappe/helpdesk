@@ -35,16 +35,22 @@ Add `--fields` with the columns you need, and `--all` to read every page.
 
 ## The conversation
 
-`get_one` returns the ticket with its emails in `communications`, oldest first. Each has `name`, `sender`, `recipients`, `cc`, `bcc`, `subject`, `content` and `creation`. The internal notes are `Comment` rows:
-
 ```sh
-frappectl -s <p> doc list Comment -f reference_doctype="HD Ticket" -f reference_name=<t> -f comment_type=Comment \
-  --fields content,owner,creation --order-by "creation asc"
+frappectl -s <p> method call frappe.desk.form.activity.get_activity_timeline -f doctype="HD Ticket" -f name=<t>
 ```
+
+The timeline lists everything that happened on the ticket, oldest first. Each activity has a `type`, an `author`, a `timestamp` and its `data`:
+
+- `email`: an email, with its `name`, `sender`, `subject` and `content`.
+- `comment`: an internal note, with its `content`.
+- `version`: a field change, with `fieldname`, `from` and `to`.
+- `log`: the ticket was created, assigned or given an attachment.
+
+To keep only the conversation and the status changes, add `-F 'visible_types:=["email", "comment", {"version": ["status"]}]'`. It holds the latest 20 emails. When `has_more_emails` is true, `method call frappe.desk.form.activity.get_more_email_activities -f doctype="HD Ticket" -f name=<t> -F start=20` gives the 20 before them.
 
 ## History and numbers for one ticket
 
-- `method call -X GET helpdesk.helpdesk.doctype.hd_ticket.api.get_timeline_changes -f name=<t>` lists each status change, with who made it and when.
+- The timeline's `version` activities say who changed which field, and when. `-F 'visible_types:=[{"version": ["status"]}]'` keeps only the status changes.
 - `method call helpdesk.api.ticket_analytics.get_ticket_analytics -f ticket=<t>` gives the ticket's SLA timeline: when it was created, first answered and resolved, against what target, and by how much it missed.
 
 ## Creating a ticket
@@ -72,4 +78,4 @@ Only `subject` and `raised_by` are needed: `contact` is filled in from a contact
 ## Merging and splitting
 
 - **Merge** (`merge_ticket -f source=<t> -f target=<t>`): the source's emails, comments and files are copied into the target. The source is closed, with `is_merged` 1 and `merged_with` set, and the customer is emailed on it. A ticket already merged cannot be merged again. There is no unmerge.
-- **Split** (`split_ticket -f subject=<s> -f communication_id=<email>`): the email you name, and every email, comment and file after it, move to a new ticket with that subject. The new ticket has `ticket_split_from` set. It returns the new ticket's name. Take the email's `name` from `get_one`'s `communications`.
+- **Split** (`split_ticket -f subject=<s> -f communication_id=<email>`): the email you name, and every email, comment and file after it, move to a new ticket with that subject. The new ticket has `ticket_split_from` set. It returns the new ticket's name. Take the email's `name` from its `email` activity in the timeline.
