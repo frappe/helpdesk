@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot :show="sidebarOpened">
+  <TransitionRoot :show="sidebarOpened" @after-leave="onSidebarClosed">
     <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
       <TransitionChild
         as="template"
@@ -81,10 +81,25 @@ const availabilityMenuOption = computed(() => ({
     : __("Set status"),
   icon: () => statusDot(agentStatusStore.myStatus),
   onClick: () => {
+    availabilityDialogPending = true;
     sidebarOpened.value = false;
-    availabilityDialogOpen.value = true;
   },
 }));
+
+// headless UI drops focus when the sidebar closes; give it back to the menu
+// button, then open the dialog so it returns focus there too
+let sidebarOpener: HTMLElement | null = null;
+watch(sidebarOpened, (opened) => {
+  if (opened) sidebarOpener = document.activeElement as HTMLElement | null;
+});
+
+let availabilityDialogPending = false;
+function onSidebarClosed() {
+  sidebarOpener?.focus();
+  if (!availabilityDialogPending) return;
+  availabilityDialogPending = false;
+  availabilityDialogOpen.value = true;
+}
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),

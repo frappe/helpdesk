@@ -238,17 +238,22 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     myStatusExpiresOn,
     (expiresOn) => {
       clearTimeout(expiryTimer);
-      if (!expiresOn) return;
-      const delay = serverInstant(expiresOn).diff();
-      // setTimeout fires at once past ~24.8 days; leave those to the scheduler
-      if (delay > MAX_TIMEOUT) return;
-      expiryTimer = setTimeout(
-        () => clearExpiredStatus(expiresOn),
-        Math.max(0, delay)
-      );
+      if (expiresOn) armExpiryTimer(expiresOn);
     },
     { immediate: true }
   );
+
+  function armExpiryTimer(expiresOn: string) {
+    const delay = serverInstant(expiresOn).diff();
+    // setTimeout fires at once past ~24.8 days: wake at the cap, measure again
+    expiryTimer = setTimeout(
+      () =>
+        delay > MAX_TIMEOUT
+          ? armExpiryTimer(expiresOn)
+          : clearExpiredStatus(expiresOn),
+      Math.min(Math.max(0, delay), MAX_TIMEOUT)
+    );
+  }
 
   // quiet: the pill is the feedback, and a failure is usually another window
   // clearing it first, whose echo brings the real state
