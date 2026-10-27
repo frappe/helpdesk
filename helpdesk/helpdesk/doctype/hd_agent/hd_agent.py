@@ -107,9 +107,8 @@ class HDAgent(Document):
     def get_availability_changed_by(self) -> str:
         return self.flags.get("availability_changed_by") or frappe.session.user
 
-    def availability_changed(self, fieldname: str = "availability") -> bool:
-        """Whether this save changes `fieldname` (the availability by default)
-        of an existing agent.
+    def existing_value_changed(self, fieldname: str) -> bool:
+        """Whether this save changes `fieldname` of an existing agent.
 
         Inserts are excluded: has_value_changed is True when there is no doc
         before save, but a new agent seeded with a default has not changed
@@ -122,8 +121,8 @@ class HDAgent(Document):
         """Broadcast an availability change to every connected client."""
         # an expiry-only change still has to reach the agent's other tabs
         if not (
-            self.availability_changed()
-            or self.availability_changed("availability_expires_on")
+            self.existing_value_changed("availability")
+            or self.existing_value_changed("availability_expires_on")
         ):
             return
 
@@ -140,7 +139,7 @@ class HDAgent(Document):
         )
 
     def capture_availability_telemetry(self):
-        if not self.availability_changed():
+        if not self.existing_value_changed("availability"):
             return
 
         capture_event("agent_availability_updated")
