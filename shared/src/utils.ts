@@ -464,12 +464,13 @@ export function articleMeta(categoryName?: string, minutes?: number) {
   return [categoryName, readTime].filter(Boolean).join(" · ");
 }
 
-// `legacy`: execCommand fallback where the Clipboard API is missing (plain http).
+const clipboard = useClipboard({ legacy: true });
+
 export async function copyToClipboard(
   text: string,
   message: string = __("Copied to clipboard.")
 ) {
-  await useClipboard({ legacy: true }).copy(text);
+  await clipboard.copy(text);
   toast.success(message);
 }
 
