@@ -48,6 +48,13 @@ scheduler_events = {
     "hourly_long": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
     ],
+    "cron": {
+        # an open tab clears its own status on time, so this only covers
+        # closed tabs and can run every 5 minutes
+        "*/5 * * * *": [
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.reset_expired_availability"
+        ]
+    },
 }
 
 

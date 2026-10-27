@@ -49,7 +49,11 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
 import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
-import { useAgentStatusStore } from "@/stores/agentStatus";
+import {
+  expiryPresets,
+  expirySummary,
+  useAgentStatusStore,
+} from "@/stores/agentStatus";
 
 const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
@@ -74,17 +78,68 @@ const statusDot = (status: string) =>
 // Native Dropdown submenu (same pattern as appsMenuOption) instead of a nested
 // Popover: reka-ui keeps the submenu inside the viewport on narrow screens,
 // where a right-placed popover overlapped the menu items below it.
-const availabilityMenuOption = computed(() => ({
-  label: agentStatusStore.myStatus
-    ? __(agentStatusStore.myStatus)
-    : __("Set status"),
-  icon: () => statusDot(agentStatusStore.myStatus),
-  submenu: agentStatusStore.statusOptions.map((option) => ({
-    label: __(option),
-    icon: () => statusDot(option),
-    onClick: () => agentStatusStore.setMyStatus(option),
-  })),
-}));
+const availabilityMenuOption = computed(() => {
+  const expiresOn = agentStatusStore.myStatusExpiresOn;
+  return {
+    label: agentStatusStore.myStatus
+      ? __(agentStatusStore.myStatus)
+      : __("Set status"),
+    // the clear time is visible without opening the menu
+    ...(expiresOn && { description: expirySummary(expiresOn) }),
+    icon: () => statusDot(agentStatusStore.myStatus),
+    submenu: [
+      {
+        group: __("Status"),
+        hideLabel: true,
+        options: agentStatusStore.statusOptions.map((option) => ({
+          label: __(option),
+          icon: () => statusDot(option),
+          selected: option === agentStatusStore.myStatus,
+          onClick: () => agentStatusStore.setMyStatus(option),
+        })),
+      },
+      ...(agentStatusStore.statusCanExpire(agentStatusStore.myStatus)
+        ? [
+            {
+              group: __("Timer"),
+              hideLabel: true,
+              options: [expiryMenuOption()],
+            },
+          ]
+        : []),
+    ],
+  };
+});
+
+// one row that opens the durations, so a phone never scrolls a long list
+function expiryMenuOption() {
+  const expiresOn = agentStatusStore.myStatusExpiresOn;
+  return {
+    label: expirySummary(expiresOn),
+    icon: expiresOn ? "lucide-clock-fading" : "lucide-clock",
+    submenu: [
+      {
+        group: __("Clear status after"),
+        hideLabel: true,
+        options: expiryPresets().map((preset) => ({
+          label: preset.label,
+          selected: agentStatusStore.isExpiryPresetActive(preset),
+          onClick: () => agentStatusStore.applyExpiryPreset(preset),
+        })),
+      },
+      {
+        group: __("Clear"),
+        hideLabel: true,
+        options: [
+          {
+            label: __("Clear now"),
+            onClick: () => agentStatusStore.clearMyStatus(),
+          },
+        ],
+      },
+    ],
+  };
+}
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),

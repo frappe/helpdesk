@@ -8,17 +8,15 @@ import {
   showSettingsModal,
 } from "@/components/Settings/settingsModal";
 import { router } from "@/router";
-import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
 import { useTelephonyStore } from "@/stores/telephony";
-import { parseColor } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { useColorScheme } from "frappe-ui";
+import { availabilityCommands } from "./availabilityCommands";
 import { GROUP, type Command } from "./paletteTypes";
 import { recentTickets } from "./recentTickets";
 import { ticketListCommands } from "./ticketListCommands";
 
-import LucideActivity from "~icons/lucide/activity";
 import LucideClock from "~icons/lucide/clock";
 import LucideFileSearch from "~icons/lucide/file-search";
 import LucideKeyboard from "~icons/lucide/keyboard";
@@ -128,17 +126,7 @@ function accountCommands(): Command[] {
       keywords: "dark light appearance",
       perform: () => toggleColorScheme(),
     },
-    {
-      id: "availability",
-      title: __("Set availability"),
-      group: GROUP.account,
-      icon: LucideActivity,
-      // Live status names too, so site-defined values ("Lunch") match.
-      keywords:
-        "my status presence online offline away busy " +
-        useAgentStatusStore().statusOptions.join(" "),
-      children: () => availabilityChildren(),
-    },
+    ...availabilityCommands(),
     {
       id: "settings",
       title: __("Settings"),
@@ -190,20 +178,6 @@ function isVNode(value: unknown): boolean {
 function openSettingsTab(label: string): void {
   setActiveSettingsTab(label as Parameters<typeof setActiveSettingsTab>[0]);
   showSettingsModal.value = true;
-}
-
-async function availabilityChildren(): Promise<Command[]> {
-  const store = useAgentStatusStore();
-  // The level snapshots this result; a cold store would freeze it empty.
-  await store.statuses.list.promise;
-  return (store.statusOptions ?? []).map((status: string) => ({
-    id: `availability-${status}`,
-    title: __(status),
-    group: "Set availability",
-    dotClass: parseColor(store.getStatus(status)?.color ?? "Gray"),
-    checked: status === store.myStatus,
-    perform: () => store.setMyStatus(status),
-  }));
 }
 
 /** Never a dead end: the typed text carries into whatever the user picks. */

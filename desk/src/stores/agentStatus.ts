@@ -3,21 +3,50 @@ import { userStorage } from "@/composables/userStorage";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
-import { createListResource, createResource, toast } from "frappe-ui";
+import {
+  createListResource,
+  createResource,
+  dayjs,
+  dayjsLocal,
+  toast,
+  type Dayjs,
+} from "frappe-ui";
+import calendar from "dayjs/plugin/calendar";
 import { defineStore } from "pinia";
 import { computed, reactive, watch } from "vue";
+
+dayjs.extend(calendar);
 
 interface LiveAvailability {
   availability: string;
   changedOn: string;
+  /** When the status clears, in system time. Empty when it never does. */
+  expiresOn: string;
 }
 
 interface AvailabilityEvent {
   agent: string;
   availability: string;
   availability_changed_on: string;
+  availability_expires_on: string | null;
   changed_by: string;
 }
+
+export interface ExpiryPreset {
+  label: string;
+  /** Chip form: "30m". */
+  short: string;
+  /** Null means the status never clears. */
+  expiresOn: () => Dayjs | null;
+  never?: true;
+}
+
+// the format frappe datetime fields are sent in
+const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
+// 12-hour, e.g. "9:41 AM"
+const TIME_FORMAT = "h:mm A";
+// the longest delay setTimeout accepts
+const MAX_TIMEOUT = 2 ** 31 - 1;
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
@@ -81,9 +110,18 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // the single source of truth for "who is what right now", including ourselves.
   const liveStatuses = reactive<Record<string, LiveAvailability>>({});
 
-  function applyLive(agent: string, availability?: string, changedOn?: string) {
+  function applyLive(
+    agent: string,
+    availability?: string,
+    changedOn?: string,
+    expiresOn?: string | null
+  ) {
     if (!agent || !availability) return;
-    liveStatuses[agent] = { availability, changedOn: changedOn ?? "" };
+    liveStatuses[agent] = {
+      availability,
+      changedOn: changedOn ?? "",
+      expiresOn: expiresOn ?? "",
+    };
   }
 
   const { $socket } = globalStore();
@@ -95,7 +133,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
         data.changed_by
       );
     }
-    applyLive(data.agent, data.availability, data.availability_changed_on);
+    applyLive(
+      data.agent,
+      data.availability,
+      data.availability_changed_on,
+      data.availability_expires_on
+    );
   });
 
   // Seed our own status from the session payload (auth.get_user already resolves
@@ -105,7 +148,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   watch(
     () => auth.availability,
     (availability) =>
-      applyLive(myAgentName ?? "", availability, auth.availabilityChangedOn),
+      applyLive(
+        myAgentName ?? "",
+        availability,
+        auth.availabilityChangedOn,
+        auth.availabilityExpiresOn
+      ),
     { immediate: true }
   );
 
@@ -131,6 +179,15 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     () => (myAgentName && liveStatuses[myAgentName]?.availability) || ""
   );
 
+  const myStatusExpiresOn = computed(
+    () => (myAgentName && liveStatuses[myAgentName]?.expiresOn) || ""
+  );
+
+  function statusCanExpire(status: string): boolean {
+    const category = getStatus(status)?.category;
+    return Boolean(category) && category !== "Active";
+  }
+
   // Selectable statuses, derived from the same list the presence dots use so the
   // menu and the dots never disagree and we avoid a second server round-trip.
   const statusOptions = computed<string[]>(() =>
@@ -140,21 +197,71 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   );
 
   function setMyStatus(status: string) {
-    if (!myAgentName || !status || status === myStatus.value) return;
-    // Optimistic: update immediately, then roll back if the server rejects it.
+    if (!status || status === myStatus.value) return;
     // changedOn is left empty — it is never rendered for our own dot and the
-    // socket echo overwrites it with the authoritative server timestamp.
+    // socket echo overwrites it with the authoritative server timestamp. The
+    // server drops the timer on a new status, so drop it here too.
+    saveMyAvailability(
+      { availability: status },
+      { availability: status, changedOn: "", expiresOn: "" }
+    );
+  }
+
+  // back to the default status, as the timer would have done
+  function clearMyStatus() {
+    setMyStatus(auth.defaultAgentStatus);
+  }
+
+  function applyExpiryPreset(preset: ExpiryPreset) {
+    // presets are on the agent's clock, the server stores system time
+    const expiresOn =
+      preset.expiresOn()?.tz(window.timezone?.system).format(DATETIME_FORMAT) ??
+      null;
+    if ((expiresOn || "") === myStatusExpiresOn.value) return;
+    saveMyAvailability(
+      { availability_expires_on: expiresOn },
+      { expiresOn: expiresOn || "" }
+    );
+  }
+
+  // the open tab clears the status on time; the scheduler covers closed tabs
+  let expiryTimer: ReturnType<typeof setTimeout> | undefined;
+  watch(
+    myStatusExpiresOn,
+    (expiresOn) => {
+      clearTimeout(expiryTimer);
+      if (!expiresOn) return;
+      const delay = dayjsLocal(expiresOn).diff(dayjsLocal());
+      // setTimeout fires at once past ~24.8 days; leave those to the scheduler
+      if (delay > MAX_TIMEOUT) return;
+      expiryTimer = setTimeout(clearMyStatus, Math.max(0, delay));
+    },
+    { immediate: true }
+  );
+
+  // only "Never" can show as picked: a stored time does not say which
+  // preset made it
+  function isExpiryPresetActive(preset: ExpiryPreset): boolean {
+    return !myStatusExpiresOn.value && Boolean(preset.never);
+  }
+
+  function saveMyAvailability(
+    values: Record<string, string | null>,
+    livePatch: Partial<LiveAvailability>
+  ) {
+    if (!myAgentName) return;
+    // Optimistic: update immediately, then roll back if the server rejects it.
     const previous = liveStatuses[myAgentName];
-    applyLive(myAgentName, status);
+    liveStatuses[myAgentName] = {
+      availability: "",
+      changedOn: "",
+      expiresOn: "",
+      ...previous,
+      ...livePatch,
+    };
     setMyAvailability.submit(
+      { doctype: "HD Agent", name: myAgentName, fieldname: values },
       {
-        doctype: "HD Agent",
-        name: myAgentName,
-        fieldname: "availability",
-        value: status,
-      },
-      {
-        // Roll back the optimistic write on failure.
         onError: () => {
           if (previous) liveStatuses[myAgentName] = previous;
           else delete liveStatuses[myAgentName];
@@ -176,9 +283,79 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     statuses,
     liveStatuses,
     myStatus,
+    myStatusExpiresOn,
+    statusCanExpire,
     statusOptions,
     setMyStatus,
+    clearMyStatus,
+    applyExpiryPreset,
+    isExpiryPresetActive,
     getStatus,
     statusColor,
   };
 });
+
+/** "Clear after" choices. A function so labels translate at render. */
+export function expiryPresets(): ExpiryPreset[] {
+  const after = (amount: number, unit: "minute" | "hour") => () =>
+    dayjsLocal().add(amount, unit);
+  return [
+    { label: __("30 minutes"), short: "30m", expiresOn: after(30, "minute") },
+    { label: __("1 hour"), short: "1h", expiresOn: after(1, "hour") },
+    { label: __("4 hours"), short: "4h", expiresOn: after(4, "hour") },
+    {
+      label: __("Today"),
+      short: __("Today"),
+      expiresOn: () => dayjsLocal().endOf("day"),
+    },
+    {
+      label: __("This week"),
+      short: __("This week"),
+      expiresOn: () => dayjsLocal().endOf("week"),
+    },
+    {
+      label: __("Never"),
+      short: __("Never"),
+      never: true,
+      expiresOn: () => null,
+    },
+  ];
+}
+
+/** Button text for a system-time expiry, on the agent's clock:
+ * "9:41 AM", "Tomorrow 9:41 AM", "Thu 9:41 AM", "30 Oct". */
+export function expiryLabel(expiresOn: string): string {
+  if (!expiresOn) return "";
+  const local = dayjsLocal(expiresOn);
+  const date = dateFormat(local);
+  return local.calendar(dayjsLocal(), {
+    sameDay: TIME_FORMAT,
+    nextDay: `[${__("Tomorrow")}] ${TIME_FORMAT}`,
+    nextWeek: `ddd ${TIME_FORMAT}`,
+    sameElse: date,
+    lastDay: date,
+    lastWeek: date,
+  });
+}
+
+/** Sentence form: "Clears today at 9:41 AM", "Clears on 30 Oct at 9:41 AM". */
+export function expirySummary(expiresOn: string): string {
+  if (!expiresOn) return __("Clear status after");
+  const local = dayjsLocal(expiresOn);
+  const time = local.format(TIME_FORMAT);
+  const onDate = () =>
+    __("Clears on {0} at {1}", [local.format(dateFormat(local)), time]);
+  return local.calendar(dayjsLocal(), {
+    sameDay: () => __("Clears today at {0}", [time]),
+    nextDay: () => __("Clears tomorrow at {0}", [time]),
+    nextWeek: () => __("Clears {0} at {1}", [local.format("dddd"), time]),
+    sameElse: onDate,
+    lastDay: onDate,
+    lastWeek: onDate,
+  });
+}
+
+// the year only when it is not this one
+function dateFormat(local: Dayjs): string {
+  return local.isSame(dayjsLocal(), "year") ? "D MMM" : "D MMM YYYY";
+}

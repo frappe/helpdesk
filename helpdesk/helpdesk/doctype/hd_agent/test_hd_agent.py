@@ -6,9 +6,14 @@ from unittest.mock import patch
 import frappe
 from frappe.client import set_value as client_set_value
 from frappe.tests.utils import FrappeTestCase
+from frappe.utils import add_to_date, now_datetime
 
 from helpdesk.api.auth import get_user
-from helpdesk.helpdesk.doctype.hd_agent.hd_agent import update_agent_role
+from helpdesk.helpdesk.doctype.hd_agent.hd_agent import (
+    HDAgent,
+    reset_expired_availability,
+    update_agent_role,
+)
 from helpdesk.test_utils import (
     create_user,
     make_agent,
@@ -220,6 +225,157 @@ class TestHDAgent(FrappeTestCase):
         self.assertEqual(result["availability"], "Away")
         self.assertIsNotNone(result["availability_changed_on"])
         self.assertEqual(result["availability_changed_by"], "Administrator")
+
+    def _in_an_hour(self) -> str:
+        return str(add_to_date(now_datetime(), hours=1))
+
+    def _expires_on(self, agent: str):
+        return frappe.db.get_value("HD Agent", agent, "availability_expires_on")
+
+    def test_status_timer_must_be_in_the_future(self):
+        past = str(add_to_date(now_datetime(), minutes=-1))
+
+        with self.assertRaises(frappe.ValidationError):
+            set_agent_availability(self.test_user, "Away", past)
+
+    # a new status starts clean instead of inheriting the old timer
+    def test_status_change_drops_the_timer(self):
+        set_agent_availability(self.test_user, "Away", self._in_an_hour())
+        agent = frappe.get_doc("HD Agent", self.test_user)
+        agent.availability = "Unavailable"
+        agent.save(ignore_permissions=True)
+
+        self.assertIsNone(self._expires_on(self.test_user))
+
+    # the timer resets to the default, so the default itself never has one
+    def test_default_status_never_keeps_a_timer(self):
+        set_agent_availability(self.test_user, "Active", self._in_an_hour())
+
+        self.assertIsNone(self._expires_on(self.test_user))
+
+    # the exact payload agentStatus.ts submits for a timer-only change
+    def test_client_set_value_sets_only_the_timer(self):
+        set_agent_availability(self.test_user, "Away")
+        frappe.set_user(self.test_user)
+
+        client_set_value(
+            doctype="HD Agent",
+            name=self.test_user,
+            fieldname={"availability_expires_on": self._in_an_hour()},
+        )
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", self.test_user, "availability"), "Away"
+        )
+        # the session payload seeds the clock button without another request
+        self.assertIsNotNone(get_user()["availability_expires_on"])
+
+    # other tabs and devices have to see a timer-only change too
+    def test_timer_change_is_published(self):
+        agent = set_agent_availability(self.test_user, "Away")
+
+        with patch(
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+        ) as publish:
+            agent.availability_expires_on = self._in_an_hour()
+            agent.save(ignore_permissions=True)
+
+        publish.assert_called_once()
+        self.assertEqual(
+            publish.call_args[1]["data"]["availability_expires_on"],
+            agent.availability_expires_on,
+        )
+
+    def test_expired_status_resets_to_default(self):
+        expired = make_agent("expired_status@test.com", first_name="Expired")
+        running = make_agent("running_status@test.com", first_name="Running")
+        set_agent_availability(expired, "Away", self._in_an_hour())
+        set_agent_availability(running, "Away", self._in_an_hour())
+        self._expire_timer(expired)
+
+        reset_expired_availability()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", expired, "availability"), "Active"
+        )
+        self.assertIsNone(self._expires_on(expired))
+        # a timer that has not run out is left alone
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", running, "availability"), "Away"
+        )
+        self.assertIsNotNone(self._expires_on(running))
+
+    def _expire_timer(self, agent: str):
+        # skip validation, a past timer can only come from time passing
+        frappe.db.set_value(
+            "HD Agent",
+            agent,
+            "availability_expires_on",
+            add_to_date(now_datetime(), minutes=-1),
+        )
+
+    # the scheduler queries first and loads later; a status picked in between
+    # has no timer and must survive
+    def test_expiry_skips_a_status_changed_since_the_query(self):
+        set_agent_availability(self.test_user, "Unavailable")
+
+        frappe.get_doc("HD Agent", self.test_user).expire_availability()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", self.test_user, "availability"),
+            "Unavailable",
+        )
+
+    # the agent set the timer, so the reset must not read as someone else's
+    def test_expiry_is_credited_to_the_agent(self):
+        set_agent_availability(self.test_user, "Away", self._in_an_hour())
+        self._expire_timer(self.test_user)
+
+        with patch(
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+        ) as publish:
+            reset_expired_availability()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", self.test_user, "availability_changed_by"),
+            self.test_user,
+        )
+        self.assertEqual(publish.call_args[1]["data"]["changed_by"], self.test_user)
+
+    def test_one_failing_expiry_does_not_block_the_rest(self):
+        failing = make_agent("failing_status@test.com", first_name="Failing")
+        set_agent_availability(failing, "Away", self._in_an_hour())
+        set_agent_availability(self.test_user, "Away", self._in_an_hour())
+        self._expire_timer(failing)
+        self._expire_timer(self.test_user)
+        original = HDAgent.reset_availability
+
+        def reset_or_fail(agent):
+            if agent.name == failing:
+                raise frappe.ValidationError
+            original(agent)
+
+        with (
+            patch.object(HDAgent, "reset_availability", reset_or_fail),
+            patch("helpdesk.helpdesk.doctype.hd_agent.hd_agent.frappe.log_error"),
+        ):
+            reset_expired_availability()
+
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", self.test_user, "availability"), "Active"
+        )
+        self.assertEqual(
+            frappe.db.get_value("HD Agent", failing, "availability"), "Away"
+        )
+
+    # "Clear now" moves the agent to this, without another request
+    def test_get_user_includes_default_agent_status(self):
+        frappe.set_user(self.test_user)
+
+        self.assertEqual(
+            get_user()["default_agent_status"],
+            frappe.db.get_single_value("HD Settings", "default_agent_status"),
+        )
 
     def _make_assignment_rule(self, team_name: str, members: list[str], rule: str):
         team = make_team(team_name, members)

@@ -539,10 +539,13 @@ def set_default_agent_status(status: str | None):
     frappe.db.set_single_value("HD Settings", "default_agent_status", status)
 
 
-def set_agent_availability(user: str, availability: str | None):
+def set_agent_availability(
+    user: str, availability: str | None, expires_on: str | None = None
+):
     """Set an agent's availability through the document lifecycle."""
     agent = frappe.get_doc("HD Agent", {"user": user})
     agent.availability = availability
+    agent.availability_expires_on = expires_on
     agent.save(ignore_permissions=True)
     return agent
 

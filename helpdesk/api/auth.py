@@ -37,7 +37,12 @@ def get_user():
         frappe.db.get_value(
             "HD Agent",
             agent_name,
-            ["availability", "availability_changed_on", "availability_changed_by"],
+            [
+                "availability",
+                "availability_changed_on",
+                "availability_changed_by",
+                "availability_expires_on",
+            ],
             as_dict=True,
         )
         if agent_name
@@ -76,6 +81,13 @@ def get_user():
         "availability": availability.get("availability"),
         "availability_changed_on": availability.get("availability_changed_on"),
         "availability_changed_by": availability.get("availability_changed_by"),
+        "availability_expires_on": availability.get("availability_expires_on"),
+        # what "Clear now" in the availability menu moves the agent to
+        "default_agent_status": (
+            frappe.db.get_single_value("HD Settings", "default_agent_status")
+            if agent_name
+            else None
+        ),
         "persona_captured": persona_captured,
     }
 
