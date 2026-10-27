@@ -95,7 +95,7 @@
             </span>
             <span
               v-if="row.category"
-              class="shrink-0 truncate px-1 text-sm leading-none text-ink-gray-5 max-sm:hidden"
+              class="shrink-0 truncate px-1 text-sm text-ink-gray-5 max-sm:hidden"
             >
               &middot; {{ row.category }}
             </span>
