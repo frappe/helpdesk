@@ -12,6 +12,7 @@ on:
       - "package.json"
       - "yarn.lock"
       - ".github/workflows/ui-tests.yml"
+      - ".github/helpers/frappe_ref.sh"
   workflow_dispatch:
 
 concurrency:
@@ -19,7 +20,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FRAPPE_BRANCH: version-15
+  # The suite targets the current desk UI, so it runs on v16 only;
+  # server tests keep covering v15.
+  FRAPPE_BRANCH: version-16
   SITE: helpdesk.test
 
 jobs:
@@ -56,7 +59,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -92,7 +95,8 @@ jobs:
       - name: Setup Bench
         run: |
           pip install frappe-bench
-          bench init --skip-redis-config-generation --skip-assets --frappe-branch "$FRAPPE_BRANCH" --python "$(which python)" ~/frappe-bench
+          FRAPPE_REF=$(bash "$GITHUB_WORKSPACE/.github/helpers/frappe_ref.sh" "$FRAPPE_BRANCH")
+          bench init --skip-redis-config-generation --skip-assets --frappe-branch "$FRAPPE_REF" --python "$(which python)" ~/frappe-bench
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
 
