@@ -98,29 +98,41 @@
              "isCustomVueComponent": true
             },
             {
-             "classes": [
-              "text-ink-gray-8",
-              "font-bold"
+             "children": [
+              {
+               "classes": [
+                "text-ink-gray-8",
+                "font-bold"
+               ],
+               "componentId": "TextBlock-h8bm1mp3i",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-3xl",
+                "tag": "h1",
+                "text": "{{ categoryName }}"
+               }
+              },
+              {
+               "classes": [
+                "text-ink-gray-6"
+               ],
+               "componentId": "TextBlock-m2czs0278",
+               "componentName": "TextBlock",
+               "componentProps": {
+                "fontSize": "text-p-base",
+                "tag": "p",
+                "text": "{{ categoryDescription }}"
+               }
+              }
              ],
-             "componentId": "TextBlock-h8bm1mp3i",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-3xl",
-              "tag": "h1",
-              "text": "{{ categoryName }}"
-             }
-            },
-            {
              "classes": [
-              "text-ink-gray-6"
+              "flex",
+              "flex-col",
+              "gap-1"
              ],
-             "componentId": "TextBlock-m2czs0278",
-             "componentName": "TextBlock",
-             "componentProps": {
-              "fontSize": "text-p-base",
-              "tag": "p",
-              "text": "{{ categoryDescription }}"
-             }
+             "componentId": "category-title-group",
+             "componentName": "container",
+             "originalElement": "div"
             },
             {
              "blockName": "meta-row",
@@ -384,7 +396,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 12:42:16.000000",
+ "modified": "2026-10-27 12:55:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",
