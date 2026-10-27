@@ -24,6 +24,11 @@ interface AvailabilityEvent {
   changed_by: string;
 }
 
+type SavedAvailability = Pick<
+  AvailabilityEvent,
+  "availability" | "availability_changed_on" | "availability_expires_on"
+>;
+
 // the format frappe datetime fields are sent in
 const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
 // the longest delay setTimeout accepts
@@ -91,6 +96,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // the single source of truth for "who is what right now", including ourselves.
   const liveStatuses = reactive<Record<string, LiveAvailability>>({});
 
+  // our own state as the server last confirmed it; a failed save rolls back
+  // to this, not to an earlier queued save's optimistic patch
+  let confirmed: LiveAvailability | undefined;
+  // this tab's saves not yet answered
+  let pendingSaves = 0;
+
   function applyLive(
     agent: string,
     availability?: string,
@@ -98,11 +109,24 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     expiresOn?: string | null
   ) {
     if (!agent || !availability) return;
-    liveStatuses[agent] = {
+    const state = {
       availability,
       changedOn: changedOn ?? "",
       expiresOn: expiresOn ?? "",
     };
+    if (agent === myAgentName) {
+      confirmed = state;
+      // an echo of an earlier save would undo the patches still queued; the
+      // last save to settle shows the confirmed state instead
+      if (pendingSaves) return;
+    }
+    liveStatuses[agent] = state;
+  }
+
+  function restoreConfirmed() {
+    if (!myAgentName) return;
+    if (confirmed) liveStatuses[myAgentName] = confirmed;
+    else delete liveStatuses[myAgentName];
   }
 
   const { $socket } = globalStore();
@@ -246,28 +270,41 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   ) {
     if (!myAgentName) return;
     // Optimistic: update immediately, then roll back if the server rejects it.
-    const previous = liveStatuses[myAgentName];
     liveStatuses[myAgentName] = {
       availability: "",
       changedOn: "",
       expiresOn: "",
-      ...previous,
+      ...liveStatuses[myAgentName],
       ...livePatch,
     };
+    pendingSaves++;
+    const confirmedWhenQueued = confirmed;
     lastSave = lastSave.then(() =>
       setMyAvailability
         .submit(
           { doctype: "HD Agent", name: myAgentName, fieldname: values },
           {
-            onSuccess: () => {
+            // set_value replies with the saved row: confirmed state, whether
+            // it lands before or after the socket echo
+            onSuccess: (agent: SavedAvailability) => {
+              pendingSaves--;
               if (!quiet) toast.success(__("Status updated successfully."));
+              applyLive(
+                myAgentName,
+                agent.availability,
+                agent.availability_changed_on,
+                agent.availability_expires_on
+              );
             },
             onError: () => {
-              // no rollback either: it would re-arm the expired timer
-              if (quiet) return;
-              toast.error(__("Could not update status."));
-              if (previous) liveStatuses[myAgentName] = previous;
-              else delete liveStatuses[myAgentName];
+              pendingSaves--;
+              if (!quiet) toast.error(__("Could not update status."));
+              // a queued save settles the state when it lands
+              if (pendingSaves) return;
+              // a quiet clear keeps its patch unless newer server state came
+              // in: restoring the expired status would re-arm its timer
+              if (quiet && confirmed === confirmedWhenQueued) return;
+              restoreConfirmed();
             },
           }
         )
