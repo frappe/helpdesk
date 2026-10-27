@@ -73,7 +73,7 @@
           />
         </div>
         <SearchArticles
-          v-if="isCustomerPortal"
+          v-if="isCustomerPortal && configStore.preferKnowledgeBase"
           :query="subject"
           class="shadow-sm"
         />
@@ -179,6 +179,7 @@ import {
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useConfigStore } from "@/stores/config";
 import SearchArticles from "../../components/SearchArticles.vue";
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
@@ -194,6 +195,7 @@ const props = withDefaults(defineProps<P>(), {
 
 const route = useRoute();
 const router = useRouter();
+const configStore = useConfigStore();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk") ?? {};
 const { isManager, userId: userID } = useAuthStore();
