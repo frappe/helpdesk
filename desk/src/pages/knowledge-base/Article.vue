@@ -655,16 +655,10 @@ const articleActions = computed(() => [
         __("Article link copied to clipboard.")
       ),
   },
-  {
-    group: __("Danger"),
-    hideLabel: true,
-    options: [
-      ...ConfirmDelete({
-        onConfirmDelete: handleDelete,
-        isConfirmingDelete: isConfirmingDeleteArticle,
-      }),
-    ],
-  },
+  ...ConfirmDelete({
+    onConfirmDelete: handleDelete,
+    isConfirmingDelete: isConfirmingDeleteArticle,
+  }),
 ]);
 
 const breadcrumbs = computed(() => {

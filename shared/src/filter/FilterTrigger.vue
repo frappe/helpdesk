@@ -29,7 +29,8 @@
     >
       <div class="min-w-0 overflow-hidden">
         <Tooltip :text="__('Clear all Filter')">
-          <div>
+          <!-- flex: a block wrapper puts the button on a text line, half a pixel taller -->
+          <div class="flex">
             <Button
               class="rounded-s-none border-s"
               icon="lucide-x"
