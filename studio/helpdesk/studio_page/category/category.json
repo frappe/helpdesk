@@ -90,14 +90,6 @@
            "blockName": "category-header",
            "children": [
             {
-             "componentId": "PortalBreadcrumbs-category",
-             "componentName": "PortalBreadcrumbs",
-             "componentProps": {
-              "items": "{{ breadcrumbs }}"
-             },
-             "isCustomVueComponent": true
-            },
-            {
              "children": [
               {
                "classes": [
@@ -396,7 +388,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 12:55:00.000000",
+ "modified": "2026-10-27 12:58:00.000000",
  "modified_by": "Administrator",
  "name": "category",
  "owner": "Administrator",

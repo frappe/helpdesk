@@ -3,7 +3,6 @@ import { __ } from '@helpdesk/shared/translation'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
 import { useBottomSheet } from '@app/composables/useDrawer'
 import { countLabel } from '@helpdesk/shared/utils'
-import { ROUTES } from '@helpdesk/shared/portalRoutes'
 import { prefetchOnHover, useKnowledgeBase } from '@app/stores/knowledgeBase'
 
 export default function setup(context) {
@@ -37,16 +36,6 @@ export default function setup(context) {
   const loaded = computed(() =>
     Boolean(context.articles.data && sidebar.data && (context.subcategoryArticles.data || context.subcategoryArticles.error)),
   )
-  const parentCategory = computed(
-    () => sidebar.data?.find((row) => row.name === category.value?.parent_article_category) || null,
-  )
-  const breadcrumbs = computed(() => [
-    { label: __('Help'), route: ROUTES.home },
-    ...(parentCategory.value
-      ? [{ label: parentCategory.value.category_name, route: ROUTES.category(parentCategory.value.name) }]
-      : []),
-    { label: categoryName.value },
-  ])
 
   return {
     ...useKnowledgeBaseHeader(context),
@@ -62,7 +51,5 @@ export default function setup(context) {
     subcategoryCount,
     sections,
     loaded,
-    parentCategory,
-    breadcrumbs,
   }
 }
