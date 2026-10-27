@@ -22,7 +22,7 @@ Ask the human for a frappectl profile, and pass it as `-s <p>`. Check it with `f
 
 A call refused with "does not have doctype access" needs a role the profile lacks. Tell the human; do not look for a way around it.
 
-- Ticket names are numbers. Pass them with `-f` (always a string), not `-F`, which sends `4` as an integer and the method refuses it.
+- Ticket names are strings: `0320` by default, though a site can change the naming rule. Pass them with `-f`, which always sends a string. `-F` can send a name that looks like a number as an integer, and the method refuses it.
 - Some methods accept only GET. Call those with `method call -X GET`. This file marks them.
 - `doc create` and `doc update` read stdin when it is not a terminal, and hang in an agent's shell. Pass `--input <file>`, or `< /dev/null` with `--set`.
 - Send dict and list arguments as JSON: `-F 'filters:={"agent":"<user>"}'`.

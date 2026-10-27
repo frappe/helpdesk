@@ -4,7 +4,7 @@
 
 | Field | What it holds |
 |---|---|
-| `name` | The ticket number |
+| `name` | The ticket's ID, a string such as `0320` |
 | `subject`, `description` | The title, and the first message as HTML |
 | `status`, `status_category` | An `HD Ticket Status`, and its category: Open, Paused or Resolved |
 | `priority`, `ticket_type` | An `HD Ticket Priority` and an `HD Ticket Type` |
