@@ -1,43 +1,41 @@
 <template>
-  <div class="flex flex-col">
-    <div class="sticky top-0 z-10 bg-surface-base pb-3 pt-3">
+  <div class="flex flex-col pb-20">
+    <!-- Sticky search and filters; bled into the column padding so rows scroll under it. -->
+    <div
+      class="sticky top-0 z-10 -mx-3 bg-surface-base px-3 pt-5 sm:-mx-5 sm:px-5 sm:pt-6"
+    >
       <TextInput
         ref="input"
         v-model="query"
-        size="lg"
-        variant="outline"
-        class="[&_input]:font-semibold"
         :placeholder="__('Search articles')"
         :aria-label="__('Search articles')"
       >
         <template #prefix>
-          <span
-            class="lucide-search size-4 text-ink-gray-4"
-            aria-hidden="true"
-          />
+          <span class="lucide-search w-4 text-ink-gray-5" aria-hidden="true" />
         </template>
         <template v-if="query" #suffix>
-          <Button
-            variant="ghost"
-            size="xs"
-            icon="lucide-x"
+          <button
+            type="button"
+            class="grid size-6 place-content-center rounded-4 p-1 focus-visible:focus-ring"
             :aria-label="__('Clear search')"
             @click="clear"
-          />
+          >
+            <span class="lucide-x w-4 text-ink-gray-7" aria-hidden="true" />
+          </button>
         </template>
       </TextInput>
 
-      <div v-if="canSearch" class="mt-3 flex flex-wrap items-center gap-2">
+      <div v-if="canSearch" class="flex flex-wrap items-center gap-2 pt-2">
         <MultiSelect v-model="selected" hide-search :options="options">
           <template #trigger>
             <Button
-              size="sm"
+              variant="outline"
               icon-left="lucide-list-filter"
               :label="filterLabel"
             />
           </template>
           <template #item-suffix="{ item }">
-            <span class="text-sm tabular-nums text-ink-gray-5">{{
+            <span class="text-xs tabular-nums text-ink-gray-5">{{
               item.count
             }}</span>
           </template>
@@ -45,7 +43,6 @@
         <Button
           v-for="chip in chips"
           :key="chip.name"
-          size="sm"
           variant="subtle"
           icon-right="lucide-x"
           :aria-label="__('Remove filter {0}', [chip.label])"
@@ -54,66 +51,98 @@
           <!-- A slot, not `label`: Button lets `label` override aria-label. -->
           {{ chip.label }}
         </Button>
-        <span
-          class="ms-auto text-sm text-ink-gray-5 max-sm:basis-full max-sm:text-end"
-        >
-          {{ countLabel(search.total, __("1 article"), __("{0} articles")) }}
-        </span>
       </div>
+      <!-- Rows fade into the toolbar as they scroll under it. -->
+      <div
+        class="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-surface-base/90 to-transparent"
+      />
     </div>
 
-    <template v-if="canSearch">
-      <PortalSkeleton
-        v-if="!search.rows.length && !search.isCurrent"
-        variant="category-rows"
-        :count="5"
+    <p
+      v-if="summary"
+      class="mt-2 flex min-h-6 items-center text-sm text-ink-gray-6"
+    >
+      {{ summary }}
+    </p>
+
+    <PortalSkeleton
+      v-if="canSearch && !search.rows.length && !search.isCurrent"
+      class="mt-5"
+      variant="category-rows"
+      :count="5"
+    />
+    <div v-else-if="rows.length" class="mt-5 flex flex-col">
+      <div
+        class="-mx-2.5 transition-opacity"
+        :class="{ 'opacity-50': canSearch && !search.isCurrent }"
+      >
+        <PortalLink
+          v-for="row in rows"
+          :key="row.name"
+          :to="ROUTES.article(row)"
+          class="group relative flex flex-col rounded-4 px-2.5 py-3 transition-colors hover:bg-surface-gray-1 focus-visible:focus-ring after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:bg-[--outline-gray-1] last:after:hidden hover:after:opacity-0 [&:has(+*:hover)]:after:opacity-0"
+          @mouseenter="prefetchOnHover(row.name)"
+        >
+          <div class="flex min-w-0 items-center">
+            <span
+              v-if="canSearch"
+              class="truncate text-base font-medium text-ink-gray-9"
+              :class="MARK"
+              v-html="row.title"
+            />
+            <span v-else class="truncate text-base font-medium text-ink-gray-9">
+              {{ row.title }}
+            </span>
+            <span
+              v-if="row.category"
+              class="shrink-0 truncate px-1 text-sm leading-none text-ink-gray-5 max-sm:hidden"
+            >
+              &middot; {{ row.category }}
+            </span>
+            <span class="ms-auto shrink-0 ps-3 text-sm text-ink-gray-5">
+              {{ articleMeta(undefined, row.minutes) }}
+            </span>
+          </div>
+          <p
+            v-if="row.excerpt"
+            class="mt-1 line-clamp-2 text-p-base text-ink-gray-6"
+            :class="MARK"
+            v-html="row.excerpt"
+          />
+        </PortalLink>
+      </div>
+      <Button
+        v-if="canSearch && search.hasMore"
+        class="mx-auto mt-4"
+        :label="__('Load more')"
+        :loading="search.isLoading && search.isCurrent"
+        @click="search.loadMore"
       />
-      <div v-else-if="search.rows.length" class="mt-1 flex flex-col">
-        <PortalArticleList
-          marked
-          class="transition-opacity"
-          :class="{ 'opacity-50': !search.isCurrent }"
-          :articles="results"
-        />
-        <Button
-          v-if="search.hasMore"
-          class="mx-auto mt-4"
-          size="md"
-          :label="__('Load more')"
-          :loading="search.isLoading && search.isCurrent"
-          @click="search.loadMore"
-        />
-      </div>
-      <div v-else class="flex flex-col items-center gap-1 py-16 text-center">
-        <span
-          class="lucide-search-x mb-1 size-5 text-ink-gray-4"
-          aria-hidden="true"
-        />
-        <span class="max-w-full truncate text-base font-medium text-ink-gray-8">
-          {{ __("No articles match “{0}”", [searchText]) }}
-        </span>
-        <span class="text-p-sm text-ink-gray-5">
-          {{ __("Try other words, or ask our team.") }}
-        </span>
-        <Button
-          class="mt-2"
-          variant="solid"
-          icon-left="lucide-plus"
-          :label="__('Raise a ticket')"
-          @click="
-            router.push(ROUTES.newTicket({ from: 'search', q: searchText }))
-          "
-        />
-      </div>
-    </template>
-
-    <section v-else-if="recent.length">
-      <h2 class="border-b border-outline-gray-1 pb-2 text-sm text-ink-gray-5">
-        {{ __("Recently viewed") }}
-      </h2>
-      <PortalArticleList :articles="recent" />
-    </section>
-
+    </div>
+    <div
+      v-else-if="canSearch"
+      class="flex flex-col items-center gap-1 py-16 text-center"
+    >
+      <span
+        class="lucide-search-x mb-1 size-5 text-ink-gray-4"
+        aria-hidden="true"
+      />
+      <span class="max-w-full truncate text-base font-medium text-ink-gray-8">
+        {{ __("No articles match “{0}”", [searchText]) }}
+      </span>
+      <span class="text-p-sm text-ink-gray-5">
+        {{ __("Try other words, or ask our team.") }}
+      </span>
+      <Button
+        class="mt-2"
+        variant="solid"
+        icon-left="lucide-plus"
+        :label="__('Raise a ticket')"
+        @click="
+          router.push(ROUTES.newTicket({ from: 'search', q: searchText }))
+        "
+      />
+    </div>
     <div v-else class="flex flex-col items-center gap-3 py-16 text-center">
       <div
         class="flex size-12 items-center justify-center rounded-full bg-surface-gray-2"
@@ -143,9 +172,9 @@ import {
   MIN_QUERY_LENGTH,
   usePagedArticleSearch,
 } from "@app/composables/useArticleSearch";
-import { useKnowledgeBase } from "@app/stores/knowledgeBase";
+import { prefetchOnHover, useKnowledgeBase } from "@app/stores/knowledgeBase";
 import { useRecent } from "@app/stores/recent";
-import PortalArticleList from "@app/components/knowledge_base/PortalArticleList.vue";
+import PortalLink from "@app/components/ui/PortalLink.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 
 const route = useRoute();
@@ -232,18 +261,23 @@ const filterLabel = computed(() =>
     : __("Category"),
 );
 
-const results = computed(() =>
-  search.rows.map((row) => ({
-    ...row,
-    meta: articleMeta(row.category_label, row.minutes),
-  })),
+// The API escapes everything except <mark>, so v-html is safe on search rows.
+const MARK =
+  "[&_mark]:rounded-sm [&_mark]:bg-surface-amber-2 [&_mark]:px-0.5 [&_mark]:text-ink-gray-9";
+
+const rows = computed(() =>
+  canSearch.value
+    ? search.rows.map((row) => ({ ...row, category: row.category_label }))
+    : recentArticles.value.map((row) => ({
+        ...row,
+        category: row.categoryName,
+      })),
 );
-const recent = computed(() =>
-  recentArticles.value.map((row) => ({
-    ...row,
-    meta: articleMeta(row.categoryName, row.minutes),
-  })),
-);
+const summary = computed(() => {
+  if (!canSearch.value) return rows.value.length ? __("Recently viewed") : "";
+  if (!search.isCurrent && !search.rows.length) return "";
+  return countLabel(search.total, __("1 article"), __("{0} articles"));
+});
 
 function clear() {
   query.value = "";

@@ -612,8 +612,10 @@ test.describe("categories and category pages", () => {
     // The search link carries the current category.
     await sidebar.getByRole("link", { name: "Search articles" }).click();
     await expect(page).toHaveURL(new RegExp(`/help/search\\?category=${sub.name}$`));
-    await expect(sidebar.getByRole("link", { name: "Search articles" })).toHaveCount(0);
-    await expect(row(parent)).toBeVisible();
+    // The search page has no sidebar and no breadcrumbs.
+    await expect(page.getByRole("textbox", { name: "Search articles" }).last()).toBeVisible();
+    await expect(sidebar).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toHaveCount(0);
 
     // CT2: the list row opens the article.
     await page.goto(`/help/category/${sub.name}`);

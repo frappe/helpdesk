@@ -20,57 +20,14 @@
      "isStudioComponent": true
     },
     {
-     "componentEvents": {
-      "click": {
-       "action": "Run Script",
-       "event": "click",
-       "script": "drawer.toggle()"
-      }
-     },
-     "componentId": "PortalSectionBar-search",
-     "componentName": "PortalSectionBar",
-     "componentProps": {
-      "label": "{{ t('Search') }}",
-      "open": "{{ drawer.open }}"
-     },
-     "isCustomVueComponent": true
-    },
-    {
      "blockName": "page-wrapper",
      "children": [
-      {
-       "blockName": "sidebar",
-       "componentEvents": {
-        "close": {
-         "action": "Run Script",
-         "event": "close",
-         "script": "drawer.close()"
-        }
-       },
-       "componentId": "PortalArticleSidebar-search",
-       "componentName": "PortalArticleSidebar",
-       "componentProps": {
-        "categories": "{{ sidebar.data || [] }}",
-        "open": "{{ drawer.open }}",
-        "loading": "{{ !sidebar.data }}",
-        "showSearch": false
-       },
-       "isCustomVueComponent": true
-      },
       {
        "blockName": "main-layout",
        "children": [
         {
          "blockName": "search-column",
          "children": [
-          {
-           "componentId": "PortalBreadcrumbs-search",
-           "componentName": "PortalBreadcrumbs",
-           "componentProps": {
-            "items": "{{ breadcrumbs }}"
-           },
-           "isCustomVueComponent": true
-          },
           {
            "classes": [
             "w-full"
@@ -83,17 +40,12 @@
          "classes": [
           "flex",
           "flex-col",
-          "mt-0",
-          "max-w-[700px]",
-          "min-w-0",
+          "max-w-[940px]",
           "w-full",
           "mx-auto",
-          "px-4",
-          "sm:px-6",
-          "xl:px-0",
-          "xl:col-start-2",
-          "portal-reveal",
-          "gap-3"
+          "px-3",
+          "sm:px-5",
+          "portal-reveal"
          ],
          "componentId": "container-search-column",
          "componentName": "container",
@@ -101,21 +53,12 @@
         }
        ],
        "classes": [
-        "items-start",
-        "border-outline-gray-1",
-        "grid",
-        "grid-cols-1",
-        "xl:grid-cols-[minmax(24px,1fr)_minmax(0,700px)_minmax(24px,1fr)_300px]",
-        "xl:pe-4",
         "flex-1",
         "h-full",
         "min-w-0",
         "overflow-y-auto",
-        "pb-10",
         "relative",
-        "w-full",
-        "pt-6",
-        "sm:pt-10"
+        "w-full"
        ],
        "componentId": "container-search-main",
        "componentName": "container",
@@ -156,7 +99,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-27 11:00:00.000000",
+ "modified": "2026-10-27 13:30:00.000000",
  "modified_by": "Administrator",
  "name": "search",
  "owner": "Administrator",

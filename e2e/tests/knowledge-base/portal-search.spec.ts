@@ -137,13 +137,15 @@ test.describe("knowledge base search page", () => {
     await expect(chip).toBeVisible();
   });
 
-  test("the search box text is 16 semibold", async ({ page }) => {
+  test("the page follows Gameplan's search layout", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/help/search");
-    const style = await searchBox(page).evaluate((input) => {
-      const { fontSize, fontWeight } = getComputedStyle(input);
-      return { fontSize, fontWeight };
-    });
-    expect(style).toEqual({ fontSize: "16px", fontWeight: "600" });
+    const box = await searchBox(page).evaluate((input) => ({
+      height: input.getBoundingClientRect().height,
+      fontSize: getComputedStyle(input).fontSize,
+      column: input.closest("[class*='max-w-[940px]']")!.getBoundingClientRect().width,
+    }));
+    expect(box).toEqual({ height: 28, fontSize: "14px", column: 940 });
   });
 
   test("Load more adds the next 20 results and goes away at the end", async ({ page, api }) => {

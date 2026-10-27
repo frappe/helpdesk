@@ -12,7 +12,7 @@
       class="border-r border-outline-gray-1 !bg-surface-base max-md:!h-[calc(90dvh-6rem)] max-md:border-r-0"
     >
       <!-- A link styled as the search box: the search page does the searching. -->
-      <div v-if="showSearch" class="px-3 pb-2 pt-4 max-md:pt-2">
+      <div class="px-3 pb-2 pt-4 max-md:pt-2">
         <RouterLink
           :to="searchRoute"
           class="flex h-7 items-center gap-2 rounded-4 border border-outline-gray-2 bg-surface-base px-2 text-base text-ink-gray-4 transition-colors hover:border-outline-gray-3 focus-visible:focus-ring max-md:h-11"
@@ -34,12 +34,11 @@
       <!-- Mask fades rows under the search box once scrolled. -->
       <div
         ref="list"
-        class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
-        :class="[
-          showSearch ? 'pt-2' : 'pt-4',
+        class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4 pt-2"
+        :class="
           !arrivedState.top &&
-            '[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)]',
-        ]"
+          '[mask-image:linear-gradient(to_bottom,transparent,black_1.5rem)]'
+        "
       >
         <!-- Rows already in hand beat the skeleton; enough rows to fill, clipped. -->
         <PortalSkeleton
@@ -144,8 +143,6 @@ const props = withDefaults(
     searchCategory?: string;
     open?: boolean;
     loading?: boolean;
-    // Off on the search page, which has its own box.
-    showSearch?: boolean;
     // Off where the page's own search takes "/".
     searchShortcut?: boolean;
   }>(),
@@ -154,7 +151,6 @@ const props = withDefaults(
     activeCategory: "",
     searchCategory: "",
     open: false,
-    showSearch: true,
     searchShortcut: true,
   }
 );
@@ -212,7 +208,7 @@ const router = useRouter();
 useKeyboardShortcut({
   combo: "Slash",
   description: __("Search articles"),
-  enabled: () => props.showSearch && props.searchShortcut,
+  enabled: () => props.searchShortcut,
   handler: () => router.push(searchRoute.value),
 });
 
