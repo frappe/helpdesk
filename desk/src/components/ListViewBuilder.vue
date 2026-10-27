@@ -3,45 +3,56 @@
   <div
     :class="[
       'flex items-center justify-between gap-2 px-5 pb-4 pt-3 ',
-      list?.data?.data?.length > 0 ? 'relative' : 'absolute w-[stretch]',
+      isLoadingRows || list?.data?.data?.length > 0
+        ? 'relative'
+        : 'absolute w-[stretch]',
     ]"
-    v-if="showViewControls"
+    v-if="!options.hideViewControls"
   >
-    <QuickFilters v-if="!isMobileView" />
-    <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
-    <div
-      class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
-      v-if="!isMobileView"
-    >
-      <Button
-        :label="__('Save Changes')"
-        v-if="isViewUpdated && canSaveView"
-        @click="handleViewUpdate"
-      />
-      <Reload @click="handleReload" :loading="list.loading" />
-      <Filter />
-      <SortBy :hide-label="isMobileView" />
-      <ColumnSettings
-        :hide-label="isMobileView"
-        v-if="!options.hideColumnSetting"
-      />
-    </div>
-    <div v-else class="flex justify-between items-center w-full">
-      <Filter />
-      <div class="flex items-center gap-2">
+    <ViewControlsSkeleton
+      v-if="!viewControlsReady"
+      :is-mobile-view="isMobileView"
+      :column-setting="!options.hideColumnSetting"
+    />
+    <template v-else>
+      <QuickFilters v-if="!isMobileView" />
+      <div v-if="!isMobileView" class="-ms-2 h-5 border-s"></div>
+      <div
+        class="flex items-start gap-2 justify-end h-full py-1 ps-0.5"
+        v-if="!isMobileView"
+      >
+        <Button
+          :label="__('Save Changes')"
+          v-if="isViewUpdated && canSaveView"
+          @click="handleViewUpdate"
+        />
         <Reload @click="handleReload" :loading="list.loading" />
+        <Filter />
         <SortBy :hide-label="isMobileView" />
+        <ColumnSettings
+          :hide-label="isMobileView"
+          v-if="!options.hideColumnSetting"
+        />
       </div>
-    </div>
+      <div v-else class="flex justify-between items-center w-full">
+        <Filter />
+        <div class="flex items-center gap-2">
+          <Reload @click="handleReload" :loading="list.loading" />
+          <SortBy :hide-label="isMobileView" />
+        </div>
+      </div>
+    </template>
   </div>
 
   <!-- Loading State -->
-  <div
-    v-if="list.loading && !list.data?.data?.length"
-    class="flex items-center justify-center h-full w-full absolute top-0 z-100"
-  >
-    <LoadingIndicator class="size-6 text-ink-gray-4" />
-  </div>
+  <ListViewSkeleton
+    v-if="isLoadingRows"
+    :columns="columns"
+    :row-count="Math.min(defaultParams.page_length_count, 20)"
+    :selectable="options.selectable"
+    :footer="false"
+    aria-busy="true"
+  />
   <!-- List View -->
   <ListView
     v-else-if="list.data?.data.length > 0"
@@ -135,7 +146,7 @@
   </div>
   <!-- Empty State -->
   <EmptyState
-    v-else-if="!list.loading"
+    v-else-if="!isLoadingRows"
     :title="emptyState.title"
     :icon="emptyState.icon"
     :description="emptyState.description"
@@ -149,8 +160,10 @@ import {
   QuickFilters,
   Reload,
   SortBy,
+  ViewControlsSkeleton,
 } from "@/components/view-controls";
 import { Filter, normalizeFilters } from "@helpdesk/shared/filter";
+import ListViewSkeleton from "@helpdesk/shared/ListViewSkeleton.vue";
 import { useScreenSize } from "@/composables/screen";
 import {
   currentView as headerView,
@@ -170,7 +183,6 @@ import {
   dayjsLocal,
   Dropdown,
   frappeRequest,
-  LoadingIndicator,
   TabButtons,
   toast,
 } from "frappe-ui";
@@ -411,6 +423,12 @@ const list = createResource({
   },
 });
 
+// Until the first response lands there is nothing to call empty, so keep the skeleton up.
+const isLoadingRows = computed(
+  () =>
+    !list.data?.data?.length && (list.loading || (!list.fetched && !list.error))
+);
+
 const exposeFunctions = {
   list,
   reload,
@@ -619,14 +637,9 @@ function applyColumnFilter(key: string, operator: string, value: any) {
   applyFilters(conditions);
 }
 
-const showViewControls = computed(() => {
-  return (
-    !options.value.hideViewControls &&
-    filterableFields.data &&
-    sortableFields.data &&
-    quickFilters.data
-  );
-});
+const viewControlsReady = computed(() =>
+  Boolean(filterableFields.data && sortableFields.data && quickFilters.data)
+);
 
 const listViewData = reactive({
   list,
