@@ -20,8 +20,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # The suite targets the current desk UI, so it runs on v16 only;
-  # server tests keep covering v15.
   FRAPPE_BRANCH: version-16
   SITE: helpdesk.test
 
