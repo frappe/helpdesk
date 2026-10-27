@@ -60,23 +60,6 @@ export function expiryLabel(expiresOn: string): string {
   });
 }
 
-/** Sentence form: "Clears today at 9:41 AM", "Clears on 30 Oct at 9:41 AM". */
-export function expirySummary(expiresOn: string): string {
-  if (!expiresOn) return __("Clear status after");
-  const local = dayjsLocal(expiresOn);
-  const time = local.format(TIME_FORMAT);
-  const onDate = () =>
-    __("Clears on {0} at {1}", [local.format(dateFormat(local)), time]);
-  return local.calendar(dayjsLocal(), {
-    sameDay: () => __("Clears today at {0}", [time]),
-    nextDay: () => __("Clears tomorrow at {0}", [time]),
-    nextWeek: () => __("Clears {0} at {1}", [local.format("dddd"), time]),
-    sameElse: onDate,
-    lastDay: onDate,
-    lastWeek: onDate,
-  });
-}
-
 /** Time left until a system-time expiry: "42m", "3h 12m", "2d 4h". */
 export function expiryRemaining(expiresOn: string, now: Date): string {
   if (!expiresOn) return "";
