@@ -214,6 +214,16 @@ class TestHDAgent(FrappeTestCase):
 
         publish.assert_not_called()
 
+    def test_inserting_an_agent_is_not_published(self):
+        # a fresh email: make_agent skips an agent that already exists
+        email = f"{frappe.generate_hash(length=8)}@test.com"
+        with patch(
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+        ) as publish:
+            make_agent(email)
+
+        publish.assert_not_called()
+
     # the session payload (auth.get_user) carries the agent's current status, so
     # the frontend seeds availability without a dedicated round-trip
     def test_get_user_includes_availability(self):
