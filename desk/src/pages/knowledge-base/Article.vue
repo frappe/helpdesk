@@ -320,6 +320,7 @@ function handleCategoryCreate() {
         });
         //update category name in breadcrumb
         article.data.category_name = category.title;
+        article.data.parent_category_name = null;
         toast.success(__("Category created successfully."));
       },
       onError: (error: string) => {
@@ -672,6 +673,12 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
+  if (article.data?.parent_category_name) {
+    items.push({
+      label: article.data.parent_category_name,
+      route: { name: "AgentKnowledgeBase" },
+    });
+  }
   if (article.data?.category_name) {
     items.push({
       label: article.data?.category_name,
