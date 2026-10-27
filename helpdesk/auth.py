@@ -70,6 +70,10 @@ ALLOWED_PATHS = [
     "/api/method/frappe.desk.form.activity.get_more_email_activities",
     "/api/method/frappe.desk.form.activity.get_more_milestone_activities",
     "/api/method/frappe.core.doctype.user.user.get_timezones",
+    "/api/v2/mcp",
+    "/api/method/frappe.integrations.oauth2.register_client",
+    "/api/method/frappe.integrations.oauth2.introspect_token",
+    "/api/method/frappe.integrations.oauth2.revoke_token",
 ]
 
 WILDCARD_PATHS = [
@@ -85,6 +89,7 @@ def authenticate():
         path = f"/api/method/{frappe.form_dict.cmd}"
     else:
         path = frappe.request.path
+    path = path.removesuffix("/")
     user_type = frappe.db.get_value("User", frappe.session.user, "user_type")
 
     if user_type == "System User":
