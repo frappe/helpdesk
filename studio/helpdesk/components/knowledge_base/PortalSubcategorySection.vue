@@ -22,7 +22,6 @@
         variant="ghost"
         size="sm"
         class="ms-auto -me-2 shrink-0"
-        iconRight="lucide-arrow-right"
         :route="ROUTES.category(category.name)"
         :aria-label="
           __('View all {0} articles in {1}', [
