@@ -55,7 +55,7 @@ from ..hd_service_level_agreement.utils import get_sla
 from .customer_edit_controller import CustomerEditController
 from .ticket_origin import resolve_ticket_origin
 
-customer_not_allowed_fields = ["customer"]
+customer_not_allowed_fields = ["customer", "source"]
 
 
 class HDTicket(Document, CustomerEditController):
@@ -159,7 +159,7 @@ class HDTicket(Document, CustomerEditController):
     def handle_email_feedback(self):
         if (
             self.is_new()
-            or self.via_customer_portal
+            or self.source != "Email"
             or self.feedback_rating
             or not self.has_value_changed("status")
             or not self.key
@@ -220,11 +220,7 @@ class HDTicket(Document, CustomerEditController):
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
         )
-        if (
-            not self.via_customer_portal
-            and not frappe.flags.initial_sync
-            and send_ack_email
-        ):
+        if self.source == "Email" and not frappe.flags.initial_sync and send_ack_email:
             self.send_acknowledgement_email()
 
     def capture_ticket_created_telemetry_events(self):
@@ -232,9 +228,9 @@ class HDTicket(Document, CustomerEditController):
             return
 
         capture_event("ticket_created")
-        if not self.via_customer_portal:
+        if self.source == "Email":
             capture_event("ticket_created_via_email")
-        if self.via_customer_portal and not is_agent():
+        if self.source == "Portal" and not is_agent():
             capture_event("ticket_created_via_customer")
 
         if self.ticket_split_from:
@@ -385,7 +381,7 @@ class HDTicket(Document, CustomerEditController):
             elif (
                 len(contact_customers) > 1
                 and not is_agent()
-                and self.via_customer_portal
+                and self.source == "Portal"
             ):
                 frappe.throw(
                     _(
@@ -785,7 +781,7 @@ class HDTicket(Document, CustomerEditController):
 
         reply_to_email = sender_email.email_id
         rendered_template: str | None = None
-        if self.via_customer_portal:
+        if self.source == "Portal":
             email_content = frappe.db.get_single_value(
                 "HD Settings", "reply_via_agent_email_content"
             )
@@ -1393,10 +1389,7 @@ class HDTicket(Document, CustomerEditController):
 
     @staticmethod
     def filter_standard_fields(fields):
-        for f in fields:
-            if f["name"] in customer_not_allowed_fields:
-                fields.remove(f)
-        return fields
+        return [f for f in fields if f["name"] not in customer_not_allowed_fields]
 
     def notify_customers(self):
         ping_customers(self)
