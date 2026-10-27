@@ -1,6 +1,7 @@
 import json
 import uuid
 from email.utils import parseaddr
+from urllib.parse import unquote, urlparse
 
 import frappe
 from bs4 import BeautifulSoup, Comment
@@ -12,7 +13,14 @@ from frappe.desk.form.assign_to import get as get_assignees
 from frappe.email.email_body import get_message_id
 from frappe.model.document import Document
 from frappe.permissions import add_permission, update_permission_property
-from frappe.utils import add_to_date, cint, get_string_between, getdate, now_datetime
+from frappe.utils import (
+    add_to_date,
+    cint,
+    get_string_between,
+    get_url,
+    getdate,
+    now_datetime,
+)
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -848,8 +856,8 @@ class HDTicket(Document):
         soup = BeautifulSoup(self.description, "html.parser")
         files = []  # List of file URLs
         for tag in soup.find_all(["img", "video"]):
-            if tag.has_attr("src"):
-                src = tag["src"]
+            src = get_site_file_url(tag.get("src"))
+            if src:
                 files.append(src)
         for f in files:
             file = frappe.db.exists(
@@ -1293,11 +1301,11 @@ class HDTicket(Document):
             comment.extract()
 
         for tag in soup.find_all(["img", "video"]):
-            src = tag.get("src")
             # only site files can be embedded; external URLs must keep their src
-            if not src or not src.startswith(("/private/files/", "/files/")):
+            file_url = get_site_file_url(tag.get("src"))
+            if not file_url:
                 continue
-            tag["embed"] = src
+            tag["embed"] = file_url
             del tag["src"]
 
         return str(soup)
@@ -1308,6 +1316,25 @@ class HDTicket(Document):
             if f["name"] in customer_not_allowed_fields:
                 fields.remove(f)
         return fields
+
+
+def get_site_file_url(src: str | None) -> str | None:
+    """Turn an absolute file URL of this site into its relative path.
+    https://<this site>/private/files/x.png -> /private/files/x.png
+    /private/files/x.png -> /private/files/x.png (already relative)
+    Returns None for other sites or non-file links."""
+    if not src:
+        return None
+    url = urlparse(src)
+    if url.scheme or url.netloc:
+        if url.scheme not in ("http", "https"):
+            return None
+        if url.netloc != urlparse(get_url()).netloc:
+            return None
+    path = unquote(url.path)
+    if not path.startswith(("/private/files/", "/files/")):
+        return None
+    return path
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
