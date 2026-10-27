@@ -5,7 +5,7 @@
     >
       <span
         class="size-4 shrink-0 text-ink-gray-6"
-        :class="category.icon || 'lucide-folder'"
+        :class="categoryIcon(category.icon)"
         aria-hidden="true"
       />
       <PortalLink
@@ -38,6 +38,7 @@
 import { Button } from "frappe-ui";
 import { __ } from "@helpdesk/shared/translation";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { categoryIcon } from "@helpdesk/shared/categoryIcons";
 import PortalLink from "@app/components/ui/PortalLink.vue";
 import PortalArticleList from "./PortalArticleList.vue";
 

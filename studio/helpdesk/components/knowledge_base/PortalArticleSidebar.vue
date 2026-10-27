@@ -67,7 +67,7 @@
             >
               <template #prefix>
                 <Icon
-                  :icon="category.icon || 'lucide-folder'"
+                  :icon="categoryIcon(category.icon)"
                   class="size-4 max-md:size-[18px]"
                   :class="
                     category.isCurrent ? 'text-ink-gray-8' : 'text-ink-gray-6'
@@ -177,6 +177,7 @@ import { __ } from "@helpdesk/shared/translation";
 import PortalCollapse from "@app/components/ui/PortalCollapse.vue";
 import PortalSkeleton from "@app/components/ui/PortalSkeleton.vue";
 import { ROUTES } from "@helpdesk/shared/portalRoutes";
+import { categoryIcon } from "@helpdesk/shared/categoryIcons";
 import { matchesQuery } from "@helpdesk/shared/utils";
 import { prefetchOnHover, sidebarState } from "@app/stores/knowledgeBase";
 
