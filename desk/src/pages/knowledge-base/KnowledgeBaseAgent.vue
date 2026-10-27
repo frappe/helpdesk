@@ -232,6 +232,7 @@ const groupByActions = [
   {
     label: __("Delete"),
     icon: "lucide-trash-2",
+    theme: "red",
     onClick: (groupedRow) => {
       handleCategoryDelete(groupedRow);
     },

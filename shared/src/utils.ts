@@ -16,32 +16,41 @@ const YEAR = 365 * DAY;
 export const CUSTOMER_PORTAL_ROOT = "/help";
 
 /**
+ * Delete in its own red group, so the menu draws a divider above it, as
+ * frappe-ui marks a danger action.
  * @param {Object} config - Configuration object
  * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
  * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
- * @returns {Array} Array of option objects for use in dropdowns
+ * @returns {Array} A menu group for use in dropdowns
  */
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
-      label: __("Delete"),
-      icon: "lucide-trash-2",
-      // preventDefault keeps the menu open so the confirm row can replace this one
-      onClick: (event) => {
-        event.preventDefault();
-        isConfirmingDelete.value = true;
-      },
-      condition: () => !isConfirmingDelete.value,
-    },
-    {
-      label: __("Confirm Delete"),
-      icon: "lucide-trash-2",
-      theme: "red",
-      onClick: () => {
-        onConfirmDelete();
-        isConfirmingDelete.value = false;
-      },
-      condition: () => isConfirmingDelete.value,
+      group: __("Danger"),
+      hideLabel: true,
+      options: [
+        {
+          label: __("Delete"),
+          icon: "lucide-trash-2",
+          theme: "red",
+          // preventDefault keeps the menu open so the confirm row can replace this one
+          onClick: (event) => {
+            event.preventDefault();
+            isConfirmingDelete.value = true;
+          },
+          condition: () => !isConfirmingDelete.value,
+        },
+        {
+          label: __("Confirm Delete"),
+          icon: "lucide-trash-2",
+          theme: "red",
+          onClick: () => {
+            onConfirmDelete();
+            isConfirmingDelete.value = false;
+          },
+          condition: () => isConfirmingDelete.value,
+        },
+      ],
     },
   ];
 }
