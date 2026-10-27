@@ -5,7 +5,7 @@ from typing import Any
 import frappe
 from frappe.cache_manager import clear_doctype_map
 from frappe.core.doctype.communication.test_communication import create_email_account
-<<<<<<< HEAD
+from frappe.permissions import rights
 
 try:
     from frappe.tests.classes.context_managers import freeze_time
@@ -16,10 +16,6 @@ except ImportError:  # frappe v15
         return FrappeTestCase.freeze_time(None, time_to_freeze, *args, **kwargs)
 
 
-=======
-from frappe.permissions import rights
-from frappe.tests.classes.context_managers import freeze_time
->>>>>>> 72331e5 (fix(perms): move permission helper to test_utils and compare if_owner)
 from frappe.utils import add_to_date, getdate, now_datetime
 
 from helpdesk.api.dashboard import HelpdeskDashboard
@@ -877,8 +873,6 @@ def get_user_roles(user: str) -> list[str]:
     )
 
 
-<<<<<<< HEAD
-=======
 def get_granted_rights(role: str) -> set[tuple]:
     """(doctype, permlevel, right, if_owner) for every right the role's DocPerms grant."""
     perms = frappe.get_all(
@@ -889,25 +883,6 @@ def get_granted_rights(role: str) -> set[tuple]:
     }
 
 
-def show_only_banners(*banners: str):
-    """Turn on exactly `banners` in HD Settings and turn every other banner off."""
-    for banner, flag in BANNERS.items():
-        frappe.db.set_single_value("HD Settings", flag, int(banner in banners))
-
-
-def dismiss_banner_as(user: str, banner: str) -> MagicMock:
-    """Dismiss `banner` as `user`, returning the realtime publisher mock."""
-    previous_user = frappe.session.user
-    frappe.set_user(user)
-    try:
-        with patch("frappe.publish_realtime") as publish_realtime:
-            dismiss_banner(banner)
-    finally:
-        frappe.set_user(previous_user)
-    return publish_realtime
-
-
->>>>>>> 72331e5 (fix(perms): move permission helper to test_utils and compare if_owner)
 def make_assigned_ticket(agent: str, subject: str, status: str | None = None):
     """A ticket that has been responded to and is assigned to `agent`, so dashboard
     queries filtered by that agent only see the tickets a test creates."""
