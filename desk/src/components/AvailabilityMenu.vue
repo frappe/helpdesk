@@ -112,6 +112,9 @@
                         ? 'active'
                         : undefined
                     "
+                    :aria-pressed="
+                      agentStatusStore.isExpiryPresetActive(preset)
+                    "
                     @click="agentStatusStore.applyExpiryPreset(preset)"
                   />
                   <Button
