@@ -90,6 +90,7 @@ def authenticate():
         path = f"/api/method/{frappe.form_dict.cmd}"
     else:
         path = frappe.request.path
+    path = path.removesuffix("/")
     user_type = frappe.db.get_value("User", frappe.session.user, "user_type")
 
     if user_type == "System User":
