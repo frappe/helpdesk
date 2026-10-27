@@ -152,9 +152,11 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // behaves the same and this needs no dedicated endpoint.
   const setMyAvailability = createResource({
     url: "frappe.client.set_value",
-    onSuccess: () => toast.success(__("Status updated successfully.")),
-    onError: () => toast.error(__("Could not update status.")),
   });
+
+  // set_value locks the row and checks its modified stamp, so a second save
+  // in flight fails; this tab sends its saves one at a time
+  let lastSave: Promise<unknown> = Promise.resolve();
 
   const myStatus = computed(
     () => (myAgentName && liveStatuses[myAgentName]?.availability) || ""
@@ -177,14 +179,15 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       .map((s: HDAgentStatus) => s.agent_status)
   );
 
-  function setMyStatus(status: string) {
+  function setMyStatus(status: string, { quiet = false } = {}) {
     if (!status || status === myStatus.value) return;
     // changedOn is left empty — it is never rendered for our own dot and the
     // socket echo overwrites it with the authoritative server timestamp. The
     // server drops the timer on a new status, so drop it here too.
     saveMyAvailability(
       { availability: status },
-      { availability: status, changedOn: "", expiresOn: "" }
+      { availability: status, changedOn: "", expiresOn: "" },
+      { quiet }
     );
   }
 
@@ -215,10 +218,20 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       const delay = serverInstant(expiresOn).diff();
       // setTimeout fires at once past ~24.8 days; leave those to the scheduler
       if (delay > MAX_TIMEOUT) return;
-      expiryTimer = setTimeout(clearMyStatus, Math.max(0, delay));
+      expiryTimer = setTimeout(
+        () => clearExpiredStatus(expiresOn),
+        Math.max(0, delay)
+      );
     },
     { immediate: true }
   );
+
+  // quiet: the pill is the feedback, and a failure is usually another window
+  // clearing it first, whose echo brings the real state
+  function clearExpiredStatus(expiresOn: string) {
+    if (myStatusExpiresOn.value !== expiresOn) return;
+    setMyStatus(auth.defaultAgentStatus, { quiet: true });
+  }
 
   // only "Never" can show as picked: a stored time does not say which
   // preset made it
@@ -228,7 +241,8 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
 
   function saveMyAvailability(
     values: Record<string, string | null>,
-    livePatch: Partial<LiveAvailability>
+    livePatch: Partial<LiveAvailability>,
+    { quiet = false } = {}
   ) {
     if (!myAgentName) return;
     // Optimistic: update immediately, then roll back if the server rejects it.
@@ -240,14 +254,25 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       ...previous,
       ...livePatch,
     };
-    setMyAvailability.submit(
-      { doctype: "HD Agent", name: myAgentName, fieldname: values },
-      {
-        onError: () => {
-          if (previous) liveStatuses[myAgentName] = previous;
-          else delete liveStatuses[myAgentName];
-        },
-      }
+    lastSave = lastSave.then(() =>
+      setMyAvailability
+        .submit(
+          { doctype: "HD Agent", name: myAgentName, fieldname: values },
+          {
+            onSuccess: () => {
+              if (!quiet) toast.success(__("Status updated successfully."));
+            },
+            onError: () => {
+              // no rollback either: it would re-arm the expired timer
+              if (quiet) return;
+              toast.error(__("Could not update status."));
+              if (previous) liveStatuses[myAgentName] = previous;
+              else delete liveStatuses[myAgentName];
+            },
+          }
+        )
+        // keep the queue going after a failed save
+        .catch(() => {})
     );
   }
 
