@@ -86,11 +86,11 @@
           <div class="flex min-w-0 items-center">
             <span
               v-if="canSearch"
-              class="truncate text-base font-medium text-ink-gray-9"
+              class="truncate text-base-medium text-ink-gray-9"
               :class="MARK"
               v-html="row.title"
             />
-            <span v-else class="truncate text-base font-medium text-ink-gray-9">
+            <span v-else class="truncate text-base-medium text-ink-gray-9">
               {{ row.title }}
             </span>
             <span
@@ -127,7 +127,7 @@
         class="lucide-search-x mb-1 size-5 text-ink-gray-4"
         aria-hidden="true"
       />
-      <span class="max-w-full truncate text-base font-medium text-ink-gray-8">
+      <span class="max-w-full truncate text-base-medium text-ink-gray-8">
         {{ __("No articles match “{0}”", [searchText]) }}
       </span>
       <span class="text-p-sm text-ink-gray-5">
