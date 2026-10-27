@@ -14,11 +14,8 @@
       >
         {{ category.category_name }}
       </PortalLink>
-      <span class="shrink-0 text-sm tabular-nums text-ink-gray-5">
-        {{ category.article_count }}
-      </span>
       <Button
-        v-if="category.article_count > 4"
+        v-if="category.article_count > 5"
         variant="ghost"
         size="sm"
         class="ms-auto -me-2 shrink-0"

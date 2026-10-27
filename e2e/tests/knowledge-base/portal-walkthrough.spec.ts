@@ -929,12 +929,12 @@ test.describe("subcategories", () => {
     // the header counts the subcategories
     await expect(page.getByText("1 subcategory", { exact: true })).toBeVisible();
 
-    // a subcategory with more than 4 articles offers "View all"
+    // a subcategory with more than 5 articles offers "View all"
     const big = await createCategory(api, `Big Sub ${uid()}`, { parent_article_category: parent.name });
-    for (let i = 0; i < 5; i++) await createArticle(api, big.name, { visibility: "Customers" });
+    for (let i = 0; i < 6; i++) await createArticle(api, big.name, { visibility: "Customers" });
     await page.reload();
     await expect(page.getByRole("link", { name: /^View all/ })).toHaveCount(1);
-    await page.getByRole("link", { name: `View all 5 articles in ${big.category_name}` }).click();
+    await page.getByRole("link", { name: `View all 6 articles in ${big.category_name}` }).click();
     await expect(page.getByRole("heading", { name: big.category_name, level: 1 })).toBeVisible();
     await page.goBack();
 

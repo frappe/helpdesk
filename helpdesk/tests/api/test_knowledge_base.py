@@ -1008,7 +1008,7 @@ class TestSubcategoryReads(IntegrationTestCase):
     def test_subcategory_articles_are_newest_first_and_capped(self) -> None:
         names = [
             make_article(category=self.sub, published_on=f"2026-01-0{day} 10:00:00")
-            for day in range(1, 6)
+            for day in range(1, 7)
         ]
 
         rows = get_subcategory_articles(self.parent)[self.sub]
