@@ -10,7 +10,9 @@
     :required="field.reqd"
     :disabled="field.readOnly"
     :loading="fetched.loading"
-    :error="fetched.error ? __('Could not load the options') : undefined"
+    :error="
+      error || (fetched.error ? __('Could not load the options') : undefined)
+    "
   />
 </template>
 
@@ -22,9 +24,12 @@ import { Combobox, createResource } from "frappe-ui";
 import { computed } from "vue";
 
 // `url` fetches the options; `options` passes a long Select's own, to search.
+// `error` is FormLayout's validation error. Declared, so it can't fall through
+// to the Combobox and override the fetch error.
 const props = defineProps<{
   field: any;
   modelValue: any;
+  error?: string | string[];
   url?: string;
   options?: { label: string; value: string }[];
 }>();
