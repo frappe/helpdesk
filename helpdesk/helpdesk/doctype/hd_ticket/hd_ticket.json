@@ -438,13 +438,12 @@
    "permlevel": 8
   },
   {
-   "collapsible": 1,
    "fieldname": "origin_section",
    "fieldtype": "Section Break",
-   "label": "Origin"
+   "label": "Ticket Origin"
   },
   {
-   "description": "Where the customer started when they raised this ticket in the portal. External means a link from another site. Empty for tickets from outside the portal.",
+   "description": "Where the customer started when they raised this ticket in the portal. Empty for tickets from outside the portal.\n<ul><li><b>Article</b>: an article page</li><li><b>Search</b>: knowledge base search</li><li><b>Ticket List</b>: their ticket list</li><li><b>Closed Ticket</b>: a closed ticket they could not reply to</li><li><b>Direct</b>: the new ticket page with no source</li><li><b>External</b>: a link from another site</li></ul>",
    "fieldname": "entry_point",
    "fieldtype": "Select",
    "label": "Entry Point",
@@ -455,6 +454,7 @@
   },
   {
    "depends_on": "eval:doc.entry_point=='Article'",
+   "description": "The article the customer was reading. Empty if they cannot read it or it no longer exists.",
    "fieldname": "source_article",
    "fieldtype": "Link",
    "label": "Source Article",
@@ -469,6 +469,7 @@
   },
   {
    "depends_on": "eval:doc.entry_point=='Search'",
+   "description": "What the customer searched for, cut to 140 characters.",
    "fieldname": "source_search",
    "fieldtype": "Data",
    "label": "Source Search",
@@ -479,6 +480,7 @@
   },
   {
    "depends_on": "eval:doc.entry_point=='External'",
+   "description": "The utm_source tag on the link from the other site, for example frappe-cloud.",
    "fieldname": "utm_source",
    "fieldtype": "Data",
    "label": "UTM Source",
@@ -569,7 +571,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2026-10-24 04:00:00.000000",
+ "modified": "2026-10-27 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
