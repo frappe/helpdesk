@@ -10,7 +10,7 @@
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
         <div class="flex items-baseline gap-3">
           <p
-            class="min-w-0 text-base font-medium text-ink-gray-8 group-hover:text-ink-gray-9 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
+            class="min-w-0 text-base-medium text-ink-gray-8 group-hover:text-ink-gray-9 truncate max-sm:whitespace-normal max-sm:line-clamp-2"
             :class="markClass"
           >
             <span v-if="marked" v-html="article.title" />

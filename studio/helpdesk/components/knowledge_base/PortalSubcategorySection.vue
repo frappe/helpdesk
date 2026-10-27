@@ -10,7 +10,7 @@
       />
       <PortalLink
         :to="ROUTES.category(category.name)"
-        class="min-w-0 truncate rounded-sm text-lg font-semibold text-ink-gray-8 hover:text-ink-gray-9 focus-visible:focus-ring"
+        class="min-w-0 truncate rounded-sm text-lg-semibold text-ink-gray-8 hover:text-ink-gray-9 focus-visible:focus-ring"
       >
         {{ category.category_name }}
       </PortalLink>
