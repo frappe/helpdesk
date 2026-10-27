@@ -49,11 +49,8 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { useApps } from "@/composables/useApps";
 import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
-import {
-  expiryPresets,
-  expirySummary,
-  useAgentStatusStore,
-} from "@/stores/agentStatus";
+import { useAgentStatusStore } from "@/stores/agentStatus";
+import { expiryPresets, expirySummary } from "@/stores/statusExpiry";
 
 const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();

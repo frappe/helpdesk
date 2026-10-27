@@ -132,14 +132,15 @@
 </template>
 
 <script setup lang="ts">
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import {
   expiryLabel,
   expiryPresets,
-  useAgentStatusStore,
-} from "@/stores/agentStatus";
+  expiryRemaining,
+} from "@/stores/statusExpiry";
 import { __ } from "@/translation";
 import { useElementSize, useNow } from "@vueuse/core";
-import { Button, ItemListRow, Popover, dayjs, dayjsLocal } from "frappe-ui";
+import { Button, ItemListRow, Popover } from "frappe-ui";
 import { computed, useTemplateRef } from "vue";
 
 const agentStatusStore = useAgentStatusStore();
@@ -149,28 +150,10 @@ const expiresLabel = computed(() => expiryLabel(expiresOn.value));
 
 const { width: labelWidth } = useElementSize(useTemplateRef("labelRef"));
 
-// dayjs does the maths; useNow is the tick that re-renders the countdown
+// useNow is the tick that re-renders the countdown
 const now = useNow({ interval: 30_000 });
 
-/** "42m", "3h 12m", "2d 4h" */
-const remaining = computed(() => {
-  if (!expiresOn.value) return "";
-  // rounded, so a fresh 1h reads "1h", not "59m"
-  const minutes = Math.round(
-    dayjsLocal(expiresOn.value).diff(now.value, "minute", true)
-  );
-  if (minutes < 1) return __("<1m");
-  // dayjs splits the units; it has no compact "2d 4h" format, so join here
-  const left = dayjs.duration(minutes, "minute");
-  const days = Math.floor(left.asDays());
-  const parts = days
-    ? [`${days}d`, left.hours() && `${left.hours()}h`]
-    : [
-        left.hours() && `${left.hours()}h`,
-        left.minutes() && `${left.minutes()}m`,
-      ];
-  return parts.filter(Boolean).join(" ");
-});
+const remaining = computed(() => expiryRemaining(expiresOn.value, now.value));
 
 // stays open on an away status, so the timer can be picked next
 function pickStatus(option: string, close: () => void) {

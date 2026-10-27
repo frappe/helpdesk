@@ -3,19 +3,15 @@ import { userStorage } from "@/composables/userStorage";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
+import { type ExpiryPreset } from "@/stores/statusExpiry";
 import {
   createListResource,
   createResource,
-  dayjs,
   dayjsLocal,
   toast,
-  type Dayjs,
 } from "frappe-ui";
-import calendar from "dayjs/plugin/calendar";
 import { defineStore } from "pinia";
 import { computed, reactive, watch } from "vue";
-
-dayjs.extend(calendar);
 
 interface LiveAvailability {
   availability: string;
@@ -32,19 +28,8 @@ interface AvailabilityEvent {
   changed_by: string;
 }
 
-export interface ExpiryPreset {
-  label: string;
-  /** Chip form: "30m". */
-  short: string;
-  /** Null means the status never clears. */
-  expiresOn: () => Dayjs | null;
-  never?: true;
-}
-
 // the format frappe datetime fields are sent in
 const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
-// 12-hour, e.g. "9:41 AM"
-const TIME_FORMAT = "h:mm A";
 // the longest delay setTimeout accepts
 const MAX_TIMEOUT = 2 ** 31 - 1;
 
@@ -294,68 +279,3 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     statusColor,
   };
 });
-
-/** "Clear after" choices. A function so labels translate at render. */
-export function expiryPresets(): ExpiryPreset[] {
-  const after = (amount: number, unit: "minute" | "hour") => () =>
-    dayjsLocal().add(amount, unit);
-  return [
-    { label: __("30 minutes"), short: "30m", expiresOn: after(30, "minute") },
-    { label: __("1 hour"), short: "1h", expiresOn: after(1, "hour") },
-    { label: __("4 hours"), short: "4h", expiresOn: after(4, "hour") },
-    {
-      label: __("Today"),
-      short: __("Today"),
-      expiresOn: () => dayjsLocal().endOf("day"),
-    },
-    {
-      label: __("This week"),
-      short: __("This week"),
-      expiresOn: () => dayjsLocal().endOf("week"),
-    },
-    {
-      label: __("Never"),
-      short: __("Never"),
-      never: true,
-      expiresOn: () => null,
-    },
-  ];
-}
-
-/** Button text for a system-time expiry, on the agent's clock:
- * "9:41 AM", "Tomorrow 9:41 AM", "Thu 9:41 AM", "30 Oct". */
-export function expiryLabel(expiresOn: string): string {
-  if (!expiresOn) return "";
-  const local = dayjsLocal(expiresOn);
-  const date = dateFormat(local);
-  return local.calendar(dayjsLocal(), {
-    sameDay: TIME_FORMAT,
-    nextDay: `[${__("Tomorrow")}] ${TIME_FORMAT}`,
-    nextWeek: `ddd ${TIME_FORMAT}`,
-    sameElse: date,
-    lastDay: date,
-    lastWeek: date,
-  });
-}
-
-/** Sentence form: "Clears today at 9:41 AM", "Clears on 30 Oct at 9:41 AM". */
-export function expirySummary(expiresOn: string): string {
-  if (!expiresOn) return __("Clear status after");
-  const local = dayjsLocal(expiresOn);
-  const time = local.format(TIME_FORMAT);
-  const onDate = () =>
-    __("Clears on {0} at {1}", [local.format(dateFormat(local)), time]);
-  return local.calendar(dayjsLocal(), {
-    sameDay: () => __("Clears today at {0}", [time]),
-    nextDay: () => __("Clears tomorrow at {0}", [time]),
-    nextWeek: () => __("Clears {0} at {1}", [local.format("dddd"), time]),
-    sameElse: onDate,
-    lastDay: onDate,
-    lastWeek: onDate,
-  });
-}
-
-// the year only when it is not this one
-function dateFormat(local: Dayjs): string {
-  return local.isSame(dayjsLocal(), "year") ? "D MMM" : "D MMM YYYY";
-}

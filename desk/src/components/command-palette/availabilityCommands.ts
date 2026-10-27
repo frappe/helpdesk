@@ -1,8 +1,5 @@
-import {
-  expiryLabel,
-  expiryPresets,
-  useAgentStatusStore,
-} from "@/stores/agentStatus";
+import { useAgentStatusStore } from "@/stores/agentStatus";
+import { expiryLabel, expiryPresets } from "@/stores/statusExpiry";
 import { parseColor } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
 import { GROUP, type Command } from "./paletteTypes";
