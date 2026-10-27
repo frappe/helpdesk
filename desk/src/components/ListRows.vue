@@ -9,7 +9,7 @@
             <component v-if="group.icon" :is="group.icon" />
             <div
               v-if="group.group.label != ''"
-              class="flex items-end gap-1 w-full"
+              class="flex items-baseline gap-2 w-full"
             >
               <span>{{ __(group.group.label) }}</span>
               <span class="text-xs text-ink-gray-5"
