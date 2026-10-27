@@ -4,12 +4,8 @@ import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
 import { type ExpiryPreset } from "@/stores/statusExpiry";
-import {
-  createListResource,
-  createResource,
-  dayjsLocal,
-  toast,
-} from "frappe-ui";
+import { serverInstant } from "@helpdesk/shared/utils";
+import { createListResource, createResource, toast } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, reactive, watch } from "vue";
 
@@ -216,7 +212,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     (expiresOn) => {
       clearTimeout(expiryTimer);
       if (!expiresOn) return;
-      const delay = dayjsLocal(expiresOn).diff(dayjsLocal());
+      const delay = serverInstant(expiresOn).diff();
       // setTimeout fires at once past ~24.8 days; leave those to the scheduler
       if (delay > MAX_TIMEOUT) return;
       expiryTimer = setTimeout(clearMyStatus, Math.max(0, delay));

@@ -1,4 +1,5 @@
 import { __ } from "@/translation";
+import { serverInstant } from "@helpdesk/shared/utils";
 import { dayjs, dayjsLocal, type Dayjs } from "frappe-ui";
 import calendar from "dayjs/plugin/calendar";
 
@@ -80,7 +81,9 @@ export function expirySummary(expiresOn: string): string {
 export function expiryRemaining(expiresOn: string, now: Date): string {
   if (!expiresOn) return "";
   // rounded, so a fresh 1h reads "1h", not "59m"
-  const minutes = Math.round(dayjsLocal(expiresOn).diff(now, "minute", true));
+  const minutes = Math.round(
+    serverInstant(expiresOn).diff(now, "minute", true)
+  );
   if (minutes < 1) return __("<1m");
   // dayjs splits the units; it has no compact "2d 4h" format, so join here
   const left = dayjs.duration(minutes, "minute");
