@@ -346,9 +346,12 @@ class HDServiceLevelAgreement(Document):
         """
         result = get_datetime(start_at)
         priority = self.get_priorities()[priority]
-        remaining_target_time = priority.get(
-            target, 0
+        remaining_target_time = cint(
+            priority.get(target)
         )  # time for response or resolution in seconds
+        if not remaining_target_time:
+            # resolution time is optional when resolution SLA is off
+            return None
         holidays = (
             self.get_holidays()
         )  # From Holiday List, returns a list of holiday dates

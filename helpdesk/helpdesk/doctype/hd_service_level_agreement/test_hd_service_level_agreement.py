@@ -225,3 +225,21 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         frappe.clear_messages()
         self.drop_priority(used, "Medium")
         self.assertIn("Medium", frappe.as_json(frappe.get_message_log()))
+
+    def test_priority_without_resolution_time_when_resolution_sla_is_off(self):
+        """Resolution time is optional without resolution SLA: no resolution target."""
+        sla = make_sla(
+            "Response Only SLA", "doc.priority == 'Medium'", priorities=["Medium"]
+        )
+        self.addCleanup(frappe.db.set_value, DOCTYPE, sla.name, "enabled", 0)
+        sla.reload()
+        sla.apply_sla_for_resolution = 0
+        sla.priorities[0].resolution_time = None
+        sla.save()
+
+        ticket = make_ticket(priority="Medium")
+        ticket.save()
+
+        self.assertEqual(ticket.sla, sla.name)
+        self.assertTrue(ticket.response_by)
+        self.assertFalse(ticket.resolution_by)
