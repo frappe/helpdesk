@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
+from datetime import timedelta
+
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import add_to_date, get_datetime
+from frappe.utils import add_to_date, get_datetime, getdate
 
 from helpdesk.consts import DEFAULT_SLA
 from helpdesk.test_utils import (
     SLA_PRIORITY_NAME,
+    add_holiday,
     get_current_week_monday,
     make_priority,
     make_sla,
     make_ticket,
+    remove_holidays,
 )
 
 DOCTYPE = "HD Service Level Agreement"
@@ -27,6 +31,17 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         sla.reload()
         sla.priorities = [row for row in sla.priorities if row.priority != priority]
         sla.save()
+
+    def at(self, day: int, hours: float):
+        """A moment in the current week, day 0 being Monday."""
+        monday = get_datetime(get_current_week_monday(hours=0))
+        return monday + timedelta(days=day, hours=hours)
+
+    def with_breaks(self, sla, break_start="13:00:00", break_end="14:00:00"):
+        """Give every workday of `sla` the same break, in memory only."""
+        for row in sla.support_and_resolution:
+            row.break_start, row.break_end = break_start, break_end
+        return sla
 
     def test_sla_creation(self):
         sla = make_sla("Test SLA")
@@ -225,3 +240,110 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
         frappe.clear_messages()
         self.drop_priority(used, "Medium")
         self.assertIn("Medium", frappe.as_json(frappe.get_message_log()))
+
+    def test_break_validation(self):
+        """A break needs both ends and must sit strictly inside the workday."""
+        sla = frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME)
+        sla.validate_support_and_resolution()  # no break is still valid
+
+        invalid = [
+            ("13:00:00", None),
+            (None, "14:00:00"),
+            ("10:00:00", "11:00:00"),  # starts with the workday
+            ("09:00:00", "11:00:00"),  # starts before the workday
+            ("17:00:00", "18:00:00"),  # ends with the workday
+            ("14:00:00", "14:00:00"),
+            ("14:00:00", "13:00:00"),
+        ]
+        for break_start, break_end in invalid:
+            with self.subTest(break_start=break_start, break_end=break_end):
+                self.with_breaks(sla, break_start, break_end)
+                with self.assertRaisesRegex(frappe.ValidationError, "row <u>1</u>"):
+                    sla.validate_support_and_resolution()
+
+        self.with_breaks(sla, "10:00:01", "17:59:59")
+        sla.validate_support_and_resolution()
+
+    def test_targets_skip_break(self):
+        """High is 1h to respond and 4h to resolve, Mon-Fri 10:00-18:00."""
+        plain = frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME)
+        breaking = self.with_breaks(frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME))
+        cases = [
+            # start, target, hold, without break, with 13:00-14:00 break
+            (self.at(0, 12 + 50 / 60), "response_time", 0, 13 + 50 / 60, 14 + 50 / 60),
+            (self.at(0, 12), "response_time", 0, 13, 13),  # ends at break start
+            (self.at(0, 13 + 20 / 60), "response_time", 0, 14 + 20 / 60, 15),
+            (
+                self.at(0, 12 + 50 / 60),
+                "resolution_time",
+                0,
+                16 + 50 / 60,
+                17 + 50 / 60,
+            ),
+            (self.at(0, 12), "resolution_time", 3600, 17, 18),  # hold time
+            # 30m on Monday, the rest on Tuesday around its break
+            (self.at(0, 17.5), "resolution_time", 0, 24 + 13.5, 24 + 14.5),
+        ]
+        for start, target, hold, without_break, with_break in cases:
+            with self.subTest(start=start, target=target):
+                for sla, hours in ((plain, without_break), (breaking, with_break)):
+                    self.assertEqual(
+                        sla.calc_time(start, "High", target, hold_time=hold),
+                        self.at(0, hours),
+                    )
+
+    def test_elapsed_time_skips_break(self):
+        plain = frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME)
+        breaking = self.with_breaks(frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME))
+        hour = 3600
+        cases = [
+            # start, end, without break, with 13:00-14:00 break
+            (self.at(0, 12.5), self.at(0, 14.5), 2 * hour, hour),  # across
+            (self.at(0, 12.5), self.at(0, 13.5), hour, hour / 2),  # into
+            (self.at(0, 13.5), self.at(0, 14.5), hour, hour / 2),  # out of
+            (self.at(0, 13.1), self.at(0, 13.9), 0.8 * hour, 0),  # inside
+            (self.at(0, 14.5), self.at(0, 12.5), 0, 0),  # backwards
+        ]
+        for start, end, without_break, with_break in cases:
+            with self.subTest(start=start, end=end):
+                self.assertAlmostEqual(
+                    plain.calc_elapsed_time(start, end), without_break
+                )
+                self.assertAlmostEqual(
+                    breaking.calc_elapsed_time(start, end), with_break
+                )
+
+        # Monday from noon, Tuesday off, Wednesday in full, Thursday until 11:00
+        add_holiday(getdate(self.at(1, 0)), "Break test holiday")
+        self.addCleanup(remove_holidays)
+        start, end = self.at(0, 12), self.at(3, 11)
+        self.assertEqual(plain.calc_elapsed_time(start, end), (6 + 8 + 1) * hour)
+        self.assertEqual(breaking.calc_elapsed_time(start, end), (5 + 7 + 1) * hour)
+
+    def test_ticket_picks_up_break_on_next_update(self):
+        """Saving a break moves targets of tickets only once they are updated,
+        and a ticket raised during the break is outside working hours."""
+        with self.freeze_time(self.at(0, 12 + 50 / 60)):
+            ticket = make_ticket(priority="High")
+        self.assertEqual(get_datetime(ticket.response_by), self.at(0, 13 + 50 / 60))
+
+        sla = self.with_breaks(frappe.get_doc(DOCTYPE, SLA_PRIORITY_NAME))
+        sla.save()
+        self.addCleanup(lambda: self.with_breaks(sla.reload(), None, None).save())
+
+        ticket.reload()
+        self.assertEqual(get_datetime(ticket.response_by), self.at(0, 13 + 50 / 60))
+        with self.freeze_time(self.at(0, 12 + 55 / 60)):
+            ticket.save()
+        self.assertEqual(get_datetime(ticket.response_by), self.at(0, 14 + 50 / 60))
+
+        with self.freeze_time(self.at(0, 13.5)):
+            during_break = make_ticket(priority="High")
+            self.assertTrue(during_break.raised_outside_working_hours)
+            self.assertTrue(during_break.is_currently_outside_working_hours())
+        with self.freeze_time(self.at(0, 14.5)):
+            self.assertFalse(during_break.is_currently_outside_working_hours())
+        # the banner holds until the next day starts, not until the break ends
+        self.assertEqual(
+            sla.get_next_working_day_start(self.at(0, 13.5)), self.at(1, 10)
+        )
