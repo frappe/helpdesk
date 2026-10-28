@@ -77,6 +77,34 @@
           />
           <ErrorMessage :message="errors.end_time" class="mt-2" />
         </div>
+
+        <div>
+          <div class="grid grid-cols-2 gap-4">
+            <FormControl
+              type="time"
+              size="sm"
+              variant="subtle"
+              :label="__('Break start')"
+              v-model="workDayData.break_start"
+            />
+            <FormControl
+              type="time"
+              size="sm"
+              variant="subtle"
+              :label="__('Break end')"
+              v-model="workDayData.break_end"
+              @blur="validateBreak"
+            />
+          </div>
+          <ErrorMessage :message="errors.break" class="mt-2" />
+        </div>
+
+        <!-- invisible, not v-if: a layout shift on blur would swallow the Save click -->
+        <Checkbox
+          :class="{ invisible: !hasBreak }"
+          v-model="applyBreakToAll"
+          :label="__('Apply break to all workdays')"
+        />
       </div>
     </template>
     <template #actions>
@@ -111,9 +139,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
-import { Dialog, FormControl, Button, toast } from "frappe-ui";
+import { ref, reactive, computed, watch } from "vue";
+import { Dialog, FormControl, Button, Checkbox, toast } from "frappe-ui";
 import { __ } from "@/translation";
+import { getBreakError } from "@/stores/sla";
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -146,13 +175,22 @@ const workDayData = reactive({
   workday: "",
   start_time: "",
   end_time: "",
+  break_start: "",
+  break_end: "",
 });
 
 const errors = reactive({
   workday: "",
   start_time: "",
   end_time: "",
+  break: "",
 });
+
+const applyBreakToAll = ref(false);
+const hasBreak = computed(() =>
+  Boolean(workDayData.break_start && workDayData.break_end)
+);
+const applyToAll = computed(() => applyBreakToAll.value && hasBreak.value);
 
 const deleteWorkDay = (event) => {
   event.preventDefault();
@@ -192,9 +230,13 @@ function resetForm() {
   workDayData.workday = "";
   workDayData.start_time = "";
   workDayData.end_time = "";
+  workDayData.break_start = "";
+  workDayData.break_end = "";
   errors.workday = "";
   errors.start_time = "";
   errors.end_time = "";
+  errors.break = "";
+  applyBreakToAll.value = false;
   isConfirmingDelete.value = false;
 }
 
@@ -236,8 +278,51 @@ const validateForm = () => {
   const isStartTimeValid = validateField("start_time");
   const isEndTimeValid = validateField("end_time") && validateTimeRange();
 
-  return isWorkdayValid && isStartTimeValid && isEndTimeValid;
+  return (
+    isWorkdayValid && isStartTimeValid && isEndTimeValid && validateBreak()
+  );
 };
+
+const validateBreak = () => {
+  errors.break = getBreakError(workDayData);
+  return !errors.break;
+};
+
+/** The form as a row, with break times as HH:MM:SS or empty. */
+function getRow() {
+  return {
+    ...workDayData,
+    break_start: formatTimeToHHMMSS(workDayData.break_start),
+    break_end: formatTimeToHHMMSS(workDayData.break_end),
+  };
+}
+
+/** Copy the break to every other workday whose hours contain it, then toast. */
+function applyBreakToOtherDays(row: ReturnType<typeof getRow>) {
+  let applied = 1;
+  const skipped: string[] = [];
+  for (const day of props.workDaysList) {
+    if (day.workday === row.workday) continue;
+    const withBreak = {
+      ...day,
+      break_start: row.break_start,
+      break_end: row.break_end,
+    };
+    if (getBreakError(withBreak)) {
+      skipped.push(day.workday);
+      continue;
+    }
+    Object.assign(day, withBreak);
+    applied++;
+  }
+  const message = __("Break applied to {0} workdays.", [String(applied)]);
+  if (!skipped.length) return toast.success(message);
+  toast.warning(
+    `${message} ${__("Skipped {0}: outside working hours.", [
+      skipped.join(", "),
+    ])}`
+  );
+}
 
 const onSave = () => {
   if (!validateForm()) {
@@ -253,10 +338,12 @@ const onSave = () => {
       if (itemIndex !== -1) {
         const updatedItem = {
           ...props.workDaysList[itemIndex],
-          ...workDayData,
+          ...getRow(),
         };
         props.workDaysList.splice(itemIndex, 1, updatedItem);
-        toast.success(__("Workday updated successfully."));
+        if (!applyToAll.value) {
+          toast.success(__("Workday updated successfully."));
+        }
       }
     } else {
       const isDuplicate = props.workDaysList.some(
@@ -269,9 +356,13 @@ const onSave = () => {
         return;
       }
 
-      const newWorkDay = { ...workDayData };
-      props.workDaysList.push(newWorkDay);
-      toast.success(__("Workday added successfully."));
+      props.workDaysList.push(getRow());
+      if (!applyToAll.value) {
+        toast.success(__("Workday added successfully."));
+      }
+    }
+    if (applyToAll.value) {
+      applyBreakToOtherDays(getRow());
     }
     dialog.value.show = false;
   } catch (error) {
@@ -289,6 +380,10 @@ watch(
           dialog.value.data.start_time
         );
         workDayData.end_time = formatTimeToHHMMSS(dialog.value.data.end_time);
+        workDayData.break_start = formatTimeToHHMMSS(
+          dialog.value.data.break_start
+        );
+        workDayData.break_end = formatTimeToHHMMSS(dialog.value.data.break_end);
       } else {
         resetForm();
       }
