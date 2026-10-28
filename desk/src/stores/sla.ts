@@ -1,5 +1,6 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
 import { __ } from "@/translation";
+import type { HDServiceDay } from "@/types/doctypes";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
@@ -259,25 +260,10 @@ export function validateSlaData(
             const startTimeStr = day.start_time.trim();
             const endTimeStr = day.end_time.trim();
 
-            const parseTime = (timeStr: string) => {
-              const [hours, minutes] = timeStr.split(":").map(Number);
-              const date = new Date();
-              date.setHours(hours, minutes || 0, 0, 0);
-              return date;
-            };
-
-            try {
-              const startTime = parseTime(startTimeStr);
-              const endTime = parseTime(endTimeStr);
-
-              if (startTime >= endTime) {
-                invalidTimeRanges.push(
-                  `${day.workday} (${startTimeStr} - ${endTimeStr})`
-                );
-              }
-            } catch (error) {
-              // If time parsing fails, mark as invalid
-              invalidTimeRanges.push(`${day.workday} (Invalid time format)`);
+            if (toMinutes(startTimeStr) >= toMinutes(endTimeStr)) {
+              invalidTimeRanges.push(
+                `${day.workday} (${startTimeStr} - ${endTimeStr})`
+              );
             }
           }
 
@@ -312,15 +298,12 @@ export function validateSlaData(
   return slaDataErrors.value;
 }
 
-interface WorkdayHours {
-  start_time?: string | null;
-  end_time?: string | null;
-  break_start?: string | null;
-  break_end?: string | null;
-}
-
 /** Why a workday's break is invalid, or "" when it is valid or there is none. */
-export function getBreakError(day: WorkdayHours): string {
+export function getBreakError(
+  day: Partial<
+    Pick<HDServiceDay, "start_time" | "end_time" | "break_start" | "break_end">
+  >
+): string {
   if (!day.break_start && !day.break_end) return "";
   if (!day.break_start || !day.break_end) {
     return __("Set both break start and break end, or neither.");
@@ -339,7 +322,7 @@ export function getBreakError(day: WorkdayHours): string {
 }
 
 /** Minutes since midnight for an "H:MM" or "H:MM:SS" time. */
-function toMinutes(time?: string | null): number {
+export function toMinutes(time?: string | null): number {
   const [hours, minutes] = (time || "").split(":").map(Number);
   return (hours || 0) * 60 + (minutes || 0);
 }

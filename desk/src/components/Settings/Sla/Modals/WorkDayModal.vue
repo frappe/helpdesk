@@ -142,7 +142,7 @@
 import { ref, reactive, computed, watch } from "vue";
 import { Dialog, FormControl, Button, Checkbox, toast } from "frappe-ui";
 import { __ } from "@/translation";
-import { getBreakError } from "@/stores/sla";
+import { getBreakError, toMinutes } from "@/stores/sla";
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -256,15 +256,7 @@ const validateTimeRange = () => {
     return false;
   }
 
-  const [startHours, startMinutes] = workDayData.start_time
-    .split(":")
-    .map(Number);
-  const [endHours, endMinutes] = workDayData.end_time.split(":").map(Number);
-
-  if (
-    endHours < startHours ||
-    (endHours === startHours && endMinutes <= startMinutes)
-  ) {
+  if (toMinutes(workDayData.start_time) >= toMinutes(workDayData.end_time)) {
     errors.end_time = "End time must be after start time";
     return false;
   }
