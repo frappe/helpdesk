@@ -725,11 +725,6 @@ class HDTicket(Document, CustomerEditController):
         if isinstance(bcc, str) and not bcc.strip():
             bcc = None
 
-        if not to and not cc and not bcc:
-            to = self.raised_by
-            if isinstance(to, str) and not to.strip():
-                to = None
-
         recipients = to
 
         sender_email = None
