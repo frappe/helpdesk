@@ -717,6 +717,19 @@ class HDTicket(Document, CustomerEditController):
         from_email_id = from_email.get("email_id") if from_email else None
         email_account_name = from_email.get("email_account") if from_email else None
         sender = from_email_id or frappe.session.user
+
+        if isinstance(to, str) and not to.strip():
+            to = None
+        if isinstance(cc, str) and not cc.strip():
+            cc = None
+        if isinstance(bcc, str) and not bcc.strip():
+            bcc = None
+
+        if not to and not cc and not bcc:
+            to = self.raised_by
+            if isinstance(to, str) and not to.strip():
+                to = None
+
         recipients = to
 
         sender_email = None
@@ -727,6 +740,9 @@ class HDTicket(Document, CustomerEditController):
 
         if recipients == "Administrator":
             recipients = frappe.get_value("User", "Administrator", "email")
+
+        if not recipients and not cc and not bcc:
+            frappe.throw(_("Email has no recipients"), frappe.ValidationError)
 
         communication = frappe.get_doc(
             {

@@ -1409,6 +1409,28 @@ class TestHDTicket(IntegrationTestCase):
         if hasattr(communication_doc, "bcc") and communication_doc.bcc:
             self.assertEqual(communication_doc.bcc, bcc_recipient)
 
+    def test_reply_via_agent_defaults_to_raised_by(self):
+        """When to, cc, and bcc are omitted, reply_via_agent defaults to ticket.raised_by."""
+        ticket = make_ticket(raised_by="customer_fallback@test.com")
+        ticket.reply_via_agent(message="Fallback reply")
+        comm = get_latest_ticket_communication(ticket.name)
+        self.assertEqual(comm.recipients, "customer_fallback@test.com")
+        self.assertEqual(comm.sent_or_received, "Sent")
+
+    def test_reply_via_agent_throws_without_recipients(self):
+        """When no to, cc, or bcc are provided and ticket has no raised_by, throw ValidationError."""
+        ticket = make_ticket()
+        ticket.db_set("raised_by", None)
+        ticket.reload()
+
+        with self.assertRaises(frappe.ValidationError):
+            ticket.reply_via_agent(message="No recipient reply")
+
+        self.assertEqual(len(sent_replies(ticket.name)), 0)
+        ticket.reload()
+        self.assertFalse(ticket.first_responded_on)
+        self.assertFalse(ticket.last_agent_response)
+
     def test_agent_reply_stores_unique_message_id_and_threads_onto_previous(self):
         """Without this, every agent reply arrives as a new thread."""
         ticket = make_ticket()
