@@ -1,31 +1,40 @@
 <template>
   <div>
-    <!-- a literal <button>: as="button" resolves to frappe-ui's Button -->
-    <button
-      v-for="option in agentStatusStore.statusOptions"
-      :key="option"
-      class="block w-full text-start"
-      :aria-pressed="option === agentStatusStore.myStatus"
-      @click="pickStatus(option)"
-    >
-      <ItemListRow class="hover:bg-surface-gray-3">
-        <template #prefix>
-          <span
-            class="size-2 rounded-full"
-            :class="agentStatusStore.statusColor(option)"
-            aria-hidden="true"
-          />
-        </template>
-        <span class="block truncate" :title="__(option)">{{ __(option) }}</span>
-        <template #suffix>
-          <span
-            v-if="option === agentStatusStore.myStatus"
-            class="lucide-check size-4 text-ink-gray-7"
-            aria-hidden="true"
-          />
-        </template>
-      </ItemListRow>
-    </button>
+    <List :row-height="32" divider="none">
+      <ListRows
+        :items="agentStatusStore.statusOptions"
+        :row-key="(option) => option"
+        v-slot="{ item: option }"
+      >
+        <ListRow
+          :aria-pressed="option === agentStatusStore.myStatus"
+          @click="pickStatus(option)"
+        >
+          <ListCell>
+            <span
+              class="size-2 rounded-full"
+              :class="agentStatusStore.statusColor(option)"
+              aria-hidden="true"
+            />
+          </ListCell>
+          <ListCell>
+            <span
+              class="truncate text-base text-ink-gray-8"
+              :title="__(option)"
+            >
+              {{ __(option) }}
+            </span>
+          </ListCell>
+          <ListCell>
+            <span
+              v-if="option === agentStatusStore.myStatus"
+              class="lucide-check size-4 text-ink-gray-7"
+              aria-hidden="true"
+            />
+          </ListCell>
+        </ListRow>
+      </ListRows>
+    </List>
 
     <!-- grows from 0fr so the panel eases to its new height -->
     <Transition
@@ -84,7 +93,8 @@
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { expiryLabel, expiryPresets } from "@/stores/statusExpiry";
 import { __ } from "@/translation";
-import { Button, ItemListRow, TabButtons } from "frappe-ui";
+import { Button, TabButtons } from "frappe-ui";
+import { List, ListCell, ListRow, ListRows } from "frappe-ui/list";
 import { computed } from "vue";
 
 const emit = defineEmits<{ close: [] }>();
