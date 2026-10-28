@@ -3,38 +3,14 @@ import { __ } from "@/translation";
 import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
-const defaultSupportAndResolution = [
-  {
-    workday: "Monday",
+/** Fresh rows each call, so edits to one new policy never leak into the next. */
+const getDefaultSupportAndResolution = () =>
+  ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((workday) => ({
+    workday,
     start_time: "09:00:00",
     end_time: "17:00:00",
     id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Tuesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Wednesday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Thursday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-  {
-    workday: "Friday",
-    start_time: "09:00:00",
-    end_time: "17:00:00",
-    id: Math.random().toString(36).substring(2, 9),
-  },
-];
+  }));
 
 export const slaData = ref({
   name: "",
@@ -50,7 +26,7 @@ export const slaData = ref({
   start_date: "",
   end_date: "",
   loading: false,
-  support_and_resolution: defaultSupportAndResolution,
+  support_and_resolution: getDefaultSupportAndResolution(),
   default_ticket_status: "",
   reopen_ticket_status: "",
   condition: [],
@@ -72,7 +48,7 @@ export const resetSlaData = () => {
     start_date: "",
     end_date: "",
     loading: false,
-    support_and_resolution: defaultSupportAndResolution,
+    support_and_resolution: getDefaultSupportAndResolution(),
     default_ticket_status: "",
     reopen_ticket_status: "",
     condition: [],

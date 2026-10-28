@@ -10,7 +10,7 @@
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-ink-gray-5 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-ink-gray-5 whitespace-normal"
         :class="{
           'ms-2': column.key === 'workday',
         }"
