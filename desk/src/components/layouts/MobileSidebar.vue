@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot :show="sidebarOpened">
+  <TransitionRoot :show="sidebarOpened" @after-leave="onSidebarClosed">
     <Dialog as="div" @close="sidebarOpened = false" class="fixed inset-0">
       <TransitionChild
         as="template"
@@ -27,6 +27,7 @@
       </TransitionChild>
     </Dialog>
   </TransitionRoot>
+  <AvailabilityDialog v-model:open="availabilityDialogOpen" />
 </template>
 
 <script setup lang="ts">
@@ -36,7 +37,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { computed, h, watch } from "vue";
+import { computed, h, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { useAuthStore } from "@/stores/auth";
@@ -50,6 +51,7 @@ import { useApps } from "@/composables/useApps";
 import { __ } from "@/translation";
 import AppSidebar from "./AppSidebar.vue";
 import { useAgentStatusStore } from "@/stores/agentStatus";
+import AvailabilityDialog from "../AvailabilityDialog.vue";
 
 const { colorScheme, toggleColorScheme } = useColorScheme();
 const { appsMenuOption } = useApps();
@@ -57,6 +59,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 
 const agentStatusStore = useAgentStatusStore();
+const availabilityDialogOpen = ref(false);
 
 // The menu injects `size-4` onto icon components; keep that as the outer
 // footprint (so it lines up with the lucide icons) and center the actual
@@ -71,20 +74,31 @@ const statusDot = (status: string) =>
     }),
   ]);
 
-// Native Dropdown submenu (same pattern as appsMenuOption) instead of a nested
-// Popover: reka-ui keeps the submenu inside the viewport on narrow screens,
-// where a right-placed popover overlapped the menu items below it.
 const availabilityMenuOption = computed(() => ({
   label: agentStatusStore.myStatus
     ? __(agentStatusStore.myStatus)
     : __("Set status"),
   icon: () => statusDot(agentStatusStore.myStatus),
-  submenu: agentStatusStore.statusOptions.map((option) => ({
-    label: __(option),
-    icon: () => statusDot(option),
-    onClick: () => agentStatusStore.setMyStatus(option),
-  })),
+  onClick: () => {
+    availabilityDialogPending = true;
+    sidebarOpened.value = false;
+  },
 }));
+
+// headless UI drops focus when the sidebar closes; give it back to the menu
+// button, then open the dialog so it returns focus there too
+let sidebarOpener: HTMLElement | null = null;
+watch(sidebarOpened, (opened) => {
+  if (opened) sidebarOpener = document.activeElement as HTMLElement | null;
+});
+
+let availabilityDialogPending = false;
+function onSidebarClosed() {
+  sidebarOpener?.focus();
+  if (!availabilityDialogPending) return;
+  availabilityDialogPending = false;
+  availabilityDialogOpen.value = true;
+}
 
 const themeMenuItem = computed(() => ({
   label: __("Toggle theme"),

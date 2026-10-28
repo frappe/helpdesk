@@ -48,6 +48,11 @@ scheduler_events = {
     "hourly_long": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_sla_status_in_ticket"
     ],
+    "cron": {
+        "*/5 * * * *": [
+            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.reset_expired_availability"
+        ]
+    },
 }
 
 

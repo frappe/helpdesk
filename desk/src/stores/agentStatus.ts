@@ -3,21 +3,34 @@ import { userStorage } from "@/composables/userStorage";
 import { globalStore } from "@/stores/globalStore";
 import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
+import { type ExpiryPreset } from "@/stores/statusExpiry";
+import { serverInstant } from "@helpdesk/shared/utils";
+import { useEventListener } from "@vueuse/core";
 import { createListResource, createResource, toast } from "frappe-ui";
 import { defineStore } from "pinia";
-import { computed, reactive, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 interface LiveAvailability {
   availability: string;
   changedOn: string;
+  /** When the status clears, in system time. Empty when it never does. */
+  expiresOn: string;
 }
 
 interface AvailabilityEvent {
   agent: string;
   availability: string;
   availability_changed_on: string;
+  availability_expires_on: string | null;
   changed_by: string;
 }
+
+type SavedAvailability = Pick<
+  AvailabilityEvent,
+  "availability" | "availability_changed_on" | "availability_expires_on"
+>;
+
+const MAX_TIMEOUT = 2 ** 31 - 1;
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
 const dotColorMap: Record<string, string> = {
@@ -81,9 +94,33 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // the single source of truth for "who is what right now", including ourselves.
   const liveStatuses = reactive<Record<string, LiveAvailability>>({});
 
-  function applyLive(agent: string, availability?: string, changedOn?: string) {
+  let confirmed: LiveAvailability | undefined;
+  let pendingSaves = 0;
+
+  function applyLive(
+    agent: string,
+    availability?: string,
+    changedOn?: string,
+    expiresOn?: string | null
+  ) {
     if (!agent || !availability) return;
-    liveStatuses[agent] = { availability, changedOn: changedOn ?? "" };
+    const state = {
+      availability,
+      changedOn: changedOn ?? "",
+      expiresOn: expiresOn ?? "",
+    };
+    if (agent === myAgentName) {
+      confirmed = state;
+      // an earlier save's echo would undo the patches still queued
+      if (pendingSaves) return;
+    }
+    liveStatuses[agent] = state;
+  }
+
+  function restoreConfirmed() {
+    if (!myAgentName) return;
+    if (confirmed) liveStatuses[myAgentName] = confirmed;
+    else delete liveStatuses[myAgentName];
   }
 
   const { $socket } = globalStore();
@@ -95,7 +132,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
         data.changed_by
       );
     }
-    applyLive(data.agent, data.availability, data.availability_changed_on);
+    applyLive(
+      data.agent,
+      data.availability,
+      data.availability_changed_on,
+      data.availability_expires_on
+    );
   });
 
   // Seed our own status from the session payload (auth.get_user already resolves
@@ -105,7 +147,12 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   watch(
     () => auth.availability,
     (availability) =>
-      applyLive(myAgentName ?? "", availability, auth.availabilityChangedOn),
+      applyLive(
+        myAgentName ?? "",
+        availability,
+        auth.availabilityChangedOn,
+        auth.availabilityExpiresOn
+      ),
     { immediate: true }
   );
 
@@ -123,13 +170,22 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // behaves the same and this needs no dedicated endpoint.
   const setMyAvailability = createResource({
     url: "frappe.client.set_value",
-    onSuccess: () => toast.success(__("Status updated successfully.")),
-    onError: () => toast.error(__("Could not update status.")),
   });
+
+  let pendingSave = Promise.resolve();
 
   const myStatus = computed(
     () => (myAgentName && liveStatuses[myAgentName]?.availability) || ""
   );
+
+  const myStatusExpiresOn = computed(
+    () => (myAgentName && liveStatuses[myAgentName]?.expiresOn) || ""
+  );
+
+  function statusCanExpire(status: string): boolean {
+    const category = getStatus(status)?.category;
+    return Boolean(category) && category !== "Active";
+  }
 
   // Selectable statuses, derived from the same list the presence dots use so the
   // menu and the dots never disagree and we avoid a second server round-trip.
@@ -139,28 +195,147 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
       .map((s: HDAgentStatus) => s.agent_status)
   );
 
-  function setMyStatus(status: string) {
-    if (!myAgentName || !status || status === myStatus.value) return;
-    // Optimistic: update immediately, then roll back if the server rejects it.
+  function setMyStatus(status: string, { quiet = false } = {}) {
+    if (!status || status === myStatus.value) return;
     // changedOn is left empty — it is never rendered for our own dot and the
-    // socket echo overwrites it with the authoritative server timestamp.
-    const previous = liveStatuses[myAgentName];
-    applyLive(myAgentName, status);
-    setMyAvailability.submit(
-      {
+    // socket echo overwrites it with the authoritative server timestamp. The
+    // server drops the timer on a new status, so drop it here too.
+    saveMyAvailability(
+      { availability: status },
+      { availability: status, changedOn: "", expiresOn: "" },
+      { quiet }
+    );
+  }
+
+  function clearMyStatus() {
+    setMyStatus(auth.defaultAgentStatus);
+  }
+
+  // a stored time does not say which preset made it
+  const pickedPreset = ref<{ label: string; expiresOn: string }>();
+
+  function applyExpiryPreset(preset: ExpiryPreset) {
+    // presets are on the agent's clock, the server stores system time
+    const expiresOn =
+      preset
+        .expiresOn()
+        ?.tz(window.timezone?.system)
+        .format("YYYY-MM-DD HH:mm:ss") ?? null;
+    if ((expiresOn || "") === myStatusExpiresOn.value) return;
+    pickedPreset.value = { label: preset.label, expiresOn: expiresOn || "" };
+    saveMyAvailability(
+      { availability_expires_on: expiresOn },
+      { expiresOn: expiresOn || "" }
+    );
+  }
+
+  let expiryTimer: ReturnType<typeof setTimeout> | undefined;
+  watch(
+    myStatusExpiresOn,
+    (expiresOn) => {
+      clearTimeout(expiryTimer);
+      if (expiresOn) armExpiryTimer(expiresOn);
+    },
+    { immediate: true }
+  );
+
+  function armExpiryTimer(expiresOn: string) {
+    const delay = serverInstant(expiresOn).diff();
+    // setTimeout fires at once past ~24.8 days: wake at the cap, measure again
+    expiryTimer = setTimeout(
+      () =>
+        delay > MAX_TIMEOUT
+          ? armExpiryTimer(expiresOn)
+          : clearExpiredStatus(expiresOn),
+      Math.min(Math.max(0, delay), MAX_TIMEOUT)
+    );
+  }
+
+  // quiet: a failure is usually another tab clearing it first
+  function clearExpiredStatus(expiresOn: string) {
+    if (myStatusExpiresOn.value !== expiresOn) return;
+    setMyStatus(auth.defaultAgentStatus, { quiet: true });
+  }
+
+  // a sleeping laptop holds the timer back; catch up when the tab is seen again
+  useEventListener(document, "visibilitychange", () => {
+    const expiresOn = myStatusExpiresOn.value;
+    if (document.visibilityState !== "visible" || !expiresOn) return;
+    if (serverInstant(expiresOn).diff() <= 0) clearExpiredStatus(expiresOn);
+  });
+
+  function isExpiryPresetActive(preset: ExpiryPreset): boolean {
+    const expiresOn = myStatusExpiresOn.value;
+    if (preset.never) return !expiresOn;
+    const picked = pickedPreset.value;
+    // the server echo can format the time differently, so compare instants
+    return (
+      Boolean(expiresOn && picked?.expiresOn) &&
+      picked?.label === preset.label &&
+      serverInstant(picked.expiresOn).isSame(serverInstant(expiresOn))
+    );
+  }
+
+  function saveMyAvailability(
+    values: Record<string, string | null>,
+    livePatch: Partial<LiveAvailability>,
+    { quiet = false } = {}
+  ) {
+    if (!myAgentName) return;
+    liveStatuses[myAgentName] = {
+      availability: "",
+      changedOn: "",
+      expiresOn: "",
+      ...liveStatuses[myAgentName],
+      ...livePatch,
+    };
+    pendingSaves++;
+    const confirmedWhenQueued = confirmed;
+    // Queue saves: set_value checks the modified stamp, so parallel writes fail.
+    pendingSave = pendingSave.then(() =>
+      submitMyAvailability(values, quiet, confirmedWhenQueued)
+    );
+  }
+
+  async function submitMyAvailability(
+    values: Record<string, string | null>,
+    quiet: boolean,
+    confirmedWhenQueued: LiveAvailability | undefined
+  ) {
+    try {
+      const agent: SavedAvailability = await setMyAvailability.submit({
         doctype: "HD Agent",
         name: myAgentName,
-        fieldname: "availability",
-        value: status,
-      },
-      {
-        // Roll back the optimistic write on failure.
-        onError: () => {
-          if (previous) liveStatuses[myAgentName] = previous;
-          else delete liveStatuses[myAgentName];
-        },
-      }
+        fieldname: values,
+      });
+      markMyAvailabilitySaved(agent, quiet);
+    } catch {
+      revertMyAvailability(quiet, confirmedWhenQueued);
+    }
+  }
+
+  function markMyAvailabilitySaved(agent: SavedAvailability, quiet: boolean) {
+    pendingSaves--;
+    if (!quiet) toast.success(__("Status updated successfully."));
+    applyLive(
+      myAgentName,
+      agent.availability,
+      agent.availability_changed_on,
+      agent.availability_expires_on
     );
+  }
+
+  function revertMyAvailability(
+    quiet: boolean,
+    confirmedWhenQueued: LiveAvailability | undefined
+  ) {
+    pendingSaves--;
+    if (!quiet) toast.error(__("Could not update status."));
+    // a queued save settles the state when it lands
+    if (pendingSaves) return;
+    // restoring an expired status would re-arm its timer
+    if (quiet && confirmed === confirmedWhenQueued) return;
+    restoreConfirmed();
   }
 
   function getStatus(name: string): HDAgentStatus | undefined {
@@ -176,8 +351,13 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     statuses,
     liveStatuses,
     myStatus,
+    myStatusExpiresOn,
+    statusCanExpire,
     statusOptions,
     setMyStatus,
+    clearMyStatus,
+    applyExpiryPreset,
+    isExpiryPresetActive,
     getStatus,
     statusColor,
   };
