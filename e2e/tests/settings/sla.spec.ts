@@ -126,7 +126,7 @@ for (const [label, viewport] of [
     await expect(workday).toBeHidden();
     await expect(page.getByText("Break applied to 2 workdays. Skipped Wednesday: outside working hours.")).toBeVisible();
     await expect(tableRow(dialog, "Tuesday")).toContainText(/1:00 PM\s*–\s*2:00 PM/);
-    await expect(tableRow(dialog, "Wednesday")).toContainText("—");
+    await expect(tableRow(dialog, "Wednesday")).not.toContainText(/PM\s*–/);
     await dialog.getByRole("button", { name: "Save", exact: true }).click();
 
     await expect.poll(async () => breaksOf(await api.get(SLA, sla))).toEqual([
@@ -162,7 +162,7 @@ for (const [label, viewport] of [
     await dialog.getByRole("button", { name: "New SLA Policy" }).click();
     await page.getByRole("button", { name: "Confirm" }).click();
     await dialog.getByRole("button", { name: "New", exact: true }).click();
-    await expect(tableRow(dialog, "Tuesday")).toContainText("—");
+    await expect(tableRow(dialog, "Tuesday")).not.toContainText(/PM\s*–/);
   });
 }
 

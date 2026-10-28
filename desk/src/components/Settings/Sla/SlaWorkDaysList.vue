@@ -52,6 +52,8 @@ import SlaWorkDaysListItem from "./SlaWorkDaysListItem.vue";
 import { slaData, slaDataErrors } from "@/stores/sla";
 import { getGridTemplateColumnsForTable } from "@/utils";
 import { __ } from "@/translation";
+import { useMediaQuery } from "@vueuse/core";
+import { computed } from "vue";
 
 interface Column {
   key: string;
@@ -84,12 +86,14 @@ const addWorkDay = () => {
   });
 };
 
-const columns: Column[] = [
+// Below lg a Break column squeezes the day names, so rows show the break on a second line instead.
+const isWide = useMediaQuery("(min-width: 1024px)");
+
+const columns = computed<Column[]>(() => [
   {
     label: "Day",
     key: "workday",
     isRequired: true,
-    width: "minmax(4.5rem, 1fr)",
   },
   {
     label: "Start time",
@@ -101,10 +105,6 @@ const columns: Column[] = [
     key: "end_time",
     isRequired: true,
   },
-  {
-    label: __("Break"),
-    key: "break",
-    width: 1.7,
-  },
-];
+  ...(isWide.value ? [{ label: __("Break"), key: "break", width: 1.7 }] : []),
+]);
 </script>
