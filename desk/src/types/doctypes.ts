@@ -31,7 +31,11 @@ export interface HDTicketStatus extends DocType {
   enabled: 0 | 1;
 }
 
+<<<<<<< HEAD
 // Last updated: 2026-06-28 13:51:31.692161
+=======
+// Last updated: 2026-10-27 13:00:00.000000
+>>>>>>> 9ccf9d2 (feat(sla): set a lunch break per workday in SLA settings)
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -235,6 +239,10 @@ export interface HDServiceDay extends ChildDocType {
   start_time: any;
   /** End Time: Time */
   end_time: any;
+  /** Break Start: Time */
+  break_start?: any;
+  /** Break End: Time */
+  break_end?: any;
 }
 
 // Last updated: 2023-03-26 22:41:29.978960
