@@ -305,10 +305,17 @@ export function validateSlaData(
             }
           }
 
+          const invalidBreaks = slaData.value.support_and_resolution
+            .filter((day) => getBreakError(day))
+            .map((day) => `${day.workday}: ${getBreakError(day)}`);
+
           if (invalidTimeRanges.length > 0) {
             slaDataErrors.value.support_and_resolution = `End time must be after start time for: ${invalidTimeRanges.join(
               ", "
             )}`;
+          } else if (invalidBreaks.length > 0) {
+            slaDataErrors.value.support_and_resolution =
+              invalidBreaks.join(" ");
           } else {
             slaDataErrors.value.support_and_resolution = "";
           }
@@ -327,4 +334,36 @@ export function validateSlaData(
   }
 
   return slaDataErrors.value;
+}
+
+interface WorkdayHours {
+  start_time?: string | null;
+  end_time?: string | null;
+  break_start?: string | null;
+  break_end?: string | null;
+}
+
+/** Why a workday's break is invalid, or "" when it is valid or there is none. */
+export function getBreakError(day: WorkdayHours): string {
+  if (!day.break_start && !day.break_end) return "";
+  if (!day.break_start || !day.break_end) {
+    return __("Set both break start and break end, or neither.");
+  }
+  const [start, end, breakStart, breakEnd] = [
+    day.start_time,
+    day.end_time,
+    day.break_start,
+    day.break_end,
+  ].map(toMinutes);
+  if (breakEnd <= breakStart) return __("Break end must be after break start.");
+  if (breakStart <= start || breakEnd >= end) {
+    return __("Break must be within working hours.");
+  }
+  return "";
+}
+
+/** Minutes since midnight for an "H:MM" or "H:MM:SS" time. */
+function toMinutes(time?: string | null): number {
+  const [hours, minutes] = (time || "").split(":").map(Number);
+  return (hours || 0) * 60 + (minutes || 0);
 }

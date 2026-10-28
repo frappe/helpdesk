@@ -10,8 +10,25 @@
       :key="column.key"
       class="w-full overflow-hidden whitespace-nowrap text-ellipsis"
     >
-      <div v-if="column.key === 'start_time' || column.key === 'end_time'">
+      <div
+        v-if="column.key === 'start_time' || column.key === 'end_time'"
+        class="whitespace-normal"
+      >
         {{ formatTime(props.row[column.key]) }}
+      </div>
+      <div
+        v-else-if="column.key === 'break'"
+        class="flex flex-wrap gap-x-1 whitespace-normal"
+      >
+        <template v-if="props.row.break_start && props.row.break_end">
+          <span class="whitespace-nowrap">
+            {{ formatTime(props.row.break_start) }} –
+          </span>
+          <span class="whitespace-nowrap">
+            {{ formatTime(props.row.break_end) }}
+          </span>
+        </template>
+        <span v-else class="text-ink-gray-4">—</span>
       </div>
       <div v-else class="ms-2">
         <select
@@ -63,6 +80,8 @@ interface WorkDay {
   workday: string;
   start_time: string;
   end_time: string;
+  break_start?: string | null;
+  break_end?: string | null;
 }
 
 const props = defineProps<{
@@ -120,6 +139,8 @@ const editWorkDay = () => {
     workday: props.row.workday,
     start_time: props.row.start_time,
     end_time: props.row.end_time,
+    break_start: props.row.break_start,
+    break_end: props.row.break_end,
   };
 };
 
@@ -130,7 +151,7 @@ const formatTime = (time) => {
   date.setHours(parseInt(hours) || 0, parseInt(minutes) || 0, 0);
 
   return date.toLocaleTimeString([], {
-    hour: "2-digit",
+    hour: "numeric",
     minute: "2-digit",
     hour12: true,
   });

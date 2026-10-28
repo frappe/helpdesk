@@ -31,7 +31,7 @@ export interface HDTicketStatus extends DocType {
   enabled: 0 | 1;
 }
 
-// Last updated: 2026-10-18 16:20:00.000000
+// Last updated: 2026-10-27 13:00:00.000000
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
@@ -243,6 +243,10 @@ export interface HDServiceDay extends ChildDocType {
   start_time: any;
   /** End Time: Time */
   end_time: any;
+  /** Break Start: Time */
+  break_start?: any;
+  /** Break End: Time */
+  break_end?: any;
 }
 
 // Last updated: 2023-03-26 22:41:29.978960
