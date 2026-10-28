@@ -119,6 +119,8 @@ for (const [label, viewport] of [
     await workday.getByRole("button", { name: "Save" }).click();
     await expect(workday.getByText("Break end must be after break start.")).toBeVisible();
     await workday.getByLabel("Break end").fill("14:00");
+    await workday.getByLabel("Break end").press("Tab");
+    await expect(workday.getByText("Break end must be after break start.")).toBeHidden();
     await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
     await workday.getByRole("button", { name: "Save" }).click();
     await expect(workday).toBeHidden();
@@ -146,6 +148,21 @@ for (const [label, viewport] of [
       ["Tuesday", null, null],
       ["Wednesday", null, null],
     ]);
+
+    // A break set on a discarded new policy must not leak into the next one.
+    await dialog.getByRole("button", { name: sla, exact: true }).click();
+    await dialog.getByRole("button", { name: "New", exact: true }).click();
+    await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+    await workday.getByLabel("Break start").fill("13:00");
+    await workday.getByLabel("Break end").fill("14:00");
+    await workday.getByLabel("Break end").press("Tab");
+    await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
+    await workday.getByRole("button", { name: "Save" }).click();
+    await expect(tableRow(dialog, "Tuesday")).toContainText(/1:00 PM\s*–\s*2:00 PM/);
+    await dialog.getByRole("button", { name: "New SLA Policy" }).click();
+    await page.getByRole("button", { name: "Confirm" }).click();
+    await dialog.getByRole("button", { name: "New", exact: true }).click();
+    await expect(tableRow(dialog, "Tuesday")).toContainText("—");
   });
 }
 
