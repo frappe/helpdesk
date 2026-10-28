@@ -20,12 +20,12 @@
         v-else-if="column.key === 'break'"
         class="flex flex-wrap gap-x-1 whitespace-normal"
       >
-        <template v-if="props.row.break_start && props.row.break_end">
+        <template v-if="hasBreak">
           <span class="whitespace-nowrap">
-            {{ formatTime(props.row.break_start) }} –
+            {{ formatTime(props.row.break_start) }}
           </span>
           <span class="whitespace-nowrap">
-            {{ formatTime(props.row.break_end) }}
+            – {{ formatTime(props.row.break_end) }}
           </span>
         </template>
         <span v-else class="text-ink-gray-4">—</span>
@@ -54,6 +54,13 @@
         <Button icon="lucide-more-horizontal" variant="ghost" />
       </Dropdown>
     </div>
+    <div
+      v-if="hasBreak && !hasBreakColumn"
+      class="col-span-full -mt-1 text-ink-gray-5"
+    >
+      {{ __("Break") }} {{ formatTime(props.row.break_start) }} –
+      {{ formatTime(props.row.break_end) }}
+    </div>
   </div>
   <hr v-if="!props.isLast" />
   <WorkDayModal
@@ -63,11 +70,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Button, Dropdown } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
 import { slaData } from "@/stores/sla";
+import { __ } from "@/translation";
 
 interface Column {
   key: string;
@@ -107,6 +115,12 @@ const dialog = ref({
 });
 
 const isConfirmingDelete = ref(false);
+const hasBreak = computed(() =>
+  Boolean(props.row.break_start && props.row.break_end)
+);
+const hasBreakColumn = computed(() =>
+  props.columns.some((column) => column.key === "break")
+);
 
 const dropdownOptions = [
   {
