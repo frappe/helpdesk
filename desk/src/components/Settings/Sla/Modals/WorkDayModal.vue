@@ -59,7 +59,7 @@
             label="Start Time"
             v-model="workDayData.start_time"
             :class="{ 'border-outline-red-4': errors.start_time }"
-            @blur="validateField('start_time')"
+            @change="validateField('start_time')"
           />
           <ErrorMessage :message="errors.start_time" class="mt-2" />
         </div>
@@ -73,7 +73,7 @@
             label="End Time"
             v-model="workDayData.end_time"
             :class="{ 'border-outline-red-4': errors.end_time }"
-            @blur="validateTimeRange"
+            @change="validateTimeRange"
           />
           <ErrorMessage :message="errors.end_time" class="mt-2" />
         </div>
@@ -93,7 +93,7 @@
               variant="subtle"
               :label="__('Break end')"
               v-model="workDayData.break_end"
-              @blur="validateBreak"
+              @change="validateBreak"
             />
           </div>
           <ErrorMessage :message="errors.break" class="mt-2" />
@@ -369,6 +369,17 @@ const onSave = () => {
     toast.error(__(`Failed to save workday: ${error}`));
   }
 };
+
+// Re-check a shown break error as the times change, so a fixed break clears it.
+watch(
+  () => [
+    workDayData.start_time,
+    workDayData.end_time,
+    workDayData.break_start,
+    workDayData.break_end,
+  ],
+  () => errors.break && validateBreak()
+);
 
 watch(
   () => dialog.value.show,
