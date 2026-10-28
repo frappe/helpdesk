@@ -169,7 +169,16 @@ class TestParkedMailTicketComment(IntegrationTestCase):
                 "message_id": self.message_id,
             }
         ).insert(ignore_permissions=True)
-        self.account = frappe.get_last_doc("Email Account")
+        # its own account: the newest one depends on which tests ran first
+        self.account = frappe.get_doc(
+            {
+                "doctype": "Email Account",
+                "email_account_name": "Parked Mail Test",
+                "email_id": "parked-mail@example.com",
+                "email_server": "imap.example.com",
+                "use_imap": 1,
+            }
+        ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
     def ticket_comments(self):
         return frappe.get_all(
