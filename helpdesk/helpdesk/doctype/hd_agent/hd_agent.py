@@ -71,8 +71,6 @@ class HDAgent(Document):
         if not self.availability_expires_on:
             return
 
-        # a new status starts without a timer, and the default status has
-        # nothing to reset to
         expiry_changed = self.has_value_changed("availability_expires_on")
         if (
             self.has_value_changed("availability") and not expiry_changed
@@ -80,7 +78,7 @@ class HDAgent(Document):
             self.availability_expires_on = None
             return
 
-        if expiry_changed and self.availability_expired():
+        if expiry_changed and self.is_availability_expired():
             frappe.throw(_("Pick a time in the future."))
 
     def reset_availability(self):
@@ -93,12 +91,12 @@ class HDAgent(Document):
         """Reset a status whose timer ran out. Credited to the agent, who set
         the timer, so it does not read as someone else changing it."""
         # the agent may have changed status since the scheduler queried
-        if not self.availability_expired():
+        if not self.is_availability_expired():
             return
         self.flags.availability_changed_by = self.user
         self.reset_availability()
 
-    def availability_expired(self) -> bool:
+    def is_availability_expired(self) -> bool:
         return (
             bool(self.availability_expires_on)
             and get_datetime(self.availability_expires_on) <= now_datetime()
@@ -167,15 +165,12 @@ def has_permission(doc: Document, ptype: str, user: str) -> bool:
 
 def reset_expired_availability():
     """Scheduler job: move agents whose status timer ran out to the default."""
-    # cutoff from python, sql NOW() is wrong when the db timezone differs
-    # from the system timezone
     agents = frappe.get_all(
         "HD Agent",
         filters={"availability_expires_on": ["<=", now_datetime()]},
         pluck="name",
     )
-    # a savepoint per agent: a failure only undoes that agent and the rest
-    # still reset, without committing mid-job
+    # a savepoint per agent, so one failure does not undo the others
     for name in agents:
         try:
             frappe.db.savepoint("expire_availability")
