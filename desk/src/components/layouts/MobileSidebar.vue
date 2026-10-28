@@ -74,7 +74,6 @@ const statusDot = (status: string) =>
     }),
   ]);
 
-// a dialog, not nested submenus: they crowd a phone screen
 const availabilityMenuOption = computed(() => ({
   label: agentStatusStore.myStatus
     ? __(agentStatusStore.myStatus)

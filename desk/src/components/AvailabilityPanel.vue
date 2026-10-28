@@ -16,7 +16,7 @@
             aria-hidden="true"
           />
         </template>
-        {{ __(option) }}
+        <span class="block truncate" :title="__(option)">{{ __(option) }}</span>
         <template #suffix>
           <span
             v-if="option === agentStatusStore.myStatus"
@@ -27,8 +27,7 @@
       </ItemListRow>
     </button>
 
-    <!-- the timer only means something away from Active. The row grows
-    from 0fr so the panel eases to its new height instead of jumping -->
+    <!-- grows from 0fr so the panel eases to its new height -->
     <Transition
       enter-active-class="transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none [&>*]:overflow-hidden"
       enter-from-class="!grid-rows-[0fr] opacity-0"
@@ -59,22 +58,15 @@
                 </Transition>
               </p>
             </div>
-            <div class="flex flex-wrap justify-between gap-1">
-              <Button
-                v-for="preset in expiryPresets()"
-                :key="preset.label"
-                size="xs"
-                :label="preset.short"
-                :data-state="
-                  agentStatusStore.isExpiryPresetActive(preset)
-                    ? 'active'
-                    : undefined
-                "
-                :aria-pressed="agentStatusStore.isExpiryPresetActive(preset)"
-                @click="agentStatusStore.applyExpiryPreset(preset)"
+            <div class="flex items-center justify-between gap-2">
+              <TabButtons
+                v-model="activePreset"
+                :options="presetOptions"
+                :aria-label="__('Clear after')"
               />
               <Button
-                size="xs"
+                theme="red"
+                variant="ghost"
                 icon="lucide-timer-reset"
                 :tooltip="__('Clear now')"
                 :aria-label="__('Clear now')"
@@ -92,7 +84,7 @@
 import { useAgentStatusStore } from "@/stores/agentStatus";
 import { expiryLabel, expiryPresets } from "@/stores/statusExpiry";
 import { __ } from "@/translation";
-import { Button, ItemListRow } from "frappe-ui";
+import { Button, ItemListRow, TabButtons } from "frappe-ui";
 import { computed } from "vue";
 
 const emit = defineEmits<{ close: [] }>();
@@ -102,6 +94,20 @@ const agentStatusStore = useAgentStatusStore();
 const expiresLabel = computed(() =>
   expiryLabel(agentStatusStore.myStatusExpiresOn)
 );
+
+const presets = expiryPresets();
+const presetOptions = presets.map((preset) => ({
+  label: preset.short,
+  value: preset.label,
+}));
+
+const activePreset = computed({
+  get: () => presets.find(agentStatusStore.isExpiryPresetActive)?.label,
+  set: (label) => {
+    const preset = presets.find((preset) => preset.label === label);
+    if (preset) agentStatusStore.applyExpiryPreset(preset);
+  },
+});
 
 // stays open on an away status, so the timer can be picked next
 function pickStatus(option: string) {

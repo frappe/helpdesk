@@ -5,9 +5,10 @@ import { __ } from "@/translation";
 import { HDAgentStatus } from "@/types/doctypes";
 import { type ExpiryPreset } from "@/stores/statusExpiry";
 import { serverInstant } from "@helpdesk/shared/utils";
+import { useEventListener } from "@vueuse/core";
 import { createListResource, createResource, toast } from "frappe-ui";
 import { defineStore } from "pinia";
-import { computed, reactive, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 interface LiveAvailability {
   availability: string;
@@ -29,9 +30,6 @@ type SavedAvailability = Pick<
   "availability" | "availability_changed_on" | "availability_expires_on"
 >;
 
-// the format frappe datetime fields are sent in
-const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
-// the longest delay setTimeout accepts
 const MAX_TIMEOUT = 2 ** 31 - 1;
 
 // Maps an HD Agent Status `color` value to a solid presence-dot background.
@@ -96,10 +94,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
   // the single source of truth for "who is what right now", including ourselves.
   const liveStatuses = reactive<Record<string, LiveAvailability>>({});
 
-  // our own state as the server last confirmed it; a failed save rolls back
-  // to this, not to an earlier queued save's optimistic patch
   let confirmed: LiveAvailability | undefined;
-  // this tab's saves not yet answered
   let pendingSaves = 0;
 
   function applyLive(
@@ -116,8 +111,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     };
     if (agent === myAgentName) {
       confirmed = state;
-      // an echo of an earlier save would undo the patches still queued; the
-      // last save to settle shows the confirmed state instead
+      // an earlier save's echo would undo the patches still queued
       if (pendingSaves) return;
     }
     liveStatuses[agent] = state;
@@ -178,9 +172,7 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     url: "frappe.client.set_value",
   });
 
-  // set_value locks the row and checks its modified stamp, so a second save
-  // in flight fails; this tab sends its saves one at a time
-  let lastSave: Promise<unknown> = Promise.resolve();
+  let pendingSave = Promise.resolve();
 
   const myStatus = computed(
     () => (myAgentName && liveStatuses[myAgentName]?.availability) || ""
@@ -215,24 +207,28 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     );
   }
 
-  // back to the default status, as the timer would have done
   function clearMyStatus() {
     setMyStatus(auth.defaultAgentStatus);
   }
 
+  // a stored time does not say which preset made it
+  const pickedPreset = ref<{ label: string; expiresOn: string }>();
+
   function applyExpiryPreset(preset: ExpiryPreset) {
     // presets are on the agent's clock, the server stores system time
     const expiresOn =
-      preset.expiresOn()?.tz(window.timezone?.system).format(DATETIME_FORMAT) ??
-      null;
+      preset
+        .expiresOn()
+        ?.tz(window.timezone?.system)
+        .format("YYYY-MM-DD HH:mm:ss") ?? null;
     if ((expiresOn || "") === myStatusExpiresOn.value) return;
+    pickedPreset.value = { label: preset.label, expiresOn: expiresOn || "" };
     saveMyAvailability(
       { availability_expires_on: expiresOn },
       { expiresOn: expiresOn || "" }
     );
   }
 
-  // the open tab clears the status on time; the scheduler covers closed tabs
   let expiryTimer: ReturnType<typeof setTimeout> | undefined;
   watch(
     myStatusExpiresOn,
@@ -255,17 +251,29 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     );
   }
 
-  // quiet: the pill is the feedback, and a failure is usually another window
-  // clearing it first, whose echo brings the real state
+  // quiet: a failure is usually another tab clearing it first
   function clearExpiredStatus(expiresOn: string) {
     if (myStatusExpiresOn.value !== expiresOn) return;
     setMyStatus(auth.defaultAgentStatus, { quiet: true });
   }
 
-  // only "Never" can show as picked: a stored time does not say which
-  // preset made it
+  // a sleeping laptop holds the timer back; catch up when the tab is seen again
+  useEventListener(document, "visibilitychange", () => {
+    const expiresOn = myStatusExpiresOn.value;
+    if (document.visibilityState !== "visible" || !expiresOn) return;
+    if (serverInstant(expiresOn).diff() <= 0) clearExpiredStatus(expiresOn);
+  });
+
   function isExpiryPresetActive(preset: ExpiryPreset): boolean {
-    return !myStatusExpiresOn.value && Boolean(preset.never);
+    const expiresOn = myStatusExpiresOn.value;
+    if (preset.never) return !expiresOn;
+    const picked = pickedPreset.value;
+    // the server echo can format the time differently, so compare instants
+    return (
+      Boolean(expiresOn && picked?.expiresOn) &&
+      picked?.label === preset.label &&
+      serverInstant(picked.expiresOn).isSame(serverInstant(expiresOn))
+    );
   }
 
   function saveMyAvailability(
@@ -274,7 +282,6 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     { quiet = false } = {}
   ) {
     if (!myAgentName) return;
-    // Optimistic: update immediately, then roll back if the server rejects it.
     liveStatuses[myAgentName] = {
       availability: "",
       changedOn: "",
@@ -284,38 +291,51 @@ export const useAgentStatusStore = defineStore("agentStatus", () => {
     };
     pendingSaves++;
     const confirmedWhenQueued = confirmed;
-    lastSave = lastSave.then(() =>
-      setMyAvailability
-        .submit(
-          { doctype: "HD Agent", name: myAgentName, fieldname: values },
-          {
-            // set_value replies with the saved row: confirmed state, whether
-            // it lands before or after the socket echo
-            onSuccess: (agent: SavedAvailability) => {
-              pendingSaves--;
-              if (!quiet) toast.success(__("Status updated successfully."));
-              applyLive(
-                myAgentName,
-                agent.availability,
-                agent.availability_changed_on,
-                agent.availability_expires_on
-              );
-            },
-            onError: () => {
-              pendingSaves--;
-              if (!quiet) toast.error(__("Could not update status."));
-              // a queued save settles the state when it lands
-              if (pendingSaves) return;
-              // a quiet clear keeps its patch unless newer server state came
-              // in: restoring the expired status would re-arm its timer
-              if (quiet && confirmed === confirmedWhenQueued) return;
-              restoreConfirmed();
-            },
-          }
-        )
-        // keep the queue going after a failed save
-        .catch(() => {})
+    // Queue saves: set_value checks the modified stamp, so parallel writes fail.
+    pendingSave = pendingSave.then(() =>
+      submitMyAvailability(values, quiet, confirmedWhenQueued)
     );
+  }
+
+  async function submitMyAvailability(
+    values: Record<string, string | null>,
+    quiet: boolean,
+    confirmedWhenQueued: LiveAvailability | undefined
+  ) {
+    try {
+      const agent: SavedAvailability = await setMyAvailability.submit({
+        doctype: "HD Agent",
+        name: myAgentName,
+        fieldname: values,
+      });
+      markMyAvailabilitySaved(agent, quiet);
+    } catch {
+      revertMyAvailability(quiet, confirmedWhenQueued);
+    }
+  }
+
+  function markMyAvailabilitySaved(agent: SavedAvailability, quiet: boolean) {
+    pendingSaves--;
+    if (!quiet) toast.success(__("Status updated successfully."));
+    applyLive(
+      myAgentName,
+      agent.availability,
+      agent.availability_changed_on,
+      agent.availability_expires_on
+    );
+  }
+
+  function revertMyAvailability(
+    quiet: boolean,
+    confirmedWhenQueued: LiveAvailability | undefined
+  ) {
+    pendingSaves--;
+    if (!quiet) toast.error(__("Could not update status."));
+    // a queued save settles the state when it lands
+    if (pendingSaves) return;
+    // restoring an expired status would re-arm its timer
+    if (quiet && confirmed === confirmedWhenQueued) return;
+    restoreConfirmed();
   }
 
   function getStatus(name: string): HDAgentStatus | undefined {

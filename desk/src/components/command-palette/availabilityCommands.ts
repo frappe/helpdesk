@@ -7,7 +7,6 @@ import { GROUP, type Command } from "./paletteTypes";
 import LucideActivity from "~icons/lucide/activity";
 import LucideClock from "~icons/lucide/clock";
 
-/** Account rows for the agent's own status, plus its timer when it can expire. */
 export function availabilityCommands(): Command[] {
   const store = useAgentStatusStore();
   return [
@@ -36,7 +35,6 @@ async function availabilityChildren(): Promise<Command[]> {
     group: "Set availability",
     dotClass: parseColor(store.getStatus(status)?.color ?? "Gray"),
     checked: status === store.myStatus,
-    // an away status drills straight into its timer, as the popover does
     ...(store.statusCanExpire(status)
       ? {
           children: () => {

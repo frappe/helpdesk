@@ -1,6 +1,5 @@
 <template>
   <!-- TODO: improve with a BottomSheet on phones -->
-  <!-- bare: the panel brings its own row padding, like in the popover -->
   <Dialog v-model:open="open" bare size="sm">
     <template #default="{ close }">
       <div class="p-2 pb-3">
