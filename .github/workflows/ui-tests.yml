@@ -12,7 +12,6 @@ on:
       - "package.json"
       - "yarn.lock"
       - ".github/workflows/ui-tests.yml"
-      - ".github/helpers/frappe_ref.sh"
   workflow_dispatch:
 
 concurrency:
@@ -93,8 +92,7 @@ jobs:
       - name: Setup Bench
         run: |
           pip install frappe-bench
-          FRAPPE_REF=$(bash "$GITHUB_WORKSPACE/.github/helpers/frappe_ref.sh" "$FRAPPE_BRANCH")
-          bench init --skip-redis-config-generation --skip-assets --frappe-branch "$FRAPPE_REF" --python "$(which python)" ~/frappe-bench
+          bench init --skip-redis-config-generation --skip-assets --frappe-branch "$FRAPPE_BRANCH" --python "$(which python)" ~/frappe-bench
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL character_set_server = 'utf8mb4'"
           mariadb --host 127.0.0.1 --port 3306 -u root -proot -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
 
