@@ -4,7 +4,9 @@ import type { DropdownOption } from "@/types";
 import { useClipboard } from "@vueuse/core";
 import {
   call,
+  dayjs,
   dayjsLocal,
+  getConfig,
   toast,
   useFileUpload,
 } from "frappe-ui";
@@ -74,6 +76,17 @@ export function dateFormat(date, format?: string) {
   if (!date) return "";
   const tzDate = dayjsLocal(date);
   return tzDate.format(_format);
+}
+
+/**
+ * The moment a server datetime names, for comparisons and durations. These do
+ * not depend on the zone a date shows in, so skip `dayjsLocal`'s conversion:
+ * it, and every later op on a zoned value, builds an `Intl` formatter.
+ */
+export function serverInstant(date: string) {
+  const systemTimezone = getConfig("systemTimezone");
+  if (!systemTimezone) return dayjs(date);
+  return dayjs(dayjs.tz(date, systemTimezone).valueOf());
 }
 
 export function timeAgo(date) {
