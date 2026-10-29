@@ -246,6 +246,8 @@ async function indexForSearch(api: Api, token: string) {
 
 async function runScheduledJob(api: Api, method: string) {
   const [job] = await api.list("Scheduled Job Type", { filters: { method } });
+  // index_docs_in_queue is frappe develop only; v16 indexes on save
+  if (!job) return;
   await api.call("frappe.core.doctype.scheduled_job_type.scheduled_job_type.execute_event", {
     doc: JSON.stringify({ name: job.name }),
   });
