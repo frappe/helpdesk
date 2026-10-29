@@ -1,4 +1,5 @@
 import { computed, ref, watch } from 'vue'
+import { __ } from '@helpdesk/shared/translation'
 import { findBannerPreset } from '@helpdesk/shared/knowledgeBaseBanner'
 import { readKnowledgeBasePreview } from '@helpdesk/shared/knowledgeBasePreview'
 import { useKnowledgeBaseHeader } from '@app/composables/useKnowledgeBaseHeader'
@@ -68,13 +69,24 @@ export default function setup(context) {
 
   // Pins swap Latest for Featured, which leads; a lone category has no tabs, so none.
   const hasFeatured = computed(() => !focusCategory.value && Boolean(pinnedArticles.data?.length))
+  const sortOptions = computed(() =>
+    hasFeatured.value
+      ? [
+          { label: __('Featured'), value: 'featured' },
+          { label: __('Popular'), value: 'popular' },
+        ]
+      : [
+          { label: __('Popular'), value: 'popular' },
+          { label: __('Latest'), value: 'latest' },
+        ],
+  )
+  // A pick whose tab went away falls back to the first tab.
   const pickedSort = ref(null)
   const sort = computed({
-    get: () => {
-      const fallback = hasFeatured.value ? 'featured' : 'popular'
-      const hidden = hasFeatured.value ? 'latest' : 'featured'
-      return pickedSort.value && pickedSort.value !== hidden ? pickedSort.value : fallback
-    },
+    get: () =>
+      sortOptions.value.some((option) => option.value === pickedSort.value)
+        ? pickedSort.value
+        : sortOptions.value[0].value,
     set: (value) => (pickedSort.value = value),
   })
   const homeArticles = computed(() => (sort.value === 'featured' ? pinnedArticles.data : articles.data))
@@ -106,7 +118,7 @@ export default function setup(context) {
     skeletonCount,
     hasHiddenCategories,
     sort,
-    hasFeatured,
+    sortOptions,
     homeArticles,
     focusCategory,
     isLoneCategory,
