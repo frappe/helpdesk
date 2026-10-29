@@ -146,8 +146,8 @@ for (const [label, viewport] of [
     await workday.getByRole("button", { name: "Save" }).click();
     await expect(workday).toBeHidden();
     await expect(page.getByText("Break applied to 2 workdays. Skipped Wednesday: outside working hours.")).toBeVisible();
-    await expect(tableRow(dialog, "Tuesday")).toContainText(/1:00 PM\s*–\s*2:00 PM/);
-    await expect(tableRow(dialog, "Wednesday")).not.toContainText(/PM\s*–/);
+    await expect(tableRow(dialog, "Tuesday")).toContainText(/13:00(:00)?\s*–\s*14:00(:00)?/);
+    await expect(tableRow(dialog, "Wednesday")).not.toContainText(/\d\s*–\s*\d/);
     // Once the policy is dirty its Save must sit inside the panel, not clipped past its edge.
     const [saveBox, panelBox] = await Promise.all([savePolicy.boundingBox(), dialog.boundingBox()]);
     expect(saveBox!.x + saveBox!.width).toBeLessThanOrEqual(panelBox!.x + panelBox!.width);
@@ -182,11 +182,11 @@ for (const [label, viewport] of [
     await workday.getByLabel("Break end").press("Tab");
     await workday.getByRole("checkbox", { name: "Apply break to all workdays" }).check();
     await workday.getByRole("button", { name: "Save" }).click();
-    await expect(tableRow(dialog, "Tuesday")).toContainText(/1:00 PM\s*–\s*2:00 PM/);
+    await expect(tableRow(dialog, "Tuesday")).toContainText(/13:00(:00)?\s*–\s*14:00(:00)?/);
     await dialog.getByRole("button", { name: "New SLA Policy" }).click();
     await page.getByRole("button", { name: "Confirm" }).click();
     await dialog.getByRole("button", { name: "New", exact: true }).click();
-    await expect(tableRow(dialog, "Tuesday")).not.toContainText(/PM\s*–/);
+    await expect(tableRow(dialog, "Tuesday")).not.toContainText(/\d\s*–\s*\d/);
   });
 }
 

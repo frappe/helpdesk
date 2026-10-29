@@ -71,9 +71,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Button, Dropdown } from "frappe-ui";
+import { Button, dayjs, Dropdown } from "frappe-ui";
 import WorkDayModal from "./Modals/WorkDayModal.vue";
-import { ConfirmDelete, getGridTemplateColumnsForTable } from "@/utils";
+import {
+  ConfirmDelete,
+  getGridTemplateColumnsForTable,
+  getTimeFormat,
+} from "@/utils";
 import { slaData } from "@/stores/sla";
 import { __ } from "@/translation";
 
@@ -158,16 +162,6 @@ const editWorkDay = () => {
   };
 };
 
-const formatTime = (time) => {
-  if (!time) return "00:00";
-  const [hours, minutes] = time.split(":");
-  const date = new Date();
-  date.setHours(parseInt(hours) || 0, parseInt(minutes) || 0, 0);
-
-  return date.toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-};
+const formatTime = (time) =>
+  dayjs(`2000-01-01 ${time || "00:00"}`).format(getTimeFormat());
 </script>
