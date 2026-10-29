@@ -455,7 +455,7 @@ test.describe("knowledge base home", () => {
     await api.update("HD Article", popular.name, { views: Math.floor(Date.now() / 1000) });
     const latest = await createArticle(api, category.name, { title: `Latest ${uid()}` });
     await page.goto("/help");
-    const articles = page.locator('[data-component-id="Repeater-9o4hxaycp"]').getByRole("link");
+    const articles = page.locator('[data-component-id="home-article-list-repeater"]').getByRole("link");
     await expect(articles.first()).toContainText(popular.title);
     await page.getByRole("radio", { name: "Latest" }).click();
     await expect(articles.first()).toContainText(latest.title);
