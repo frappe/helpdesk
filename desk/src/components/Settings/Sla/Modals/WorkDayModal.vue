@@ -117,7 +117,7 @@
           <Button
             variant="subtle"
             :theme="isConfirmingDelete ? 'red' : 'gray'"
-            :label="isConfirmingDelete ? 'Confirm Delete' : 'Delete'"
+            :label="isConfirmingDelete ? __('Confirm Delete') : __('Delete')"
             @click="deleteWorkDay"
             icon-left="lucide-trash-2"
           />
@@ -127,9 +127,9 @@
             variant="subtle"
             theme="gray"
             @click="dialog.show = false"
-            label="Cancel"
+            :label="__('Cancel')"
           />
-          <Button variant="solid" @click="onSave" label="Save" />
+          <Button variant="solid" @click="onSave" :label="__('Save')" />
         </div>
       </div>
     </template>
@@ -320,9 +320,10 @@ function deleteWorkDay(event: Event) {
     return;
   }
   const index = props.workDaysList.findIndex(
-    (item) => item.workday === workDayData.workday
+    (item) => item.workday === dialog.value.data?.workday
   );
   if (index !== -1) props.workDaysList.splice(index, 1);
+  dialog.value.show = false;
 }
 
 function loadForm(data: WorkDayRow) {
