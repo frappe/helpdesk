@@ -59,6 +59,41 @@ class TestGetListData(IntegrationTestCase):
         self.assertEqual(result["row_count"], 2)
         self.assertEqual(result["total_count"], 3)
 
+    def test_stale_view_field_degrades_to_fewer_columns(self) -> None:
+        # a saved view that predates a removed/renamed field loses the one
+        # column instead of breaking the whole list (#3773)
+        with self.set_user(self.agent):
+            result = get_list_data(
+                "HD Ticket",
+                filters=[["name", "in", list(self.tickets.values())]],
+                columns=[
+                    {
+                        "label": "Gone",
+                        "type": "Data",
+                        "key": "no_such_field",
+                        "width": "1rem",
+                    }
+                ],
+                rows=["name", "subject", "no_such_field"],
+                order_by="no_such_field desc",
+            )
+
+        self.assertEqual(result["row_count"], 3)
+        names = [row.name for row in result["data"]]
+        self.assertEqual(set(names), set(self.tickets.values()))
+
+    def test_stale_filter_field_is_dropped(self) -> None:
+        with self.set_user(self.agent):
+            result = get_list_data(
+                "HD Ticket",
+                filters=[
+                    ["name", "in", list(self.tickets.values())],
+                    ["no_such_field", "=", "anything"],
+                ],
+            )
+
+        self.assertEqual(result["row_count"], 3)
+
     def test_empty_filters_list_everything(self) -> None:
         for empty in ({}, []):
             with self.subTest(filters=empty), self.set_user(self.agent):
