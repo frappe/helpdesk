@@ -2,7 +2,7 @@
   <Dialog
     v-model:open="dialog.show"
     @after-leave="resetForm"
-    :title="dialog.isEditing ? 'Edit workday' : 'Add workday'"
+    :title="dialog.isEditing ? __('Edit workday') : __('Add workday')"
   >
     <template #default>
       <div class="flex flex-col gap-4">
@@ -11,8 +11,8 @@
             :type="'select'"
             size="sm"
             variant="subtle"
-            placeholder="Select Workday"
-            label="Workday"
+            :placeholder="__('Select workday')"
+            :label="__('Workday')"
             v-model="workDayData.workday"
             :options="[
               {
@@ -55,8 +55,7 @@
             :type="'time'"
             size="sm"
             variant="subtle"
-            placeholder="Start Time"
-            label="Start Time"
+            :label="__('Start time')"
             v-model="workDayData.start_time"
             :class="{ 'border-outline-red-4': errors.start_time }"
             @change="validateField('start_time')"
@@ -69,8 +68,7 @@
             :type="'time'"
             size="sm"
             variant="subtle"
-            placeholder="End Time"
-            label="End Time"
+            :label="__('End time')"
             v-model="workDayData.end_time"
             :class="{ 'border-outline-red-4': errors.end_time }"
             @change="validateTimeRange"
@@ -143,6 +141,16 @@ import { ref, reactive, computed, watch } from "vue";
 import { Dialog, FormControl, Button, Checkbox, toast } from "frappe-ui";
 import { __ } from "@/translation";
 import { getBreakError, toMinutes } from "@/stores/sla";
+import type { HDServiceDay } from "@/types/doctypes";
+
+type WorkDayRow = Partial<
+  Pick<
+    HDServiceDay,
+    "workday" | "start_time" | "end_time" | "break_start" | "break_end"
+  >
+>;
+
+const TIME_FIELDS = ["start_time", "end_time", "break_start", "break_end"] as const;
 
 const isConfirmingDelete = ref(false);
 const props = defineProps({
@@ -192,114 +200,99 @@ const hasBreak = computed(() =>
 );
 const applyToAll = computed(() => applyBreakToAll.value && hasBreak.value);
 
-const deleteWorkDay = (event) => {
-  event.preventDefault();
-  if (!isConfirmingDelete.value) {
-    isConfirmingDelete.value = true;
+function onSave() {
+  if (!validateForm()) {
+    toast.error(__("Please fix the errors in the form"));
     return;
   }
-
-  const item = props.workDaysList.findIndex(
-    (item) => item.workday === workDayData.workday
-  );
-  if (item !== -1) {
-    props.workDaysList.splice(item, 1);
+  try {
+    const saved = dialog.value.isEditing ? updateRow() : addRow();
+    if (!saved) return;
+    if (applyToAll.value) applyBreakToOtherDays(getRow());
+    dialog.value.show = false;
+  } catch (error) {
+    toast.error(__("Failed to save workday: {0}", [String(error)]));
   }
-};
-
-function formatTimeToHHMMSS(timeStr: string) {
-  if (!timeStr) return "";
-
-  if (/^\d{1,2}:\d{2}:\d{2}$/.test(timeStr)) {
-    const [hours, minutes, seconds] = timeStr.split(":");
-    return `${hours.padStart(2, "0")}:${minutes.padStart(
-      2,
-      "0"
-    )}:${seconds.padStart(2, "0")}`;
-  }
-
-  if (/^\d{1,2}:\d{2}$/.test(timeStr)) {
-    const [hours, minutes] = timeStr.split(":");
-    return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`;
-  }
-
-  return "";
 }
 
-function resetForm() {
-  workDayData.workday = "";
-  workDayData.start_time = "";
-  workDayData.end_time = "";
-  workDayData.break_start = "";
-  workDayData.break_end = "";
-  errors.workday = "";
-  errors.start_time = "";
-  errors.end_time = "";
-  errors.break = "";
-  applyBreakToAll.value = false;
-  isConfirmingDelete.value = false;
-}
-
-const validateField = (field: string) => {
-  if (!workDayData[field as keyof typeof workDayData]) {
-    errors[field as keyof typeof errors] = "This field is required";
-    return false;
-  }
-  errors[field as keyof typeof errors] = "";
-  return true;
-};
-
-const validateTimeRange = () => {
-  if (!workDayData.start_time || !workDayData.end_time) {
-    if (!workDayData.start_time) errors.start_time = "Start time is required";
-    if (!workDayData.end_time) errors.end_time = "End time is required";
-    return false;
-  }
-
-  if (toMinutes(workDayData.start_time) >= toMinutes(workDayData.end_time)) {
-    errors.end_time = "End time must be after start time";
-    return false;
-  }
-
-  errors.end_time = "";
-  return true;
-};
-
-const validateForm = () => {
+function validateForm() {
   const isWorkdayValid = validateField("workday");
   const isStartTimeValid = validateField("start_time");
   const isEndTimeValid = validateField("end_time") && validateTimeRange();
-
   return (
     isWorkdayValid && isStartTimeValid && isEndTimeValid && validateBreak()
   );
-};
+}
 
-const validateBreak = () => {
+function validateField(field: keyof typeof errors & keyof typeof workDayData) {
+  errors[field] = workDayData[field] ? "" : __("This field is required");
+  return !errors[field];
+}
+
+function validateTimeRange() {
+  if (!workDayData.start_time || !workDayData.end_time) {
+    if (!workDayData.start_time) errors.start_time = __("Start time is required");
+    if (!workDayData.end_time) errors.end_time = __("End time is required");
+    return false;
+  }
+  if (toMinutes(workDayData.start_time) >= toMinutes(workDayData.end_time)) {
+    errors.end_time = __("End time must be after start time");
+    return false;
+  }
+  errors.end_time = "";
+  return true;
+}
+
+function validateBreak() {
   errors.break = getBreakError(workDayData);
   return !errors.break;
-};
+}
 
-/** The form as a row, with break times as HH:MM:SS or empty. */
-function getRow() {
-  return {
-    ...workDayData,
-    break_start: formatTimeToHHMMSS(workDayData.break_start),
-    break_end: formatTimeToHHMMSS(workDayData.break_end),
-  };
+/** Replace the edited row in the list; false when it is no longer there. */
+function updateRow() {
+  const index = props.workDaysList.findIndex(
+    (item) => item.workday === dialog.value.data?.workday
+  );
+  if (index === -1) return false;
+  const row = props.workDaysList[index];
+  props.workDaysList.splice(index, 1, { ...row, ...getRow(row) });
+  if (!applyToAll.value) toast.success(__("Workday updated successfully."));
+  return true;
+}
+
+/** Append the form as a new row; false when that workday already exists. */
+function addRow() {
+  if (props.workDaysList.some((item) => item.workday === workDayData.workday)) {
+    errors.workday = __("This workday already exists");
+    toast.error(__("A workday with this name already exists"));
+    return false;
+  }
+  props.workDaysList.push(getRow());
+  if (!applyToAll.value) toast.success(__("Workday added successfully."));
+  return true;
+}
+
+/**
+ * The form as a row, times as HH:MM:SS. A time equal to the loaded one keeps
+ * its loaded form (e.g. "9:00:00", or null for no break), so an unchanged save
+ * changes nothing.
+ */
+function getRow(loaded: WorkDayRow = {}): WorkDayRow {
+  const row: WorkDayRow = { workday: workDayData.workday };
+  for (const field of TIME_FIELDS) {
+    const time = formatTimeToHHMMSS(workDayData[field]);
+    row[field] = time === formatTimeToHHMMSS(loaded[field]) ? loaded[field] : time;
+  }
+  return row;
 }
 
 /** Copy the break to every other workday whose hours contain it, then toast. */
-function applyBreakToOtherDays(row: ReturnType<typeof getRow>) {
-  let applied = 1;
+function applyBreakToOtherDays(row: WorkDayRow) {
   const skipped: string[] = [];
+  let applied = 1;
   for (const day of props.workDaysList) {
     if (day.workday === row.workday) continue;
-    const withBreak = {
-      ...day,
-      break_start: row.break_start,
-      break_end: row.break_end,
-    };
+    const withBreak = { ...day, break_start: row.break_start, break_end: row.break_end };
     if (getBreakError(withBreak)) {
       skipped.push(day.workday);
       continue;
@@ -307,60 +300,53 @@ function applyBreakToOtherDays(row: ReturnType<typeof getRow>) {
     Object.assign(day, withBreak);
     applied++;
   }
-  const message = __("Break applied to {0} workdays.", [String(applied)]);
-  if (!skipped.length) return toast.success(message);
-  toast.warning(
-    `${message} ${__("Skipped {0}: outside working hours.", [
-      skipped.join(", "),
-    ])}`
-  );
+  toastAppliedBreak(applied, skipped);
 }
 
-const onSave = () => {
-  if (!validateForm()) {
-    toast.error(__("Please fix the errors in the form"));
+function toastAppliedBreak(applied: number, skipped: string[]) {
+  const message =
+    applied === 1
+      ? __("Break applied to 1 workday.")
+      : __("Break applied to {0} workdays.", [String(applied)]);
+  if (!skipped.length) return toast.success(message);
+  const skippedMessage = __("Skipped {0}: outside working hours.", [skipped.join(", ")]);
+  toast.warning(`${message} ${skippedMessage}`);
+}
+
+function deleteWorkDay(event: Event) {
+  event.preventDefault();
+  if (!isConfirmingDelete.value) {
+    isConfirmingDelete.value = true;
     return;
   }
+  const index = props.workDaysList.findIndex(
+    (item) => item.workday === workDayData.workday
+  );
+  if (index !== -1) props.workDaysList.splice(index, 1);
+}
 
-  try {
-    if (dialog.value.isEditing) {
-      const itemIndex = props.workDaysList.findIndex(
-        (item) => item.workday === dialog.value.data?.workday
-      );
-      if (itemIndex !== -1) {
-        const updatedItem = {
-          ...props.workDaysList[itemIndex],
-          ...getRow(),
-        };
-        props.workDaysList.splice(itemIndex, 1, updatedItem);
-        if (!applyToAll.value) {
-          toast.success(__("Workday updated successfully."));
-        }
-      }
-    } else {
-      const isDuplicate = props.workDaysList.some(
-        (item) => item.workday === workDayData.workday
-      );
-
-      if (isDuplicate) {
-        errors.workday = "This workday already exists";
-        toast.error(__("A workday with this name already exists"));
-        return;
-      }
-
-      props.workDaysList.push(getRow());
-      if (!applyToAll.value) {
-        toast.success(__("Workday added successfully."));
-      }
-    }
-    if (applyToAll.value) {
-      applyBreakToOtherDays(getRow());
-    }
-    dialog.value.show = false;
-  } catch (error) {
-    toast.error(__(`Failed to save workday: ${error}`));
+function loadForm(data: WorkDayRow) {
+  workDayData.workday = data.workday || "";
+  for (const field of TIME_FIELDS) {
+    workDayData[field] = formatTimeToHHMMSS(data[field]);
   }
-};
+}
+
+function resetForm() {
+  loadForm({});
+  Object.assign(errors, { workday: "", start_time: "", end_time: "", break: "" });
+  applyBreakToAll.value = false;
+  isConfirmingDelete.value = false;
+}
+
+function formatTimeToHHMMSS(time?: string | null) {
+  const parts = (time || "").split(":");
+  if (parts.length < 2 || parts.length > 3 || !parts.every((part) => /^\d{1,2}$/.test(part))) {
+    return "";
+  }
+  const [hours, minutes, seconds = "00"] = parts;
+  return [hours, minutes, seconds].map((part) => part.padStart(2, "0")).join(":");
+}
 
 // Re-check a shown break error as the times change, so a fixed break clears it.
 watch(
@@ -376,21 +362,9 @@ watch(
 watch(
   () => dialog.value.show,
   (isOpen) => {
-    if (isOpen) {
-      if (dialog.value.isEditing && dialog.value.data) {
-        workDayData.workday = dialog.value.data.workday;
-        workDayData.start_time = formatTimeToHHMMSS(
-          dialog.value.data.start_time
-        );
-        workDayData.end_time = formatTimeToHHMMSS(dialog.value.data.end_time);
-        workDayData.break_start = formatTimeToHHMMSS(
-          dialog.value.data.break_start
-        );
-        workDayData.break_end = formatTimeToHHMMSS(dialog.value.data.break_end);
-      } else {
-        resetForm();
-      }
-    }
+    if (!isOpen) return;
+    if (dialog.value.isEditing && dialog.value.data) loadForm(dialog.value.data);
+    else resetForm();
   }
 );
 </script>

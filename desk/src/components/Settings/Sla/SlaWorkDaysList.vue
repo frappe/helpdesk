@@ -1,7 +1,7 @@
 <template>
   <div class="rounded-5 border px-2 border-outline-gray-2 text-sm">
     <div
-      class="grid p-2 px-4 items-center"
+      class="grid gap-2 p-2 md:px-4 items-center"
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
@@ -94,6 +94,8 @@ const columns = computed<Column[]>(() => [
     label: "Day",
     key: "workday",
     isRequired: true,
+    // Room for "Wednesday" in the 640px settings panel.
+    width: "minmax(6.5rem, 1fr)",
   },
   {
     label: "Start time",
