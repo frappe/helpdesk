@@ -9,7 +9,6 @@ from frappe.utils import (
     escape_html,
     expand_relative_urls,
     get_user_info_for_avatar,
-    sbool,
 )
 from frappe.website.utils import cleanup_page_name, find_first_image
 
@@ -198,41 +197,50 @@ def move_to_category(category: str, articles: list[str]):
 # Guest endpoints: make_article_filters limits guests to Public articles.
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_articles(
-    category: str | None = None,
-    limit: int | None = None,
-    sort: str = "latest",
-    pinned: bool = False,
-    names: str | list | None = None,
+    category: str | None = None, limit: int | None = None, sort: str = "latest"
 ) -> list[dict]:
-    """`pinned` reads the home page's pins; `names`, Settings Preview's unsaved ones."""
     validate_public_access()
     filters = make_article_filters()
     order_by = "views desc" if sort == "popular" else "published_on desc"
     if category:
         filters["category"] = category
         order_by = f"{WEIGHT_ORDER}, {order_by}"
-    if names is not None or sbool(pinned):
-        # Featured is for customers, so agents skip Private too; others keep their narrower filter.
-        filters.setdefault("visibility", ["!=", PRIVATE])
-    if names is not None:
-        names = _parse_guest_names(names, LIST_LIMIT)
-        if not names:
-            return []
-        filters["name"] = ["in", names]
-    elif sbool(pinned):
-        filters["pinned"] = 1
-        order_by = "pinned_order asc"
-    limit = min(cint(limit) or LIST_LIMIT, LIST_LIMIT)
-    rows = frappe.get_all(
+    return frappe.get_all(
         "HD Article",
         filters=filters,
         fields=["name", "title", "excerpt"],
         order_by=order_by,
-        # names are already capped; the limit cuts after their order
-        limit_page_length=LIST_LIMIT if names is not None else limit,
+        limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
     )
-    if names is not None:
-        rows.sort(key=lambda row: names.index(row.name))
+
+
+@frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
+def get_featured_articles(
+    names: str | list | None = None, limit: int | None = None
+) -> list[dict]:
+    """The home page's pins in order; `names`, Settings Preview's unsaved ones."""
+    validate_public_access()
+    filters = make_article_filters()
+    # Featured is for customers, so agents skip Private too; others keep their narrower filter.
+    filters.setdefault("visibility", ["!=", PRIVATE])
+    limit = min(cint(limit) or LIST_LIMIT, LIST_LIMIT)
+    fields = ["name", "title", "excerpt"]
+    if names is None:
+        filters["pinned"] = 1
+        return frappe.get_all(
+            "HD Article",
+            filters=filters,
+            fields=fields,
+            order_by="pinned_order asc",
+            limit_page_length=limit,
+        )
+    names = _parse_guest_names(names, LIST_LIMIT)
+    if not names:
+        return []
+    filters["name"] = ["in", names]
+    # the limit cuts after their order
+    rows = frappe.get_all("HD Article", filters=filters, fields=fields)
+    rows.sort(key=lambda row: names.index(row.name))
     return rows[:limit]
 
 

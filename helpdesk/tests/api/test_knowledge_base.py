@@ -15,6 +15,7 @@ from helpdesk.api.knowledge_base import (
     get_article,
     get_article_markdown,
     get_articles,
+    get_featured_articles,
     get_categories,
     get_category_delete_summary,
     get_category_options,
@@ -79,6 +80,7 @@ class TestPublicReads(IntegrationTestCase):
     def test_every_endpoint_is_reachable_without_a_session(self) -> None:
         for endpoint in (
             get_articles,
+            get_featured_articles,
             get_article,
             get_article_markdown,
             get_categories,
@@ -94,6 +96,7 @@ class TestPublicReads(IntegrationTestCase):
         with self.set_user("Guest"):
             for endpoint, args in (
                 (get_articles, ()),
+                (get_featured_articles, ()),
                 (get_kb_sidebar, ()),
                 (get_categories, ()),
                 (get_subcategory_articles, (self.category.name,)),
@@ -199,7 +202,7 @@ class TestPublicReads(IntegrationTestCase):
         second = self.make_article("Fixture second", pinned=1)
         frappe.db.set_value("HD Article", first, "pinned_order", 1000)
 
-        names = [row.name for row in get_articles(pinned=1)]
+        names = [row.name for row in get_featured_articles()]
 
         self.assertEqual([n for n in names if n in (first, second)], [second, first])
         self.assertNotIn(self.published, names)
@@ -227,13 +230,15 @@ class TestPublicReads(IntegrationTestCase):
     def test_names_read_in_the_given_order(self) -> None:
         second = self.make_article("Fixture second")
 
-        rows = get_articles(names=frappe.as_json([second, self.published, self.draft]))
+        rows = get_featured_articles(
+            names=frappe.as_json([second, self.published, self.draft])
+        )
 
         self.assertEqual([row.name for row in rows], [second, self.published])
 
     def test_junk_names_read_none(self) -> None:
         for names in ("not json", "{}", "[]", '[1, {"a": 1}]'):
-            self.assertEqual(get_articles(names=names), [])
+            self.assertEqual(get_featured_articles(names=names), [])
 
     def test_reads_one_published_article(self) -> None:
         article = get_article(self.published)
