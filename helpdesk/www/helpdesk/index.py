@@ -71,6 +71,7 @@ def get_boot():
             "dir": "rtl" if is_rtl() else "ltr",
             "apps": frappe.get_installed_apps(),
             "telemetry": get_telemetry_boot(),
+            "cloud_settings": get_cloud_settings_boot(),
         }
     )
 
@@ -92,3 +93,12 @@ def get_telemetry_boot():
         return boot_config()
     except Exception:
         return {"enabled": False}
+
+
+def get_cloud_settings_boot():
+    """Frappe Cloud v2 settings context; enabled only for System Managers on a Pilot-managed site."""
+    try:
+        from frappe.integrations.frappe_providers.cloud_settings import get_boot_context
+    except ImportError:
+        return {"enabled": False}
+    return get_boot_context()
