@@ -438,7 +438,7 @@
              "$type": "variable",
              "name": "sort"
             },
-            "options": "{{ [...(hasFeatured ? [{ label: t(\"Featured\"), value: \"featured\" }] : []), { label: t(\"Popular\"), value: \"popular\" }, ...(hasFeatured ? [] : [{ label: t(\"Latest\"), value: \"latest\" }])] }}",
+            "options": "{{ sortOptions }}",
             "size": "sm",
             "type": "subtle",
             "vertical": false
@@ -716,7 +716,7 @@
  "frappe_app": "helpdesk",
  "idx": 0,
  "is_standard": 1,
- "modified": "2026-10-30 12:00:00.000000",
+ "modified": "2026-10-30 13:00:00.000000",
  "modified_by": "Administrator",
  "name": "public_kb",
  "owner": "Administrator",
