@@ -6,7 +6,7 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 
 | DocType | Folder under `helpdesk/helpdesk/doctype/` | Holds |
 |---|---|---|
-| `HD Article` | `hd_article` | title, category, content, excerpt, author, `status`, `visibility`, `title_slug`, views |
+| `HD Article` | `hd_article` | title, category, content, excerpt, author, `status`, `visibility`, `title_slug`, views, `weight`, `pinned`, `pinned_order` |
 | `HD Article Category` | `hd_article_category` | name, description, icon, `pinned`, `pinned_order` |
 | `HD Article Feedback` | `hd_article_feedback` | one vote per user or guest visitor: 0 none, 1 like, 2 dislike |
 
@@ -16,6 +16,8 @@ Agents write articles in the desk at `/helpdesk/kb`. Customers and guests read t
 - `prefer_knowledge_base`: the customer home is the KB (`/help`), not the ticket list (`/help/my-tickets`).
 - `allow_anonymous_article_voting`: guests can vote.
 - `banner_image`, `banner_preset`: the banner on the KB home.
+
+Within a category, every article list (`get_articles` with a `category`, `get_subcategory_articles`, `get_kb_sidebar`) sorts by `weight` first, heaviest on top. Pins write the weight: the first of N pinned articles weighs N, the last 1, and an unpinned article goes back to 0 (`HDArticle.sync_pinned_weights`).
 
 ## Who can read what
 
@@ -62,7 +64,7 @@ Other files:
 | Article and category list | `desk/src/pages/knowledge-base/KnowledgeBaseAgent.vue` (`/helpdesk/kb`) |
 | Read and edit an article | `desk/src/pages/knowledge-base/Article.vue` (`/helpdesk/kb/articles/:articleId`) |
 | New article | `desk/src/pages/knowledge-base/NewArticle.vue` |
-| Category, access, move and merge dialogs | `desk/src/components/knowledge-base/` |
+| Category, access, move, merge and weight dialogs | `desk/src/components/knowledge-base/` |
 | Desk KB state | `desk/src/stores/knowledgeBase.ts` |
 | KB settings tab | `desk/src/components/Settings/KnowledgeBase/KnowledgeBase.vue` |
 
@@ -72,7 +74,7 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 
 | Page | URL | Data |
 |---|---|---|
-| `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent) |
+| `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent, and `pinned` for featured articles) |
 | `categories` | `/help/categories` | `get_categories` |
 | `category` | `/help/category/:category` | `get_articles` for one category |
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `get_article_markdown` |
@@ -84,9 +86,9 @@ Search (`PortalArticleSearch`) and the article suggestions on the new ticket for
 
 ## Settings shared by both apps
 
-The KB look and feel (banner, pinned categories, header links) has one form, `shared/src/settings/KnowledgeBaseForm.vue`. The desk Settings tab and the portal Settings dialog both render it.
+The KB look and feel (banner, pinned categories and articles, header links) has one form, `shared/src/settings/KnowledgeBaseForm.vue`. The desk Settings tab and the portal Settings dialog both render it.
 
-`shared/src/settings/knowledgeBaseDraft.ts` holds the unsaved draft. It writes `HD Settings`, the category pins and the header links. Header links are stored in an `HD Form Script` with `apply_to_knowledge_base` set.
+`shared/src/settings/knowledgeBaseDraft.ts` holds the unsaved draft. It writes `HD Settings`, the category and article pins and the header links. Header links are stored in an `HD Form Script` with `apply_to_knowledge_base` set.
 
 `?preview=1` on the KB home shows the unsaved draft (`shared/src/knowledgeBasePreview.ts`).
 

@@ -4,8 +4,8 @@
       <div class="flex shrink-0 items-center justify-between px-4 pt-3">
         <div class="flex items-center gap-2">
           <Dialog.Title as-child>
-            <h2 class="text-lg font-medium text-ink-gray-9">
-              {{ __("Pinned categories") }}
+            <h2 class="text-lg-medium text-ink-gray-9">
+              {{ text.title }}
             </h2>
           </Dialog.Title>
           <!-- As the settings title shows it. -->
@@ -26,8 +26,8 @@
       <div class="shrink-0 border-b border-outline-gray-1 px-4 py-3">
         <TextInput
           v-model="query"
-          :placeholder="__('Search categories to pin')"
-          :aria-label="__('Search categories to pin')"
+          :placeholder="text.search"
+          :aria-label="text.search"
         >
           <template #prefix>
             <span
@@ -48,63 +48,59 @@
       </div>
 
       <ScrollArea class="min-h-0 flex-1" viewport-class="px-4 py-3">
-        <div v-if="categories.length" class="space-y-4">
+        <div v-if="items.length" class="space-y-4">
           <section class="space-y-1.5">
-            <h3 class="text-base font-medium text-ink-gray-8">
+            <h3 class="text-base-medium text-ink-gray-8">
               {{ __("Pinned") }}
             </h3>
             <!-- Search leaves the pins alone: it finds categories to pin. -->
             <Draggable
-              :list="pinnedCategories"
+              :list="pinnedItems"
               item-key="value"
               :group="GROUP"
               v-bind="DRAG_OPTIONS"
               :class="LIST"
               @change="onPinnedChange"
             >
-              <template #item="{ element: category }">
+              <template #item="{ element: item }">
                 <div :class="[ROW, 'cursor-grab']">
                   <span
                     class="lucide-grip-vertical size-4 shrink-0 text-ink-gray-4"
                     aria-hidden="true"
                   />
                   <span
-                    :class="category.icon"
+                    :class="item.icon"
                     class="size-4 shrink-0 text-ink-gray-6"
                   />
                   <span class="min-w-0 flex-1 truncate text-base">
-                    {{ category.label }}
+                    {{ item.label }}
                   </span>
-                  <CategoryAccessBadge :access="category.access" />
+                  <CategoryAccessBadge :access="item.access" />
                   <Button
                     variant="ghost"
                     size="xs"
                     icon="lucide-pin-off"
-                    :label="__('Unpin {0}', [category.label])"
+                    :label="__('Unpin {0}', [item.label])"
                     :tooltip="__('Unpin')"
                     :class="ACTION"
-                    @click.stop="moveTo(category.value, 'unpinned')"
+                    @click.stop="moveTo(item.value, 'unpinned')"
                   />
                 </div>
               </template>
               <template #footer>
                 <div
-                  v-if="!pinnedCategories.length"
+                  v-if="!pinnedItems.length"
                   class="px-3 py-6 text-center text-p-sm text-ink-gray-5"
                 >
-                  {{
-                    __(
-                      "Nothing pinned yet. The home page will list all categories alphabetically."
-                    )
-                  }}
+                  {{ text.empty }}
                 </div>
               </template>
             </Draggable>
           </section>
 
           <section class="space-y-1.5">
-            <h3 class="text-base font-medium text-ink-gray-8">
-              {{ __("Other categories") }}
+            <h3 class="text-base-medium text-ink-gray-8">
+              {{ text.others }}
             </h3>
             <!-- Sorted A–Z, so a dropped row snaps into place. -->
             <Draggable
@@ -117,7 +113,7 @@
               :class="LIST"
               @change="onUnpinnedChange"
             >
-              <template #item="{ element: category }">
+              <template #item="{ element: item }">
                 <div :class="[ROW, search ? 'cursor-default' : 'cursor-grab']">
                   <span
                     v-if="!search"
@@ -125,21 +121,21 @@
                     aria-hidden="true"
                   />
                   <span
-                    :class="category.icon"
+                    :class="item.icon"
                     class="size-4 shrink-0 text-ink-gray-6"
                   />
                   <span class="min-w-0 flex-1 truncate text-base">
-                    {{ category.label }}
+                    {{ item.label }}
                   </span>
-                  <CategoryAccessBadge :access="category.access" />
+                  <CategoryAccessBadge :access="item.access" />
                   <Button
                     variant="ghost"
                     size="xs"
                     icon="lucide-pin"
-                    :label="__('Pin {0}', [category.label])"
+                    :label="__('Pin {0}', [item.label])"
                     :tooltip="__('Pin')"
                     :class="ACTION"
-                    @click.stop="moveTo(category.value, 'pinned')"
+                    @click.stop="moveTo(item.value, 'pinned')"
                   />
                 </div>
               </template>
@@ -148,9 +144,13 @@
                   v-if="!shownUnpinned.length"
                   class="px-3 py-6 text-center text-p-sm text-ink-gray-5"
                 >
-                  {{
-                    search ? __("No matches") : __("Every category is pinned")
-                  }}
+                  {{ search ? __("No matches") : text.allPinned }}
+                </div>
+                <div
+                  v-else-if="hiddenCount"
+                  class="px-3 py-2 text-center text-p-sm text-ink-gray-5"
+                >
+                  {{ __("Search to find {0} more", [hiddenCount]) }}
                 </div>
               </template>
             </Draggable>
@@ -158,7 +158,7 @@
         </div>
 
         <div v-else class="px-3 py-6 text-center text-p-sm text-ink-gray-5">
-          {{ __("No categories found") }}
+          {{ text.none }}
         </div>
       </ScrollArea>
 
@@ -190,9 +190,11 @@ import { Badge, Button, Dialog, ScrollArea, TextInput } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import Draggable from "vuedraggable";
 import CategoryAccessBadge from "./CategoryAccessBadge.vue";
+import type { PinKind } from "./knowledgeBaseDraft";
+import { pinnedListText } from "./pinnedListText";
 
 type Section = "pinned" | "unpinned";
-type Category = {
+type Item = {
   label: string;
   value: string;
   icon: string;
@@ -200,8 +202,8 @@ type Category = {
   access?: string;
 };
 type Change = {
-  added?: { element: Category; newIndex: number };
-  moved?: { element: Category; newIndex: number };
+  added?: { element: Item; newIndex: number };
+  moved?: { element: Item; newIndex: number };
 };
 
 const ROW =
@@ -210,7 +212,9 @@ const ACTION = "shrink-0 text-ink-gray-5";
 // No min height: the empty message is the drop target.
 const LIST = "rounded-6 border border-outline-gray-2 px-1.5 py-2";
 // Touch drags need a short hold, so the list still scrolls.
-const GROUP = "pinned-categories";
+const GROUP = "pinned-items";
+// A big knowledge base lists past this only through search.
+const SHOWN_LIMIT = 100;
 const DRAG_OPTIONS = {
   animation: 150,
   delay: 200,
@@ -219,7 +223,8 @@ const DRAG_OPTIONS = {
 };
 
 const props = defineProps<{
-  categories: Category[];
+  kind: PinKind;
+  items: Item[];
   pinned: string[];
   // Resolves true on success.
   save: (pinned: string[]) => Promise<boolean>;
@@ -227,6 +232,7 @@ const props = defineProps<{
 
 const show = defineModel<boolean>("open", { required: true });
 
+const text = computed(() => pinnedListText(props.kind));
 const query = ref("");
 const search = computed(() => query.value.trim().toLowerCase());
 const selected = ref<string[]>([]);
@@ -242,30 +248,32 @@ watch(show, (open) => {
 });
 
 const byName = computed(
-  () => new Map(props.categories.map((category) => [category.value, category]))
+  () => new Map(props.items.map((item) => [item.value, item]))
 );
 
-const pinnedCategories = computed(() =>
+const pinnedItems = computed(() =>
   selected.value
     .map((name) => byName.value.get(name))
-    .filter((category): category is Category => category !== undefined)
+    .filter((item): item is Item => item !== undefined)
 );
 
-// A–Z, as the home page lists them.
-const unpinnedCategories = computed(() =>
-  props.categories.filter(
-    (category) => !selected.value.includes(category.value)
-  )
+// A–Z, as the home page lists categories.
+const unpinnedItems = computed(() =>
+  props.items.filter((item) => !selected.value.includes(item.value))
 );
 
-function matches(category: Category) {
-  return category.label.toLowerCase().includes(search.value);
+function matches(item: Item) {
+  return item.label.toLowerCase().includes(search.value);
 }
 
+const matchingUnpinned = computed(() =>
+  search.value ? unpinnedItems.value.filter(matches) : unpinnedItems.value
+);
 const shownUnpinned = computed(() =>
-  search.value
-    ? unpinnedCategories.value.filter(matches)
-    : unpinnedCategories.value
+  matchingUnpinned.value.slice(0, SHOWN_LIMIT)
+);
+const hiddenCount = computed(
+  () => matchingUnpinned.value.length - shownUnpinned.value.length
 );
 
 const hasUnsavedChanges = computed(
@@ -276,8 +284,8 @@ function onPinnedChange({ added, moved }: Change) {
   const change = added || moved;
   if (!change) return;
   // newIndex counts shown rows; pins to missing categories aren't shown
-  const names = pinnedCategories.value
-    .map((category) => category.value)
+  const names = pinnedItems.value
+    .map((item) => item.value)
     .filter((name) => name !== change.element.value);
   names.splice(change.newIndex, 0, change.element.value);
   const missing = selected.value.filter((name) => !byName.value.has(name));
