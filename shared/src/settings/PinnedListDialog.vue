@@ -53,7 +53,7 @@
             <h3 class="text-base-medium text-ink-gray-8">
               {{ __("Pinned") }}
             </h3>
-            <!-- Search leaves the pins alone: it finds categories to pin. -->
+            <!-- Search leaves the pins alone: it finds items to pin. -->
             <Draggable
               :list="pinnedItems"
               item-key="value"
@@ -257,7 +257,7 @@ const pinnedItems = computed(() =>
     .filter((item): item is Item => item !== undefined)
 );
 
-// A–Z, as the home page lists categories.
+// In the order the items come: A–Z.
 const unpinnedItems = computed(() =>
   props.items.filter((item) => !selected.value.includes(item.value))
 );
@@ -283,7 +283,7 @@ const hasUnsavedChanges = computed(
 function onPinnedChange({ added, moved }: Change) {
   const change = added || moved;
   if (!change) return;
-  // newIndex counts shown rows; pins to missing categories aren't shown
+  // newIndex counts shown rows; pins to missing items aren't shown
   const names = pinnedItems.value
     .map((item) => item.value)
     .filter((name) => name !== change.element.value);
