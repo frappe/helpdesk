@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
@@ -251,10 +253,8 @@ def get_featured_articles(
 def _parse_guest_names(value, limit: int) -> list[str]:
     """Guest input: a name or a JSON list of names. Bad JSON is a plain name, junk is dropped."""
     if isinstance(value, str) and value.lstrip().startswith("["):
-        try:
+        with suppress(Exception):
             value = frappe.parse_json(value)
-        except Exception:
-            pass
     names = [value] if isinstance(value, str) else value
     if not isinstance(names, list):
         return []
