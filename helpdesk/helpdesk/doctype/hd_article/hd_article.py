@@ -30,10 +30,10 @@ class HDArticle(Document):
             self.category = None
         self.validate_article_category()
         self.validate_published_content()
-        self.validate_pinned_order()
+        self.validate_pin()
 
-    def validate_pinned_order(self):
-        """Order is 1-based; 0 means unpinned. Only Published articles stay pinned."""
+    def validate_pin(self):
+        """Order is 1-based; 0 means unpinned. Only Published articles stay pinned, and unpinning resets the weight."""
         if self.status != "Published":
             self.pinned = 0
         if not self.pinned:
