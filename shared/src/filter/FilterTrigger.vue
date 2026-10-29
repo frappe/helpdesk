@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-fit items-center">
     <Button
-      :label="label"
+      :label="label ?? __('Filter')"
       :class="count ? 'rounded-e-none' : ''"
       @click="$emit('toggle')"
     >
@@ -59,7 +59,7 @@ interface E {
   (event: "clear"): void;
 }
 
-withDefaults(defineProps<P>(), { label: "Filter" });
+defineProps<P>();
 
 // A 0fr to 1fr grid column animates the width, which `auto` cannot.
 const REVEAL =
