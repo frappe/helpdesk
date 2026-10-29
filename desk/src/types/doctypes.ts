@@ -32,10 +32,14 @@ export interface HDTicketStatus extends DocType {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Last updated: 2026-06-28 13:51:31.692161
 =======
 // Last updated: 2026-10-27 13:00:00.000000
 >>>>>>> 9ccf9d2 (feat(sla): set a lunch break per workday in SLA settings)
+=======
+// Last updated: 2026-10-18 16:20:00.000000
+>>>>>>> 1b26b48 (fix(sla): tidy the workday dialog and keep unchanged saves clean)
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
