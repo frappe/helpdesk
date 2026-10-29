@@ -5,6 +5,8 @@ export type KnowledgeBasePreview = {
   banner_image: string;
   banner_preset: string;
   pinned: string[];
+  // Missing in a preview saved before article pins.
+  pinned_articles?: string[];
   links: { label: string; url: string; open_in_new_tab: boolean }[];
 };
 

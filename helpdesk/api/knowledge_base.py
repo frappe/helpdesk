@@ -58,6 +58,8 @@ LIST_LIMIT = 100
 SUBCATEGORY_ARTICLES_LIMIT = 5
 # the sidebar reads its titles in one request; newer ones win past this
 TITLES_LIMIT = 1000
+# within a category, heavier articles list first
+WEIGHT_ORDER = "weight desc"
 
 VISITOR_COOKIE = "hd_visitor"
 VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60
@@ -289,22 +291,55 @@ def move_to_category(category: str, articles: list[str]):
 # Guest endpoints: make_article_filters limits guests to Public articles.
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
 def get_articles(
-    category: str | None = None, limit: int | None = None, sort: str = "latest"
+    category: str | None = None,
+    limit: int | None = None,
+    sort: str = "latest",
+    pinned: bool = False,
+    names: str | list | None = None,
 ) -> list[dict]:
     """List published articles the caller can read: name, title and excerpt.
-    Optionally of one category, at most 100. `sort` "popular" orders by views, else
-    newest first. Guests only when the knowledge base is public."""
+    Optionally of one category, heaviest first, at most 100. `sort` "popular" orders by
+    views, else newest first. `pinned` reads the home page's pins; `names`, Settings
+    Preview's unsaved ones. Guests only when the knowledge base is public."""
     validate_public_access()
     filters = make_article_filters()
+    order_by = "views desc" if sort == "popular" else "published_on desc"
     if category:
         filters["category"] = category
-    return frappe.get_all(
+        order_by = f"{WEIGHT_ORDER}, {order_by}"
+    if names is not None:
+        names = _parse_guest_names(names, LIST_LIMIT)
+        if not names:
+            return []
+        filters["name"] = ["in", names]
+    elif sbool(pinned):
+        filters["pinned"] = 1
+        order_by = "pinned_order asc"
+    limit = min(cint(limit) or LIST_LIMIT, LIST_LIMIT)
+    rows = frappe.get_all(
         "HD Article",
         filters=filters,
         fields=["name", "title", "excerpt"],
-        order_by="views desc" if sort == "popular" else "published_on desc",
-        limit_page_length=min(cint(limit) or LIST_LIMIT, LIST_LIMIT),
+        order_by=order_by,
+        # names are already capped; the limit cuts after their order
+        limit_page_length=LIST_LIMIT if names is not None else limit,
     )
+    if names is not None:
+        rows.sort(key=lambda row: names.index(row.name))
+    return rows[:limit]
+
+
+def _parse_guest_names(value, limit: int) -> list[str]:
+    """Guest input: a name or a JSON list of names. Bad JSON is a plain name, junk is dropped."""
+    if isinstance(value, str) and value.lstrip().startswith("["):
+        try:
+            value = frappe.parse_json(value)
+        except Exception:
+            pass
+    names = [value] if isinstance(value, str) else value
+    if not isinstance(names, list):
+        return []
+    return [name for name in names if isinstance(name, str) and name][:limit]
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET"])  # nosemgrep
@@ -320,7 +355,7 @@ def get_subcategory_articles(category: str) -> dict[str, list[dict]]:
         "HD Article",
         filters=make_article_filters(category=["in", subcategories]),
         fields=["name", "title", "category"],
-        order_by="published_on desc",
+        order_by=f"{WEIGHT_ORDER}, published_on desc",
         limit_page_length=TITLES_LIMIT,
     ):
         rows = result.setdefault(row.pop("category"), [])
@@ -351,7 +386,7 @@ def get_kb_sidebar() -> list[dict]:
         "HD Article",
         filters=make_article_filters(category=["is", "set"]),
         fields=["name", "title", "category"],
-        order_by="published_on desc",
+        order_by=f"{WEIGHT_ORDER}, published_on desc",
         limit_page_length=TITLES_LIMIT,
     ):
         articles.setdefault(row.pop("category"), []).append(row)
@@ -368,7 +403,10 @@ def get_article(name: str) -> dict:
     2 not helpful. Doesn't count a view (see increment_views). Guests only when the
     knowledge base is public."""
     name = _get_article_name(name)
-    article = _get_viewable_article(name, [*PUBLIC_ARTICLE_FIELDS, "content"])
+    # the desk article page shows the pin and edits the weight
+    article = _get_viewable_article(
+        name, [*PUBLIC_ARTICLE_FIELDS, "content", "pinned", "weight"]
+    )
     article.author = _get_byline(article.author)
     article.title_slug = cleanup_page_name(article.title)
     # archived articles have no category
