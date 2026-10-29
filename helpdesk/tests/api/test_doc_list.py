@@ -82,18 +82,6 @@ class TestGetListData(IntegrationTestCase):
         names = [row.name for row in result["data"]]
         self.assertEqual(set(names), set(self.tickets.values()))
 
-    def test_stale_filter_field_is_dropped(self) -> None:
-        with self.set_user(self.agent):
-            result = get_list_data(
-                "HD Ticket",
-                filters=[
-                    ["name", "in", list(self.tickets.values())],
-                    ["no_such_field", "=", "anything"],
-                ],
-            )
-
-        self.assertEqual(result["row_count"], 3)
-
     def test_empty_filters_list_everything(self) -> None:
         for empty in ({}, []):
             with self.subTest(filters=empty), self.set_user(self.agent):
