@@ -67,8 +67,9 @@ export default function setup(context) {
   const focusCategory = computed(() => (homeCategories.value.length === 1 ? homeCategories.value[0] : null))
   const isLoneCategory = computed(() => Boolean(focusCategory.value))
 
-  // Pins swap Latest for Featured, which leads; a lone category has no tabs, so none.
+  // Pins swap Latest for Featured, which leads; a lone category has no tabs, so lists them above its own.
   const hasFeatured = computed(() => !focusCategory.value && Boolean(pinnedArticles.data?.length))
+  const hasLoneFeatured = computed(() => Boolean(focusCategory.value && pinnedArticles.data?.length))
   const sortOptions = computed(() =>
     hasFeatured.value
       ? [
@@ -122,5 +123,6 @@ export default function setup(context) {
     homeArticles,
     focusCategory,
     isLoneCategory,
+    hasLoneFeatured,
   }
 }
