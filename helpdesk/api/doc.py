@@ -3,7 +3,7 @@ import re
 import frappe
 from frappe import _
 from frappe.desk.form.assign_to import set_status
-from frappe.model import OPTIONAL_FIELDS, get_permitted_fields, no_value_fields
+from frappe.model import OPTIONAL_FIELDS, no_value_fields
 from frappe.model.document import get_controller
 from frappe.query_builder.functions import Date
 from pypika import Criterion
@@ -22,33 +22,25 @@ SLA_ROW_FIELDS = ["sla", "status", "first_responded_on", "resolution_date"]
 
 
 def drop_unknown_list_fields(
-    doctype: str, rows: list, filters: list, order_by: str
-) -> tuple[list, list, str]:
-    """Drop names the doctype no longer has from a caller-supplied list selection.
+    doctype: str, rows: list, order_by: str
+) -> tuple[list, str]:
+    """Drop names that no longer exist on the doctype from a saved view's selection.
 
-    Saved views store columns, rows, filters and order_by verbatim; after a field is
-    renamed or removed, any one of those names fails the whole `frappe.get_list`
-    call and the list will not load at all - which also removes the UI that could
-    fix the view. Keep the names that still resolve so the view loses one column
-    instead of the whole list.
+    Saved views store their columns and sort order verbatim; after a field is
+    renamed or removed, one stale name fails the whole `frappe.get_list` call and
+    the list will not load at all - which also removes the UI that could fix the
+    view. Check against the doctype's schema only, never the caller's permissions:
+    a field that exists but is not readable by this user is passed through so
+    Frappe's own field-level permission handling applies unchanged. Filters are
+    not touched: dropping a predicate would silently widen the result set.
     """
-    permitted = set(get_permitted_fields(doctype, ignore_virtual=True)) | set(
-        OPTIONAL_FIELDS
-    )
+    valid = set(frappe.get_meta(doctype).get_valid_columns()) | set(OPTIONAL_FIELDS)
 
-    def is_known(name: str) -> bool:
+    def exists(name: str) -> bool:
         # dotted "table.field" references are validated by the query layer itself
-        return name in permitted or "." in name
+        return name in valid or "." in name
 
-    rows = [row for row in rows if is_known(row)] or ["name"]
-
-    if isinstance(filters, list):
-        # a condition is [field, op, value] or [doctype, field, op, value]
-        filters = [
-            f
-            for f in filters
-            if not (isinstance(f, (list, tuple)) and len(f) >= 3) or is_known(f[-3])
-        ]
+    rows = [row for row in rows if exists(row)] or ["name"]
 
     order_keys = []
     for part in (order_by or "").split(","):
@@ -58,11 +50,11 @@ def drop_unknown_list_fields(
         # strip the direction keyword, then the backticked `tabDocType`. prefix
         expr = re.sub(r"\s+(asc|desc)$", "", part, flags=re.IGNORECASE).strip()
         field = expr.rsplit(".", 1)[-1].strip("`")
-        if field in permitted:
+        if field in valid:
             order_keys.append(part)
     order_by = ", ".join(order_keys) or "modified desc"
 
-    return rows, filters, order_by
+    return rows, order_by
 
 
 @frappe.whitelist()
@@ -166,7 +158,7 @@ def get_list_data(
         # the SLA columns can't tell fulfilled from due without these, and no saved view lists them
         for field in SLA_ROW_FIELDS:
             rows.append(field) if field not in rows else rows
-    rows, filters, order_by = drop_unknown_list_fields(doctype, rows, filters, order_by)
+    rows, order_by = drop_unknown_list_fields(doctype, rows, order_by)
 
     data = (
         frappe.get_list(
@@ -794,4 +786,4 @@ def remove_assignments(doctype: str, name: str, assignees: list[str]):
             todo=None,
             assign_to=assign_to,
             status="Cancelled",
-        )
+    )
