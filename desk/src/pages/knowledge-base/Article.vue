@@ -678,16 +678,27 @@ const articleActions = computed(() => [
           icon: "lucide-lock",
           onClick: () => (showAccessModal.value = true),
         },
-        {
-          label: article.data?.pinned
-            ? __("Unpin from home page")
-            : __("Pin to home page"),
-          icon: article.data?.pinned ? "lucide-pin-off" : "lucide-pin",
-          onClick: () =>
-            article.data.pinned
-              ? save({ pinned: 0 }, __("Article unpinned from the home page."))
-              : save({ pinned: 1 }, __("Article pinned to the home page.")),
-        },
+        // Customers never see Private articles; a pinned one can still be unpinned.
+        ...(article.data?.pinned || article.data?.visibility !== "Private"
+          ? [
+              {
+                label: article.data?.pinned
+                  ? __("Unpin from home page")
+                  : __("Pin to home page"),
+                icon: article.data?.pinned ? "lucide-pin-off" : "lucide-pin",
+                onClick: () =>
+                  article.data.pinned
+                    ? save(
+                        { pinned: 0 },
+                        __("Article unpinned from the home page.")
+                      )
+                    : save(
+                        { pinned: 1 },
+                        __("Article pinned to the home page.")
+                      ),
+              },
+            ]
+          : []),
       ]
     : []),
   {
