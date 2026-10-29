@@ -14,6 +14,7 @@ from helpdesk.test_utils import (
     create_contact,
     create_customer,
     create_user,
+    get_granted_rights,
     get_invitation,
     make_ticket,
     update_role_in_customer,
@@ -501,6 +502,13 @@ class TestHDCustomer(FrappeTestCase):
         # the invite only carries the manager role; the base role must still be synced
         self.assertIn("HD Customer", roles)
         self.assertIn("HD Customer Manager", roles)
+
+    def test_manager_role_covers_customer_permissions(self) -> None:
+        """A user with only the manager role can do everything a customer can."""
+        manager = get_granted_rights("HD Customer Manager")
+        # an unrestricted grant also covers the own-records-only one
+        manager |= {(*p[:3], 1) for p in manager}
+        self.assertFalse(get_granted_rights("HD Customer") - manager)
 
 
 def cleanup_customer_and_contact(customer_name: str, email: str) -> None:
