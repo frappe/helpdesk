@@ -15,6 +15,7 @@ from frappe.website.utils import cleanup_page_name, find_first_image
 
 from helpdesk.api.article import search_accessible_articles
 from helpdesk.helpdesk.doctype.hd_article.hd_article import (
+    PRIVATE,
     can_view_article,
     get_voter,
     make_article_filters,
@@ -210,6 +211,9 @@ def get_articles(
     if category:
         filters["category"] = category
         order_by = f"{WEIGHT_ORDER}, {order_by}"
+    if names is not None or sbool(pinned):
+        # Featured is for customers, so agents skip Private too; others keep their narrower filter.
+        filters.setdefault("visibility", ["!=", PRIVATE])
     if names is not None:
         names = _parse_guest_names(names, LIST_LIMIT)
         if not names:
