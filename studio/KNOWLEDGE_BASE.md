@@ -45,7 +45,7 @@ The `General` category is reserved. It cannot be renamed or deleted.
 
 `helpdesk/api/knowledge_base.py` has the KB endpoints.
 
-- **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_kb_sidebar`, `get_article`, `get_article_markdown`, `search_articles`.
+- **Reads** (guests allowed, `GET`): `get_categories`, `get_articles`, `get_featured_articles`, `get_kb_sidebar`, `get_article`, `get_article_markdown`, `search_articles`.
 - **Guest writes** (`POST`, rate limited): `vote_on_article`, `increment_views`. A guest voter is known by the `hd_visitor` cookie.
 - **Agent only**: `create_category`, `delete_articles`, `move_to_category`, `merge_category`, `get_category_visibility`, `set_category_visibility`, `get_general_category`.
 
@@ -74,7 +74,7 @@ The desk links to the portal copy of an article with `CUSTOMER_PORTAL_ROOT + ROU
 
 | Page | URL | Data |
 |---|---|---|
-| `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent, and `pinned` for featured articles) |
+| `public_kb` | `/help` | `get_categories`, `get_articles` (popular or recent), `get_featured_articles` |
 | `categories` | `/help/categories` | `get_categories` |
 | `category` | `/help/category/:category` | `get_articles` for one category |
 | `article` | `/help/articles/:name-slug` | `get_article`, `increment_views`, `vote_on_article`, `get_article_markdown` |
