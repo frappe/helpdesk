@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid gap-2 py-3.5 px-4 items-center"
+    class="grid gap-2 py-3.5 px-2 md:px-4 items-center"
     :style="{
       gridTemplateColumns: getGridTemplateColumnsForTable(props.columns),
     }"
@@ -32,7 +32,7 @@
       </div>
       <div v-else class="ms-2">
         <select
-          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-5 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
+          class="w-full h-7 text-base hover:bg-surface-gray-3 rounded-5 p-0 ps-2 pe-2 bg-transparent -ms-2 border-0 text-ink-gray-8 focus-visible:!ring-0 bg-none truncate"
           v-model="props.row[column.key]"
         >
           <option
@@ -56,7 +56,7 @@
     </div>
     <div
       v-if="hasBreak && !hasBreakColumn"
-      class="col-span-full -mt-1 text-ink-gray-5"
+      class="col-span-full -mt-1 ms-2 text-ink-gray-5"
     >
       {{ __("Break") }} {{ formatTime(props.row.break_start) }} –
       {{ formatTime(props.row.break_end) }}

@@ -31,7 +31,7 @@ export interface HDTicketStatus extends DocType {
   enabled: 0 | 1;
 }
 
-// Last updated: 2026-10-27 13:00:00.000000
+// Last updated: 2026-10-18 16:20:00.000000
 export interface HDTicket extends DocType {
   /** Subject: Data */
   subject: string;
