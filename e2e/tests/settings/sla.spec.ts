@@ -77,7 +77,15 @@ test("an SLA's targets, work days and holiday list are edited and saved", async 
   await workday.getByRole("button", { name: "Save" }).click();
   await expect(workday).toBeHidden();
   await expect(page.getByText("Break applied to 1 workday. Skipped Monday: outside working hours.")).toBeVisible();
-  await deleteFromMenu(page, tableRow(dialog, "Monday").getByRole("button"));
+  // Delete removes the row being edited, even after the Workday select names another day.
+  await rowMenu(page, tableRow(dialog, "Monday"), "Edit");
+  await workday.getByRole("combobox", { name: "Workday" }).click();
+  await page.getByRole("option", { name: "Tuesday" }).click();
+  await workday.getByRole("button", { name: "Delete" }).click();
+  await workday.getByRole("button", { name: "Confirm Delete" }).click();
+  await expect(workday).toBeHidden();
+  await expect(tableRow(dialog, "Monday")).toHaveCount(0);
+  await expect(tableRow(dialog, "Tuesday")).toHaveCount(1);
   await dialog.getByRole("button", { name: "Add row" }).last().click();
 
   await dialog.getByRole("button", { name: firstList, exact: true }).click();
