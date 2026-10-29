@@ -87,6 +87,9 @@
                     @click="isNameDirty ? save() : (editName = false)"
                   />
                 </div>
+                <span class="text-p-sm text-ink-gray-6 truncate">
+                  {{ user?.doc?.email }}
+                </span>
               </div>
             </div>
           </template>
