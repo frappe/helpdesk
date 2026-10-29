@@ -31,8 +31,7 @@ export default function setup(context) {
     (value) => {
       if (!value) return
       const names = preview.value?.pinned_articles
-      const params = names ? { names: JSON.stringify(names) } : { pinned: 1 }
-      pinnedArticles.fetch({ ...params, limit: ARTICLE_LIMIT })
+      pinnedArticles.fetch({ ...(names && { names: JSON.stringify(names) }), limit: ARTICLE_LIMIT })
     },
     { immediate: true },
   )
