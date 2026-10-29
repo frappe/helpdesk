@@ -101,8 +101,14 @@ import SettingsFormSkeleton from "./SettingsFormSkeleton.vue";
 import { type PinKind, useKnowledgeBaseDraft } from "./knowledgeBaseDraft";
 
 // Switches and the pin dialog save at once; the rest waits for Save.
-const { draft, settings, setToggle, savePins, categoryOptions, articleOptions } =
-  useKnowledgeBaseDraft();
+const {
+  draft,
+  settings,
+  setToggle,
+  savePins,
+  categoryOptions,
+  articleOptions,
+} = useKnowledgeBaseDraft();
 
 const emit = defineEmits<{ pinsSaved: [] }>();
 
