@@ -40,7 +40,10 @@
                 {{ index + 1 }}
               </span>
               <span class="min-w-0 flex-1 truncate">{{ row.title }}</span>
-              <span v-if="row.weight" class="shrink-0 text-p-sm text-ink-gray-5">
+              <span
+                v-if="row.weight"
+                class="shrink-0 text-p-sm text-ink-gray-5"
+              >
                 {{ __("Weight {0}", [row.weight]) }}
               </span>
             </li>
@@ -68,6 +71,7 @@ const emit = defineEmits<{ save: [weight: number] }>();
 
 const open = defineModel<boolean>({ required: true });
 const weight = ref<number | string>(0);
+const cleanWeight = computed(() => Math.max(0, Number(weight.value) || 0));
 
 const title = computed(() =>
   props.articles.length > 1
@@ -86,7 +90,6 @@ const siblings = createResource({
       visibility: ["!=", "Private"],
     },
     fields: ["name", "title", "weight", "published_on"],
-    order_by: "weight desc, published_on desc",
     limit_page_length: 0,
   }),
 });
@@ -105,9 +108,7 @@ const preview = computed(() =>
   (siblings.data || [])
     .map((row) => ({
       ...row,
-      weight: selected.value.has(row.name)
-        ? Math.max(0, Number(weight.value) || 0)
-        : row.weight,
+      weight: selected.value.has(row.name) ? cleanWeight.value : row.weight,
     }))
     .sort(
       (a, b) =>
@@ -118,6 +119,6 @@ const preview = computed(() =>
 
 function save() {
   open.value = false;
-  emit("save", Math.max(0, Number(weight.value) || 0));
+  emit("save", cleanWeight.value);
 }
 </script>
