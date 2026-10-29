@@ -64,8 +64,15 @@ const each = (values: Record<Key, unknown>, field: string) => async ({ api, name
 
 const subject = (key: Key) => (context: Context) => `${context.id} ${SUBJECTS[key]}`;
 const priorities = each({ a: "High", b: "Medium", c: "Low" }, "priority");
-const daysAgo = (days: number) =>
-  new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+// Site time zone, as the server resolves "Today"; UTC's date can differ. A fresh
+// site (CI) has none set, and the server then falls back to Asia/Kolkata.
+const openingDates = async (context: Context) => {
+  const { time_zone } = await context.api.get("System Settings", "System Settings");
+  const timeZone = time_zone || "Asia/Kolkata";
+  const daysAgo = (days: number) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone }).format(Date.now() - days * 86_400_000);
+  await each({ a: "2020-01-15", b: daysAgo(3), c: daysAgo(0) }, "opening_date")(context);
+};
 
 const cases: FilterCase[] = [
   { field: "Subject", enter: type(subject("b")), shown: ["b"], hidden: ["a", "c"] },
@@ -154,14 +161,14 @@ const cases: FilterCase[] = [
   },
   {
     field: "Opening Date",
-    setup: each({ a: "2020-01-15", b: daysAgo(3), c: daysAgo(0) }, "opening_date"),
+    setup: openingDates,
     enter: pick("Today"),
     shown: ["c"],
     hidden: ["a", "b"],
   },
   {
     field: "Opening Date",
-    setup: each({ a: "2020-01-15", b: daysAgo(3), c: daysAgo(0) }, "opening_date"),
+    setup: openingDates,
     enter: pick("Last 7 Days"),
     shown: ["b", "c"],
     hidden: ["a"],
