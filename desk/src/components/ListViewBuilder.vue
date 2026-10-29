@@ -161,7 +161,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { View, ViewType } from "@/types";
-import { formatTimeShort, getIcon } from "@/utils";
+import { getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { __ } from "@/translation";
@@ -561,8 +561,8 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "text-p-xs",
-      textContent: formatTimeShort(item),
+      class: "text-base",
+      textContent: dayjsLocal(item).fromNow(),
     });
   }
   if (column.type === "MultipleAvatar") {
